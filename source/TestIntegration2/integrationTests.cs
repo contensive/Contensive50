@@ -63,7 +63,7 @@ namespace integrationTests
             string activeScript = "function m\nm=cp.doc.getText(\"echo\")\nend function";
             string echoText = "text added to document";
             //
-            if (cs.Insert( Contensive.Core.constantsModule.cnAddons))
+            if (cs.Insert( Contensive.Core.constants.cnAddons))
             {
                 recordId = cs.GetInteger("id");
                 cs.SetField("name", addonName);
@@ -82,7 +82,7 @@ namespace integrationTests
             //
             Assert.AreEqual(htmlText + wysiwygText + echoText, cp.executeAddon(recordId.ToString()));
             //dispose
-            cp.Content.DeleteRecords(Contensive.Core.constantsModule.cnAddons, "id=" + recordId.ToString());
+            cp.Content.Delete(Contensive.Core.constants.cnAddons, "id=" + recordId.ToString());
             cp.Dispose();
         }
         //====================================================================================================
@@ -103,7 +103,7 @@ namespace integrationTests
             string activeScript = "function m\nm=cp.doc.getText(\"echo\")\nend function";
             string echoText = "text added to document";
             //
-            if (cs.Insert(Contensive.Core.constantsModule.cnAddons))
+            if (cs.Insert(Contensive.Core.constants.cnAddons))
             {
                 recordId = cs.GetInteger("id");
                 cs.SetField("name", addonName);
@@ -119,7 +119,7 @@ namespace integrationTests
             // assert
             Assert.AreEqual(htmlText + wysiwygText + echoText, cp.executeRoute(addonName));
             //dispose
-            cp.Content.DeleteRecords(Contensive.Core.constantsModule.cnAddons, "id=" + recordId.ToString());
+            cp.Content.Delete(Contensive.Core.constants.cnAddons, "id=" + recordId.ToString());
             cp.Dispose();
         }
     }
@@ -336,8 +336,8 @@ namespace integrationTests
             Assert.AreNotEqual(0, recordBId);
             Assert.AreNotEqual(recordAId, recordBId);
             // dispose
-            cp.Content.DeleteRecords("people", "id=" + recordAId);
-            cp.Content.DeleteRecords("people", "id=" + recordBId);
+            cp.Content.Delete("people", "id=" + recordAId);
+            cp.Content.Delete("people", "id=" + recordBId);
             cp.Dispose();
         }
         //====================================================================================================
@@ -360,7 +360,7 @@ namespace integrationTests
             }
             cs.Close();
             // act
-            cp.Content.DeleteRecords("people", "id=" + peopleId.ToString());
+            cp.Content.Delete("people", "id=" + peopleId.ToString());
             //
             if (cs.OpenSQL("select count(*) as cnt  from ccmembers"))
             {
@@ -392,7 +392,7 @@ namespace integrationTests
             // assert
             Assert.AreEqual(testCopy, cp.Content.GetCopy(copyName));
             // dispose
-            cp.Content.DeleteRecords("copy content", "id=" + recordId.ToString());
+            cp.Content.Delete("copy content", "id=" + recordId.ToString());
             cp.Dispose();
         }
         //====================================================================================================
@@ -412,7 +412,7 @@ namespace integrationTests
             // assert
             Assert.AreEqual(testCopy, cp.Content.GetCopy(copyName, testCopy));
             // dispose
-            cp.Content.DeleteRecords("copy content", "name=" + cp.Db.EncodeSQLText(copyName));
+            cp.Content.Delete("copy content", "name=" + cp.Db.EncodeSQLText(copyName));
             cp.Dispose();
         }
         //====================================================================================================
@@ -436,7 +436,7 @@ namespace integrationTests
             // assert
             Assert.AreEqual(testCopyB, cp.Content.GetCopy(copyName, "shouldNotNeedDefault"));
             // dispose
-            cp.Content.DeleteRecords("copy content", "name=" + cp.Db.EncodeSQLText(copyName));
+            cp.Content.Delete("copy content", "name=" + cp.Db.EncodeSQLText(copyName));
             cp.Dispose();
         }
         //====================================================================================================
@@ -534,10 +534,10 @@ namespace integrationTests
             // assert
             //
             Assert.AreNotEqual(0, cp.Content.AddContent(contentName1));
-            Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldTextName, constantsModule.FieldTypeIdText));
-            Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldBooleanName, constantsModule.FieldTypeIdBoolean));
-            Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldDateName, constantsModule.FieldTypeIdDate));
-            Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldIntegerName, constantsModule.FieldTypeIdInteger));
+            Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldTextName, constants.FieldTypeIdText));
+            Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldBooleanName, constants.FieldTypeIdBoolean));
+            Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldDateName, constants.FieldTypeIdDate));
+            Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldIntegerName, constants.FieldTypeIdInteger));
             //
             if (cs.Insert(contentName1))
             {
@@ -603,7 +603,7 @@ namespace integrationTests
             //
             // dispose
             //
-            cp.Content.DeleteRecords("people", "id=" + newuserId);
+            cp.Content.Delete("people", "id=" + newuserId);
             cp.Dispose();
         }
         //====================================================================================================
@@ -629,7 +629,7 @@ namespace integrationTests
             //
             // dispose
             //
-            cp.Content.DeleteRecords("people", "id=" + newuserId);
+            cp.Content.Delete("people", "id=" + newuserId);
             cp.Dispose();
         }
         //====================================================================================================
@@ -660,7 +660,7 @@ namespace integrationTests
             //
             // dispose
             //
-            cp.Content.DeleteRecords("people", "id=" + newuserId);
+            cp.Content.Delete("people", "id=" + newuserId);
             cp.Dispose();
         }
         //====================================================================================================
@@ -705,9 +705,9 @@ namespace integrationTests
             //
             // dispose
             //
-            cp.Content.DeleteRecords("groups", "name=" + cp.Db.EncodeSQLText(groupName));
-            cp.Content.DeleteRecords("people", "id=" + user1Id);
-            cp.Content.DeleteRecords("people", "id=" + user2Id);
+            cp.Content.Delete("groups", "name=" + cp.Db.EncodeSQLText(groupName));
+            cp.Content.Delete("people", "id=" + user1Id);
+            cp.Content.Delete("people", "id=" + user2Id);
             cp.Dispose();
         }
         //====================================================================================================
@@ -746,7 +746,7 @@ namespace integrationTests
             //
             // dispose
             //
-            cp.Content.DeleteRecords("people", "id=" + user1Id);
+            cp.Content.Delete("people", "id=" + user1Id);
             cp.Dispose();
         }
         //====================================================================================================
@@ -775,7 +775,7 @@ namespace integrationTests
             //
             // dispose
             //
-            cp.Content.DeleteRecords("people", "id=" + user1Id);
+            cp.Content.Delete("people", "id=" + user1Id);
             cp.Dispose();
         }
         //====================================================================================================
@@ -818,7 +818,7 @@ namespace integrationTests
             //
             // dispose
             //
-            cp.Content.DeleteRecords("people", "id=" + user1Id);
+            cp.Content.Delete("people", "id=" + user1Id);
             cp.Dispose();
         }
         //====================================================================================================

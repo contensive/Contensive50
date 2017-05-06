@@ -3,6 +3,8 @@ Option Explicit On
 Option Strict On
 
 Imports System.Xml
+Imports Contensive.Core.Controllers.genericController
+Imports Contensive.Core.Controllers
 
 Namespace Contensive.Core
     Public Class coreXmlToolsClass
@@ -179,7 +181,7 @@ Namespace Contensive.Core
                 SQL = "select id from cccontent where name=" & cpCore.db.encodeSQLText(iContentName)
                 RS = cpCore.db.executeSql(SQL)
                 If RS.Rows.Count > 0 Then
-                    ContentID = EncodeInteger(RS.Rows(0).Item("id"))
+                    ContentID = genericController.EncodeInteger(RS.Rows(0).Item("id"))
                 End If
             End If
             If iContentName <> "" And (ContentID = 0) Then
@@ -269,12 +271,12 @@ Namespace Contensive.Core
                     '
                     ' ----- <cdef>
                     '
-                    IsBaseContent = EncodeBoolean(dr("isBaseContent"))
+                    IsBaseContent = genericController.EncodeBoolean(dr("isBaseContent"))
                     iContentName = GetRSXMLAttribute(appName, dr, "Name")
-                    If vbInstr(1, iContentName, "data sources", vbTextCompare) = 1 Then
+                    If genericController.vbInstr(1, iContentName, "data sources", vbTextCompare) = 1 Then
                         iContentName = iContentName
                     End If
-                    ContentID = EncodeInteger(dr("ID"))
+                    ContentID = genericController.EncodeInteger(dr("ID"))
                     sb.Append(vbCrLf & vbTab & "<CDef")
                     sb.Append(" Name=""" & iContentName & """")
                     If (Not IsBaseContent) Or IncludeBaseFields Then
@@ -291,14 +293,14 @@ Namespace Contensive.Core
                         sb.Append(" AllowTopicRules=""" & GetRSXMLAttribute(appName, dr, "AllowTopicRules") & """")
                         sb.Append(" AllowWorkflowAuthoring=""" & GetRSXMLAttribute(appName, dr, "AllowWorkflowAuthoring") & """")
                         '
-                        AuthoringTableID = EncodeInteger(dr("AuthoringTableID"))
+                        AuthoringTableID = genericController.EncodeInteger(dr("AuthoringTableID"))
                         TableName = ""
                         DataSourceName = ""
                         If AuthoringTableID <> 0 Then
                             For Ptr = 0 To TableCnt - 1
-                                If EncodeInteger(Tables(0, Ptr)) = AuthoringTableID Then
-                                    TableName = EncodeText(Tables(1, Ptr))
-                                    DataSourceName = EncodeText(Tables(2, Ptr))
+                                If genericController.EncodeInteger(Tables(0, Ptr)) = AuthoringTableID Then
+                                    TableName = genericController.encodeText(Tables(1, Ptr))
+                                    DataSourceName = genericController.encodeText(Tables(2, Ptr))
                                     Exit For
                                 End If
                             Next
@@ -306,21 +308,21 @@ Namespace Contensive.Core
                         If DataSourceName = "" Then
                             DataSourceName = "Default"
                         End If
-                        If vbUCase(TableName) = "CCMENUENTRIES" Then
+                        If genericController.vbUCase(TableName) = "CCMENUENTRIES" Then
                             FoundMenuTable = True
                         End If
                         sb.Append(" AuthoringDataSourceName=""" & EncodeXMLattribute(DataSourceName) & """")
                         sb.Append(" AuthoringTableName=""" & EncodeXMLattribute(TableName) & """")
                         '
-                        ContentTableID = EncodeInteger(dr("ContentTableID"))
+                        ContentTableID = genericController.EncodeInteger(dr("ContentTableID"))
                         If ContentTableID <> AuthoringTableID Then
                             If ContentTableID <> 0 Then
                                 TableName = ""
                                 DataSourceName = ""
                                 For Ptr = 0 To TableCnt - 1
-                                    If EncodeInteger(Tables(0, Ptr)) = ContentTableID Then
-                                        TableName = EncodeText(Tables(1, Ptr))
-                                        DataSourceName = EncodeText(Tables(2, Ptr))
+                                    If genericController.EncodeInteger(Tables(0, Ptr)) = ContentTableID Then
+                                        TableName = genericController.encodeText(Tables(1, Ptr))
+                                        DataSourceName = genericController.encodeText(Tables(2, Ptr))
                                         Exit For
                                     End If
                                 Next
@@ -332,18 +334,18 @@ Namespace Contensive.Core
                         sb.Append(" ContentDataSourceName=""" & EncodeXMLattribute(DataSourceName) & """")
                         sb.Append(" ContentTableName=""" & EncodeXMLattribute(TableName) & """")
                         '
-                        DefaultSortMethodID = EncodeInteger(dr("DefaultSortMethodID"))
+                        DefaultSortMethodID = genericController.EncodeInteger(dr("DefaultSortMethodID"))
                         DefaultSortMethod = CacheLookup(DefaultSortMethodID, Sorts)
                         sb.Append(" DefaultSortMethod=""" & EncodeXMLattribute(DefaultSortMethod) & """")
                         '
                         sb.Append(" DeveloperOnly=""" & GetRSXMLAttribute(appName, dr, "DeveloperOnly") & """")
                         sb.Append(" DropDownFieldList=""" & GetRSXMLAttribute(appName, dr, "DropDownFieldList") & """")
                         '
-                        EditorGroupID = EncodeInteger(dr("EditorGroupID"))
+                        EditorGroupID = genericController.EncodeInteger(dr("EditorGroupID"))
                         EditorGroupName = CacheLookup(EditorGroupID, Groups)
                         sb.Append(" EditorGroupName=""" & EncodeXMLattribute(EditorGroupName) & """")
                         '
-                        ParentID = EncodeInteger(dr("ParentID"))
+                        ParentID = genericController.EncodeInteger(dr("ParentID"))
                         ParentName = CacheLookup(ParentID, Contents)
                         sb.Append(" Parent=""" & EncodeXMLattribute(ParentName) & """")
                         '
@@ -375,9 +377,9 @@ Namespace Contensive.Core
                     fieldId = 0
                     Do While (CFieldPtr < CFieldCnt)
                         LastFieldID = fieldId
-                        fieldId = EncodeInteger(CFields(f_ID, CFieldPtr))
-                        FieldName = EncodeText(CFields(f_Name, CFieldPtr))
-                        FieldContentID = EncodeInteger(CFields(f_contentid, CFieldPtr))
+                        fieldId = genericController.EncodeInteger(CFields(f_ID, CFieldPtr))
+                        FieldName = genericController.encodeText(CFields(f_Name, CFieldPtr))
+                        FieldContentID = genericController.EncodeInteger(CFields(f_contentid, CFieldPtr))
                         If FieldContentID > ContentID Then
                             Exit Do
                         ElseIf (FieldContentID = ContentID) And (fieldId <> LastFieldID) Then
@@ -419,19 +421,19 @@ Namespace Contensive.Core
                                     sb.Append(" IsBaseField=""" & xaB(CFields(f_IsBaseField, CFieldPtr)) & """")
                                 End If
                                 '
-                                RecordID = EncodeInteger(CFields(f_LookupContentID, CFieldPtr))
+                                RecordID = genericController.EncodeInteger(CFields(f_LookupContentID, CFieldPtr))
                                 RecordName = CacheLookup(RecordID, Contents)
                                 sb.Append(" LookupContent=""" & cpCore.html.html_EncodeHTML(RecordName) & """")
                                 '
-                                RecordID = EncodeInteger(CFields(f_RedirectContentID, CFieldPtr))
+                                RecordID = genericController.EncodeInteger(CFields(f_RedirectContentID, CFieldPtr))
                                 RecordName = CacheLookup(RecordID, Contents)
                                 sb.Append(" RedirectContent=""" & cpCore.html.html_EncodeHTML(RecordName) & """")
                                 '
-                                RecordID = EncodeInteger(CFields(f_ManyToManyContentID, CFieldPtr))
+                                RecordID = genericController.EncodeInteger(CFields(f_ManyToManyContentID, CFieldPtr))
                                 RecordName = CacheLookup(RecordID, Contents)
                                 sb.Append(" ManyToManyContent=""" & cpCore.html.html_EncodeHTML(RecordName) & """")
                                 '
-                                RecordID = EncodeInteger(CFields(f_ManyToManyRuleContentID, CFieldPtr))
+                                RecordID = genericController.EncodeInteger(CFields(f_ManyToManyRuleContentID, CFieldPtr))
                                 RecordName = CacheLookup(RecordID, Contents)
                                 sb.Append(" ManyToManyRuleContent=""" & cpCore.html.html_EncodeHTML(RecordName) & """")
                                 '
@@ -590,9 +592,9 @@ ErrorTrap:
             'If Not (Node.Attributes Is Nothing) Then
             '    REsultNode = Node.Attributes.getNamedItem(Name)
             '    If (REsultNode Is Nothing) Then
-            UcaseName = vbUCase(Name)
+            UcaseName = genericController.vbUCase(Name)
             For Each NodeAttribute In Node.Attributes
-                If vbUCase(NodeAttribute.Name) = UcaseName Then
+                If genericController.vbUCase(NodeAttribute.Name) = UcaseName Then
                     GetXMLAttribute = NodeAttribute.Value
                     Found = True
                     Exit For
@@ -628,7 +630,7 @@ ErrorTrap:
         '========================================================================
         '
         Private Function GetXMLAttributeBoolean(ByVal Found As Boolean, ByVal Node As XmlNode, ByVal Name As String, ByVal DefaultIfNotFound As Boolean) As Boolean
-            GetXMLAttributeBoolean = EncodeBoolean(GetXMLAttribute(Found, Node, Name, CStr(DefaultIfNotFound)))
+            GetXMLAttributeBoolean = genericController.EncodeBoolean(GetXMLAttribute(Found, Node, Name, CStr(DefaultIfNotFound)))
         End Function
         '
         '========================================================================
@@ -636,7 +638,7 @@ ErrorTrap:
         '========================================================================
         '
         Private Function GetXMLAttributeInteger(ByVal Found As Boolean, ByVal Node As XmlNode, ByVal Name As String, ByVal DefaultIfNotFound As Integer) As Integer
-            GetXMLAttributeInteger = EncodeInteger(GetXMLAttribute(Found, Node, Name, CStr(DefaultIfNotFound)))
+            GetXMLAttributeInteger = genericController.EncodeInteger(GetXMLAttribute(Found, Node, Name, CStr(DefaultIfNotFound)))
         End Function
         ''
         ''========================================================================
@@ -652,7 +654,7 @@ ErrorTrap:
         '    MethodName = "XMLClass.GetXMLAttribute"
         '    '
         '    For Each NodeAttribute In NodeName.Attributes
-        '        If vbUCase(NodeAttribute.Name) = vbUCase(Name) Then
+        '        If genericController.vbUCase(NodeAttribute.Name) = genericController.vbUCase(Name) Then
         '            GetXMLAttribute = NodeAttribute.nodeValue
         '            End If
         '        Next
@@ -851,11 +853,11 @@ ErrorTrap:
                 NavIconType = 0
                 NavIconTitle = ""
                 For Each rsDr As DataRow In dt.Rows
-                    RecordName = EncodeText(rsDr("Name"))
+                    RecordName = genericController.encodeText(rsDr("Name"))
                     If RecordName = "Advanced" Then
                         RecordName = RecordName
                     End If
-                    ParentID = EncodeInteger(rsDr("ParentID"))
+                    ParentID = genericController.EncodeInteger(rsDr("ParentID"))
                     menuNameSpace = getMenuNameSpace(ParentID, "")
                     Call sb.Append("<NavigatorEntry Name=""" & EncodeXMLattribute(RecordName) & """")
                     Call sb.Append(" NameSpace=""" & menuNameSpace & """")
@@ -867,7 +869,7 @@ ErrorTrap:
                     Call sb.Append(" Active=""" & GetRSXMLAttribute(appName, rsDr, "Active") & """")
                     Call sb.Append(" AddonName=""" & GetRSXMLLookupAttribute(appName, rsDr, "AddonID", "ccAggregateFunctions") & """")
                     Call sb.Append(" SortOrder=""" & GetRSXMLAttribute(appName, rsDr, "SortOrder") & """")
-                    NavIconType = EncodeInteger(GetRSXMLAttribute(appName, rsDr, "NavIconType"))
+                    NavIconType = genericController.EncodeInteger(GetRSXMLAttribute(appName, rsDr, "NavIconType"))
                     NavIconTitle = GetRSXMLAttribute(appName, rsDr, "NavIconTitle")
                     Call sb.Append(" NavIconTitle=""" & NavIconTitle & """")
                     SplitArray = Split(NavIconTypeList & ",help", ",")
@@ -925,7 +927,7 @@ ErrorTrap:
             If (isDataTableOk(rs)) Then
                 If True Then
                     For Each dr As DataRow In rs.Rows
-                        RecordName = EncodeText(dr("Name"))
+                        RecordName = genericController.encodeText(dr("Name"))
                         Call sb.Append("<MenuEntry Name=""" & EncodeXMLattribute(RecordName) & """")
                         Call sb.Append(" ParentName=""" & GetRSXMLLookupAttribute(appName, dr, "ParentID", "ccMenuEntries") & """")
                         Call sb.Append(" LinkPage=""" & GetRSXMLAttribute(appName, dr, "LinkPage") & """")
@@ -992,9 +994,9 @@ ErrorTrap:
         '
         Private Function EncodeXMLattribute(ByVal Source As String) As String
             EncodeXMLattribute = cpCore.html.html_EncodeHTML(Source)
-            EncodeXMLattribute = vbReplace(EncodeXMLattribute, vbCrLf, " ")
-            EncodeXMLattribute = vbReplace(EncodeXMLattribute, vbCr, "")
-            EncodeXMLattribute = vbReplace(EncodeXMLattribute, vbLf, "")
+            EncodeXMLattribute = genericController.vbReplace(EncodeXMLattribute, vbCrLf, " ")
+            EncodeXMLattribute = genericController.vbReplace(EncodeXMLattribute, vbCr, "")
+            EncodeXMLattribute = genericController.vbReplace(EncodeXMLattribute, vbLf, "")
         End Function
         '
         '
@@ -1027,7 +1029,7 @@ ErrorTrap:
         Private Function GetRSXMLAttribute(ByVal appName As String, ByVal dr As DataRow, ByVal FieldName As String) As String
             On Error GoTo ErrorTrap
             '
-            GetRSXMLAttribute = EncodeXMLattribute(EncodeText(dr(FieldName)))
+            GetRSXMLAttribute = EncodeXMLattribute(genericController.encodeText(dr(FieldName)))
             '
             Exit Function
             '
@@ -1042,7 +1044,7 @@ ErrorTrap:
         Private Function GetRSXMLLookupAttribute(ByVal appName As String, ByVal dr As DataRow, ByVal FieldName As String, ByVal TableName As String) As String
             On Error GoTo ErrorTrap
             '
-            GetRSXMLLookupAttribute = EncodeXMLattribute(GetTableRecordName(TableName, EncodeInteger(dr(FieldName))))
+            GetRSXMLLookupAttribute = EncodeXMLattribute(GetTableRecordName(TableName, genericController.EncodeInteger(dr(FieldName))))
             '
             Exit Function
             '
@@ -1065,7 +1067,7 @@ ErrorTrap:
             '
             appName = cpCore.serverconfig.appConfig.name
             If RecordID <> 0 Then
-                If vbInstr(1, "," & UsedIDString & ",", "," & RecordID & ",", vbTextCompare) <> 0 Then
+                If genericController.vbInstr(1, "," & UsedIDString & ",", "," & RecordID & ",", vbTextCompare) <> 0 Then
                     Call HandleClassErrorAndResume(appName, "getMenuNameSpace", "Circular reference found in UsedIDString [" & UsedIDString & "] getting ccMenuEntries namespace for recordid [" & RecordID & "]")
                     getMenuNameSpace = ""
                 Else
@@ -1074,8 +1076,8 @@ ErrorTrap:
                     If RecordID <> 0 Then
                         rs = cpCore.db.executeSql("select Name,ParentID from ccMenuEntries where ID=" & RecordID)
                         If (isDataTableOk(rs)) Then
-                            ParentID = EncodeInteger(rs.Rows(0).Item("ParentID"))
-                            RecordName = EncodeText(rs.Rows(0).Item("Name"))
+                            ParentID = genericController.EncodeInteger(rs.Rows(0).Item("ParentID"))
+                            RecordName = genericController.encodeText(rs.Rows(0).Item("Name"))
                         End If
                         If (isDataTableOk(rs)) Then
                             If False Then
@@ -1124,8 +1126,8 @@ ErrorTrap:
             CacheLookup = ""
             If RecordID <> 0 Then
                 For Ptr = 0 To UBound(Cache, 2)
-                    If EncodeInteger(Cache(0, Ptr)) = RecordID Then
-                        CacheLookup = EncodeText(Cache(1, Ptr))
+                    If genericController.EncodeInteger(Cache(0, Ptr)) = RecordID Then
+                        CacheLookup = genericController.encodeText(Cache(1, Ptr))
                         Exit For
                     End If
                 Next
@@ -1135,13 +1137,13 @@ ErrorTrap:
         '
         '
         Private Function xaT(ByVal Source As Object) As String
-            xaT = EncodeXMLattribute(EncodeText(Source))
+            xaT = EncodeXMLattribute(genericController.encodeText(Source))
         End Function
         '
         '
         '
         Private Function xaB(ByVal Source As Object) As String
-            xaB = CStr(EncodeBoolean(EncodeText(Source)))
+            xaB = CStr(genericController.EncodeBoolean(genericController.encodeText(Source)))
         End Function
         '
         '===========================================================================

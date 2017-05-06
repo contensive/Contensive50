@@ -580,7 +580,7 @@
 //        //    '   if float, rounds to integer
 //        //    '==========================================================================
 //        //    '
-//        //    Public Function encodeInteger(ExpressionVariant As Object) As Integer
+//        //    Public Function genericController.EncodeInteger(ExpressionVariant As Object) As Integer
 //        //        ' 7/14/2009 - cover the overflow case, return 0
 //        //        On Error Resume Next
 //        //        '
@@ -588,7 +588,7 @@
 //        //            If Not IsMissing(ExpressionVariant) Then
 //        //                If Not IsNull(ExpressionVariant) Then
 //        //                    If ExpressionVariant <> "" Then
-//        //                        If vbIsNumeric(ExpressionVariant) Then
+//        //                        If genericController.vbIsNumeric(ExpressionVariant) Then
 //        //                            encodeInteger = CLng(ExpressionVariant)
 //        //                        End If
 //        //                    End If
@@ -617,7 +617,7 @@
 //        //        If Not IsMissing(ExpressionVariant) Then
 //        //            If Not IsNull(ExpressionVariant) Then
 //        //                If ExpressionVariant <> "" Then
-//        //                    If vbIsNumeric(ExpressionVariant) Then
+//        //                    If genericController.vbIsNumeric(ExpressionVariant) Then
 //        //                        encodeNumber = ExpressionVariant
 //        //                    End If
 //        //                End If
@@ -638,7 +638,7 @@
 //        //    '   returns 0 if the input is not a number
 //        //    '==========================================================================
 //        //    '
-//        //    Public Function encodeDate(ExpressionVariant As Object) As Date
+//        //    Public Function  genericController.EncodeDate(ExpressionVariant As Object) As Date
 //        //        On Error GoTo ErrorTrap
 //        //        '
 //        //        '    encodeDate = CDate(ExpressionVariant)
@@ -668,24 +668,24 @@
 //        //    '   Returns true if input is not false, else false
 //        //    '==========================================================================
 //        //    '
-//        //    Public Function encodeBoolean(ExpressionVariant As Object) As Boolean
+//        //    Public Function genericController.EncodeBoolean(ExpressionVariant As Object) As Boolean
 //        //        On Error GoTo ErrorTrap
 //        //        '
 //        //        'encodeBoolean = False
 //        //        If Not IsMissing(ExpressionVariant) Then
 //        //            If Not IsNull(ExpressionVariant) Then
 //        //                If ExpressionVariant <> "" Then
-//        //                    If vbIsNumeric(ExpressionVariant) Then
+//        //                    If genericController.vbIsNumeric(ExpressionVariant) Then
 //        //                        If ExpressionVariant <> "0" Then
 //        //                            If ExpressionVariant <> 0 Then
 //        //                                encodeBoolean = True
 //        //                            End If
 //        //                        End If
-//        //                    ElseIf vbUCase(ExpressionVariant) = "ON" Then
+//        //                    ElseIf genericController.vbUCase(ExpressionVariant) = "ON" Then
 //        //                        encodeBoolean = True
-//        //                    ElseIf vbUCase(ExpressionVariant) = "YES" Then
+//        //                    ElseIf genericController.vbUCase(ExpressionVariant) = "YES" Then
 //        //                        encodeBoolean = True
-//        //                    ElseIf vbUCase(ExpressionVariant) = "TRUE" Then
+//        //                    ElseIf genericController.vbUCase(ExpressionVariant) = "TRUE" Then
 //        //                        encodeBoolean = True
 //        //                    Else
 //        //                        encodeBoolean = False
@@ -711,7 +711,7 @@
 //        //        On Error GoTo ErrorTrap
 //        //        '
 //        //        'encodeBit = 0
-//        //        If encodeBoolean(ExpressionVariant) Then
+//        //        If genericController.EncodeBoolean(ExpressionVariant) Then
 //        //            encodeBit = 1
 //        //        End If
 //        //        '
@@ -729,7 +729,7 @@
 //        //    '   returns emptystring if the input is not a string
 //        //    '==========================================================================
 //        //    '
-//        //    Public Function encodeText(ExpressionVariant As Object) As String
+//        //    Public Function genericController.encodeText(ExpressionVariant As Object) As String
 //        //        On Error GoTo ErrorTrap
 //        //        '
 //        //        'encodeText = ""
@@ -785,14 +785,14 @@
 //        //
 //        public static int encodeEmptyInteger(string sourceText, int DefaultInteger)
 //        {
-//            return EncodeInteger(encodeEmptyText(sourceText, DefaultInteger.ToString));
+//            return genericController.EncodeInteger(encodeEmptyText(sourceText, DefaultInteger.ToString));
 //        }
 //        //
 //        //
 //        //
 //        public static System.DateTime encodeEmptyDate(string sourceText, System.DateTime DefaultDate)
 //        {
-//            return EncodeDate(encodeEmptyText(sourceText, DefaultDate.ToString));
+//            return  genericController.EncodeDate(encodeEmptyText(sourceText, DefaultDate.ToString));
 //        }
 //        //
 //        //
@@ -806,7 +806,7 @@
 //        //
 //        public static bool encodeEmptyBoolean(string sourceText, bool DefaultState)
 //        {
-//            return EncodeBoolean(encodeEmptyText(sourceText, DefaultState.ToString));
+//            return genericController.EncodeBoolean(encodeEmptyText(sourceText, DefaultState.ToString));
 //        }
 //        //    '
 //        //    '================================================================================================================
@@ -824,8 +824,8 @@
 //        //        ' Get Protocol (before the first :)
 //        //        '
 //        //        WorkingURL = SourceURL
-//        //        Position = vbInstr(1, WorkingURL, ":")
-//        //        'Position = vbInstr(1, WorkingURL, "://")
+//        //        Position = genericController.vbInstr(1, WorkingURL, ":")
+//        //        'Position = genericController.vbInstr(1, WorkingURL, "://")
 //        //        If Position <> 0 Then
 //        //            Protocol = Mid(WorkingURL, 1, Position + 2)
 //        //            WorkingURL = Mid(WorkingURL, Position + 3)
@@ -833,7 +833,7 @@
 //        //        '
 //        //        ' compatibility fix
 //        //        '
-//        //        If vbInstr(1, WorkingURL, "//") = 1 Then
+//        //        If genericController.vbInstr(1, WorkingURL, "//") = 1 Then
 //        //            If Protocol = "" Then
 //        //                Protocol = "http:"
 //        //            End If
@@ -843,7 +843,7 @@
 //        //        '
 //        //        ' Get QueryString
 //        //        '
-//        //        Position = vbInstr(1, WorkingURL, "?")
+//        //        Position = genericController.vbInstr(1, WorkingURL, "?")
 //        //        If Position > 0 Then
 //        //            QueryString = Mid(WorkingURL, Position)
 //        //            WorkingURL = Mid(WorkingURL, 1, Position - 1)
@@ -852,7 +852,7 @@
 //        //        ' separate host from pathpage
 //        //        '
 //        //        'iURLHost = WorkingURL
-//        //        Position = vbInstr(WorkingURL, "/")
+//        //        Position = genericController.vbInstr(WorkingURL, "/")
 //        //        If (Position = 0) And (Protocol = "") Then
 //        //            '
 //        //            ' Page without path or host
@@ -915,7 +915,7 @@
 //        //        Dim Position As Integer
 //        //        '
 //        //        iURLWorking = SourceURL
-//        //        Position = vbInstr(1, iURLWorking, "://")
+//        //        Position = genericController.vbInstr(1, iURLWorking, "://")
 //        //        If Position <> 0 Then
 //        //            iURLProtocol = Mid(iURLWorking, 1, Position + 2)
 //        //            iURLWorking = Mid(iURLWorking, Position + 3)
@@ -924,7 +924,7 @@
 //        //        ' separate Host:Port from pathpage
 //        //        '
 //        //        iURLHost = iURLWorking
-//        //        Position = vbInstr(iURLHost, "/")
+//        //        Position = genericController.vbInstr(iURLHost, "/")
 //        //        If Position = 0 Then
 //        //            '
 //        //            ' just host, no path or page
@@ -952,12 +952,12 @@
 //        //        '
 //        //        ' Divide Host from Port
 //        //        '
-//        //        Position = vbInstr(iURLHost, ":")
+//        //        Position = genericController.vbInstr(iURLHost, ":")
 //        //        If Position = 0 Then
 //        //            '
 //        //            ' host not given, take a guess
 //        //            '
-//        //            Select Case vbUCase(iURLProtocol)
+//        //            Select Case genericController.vbUCase(iURLProtocol)
 //        //                Case "FTP://"
 //        //                    iURLPort = "21"
 //        //                Case "HTTP://", "HTTPS://"
@@ -969,7 +969,7 @@
 //        //            iURLPort = Mid(iURLHost, Position + 1)
 //        //            iURLHost = Mid(iURLHost, 1, Position - 1)
 //        //        End If
-//        //        Position = vbInstr(1, iURLPage, "?")
+//        //        Position = genericController.vbInstr(1, iURLPage, "?")
 //        //        If Position > 0 Then
 //        //            iURLQueryString = Mid(iURLPage, Position)
 //        //            iURLPage = Mid(iURLPage, 1, Position - 1)
@@ -1053,7 +1053,7 @@
 //        //            '
 //        //            ' If not explicit
 //        //            '
-//        //            If vbInstr(1, ArgumentString, vbCrLf) <> 0 Then
+//        //            If genericController.vbInstr(1, ArgumentString, vbCrLf) <> 0 Then
 //        //                '
 //        //                ' crlf can only be here if it is the delimiter
 //        //                '
@@ -1070,7 +1070,7 @@
 //        //        getSimpleNameValue = iDefaultValue
 //        //        If WorkingString <> "" Then
 //        //            WorkingString = Delimiter & WorkingString & Delimiter
-//        //            ValueStart = vbInstr(1, WorkingString, Delimiter & Name & "=", vbTextCompare)
+//        //            ValueStart = genericController.vbInstr(1, WorkingString, Delimiter & Name & "=", vbTextCompare)
 //        //            If ValueStart <> 0 Then
 //        //                NameLength = Len(Name)
 //        //                ValueStart = ValueStart + Len(Delimiter) + NameLength + 1
@@ -1079,9 +1079,9 @@
 //        //                    ValueStart = ValueStart + 1
 //        //                End If
 //        //                If IsQuoted Then
-//        //                    ValueEnd = vbInstr(ValueStart, WorkingString, """" & Delimiter)
+//        //                    ValueEnd = genericController.vbInstr(ValueStart, WorkingString, """" & Delimiter)
 //        //                Else
-//        //                    ValueEnd = vbInstr(ValueStart, WorkingString, Delimiter)
+//        //                    ValueEnd = genericController.vbInstr(ValueStart, WorkingString, Delimiter)
 //        //                End If
 //        //                If ValueEnd = 0 Then
 //        //                    getSimpleNameValue = Mid(WorkingString, ValueStart)
@@ -1121,14 +1121,14 @@
 //        //        '
 //        //        ' remove the manual select list syntax "answer[choice1|choice2]"
 //        //        '
-//        //        Pos = vbInstr(1, GetAggrOption_old, "[")
+//        //        Pos = genericController.vbInstr(1, GetAggrOption_old, "[")
 //        //        If Pos <> 0 Then
 //        //            GetAggrOption_old = Left(GetAggrOption_old, Pos - 1)
 //        //        End If
 //        //        '
 //        //        ' remove any function syntax "answer{selectcontentname RSS Feeds}"
 //        //        '
-//        //        Pos = vbInstr(1, GetAggrOption_old, "{")
+//        //        Pos = genericController.vbInstr(1, GetAggrOption_old, "{")
 //        //        If Pos <> 0 Then
 //        //            GetAggrOption_old = Left(GetAggrOption_old, Pos - 1)
 //        //        End If
@@ -1170,8 +1170,8 @@
 //        //            ' ??? this should not be here -- to correct a field used in a CDef, truncate in SaveCS by fieldtype
 //        //            'encodeSQLText = Left(ExpressionVariant, 255)
 //        //            'remove-can not find a case where | is not allowed to be saved.
-//        //            'encodeSQLText = vbReplace(encodeSQLText, "|", "_")
-//        //            encodeSQLText = "'" & vbReplace(encodeSQLText, "'", "''") & "'"
+//        //            'encodeSQLText = genericController.vbReplace(encodeSQLText, "|", "_")
+//        //            encodeSQLText = "'" & genericController.vbReplace(encodeSQLText, "'", "''") & "'"
 //        //        End If
 //        //        Exit Function
 //        //        '
@@ -1199,8 +1199,8 @@
 //        //            encodeSQLLongText = "null"
 //        //        Else
 //        //            encodeSQLLongText = ExpressionVariant
-//        //            'encodeSQLLongText = vbReplace(ExpressionVariant, "|", "_")
-//        //            encodeSQLLongText = "'" & vbReplace(encodeSQLLongText, "'", "''") & "'"
+//        //            'encodeSQLLongText = genericController.vbReplace(ExpressionVariant, "|", "_")
+//        //            encodeSQLLongText = "'" & genericController.vbReplace(encodeSQLLongText, "'", "''") & "'"
 //        //        End If
 //        //        Exit Function
 //        //        '
@@ -1280,7 +1280,7 @@
 //        //            encodeSQLNumber = "null"
 //        //        ElseIf ExpressionVariant = "" Then
 //        //            encodeSQLNumber = "null"
-//        //        ElseIf vbIsNumeric(ExpressionVariant) Then
+//        //        ElseIf genericController.vbIsNumeric(ExpressionVariant) Then
 //        //            Select Case VarType(ExpressionVariant)
 //        //                Case vbBoolean
 //        //                    If ExpressionVariant Then
@@ -1311,7 +1311,7 @@
 //        //        Dim src As String
 //        //        '
 //        //        encodeSQLBoolean = SQLFalse
-//        //        If encodeBoolean(ExpressionVariant) Then
+//        //        If genericController.EncodeBoolean(ExpressionVariant) Then
 //        //            encodeSQLBoolean = SQLTrue
 //        //        End If
 //        //        '    If Not IsNull(ExpressionVariant) Then
@@ -1335,8 +1335,8 @@
 //        //        Dim NextLF As Integer
 //        //        Dim BOL As Integer
 //        //        '
-//        //        NextCR = vbInstr(1, Body, vbCr)
-//        //        NextLF = vbInstr(1, Body, vbLf)
+//        //        NextCR = genericController.vbInstr(1, Body, vbCr)
+//        //        NextLF = genericController.vbInstr(1, Body, vbLf)
 
 //        //        If NextCR <> 0 Or NextLF <> 0 Then
 //        //            If NextCR <> 0 Then
@@ -1368,7 +1368,7 @@
 //        //            Body = ""
 //        //        End If
 
-//        //        'EOL = vbInstr(1, Body, vbCrLf)
+//        //        'EOL = genericController.vbInstr(1, Body, vbCrLf)
 
 //        //        'If EOL <> 0 Then
 //        //        '    getLine = Mid(Body, 1, EOL - 1)
@@ -1381,7 +1381,7 @@
 //        //    '   Get a Random Long Value
 //        //    '=================================================================================
 //        //    '
-//        //    Public Function GetRandomInteger() As Integer
+//        //    Public Function genericController.GetRandomInteger() As Integer
 //        //        '
 //        //        Dim RandomBase As Integer
 //        //        Dim RandomLimit As Integer
@@ -1428,7 +1428,7 @@
 //        //   If the QueryName is not found in the string, ignore call
 //        //=============================================================================
 //        //
-//        public static string ModifyQueryString(string WorkingQuery, string QueryName, string QueryValue, bool AddIfMissing = true)
+//        public static string genericController.ModifyQueryString(string WorkingQuery, string QueryName, string QueryValue, bool AddIfMissing = true)
 //        {
 //            string functionReturnValue = null;
 //            //
@@ -1442,14 +1442,14 @@
 //            return functionReturnValue;
 //        }
 //        //
-//        public static string ModifyQueryString(string WorkingQuery, string QueryName, int QueryValue, bool AddIfMissing = true)
+//        public static string genericController.ModifyQueryString(string WorkingQuery, string QueryName, int QueryValue, bool AddIfMissing = true)
 //        {
-//            return ModifyQueryString(WorkingQuery, QueryName, QueryValue.ToString, AddIfMissing);
+//            return genericController.ModifyQueryString(WorkingQuery, QueryName, QueryValue.ToString, AddIfMissing);
 //        }
 //        //
-//        public static string ModifyQueryString(string WorkingQuery, string QueryName, bool QueryValue, bool AddIfMissing = true)
+//        public static string genericController.ModifyQueryString(string WorkingQuery, string QueryName, bool QueryValue, bool AddIfMissing = true)
 //        {
-//            return ModifyQueryString(WorkingQuery, QueryName, QueryValue.ToString, AddIfMissing);
+//            return genericController.ModifyQueryString(WorkingQuery, QueryName, QueryValue.ToString, AddIfMissing);
 //        }
 //        //
 //        //=============================================================================
@@ -1478,16 +1478,16 @@
 //                string QueryString = null;
 //                //
 //                iAddIfMissing = AddIfMissing;
-//                if (vbInstr(1, Link, "?") != 0)
+//                if (genericController.vbInstr(1, Link, "?") != 0)
 //                {
-//                    functionReturnValue = Strings.Mid(Link, 1, vbInstr(1, Link, "?") - 1);
+//                    functionReturnValue = Strings.Mid(Link, 1, genericController.vbInstr(1, Link, "?") - 1);
 //                    QueryString = Strings.Mid(Link, Strings.Len(modifyLinkQuery()) + 2);
 //                }
 //                else {
 //                    functionReturnValue = Link;
 //                    QueryString = "";
 //                }
-//                UcaseQueryName = vbUCase(EncodeRequestVariable(QueryName));
+//                UcaseQueryName = genericController.vbUCase(EncodeRequestVariable(QueryName));
 //                if (!string.IsNullOrEmpty(QueryString))
 //                {
 //                    Element = Strings.Split(QueryString, "&");
@@ -1538,7 +1538,7 @@
 //                        //
 //                        // element found and needs to be removed
 //                        //
-//                        QueryString = vbReplace(QueryString, "&&", "&");
+//                        QueryString = genericController.vbReplace(QueryString, "&&", "&");
 //                        if (Strings.Left(QueryString, 1) == "&")
 //                        {
 //                            QueryString = Strings.Mid(QueryString, 2);
@@ -1605,9 +1605,9 @@
 //        //                GetErrString = "[no error]"
 //        //            Else
 //        //                Copy = Err.Description
-//        //                Copy = vbReplace(Copy, vbCrLf, "-")
-//        //                Copy = vbReplace(Copy, vbLf, "-")
-//        //                Copy = vbReplace(Copy, vbCrLf, "")
+//        //                Copy = genericController.vbReplace(Copy, vbCrLf, "-")
+//        //                Copy = genericController.vbReplace(Copy, vbLf, "-")
+//        //                Copy = genericController.vbReplace(Copy, vbCrLf, "")
 //        //                GetErrString = "[" & Err.Source & " #" & Err.Number & ", " & Copy & "]"
 //        //            End If
 //        //        Else
@@ -1615,9 +1615,9 @@
 //        //                GetErrString = "[no error]"
 //        //            Else
 //        //                Copy = ErrorObject.Description
-//        //                Copy = vbReplace(Copy, vbCrLf, "-")
-//        //                Copy = vbReplace(Copy, vbLf, "-")
-//        //                Copy = vbReplace(Copy, vbCrLf, "")
+//        //                Copy = genericController.vbReplace(Copy, vbCrLf, "-")
+//        //                Copy = genericController.vbReplace(Copy, vbLf, "-")
+//        //                Copy = genericController.vbReplace(Copy, vbCrLf, "")
 //        //                GetErrString = "[" & ErrorObject.Source & " #" & ErrorObject.Number & ", " & Copy & "]"
 //        //            End If
 //        //        End If
@@ -1637,7 +1637,7 @@
 //        //    '==========================================================================================
 //        //    '
 //        //    Public Function IsInDelimitedString(DelimitedString As String, TestString As String, Delimiter As String) As Boolean
-//        //        IsInDelimitedString = (0 <> vbInstr(1, Delimiter & DelimitedString & Delimiter, Delimiter & TestString & Delimiter, vbTextCompare))
+//        //        IsInDelimitedString = (0 <> genericController.vbInstr(1, Delimiter & DelimitedString & Delimiter, Delimiter & TestString & Delimiter, vbTextCompare))
 //        //    End Function
 //        //    '
 //        //    '========================================================================
@@ -1658,18 +1658,18 @@
 //        //        If Source <> "" Then
 //        //            URLSplit = Split(Source, "?")
 //        //            encodeURL = URLSplit(0)
-//        //            encodeURL = vbReplace(encodeURL, "%", "%25")
+//        //            encodeURL = genericController.vbReplace(encodeURL, "%", "%25")
 //        //            '
-//        //            encodeURL = vbReplace(encodeURL, """", "%22")
-//        //            encodeURL = vbReplace(encodeURL, " ", "%20")
-//        //            encodeURL = vbReplace(encodeURL, "$", "%24")
-//        //            encodeURL = vbReplace(encodeURL, "+", "%2B")
-//        //            encodeURL = vbReplace(encodeURL, ",", "%2C")
-//        //            encodeURL = vbReplace(encodeURL, ";", "%3B")
-//        //            encodeURL = vbReplace(encodeURL, "<", "%3C")
-//        //            encodeURL = vbReplace(encodeURL, "=", "%3D")
-//        //            encodeURL = vbReplace(encodeURL, ">", "%3E")
-//        //            encodeURL = vbReplace(encodeURL, "@", "%40")
+//        //            encodeURL = genericController.vbReplace(encodeURL, """", "%22")
+//        //            encodeURL = genericController.vbReplace(encodeURL, " ", "%20")
+//        //            encodeURL = genericController.vbReplace(encodeURL, "$", "%24")
+//        //            encodeURL = genericController.vbReplace(encodeURL, "+", "%2B")
+//        //            encodeURL = genericController.vbReplace(encodeURL, ",", "%2C")
+//        //            encodeURL = genericController.vbReplace(encodeURL, ";", "%3B")
+//        //            encodeURL = genericController.vbReplace(encodeURL, "<", "%3C")
+//        //            encodeURL = genericController.vbReplace(encodeURL, "=", "%3D")
+//        //            encodeURL = genericController.vbReplace(encodeURL, ">", "%3E")
+//        //            encodeURL = genericController.vbReplace(encodeURL, "@", "%40")
 //        //            If UBound(URLSplit) > 0 Then
 //        //                encodeURL = encodeURL & "?" & encodeQueryString(URLSplit(1))
 //        //            End If
@@ -1732,15 +1732,15 @@
 //        //        If Source <> "" Then
 //        //            LocalSource = Source
 //        //            ' "+" is an allowed character for filenames. If you add it, the wrong file will be looked up
-//        //            'LocalSource = vbReplace(LocalSource, " ", "+")
+//        //            'LocalSource = genericController.vbReplace(LocalSource, " ", "+")
 //        //            For SourcePointer = 1 To Len(LocalSource)
 //        //                Character = Mid(LocalSource, SourcePointer, 1)
 //        //                ' "%" added so if this is called twice, it will not destroy "%20" values
 //        //                'If Character = " " Then
 //        //                '    encodeRequestVariable = encodeRequestVariable & "+"
-//        //                If vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_!*()", Character, vbTextCompare) <> 0 Then
-//        //                    'ElseIf vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./:-_!*()", Character, vbTextCompare) <> 0 Then
-//        //                    'ElseIf vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./:?#-_!~*'()%", Character, vbTextCompare) <> 0 Then
+//        //                If genericController.vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_!*()", Character, vbTextCompare) <> 0 Then
+//        //                    'ElseIf genericController.vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./:-_!*()", Character, vbTextCompare) <> 0 Then
+//        //                    'ElseIf genericController.vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./:?#-_!~*'()%", Character, vbTextCompare) <> 0 Then
 //        //                    encodeRequestVariable = encodeRequestVariable & Character
 //        //                Else
 //        //                    encodeRequestVariable = encodeRequestVariable & "%" & Hex(Asc(Character))
@@ -1761,12 +1761,12 @@
 //        //        ' ##### removed to catch err<>0 problem on error resume next
 //        //        '
 //        //        encodeHTML = Source
-//        //        encodeHTML = vbReplace(encodeHTML, "&", "&amp;")
-//        //        encodeHTML = vbReplace(encodeHTML, "<", "&lt;")
-//        //        encodeHTML = vbReplace(encodeHTML, ">", "&gt;")
-//        //        encodeHTML = vbReplace(encodeHTML, """", "&quot;")
-//        //        encodeHTML = vbReplace(encodeHTML, "'", "&#39;")
-//        //        'encodeHTML = vbReplace(encodeHTML, "'", "&apos;")
+//        //        encodeHTML = genericController.vbReplace(encodeHTML, "&", "&amp;")
+//        //        encodeHTML = genericController.vbReplace(encodeHTML, "<", "&lt;")
+//        //        encodeHTML = genericController.vbReplace(encodeHTML, ">", "&gt;")
+//        //        encodeHTML = genericController.vbReplace(encodeHTML, """", "&quot;")
+//        //        encodeHTML = genericController.vbReplace(encodeHTML, "'", "&#39;")
+//        //        'encodeHTML = genericController.vbReplace(encodeHTML, "'", "&apos;")
 //        //        '
 //        //    End Function
 //        //
@@ -1816,9 +1816,9 @@
 //                    }
 //                    if (!string.IsNullOrEmpty(CharCodeString))
 //                    {
-//                        if (vbIsNumeric(CharCodeString))
+//                        if (genericController.vbIsNumeric(CharCodeString))
 //                        {
-//                            CharCode = EncodeInteger(CharCodeString);
+//                            CharCode = genericController.EncodeInteger(CharCodeString);
 //                            s = Strings.Mid(s, 1, Pos - 1) + Strings.Chr(CharCode) + Strings.Mid(s, posEnd);
 //                        }
 //                    }
@@ -1828,25 +1828,25 @@
 //                //
 //                // replace out all common names (at least the most common for now)
 //                //
-//                s = vbReplace(s, "&lt;", "<");
-//                s = vbReplace(s, "&gt;", ">");
-//                s = vbReplace(s, "&quot;", "\"");
-//                s = vbReplace(s, "&apos;", "'");
+//                s = genericController.vbReplace(s, "&lt;", "<");
+//                s = genericController.vbReplace(s, "&gt;", ">");
+//                s = genericController.vbReplace(s, "&quot;", "\"");
+//                s = genericController.vbReplace(s, "&apos;", "'");
 //                //
 //                // Always replace the amp last
 //                //
-//                s = vbReplace(s, "&amp;", "&");
+//                s = genericController.vbReplace(s, "&amp;", "&");
 //                //
 //                functionReturnValue = s;
 //            }
 //            return functionReturnValue;
 //            // pre-11/26/2009
 //            //decodeHtml = Source
-//            //decodeHtml = vbReplace(decodeHtml, "&amp;", "&")
-//            //decodeHtml = vbReplace(decodeHtml, "&lt;", "<")
-//            //decodeHtml = vbReplace(decodeHtml, "&gt;", ">")
-//            //decodeHtml = vbReplace(decodeHtml, "&quot;", """")
-//            //decodeHtml = vbReplace(decodeHtml, "&nbsp;", " ")
+//            //decodeHtml = genericController.vbReplace(decodeHtml, "&amp;", "&")
+//            //decodeHtml = genericController.vbReplace(decodeHtml, "&lt;", "<")
+//            //decodeHtml = genericController.vbReplace(decodeHtml, "&gt;", ">")
+//            //decodeHtml = genericController.vbReplace(decodeHtml, "&quot;", """")
+//            //decodeHtml = genericController.vbReplace(decodeHtml, "&nbsp;", " ")
 //            //
 //        }
 //        //    '
@@ -1861,25 +1861,25 @@
 //            string post = null;
 //            string target = null;
 //            //
-//            posStart = vbInstr(1, Source, "<![CDATA[", CompareMethod.Text);
+//            posStart = genericController.vbInstr(1, Source, "<![CDATA[", CompareMethod.Text);
 //            if (posStart == 0)
 //            {
 //                //
 //                // no cdata
 //                //
-//                posStart = vbInstr(1, Source, "<textarea", CompareMethod.Text);
+//                posStart = genericController.vbInstr(1, Source, "<textarea", CompareMethod.Text);
 //                if (posStart == 0)
 //                {
 //                    //
 //                    // no textarea
 //                    //
-//                    functionReturnValue = vbReplace(Source, Constants.vbCrLf + Constants.vbTab, Constants.vbCrLf + Constants.vbTab + Constants.vbTab);
+//                    functionReturnValue = genericController.vbReplace(Source, Constants.vbCrLf + Constants.vbTab, Constants.vbCrLf + Constants.vbTab + Constants.vbTab);
 //                }
 //                else {
 //                    //
 //                    // text area found, isolate it and indent before and after
 //                    //
-//                    posEnd = vbInstr(posStart, Source, "</textarea>", CompareMethod.Text);
+//                    posEnd = genericController.vbInstr(posStart, Source, "</textarea>", CompareMethod.Text);
 //                    pre = Strings.Mid(Source, 1, posStart - 1);
 //                    if (posEnd == 0)
 //                    {
@@ -1897,7 +1897,7 @@
 //                //
 //                // cdata found, isolate it and indent before and after
 //                //
-//                posEnd = vbInstr(posStart, Source, "]]>", CompareMethod.Text);
+//                posEnd = genericController.vbInstr(posStart, Source, "]]>", CompareMethod.Text);
 //                pre = Strings.Mid(Source, 1, posStart - 1);
 //                if (posEnd == 0)
 //                {
@@ -1912,8 +1912,8 @@
 //            }
 //            return functionReturnValue;
 //            //    kmaIndent = Source
-//            //    If vbInstr(1, kmaIndent, "<textarea", vbTextCompare) = 0 Then
-//            //        kmaIndent = vbReplace(Source, vbCrLf & vbTab, vbCrLf & vbTab & vbTab)
+//            //    If genericController.vbInstr(1, kmaIndent, "<textarea", vbTextCompare) = 0 Then
+//            //        kmaIndent = genericController.vbReplace(Source, vbCrLf & vbTab, vbCrLf & vbTab & vbTab)
 //            //    End If
 //        }
 //        //
@@ -3930,7 +3930,7 @@
 //        //    '========================================================================
 //        //    '
 //        //    Function IsTrue(ValueVariant) As Boolean
-//        //        IsTrue = encodeBoolean(ValueVariant)
+//        //        IsTrue = genericController.EncodeBoolean(ValueVariant)
 //        //    End Function
 //        //    '
 //        //    '========================================================================
@@ -3952,7 +3952,7 @@
 //        //                    EncodeXML = "null"
 //        //                ElseIf ValueVariant = "" Then
 //        //                    EncodeXML = "null"
-//        //                ElseIf vbIsNumeric(ValueVariant) Then
+//        //                ElseIf genericController.vbIsNumeric(ValueVariant) Then
 //        //                    EncodeXML = Int(ValueVariant)
 //        //                Else
 //        //                    EncodeXML = "null"
@@ -3970,7 +3970,7 @@
 //        //                    EncodeXML = "null"
 //        //                ElseIf ValueVariant = "" Then
 //        //                    EncodeXML = "null"
-//        //                ElseIf vbIsNumeric(ValueVariant) Then
+//        //                ElseIf genericController.vbIsNumeric(ValueVariant) Then
 //        //                    EncodeXML = ValueVariant
 //        //                Else
 //        //                    EncodeXML = "null"
@@ -3980,7 +3980,7 @@
 //        //                    EncodeXML = "null"
 //        //                ElseIf ValueVariant = "" Then
 //        //                    EncodeXML = "null"
-//        //                ElseIf vbIsNumeric(ValueVariant) Then
+//        //                ElseIf genericController.vbIsNumeric(ValueVariant) Then
 //        //                    EncodeXML = ValueVariant
 //        //                Else
 //        //                    EncodeXML = "null"
@@ -3997,7 +3997,7 @@
 //        //                    'TimeMinutes = Int(TimeValuething / 60!) - (TimeHours * 60)
 //        //                    'TimeSeconds = TimeValuething - (TimeHours * 3600!) - (TimeMinutes * 60!)
 //        //                    'EncodeXML = Year(ValueVariant) & "-" & Right("0" & Month(ValueVariant), 2) & "-" & Right("0" & Day(ValueVariant), 2) & " " & Right("0" & TimeHours, 2) & ":" & Right("0" & TimeMinutes, 2) & ":" & Right("0" & TimeSeconds, 2)
-//        //                    EncodeXML = encodeText(ValueVariant)
+//        //                    EncodeXML = genericController.encodeText(ValueVariant)
 //        //                End If
 //        //            Case Else
 //        //                '
@@ -4020,9 +4020,9 @@
 //        //                    EncodeXML = ""
 //        //                Else
 //        //                    'EncodeXML = ASPServer.HTMLEncode(ValueVariant)
-//        //                    'EncodeXML = vbReplace(ValueVariant, "&", "&lt;")
-//        //                    'EncodeXML = vbReplace(ValueVariant, "<", "&lt;")
-//        //                    'EncodeXML = vbReplace(EncodeXML, ">", "&gt;")
+//        //                    'EncodeXML = genericController.vbReplace(ValueVariant, "&", "&lt;")
+//        //                    'EncodeXML = genericController.vbReplace(ValueVariant, "<", "&lt;")
+//        //                    'EncodeXML = genericController.vbReplace(EncodeXML, ">", "&gt;")
 //        //                End If
 //        //        End Select
 //        //        '
@@ -4072,8 +4072,8 @@
 //        //    '    If Len(encodeFilename) > 254 Then
 //        //    '        encodeFilename = Left(encodeFilename, 254)
 //        //    '    End If
-//        //    '    encodeFilename = vbReplace(encodeFilename, vbCr, "_")
-//        //    '    encodeFilename = vbReplace(encodeFilename, vbLf, "_")
+//        //    '    encodeFilename = genericController.vbReplace(encodeFilename, vbCr, "_")
+//        //    '    encodeFilename = genericController.vbReplace(encodeFilename, vbLf, "_")
 //        //    '    '
 //        //    '    End Function
 //        //    '
@@ -4114,7 +4114,7 @@
 //        //        Count = UBound(ArrayOfSource) + 1
 //        //        ReplaceMany = Source
 //        //        For Pointer = 0 To Count - 1
-//        //            ReplaceMany = vbReplace(ReplaceMany, ArrayOfSource(Pointer), ArrayOfReplacement(Pointer))
+//        //            ReplaceMany = genericController.vbReplace(ReplaceMany, ArrayOfSource(Pointer), ArrayOfReplacement(Pointer))
 //        //        Next
 //        //        '
 //        //    End Function
@@ -4134,20 +4134,20 @@
 //        //        Dim URIPage As String
 //        //        URIWorking = URI
 //        //        If Mid(vbUCase(URIWorking), 1, 4) = "HTTP" Then
-//        //            URIWorking = Mid(URIWorking, vbInstr(1, URIWorking, "//") + 2)
+//        //            URIWorking = Mid(URIWorking, genericController.vbInstr(1, URIWorking, "//") + 2)
 //        //        End If
 //        //        URIHost = URIWorking
-//        //        Slash = vbInstr(1, URIHost, "/")
+//        //        Slash = genericController.vbInstr(1, URIHost, "/")
 //        //        If Slash = 0 Then
 //        //            URIPath = "/"
 //        //            URIPage = ""
 //        //        Else
 //        //            URIPath = Mid(URIHost, Slash)
 //        //            URIHost = Mid(URIHost, 1, Slash - 1)
-//        //            Slash = vbInstr(1, URIPath, "/")
+//        //            Slash = genericController.vbInstr(1, URIPath, "/")
 //        //            Do While Slash <> 0
 //        //                LastSlash = Slash
-//        //                Slash = vbInstr(LastSlash + 1, URIPath, "/")
+//        //                Slash = genericController.vbInstr(LastSlash + 1, URIPath, "/")
 //        //                '''DoEvents()
 //        //            Loop
 //        //            URIPage = Mid(URIPath, LastSlash + 1)
@@ -4172,20 +4172,20 @@
 //        //        Dim URIWorking As String
 //        //        URIWorking = URI
 //        //        If Mid(vbUCase(URIWorking), 1, 4) = "HTTP" Then
-//        //            URIWorking = Mid(URIWorking, vbInstr(1, URIWorking, "//") + 2)
+//        //            URIWorking = Mid(URIWorking, genericController.vbInstr(1, URIWorking, "//") + 2)
 //        //        End If
 //        //        URIHost = URIWorking
-//        //        Slash = vbInstr(1, URIHost, "/")
+//        //        Slash = genericController.vbInstr(1, URIHost, "/")
 //        //        If Slash = 0 Then
 //        //            URIPath = "/"
 //        //            URIPage = ""
 //        //        Else
 //        //            URIPath = Mid(URIHost, Slash)
 //        //            URIHost = Mid(URIHost, 1, Slash - 1)
-//        //            Slash = vbInstr(1, URIPath, "/")
+//        //            Slash = genericController.vbInstr(1, URIPath, "/")
 //        //            Do While Slash <> 0
 //        //                LastSlash = Slash
-//        //                Slash = vbInstr(LastSlash + 1, URIPath, "/")
+//        //                Slash = genericController.vbInstr(LastSlash + 1, URIPath, "/")
 //        //                '''DoEvents()
 //        //            Loop
 //        //            URIPage = Mid(URIPath, LastSlash + 1)
@@ -4492,21 +4492,21 @@
 //            //
 //            // ----- read pairs in from NameValueLines
 //            //
-//            iNameValueLines = EncodeText(NameValueLines);
-//            if (vbInstr(1, iNameValueLines, "=") != 0)
+//            iNameValueLines = genericController.encodeText(NameValueLines);
+//            if (genericController.vbInstr(1, iNameValueLines, "=") != 0)
 //            {
 //                PairCnt = 0;
-//                Lines = SplitCRLF(iNameValueLines);
+//                Lines = genericController.SplitCRLF(iNameValueLines);
 //                for (LinePtr = 0; LinePtr <= Information.UBound(Lines); LinePtr++)
 //                {
-//                    if (vbInstr(1, Lines(LinePtr), "=") != 0)
+//                    if (genericController.vbInstr(1, Lines(LinePtr), "=") != 0)
 //                    {
 //                        Splits = Strings.Split(Lines(LinePtr), "=");
 //                        Array.Resize(ref Names, PairCnt + 1);
 //                        Array.Resize(ref Names, PairCnt + 1);
 //                        Array.Resize(ref Values, PairCnt + 1);
 //                        Names(PairCnt) = Strings.Trim(Splits(0));
-//                        Names(PairCnt) = vbReplace(Names(PairCnt), Constants.vbTab, "");
+//                        Names(PairCnt) = genericController.vbReplace(Names(PairCnt), Constants.vbTab, "");
 //                        Splits(0) = "";
 //                        Values(PairCnt) = Strings.Trim(Splits(1));
 //                        PairCnt = PairCnt + 1;
@@ -4516,12 +4516,12 @@
 //            //
 //            // ----- Process replacements on Source
 //            //
-//            functionReturnValue = EncodeText(Source);
+//            functionReturnValue = genericController.encodeText(Source);
 //            if (PairCnt > 0)
 //            {
 //                for (PairPtr = 0; PairPtr <= PairCnt - 1; PairPtr++)
 //                {
-//                    functionReturnValue = vbReplace(processReplacement(), Names(PairPtr), Values(PairPtr), 1, 99, Constants.vbTextCompare);
+//                    functionReturnValue = genericController.vbReplace(processReplacement(), Names(PairPtr), Values(PairPtr), 1, 99, Constants.vbTextCompare);
 //                }
 //            }
 //            return functionReturnValue;
@@ -4887,32 +4887,32 @@
 //            //
 //            s = Source;
 //            //
-//            s = vbReplace(s, " href=\"", " href=\"/", 1, 99, Constants.vbTextCompare);
-//            s = vbReplace(s, " href=\"/http", " href=\"http", 1, 99, Constants.vbTextCompare);
-//            s = vbReplace(s, " href=\"/mailto", " href=\"mailto", 1, 99, Constants.vbTextCompare);
-//            s = vbReplace(s, " href=\"//", " href=\"" + RootLink, 1, 99, Constants.vbTextCompare);
-//            s = vbReplace(s, " href=\"/?", " href=\"" + RootLink + "?", 1, 99, Constants.vbTextCompare);
-//            s = vbReplace(s, " href=\"/", " href=\"" + RootLink, 1, 99, Constants.vbTextCompare);
+//            s = genericController.vbReplace(s, " href=\"", " href=\"/", 1, 99, Constants.vbTextCompare);
+//            s = genericController.vbReplace(s, " href=\"/http", " href=\"http", 1, 99, Constants.vbTextCompare);
+//            s = genericController.vbReplace(s, " href=\"/mailto", " href=\"mailto", 1, 99, Constants.vbTextCompare);
+//            s = genericController.vbReplace(s, " href=\"//", " href=\"" + RootLink, 1, 99, Constants.vbTextCompare);
+//            s = genericController.vbReplace(s, " href=\"/?", " href=\"" + RootLink + "?", 1, 99, Constants.vbTextCompare);
+//            s = genericController.vbReplace(s, " href=\"/", " href=\"" + RootLink, 1, 99, Constants.vbTextCompare);
 //            //
-//            s = vbReplace(s, " href=", " href=/", 1, 99, Constants.vbTextCompare);
-//            s = vbReplace(s, " href=/\"", " href=\"", 1, 99, Constants.vbTextCompare);
-//            s = vbReplace(s, " href=/http", " href=http", 1, 99, Constants.vbTextCompare);
-//            s = vbReplace(s, " href=//", " href=" + RootLink, 1, 99, Constants.vbTextCompare);
-//            s = vbReplace(s, " href=/?", " href=" + RootLink + "?", 1, 99, Constants.vbTextCompare);
-//            s = vbReplace(s, " href=/", " href=" + RootLink, 1, 99, Constants.vbTextCompare);
+//            s = genericController.vbReplace(s, " href=", " href=/", 1, 99, Constants.vbTextCompare);
+//            s = genericController.vbReplace(s, " href=/\"", " href=\"", 1, 99, Constants.vbTextCompare);
+//            s = genericController.vbReplace(s, " href=/http", " href=http", 1, 99, Constants.vbTextCompare);
+//            s = genericController.vbReplace(s, " href=//", " href=" + RootLink, 1, 99, Constants.vbTextCompare);
+//            s = genericController.vbReplace(s, " href=/?", " href=" + RootLink + "?", 1, 99, Constants.vbTextCompare);
+//            s = genericController.vbReplace(s, " href=/", " href=" + RootLink, 1, 99, Constants.vbTextCompare);
 //            //
-//            s = vbReplace(s, " src=\"", " src=\"/", 1, 99, Constants.vbTextCompare);
-//            s = vbReplace(s, " src=\"/http", " src=\"http", 1, 99, Constants.vbTextCompare);
-//            s = vbReplace(s, " src=\"//", " src=\"" + RootLink, 1, 99, Constants.vbTextCompare);
-//            s = vbReplace(s, " src=\"/?", " src=\"" + RootLink + "?", 1, 99, Constants.vbTextCompare);
-//            s = vbReplace(s, " src=\"/", " src=\"" + RootLink, 1, 99, Constants.vbTextCompare);
+//            s = genericController.vbReplace(s, " src=\"", " src=\"/", 1, 99, Constants.vbTextCompare);
+//            s = genericController.vbReplace(s, " src=\"/http", " src=\"http", 1, 99, Constants.vbTextCompare);
+//            s = genericController.vbReplace(s, " src=\"//", " src=\"" + RootLink, 1, 99, Constants.vbTextCompare);
+//            s = genericController.vbReplace(s, " src=\"/?", " src=\"" + RootLink + "?", 1, 99, Constants.vbTextCompare);
+//            s = genericController.vbReplace(s, " src=\"/", " src=\"" + RootLink, 1, 99, Constants.vbTextCompare);
 //            //
-//            s = vbReplace(s, " src=", " src=/", 1, 99, Constants.vbTextCompare);
-//            s = vbReplace(s, " src=/\"", " src=\"", 1, 99, Constants.vbTextCompare);
-//            s = vbReplace(s, " src=/http", " src=http", 1, 99, Constants.vbTextCompare);
-//            s = vbReplace(s, " src=//", " src=" + RootLink, 1, 99, Constants.vbTextCompare);
-//            s = vbReplace(s, " src=/?", " src=" + RootLink + "?", 1, 99, Constants.vbTextCompare);
-//            s = vbReplace(s, " src=/", " src=" + RootLink, 1, 99, Constants.vbTextCompare);
+//            s = genericController.vbReplace(s, " src=", " src=/", 1, 99, Constants.vbTextCompare);
+//            s = genericController.vbReplace(s, " src=/\"", " src=\"", 1, 99, Constants.vbTextCompare);
+//            s = genericController.vbReplace(s, " src=/http", " src=http", 1, 99, Constants.vbTextCompare);
+//            s = genericController.vbReplace(s, " src=//", " src=" + RootLink, 1, 99, Constants.vbTextCompare);
+//            s = genericController.vbReplace(s, " src=/?", " src=" + RootLink + "?", 1, 99, Constants.vbTextCompare);
+//            s = genericController.vbReplace(s, " src=/", " src=" + RootLink, 1, 99, Constants.vbTextCompare);
 //            //
 //            functionReturnValue = s;
 //            return functionReturnValue;
@@ -4928,10 +4928,10 @@
 //        //Public Function getAppPath() As String
 //        //    Dim Ptr As Integer
 //        //    getAppPath = App.Path
-//        //    Ptr = vbInstr(1, getAppPath, "\github\", vbTextCompare)
+//        //    Ptr = genericController.vbInstr(1, getAppPath, "\github\", vbTextCompare)
 //        //    If Ptr <> 0 Then
 //        //        ' for ...\github\contensive4?\bin"
-//        //        Ptr = vbInstr(Ptr + 8, getAppPath, "\")
+//        //        Ptr = genericController.vbInstr(Ptr + 8, getAppPath, "\")
 //        //        getAppPath = Left(getAppPath, Ptr) & "bin"
 //        //    End If
 //        //End Function
@@ -4942,7 +4942,7 @@
 //        //    Dim testPath As String
 //        //    '
 //        //    GetAddonRootPath = getAppPath & "\addons"
-//        //    If vbInstr(1, GetAddonRootPath, "\github\", vbTextCompare) <> 0 Then
+//        //    If genericController.vbInstr(1, GetAddonRootPath, "\github\", vbTextCompare) <> 0 Then
 //        //        '
 //        //        ' debugging - change program path to dummy path so addon builds all copy to
 //        //        '
@@ -4963,21 +4963,21 @@
 //        //
 //        //
 //        //
-//        public static string[] SplitCRLF(string Expression)
+//        public static string[] genericController.SplitCRLF(string Expression)
 //        {
 //            string[] functionReturnValue = null;
 //            string[] Args = null;
 //            int Ptr = 0;
 //            //
-//            if (vbInstr(1, Expression, Constants.vbCrLf) != 0)
+//            if (genericController.vbInstr(1, Expression, Constants.vbCrLf) != 0)
 //            {
 //                functionReturnValue = Strings.Split(Expression, Constants.vbCrLf, , Constants.vbTextCompare);
 //            }
-//            else if (vbInstr(1, Expression, Constants.vbCr) != 0)
+//            else if (genericController.vbInstr(1, Expression, Constants.vbCr) != 0)
 //            {
 //                functionReturnValue = Strings.Split(Expression, Constants.vbCr, , Constants.vbTextCompare);
 //            }
-//            else if (vbInstr(1, Expression, Constants.vbLf) != 0)
+//            else if (genericController.vbInstr(1, Expression, Constants.vbLf) != 0)
 //            {
 //                functionReturnValue = Strings.Split(Expression, Constants.vbLf, , Constants.vbTextCompare);
 //            }
@@ -5028,18 +5028,18 @@
 //                if (true)
 //                {
 //                    //If AddonNewParse Then
-//                    a = vbReplace(a, "\\", "\\\\");
-//                    a = vbReplace(a, Constants.vbCrLf, "\\n");
-//                    a = vbReplace(a, Constants.vbTab, "\\t");
-//                    a = vbReplace(a, "&", "\\&");
-//                    a = vbReplace(a, "=", "\\=");
-//                    a = vbReplace(a, ",", "\\,");
-//                    a = vbReplace(a, "\"", "\\\"");
-//                    a = vbReplace(a, "'", "\\'");
-//                    a = vbReplace(a, "|", "\\|");
-//                    a = vbReplace(a, "[", "\\[");
-//                    a = vbReplace(a, "]", "\\]");
-//                    a = vbReplace(a, ":", "\\:");
+//                    a = genericController.vbReplace(a, "\\", "\\\\");
+//                    a = genericController.vbReplace(a, Constants.vbCrLf, "\\n");
+//                    a = genericController.vbReplace(a, Constants.vbTab, "\\t");
+//                    a = genericController.vbReplace(a, "&", "\\&");
+//                    a = genericController.vbReplace(a, "=", "\\=");
+//                    a = genericController.vbReplace(a, ",", "\\,");
+//                    a = genericController.vbReplace(a, "\"", "\\\"");
+//                    a = genericController.vbReplace(a, "'", "\\'");
+//                    a = genericController.vbReplace(a, "|", "\\|");
+//                    a = genericController.vbReplace(a, "[", "\\[");
+//                    a = genericController.vbReplace(a, "]", "\\]");
+//                    a = genericController.vbReplace(a, ":", "\\:");
 //                }
 //                functionReturnValue = a;
 //            }
@@ -5071,18 +5071,18 @@
 //            if (true)
 //            {
 //                //If AddonNewParse Then
-//                a = vbReplace(a, "\\:", ":");
-//                a = vbReplace(a, "\\]", "]");
-//                a = vbReplace(a, "\\[", "[");
-//                a = vbReplace(a, "\\|", "|");
-//                a = vbReplace(a, "\\'", "'");
-//                a = vbReplace(a, "\\\"", "\"");
-//                a = vbReplace(a, "\\,", ",");
-//                a = vbReplace(a, "\\=", "=");
-//                a = vbReplace(a, "\\&", "&");
-//                a = vbReplace(a, "\\t", Constants.vbTab);
-//                a = vbReplace(a, "\\n", Constants.vbCrLf);
-//                a = vbReplace(a, "\\\\", "\\");
+//                a = genericController.vbReplace(a, "\\:", ":");
+//                a = genericController.vbReplace(a, "\\]", "]");
+//                a = genericController.vbReplace(a, "\\[", "[");
+//                a = genericController.vbReplace(a, "\\|", "|");
+//                a = genericController.vbReplace(a, "\\'", "'");
+//                a = genericController.vbReplace(a, "\\\"", "\"");
+//                a = genericController.vbReplace(a, "\\,", ",");
+//                a = genericController.vbReplace(a, "\\=", "=");
+//                a = genericController.vbReplace(a, "\\&", "&");
+//                a = genericController.vbReplace(a, "\\t", Constants.vbTab);
+//                a = genericController.vbReplace(a, "\\n", Constants.vbCrLf);
+//                a = genericController.vbReplace(a, "\\\\", "\\");
 //            }
 //            return a;
 //        }
@@ -5107,18 +5107,18 @@
 //        //        Dim a As String
 //        //        a = Arg
 //        //        If a <> "" Then
-//        //            a = vbReplace(a, vbCrLf, "#0013#")
-//        //            a = vbReplace(a, vbLf, "#0013#")
-//        //            a = vbReplace(a, vbCr, "#0013#")
-//        //            a = vbReplace(a, "&", "#0038#")
-//        //            a = vbReplace(a, "=", "#0061#")
-//        //            a = vbReplace(a, ",", "#0044#")
-//        //            a = vbReplace(a, """", "#0034#")
-//        //            a = vbReplace(a, "'", "#0039#")
-//        //            a = vbReplace(a, "|", "#0124#")
-//        //            a = vbReplace(a, "[", "#0091#")
-//        //            a = vbReplace(a, "]", "#0093#")
-//        //            a = vbReplace(a, ":", "#0058#")
+//        //            a = genericController.vbReplace(a, vbCrLf, "#0013#")
+//        //            a = genericController.vbReplace(a, vbLf, "#0013#")
+//        //            a = genericController.vbReplace(a, vbCr, "#0013#")
+//        //            a = genericController.vbReplace(a, "&", "#0038#")
+//        //            a = genericController.vbReplace(a, "=", "#0061#")
+//        //            a = genericController.vbReplace(a, ",", "#0044#")
+//        //            a = genericController.vbReplace(a, """", "#0034#")
+//        //            a = genericController.vbReplace(a, "'", "#0039#")
+//        //            a = genericController.vbReplace(a, "|", "#0124#")
+//        //            a = genericController.vbReplace(a, "[", "#0091#")
+//        //            a = genericController.vbReplace(a, "]", "#0093#")
+//        //            a = genericController.vbReplace(a, ":", "#0058#")
 //        //        End If
 //        //        encodeNvaArgument = a
 //        //    End Function
@@ -5133,16 +5133,16 @@
 //        //        Dim a As String
 //        //        '
 //        //        a = EncodedArg
-//        //        a = vbReplace(a, "#0058#", ":")
-//        //        a = vbReplace(a, "#0093#", "]")
-//        //        a = vbReplace(a, "#0091#", "[")
-//        //        a = vbReplace(a, "#0124#", "|")
-//        //        a = vbReplace(a, "#0039#", "'")
-//        //        a = vbReplace(a, "#0034#", """")
-//        //        a = vbReplace(a, "#0044#", ",")
-//        //        a = vbReplace(a, "#0061#", "=")
-//        //        a = vbReplace(a, "#0038#", "&")
-//        //        a = vbReplace(a, "#0013#", vbCrLf)
+//        //        a = genericController.vbReplace(a, "#0058#", ":")
+//        //        a = genericController.vbReplace(a, "#0093#", "]")
+//        //        a = genericController.vbReplace(a, "#0091#", "[")
+//        //        a = genericController.vbReplace(a, "#0124#", "|")
+//        //        a = genericController.vbReplace(a, "#0039#", "'")
+//        //        a = genericController.vbReplace(a, "#0034#", """")
+//        //        a = genericController.vbReplace(a, "#0044#", ",")
+//        //        a = genericController.vbReplace(a, "#0061#", "=")
+//        //        a = genericController.vbReplace(a, "#0038#", "&")
+//        //        a = genericController.vbReplace(a, "#0013#", vbCrLf)
 //        //        decodeNvaArgument = a
 //        //    End Function
 //        //    '
@@ -5162,17 +5162,17 @@
 //                //
 //                functionReturnValue = false;
 //            }
-//            else if (vbInstr(1, Link, "://") != 0)
+//            else if (genericController.vbInstr(1, Link, "://") != 0)
 //            {
 //                //
 //                // includes protocol, may be link to another site
 //                //
-//                LinkHost = vbLCase(Link);
+//                LinkHost = genericController.vbLCase(Link);
 //                Pos = 1;
-//                Pos = vbInstr(Pos, LinkHost, "://");
+//                Pos = genericController.vbInstr(Pos, LinkHost, "://");
 //                if (Pos > 0)
 //                {
-//                    Pos = vbInstr(Pos + 3, LinkHost, "/");
+//                    Pos = genericController.vbInstr(Pos + 3, LinkHost, "/");
 //                    if (Pos > 0)
 //                    {
 //                        LinkHost = Strings.Mid(LinkHost, 1, Pos - 1);
@@ -5183,25 +5183,25 @@
 //                        //
 //                        // try combinations including/excluding www.
 //                        //
-//                        if (vbInstr(1, LinkHost, "www.", Constants.vbTextCompare) != 0)
+//                        if (genericController.vbInstr(1, LinkHost, "www.", Constants.vbTextCompare) != 0)
 //                        {
 //                            //
 //                            // remove it
 //                            //
-//                            LinkHost = vbReplace(LinkHost, "www.", "", 1, 99, Constants.vbTextCompare);
+//                            LinkHost = genericController.vbReplace(LinkHost, "www.", "", 1, 99, Constants.vbTextCompare);
 //                            functionReturnValue = (vbLCase(Host) == LinkHost);
 //                        }
 //                        else {
 //                            //
 //                            // add it
 //                            //
-//                            LinkHost = vbReplace(LinkHost, "://", "://www.", 1, 99, Constants.vbTextCompare);
+//                            LinkHost = genericController.vbReplace(LinkHost, "://", "://www.", 1, 99, Constants.vbTextCompare);
 //                            functionReturnValue = (vbLCase(Host) == LinkHost);
 //                        }
 //                    }
 //                }
 //            }
-//            else if (vbInstr(1, Link, "#") == 1)
+//            else if (genericController.vbInstr(1, Link, "#") == 1)
 //            {
 //                //
 //                // Is a bookmark, not a link
@@ -5238,21 +5238,21 @@
 //            int Pos = 0;
 //            //
 //            functionReturnValue = Link;
-//            if (vbInstr(1, Link, "/") == 1)
+//            if (genericController.vbInstr(1, Link, "/") == 1)
 //            {
 //                //
 //                //   case /images/logo-cmc.main_jpg with any Basepath to /images/logo-cmc.main_jpg
 //                //
 //            }
-//            else if (vbInstr(1, Link, "://") != 0)
+//            else if (genericController.vbInstr(1, Link, "://") != 0)
 //            {
 //                //
 //                //   case http://gcm.brandeveolve.com/images/logo-cmc.main_jpg with any BasePath  to /images/logo-cmc.main_jpg
 //                //
-//                Pos = vbInstr(1, Link, "://");
+//                Pos = genericController.vbInstr(1, Link, "://");
 //                if (Pos > 0)
 //                {
-//                    Pos = vbInstr(Pos + 3, Link, "/");
+//                    Pos = genericController.vbInstr(Pos + 3, Link, "/");
 //                    if (Pos > 0)
 //                    {
 //                        functionReturnValue = Strings.Mid(Link, Pos);
@@ -5313,7 +5313,7 @@
 //                    IconSprites = 4;
 //                }
 //            }
-//            else if (vbInstr(1, IconFilename, "://") != 0)
+//            else if (genericController.vbInstr(1, IconFilename, "://") != 0)
 //            {
 //                //
 //                // icon is an Absolute URL - leave it
@@ -5484,8 +5484,8 @@
 //            // Get Protocol (before the first :)
 //            //
 //            WorkingURL = SourceURL;
-//            Position = vbInstr(1, WorkingURL, ":");
-//            //Position = vbInstr(1, WorkingURL, "://")
+//            Position = genericController.vbInstr(1, WorkingURL, ":");
+//            //Position = genericController.vbInstr(1, WorkingURL, "://")
 //            if (Position != 0)
 //            {
 //                Protocol = Strings.Mid(WorkingURL, 1, Position + 2);
@@ -5494,7 +5494,7 @@
 //            //
 //            // compatibility fix
 //            //
-//            if (vbInstr(1, WorkingURL, "//") == 1)
+//            if (genericController.vbInstr(1, WorkingURL, "//") == 1)
 //            {
 //                if (string.IsNullOrEmpty(Protocol))
 //                {
@@ -5506,7 +5506,7 @@
 //            //
 //            // Get QueryString
 //            //
-//            Position = vbInstr(1, WorkingURL, "?");
+//            Position = genericController.vbInstr(1, WorkingURL, "?");
 //            if (Position > 0)
 //            {
 //                QueryString = Strings.Mid(WorkingURL, Position);
@@ -5516,7 +5516,7 @@
 //            // separate host from pathpage
 //            //
 //            //iURLHost = WorkingURL
-//            Position = vbInstr(WorkingURL, "/");
+//            Position = genericController.vbInstr(WorkingURL, "/");
 //            if ((Position == 0) & (string.IsNullOrEmpty(Protocol)))
 //            {
 //                //
@@ -5579,7 +5579,7 @@
 //            int Position = 0;
 //            //
 //            iURLWorking = SourceURL;
-//            Position = vbInstr(1, iURLWorking, "://");
+//            Position = genericController.vbInstr(1, iURLWorking, "://");
 //            if (Position != 0)
 //            {
 //                iURLProtocol = Strings.Mid(iURLWorking, 1, Position + 2);
@@ -5589,7 +5589,7 @@
 //            // separate Host:Port from pathpage
 //            //
 //            iURLHost = iURLWorking;
-//            Position = vbInstr(iURLHost, "/");
+//            Position = genericController.vbInstr(iURLHost, "/");
 //            if (Position == 0)
 //            {
 //                //
@@ -5621,7 +5621,7 @@
 //            //
 //            // Divide Host from Port
 //            //
-//            Position = vbInstr(iURLHost, ":");
+//            Position = genericController.vbInstr(iURLHost, ":");
 //            if (Position == 0)
 //            {
 //                //
@@ -5645,7 +5645,7 @@
 //                iURLPort = Strings.Mid(iURLHost, Position + 1);
 //                iURLHost = Strings.Mid(iURLHost, 1, Position - 1);
 //            }
-//            Position = vbInstr(1, iURLPage, "?");
+//            Position = genericController.vbInstr(1, iURLPage, "?");
 //            if (Position > 0)
 //            {
 //                iURLQueryString = Strings.Mid(iURLPage, Position);
@@ -5715,7 +5715,7 @@
 //                //
 //                // If not explicit
 //                //
-//                if (vbInstr(1, ArgumentString, Constants.vbCrLf) != 0)
+//                if (genericController.vbInstr(1, ArgumentString, Constants.vbCrLf) != 0)
 //                {
 //                    //
 //                    // crlf can only be here if it is the delimiter
@@ -5735,7 +5735,7 @@
 //            if (!string.IsNullOrEmpty(WorkingString))
 //            {
 //                WorkingString = Delimiter + WorkingString + Delimiter;
-//                ValueStart = vbInstr(1, WorkingString, Delimiter + Name + "=", Constants.vbTextCompare);
+//                ValueStart = genericController.vbInstr(1, WorkingString, Delimiter + Name + "=", Constants.vbTextCompare);
 //                if (ValueStart != 0)
 //                {
 //                    NameLength = Strings.Len(Name);
@@ -5747,10 +5747,10 @@
 //                    }
 //                    if (IsQuoted)
 //                    {
-//                        ValueEnd = vbInstr(ValueStart, WorkingString, "\"" + Delimiter);
+//                        ValueEnd = genericController.vbInstr(ValueStart, WorkingString, "\"" + Delimiter);
 //                    }
 //                    else {
-//                        ValueEnd = vbInstr(ValueStart, WorkingString, Delimiter);
+//                        ValueEnd = genericController.vbInstr(ValueStart, WorkingString, Delimiter);
 //                    }
 //                    if (ValueEnd == 0)
 //                    {
@@ -5786,14 +5786,14 @@
 //        //    '
 //        //    ' remove the manual select list syntax "answer[choice1|choice2]"
 //        //    '
-//        //    Pos = vbInstr(1, GetAggrOption, "[")
+//        //    Pos = genericController.vbInstr(1, GetAggrOption, "[")
 //        //    If Pos <> 0 Then
 //        //        GetAggrOption = Left(GetAggrOption, Pos - 1)
 //        //    End If
 //        //    '
 //        //    ' remove any function syntax "answer{selectcontentname RSS Feeds}"
 //        //    '
-//        //    Pos = vbInstr(1, GetAggrOption, "{")
+//        //    Pos = genericController.vbInstr(1, GetAggrOption, "{")
 //        //    If Pos <> 0 Then
 //        //        GetAggrOption = Left(GetAggrOption, Pos - 1)
 //        //    End If
@@ -5818,8 +5818,8 @@
 //        //    Dim NextLF As Integer
 //        //    Dim BOL As Integer
 //        //    '
-//        //    NextCR = vbInstr(1, Body, vbCr)
-//        //    NextLF = vbInstr(1, Body, vbLf)
+//        //    NextCR = genericController.vbInstr(1, Body, vbCr)
+//        //    NextLF = genericController.vbInstr(1, Body, vbLf)
 
 //        //    If NextCR <> 0 Or NextLF <> 0 Then
 //        //        If NextCR <> 0 Then
@@ -5856,7 +5856,7 @@
 //        //   Get a Random Long Value
 //        //=================================================================================
 //        //
-//        public static int GetRandomInteger()
+//        public static int genericController.GetRandomInteger()
 //        {
 //            //
 //            int RandomBase = 0;
@@ -5896,9 +5896,9 @@
 //        //'   If the QueryName is not found in the string, ignore call
 //        //'=============================================================================
 //        //'
-//        //Public Function ModifyQueryString(ByVal WorkingQuery As String, ByVal QueryName As String, ByVal QueryValue As String, Optional ByVal AddIfMissing As Boolean = True) As String
+//        //Public Function genericController.ModifyQueryString(ByVal WorkingQuery As String, ByVal QueryName As String, ByVal QueryValue As String, Optional ByVal AddIfMissing As Boolean = True) As String
 //        //    '
-//        //    If vbInstr(1, WorkingQuery, "?") Then
+//        //    If genericController.vbInstr(1, WorkingQuery, "?") Then
 //        //        ModifyQueryString = ModifyLinkQueryString(WorkingQuery, QueryName, QueryValue, AddIfMissing)
 //        //    Else
 //        //        ModifyQueryString = Mid(ModifyLinkQueryString("?" & WorkingQuery, QueryName, QueryValue, AddIfMissing), 2)
@@ -5921,16 +5921,16 @@
 //            bool ElementFound = false;
 //            string QueryString = null;
 //            //
-//            if (vbInstr(1, Link, "?") != 0)
+//            if (genericController.vbInstr(1, Link, "?") != 0)
 //            {
-//                functionReturnValue = Strings.Mid(Link, 1, vbInstr(1, Link, "?") - 1);
+//                functionReturnValue = Strings.Mid(Link, 1, genericController.vbInstr(1, Link, "?") - 1);
 //                QueryString = Strings.Mid(Link, Strings.Len(ModifyLinkQueryString()) + 2);
 //            }
 //            else {
 //                functionReturnValue = Link;
 //                QueryString = "";
 //            }
-//            UcaseQueryName = vbUCase(EncodeRequestVariable(QueryName));
+//            UcaseQueryName = genericController.vbUCase(EncodeRequestVariable(QueryName));
 //            if (!string.IsNullOrEmpty(QueryString))
 //            {
 //                Element = Strings.Split(QueryString, "&");
@@ -5981,7 +5981,7 @@
 //                    //
 //                    // element found and needs to be removed
 //                    //
-//                    QueryString = vbReplace(QueryString, "&&", "&");
+//                    QueryString = genericController.vbReplace(QueryString, "&&", "&");
 //                    if (Strings.Left(QueryString, 1) == "&")
 //                    {
 //                        QueryString = Strings.Mid(QueryString, 2);
@@ -6052,9 +6052,9 @@
 //                }
 //                else {
 //                    Copy = Err.Description;
-//                    Copy = vbReplace(Copy, Constants.vbCrLf, "-");
-//                    Copy = vbReplace(Copy, Constants.vbLf, "-");
-//                    Copy = vbReplace(Copy, Constants.vbCrLf, "");
+//                    Copy = genericController.vbReplace(Copy, Constants.vbCrLf, "-");
+//                    Copy = genericController.vbReplace(Copy, Constants.vbLf, "-");
+//                    Copy = genericController.vbReplace(Copy, Constants.vbCrLf, "");
 //                    functionReturnValue = "[" + Err.Source + " #" + Err.Number + ", " + Copy + "]";
 //                }
 //            }
@@ -6065,9 +6065,9 @@
 //                }
 //                else {
 //                    Copy = ErrorObject.Description;
-//                    Copy = vbReplace(Copy, Constants.vbCrLf, "-");
-//                    Copy = vbReplace(Copy, Constants.vbLf, "-");
-//                    Copy = vbReplace(Copy, Constants.vbCrLf, "");
+//                    Copy = genericController.vbReplace(Copy, Constants.vbCrLf, "-");
+//                    Copy = genericController.vbReplace(Copy, Constants.vbLf, "-");
+//                    Copy = genericController.vbReplace(Copy, Constants.vbCrLf, "");
 //                    functionReturnValue = "[" + ErrorObject.Source + " #" + ErrorObject.Number + ", " + Copy + "]";
 //                }
 //            }
@@ -6092,7 +6092,7 @@
 //        //
 //        public static bool IsInDelimitedString(string DelimitedString, string TestString, string Delimiter)
 //        {
-//            return (0 != vbInstr(1, Delimiter + DelimitedString + Delimiter, Delimiter + TestString + Delimiter, Constants.vbTextCompare));
+//            return (0 != genericController.vbInstr(1, Delimiter + DelimitedString + Delimiter, Delimiter + TestString + Delimiter, Constants.vbTextCompare));
 //        }
 //        //
 //        //========================================================================
@@ -6116,18 +6116,18 @@
 //            {
 //                URLSplit = Strings.Split(Source, "?");
 //                functionReturnValue = URLSplit(0);
-//                functionReturnValue = vbReplace(EncodeURL(), "%", "%25");
+//                functionReturnValue = genericController.vbReplace(EncodeURL(), "%", "%25");
 //                //
-//                functionReturnValue = vbReplace(EncodeURL(), "\"", "%22");
-//                functionReturnValue = vbReplace(EncodeURL(), " ", "%20");
-//                functionReturnValue = vbReplace(EncodeURL(), "$", "%24");
-//                functionReturnValue = vbReplace(EncodeURL(), "+", "%2B");
-//                functionReturnValue = vbReplace(EncodeURL(), ",", "%2C");
-//                functionReturnValue = vbReplace(EncodeURL(), ";", "%3B");
-//                functionReturnValue = vbReplace(EncodeURL(), "<", "%3C");
-//                functionReturnValue = vbReplace(EncodeURL(), "=", "%3D");
-//                functionReturnValue = vbReplace(EncodeURL(), ">", "%3E");
-//                functionReturnValue = vbReplace(EncodeURL(), "@", "%40");
+//                functionReturnValue = genericController.vbReplace(EncodeURL(), "\"", "%22");
+//                functionReturnValue = genericController.vbReplace(EncodeURL(), " ", "%20");
+//                functionReturnValue = genericController.vbReplace(EncodeURL(), "$", "%24");
+//                functionReturnValue = genericController.vbReplace(EncodeURL(), "+", "%2B");
+//                functionReturnValue = genericController.vbReplace(EncodeURL(), ",", "%2C");
+//                functionReturnValue = genericController.vbReplace(EncodeURL(), ";", "%3B");
+//                functionReturnValue = genericController.vbReplace(EncodeURL(), "<", "%3C");
+//                functionReturnValue = genericController.vbReplace(EncodeURL(), "=", "%3D");
+//                functionReturnValue = genericController.vbReplace(EncodeURL(), ">", "%3E");
+//                functionReturnValue = genericController.vbReplace(EncodeURL(), "@", "%40");
 //                if (Information.UBound(URLSplit) > 0)
 //                {
 //                    functionReturnValue = functionReturnValue + "?" + EncodeQueryString(URLSplit(1));
@@ -6205,7 +6205,7 @@
 //            {
 //                LocalSource = Source;
 //                // "+" is an allowed character for filenames. If you add it, the wrong file will be looked up
-//                //LocalSource = vbReplace(LocalSource, " ", "+")
+//                //LocalSource = genericController.vbReplace(LocalSource, " ", "+")
 //                for (SourcePointer = 1; SourcePointer <= Strings.Len(LocalSource); SourcePointer++)
 //                {
 //                    Character = Strings.Mid(LocalSource, SourcePointer, 1);
@@ -6216,9 +6216,9 @@
 //                        //If Character = " " Then
 //                        functionReturnValue += "+";
 //                    }
-//                    else if (vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./:-_!*()", Character, Constants.vbTextCompare) != 0)
+//                    else if (genericController.vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./:-_!*()", Character, Constants.vbTextCompare) != 0)
 //                    {
-//                        //ElseIf vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./:?#-_!~*'()%", Character, vbTextCompare) <> 0 Then
+//                        //ElseIf genericController.vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./:?#-_!~*'()%", Character, vbTextCompare) <> 0 Then
 //                        functionReturnValue += Character;
 //                    }
 //                    else {
@@ -6243,11 +6243,11 @@
 //            // ##### removed to catch err<>0 problem on error resume next
 //            //
 //            functionReturnValue = Source;
-//            functionReturnValue = vbReplace(cpcore.html.html_EncodeHTML(), "&", "&amp;");
-//            functionReturnValue = vbReplace(cpcore.html.html_EncodeHTML(), "<", "&lt;");
-//            functionReturnValue = vbReplace(cpcore.html.html_EncodeHTML(), ">", "&gt;");
-//            functionReturnValue = vbReplace(cpcore.html.html_EncodeHTML(), "\"", "&quot;");
-//            functionReturnValue = vbReplace(cpcore.html.html_EncodeHTML(), "'", "&apos;");
+//            functionReturnValue = genericController.vbReplace(cpcore.html.html_EncodeHTML(), "&", "&amp;");
+//            functionReturnValue = genericController.vbReplace(cpcore.html.html_EncodeHTML(), "<", "&lt;");
+//            functionReturnValue = genericController.vbReplace(cpcore.html.html_EncodeHTML(), ">", "&gt;");
+//            functionReturnValue = genericController.vbReplace(cpcore.html.html_EncodeHTML(), "\"", "&quot;");
+//            functionReturnValue = genericController.vbReplace(cpcore.html.html_EncodeHTML(), "'", "&apos;");
 //            return functionReturnValue;
 //            //
 //        }
@@ -6288,7 +6288,7 @@
 //        //            PosEnd = Pos + 6
 //        //        End If
 //        //        If CharCodeString <> "" Then
-//        //            If vbIsNumeric(CharCodeString) Then
+//        //            If genericController.vbIsNumeric(CharCodeString) Then
 //        //                CharCode = CLng(CharCodeString)
 //        //                s = Mid(s, 1, Pos - 1) & Chr(CharCode) & Mid(s, PosEnd)
 //        //            End If
@@ -6299,14 +6299,14 @@
 //        //    '
 //        //    ' character entities (at least the most common )
 //        //    '
-//        //    s = vbReplace(s, "&lt;", "<")
-//        //    s = vbReplace(s, "&gt;", ">")
-//        //    s = vbReplace(s, "&quot;", """")
-//        //    s = vbReplace(s, "&apos;", "'")
+//        //    s = genericController.vbReplace(s, "&lt;", "<")
+//        //    s = genericController.vbReplace(s, "&gt;", ">")
+//        //    s = genericController.vbReplace(s, "&quot;", """")
+//        //    s = genericController.vbReplace(s, "&apos;", "'")
 //        //    '
 //        //    ' always last
 //        //    '
-//        //    s = vbReplace(s, "&amp;", "&")
+//        //    s = genericController.vbReplace(s, "&amp;", "&")
 //        //    '
 //        //    DecodeHTML = s
 //        //    '
@@ -6345,24 +6345,24 @@
 //            //
 //            //iURL = Source
 //            // plus to space only applies for query component of a URL, but %99 encoding works for both
-//            //DecodeResponseVariable = vbReplace(iURL, "+", " ")
+//            //DecodeResponseVariable = genericController.vbReplace(iURL, "+", " ")
 //            functionReturnValue = Source;
-//            Position = vbInstr(1, DecodeResponseVariable(), "%");
+//            Position = genericController.vbInstr(1, DecodeResponseVariable(), "%");
 //            while (Position != 0)
 //            {
 //                ESCString = Strings.Mid(DecodeResponseVariable(), Position, 3);
-//                Digit0 = vbUCase(Strings.Mid(ESCString, 2, 1));
-//                Digit1 = vbUCase(Strings.Mid(ESCString, 3, 1));
+//                Digit0 = genericController.vbUCase(Strings.Mid(ESCString, 2, 1));
+//                Digit1 = genericController.vbUCase(Strings.Mid(ESCString, 3, 1));
 //                if (((Digit0 >= "0") & (Digit0 <= "9")) | ((Digit0 >= "A") & (Digit0 <= "F")))
 //                {
 //                    if (((Digit1 >= "0") & (Digit1 <= "9")) | ((Digit1 >= "A") & (Digit1 <= "F")))
 //                    {
 //                        ESCValue = Convert.ToInt32("&H" + Strings.Mid(ESCString, 2));
 //                        functionReturnValue = Strings.Mid(DecodeResponseVariable(), 1, Position - 1) + Strings.Chr(ESCValue) + Strings.Mid(DecodeResponseVariable(), Position + 3);
-//                        //  & vbReplace(DecodeResponseVariable, ESCString, Chr(ESCValue), Position, 1)
+//                        //  & genericController.vbReplace(DecodeResponseVariable, ESCString, Chr(ESCValue), Position, 1)
 //                    }
 //                }
-//                Position = vbInstr(Position + 1, DecodeResponseVariable(), "%");
+//                Position = genericController.vbInstr(Position + 1, DecodeResponseVariable(), "%");
 //            }
 //            return functionReturnValue;
 //            //
@@ -6387,23 +6387,23 @@
 //            //
 //            //iURL = Source
 //            // plus to space only applies for query component of a URL, but %99 encoding works for both
-//            //DecodeURL = vbReplace(iURL, "+", " ")
+//            //DecodeURL = genericController.vbReplace(iURL, "+", " ")
 //            functionReturnValue = Source;
-//            Position = vbInstr(1, DecodeURL(), "%");
+//            Position = genericController.vbInstr(1, DecodeURL(), "%");
 //            while (Position != 0)
 //            {
 //                ESCString = Strings.Mid(DecodeURL(), Position, 3);
-//                Digit0 = vbUCase(Strings.Mid(ESCString, 2, 1));
-//                Digit1 = vbUCase(Strings.Mid(ESCString, 3, 1));
+//                Digit0 = genericController.vbUCase(Strings.Mid(ESCString, 2, 1));
+//                Digit1 = genericController.vbUCase(Strings.Mid(ESCString, 3, 1));
 //                if (((Digit0 >= "0") & (Digit0 <= "9")) | ((Digit0 >= "A") & (Digit0 <= "F")))
 //                {
 //                    if (((Digit1 >= "0") & (Digit1 <= "9")) | ((Digit1 >= "A") & (Digit1 <= "F")))
 //                    {
 //                        ESCValue = Convert.ToInt32("&H" + Strings.Mid(ESCString, 2));
-//                        functionReturnValue = vbReplace(DecodeURL(), ESCString, Strings.Chr(ESCValue));
+//                        functionReturnValue = genericController.vbReplace(DecodeURL(), ESCString, Strings.Chr(ESCValue));
 //                    }
 //                }
-//                Position = vbInstr(Position + 1, DecodeURL(), "%");
+//                Position = genericController.vbInstr(Position + 1, DecodeURL(), "%");
 //            }
 //            return functionReturnValue;
 //            //
@@ -6707,7 +6707,7 @@
 //            functionReturnValue = URL;
 //            if (!string.IsNullOrEmpty(URL) & !string.IsNullOrEmpty(PathPagePrefix))
 //            {
-//                if (vbInstr(1, ConvertShortLinkToLink(), PathPagePrefix, Constants.vbTextCompare) == 1)
+//                if (genericController.vbInstr(1, ConvertShortLinkToLink(), PathPagePrefix, Constants.vbTextCompare) == 1)
 //                {
 //                    functionReturnValue = Strings.Mid(ConvertShortLinkToLink(), Strings.Len(PathPagePrefix) + 1);
 //                }
@@ -6736,14 +6736,14 @@
 //            //
 //            // ----- Determine Protocol
 //            //
-//            if (vbInstr(1, WorkingLink, "HTTP://", Constants.vbTextCompare) == 1)
+//            if (genericController.vbInstr(1, WorkingLink, "HTTP://", Constants.vbTextCompare) == 1)
 //            {
 //                //
 //                // HTTP
 //                //
 //                Protocol = Strings.Mid(WorkingLink, 1, 7);
 //            }
-//            else if (vbInstr(1, WorkingLink, "HTTPS://", Constants.vbTextCompare) == 1)
+//            else if (genericController.vbInstr(1, WorkingLink, "HTTPS://", Constants.vbTextCompare) == 1)
 //            {
 //                //
 //                // HTTPS
@@ -6772,7 +6772,7 @@
 //                        //
 //                        BadString = GoodString;
 //                        GoodString = ServerVirtualPath + "/files/";
-//                        WorkingLink = vbReplace(WorkingLink, BadString, GoodString, 1, 99, Constants.vbTextCompare);
+//                        WorkingLink = genericController.vbReplace(WorkingLink, BadString, GoodString, 1, 99, Constants.vbTextCompare);
 //                    }
 //                    else {
 //                        //
@@ -6780,11 +6780,11 @@
 //                        //
 //                        BadString = Protocol + ServerHost + ServerVirtualPath + "/";
 //                        GoodString = "/";
-//                        WorkingLink = vbReplace(WorkingLink, BadString, GoodString, 1, 99, Constants.vbTextCompare);
+//                        WorkingLink = genericController.vbReplace(WorkingLink, BadString, GoodString, 1, 99, Constants.vbTextCompare);
 //                        //
 //                        BadString = Protocol + ServerHost + "/";
 //                        GoodString = "/";
-//                        WorkingLink = vbReplace(WorkingLink, BadString, GoodString, 1, 99, Constants.vbTextCompare);
+//                        WorkingLink = genericController.vbReplace(WorkingLink, BadString, GoodString, 1, 99, Constants.vbTextCompare);
 //                    }
 //                }
 //            }
@@ -6832,7 +6832,7 @@
 //                        //
 //                        // Virtual hosted site, add VirualPath if it is not there
 //                        //
-//                        if (vbInstr(1, Path, AppRootPath, Constants.vbTextCompare) == 0)
+//                        if (genericController.vbInstr(1, Path, AppRootPath, Constants.vbTextCompare) == 0)
 //                        {
 //                            if (Path == "/")
 //                            {
@@ -6847,9 +6847,9 @@
 //                        //
 //                        // Root hosted site, remove virtual path if it is there
 //                        //
-//                        if (vbInstr(1, Path, AppRootPath, Constants.vbTextCompare) != 0)
+//                        if (genericController.vbInstr(1, Path, AppRootPath, Constants.vbTextCompare) != 0)
 //                        {
-//                            Path = vbReplace(Path, AppRootPath, "/");
+//                            Path = genericController.vbReplace(Path, AppRootPath, "/");
 //                        }
 //                    }
 //                    functionReturnValue = Protocol + Host + Path + Page + QueryString;
@@ -6891,7 +6891,7 @@
 //            functionReturnValue = "";
 //            iAnchorTag = AnchorTag;
 //            iAnchorText = AnchorText;
-//            UcaseAnchorText = vbUCase(iAnchorText);
+//            UcaseAnchorText = genericController.vbUCase(iAnchorText);
 //            if ((!string.IsNullOrEmpty(iAnchorTag)) & (!string.IsNullOrEmpty(iAnchorText)))
 //            {
 //                LinkPosition = Strings.InStrRev(UcaseAnchorText, "<LINK>", -1);
@@ -6934,7 +6934,7 @@
 //                {
 //                    for (SegPtr = 0; SegPtr <= SegMax; SegPtr++)
 //                    {
-//                        SegSplit(SegPtr) = vbUCase(Strings.Left(SegSplit(SegPtr), 1)) + vbLCase(Strings.Mid(SegSplit(SegPtr), 2));
+//                        SegSplit(SegPtr) = genericController.vbUCase(Strings.Left(SegSplit(SegPtr), 1)) + genericController.vbLCase(Strings.Mid(SegSplit(SegPtr), 2));
 //                    }
 //                }
 //                functionReturnValue = Strings.Join(SegSplit, " ");
@@ -6950,10 +6950,10 @@
 //            int Pos = 0;
 //            int PosEnd = 0;
 //            functionReturnValue = Source;
-//            Pos = vbInstr(1, Source, "<" + TagName, Constants.vbTextCompare);
+//            Pos = genericController.vbInstr(1, Source, "<" + TagName, Constants.vbTextCompare);
 //            if (Pos != 0)
 //            {
-//                PosEnd = vbInstr(Pos, Source, ">");
+//                PosEnd = genericController.vbInstr(Pos, Source, ">");
 //                if (PosEnd > 0)
 //                {
 //                    functionReturnValue = Strings.Left(Source, Pos - 1) + Strings.Mid(Source, PosEnd + 1);
@@ -6968,11 +6968,11 @@
 //        {
 //            string functionReturnValue = null;
 //            functionReturnValue = Source;
-//            while (vbInstr(1, RemoveStyleTags(), "<style", Constants.vbTextCompare) != 0)
+//            while (genericController.vbInstr(1, RemoveStyleTags(), "<style", Constants.vbTextCompare) != 0)
 //            {
 //                functionReturnValue = RemoveTag(RemoveStyleTags(), "style");
 //            }
-//            while (vbInstr(1, RemoveStyleTags(), "</style", Constants.vbTextCompare) != 0)
+//            while (genericController.vbInstr(1, RemoveStyleTags(), "</style", Constants.vbTextCompare) != 0)
 //            {
 //                functionReturnValue = RemoveTag(RemoveStyleTags(), "/style");
 //            }
@@ -6992,7 +6992,7 @@
 //            if (Strings.Len(GetSingular()) > 1)
 //            {
 //                LastCharacter = Strings.Right(GetSingular(), 1);
-//                if (LastCharacter != vbUCase(LastCharacter))
+//                if (LastCharacter != genericController.vbUCase(LastCharacter))
 //                {
 //                    UpperCase = true;
 //                }
@@ -7028,12 +7028,12 @@
 //            string functionReturnValue = null;
 //            //
 //            functionReturnValue = Source;
-//            functionReturnValue = vbReplace(EncodeJavascript(), "\\", "\\\\");
-//            functionReturnValue = vbReplace(EncodeJavascript(), "'", "\\'");
-//            //EncodeJavascript = vbReplace(EncodeJavascript, "'", "'+""'""+'")
-//            functionReturnValue = vbReplace(EncodeJavascript(), Constants.vbCrLf, "\\n");
-//            functionReturnValue = vbReplace(EncodeJavascript(), Constants.vbCr, "\\n");
-//            functionReturnValue = vbReplace(EncodeJavascript(), Constants.vbLf, "\\n");
+//            functionReturnValue = genericController.vbReplace(EncodeJavascript(), "\\", "\\\\");
+//            functionReturnValue = genericController.vbReplace(EncodeJavascript(), "'", "\\'");
+//            //EncodeJavascript = genericController.vbReplace(EncodeJavascript, "'", "'+""'""+'")
+//            functionReturnValue = genericController.vbReplace(EncodeJavascript(), Constants.vbCrLf, "\\n");
+//            functionReturnValue = genericController.vbReplace(EncodeJavascript(), Constants.vbCr, "\\n");
+//            functionReturnValue = genericController.vbReplace(EncodeJavascript(), Constants.vbLf, "\\n");
 //            return functionReturnValue;
 //            //
 //        }
@@ -7056,8 +7056,8 @@
 //            functionReturnValue = 0;
 //            if (!string.IsNullOrEmpty(ListOfItems))
 //            {
-//                LcaseItem = vbLCase(Item);
-//                LcaseList = vbLCase(ListOfItems);
+//                LcaseItem = genericController.vbLCase(Item);
+//                LcaseList = genericController.vbLCase(ListOfItems);
 //                Items = SplitDelimited(LcaseList, ",");
 //                for (Ptr = 0; Ptr <= Information.UBound(Items); Ptr++)
 //                {
@@ -7100,7 +7100,7 @@
 //            Pos = 1;
 //            while ((Pos > 0) & (LoopCnt < 100))
 //            {
-//                TagStart = vbInstr(Pos, PageSource, "<" + Tag, Constants.vbTextCompare);
+//                TagStart = genericController.vbInstr(Pos, PageSource, "<" + Tag, Constants.vbTextCompare);
 //                if (TagStart == 0)
 //                {
 //                    Pos = 0;
@@ -7109,33 +7109,33 @@
 //                    //
 //                    // tag found, skip any comments that start between current position and the tag
 //                    //
-//                    CommentPos = vbInstr(Pos, PageSource, "<!--");
+//                    CommentPos = genericController.vbInstr(Pos, PageSource, "<!--");
 //                    if ((CommentPos != 0) & (CommentPos < TagStart))
 //                    {
 //                        //
 //                        // skip comment and start again
 //                        //
-//                        Pos = vbInstr(CommentPos, PageSource, "-->");
+//                        Pos = genericController.vbInstr(CommentPos, PageSource, "-->");
 //                    }
 //                    else {
-//                        ScriptPos = vbInstr(Pos, PageSource, "<script");
+//                        ScriptPos = genericController.vbInstr(Pos, PageSource, "<script");
 //                        if ((ScriptPos != 0) & (ScriptPos < TagStart))
 //                        {
 //                            //
 //                            // skip comment and start again
 //                            //
-//                            Pos = vbInstr(ScriptPos, PageSource, "</script");
+//                            Pos = genericController.vbInstr(ScriptPos, PageSource, "</script");
 //                        }
 //                        else {
 //                            //
 //                            // Get the tags innerHTML
 //                            //
-//                            TagStart = vbInstr(TagStart, PageSource, ">", Constants.vbTextCompare);
+//                            TagStart = genericController.vbInstr(TagStart, PageSource, ">", Constants.vbTextCompare);
 //                            Pos = TagStart;
 //                            if (TagStart != 0)
 //                            {
 //                                TagStart = TagStart + 1;
-//                                TagEnd = vbInstr(TagStart, PageSource, "</" + Tag, Constants.vbTextCompare);
+//                                TagEnd = genericController.vbInstr(TagStart, PageSource, "</" + Tag, Constants.vbTextCompare);
 //                                if (TagEnd != 0)
 //                                {
 //                                    functionReturnValue += Strings.Mid(PageSource, TagStart, TagEnd - TagStart);
@@ -7146,7 +7146,7 @@
 //                    LoopCnt = LoopCnt + 1;
 //                    if (ReturnAll)
 //                    {
-//                        TagStart = vbInstr(TagEnd, PageSource, "<" + Tag, Constants.vbTextCompare);
+//                        TagStart = genericController.vbInstr(TagEnd, PageSource, "<" + Tag, Constants.vbTextCompare);
 //                    }
 //                    else {
 //                        TagStart = 0;
@@ -7162,12 +7162,12 @@
 //        //
 //        //
 //        //
-//        public static int EncodeInteger(object Expression)
+//        public static int genericController.EncodeInteger(object Expression)
 //        {
 //            int functionReturnValue = 0;
 //            //
 //            functionReturnValue = 0;
-//            if (vbIsNumeric(Expression))
+//            if (genericController.vbIsNumeric(Expression))
 //            {
 //                functionReturnValue = Convert.ToInt32(Expression);
 //            }
@@ -7187,7 +7187,7 @@
 //        {
 //            double functionReturnValue = 0;
 //            functionReturnValue = 0;
-//            if (vbIsNumeric(Expression))
+//            if (genericController.vbIsNumeric(Expression))
 //            {
 //                functionReturnValue = Convert.ToDouble(Expression);
 //            }
@@ -7203,7 +7203,7 @@
 //        //
 //        //====================================================================================================
 //        //
-//        public static string EncodeText(object Expression)
+//        public static string genericController.encodeText(object Expression)
 //        {
 //            string functionReturnValue = null;
 //            try
@@ -7226,7 +7226,7 @@
 //        //
 //        //====================================================================================================
 //        //
-//        public static bool EncodeBoolean(object Expression)
+//        public static bool genericController.EncodeBoolean(object Expression)
 //        {
 //            bool functionReturnValue = false;
 //            functionReturnValue = false;
@@ -7234,7 +7234,7 @@
 //            {
 //                functionReturnValue = (bool)Expression;
 //            }
-//            else if (vbIsNumeric(Expression))
+//            else if (genericController.vbIsNumeric(Expression))
 //            {
 //                functionReturnValue = (Convert.ToString(Expression) != "0");
 //            }
@@ -7254,7 +7254,7 @@
 //        //
 //        //====================================================================================================
 //        //
-//        public static System.DateTime EncodeDate(object Expression)
+//        public static System.DateTime  genericController.EncodeDate(object Expression)
 //        {
 //            System.DateTime functionReturnValue = default(System.DateTime);
 //            functionReturnValue = System.DateTime.MinValue;
@@ -7282,8 +7282,8 @@
 //                int NextLF = 0;
 //                int BOL = 0;
 //                //
-//                NextCR = vbInstr(1, Body, Constants.vbCr);
-//                NextLF = vbInstr(1, Body, Constants.vbLf);
+//                NextCR = genericController.vbInstr(1, Body, Constants.vbCr);
+//                NextLF = genericController.vbInstr(1, Body, Constants.vbLf);
 
 //                if (NextCR != 0 | NextLF != 0)
 //                {
@@ -7397,18 +7397,18 @@
 //            a = Arg;
 //            if (!string.IsNullOrEmpty(a))
 //            {
-//                a = vbReplace(a, Constants.vbCrLf, "#0013#");
-//                a = vbReplace(a, Constants.vbLf, "#0013#");
-//                a = vbReplace(a, Constants.vbCr, "#0013#");
-//                a = vbReplace(a, "&", "#0038#");
-//                a = vbReplace(a, "=", "#0061#");
-//                a = vbReplace(a, ",", "#0044#");
-//                a = vbReplace(a, "\"", "#0034#");
-//                a = vbReplace(a, "'", "#0039#");
-//                a = vbReplace(a, "|", "#0124#");
-//                a = vbReplace(a, "[", "#0091#");
-//                a = vbReplace(a, "]", "#0093#");
-//                a = vbReplace(a, ":", "#0058#");
+//                a = genericController.vbReplace(a, Constants.vbCrLf, "#0013#");
+//                a = genericController.vbReplace(a, Constants.vbLf, "#0013#");
+//                a = genericController.vbReplace(a, Constants.vbCr, "#0013#");
+//                a = genericController.vbReplace(a, "&", "#0038#");
+//                a = genericController.vbReplace(a, "=", "#0061#");
+//                a = genericController.vbReplace(a, ",", "#0044#");
+//                a = genericController.vbReplace(a, "\"", "#0034#");
+//                a = genericController.vbReplace(a, "'", "#0039#");
+//                a = genericController.vbReplace(a, "|", "#0124#");
+//                a = genericController.vbReplace(a, "[", "#0091#");
+//                a = genericController.vbReplace(a, "]", "#0093#");
+//                a = genericController.vbReplace(a, ":", "#0058#");
 //            }
 //            return a;
 //        }
@@ -7424,16 +7424,16 @@
 //            string a = null;
 //            //
 //            a = EncodedArg;
-//            a = vbReplace(a, "#0058#", ":");
-//            a = vbReplace(a, "#0093#", "]");
-//            a = vbReplace(a, "#0091#", "[");
-//            a = vbReplace(a, "#0124#", "|");
-//            a = vbReplace(a, "#0039#", "'");
-//            a = vbReplace(a, "#0034#", "\"");
-//            a = vbReplace(a, "#0044#", ",");
-//            a = vbReplace(a, "#0061#", "=");
-//            a = vbReplace(a, "#0038#", "&");
-//            a = vbReplace(a, "#0013#", Constants.vbCrLf);
+//            a = genericController.vbReplace(a, "#0058#", ":");
+//            a = genericController.vbReplace(a, "#0093#", "]");
+//            a = genericController.vbReplace(a, "#0091#", "[");
+//            a = genericController.vbReplace(a, "#0124#", "|");
+//            a = genericController.vbReplace(a, "#0039#", "'");
+//            a = genericController.vbReplace(a, "#0034#", "\"");
+//            a = genericController.vbReplace(a, "#0044#", ",");
+//            a = genericController.vbReplace(a, "#0061#", "=");
+//            a = genericController.vbReplace(a, "#0038#", "&");
+//            a = genericController.vbReplace(a, "#0013#", Constants.vbCrLf);
 //            return a;
 //        }
 //        //
@@ -7442,9 +7442,9 @@
 //        {
 //            string Copy = null;
 //            Copy = Source;
-//            Copy = vbReplace(Copy, Constants.vbCrLf, " ");
-//            Copy = vbReplace(Copy, Constants.vbLf, " ");
-//            Copy = vbReplace(Copy, Constants.vbCr, " ");
+//            Copy = genericController.vbReplace(Copy, Constants.vbCrLf, " ");
+//            Copy = genericController.vbReplace(Copy, Constants.vbLf, " ");
+//            Copy = genericController.vbReplace(Copy, Constants.vbCr, " ");
 //            return Copy;
 //        }
 //        //        '
@@ -7457,11 +7457,11 @@
 //        //            If expression Is Nothing Then
 //        //                returnString = "null"
 //        //            Else
-//        //                returnString = EncodeText(expression)
+//        //                returnString = genericController.encodeText(expression)
 //        //                If returnString = "" Then
 //        //                    returnString = "null"
 //        //                Else
-//        //                    returnString = "'" & vbReplace(returnString, "'", "''") & "'"
+//        //                    returnString = "'" & genericController.vbReplace(returnString, "'", "''") & "'"
 //        //                End If
 //        //            End If
 //        //            Return returnString
@@ -7476,11 +7476,11 @@
 //        //            If expression Is Nothing Then
 //        //                returnString = "null"
 //        //            Else
-//        //                returnString = EncodeText(expression)
+//        //                returnString = genericController.encodeText(expression)
 //        //                If returnString = "" Then
 //        //                    returnString = "null"
 //        //                Else
-//        //                    returnString = "'" & vbReplace(returnString, "'", "''") & "'"
+//        //                    returnString = "'" & genericController.vbReplace(returnString, "'", "''") & "'"
 //        //                End If
 //        //            End If
 //        //            Return returnString
@@ -7502,7 +7502,7 @@
 //        //                If IsDBNull(expression) Then
 //        //                    returnString = "null"
 //        //                Else
-//        //                    expressionDate = EncodeDate(expression)
+//        //                    expressionDate =  genericController.EncodeDate(expression)
 //        //                    If (expressionDate = Date.MinValue) Then
 //        //                        returnString = "null"
 //        //                    Else
@@ -7529,7 +7529,7 @@
 //        //                Else
 //        //                    returnString = SQLFalse
 //        //                End If
-//        //            ElseIf Not vbIsNumeric(expression) Then
+//        //            ElseIf Not genericController.vbIsNumeric(expression) Then
 //        //                returnString = "null"
 //        //            Else
 //        //                returnString = expression.ToString
@@ -7552,7 +7552,7 @@
 //        //            'Dim src As String
 //        //            '
 //        //            app.EncodeSQLBoolean = SQLFalse
-//        //            If EncodeBoolean(ExpressionVariant) Then
+//        //            If genericController.EncodeBoolean(ExpressionVariant) Then
 //        //                app.EncodeSQLBoolean = SQLTrue
 //        //            End If
 //        //        End Function
@@ -7587,7 +7587,7 @@
 //                //
 //                // If not explicit
 //                //
-//                if (vbInstr(1, ArgumentString, Constants.vbCrLf) != 0)
+//                if (genericController.vbInstr(1, ArgumentString, Constants.vbCrLf) != 0)
 //                {
 //                    //
 //                    // crlf can only be here if it is the delimiter
@@ -7607,7 +7607,7 @@
 //            if (!string.IsNullOrEmpty(WorkingString))
 //            {
 //                WorkingString = Delimiter + WorkingString + Delimiter;
-//                ValueStart = vbInstr(1, WorkingString, Delimiter + Name + "=", Constants.vbTextCompare);
+//                ValueStart = genericController.vbInstr(1, WorkingString, Delimiter + Name + "=", Constants.vbTextCompare);
 //                if (ValueStart != 0)
 //                {
 //                    NameLength = Strings.Len(Name);
@@ -7619,10 +7619,10 @@
 //                    }
 //                    if (IsQuoted)
 //                    {
-//                        ValueEnd = vbInstr(ValueStart, WorkingString, "\"" + Delimiter);
+//                        ValueEnd = genericController.vbInstr(ValueStart, WorkingString, "\"" + Delimiter);
 //                    }
 //                    else {
-//                        ValueEnd = vbInstr(ValueStart, WorkingString, Delimiter);
+//                        ValueEnd = genericController.vbInstr(ValueStart, WorkingString, Delimiter);
 //                    }
 //                    if (ValueEnd == 0)
 //                    {
@@ -7681,7 +7681,7 @@
 //        //    Dim testPath As String
 //        //    '
 //        //    GetAddonRootPath = "addons"
-//        //    If vbInstr(1, GetAddonRootPath, "\github\", vbTextCompare) <> 0 Then
+//        //    If genericController.vbInstr(1, GetAddonRootPath, "\github\", vbTextCompare) <> 0 Then
 //        //        '
 //        //        ' debugging - change program path to dummy path so addon builds all copy to
 //        //        '
@@ -7920,7 +7920,7 @@
 //        /// </summary>
 //        /// <param name="sourceDate"></param>
 //        /// <returns></returns>
-//        public static System.DateTime encodeDateMinValue(System.DateTime sourceDate)
+//        public static System.DateTime genericController.encodeDateMinValue(System.DateTime sourceDate)
 //        {
 //            if (sourceDate <= 1 / 1 / 1000 12:00:00 AM) {
 //                return System.DateTime.MinValue;
@@ -7936,7 +7936,7 @@
 //        /// <returns></returns>
 //        public static bool isMinDate(System.DateTime sourceDate)
 //        {
-//            return encodeDateMinValue(sourceDate) == System.DateTime.MinValue;
+//            return genericController.encodeDateMinValue(sourceDate) == System.DateTime.MinValue;
 //        }
 
 //        //
@@ -7961,16 +7961,16 @@
 //            MethodName = "csv_GetVirtualFilenameByTable";
 //            //
 //            iTableName = TableName;
-//            iTableName = vbReplace(iTableName, " ", "_");
-//            iTableName = vbReplace(iTableName, ".", "_");
+//            iTableName = genericController.vbReplace(iTableName, " ", "_");
+//            iTableName = genericController.vbReplace(iTableName, ".", "_");
 //            //
 //            iFieldName = FieldName;
-//            iFieldName = vbReplace(FieldName, " ", "_");
-//            iFieldName = vbReplace(iFieldName, ".", "_");
+//            iFieldName = genericController.vbReplace(FieldName, " ", "_");
+//            iFieldName = genericController.vbReplace(iFieldName, ".", "_");
 //            //
 //            iOriginalFilename = OriginalFilename;
-//            iOriginalFilename = vbReplace(iOriginalFilename, " ", "_");
-//            iOriginalFilename = vbReplace(iOriginalFilename, ".", "_");
+//            iOriginalFilename = genericController.vbReplace(iOriginalFilename, " ", "_");
+//            iOriginalFilename = genericController.vbReplace(iOriginalFilename, ".", "_");
 //            //
 //            RecordIDString = Convert.ToString(RecordID);
 //            if (RecordID == 0)
@@ -8023,10 +8023,10 @@
 //            MethodName = "getRandomLong";
 //            //
 //            RandomBase = Threading.Thread.CurrentThread.ManagedThreadId;
-//            RandomBase = EncodeInteger(RandomBase + ((Math.Pow(2, 30)) - 1));
-//            RandomLimit = EncodeInteger((Math.Pow(2, 31)) - RandomBase - 1);
+//            RandomBase = genericController.EncodeInteger(RandomBase + ((Math.Pow(2, 30)) - 1));
+//            RandomLimit = genericController.EncodeInteger((Math.Pow(2, 31)) - RandomBase - 1);
 //            VBMath.Randomize();
-//            return EncodeInteger(RandomBase + (VBMath.Rnd() * RandomLimit));
+//            return genericController.EncodeInteger(RandomBase + (VBMath.Rnd() * RandomLimit));
 //        }
 //        //
 //        //====================================================================================================
@@ -8051,11 +8051,11 @@
 //            string returnPath = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
 //            int ptr = 0;
 //            //
-//            ptr = vbInstr(1, returnPath, "\\github\\", Constants.vbTextCompare);
+//            ptr = genericController.vbInstr(1, returnPath, "\\github\\", Constants.vbTextCompare);
 //            if (ptr != 0)
 //            {
 //                // for ...\github\contensive4?\bin"
-//                ptr = vbInstr(ptr + 8, returnPath, "\\");
+//                ptr = genericController.vbInstr(ptr + 8, returnPath, "\\");
 //                returnPath = Strings.Left(returnPath, ptr) + "bin\\";
 //            }
 
@@ -8127,7 +8127,7 @@
 //                    cPtr = 0;
 //                    foreach (DataColumn cell in dt.Columns)
 //                    {
-//                        rows(cPtr, rPtr) = EncodeText(dr(cell));
+//                        rows(cPtr, rPtr) = genericController.encodeText(dr(cell));
 //                        cPtr += 1;
 //                    }
 //                    rPtr += 1;
@@ -8199,7 +8199,7 @@
 //            // this routine was originally written to handle modes that were not adopted (content file absolute and relative URLs)
 //            // leave it here as a simple slash converter in case other conversions are needed later
 //            //
-//            return vbReplace(cdnUrl, "/", "\\");
+//            return genericController.vbReplace(cdnUrl, "/", "\\");
 //        }
 //        //
 //        //==============================================================================
@@ -8248,22 +8248,22 @@
 //        //
 //        //====================================================================================================
 //        //
-//        public static int vbInstr(string string1, string string2, CompareMethod compare)
+//        public static int genericController.vbInstr(string string1, string string2, CompareMethod compare)
 //        {
-//            return vbInstr(1, string1, string2, compare);
+//            return genericController.vbInstr(1, string1, string2, compare);
 //        }
 //        //
-//        public static int vbInstr(string string1, string string2)
+//        public static int genericController.vbInstr(string string1, string string2)
 //        {
-//            return vbInstr(1, string1, string2, CompareMethod.Binary);
+//            return genericController.vbInstr(1, string1, string2, CompareMethod.Binary);
 //        }
 //        //
-//        public static int vbInstr(int start, string string1, string string2)
+//        public static int genericController.vbInstr(int start, string string1, string string2)
 //        {
-//            return vbInstr(start, string1, string2, CompareMethod.Binary);
+//            return genericController.vbInstr(start, string1, string2, CompareMethod.Binary);
 //        }
 //        //
-//        public static int vbInstr(int start, string string1, string string2, CompareMethod compare)
+//        public static int genericController.vbInstr(int start, string string1, string string2, CompareMethod compare)
 //        {
 //            if ((string.IsNullOrEmpty(string1)))
 //            {
@@ -8288,12 +8288,12 @@
 //        //
 //        //====================================================================================================
 //        //
-//        public static string vbReplace(string expression, string find, string replacement)
+//        public static string genericController.vbReplace(string expression, string find, string replacement)
 //        {
-//            return vbReplace(expression, find, replacement, 1, 9999, CompareMethod.Binary);
+//            return genericController.vbReplace(expression, find, replacement, 1, 9999, CompareMethod.Binary);
 //        }
 //        //
-//        public static string vbReplace(string expression, string find, string replacement, int startIgnore, int countIgnore, CompareMethod compare)
+//        public static string genericController.vbReplace(string expression, string find, string replacement, int startIgnore, int countIgnore, CompareMethod compare)
 //        {
 //            if (string.IsNullOrEmpty(expression))
 //            {
@@ -8324,7 +8324,7 @@
 //        /// </summary>
 //        /// <param name="source"></param>
 //        /// <returns></returns>
-//        public static string vbUCase(string source)
+//        public static string genericController.vbUCase(string source)
 //        {
 //            if ((string.IsNullOrEmpty(source)))
 //            {
@@ -8341,7 +8341,7 @@
 //        /// </summary>
 //        /// <param name="source"></param>
 //        /// <returns></returns>
-//        public static string vbLCase(string source)
+//        public static string genericController.vbLCase(string source)
 //        {
 //            if ((string.IsNullOrEmpty(source)))
 //            {
@@ -8442,7 +8442,7 @@
 //            }
 //        }
 //        //
-//        public static bool vbIsNumeric(object Expression)
+//        public static bool genericController.vbIsNumeric(object Expression)
 //        {
 //            if ((Expression is DateTime))
 //            {
@@ -8488,13 +8488,13 @@
 //            // arrange
 //            // act
 //            // assert
-//            Assert.AreEqual(coreCommonModule.EncodeBoolean(true), true);
-//            Assert.AreEqual(coreCommonModule.EncodeBoolean(0), false);
-//            Assert.AreEqual(coreCommonModule.EncodeBoolean(1), true);
-//            Assert.AreEqual(coreCommonModule.EncodeBoolean("on"), true);
-//            Assert.AreEqual(coreCommonModule.EncodeBoolean("off"), false);
-//            Assert.AreEqual(coreCommonModule.EncodeBoolean("true"), true);
-//            Assert.AreEqual(coreCommonModule.EncodeBoolean("false"), false);
+//            Assert.AreEqual(coreCommonModule.genericController.EncodeBoolean(true), true);
+//            Assert.AreEqual(coreCommonModule.genericController.EncodeBoolean(0), false);
+//            Assert.AreEqual(coreCommonModule.genericController.EncodeBoolean(1), true);
+//            Assert.AreEqual(coreCommonModule.genericController.EncodeBoolean("on"), true);
+//            Assert.AreEqual(coreCommonModule.genericController.EncodeBoolean("off"), false);
+//            Assert.AreEqual(coreCommonModule.genericController.EncodeBoolean("true"), true);
+//            Assert.AreEqual(coreCommonModule.genericController.EncodeBoolean("false"), false);
 //        }
 //        //
 //        [Fact()]
@@ -8503,7 +8503,7 @@
 //            // arrange
 //            // act
 //            // assert
-//            Assert.AreEqual(coreCommonModule.EncodeText(1), "1");
+//            Assert.AreEqual(coreCommonModule.genericController.encodeText(1), "1");
 //        }
 //        //
 //        [Fact()]
@@ -8554,34 +8554,34 @@
 //        [Fact()]
 //        public void vbInstr_test()
 //        {
-//            //vbInstr(1, Link, "?")
-//            Assert.AreEqual(Strings.InStr("abcdefgabcdefgabcdefgabcdefg", "d"), coreCommonModule.vbInstr("abcdefgabcdefgabcdefgabcdefg", "d"));
-//            Assert.AreEqual(Strings.InStr("abcdefgabcdefgabcdefgabcdefg", "E"), coreCommonModule.vbInstr("abcdefgabcdefgabcdefgabcdefg", "E"));
-//            Assert.AreEqual(Strings.InStr(10, "abcdefgabcdefgabcdefgabcdefg", "E"), coreCommonModule.vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E"));
-//            Assert.AreEqual(Strings.InStr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Binary), coreCommonModule.vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Binary));
-//            Assert.AreEqual(Strings.InStr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Text), coreCommonModule.vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Text));
-//            Assert.AreEqual(Strings.InStr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Binary), coreCommonModule.vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Binary));
-//            Assert.AreEqual(Strings.InStr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Text), coreCommonModule.vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Text));
+//            //genericController.vbInstr(1, Link, "?")
+//            Assert.AreEqual(Strings.InStr("abcdefgabcdefgabcdefgabcdefg", "d"), coreCommonModule.genericController.vbInstr("abcdefgabcdefgabcdefgabcdefg", "d"));
+//            Assert.AreEqual(Strings.InStr("abcdefgabcdefgabcdefgabcdefg", "E"), coreCommonModule.genericController.vbInstr("abcdefgabcdefgabcdefgabcdefg", "E"));
+//            Assert.AreEqual(Strings.InStr(10, "abcdefgabcdefgabcdefgabcdefg", "E"), coreCommonModule.genericController.vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E"));
+//            Assert.AreEqual(Strings.InStr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Binary), coreCommonModule.genericController.vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Binary));
+//            Assert.AreEqual(Strings.InStr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Text), coreCommonModule.genericController.vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Text));
+//            Assert.AreEqual(Strings.InStr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Binary), coreCommonModule.genericController.vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Binary));
+//            Assert.AreEqual(Strings.InStr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Text), coreCommonModule.genericController.vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Text));
 //            string haystack = "abcdefgabcdefgabcdefgabcdefg";
 //            string needle = "c";
-//            Assert.AreEqual(Strings.InStr(1, "?", "?"), coreCommonModule.vbInstr(1, "?", "?"));
+//            Assert.AreEqual(Strings.InStr(1, "?", "?"), coreCommonModule.genericController.vbInstr(1, "?", "?"));
 //            for (int ptr = 1; ptr <= haystack.Length; ptr++)
 //            {
-//                Assert.AreEqual(Strings.InStr(ptr, haystack, needle, CompareMethod.Binary), coreCommonModule.vbInstr(ptr, haystack, needle, CompareMethod.Binary));
+//                Assert.AreEqual(Strings.InStr(ptr, haystack, needle, CompareMethod.Binary), coreCommonModule.genericController.vbInstr(ptr, haystack, needle, CompareMethod.Binary));
 //            }
 //        }
 //        //
 //        [Fact()]
 //        public void vbIsNumeric_test()
 //        {
-//            Assert.AreEqual(Information.IsNumeric(0), coreCommonModule.vbIsNumeric(0));
-//            Assert.AreEqual(Information.IsNumeric(new System.DateTime(2000, 1, 1)), coreCommonModule.vbIsNumeric(new System.DateTime(2000, 1, 1)));
-//            Assert.AreEqual(Information.IsNumeric(1234), coreCommonModule.vbIsNumeric(1234));
-//            Assert.AreEqual(Information.IsNumeric(12.34), coreCommonModule.vbIsNumeric(12.34));
-//            Assert.AreEqual(Information.IsNumeric("abcd"), coreCommonModule.vbIsNumeric("abcd"));
-//            Assert.AreEqual(Information.IsNumeric("1234"), coreCommonModule.vbIsNumeric("1234"));
-//            Assert.AreEqual(Information.IsNumeric("12.34"), coreCommonModule.vbIsNumeric("12.34"));
-//            Assert.AreEqual(Information.IsNumeric(null), coreCommonModule.vbIsNumeric(null));
+//            Assert.AreEqual(Information.IsNumeric(0), coreCommonModule.genericController.vbIsNumeric(0));
+//            Assert.AreEqual(Information.IsNumeric(new System.DateTime(2000, 1, 1)), coreCommonModule.genericController.vbIsNumeric(new System.DateTime(2000, 1, 1)));
+//            Assert.AreEqual(Information.IsNumeric(1234), coreCommonModule.genericController.vbIsNumeric(1234));
+//            Assert.AreEqual(Information.IsNumeric(12.34), coreCommonModule.genericController.vbIsNumeric(12.34));
+//            Assert.AreEqual(Information.IsNumeric("abcd"), coreCommonModule.genericController.vbIsNumeric("abcd"));
+//            Assert.AreEqual(Information.IsNumeric("1234"), coreCommonModule.genericController.vbIsNumeric("1234"));
+//            Assert.AreEqual(Information.IsNumeric("12.34"), coreCommonModule.genericController.vbIsNumeric("12.34"));
+//            Assert.AreEqual(Information.IsNumeric(null), coreCommonModule.genericController.vbIsNumeric(null));
 //        }
 //        //
 //        [Fact()]

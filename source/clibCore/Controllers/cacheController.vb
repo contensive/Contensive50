@@ -71,7 +71,7 @@ Namespace Contensive.Core.Controllers
                             Dim serializedDataObject As String = Nothing
                             Using mutex As New System.Threading.Mutex(False, rawCacheName)
                                 mutex.WaitOne()
-                                serializedDataObject = cpCore.privateFiles.readFile("appCache\" & encodeFilename(rawCacheName & ".txt"))
+                                serializedDataObject = cpCore.privateFiles.readFile("appCache\" & genericController.encodeFilename(rawCacheName & ".txt"))
                                 mutex.ReleaseMutex()
                             End Using
                             If String.IsNullOrEmpty(serializedDataObject) Then
@@ -139,7 +139,7 @@ Namespace Contensive.Core.Controllers
                 Else
                     cacheEndpointSplit = cacheEndpoint.Split(":"c)
                     If cacheEndpointSplit.Count > 1 Then
-                        cacheEndpointPort = EncodeInteger(cacheEndpointSplit(1))
+                        cacheEndpointPort = genericController.EncodeInteger(cacheEndpointSplit(1))
                     Else
                         cacheEndpointPort = 11211
                     End If
@@ -176,7 +176,7 @@ Namespace Contensive.Core.Controllers
                     If TypeOf (dataObject) Is Date Then
                         _globalInvalidationDate = DirectCast(dataObject, Date)
                     ElseIf TypeOf (dataObject) Is String Then
-                        _globalInvalidationDate = EncodeDate(dataObject)
+                        _globalInvalidationDate = genericController.EncodeDate(dataObject)
                     Else
                         _globalInvalidationDate = Date.MinValue
                     End If
@@ -210,7 +210,7 @@ Namespace Contensive.Core.Controllers
                             'Dim serializedData As String = cpCore.json.Serialize(data)
                             Using mutex As New System.Threading.Mutex(False, rawCacheName)
                                 mutex.WaitOne()
-                                cpCore.privateFiles.saveFile("appCache\" & encodeFilename(rawCacheName & ".txt"), serializedData)
+                                cpCore.privateFiles.saveFile("appCache\" & genericController.encodeFilename(rawCacheName & ".txt"), serializedData)
                                 mutex.ReleaseMutex()
                             End Using
                         Else
@@ -590,6 +590,11 @@ Namespace Contensive.Core.Controllers
                 Return cpCore.serverConfig.appConfig.enableCache
             End Get
         End Property
+        '
+        '====================================================================================================
+        Public Function getString(key As String) As String
+            Return genericController.encodeText(getObject(Of String)(key))
+        End Function
         '
         '========================================================================
         '   Read a string from Bake Cache

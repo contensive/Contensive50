@@ -3,6 +3,8 @@ Option Explicit On
 Option Strict On
 
 Imports Microsoft.Web.Administration
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 
 Namespace Contensive.Core
     ''' <summary>
@@ -72,15 +74,15 @@ Namespace Contensive.Core
                 Dim Copy As String
                 '
                 Call Randomize()
-                LogFilename = "Temp\" & EncodeText(GetRandomInteger()) & ".Log"
+                LogFilename = "Temp\" & genericController.encodeText(genericController.GetRandomInteger()) & ".Log"
                 Cmd = "IISReset.exe"
                 arg = "/restart >> """ & LogFilename & """"
                 Call runProcess(cpCore, Cmd, arg, True)
                 Copy = cpCore.privateFiles.readFile(LogFilename)
                 Call cpCore.privateFiles.deleteFile(LogFilename)
-                Copy = vbReplace(Copy, vbCrLf, "\n")
-                Copy = vbReplace(Copy, vbCr, "\n")
-                Copy = vbReplace(Copy, vbLf, "\n")
+                Copy = genericController.vbReplace(Copy, vbCrLf, "\n")
+                Copy = genericController.vbReplace(Copy, vbCr, "\n")
+                Copy = genericController.vbReplace(Copy, vbLf, "\n")
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -99,14 +101,14 @@ Namespace Contensive.Core
                 Dim Copy As String
                 '
                 Call Randomize()
-                LogFilename = "Temp\" & EncodeText(GetRandomInteger()) & ".Log"
+                LogFilename = "Temp\" & genericController.encodeText(genericController.GetRandomInteger()) & ".Log"
                 Cmd = "%comspec% /c IISReset /stop >> """ & LogFilename & """"
                 Call runProcess(cpCore, Cmd, , True)
                 Copy = cpCore.privateFiles.readFile(LogFilename)
                 Call cpCore.privateFiles.deleteFile(LogFilename)
-                Copy = vbReplace(Copy, vbCrLf, "\n")
-                Copy = vbReplace(Copy, vbCr, "\n")
-                Copy = vbReplace(Copy, vbLf, "\n")
+                Copy = genericController.vbReplace(Copy, vbCrLf, "\n")
+                Copy = genericController.vbReplace(Copy, vbCr, "\n")
+                Copy = genericController.vbReplace(Copy, vbLf, "\n")
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -130,9 +132,9 @@ Namespace Contensive.Core
                 Call runProcess(cpCore, Cmd, , True)
                 Copy = cpCore.privateFiles.readFile(LogFilename)
                 Call cpCore.privateFiles.deleteFile(LogFilename)
-                Copy = vbReplace(Copy, vbCrLf, "\n")
-                Copy = vbReplace(Copy, vbCr, "\n")
-                Copy = vbReplace(Copy, vbLf, "\n")
+                Copy = genericController.vbReplace(Copy, vbCrLf, "\n")
+                Copy = genericController.vbReplace(Copy, vbCr, "\n")
+                Copy = genericController.vbReplace(Copy, vbLf, "\n")
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -258,7 +260,7 @@ Namespace Contensive.Core
                             '
                             ' normal non-first elements
                             '
-                            requestQueryString = ModifyQueryString(requestQueryString, key, keyValue)
+                            requestQueryString = genericController.ModifyQueryString(requestQueryString, key, keyValue)
                         Else
                             '
                             ' first element - test first querystring element for iis 404
@@ -266,13 +268,13 @@ Namespace Contensive.Core
                             If ((keyValue & "    ").Substring(0, 4) = "404;") Then
                                 ' 404 hit with url like http://domain/page, qsName is http://domain/page qsValue is value0
                                 aliasRoute = keyValue.Substring(4)
-                                requestQueryString = ModifyQueryString(requestQueryString, key, keyValue)
+                                requestQueryString = genericController.ModifyQueryString(requestQueryString, key, keyValue)
                             Else
                                 ' test for special 404 case where first element of qs starts 404;url
                                 If ((key & "    ").Substring(0, 4) = "404;") Then
                                     ' 404 hit with url like 404;http://domain/page?name0=value0&etc... , qsName is http://domain/page?name0 qsValue is value0
                                     key = key.Substring(4)
-                                    pos = vbInstr(1, key, "?")
+                                    pos = genericController.vbInstr(1, key, "?")
                                     If pos <> 0 Then
                                         aliasRoute = Mid(key, 1, pos - 1)
                                         key = Mid(key, pos + 1)
@@ -280,15 +282,15 @@ Namespace Contensive.Core
                                         aliasRoute = key
                                         key = ""
                                     End If
-                                    requestQueryString = ModifyQueryString(requestQueryString, key, keyValue)
+                                    requestQueryString = genericController.ModifyQueryString(requestQueryString, key, keyValue)
                                 Else
-                                    requestQueryString = ModifyQueryString(requestQueryString, key, keyValue)
+                                    requestQueryString = genericController.ModifyQueryString(requestQueryString, key, keyValue)
                                 End If
                             End If
                             '
                             ' set context domain and pathPath from the URL from in the 404 string 
                             '
-                            pos = vbInstr(1, aliasRoute, "://")
+                            pos = genericController.vbInstr(1, aliasRoute, "://")
                             If pos > 0 Then
                                 '
                                 ' remove protocol
@@ -296,14 +298,14 @@ Namespace Contensive.Core
                                 testPage = aliasRoute
                                 SourceProtocol = Mid(testPage, 1, pos + 2)
                                 testPage = Mid(testPage, pos + 3)
-                                pos = vbInstr(1, testPage, "/")
+                                pos = genericController.vbInstr(1, testPage, "/")
                                 If pos > 0 Then
                                     '
                                     ' remove domain and port
                                     '
                                     aliasDomain = Mid(testPage, 1, pos - 1)
                                     aliasPathPage = Mid(testPage, pos)
-                                    pos = vbInstr(1, aliasDomain, ":")
+                                    pos = genericController.vbInstr(1, aliasDomain, ":")
                                     If pos > 0 Then
                                         aliasPort = Mid(aliasDomain, pos + 1)
                                         aliasDomain = Left(aliasDomain, pos - 1)
@@ -344,7 +346,7 @@ Namespace Contensive.Core
                         For Each key In iisContext.Request.Form.Keys
                             keyValue = iisContext.Request.Form(key)
                             cpCore.docProperties.setProperty(key, keyValue, True)
-                            requestFormString = ModifyQueryString(requestFormString, key, keyValue)
+                            requestFormString = genericController.ModifyQueryString(requestFormString, key, keyValue)
                         Next
                     Else
                         '
@@ -359,7 +361,7 @@ Namespace Contensive.Core
                                     key = parameter.Name
                                     keyValue = parameter.Data
                                     cpCore.docProperties.setProperty(key, keyValue, True)
-                                    requestFormString = ModifyQueryString(requestFormString, key, keyValue)
+                                    requestFormString = genericController.ModifyQueryString(requestFormString, key, keyValue)
                                 Next
                                 '
                                 ' file uploads, add to doc properties
@@ -475,7 +477,7 @@ Namespace Contensive.Core
                         ' /***** removed so the new system does not cpcore.main_Get the referrers QS
                         ' /***** the best we remember, only Aspen uses this, and they are moving
                         '
-                        If vbInstr(1, requestReferrer, "?") <> 0 Then
+                        If genericController.vbInstr(1, requestReferrer, "?") <> 0 Then
                             LinkSplit = Split(requestReferrer, "?")
                             ampSplit = Split(LinkSplit(1), "&")
                             ampSplitCount = UBound(ampSplit) + 1
@@ -573,7 +575,7 @@ Namespace Contensive.Core
                     End If
                     '
                     ' REFACTOR -- move to cpcore.domains class 
-                    domainDetailsListText = EncodeText(cpCore.cache.getObject(Of String)("domainContentList"))
+                    domainDetailsListText = genericController.encodeText(cpCore.cache.getObject(Of String)("domainContentList"))
                     If Not String.IsNullOrEmpty(domainDetailsListText) Then
                         Try
                             cpCore.domains.domainDetailsList = cpCore.json.Deserialize(Of Dictionary(Of String, Models.Entity.domainLegacyModel.domainDetailsClass))(domainDetailsListText)
@@ -599,16 +601,16 @@ Namespace Contensive.Core
                                         If Not cpCore.domains.domainDetailsList.ContainsKey(domainNameNew.ToLower) Then
                                             Dim domainDetailsNew As New Models.Entity.domainLegacyModel.domainDetailsClass
                                             domainDetailsNew.name = domainNameNew
-                                            domainDetailsNew.rootPageId = EncodeInteger(row.Item(1).ToString)
-                                            domainDetailsNew.noFollow = EncodeBoolean(row.Item(2).ToString)
-                                            domainDetailsNew.typeId = EncodeInteger(row.Item(3).ToString)
-                                            domainDetailsNew.visited = EncodeBoolean(row.Item(4).ToString)
-                                            domainDetailsNew.id = EncodeInteger(row.Item(5).ToString)
+                                            domainDetailsNew.rootPageId = genericController.EncodeInteger(row.Item(1).ToString)
+                                            domainDetailsNew.noFollow = genericController.EncodeBoolean(row.Item(2).ToString)
+                                            domainDetailsNew.typeId = genericController.EncodeInteger(row.Item(3).ToString)
+                                            domainDetailsNew.visited = genericController.EncodeBoolean(row.Item(4).ToString)
+                                            domainDetailsNew.id = genericController.EncodeInteger(row.Item(5).ToString)
                                             domainDetailsNew.forwardUrl = row.Item(6).ToString
-                                            domainDetailsNew.defaultTemplateId = EncodeInteger(row.Item(7).ToString)
-                                            domainDetailsNew.pageNotFoundPageId = EncodeInteger(row.Item(8).ToString)
-                                            domainDetailsNew.allowCrossLogin = EncodeBoolean(row.Item(9).ToString)
-                                            domainDetailsNew.forwardDomainId = EncodeInteger(row.Item(10).ToString)
+                                            domainDetailsNew.defaultTemplateId = genericController.EncodeInteger(row.Item(7).ToString)
+                                            domainDetailsNew.pageNotFoundPageId = genericController.EncodeInteger(row.Item(8).ToString)
+                                            domainDetailsNew.allowCrossLogin = genericController.EncodeBoolean(row.Item(9).ToString)
+                                            domainDetailsNew.forwardDomainId = genericController.EncodeInteger(row.Item(10).ToString)
                                             cpCore.domains.domainDetailsList.Add(domainNameNew.ToLower(), domainDetailsNew)
                                         End If
                                     End If
@@ -673,7 +675,7 @@ Namespace Contensive.Core
                             '
                             ' normal domain, leave it
                             '
-                        ElseIf vbInstr(1, requestPathPage, cpCore.siteProperties.adminURL, vbTextCompare) <> 0 Then
+                        ElseIf genericController.vbInstr(1, requestPathPage, cpCore.siteProperties.adminURL, vbTextCompare) <> 0 Then
                             '
                             ' forwarding does not work in the admin site
                             '
@@ -684,7 +686,7 @@ Namespace Contensive.Core
                             '
                             'Call AppendLog("main_init(), 1710 - exit for domain forward")
                             '
-                            If vbInstr(1, cpCore.domains.domainDetails.forwardUrl, "://") = 0 Then
+                            If genericController.vbInstr(1, cpCore.domains.domainDetails.forwardUrl, "://") = 0 Then
                                 cpCore.domains.domainDetails.forwardUrl = "http://" & cpCore.domains.domainDetails.forwardUrl
                             End If
                             Call cpCore.webServerIO_Redirect2(cpCore.domains.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domains.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this URL", False)
@@ -695,13 +697,13 @@ Namespace Contensive.Core
                             '
                             forwardDomain = cpCore.content_GetRecordName("domains", cpCore.domains.domainDetails.forwardDomainId)
                             If forwardDomain <> "" Then
-                                pos = vbInstr(1, requestLinkSource, requestDomain, vbTextCompare)
+                                pos = genericController.vbInstr(1, requestLinkSource, requestDomain, vbTextCompare)
                                 If (pos > 0) Then
                                     '
                                     'Call AppendLog("main_init(), 1720 - exit for forward domain")
                                     '
                                     cpCore.domains.domainDetails.forwardUrl = Mid(requestLinkSource, 1, pos - 1) & forwardDomain & Mid(requestLinkSource, pos + Len(requestDomain))
-                                    'main_domainForwardUrl = vbReplace(main_ServerLinkSource, cpcore.main_ServerHost, forwardDomain)
+                                    'main_domainForwardUrl = genericController.vbReplace(main_ServerLinkSource, cpcore.main_ServerHost, forwardDomain)
                                     Call cpCore.webServerIO_Redirect2(cpCore.domains.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domains.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this replacement domain", False)
                                     Return cpCore.docOpen
                                 End If
@@ -855,7 +857,7 @@ Namespace Contensive.Core
                     '
                     'Call AppendLog("main_init(), 2300")
                     '
-                    If (RedirectLink = "") And (Not cpCore.domains.ServerMultiDomainMode) And (LCase(requestDomain) <> vbLCase(cpCore.webServerIO_requestDomain)) Then
+                    If (RedirectLink = "") And (Not cpCore.domains.ServerMultiDomainMode) And (LCase(requestDomain) <> genericController.vbLCase(cpCore.webServerIO_requestDomain)) Then
                         '
                         'Call AppendLog("main_init(), 2310 - exit in domain and path check")
                         '
@@ -875,7 +877,7 @@ Namespace Contensive.Core
                     ''
                     'If (RedirectLink = "") And (requestAppRootPath = "/") And (InStr(1, cpCore.webServerIO_requestPath, cpCore.webServerIO_requestVirtualFilePath & "/", vbTextCompare) = 1) Then
                     '    Copy = "Redirecting because this site can not be run in the path [" & cpCore.webServerIO_requestVirtualFilePath & "]"
-                    '    cpCore.webServerIO_requestPath = vbReplace(cpCore.webServerIO_requestPath, cpCore.serverConfig.appConfig.name & "/", "", 1, 99, vbTextCompare)
+                    '    cpCore.webServerIO_requestPath = genericController.vbReplace(cpCore.webServerIO_requestPath, cpCore.serverConfig.appConfig.name & "/", "", 1, 99, vbTextCompare)
                     '    Dim dstUrl As String = cpCore.webServerIO_requestProtocol & cpCore.webServerIO_requestDomain & cpCore.webServerIO_requestPath & cpCore.webServerIO_requestPage
                     '    If requestQueryString <> "" Then
                     '        dstUrl &= "?" & requestQueryString
@@ -956,9 +958,9 @@ Namespace Contensive.Core
                 ''
                 'web_GetStreamCookie = ""
                 'If web.cookieArrayCount > 0 Then
-                '    UName = vbUCase(CookieName)
+                '    UName = genericController.vbUCase(CookieName)
                 '    For Pointer = 0 To web.cookieArrayCount - 1
-                '        If UName = vbUCase(web.requestCookies(Pointer).Name) Then
+                '        If UName = genericController.vbUCase(web.requestCookies(Pointer).Name) Then
                 '            web_GetStreamCookie = web.requestCookies(Pointer).Value
                 '            Exit For
                 '        End If
@@ -1000,13 +1002,13 @@ Namespace Contensive.Core
                 Dim usedDomainList As String = ""
                 Dim Ptr As Integer
                 '
-                iCookieName = EncodeText(CookieName)
-                iCookieValue = EncodeText(CookieValue)
+                iCookieName = genericController.encodeText(CookieName)
+                iCookieValue = genericController.encodeText(CookieValue)
                 '
                 MethodName = "main_addResponseCookie"
                 '
                 If cpCore.docOpen And cpCore.docBufferEnabled Then
-                    If (isMissing(domain)) And cpCore.domains.domainDetails.allowCrossLogin And EncodeBoolean(cpCore.siteProperties.getBoolean("Write Cookies to All Domains", True)) Then
+                    If (isMissing(domain)) And cpCore.domains.domainDetails.allowCrossLogin And genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("Write Cookies to All Domains", True)) Then
                         '
                         ' no domain provided, new mode
                         '   - write cookie for current domains
@@ -1021,7 +1023,7 @@ Namespace Contensive.Core
                                 '
                                 ' valid, non-repeat domain
                                 '
-                                If vbLCase(domainSet) = vbLCase(requestDomain) Then
+                                If genericController.vbLCase(domainSet) = genericController.vbLCase(requestDomain) Then
                                     '
                                     ' current domain, set cookie
                                     '
@@ -1035,7 +1037,7 @@ Namespace Contensive.Core
                                         End If
                                         'main_ASPResponse.Cookies(iCookieName).domain = domainSet
                                         If Not isMissing(Path) Then
-                                            iisContext.Response.Cookies(iCookieName).Path = EncodeText(Path)
+                                            iisContext.Response.Cookies(iCookieName).Path = genericController.encodeText(Path)
                                         End If
                                         If Not isMissing(Secure) Then
                                             iisContext.Response.Cookies(iCookieName).Secure = Secure
@@ -1062,12 +1064,12 @@ Namespace Contensive.Core
                                         '
                                         s = "/"
                                         If Not isMissing(Path) Then
-                                            s = EncodeText(Path)
+                                            s = genericController.encodeText(Path)
                                         End If
                                         cpCore._docBufferCookies = cpCore._docBufferCookies & vbCrLf & s
                                         '
                                         s = "false"
-                                        If EncodeBoolean(Secure) Then
+                                        If genericController.EncodeBoolean(Secure) Then
                                             s = "true"
                                         End If
                                         cpCore._docBufferCookies = cpCore._docBufferCookies & vbCrLf & s
@@ -1081,15 +1083,15 @@ Namespace Contensive.Core
                                     Link = Link & "?n=" & EncodeRequestVariable(iCookieName)
                                     Link = Link & "&v=" & EncodeRequestVariable(iCookieValue)
                                     If Not isMissing(Path) Then
-                                        C = EncodeText(Path)
+                                        C = genericController.encodeText(Path)
                                         C = EncodeRequestVariable(C)
-                                        C = vbReplace(C, "/", "%2F")
+                                        C = genericController.vbReplace(C, "/", "%2F")
                                         Link = Link & "&p=" & C
                                     End If
                                     If Not isMinDate(DateExpires) Then
-                                        C = EncodeText(DateExpires)
+                                        C = genericController.encodeText(DateExpires)
                                         C = EncodeRequestVariable(C)
-                                        C = vbReplace(C, "/", "%2F")
+                                        C = genericController.vbReplace(C, "/", "%2F")
                                         Link = Link & "&e=" & C
                                     End If
                                     Link = cpCore.html.html_EncodeHTML(Link)
@@ -1111,7 +1113,7 @@ Namespace Contensive.Core
                             End If
                             'main_ASPResponse.Cookies(iCookieName).domain = domainSet
                             If Not isMissing(Path) Then
-                                iisContext.Response.Cookies(iCookieName).Path = EncodeText(Path)
+                                iisContext.Response.Cookies(iCookieName).Path = genericController.encodeText(Path)
                             End If
                             If Not isMissing(Secure) Then
                                 iisContext.Response.Cookies(iCookieName).Secure = Secure
@@ -1135,18 +1137,18 @@ Namespace Contensive.Core
                             '
                             s = ""
                             If Not isMissing(domain) Then
-                                s = EncodeText(domain)
+                                s = genericController.encodeText(domain)
                             End If
                             cpCore._docBufferCookies = cpCore._docBufferCookies & vbCrLf & s
                             '
                             s = "/"
                             If Not isMissing(Path) Then
-                                s = EncodeText(Path)
+                                s = genericController.encodeText(Path)
                             End If
                             cpCore._docBufferCookies = cpCore._docBufferCookies & vbCrLf & s
                             '
                             s = "false"
-                            If EncodeBoolean(Secure) Then
+                            If genericController.EncodeBoolean(Secure) Then
                                 s = "true"
                             End If
                             cpCore._docBufferCookies = cpCore._docBufferCookies & vbCrLf & s

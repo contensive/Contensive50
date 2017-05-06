@@ -2,6 +2,8 @@
 Option Explicit On
 Option Strict On
 
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 Imports System.Xml
 
 Namespace Contensive.Core
@@ -144,7 +146,7 @@ Namespace Contensive.Core
                     Else
                         '
                         PreTableCopy = "Use this form to upload an add-on collection. If the GUID of the add-on matches one already installed on this server, it will be updated. If the GUID is new, it will be added."
-                        InstallFolder = "temp\CollectionUpload" & CStr(GetRandomInteger())
+                        InstallFolder = "temp\CollectionUpload" & CStr(genericController.GetRandomInteger())
                         privateFilesInstallPath = InstallFolder & "\"
                         If (Button = ButtonOK) Then
                             '
@@ -239,17 +241,17 @@ Namespace Contensive.Core
                                         '                                        '
                                         '                                    Else
                                         '                                        With Doc.documentElement
-                                        '                                            If vbLCase(.baseName) = "collection" Then
+                                        '                                            If genericController.vbLCase(.baseName) = "collection" Then
                                         '                                                CollectionName = GetXMLAttribute(IsFound, Doc.documentElement, "name", "")
-                                        '                                                CollectionSystem = encodeBoolean(GetXMLAttribute(IsFound, Doc.documentElement, "system", ""))
+                                        '                                                CollectionSystem = genericController.EncodeBoolean(GetXMLAttribute(IsFound, Doc.documentElement, "system", ""))
                                         '                                                For Each CDef_Node In .childNodes
-                                        '                                                    Select Case vbLCase(CDef_Node.name)
+                                        '                                                    Select Case genericController.vbLCase(CDef_Node.name)
                                         '                                                        Case "interfaces"
                                         '                                                            For Each InterfaceNode In CDef_Node.childNodes
-                                        '                                                                Select Case vbLCase(InterfaceNode.name)
+                                        '                                                                Select Case genericController.vbLCase(InterfaceNode.name)
                                         '                                                                    Case "page"
                                         '                                                                        For Each PageNode In InterfaceNode.childNodes
-                                        '                                                                            If vbLCase(PageNode.name) = "navigator" Then
+                                        '                                                                            If genericController.vbLCase(PageNode.name) = "navigator" Then
                                         '                                                                                NavigatorCnt = Collections(CollectionCnt).NavigatorCnt
                                         '                                                                                ReDim Preserve Collections(CollectionCnt).Navigators(NavigatorCnt)
                                         '                                                                                Collections(CollectionCnt).Navigators(NavigatorCnt).name = GetXMLAttribute(IsFound, PageNode, "name", "")
@@ -265,13 +267,13 @@ Namespace Contensive.Core
                                         '                                                            ' load menu entries
                                         '                                                            '
                                         '                                                            For Each CDefNode In CDef_Node.childNodes
-                                        '                                                                If vbLCase(CDefNode.name) = "adminmenu" Then
+                                        '                                                                If genericController.vbLCase(CDefNode.name) = "adminmenu" Then
                                         '                                                                    MenuCnt = Collections(CollectionCnt).MenuCnt
                                         '                                                                    ReDim Preserve Collections(CollectionCnt).Menus(MenuCnt)
                                         '                                                                    Collections(CollectionCnt).Menus(MenuCnt) = GetXMLAttribute(IsFound, CDefNode, "name", "")
                                         '                                                                    Collections(CollectionCnt).MenuCnt = MenuCnt + 1
                                         '                                                                End If
-                                        '                                                                If vbLCase(CDefNode.name) = "navigatorentry" Then
+                                        '                                                                If genericController.vbLCase(CDefNode.name) = "navigatorentry" Then
                                         '                                                                    NavigatorCnt = Collections(CollectionCnt).NavigatorCnt
                                         '                                                                    ReDim Preserve Collections(CollectionCnt).Navigators(NavigatorCnt)
                                         '                                                                    Collections(CollectionCnt).Navigators(NavigatorCnt).name = GetXMLAttribute(IsFound, CDefNode, "name", "")
@@ -595,9 +597,9 @@ Namespace Contensive.Core
                                     LocalCollectionXML = addonInstall.getCollectionListFile()
                                     Call LocalCollections.LoadXml(LocalCollectionXML)
                                     For Each CDef_Node In LocalCollections.DocumentElement.ChildNodes
-                                        If vbLCase(CDef_Node.Name) = "collection" Then
+                                        If genericController.vbLCase(CDef_Node.Name) = "collection" Then
                                             For Each CollectionNode In CDef_Node.ChildNodes
-                                                If vbLCase(CollectionNode.Name) = "guid" Then
+                                                If genericController.vbLCase(CollectionNode.Name) = "guid" Then
                                                     OnServerGuidList &= "," & CollectionNode.InnerText
                                                     Exit For
                                                 End If
@@ -618,7 +620,7 @@ Namespace Contensive.Core
                                     End Try
                                     Ptr = 0
                                     If Not parseError Then
-                                        If vbLCase(LibCollections.DocumentElement.Name) <> vbLCase(CollectionListRootNode) Then
+                                        If genericController.vbLCase(LibCollections.DocumentElement.Name) <> genericController.vbLCase(CollectionListRootNode) Then
                                             UserError = "There was an error reading the Collection Library file. The '" & CollectionListRootNode & "' element was not found."
                                             Call HandleClassAppendLog("AddonManager", UserError)
                                             status &= "<br>" & UserError
@@ -629,13 +631,13 @@ Namespace Contensive.Core
                                             '
                                             RowPtr = 0
                                             For Each CDef_Node In LibCollections.DocumentElement.ChildNodes
-                                                Select Case vbLCase(CDef_Node.Name)
+                                                Select Case genericController.vbLCase(CDef_Node.Name)
                                                     Case "collection"
                                                         '
                                                         ' Read the collection
                                                         '
                                                         For Each CollectionNode In CDef_Node.ChildNodes
-                                                            Select Case vbLCase(CollectionNode.Name)
+                                                            Select Case genericController.vbLCase(CollectionNode.Name)
                                                                 Case "name"
                                                                     '
                                                                     ' Name
@@ -692,7 +694,7 @@ Namespace Contensive.Core
                                                                 Cells3(RowPtr, 2) = CollectionLastChangeDate & "&nbsp;"
                                                                 Cells3(RowPtr, 3) = CollectionDescription & "&nbsp;"
                                                             Else
-                                                                IsOnServer = EncodeBoolean(InStr(1, OnServerGuidList, CollectionGuid, vbTextCompare))
+                                                                IsOnServer = genericController.EncodeBoolean(InStr(1, OnServerGuidList, CollectionGuid, vbTextCompare))
                                                                 CS = cpCore.db.cs_open("Add-on Collections", GuidFieldName & "=" & cpCore.db.encodeSQLText(CollectionGuid), , , , , , "ID")
                                                                 IsOnSite = cpCore.db.cs_ok(CS)
                                                                 Call cpCore.db.cs_Close(CS)
@@ -928,9 +930,9 @@ ErrorTrap:
             Found = False
             ResultNode = Node.Attributes.GetNamedItem(Name)
             If (ResultNode Is Nothing) Then
-                UcaseName = vbUCase(Name)
+                UcaseName = genericController.vbUCase(Name)
                 For Each NodeAttribute In Node.Attributes
-                    If vbUCase(NodeAttribute.Name) = UcaseName Then
+                    If genericController.vbUCase(NodeAttribute.Name) = UcaseName Then
                         GetXMLAttribute = NodeAttribute.Value
                         Found = True
                         Exit For
@@ -983,7 +985,7 @@ ErrorTrap:
             GetParentIDFromNameSpace = 0
             If menuNameSpace <> "" Then
                 'ParentName = ParentNameSpace
-                Pos = vbInstr(1, menuNameSpace, ".")
+                Pos = genericController.vbInstr(1, menuNameSpace, ".")
                 If Pos = 0 Then
                     ParentName = menuNameSpace
                     ParentNameSpace = ""

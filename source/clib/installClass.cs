@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using Contensive.Core;
 //
-namespace  Contensive.Core {
+namespace  Contensive.CLI {
     static class installClass {
         //
         //====================================================================================================

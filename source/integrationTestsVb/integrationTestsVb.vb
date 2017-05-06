@@ -1,5 +1,8 @@
 ﻿
 Imports Contensive.Core
+Imports Contensive.Core.constants
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 Imports Contensive.BaseClasses
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
 Imports System
@@ -133,7 +136,7 @@ Namespace integrationTests
                 ' assert
                 Assert.AreEqual(layoutC, block.GetHtml())
             Finally
-                cp.Content.DeleteRecords("copy content", "id=" & recordId)
+                cp.Content.Delete("copy content", "id=" & recordId)
             End Try
         End Sub
         '
@@ -179,7 +182,7 @@ Namespace integrationTests
                 ' assert
                 Assert.AreEqual(layoutC, block.GetHtml())
             Finally
-                cp.Content.DeleteRecords("layouts", "id=" & recordId)
+                cp.Content.Delete("layouts", "id=" & recordId)
             End Try
         End Sub
         '
@@ -243,20 +246,20 @@ Namespace integrationTests
             ' arrange
             ' act
             ' assert
-            Assert.AreEqual(EncodeBoolean(True), True)
-            Assert.AreEqual(EncodeBoolean(0), False)
-            Assert.AreEqual(EncodeBoolean(1), True)
-            Assert.AreEqual(EncodeBoolean("on"), True)
-            Assert.AreEqual(EncodeBoolean("off"), False)
-            Assert.AreEqual(EncodeBoolean("true"), True)
-            Assert.AreEqual(EncodeBoolean("false"), False)
+            Assert.AreEqual(genericController.EncodeBoolean(True), True)
+            Assert.AreEqual(genericController.EncodeBoolean(0), False)
+            Assert.AreEqual(genericController.EncodeBoolean(1), True)
+            Assert.AreEqual(genericController.EncodeBoolean("on"), True)
+            Assert.AreEqual(genericController.EncodeBoolean("off"), False)
+            Assert.AreEqual(genericController.EncodeBoolean("true"), True)
+            Assert.AreEqual(genericController.EncodeBoolean("false"), False)
         End Sub
         '
         <TestMethod()> Public Sub encodeText_unit()
             ' arrange
             ' act
             ' assert
-            Assert.AreEqual(EncodeText(1), "1")
+            Assert.AreEqual(genericController.encodeText(1), "1")
         End Sub
         '
         <TestMethod()> Public Sub sample_unit()
@@ -278,11 +281,11 @@ Namespace integrationTests
             ' arrange
             ' act
             ' assert
-            Assert.AreEqual("", ModifyQueryString("", "a", "1", False))
-            Assert.AreEqual("a=1", ModifyQueryString("", "a", "1", True))
-            Assert.AreEqual("a=1", ModifyQueryString("a=0", "a", "1", False))
-            Assert.AreEqual("a=1", ModifyQueryString("a=0", "a", "1", True))
-            Assert.AreEqual("a=1&b=2", ModifyQueryString("a=1", "b", "2", True))
+            Assert.AreEqual("", genericController.ModifyQueryString("", "a", "1", False))
+            Assert.AreEqual("a=1", genericController.ModifyQueryString("", "a", "1", True))
+            Assert.AreEqual("a=1", genericController.ModifyQueryString("a=0", "a", "1", False))
+            Assert.AreEqual("a=1", genericController.ModifyQueryString("a=0", "a", "1", True))
+            Assert.AreEqual("a=1&b=2", genericController.ModifyQueryString("a=1", "b", "2", True))
         End Sub
         '
         <TestMethod()> Public Sub ModifyLinkQuery_unit()
@@ -297,31 +300,31 @@ Namespace integrationTests
         End Sub
         '
         <TestMethod()> Public Sub vbInstr_test()
-            'vbInstr(1, Link, "?")
-            Assert.AreEqual(InStr("abcdefgabcdefgabcdefgabcdefg", "d"), vbInstr("abcdefgabcdefgabcdefgabcdefg", "d"))
-            Assert.AreEqual(InStr("abcdefgabcdefgabcdefgabcdefg", "E"), vbInstr("abcdefgabcdefgabcdefgabcdefg", "E"))
-            Assert.AreEqual(InStr(10, "abcdefgabcdefgabcdefgabcdefg", "E"), vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E"))
-            Assert.AreEqual(InStr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Binary), vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Binary))
-            Assert.AreEqual(InStr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Text), vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Text))
-            Assert.AreEqual(InStr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Binary), vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Binary))
-            Assert.AreEqual(InStr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Text), vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Text))
+            'genericController.vbInstr(1, Link, "?")
+            Assert.AreEqual(InStr("abcdefgabcdefgabcdefgabcdefg", "d"), genericController.vbInstr("abcdefgabcdefgabcdefgabcdefg", "d"))
+            Assert.AreEqual(InStr("abcdefgabcdefgabcdefgabcdefg", "E"), genericController.vbInstr("abcdefgabcdefgabcdefgabcdefg", "E"))
+            Assert.AreEqual(InStr(10, "abcdefgabcdefgabcdefgabcdefg", "E"), genericController.vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E"))
+            Assert.AreEqual(InStr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Binary), genericController.vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Binary))
+            Assert.AreEqual(InStr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Text), genericController.vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Text))
+            Assert.AreEqual(InStr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Binary), genericController.vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Binary))
+            Assert.AreEqual(InStr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Text), genericController.vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Text))
             Dim haystack As String = "abcdefgabcdefgabcdefgabcdefg"
             Dim needle As String = "c"
-            Assert.AreEqual(InStr(1, "?", "?"), vbInstr(1, "?", "?"))
+            Assert.AreEqual(InStr(1, "?", "?"), genericController.vbInstr(1, "?", "?"))
             For ptr As Integer = 1 To haystack.Length
-                Assert.AreEqual(InStr(ptr, haystack, needle, CompareMethod.Binary), vbInstr(ptr, haystack, needle, CompareMethod.Binary))
+                Assert.AreEqual(InStr(ptr, haystack, needle, CompareMethod.Binary), genericController.vbInstr(ptr, haystack, needle, CompareMethod.Binary))
             Next
         End Sub
         '
         <TestMethod()> Public Sub vbIsNumeric_test()
-            Assert.AreEqual(IsNumeric(0), vbIsNumeric(0))
-            Assert.AreEqual(IsNumeric(New Date(2000, 1, 1)), vbIsNumeric(New Date(2000, 1, 1)))
-            Assert.AreEqual(IsNumeric(1234), vbIsNumeric(1234))
-            Assert.AreEqual(IsNumeric(12.34), vbIsNumeric(12.34))
-            Assert.AreEqual(IsNumeric("abcd"), vbIsNumeric("abcd"))
-            Assert.AreEqual(IsNumeric("1234"), vbIsNumeric("1234"))
-            Assert.AreEqual(IsNumeric("12.34"), vbIsNumeric("12.34"))
-            Assert.AreEqual(IsNumeric(Nothing), vbIsNumeric(Nothing))
+            Assert.AreEqual(IsNumeric(0), genericController.vbIsNumeric(0))
+            Assert.AreEqual(IsNumeric(New Date(2000, 1, 1)), genericController.vbIsNumeric(New Date(2000, 1, 1)))
+            Assert.AreEqual(IsNumeric(1234), genericController.vbIsNumeric(1234))
+            Assert.AreEqual(IsNumeric(12.34), genericController.vbIsNumeric(12.34))
+            Assert.AreEqual(IsNumeric("abcd"), genericController.vbIsNumeric("abcd"))
+            Assert.AreEqual(IsNumeric("1234"), genericController.vbIsNumeric("1234"))
+            Assert.AreEqual(IsNumeric("12.34"), genericController.vbIsNumeric("12.34"))
+            Assert.AreEqual(IsNumeric(Nothing), genericController.vbIsNumeric(Nothing))
         End Sub
         '
         <TestMethod()> Public Sub vbReplace_test()
@@ -331,44 +334,44 @@ Namespace integrationTests
             Dim count As Integer = 9999
             '
             expected = Replace("abcdefg", "cd", "12345")
-            actual = vbReplace("abcdefg", "cd", "12345")
+            actual = genericController.vbReplace("abcdefg", "cd", "12345")
             Assert.AreEqual(expected, actual)
             '
             expected = Replace("abcdefg", "cD", "12345")
-            actual = vbReplace("abcdefg", "cD", "12345")
+            actual = genericController.vbReplace("abcdefg", "cD", "12345")
             Assert.AreEqual(expected, actual)
             '
             expected = Replace("abcdefg", "cd", "12345", start, count, CompareMethod.Binary)
-            actual = vbReplace("abcdefg", "cd", "12345", start, count, CompareMethod.Binary)
+            actual = genericController.vbReplace("abcdefg", "cd", "12345", start, count, CompareMethod.Binary)
             Assert.AreEqual(expected, actual)
             '
             expected = Replace("abcdefg", "cD", "12345", start, count, CompareMethod.Binary)
-            actual = vbReplace("abcdefg", "cD", "12345", start, count, CompareMethod.Binary)
+            actual = genericController.vbReplace("abcdefg", "cD", "12345", start, count, CompareMethod.Binary)
             Assert.AreEqual(expected, actual)
             '
             expected = Replace("abcdefg", "cd", "12345", start, count, CompareMethod.Text)
-            actual = vbReplace("abcdefg", "cd", "12345", start, count, CompareMethod.Text)
+            actual = genericController.vbReplace("abcdefg", "cd", "12345", start, count, CompareMethod.Text)
             Assert.AreEqual(expected, actual)
             '
             expected = Replace("abcdefg", "cD", "12345", start, count, CompareMethod.Text)
-            actual = vbReplace("abcdefg", "cD", "12345", start, count, CompareMethod.Text)
+            actual = genericController.vbReplace("abcdefg", "cD", "12345", start, count, CompareMethod.Text)
             Assert.AreEqual(expected, actual)
         End Sub
         '
         <TestMethod()> Public Sub vbUCase_test()
-            Assert.AreEqual(UCase("AbCdEfG"), vbUCase("AbCdEfG"))
-            Assert.AreEqual(UCase("ABCDEFG"), vbUCase("ABCDEFG"))
-            Assert.AreEqual(UCase("abcdefg"), vbUCase("abcdefg"))
+            Assert.AreEqual(UCase("AbCdEfG"), genericController.vbUCase("AbCdEfG"))
+            Assert.AreEqual(UCase("ABCDEFG"), genericController.vbUCase("ABCDEFG"))
+            Assert.AreEqual(UCase("abcdefg"), genericController.vbUCase("abcdefg"))
         End Sub
         '
         <TestMethod()> Public Sub vbLCase_test()
-            Assert.AreEqual(LCase("AbCdEfG"), vbLCase("AbCdEfG"))
-            Assert.AreEqual(LCase("ABCDEFG"), vbLCase("ABCDEFG"))
-            Assert.AreEqual(LCase("abcdefg"), vbLCase("abcdefg"))
+            Assert.AreEqual(LCase("AbCdEfG"), genericController.vbLCase("AbCdEfG"))
+            Assert.AreEqual(LCase("ABCDEFG"), genericController.vbLCase("ABCDEFG"))
+            Assert.AreEqual(LCase("abcdefg"), genericController.vbLCase("abcdefg"))
         End Sub
         '
         <TestMethod()> Public Sub vbLeft_test()
-            Assert.AreEqual(LCase("AbCdEfG"), vbLCase("AbCdEfG"))
+            Assert.AreEqual(LCase("AbCdEfG"), genericController.vbLCase("AbCdEfG"))
         End Sub
     End Class
     '

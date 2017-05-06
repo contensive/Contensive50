@@ -1,5 +1,8 @@
 
+
 Imports Contensive.BaseClasses
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 Imports System.Runtime.InteropServices
 
 Namespace Contensive.Core
@@ -144,7 +147,7 @@ Namespace Contensive.Core
         '=======================================================================================================
         '
         Public Overrides Function GetBoolean(PropertyName As String, Optional DefaultValue As String = "") As Boolean
-            Return cp.Utils.EncodeBoolean(GetProperty(PropertyName, DefaultValue))
+            Return genericController.EncodeBoolean(GetProperty(PropertyName, DefaultValue))
         End Function
         '
         '=======================================================================================================
@@ -152,7 +155,7 @@ Namespace Contensive.Core
         '=======================================================================================================
         '
         Public Overrides Function GetDate(PropertyName As String, Optional DefaultValue As String = "") As Date
-            Return cp.Utils.EncodeDate(GetProperty(PropertyName, DefaultValue))
+            Return genericController.EncodeDate(GetProperty(PropertyName, DefaultValue))
         End Function
         '
         '=======================================================================================================

@@ -4,6 +4,8 @@ Option Strict On
 
 Imports System.Net.Mail
 Imports System.Net.Mime
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 '
 Namespace Contensive.Core
     Public Class coreSmtpHandlerClass
@@ -37,14 +39,14 @@ Namespace Contensive.Core
         '========================================================================
         '
         Public Function SendEmail4(ByVal ToAddress As Object, ByVal FromAddress As Object, ByVal SubjectMessage As Object, ByVal BodyMessage As Object, ByVal ResultLogPathPage As Object, ByVal SMTPServer As Object, ByVal Immediate As Boolean, ByVal HTML As Boolean, Optional ByVal EmailOutPath As String = "") As Boolean
-            Return String.IsNullOrEmpty(sendEmail5(EncodeText(ToAddress) _
-                , EncodeText(FromAddress) _
-                , EncodeText(SubjectMessage) _
-                , EncodeText(BodyMessage) _
+            Return String.IsNullOrEmpty(sendEmail5(genericController.encodeText(ToAddress) _
+                , genericController.encodeText(FromAddress) _
+                , genericController.encodeText(SubjectMessage) _
+                , genericController.encodeText(BodyMessage) _
                 , "" _
                 , "" _
-                , EncodeText(ResultLogPathPage) _
-                , EncodeText(SMTPServer) _
+                , genericController.encodeText(ResultLogPathPage) _
+                , genericController.encodeText(SMTPServer) _
                 , Immediate _
                 , HTML _
                 , encodeEmptyText(EmailOutPath, "")))
@@ -92,10 +94,10 @@ Namespace Contensive.Core
                             '
                             converthtmlToText = New coreHtmlToTextClass(cpCore)
                             EmailBodyHTML = EmailBody
-                            If vbInstr(1, EmailBodyHTML, "<BODY", vbTextCompare) = 0 Then
+                            If genericController.vbInstr(1, EmailBodyHTML, "<BODY", vbTextCompare) = 0 Then
                                 EmailBodyHTML = "<BODY>" & EmailBodyHTML & "</BODY>"
                             End If
-                            If vbInstr(1, EmailBodyHTML, "<HTML>", vbTextCompare) = 0 Then
+                            If genericController.vbInstr(1, EmailBodyHTML, "<HTML>", vbTextCompare) = 0 Then
                                 EmailBodyHTML = "<HTML>" & EmailBodyHTML & "</HTML>"
                             End If
                             EmailBodyText = converthtmlToText.convert(EmailBody)
@@ -111,7 +113,7 @@ Namespace Contensive.Core
                         '
                         ' ----- clean up the result code for logging (change empty to "ok")
                         '
-                        sendEmail5 = vbReplace(sendEmail5, vbCrLf, "")
+                        sendEmail5 = genericController.vbReplace(sendEmail5, vbCrLf, "")
                         If sendEmail5 = "" Then
                             SendResult = "ok"
                         Else
@@ -171,16 +173,16 @@ Namespace Contensive.Core
             '
             Copy = ""
             Copy = Copy & "Contensive Handler " & My.Application.Info.Version.Major & "." & My.Application.Info.Version.Minor & "." & My.Application.Info.Version.Revision & vbCrLf
-            Copy = Copy & EncodeText(SMTPServer) & vbCrLf
-            Copy = Copy & EncodeText(ResultLogPathPage) & vbCrLf
-            Copy = Copy & EncodeText(ToAddress) & vbCrLf
-            Copy = Copy & EncodeText(FromAddress) & vbCrLf
-            Copy = Copy & EncodeText(BounceAddress) & vbCrLf
-            Copy = Copy & EncodeText(ReplyToAddress) & vbCrLf
-            Copy = Copy & EncodeText(SubjectMessage) & vbCrLf
-            Copy = Copy & EncodeText(HTML) & vbCrLf
-            Copy = Copy & EncodeText(BodyMessage)
-            Filename = "Out" & CStr(GetRandomInteger()) & ".txt"
+            Copy = Copy & genericController.encodeText(SMTPServer) & vbCrLf
+            Copy = Copy & genericController.encodeText(ResultLogPathPage) & vbCrLf
+            Copy = Copy & genericController.encodeText(ToAddress) & vbCrLf
+            Copy = Copy & genericController.encodeText(FromAddress) & vbCrLf
+            Copy = Copy & genericController.encodeText(BounceAddress) & vbCrLf
+            Copy = Copy & genericController.encodeText(ReplyToAddress) & vbCrLf
+            Copy = Copy & genericController.encodeText(SubjectMessage) & vbCrLf
+            Copy = Copy & genericController.encodeText(HTML) & vbCrLf
+            Copy = Copy & genericController.encodeText(BodyMessage)
+            Filename = "Out" & CStr(genericController.GetRandomInteger()) & ".txt"
             '
             Call cpCore.appRootFiles.saveFile(iEmailOutPath & Filename, Copy)
             '
@@ -260,7 +262,7 @@ ErrorTrap:
                 '
                 Dim Line0 As String
                 Line0 = ReadLine(Copy)
-                If vbUCase(Mid(Line0, 1, 11)) = "CONTENSIVE " Then
+                If genericController.vbUCase(Mid(Line0, 1, 11)) = "CONTENSIVE " Then
                     '
                     ' Email record (LINE0 IS CONENSIVE AND VERSION)
                     '
@@ -271,7 +273,7 @@ ErrorTrap:
                     BounceAddress = ReadLine(Copy)
                     ReplyToAddress = ReadLine(Copy)
                     EmailSubject = ReadLine(Copy)
-                    HTML = EncodeBoolean(ReadLine(Copy))
+                    HTML = genericController.EncodeBoolean(ReadLine(Copy))
                     '
                     ' removed this because the addqueue did not put it in
                     '
@@ -286,7 +288,7 @@ ErrorTrap:
                     EmailTo = ReadLine(Copy)
                     EmailFrom = ReadLine(Copy)
                     EmailSubject = ReadLine(Copy)
-                    HTML = EncodeBoolean(ReadLine(Copy))
+                    HTML = genericController.EncodeBoolean(ReadLine(Copy))
                     EmailBody = Copy
                 End If
                 If (EmailSMTP <> "") _
@@ -321,7 +323,7 @@ ErrorTrap:
         Private Function ReadLine(ByRef Body As String) As String
             Dim line As String = ""
             Try
-                Dim EOL As Integer = vbInstr(1, Body, vbCrLf)
+                Dim EOL As Integer = genericController.vbInstr(1, Body, vbCrLf)
                 If EOL <> 0 Then
                     line = Mid(Body, 1, EOL - 1)
                     Body = Mid(Body, EOL + 2)
@@ -358,7 +360,7 @@ ErrorTrap:
             Dim SplitArray() As String
             CheckAddress = False
             If EmailAddress <> "" Then
-                If vbInstr(1, EmailAddress, "@") <> 0 Then
+                If genericController.vbInstr(1, EmailAddress, "@") <> 0 Then
                     SplitArray = Split(EmailAddress, "@")
                     If UBound(SplitArray) = 1 Then
                         If Len(SplitArray(0)) > 0 Then
@@ -383,7 +385,7 @@ ErrorTrap:
             '
             If EmailServer = "" Then
                 CheckServer = False
-            ElseIf vbInstr(1, EmailServer, "SMTP.YourServer.Com", vbTextCompare) <> 0 Then
+            ElseIf genericController.vbInstr(1, EmailServer, "SMTP.YourServer.Com", vbTextCompare) <> 0 Then
                 CheckServer = False
             Else
                 SplitArray = Split(EmailServer, ".")

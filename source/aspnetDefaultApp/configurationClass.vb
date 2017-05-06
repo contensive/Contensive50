@@ -14,7 +14,7 @@ Public Class configurationClass
         serverConfig.appConfig.cdnFilesNetprefix = ConfigurationManager.AppSettings("ContensiveCdnFilesNetprefix")
         serverConfig.appConfig.cdnFilesPath = ConfigurationManager.AppSettings("ContensiveCdnFilesPath")
         serverConfig.appConfig.domainList.Add(ConfigurationManager.AppSettings("ContensivePrimaryDomain"))
-        serverConfig.appConfig.enableCache = encodeBoolean(ConfigurationManager.AppSettings("ContensiveEnableCache"))
+        serverConfig.appConfig.enableCache = genericController.EncodeBoolean(ConfigurationManager.AppSettings("ContensiveEnableCache"))
         serverConfig.appConfig.enabled = True
         serverConfig.appConfig.name = ConfigurationManager.AppSettings("ContensiveAppName")
         serverConfig.appConfig.privateFilesPath = ConfigurationManager.AppSettings("ContensivePrivateFilesPath")
@@ -23,10 +23,10 @@ Public Class configurationClass
         serverConfig.cdnFilesRemoteEndpoint = ConfigurationManager.AppSettings("ContensiveCdnFilesRemoteEndpoint")
         serverConfig.defaultDataSourceAddress = ConfigurationManager.AppSettings("ContensiveDefaultDataSourceAddress")
         serverConfig.defaultDataSourcePassword = ConfigurationManager.AppSettings("ContensiveDefaultDataSourcePassword")
-        'serverConfig.defaultDataSourceType = encodeInteger(ConfigurationManager.AppSettings("ContensiveDefaultDataSourceType"))
+        'serverConfig.defaultDataSourceType = genericController.EncodeInteger(ConfigurationManager.AppSettings("ContensiveDefaultDataSourceType"))
         serverConfig.defaultDataSourceUsername = ConfigurationManager.AppSettings("ContensiveDefaultDataSourceUsername")
-        serverConfig.isLocalCache = encodeBoolean(ConfigurationManager.AppSettings("ContensiveIsLocalCache"))
-        serverConfig.isLocalFileSystem = encodeBoolean(ConfigurationManager.AppSettings("ContensiveIsLocalFileSystem"))
+        serverConfig.isLocalCache = genericController.EncodeBoolean(ConfigurationManager.AppSettings("ContensiveIsLocalCache"))
+        serverConfig.isLocalFileSystem = genericController.EncodeBoolean(ConfigurationManager.AppSettings("ContensiveIsLocalFileSystem"))
         serverConfig.localDataDriveLetter = ConfigurationManager.AppSettings("ContensiveLocalDataDriveLetter")
         serverConfig.name = ConfigurationManager.AppSettings("ContensiveServerGroupName")
         serverConfig.password = ConfigurationManager.AppSettings("ContensiveServerGroupPassword")
@@ -96,7 +96,7 @@ Public Class configurationClass
         cs.Close()
     End Sub
     '
-    Private Shared Function encodeBoolean(source As String) As Boolean
+    Private Shared Function EncodeBoolean(source As String) As Boolean
         Return Equals(source.ToLower(), "true") Or Equals(source.ToLower(), "yes") Or Equals(source.ToLower(), "on") Or (IsNumeric(source) And (source <> "0"))
     End Function
     '

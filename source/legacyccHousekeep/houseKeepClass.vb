@@ -1,6 +1,11 @@
 ﻿
-'Imports Contensive.Core
+Option Explicit On
+Option Strict On
+
 Imports Contensive.Core
+Imports Contensive.Core.constants
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 Imports System.Xml
 
 Namespace Contensive.Core
@@ -175,7 +180,7 @@ Namespace Contensive.Core
                             End If
                             If Trim(LCase(NameValue(0))) = "serverhousekeeptime" Then
                                 If IsDate(NameValue(1)) Then
-                                    ServerHousekeepTime = rightNow.Date.Add(EncodeDate(NameValue(1)).TimeOfDay)
+                                    ServerHousekeepTime = rightNow.Date.Add( genericController.EncodeDate(NameValue(1)).TimeOfDay)
                                 End If
                             End If
                         End If
@@ -257,7 +262,7 @@ Namespace Contensive.Core
                     'Else
                     'appArg = Split(appRow, vbTab)
                     'appName = appArg(0)
-                    appStatus = EncodeInteger(appName)
+                    appStatus = genericController.EncodeInteger(appName)
                     If appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady Then
 
 
@@ -295,7 +300,7 @@ Namespace Contensive.Core
                                 '
                                 DomainNameList = cp.core.app_domainList
                                 DomainNamePrimary = DomainNameList
-                                Pos = vbInstr(1, DomainNamePrimary, ",")
+                                Pos = genericController.vbInstr(1, DomainNamePrimary, ",")
                                 If Pos > 1 Then
                                     DomainNamePrimary = Mid(DomainNamePrimary, 1, Pos - 1)
                                 End If
@@ -313,7 +318,7 @@ Namespace Contensive.Core
                                 '
                                 ' Get ArchiveAgeDays - use this as the oldest data they care about
                                 '
-                                VisitArchiveAgeDays = EncodeInteger(cp.core.siteProperties.getText("ArchiveRecordAgeDays", "365"))
+                                VisitArchiveAgeDays = genericController.EncodeInteger(cp.core.siteProperties.getText("ArchiveRecordAgeDays", "365"))
                                 If (VisitArchiveAgeDays < 2) Then
                                     VisitArchiveAgeDays = 2
                                     Call cp.core.siteProperties.setProperty("ArchiveRecordAgeDays", "2")
@@ -327,7 +332,7 @@ Namespace Contensive.Core
                                 '
                                 ' Get GuestArchiveAgeDays
                                 '
-                                GuestArchiveAgeDays = EncodeInteger(cp.core.siteProperties.getText("ArchivePeopleAgeDays", "2"))
+                                GuestArchiveAgeDays = genericController.EncodeInteger(cp.core.siteProperties.getText("ArchivePeopleAgeDays", "2"))
                                 If (GuestArchiveAgeDays < 2) Then
                                     GuestArchiveAgeDays = 2
                                     Call cp.core.siteProperties.setProperty("ArchivePeopleAgeDays", CStr(GuestArchiveAgeDays))
@@ -335,7 +340,7 @@ Namespace Contensive.Core
                                 '
                                 ' Get EmailDropArchiveAgeDays
                                 '
-                                EmailDropArchiveAgeDays = EncodeInteger(cp.core.siteProperties.getText("ArchiveEmailDropAgeDays", "90"))
+                                EmailDropArchiveAgeDays = genericController.EncodeInteger(cp.core.siteProperties.getText("ArchiveEmailDropAgeDays", "90"))
                                 If (EmailDropArchiveAgeDays < 2) Then
                                     EmailDropArchiveAgeDays = 2
                                     Call cp.core.siteProperties.setProperty("ArchiveEmailDropAgeDays", CStr(EmailDropArchiveAgeDays))
@@ -498,13 +503,13 @@ Namespace Contensive.Core
                                         SQL = cp.core.db.GetSQLSelect("default", "ccviewingsummary", "DateNumber", "TimeDuration=24 and DateNumber>=" & OldestVisitSummaryWeCareAbout.Date.ToOADate, "DateNumber Desc", , 1)
                                         CS = cp.core.db.cs_openCsSql_rev("default", SQL)
                                         If Not cp.core.db.cs_ok(CS) Then
-                                            DatePtr = CLng(Int(OldestVisitSummaryWeCareAbout))
+                                            DatePtr = CInt(DateDiff(DateInterval.Day, OldestVisitSummaryWeCareAbout, Date.MinValue))
                                         Else
                                             DatePtr = cp.core.db.cs_getInteger(CS, "DateNumber")
                                         End If
                                         Call cp.core.db.cs_Close(CS)
-                                        If DatePtr < CLng(Int(OldestVisitSummaryWeCareAbout)) Then
-                                            DatePtr = CLng(Int(OldestVisitSummaryWeCareAbout))
+                                        If DatePtr < genericController.convertDateToDayPtr(OldestVisitSummaryWeCareAbout) Then
+                                            DatePtr = genericController.convertDateToDayPtr(OldestVisitSummaryWeCareAbout)
                                         End If
                                         Call HouseKeep_PageViewSummary(Date.FromOADate(DatePtr), Yesterday, 24, cp.core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout)
                                         '                    For DatePtr = OldestVisitSummaryWeCareAbout To Int(Yesterday)
@@ -633,7 +638,7 @@ Namespace Contensive.Core
                                         AlarmTimeString = "12:00:00 AM"
                                         Call cp.core.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString)
                                     End If
-                                    AlarmTimeMinutesSinceMidnight = EncodeDate(AlarmTimeString).TimeOfDay.TotalMinutes
+                                    AlarmTimeMinutesSinceMidnight =  genericController.EncodeDate(AlarmTimeString).TimeOfDay.TotalMinutes
                                     minutesSinceMidnight = rightNow.TimeOfDay.TotalMinutes
                                     LastCheckMinutesFromMidnight = LastCheckDateTime.TimeOfDay.TotalMinutes
                                     If (minutesSinceMidnight > LastCheckMinutesFromMidnight) And (LastCheckMinutesFromMidnight >= LastCheckMinutesFromMidnight) And (LastCheckMinutesFromMidnight < minutesSinceMidnight) Then
@@ -737,7 +742,7 @@ ErrorTrap:
             MidnightTwoDaysAgo = rightNow.AddDays(-2).Date
             thirtyDaysAgo = rightNow.AddDays(-30).Date
             appName = cp.core.serverConfig.appConfig.name
-            ArchiveDeleteNoCookie = EncodeBoolean(cp.core.siteProperties.getText("ArchiveDeleteNoCookie", "1"))
+            ArchiveDeleteNoCookie = genericController.EncodeBoolean(cp.core.siteProperties.getText("ArchiveDeleteNoCookie", "1"))
             DataSourceType = cp.core.db.getDataSourceType("default")
             TimeoutSave = cp.core.db.sqlCommandTimeout
             cp.core.db.sqlCommandTimeout = 1800
@@ -1534,7 +1539,7 @@ ErrorTrap:
             '
             ' Content TextFile types with no controlling record
             '
-            If EncodeBoolean(cp.core.siteProperties.getText("ArchiveAllowFileClean", "false")) Then
+            If genericController.EncodeBoolean(cp.core.siteProperties.getText("ArchiveAllowFileClean", "false")) Then
                 '
                 Dim DSType As Integer
                 DSType = cp.core.db.getDataSourceType("")
@@ -1560,7 +1565,7 @@ ErrorTrap:
                         For Each file As IO.FileInfo In FileList
                             Filename = file.Name
                             VirtualFileName = PathName & "\" & Filename
-                            VirtualLink = vbReplace(VirtualFileName, "\", "/")
+                            VirtualLink = genericController.vbReplace(VirtualFileName, "\", "/")
                             FileSize = file.Length
                             If FileSize = 0 Then
                                 SQL = "update " & TableName & " set " & FieldName & "=null where (" & FieldName & "=" & cp.core.db.encodeSQLText(VirtualFileName) & ")or(" & FieldName & "=" & cp.core.db.encodeSQLText(VirtualLink) & ")"
@@ -1651,7 +1656,7 @@ ErrorTrap:
                 '                                                If FilenameAltSize <> "" Then
                 '                                                FilenameDim = Split(FilenameAltSize, "x")
                 '                                                If UBound(FilenameDim) = 1 Then
-                '                                                    If vbIsNumeric(FilenameDim(0)) And vbIsNumeric(FilenameDim(1)) Then
+                '                                                    If genericController.vbIsNumeric(FilenameDim(0)) And genericController.vbIsNumeric(FilenameDim(1)) Then
                 '                                                        FilenameNoExt = Mid(FilenameNoExt, 1, Pos - 1)
                 '                                                    End If
                 '                                                End If
@@ -1740,7 +1745,7 @@ ErrorTrap:
             'SQLTableMemberRules = cp.Core.csv_GetContentTablename("Member Rules")
             'SQLTableGroups = cp.Core.csv_GetContentTablename("Groups")
             '
-            'VisitArchiveAgeDays = encodeInteger(cp.Core.csv_GetSiteProperty("ArchiveRecordAgeDays", "0"))
+            'VisitArchiveAgeDays = genericController.EncodeInteger(cp.Core.csv_GetSiteProperty("ArchiveRecordAgeDays", "0"))
             If True Then
                 appName = cp.core.serverConfig.appConfig.name
                 DeleteBeforeDateSQL = cp.core.db.encodeSQLDate(DeleteBeforeDate)
@@ -1860,7 +1865,7 @@ ErrorTrap:
             'SQLTableMemberRules = cp.Core.csv_GetContentTablename("Member Rules")
             'SQLTableGroups = cp.Core.csv_GetContentTablename("Groups")
             '
-            'VisitArchiveAgeDays = encodeInteger(cp.Core.csv_GetSiteProperty("ArchiveRecordAgeDays", "0"))
+            'VisitArchiveAgeDays = genericController.EncodeInteger(cp.Core.csv_GetSiteProperty("ArchiveRecordAgeDays", "0"))
             If True Then
                 appName = cp.core.serverConfig.appConfig.name
                 DeleteBeforeDateSQL = cp.core.db.encodeSQLDate(DeleteBeforeDate)
@@ -2375,7 +2380,7 @@ ErrorTrap:
                 loadOK = True
                 Call Doc.Load(URL)
                 With Doc.DocumentElement
-                    If (LCase(Doc.DocumentElement.Name) <> vbLCase("ContensiveUpdate")) Then
+                    If (LCase(Doc.DocumentElement.Name) <> genericController.vbLCase("ContensiveUpdate")) Then
                         DownloadUpdates = False
                     Else
                         If Doc.DocumentElement.ChildNodes.Count = 0 Then
@@ -2384,7 +2389,7 @@ ErrorTrap:
                             With Doc.DocumentElement
                                 For Each CDefSection In .ChildNodes
                                     Copy = CDefSection.InnerText
-                                    Select Case vbLCase(CDefSection.Name)
+                                    Select Case genericController.vbLCase(CDefSection.Name)
                                         Case "mastervisitnamelist"
                                             '
                                             ' Read in the interfaces and save to Add-ons
@@ -2789,7 +2794,7 @@ ErrorTrap:
                     '
                     Call AppendClassLog("Server", "RegisterAddonFolder", "Collection.xml loaded ok")
                     '
-                    If vbLCase(Doc.DocumentElement.Name) <> vbLCase(CollectionListRootNode) Then
+                    If genericController.vbLCase(Doc.DocumentElement.Name) <> genericController.vbLCase(CollectionListRootNode) Then
                         Call AppendClassLog("Server", "", "RegisterAddonFolder, Hint=[" & hint & "], The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.")
                     Else
                         '
@@ -2797,7 +2802,7 @@ ErrorTrap:
                         '
                         With Doc.DocumentElement
                             If True Then
-                                'If vbLCase(.name) <> "collectionlist" Then
+                                'If genericController.vbLCase(.name) <> "collectionlist" Then
                                 '    Call AppendClassLog("Server", "", "RegisterAddonFolder, basename was not collectionlist, [" & .name & "].")
                                 'Else
                                 NodeCnt = 0
@@ -2810,22 +2815,22 @@ ErrorTrap:
                                     LocalGuid = ""
                                     LocalName = "no name found"
                                     LocalPath = ""
-                                    Select Case vbLCase(LocalListNode.Name)
+                                    Select Case genericController.vbLCase(LocalListNode.Name)
                                         Case "collection"
                                             LocalGuid = ""
                                             For Each CollectionNode In LocalListNode.ChildNodes
-                                                Select Case vbLCase(CollectionNode.Name)
+                                                Select Case genericController.vbLCase(CollectionNode.Name)
                                                     Case "name"
                                                         '
-                                                        LocalName = vbLCase(CollectionNode.InnerText)
+                                                        LocalName = genericController.vbLCase(CollectionNode.InnerText)
                                                     Case "guid"
                                                         '
-                                                        LocalGuid = vbLCase(CollectionNode.InnerText)
+                                                        LocalGuid = genericController.vbLCase(CollectionNode.InnerText)
                                                     Case "path"
                                                         '
-                                                        CollectionPath = vbLCase(CollectionNode.InnerText)
+                                                        CollectionPath = genericController.vbLCase(CollectionNode.InnerText)
                                                     Case "lastchangedate"
-                                                        LastChangeDate = EncodeDate(CollectionNode.InnerText)
+                                                        LastChangeDate =  genericController.EncodeDate(CollectionNode.InnerText)
                                                 End Select
                                             Next
                                     End Select
@@ -2840,7 +2845,7 @@ ErrorTrap:
                                         Call AppendClassLog("Server", "RegisterAddonFolder", "no collection path, skipping")
                                         '
                                     Else
-                                        CollectionPath = vbLCase(CollectionPath)
+                                        CollectionPath = genericController.vbLCase(CollectionPath)
                                         CollectionRootPath = CollectionPath
                                         Pos = InStrRev(CollectionRootPath, "\")
                                         If Pos <= 0 Then

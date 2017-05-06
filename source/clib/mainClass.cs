@@ -1,9 +1,12 @@
-﻿using System;
+﻿
+using Contensive.Core.Controllers;
+using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 
 namespace Contensive.Core
 {
@@ -193,7 +196,7 @@ namespace Contensive.Core
                                         {
                                             //
                                             // turn the windows service scheduler on/off
-                                            cp.core.serverConfig.allowTaskSchedulerService = cp.Utils.EncodeBoolean(args[argPtr]);
+                                            cp.core.serverConfig.allowTaskSchedulerService = genericController.EncodeBoolean(args[argPtr]);
                                             cp.core.serverConfig.saveObject(cp.core);
                                             Console.WriteLine("allowtaskscheduler set " + cp.core.serverConfig.allowTaskSchedulerService.ToString());
                                         }
@@ -222,7 +225,7 @@ namespace Contensive.Core
                                         {
                                             //
                                             // -- turn the windows service scheduler on/off
-                                            cp.core.serverConfig.allowTaskRunnerService = cp.Utils.EncodeBoolean(args[argPtr]);
+                                            cp.core.serverConfig.allowTaskRunnerService = genericController.EncodeBoolean(args[argPtr]);
                                             cp.core.serverConfig.saveObject(cp.core);
                                             Console.WriteLine("allowtaskrunner set " + cp.core.serverConfig.allowTaskRunnerService.ToString());
                                         }
@@ -260,8 +263,8 @@ namespace Contensive.Core
                                             //
                                             // turn the windows service scheduler on/off
                                             //
-                                            cp.core.serverConfig.allowTaskSchedulerService = cp.Utils.EncodeBoolean(args[argPtr]);
-                                            cp.core.serverConfig.allowTaskRunnerService = cp.Utils.EncodeBoolean(args[argPtr]);
+                                            cp.core.serverConfig.allowTaskSchedulerService = genericController.EncodeBoolean(args[argPtr]);
+                                            cp.core.serverConfig.allowTaskRunnerService = genericController.EncodeBoolean(args[argPtr]);
                                             cp.core.serverConfig.saveObject(cp.core);
                                             Console.WriteLine("allowTaskScheduler set " + cp.core.serverConfig.allowTaskSchedulerService.ToString());
                                             Console.WriteLine("allowTaskRunner set " + cp.core.serverConfig.allowTaskRunnerService.ToString());

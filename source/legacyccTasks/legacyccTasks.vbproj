@@ -9,8 +9,9 @@
     </SchemaVersion>
     <ProjectGuid>{21D358F3-184A-4B8F-AD05-814C1E92731E}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <StartupObject>ccTasks.Contensive.Core.tasksModule</StartupObject>
-    <RootNamespace>ccTasks</RootNamespace>
+    <StartupObject>Contensive.Core.tasksModule</StartupObject>
+    <RootNamespace>
+    </RootNamespace>
     <AssemblyName>ccTasks</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Console</MyType>
@@ -319,7 +320,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\clibCore\clibCore.vbproj">
-      <Project>{9814C7BD-200C-4C57-859D-5D81899A3421}</Project>
+      <Project>{9814c7bd-200c-4c57-859d-5d81899a3421}</Project>
       <Name>clibCore</Name>
     </ProjectReference>
   </ItemGroup>

@@ -1,5 +1,9 @@
 
-Imports Contensive.BaseClasses
+Option Explicit On
+Option Strict On
+
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 Imports System.Runtime.InteropServices
 
 Namespace Contensive.Core
@@ -358,16 +362,16 @@ Namespace Contensive.Core
             decodeLegacyAddonOptionArgument = ""
             If EncodedArg <> "" Then
                 a = EncodedArg
-                a = vbReplace(a, "#0058#", ":")
-                a = vbReplace(a, "#0093#", "]")
-                a = vbReplace(a, "#0091#", "[")
-                a = vbReplace(a, "#0124#", "|")
-                a = vbReplace(a, "#0039#", "'")
-                a = vbReplace(a, "#0034#", """")
-                a = vbReplace(a, "#0044#", ",")
-                a = vbReplace(a, "#0061#", "=")
-                a = vbReplace(a, "#0038#", "&")
-                a = vbReplace(a, "#0013#", vbCrLf)
+                a = genericController.vbReplace(a, "#0058#", ":")
+                a = genericController.vbReplace(a, "#0093#", "]")
+                a = genericController.vbReplace(a, "#0091#", "[")
+                a = genericController.vbReplace(a, "#0124#", "|")
+                a = genericController.vbReplace(a, "#0039#", "'")
+                a = genericController.vbReplace(a, "#0034#", """")
+                a = genericController.vbReplace(a, "#0044#", ",")
+                a = genericController.vbReplace(a, "#0061#", "=")
+                a = genericController.vbReplace(a, "#0038#", "&")
+                a = genericController.vbReplace(a, "#0013#", vbCrLf)
                 decodeLegacyAddonOptionArgument = a
             End If
         End Function
@@ -385,13 +389,13 @@ Namespace Contensive.Core
         '=======================================================================================================
         '
         Public Overrides Function GetBoolean(PropertyName As String, Optional DefaultValue As String = "") As Boolean
-            Return cp.Utils.EncodeBoolean(GetProperty(PropertyName, DefaultValue))
+            Return genericController.EncodeBoolean(GetProperty(PropertyName, DefaultValue))
         End Function
         '
         '=======================================================================================================
         '
         Public Overrides Function GetDate(PropertyName As String, Optional DefaultValue As String = "") As Date
-            Return cp.Utils.EncodeDate(GetProperty(PropertyName, DefaultValue))
+            Return genericController.EncodeDate(GetProperty(PropertyName, DefaultValue))
         End Function
         '
         '=======================================================================================================
@@ -456,14 +460,14 @@ Namespace Contensive.Core
                 ''If Not value Is Nothing Then
                 ''    valueObj = value
                 ''End If
-                'value = EncodeText(value)
+                'value = genericController.encodeText(value)
                 'Call appendDebugLog("var set, " & Name & "=" & value.ToString)
                 'If Name <> "" Then
                 '    lcName = Name.ToLower
                 '    If LocalVars.Contains(lcName) Then
                 '        Call LocalVars.Remove(lcName)
                 '        If value = "" Then
-                '            LocalVarNameList = vbReplace(LocalVarNameList, vbCrLf & lcName, "", , , CompareMethod.Text)
+                '            LocalVarNameList = genericController.vbReplace(LocalVarNameList, vbCrLf & lcName, "", , , CompareMethod.Text)
                 '        Else
                 '            Call LocalVars.Add(value, lcName)
                 '            Call tp("Property var set, name found in localVars, removed and re-added, LocalVarNameList=" & LocalVarNameList)

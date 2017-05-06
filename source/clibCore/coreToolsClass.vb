@@ -1,6 +1,9 @@
 ﻿
 Option Explicit On
 Option Strict On
+
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 '
 Namespace Contensive.Core
     Public Class coreToolsClass
@@ -578,9 +581,9 @@ ErrorTrap:
                     ' Add this SQL to the members SQL list
                     '
                     If SQL <> "" Then
-                        SQLArchive = vbReplace(SQLArchive, SQL & vbCrLf, "")
+                        SQLArchive = genericController.vbReplace(SQLArchive, SQL & vbCrLf, "")
                         SQLArchiveOld = SQLArchive
-                        SQLArchive = vbReplace(SQL, vbCrLf, " ") & vbCrLf
+                        SQLArchive = genericController.vbReplace(SQL, vbCrLf, " ") & vbCrLf
                         LineCounter = 0
                         Do While (LineCounter < 10) And (SQLArchiveOld <> "")
                             SQLArchive = SQLArchive & getLine(SQLArchiveOld) & vbCrLf
@@ -652,7 +655,7 @@ ErrorTrap:
                                 ElseIf CellData = "" Then
                                     Stream.Add(ColumnStart & "[empty]" & ColumnEnd)
                                 Else
-                                    Stream.Add(ColumnStart & cpCore.html.html_EncodeHTML(EncodeText(CellData)) & ColumnEnd)
+                                    Stream.Add(ColumnStart & cpCore.html.html_EncodeHTML(genericController.encodeText(CellData)) & ColumnEnd)
                                 End If
                             Next
                             Stream.Add(RowEnd)
@@ -921,7 +924,7 @@ ErrorTrap:
             TargetFieldID = cpCore.doc_getInteger("fi")
             ContentID = cpCore.doc_getInteger(RequestNameToolContentID)
             'ColumnPointer = cpCore.main_GetStreamInteger("dtcn")
-            FieldNameToAdd = vbUCase(cpCore.docProperties.getText(RequestNameAddField))
+            FieldNameToAdd = genericController.vbUCase(cpCore.docProperties.getText(RequestNameAddField))
             FieldIDToAdd = cpCore.doc_getInteger(RequestNameAddFieldID)
             ButtonList = ButtonCancel & "," & ButtonSelect
             ReloadCDef = cpCore.doc_getBoolean("ReloadCDef")
@@ -1556,7 +1559,7 @@ ErrorTrap:
                 For DiagActionPointer = 0 To iDiagActionCount
                     DiagAction = cpCore.docProperties.getText("DiagAction" & DiagActionPointer)
                     Stream.Add("Perform Action " & DiagActionPointer & " - " & DiagAction & "<br>")
-                    Select Case EncodeInteger(DiagArgument(DiagAction, 0))
+                    Select Case genericController.EncodeInteger(DiagArgument(DiagAction, 0))
                         Case DiagActionSetFieldType
                             '
                             ' ----- Set Field Type
@@ -1584,7 +1587,7 @@ ErrorTrap:
                             ' ----- Delete Record
                             '
                             ContentName = DiagArgument(DiagAction, 1)
-                            RecordID = EncodeInteger(DiagArgument(DiagAction, 2))
+                            RecordID = genericController.EncodeInteger(DiagArgument(DiagAction, 2))
                             Call cpCore.DeleteContentRecord(ContentName, RecordID)
                             'end case
                         Case DiagActionContentDeDupe
@@ -1604,7 +1607,7 @@ ErrorTrap:
                             ' ----- Set Field Inactive
                             '
                             ContentName = DiagArgument(DiagAction, 1)
-                            RecordID = EncodeInteger(DiagArgument(DiagAction, 2))
+                            RecordID = genericController.EncodeInteger(DiagArgument(DiagAction, 2))
                             CS = cpCore.db.cs_open(ContentName, "(ID=" & RecordID & ")")
                             If cpCore.db.cs_ok(CS) Then
                                 Call cpCore.db.cs_set(CS, "active", 0)
@@ -1616,7 +1619,7 @@ ErrorTrap:
                             ' ----- Set Field not-required
                             '
                             ContentName = DiagArgument(DiagAction, 1)
-                            RecordID = EncodeInteger(DiagArgument(DiagAction, 2))
+                            RecordID = genericController.EncodeInteger(DiagArgument(DiagAction, 2))
                             CS = cpCore.db.cs_open(ContentName, "(ID=" & RecordID & ")")
                             If cpCore.db.cs_ok(CS) Then
                                 Call cpCore.db.cs_set(CS, "required", 0)
@@ -1966,7 +1969,7 @@ ErrorTrap:
                     '
                     Call cpCore.db.cs_goFirst(CSPointer)
                     Do While cpCore.db.cs_ok(CSPointer)
-                        Select Case vbUCase(cpCore.db.cs_getText(CSPointer, "name"))
+                        Select Case genericController.vbUCase(cpCore.db.cs_getText(CSPointer, "name"))
                             Case "ACTIVE"
                                 Call cpCore.db.cs_set(CSPointer, "IndexColumn", 0)
                                 Call cpCore.db.cs_set(CSPointer, "IndexWidth", 20)
@@ -2294,7 +2297,7 @@ ErrorTrap:
             EndOfList = False
             CommandStartPosition = 1
             Do While (CommandCount < CommandPosition) And (Not EndOfList)
-                CommandStartPosition = vbInstr(CommandStartPosition, CommandList, ",")
+                CommandStartPosition = genericController.vbInstr(CommandStartPosition, CommandList, ",")
                 If CommandStartPosition = 0 Then
                     EndOfList = True
                 End If
@@ -2302,7 +2305,7 @@ ErrorTrap:
                 CommandCount = CommandCount + 1
             Loop
             If (Not EndOfList) Then
-                CommandEndPosition = vbInstr(CommandStartPosition, CommandList, ",")
+                CommandEndPosition = genericController.vbInstr(CommandStartPosition, CommandList, ",")
                 If CommandEndPosition = 0 Then
                     DiagArgument = Mid(CommandList, CommandStartPosition)
                 Else
@@ -2357,7 +2360,7 @@ ErrorTrap:
                 'Stream.Add(Now & " count=[" & TestCount & "]x, PageSize=[" & PageSize & "]<br>")
                 'For TestPointer = 1 To 1000
                 '    TestTicks = GetTickCount
-                '    TestCopy = EncodeText(cpCore.csGetFieldCount(1))
+                '    TestCopy = genericController.encodeText(cpCore.csGetFieldCount(1))
                 '    OpenTicks = OpenTicks + GetTickCount - TestTicks
                 'Next
                 'Stream.Add(Now & " Finished<br>")
@@ -2381,7 +2384,7 @@ ErrorTrap:
                         NextTicks = NextTicks + GetTickCount - TestTicks
                         '
                         TestTicks = GetTickCount
-                        TestCopy = EncodeText(dr("NAME"))
+                        TestCopy = genericController.encodeText(dr("NAME"))
                         ReadTicks = ReadTicks + GetTickCount - TestTicks
                         '
                         RecordCount = RecordCount + 1
@@ -2413,7 +2416,7 @@ ErrorTrap:
                     Do While cpCore.db.cs_ok(CS)
                         '
                         TestTicks = GetTickCount
-                        TestCopy = EncodeText(cpCore.db.cs_getField(CS, "Name"))
+                        TestCopy = genericController.encodeText(cpCore.db.cs_getField(CS, "Name"))
                         ReadTicks = ReadTicks + GetTickCount - TestTicks
                         '
                         TestTicks = GetTickCount
@@ -2449,7 +2452,7 @@ ErrorTrap:
                     Do While cpCore.db.cs_ok(CS)
                         '
                         TestTicks = GetTickCount
-                        TestCopy = EncodeText(cpCore.db.cs_getField(CS, "Name"))
+                        TestCopy = genericController.encodeText(cpCore.db.cs_getField(CS, "Name"))
                         ReadTicks = ReadTicks + GetTickCount - TestTicks
                         '
                         TestTicks = GetTickCount
@@ -2496,7 +2499,7 @@ ErrorTrap:
             Local_GetContentID = 0
             dt = cpCore.db.executeSql("Select ID from ccContent where name=" & cpCore.db.encodeSQLText(ContentName))
             If dt.Rows.Count > 0 Then
-                Local_GetContentID = EncodeInteger(dt.Rows(0).Item(0))
+                Local_GetContentID = genericController.EncodeInteger(dt.Rows(0).Item(0))
             End If
             '
             Exit Function
@@ -2519,7 +2522,7 @@ ErrorTrap:
             Local_GetContentNameByID = ""
             dt = cpCore.db.executeSql("Select name from ccContent where id=" & ContentID)
             If dt.Rows.Count > 0 Then
-                Local_GetContentNameByID = EncodeText(dt.Rows(0).Item(0))
+                Local_GetContentNameByID = genericController.encodeText(dt.Rows(0).Item(0))
             End If
             '
             Exit Function
@@ -2542,7 +2545,7 @@ ErrorTrap:
             Local_GetContentTableName = ""
             RS = cpCore.db.executeSql("Select ccTables.Name as TableName from ccContent Left Join ccTables on ccContent.ContentTableID=ccTables.ID where ccContent.name=" & cpCore.db.encodeSQLText(ContentName))
             If RS.Rows.Count > 0 Then
-                Local_GetContentTableName = EncodeText(RS.Rows(0).Item(0))
+                Local_GetContentTableName = genericController.encodeText(RS.Rows(0).Item(0))
             End If
             '
             Exit Function
@@ -2570,7 +2573,7 @@ ErrorTrap:
                     & " where ccContent.name=" & cpCore.db.encodeSQLText(ContentName)
             RS = cpCore.db.executeSql(SQL)
             If isDataTableOk(RS) Then
-                Local_GetContentDataSource = EncodeText(RS.Rows(0).Item("Name"))
+                Local_GetContentDataSource = genericController.encodeText(RS.Rows(0).Item("Name"))
             End If
             If Local_GetContentDataSource = "" Then
                 Local_GetContentDataSource = "Default"
@@ -2958,13 +2961,13 @@ ErrorTrap:
                         '
                         ' ----- Save the input
                         '
-                        RecordCount = EncodeInteger(cp.Doc.GetInteger("dtfaRecordCount"))
+                        RecordCount = genericController.EncodeInteger(cp.Doc.GetInteger("dtfaRecordCount"))
                         If RecordCount > 0 Then
                             For RecordPointer = 0 To RecordCount - 1
                                 '
                                 formFieldName = cp.Doc.GetText("dtfaName." & RecordPointer)
                                 formFieldTypeId = cp.Doc.GetInteger("dtfaType." & RecordPointer)
-                                formFieldId = EncodeInteger(cp.Doc.GetInteger("dtfaID." & RecordPointer))
+                                formFieldId = genericController.EncodeInteger(cp.Doc.GetInteger("dtfaID." & RecordPointer))
                                 formFieldInherited = cp.Doc.GetBoolean("dtfaInherited." & RecordPointer)
                                 '
                                 ' problem - looking for the name in the Db using the form's name, but it could have changed.
@@ -3008,8 +3011,8 @@ ErrorTrap:
                                                         '
                                                         ' remoave spaces from new name
                                                         '
-                                                        StatusMessage = StatusMessage & "<LI>Field [" & formFieldName & "] was renamed [" & vbReplace(formFieldName, " ", "") & "] because the field name can not include spaces.</LI>"
-                                                        formFieldName = vbReplace(formFieldName, " ", "")
+                                                        StatusMessage = StatusMessage & "<LI>Field [" & formFieldName & "] was renamed [" & genericController.vbReplace(formFieldName, " ", "") & "] because the field name can not include spaces.</LI>"
+                                                        formFieldName = genericController.vbReplace(formFieldName, " ", "")
                                                     End If
                                                     '
                                                     If (formFieldName <> "") And (formFieldTypeId <> 0) And ((.nameLc = "") Or (.fieldTypeId = 0)) Then
@@ -3049,7 +3052,7 @@ ErrorTrap:
                                                     & ",type=" & formFieldTypeId _
                                                     & ",caption=" & cpCore.db.encodeSQLText(cp.Doc.GetText("dtfaCaption." & RecordPointer)) _
                                                     & ",DefaultValue=" & cpCore.db.encodeSQLText(cp.Doc.GetText("dtfaDefaultValue." & RecordPointer)) _
-                                                    & ",EditSortPriority=" & cpCore.db.encodeSQLText(EncodeText(cp.Doc.GetInteger("dtfaEditSortPriority." & RecordPointer))) _
+                                                    & ",EditSortPriority=" & cpCore.db.encodeSQLText(genericController.encodeText(cp.Doc.GetInteger("dtfaEditSortPriority." & RecordPointer))) _
                                                     & ",Active=" & cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaActive." & RecordPointer)) _
                                                     & ",ReadOnly=" & cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaReadOnly." & RecordPointer)) _
                                                     & ",Authorable=" & cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAuthorable." & RecordPointer)) _
@@ -3327,9 +3330,9 @@ ErrorTrap:
                                 '
                                 streamRow.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
                                 If .inherited Then
-                                    Call streamRow.Add(SpanClassAdminSmall & EncodeText(.defaultValue) & "</SPAN>")
+                                    Call streamRow.Add(SpanClassAdminSmall & genericController.encodeText(.defaultValue) & "</SPAN>")
                                 Else
-                                    Call streamRow.Add(cpCore.html_GetFormInputText2("dtfaDefaultValue." & RecordCount, EncodeText(.defaultValue), 1, 10))
+                                    Call streamRow.Add(cpCore.html_GetFormInputText2("dtfaDefaultValue." & RecordCount, genericController.encodeText(.defaultValue), 1, 10))
                                 End If
                                 streamRow.Add("</nobr></td>")
                                 '
@@ -3349,8 +3352,8 @@ ErrorTrap:
                                     Call streamRow.Add(cpCore.content_GetRecordName("content field types", .fieldTypeId) & cpCore.html_GetFormInputHidden("dtfaType." & RecordCount, .fieldTypeId))
                                 Else
                                     TypeSelect = TypeSelectTemplate
-                                    TypeSelect = vbReplace(TypeSelect, "menuname", "dtfaType." & RecordCount, 1, 99, vbTextCompare)
-                                    TypeSelect = vbReplace(TypeSelect, "=""" & .fieldTypeId & """", "=""" & .fieldTypeId & """ selected", 1, 99, vbTextCompare)
+                                    TypeSelect = genericController.vbReplace(TypeSelect, "menuname", "dtfaType." & RecordCount, 1, 99, vbTextCompare)
+                                    TypeSelect = genericController.vbReplace(TypeSelect, "=""" & .fieldTypeId & """", "=""" & .fieldTypeId & """ selected", 1, 99, vbTextCompare)
                                     Call streamRow.Add(TypeSelect)
                                 End If
                                 streamRow.Add("</nobr></td>")
@@ -3367,50 +3370,50 @@ ErrorTrap:
                                 '
                                 ' active
                                 '
-                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaActive." & RecordCount, EncodeText(.active), .inherited))
+                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaActive." & RecordCount, genericController.encodeText(.active), .inherited))
                                 '
                                 ' read only
                                 '
-                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaReadOnly." & RecordCount, EncodeText(.ReadOnly), .inherited))
+                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaReadOnly." & RecordCount, genericController.encodeText(.ReadOnly), .inherited))
                                 '
                                 ' authorable
                                 '
-                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaAuthorable." & RecordCount, EncodeText(.authorable), .inherited))
+                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaAuthorable." & RecordCount, genericController.encodeText(.authorable), .inherited))
                                 '
                                 ' required
                                 '
-                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaRequired." & RecordCount, EncodeText(.Required), .inherited))
+                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaRequired." & RecordCount, genericController.encodeText(.Required), .inherited))
                                 '
                                 ' UniqueName
                                 '
-                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaUniqueName." & RecordCount, EncodeText(.UniqueName), .inherited))
+                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaUniqueName." & RecordCount, genericController.encodeText(.UniqueName), .inherited))
                                 '
                                 ' text buffered
                                 '
-                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaTextBuffered." & RecordCount, EncodeText(.TextBuffered), .inherited))
+                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaTextBuffered." & RecordCount, genericController.encodeText(.TextBuffered), .inherited))
                                 '
                                 ' password
                                 '
-                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaPassword." & RecordCount, EncodeText(.Password), .inherited))
+                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaPassword." & RecordCount, genericController.encodeText(.Password), .inherited))
                                 '
                                 ' scramble
                                 '
-                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaScramble." & RecordCount, EncodeText(.Scramble), .inherited))
+                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaScramble." & RecordCount, genericController.encodeText(.Scramble), .inherited))
                                 '
                                 ' HTML Content
                                 '
-                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaHTMLContent." & RecordCount, EncodeText(.htmlContent), .inherited))
+                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaHTMLContent." & RecordCount, genericController.encodeText(.htmlContent), .inherited))
                                 '
                                 ' Admin Only
                                 '
                                 If cpCore.user.isAuthenticatedAdmin Then
-                                    streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaAdminOnly." & RecordCount, EncodeText(.adminOnly), .inherited))
+                                    streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaAdminOnly." & RecordCount, genericController.encodeText(.adminOnly), .inherited))
                                 End If
                                 '
                                 ' Developer Only
                                 '
                                 If cpCore.user.isAuthenticatedDeveloper Then
-                                    streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaDeveloperOnly." & RecordCount, EncodeText(.developerOnly), .inherited))
+                                    streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaDeveloperOnly." & RecordCount, genericController.encodeText(.developerOnly), .inherited))
                                 End If
                                 '
                                 streamRow.Add("</tr>")
@@ -3584,14 +3587,14 @@ ErrorTrap:
                     Rows = cpCore.db.convertDataTabletoArray(RSSchema)
                     RowMax = UBound(Rows, 2)
                     For RowPointer = 0 To RowMax
-                        IndexName = EncodeText(Rows(5, RowPointer))
+                        IndexName = genericController.encodeText(Rows(5, RowPointer))
                         If IndexName <> "" Then
                             GetForm_DbIndex = GetForm_DbIndex & StartTableRow()
                             Copy = cpCore.html_GetFormInputCheckBox2("DropIndex." & RowPointer, False) _
                                     & cpCore.html_GetFormInputHidden("DropIndexName." & RowPointer, IndexName) _
-                                    & EncodeText(IndexName)
+                                    & genericController.encodeText(IndexName)
                             GetForm_DbIndex = GetForm_DbIndex & GetTableCell(Copy, , , TableRowEven)
-                            GetForm_DbIndex = GetForm_DbIndex & GetTableCell(EncodeText(Rows(17, RowPointer)), , , TableRowEven)
+                            GetForm_DbIndex = GetForm_DbIndex & GetTableCell(genericController.encodeText(Rows(17, RowPointer)), , , TableRowEven)
                             GetForm_DbIndex = GetForm_DbIndex & GetTableCell("&nbsp;", , , TableRowEven)
                             GetForm_DbIndex = GetForm_DbIndex & kmaEndTableRow
                             TableRowEven = Not TableRowEven
@@ -3620,7 +3623,7 @@ ErrorTrap:
                         GetForm_DbIndex = GetForm_DbIndex & StartTableRow()
                         Copy = cpCore.html_GetFormInputCheckBox2("AddIndex." & RowPointer, False) _
                                 & cpCore.html_GetFormInputHidden("AddIndexFieldName." & RowPointer, Rows(3, RowPointer)) _
-                                & EncodeText(Rows(3, RowPointer))
+                                & genericController.encodeText(Rows(3, RowPointer))
                         GetForm_DbIndex = GetForm_DbIndex & GetTableCell(Copy, , , TableRowEven)
                         GetForm_DbIndex = GetForm_DbIndex & GetTableCell("&nbsp;", , , TableRowEven)
                         GetForm_DbIndex = GetForm_DbIndex & GetTableCell("&nbsp;", , , TableRowEven)
@@ -3742,8 +3745,8 @@ ErrorTrap:
             GetForm_LogFiles = GetForm_LogFiles & "<P></P>"
             '
             QueryOld = ".asp?"
-            QueryNew = ModifyQueryString(QueryOld, RequestNameAdminForm, AdminFormToolLogFileView, True)
-            GetForm_LogFiles = GetForm_LogFiles & vbReplace(GetForm_LogFiles_Details(), QueryOld, QueryNew & "&", 1, 99, vbTextCompare)
+            QueryNew = genericController.ModifyQueryString(QueryOld, RequestNameAdminForm, AdminFormToolLogFileView, True)
+            GetForm_LogFiles = GetForm_LogFiles & genericController.vbReplace(GetForm_LogFiles_Details(), QueryOld, QueryNew & "&", 1, 99, vbTextCompare)
             '
             'GetForm_LogFiles = GetForm_LogFiles & cpCore.main_GetFormInputHidden("af", AdminFormToolLogFileView)
             GetForm_LogFiles = (genericLegacyView.OpenFormTable(cpCore, ButtonList)) & GetForm_LogFiles & (genericLegacyView.CloseFormTable(cpCore, ButtonList))
@@ -3874,9 +3877,9 @@ ErrorTrap:
                             FileDate = LineSplit(3)
                             FileURL = StartPath & CurrentPath & "\" & Filename
                             QueryString = cpCore.web_RefreshQueryString
-                            QueryString = ModifyQueryString(QueryString, RequestNameAdminForm, CStr(AdminFormTool), True)
-                            QueryString = ModifyQueryString(QueryString, "at", AdminFormToolLogFileView, True)
-                            QueryString = ModifyQueryString(QueryString, "SourceFile", FileURL, True)
+                            QueryString = genericController.ModifyQueryString(QueryString, RequestNameAdminForm, CStr(AdminFormTool), True)
+                            QueryString = genericController.ModifyQueryString(QueryString, "at", AdminFormToolLogFileView, True)
+                            QueryString = genericController.ModifyQueryString(QueryString, "SourceFile", FileURL, True)
                             CellCopy = "<A href=""" & cpCore.webServerIO_requestPath & "?" & QueryString & """ target=""_blank"">" & Filename & "</A>"
                             GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetForm_LogFiles_Details_GetRow(SpacerImage, CellCopy, FileSize, FileDate, RowEven)
                         End If
@@ -3896,7 +3899,7 @@ ErrorTrap:
             '
             Dim ClassString As String
             '
-            If EncodeBoolean(RowEven) Then
+            If genericController.EncodeBoolean(RowEven) Then
                 RowEven = False
                 ClassString = " class=""ccPanelRowEven"" "
             Else
@@ -3904,12 +3907,12 @@ ErrorTrap:
                 ClassString = " class=""ccPanelRowOdd"" "
             End If
             '
-            Cell0 = EncodeText(Cell0)
+            Cell0 = genericController.encodeText(Cell0)
             If Cell0 = "" Then
                 Cell0 = "&nbsp;"
             End If
             '
-            Cell1 = EncodeText(Cell1)
+            Cell1 = genericController.encodeText(Cell1)
             '
             If Cell1 = "" Then
                 GetForm_LogFiles_Details_GetRow = "<tr><TD" & ClassString & " Colspan=""4"">" & Cell0 & "</td></tr>"
@@ -4170,15 +4173,15 @@ ErrorTrap:
                     FileDetailString = Files(Ptr)
                     FileDetails = Split(FileDetailString, ",")
                     Filename = FileDetails(0)
-                    Link = vbReplace(AppPath & Filename, "\", "/")
+                    Link = genericController.vbReplace(AppPath & Filename, "\", "/")
                     If AllowScriptLink And (InStr(1, Filename, ".asp", vbTextCompare) <> 0) And (Mid(Filename, 1, 1) <> "_") Then
                         '
                         result = result & "<br>Create Hard Template for script page [" & Link & "]"
                         '
-                        Link = vbReplace(AppPath & Filename, "\", "/")
-                        TemplateName = vbReplace(Link, "/", "-")
-                        If vbInstr(1, TemplateName, ".") <> 0 Then
-                            TemplateName = Mid(TemplateName, 1, vbInstr(1, TemplateName, ".") - 1)
+                        Link = genericController.vbReplace(AppPath & Filename, "\", "/")
+                        TemplateName = genericController.vbReplace(Link, "/", "-")
+                        If genericController.vbInstr(1, TemplateName, ".") <> 0 Then
+                            TemplateName = Mid(TemplateName, 1, genericController.vbInstr(1, TemplateName, ".") - 1)
 
                         End If
                         '
@@ -4198,10 +4201,10 @@ ErrorTrap:
                         '
                         PageSource = cpCore.appRootFiles.readFile(Filename)
                         PageSource = cpCore.main_GetBody(PageSource)
-                        Link = vbReplace(AppPath & Filename, "\", "/")
-                        TemplateName = vbReplace(Link, "/", "-")
-                        If vbInstr(1, TemplateName, ".") <> 0 Then
-                            TemplateName = Mid(TemplateName, 1, vbInstr(1, TemplateName, ".") - 1)
+                        Link = genericController.vbReplace(AppPath & Filename, "\", "/")
+                        TemplateName = genericController.vbReplace(Link, "/", "-")
+                        If genericController.vbInstr(1, TemplateName, ".") <> 0 Then
+                            TemplateName = Mid(TemplateName, 1, genericController.vbInstr(1, TemplateName, ".") - 1)
 
                         End If
                         '
@@ -4298,7 +4301,7 @@ ErrorTrap:
         '                With LoadCDef
         '                    CS = cpCore.db.cs_open("Content Fields", "contentid=" & ContentID)
         '                    Do While cpCore.db.cs_ok(CS)
-        '                        Select Case vbUCase(cpCore.db.cs_getText(CS, "name"))
+        '                        Select Case genericController.vbUCase(cpCore.db.cs_getText(CS, "name"))
         '                            Case "NAME"
         '                                .Name = ""
         '                        End Select
@@ -4345,7 +4348,7 @@ ErrorTrap:
         '                    For Each keyValuePair As KeyValuePair(Of String, appServices_metaDataClass.CDefFieldClass) In .fields
         '                        Dim field As appServices_metaDataClass.CDefFieldClass = keyValuePair.Value
         '                        FieldActive = field.active
-        '                        FieldWidth = EncodeInteger(field.IndexWidth)
+        '                        FieldWidth = genericController.EncodeInteger(field.IndexWidth)
         '                        If FieldActive And (FieldWidth > 0) Then
         '                            adminColumn = New appServices_metaDataClass.CDefAdminColumnClass
         '                            FieldWidthTotal = FieldWidthTotal + FieldWidth
@@ -4376,7 +4379,7 @@ ErrorTrap:
         '                            IndexColumn(DestPtr + 1) = field.IndexColumn
         '                            adminColumn.Name = field.Name
         '                            adminColumn.SortDirection = field.IndexSortDirection
-        '                            adminColumn.SortPriority = EncodeInteger(field.IndexSortOrder)
+        '                            adminColumn.SortPriority = genericController.EncodeInteger(field.IndexSortOrder)
         '                            adminColumn.Width = FieldWidth
         '                            .adminColumns.Add(adminColumn)
         '                        End If
@@ -4525,7 +4528,7 @@ ErrorTrap:
                 If RowCnt > 0 Then
                     For RowPtr = 0 To RowCnt - 1
                         If cpCore.doc_getBoolean("Cdef" & RowPtr) Then
-                            lcName = vbLCase(cpCore.docProperties.getText("CDefName" & RowPtr))
+                            lcName = genericController.vbLCase(cpCore.docProperties.getText("CDefName" & RowPtr))
                             If IsDeveloper Or (lcName = "page content") Or (lcName = "copy content") Or (lcName = "page templates") Then
                                 CDefList = CDefList & "," & lcName
                             End If
@@ -4587,10 +4590,10 @@ ErrorTrap:
             CS = cpCore.db.cs_open("Content")
             Do While cpCore.db.cs_ok(CS)
                 RecordName = cpCore.db.cs_getText(CS, "Name")
-                lcName = vbLCase(RecordName)
+                lcName = genericController.vbLCase(RecordName)
                 If IsDeveloper Or (lcName = "page content") Or (lcName = "copy content") Or (lcName = "page templates") Then
                     RecordID = cpCore.db.cs_getInteger(CS, "ID")
-                    If vbInstr(1, "," & CDefList & ",", "," & RecordName & ",") <> 0 Then
+                    If genericController.vbInstr(1, "," & CDefList & ",", "," & RecordName & ",") <> 0 Then
                         TopHalf = TopHalf & "<div>" & cpCore.html_GetFormInputCheckBox2("Cdef" & RowPtr, True) & cpCore.html_GetFormInputHidden("CDefName" & RowPtr, RecordName) & "&nbsp;" & cpCore.db.cs_getText(CS, "Name") & "</div>"
                     Else
                         BottomHalf = BottomHalf & "<div>" & cpCore.html_GetFormInputCheckBox2("Cdef" & RowPtr, False) & cpCore.html_GetFormInputHidden("CDefName" & RowPtr, RecordName) & "&nbsp;" & cpCore.db.cs_getText(CS, "Name") & "</div>"

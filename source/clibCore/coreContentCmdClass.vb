@@ -2,7 +2,8 @@
 Option Explicit On
 Option Strict On
 
-
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 Imports Contensive.BaseClasses
 Imports Contensive.Core.coreCommonModule
 
@@ -41,9 +42,9 @@ Namespace Contensive.Core
         '        Dim personalizationIsAuthenticated As Boolean
         '        '
         '        src = CsvObject.GetAddonOption("data", optionString)
-        '        Context = encodeInteger(CsvObject.GetAddonOption("context", optionString))
-        '        personalizationPeopleId = EncodeInteger(CsvObject.GetAddonOption("personalizationPeopleId", optionString))
-        '        personalizationIsAuthenticated = EncodeBoolean(CsvObject.GetAddonOption("personalizationIsAuthenticated", optionString))
+        '        Context = genericController.EncodeInteger(CsvObject.GetAddonOption("context", optionString))
+        '        personalizationPeopleId = genericController.EncodeInteger(CsvObject.GetAddonOption("personalizationPeopleId", optionString))
+        '        personalizationIsAuthenticated = genericController.EncodeBoolean(CsvObject.GetAddonOption("personalizationIsAuthenticated", optionString))
         '        '
         '        ' compatibility with old Contensive
         '        '
@@ -170,7 +171,7 @@ Namespace Contensive.Core
                 ptrLast = 1
                 Do
                     Cmd = ""
-                    posOpen = vbInstr(ptrLast, src, contentReplaceEscapeStart)
+                    posOpen = genericController.vbInstr(ptrLast, src, contentReplaceEscapeStart)
                     Ptr = posOpen
                     If Ptr = 0 Then
                         '
@@ -182,7 +183,7 @@ Namespace Contensive.Core
                         '
                         notFound = True
                         Do
-                            posClose = vbInstr(Ptr, src, contentReplaceEscapeEnd)
+                            posClose = genericController.vbInstr(Ptr, src, contentReplaceEscapeEnd)
                             If posClose = 0 Then
                                 '
                                 ' brace opened but no close, forget the open and exit
@@ -192,7 +193,7 @@ Namespace Contensive.Core
                             Else
                                 posDq = Ptr
                                 Do
-                                    posDq = vbInstr(posDq + 1, src, """")
+                                    posDq = genericController.vbInstr(posDq + 1, src, """")
                                     escape = ""
                                     If posDq > 0 Then
                                         escape = Mid(src, posDq - 1, 1)
@@ -200,7 +201,7 @@ Namespace Contensive.Core
                                 Loop While (escape = "\")
                                 posSq = Ptr
                                 Do
-                                    posSq = vbInstr(posSq + 1, src, "'")
+                                    posSq = genericController.vbInstr(posSq + 1, src, "'")
                                     escape = ""
                                     If posSq > 0 Then
                                         escape = Mid(src, posSq - 1, 1)
@@ -223,7 +224,7 @@ Namespace Contensive.Core
                                             ' skip forward to the next non-escaped sq
                                             '
                                             Do
-                                                posSq = vbInstr(posSq + 1, src, "'")
+                                                posSq = genericController.vbInstr(posSq + 1, src, "'")
                                                 escape = ""
                                                 If posSq > 0 Then
                                                     escape = Mid(src, posSq - 1, 1)
@@ -244,7 +245,7 @@ Namespace Contensive.Core
                                             '
                                             Do
                                                 'Ptr = posDq + 1
-                                                posDq = vbInstr(posDq + 1, src, """")
+                                                posDq = genericController.vbInstr(posDq + 1, src, """")
                                                 escape = ""
                                                 If posDq > 0 Then
                                                     escape = Mid(src, posDq - 1, 1)
@@ -334,11 +335,11 @@ Namespace Contensive.Core
                     If trimLen > 0 Then
                         leftChr = Left(cmdSrc, 1)
                         rightChr = Right(cmdSrc, 1)
-                        If vbInstr(1, whiteChrs, leftChr) <> 0 Then
+                        If genericController.vbInstr(1, whiteChrs, leftChr) <> 0 Then
                             cmdSrc = Mid(cmdSrc, 2)
                             trimming = True
                         End If
-                        If vbInstr(1, whiteChrs, rightChr) <> 0 Then
+                        If genericController.vbInstr(1, whiteChrs, rightChr) <> 0 Then
                             cmdSrc = Mid(cmdSrc, 1, Len(cmdSrc) - 1)
                             trimming = True
                         End If
@@ -427,7 +428,7 @@ Namespace Contensive.Core
                             '   "Open" file
                             '   "Open" "file"
                             '
-                            Pos = vbInstr(2, cmdText, """")
+                            Pos = genericController.vbInstr(2, cmdText, """")
                             If Pos <= 1 Then
                                 Throw New ApplicationException("Error parsing content command [" & cmdSrc & "], expected a close quote around position " & Pos)
                             Else
@@ -455,7 +456,7 @@ Namespace Contensive.Core
                             '   open
                             '   open file
                             '
-                            Pos = vbInstr(1, cmdText, " ")
+                            Pos = genericController.vbInstr(1, cmdText, " ")
                             If Pos > 0 Then
                                 cmdArg = Mid(cmdSrc, Pos + 1)
                                 cmdText = Trim(Mid(cmdSrc, 1, Pos - 1))
@@ -465,7 +466,7 @@ Namespace Contensive.Core
                             '
                             'cmdarg is quoted
                             '
-                            Pos = vbInstr(2, cmdArg, """")
+                            Pos = genericController.vbInstr(2, cmdArg, """")
                             If Pos <= 1 Then
                                 Throw New ApplicationException("Error parsing JSON command list, expected a quoted command argument, command list [" & cmdSrc & "]")
                             Else
@@ -569,7 +570,7 @@ Namespace Contensive.Core
                         '
                         ' execute the cmd with cmdArgDef dictionary
                         '
-                        Select Case vbLCase(cmdText)
+                        Select Case genericController.vbLCase(cmdText)
                             Case "textbox"
                                 '
                                 ' Opens a textbox addon (patch for text box name being "text name" so it requies json)copy content record
@@ -631,7 +632,7 @@ Namespace Contensive.Core
                                     'CmdAccumulator = cpCore.main_GetContentCopy(ArgName, "copy content")
                                     Dim dt As DataTable = cpCore.db.executeSql("select layout from ccLayouts where name=" & cpCore.db.encodeSQLText(ArgName))
                                     If Not (dt Is Nothing) Then
-                                        CmdAccumulator = EncodeText(dt.Rows(0).Item("layout"))
+                                        CmdAccumulator = genericController.encodeText(dt.Rows(0).Item("layout"))
                                     End If
                                     dt.Dispose()
                                 End If
@@ -724,7 +725,7 @@ Namespace Contensive.Core
                                 'CmdAccumulator = ""
                                 'ArgName = ""
                                 'For Ptr = 0 To cmdArgDef.Count - 1
-                                '    Select Case vbLCase(cmdArgDef.Keys(Ptr))
+                                '    Select Case genericController.vbLCase(cmdArgDef.Keys(Ptr))
                                 '        Case "name", "default"
                                 '            ArgName = cmdArgDef.Item(Ptr)
                                 '    End Select
@@ -746,7 +747,7 @@ Namespace Contensive.Core
                                 ''CmdAccumulator = ""
                                 'ArgName = ""
                                 'For Ptr = 0 To cmdArgDef.Count - 1
-                                '    Select Case vbLCase(cmdArgDef.Keys(Ptr))
+                                '    Select Case genericController.vbLCase(cmdArgDef.Keys(Ptr))
                                 '        Case "find"
                                 '            argFind = cmdArgDef.Item(Ptr)
                                 '        Case "replace"
@@ -754,7 +755,7 @@ Namespace Contensive.Core
                                 '    End Select
                                 'Next
                                 'If argFind <> "" Then
-                                '    CmdAccumulator = vbReplace(CmdAccumulator, argFind, argReplace, vbTextCompare)
+                                '    CmdAccumulator = genericController.vbReplace(CmdAccumulator, argFind, argReplace, vbTextCompare)
                                 'End If
                             Case "setinner"
                                 Throw New NotImplementedException("setInner contentCmd")
@@ -769,7 +770,7 @@ Namespace Contensive.Core
                                 ''
                                 'ArgName = ""
                                 'For Ptr = 0 To cmdArgDef.Count - 1
-                                '    Select Case vbLCase(cmdArgDef.Keys(Ptr))
+                                '    Select Case genericController.vbLCase(cmdArgDef.Keys(Ptr))
                                 '        Case "find"
                                 '            argFind = cmdArgDef.Item(Ptr)
                                 '        Case "replace"
@@ -791,7 +792,7 @@ Namespace Contensive.Core
                                 ''
                                 'ArgName = ""
                                 'For Ptr = 0 To cmdArgDef.Count - 1
-                                '    Select Case vbLCase(cmdArgDef.Keys(Ptr))
+                                '    Select Case genericController.vbLCase(cmdArgDef.Keys(Ptr))
                                 '        Case "find"
                                 '            argFind = cmdArgDef.Item(Ptr)
                                 '        Case "replace"
@@ -814,7 +815,7 @@ Namespace Contensive.Core
                                 ''
                                 'ArgName = ""
                                 'For Ptr = 0 To cmdArgDef.Count - 1
-                                '    Select Case vbLCase(cmdArgDef.Keys(Ptr))
+                                '    Select Case genericController.vbLCase(cmdArgDef.Keys(Ptr))
                                 '        Case "find"
                                 '            argFind = cmdArgDef.Item(Ptr)
                                 '        Case "replace"
@@ -836,7 +837,7 @@ Namespace Contensive.Core
                                 ''
                                 'ArgName = ""
                                 'For Ptr = 0 To cmdArgDef.Count - 1
-                                '    Select Case vbLCase(cmdArgDef.Keys(Ptr))
+                                '    Select Case genericController.vbLCase(cmdArgDef.Keys(Ptr))
                                 '        Case "find"
                                 '            argFind = cmdArgDef.Item(Ptr)
                                 '        Case "replace"
@@ -862,7 +863,7 @@ Namespace Contensive.Core
                                         Case "guid"
                                             ArgGuid = kvp.Value.ToString()
                                         Case Else
-                                            ArgOptionString &= "&" & encodeNvaArgument(EncodeText(kvp.Key.ToString())) & "=" & encodeNvaArgument(EncodeText(kvp.Value.ToString()))
+                                            ArgOptionString &= "&" & encodeNvaArgument(genericController.encodeText(kvp.Key.ToString())) & "=" & encodeNvaArgument(genericController.encodeText(kvp.Value.ToString()))
                                     End Select
                                 Next
                                 ArgOptionString &= "&cmdAccumulator=" & encodeNvaArgument(CmdAccumulator)
@@ -882,7 +883,7 @@ Namespace Contensive.Core
                                         Case "guid"
                                             ArgGuid = kvp.Value.ToString()
                                         Case Else
-                                            ArgOptionString &= "&" & encodeNvaArgument(EncodeText(kvp.Key)) & "=" & encodeNvaArgument(EncodeText(kvp.Value.ToString()))
+                                            ArgOptionString &= "&" & encodeNvaArgument(genericController.encodeText(kvp.Key)) & "=" & encodeNvaArgument(genericController.encodeText(kvp.Value.ToString()))
                                     End Select
                                 Next
                                 ArgOptionString = ArgOptionString & "&cmdAccumulator=" & encodeNvaArgument(CmdAccumulator)

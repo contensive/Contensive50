@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using Contensive.Core;
 
-namespace  Contensive.Core {
+namespace  Contensive.CLI {
     class createAppClass {
         public void createApp() {
             try
@@ -154,7 +154,7 @@ namespace  Contensive.Core {
                 {
                     Controllers.iisController.verifySite(cp.core,appName, domainName, cp.core.serverConfig.appConfig.appRootFilesPath, iisDefaultDoc);
                     Controllers.appBuilderController.upgrade(cp.core,true);
-                    cp.core.siteProperties.setProperty(Contensive.Core.coreCommonModule.siteproperty_serverPageDefault_name, iisDefaultDoc);
+                    cp.core.siteProperties.setProperty(constants.siteproperty_serverPageDefault_name, iisDefaultDoc);
                 }
             }
             catch (Exception ex)

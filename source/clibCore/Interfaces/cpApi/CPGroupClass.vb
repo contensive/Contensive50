@@ -1,4 +1,6 @@
 
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 Imports Contensive.BaseClasses
 Imports System.Runtime.InteropServices
 
@@ -96,8 +98,8 @@ Namespace Contensive.Core
         Public Overrides Function GetName(ByVal GroupNameIdOrGuid As String) As String
             Dim returnText As String = ""
             Try
-                If vbIsNumeric(GroupNameIdOrGuid) Then
-                    returnText = cpCore.GetRecordName("groups", EncodeInteger(GroupNameIdOrGuid))
+                If genericController.vbIsNumeric(GroupNameIdOrGuid) Then
+                    returnText = cpCore.GetRecordName("groups", genericController.EncodeInteger(GroupNameIdOrGuid))
                 Else
                     Dim sqlCriteria As String = cpCore.db.getNameIdOrGuidSqlCriteria(GroupNameIdOrGuid)
                     Dim cs As CPCSClass = cp.CSNew()
@@ -123,7 +125,7 @@ Namespace Contensive.Core
                 If userId = 0 Then
                     userId = cp.User.Id
                 End If
-                Call cp.Content.DeleteRecords("Member Rules", "((memberid=" & removeUserId.ToString & ")and(groupid=" & GroupID.ToString & "))")
+                Call cp.Content.Delete("Member Rules", "((memberid=" & removeUserId.ToString & ")and(groupid=" & GroupID.ToString & "))")
             End If
         End Sub
         '

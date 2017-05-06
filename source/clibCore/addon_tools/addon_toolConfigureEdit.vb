@@ -9,7 +9,7 @@ Imports Contensive.BaseClasses
 '
 Namespace Contensive.Addons
     '
-    Public Class toolConfigureEditClass
+    Public Class addon_toolConfigureEditClass
         Inherits Contensive.BaseClasses.AddonBaseClass
         '
         '====================================================================================================

@@ -4,6 +4,7 @@ Option Strict On
 
 Imports System.Reflection
 Imports Contensive.BaseClasses
+Imports Contensive.Core.Controllers.genericController
 
 Imports System.Xml
 
@@ -364,29 +365,29 @@ Namespace Contensive.Core.Controllers
                 Else
                     Dim addonCacheKey As String = addonCachePtr.ToString
                     FoundAddon = True
-                    ProgramID = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ObjectProgramID)
-                    AddonName = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_name)
-                    addonId = EncodeInteger(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_Id)
-                    addonCollectionId = EncodeInteger(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_collectionid)
-                    AddonGuid = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ccguid)
+                    ProgramID = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ObjectProgramID)
+                    AddonName = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_name)
+                    addonId = genericController.EncodeInteger(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_Id)
+                    addonCollectionId = genericController.EncodeInteger(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_collectionid)
+                    AddonGuid = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ccguid)
                     If AddonGuid <> "" Then
                         AddonNameOrGuid_Local = AddonGuid
                     Else
                         AddonNameOrGuid_Local = AddonName
                     End If
-                    HTMLContent = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_Copy)
-                    Link = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_Link)
-                    DotNetClassFullName = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_DotNetClass)
-                    AddonOptionConstructor = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ArgumentList)
-                    AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
-                    AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbLf, vbCr)
-                    AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
+                    HTMLContent = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_Copy)
+                    Link = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_Link)
+                    DotNetClassFullName = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_DotNetClass)
+                    AddonOptionConstructor = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ArgumentList)
+                    AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
+                    AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbLf, vbCr)
+                    AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
                     '
                     AddonBlockEditTools = False
                     TextContent = ""
                     FormXML = ""
-                    TextContent = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_CopyText)
-                    IsInline = EncodeBoolean(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_IsInline)
+                    TextContent = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_CopyText)
+                    IsInline = genericController.EncodeBoolean(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_IsInline)
                     '
                     ' Support BlockDefaultStyles and CustomStylesFilename
                     '
@@ -394,18 +395,18 @@ Namespace Contensive.Core.Controllers
                         '
                         ' Add default styles
                         '
-                        DefaultStylesFilename = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_StylesFilename)
+                        DefaultStylesFilename = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_StylesFilename)
                     End If
                     '
                     ' Add custom styles
                     '
-                    CustomStylesFilename = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_CustomStylesFilename)
-                    FormXML = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_formxml)
-                    RemoteAssetLink = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_RemoteAssetLink)
-                    AsAjax = EncodeBoolean(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_AsAjax)
-                    InFrame = EncodeBoolean(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_InFrame)
-                    ScriptingEntryPoint = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ScriptingEntryPoint)
-                    scriptinglanguageid = EncodeInteger(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ScriptingLanguageID)
+                    CustomStylesFilename = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_CustomStylesFilename)
+                    FormXML = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_formxml)
+                    RemoteAssetLink = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_RemoteAssetLink)
+                    AsAjax = genericController.EncodeBoolean(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_AsAjax)
+                    InFrame = genericController.EncodeBoolean(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_InFrame)
+                    ScriptingEntryPoint = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ScriptingEntryPoint)
+                    scriptinglanguageid = genericController.EncodeInteger(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ScriptingLanguageID)
                     '
                     ' Get Language
                     '
@@ -416,19 +417,19 @@ Namespace Contensive.Core.Controllers
                     If ScriptingLanguage = "" Then
                         ScriptingLanguage = "VBScript"
                     End If
-                    ScriptingCode = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ScriptingCode)
-                    AddonBlockEditTools = EncodeBoolean(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_BlockEditTools)
-                    ScriptingTimeout = EncodeInteger(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ScriptingTimeout)
-                    inlineScript = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_inlineScript)
-                    helpCopy = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_help)
-                    helpLink = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_helpLink)
-                    JSOnLoad = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_JavaScriptOnLoad)
-                    JSBodyEnd = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_JavaScriptBodyEnd)
-                    PageTitle = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_PageTitle)
-                    MetaDescription = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_MetaDescription)
-                    MetaKeywordList = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_MetaKeywordList)
-                    OtherHeadTags = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_OtherHeadTags)
-                    JSFilename = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_JSFilename)
+                    ScriptingCode = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ScriptingCode)
+                    AddonBlockEditTools = genericController.EncodeBoolean(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_BlockEditTools)
+                    ScriptingTimeout = genericController.EncodeInteger(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ScriptingTimeout)
+                    inlineScript = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_inlineScript)
+                    helpCopy = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_help)
+                    helpLink = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_helpLink)
+                    JSOnLoad = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_JavaScriptOnLoad)
+                    JSBodyEnd = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_JavaScriptBodyEnd)
+                    PageTitle = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_PageTitle)
+                    MetaDescription = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_MetaDescription)
+                    MetaKeywordList = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_MetaKeywordList)
+                    OtherHeadTags = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_OtherHeadTags)
+                    JSFilename = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_JSFilename)
                     If JSFilename <> "" Then
                         JSFilename = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
                     End If
@@ -448,7 +449,7 @@ Namespace Contensive.Core.Controllers
                     addonIdKey = addonId.ToString
                     Ptr = cpCore.cache_addonStyleRules.getFirstPtr(addonIdKey)
                     Do While Ptr >= 0
-                        styleId = EncodeInteger(cpCore.cache_addonStyleRules.getValue(Ptr))
+                        styleId = genericController.EncodeInteger(cpCore.cache_addonStyleRules.getValue(Ptr))
                         Call cpCore.main_AddSharedStyleID2(styleId, AddonName)
                         Ptr = cpCore.cache_addonStyleRules.getNextPtr()
                     Loop
@@ -483,7 +484,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' temporary fix for Content Box not handling ajax or inframe
                     '
-                    If vbLCase(AddonGuid) = vbLCase(ContentBoxGuid) Then
+                    If genericController.vbLCase(AddonGuid) = genericController.vbLCase(ContentBoxGuid) Then
                         AsAjax = False
                         InFrame = False
                         AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_BlockNoAjax
@@ -499,7 +500,7 @@ Namespace Contensive.Core.Controllers
                         ' Build-in Add-ons
                         '-----------------------------------------------------------------------------------------------------
                         '
-                        If vbLCase(AddonName) = "block text" Then
+                        If genericController.vbLCase(AddonName) = "block text" Then
                             AddonNameOrGuid_Local = AddonName
                             FoundAddon = True
                             'IsProcess = False
@@ -539,7 +540,7 @@ Namespace Contensive.Core.Controllers
                             '    End If
                             ' End If
                             '
-                        ElseIf vbLCase(AddonName) = "block text end" Then
+                        ElseIf genericController.vbLCase(AddonName) = "block text end" Then
                             AddonNameOrGuid_Local = AddonName
                             FoundAddon = True
                             'IsProcess = False
@@ -663,11 +664,11 @@ Namespace Contensive.Core.Controllers
                             '
                             OptionCnt = 0
                             If WorkingOptionString <> "" Then
-                                If vbInstr(1, WorkingOptionString, vbCrLf) <> 0 Then
+                                If genericController.vbInstr(1, WorkingOptionString, vbCrLf) <> 0 Then
                                     '
                                     ' this should never be the case
                                     '
-                                    Options = SplitCRLF(WorkingOptionString)
+                                    Options = genericController.SplitCRLF(WorkingOptionString)
                                     OptionCnt = UBound(Options) + 1
                                 Else
                                     '
@@ -683,7 +684,7 @@ Namespace Contensive.Core.Controllers
                                 For OptionPtr = 0 To OptionCnt - 1
                                     With OptionsForCPVars(OptionPtr)
                                         .Name = Options(OptionPtr)
-                                        If vbInstr(1, .Name, "=") <> 0 Then
+                                        If genericController.vbInstr(1, .Name, "=") <> 0 Then
                                             Dim nameLc As String
                                             OptionPair = Split(.Name, "=")
                                             .Name = Trim(OptionPair(0))
@@ -694,18 +695,18 @@ Namespace Contensive.Core.Controllers
                                             ' the Addon Encoded Instance OptionString
                                             ' So, as I parse it for use in the add-on, I need to unencode it
                                             '
-                                            .Name = decodeNvaArgument(.Name)
-                                            .Value = decodeNvaArgument(.Value)
+                                            .Name = genericController.decodeNvaArgument(.Name)
+                                            .Value = genericController.decodeNvaArgument(.Value)
                                             '
                                             '
                                             nameLc = .Name.ToLower()
                                             If nameLc = "wrapper" Then
-                                                WrapperID = EncodeInteger(.Value)
+                                                WrapperID = genericController.EncodeInteger(.Value)
                                                 If WrapperID = 0 Then
                                                     WrapperID = DefaultWrapperID
                                                 End If
                                             ElseIf nameLc = "as ajax" Then
-                                                If EncodeBoolean(.Value) Then
+                                                If genericController.EncodeBoolean(.Value) Then
                                                     AsAjax = True
                                                 End If
                                             ElseIf nameLc = "css container id" Then
@@ -725,24 +726,24 @@ Namespace Contensive.Core.Controllers
                                 '
                                 ' convert from AddonConstructor format (crlf delimited, constructorincoded) to AddonOption format without selector (& delimited, addonencoded)
                                 '
-                                AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
-                                AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbLf, vbCr)
-                                AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
-                                Options = SplitCRLF(AddonOptionConstructor)
+                                AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
+                                AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbLf, vbCr)
+                                AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
+                                Options = genericController.SplitCRLF(AddonOptionConstructor)
                                 OptionCnt = UBound(Options) + 1
                                 For OptionPtr = 0 To OptionCnt - 1
                                     OptionName = Options(OptionPtr)
                                     OptionValue = ""
                                     '
-                                    OptionName = vbReplace(OptionName, "\=", vbCrLf)
-                                    If vbInstr(1, OptionName, "=") <> 0 Then
+                                    OptionName = genericController.vbReplace(OptionName, "\=", vbCrLf)
+                                    If genericController.vbInstr(1, OptionName, "=") <> 0 Then
                                         OptionPair = Split(OptionName, "=")
                                         OptionName = OptionPair(0)
                                         OptionPair(0) = ""
                                         OptionValue = Mid(Join(OptionPair, "="), 2)
                                     End If
-                                    OptionName = vbReplace(OptionName, vbCrLf, "\=")
-                                    OptionValue = vbReplace(OptionValue, vbCrLf, "\=")
+                                    OptionName = genericController.vbReplace(OptionName, vbCrLf, "\=")
+                                    OptionValue = genericController.vbReplace(OptionValue, vbCrLf, "\=")
                                     '
                                     Do While (Mid(OptionName, 1, 1) = vbTab) And Len(OptionName) > 1
                                         OptionName = Mid(OptionName, 2)
@@ -750,11 +751,11 @@ Namespace Contensive.Core.Controllers
                                     OptionName = Trim(OptionName)
                                     '
                                     ' split on [, throw out the right side
-                                    OptionValue = vbReplace(OptionValue, "\[", vbCrLf)
-                                    If vbInstr(1, OptionValue, "[") <> 0 Then
-                                        OptionValue = Left(OptionValue, vbInstr(1, OptionValue, "[") - 1)
+                                    OptionValue = genericController.vbReplace(OptionValue, "\[", vbCrLf)
+                                    If genericController.vbInstr(1, OptionValue, "[") <> 0 Then
+                                        OptionValue = Left(OptionValue, genericController.vbInstr(1, OptionValue, "[") - 1)
                                     End If
-                                    OptionValue = vbReplace(OptionValue, vbCrLf, "\[")
+                                    OptionValue = genericController.vbReplace(OptionValue, vbCrLf, "\[")
                                     '
                                     ' Decode Constructor format
                                     '
@@ -764,7 +765,7 @@ Namespace Contensive.Core.Controllers
                                     ' check for duplicates
                                     '
                                     For Ptr = 0 To OptionsForCPVars_Cnt - 1
-                                        If vbLCase(OptionName) = vbLCase(OptionsForCPVars(Ptr).Name) Then
+                                        If genericController.vbLCase(OptionName) = genericController.vbLCase(OptionsForCPVars(Ptr).Name) Then
                                             Exit For
                                         End If
                                     Next
@@ -843,7 +844,7 @@ Namespace Contensive.Core.Controllers
                                     ' web-only
                                     '
                                     Link = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & requestAppRootPath & cpCore.siteProperties.serverPageDefault
-                                    If vbInstr(1, Link, "?") = 0 Then
+                                    If genericController.vbInstr(1, Link, "?") = 0 Then
                                         Link = Link & "?"
                                     Else
                                         Link = Link & "&"
@@ -1018,13 +1019,13 @@ Namespace Contensive.Core.Controllers
                                         ' 20131221 - 4.2.317 - try test first to save time
                                         If isInStr(1, TestString, ReplaceSource) Then
                                             ReplaceValue = ReplaceValues(Ptr)
-                                            HTMLContent = vbReplace(HTMLContent, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
-                                            TextContent = vbReplace(TextContent, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
-                                            PageTitle = vbReplace(PageTitle, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
-                                            MetaDescription = vbReplace(MetaDescription, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
-                                            MetaKeywordList = vbReplace(MetaKeywordList, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
-                                            OtherHeadTags = vbReplace(OtherHeadTags, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
-                                            FormXML = vbReplace(FormXML, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
+                                            HTMLContent = genericController.vbReplace(HTMLContent, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
+                                            TextContent = genericController.vbReplace(TextContent, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
+                                            PageTitle = genericController.vbReplace(PageTitle, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
+                                            MetaDescription = genericController.vbReplace(MetaDescription, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
+                                            MetaKeywordList = genericController.vbReplace(MetaKeywordList, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
+                                            OtherHeadTags = genericController.vbReplace(OtherHeadTags, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
+                                            FormXML = genericController.vbReplace(FormXML, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
                                         End If
                                     Next
                                 End If
@@ -1054,7 +1055,7 @@ Namespace Contensive.Core.Controllers
                                     If addon_IncludedAddonIDList <> "" Then
                                         includedAddonIds = Split(addon_IncludedAddonIDList, ",")
                                         For Ptr = 0 To UBound(includedAddonIds)
-                                            includedAddonId = EncodeInteger(includedAddonIds(Ptr))
+                                            includedAddonId = genericController.EncodeInteger(includedAddonIds(Ptr))
                                             If includedAddonId <> 0 Then
                                                 IncludeContent = IncludeContent & execute(includedAddonId, "", "", CPUtilsBaseClass.addonContext.ContextAdmin, HostContentName, HostRecordID, HostFieldName, ACInstanceID, True, DefaultWrapperID, ignore_TemplateCaseOnly_PageContent, AddonStatusOK, Nothing, ignore_addonCallingItselfIdList & "," & addonId, Nothing, ignore_AddonsRunOnThisPageIdList, personalizationPeopleId, personalizationIsAuthenticated)
                                             End If
@@ -1147,7 +1148,7 @@ Namespace Contensive.Core.Controllers
                                 If (True) Then
                                     If RemoteAssetLink <> "" Then
                                         WorkingLink = RemoteAssetLink
-                                        If vbInstr(1, WorkingLink, "://") = 0 Then
+                                        If genericController.vbInstr(1, WorkingLink, "://") = 0 Then
                                             If isMainOk Then
                                                 '
                                                 ' use request object to build link
@@ -1171,12 +1172,12 @@ Namespace Contensive.Core.Controllers
                                         Dim PosStart As Integer
                                         kmaHTTP = New coreHttpRequestClass()
                                         RemoteAssetContent = kmaHTTP.getURL(WorkingLink)
-                                        Pos = vbInstr(1, RemoteAssetContent, "<body", vbTextCompare)
+                                        Pos = genericController.vbInstr(1, RemoteAssetContent, "<body", vbTextCompare)
                                         If Pos > 0 Then
-                                            Pos = vbInstr(Pos, RemoteAssetContent, ">")
+                                            Pos = genericController.vbInstr(Pos, RemoteAssetContent, ">")
                                             If Pos > 0 Then
                                                 PosStart = Pos + 1
-                                                Pos = vbInstr(Pos, RemoteAssetContent, "</body", vbTextCompare)
+                                                Pos = genericController.vbInstr(Pos, RemoteAssetContent, "</body", vbTextCompare)
                                                 If Pos > 0 Then
                                                     RemoteAssetContent = Mid(RemoteAssetContent, PosStart, Pos - PosStart)
                                                 End If
@@ -1206,7 +1207,7 @@ Namespace Contensive.Core.Controllers
                                 '#End If
                                 If isMainOk And (Link <> "") Then
                                     If WorkingOptionString <> "" Then
-                                        If vbInstr(1, Link, "?") = 0 Then
+                                        If genericController.vbInstr(1, Link, "?") = 0 Then
                                             Link = Link & "?" & WorkingOptionString
                                         Else
                                             Link = Link & "&" & WorkingOptionString
@@ -1289,7 +1290,7 @@ Namespace Contensive.Core.Controllers
                                 '' +++++ 9/8/2011, 4.1.482
                                 ''
                                 's = TextContent & HTMLContent & IncludeContent & ScriptCallbackContent & FormContent & RemoteAssetContent & ScriptContent & ObjectContent & AssemblyContent & inlineScriptContent
-                                's = vbReplace(s, "{%", "{<!---->%")
+                                's = genericController.vbReplace(s, "{%", "{<!---->%")
                                 '
                                 '-----------------------------------------------------------------
                                 ' check for xml contensive process instruction
@@ -1300,7 +1301,7 @@ Namespace Contensive.Core.Controllers
                                 '#If traceExecuteAddon Then
                                 'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") ac"
                                 '#End If
-                                Pos = vbInstr(1, returnVal, "<?contensive", vbTextCompare)
+                                Pos = genericController.vbInstr(1, returnVal, "<?contensive", vbTextCompare)
                                 If Pos > 0 Then
                                     Throw New ApplicationException("xml structured commands are no longer supported")
                                     ''
@@ -1414,7 +1415,7 @@ Namespace Contensive.Core.Controllers
                                                 HTMLViewerEditIcon = getHTMLViewerBubble(addonId, "editWrapper" & cpCore.pageManager_EditWrapperCnt, DialogList)
                                                 HelpIcon = getHelpBubble(addonId, helpCopy, addonCollectionId, DialogList)
                                                 ToolBar = InstanceSettingsEditIcon & AddonEditIcon & AddonStylesEditIcon & SiteStylesEditIcon & HTMLViewerEditIcon & HelpIcon
-                                                ToolBar = vbReplace(ToolBar, "&nbsp;", "", 1, 99, vbTextCompare)
+                                                ToolBar = genericController.vbReplace(ToolBar, "&nbsp;", "", 1, 99, vbTextCompare)
                                                 returnVal = cpCore.main_GetEditWrapper("<div class=""ccAddonEditTools"">" & ToolBar & "&nbsp;" & AddonName & DialogList & "</div>", returnVal)
                                                 's = GetEditWrapper("<div class=""ccAddonEditCaption"">" & AddonName & "</div><div class=""ccAddonEditTools"">" & ToolBar & "</div>", s)
                                             ElseIf cpCore.visitProperty.getBoolean("AllowEditing") Then
@@ -1428,7 +1429,7 @@ Namespace Contensive.Core.Controllers
                                     '
                                     If isMainOk And (Context <> CPUtilsBaseClass.addonContext.ContextAdmin) And (Context <> CPUtilsBaseClass.addonContext.ContextEmail) And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) And (Context <> CPUtilsBaseClass.addonContext.ContextSimple) Then
                                         If cpCore.visitProperty.getBoolean("AllowDebugging") Then
-                                            AddonCommentName = vbReplace(AddonName, "-->", "..>")
+                                            AddonCommentName = genericController.vbReplace(AddonName, "-->", "..>")
                                             If IsInline Then
                                                 returnVal = "<!-- Add-on " & AddonCommentName & " -->" & returnVal & "<!-- /Add-on " & AddonCommentName & " -->"
                                             Else
@@ -1451,7 +1452,7 @@ Namespace Contensive.Core.Controllers
                             ' this completes the execute of this addon. remove it from the 'running' list
                             '
                             cpCore.addonsCurrentlyRunningIdList.Remove(addonId)
-                            'csv_addon_execute_AddonsCurrentlyRunningIdList = vbReplace(csv_addon_execute_AddonsCurrentlyRunningIdList & ",", "," & addonId & ",", ",")
+                            'csv_addon_execute_AddonsCurrentlyRunningIdList = genericController.vbReplace(csv_addon_execute_AddonsCurrentlyRunningIdList & ",", "," & addonId & ",", ",")
                         End If
                     End If
                 End If
@@ -1565,7 +1566,7 @@ Namespace Contensive.Core.Controllers
                         '
                         ' data is OK
                         '
-                        If vbLCase(Doc.DocumentElement.Name) <> "form" Then
+                        If genericController.vbLCase(Doc.DocumentElement.Name) <> "form" Then
                             '
                             ' error - Need a way to reach the user that submitted the file
                             '
@@ -1578,26 +1579,26 @@ Namespace Contensive.Core.Controllers
                             If (Button = ButtonSave) Or (Button = ButtonOK) Then
                                 With Doc.DocumentElement
                                     For Each SettingNode In .ChildNodes
-                                        Select Case vbLCase(SettingNode.Name)
+                                        Select Case genericController.vbLCase(SettingNode.Name)
                                             Case "tab"
                                                 For Each TabNode In SettingNode.ChildNodes
-                                                    Select Case vbLCase(TabNode.Name)
+                                                    Select Case genericController.vbLCase(TabNode.Name)
                                                         Case "siteproperty"
                                                             '
                                                             FieldName = cpCore.csv_GetXMLAttribute(IsFound, TabNode, "name", "")
                                                             FieldValue = cpCore.docProperties.getText(FieldName)
                                                             fieldType = cpCore.csv_GetXMLAttribute(IsFound, TabNode, "type", "")
-                                                            Select Case vbLCase(fieldType)
+                                                            Select Case genericController.vbLCase(fieldType)
                                                                 Case "integer"
                                                                     '
                                                                     If FieldValue <> "" Then
-                                                                        FieldValue = EncodeInteger(FieldValue).ToString
+                                                                        FieldValue = genericController.EncodeInteger(FieldValue).ToString
                                                                     End If
                                                                     Call cpCore.siteProperties.setProperty(FieldName, FieldValue)
                                                                 Case "boolean"
                                                                     '
                                                                     If FieldValue <> "" Then
-                                                                        FieldValue = EncodeBoolean(FieldValue).ToString
+                                                                        FieldValue = genericController.EncodeBoolean(FieldValue).ToString
                                                                     End If
                                                                     Call cpCore.siteProperties.setProperty(FieldName, FieldValue)
                                                                 Case "float"
@@ -1609,7 +1610,7 @@ Namespace Contensive.Core.Controllers
                                                                 Case "date"
                                                                     '
                                                                     If FieldValue <> "" Then
-                                                                        FieldValue = EncodeDate(FieldValue).ToString
+                                                                        FieldValue =  genericController.EncodeDate(FieldValue).ToString
                                                                     End If
                                                                     Call cpCore.siteProperties.setProperty(FieldName, FieldValue)
                                                                 Case "file", "imagefile"
@@ -1666,10 +1667,10 @@ Namespace Contensive.Core.Controllers
                                                             '
                                                             ' A Copy Content block
                                                             '
-                                                            FieldReadOnly = EncodeBoolean(cpCore.csv_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
+                                                            FieldReadOnly = genericController.EncodeBoolean(cpCore.csv_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
                                                             If Not FieldReadOnly Then
                                                                 FieldName = cpCore.csv_GetXMLAttribute(IsFound, TabNode, "name", "")
-                                                                FieldHTML = EncodeBoolean(cpCore.csv_GetXMLAttribute(IsFound, TabNode, "html", "false"))
+                                                                FieldHTML = genericController.EncodeBoolean(cpCore.csv_GetXMLAttribute(IsFound, TabNode, "html", "false"))
                                                                 If FieldHTML Then
                                                                     '
                                                                     ' treat html as active content for now.
@@ -1706,7 +1707,7 @@ Namespace Contensive.Core.Controllers
                                                             '
                                                             ' A File Content block
                                                             '
-                                                            FieldReadOnly = EncodeBoolean(cpCore.csv_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
+                                                            FieldReadOnly = genericController.EncodeBoolean(cpCore.csv_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
                                                             If Not FieldReadOnly Then
                                                                 FieldName = cpCore.csv_GetXMLAttribute(IsFound, TabNode, "name", "")
                                                                 fieldfilename = cpCore.csv_GetXMLAttribute(IsFound, TabNode, "filename", "")
@@ -1738,7 +1739,7 @@ Namespace Contensive.Core.Controllers
                             Name = cpCore.csv_GetXMLAttribute(IsFound, Doc.DocumentElement, "name", "")
                             With Doc.DocumentElement
                                 For Each SettingNode In .ChildNodes
-                                    Select Case vbLCase(SettingNode.Name)
+                                    Select Case genericController.vbLCase(SettingNode.Name)
                                         Case "description"
                                             Description = SettingNode.InnerText
                                         Case "tab"
@@ -1751,7 +1752,7 @@ Namespace Contensive.Core.Controllers
                                             End If
                                             TabCell = New coreFastStringClass
                                             For Each TabNode In SettingNode.ChildNodes
-                                                Select Case vbLCase(TabNode.Name)
+                                                Select Case genericController.vbLCase(TabNode.Name)
                                                     Case "heading"
                                                         '
                                                         ' Heading
@@ -1768,8 +1769,8 @@ Namespace Contensive.Core.Controllers
                                                             If FieldCaption = "" Then
                                                                 FieldCaption = FieldName
                                                             End If
-                                                            FieldReadOnly = EncodeBoolean(cpCore.csv_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
-                                                            FieldHTML = EncodeBoolean(cpCore.csv_GetXMLAttribute(IsFound, TabNode, "html", ""))
+                                                            FieldReadOnly = genericController.EncodeBoolean(cpCore.csv_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
+                                                            FieldHTML = genericController.EncodeBoolean(cpCore.csv_GetXMLAttribute(IsFound, TabNode, "html", ""))
                                                             fieldType = cpCore.csv_GetXMLAttribute(IsFound, TabNode, "type", "")
                                                             FieldSelector = cpCore.csv_GetXMLAttribute(IsFound, TabNode, "selector", "")
                                                             FieldDescription = cpCore.csv_GetXMLAttribute(IsFound, TabNode, "description", "")
@@ -1791,7 +1792,7 @@ Namespace Contensive.Core.Controllers
                                                                 '
                                                                 ' Use default editor for each field type
                                                                 '
-                                                                Select Case vbLCase(fieldType)
+                                                                Select Case genericController.vbLCase(fieldType)
                                                                     Case "integer"
                                                                         '
                                                                         If FieldReadOnly Then
@@ -1801,11 +1802,11 @@ Namespace Contensive.Core.Controllers
                                                                         End If
                                                                     Case "boolean"
                                                                         If FieldReadOnly Then
-                                                                            Copy = cpCore.html_GetFormInputCheckBox2(FieldName, EncodeBoolean(FieldValue))
-                                                                            Copy = vbReplace(Copy, ">", " disabled>")
+                                                                            Copy = cpCore.html_GetFormInputCheckBox2(FieldName, genericController.EncodeBoolean(FieldValue))
+                                                                            Copy = genericController.vbReplace(Copy, ">", " disabled>")
                                                                             Copy = Copy & cpCore.html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
-                                                                            Copy = cpCore.html_GetFormInputCheckBox2(FieldName, EncodeBoolean(FieldValue))
+                                                                            Copy = cpCore.html_GetFormInputCheckBox2(FieldName, genericController.EncodeBoolean(FieldValue))
                                                                         End If
                                                                     Case "float"
                                                                         If FieldReadOnly Then
@@ -1911,9 +1912,9 @@ Namespace Contensive.Core.Controllers
                                                             If FieldCaption = "" Then
                                                                 FieldCaption = FieldName
                                                             End If
-                                                            FieldReadOnly = EncodeBoolean(cpCore.csv_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
+                                                            FieldReadOnly = genericController.EncodeBoolean(cpCore.csv_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
                                                             FieldDescription = cpCore.csv_GetXMLAttribute(IsFound, TabNode, "description", "")
-                                                            FieldHTML = EncodeBoolean(cpCore.csv_GetXMLAttribute(IsFound, TabNode, "html", ""))
+                                                            FieldHTML = genericController.EncodeBoolean(cpCore.csv_GetXMLAttribute(IsFound, TabNode, "html", ""))
                                                             '
                                                             CS = cpCore.db.cs_open("Copy Content", "Name=" & cpCore.db.encodeSQLText(FieldName), "ID", , , , , "id,name,Copy")
                                                             If Not cpCore.db.cs_ok(CS) Then
@@ -1922,7 +1923,7 @@ Namespace Contensive.Core.Controllers
                                                                 If cpCore.db.cs_ok(CS) Then
                                                                     RecordID = cpCore.db.cs_getInteger(CS, "ID")
                                                                     Call cpCore.db.cs_set(CS, "name", FieldName)
-                                                                    Call cpCore.db.cs_set(CS, "copy", EncodeText(TabNode.InnerText))
+                                                                    Call cpCore.db.cs_set(CS, "copy", genericController.encodeText(TabNode.InnerText))
                                                                     Call cpCore.db.cs_save2(CS)
                                                                     Call cpCore.workflow.publishEdit("Copy Content", RecordID)
                                                                 End If
@@ -1956,7 +1957,7 @@ Namespace Contensive.Core.Controllers
                                                         FieldName = cpCore.csv_GetXMLAttribute(IsFound, TabNode, "name", "")
                                                         FieldCaption = cpCore.csv_GetXMLAttribute(IsFound, TabNode, "caption", "")
                                                         fieldfilename = cpCore.csv_GetXMLAttribute(IsFound, TabNode, "filename", "")
-                                                        FieldReadOnly = EncodeBoolean(cpCore.csv_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
+                                                        FieldReadOnly = genericController.EncodeBoolean(cpCore.csv_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
                                                         FieldDescription = cpCore.csv_GetXMLAttribute(IsFound, TabNode, "description", "")
                                                         FieldDefaultValue = TabNode.InnerText
                                                         Copy = ""
@@ -1980,7 +1981,7 @@ Namespace Contensive.Core.Controllers
                                                         FieldSQL = TabNode.InnerText
                                                         FieldCaption = cpCore.csv_GetXMLAttribute(IsFound, TabNode, "caption", "")
                                                         FieldDescription = cpCore.csv_GetXMLAttribute(IsFound, TabNode, "description", "")
-                                                        SQLPageSize = EncodeInteger(cpCore.csv_GetXMLAttribute(IsFound, TabNode, "rowmax", ""))
+                                                        SQLPageSize = genericController.EncodeInteger(cpCore.csv_GetXMLAttribute(IsFound, TabNode, "rowmax", ""))
                                                         If SQLPageSize = 0 Then
                                                             SQLPageSize = 100
                                                         End If
@@ -2026,7 +2027,7 @@ Namespace Contensive.Core.Controllers
                                                             '
                                                             If rs.Rows.Count > 0 Then
                                                                 If rs.Rows.Count = 1 And rs.Columns.Count = 1 Then
-                                                                    Copy = cpCore.html_GetFormInputText2("result", EncodeText(something(0, 0)), , , , , True)
+                                                                    Copy = cpCore.html_GetFormInputText2("result", genericController.encodeText(something(0, 0)), , , , , True)
                                                                 Else
                                                                     For Each dr As DataRow In rs.Rows
                                                                         '
@@ -2070,10 +2071,10 @@ Namespace Contensive.Core.Controllers
                                                                                     '    Copy = Copy & ("<br>(" & Ptr & ")&nbsp;[" & CellData(Ptr) & "]")
                                                                                     'Next
                                                                                     'Copy = Copy & (ColumnEnd)
-                                                                                ElseIf EncodeText(CellData) = "" Then
+                                                                                ElseIf genericController.encodeText(CellData) = "" Then
                                                                                     Copy = Copy & (ColumnStart & "[empty]" & ColumnEnd)
                                                                                 Else
-                                                                                    Copy = Copy & (ColumnStart & cpCore.html.html_EncodeHTML(EncodeText(CellData)) & ColumnEnd)
+                                                                                    Copy = Copy & (ColumnStart & cpCore.html.html_EncodeHTML(genericController.encodeText(CellData)) & ColumnEnd)
                                                                                 End If
                                                                             Next
                                                                             Copy = Copy & (RowEnd)
@@ -2176,25 +2177,25 @@ ErrorTrap:
             FastString = New coreFastStringClass
             '
             Call buildAddonOptionLists(ignore, ExpandedSelector, SitePropertyName & "=" & selector, SitePropertyName & "=" & SitePropertyValue, "0", True)
-            Pos = vbInstr(1, ExpandedSelector, "[")
+            Pos = genericController.vbInstr(1, ExpandedSelector, "[")
             If Pos <> 0 Then
                 '
                 ' List of Options, might be select, radio or checkbox
                 '
-                LCaseOptionDefault = vbLCase(Mid(ExpandedSelector, 1, Pos - 1))
+                LCaseOptionDefault = genericController.vbLCase(Mid(ExpandedSelector, 1, Pos - 1))
                 Dim PosEqual As Integer
 
-                PosEqual = vbInstr(1, LCaseOptionDefault, "=")
+                PosEqual = genericController.vbInstr(1, LCaseOptionDefault, "=")
                 If PosEqual > 0 Then
                     LCaseOptionDefault = Mid(LCaseOptionDefault, PosEqual + 1)
                 End If
 
-                LCaseOptionDefault = decodeNvaArgument(LCaseOptionDefault)
+                LCaseOptionDefault = genericController.decodeNvaArgument(LCaseOptionDefault)
                 ExpandedSelector = Mid(ExpandedSelector, Pos + 1)
-                Pos = vbInstr(1, ExpandedSelector, "]")
+                Pos = genericController.vbInstr(1, ExpandedSelector, "]")
                 If Pos > 0 Then
                     If Pos < Len(ExpandedSelector) Then
-                        OptionSuffix = vbLCase(Trim(Mid(ExpandedSelector, Pos + 1)))
+                        OptionSuffix = genericController.vbLCase(Trim(Mid(ExpandedSelector, Pos + 1)))
                     End If
                     ExpandedSelector = Mid(ExpandedSelector, 1, Pos - 1)
                 End If
@@ -2204,20 +2205,20 @@ ErrorTrap:
                 For OptionPtr = 0 To OptionCnt - 1
                     OptionValue_AddonEncoded = Trim(OptionValues(OptionPtr))
                     If OptionValue_AddonEncoded <> "" Then
-                        Pos = vbInstr(1, OptionValue_AddonEncoded, ":")
+                        Pos = genericController.vbInstr(1, OptionValue_AddonEncoded, ":")
                         If Pos = 0 Then
-                            OptionValue = decodeNvaArgument(OptionValue_AddonEncoded)
+                            OptionValue = genericController.decodeNvaArgument(OptionValue_AddonEncoded)
                             OptionCaption = OptionValue
                         Else
-                            OptionCaption = decodeNvaArgument(Mid(OptionValue_AddonEncoded, 1, Pos - 1))
-                            OptionValue = decodeNvaArgument(Mid(OptionValue_AddonEncoded, Pos + 1))
+                            OptionCaption = genericController.decodeNvaArgument(Mid(OptionValue_AddonEncoded, 1, Pos - 1))
+                            OptionValue = genericController.decodeNvaArgument(Mid(OptionValue_AddonEncoded, Pos + 1))
                         End If
                         Select Case OptionSuffix
                             Case "checkbox"
                                 '
                                 ' Create checkbox addon_execute_getFormContent_decodeSelector
                                 '
-                                If vbInstr(1, "," & LCaseOptionDefault & ",", "," & vbLCase(OptionValue) & ",") <> 0 Then
+                                If genericController.vbInstr(1, "," & LCaseOptionDefault & ",", "," & genericController.vbLCase(OptionValue) & ",") <> 0 Then
                                     getFormContent_decodeSelector = getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & SitePropertyName & OptionPtr & """ value=""" & OptionValue & """ checked=""checked"">" & OptionCaption & "</div>"
                                 Else
                                     getFormContent_decodeSelector = getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & SitePropertyName & OptionPtr & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
@@ -2226,7 +2227,7 @@ ErrorTrap:
                                 '
                                 ' Create Radio addon_execute_getFormContent_decodeSelector
                                 '
-                                If vbLCase(OptionValue) = LCaseOptionDefault Then
+                                If genericController.vbLCase(OptionValue) = LCaseOptionDefault Then
                                     getFormContent_decodeSelector = getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & SitePropertyName & """ value=""" & OptionValue & """ checked=""checked"" >" & OptionCaption & "</div>"
                                 Else
                                     getFormContent_decodeSelector = getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & SitePropertyName & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
@@ -2235,7 +2236,7 @@ ErrorTrap:
                                 '
                                 ' Create select addon_execute_getFormContent_decodeSelector
                                 '
-                                If vbLCase(OptionValue) = LCaseOptionDefault Then
+                                If genericController.vbLCase(OptionValue) = LCaseOptionDefault Then
                                     getFormContent_decodeSelector = getFormContent_decodeSelector & "<option value=""" & OptionValue & """ selected>" & OptionCaption & "</option>"
                                 Else
                                     getFormContent_decodeSelector = getFormContent_decodeSelector & "<option value=""" & OptionValue & """>" & OptionCaption & "</option>"
@@ -2252,7 +2253,7 @@ ErrorTrap:
                         '
                         ' Create Radio addon_execute_getFormContent_decodeSelector
                         '
-                        'addon_execute_getFormContent_decodeSelector = "<div>" & vbReplace(addon_execute_getFormContent_decodeSelector, "><", "></div><div><") & "</div>"
+                        'addon_execute_getFormContent_decodeSelector = "<div>" & genericController.vbReplace(addon_execute_getFormContent_decodeSelector, "><", "></div><div><") & "</div>"
                     Case Else
                         '
                         ' Create select addon_execute_getFormContent_decodeSelector
@@ -2264,7 +2265,7 @@ ErrorTrap:
                 ' Create Text addon_execute_getFormContent_decodeSelector
                 '
 
-                selector = decodeNvaArgument(selector)
+                selector = genericController.decodeNvaArgument(selector)
                 getFormContent_decodeSelector = cpCore.html_GetFormInputText2(SitePropertyName, selector, 1, 20)
             End If
 
@@ -2293,8 +2294,8 @@ ErrorTrap:
                 ScriptName = "unnamed script with method [" & EntryPoint & "] and length [" & Len(Code) & "]"
             Else
                 FirstLine = Code
-                FirstLine = vbReplace(FirstLine, vbTab, "")
-                Pos = vbInstr(1, FirstLine, vbCrLf)
+                FirstLine = genericController.vbReplace(FirstLine, vbTab, "")
+                Pos = genericController.vbInstr(1, FirstLine, vbCrLf)
                 If (Pos <= 0) Or (Pos > 50) Then
                     FirstLine = Left(FirstLine, 50)
                 Else
@@ -2367,14 +2368,14 @@ ErrorTrap:
                     For Ptr = 0 To ReplaceCnt - 1
                         ReplaceName = "$" & ReplaceNames(Ptr) & "$"
                         ReplaceValue = ReplaceValues(Ptr)
-                        WorkingEntryPoint = vbReplace(WorkingEntryPoint, ReplaceName, ReplaceValue, 1, 99, vbTextCompare)
-                        WorkingCode = vbReplace(WorkingCode, ReplaceName, ReplaceValue, 1, 99, vbTextCompare)
+                        WorkingEntryPoint = genericController.vbReplace(WorkingEntryPoint, ReplaceName, ReplaceValue, 1, 99, vbTextCompare)
+                        WorkingCode = genericController.vbReplace(WorkingCode, ReplaceName, ReplaceValue, 1, 99, vbTextCompare)
                     Next
                 End If
                 EntryPointName = WorkingEntryPoint
-                Pos = vbInstr(1, EntryPointName, "(")
+                Pos = genericController.vbInstr(1, EntryPointName, "(")
                 If Pos = 0 Then
-                    Pos = vbInstr(1, EntryPointName, " ")
+                    Pos = genericController.vbInstr(1, EntryPointName, " ")
                 End If
                 If Pos > 1 Then
                     EntryPointArgs = Trim(Mid(EntryPointName, Pos))
@@ -2450,30 +2451,30 @@ ErrorTrap:
                                         End If
                                         Try
                                             If EntryPointArgs = "" Then
-                                                returnText = EncodeText(sc.Run(EntryPointName))
+                                                returnText = genericController.encodeText(sc.Run(EntryPointName))
 
                                             Else
                                                 Select Case UBound(Args)
                                                     Case 0
-                                                        returnText = EncodeText(sc.Run(EntryPointName, Args(0)))
+                                                        returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0)))
                                                     Case 1
-                                                        returnText = EncodeText(sc.Run(EntryPointName, Args(0), Args(1)))
+                                                        returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1)))
                                                     Case 2
-                                                        returnText = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2)))
+                                                        returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2)))
                                                     Case 3
-                                                        returnText = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3)))
+                                                        returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3)))
                                                     Case 4
-                                                        returnText = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4)))
+                                                        returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4)))
                                                     Case 5
-                                                        returnText = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5)))
+                                                        returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5)))
                                                     Case 6
-                                                        returnText = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6)))
+                                                        returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6)))
                                                     Case 7
-                                                        returnText = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6), Args(7)))
+                                                        returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6), Args(7)))
                                                     Case 8
-                                                        returnText = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6), Args(7), Args(8)))
+                                                        returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6), Args(7), Args(8)))
                                                     Case 9
-                                                        returnText = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6), Args(7), Args(8), Args(9)))
+                                                        returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6), Args(7), Args(8), Args(9)))
                                                     Case Else
                                                         Call cpCore.handleLegacyError6("csv_ExecuteScript4", "Scripting only supports 10 arguments.")
                                                 End Select
@@ -2824,8 +2825,8 @@ ErrorTrap:
             ProcessStartTick = GetTickCount
             addonPtr = cpCore.addonCache.getPtr(AddonIDGuidOrName)
             If addonPtr >= 0 Then
-                addonId = EncodeInteger(cpCore.addonCache.localCache.addonList(addonPtr.ToString).addonCache_Id)
-                AddonName = EncodeText(cpCore.addonCache.localCache.addonList(addonPtr.ToString).addonCache_name)
+                addonId = genericController.EncodeInteger(cpCore.addonCache.localCache.addonList(addonPtr.ToString).addonCache_Id)
+                AddonName = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonPtr.ToString).addonCache_name)
                 'hint = hint & ",020 addonname=[" & AddonName & "] addonid=[" & addonId & "]"
             End If
             '
@@ -2898,7 +2899,7 @@ ErrorTrap:
         '
         Public Function execute_legacy3(ByVal AddonIDGuidOrName As String, Optional ByVal Option_String As String = "", Optional ByVal WrapperID As Integer = 0, Optional ByVal nothingObject As Object = Nothing) As String
             Dim AddonStatusOK As Boolean
-            If vbIsNumeric(AddonIDGuidOrName) Then
+            If genericController.vbIsNumeric(AddonIDGuidOrName) Then
                 execute_legacy3 = execute_legacy2(EncodeInteger(AddonIDGuidOrName), "", Option_String, CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, WrapperID, "", AddonStatusOK, nothingObject)
             Else
                 execute_legacy3 = execute_legacy2(0, AddonIDGuidOrName, Option_String, CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, WrapperID, "", AddonStatusOK, nothingObject)
@@ -2915,7 +2916,7 @@ ErrorTrap:
             If workingContext = 0 Then
                 workingContext = CPUtilsBaseClass.addonContext.ContextPage
             End If
-            If vbIsNumeric(AddonIDGuidOrName) Then
+            If genericController.vbIsNumeric(AddonIDGuidOrName) Then
                 execute_legacy4 = execute_legacy2(EncodeInteger(AddonIDGuidOrName), "", Option_String, workingContext, "", 0, "", "", False, 0, "", AddonStatusOK, nothingObject)
             Else
                 execute_legacy4 = execute_legacy2(0, AddonIDGuidOrName, Option_String, workingContext, "", 0, "", "", False, 0, "", AddonStatusOK, nothingObject)
@@ -3026,29 +3027,29 @@ ErrorTrap:
                             OptionDefault = ""
                             LCaseOptionDefault = ""
                             OptionSelector = ""
-                            Pos = vbInstr(1, OptionName, "=")
+                            Pos = genericController.vbInstr(1, OptionName, "=")
                             If Pos <> 0 Then
                                 If (Pos < Len(OptionName)) Then
                                     OptionSelector = Trim(Mid(OptionName, Pos + 1))
                                 End If
                                 OptionName = Trim(Left(OptionName, Pos - 1))
                             End If
-                            OptionName = decodeNvaArgument(OptionName)
-                            Pos = vbInstr(1, OptionSelector, "[")
+                            OptionName = genericController.decodeNvaArgument(OptionName)
+                            Pos = genericController.vbInstr(1, OptionSelector, "[")
                             If Pos <> 0 Then
                                 '
                                 ' List of Options, might be select, radio, checkbox, resourcelink
                                 '
                                 OptionDefault = Mid(OptionSelector, 1, Pos - 1)
-                                OptionDefault = decodeNvaArgument(OptionDefault)
-                                LCaseOptionDefault = vbLCase(OptionDefault)
-                                'LCaseOptionDefault = decodeNvaArgument(LCaseOptionDefault)
+                                OptionDefault = genericController.decodeNvaArgument(OptionDefault)
+                                LCaseOptionDefault = genericController.vbLCase(OptionDefault)
+                                'LCaseOptionDefault = genericController.decodeNvaArgument(LCaseOptionDefault)
 
                                 OptionSelector = Mid(OptionSelector, Pos + 1)
-                                Pos = vbInstr(1, OptionSelector, "]")
+                                Pos = genericController.vbInstr(1, OptionSelector, "]")
                                 If Pos > 0 Then
                                     If Pos < Len(OptionSelector) Then
-                                        OptionSuffix = vbLCase(Trim(Mid(OptionSelector, Pos + 1)))
+                                        OptionSuffix = genericController.vbLCase(Trim(Mid(OptionSelector, Pos + 1)))
                                     End If
                                     OptionSelector = Mid(OptionSelector, 1, Pos - 1)
                                 End If
@@ -3058,20 +3059,20 @@ ErrorTrap:
                                 For OptionPtr = 0 To OptionCnt - 1
                                     OptionValue_AddonEncoded = Trim(OptionValues(OptionPtr))
                                     If OptionValue_AddonEncoded <> "" Then
-                                        Pos = vbInstr(1, OptionValue_AddonEncoded, ":")
+                                        Pos = genericController.vbInstr(1, OptionValue_AddonEncoded, ":")
                                         If Pos = 0 Then
-                                            OptionValue = decodeNvaArgument(OptionValue_AddonEncoded)
+                                            OptionValue = genericController.decodeNvaArgument(OptionValue_AddonEncoded)
                                             OptionCaption = OptionValue
                                         Else
-                                            OptionCaption = decodeNvaArgument(Mid(OptionValue_AddonEncoded, 1, Pos - 1))
-                                            OptionValue = decodeNvaArgument(Mid(OptionValue_AddonEncoded, Pos + 1))
+                                            OptionCaption = genericController.decodeNvaArgument(Mid(OptionValue_AddonEncoded, 1, Pos - 1))
+                                            OptionValue = genericController.decodeNvaArgument(Mid(OptionValue_AddonEncoded, Pos + 1))
                                         End If
                                         Select Case OptionSuffix
                                             Case "checkbox"
                                                 '
                                                 ' Create checkbox FormInput
                                                 '
-                                                If vbInstr(1, "," & LCaseOptionDefault & ",", "," & vbLCase(OptionValue) & ",") <> 0 Then
+                                                If genericController.vbInstr(1, "," & LCaseOptionDefault & ",", "," & genericController.vbLCase(OptionValue) & ",") <> 0 Then
                                                     FormInput = FormInput & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & OptionName & OptionPtr & """ value=""" & OptionValue & """ checked=""checked"">" & OptionCaption & "</div>"
                                                 Else
                                                     FormInput = FormInput & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & OptionName & OptionPtr & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
@@ -3080,7 +3081,7 @@ ErrorTrap:
                                                 '
                                                 ' Create Radio FormInput
                                                 '
-                                                If vbLCase(OptionValue) = LCaseOptionDefault Then
+                                                If genericController.vbLCase(OptionValue) = LCaseOptionDefault Then
                                                     FormInput = FormInput & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & OptionName & """ value=""" & OptionValue & """ checked=""checked"" >" & OptionCaption & "</div>"
                                                 Else
                                                     FormInput = FormInput & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & OptionName & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
@@ -3089,10 +3090,10 @@ ErrorTrap:
                                                 '
                                                 ' Create select FormInput
                                                 '
-                                                If vbLCase(OptionValue) = LCaseOptionDefault Then
+                                                If genericController.vbLCase(OptionValue) = LCaseOptionDefault Then
                                                     FormInput = FormInput & "<option value=""" & OptionValue & """ selected>" & OptionCaption & "</option>"
                                                 Else
-                                                    OptionCaption = vbReplace(OptionCaption, vbCrLf, " ")
+                                                    OptionCaption = genericController.vbReplace(OptionCaption, vbCrLf, " ")
                                                     FormInput = FormInput & "<option value=""" & OptionValue & """>" & OptionCaption & "</option>"
                                                 End If
                                         End Select
@@ -3104,7 +3105,7 @@ ErrorTrap:
                                     '                                ' ----- Link (href value
                                     '                                '
                                     '                                Return_NewFieldList = Return_NewFieldList & "," & FieldName
-                                    '                                FieldValueText = encodeText(FieldValueVariant)
+                                    '                                FieldValueText = genericController.encodeText(FieldValueVariant)
                                     '                                EditorString = "" _
                                     '                                    & cpcore.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80, FormFieldLCaseName) _
                                     '                                    & "&nbsp;<a href=""#"" onClick=""OpenResourceLinkWindow( '" & FormFieldLCaseName & "' ) ;return false;""><img src=""/ccLib/images/ResourceLink1616.gif"" width=16 height=16 border=0 alt=""Link to a resource"" title=""Link to a resource""></a>" _
@@ -3115,7 +3116,7 @@ ErrorTrap:
                                     '                                ' ----- Resource Link (src value)
                                     '                                '
                                     '                                Return_NewFieldList = Return_NewFieldList & "," & FieldName
-                                    '                                FieldValueText = encodeText(FieldValueVariant)
+                                    '                                FieldValueText = genericController.encodeText(FieldValueVariant)
                                     '                                EditorString = "" _
                                     '                                    & cpcore.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80, FormFieldLCaseName) _
                                     '                                    & "&nbsp;<a href=""#"" onClick=""OpenResourceLinkWindow( '" & FormFieldLCaseName & "' ) ;return false;""><img src=""/ccLib/images/ResourceLink1616.gif"" width=16 height=16 border=0 alt=""Link to a resource"" title=""Link to a resource""></a>"
@@ -3125,7 +3126,7 @@ ErrorTrap:
                                         '
                                         ' Create text box linked to resource library
                                         '
-                                        OptionDefault = decodeNvaArgument(OptionDefault)
+                                        OptionDefault = genericController.decodeNvaArgument(OptionDefault)
                                         FormInput = "" _
                                             & cpCore.html_GetFormInputText2(OptionName, OptionDefault, 1, 20) _
                                             & "&nbsp;<a href=""#"" onClick=""OpenResourceLinkWindow( '" & OptionName & "' ) ;return false;""><img src=""/ccLib/images/ResourceLink1616.gif"" width=16 height=16 border=0 alt=""Link to a resource"" title=""Link to a resource""></a>"
@@ -3149,7 +3150,7 @@ ErrorTrap:
                                 ' Create Text FormInput
                                 '
 
-                                OptionSelector = decodeNvaArgument(OptionSelector)
+                                OptionSelector = genericController.decodeNvaArgument(OptionSelector)
                                 FormInput = cpCore.html_GetFormInputText2(OptionName, OptionSelector, 1, 20)
                             End If
                             CopyContent = CopyContent _
@@ -3170,8 +3171,8 @@ ErrorTrap:
                     '
                     BubbleJS = " onClick=""HelpBubbleOn( 'HelpBubble" & cpCore.pageManager_HelpCodeCount & "',this);return false;"""
                     QueryString = cpCore.web_RefreshQueryString
-                    QueryString = ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
-                    'QueryString = ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
+                    QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
+                    'QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                     return_DialogList = return_DialogList _
                         & "<div class=""ccCon helpDialogCon"">" _
                         & cpCore.html_GetUploadFormStart() _
@@ -3285,8 +3286,8 @@ ErrorTrap:
                     '
                     BubbleJS = " onClick=""HelpBubbleOn( 'HelpBubble" & cpCore.pageManager_HelpCodeCount & "',this);return false;"""
                     QueryString = cpCore.web_RefreshQueryString
-                    QueryString = ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
-                    'QueryString = ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
+                    QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
+                    'QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                     Dim Dialog As String
 
                     Dialog = Dialog _
@@ -3358,7 +3359,7 @@ ErrorTrap:
             '
             If cpCore.user.isAuthenticated() Then
                 If cpCore.user.isEditingAnything() Then
-                    StyleSN = EncodeInteger(cpCore.siteProperties.getText("StylesheetSerialNumber", "0"))
+                    StyleSN = genericController.EncodeInteger(cpCore.siteProperties.getText("StylesheetSerialNumber", "0"))
                     cpCore.pageManager_HelpViewerButtonID = "HelpBubble" & cpCore.pageManager_HelpCodeCount
                     InnerCopy = helpCopy
                     If InnerCopy = "" Then
@@ -3394,8 +3395,8 @@ ErrorTrap:
                         & ""
                     '
                     QueryString = cpCore.web_RefreshQueryString
-                    QueryString = ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
-                    'QueryString = ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
+                    QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
+                    'QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                     return_DialogList = return_DialogList _
                         & "<div class=""ccCon helpDialogCon"">" _
                         & "<table border=0 cellpadding=0 cellspacing=0 class=""ccBubbleCon"" id=""HelpBubble" & cpCore.pageManager_HelpCodeCount & """ style=""display:none;visibility:hidden;"">" _
@@ -3467,7 +3468,7 @@ ErrorTrap:
             '
             If cpCore.user.isAuthenticated() Then
                 If cpCore.user.isEditingAnything() Then
-                    StyleSN = EncodeInteger(cpCore.siteProperties.getText("StylesheetSerialNumber", "0"))
+                    StyleSN = genericController.EncodeInteger(cpCore.siteProperties.getText("StylesheetSerialNumber", "0"))
                     HTMLViewerBubbleID = "HelpBubble" & cpCore.pageManager_HelpCodeCount
                     '
                     CopyHeader = CopyHeader _
@@ -3488,8 +3489,8 @@ ErrorTrap:
                         & ""
                     '
                     QueryString = cpCore.web_RefreshQueryString
-                    QueryString = ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
-                    'QueryString = ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
+                    QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
+                    'QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                     return_DialogList = return_DialogList _
                         & "<div class=""ccCon helpDialogCon"">" _
                         & "<table border=0 cellpadding=0 cellspacing=0 class=""ccBubbleCon"" id=""" & HTMLViewerBubbleID & """ style=""display:none;visibility:hidden;"">" _
@@ -3642,7 +3643,7 @@ ErrorTrap:
                         '
                         ' data is OK
                         '
-                        If vbLCase(Doc.DocumentElement.Name) <> "form" Then
+                        If genericController.vbLCase(Doc.DocumentElement.Name) <> "form" Then
                             '
                             ' error - Need a way to reach the user that submitted the file
                             '
@@ -3655,26 +3656,26 @@ ErrorTrap:
                             If (Button = ButtonSave) Or (Button = ButtonOK) Then
                                 With Doc.DocumentElement
                                     For Each SettingNode In .ChildNodes
-                                        Select Case vbLCase(SettingNode.Name)
+                                        Select Case genericController.vbLCase(SettingNode.Name)
                                             Case "tab"
                                                 For Each TabNode In SettingNode.ChildNodes
-                                                    Select Case vbLCase(TabNode.Name)
+                                                    Select Case genericController.vbLCase(TabNode.Name)
                                                         Case "siteproperty"
                                                             '
                                                             FieldName = cpCore.main_GetXMLAttribute(IsFound, TabNode, "name", "")
                                                             FieldValue = cpCore.docProperties.getText(FieldName)
                                                             fieldType = cpCore.main_GetXMLAttribute(IsFound, TabNode, "type", "")
-                                                            Select Case vbLCase(fieldType)
+                                                            Select Case genericController.vbLCase(fieldType)
                                                                 Case "integer"
                                                                     '
                                                                     If FieldValue <> "" Then
-                                                                        FieldValue = EncodeInteger(FieldValue).ToString
+                                                                        FieldValue = genericController.EncodeInteger(FieldValue).ToString
                                                                     End If
                                                                     Call cpCore.siteProperties.setProperty(FieldName, FieldValue)
                                                                 Case "boolean"
                                                                     '
                                                                     If FieldValue <> "" Then
-                                                                        FieldValue = EncodeBoolean(FieldValue).ToString
+                                                                        FieldValue = genericController.EncodeBoolean(FieldValue).ToString
                                                                     End If
                                                                     Call cpCore.siteProperties.setProperty(FieldName, FieldValue)
                                                                 Case "float"
@@ -3686,7 +3687,7 @@ ErrorTrap:
                                                                 Case "date"
                                                                     '
                                                                     If FieldValue <> "" Then
-                                                                        FieldValue = EncodeDate(FieldValue).ToString
+                                                                        FieldValue =  genericController.EncodeDate(FieldValue).ToString
                                                                     End If
                                                                     Call cpCore.siteProperties.setProperty(FieldName, FieldValue)
                                                                 Case "file", "imagefile"
@@ -3743,10 +3744,10 @@ ErrorTrap:
                                                             '
                                                             ' A Copy Content block
                                                             '
-                                                            FieldReadOnly = EncodeBoolean(cpCore.main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
+                                                            FieldReadOnly = genericController.EncodeBoolean(cpCore.main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
                                                             If Not FieldReadOnly Then
                                                                 FieldName = cpCore.main_GetXMLAttribute(IsFound, TabNode, "name", "")
-                                                                FieldHTML = EncodeBoolean(cpCore.main_GetXMLAttribute(IsFound, TabNode, "html", "false"))
+                                                                FieldHTML = genericController.EncodeBoolean(cpCore.main_GetXMLAttribute(IsFound, TabNode, "html", "false"))
                                                                 If FieldHTML Then
                                                                     '
                                                                     ' treat html as active content for now.
@@ -3783,7 +3784,7 @@ ErrorTrap:
                                                             '
                                                             ' A File Content block
                                                             '
-                                                            FieldReadOnly = EncodeBoolean(cpCore.main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
+                                                            FieldReadOnly = genericController.EncodeBoolean(cpCore.main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
                                                             If Not FieldReadOnly Then
                                                                 FieldName = cpCore.main_GetXMLAttribute(IsFound, TabNode, "name", "")
                                                                 fieldfilename = cpCore.main_GetXMLAttribute(IsFound, TabNode, "filename", "")
@@ -3815,7 +3816,7 @@ ErrorTrap:
                             Name = cpCore.main_GetXMLAttribute(IsFound, Doc.DocumentElement, "name", "")
                             With Doc.DocumentElement
                                 For Each SettingNode In .ChildNodes
-                                    Select Case vbLCase(SettingNode.Name)
+                                    Select Case genericController.vbLCase(SettingNode.Name)
                                         Case "description"
                                             Description = SettingNode.InnerText
                                         Case "tab"
@@ -3825,7 +3826,7 @@ ErrorTrap:
                                             TabHeading = cpCore.main_GetXMLAttribute(IsFound, SettingNode, "heading", "")
                                             TabCell = New coreFastStringClass
                                             For Each TabNode In SettingNode.ChildNodes
-                                                Select Case vbLCase(TabNode.Name)
+                                                Select Case genericController.vbLCase(TabNode.Name)
                                                     Case "heading"
                                                         '
                                                         ' Heading
@@ -3842,8 +3843,8 @@ ErrorTrap:
                                                             If FieldCaption = "" Then
                                                                 FieldCaption = FieldName
                                                             End If
-                                                            FieldReadOnly = EncodeBoolean(cpCore.main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
-                                                            FieldHTML = EncodeBoolean(cpCore.main_GetXMLAttribute(IsFound, TabNode, "html", ""))
+                                                            FieldReadOnly = genericController.EncodeBoolean(cpCore.main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
+                                                            FieldHTML = genericController.EncodeBoolean(cpCore.main_GetXMLAttribute(IsFound, TabNode, "html", ""))
                                                             fieldType = cpCore.main_GetXMLAttribute(IsFound, TabNode, "type", "")
                                                             FieldSelector = cpCore.main_GetXMLAttribute(IsFound, TabNode, "selector", "")
                                                             FieldDescription = cpCore.main_GetXMLAttribute(IsFound, TabNode, "description", "")
@@ -3872,7 +3873,7 @@ ErrorTrap:
                                                                 '
                                                                 ' Use default editor for each field type
                                                                 '
-                                                                Select Case vbLCase(fieldType)
+                                                                Select Case genericController.vbLCase(fieldType)
                                                                     Case "integer"
                                                                         '
                                                                         If FieldReadOnly Then
@@ -3882,11 +3883,11 @@ ErrorTrap:
                                                                         End If
                                                                     Case "boolean"
                                                                         If FieldReadOnly Then
-                                                                            Copy = cpCore.html_GetFormInputCheckBox2(FieldName, EncodeBoolean(FieldValue))
-                                                                            Copy = vbReplace(Copy, ">", " disabled>")
+                                                                            Copy = cpCore.html_GetFormInputCheckBox2(FieldName, genericController.EncodeBoolean(FieldValue))
+                                                                            Copy = genericController.vbReplace(Copy, ">", " disabled>")
                                                                             Copy = Copy & cpCore.html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
-                                                                            Copy = cpCore.html_GetFormInputCheckBox2(FieldName, EncodeBoolean(FieldValue))
+                                                                            Copy = cpCore.html_GetFormInputCheckBox2(FieldName, genericController.EncodeBoolean(FieldValue))
                                                                         End If
                                                                     Case "float"
                                                                         If FieldReadOnly Then
@@ -3990,9 +3991,9 @@ ErrorTrap:
                                                             If FieldCaption = "" Then
                                                                 FieldCaption = FieldName
                                                             End If
-                                                            FieldReadOnly = EncodeBoolean(cpCore.main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
+                                                            FieldReadOnly = genericController.EncodeBoolean(cpCore.main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
                                                             FieldDescription = cpCore.main_GetXMLAttribute(IsFound, TabNode, "description", "")
-                                                            FieldHTML = EncodeBoolean(cpCore.main_GetXMLAttribute(IsFound, TabNode, "html", ""))
+                                                            FieldHTML = genericController.EncodeBoolean(cpCore.main_GetXMLAttribute(IsFound, TabNode, "html", ""))
                                                             '
                                                             CS = cpCore.db.cs_open("Copy Content", "Name=" & cpCore.EncodeSQLText(FieldName), "ID", , , , , "Copy")
                                                             If Not cpCore.db.cs_ok(CS) Then
@@ -4001,7 +4002,7 @@ ErrorTrap:
                                                                 If cpCore.db.cs_ok(CS) Then
                                                                     RecordID = cpCore.db.cs_getInteger(CS, "ID")
                                                                     Call cpCore.db.cs_set(CS, "name", FieldName)
-                                                                    Call cpCore.db.cs_set(CS, "copy", EncodeText(TabNode.InnerText))
+                                                                    Call cpCore.db.cs_set(CS, "copy", genericController.encodeText(TabNode.InnerText))
                                                                     Call cpCore.db.cs_save2(CS)
                                                                     Call cpCore.workflow.publishEdit("Copy Content", RecordID)
                                                                 End If
@@ -4035,7 +4036,7 @@ ErrorTrap:
                                                         FieldName = cpCore.main_GetXMLAttribute(IsFound, TabNode, "name", "")
                                                         FieldCaption = cpCore.main_GetXMLAttribute(IsFound, TabNode, "caption", "")
                                                         fieldfilename = cpCore.main_GetXMLAttribute(IsFound, TabNode, "filename", "")
-                                                        FieldReadOnly = EncodeBoolean(cpCore.main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
+                                                        FieldReadOnly = genericController.EncodeBoolean(cpCore.main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
                                                         FieldDescription = cpCore.main_GetXMLAttribute(IsFound, TabNode, "description", "")
                                                         FieldDefaultValue = TabNode.InnerText
                                                         Copy = ""
@@ -4059,7 +4060,7 @@ ErrorTrap:
                                                         FieldSQL = TabNode.InnerText
                                                         FieldCaption = cpCore.main_GetXMLAttribute(IsFound, TabNode, "caption", "")
                                                         FieldDescription = cpCore.main_GetXMLAttribute(IsFound, TabNode, "description", "")
-                                                        SQLPageSize = EncodeInteger(cpCore.main_GetXMLAttribute(IsFound, TabNode, "rowmax", ""))
+                                                        SQLPageSize = genericController.EncodeInteger(cpCore.main_GetXMLAttribute(IsFound, TabNode, "rowmax", ""))
                                                         If SQLPageSize = 0 Then
                                                             SQLPageSize = 100
                                                         End If
@@ -4109,7 +4110,7 @@ ErrorTrap:
                                                                 '
                                                                 ' Single result, display with no table
                                                                 '
-                                                                Copy = cpCore.html_GetFormInputText2("result", EncodeText(dataArray(0, 0)), , , , , True)
+                                                                Copy = cpCore.html_GetFormInputText2("result", genericController.encodeText(dataArray(0, 0)), , , , , True)
                                                             Else
                                                                 '
                                                                 ' Build headers
@@ -4153,10 +4154,10 @@ ErrorTrap:
                                                                             '    Copy = Copy & ("<br>(" & Ptr & ")&nbsp;[" & CellData(Ptr) & "]")
                                                                             'Next
                                                                             'Copy = Copy & (ColumnEnd)
-                                                                        ElseIf EncodeText(CellData) = "" Then
+                                                                        ElseIf genericController.encodeText(CellData) = "" Then
                                                                             Copy = Copy & (ColumnStart & "[empty]" & ColumnEnd)
                                                                         Else
-                                                                            Copy = Copy & (ColumnStart & cpCore.html.html_EncodeHTML(EncodeText(CellData)) & ColumnEnd)
+                                                                            Copy = Copy & (ColumnStart & cpCore.html.html_EncodeHTML(genericController.encodeText(CellData)) & ColumnEnd)
                                                                         End If
                                                                     Next
                                                                     Copy = Copy & (RowEnd)
@@ -4257,25 +4258,25 @@ ErrorTrap:
             FastString = New coreFastStringClass
             '
             Call buildAddonOptionLists(ignore, ExpandedSelector, SitePropertyName & "=" & selector, SitePropertyName & "=" & SitePropertyValue, "0", True)
-            Pos = vbInstr(1, ExpandedSelector, "[")
+            Pos = genericController.vbInstr(1, ExpandedSelector, "[")
             If Pos <> 0 Then
                 '
                 ' List of Options, might be select, radio or checkbox
                 '
-                LCaseOptionDefault = vbLCase(Mid(ExpandedSelector, 1, Pos - 1))
+                LCaseOptionDefault = genericController.vbLCase(Mid(ExpandedSelector, 1, Pos - 1))
                 Dim PosEqual As Integer
 
-                PosEqual = vbInstr(1, LCaseOptionDefault, "=")
+                PosEqual = genericController.vbInstr(1, LCaseOptionDefault, "=")
                 If PosEqual > 0 Then
                     LCaseOptionDefault = Mid(LCaseOptionDefault, PosEqual + 1)
                 End If
 
-                LCaseOptionDefault = decodeNvaArgument(LCaseOptionDefault)
+                LCaseOptionDefault = genericController.decodeNvaArgument(LCaseOptionDefault)
                 ExpandedSelector = Mid(ExpandedSelector, Pos + 1)
-                Pos = vbInstr(1, ExpandedSelector, "]")
+                Pos = genericController.vbInstr(1, ExpandedSelector, "]")
                 If Pos > 0 Then
                     If Pos < Len(ExpandedSelector) Then
-                        OptionSuffix = vbLCase(Trim(Mid(ExpandedSelector, Pos + 1)))
+                        OptionSuffix = genericController.vbLCase(Trim(Mid(ExpandedSelector, Pos + 1)))
                     End If
                     ExpandedSelector = Mid(ExpandedSelector, 1, Pos - 1)
                 End If
@@ -4285,20 +4286,20 @@ ErrorTrap:
                 For OptionPtr = 0 To OptionCnt - 1
                     OptionValue_AddonEncoded = Trim(OptionValues(OptionPtr))
                     If OptionValue_AddonEncoded <> "" Then
-                        Pos = vbInstr(1, OptionValue_AddonEncoded, ":")
+                        Pos = genericController.vbInstr(1, OptionValue_AddonEncoded, ":")
                         If Pos = 0 Then
-                            OptionValue = decodeNvaArgument(OptionValue_AddonEncoded)
+                            OptionValue = genericController.decodeNvaArgument(OptionValue_AddonEncoded)
                             OptionCaption = OptionValue
                         Else
-                            OptionCaption = decodeNvaArgument(Mid(OptionValue_AddonEncoded, 1, Pos - 1))
-                            OptionValue = decodeNvaArgument(Mid(OptionValue_AddonEncoded, Pos + 1))
+                            OptionCaption = genericController.decodeNvaArgument(Mid(OptionValue_AddonEncoded, 1, Pos - 1))
+                            OptionValue = genericController.decodeNvaArgument(Mid(OptionValue_AddonEncoded, Pos + 1))
                         End If
                         Select Case OptionSuffix
                             Case "checkbox"
                                 '
                                 ' Create checkbox
                                 '
-                                If vbInstr(1, "," & LCaseOptionDefault & ",", "," & vbLCase(OptionValue) & ",") <> 0 Then
+                                If genericController.vbInstr(1, "," & LCaseOptionDefault & ",", "," & genericController.vbLCase(OptionValue) & ",") <> 0 Then
                                     getFormContent_decodeSelector = getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & SitePropertyName & OptionPtr & """ value=""" & OptionValue & """ checked=""checked"">" & OptionCaption & "</div>"
                                 Else
                                     getFormContent_decodeSelector = getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & SitePropertyName & OptionPtr & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
@@ -4307,7 +4308,7 @@ ErrorTrap:
                                 '
                                 ' Create Radio
                                 '
-                                If vbLCase(OptionValue) = LCaseOptionDefault Then
+                                If genericController.vbLCase(OptionValue) = LCaseOptionDefault Then
                                     getFormContent_decodeSelector = getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & SitePropertyName & """ value=""" & OptionValue & """ checked=""checked"" >" & OptionCaption & "</div>"
                                 Else
                                     getFormContent_decodeSelector = getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & SitePropertyName & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
@@ -4316,7 +4317,7 @@ ErrorTrap:
                                 '
                                 ' Create select 
                                 '
-                                If vbLCase(OptionValue) = LCaseOptionDefault Then
+                                If genericController.vbLCase(OptionValue) = LCaseOptionDefault Then
                                     getFormContent_decodeSelector = getFormContent_decodeSelector & "<option value=""" & OptionValue & """ selected>" & OptionCaption & "</option>"
                                 Else
                                     getFormContent_decodeSelector = getFormContent_decodeSelector & "<option value=""" & OptionValue & """>" & OptionCaption & "</option>"
@@ -4333,7 +4334,7 @@ ErrorTrap:
                         '
                         ' Create Radio 
                         '
-                        'cpcore.main_addon_execute_GetFormContent_decodeSelector = "<div>" & vbReplace(cpcore.main_addon_execute_GetFormContent_decodeSelector, "><", "></div><div><") & "</div>"
+                        'cpcore.main_addon_execute_GetFormContent_decodeSelector = "<div>" & genericController.vbReplace(cpcore.main_addon_execute_GetFormContent_decodeSelector, "><", "></div><div><") & "</div>"
                     Case Else
                         '
                         ' Create select 
@@ -4345,7 +4346,7 @@ ErrorTrap:
                 ' Create Text addon_execute_GetFormContent_decodeSelector
                 '
 
-                selector = decodeNvaArgument(selector)
+                selector = genericController.decodeNvaArgument(selector)
                 getFormContent_decodeSelector = cpCore.html_GetFormInputText2(SitePropertyName, selector, 1, 20)
             End If
 
@@ -4421,18 +4422,18 @@ ErrorTrap:
                     ConstructorSelector = ""
                     ConstructorValue = ""
                     ConstructorType = "text"
-                    Pos = vbInstr(1, ConstructorName, "=")
+                    Pos = genericController.vbInstr(1, ConstructorName, "=")
                     If Pos > 1 Then
                         ConstructorValue = Mid(ConstructorName, Pos + 1)
                         ConstructorName = Trim(Left(ConstructorName, Pos - 1))
-                        Pos = vbInstr(1, ConstructorValue, "[")
+                        Pos = genericController.vbInstr(1, ConstructorValue, "[")
                         If Pos > 0 Then
                             ConstructorSelector = Mid(ConstructorValue, Pos)
                             ConstructorValue = Mid(ConstructorValue, 1, Pos - 1)
                         End If
                     End If
                     If ConstructorName <> "" Then
-                        'Pos = vbInstr(1, ConstructorName, ",")
+                        'Pos = genericController.vbInstr(1, ConstructorName, ",")
                         'If Pos > 1 Then
                         '    ConstructorType = Mid(ConstructorName, Pos + 1)
                         '    ConstructorName = Left(ConstructorName, Pos - 1)
@@ -4463,22 +4464,22 @@ ErrorTrap:
                 For IPtr = 0 To InstanceCnt - 1
                     InstanceName = InstanceNameValues(IPtr)
                     InstanceValue = ""
-                    Pos = vbInstr(1, InstanceName, "=")
+                    Pos = genericController.vbInstr(1, InstanceName, "=")
                     If Pos > 1 Then
                         InstanceValue = Mid(InstanceName, Pos + 1)
                         InstanceName = Trim(Left(InstanceName, Pos - 1))
-                        Pos = vbInstr(1, InstanceValue, "[")
+                        Pos = genericController.vbInstr(1, InstanceValue, "[")
                         If Pos >= 1 Then
                             InstanceValue = Mid(InstanceValue, 1, Pos - 1)
                         End If
                     End If
                     If InstanceName <> "" Then
-                        'Pos = vbInstr(1, InstanceName, ",")
+                        'Pos = genericController.vbInstr(1, InstanceName, ",")
                         'If Pos > 1 Then
                         '    InstanceType = Mid(InstanceName, Pos + 1)
                         '    InstanceName = Left(InstanceName, Pos - 1)
                         'End If
-                        InstanceNames(SavePtr) = vbLCase(InstanceName)
+                        InstanceNames(SavePtr) = genericController.vbLCase(InstanceName)
                         InstanceValues(SavePtr) = InstanceValue
                         'InstanceTypes(IPtr) = InstanceType
                         '
@@ -4486,7 +4487,7 @@ ErrorTrap:
                         '
                         If ConstructorCnt > 0 Then
                             For ConstructorPtr = 0 To ConstructorCnt - 1
-                                If vbLCase(InstanceName) = vbLCase(ConstructorNames(ConstructorPtr)) Then
+                                If genericController.vbLCase(InstanceName) = genericController.vbLCase(ConstructorNames(ConstructorPtr)) Then
                                     Exit For
                                 End If
                             Next
@@ -4610,7 +4611,7 @@ ErrorTrap:
                 End If
                 Copy = cpCore.db.cs_getText(CS, "stylesfilename")
                 If Copy <> "" Then
-                    If vbInstr(1, Copy, "://") <> 0 Then
+                    If genericController.vbInstr(1, Copy, "://") <> 0 Then
                     ElseIf Left(Copy, 1) = "/" Then
                     Else
                         Copy = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, Copy)
@@ -4619,9 +4620,9 @@ ErrorTrap:
                 End If
                 '
                 If Wrapper <> "" Then
-                    Pos = vbInstr(1, Wrapper, TargetString, vbTextCompare)
+                    Pos = genericController.vbInstr(1, Wrapper, TargetString, vbTextCompare)
                     If Pos <> 0 Then
-                        s = vbReplace(Wrapper, TargetString, s, 1, 99, vbTextCompare)
+                        s = genericController.vbReplace(Wrapper, TargetString, s, 1, 99, vbTextCompare)
                     Else
                         s = "" _
                             & "<!-- the selected wrapper does not include the Target String marker to locate the position of the content. -->" _

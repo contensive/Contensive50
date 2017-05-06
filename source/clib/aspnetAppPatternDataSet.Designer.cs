@@ -10,7 +10,7 @@
 
 #pragma warning disable 1591
 
-namespace Contensive.Core {
+namespace Contensive.CLI {
     
     
     /// <summary>

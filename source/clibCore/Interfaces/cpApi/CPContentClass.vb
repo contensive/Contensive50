@@ -116,21 +116,13 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetLinkAliasByPageID(ByVal PageID As Integer, ByVal QueryStringSuffix As String, ByVal DefaultLink As String) As String
-            If True Then
-                Return cpCore.main_GetLinkAliasByPageID(PageID, QueryStringSuffix, DefaultLink)
-            Else
-                Return ""
-            End If
+            Return cpCore.main_GetLinkAliasByPageID(PageID, QueryStringSuffix, DefaultLink)
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Function GetPageLink(ByVal PageID As Integer, Optional ByVal QueryStringSuffix As String = "", Optional ByVal AllowLinkAlias As Boolean = True) As String
-            If True Then
-                Return cpCore.main_GetPageLink3(PageID, QueryStringSuffix, AllowLinkAlias)
-            Else
-                Return ""
-            End If
+            Return cpCore.main_GetPageLink3(PageID, QueryStringSuffix, AllowLinkAlias)
         End Function
         '
         '====================================================================================================
@@ -213,10 +205,8 @@ Namespace Contensive.Core
         Public Overrides Function getLayout(ByVal layoutName As String) As String
             Dim result As String = ""
             Try
-                Dim cs As CPCSClass
-                '
-                cs = New CPCSClass(cp)
-                cs.Open("layouts", "name=" & cp.Db.EncodeSQLText(layoutName), "id",, "layout")
+                Dim cs As New csController(cpCore)
+                cs.open("layouts", "name=" & cp.Db.EncodeSQLText(layoutName), "id",, "layout")
                 If cs.OK Then
                     result = cs.GetText("layout")
                 End If
@@ -232,7 +222,7 @@ Namespace Contensive.Core
         Public Overrides Function AddRecord(ByVal ContentName As String, ByVal recordName As String) As Integer
             Dim recordId As Integer = 0
             Try
-                Dim cs As CPCSClass = cp.CSNew()
+                Dim cs As New csController(cpCore)
                 If cs.Insert(ContentName) Then
                     cs.SetField("name", recordName)
                     recordId = cs.GetInteger("id")
@@ -249,9 +239,9 @@ Namespace Contensive.Core
         Public Overrides Function AddRecord(ContentName As String) As Integer
             Dim recordId As Integer = 0
             Try
-                Dim cs As CPCSClass = cp.CSNew()
+                Dim cs As New csController(cpCore)
                 If cs.Insert(ContentName) Then
-                    recordId = cs.GetInteger("id")
+                    recordId = cs.getInteger("id")
                 End If
                 Call cs.Close()
             Catch ex As Exception
@@ -263,12 +253,6 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Sub Delete(ByVal ContentName As String, ByVal SQLCriteria As String)
-            Call cpCore.db.deleteContentRecords(ContentName, SQLCriteria)
-        End Sub
-        '
-        '====================================================================================================
-        '
-        Public Overrides Sub DeleteRecords(ByVal ContentName As String, ByVal SQLCriteria As String)
             Call cpCore.db.deleteContentRecords(ContentName, SQLCriteria)
         End Sub
         '

@@ -1,6 +1,9 @@
 ﻿
 Option Explicit On
 Option Strict On
+
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 '
 Namespace Contensive.Core
     '
@@ -98,7 +101,7 @@ Namespace Contensive.Core
                 '
                 ArrayPointer = -1
                 If store.ArrayCount > 0 Then
-                    UcaseTargetKey = vbReplace(UCase(Key), vbCrLf, "")
+                    UcaseTargetKey = genericController.vbReplace(UCase(Key), vbCrLf, "")
                     LowGuess = -1
                     HighGuess = store.ArrayCount - 1
                     Do While (HighGuess - LowGuess) > 1
@@ -138,8 +141,8 @@ Namespace Contensive.Core
                 Dim UcaseKey As String
                 test = ""
                 '
-                UcaseKey = vbReplace(UCase(Key), vbCrLf, "")
-                'UcaseKey = vbUCase(Key)
+                UcaseKey = genericController.vbReplace(UCase(Key), vbCrLf, "")
+                'UcaseKey = genericController.vbUCase(Key)
                 store.ArrayPointer = GetArrayPointer(Key)
                 If store.ArrayPointer > -1 Then
                     ' Make sure this is the first match
@@ -153,7 +156,7 @@ Namespace Contensive.Core
                         End If
                     Loop
                     store.ArrayPointer = store.ArrayPointer + 1
-                    returnKey = EncodeInteger(store.PointerArray(store.ArrayPointer))
+                    returnKey = genericController.EncodeInteger(store.PointerArray(store.ArrayPointer))
                 End If
             Catch ex As Exception
                 Throw New indexException("GetPointer error", ex)
@@ -171,7 +174,7 @@ Namespace Contensive.Core
             Try
                 Dim keyToSave As String
                 '
-                keyToSave = vbReplace(UCase(Key), vbCrLf, "")
+                keyToSave = genericController.vbReplace(UCase(Key), vbCrLf, "")
                 '
                 If store.ArrayCount >= store.ArraySize Then
                     store.ArraySize = store.ArraySize + KeyPointerArrayChunk
@@ -200,9 +203,9 @@ Namespace Contensive.Core
                 '
                 If store.ArrayPointer < (store.ArrayCount - 1) Then
                     store.ArrayPointer = store.ArrayPointer + 1
-                    UcaseKey = vbUCase(Key)
+                    UcaseKey = genericController.vbUCase(Key)
                     If (store.UcaseKeyArray(store.ArrayPointer) = UcaseKey) Then
-                        nextPointerMatch = EncodeInteger(store.PointerArray(store.ArrayPointer))
+                        nextPointerMatch = genericController.EncodeInteger(store.PointerArray(store.ArrayPointer))
                     Else
                         store.ArrayPointer = store.ArrayPointer - 1
                     End If
@@ -228,7 +231,7 @@ Namespace Contensive.Core
                 ' GetFirstPointer = -1
                 If store.ArrayCount > 0 Then
                     store.ArrayPointer = 0
-                    firstPointer = EncodeInteger(store.PointerArray(store.ArrayPointer))
+                    firstPointer = genericController.EncodeInteger(store.PointerArray(store.ArrayPointer))
                 End If
                 '
             Catch ex As Exception
@@ -252,7 +255,7 @@ Namespace Contensive.Core
                 'nextPointer = -1
                 If (store.ArrayPointer + 1) < store.ArrayCount Then
                     store.ArrayPointer = store.ArrayPointer + 1
-                    nextPointer = EncodeInteger(store.PointerArray(store.ArrayPointer))
+                    nextPointer = genericController.EncodeInteger(store.PointerArray(store.ArrayPointer))
                 End If
             Catch ex As Exception
                 Throw New indexException("GetPointer error", ex)

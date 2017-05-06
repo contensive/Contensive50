@@ -1,4 +1,6 @@
 
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 Imports System.Windows.Forms
 Imports CL = Contensive.Core.coreCommonModule
 Imports Contensive.BaseClasses
@@ -74,7 +76,7 @@ Namespace Contensive.Core
         '=======================================================================================================
         '
         Public Overrides Function GetBoolean(ByVal PropertyName As String, Optional ByVal DefaultValue As String = "") As Boolean
-            Return CP.Utils.EncodeBoolean(GetProperty(PropertyName, DefaultValue))
+            Return genericController.EncodeBoolean(GetProperty(PropertyName, DefaultValue))
         End Function
         '
         '=======================================================================================================
@@ -82,7 +84,7 @@ Namespace Contensive.Core
         '=======================================================================================================
         '
         Public Overrides Function GetDate(ByVal PropertyName As String, Optional ByVal DefaultValue As String = "") As Date
-            Return CP.Utils.EncodeDate(GetProperty(PropertyName, DefaultValue))
+            Return genericController.EncodeDate(GetProperty(PropertyName, DefaultValue))
         End Function
         '
         '=======================================================================================================
@@ -114,7 +116,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property MultiDomainMode() As Boolean 'Inherits BaseClasses.CPSiteBaseClass.MultiDomainMode
             Get
                 MultiDomainMode = False
-                If vbInstr(1, "," & cpCore.app_domainList & ",", ",*,", vbTextCompare) <> 0 Then
+                If genericController.vbInstr(1, "," & cpCore.app_domainList & ",", ",*,", vbTextCompare) <> 0 Then
                     MultiDomainMode = True
                 End If
             End Get
@@ -154,7 +156,7 @@ Namespace Contensive.Core
         '
         Public Overrides ReadOnly Property TrapErrors() As Boolean 'Inherits BaseClasses.CPSiteBaseClass.TrapErrors
             Get
-                Return CL.EncodeBoolean(GetProperty("TrapErrors", "1"))
+                Return genericController.EncodeBoolean(GetProperty("TrapErrors", "1"))
             End Get
         End Property
 
@@ -346,7 +348,7 @@ Namespace Contensive.Core
                     & " from (ccAddonEvents e" _
                     & " left join ccAddonEventCatchers c on c.eventId=e.id)" _
                     & " where "
-                If vbIsNumeric(eventNameIdOrGuid) Then
+                If genericController.vbIsNumeric(eventNameIdOrGuid) Then
                     sql &= "e.id=" & CP.Db.EncodeSQLNumber(CDbl(eventNameIdOrGuid))
                 ElseIf CP.Utils.isGuid(eventNameIdOrGuid) Then
                     sql &= "e.ccGuid=" & CP.Db.EncodeSQLText(eventNameIdOrGuid)
@@ -357,7 +359,7 @@ Namespace Contensive.Core
                     '
                     ' event not found
                     '
-                    If vbIsNumeric(eventNameIdOrGuid) Then
+                    If genericController.vbIsNumeric(eventNameIdOrGuid) Then
                         '
                         ' can not create an id
                         '

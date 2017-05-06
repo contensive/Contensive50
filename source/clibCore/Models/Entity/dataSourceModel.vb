@@ -50,12 +50,12 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <param name="recordId"></param>
-        Public Shared Function getObject(cp As CPBaseClass, recordId As Integer, ByRef adminMessageList As List(Of String)) As Models.Entity.dataSourceModel
+        Public Shared Function getObject(cpcore As coreClass, recordId As Integer, ByRef adminMessageList As List(Of String)) As Models.Entity.dataSourceModel
             Dim returnModel As Models.Entity.dataSourceModel = Nothing
             Try
                 Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer
                 Dim recordCacheName As String = cnDataSources & "CachedModelRecordId" & recordId
-                Dim recordCache As String = cp.Cache.Read(recordCacheName)
+                Dim recordCache As String = cpcore.cache.getString(recordCacheName)
                 Dim loadDbModel As Boolean = True
                 If Not String.IsNullOrEmpty(recordCache) Then
                     Try
@@ -71,11 +71,11 @@ Namespace Contensive.Core.Models.Entity
                     End Try
                 End If
                 If loadDbModel Or (returnModel Is Nothing) Then
-                    returnModel = getObjectNoCache(cp, recordId)
-                    Call cp.Cache.Save(recordCacheName, json_serializer.Serialize(returnModel), cacheTagList)
+                    returnModel = getObjectNoCache(cpcore, recordId)
+                    Call cpcore.cache.setKey(recordCacheName, json_serializer.Serialize(returnModel), cacheTagList)
                 End If
             Catch ex As Exception
-                cp.Site.ErrorReport(ex)
+                cpcore.handleExceptionAndRethrow(ex)
             End Try
             Return returnModel
         End Function
@@ -85,22 +85,22 @@ Namespace Contensive.Core.Models.Entity
         ''' called only from getObject. Load the model from the Db without cache. If there are any properties or objects that cannot be used from cache, do not include them here either, load in getObject()
         ''' </summary>
         ''' <param name="recordId"></param>
-        Private Shared Function getObjectNoCache(cp As CPBaseClass, recordId As Integer) As Models.Entity.dataSourceModel
+        Private Shared Function getObjectNoCache(cpcore As coreClass, recordId As Integer) As Models.Entity.dataSourceModel
             Dim returnNewModel As New dataSourceModel()
             Try
-                Dim cs As CPCSBaseClass = cp.CSNew()
+                Dim cs As New csController(cpcore)
                 returnNewModel.id = 0
                 If recordId <> 0 Then
-                    cs.Open(cnDataSources, "(ID=" & recordId & ")", "name", True, "name,connString")
-                    If cs.OK() Then
+                    cs.open(cnDataSources, "(ID=" & recordId & ")", "name", True, "name,connString")
+                    If cs.ok() Then
                         returnNewModel.id = recordId
-                        returnNewModel.name = normalizeDataSourceName(cs.GetText("Name"))
-                        returnNewModel.connStringOLEDB = cs.GetText("connString")
+                        returnNewModel.name = normalizeDataSourceName(cs.getText("Name"))
+                        returnNewModel.connStringOLEDB = cs.getText("connString")
                     End If
                     Call cs.Close()
                 End If
             Catch ex As Exception
-                cp.Site.ErrorReport(ex)
+                cpcore.handleExceptionAndRethrow(ex)
             End Try
             Return returnNewModel
         End Function
@@ -111,11 +111,11 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <returns></returns>
-        Public Function saveObject(cp As CPBaseClass) As Integer
+        Public Function saveObject(cpcore As coreClass) As Integer
             Try
-                Dim cs As CPCSBaseClass = cp.CSNew()
+                Dim cs As New csController(cpcore)
                 If (id > 0) Then
-                    If Not cs.Open(cnDataSources, "id=" & id) Then
+                    If Not cs.open(cnDataSources, "id=" & id) Then
                         id = 0
                         cs.Close()
                         Throw New ApplicationException("Unable to open record [" & id & "]")
@@ -127,14 +127,14 @@ Namespace Contensive.Core.Models.Entity
                         Throw New ApplicationException("Unable to insert record")
                     End If
                 End If
-                If cs.OK() Then
-                    id = cs.GetInteger("id")
+                If cs.ok() Then
+                    id = cs.getInteger("id")
                     Call cs.SetField("name", normalizeDataSourceName(name))
                     Call cs.SetField("connString", connStringOLEDB)
                 End If
                 Call cs.Close()
             Catch ex As Exception
-                cp.Site.ErrorReport(ex)
+                cpcore.handleExceptionAndRethrow(ex)
                 Throw
             End Try
             Return id
@@ -184,8 +184,8 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="cp"></param>
         ''' <param name="recordId"></param>record
         ''' <returns></returns>
-        Public Shared Function getRecordName(cp As CPBaseClass, recordId As Integer) As String
-            Return cp.Content.GetRecordName(cnDataSources, recordId)
+        Public Shared Function getRecordName(cpcore As coreClass, recordId As Integer) As String
+            Return cpcore.content_GetRecordName(cnDataSources, recordId)
         End Function
     End Class
 End Namespace

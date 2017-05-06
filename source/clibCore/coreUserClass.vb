@@ -2,6 +2,9 @@
 Option Explicit On
 Option Strict On
 
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
+
 Namespace Contensive.Core
     '
     '====================================================================================================
@@ -173,23 +176,23 @@ Namespace Contensive.Core
                         '
                         ' always false until visit loaded
                         '
-                        localContentNameOrId = EncodeText(ContentNameOrId)
+                        localContentNameOrId = genericController.encodeText(ContentNameOrId)
                         cacheTestName = localContentNameOrId
                         If cacheTestName = "" Then
                             cacheTestName = "iseditingall"
                         End If
-                        cacheTestName = vbLCase(cacheTestName)
-                        If coreCommonModule.IsInDelimitedString(main_IsEditingContentList, cacheTestName, ",") Then
+                        cacheTestName = genericController.vbLCase(cacheTestName)
+                        If genericController.IsInDelimitedString(main_IsEditingContentList, cacheTestName, ",") Then
                             Call cpCore.debug_testPoint("...is in main_IsEditingContentList")
                             returnResult = True
-                        ElseIf coreCommonModule.IsInDelimitedString(main_IsNotEditingContentList, cacheTestName, ",") Then
+                        ElseIf genericController.IsInDelimitedString(main_IsNotEditingContentList, cacheTestName, ",") Then
                             Call cpCore.debug_testPoint("...is in main_IsNotEditingContentList")
                         Else
                             If isAuthenticated() Then
                                 If Not cpCore.pageManager_printVersion Then
                                     If (cpCore.visitProperty.getBoolean("AllowEditing") Or cpCore.visitProperty.getBoolean("AllowAdvancedEditor")) Then
                                         If localContentNameOrId <> "" Then
-                                            If vbIsNumeric(localContentNameOrId) Then
+                                            If genericController.vbIsNumeric(localContentNameOrId) Then
                                                 localContentNameOrId = cpCore.metaData.getContentNameByID(EncodeInteger(localContentNameOrId))
                                             End If
                                         End If
@@ -221,7 +224,7 @@ Namespace Contensive.Core
             Dim returnResult As Boolean = False
             Try
                 If (Not cpCore.pageManager_printVersion) Then
-                    If isAuthenticatedContentManager(EncodeText(ContentName)) Then
+                    If isAuthenticatedContentManager(genericController.encodeText(ContentName)) Then
                         returnResult = cpCore.visitProperty.getBoolean("AllowQuickEditor")
                     End If
                 End If
@@ -242,7 +245,7 @@ Namespace Contensive.Core
             Dim returnResult As Boolean = False
             Try
                 If (Not cpCore.pageManager_printVersion) Then
-                    If isAuthenticatedContentManager(EncodeText(ContentName)) Then
+                    If isAuthenticatedContentManager(genericController.encodeText(ContentName)) Then
                         returnResult = cpCore.visitProperty.getBoolean("AllowAdvancedEditor")
                     End If
                 End If
@@ -381,8 +384,8 @@ Namespace Contensive.Core
                         ' login successful, redirect back to this page (without a method)
                         '
                         QS = cpCore.web_RefreshQueryString
-                        QS = ModifyQueryString(QS, "method", "")
-                        QS = ModifyQueryString(QS, "RequestBinary", "")
+                        QS = genericController.ModifyQueryString(QS, "method", "")
+                        QS = genericController.ModifyQueryString(QS, "RequestBinary", "")
                         '
                         Call cpCore.webServerIO_Redirect2("?" & QS, "Login form success", False)
                     End If
@@ -414,7 +417,7 @@ Namespace Contensive.Core
                     & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"">" _
                     & cr2 & "<tr>" _
                     & cr3 & "<td style=""text-align:right;vertical-align:middle;width:30%;padding:4px"" align=""right"" width=""30%"">" & SpanClassAdminNormal & "Email</span></td>" _
-                    & cr3 & "<td style=""text-align:left;vertical-align:middle;width:70%;padding:4px"" align=""left""  width=""70%""><input NAME=""" & "email"" VALUE=""" & cpcore.html.html_EncodeHTML(loginForm_Email) & """ SIZE=""20"" MAXLENGTH=""50""></td>" _
+                    & cr3 & "<td style=""text-align:left;vertical-align:middle;width:70%;padding:4px"" align=""left""  width=""70%""><input NAME=""" & "email"" VALUE=""" & cpCore.html.html_EncodeHTML(loginForm_Email) & """ SIZE=""20"" MAXLENGTH=""50""></td>" _
                     & cr2 & "</tr>" _
                     & cr2 & "<tr>" _
                     & cr3 & "<td colspan=""2"">&nbsp;</td>" _
@@ -437,7 +440,7 @@ Namespace Contensive.Core
                     For Each key As String In cpCore.docProperties.getKeyList
                         With cpCore.docProperties.getProperty(key)
                             If .IsForm Then
-                                Select Case vbUCase(.Name)
+                                Select Case genericController.vbUCase(.Name)
                                     Case "S", "MA", "MB", "USERNAME", "PASSWORD", "EMAIL"
                                     Case Else
                                         returnResult = returnResult & cpCore.html_GetFormInputHidden(.Name, .Value)
@@ -447,8 +450,8 @@ Namespace Contensive.Core
                     Next
                     '
                     QueryString = cpCore.web_RefreshQueryString
-                    QueryString = ModifyQueryString(QueryString, "S", "")
-                    QueryString = ModifyQueryString(QueryString, "ccIPage", "")
+                    QueryString = genericController.ModifyQueryString(QueryString, "S", "")
+                    QueryString = genericController.ModifyQueryString(QueryString, "ccIPage", "")
                     returnResult = "" _
                     & cpCore.html_GetFormStart(QueryString) _
                     & kmaIndent(returnResult) _
@@ -486,9 +489,9 @@ Namespace Contensive.Core
                 returnREsult = False
                 If isAuthenticated Then
                     WorkingIDList = GroupIDList
-                    WorkingIDList = vbReplace(WorkingIDList, " ", "")
-                    Do While vbInstr(1, WorkingIDList, ",,") <> 0
-                        WorkingIDList = vbReplace(WorkingIDList, ",,", ",")
+                    WorkingIDList = genericController.vbReplace(WorkingIDList, " ", "")
+                    Do While genericController.vbInstr(1, WorkingIDList, ",,") <> 0
+                        WorkingIDList = genericController.vbReplace(WorkingIDList, ",,", ",")
                     Loop
                     If (WorkingIDList <> "") Then
                         If vbMid(WorkingIDList, 1) = "," Then
@@ -504,7 +507,7 @@ Namespace Contensive.Core
                             If vbLen(WorkingIDList) <= 1 Then
                                 WorkingIDList = ""
                             Else
-                                WorkingIDList = vbMid(WorkingIDList, 1, vbLen(WorkingIDList) - 1)
+                                WorkingIDList = genericController.vbMid(WorkingIDList, 1, vbLen(WorkingIDList) - 1)
                             End If
                         End If
                     End If
@@ -531,7 +534,7 @@ Namespace Contensive.Core
                         '
                         ' check if they are admin or in the group list
                         '
-                        If vbInstr(1, WorkingIDList, ",") <> 0 Then
+                        If genericController.vbInstr(1, WorkingIDList, ",") <> 0 Then
                             Criteria = "r.GroupID in (" & WorkingIDList & ")"
                         Else
                             Criteria = "r.GroupID=" & WorkingIDList
@@ -617,7 +620,7 @@ Namespace Contensive.Core
                         '
                         styleFilename = cpCore.db.cs_getText(CS, "StyleFilename")
                         If styleFilename <> "" Then
-                            Call cpCore.main_AddStylesheetLink(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverconfig.appConfig.cdnFilesNetprefix, styleFilename))
+                            Call cpCore.main_AddStylesheetLink(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, styleFilename))
                         End If
                         excludeFromAnalytics = cpCore.db.cs_getBoolean(CS, "ExcludeFromAnalytics")
                         returnRecordId = recordId
@@ -638,11 +641,11 @@ Namespace Contensive.Core
             Dim returnREsult As Boolean = False
             Try
                 Dim iMemberID As Integer
-                iMemberID = EncodeInteger(checkMemberID)
+                iMemberID = genericController.EncodeInteger(checkMemberID)
                 If iMemberID = 0 Then
                     iMemberID = id
                 End If
-                returnREsult = isMemberOfGroupList("," & cpCore.group_GetGroupID(EncodeText(GroupName)), iMemberID, True)
+                returnREsult = isMemberOfGroupList("," & cpCore.group_GetGroupID(genericController.encodeText(GroupName)), iMemberID, True)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -661,7 +664,7 @@ Namespace Contensive.Core
                 If iMemberID = 0 Then
                     iMemberID = id
                 End If
-                returnREsult = isMemberOfGroupList("," & cpCore.group_GetGroupID(EncodeText(GroupName)), iMemberID, adminReturnsTrue)
+                returnREsult = isMemberOfGroupList("," & cpCore.group_GetGroupID(genericController.encodeText(GroupName)), iMemberID, adminReturnsTrue)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -790,7 +793,7 @@ Namespace Contensive.Core
                 Const passwordChrs As String = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345678999999"
                 Const passwordChrsLength As Integer = 62
                 '
-                workingEmail = EncodeText(Email)
+                workingEmail = genericController.encodeText(Email)
                 '
                 returnREsult = False
                 If workingEmail = "" Then
@@ -798,7 +801,7 @@ Namespace Contensive.Core
                     cpCore.error_AddUserError("Please enter your email address before requesting your username and password.")
                 Else
                     'hint = "120"
-                    atPtr = vbInstr(1, workingEmail, "@")
+                    atPtr = genericController.vbInstr(1, workingEmail, "@")
                     If atPtr < 2 Then
                         '
                         ' email not valid
@@ -1155,7 +1158,7 @@ Namespace Contensive.Core
                     language = (cpCore.db.cs_getText(CS, "LanguageName"))
                     styleFilename = cpCore.db.cs_getText(CS, "StyleFilename")
                     If styleFilename <> "" Then
-                        Call cpCore.main_AddStylesheetLink(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverconfig.appConfig.cdnFilesNetprefix, styleFilename))
+                        Call cpCore.main_AddStylesheetLink(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, styleFilename))
                     End If
                     excludeFromAnalytics = cpCore.db.cs_getBoolean(CS, "ExcludeFromAnalytics")
                     '
@@ -1389,7 +1392,7 @@ Namespace Contensive.Core
                 loginForm_Username = cpCore.docProperties.getText("username")
                 loginForm_Password = cpCore.docProperties.getText("password")
                 '
-                If Not EncodeBoolean(cpCore.siteProperties.getBoolean("AllowMemberJoin", False)) Then
+                If Not genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("AllowMemberJoin", False)) Then
                     cpCore.error_AddUserError("This site does not accept public main_MemberShip.")
                 Else
                     If Not isNewLoginOK(loginForm_Username, loginForm_Password, ErrorMessage, errorCode) Then
@@ -1517,19 +1520,19 @@ Namespace Contensive.Core
                     '
                     ' ----- Error Messages
                     '
-                    If EncodeBoolean(cpCore.siteProperties.getBoolean("allowEmailLogin", False)) Then
+                    If genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("allowEmailLogin", False)) Then
                         usernameMsg = "<b>To login, enter your username or email address with your password.</b></p>"
                     Else
                         usernameMsg = "<b>To login, enter your username and password.</b></p>"
                     End If
                     '
                     QueryString = cpCore.webServerIO.requestQueryString
-                    QueryString = ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
-                    QueryString = ModifyQueryString(QueryString, "requestbinary", "", False)
+                    QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
+                    QueryString = genericController.ModifyQueryString(QueryString, "requestbinary", "", False)
                     '
                     ' ----- Username
                     '
-                    If EncodeBoolean(cpCore.siteProperties.getBoolean("allowEmailLogin", False)) Then
+                    If genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("allowEmailLogin", False)) Then
                         Caption = "Username&nbsp;or&nbsp;Email"
                     Else
                         Caption = "Username"
@@ -1543,7 +1546,7 @@ Namespace Contensive.Core
                     '
                     ' ----- Password
                     '
-                    If EncodeBoolean(cpCore.siteProperties.getBoolean("allowNoPasswordLogin", False)) Then
+                    If genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("allowNoPasswordLogin", False)) Then
                         Caption = "Password&nbsp;(optional)"
                     Else
                         Caption = "Password"
@@ -1557,7 +1560,7 @@ Namespace Contensive.Core
                     '
                     ' ----- autologin support
                     '
-                    If EncodeBoolean(cpCore.siteProperties.getBoolean("AllowAutoLogin", False)) Then
+                    If genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("AllowAutoLogin", False)) Then
                         loginForm = loginForm _
                         & cr & "<tr>" _
                         & cr2 & "<td align=""right"">&nbsp;</td>" _
@@ -1602,7 +1605,7 @@ Namespace Contensive.Core
                     '
                     ' ----- Password Form
                     '
-                    If EncodeBoolean(cpCore.siteProperties.getBoolean("allowPasswordEmail", True)) Then
+                    If genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("allowPasswordEmail", True)) Then
                         Panel = "" _
                             & Panel _
                             & cr & "<p class=""ccAdminNormal""><b>Forget your password?</b></p>" _
@@ -1670,8 +1673,8 @@ Namespace Contensive.Core
                 Dim allowNoPasswordLogin As Boolean
                 Dim iLoginFieldValue As String
                 '
-                iLoginFieldValue = EncodeText(username)
-                iPassword = EncodeText(password)
+                iLoginFieldValue = genericController.encodeText(username)
+                iPassword = genericController.encodeText(password)
                 '
                 returnUserId = 0
                 allowEmailLogin = cpCore.siteProperties.getBoolean("allowEmailLogin")
@@ -1716,7 +1719,7 @@ Namespace Contensive.Core
                         ' ----- loginFieldValue not found, stop here
                         '
                         Call cpCore.error_AddUserError(badLoginUserError)
-                    ElseIf (Not EncodeBoolean(cpCore.siteProperties.getBoolean("AllowDuplicateUsernames", False))) And (cpCore.db.cs_getRowCount(CS) > 1) Then
+                    ElseIf (Not genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("AllowDuplicateUsernames", False))) And (cpCore.db.cs_getRowCount(CS) > 1) Then
                         '
                         ' ----- AllowDuplicates is false, and there are more then one record
                         '
@@ -1760,7 +1763,7 @@ Namespace Contensive.Core
                                 '
                                 ' password login
                                 '
-                                If vbLCase(cpCore.db.cs_getText(CS, "password")) = vbLCase(iPassword) Then
+                                If genericController.vbLCase(cpCore.db.cs_getText(CS, "password")) = genericController.vbLCase(iPassword) Then
                                     returnUserId = cpCore.db.cs_getInteger(CS, "ID")
                                 End If
                             End If
@@ -1900,7 +1903,7 @@ Namespace Contensive.Core
                 returnAllowEdit = False
                 returnAllowAdd = False
                 returnAllowDelete = False
-                If coreCommonModule.IsInDelimitedString(usedContentIdList, CStr(ContentID), ",") Then
+                If genericController.IsInDelimitedString(usedContentIdList, CStr(ContentID), ",") Then
                     '
                     ' failed usedContentIdList test, this content id was in the child path
                     '
@@ -1909,17 +1912,17 @@ Namespace Contensive.Core
                     '
                     ' ----- not a valid contentname
                     '
-                ElseIf coreCommonModule.IsInDelimitedString(contentAccessRights_NotList, CStr(ContentID), ",") Then
+                ElseIf genericController.IsInDelimitedString(contentAccessRights_NotList, CStr(ContentID), ",") Then
                     '
                     ' ----- was previously found to not be a Content Manager
                     '
-                ElseIf coreCommonModule.IsInDelimitedString(contentAccessRights_List, CStr(ContentID), ",") Then
+                ElseIf genericController.IsInDelimitedString(contentAccessRights_List, CStr(ContentID), ",") Then
                     '
                     ' ----- was previously found to be a Content Manager
                     '
                     returnAllowEdit = True
-                    returnAllowAdd = coreCommonModule.IsInDelimitedString(contentAccessRights_AllowAddList, CStr(ContentID), ",")
-                    returnAllowDelete = coreCommonModule.IsInDelimitedString(contentAccessRights_AllowDeleteList, CStr(ContentID), ",")
+                    returnAllowAdd = genericController.IsInDelimitedString(contentAccessRights_AllowAddList, CStr(ContentID), ",")
+                    returnAllowDelete = genericController.IsInDelimitedString(contentAccessRights_AllowDeleteList, CStr(ContentID), ",")
                 Else
                     '
                     ' ----- Must test it

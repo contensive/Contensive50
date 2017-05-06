@@ -50,8 +50,8 @@ End Namespace
 '                '
 '                ' cluster ok, process the command
 '                '
-'                MonitorPort = EncodeInteger(getCmdLineValue(cp.core, "port", My.Application.CommandLineArgs, "0"))
-'                maxInstanceCnt = EncodeInteger(getCmdLineValue(cp.core, "max", My.Application.CommandLineArgs, "5"))
+'                MonitorPort = genericController.EncodeInteger(getCmdLineValue(cp.core, "port", My.Application.CommandLineArgs, "0"))
+'                maxInstanceCnt = genericController.EncodeInteger(getCmdLineValue(cp.core, "max", My.Application.CommandLineArgs, "5"))
 '                '
 '                cp.core.appendLog("cmdModule.main, MonitorPort=[" & MonitorPort & "], maxInstanceCnt=[" & maxInstanceCnt & "]")
 '                '
@@ -84,7 +84,7 @@ End Namespace
 '                        cp.core.appendLog("cmdModule.main, call getNextAsyncCmd and loop until command is 'error', or empty ")
 '                        '
 '                        'cmd = GetNextAsyncCmd(cp.core, "127.0.0.1", MonitorPort, "", "")
-'                        Do While cmd <> "" And vbInstr(1, cmd, "error", vbTextCompare) <> 1
+'                        Do While cmd <> "" And genericController.vbInstr(1, cmd, "error", vbTextCompare) <> 1
 '                            '
 '                            cp.core.appendLog("cmdModule.main, looping, cmd=[" & cmd & "]")
 '                            '
@@ -194,7 +194,7 @@ End Namespace
 '                        'Else
 
 '                        'End If
-'                        Select Case vbUCase(Method)
+'                        Select Case genericController.vbUCase(Method)
 '                            'Case "INSTALLADDON", "INSTALLADDONS"
 '                            '    '
 '                            '    ' Install Add-ons in the AddonInstall folder of the applications virtual folder
@@ -276,7 +276,7 @@ End Namespace
 '                                '        AdminEmail = getCmdLineValue("AdminEmail", cmdLine, "", " ")
 '                                '        siteKey = getCmdLineValue("siteKey", cmdLine, "", " ")
 '                                '        DefaultDoc = getCmdLineValue("defaultDoc", cmdLine, "index.php", " ")
-'                                '        SiteType = EncodeInteger(getCmdLineValue("siteType", cmdLine, SiteTypeBasePhp, " "))
+'                                '        SiteType = genericController.EncodeInteger(getCmdLineValue("siteType", cmdLine, SiteTypeBasePhp, " "))
 '                                '        addonList = getCmdLineValue("addonList", cmdLine, "", " ")
 '                                '        '
 '                                '        'hint = hint & ",140"
@@ -465,7 +465,7 @@ End Namespace
 '                                    '20151109 - removed but unsure what in initContext can/must be moved to cp constructor
 '                                    'Call cp.execute_initContext()
 '                                    If cpCore.app.status = applicationStatusEnum.ApplicationStatusReady Then
-'                                        AddonIdGuidOrName = EncodeInteger(getCmdLineValue(cpCore, "AddonId", cmdLine, "", " "))
+'                                        AddonIdGuidOrName = genericController.EncodeInteger(getCmdLineValue(cpCore, "AddonId", cmdLine, "", " "))
 '                                        If AddonIdGuidOrName = "0" Then
 '                                            AddonIdGuidOrName = getCmdLineValue(cpCore, "addonguid", cmdLine, "", " ")
 '                                            If AddonIdGuidOrName = "" Then
@@ -487,7 +487,7 @@ End Namespace
 '                                '                    If true Then
 '                                '                        CSConnection = cmc.csv_OpenConnection(AppName)
 '                                '                        If CSConnection.ApplicationStatus = ApplicationStatusRunning Then
-'                                '                            AddonIdGuidOrName = encodeInteger(getCmdLineValue("AddonId", cmdLine, "", " "))
+'                                '                            AddonIdGuidOrName = genericController.EncodeInteger(getCmdLineValue("AddonId", cmdLine, "", " "))
 '                                '                            If AddonIdGuidOrName = "0" Then
 '                                '                                AddonIdGuidOrName = getCmdLineValue("addonguid", cmdLine, "", " ")
 '                                '                                If AddonIdGuidOrName = "" Then
@@ -507,7 +507,7 @@ End Namespace
 '                                '
 '                                ' Unknown
 '                                '
-'                                cpCore.handleLegacyError2("CmdModule", "ExecuteServerCmd", "Unknown command [" & vbUCase(Method) & "]")
+'                                cpCore.handleLegacyError2("CmdModule", "ExecuteServerCmd", "Unknown command [" & genericController.vbUCase(Method) & "]")
 '                        End Select
 '                    End If
 '                End If

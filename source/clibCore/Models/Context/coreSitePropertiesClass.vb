@@ -2,6 +2,9 @@
 Option Explicit On
 Option Strict On
 
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
+
 Namespace Contensive.Core.Models.Context
     '
     '====================================================================================================
@@ -27,7 +30,7 @@ Namespace Contensive.Core.Models.Context
         Public ReadOnly Property allowVisitTracking() As Boolean
             Get
                 If Not _allowVisitTrackingLoaded Then
-                    _allowVisitTracking = EncodeBoolean(getText("allowVisitTracking", "true"))
+                    _allowVisitTracking = genericController.EncodeBoolean(getText("allowVisitTracking", "true"))
                     _allowVisitTrackingLoaded = True
                 End If
                 Return _allowVisitTracking
@@ -41,7 +44,7 @@ Namespace Contensive.Core.Models.Context
         Public ReadOnly Property allowTransactionLog() As Boolean
             Get
                 If Not _allowTransactionLog_localLoaded Then
-                    _allowTransactionLog_local = EncodeBoolean(getText("UseContentWatchLink", "false"))
+                    _allowTransactionLog_local = genericController.EncodeBoolean(getText("UseContentWatchLink", "false"))
                     _allowTransactionLog_localLoaded = True
                 End If
                 Return _allowTransactionLog_local
@@ -229,7 +232,7 @@ Namespace Contensive.Core.Models.Context
                         '
                         ' read value from property
                         '
-                        _AllowTemplateLinkVerification_Local = EncodeBoolean(TestString)
+                        _AllowTemplateLinkVerification_Local = genericController.EncodeBoolean(TestString)
                     Else
                         '
                         ' Update - template link verification is needed for Template.IsSecure, so turn it on for new sites
@@ -353,7 +356,7 @@ Namespace Contensive.Core.Models.Context
                 Dim Position As Integer
                 If Not _AdminURL_LocalLoaded Then
                     _AdminURL_Local = getText("AdminURL", cpCore.serverConfig.appConfig.adminRoute)
-                    Position = vbInstr(1, _AdminURL_Local, "?")
+                    Position = genericController.vbInstr(1, _AdminURL_Local, "?")
                     If Position <> 0 Then
                         _AdminURL_Local = Mid(_AdminURL_Local, 1, Position - 1)
                     End If
@@ -440,7 +443,7 @@ Namespace Contensive.Core.Models.Context
                 SQL = "SELECT ID FROM CCSETUP WHERE NAME=" & cpCore.db.encodeSQLText(propertyName) & " order by id"
                 dt = cpCore.db.executeSql(SQL)
                 If dt.Rows.Count > 0 Then
-                    RecordID = EncodeInteger(dt.Rows(0).Item("ID"))
+                    RecordID = genericController.EncodeInteger(dt.Rows(0).Item("ID"))
                 End If
                 If RecordID <> 0 Then
                     SQL = "UPDATE ccSetup Set FieldValue=" & cpCore.db.encodeSQLText(Value) & ",ModifiedDate=" & SQLNow & " WHERE ID=" & RecordID
@@ -451,7 +454,7 @@ Namespace Contensive.Core.Models.Context
                     SQL = "SELECT ID FROM cccontent WHERE NAME='site properties' order by id"
                     dt = cpCore.db.executeSql(SQL)
                     If dt.Rows.Count > 0 Then
-                        ContentID = EncodeInteger(dt.Rows(0).Item("ID"))
+                        ContentID = genericController.EncodeInteger(dt.Rows(0).Item("ID"))
                     End If
                     'ContentID = csv_GetContentID("Site Properties")
                     SQL = "INSERT INTO ccSetup (ACTIVE,CONTENTCONTROLID,NAME,FIELDVALUE,ModifiedDate,DateAdded)VALUES(" & SQLTrue & "," & cpCore.db.encodeSQLNumber(ContentID) & "," & cpCore.db.encodeSQLText(UCase(propertyName)) & "," & cpCore.db.encodeSQLText(Value) & "," & SQLNow & "," & SQLNow & ");"
@@ -506,7 +509,7 @@ Namespace Contensive.Core.Models.Context
                 SQL = "select FieldValue from ccSetup where name=" & cpCore.db.encodeSQLText(PropertyName) & " order by id"
                 dt = cpCore.db.executeSql(SQL)
                 If dt.Rows.Count > 0 Then
-                    returnString = EncodeText(dt.Rows(0).Item("FieldValue"))
+                    returnString = genericController.encodeText(dt.Rows(0).Item("FieldValue"))
                     return_propertyFound = True
                 ElseIf (DefaultValue <> "") Then
                     ' do not set - set may have to save, and save needs contentId, which now loads ondemand, which checks cache, which does a getSiteProperty.
@@ -572,7 +575,7 @@ Namespace Contensive.Core.Models.Context
         ''' <param name="DefaultValue"></param>
         ''' <returns></returns>
         Public Function getinteger(ByVal PropertyName As String, Optional ByVal DefaultValue As Integer = 0) As Integer
-            Return EncodeInteger(getText(PropertyName, DefaultValue.ToString))
+            Return genericController.EncodeInteger(getText(PropertyName, DefaultValue.ToString))
         End Function
         '
         '========================================================================
@@ -583,7 +586,11 @@ Namespace Contensive.Core.Models.Context
         ''' <param name="DefaultValue"></param>
         ''' <returns></returns>
         Public Function getBoolean(ByVal PropertyName As String, Optional ByVal DefaultValue As Boolean = False) As Boolean
-            Return EncodeBoolean(getText(PropertyName, DefaultValue.ToString))
+            Return genericController.EncodeBoolean(getText(PropertyName, DefaultValue.ToString))
+        End Function
+        '
+        Public Function getDate(ByVal PropertyName As String, Optional ByVal DefaultValue As Date = Nothing) As Date
+            Return genericController.EncodeDate(getText(PropertyName, DefaultValue.ToString))
         End Function
         '
         '====================================================================================================
@@ -599,7 +606,7 @@ Namespace Contensive.Core.Models.Context
                 'Return True
                 Dim propertyFound As Boolean = False
                 If Not siteProperty_AllowCache_LocalLoaded Then
-                    siteProperty_AllowCache_Local = EncodeBoolean(getText_noCache("AllowBake", "0", propertyFound))
+                    siteProperty_AllowCache_Local = genericController.EncodeBoolean(getText_noCache("AllowBake", "0", propertyFound))
                     siteProperty_AllowCache_LocalLoaded = True
                 End If
                 allowCache_notCached = siteProperty_AllowCache_Local

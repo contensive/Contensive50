@@ -393,8 +393,10 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="constantsModule.vb" />
+    <Compile Include="constants.vb" />
+    <Compile Include="Controllers\csController.vb" />
     <Compile Include="Controllers\dbEngineController.vb" />
+    <Compile Include="Controllers\genericController.vb" />
     <Compile Include="Controllers\iisController.vb" />
     <Compile Include="addonLegacyModel.vb" />
     <Compile Include="Controllers\addonController.vb" />
@@ -402,9 +404,8 @@
     <Compile Include="coreDocPropertiesClass.vb" />
     <Compile Include="Models\Entity\domainLegacyModel.vb" />
     <Compile Include="coreEncodeBase64Class.vb" />
-    <Compile Include="Controllers\pageManagerController.vb" />
-    <Compile Include="Interfaces\_blankAddon.vb" />
-    <Compile Include="Interfaces\toolConfigureEdit.vb" />
+    <Compile Include="addon_pageManager\pageManagerController.vb" />
+    <Compile Include="addon_tools\addon_toolConfigureEdit.vb" />
     <Compile Include="Models\Context\coreSitePropertiesClass.vb" />
     <Compile Include="coreUserClass.vb" />
     <Compile Include="coreWebServerIOClass.vb" />
@@ -412,8 +413,8 @@
     <Compile Include="coreCacheKeyPtrClass.vb" />
     <Compile Include="coreSecurityClass.vb" />
     <Compile Include="Controllers\addonInstallClass.vb" />
-    <Compile Include="Interfaces\addon_AddonMngrSafeClass.vb" />
-    <Compile Include="Interfaces\addon_AdminClass.vb" />
+    <Compile Include="addon_addonMngr\addon_AddonMngrSafeClass.vb" />
+    <Compile Include="addon_adminSite\addon_AdminClass.vb" />
     <Compile Include="coreAdminUIClass.vb" />
     <Compile Include="Controllers\dbController.vb" />
     <Compile Include="coreClusterClass.vb" />
@@ -468,11 +469,11 @@
     <Compile Include="coreMenuTabClass.vb" />
     <Compile Include="coreMenuTreeClass.vb" />
     <Compile Include="Controllers\appBuilderController.vb" />
-    <Compile Include="Models\Context\_blankModel.vb" />
     <Compile Include="Models\Entity\serverConfigModel.vb" />
     <Compile Include="Models\Entity\dataSourceModel.vb" />
     <Compile Include="Models\Entity\_blankCachedModel.vb" />
     <Compile Include="Models\Entity\addonModel.vb" />
+    <Compile Include="Models\Entity\groupModel.vb" />
     <Compile Include="Models\Entity\_blankModel.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

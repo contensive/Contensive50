@@ -3,6 +3,7 @@ Option Explicit On
 Option Strict On
 
 Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 
 Namespace Contensive.Core
     Public Class coreWorkflowClass
@@ -84,13 +85,13 @@ Namespace Contensive.Core
                 Dim ReturnMemberID As Integer
                 Dim ReturnDateExpires As Date
                 '
-                main_EditLockContentRecordKey_Local = (ContentName & EncodeText(RecordID))
+                main_EditLockContentRecordKey_Local = (ContentName & genericController.encodeText(RecordID))
                 main_EditLockDateExpires_Local = Date.MinValue
                 main_EditLockMemberID_Local = 0
                 main_EditLockMemberName_Local = ""
                 main_EditLockStatus_Local = False
                 '
-                main_EditLockStatus_Local = getEditLock(EncodeText(ContentName), EncodeInteger(RecordID), ReturnMemberID, ReturnDateExpires)
+                main_EditLockStatus_Local = getEditLock(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), ReturnMemberID, ReturnDateExpires)
                 If main_EditLockStatus_Local And (ReturnMemberID <> cpCore.user.id) Then
                     main_EditLockStatus_Local = True
                     main_EditLockDateExpires_Local = ReturnDateExpires
@@ -111,7 +112,7 @@ Namespace Contensive.Core
             Try
                 Dim CS As Integer
                 '
-                If (main_EditLockContentRecordKey_Local <> (ContentName & EncodeText(RecordID))) Then
+                If (main_EditLockContentRecordKey_Local <> (ContentName & genericController.encodeText(RecordID))) Then
                     Call GetEditLockStatus(ContentName, RecordID)
                 End If
                 If main_EditLockStatus_Local Then
@@ -142,7 +143,7 @@ Namespace Contensive.Core
         Public Function GetEditLockDateExpires(ByVal ContentName As String, ByVal RecordID As Integer) As Date
             Dim returnDate As Date = Date.MinValue
             Try
-                If (main_EditLockContentRecordKey_Local <> (ContentName & EncodeText(RecordID))) Then
+                If (main_EditLockContentRecordKey_Local <> (ContentName & genericController.encodeText(RecordID))) Then
                     Call GetEditLockStatus(ContentName, RecordID)
                 End If
                 If main_EditLockStatus_Local Then
@@ -159,7 +160,7 @@ Namespace Contensive.Core
         '========================================================================
         '
         Public Sub SetEditLock(ByVal ContentName As String, ByVal RecordID As Integer)
-            Call setEditLock(EncodeText(ContentName), EncodeInteger(RecordID), cpCore.user.id)
+            Call setEditLock(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.user.id)
         End Sub
         '
         '========================================================================
@@ -167,7 +168,7 @@ Namespace Contensive.Core
         '========================================================================
         '
         Public Sub ClearEditLock(ByVal ContentName As String, ByVal RecordID As Integer)
-            Call clearEditLock(EncodeText(ContentName), EncodeInteger(RecordID), cpCore.user.id)
+            Call clearEditLock(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.user.id)
         End Sub
         '
         '========================================================================
@@ -175,7 +176,7 @@ Namespace Contensive.Core
         '========================================================================
         '
         Public Sub publishEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-            Call publishEdit(EncodeText(ContentName), EncodeInteger(RecordID), cpCore.user.id)
+            Call publishEdit(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.user.id)
         End Sub
         '
         '========================================================================
@@ -183,7 +184,7 @@ Namespace Contensive.Core
         '========================================================================
         '
         Public Sub approveEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-            Call approveEdit(EncodeText(ContentName), EncodeInteger(RecordID), cpCore.user.id)
+            Call approveEdit(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.user.id)
         End Sub
         '
         '========================================================================
@@ -191,7 +192,7 @@ Namespace Contensive.Core
         '========================================================================
         '
         Public Sub main_SubmitEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-            Call submitEdit2(EncodeText(ContentName), EncodeInteger(RecordID), cpCore.user.id)
+            Call submitEdit2(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.user.id)
         End Sub
         '
         '=========================================================================================
@@ -201,7 +202,7 @@ Namespace Contensive.Core
         '=========================================================================================
         '
         Public Function isWorkflowAuthoringCompatible(ByVal ContentName As String) As Boolean
-            isWorkflowAuthoringCompatible = EncodeBoolean(cpCore.GetContentProperty(EncodeText(ContentName), "ALLOWWORKFLOWAUTHORING"))
+            isWorkflowAuthoringCompatible = genericController.EncodeBoolean(cpCore.GetContentProperty(genericController.encodeText(ContentName), "ALLOWWORKFLOWAUTHORING"))
         End Function
         '
         '==========================================================================================
@@ -290,8 +291,8 @@ Namespace Contensive.Core
                             Call cpCore.handleExceptionAndRethrow(New ApplicationException("During record publishing, there was an error opening the live record, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
                         Else
                             If True Then
-                                LiveRecordID = EncodeInteger(cpCore.db.getDataRowColumnName(RSLive.Rows(0), "ID"))
-                                LiveRecordBlank = EncodeBoolean(cpCore.db.getDataRowColumnName(RSLive.Rows(0), "EditBlank"))
+                                LiveRecordID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(RSLive.Rows(0), "ID"))
+                                LiveRecordBlank = genericController.EncodeBoolean(cpCore.db.getDataRowColumnName(RSLive.Rows(0), "EditBlank"))
                                 '
                                 ' ----- Open the edit record
                                 '
@@ -302,11 +303,11 @@ Namespace Contensive.Core
                                     Call cpCore.handleExceptionAndRethrow(New ApplicationException("During record publishing, there was an error opening the edit record [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
                                 Else
                                     If True Then
-                                        EditRecordID = EncodeInteger(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), "ID"))
-                                        EditRecordCID = EncodeInteger(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), "ContentControlID"))
-                                        EditRecordBlank = EncodeBoolean(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), "EditBlank"))
+                                        EditRecordID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), "ID"))
+                                        EditRecordCID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), "ContentControlID"))
+                                        EditRecordBlank = genericController.EncodeBoolean(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), "EditBlank"))
                                         PublishingDelete = EditRecordBlank
-                                        PublishingInactive = Not EncodeBoolean(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), "active"))
+                                        PublishingInactive = Not genericController.EncodeBoolean(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), "active"))
                                         '
                                         ' ----- Create new Edit record
                                         '
@@ -336,7 +337,7 @@ Namespace Contensive.Core
                                                             '
                                                             ' Process These field types
                                                             '
-                                                            Select Case vbUCase(FieldName)
+                                                            Select Case genericController.vbUCase(FieldName)
                                                                 Case "EDITARCHIVE", "ID", "EDITSOURCEID", "EDITBLANK", "CONTENTCONTROLID"
                                                                 '
                                                                 ' ----- control fields that should not be in any dataset
@@ -363,7 +364,7 @@ Namespace Contensive.Core
                                                                                 '
                                                                                 ' ----- cdn files - create copy of File for neweditrecord
                                                                                 '
-                                                                                EditFilename = EncodeText(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), FieldName))
+                                                                                EditFilename = genericController.encodeText(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), FieldName))
                                                                                 If EditFilename = "" Then
                                                                                     NewEditSqlFieldList.add(FieldName, cpCore.db.encodeSQLText(""))
                                                                                 Else
@@ -376,7 +377,7 @@ Namespace Contensive.Core
                                                                                 '
                                                                                 ' ----- private files - create copy of File for neweditrecord
                                                                                 '
-                                                                                EditFilename = EncodeText(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), FieldName))
+                                                                                EditFilename = genericController.encodeText(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), FieldName))
                                                                                 If EditFilename = "" Then
                                                                                     NewEditSqlFieldList.add(FieldName, cpCore.db.encodeSQLText(""))
                                                                                 Else
@@ -596,7 +597,7 @@ Namespace Contensive.Core
                                 '
                                 Call cpCore.handleExceptionAndRethrow(New ApplicationException("During record publishing, the live record could not be found, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
                             Else
-                                LiveRecordID = EncodeInteger(cpCore.db.getDataRowColumnName(RSLive.Rows(0), "ID"))
+                                LiveRecordID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(RSLive.Rows(0), "ID"))
                                 '
                                 ' Open the edit record
                                 '
@@ -609,7 +610,7 @@ Namespace Contensive.Core
                                         '
                                         Call cpCore.handleExceptionAndRethrow(New ApplicationException("During record publishing, the edit record could not be found, [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
                                     Else
-                                        EditRecordID = EncodeInteger(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), "ID"))
+                                        EditRecordID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), "ID"))
                                         '
                                         ' create update arrays
                                         '
@@ -621,7 +622,7 @@ Namespace Contensive.Core
                                                 If cpCore.db.isSQLTableField(EditDataSourceName, EditTableName, FieldName) Then
                                                     fieldTypeId = .fieldTypeId
                                                     LiveSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSLive.Rows(0), FieldName), fieldTypeId)
-                                                    Select Case vbUCase(FieldName)
+                                                    Select Case genericController.vbUCase(FieldName)
                                                         Case "EDITARCHIVE", "ID", "EDITSOURCEID"
                                                             '
                                                             '   block from dataset
@@ -634,7 +635,7 @@ Namespace Contensive.Core
                                                                 '
                                                                 '   cdnfiles - create copy of Live TextFile for Edit record
                                                                 '
-                                                                LiveFilename = EncodeText(cpCore.db.getDataRowColumnName(RSLive.Rows(0), FieldName))
+                                                                LiveFilename = genericController.encodeText(cpCore.db.getDataRowColumnName(RSLive.Rows(0), FieldName))
                                                                 If LiveFilename <> "" Then
                                                                     EditFilename = csv_GetVirtualFilenameByTable(EditTableName, FieldName, EditRecordID, "", fieldTypeId)
                                                                     Call cpCore.cdnFiles.copyFile(LiveFilename, EditFilename)
@@ -645,7 +646,7 @@ Namespace Contensive.Core
                                                                 '
                                                                 '   pivatefiles - create copy of Live TextFile for Edit record
                                                                 '
-                                                                LiveFilename = EncodeText(cpCore.db.getDataRowColumnName(RSLive.Rows(0), FieldName))
+                                                                LiveFilename = genericController.encodeText(cpCore.db.getDataRowColumnName(RSLive.Rows(0), FieldName))
                                                                 If LiveFilename <> "" Then
                                                                     EditFilename = csv_GetVirtualFilenameByTable(EditTableName, FieldName, EditRecordID, "", fieldTypeId)
                                                                     Call cpCore.privateFiles.copyFile(LiveFilename, EditFilename)
@@ -859,7 +860,7 @@ Namespace Contensive.Core
                                         Call cpCore.db.cs_setField(CSNewLock, "RecordID", RecordID)
                                         Call cpCore.db.cs_setField(CSNewLock, "DateExpires", (Now.AddDays(EditLockTimeoutDays)))
                                         Call cpCore.db.cs_setField(CSNewLock, "ControlType", AuthoringControlsEditing)
-                                        Call cpCore.db.cs_setField(CSNewLock, "ContentRecordKey", EncodeText(ContentID & "." & RecordID))
+                                        Call cpCore.db.cs_setField(CSNewLock, "ContentRecordKey", genericController.encodeText(ContentID & "." & RecordID))
                                         Call cpCore.db.cs_setField(CSNewLock, "ContentID", ContentID)
                                     End If
                                     Call cpCore.db.cs_Close(CSNewLock)
@@ -885,7 +886,7 @@ Namespace Contensive.Core
                                     If cpCore.db.cs_ok(CSNewLock) Then
                                         Call cpCore.db.cs_setField(CSNewLock, "RecordID", RecordID)
                                         Call cpCore.db.cs_setField(CSNewLock, "ControlType", AuthoringControl)
-                                        Call cpCore.db.cs_setField(CSNewLock, "ContentRecordKey", EncodeText(ContentID & "." & RecordID))
+                                        Call cpCore.db.cs_setField(CSNewLock, "ContentRecordKey", genericController.encodeText(ContentID & "." & RecordID))
                                         Call cpCore.db.cs_setField(CSNewLock, "ContentID", ContentID)
                                     End If
                                     Call cpCore.db.cs_Close(CSNewLock)
@@ -896,7 +897,7 @@ Namespace Contensive.Core
                                     'Call csv_SetCSField(CSCurrentLock, "ContentID", ContentID)
                                     'Call csv_SetCSField(CSCurrentLock, "RecordID", RecordID)
                                     'Call csv_SetCSField(CSCurrentLock, "ControlType", AuthoringControl)
-                                    'Call csv_SetCSField(CSCurrentLock, "ContentRecordKey", encodeText(ContentID & "." & RecordID))
+                                    'Call csv_SetCSField(CSCurrentLock, "ContentRecordKey", genericController.encodeText(ContentID & "." & RecordID))
                                 End If
                                 Call cpCore.db.cs_Close(CSCurrentLock)
                             End If
@@ -984,8 +985,8 @@ Namespace Contensive.Core
                             & " ORDER BY AuthoringTableName.ID DESC;"
                             rs = cpCore.db.executeSql(SQL, DataSourceName)
                             If isDataTableOk(rs) Then
-                                IsInserted = EncodeBoolean(cpCore.db.getDataRowColumnName(rs.Rows(0), "IsInserted"))
-                                IsDeleted = EncodeBoolean(cpCore.db.getDataRowColumnName(rs.Rows(0), "IsDeleted"))
+                                IsInserted = genericController.EncodeBoolean(cpCore.db.getDataRowColumnName(rs.Rows(0), "IsInserted"))
+                                IsDeleted = genericController.EncodeBoolean(cpCore.db.getDataRowColumnName(rs.Rows(0), "IsDeleted"))
                                 'IsModified = (getDataRowColumnName(RS.rows(0), "LiveRecordModifiedDate") <> getDataRowColumnName(RS.rows(0), "EditRecordModifiedDate"))
                             End If
                             Call closeDataTable(rs)
@@ -1049,7 +1050,7 @@ Namespace Contensive.Core
                 Dim EditLockKey2 As String
                 '
                 If (ContentName <> "") And (RecordID <> 0) Then
-                    EditLockKey2 = vbUCase(ContentName & "," & CStr(RecordID))
+                    EditLockKey2 = genericController.vbUCase(ContentName & "," & CStr(RecordID))
                     StringBuffer = cpCore.siteProperties.getText("EditLockTimeout", "5")
                     EditLockTimeoutMinutes = EncodeNumber(StringBuffer)
                     EditLockDateExpires = DateTime.Now.AddMinutes(EditLockTimeoutMinutes)
@@ -1135,7 +1136,7 @@ Namespace Contensive.Core
                 Dim DateNow As Date
                 '
                 If (ContentName <> "") And (RecordID <> 0) And (EditLockCount > 0) Then
-                    EditLockKey2 = vbUCase(ContentName & "," & CStr(RecordID))
+                    EditLockKey2 = genericController.vbUCase(ContentName & "," & CStr(RecordID))
                     DateNow = DateTime.Now
                     For SourcePointer = 0 To EditLockCount - 1
                         If (EditLockArray(SourcePointer).Key = EditLockKey2) Then

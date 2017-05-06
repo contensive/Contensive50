@@ -2,6 +2,8 @@
 Option Explicit On
 Option Strict On
 
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 Imports System.IO
 Imports ICSharpCode.SharpZipLib.Core
 Imports ICSharpCode.SharpZipLib.Zip
@@ -294,13 +296,13 @@ Namespace Contensive.Core
                 Else
                     WorkingPath = normalizePath(physicalFolderPath)
                     If Not Directory.Exists(WorkingPath) Then
-                        Position = vbInstr(1, WorkingPath, "\")
+                        Position = genericController.vbInstr(1, WorkingPath, "\")
                         Do While Position <> 0
                             PartialPath = Mid(WorkingPath, 1, Position - 1)
                             If Not Directory.Exists(PartialPath) Then
                                 Call Directory.CreateDirectory(PartialPath)
                             End If
-                            Position = vbInstr(Position + 1, WorkingPath, "\")
+                            Position = genericController.vbInstr(Position + 1, WorkingPath, "\")
                         Loop
                     End If
                 End If
@@ -730,7 +732,7 @@ Namespace Contensive.Core
                 '
                 If (pathFilename <> "") And (Link <> "") Then
                     pathFilename = normalizePathFilename(pathFilename)
-                    URLLink = vbReplace(Link, " ", "%20")
+                    URLLink = genericController.vbReplace(Link, " ", "%20")
                     HTTP.timeout = 600
                     Call HTTP.getUrlToFile(CStr(URLLink), convertToAbsPath(pathFilename))
                 End If

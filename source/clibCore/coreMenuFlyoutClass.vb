@@ -1,6 +1,9 @@
 ﻿
 Option Explicit On
 Option Strict On
+
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 '
 Namespace Contensive.Core
     Public Class coreMenuFlyoutClass
@@ -168,8 +171,8 @@ ErrorTrap:
             Dim UcaseEntryName As String
             Dim iNewWindow As Boolean
             '
-            iEntryName = vbReplace(encodeEmptyText(EntryName, ""), ",", " ")
-            UcaseEntryName = vbUCase(iEntryName)
+            iEntryName = genericController.vbReplace(encodeEmptyText(EntryName, ""), ",", " ")
+            UcaseEntryName = genericController.vbUCase(iEntryName)
             '
             If (iEntryName <> "") And (InStr(1, UsedEntries & ",", "," & UcaseEntryName & ",", vbBinaryCompare) = 0) Then
                 UsedEntries = UsedEntries & "," & UcaseEntryName
@@ -193,7 +196,7 @@ ErrorTrap:
                     End If
                     .CaptionImage = encodeEmptyText(CaptionImageLink, "")
                     .Name = UcaseEntryName
-                    .ParentName = vbUCase(encodeEmptyText(ParentiEntryName, ""))
+                    .ParentName = genericController.vbUCase(encodeEmptyText(ParentiEntryName, ""))
                     .ImageOver = ImageOverLink
                     .NewWindow = NewWindow
                 End With
@@ -227,7 +230,7 @@ ErrorTrap:
             Dim EndOfLine As Integer
             '
             ReadLine = ""
-            EndOfLine = vbInstr(StartPosition, Source, vbCrLf)
+            EndOfLine = genericController.vbInstr(StartPosition, Source, vbCrLf)
             If EndOfLine <> 0 Then
                 ReadLine = Mid(Source, StartPosition, EndOfLine)
                 StartPosition = EndOfLine + 2
@@ -274,7 +277,7 @@ ErrorTrap:
                     If LocalStyleSheetPrefix = "" Then
                         LocalStyleSheetPrefix = "ccFlyout"
                     End If
-                    UcaseMenuName = vbUCase(MenuName)
+                    UcaseMenuName = genericController.vbUCase(MenuName)
                     For EntryPointer = 0 To iEntryCount - 1
                         If iEntry(EntryPointer).Name = UcaseMenuName Then
                             Exit For
@@ -284,7 +287,7 @@ ErrorTrap:
                         MouseClickCode = ""
                         MouseOverCode = ""
                         MouseOutCode = ""
-                        ImageID = "img" & CStr(GetRandomInteger()) & "s"
+                        ImageID = "img" & CStr(genericController.GetRandomInteger()) & "s"
                         FlyoutStyle = LocalStyleSheetPrefix & "Button"
                         '
                         Select Case MenuStyle

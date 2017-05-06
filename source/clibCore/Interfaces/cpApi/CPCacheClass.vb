@@ -1,5 +1,11 @@
+
+Option Explicit On
+Option Strict On
+
 Imports Contensive.BaseClasses
 Imports System.Runtime.InteropServices
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 
 Namespace Contensive.Core
     '
@@ -76,7 +82,7 @@ Namespace Contensive.Core
                 If String.IsNullOrEmpty(invalidationTagCommaList.Trim) Then
                     '
                 Else
-                    invalidationTagList.AddRange(invalidationTagCommaList.Split(","))
+                    invalidationTagList.AddRange(invalidationTagCommaList.Split(","c))
                 End If
                 If (invalidationDate = #12:00:00 AM#) Then
                     Call cpCore.cache.setKey(key, Value, invalidationTagList)
@@ -97,19 +103,19 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function getInteger(key As String) As Integer
-            Return EncodeInteger(getObject(key))
+            Return genericController.EncodeInteger(getObject(key))
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Function getBoolean(key As String) As Boolean
-            Return EncodeBoolean(getObject(key))
+            Return genericController.EncodeBoolean(getObject(key))
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Function getDate(key As String) As Date
-            Return EncodeDate(getObject(key))
+            Return  genericController.EncodeDate(getObject(key))
         End Function
         '
         '====================================================================================================
@@ -121,7 +127,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function getText(key As String) As String
-            Return EncodeText(getObject(key))
+            Return genericController.encodeText(getObject(key))
         End Function
         '
         '====================================================================================================
@@ -160,7 +166,7 @@ Namespace Contensive.Core
         ''' <param name="value"></param>
         ''' <param name="invalidationDate"></param>
         Public Overrides Sub SetKey(key As String, value As Object, invalidationDate As Date)
-            cpCore.cache.setKey(key, value, invalidationDate)
+            cpCore.cache.setKey(key, value, invalidationDate, "")
         End Sub
         '
         '====================================================================================================

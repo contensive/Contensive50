@@ -2,6 +2,8 @@
 Option Explicit On
 Option Strict On
 
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 Imports Contensive.BaseClasses
 Imports System.Runtime.InteropServices
 
@@ -434,7 +436,7 @@ Namespace Contensive.Core
         '=======================================================================================================
         '
         Public Overrides Function GetBoolean(PropertyName As String, Optional DefaultValue As String = "") As Boolean
-            Return cpCore.userProperty.getBoolean(PropertyName, EncodeBoolean(DefaultValue))
+            Return cpCore.userProperty.getBoolean(PropertyName, genericController.EncodeBoolean(DefaultValue))
         End Function
         '
         '=======================================================================================================
@@ -442,7 +444,7 @@ Namespace Contensive.Core
         '=======================================================================================================
         '
         Public Overrides Function GetDate(PropertyName As String, Optional DefaultValue As String = "") As Date
-            Return cpCore.userProperty.getDate(PropertyName, EncodeDate(DefaultValue))
+            Return cpCore.userProperty.getDate(PropertyName,  genericController.EncodeDate(DefaultValue))
         End Function
         '
         '=======================================================================================================
@@ -450,7 +452,7 @@ Namespace Contensive.Core
         '=======================================================================================================
         '
         Public Overrides Function GetInteger(PropertyName As String, Optional DefaultValue As String = "") As Integer
-            Return cpCore.userProperty.getInteger(PropertyName, EncodeInteger(DefaultValue))
+            Return cpCore.userProperty.getInteger(PropertyName, genericController.EncodeInteger(DefaultValue))
         End Function
         '
         '=======================================================================================================

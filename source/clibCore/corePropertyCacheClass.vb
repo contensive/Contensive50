@@ -3,7 +3,8 @@ Option Explicit On
 Option Strict On
 
 Imports Contensive.Core.Controllers
-'
+Imports Contensive.Core.Controllers.genericController
+
 Namespace Contensive.Core
     Public Class corePropertyCacheClass
         '
@@ -131,7 +132,7 @@ Namespace Contensive.Core
                 Call db.cs_Close(CS)
             ElseIf propertyCache(1, Ptr) <> PropertyValue Then
                 propertyCache(1, Ptr) = PropertyValue
-                RecordID = EncodeInteger(propertyCache(2, Ptr))
+                RecordID = genericController.EncodeInteger(propertyCache(2, Ptr))
                 SQLNow = db.encodeSQLDate(Now)
                 '
                 ' save the value in the property that was found
@@ -190,7 +191,7 @@ ErrorTrap:
         ''' <param name="keyId"></param>
         ''' <returns></returns>
         Public Function getDate(ByVal propertyName As String, ByVal defaultValue As Date, ByVal keyId As Integer) As Date
-            Return EncodeDate(getText(propertyName, EncodeText(defaultValue), keyId))
+            Return genericController.EncodeDate(getText(propertyName, genericController.encodeText(defaultValue), keyId))
         End Function
         '
         '====================================================================================================
@@ -234,7 +235,7 @@ ErrorTrap:
         ''' <param name="keyId"></param>
         ''' <returns></returns>
         Public Function getNumber(ByVal propertyName As String, ByVal defaultValue As Double, ByVal keyId As Integer) As Double
-            Return EncodeNumber(getText(propertyName, EncodeText(defaultValue), keyId))
+            Return EncodeNumber(getText(propertyName, genericController.encodeText(defaultValue), keyId))
         End Function
         '
         '====================================================================================================
@@ -278,7 +279,7 @@ ErrorTrap:
         ''' <param name="keyId"></param>
         ''' <returns></returns>
         Public Function getBoolean(ByVal propertyName As String, ByVal defaultValue As Boolean, ByVal keyId As Integer) As Boolean
-            Return EncodeBoolean(getText(propertyName, EncodeText(defaultValue), keyId))
+            Return genericController.EncodeBoolean(getText(propertyName, genericController.encodeText(defaultValue), keyId))
         End Function
         '
         '====================================================================================================
@@ -322,7 +323,7 @@ ErrorTrap:
         ''' <param name="keyId"></param>
         ''' <returns></returns>
         Public Function getInteger(ByVal propertyName As String, ByVal defaultValue As Integer, ByVal keyId As Integer) As Integer
-            Return EncodeInteger(getText(propertyName, EncodeText(defaultValue), keyId))
+            Return genericController.EncodeInteger(getText(propertyName, genericController.encodeText(defaultValue), keyId))
         End Function
         '
         '====================================================================================================
@@ -379,7 +380,7 @@ ErrorTrap:
                 If propertyCacheCnt > 0 Then
                     Ptr = propertyCache_nameIndex.getPtr(propertyName)
                     If Ptr >= 0 Then
-                        returnString = EncodeText(propertyCache(1, Ptr))
+                        returnString = genericController.encodeText(propertyCache(1, Ptr))
                         Found = True
                     End If
                 End If
@@ -410,10 +411,10 @@ ErrorTrap:
                     propertyCacheCnt = 0
                     ReDim propertyCache(2, dt.Rows.Count - 1)
                     For Each dr As DataRow In dt.Rows
-                        Name = EncodeText(dr(0))
+                        Name = genericController.encodeText(dr(0))
                         propertyCache(0, propertyCacheCnt) = Name
-                        propertyCache(1, propertyCacheCnt) = EncodeText(dr(1))
-                        propertyCache(2, propertyCacheCnt) = EncodeInteger(dr(2)).ToString
+                        propertyCache(1, propertyCacheCnt) = genericController.encodeText(dr(1))
+                        propertyCache(2, propertyCacheCnt) = genericController.EncodeInteger(dr(2)).ToString
                         Call propertyCache_nameIndex.setPtr(LCase(Name), propertyCacheCnt)
                         propertyCacheCnt += 1
                     Next

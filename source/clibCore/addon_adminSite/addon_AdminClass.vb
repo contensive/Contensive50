@@ -2,6 +2,8 @@
 Option Explicit On
 Option Strict On
 '
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 Imports Contensive.Core.coreCommonModule
 Imports System.Xml
 Imports Contensive.Core
@@ -58,7 +60,7 @@ Namespace Contensive.Addons
                 Next
                 If Not IsNothing(cpCore.webServerIO.requestFormBinaryHeader) Then
                     BinaryHeader = cpCore.webServerIO.requestFormBinaryHeader
-                    BinaryHeaderString = kmaByteArrayToString(BinaryHeader)
+                    BinaryHeaderString = genericController.kmaByteArrayToString(BinaryHeader)
                     SaveContent &= "" _
                         & vbCrLf & "----------" _
                         & vbCrLf & "binary header:" _
@@ -263,7 +265,7 @@ leak200:
                     & ""
                 Call Stream.Add("" _
                     & cr & "<div style=""display:table;margin:100px auto auto auto;"">" _
-                    & kmaIndent(s) _
+                    & genericController.kmaIndent(s) _
                     & cr & "</div>" _
                     & "")
             Else
@@ -333,8 +335,8 @@ leak200:
                 If (AdminSourceForm = AdminFormEdit) Then
                     If (Not cpCore.error_IsUserError()) And cpCore.main_ReturnAfterEdit And ((AdminButton = ButtonOK) Or (AdminButton = ButtonCancel) Or (AdminButton = ButtonDelete) Or (AdminButton = ButtonPublish) Or (AdminButton = ButtonPublishApprove) Or (AdminButton = ButtonAbortEdit) Or (AdminButton = ButtonPublishSubmit)) Then
                         EditReferer = cpCore.docProperties.getText("EditReferer")
-                        CurrentLink = modifyLinkQuery(cpCore.webServerIO_ServerLink, "editreferer", "", False)
-                        CurrentLink = vbLCase(CurrentLink)
+                        CurrentLink = genericController.modifyLinkQuery(cpCore.webServerIO_ServerLink, "editreferer", "", False)
+                        CurrentLink = genericController.vbLCase(CurrentLink)
                         '
                         ' check if this editreferer includes cid=thisone and id=thisone -- if so, go to index form for this cid
                         '
@@ -369,13 +371,13 @@ leak200:
                 ' build refresh string
                 '-------------------------------------------------------------------------------
                 '
-                If AdminContent.Id <> 0 Then Call cpCore.webServerIO_addRefreshQueryString("cid", EncodeText(AdminContent.Id))
-                If editRecord.id <> 0 Then Call cpCore.webServerIO_addRefreshQueryString("id", EncodeText(editRecord.id))
+                If AdminContent.Id <> 0 Then Call cpCore.webServerIO_addRefreshQueryString("cid", genericController.encodeText(AdminContent.Id))
+                If editRecord.id <> 0 Then Call cpCore.webServerIO_addRefreshQueryString("id", genericController.encodeText(editRecord.id))
                 If TitleExtension <> "" Then Call cpCore.webServerIO_addRefreshQueryString(RequestNameTitleExtension, cpCore.main_EncodeRequestVariable(TitleExtension))
-                If RecordTop <> 0 Then Call cpCore.webServerIO_addRefreshQueryString("rt", EncodeText(RecordTop))
-                If RecordsPerPage <> RecordsPerPageDefault Then Call cpCore.webServerIO_addRefreshQueryString("rs", EncodeText(RecordsPerPage))
-                If AdminForm <> 0 Then Call cpCore.webServerIO_addRefreshQueryString(RequestNameAdminForm, EncodeText(AdminForm))
-                If MenuDepth <> 0 Then Call cpCore.webServerIO_addRefreshQueryString(RequestNameAdminDepth, EncodeText(MenuDepth))
+                If RecordTop <> 0 Then Call cpCore.webServerIO_addRefreshQueryString("rt", genericController.encodeText(RecordTop))
+                If RecordsPerPage <> RecordsPerPageDefault Then Call cpCore.webServerIO_addRefreshQueryString("rs", genericController.encodeText(RecordsPerPage))
+                If AdminForm <> 0 Then Call cpCore.webServerIO_addRefreshQueryString(RequestNameAdminForm, genericController.encodeText(AdminForm))
+                If MenuDepth <> 0 Then Call cpCore.webServerIO_addRefreshQueryString(RequestNameAdminDepth, genericController.encodeText(MenuDepth))
                 '
                 ' normalize guid
                 '
@@ -575,7 +577,7 @@ leak200:
                     Call Stream.Add(ContentCell)
                 Else
                     Call Stream.Add(cr & GetForm_Top(MenuEntryContentName))
-                    Call Stream.Add(kmaIndent(ContentCell))
+                    Call Stream.Add(genericController.kmaIndent(ContentCell))
                     Call Stream.Add(cr & AdminFormBottom)
                 End If
                 Call Stream.Add(cr & "<script language=""javascript1.2"" type=""text/javascript"">" & JavaScriptString)
@@ -638,7 +640,7 @@ ErrorTrap:
             '
             ' Tab Control
             '
-            allowAdminTabs = EncodeBoolean(cpCore.userProperty.getText("AllowAdminTabs", "1"))
+            allowAdminTabs = genericController.EncodeBoolean(cpCore.userProperty.getText("AllowAdminTabs", "1"))
             If cpCore.docProperties.getText("tabs") <> "" Then
                 If cpCore.doc_getBoolean2("tabs") <> allowAdminTabs Then
                     allowAdminTabs = Not allowAdminTabs
@@ -706,12 +708,12 @@ ErrorTrap:
             '
             WherePairCount = 99
             For WCount = 0 To 99
-                WherePair(0, WCount) = EncodeText(cpCore.docProperties.getText("WL" & WCount))
+                WherePair(0, WCount) = genericController.encodeText(cpCore.docProperties.getText("WL" & WCount))
                 If WherePair(0, WCount) = "" Then
                     WherePairCount = WCount
                     Exit For
                 Else
-                    WherePair(1, WCount) = EncodeText(cpCore.docProperties.getText("WR" & WCount))
+                    WherePair(1, WCount) = genericController.encodeText(cpCore.docProperties.getText("WR" & WCount))
                     Call cpCore.webServerIO_addRefreshQueryString("wl" & WCount, cpCore.main_EncodeRequestVariable(WherePair(0, WCount)))
                     Call cpCore.webServerIO_addRefreshQueryString("wr" & WCount, cpCore.main_EncodeRequestVariable(WherePair(1, WCount)))
                 End If
@@ -719,14 +721,14 @@ ErrorTrap:
             '
             ' Read WhereClauseContent to WherePairCount
             '
-            WhereClauseContent = EncodeText(cpCore.docProperties.getText("wc"))
+            WhereClauseContent = genericController.encodeText(cpCore.docProperties.getText("wc"))
             If (WhereClauseContent <> "") Then
                 '
                 ' ***** really needs a server.URLDecode() function
                 '
                 Call cpCore.webServerIO_addRefreshQueryString("wc", WhereClauseContent)
-                'WhereClauseContent = vbReplace(WhereClauseContent, "%3D", "=")
-                'WhereClauseContent = vbReplace(WhereClauseContent, "%26", "&")
+                'WhereClauseContent = genericController.vbReplace(WhereClauseContent, "%3D", "=")
+                'WhereClauseContent = genericController.vbReplace(WhereClauseContent, "%26", "&")
                 If WhereClauseContent <> "" Then
                     QSSplit = Split(WhereClauseContent, ",")
                     For QSPointer = 0 To UBound(QSSplit)
@@ -795,10 +797,10 @@ ErrorTrap:
                     AdminButton = ""
                     AdminAction = AdminActionEditRefresh
                     AdminForm = AdminFormEdit
-                    Pos = vbInstr(1, fieldEditorPreference, ":")
+                    Pos = genericController.vbInstr(1, fieldEditorPreference, ":")
                     If Pos > 0 Then
-                        fieldEditorFieldId = EncodeInteger(Mid(fieldEditorPreference, 1, Pos - 1))
-                        fieldEditorAddonId = EncodeInteger(Mid(fieldEditorPreference, Pos + 1))
+                        fieldEditorFieldId = genericController.EncodeInteger(Mid(fieldEditorPreference, 1, Pos - 1))
+                        fieldEditorAddonId = genericController.EncodeInteger(Mid(fieldEditorPreference, Pos + 1))
                         If (fieldEditorFieldId <> 0) Then
                             editorOk = True
                             SQL = "select id from ccfields where (active<>0) and id=" & fieldEditorFieldId
@@ -848,7 +850,7 @@ ErrorTrap:
                                     Cnt = UBound(Parts) + 1
                                     If Cnt > 0 Then
                                         For Ptr = 1 To Cnt - 1
-                                            Pos = vbInstr(1, Parts(Ptr), ",")
+                                            Pos = genericController.vbInstr(1, Parts(Ptr), ",")
                                             If Pos = 0 Then
                                                 Parts(Ptr) = ""
                                             ElseIf Pos > 0 Then
@@ -1323,7 +1325,7 @@ ErrorTrap:
                                     '
                                     EmailToConfirmationMemberID = 0
                                     If editRecord.fieldsLc.ContainsKey("testmemberid") Then
-                                        EmailToConfirmationMemberID = EncodeInteger(editRecord.fieldsLc.Item("testmemberid").value)
+                                        EmailToConfirmationMemberID = genericController.EncodeInteger(editRecord.fieldsLc.Item("testmemberid").value)
                                         Call cpCore.email_sendEmailConfirmationTest(editRecord.id, EmailToConfirmationMemberID)
                                         '
                                         If editRecord.fieldsLc.ContainsKey("lastsendtestdate") Then
@@ -1358,7 +1360,7 @@ ErrorTrap:
                                             '
                                             ' Page Content special cases
                                             '
-                                            If vbLCase(adminContent.ContentTableName) = "ccpagecontent" Then
+                                            If genericController.vbLCase(adminContent.ContentTableName) = "ccpagecontent" Then
                                                 Call cpCore.pageManager_cache_pageContent_removeRow(RecordID, False, False)
                                                 If RecordID = (cpCore.siteProperties.getinteger("PageNotFoundPageID", 0)) Then
                                                     Call cpCore.siteProperties.getText("PageNotFoundPageID", "0")
@@ -1689,34 +1691,34 @@ ErrorTrap:
                 '
                 editRecord.menuHeadline = ""
                 If editRecord.fieldsLc.ContainsKey("menuheadline") Then
-                    editRecord.menuHeadline = EncodeText(editRecord.fieldsLc.Item("menuheadline").value)
+                    editRecord.menuHeadline = genericController.encodeText(editRecord.fieldsLc.Item("menuheadline").value)
                 End If
                 '
                 editRecord.menuHeadline = ""
                 If editRecord.fieldsLc.ContainsKey("name") Then
                     'Dim editRecordField As editRecordFieldClass = editRecord.fieldsLc.Item("name")
                     'editRecord.nameLc = editRecordField.value.ToString()
-                    editRecord.nameLc = EncodeText(editRecord.fieldsLc.Item("name").value)
+                    editRecord.nameLc = genericController.encodeText(editRecord.fieldsLc.Item("name").value)
                 End If
                 '
                 editRecord.menuHeadline = ""
                 If editRecord.fieldsLc.ContainsKey("active") Then
-                    editRecord.active = EncodeBoolean(editRecord.fieldsLc.Item("active").value)
+                    editRecord.active = genericController.EncodeBoolean(editRecord.fieldsLc.Item("active").value)
                 End If
                 '
                 editRecord.menuHeadline = ""
                 If editRecord.fieldsLc.ContainsKey("contentcontrolid") Then
-                    editRecord.contentControlId = EncodeInteger(editRecord.fieldsLc.Item("contentcontrolid").value)
+                    editRecord.contentControlId = genericController.EncodeInteger(editRecord.fieldsLc.Item("contentcontrolid").value)
                 End If
                 '
                 editRecord.menuHeadline = ""
                 If editRecord.fieldsLc.ContainsKey("parentid") Then
-                    editRecord.parentID = EncodeInteger(editRecord.fieldsLc.Item("parentid").value)
+                    editRecord.parentID = genericController.EncodeInteger(editRecord.fieldsLc.Item("parentid").value)
                 End If
                 '
                 editRecord.menuHeadline = ""
                 If editRecord.fieldsLc.ContainsKey("rootpageid") Then
-                    editRecord.RootPageID = EncodeInteger(editRecord.fieldsLc.Item("rootpageid").value)
+                    editRecord.RootPageID = genericController.EncodeInteger(editRecord.fieldsLc.Item("rootpageid").value)
                 End If
                 '
                 ' ----- Set the local global copy of Edit Record Locks
@@ -1745,10 +1747,10 @@ ErrorTrap:
                 '
                 ' ----- Set Read Only: if non-developer tries to edit a developer record
                 '
-                If vbUCase(adminContent.ContentTableName) = vbUCase("ccMembers") Then
+                If genericController.vbUCase(adminContent.ContentTableName) = genericController.vbUCase("ccMembers") Then
                     If Not cpCore.user.isAuthenticatedDeveloper Then
                         If editRecord.fieldsLc.ContainsKey("developer") Then
-                            If EncodeBoolean(editRecord.fieldsLc.Item("developer").value) Then
+                            If genericController.EncodeBoolean(editRecord.fieldsLc.Item("developer").value) Then
                                 editRecord.Read_Only = True
                                 cpCore.error_AddUserError("You Do Not have access rights To edit this record.")
                                 BlockEditForm = True
@@ -1785,12 +1787,12 @@ ErrorTrap:
             '
             Dim WhereCount As Integer
             '
-            FieldName = vbUCase(FieldName)
+            FieldName = genericController.vbUCase(FieldName)
             '
             GetWherePairValue = ""
             If WherePairCount > 0 Then
                 For WhereCount = 0 To WherePairCount - 1
-                    If FieldName = vbUCase(WherePair(0, WhereCount)) Then
+                    If FieldName = genericController.vbUCase(WherePair(0, WhereCount)) Then
                         GetWherePairValue = WherePair(1, WhereCount)
                         Exit For
                     End If
@@ -1840,25 +1842,25 @@ ErrorTrap:
                         End If
                         defaultValue = .defaultValue
                         '    End If
-                        If .active And Not IsNull(defaultValue) Then
+                        If .active And Not genericController.IsNull(defaultValue) Then
                             Select Case .fieldTypeId
                                 Case FieldTypeIdInteger, FieldTypeIdAutoIdIncrement, FieldTypeIdMemberSelect
                                     '
-                                    editrecord.fieldsLc(field.nameLc).value = EncodeInteger(defaultValue)
+                                    editrecord.fieldsLc(field.nameLc).value = genericController.EncodeInteger(defaultValue)
                                 Case FieldTypeIdCurrency, FieldTypeIdFloat
                                     '
-                                    editrecord.fieldsLc(field.nameLc).value = EncodeNumber(defaultValue)
+                                    editrecord.fieldsLc(field.nameLc).value = genericController.EncodeNumber(defaultValue)
                                 Case FieldTypeIdBoolean
                                     '
-                                    editrecord.fieldsLc(field.nameLc).value = EncodeBoolean(defaultValue)
+                                    editrecord.fieldsLc(field.nameLc).value = genericController.EncodeBoolean(defaultValue)
                                 Case FieldTypeIdDate
                                     '
-                                    editrecord.fieldsLc(field.nameLc).value = EncodeDate(defaultValue)
+                                    editrecord.fieldsLc(field.nameLc).value = genericController.EncodeDate(defaultValue)
                                 Case FieldTypeIdLookup
 
-                                    DefaultValueText = EncodeText(.defaultValue)
+                                    DefaultValueText = genericController.encodeText(.defaultValue)
                                     If DefaultValueText <> "" Then
-                                        If vbIsNumeric(DefaultValueText) Then
+                                        If genericController.vbIsNumeric(DefaultValueText) Then
                                             editrecord.fieldsLc(field.nameLc).value = DefaultValueText
                                         Else
                                             If .lookupContentID <> 0 Then
@@ -1867,10 +1869,10 @@ ErrorTrap:
                                                     editrecord.fieldsLc(field.nameLc).value = cpCore.main_GetRecordID(LookupContentName, DefaultValueText)
                                                 End If
                                             ElseIf .lookupList <> "" Then
-                                                UCaseDefaultValueText = vbUCase(DefaultValueText)
+                                                UCaseDefaultValueText = genericController.vbUCase(DefaultValueText)
                                                 lookups = Split(.lookupList, ",")
                                                 For Ptr = 0 To UBound(lookups)
-                                                    If UCaseDefaultValueText = vbUCase(lookups(Ptr)) Then
+                                                    If UCaseDefaultValueText = genericController.vbUCase(lookups(Ptr)) Then
                                                         editrecord.fieldsLc(field.nameLc).value = Ptr + 1
                                                         Exit For
                                                     End If
@@ -1881,14 +1883,14 @@ ErrorTrap:
 
                                 Case Else
                                     '
-                                    editrecord.fieldsLc(field.nameLc).value = EncodeText(defaultValue)
+                                    editrecord.fieldsLc(field.nameLc).value = genericController.encodeText(defaultValue)
                             End Select
                         End If
                         '
                         ' process reserved fields (set defaults just makes it look good)
                         ' (also, this presets readonly/devonly/adminonly fields not set to member)
                         '
-                        Select Case vbUCase(.nameLc)
+                        Select Case genericController.vbUCase(.nameLc)
                             'Case "ID"
                             '    .readonlyfield = True
                             '    .Required = False
@@ -1938,16 +1940,16 @@ ErrorTrap:
                         Select Case .fieldTypeId
                             Case FieldTypeIdInteger, FieldTypeIdLookup, FieldTypeIdAutoIdIncrement
                                 '
-                                editRecord.fieldsLc.Item(.nameLc).value = EncodeInteger(DefaultValueText)
+                                editRecord.fieldsLc.Item(.nameLc).value = genericController.EncodeInteger(DefaultValueText)
                             Case FieldTypeIdCurrency, FieldTypeIdFloat
                                 '
-                                editRecord.fieldsLc.Item(.nameLc).value = EncodeNumber(DefaultValueText)
+                                editRecord.fieldsLc.Item(.nameLc).value = genericController.EncodeNumber(DefaultValueText)
                             Case FieldTypeIdBoolean
                                 '
-                                editRecord.fieldsLc.Item(.nameLc).value = EncodeBoolean(DefaultValueText)
+                                editRecord.fieldsLc.Item(.nameLc).value = genericController.EncodeBoolean(DefaultValueText)
                             Case FieldTypeIdDate
                                 '
-                                editRecord.fieldsLc.Item(.nameLc).value = EncodeDate(DefaultValueText)
+                                editRecord.fieldsLc.Item(.nameLc).value = genericController.EncodeDate(DefaultValueText)
                             Case FieldTypeIdManyToMany
                                 '
                                 ' Many to Many can capture a list of ID values representing the 'secondary' values in the Many-To-Many Rules table
@@ -2130,7 +2132,7 @@ ErrorTrap:
                                 '
                                 ' Check for required and null case loading error
                                 '
-                                If CheckUserErrors And .Required And (IsNull(DBValueVariant)) Then
+                                If CheckUserErrors And .Required And (genericController.IsNull(DBValueVariant)) Then
                                     '
                                     ' if required and null
                                     '
@@ -2158,7 +2160,7 @@ ErrorTrap:
                                 '
                                 ' Save EditRecord values
                                 '
-                                Select Case vbUCase(.nameLc)
+                                Select Case genericController.vbUCase(.nameLc)
                                     Case "DATEADDED"
                                         editrecord.dateAdded = cpCore.db.cs_getDate(CSLiveRecord, .nameLc)
                                     Case "MODIFIEDDATE"
@@ -2262,7 +2264,7 @@ ErrorTrap:
                     '
                     ' if page content, check for the 'pagenotfound','landingpageid' checkboxes in control tab
                     '
-                    If vbLCase(adminContent.ContentTableName) = "ccpagecontent" Then
+                    If genericController.vbLCase(adminContent.ContentTableName) = "ccpagecontent" Then
                         '
                         PageNotFoundPageID = (cpCore.siteProperties.getinteger("PageNotFoundPageID", 0))
                         If cpCore.doc_getBoolean2("PageNotFound") Then
@@ -2313,10 +2315,10 @@ ErrorTrap:
         '    FieldFound = False
         '    DataSourceName = cpCore.db.getDataSourceNameByID(AdminContent.DataSourceID)
         '    If (FieldName <> "") Then
-        '        UcaseFieldName = vbUCase(FieldName)
+        '        UcaseFieldName = genericController.vbUCase(FieldName)
         '        If AdminContent.fields.count > 0 Then
         '            For FieldPointer = 0 To AdminContent.fields.count - 1
-        '                If vbUCase(AdminContent.fields(FieldPointer).Name) = UcaseFieldName Then
+        '                If genericController.vbUCase(AdminContent.fields(FieldPointer).Name) = UcaseFieldName Then
         '                    Call LoadEditResponseByPointer(FormID, FieldPointer, DataSourceName)
         '                    FieldFound = True
         '                    Exit For
@@ -2395,19 +2397,19 @@ ErrorTrap:
                     ' Assume OK, mark not ok if there is a problem
                     '
                     ResponseFieldValueIsOKToSave = True
-                    FieldName = vbUCase(.nameLc)
+                    FieldName = genericController.vbUCase(.nameLc)
                     responseName = FieldName
                     InLoadedFieldList = (InStr(1, FormFieldListToBeLoaded, "," & FieldName & ",", vbTextCompare) <> 0)
                     InEmptyFieldList = (InStr(1, FormEmptyFieldList, "," & responseName & ",", vbTextCompare) <> 0)
                     InResponse = cpCore.docProperties.containsKey(responseName)
-                    FormFieldListToBeLoaded = vbReplace(FormFieldListToBeLoaded, "," & FieldName & ",", ",", 1, 99, vbTextCompare)
+                    FormFieldListToBeLoaded = genericController.vbReplace(FormFieldListToBeLoaded, "," & FieldName & ",", ",", 1, 99, vbTextCompare)
                     ResponseFieldValueText = cpCore.web_ReadStreamText(responseName)
                     ResponseFieldIsEmpty = String.IsNullOrEmpty(ResponseFieldValueText)
                     If .editTabName <> "" Then
                         TabCopy = " In the " & .editTabName & " tab"
                     End If
                     '
-                    If vbInstr(1, FieldName, "PARENTID", vbTextCompare) <> 0 Then
+                    If genericController.vbInstr(1, FieldName, "PARENTID", vbTextCompare) <> 0 Then
                         FieldName = FieldName
                     End If
                     '
@@ -2436,8 +2438,8 @@ ErrorTrap:
                             '
                             ResponseFieldValueText = cpCore.web_ReadStreamText(FieldName)
                             'ResponseValueVariant = cpCore.main_ReadStreamText(FieldName)
-                            'ResponseValueText = EncodeText(ResponseValueVariant)
-                            If EncodeInteger(ResponseFieldValueText) = EncodeInteger(editRecord.fieldsLc(.nameLc).value) Then
+                            'ResponseValueText = genericController.encodeText(ResponseValueVariant)
+                            If genericController.EncodeInteger(ResponseFieldValueText) = genericController.EncodeInteger(editRecord.fieldsLc(.nameLc).value) Then
                                 '
                                 ' No change
                                 '
@@ -2463,8 +2465,8 @@ ErrorTrap:
                             End If
                             '
                             ResponseFieldValueText = cpCore.web_ReadStreamText(FieldName)
-                            'ResponseValueText = encodeText(ResponseValueVariant)
-                            If EncodeInteger(ResponseFieldValueText) = EncodeInteger(editRecord.fieldsLc(.nameLc).value) Then
+                            'ResponseValueText = genericController.encodeText(ResponseValueVariant)
+                            If genericController.EncodeInteger(ResponseFieldValueText) = genericController.EncodeInteger(editRecord.fieldsLc(.nameLc).value) Then
                                 '
                                 ' No change
                                 '
@@ -2568,8 +2570,8 @@ ErrorTrap:
                                         '
                                         ResponseFieldIsEmpty = ResponseFieldIsEmpty Or (ResponseFieldValueText = "")
                                         If Not ResponseFieldIsEmpty Then
-                                            If vbIsNumeric(ResponseFieldValueText) Then
-                                                'ResponseValueVariant = EncodeInteger(ResponseValueVariant)
+                                            If genericController.vbIsNumeric(ResponseFieldValueText) Then
+                                                'ResponseValueVariant = genericController.EncodeInteger(ResponseValueVariant)
                                             Else
                                                 cpCore.error_AddUserError("The record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be a numeric value.")
                                                 ResponseFieldValueIsOKToSave = False
@@ -2581,7 +2583,7 @@ ErrorTrap:
                                         '
                                         ResponseFieldIsEmpty = ResponseFieldIsEmpty Or (ResponseFieldValueText = "")
                                         If Not ResponseFieldIsEmpty Then
-                                            If vbIsNumeric(ResponseFieldValueText) Then
+                                            If genericController.vbIsNumeric(ResponseFieldValueText) Then
                                                 'ResponseValueVariant = EncodeNumber(ResponseValueVariant)
                                             Else
                                                 cpCore.error_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be a numeric value.")
@@ -2594,8 +2596,8 @@ ErrorTrap:
                                         '
                                         ResponseFieldIsEmpty = ResponseFieldIsEmpty Or (ResponseFieldValueText = "")
                                         If Not ResponseFieldIsEmpty Then
-                                            If vbIsNumeric(ResponseFieldValueText) Then
-                                                'ResponseValueVariant = EncodeInteger(ResponseValueVariant)
+                                            If genericController.vbIsNumeric(ResponseFieldValueText) Then
+                                                'ResponseValueVariant = genericController.EncodeInteger(ResponseValueVariant)
                                             Else
                                                 cpCore.error_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " had an invalid selection.")
                                                 ResponseFieldValueIsOKToSave = False
@@ -2617,12 +2619,12 @@ ErrorTrap:
                                         '
                                         ' ----- translate to boolean
                                         '
-                                        ResponseFieldValueText = EncodeBoolean(ResponseFieldValueText).ToString
+                                        ResponseFieldValueText = genericController.EncodeBoolean(ResponseFieldValueText).ToString
                                     Case FieldTypeIdLink
                                         '
                                         ' ----- Link field - if it starts with 'www.', add the http:// automatically
                                         '
-                                        ResponseFieldValueText = EncodeText(ResponseFieldValueText)
+                                        ResponseFieldValueText = genericController.encodeText(ResponseFieldValueText)
                                         If Left(LCase(ResponseFieldValueText), 4) = "www." Then
                                             ResponseFieldValueText = "http//" & ResponseFieldValueText
                                         End If
@@ -2640,9 +2642,9 @@ ErrorTrap:
                                         End If
                                         '
                                         If Not .htmlContent Then
-                                            lcaseCopy = vbLCase(ResponseFieldValueText)
-                                            lcaseCopy = vbReplace(lcaseCopy, vbCr, "")
-                                            lcaseCopy = vbReplace(lcaseCopy, vbLf, "")
+                                            lcaseCopy = genericController.vbLCase(ResponseFieldValueText)
+                                            lcaseCopy = genericController.vbReplace(lcaseCopy, vbCr, "")
+                                            lcaseCopy = genericController.vbReplace(lcaseCopy, vbLf, "")
                                             lcaseCopy = Trim(lcaseCopy)
                                             If (lcaseCopy = HTMLEditorDefaultCopyNoCr) Or (lcaseCopy = HTMLEditorDefaultCopyNoCr2) Then
                                                 '
@@ -2650,12 +2652,12 @@ ErrorTrap:
                                                 '
                                                 ResponseFieldValueText = ""
                                             Else
-                                                If vbInstr(1, ResponseFieldValueText, HTMLEditorDefaultCopyStartMark) <> 0 Then
+                                                If genericController.vbInstr(1, ResponseFieldValueText, HTMLEditorDefaultCopyStartMark) <> 0 Then
                                                     '
                                                     ' if the default copy was editing, remote the markers
                                                     '
-                                                    ResponseFieldValueText = vbReplace(ResponseFieldValueText, HTMLEditorDefaultCopyStartMark, "")
-                                                    ResponseFieldValueText = vbReplace(ResponseFieldValueText, HTMLEditorDefaultCopyEndMark, "")
+                                                    ResponseFieldValueText = genericController.vbReplace(ResponseFieldValueText, HTMLEditorDefaultCopyStartMark, "")
+                                                    ResponseFieldValueText = genericController.vbReplace(ResponseFieldValueText, HTMLEditorDefaultCopyEndMark, "")
                                                     'ResponseValueVariant = ResponseValueText
                                                 End If
                                                 '
@@ -2664,7 +2666,7 @@ ErrorTrap:
                                                 '   then cannot fixgure out how to remove it
                                                 '
                                                 ResponseFieldValueText = cpCore.html_DecodeContent(ResponseFieldValueText)
-                                                ResponseFieldValueText = vbLCase(EncodeText(ResponseFieldValueText))
+                                                ResponseFieldValueText = genericController.vbLCase(genericController.encodeText(ResponseFieldValueText))
                                                 If Len(ResponseFieldValueText) < 20 Then
                                                     HasInput = (InStr(1, ResponseFieldValueText, "<input ") <> 0)
                                                     If Not HasInput Then
@@ -2673,7 +2675,7 @@ ErrorTrap:
                                                             HasAC = (InStr(1, ResponseFieldValueText, "<ac ") <> 0)
                                                             If Not HasAC Then
                                                                 HTMLDecode = New coreHtmlToTextClass(cpCore)
-                                                                Copy = Trim(HTMLDecode.convert(EncodeText(ResponseFieldValueText)))
+                                                                Copy = Trim(HTMLDecode.convert(genericController.encodeText(ResponseFieldValueText)))
                                                                 If Copy = "" Then
                                                                     ResponseFieldValueText = ""
                                                                 End If
@@ -2702,7 +2704,7 @@ ErrorTrap:
                                     ' check circular reference on all parentid fields
                                     '
 
-                                    ParentID = EncodeInteger(ResponseFieldValueText)
+                                    ParentID = genericController.EncodeInteger(ResponseFieldValueText)
                                     LoopPtr = 0
                                     UsedIDs = editRecord.id.ToString
                                     Do While (LoopPtr < LoopPtrMax) And (ParentID <> 0) And (InStr(1, "," & UsedIDs & ",", "," & CStr(ParentID) & ",", vbBinaryCompare) = 0)
@@ -2752,11 +2754,11 @@ ErrorTrap:
                                 '
                                 ' special case - people records without Allowduplicateusername require username to be unique
                                 '
-                                If vbLCase(adminContent.ContentTableName) = "ccmembers" Then
-                                    If vbLCase(.nameLc) = "username" Then
+                                If genericController.vbLCase(adminContent.ContentTableName) = "ccmembers" Then
+                                    If genericController.vbLCase(.nameLc) = "username" Then
                                         blockDuplicateUsername = Not (cpCore.siteProperties.getBoolean("allowduplicateusername", False))
                                     End If
-                                    If vbLCase(.nameLc) = "email" Then
+                                    If genericController.vbLCase(.nameLc) = "email" Then
                                         blockDuplicateEmail = (cpCore.siteProperties.getBoolean("allowemaillogin", False))
                                     End If
                                 End If
@@ -3016,15 +3018,15 @@ ErrorTrap:
                     If True Then ' 3.3.930" Then
                         Call cpCore.db.cs_set(CS, "OtherHeadTags", cpCore.docProperties.getText("MetaContent.OtherHeadTags"))
                         MetaKeywordList = cpCore.docProperties.getText("MetaContent.MetaKeywordList")
-                        MetaKeywordList = vbReplace(MetaKeywordList, ",", vbCrLf)
-                        Do While vbInstr(1, MetaKeywordList, vbCrLf & " ") <> 0
-                            MetaKeywordList = vbReplace(MetaKeywordList, vbCrLf & " ", vbCrLf)
+                        MetaKeywordList = genericController.vbReplace(MetaKeywordList, ",", vbCrLf)
+                        Do While genericController.vbInstr(1, MetaKeywordList, vbCrLf & " ") <> 0
+                            MetaKeywordList = genericController.vbReplace(MetaKeywordList, vbCrLf & " ", vbCrLf)
                         Loop
-                        Do While vbInstr(1, MetaKeywordList, " " & vbCrLf) <> 0
-                            MetaKeywordList = vbReplace(MetaKeywordList, " " & vbCrLf, vbCrLf)
+                        Do While genericController.vbInstr(1, MetaKeywordList, " " & vbCrLf) <> 0
+                            MetaKeywordList = genericController.vbReplace(MetaKeywordList, " " & vbCrLf, vbCrLf)
                         Loop
-                        Do While vbInstr(1, MetaKeywordList, vbCrLf & vbCrLf) <> 0
-                            MetaKeywordList = vbReplace(MetaKeywordList, vbCrLf & vbCrLf, vbCrLf)
+                        Do While genericController.vbInstr(1, MetaKeywordList, vbCrLf & vbCrLf) <> 0
+                            MetaKeywordList = genericController.vbReplace(MetaKeywordList, vbCrLf & vbCrLf, vbCrLf)
                         Loop
                         Do While (MetaKeywordList <> "") And (Right(MetaKeywordList, 2) = vbCrLf)
                             MetaKeywordList = Left(MetaKeywordList, Len(MetaKeywordList) - 2)
@@ -3033,7 +3035,7 @@ ErrorTrap:
                     ElseIf cpCore.db.cs_isFieldSupported(CS, "OtherHeadTags") Then
                         Call cpCore.db.cs_set(CS, "OtherHeadTags", cpCore.docProperties.getText("MetaContent.OtherHeadTags"))
                     End If
-                    Call cpCore.main_ProcessCheckList("MetaContent.KeywordList", "Meta Content", EncodeText(MetaContentID), "Meta Keywords", "Meta Keyword Rules", "MetaContentID", "MetaKeywordID")
+                    Call cpCore.main_ProcessCheckList("MetaContent.KeywordList", "Meta Content", genericController.encodeText(MetaContentID), "Meta Keywords", "Meta Keyword Rules", "MetaContentID", "MetaKeywordID")
                 End If
                 Call cpCore.db.cs_Close(CS)
                 '
@@ -3263,19 +3265,19 @@ ErrorTrap:
                         With field
                             Dim editRecordField As editRecordFieldClass = editRecord.fieldsLc(.nameLc)
                             FieldValueVariant = editRecordField.value
-                            FieldValueText = EncodeText(FieldValueVariant)
+                            FieldValueText = genericController.encodeText(FieldValueVariant)
                             FieldChanged = False
                             FieldName = .nameLc
-                            UcaseFieldName = vbUCase(FieldName)
+                            UcaseFieldName = genericController.vbUCase(FieldName)
                             '
                             ' ----- Handle special case fields
                             '
                             Select Case UcaseFieldName
                                 Case "NAME"
                                     '
-                                    editRecord.nameLc = EncodeText(FieldValueVariant)
+                                    editRecord.nameLc = genericController.encodeText(FieldValueVariant)
                                 Case "CCGUID"
-                                    If cpCore.db.cs_getText(CSEditRecord, FieldName) <> EncodeText(FieldValueVariant) Then
+                                    If cpCore.db.cs_getText(CSEditRecord, FieldName) <> genericController.encodeText(FieldValueVariant) Then
                                         FieldChanged = True
                                         RecordChanged = True
                                         Call cpCore.db.cs_set(CSEditRecord, FieldName, FieldValueVariant)
@@ -3283,7 +3285,7 @@ ErrorTrap:
                                         'RecordChanged = True
                                         'Call cpCore.app.SetCS(CSEditRecord, FieldName, FieldValueVariant)
                                 Case "CONTENTCATEGORYID"
-                                    If cpCore.db.cs_getInteger(CSEditRecord, FieldName) <> EncodeInteger(FieldValueVariant) Then
+                                    If cpCore.db.cs_getInteger(CSEditRecord, FieldName) <> genericController.EncodeInteger(FieldValueVariant) Then
                                         FieldChanged = True
                                         RecordChanged = True
                                         Call cpCore.db.cs_set(CSEditRecord, FieldName, FieldValueVariant)
@@ -3296,15 +3298,15 @@ ErrorTrap:
                                     ' block the change from this save
                                     ' Update the content control ID here, for all the children, and all the edit and archive records of both
                                     '
-                                    If editRecord.contentControlId <> EncodeInteger(FieldValueVariant) Then
-                                        SaveCCIDValue = EncodeInteger(FieldValueVariant)
+                                    If editRecord.contentControlId <> genericController.EncodeInteger(FieldValueVariant) Then
+                                        SaveCCIDValue = genericController.EncodeInteger(FieldValueVariant)
                                         RecordChanged = True
                                     End If
                                         '
                                         ' I really do not understand this one - it must have been a copy from somewhere else, or a mistake
                                         'FieldValueVariant = cpCore.main_memberID
                                 Case "ACTIVE"
-                                    If (Not EncodeBoolean(FieldValueVariant)) Then
+                                    If (Not genericController.EncodeBoolean(FieldValueVariant)) Then
                                         '
                                         ' ----- record is being saved inactive, delete contentwatch and contentwatchlistrules
                                         '
@@ -3318,7 +3320,7 @@ ErrorTrap:
                                     '
                                     ' ----- make sure content watch expires before content expires
                                     '
-                                    If (Not IsNull(FieldValueVariant)) Then
+                                    If (Not genericController.IsNull(FieldValueVariant)) Then
                                         If IsDate(FieldValueVariant) Then
                                             Dim fieldValueDate As Date = CDate(FieldValueVariant)
                                             If ContentWatchExpires <= Date.MinValue Then
@@ -3333,7 +3335,7 @@ ErrorTrap:
                                     '
                                     ' ----- make sure content watch expires before content archives
                                     '
-                                    If (Not IsNull(FieldValueVariant)) Then
+                                    If (Not genericController.IsNull(FieldValueVariant)) Then
                                         If IsDate(FieldValueVariant) Then
                                             Dim fieldValueDate As Date = CDate(FieldValueVariant)
                                             If (ContentWatchExpires) <= Date.MinValue Then
@@ -3365,13 +3367,13 @@ ErrorTrap:
                                             FieldChanged = True
                                             Call cpCore.db.cs_setField(CSEditRecord, FieldName, DBNull.Value)
                                         End If
-                                        FieldValueText = EncodeText(FieldValueVariant)
+                                        FieldValueText = genericController.encodeText(FieldValueVariant)
                                         If FieldValueText <> "" Then
                                             Filename = FieldValueText
                                             Dim pathFilename As String = cpCore.db.cs_getFilename(CSEditRecord, FieldName, Filename, adminContent.Name)
                                             Path = pathFilename
-                                            Path = vbReplace(Path, "\", "/")
-                                            Path = vbReplace(Path, "/" & Filename, "")
+                                            Path = genericController.vbReplace(Path, "\", "/")
+                                            Path = genericController.vbReplace(Path, "/" & Filename, "")
                                             cpCore.cdnFiles.saveUpload(FieldName, Path, Filename)
                                             Call cpCore.db.cs_setField(CSEditRecord, FieldName, Path & Filename)
                                             'Call cpCore.web_processFormInputFile(FieldName, cpCore.cdnFiles, Path)
@@ -3382,7 +3384,7 @@ ErrorTrap:
                                         '
                                         ' boolean
                                         '
-                                        If cpCore.db.cs_getBoolean(CSEditRecord, FieldName) <> EncodeBoolean(FieldValueVariant) Then
+                                        If cpCore.db.cs_getBoolean(CSEditRecord, FieldName) <> genericController.EncodeBoolean(FieldValueVariant) Then
                                             RecordChanged = True
                                             FieldChanged = True
                                             Call cpCore.db.cs_set(CSEditRecord, FieldName, FieldValueVariant)
@@ -3392,7 +3394,7 @@ ErrorTrap:
                                         ' Floating pointer numbers
                                         '
                                         testStr = cpCore.db.cs_getText(CSEditRecord, FieldName)
-                                        If testStr <> EncodeText(FieldValueVariant) Then
+                                        If testStr <> genericController.encodeText(FieldValueVariant) Then
                                             'If cpCore.main_cs_getNumber(CSEditRecord, FieldName) <> encodeNumber(FieldValueVariant) Then
                                             RecordChanged = True
                                             FieldChanged = True
@@ -3402,7 +3404,7 @@ ErrorTrap:
                                         '
                                         ' Date
                                         '
-                                        If cpCore.db.cs_getDate(CSEditRecord, FieldName) <> EncodeDate(FieldValueVariant) Then
+                                        If cpCore.db.cs_getDate(CSEditRecord, FieldName) <> genericController.EncodeDate(FieldValueVariant) Then
                                             FieldChanged = True
                                             RecordChanged = True
                                             Call cpCore.db.cs_set(CSEditRecord, FieldName, FieldValueVariant)
@@ -3412,8 +3414,8 @@ ErrorTrap:
                                         ' Integers
                                         '
                                         testStr = cpCore.db.cs_getText(CSEditRecord, FieldName)
-                                        If testStr <> EncodeText(FieldValueVariant) Then
-                                            'If cpCore.app.cs_getInteger(CSEditRecord, FieldName) <> encodeInteger(FieldValueVariant) Then
+                                        If testStr <> genericController.encodeText(FieldValueVariant) Then
+                                            'If cpCore.app.cs_getInteger(CSEditRecord, FieldName) <> genericController.EncodeInteger(FieldValueVariant) Then
                                             FieldChanged = True
                                             RecordChanged = True
                                             Call cpCore.db.cs_set(CSEditRecord, FieldName, FieldValueVariant)
@@ -3422,10 +3424,10 @@ ErrorTrap:
                                         '
                                         ' Text
                                         '
-                                        If cpCore.db.cs_get(CSEditRecord, FieldName) <> EncodeText(FieldValueVariant) Then
+                                        If cpCore.db.cs_get(CSEditRecord, FieldName) <> genericController.encodeText(FieldValueVariant) Then
                                             FieldChanged = True
                                             RecordChanged = True
-                                            Call cpCore.db.cs_set(CSEditRecord, FieldName, EncodeText(FieldValueVariant))
+                                            Call cpCore.db.cs_set(CSEditRecord, FieldName, genericController.encodeText(FieldValueVariant))
                                         End If
                                     Case FieldTypeIdManyToMany
                                         '
@@ -3457,8 +3459,8 @@ ErrorTrap:
                         ' Log Activity for changes to people and organizattions
                         '
                         If FieldChanged Then
-                            Select Case vbLCase(adminContent.ContentTableName)
-                                Case vbLCase("ccMembers")
+                            Select Case genericController.vbLCase(adminContent.ContentTableName)
+                                Case genericController.vbLCase("ccMembers")
                                     'Case "ccmembers"
                                     '
                                     ' Log people
@@ -3508,13 +3510,13 @@ ErrorTrap:
                     ' ----- Clear/Set PageNotFound
                     '
                     If editRecord.SetPageNotFoundPageID Then
-                        Call cpCore.siteProperties.setProperty("PageNotFoundPageID", EncodeText(editRecord.id))
+                        Call cpCore.siteProperties.setProperty("PageNotFoundPageID", genericController.encodeText(editRecord.id))
                     End If
                     '
                     ' ----- Clear/Set LandingPageID
                     '
                     If editRecord.SetLandingPageID Then
-                        Call cpCore.siteProperties.setProperty("LandingPageID", EncodeText(editRecord.id))
+                        Call cpCore.siteProperties.setProperty("LandingPageID", genericController.encodeText(editRecord.id))
                     End If
                     '
                     ' ----- clear/set authoring controls
@@ -3553,7 +3555,7 @@ ErrorTrap:
             '
             GetJustTableName = Trim(UCase(SQL))
             Do While (GetJustTableName <> "") And (InStr(GetJustTableName, " ") <> 0)
-                GetJustTableName = Mid(GetJustTableName, vbInstr(GetJustTableName, " ") + 1)
+                GetJustTableName = Mid(GetJustTableName, genericController.vbInstr(GetJustTableName, " ") + 1)
             Loop
             Exit Function
             '
@@ -3611,7 +3613,7 @@ ErrorTrap:
                         '    Stream.Add( Mid(cpCore.app.cs_get(CS, .Name), 7 + Len(.Name) + Len(AdminContent.ContentTableName)))
                         Case FieldTypeIdFile, FieldTypeIdFileImage
                             Filename = cpCore.db.cs_get(CS, .nameLc)
-                            Filename = vbReplace(Filename, "\", "/")
+                            Filename = genericController.vbReplace(Filename, "\", "/")
                             Pos = InStrRev(Filename, "/")
                             If Pos <> 0 Then
                                 Filename = Mid(Filename, Pos + 1)
@@ -3897,11 +3899,11 @@ ErrorTrap:
                         '
                         ' special case - if you are coming from the advanced search, go back to the list page
                         '
-                        EditReferer = vbReplace(EditReferer, "&af=39", "")
+                        EditReferer = genericController.vbReplace(EditReferer, "&af=39", "")
                         '
                         ' if referer includes AdminWarningMsg (admin hint message), remove it -- this edit may fix the problem
                         '
-                        Pos = vbInstr(1, EditReferer, "AdminWarningMsg=", vbTextCompare)
+                        Pos = genericController.vbInstr(1, EditReferer, "AdminWarningMsg=", vbTextCompare)
                         If Pos <> 0 Then
                             EditReferer = Left(EditReferer, Pos - 2)
                         End If
@@ -3949,7 +3951,7 @@ ErrorTrap:
                         Else
                             IsLandingPage = (editRecord.id = LandingPageID)
                             'If IsLandingPage Then
-                            '    If encodeInteger(cpCore.main_GetSiteProperty2("LandingPageID", "", True)) <> LandingPageID Then
+                            '    If genericController.EncodeInteger(cpCore.main_GetSiteProperty2("LandingPageID", "", True)) <> LandingPageID Then
                             '        IsLandingPageTemp = True
                             '    End If
                             'End If
@@ -3982,7 +3984,7 @@ ErrorTrap:
                             End If
                             PCCPtr = cpCore.pageManager_cache_pageContent_getPtr(TestPageID, False, False)
                             If PCCPtr >= 0 Then
-                                TestPageID = EncodeInteger(PCC(PCC_ParentID, PCCPtr))
+                                TestPageID = genericController.EncodeInteger(PCC(PCC_ParentID, PCCPtr))
                             End If
                             LoopPtr = LoopPtr + 1
                         Loop
@@ -4029,7 +4031,7 @@ ErrorTrap:
                     '
                     CreatedCopy = ""
                     Dim editRecordDateAdded As Date
-                    editRecordDateAdded = EncodeDate(editRecord.fieldsLc("dateadded").value)
+                    editRecordDateAdded = genericController.EncodeDate(editRecord.fieldsLc("dateadded").value)
                     If editRecord.dateAdded <> Date.MinValue Then
                         CreatedCopy = CreatedCopy & " " & editRecordDateAdded.ToString()  ' editRecord.dateAdded
                     End If
@@ -4178,7 +4180,7 @@ ErrorTrap:
                     & " and f.editorAddonId is not null"
                 dt = cpCore.db.executeSql(SQL)
 
-                Cells = cpcore.db.convertDataTabletoArray(dt)
+                Cells = cpCore.db.convertDataTabletoArray(dt)
                 Cnt = Cells.GetLength(1)
                 'If CBool(Cells.GetLength(0)) Then
                 '    Cnt = 0
@@ -4186,7 +4188,7 @@ ErrorTrap:
                 '    Cnt = UBound(Cells, 2) + 1
                 'End If
                 For Ptr = 0 To Cnt - 1
-                    fieldId = EncodeInteger(Cells(0, Ptr))
+                    fieldId = genericController.EncodeInteger(Cells(0, Ptr))
                     If fieldId > 0 Then
                         fieldEditorPreferencesList = fieldEditorPreferencesList & "," & fieldId & ":" & Cells(1, Ptr)
                     End If
@@ -4203,19 +4205,19 @@ ErrorTrap:
                 Cells = cpCore.db.convertDataTabletoArray(dt)
                 fieldEditorOptionCnt = UBound(Cells, 2) + 1
                 For Ptr = 0 To fieldEditorOptionCnt - 1
-                    fieldId = EncodeInteger(Cells(0, Ptr))
+                    fieldId = genericController.EncodeInteger(Cells(0, Ptr))
                     If (fieldId > 0) And (Not fieldEditorOptions.ContainsKey(fieldId.ToString)) Then
-                        fieldEditorOptions.Add(fieldId.ToString, EncodeInteger(Cells(1, Ptr)))
+                        fieldEditorOptions.Add(fieldId.ToString, genericController.EncodeInteger(Cells(1, Ptr)))
                     End If
                 Next
                 '
                 ' ----- determine contentType for editor
                 '
-                If vbLCase(adminContent.Name) = "email templates" Then
+                If genericController.vbLCase(adminContent.Name) = "email templates" Then
                     ContentType = csv_contentTypeEnum.contentTypeEmailTemplate
-                ElseIf vbLCase(adminContent.ContentTableName) = "cctemplates" Then
+                ElseIf genericController.vbLCase(adminContent.ContentTableName) = "cctemplates" Then
                     ContentType = csv_contentTypeEnum.contentTypeWebTemplate
-                ElseIf vbLCase(adminContent.ContentTableName) = "ccemail" Then
+                ElseIf genericController.vbLCase(adminContent.ContentTableName) = "ccemail" Then
                     ContentType = csv_contentTypeEnum.contentTypeEmail
                 Else
                     ContentType = csv_contentTypeEnum.contentTypeWeb
@@ -4228,8 +4230,8 @@ ErrorTrap:
                 '
                 ' ----- Create edit page
                 '
-                Select Case vbUCase(adminContent.ContentTableName)
-                    Case vbUCase("ccMembers")
+                Select Case genericController.vbUCase(adminContent.ContentTableName)
+                    Case genericController.vbUCase("ccMembers")
                         If Not (cpCore.user.isAuthenticatedAdmin) Then
                             '
                             ' Must be admin
@@ -4240,7 +4242,7 @@ ErrorTrap:
                             ))
                         Else
                             EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, AllowDelete, allowSave, AllowAdd)
-                            EditSectionButtonBar = vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeletePerson)
+                            EditSectionButtonBar = genericController.vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeletePerson)
                             Call Stream.Add(EditSectionButtonBar)
                             Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                             Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
@@ -4266,7 +4268,7 @@ ErrorTrap:
                             ))
                         Else
                             EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, AllowDelete, allowSave, AllowAdd)
-                            EditSectionButtonBar = vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
+                            EditSectionButtonBar = genericController.vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                             Call Stream.Add(EditSectionButtonBar)
                             Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                             Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
@@ -4289,7 +4291,7 @@ ErrorTrap:
                         If True Then ' 3.4.201" Then
                             AllowEmailSendWithoutTest = (cpCore.siteProperties.getBoolean("AllowEmailSendWithoutTest", False))
                             If editRecord.fieldsLc.ContainsKey("lastsendtestdate") Then
-                                LastSendTestDate = EncodeDate(editRecord.fieldsLc("lastsendtestdate").value)
+                                LastSendTestDate = genericController.EncodeDate(editRecord.fieldsLc("lastsendtestdate").value)
                             End If
                         End If
                         If Not (cpCore.user.isAuthenticatedAdmin) Then
@@ -4350,7 +4352,7 @@ ErrorTrap:
                                     editRecord.fieldsLc.Item("testmemberid").value = cpCore.user.id
                                 End If
                                 If editRecord.fieldsLc.ContainsKey("submitted") Then
-                                    EmailSubmitted = EncodeBoolean(editRecord.fieldsLc.Item("submitted").value)
+                                    EmailSubmitted = genericController.EncodeBoolean(editRecord.fieldsLc.Item("submitted").value)
                                 End If
                             End If
                             EditSectionButtonBar = ""
@@ -4404,10 +4406,10 @@ ErrorTrap:
                                     editRecord.fieldsLc.Item("testmemberid").value = cpCore.user.id
                                 End If
                                 If editRecord.fieldsLc.ContainsKey("submitted") Then
-                                    EmailSubmitted = EncodeBoolean(editRecord.fieldsLc.Item("submitted").value)
+                                    EmailSubmitted = genericController.EncodeBoolean(editRecord.fieldsLc.Item("submitted").value)
                                 End If
                                 If editRecord.fieldsLc.ContainsKey("sent") Then
-                                    EmailSent = EncodeBoolean(editRecord.fieldsLc.Item("sent").value)
+                                    EmailSent = genericController.EncodeBoolean(editRecord.fieldsLc.Item("sent").value)
                                 End If
                             End If
                             EditSectionButtonBar = ""
@@ -4456,7 +4458,7 @@ ErrorTrap:
                             ))
                         Else
                             EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, AllowDelete, allowSave, AllowAdd)
-                            EditSectionButtonBar = vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
+                            EditSectionButtonBar = genericController.vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                             Call Stream.Add(EditSectionButtonBar)
                             Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                             Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
@@ -4475,7 +4477,7 @@ ErrorTrap:
                         '
                         TableID = cpCore.main_GetRecordID("Tables", "ccPageContent")
                         EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, (Not IsLandingPage) And (Not IsLandingPageParent) And AllowDelete, allowSave, AllowAdd, True)
-                        EditSectionButtonBar = vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeletePage)
+                        EditSectionButtonBar = genericController.vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeletePage)
                         Call Stream.Add(EditSectionButtonBar)
                         Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                         Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, IsLandingPage Or IsLandingPageParent, IsRootPage, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
@@ -4495,7 +4497,7 @@ ErrorTrap:
                         ' Site Sections
                         '
                         EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, (Not IsLandingSection) And AllowDelete, allowSave, AllowAdd)
-                        EditSectionButtonBar = vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
+                        EditSectionButtonBar = genericController.vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                         Call Stream.Add(EditSectionButtonBar)
                         Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                         Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, IsLandingSection, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
@@ -4512,7 +4514,7 @@ ErrorTrap:
                         ' Edit Dynamic Sections
                         '
                         EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, AllowDelete, allowSave, AllowAdd)
-                        EditSectionButtonBar = vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
+                        EditSectionButtonBar = genericController.vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                         Call Stream.Add(EditSectionButtonBar)
                         Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                         Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
@@ -4528,7 +4530,7 @@ ErrorTrap:
                         ' Library Folders
                         '
                         EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, AllowDelete, allowSave, AllowAdd)
-                        EditSectionButtonBar = vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
+                        EditSectionButtonBar = genericController.vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                         Call Stream.Add(EditSectionButtonBar)
                         Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                         Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
@@ -4538,13 +4540,13 @@ ErrorTrap:
                             Call Stream.Add(cpCore.menu_GetComboTabs())
                         End If
                         Call Stream.Add(EditSectionButtonBar)
-                    Case vbUCase("ccGroups")
+                    Case genericController.vbUCase("ccGroups")
                         'Case "CCGROUPS"
                         '
                         ' Groups
                         '
                         EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, AllowDelete, allowSave, AllowAdd)
-                        EditSectionButtonBar = vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
+                        EditSectionButtonBar = genericController.vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                         Call Stream.Add(EditSectionButtonBar)
                         Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                         Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
@@ -4570,7 +4572,7 @@ ErrorTrap:
                     '            '   Site Properties
                     '            '
                     '            EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord,)
-                    '            EditSectionButtonBar = vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
+                    '            EditSectionButtonBar = genericController.vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                     '            Call Stream.Add(EditSectionButtonBar)
                     '            Call Stream.Add(Adminui.GetTitleBar( GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                     '            Call Stream.Add(GetForm_Edit_UserFieldTabs(adminContent, editRecord,FormID, editrecord.read_only, False, False, ContentType, AllowAjaxTabs))
@@ -4585,7 +4587,7 @@ ErrorTrap:
                         ' LAYOUTS
                         '
                         EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, AllowDelete, allowSave, AllowAdd)
-                        EditSectionButtonBar = vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
+                        EditSectionButtonBar = genericController.vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                         Call Stream.Add(EditSectionButtonBar)
                         Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                         Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
@@ -4600,7 +4602,7 @@ ErrorTrap:
                         ' All other tables (User definined)
                         '
                         EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, AllowDelete, allowSave, AllowAdd)
-                        EditSectionButtonBar = vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
+                        EditSectionButtonBar = genericController.vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                         Call Stream.Add(EditSectionButtonBar)
                         Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                         Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
@@ -4724,21 +4726,21 @@ ErrorTrap:
                         Call cpCore.siteProperties.setProperty("EDGAuthPassword", EDGAuthPassword)
                         '
                         EDGCreateSnapShot = cpCore.doc_getBoolean2("EDGCreateSnapShot")
-                        Call cpCore.siteProperties.setProperty("EDGCreateSnapShot", EncodeText(EDGCreateSnapShot))
+                        Call cpCore.siteProperties.setProperty("EDGCreateSnapShot", genericController.encodeText(EDGCreateSnapShot))
                         '
                         EDGPublishToProduction = cpCore.doc_getBoolean2("EDGPublishToProduction")
-                        Call cpCore.siteProperties.setProperty("EDGPublishToProduction", EncodeText(EDGPublishToProduction))
+                        Call cpCore.siteProperties.setProperty("EDGPublishToProduction", genericController.encodeText(EDGPublishToProduction))
                         '
                         ' Begin Publish
                         '
                         EDGPublishNow = (EDGCreateSnapShot Or EDGPublishToProduction)
-                        Call cpCore.siteProperties.setProperty("EDGPublishNow", EncodeText(EDGPublishNow))
+                        Call cpCore.siteProperties.setProperty("EDGPublishNow", genericController.encodeText(EDGPublishNow))
                     Case ButtonAbort
                         '
                         ' Abort Publish
                         '
                         EDGPublishNow = False
-                        Call cpCore.siteProperties.setProperty("EDGPublishNow", EncodeText(EDGPublishNow))
+                        Call cpCore.siteProperties.setProperty("EDGPublishNow", genericController.encodeText(EDGPublishNow))
                     Case ButtonRefresh
                         '
                         ' Refresh (no action)
@@ -4756,7 +4758,7 @@ ErrorTrap:
                 '
                 ' ----- activity
                 '
-                Copy = EncodeText(cpCore.siteProperties.getText("EDGPublishStatus", "Waiting"))
+                Copy = genericController.encodeText(cpCore.siteProperties.getText("EDGPublishStatus", "Waiting"))
                 Call Content.Add(Adminui.GetEditRow(Copy, "Activity", "", False, False, ""))
                 '
                 ' ----- Pages Found
@@ -4765,7 +4767,7 @@ ErrorTrap:
                 SQL = "SELECT Count(ccEDGPublishDocs.ID) AS PagesFound FROM ccEDGPublishDocs;"
                 CSPointer = cpCore.db.cs_openCsSql_rev("Default", SQL)
                 If cpCore.db.cs_ok(CSPointer) Then
-                    Copy = EncodeText(cpCore.db.cs_getInteger(CSPointer, "PagesFound"))
+                    Copy = genericController.encodeText(cpCore.db.cs_getInteger(CSPointer, "PagesFound"))
                 End If
                 Call cpCore.db.cs_Close(CSPointer)
                 Call Content.Add(Adminui.GetEditRow(Copy, "Links Found", "", False, False, ""))
@@ -4776,7 +4778,7 @@ ErrorTrap:
                 SQL = "SELECT Count(ccEDGPublishDocs.ID) AS PagesFound FROM ccEDGPublishDocs where (UpToDate=1);"
                 CSPointer = cpCore.db.cs_openCsSql_rev("Default", SQL)
                 If cpCore.db.cs_ok(CSPointer) Then
-                    Copy = EncodeText(cpCore.db.cs_getInteger(CSPointer, "PagesFound"))
+                    Copy = genericController.encodeText(cpCore.db.cs_getInteger(CSPointer, "PagesFound"))
                 End If
                 Call cpCore.db.cs_Close(CSPointer)
                 Call Content.Add(Adminui.GetEditRow(Copy, "Pages Complete", "", False, False, ""))
@@ -4784,12 +4786,12 @@ ErrorTrap:
                 ' ----- Bad Links
                 '
                 Copy = "n/a"
-                QueryString = ModifyQueryString(cpCore.web_RefreshQueryString, RequestNameAdminForm, AdminFormReports, True)
-                QueryString = ModifyQueryString(QueryString, RequestNameReportForm, ReportFormEDGDocErrors, True)
+                QueryString = genericController.ModifyQueryString(cpCore.web_RefreshQueryString, RequestNameAdminForm, AdminFormReports, True)
+                QueryString = genericController.ModifyQueryString(QueryString, RequestNameReportForm, ReportFormEDGDocErrors, True)
                 SQL = "SELECT Count(ccEDGPublishDocs.ID) AS PagesFound FROM ccEDGPublishDocs where (UpToDate=1) And (LinkAlias Is Not null) And ((HTTPResponse Is null) Or ((Not (HTTPResponse Like '% 200 %'))and (not (HTTPResponse like '% 302 %'))));"
                 CSPointer = cpCore.db.cs_openCsSql_rev("Default", SQL)
                 If cpCore.db.cs_ok(CSPointer) Then
-                    Copy = EncodeText(cpCore.db.cs_getInteger(CSPointer, "PagesFound"))
+                    Copy = genericController.encodeText(cpCore.db.cs_getInteger(CSPointer, "PagesFound"))
                 End If
                 Call cpCore.db.cs_Close(CSPointer)
                 Call Content.Add(Adminui.GetEditRow("<a href=""" & cpCore.html.html_EncodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & QueryString) & """ target=""_blank"">" & SpanClassAdminNormal & Copy & "</a>", "Bad Links", "", False, False, ""))
@@ -5022,7 +5024,7 @@ ErrorTrap:
                                 '
                                 ' make sure the record exists
                                 '
-                                If vbUCase(TableName) = "CCPAGECONTENT" Then
+                                If genericController.vbUCase(TableName) = "CCPAGECONTENT" Then
                                     FieldList = "ID,Name,Headline,MenuHeadline"
                                     'SQL = "SELECT ID,Name,Headline,MenuHeadline from " & TableName & " WHERE ID=" & RecordID
                                 Else
@@ -5340,7 +5342,7 @@ ErrorTrap:
                         With field
                             If .editTabName.ToLower() = EditTab.ToLower() Then
                                 If IsVisibleUserField(.adminOnly, .developerOnly, .active, .authorable, .nameLc, adminContent.ContentTableName) Then
-                                    AlphaSort = GetIntegerString(.editSortPriority, 10) & "-" & GetIntegerString(.id, 10)
+                                    AlphaSort = genericController.GetIntegerString(.editSortPriority, 10) & "-" & genericController.GetIntegerString(.id, 10)
                                     sortingFields.Add(AlphaSort, field)
                                 End If
                             End If
@@ -5356,10 +5358,10 @@ ErrorTrap:
                             fieldId = .id
                             WhyReadOnlyMsg = ""
                             FieldName = .nameLc
-                            FormFieldLCaseName = vbLCase(FieldName)
+                            FormFieldLCaseName = genericController.vbLCase(FieldName)
                             fieldTypeId = .fieldTypeId
                             FieldValueObject = editRecord.fieldsLc(.nameLc).value
-                            FieldValueText = EncodeText(FieldValueObject)
+                            FieldValueText = genericController.encodeText(FieldValueObject)
                             FieldRows = 1
                             FieldOptionRow = "&nbsp;"
                             FieldPreferenceHTML = .htmlContent
@@ -5385,12 +5387,12 @@ ErrorTrap:
                             ' Read only Special Cases
                             '
                             If IsLandingPage Then
-                                Select Case vbLCase(.nameLc)
+                                Select Case genericController.vbLCase(.nameLc)
                                     Case "active"
                                         '
                                         ' if active, it is read only -- if inactive, let them set it active.
                                         '
-                                        FieldReadOnly = (EncodeBoolean(FieldValueObject))
+                                        FieldReadOnly = (genericController.EncodeBoolean(FieldValueObject))
                                         If FieldReadOnly Then
                                             WhyReadOnlyMsg = "&nbsp;(disabled because you can not mark the landing page inactive)"
                                         End If
@@ -5404,7 +5406,7 @@ ErrorTrap:
                             End If
                             '
                             If IsRootPage Then
-                                Select Case vbLCase(.nameLc)
+                                Select Case genericController.vbLCase(.nameLc)
                                     Case "dateexpires", "pubdate", "datearchive", "archiveparentid"
                                         FieldReadOnly = True
                                         WhyReadOnlyMsg = "&nbsp;(disabled for root pages)"
@@ -5418,7 +5420,7 @@ ErrorTrap:
                             '
                             ' Special Case - ccemail table Alloweid should be disabled if siteproperty AllowLinkLogin is false
                             '
-                            If vbLCase(adminContent.ContentTableName) = "ccemail" And vbLCase(FieldName) = "allowlinkeid" Then
+                            If genericController.vbLCase(adminContent.ContentTableName) = "ccemail" And genericController.vbLCase(FieldName) = "allowlinkeid" Then
                                 If Not (cpCore.siteProperties.getBoolean("AllowLinkLogin", True)) Then
                                     '.ValueVariant = "0"
                                     FieldValueObject = "0"
@@ -5427,7 +5429,7 @@ ErrorTrap:
                                     FieldValueText = "0"
                                 End If
                             End If
-                            EditorStyleModifier = vbLCase(cpCore.db.getFieldTypeNameFromFieldTypeId(fieldTypeId))
+                            EditorStyleModifier = genericController.vbLCase(cpCore.db.getFieldTypeNameFromFieldTypeId(fieldTypeId))
                             EditorString = ""
                             editorReadOnly = (RecordReadOnly Or .ReadOnly Or (editRecord.id <> 0 And .NotEditable) Or (FieldReadOnly))
                             '
@@ -5435,19 +5437,19 @@ ErrorTrap:
                             '
                             editorAddonID = 0
                             'editorPreferenceAddonId = 0
-                            fieldIdPos = vbInstr(1, "," & fieldEditorPreferenceList, "," & CStr(fieldId) & ":")
+                            fieldIdPos = genericController.vbInstr(1, "," & fieldEditorPreferenceList, "," & CStr(fieldId) & ":")
                             Do While (editorAddonID = 0) And (fieldIdPos > 0)
                                 fieldIdPos = fieldIdPos + 1 + Len(CStr(fieldId))
-                                Pos = vbInstr(fieldIdPos, fieldEditorPreferenceList & ",", ",")
+                                Pos = genericController.vbInstr(fieldIdPos, fieldEditorPreferenceList & ",", ",")
                                 If Pos > 0 Then
-                                    editorAddonID = EncodeInteger(Mid(fieldEditorPreferenceList, fieldIdPos, Pos - fieldIdPos))
-                                    'editorPreferenceAddonId = encodeInteger(Mid(fieldEditorPreferenceList, fieldIdPos, Pos - fieldIdPos))
+                                    editorAddonID = genericController.EncodeInteger(Mid(fieldEditorPreferenceList, fieldIdPos, Pos - fieldIdPos))
+                                    'editorPreferenceAddonId = genericController.EncodeInteger(Mid(fieldEditorPreferenceList, fieldIdPos, Pos - fieldIdPos))
                                     'editorAddonID = editorPreferenceAddonId
                                 End If
-                                fieldIdPos = vbInstr(fieldIdPos + 1, "," & fieldEditorPreferenceList, "," & CStr(fieldId) & ":")
+                                fieldIdPos = genericController.vbInstr(fieldIdPos + 1, "," & fieldEditorPreferenceList, "," & CStr(fieldId) & ":")
                             Loop
                             If editorAddonID = 0 Then
-                                fieldTypeDefaultEditorAddonId = EncodeInteger(fieldTypeDefaultEditors(fieldTypeId))
+                                fieldTypeDefaultEditorAddonId = genericController.EncodeInteger(fieldTypeDefaultEditors(fieldTypeId))
                                 editorAddonID = fieldTypeDefaultEditorAddonId
                             End If
                             Dim useEditorAddon As Boolean
@@ -5462,15 +5464,15 @@ ErrorTrap:
                                 ' note: &editorFieldType should be deprecated
                                 '
                                 addonOptionString = "" _
-                                    & "editorName=" & encodeNvaArgument(FormFieldLCaseName) _
-                                    & "&editorValue=" & encodeNvaArgument(FieldValueText) _
+                                    & "editorName=" & genericController.encodeNvaArgument(FormFieldLCaseName) _
+                                    & "&editorValue=" & genericController.encodeNvaArgument(FieldValueText) _
                                     & "&editorFieldId=" & fieldId _
                                     & "&editorFieldType=" & fieldTypeId _
                                     & "&editorReadOnly=" & editorReadOnly _
                                     & "&editorWidth=" _
                                     & "&editorHeight=" _
                                     & ""
-                                If EncodeBoolean((fieldTypeId = FieldTypeIdHTML) Or (fieldTypeId = FieldTypeIdFileHTMLPrivate)) Then
+                                If genericController.EncodeBoolean((fieldTypeId = FieldTypeIdHTML) Or (fieldTypeId = FieldTypeIdFileHTMLPrivate)) Then
                                     '
                                     ' include html related arguments
                                     '
@@ -5480,9 +5482,9 @@ ErrorTrap:
 
                                     addonOptionString = addonOptionString _
                                         & "&editorAllowActiveContent=1" _
-                                        & "&editorAddonList=" & encodeNvaArgument(editorAddonListJSON) _
-                                        & "&editorStyles=" & encodeNvaArgument(styleList) _
-                                        & "&editorStyleOptions=" & encodeNvaArgument(styleOptionList) _
+                                        & "&editorAddonList=" & genericController.encodeNvaArgument(editorAddonListJSON) _
+                                        & "&editorStyles=" & genericController.encodeNvaArgument(styleList) _
+                                        & "&editorStyleOptions=" & genericController.encodeNvaArgument(styleOptionList) _
                                         & ""
                                 End If
 
@@ -5515,9 +5517,9 @@ ErrorTrap:
                                         Dim PosStart As Integer
                                         Dim PosEnd As Integer
                                         tmpList = cpCore.userProperty.getText("editorPreferencesForContent:" & adminContent.Id, "")
-                                        PosStart = vbInstr(1, "," & tmpList, "," & fieldId & ":")
+                                        PosStart = genericController.vbInstr(1, "," & tmpList, "," & fieldId & ":")
                                         If PosStart > 0 Then
-                                            PosEnd = vbInstr(PosStart + 1, "," & tmpList, ",")
+                                            PosEnd = genericController.vbInstr(PosStart + 1, "," & tmpList, ",")
                                             If PosEnd = 0 Then
                                                 tmpList = Mid(tmpList, 1, PosStart - 1)
                                             Else
@@ -5560,7 +5562,7 @@ ErrorTrap:
                                     If editRecord.id = 0 Then
                                         EditorString &= ("[available after save]")
                                     Else
-                                        RedirectPath = vbReplace(RedirectPath, "'", "\'")
+                                        RedirectPath = genericController.vbReplace(RedirectPath, "'", "\'")
                                         EditorString &= ("<a href=""#""")
                                         EditorString &= (" onclick=""" _
                                             & " window.open('" & RedirectPath & "', '_blank', 'scrollbars=yes,toolbar=no,status=no,resizable=yes');" _
@@ -5585,8 +5587,8 @@ ErrorTrap:
                                             ' ----- Boolean ReadOnly
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueBoolean = EncodeBoolean(FieldValueObject)
-                                            EditorString &= (cpCore.html_GetFormInputHidden(FormFieldLCaseName, EncodeText(FieldValueBoolean)))
+                                            FieldValueBoolean = genericController.EncodeBoolean(FieldValueObject)
+                                            EditorString &= (cpCore.html_GetFormInputHidden(FormFieldLCaseName, genericController.encodeText(FieldValueBoolean)))
                                             EditorString &= (cpCore.html_GetFormInputCheckBox2(FormFieldLCaseName, FieldValueBoolean, , True, "checkBox"))
                                             EditorString &= WhyReadOnlyMsg
                                             '
@@ -5595,9 +5597,9 @@ ErrorTrap:
                                             ' ----- File ReadOnly
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueObject)
+                                            FieldValueText = genericController.encodeText(FieldValueObject)
                                             NonEncodedLink = cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, FieldValueText)
-                                            EncodedLink = EncodeURL(NonEncodedLink)
+                                            EncodedLink = genericController.EncodeURL(NonEncodedLink)
                                             EditorString &= (cpCore.html_GetFormInputHidden(FormFieldLCaseName, ""))
                                             If FieldValueText = "" Then
                                                 EditorString &= ("[no file]")
@@ -5614,12 +5616,12 @@ ErrorTrap:
                                             ' ----- Lookup ReadOnly
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueInteger = EncodeInteger(FieldValueObject)
-                                            EditorString &= (cpCore.html_GetFormInputHidden(FormFieldLCaseName, EncodeText(FieldValueInteger)))
+                                            FieldValueInteger = genericController.EncodeInteger(FieldValueObject)
+                                            EditorString &= (cpCore.html_GetFormInputHidden(FormFieldLCaseName, genericController.encodeText(FieldValueInteger)))
                                             'Call s.Add("<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
                                             LookupContentName = ""
                                             If .lookupContentID <> 0 Then
-                                                LookupContentName = EncodeText(cpCore.metaData.getContentNameByID(.lookupContentID))
+                                                LookupContentName = genericController.encodeText(cpCore.metaData.getContentNameByID(.lookupContentID))
                                             End If
                                             If LookupContentName <> "" Then
                                                 CSLookup = cpCore.csOpenRecord(LookupContentName, FieldValueInteger, False, , "Name,ContentControlID")
@@ -5652,8 +5654,8 @@ ErrorTrap:
                                             ' ----- Member Select ReadOnly
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueInteger = EncodeInteger(FieldValueObject)
-                                            EditorString &= (cpCore.html_GetFormInputHidden(FormFieldLCaseName, EncodeText(FieldValueInteger)))
+                                            FieldValueInteger = genericController.EncodeInteger(FieldValueObject)
+                                            EditorString &= (cpCore.html_GetFormInputHidden(FormFieldLCaseName, genericController.encodeText(FieldValueInteger)))
                                             If FieldValueInteger = 0 Then
                                                 EditorString &= ("None")
                                             Else
@@ -5679,7 +5681,7 @@ ErrorTrap:
                                             '
                                             '   Placeholder
                                             '
-                                            FieldValueText = EncodeText(FieldValueObject)
+                                            FieldValueText = genericController.encodeText(FieldValueObject)
                                             MTMContent0 = cpCore.metaData.getContentNameByID(.contentId)
                                             MTMContent1 = cpCore.metaData.getContentNameByID(.manyToManyContentID)
                                             MTMRuleContent = cpCore.metaData.getContentNameByID(.manyToManyRuleContentID)
@@ -5693,8 +5695,8 @@ ErrorTrap:
                                             ' ----- Currency ReadOnly
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueNumber = EncodeNumber(FieldValueObject)
-                                            EditorString &= (cpCore.html_GetFormInputHidden(FormFieldLCaseName, EncodeText(FieldValueNumber)))
+                                            FieldValueNumber = genericController.EncodeNumber(FieldValueObject)
+                                            EditorString &= (cpCore.html_GetFormInputHidden(FormFieldLCaseName, genericController.encodeText(FieldValueNumber)))
                                             EditorString &= (cpCore.html_GetFormInputText2(FormFieldLCaseName, CStr(FieldValueNumber), , , , , True, "text"))
                                             EditorString &= (FormatCurrency(FieldValueNumber))
                                             EditorString &= WhyReadOnlyMsg
@@ -5704,7 +5706,7 @@ ErrorTrap:
                                             ' ----- date
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueDate = encodeDateMinValue(EncodeDate(FieldValueObject))
+                                            FieldValueDate = genericController.encodeDateMinValue(genericController.EncodeDate(FieldValueObject))
                                             If FieldValueDate = Date.MinValue Then
                                                 FieldValueText = ""
                                             Else
@@ -5719,7 +5721,7 @@ ErrorTrap:
                                             ' ----- number
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueObject)
+                                            FieldValueText = genericController.encodeText(FieldValueObject)
                                             EditorString &= (cpCore.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText))
                                             EditorString &= (cpCore.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, , , , , True, "number"))
                                             EditorString &= WhyReadOnlyMsg
@@ -5733,7 +5735,7 @@ ErrorTrap:
                                                 ' edit html as html (see the code)
                                                 '
                                                 return_NewFieldList = return_NewFieldList & "," & FieldName
-                                                FieldValueText = EncodeText(FieldValueObject)
+                                                FieldValueText = genericController.encodeText(FieldValueObject)
                                                 EditorString &= cpCore.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText)
                                                 EditorStyleModifier = "textexpandable"
                                                 FieldRows = (cpCore.properties_user_getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
@@ -5743,7 +5745,7 @@ ErrorTrap:
                                                 ' edit html as wysiwyg
                                                 '
                                                 return_NewFieldList = return_NewFieldList & "," & FieldName
-                                                FieldValueText = EncodeText(FieldValueObject)
+                                                FieldValueText = genericController.encodeText(FieldValueObject)
                                                 EditorString &= cpCore.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText)
                                                 '
                                                 EditorStyleModifier = "text"
@@ -5761,7 +5763,7 @@ ErrorTrap:
                                             ' ----- FieldTypeText
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueObject)
+                                            FieldValueText = genericController.encodeText(FieldValueObject)
                                             EditorString &= cpCore.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText)
                                             If .Password Then
                                                 '
@@ -5779,7 +5781,7 @@ ErrorTrap:
                                             ' ----- LongText, TextFile
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueObject)
+                                            FieldValueText = genericController.encodeText(FieldValueObject)
                                             EditorString &= cpCore.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText)
                                             EditorStyleModifier = "textexpandable"
                                             FieldRows = (cpCore.properties_user_getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
@@ -5789,7 +5791,7 @@ ErrorTrap:
                                             ' ----- Legacy text type -- not used unless something was missed
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueObject)
+                                            FieldValueText = genericController.encodeText(FieldValueObject)
                                             EditorString &= cpCore.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText)
                                             If .Password Then
                                                 '
@@ -5845,7 +5847,7 @@ ErrorTrap:
                                             ' ----- Boolean
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueBoolean = EncodeBoolean(FieldValueObject)
+                                            FieldValueBoolean = genericController.EncodeBoolean(FieldValueObject)
                                             's.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
                                             EditorString &= (cpCore.html_GetFormInputCheckBox2(FormFieldLCaseName, FieldValueBoolean, , , "checkBox"))
                                             's.Add( "&nbsp;</span></nobr></td>")
@@ -5855,13 +5857,13 @@ ErrorTrap:
                                             ' ----- File
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueObject)
+                                            FieldValueText = genericController.encodeText(FieldValueObject)
                                             'Call s.Add("<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
                                             If FieldValueText = "" Then
                                                 EditorString &= (cpCore.html_GetFormInputFile2(FormFieldLCaseName, , "file"))
                                             Else
                                                 NonEncodedLink = cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, FieldValueText)
-                                                EncodedLink = EncodeURL(NonEncodedLink)
+                                                EncodedLink = genericController.EncodeURL(NonEncodedLink)
                                                 Dim filename As String = ""
                                                 Dim path As String = ""
                                                 cpCore.privateFiles.splitPathFilename(FieldValueText, path, filename)
@@ -5874,10 +5876,10 @@ ErrorTrap:
                                             '
                                             ' ----- Lookup
                                             '
-                                            FieldValueInteger = EncodeInteger(FieldValueObject)
+                                            FieldValueInteger = genericController.EncodeInteger(FieldValueObject)
                                             LookupContentName = ""
                                             If .lookupContentID <> 0 Then
-                                                LookupContentName = EncodeText(cpCore.metaData.getContentNameByID(.lookupContentID))
+                                                LookupContentName = genericController.encodeText(cpCore.metaData.getContentNameByID(.lookupContentID))
                                             End If
                                             If LookupContentName <> "" Then
                                                 return_NewFieldList = return_NewFieldList & "," & FieldName
@@ -5911,7 +5913,7 @@ ErrorTrap:
                                             ' ----- Member Select
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueInteger = EncodeInteger(FieldValueObject)
+                                            FieldValueInteger = genericController.EncodeInteger(FieldValueObject)
                                             's.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
                                             If Not .Required Then
                                                 EditorString &= (cpCore.html_GetFormInputMemberSelect(FormFieldLCaseName, FieldValueInteger, .MemberSelectGroupID, "", "None", "select"))
@@ -5933,7 +5935,7 @@ ErrorTrap:
                                             '
                                             '   Placeholder
                                             '
-                                            FieldValueText = EncodeText(FieldValueObject)
+                                            FieldValueText = genericController.encodeText(FieldValueObject)
                                             'Call s.Add("<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
                                             '
                                             MTMContent0 = cpCore.metaData.getContentNameByID(.contentId)
@@ -5947,7 +5949,7 @@ ErrorTrap:
                                             ' ----- Date
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueDate = encodeDateMinValue(EncodeDate(FieldValueObject))
+                                            FieldValueDate = genericController.encodeDateMinValue(genericController.EncodeDate(FieldValueObject))
                                             If FieldValueDate = Date.MinValue Then
                                                 FieldValueText = ""
                                             Else
@@ -5960,7 +5962,7 @@ ErrorTrap:
                                             ' ----- Others that simply print
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueObject)
+                                            FieldValueText = genericController.encodeText(FieldValueObject)
                                             's.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
                                             If .Password Then
                                                 EditorString &= (cpCore.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, , , , True, False, "password"))
@@ -5982,7 +5984,7 @@ ErrorTrap:
                                             ' ----- Link (href value
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueObject)
+                                            FieldValueText = genericController.encodeText(FieldValueObject)
                                             EditorString = "" _
                                                 & cpCore.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80, FormFieldLCaseName, , , "link") _
                                                 & "&nbsp;<a href=""#"" onClick=""OpenResourceLinkWindow( '" & FormFieldLCaseName & "' ) ;return false;""><img src=""/ccLib/images/ResourceLink1616.gif"" width=16 height=16 border=0 alt=""Link to a resource"" title=""Link to a resource""></a>" _
@@ -5993,7 +5995,7 @@ ErrorTrap:
                                             ' ----- Resource Link (src value)
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueObject)
+                                            FieldValueText = genericController.encodeText(FieldValueObject)
                                             EditorString = "" _
                                                 & cpCore.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80, FormFieldLCaseName, , , "resourceLink") _
                                                 & "&nbsp;<a href=""#"" onClick=""OpenResourceLinkWindow( '" & FormFieldLCaseName & "' ) ;return false;""><img src=""/ccLib/images/ResourceLink1616.gif"" width=16 height=16 border=0 alt=""Link to a resource"" title=""Link to a resource""></a>"
@@ -6003,7 +6005,7 @@ ErrorTrap:
                                             ' ----- Text Type
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueObject)
+                                            FieldValueText = genericController.encodeText(FieldValueObject)
                                             If .Password Then
                                                 '
                                                 ' Password forces simple text box
@@ -6032,7 +6034,7 @@ ErrorTrap:
                                             ' content is html
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueObject)
+                                            FieldValueText = genericController.encodeText(FieldValueObject)
                                             '
                                             ' 9/7/2012 -- added this to support:
                                             '   html fields types mean they hold html
@@ -6068,7 +6070,7 @@ ErrorTrap:
                                             ' -- Long Text, use text editor
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueObject)
+                                            FieldValueText = genericController.encodeText(FieldValueObject)
                                             '
                                             EditorStyleModifier = "textexpandable"
                                             FieldRows = (cpCore.properties_user_getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
@@ -6079,7 +6081,7 @@ ErrorTrap:
                                             ' ----- CSS field
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueObject)
+                                            FieldValueText = genericController.encodeText(FieldValueObject)
                                             EditorStyleModifier = "textexpandable"
                                             FieldRows = (cpCore.properties_user_getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
                                             EditorString = cpCore.main_GetFormInputStyles(FormFieldLCaseName, FieldValueText, , "styles")
@@ -6089,7 +6091,7 @@ ErrorTrap:
                                             ' ----- Javascript field
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueObject)
+                                            FieldValueText = genericController.encodeText(FieldValueObject)
                                             EditorStyleModifier = "textexpandable"
                                             FieldRows = (cpCore.properties_user_getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
                                             EditorString = cpCore.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, FieldRows, , FormFieldLCaseName, False, , "text")
@@ -6099,7 +6101,7 @@ ErrorTrap:
                                             ' ----- xml field
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueObject)
+                                            FieldValueText = genericController.encodeText(FieldValueObject)
                                             EditorStyleModifier = "textexpandable"
                                             FieldRows = (cpCore.properties_user_getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
                                             EditorString = cpCore.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, FieldRows, , FormFieldLCaseName, False, , "text")
@@ -6109,7 +6111,7 @@ ErrorTrap:
                                             ' ----- Legacy text type -- not used unless something was missed
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueObject)
+                                            FieldValueText = genericController.encodeText(FieldValueObject)
                                             If .Password Then
                                                 '
                                                 ' Password forces simple text box
@@ -6169,7 +6171,7 @@ ErrorTrap:
                             HelpMsgDefault = ""
                             HelpMsgCustom = ""
                             EditorHelp = ""
-                            LcaseName = vbLCase(.nameLc)
+                            LcaseName = genericController.vbLCase(.nameLc)
                             If AllowHelpMsgCustom Then
                                 HelpMsgDefault = .HelpDefault
                                 HelpMsgCustom = .HelpCustom
@@ -6451,14 +6453,14 @@ ErrorTrap:
                         If ContentWatchRecordID <> 0 Then
                             CSRules = cpCore.db.cs_open("Content Watch List Rules", "(ContentWatchID=" & ContentWatchRecordID & ")AND(ContentWatchListID=" & ContentWatchListID & ")")
                             If editRecord.Read_Only Then
-                                HTMLFieldString = EncodeText(cpCore.db.cs_ok(CSRules))
+                                HTMLFieldString = genericController.encodeText(cpCore.db.cs_ok(CSRules))
                             Else
                                 HTMLFieldString = cpCore.html_GetFormInputCheckBox2("ContentWatchList." & cpCore.db.cs_get(CSLists, "ID"), cpCore.db.cs_ok(CSRules))
                             End If
                             Call cpCore.db.cs_Close(CSRules)
                         Else
                             If editRecord.Read_Only Then
-                                HTMLFieldString = EncodeText(False)
+                                HTMLFieldString = genericController.encodeText(False)
                             Else
                                 HTMLFieldString = cpCore.html_GetFormInputCheckBox2("ContentWatchList." & cpCore.db.cs_get(CSLists, "ID"), False)
                             End If
@@ -6616,14 +6618,14 @@ ErrorTrap:
                 If editRecord.id = 0 Then
                     HTMLFieldString = "(available after save)"
                 Else
-                    HTMLFieldString = EncodeText(editRecord.id)
+                    HTMLFieldString = genericController.encodeText(editRecord.id)
                 End If
                 HTMLFieldString = cpCore.html_GetFormInputText2("ignore", HTMLFieldString, , , , , True)
                 Call FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Record Number", FieldHelp, True, False, ""))
                 '
                 ' ----- If Page Content , check if this is the default PageNotFound page
                 '
-                If vbLCase(adminContent.ContentTableName) = "ccpagecontent" Then
+                If genericController.vbLCase(adminContent.ContentTableName) = "ccpagecontent" Then
                     '
                     ' Landing Page
                     '
@@ -6632,7 +6634,7 @@ ErrorTrap:
                     If cpCore.user.isAuthenticatedAdmin Then
                         HTMLFieldString = cpCore.html_GetFormInputCheckBox2("LandingPageID", Checked)
                     Else
-                        HTMLFieldString = "<b>" & GetYesNo(Checked) & "</b>" & cpCore.html_GetFormInputHidden("LandingPageID", Checked)
+                        HTMLFieldString = "<b>" & genericController.GetYesNo(Checked) & "</b>" & cpCore.html_GetFormInputHidden("LandingPageID", Checked)
                     End If
                     HTMLFieldString = HTMLFieldString
                     Call FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Set Default Landing Page", Copy, False, False, ""))
@@ -6644,7 +6646,7 @@ ErrorTrap:
                     If cpCore.user.isAuthenticatedAdmin Then
                         HTMLFieldString = cpCore.html_GetFormInputCheckBox2("PageNotFound", Checked)
                     Else
-                        HTMLFieldString = "<b>" & GetYesNo(Checked) & "</b>" & cpCore.html_GetFormInputHidden("PageNotFound", Checked)
+                        HTMLFieldString = "<b>" & genericController.GetYesNo(Checked) & "</b>" & cpCore.html_GetFormInputHidden("PageNotFound", Checked)
                     End If
                     '            If (EditRecord.ID <> 0) And (EditRecord.ID = cpCore.main_GetSiteProperty2("PageNotFoundPageID", "0", True)) Then
                     '                HTMLFieldString = cpCore.main_GetFormInputCheckBox2("PageNotFound", True)
@@ -6670,14 +6672,14 @@ ErrorTrap:
                 '
                 ' ----- Widget Code
                 '
-                If vbLCase(adminContent.ContentTableName) = "ccaggregatefunctions" Then
+                If genericController.vbLCase(adminContent.ContentTableName) = "ccaggregatefunctions" Then
                     '
                     ' ----- Add-ons
                     '
                     Dim AllowWidget As Boolean
                     AllowWidget = False
                     If editRecord.fieldsLc.ContainsKey("remotemethod") Then
-                        AllowWidget = EncodeBoolean(editRecord.fieldsLc.Item("remotemethod").value)
+                        AllowWidget = genericController.EncodeBoolean(editRecord.fieldsLc.Item("remotemethod").value)
                     End If
                     If Not AllowWidget Then
                         FieldHelp = "If you wish to use this add-on as a widget, enable 'Is Remote Method' on the 'Placement' tab and save the record. The necessary html code, or 'embed code' will be created here for you to cut-and-paste into the website."
@@ -6690,7 +6692,7 @@ ErrorTrap:
                             & "<SCRIPT type=text/javascript>" _
                             & vbCrLf & "var ccProto=(('https:'==document.location.protocol) ? 'https://' : 'http://');" _
                             & vbCrLf & "document.write(unescape(""%3Cscript src='"" + ccProto + """ & cpCore.webServerIO_requestDomain & "/ccLib/ClientSide/Core.js' type='text/javascript'%3E%3C/script%3E""));" _
-                            & vbCrLf & "document.write(unescape(""%3Cscript src='"" + ccProto + """ & cpCore.webServerIO_requestDomain & "/" & EncodeURL(editRecord.nameLc) & "?requestjsform=1' type='text/javascript'%3E%3C/script%3E""));" _
+                            & vbCrLf & "document.write(unescape(""%3Cscript src='"" + ccProto + """ & cpCore.webServerIO_requestDomain & "/" & genericController.EncodeURL(editRecord.nameLc) & "?requestjsform=1' type='text/javascript'%3E%3C/script%3E""));" _
                             & vbCrLf & "</SCRIPT>"
                         '<SCRIPT type=text/javascript>
                         'var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
@@ -6709,7 +6711,7 @@ ErrorTrap:
                 '
                 If editRecord.fieldsLc.ContainsKey("ccguid") Then
                     Dim contentField As coreMetaDataClass.CDefFieldClass = adminContent.fields.Item("ccguid")
-                    HTMLFieldString = EncodeText(editRecord.fieldsLc.Item("ccguid").value)
+                    HTMLFieldString = genericController.encodeText(editRecord.fieldsLc.Item("ccguid").value)
                     FieldHelp = "This is a unique number that identifies this record globally. A GUID is not required, but when set it should never be changed. GUIDs are used to synchronize records. When empty, you can create a new guid. Only Developers can modify the guid."
                     If HTMLFieldString = "" Then
                         '
@@ -6744,14 +6746,14 @@ ErrorTrap:
                 ' ----- EID (Encoded ID)
                 '
                 FieldHelp = ""
-                If vbUCase(adminContent.ContentTableName) = vbUCase("ccMembers") Then
+                If genericController.vbUCase(adminContent.ContentTableName) = genericController.vbUCase("ccMembers") Then
                     AllowEID = (cpCore.siteProperties.getBoolean("AllowLinkLogin", True)) Or (cpCore.siteProperties.getBoolean("AllowLinkRecognize", True))
                     If (Not AllowEID) Then
                         HTMLFieldString = "(link login and link recognize are disabled in security preferences)"
                     ElseIf editRecord.id = 0 Then
                         HTMLFieldString = "(available after save)"
                     Else
-                        EID = EncodeText(cpCore.security.encodeToken(editRecord.id, cpCore.app_startTime))
+                        EID = genericController.encodeText(cpCore.security.encodeToken(editRecord.id, cpCore.app_startTime))
                         If (cpCore.siteProperties.getBoolean("AllowLinkLogin", True)) Then
                             HTMLFieldString = EID
                             'HTMLFieldString = EID _
@@ -6780,8 +6782,8 @@ ErrorTrap:
                         '
                         ' if this record has a parent id, only include CDefs compatible with the parent record - otherwise get all for the table
                         '
-                        FieldHelp = EncodeText(.HelpMessage)
-                        FieldRequired = EncodeBoolean(.Required)
+                        FieldHelp = genericController.encodeText(.HelpMessage)
+                        FieldRequired = genericController.EncodeBoolean(.Required)
                         FieldValueInteger = editRecord.contentControlId
                         '
                         '
@@ -6893,7 +6895,7 @@ ErrorTrap:
                 If editRecord.id = 0 Then
                     HTMLFieldString = "(available after save)"
                 Else
-                    HTMLFieldString = EncodeText(EncodeDate(editRecord.dateAdded))
+                    HTMLFieldString = genericController.encodeText(genericController.EncodeDate(editRecord.dateAdded))
                     If HTMLFieldString = "12:00:00 AM" Then
                         HTMLFieldString = "unknown"
                     End If
@@ -6926,7 +6928,7 @@ ErrorTrap:
                 If editRecord.id = 0 Then
                     HTMLFieldString = "(available after save)"
                 Else
-                    HTMLFieldString = EncodeText(EncodeDate(editRecord.modifiedDate))
+                    HTMLFieldString = genericController.encodeText(genericController.EncodeDate(editRecord.modifiedDate))
                     If HTMLFieldString = "12:00:00 AM" Then
                         HTMLFieldString = "unknown"
                     End If
@@ -7011,12 +7013,12 @@ ErrorTrap:
                 Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
                 '
                 FieldName = field.nameLc
-                If vbLCase(FieldName) = "name" Then
-                    SitePropertyName = EncodeText(editRecord.fieldsLc(field.nameLc).value)
+                If genericController.vbLCase(FieldName) = "name" Then
+                    SitePropertyName = genericController.encodeText(editRecord.fieldsLc(field.nameLc).value)
                 ElseIf (LCase(FieldName) = "fieldvalue") Then
-                    SitePropertyValue = EncodeText(editRecord.fieldsLc(field.nameLc).value)
+                    SitePropertyValue = genericController.encodeText(editRecord.fieldsLc(field.nameLc).value)
                 ElseIf (LCase(FieldName) = "selector") Then
-                    selector = EncodeText(editRecord.fieldsLc(field.nameLc).value)
+                    selector = genericController.encodeText(editRecord.fieldsLc(field.nameLc).value)
                 End If
             Next
             If SitePropertyName = "" Then
@@ -7029,19 +7031,19 @@ ErrorTrap:
 
                 '--------------
 
-                Pos = vbInstr(1, ExpandedSelector, "[")
+                Pos = genericController.vbInstr(1, ExpandedSelector, "[")
                 If Pos <> 0 Then
                     '
                     ' List of Options, might be select, radio or checkbox
                     '
-                    LCaseOptionDefault = vbLCase(Mid(ExpandedSelector, 1, Pos - 1))
-                    LCaseOptionDefault = decodeNvaArgument(LCaseOptionDefault)
+                    LCaseOptionDefault = genericController.vbLCase(Mid(ExpandedSelector, 1, Pos - 1))
+                    LCaseOptionDefault = genericController.decodeNvaArgument(LCaseOptionDefault)
 
                     ExpandedSelector = Mid(ExpandedSelector, Pos + 1)
-                    Pos = vbInstr(1, ExpandedSelector, "]")
+                    Pos = genericController.vbInstr(1, ExpandedSelector, "]")
                     If Pos > 0 Then
                         If Pos < Len(ExpandedSelector) Then
-                            OptionSuffix = vbLCase(Trim(Mid(ExpandedSelector, Pos + 1)))
+                            OptionSuffix = genericController.vbLCase(Trim(Mid(ExpandedSelector, Pos + 1)))
                         End If
                         ExpandedSelector = Mid(ExpandedSelector, 1, Pos - 1)
                     End If
@@ -7051,20 +7053,20 @@ ErrorTrap:
                     For OptionPtr = 0 To OptionCnt - 1
                         OptionValue_AddonEncoded = Trim(OptionValues(OptionPtr))
                         If OptionValue_AddonEncoded <> "" Then
-                            Pos = vbInstr(1, OptionValue_AddonEncoded, ":")
+                            Pos = genericController.vbInstr(1, OptionValue_AddonEncoded, ":")
                             If Pos = 0 Then
-                                OptionValue = decodeNvaArgument(OptionValue_AddonEncoded)
+                                OptionValue = genericController.decodeNvaArgument(OptionValue_AddonEncoded)
                                 OptionCaption = OptionValue
                             Else
-                                OptionCaption = decodeNvaArgument(Mid(OptionValue_AddonEncoded, 1, Pos - 1))
-                                OptionValue = decodeNvaArgument(Mid(OptionValue_AddonEncoded, Pos + 1))
+                                OptionCaption = genericController.decodeNvaArgument(Mid(OptionValue_AddonEncoded, 1, Pos - 1))
+                                OptionValue = genericController.decodeNvaArgument(Mid(OptionValue_AddonEncoded, Pos + 1))
                             End If
                             Select Case OptionSuffix
                                 Case "checkbox"
                                     '
                                     ' Create checkbox HTMLFieldString
                                     '
-                                    If vbInstr(1, "," & LCaseOptionDefault & ",", "," & vbLCase(OptionValue) & ",") <> 0 Then
+                                    If genericController.vbInstr(1, "," & LCaseOptionDefault & ",", "," & genericController.vbLCase(OptionValue) & ",") <> 0 Then
                                         HTMLFieldString = HTMLFieldString & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & SitePropertyName & OptionPtr & """ value=""" & OptionValue & """ checked=""checked"">" & OptionCaption & "</div>"
                                     Else
                                         HTMLFieldString = HTMLFieldString & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & SitePropertyName & OptionPtr & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
@@ -7073,7 +7075,7 @@ ErrorTrap:
                                     '
                                     ' Create Radio HTMLFieldString
                                     '
-                                    If vbLCase(OptionValue) = LCaseOptionDefault Then
+                                    If genericController.vbLCase(OptionValue) = LCaseOptionDefault Then
                                         HTMLFieldString = HTMLFieldString & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & SitePropertyName & """ value=""" & OptionValue & """ checked=""checked"" >" & OptionCaption & "</div>"
                                     Else
                                         HTMLFieldString = HTMLFieldString & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & SitePropertyName & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
@@ -7082,7 +7084,7 @@ ErrorTrap:
                                     '
                                     ' Create select HTMLFieldString
                                     '
-                                    If vbLCase(OptionValue) = LCaseOptionDefault Then
+                                    If genericController.vbLCase(OptionValue) = LCaseOptionDefault Then
                                         HTMLFieldString = HTMLFieldString & "<option value=""" & OptionValue & """ selected>" & OptionCaption & "</option>"
                                     Else
                                         HTMLFieldString = HTMLFieldString & "<option value=""" & OptionValue & """>" & OptionCaption & "</option>"
@@ -7101,7 +7103,7 @@ ErrorTrap:
                             '
                             ' Create Radio HTMLFieldString
                             '
-                            'HTMLFieldString = "<div>" & vbReplace(HTMLFieldString, "><", "></div><div><") & "</div>"
+                            'HTMLFieldString = "<div>" & genericController.vbReplace(HTMLFieldString, "><", "></div><div><") & "</div>"
                         Case Else
                             '
                             ' Create select HTMLFieldString
@@ -7113,12 +7115,12 @@ ErrorTrap:
                     ' Create Text HTMLFieldString
                     '
 
-                    selector = decodeNvaArgument(selector)
+                    selector = genericController.decodeNvaArgument(selector)
                     HTMLFieldString = cpCore.html_GetFormInputText2(SitePropertyName, selector, 1, 20)
                 End If
                 '--------------
 
-                'HTMLFieldString = cpCore.main_GetFormInputText2( vbLCase(FieldName), VAlue)
+                'HTMLFieldString = cpCore.main_GetFormInputText2( genericController.vbLCase(FieldName), VAlue)
             End If
             Call FastString.Add(Adminui.GetEditRow(HTMLFieldString, SitePropertyName, "", False, False, ""))
             GetForm_Edit_SiteProperties = Adminui.GetEditPanel((Not allowAdminTabs), "Control Information", "", Adminui.EditTableOpen & FastString.Text & Adminui.EditTableClose)
@@ -7151,7 +7153,7 @@ ErrorTrap:
                     CS = cpCore.db.cs_open(cnAddons, "ccguid=" & cpCore.db.encodeSQLText(DashboardAddonGuid))
                     If cpCore.db.cs_ok(CS) Then
                         addonId = cpCore.db.cs_getInteger(CS, "id")
-                        Call cpCore.siteProperties.setProperty("AdminRootAddonID", EncodeText(addonId))
+                        Call cpCore.siteProperties.setProperty("AdminRootAddonID", genericController.encodeText(addonId))
                     End If
                     Call cpCore.db.cs_Close(CS)
                 End If
@@ -7170,11 +7172,11 @@ ErrorTrap:
                         ' the desktop has been set to none - go with default desktop
                         '
                         addonId = 0
-                    ElseIf vbIsNumeric(AddonIDText) Then
+                    ElseIf genericController.vbIsNumeric(AddonIDText) Then
                         '
                         ' it has been set to a non-zero number
                         '
-                        addonId = EncodeInteger(AddonIDText)
+                        addonId = genericController.EncodeInteger(AddonIDText)
                         '
                         ' Verify it so there is no error when it runs
                         '
@@ -7196,7 +7198,7 @@ ErrorTrap:
                         CS = cpCore.db.cs_open(cnAddons, "ccguid=" & cpCore.db.encodeSQLText(DashboardAddonGuid))
                         If cpCore.db.cs_ok(CS) Then
                             addonId = cpCore.db.cs_getInteger(CS, "id")
-                            Call cpCore.siteProperties.setProperty("AdminRootAddonID", EncodeText(addonId))
+                            Call cpCore.siteProperties.setProperty("AdminRootAddonID", genericController.encodeText(addonId))
                         End If
                         Call cpCore.db.cs_Close(CS)
                     End If
@@ -7546,7 +7548,7 @@ ErrorTrap:
                 '
                 linkAlias = ""
                 If adminContent.fields.ContainsKey("linkalias") Then
-                    linkAlias = EncodeText(editRecord.fieldsLc.Item("linkalias").value)
+                    linkAlias = genericController.encodeText(editRecord.fieldsLc.Item("linkalias").value)
                 End If
                 Call f.Add("<tr><td class=""ccAdminEditCaption"">" & SpanClassAdminSmall & "Link Alias</td>")
                 Call f.Add("<td class=""ccAdminEditField"" align=""left"" colspan=""2"">" & SpanClassAdminNormal)
@@ -7753,14 +7755,14 @@ ErrorTrap:
                 For Ptr = 0 To Cnt - 1
                     GroupID = 0
                     Dim HiddenPos As Integer
-                    HiddenPos = vbInstr(1, GroupSplit(Ptr), "hidden", vbTextCompare)
+                    HiddenPos = genericController.vbInstr(1, GroupSplit(Ptr), "hidden", vbTextCompare)
                     If HiddenPos > 0 Then
-                        IDPtr = vbInstr(1, GroupSplit(Ptr), "value=", vbTextCompare)
-                        'IDPtr = vbInstr(HiddenPos, GroupSplit(Ptr), "value=", vbTextCompare)
+                        IDPtr = genericController.vbInstr(1, GroupSplit(Ptr), "value=", vbTextCompare)
+                        'IDPtr = genericController.vbInstr(HiddenPos, GroupSplit(Ptr), "value=", vbTextCompare)
                         If IDPtr > 0 Then
-                            IDEndPtr = vbInstr(IDPtr, GroupSplit(Ptr), ">")
+                            IDEndPtr = genericController.vbInstr(IDPtr, GroupSplit(Ptr), ">")
                             If IDEndPtr > 0 Then
-                                GroupID = EncodeInteger(Mid(GroupSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
+                                GroupID = genericController.EncodeInteger(Mid(GroupSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
                             End If
                         End If
                         If GroupID > 0 Then
@@ -7833,11 +7835,11 @@ ErrorTrap:
             'Else
             '    For Ptr = 0 To UBound(GroupSplit)
             '        GroupID = 0
-            '        IDPtr = vbInstr(1, GroupSplit(Ptr), "value=", vbTextCompare)
+            '        IDPtr = genericController.vbInstr(1, GroupSplit(Ptr), "value=", vbTextCompare)
             '        If IDPtr > 0 Then
-            '            IDEndPtr = vbInstr(IDPtr, GroupSplit(Ptr), ">")
+            '            IDEndPtr = genericController.vbInstr(IDPtr, GroupSplit(Ptr), ">")
             '            If IDEndPtr > 0 Then
-            '                GroupID = EncodeInteger(Mid(GroupSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
+            '                GroupID = genericController.EncodeInteger(Mid(GroupSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
             '            End If
             '        End If
             '        If GroupID > 0 Then
@@ -7880,7 +7882,7 @@ ErrorTrap:
             '
             f.Add(Adminui.GetEditRow("<a href=?" & RequestNameAdminForm & "=28 target=_blank>Open in New Window</a>", "Email Control", "The settings in this section can be modified with the Email Control page."))
             f.Add(Adminui.GetEditRow(cpCore.siteProperties.getText("EmailBounceAddress", ""), "Bounce Email Address", "All bounced emails will be sent to this address automatically. This must be a valid email account, and you should either use Contensive Bounce processing to capture the emails, or manually remove them from the account yourself."))
-            f.Add(Adminui.GetEditRow(GetYesNo(EncodeBoolean(cpCore.siteProperties.getBoolean("AllowEmailBounceProcessing", False))), "Allow Bounce Email Processing", "If checked, Contensive will periodically retrieve all the email from the POP email account and take action on the membefr account that sent the email."))
+            f.Add(Adminui.GetEditRow(genericController.GetYesNo(genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("AllowEmailBounceProcessing", False))), "Allow Bounce Email Processing", "If checked, Contensive will periodically retrieve all the email from the POP email account and take action on the membefr account that sent the email."))
             Select Case cpCore.siteProperties.getText("EMAILBOUNCEPROCESSACTION", "0")
                 Case "1"
                     Copy = "Clear the Allow Group Email field for all members with a matching Email address"
@@ -8011,7 +8013,7 @@ ErrorTrap:
                                 If Membership(MembershipPointer) = GroupID Then
                                     GroupActive = Active(MembershipPointer)
                                     If DateExpires(MembershipPointer) > Date.MinValue Then
-                                        DateExpireValue = EncodeText(DateExpires(MembershipPointer))
+                                        DateExpireValue = genericController.encodeText(DateExpires(MembershipPointer))
                                     End If
                                     Exit For
                                 End If
@@ -8173,11 +8175,11 @@ ErrorTrap:
             GroupSplit = Split(GroupList, "<br >", , vbTextCompare)
             For Ptr = 0 To UBound(GroupSplit)
                 GroupID = 0
-                IDPtr = vbInstr(1, GroupSplit(Ptr), "value=", vbTextCompare)
+                IDPtr = genericController.vbInstr(1, GroupSplit(Ptr), "value=", vbTextCompare)
                 If IDPtr > 0 Then
-                    IDEndPtr = vbInstr(IDPtr, GroupSplit(Ptr), ">")
+                    IDEndPtr = genericController.vbInstr(IDPtr, GroupSplit(Ptr), ">")
                     If IDEndPtr > 0 Then
-                        GroupID = EncodeInteger(Mid(GroupSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
+                        GroupID = genericController.EncodeInteger(Mid(GroupSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
                     End If
                 End If
                 If GroupID > 0 Then
@@ -8221,11 +8223,11 @@ ErrorTrap:
             GroupSplit = Split(GroupList, "<br >", , vbTextCompare)
             For Ptr = 0 To UBound(GroupSplit)
                 GroupID = 0
-                IDPtr = vbInstr(1, GroupSplit(Ptr), "value=", vbTextCompare)
+                IDPtr = genericController.vbInstr(1, GroupSplit(Ptr), "value=", vbTextCompare)
                 If IDPtr > 0 Then
-                    IDEndPtr = vbInstr(IDPtr, GroupSplit(Ptr), ">")
+                    IDEndPtr = genericController.vbInstr(IDPtr, GroupSplit(Ptr), ">")
                     If IDEndPtr > 0 Then
-                        GroupID = EncodeInteger(Mid(GroupSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
+                        GroupID = genericController.EncodeInteger(Mid(GroupSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
                     End If
                 End If
                 If GroupID > 0 Then
@@ -8271,8 +8273,8 @@ ErrorTrap:
             '
             If WherePairCount > 0 Then
                 For WCPtr = 0 To WherePairCount - 1
-                    If vbUCase(WherePair(0, WCPtr)) = "MENUID" Then
-                        ForcedMenuID = EncodeInteger(WherePair(1, WCPtr))
+                    If genericController.vbUCase(WherePair(0, WCPtr)) = "MENUID" Then
+                        ForcedMenuID = genericController.EncodeInteger(WherePair(1, WCPtr))
                         Exit For
                     End If
                 Next
@@ -8290,21 +8292,21 @@ ErrorTrap:
             DynamicMenuSplit = Split(DynamicMenuList, "<br >", , vbTextCompare)
             For Ptr = 0 To UBound(DynamicMenuSplit)
                 DynamicMenuID = -1
-                IDPtr = vbInstr(1, DynamicMenuSplit(Ptr), "value=", vbTextCompare)
+                IDPtr = genericController.vbInstr(1, DynamicMenuSplit(Ptr), "value=", vbTextCompare)
                 If IDPtr > 0 Then
-                    IDEndPtr = vbInstr(IDPtr, DynamicMenuSplit(Ptr), ">")
+                    IDEndPtr = genericController.vbInstr(IDPtr, DynamicMenuSplit(Ptr), ">")
                     If IDEndPtr > 0 Then
-                        DynamicMenuID = EncodeInteger(Mid(DynamicMenuSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
+                        DynamicMenuID = genericController.EncodeInteger(Mid(DynamicMenuSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
                     End If
                 End If
                 If ForcedMenuID = DynamicMenuID Then
-                    DynamicMenuSplit(Ptr) = vbReplace(DynamicMenuSplit(Ptr), "type=checkbox ", "type=checkbox checked ", 1, 99, vbTextCompare)
+                    DynamicMenuSplit(Ptr) = genericController.vbReplace(DynamicMenuSplit(Ptr), "type=checkbox ", "type=checkbox checked ", 1, 99, vbTextCompare)
                 End If
                 'If WherePairCount > 0 Then
                 '    For WCPtr = 0 To WherePairCount - 1
-                '        If vbUCase(WherePair(0, WCPtr)) = "MENUID" Then
+                '        If genericController.vbUCase(WherePair(0, WCPtr)) = "MENUID" Then
                 '            If WherePair(1, WCPtr) = CStr(DynamicMenuID) Then
-                '                DynamicMenuSplit(Ptr) = vbReplace(DynamicMenuSplit(Ptr), "<input ", "<input checked ", 1, 1, vbTextCompare)
+                '                DynamicMenuSplit(Ptr) = genericController.vbReplace(DynamicMenuSplit(Ptr), "<input ", "<input checked ", 1, 1, vbTextCompare)
                 '            End If
                 '            Exit For
                 '        End If
@@ -8351,11 +8353,11 @@ ErrorTrap:
             SectionSplit = Split(SectionList, "<br >", , vbTextCompare)
             For Ptr = 0 To UBound(SectionSplit)
                 SectionID = 0
-                IDPtr = vbInstr(1, SectionSplit(Ptr), "value=", vbTextCompare)
+                IDPtr = genericController.vbInstr(1, SectionSplit(Ptr), "value=", vbTextCompare)
                 If IDPtr > 0 Then
-                    IDEndPtr = vbInstr(IDPtr, SectionSplit(Ptr), ">")
+                    IDEndPtr = genericController.vbInstr(IDPtr, SectionSplit(Ptr), ">")
                     If IDEndPtr > 0 Then
-                        SectionID = EncodeInteger(Mid(SectionSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
+                        SectionID = genericController.EncodeInteger(Mid(SectionSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
                     End If
                 End If
                 'If SectionID > 0 Then
@@ -8398,11 +8400,11 @@ ErrorTrap:
             GroupSplit = Split(GroupList, "<br >", , vbTextCompare)
             For Ptr = 0 To UBound(GroupSplit)
                 GroupID = 0
-                IDPtr = vbInstr(1, GroupSplit(Ptr), "value=", vbTextCompare)
+                IDPtr = genericController.vbInstr(1, GroupSplit(Ptr), "value=", vbTextCompare)
                 If IDPtr > 0 Then
-                    IDEndPtr = vbInstr(IDPtr, GroupSplit(Ptr), ">")
+                    IDEndPtr = genericController.vbInstr(IDPtr, GroupSplit(Ptr), ">")
                     If IDEndPtr > 0 Then
-                        GroupID = EncodeInteger(Mid(GroupSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
+                        GroupID = genericController.EncodeInteger(Mid(GroupSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
                     End If
                 End If
                 If GroupID > 0 Then
@@ -8692,12 +8694,12 @@ ErrorTrap:
         '            ''Dim arrayOfFields() As appServices_metaDataClass.CDefFieldClass
         '            '
         '            GetFieldPtrNoError = -1
-        '            UcaseTargetField = vbUCase(TargetField)
+        '            UcaseTargetField = genericController.vbUCase(TargetField)
         '            If adminContent.fields.Count > 0 Then
         '                arrayOfFields = adminContent.fields
         '                For GetFieldPtrNoError = 0 To adminContent.fields.Count - 1
 
-        '                    If vbUCase(arrayOfFields(GetFieldPtrNoError).Name) = UcaseTargetField Then
+        '                    If genericController.vbUCase(arrayOfFields(GetFieldPtrNoError).Name) = UcaseTargetField Then
         '                        Exit For
         '                    End If
         '                Next
@@ -8780,7 +8782,7 @@ ErrorTrap:
             '
             IncludeWidth = False
             If ButtonWidth <> "" Then
-                If vbIsNumeric(ButtonWidth) Then
+                If genericController.vbIsNumeric(ButtonWidth) Then
                     IncludeWidth = True
                 End If
             End If
@@ -9045,7 +9047,7 @@ ErrorTrap:
         '                            If MenuPage = "" Then
         '                                MenuPage = cpCore.siteProperties.serverPageDefault
         '                            End If
-        '                            If vbInstr(MenuPage, "?") = 0 Then
+        '                            If genericController.vbInstr(MenuPage, "?") = 0 Then
         '                                MenuPage = MenuPage & "?s=0"
         '                                'Else
         '                                '    MenuPage = MenuPage
@@ -9105,10 +9107,10 @@ ErrorTrap:
                 '
                 QS = cpCore.web_RefreshQueryString
                 If allowAdminTabs Then
-                    QS = ModifyQueryString(QS, "tabs", "0", True)
+                    QS = genericController.ModifyQueryString(QS, "tabs", "0", True)
                     RightSide = RightSide & GetActiveImage(cpCore.serverConfig.appConfig.adminRoute & "?" & QS, "Disable Tabs", "LibButtonNoTabs.GIF", "LibButtonNoTabsRev.GIF", "Disable Tabs", "16", "16", "", "", "")
                 Else
-                    QS = ModifyQueryString(QS, "tabs", "1", True)
+                    QS = genericController.ModifyQueryString(QS, "tabs", "1", True)
                     RightSide = RightSide & GetActiveImage(cpCore.serverConfig.appConfig.adminRoute & "?" & QS, "Enable Tabs", "LibButtonTabs.GIF", "LibButtonTabsRev.GIF", "Enable Tabs", "16", "16", "", "", "")
                 End If
                 '
@@ -9118,10 +9120,10 @@ ErrorTrap:
                 If MenuDepth = 0 Then
                     RightSide = RightSide & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""16"" >"
                     If AdminMenuModeID = AdminMenuModeTop Then
-                        QS = ModifyQueryString(QS, "mm", "1", True)
+                        QS = genericController.ModifyQueryString(QS, "mm", "1", True)
                         RightSide = RightSide & GetActiveImage(cpCore.serverConfig.appConfig.adminRoute & "?" & QS, "Use Navigator", "LibButtonMenuTop.GIF", "LibButtonMenuTopOver.GIF", "Use Navigator", "16", "16", "", "", "")
                     Else
-                        QS = ModifyQueryString(QS, "mm", "2", True)
+                        QS = genericController.ModifyQueryString(QS, "mm", "2", True)
                         RightSide = RightSide & GetActiveImage(cpCore.serverConfig.appConfig.adminRoute & "?" & QS, "Use Dropdown Menus", "LibButtonMenuLeft.GIF", "LibButtonMenuLeftOver.GIF", "Use Dropdown Menus", "16", "16", "", "", "")
                     End If
                 End If
@@ -9175,7 +9177,7 @@ ErrorTrap:
                     Stream.Add("" _
                         & cr & "<table border=0 cellpadding=0 cellspacing=0><tr>" _
                         & cr & "<td class=""ccToolsCon"" valign=top>" _
-                        & kmaIndent(AdminNavFull) _
+                        & genericController.kmaIndent(AdminNavFull) _
                         & cr & "</td>" _
                         & cr & "<td id=""desktop"" class=""ccContentCon"" valign=top>")
                     AdminFormBottom = AdminFormBottom & "</td></tr></table>"
@@ -9313,7 +9315,7 @@ ErrorTrap:
                 'ContentControlCriteria = cpCore.csv_GetContentControlCriteria(MenuContentName)
                 Criteria = Criteria & "AND" & cpCore.content_getContentControlCriteria(MenuContentName)
             End If
-            iParentCriteria = encodeEmptyText(ParentCriteria, "")
+            iParentCriteria = genericController.encodeEmptyText(ParentCriteria, "")
             If cpCore.user.isAuthenticatedDeveloper Then
                 '
                 ' ----- Developer
@@ -9387,7 +9389,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetMenuCSPointer")
             '
             Dim iParentCriteria As String
-            iParentCriteria = encodeEmptyText(ParentCriteria, "")
+            iParentCriteria = genericController.encodeEmptyText(ParentCriteria, "")
             If iParentCriteria <> "" Then
                 iParentCriteria = "(" & iParentCriteria & ")"
             End If
@@ -9486,9 +9488,9 @@ ErrorTrap:
                 Else
                     GetMenuLink = cpCore.siteProperties.adminURL
                 End If
-                ContentID = EncodeInteger(LinkCID)
+                ContentID = genericController.EncodeInteger(LinkCID)
                 If ContentID <> 0 Then
-                    GetMenuLink = modifyLinkQuery(GetMenuLink, "cid", CStr(ContentID), True)
+                    GetMenuLink = genericController.modifyLinkQuery(GetMenuLink, "cid", CStr(ContentID), True)
                 End If
             End If
             Exit Function
@@ -9688,9 +9690,9 @@ ErrorTrap:
                                     '' Linked Styles
                                     '' Bump the Style Serial Number so next fetch is not cached
                                     ''
-                                    'StyleSN = encodeInteger(cpCore.main_GetSiteProperty2("StylesheetSerialNumber", "0"))
+                                    'StyleSN = genericController.EncodeInteger(cpCore.main_GetSiteProperty2("StylesheetSerialNumber", "0"))
                                     'StyleSN = StyleSN + 1
-                                    'Call cpCore.app.setSiteProperty("StylesheetSerialNumber", encodeText(StyleSN))
+                                    'Call cpCore.app.setSiteProperty("StylesheetSerialNumber", genericController.encodeText(StyleSN))
                                     ''
                                     '' Save new public stylesheet
                                     ''
@@ -9702,12 +9704,12 @@ ErrorTrap:
                                 '
                                 ' delete all templateid based editorstylerule files, build on-demand
                                 '
-                                EditorStyleRulesFilename = vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, vbTextCompare)
+                                EditorStyleRulesFilename = genericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, vbTextCompare)
                                 Call cpCore.cdnFiles.deleteFile(EditorStyleRulesFilename)
                                 '
                                 CS = cpCore.db.cs_openCsSql_rev("default", "select id from cctemplates")
                                 Do While cpCore.db.cs_ok(CS)
-                                    EditorStyleRulesFilename = vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", cpCore.main_cs_get2Text(CS, "ID"), 1, 99, vbTextCompare)
+                                    EditorStyleRulesFilename = genericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", cpCore.main_cs_get2Text(CS, "ID"), 1, 99, vbTextCompare)
                                     Call cpCore.cdnFiles.deleteFile(EditorStyleRulesFilename)
                                     Call cpCore.db.cs_goNext(CS)
                                 Loop
@@ -9823,9 +9825,9 @@ ErrorTrap:
             Call cpCore.main_AddHeadScriptCode("var docLoaded=false", "Form loader")
             Call cpCore.main_AddOnLoadJavascript2("docLoaded=true;", "Form loader")
             s = cpCore.html_GetUploadFormStart()
-            s = vbReplace(s, ">", " onSubmit=""cj.admin.saveEmptyFieldList('" & "FormEmptyFieldList');"">")
-            s = vbReplace(s, ">", " autocomplete=""off"">")
-            s = vbReplace(s, ">", " id=""adminEditForm"">")
+            s = genericController.vbReplace(s, ">", " onSubmit=""cj.admin.saveEmptyFieldList('" & "FormEmptyFieldList');"">")
+            s = genericController.vbReplace(s, ">", " autocomplete=""off"">")
+            s = genericController.vbReplace(s, ">", " id=""adminEditForm"">")
             s = s & vbCrLf & "<input TYPE=""hidden"" NAME=""" & RequestNameAdminSourceForm & """ VALUE=""" & AdminFormID.ToString & """>"
             s = s & vbCrLf & "<input TYPE=""hidden"" NAME=""" & RequestNameTitleExtension & """ VALUE=""" & TitleExtension & """>"
             s = s & vbCrLf & "<input TYPE=""hidden"" NAME=""" & RequestNameAdminDepth & """ VALUE=""" & MenuDepth & """>"
@@ -9866,7 +9868,7 @@ ErrorTrap:
                 ' ccpagecontent.linkalias is a control field that is not in control tab
                 '
             Else
-                Select Case vbUCase(Name)
+                Select Case genericController.vbUCase(Name)
                     Case "ID", "CONTENTCONTROLID", "CREATEDBY", "DATEADDED", "MODIFIEDBY", "MODIFIEDDATE", "CREATEKEY", "EDITSOURCEID", "EDITBLANK", "EDITARCHIVE", "CONTENTCATEGORYID", "CCGUID"
                         '
                         ' ----- control fields are not editable user fields
@@ -9974,8 +9976,8 @@ ErrorTrap:
                 '
                 '
                 If Not cpCore.error_IsUserError Then
-                    Select Case vbUCase(adminContent.ContentTableName)
-                        Case vbUCase("ccMembers")
+                    Select Case genericController.vbUCase(adminContent.ContentTableName)
+                        Case genericController.vbUCase("ccMembers")
                             '
                             '
                             '
@@ -9988,7 +9990,7 @@ ErrorTrap:
                             '
                             '
                             Call SaveEditRecord(adminContent, editRecord)
-                            Call cpCore.main_ProcessCheckList("PathRules", "Paths", EncodeText(editRecord.id), "Groups", "Path Rules", "PathID", "GroupID")
+                            Call cpCore.main_ProcessCheckList("PathRules", "Paths", genericController.encodeText(editRecord.id), "Groups", "Path Rules", "PathID", "GroupID")
                         Case "CCEMAIL"
                             '
                             '
@@ -9998,8 +10000,8 @@ ErrorTrap:
                             'If cpCore.main_GetSiteProperty2("BuildVersion") >= "3.3.291" Then
                             '    Call cpCore.app.executeSql( "update ccEmail set InlineStyles=" & encodeSQLText(cpCore.main_GetStyleSheetProcessed) & " where ID=" & EditRecord.ID)
                             'End If
-                            Call cpCore.main_ProcessCheckList("EmailGroups", "Group Email", EncodeText(editRecord.id), "Groups", "Email Groups", "EmailID", "GroupID")
-                            Call cpCore.main_ProcessCheckList("EmailTopics", "Group Email", EncodeText(editRecord.id), "Topics", "Email Topics", "EmailID", "TopicID")
+                            Call cpCore.main_ProcessCheckList("EmailGroups", "Group Email", genericController.encodeText(editRecord.id), "Groups", "Email Groups", "EmailID", "GroupID")
+                            Call cpCore.main_ProcessCheckList("EmailTopics", "Group Email", genericController.encodeText(editRecord.id), "Topics", "Email Topics", "EmailID", "TopicID")
                         Case "CCCONTENT"
                             '
                             '
@@ -10026,8 +10028,8 @@ ErrorTrap:
                             Call LoadContentTrackingResponse(adminContent, editRecord)
                             'Call LoadAndSaveCalendarEvents
                             Call LoadAndSaveMetaContent()
-                            Call cpCore.main_ProcessCheckList("SectionBlockRules", adminContent.Name, EncodeText(editRecord.id), "Groups", "Section Block Rules", "SectionID", "GroupID")
-                            Call cpCore.main_ProcessCheckList("SectionDynamicMenuRules", adminContent.Name, EncodeText(editRecord.id), "Dynamic Menus", "Dynamic Menu Section Rules", "SectionID", "DynamicMenuID")
+                            Call cpCore.main_ProcessCheckList("SectionBlockRules", adminContent.Name, genericController.encodeText(editRecord.id), "Groups", "Section Block Rules", "SectionID", "GroupID")
+                            Call cpCore.main_ProcessCheckList("SectionDynamicMenuRules", adminContent.Name, genericController.encodeText(editRecord.id), "Dynamic Menus", "Dynamic Menu Section Rules", "SectionID", "DynamicMenuID")
                             'call SaveTopicRules
                             Call SaveContentTracking(adminContent, editRecord)
                         Case "CCDYNAMICMENUS"
@@ -10035,7 +10037,7 @@ ErrorTrap:
                             '
                             '
                             Call SaveEditRecord(adminContent, editRecord)
-                            Call cpCore.main_ProcessCheckList("DynamicMenuSectionRules", adminContent.Name, EncodeText(editRecord.id), "Site Sections", "Dynamic Menu Section Rules", "DynamicMenuID", "SectionID")
+                            Call cpCore.main_ProcessCheckList("DynamicMenuSectionRules", adminContent.Name, genericController.encodeText(editRecord.id), "Site Sections", "Dynamic Menu Section Rules", "DynamicMenuID", "SectionID")
                             'call SaveTopicRules
                             Call SaveContentTracking(adminContent, editRecord)
                             '
@@ -10052,7 +10054,7 @@ ErrorTrap:
                             Call LoadContentTrackingResponse(adminContent, editRecord)
                             'Call LoadAndSaveCalendarEvents
                             Call LoadAndSaveMetaContent()
-                            Call cpCore.main_ProcessCheckList("LibraryFolderRules", adminContent.Name, EncodeText(editRecord.id), "Groups", "Library Folder Rules", "FolderID", "GroupID")
+                            Call cpCore.main_ProcessCheckList("LibraryFolderRules", adminContent.Name, genericController.encodeText(editRecord.id), "Groups", "Library Folder Rules", "FolderID", "GroupID")
                             'call SaveTopicRules
                             Call SaveContentTracking(adminContent, editRecord)
                         Case "CCSETUP"
@@ -10076,7 +10078,7 @@ ErrorTrap:
                                     End If
                                 End If
                             End If
-                        Case vbUCase("ccGroups")
+                        Case genericController.vbUCase("ccGroups")
                             'Case "CCGROUPS"
                             '
                             '
@@ -10102,7 +10104,7 @@ ErrorTrap:
                             'call SaveTopicRules
                             Call SaveContentTracking(adminContent, editRecord)
                             '
-                            EditorStyleRulesFilename = vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", editRecord.id.ToString, 1, 99, vbTextCompare)
+                            EditorStyleRulesFilename = genericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", editRecord.id.ToString, 1, 99, vbTextCompare)
                             Call cpCore.privateFiles.deleteFile(EditorStyleRulesFilename)
                         Case "CCSHAREDSTYLES"
                             '
@@ -10116,12 +10118,12 @@ ErrorTrap:
                             'call SaveTopicRules
                             Call SaveContentTracking(adminContent, editRecord)
                             '
-                            EditorStyleRulesFilename = vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, vbTextCompare)
+                            EditorStyleRulesFilename = genericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, vbTextCompare)
                             Call cpCore.cdnFiles.deleteFile(EditorStyleRulesFilename)
                             '
                             CS = cpCore.db.cs_openCsSql_rev("default", "select id from cctemplates")
                             Do While cpCore.db.cs_ok(CS)
-                                EditorStyleRulesFilename = vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", cpCore.main_cs_get2Text(CS, "ID"), 1, 99, vbTextCompare)
+                                EditorStyleRulesFilename = genericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", cpCore.main_cs_get2Text(CS, "ID"), 1, 99, vbTextCompare)
                                 Call cpCore.cdnFiles.deleteFile(EditorStyleRulesFilename)
                                 Call cpCore.db.cs_goNext(CS)
                             Loop
@@ -10169,7 +10171,7 @@ ErrorTrap:
             ' converted array to dictionary - Dim FieldPointer As Integer
             '
             If Not cpCore.error_IsUserError Then
-                Select Case vbUCase(adminContent.ContentTableName)
+                Select Case genericController.vbUCase(adminContent.ContentTableName)
                     Case "CCEMAIL"
                         '
                         ' --- preload array with values that may not come back in response
@@ -10189,7 +10191,7 @@ ErrorTrap:
                             End If
                             '
                             editRecord.id = 0
-                            Call cpCore.webServerIO_addRefreshQueryString("id", EncodeText(editRecord.id))
+                            Call cpCore.webServerIO_addRefreshQueryString("id", genericController.encodeText(editRecord.id))
                         End If
                     Case Else
                         '
@@ -10230,8 +10232,8 @@ ErrorTrap:
                             For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In adminContent.fields
                                 Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
                                 With field
-                                    If vbLCase(.nameLc) = "email" Then
-                                        If (LCase(adminContent.ContentTableName) = "ccmembers") And (EncodeBoolean(cpCore.siteProperties.getBoolean("allowemaillogin", False))) Then
+                                    If genericController.vbLCase(.nameLc) = "email" Then
+                                        If (LCase(adminContent.ContentTableName) = "ccmembers") And (genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("allowemaillogin", False))) Then
                                             editRecord.fieldsLc(.nameLc).value = ""
                                         End If
                                     End If
@@ -10241,7 +10243,7 @@ ErrorTrap:
                                 End With
                             Next
                             '
-                            Call cpCore.webServerIO_addRefreshQueryString("id", EncodeText(editRecord.id))
+                            Call cpCore.webServerIO_addRefreshQueryString("id", genericController.encodeText(editRecord.id))
                         End If
                         'Call cpCore.main_AddUserError("The create duplicate action is not supported for this content.")
                 End Select
@@ -10301,8 +10303,8 @@ ErrorTrap:
                 ' ----- Get the baked version
                 '
                 BakeName = "AdminMenu" & Format(cpCore.user.id, "00000000")
-                GetMenuTopMode = EncodeText(cpCore.cache.getObject(Of String)(BakeName))
-                MenuDelimiterPosition = vbInstr(1, GetMenuTopMode, MenuDelimiter, vbTextCompare)
+                GetMenuTopMode = genericController.encodeText(cpCore.cache.getObject(Of String)(BakeName))
+                MenuDelimiterPosition = genericController.vbInstr(1, GetMenuTopMode, MenuDelimiter, vbTextCompare)
                 If MenuDelimiterPosition > 1 Then
                     MenuClose = Mid(GetMenuTopMode, MenuDelimiterPosition + Len(MenuDelimiter))
                     GetMenuTopMode = Mid(GetMenuTopMode, 1, MenuDelimiterPosition - 1)
@@ -10341,7 +10343,7 @@ ErrorTrap:
                             ParentID = cpCore.db.cs_getInteger(CSMenus, "ParentID")
                             If AccessOK Then
                                 Link = GetMenuLink(cpCore.db.cs_get(CSMenus, "LinkPage"), ContentID)
-                                If vbInstr(1, Link, "?") = 1 Then
+                                If genericController.vbInstr(1, Link, "?") = 1 Then
                                     Link = cpCore.serverConfig.appConfig.adminRoute & Link
                                 End If
                             Else
@@ -10352,7 +10354,7 @@ ErrorTrap:
                             '    Link = Link
                             '    End If
                             NewWindow = cpCore.db.cs_getBoolean(CSMenus, "NewWindow")
-                            Call cpCore.menu_AddEntry(EncodeText(Id), ParentID.ToString, ImageLink, ImageOverLink, Link, LinkLabel, StyleSheet, StyleSheetHover, NewWindow)
+                            Call cpCore.menu_AddEntry(genericController.encodeText(Id), ParentID.ToString, ImageLink, ImageOverLink, Link, LinkLabel, StyleSheet, StyleSheetHover, NewWindow)
 
                             Call cpCore.db.cs_goNext(CSMenus)
                         Loop
@@ -10376,7 +10378,7 @@ ErrorTrap:
                             Name = cpCore.db.cs_get(CSMenus, "Name")
                             Id = cpCore.db.cs_getInteger(CSMenus, "ID")
                             NewWindow = cpCore.db.cs_getBoolean(CSMenus, "NewWindow")
-                            MenuHeader = cpCore.menuFlyout.getMenu(EncodeText(Id), 0)
+                            MenuHeader = cpCore.menuFlyout.getMenu(genericController.encodeText(Id), 0)
                             If MenuHeader <> "" Then
                                 If ButtonCnt > 0 Then
                                     GetMenuTopMode = GetMenuTopMode & "<td class=""ccFlyoutDelimiter"">|</td>"
@@ -10912,7 +10914,7 @@ ErrorTrap:
                 ArchiveRecordAgeDays = (cpCore.siteProperties.getinteger("ArchiveRecordAgeDays", 0))
                 ArchiveTimeOfDay = cpCore.siteProperties.getText("ArchiveTimeOfDay", "12:00:00 AM")
                 ArchiveAllowFileClean = (cpCore.siteProperties.getBoolean("ArchiveAllowFileClean", False))
-                'ArchiveAllowLogClean = encodeBoolean(cpCore.main_GetSiteProperty2("ArchiveAllowLogClean", False))
+                'ArchiveAllowLogClean = genericController.EncodeBoolean(cpCore.main_GetSiteProperty2("ArchiveAllowLogClean", False))
 
                 '
                 ' Process Requests
@@ -10921,13 +10923,13 @@ ErrorTrap:
                     Case ButtonOK, ButtonSave
                         '
                         ArchiveRecordAgeDays = cpCore.docProperties.getInteger("ArchiveRecordAgeDays")
-                        Call cpCore.siteProperties.setProperty("ArchiveRecordAgeDays", EncodeText(ArchiveRecordAgeDays))
+                        Call cpCore.siteProperties.setProperty("ArchiveRecordAgeDays", genericController.encodeText(ArchiveRecordAgeDays))
                         '
                         ArchiveTimeOfDay = cpCore.docProperties.getText("ArchiveTimeOfDay")
                         Call cpCore.siteProperties.setProperty("ArchiveTimeOfDay", ArchiveTimeOfDay)
                         '
                         ArchiveAllowFileClean = cpCore.doc_getBoolean2("ArchiveAllowFileClean")
-                        Call cpCore.siteProperties.setProperty("ArchiveAllowFileClean", EncodeText(ArchiveAllowFileClean))
+                        Call cpCore.siteProperties.setProperty("ArchiveAllowFileClean", genericController.encodeText(ArchiveAllowFileClean))
                 End Select
                 '
                 If Button = ButtonOK Then
@@ -10936,7 +10938,7 @@ ErrorTrap:
                 '
                 ' ----- Status
                 '
-                Call Content.Add(StartTableRow() & "<td colspan=""3"" class=""ccPanel3D ccAdminEditSubHeader""><b>Status</b>" & kmaEndTableCell & kmaEndTableRow)
+                Call Content.Add(genericController.StartTableRow() & "<td colspan=""3"" class=""ccPanel3D ccAdminEditSubHeader""><b>Status</b>" & kmaEndTableCell & kmaEndTableRow)
                 '
                 ' ----- Visits Found
                 '
@@ -10960,8 +10962,8 @@ ErrorTrap:
                 If cpCore.db.cs_ok(CSServers) Then
                     DateValue = cpCore.db.cs_getDate(CSServers, "DateAdded")
                     If DateValue <> Date.MinValue Then
-                        Copy = EncodeText(DateValue)
-                        AgeInDays = EncodeText(Int(cpCore.app_startTime - DateValue))
+                        Copy = genericController.encodeText(DateValue)
+                        AgeInDays = genericController.encodeText(Int(cpCore.app_startTime - DateValue))
                     End If
                 End If
                 Call cpCore.db.cs_Close(CSServers)
@@ -10978,7 +10980,7 @@ ErrorTrap:
                 Call cpCore.db.cs_Close(CSServers)
                 Call Content.Add(Adminui.GetEditRow(SpanClassAdminNormal & PagesTotal, "Viewings Found", "", False, False, ""))
                 '
-                Call Content.Add(StartTableRow() & "<td colspan=""3"" class=""ccPanel3D ccAdminEditSubHeader""><b>Options</b>" & kmaEndTableCell & kmaEndTableRow)
+                Call Content.Add(genericController.StartTableRow() & "<td colspan=""3"" class=""ccPanel3D ccAdminEditSubHeader""><b>Options</b>" & kmaEndTableCell & kmaEndTableRow)
                 '
                 Caption = "Archive Age"
                 Copy = cpCore.html_GetFormInputText2("ArchiveRecordAgeDays", CStr(ArchiveRecordAgeDays), , 20) & "&nbsp;Number of days to keep visit records. 0 disables housekeeping."
@@ -11026,7 +11028,7 @@ ErrorTrap:
         '    End If
         '    Select Case FieldType
         '        Case FieldTypeBoolean
-        '            GetPropertyControl = cpCore.main_GetFormInputCheckBox2(Name, encodeBoolean(CurrentValue))
+        '            GetPropertyControl = cpCore.main_GetFormInputCheckBox2(Name, genericController.EncodeBoolean(CurrentValue))
         '        Case Else
         '            GetPropertyControl = cpCore.main_GetFormInputText2(Name, CurrentValue)
         '    End Select
@@ -11046,7 +11048,7 @@ ErrorTrap:
             Dim CurrentValue As String
             '
             If readOnlyField Then
-                GetPropertyHTMLControl = "<div style=""border:1px solid #808080; padding:20px;"">" & decodeHtml(cpCore.siteProperties.getText(Name, DefaultValue)) & "</div>"
+                GetPropertyHTMLControl = "<div style=""border:1px solid #808080; padding:20px;"">" & genericController.decodeHtml(cpCore.siteProperties.getText(Name, DefaultValue)) & "</div>"
             ElseIf ProcessRequest Then
                 CurrentValue = cpCore.docProperties.getText(Name)
                 Call cpCore.siteProperties.setProperty(Name, CurrentValue)
@@ -11112,14 +11114,14 @@ ErrorTrap:
                 ButtonList = ButtonCancel
                 Content.Add(Adminui.GetFormBodyAdminOnly())
             Else
-                'StyleSN = encodeInteger(cpCore.main_GetSiteProperty2("StylesheetSerialNumber", false ))
+                'StyleSN = genericController.EncodeInteger(cpCore.main_GetSiteProperty2("StylesheetSerialNumber", false ))
                 AllowCSSReset = False
                 If True Then ' 4.1.101" Then
                     AllowCSSReset = (cpCore.siteProperties.getBoolean("Allow CSS Reset", False))
                 End If
                 '
                 Copy = cpCore.html_GetFormInputTextExpandable("StyleEditor", cpCore.cdnFiles.readFile(DynamicStylesFilename), 20)
-                Copy = vbReplace(Copy, " cols=""100""", " style=""width:100%;""", 1, 99, vbTextCompare)
+                Copy = genericController.vbReplace(Copy, " cols=""100""", " style=""width:100%;""", 1, 99, vbTextCompare)
                 Copy = "" _
                     & "<div style=""padding:10px;"">" & cpCore.html_GetFormInputCheckBox2(RequestNameAllowCSSReset, AllowCSSReset) & "&nbsp;Include Contensive reset styles</div>" _
                     & "<div style=""padding:10px;"">" & Copy & "</div>"
@@ -11176,14 +11178,14 @@ ErrorTrap:
             If RecordID <> 0 Then
                 EditIcon = "<a href=""?cid=" & cpCore.main_GetContentID(ContentName) & "&id=" & RecordID & "&" & RequestNameAdminForm & "=4"" target=_blank><img src=""/ccLib/images/IconContentEdit.gif"" border=0 alt=""Edit content"" valign=absmiddle></a>"
             Else
-                EditIcon = "<a href=""?cid=" & cpCore.main_GetContentID(ContentName) & "&" & RequestNameAdminForm & "=4&" & RequestNameAdminAction & "=2&ad=1&wc=" & EncodeURL("name=" & CopyName) & """ target=_blank><img src=""/ccLib/images/IconContentEdit.gif"" border=0 alt=""Edit content"" valign=absmiddle></a>"
+                EditIcon = "<a href=""?cid=" & cpCore.main_GetContentID(ContentName) & "&" & RequestNameAdminForm & "=4&" & RequestNameAdminAction & "=2&ad=1&wc=" & genericController.EncodeURL("name=" & CopyName) & """ target=_blank><img src=""/ccLib/images/IconContentEdit.gif"" border=0 alt=""Edit content"" valign=absmiddle></a>"
             End If
             If Copy = "" Then
                 Copy = "&nbsp;"
             End If
             '
             GetForm_ControlPage_CopyContent = "" _
-                & StartTable(4, 0, 1) & "<tr>" _
+                & genericController.StartTable(4, 0, 1) & "<tr>" _
                 & "<td width=150 align=right>" & Caption & "<br><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=150 height=1></td>" _
                 & "<td width=20 align=center>" & EditIcon & "</td>" _
                 & "<td>" & Copy & "&nbsp;</td>" _
@@ -11322,9 +11324,9 @@ ErrorTrap:
         '            '
         '            HelpCopy = "Set the action to be performed when an Email address is identified as invalid by the bounce process."
         '            If Not SaveAction Then
-        '                FieldValue = encodeInteger(cpCore.main_GetSiteProperty2("EMAILBOUNCEPROCESSACTION"))
+        '                FieldValue = genericController.EncodeInteger(cpCore.main_GetSiteProperty2("EMAILBOUNCEPROCESSACTION"))
         '            Else
-        '                FieldValue = encodeInteger(cpCore.main_GetStreamText2("EMAILBOUNCEPROCESSACTION"))
+        '                FieldValue = genericController.EncodeInteger(cpCore.main_GetStreamText2("EMAILBOUNCEPROCESSACTION"))
         '                Call cpCore.app.setSiteProperty("EMAILBOUNCEPROCESSACTION", FieldValue)
         '            End If
         '            Copy = "<select size=1 name=EMAILBOUNCEPROCESSACTION>" _
@@ -11333,7 +11335,7 @@ ErrorTrap:
         '                & "<option value=2>Clear all member Email addresses that match the Email address</option>" _
         '                & "<option value=3>Delete all Members with a matching Email address</option>" _
         '                & "</select>"
-        '            Copy = vbReplace(Copy, "value=" & FieldValue, "selected value=" & FieldValue)
+        '            Copy = genericController.vbReplace(Copy, "value=" & FieldValue, "selected value=" & FieldValue)
         '            Call Content.Add(AdminUI.GetEditRow( Copy, "Bounce Email Action", HelpCopy, False, False))
         '            '
         '            HelpCopy = "Bounce emails are retrieved about every minute. This is the status of the last check."
@@ -11511,11 +11513,11 @@ ErrorTrap:
                                             If cpCore.db.cs_ok(CSDst) Then
                                                 Call cpCore.db.cs_set(CSDst, "Name", cpCore.db.cs_getText(CSSrc, "name"))
                                                 Call cpCore.db.cs_set(CSDst, SQLFieldName, cpCore.db.cs_getText(CSSrc, SQLFieldName))
-                                                If vbLCase(cpCore.db.cs_getText(CSSrc, "command")) = "xml" Then
-                                                    Call cpCore.db.cs_set(CSDst, "Filename", "DupDownload_" & CStr(dateToSeconds(cpCore.app_startTime)) & CStr(GetRandomInteger()) & ".xml")
+                                                If genericController.vbLCase(cpCore.db.cs_getText(CSSrc, "command")) = "xml" Then
+                                                    Call cpCore.db.cs_set(CSDst, "Filename", "DupDownload_" & CStr(genericController.dateToSeconds(cpCore.app_startTime)) & CStr(genericController.GetRandomInteger()) & ".xml")
                                                     Call cpCore.db.cs_set(CSDst, "Command", "BUILDXML")
                                                 Else
-                                                    Call cpCore.db.cs_set(CSDst, "Filename", "DupDownload_" & CStr(dateToSeconds(cpCore.app_startTime)) & CStr(GetRandomInteger()) & ".csv")
+                                                    Call cpCore.db.cs_set(CSDst, "Filename", "DupDownload_" & CStr(genericController.dateToSeconds(cpCore.app_startTime)) & CStr(genericController.GetRandomInteger()) & ".csv")
                                                     Call cpCore.db.cs_set(CSDst, "Command", "BUILDCSV")
                                                 End If
                                             End If
@@ -11539,7 +11541,7 @@ ErrorTrap:
                                     TableName = cpCore.GetContentTablename(ContentName)
                                     Criteria = cpCore.content_getContentControlCriteria(ContentName)
                                     Name = "CSV Download, " & ContentName
-                                    Filename = vbReplace(ContentName, " ", "") & "_" & CStr(dateToSeconds(cpCore.app_startTime)) & CStr(GetRandomInteger()) & ".csv"
+                                    Filename = genericController.vbReplace(ContentName, " ", "") & "_" & CStr(genericController.dateToSeconds(cpCore.app_startTime)) & CStr(genericController.GetRandomInteger()) & ".csv"
                                     Call cpCore.db.cs_set(CS, "Name", Name)
                                     Call cpCore.db.cs_set(CS, "Filename", Filename)
                                     Call cpCore.db.cs_set(CS, "Command", "BUILDCSV")
@@ -11556,7 +11558,7 @@ ErrorTrap:
                                     TableName = cpCore.GetContentTablename(ContentName)
                                     Criteria = cpCore.content_getContentControlCriteria(ContentName)
                                     Name = "XML Download, " & ContentName
-                                    Filename = vbReplace(ContentName, " ", "") & "_" & CStr(dateToSeconds(cpCore.app_startTime)) & CStr(GetRandomInteger()) & ".xml"
+                                    Filename = genericController.vbReplace(ContentName, " ", "") & "_" & CStr(genericController.dateToSeconds(cpCore.app_startTime)) & CStr(genericController.GetRandomInteger()) & ".xml"
                                     Call cpCore.db.cs_set(CS, "Name", Name)
                                     Call cpCore.db.cs_set(CS, "Filename", Filename)
                                     Call cpCore.db.cs_set(CS, "Command", "BUILDXML")
@@ -11672,7 +11674,7 @@ ErrorTrap:
                         ElseIf ResultMessage = "ok" Then
                             Cells(RowPointer, 4) = "<div id=""pending" & RowPointer & """>" & LinkPrefix & cpCore.db.cs_getText(CS, "filename") & LinkSuffix & "</div>"
                         Else
-                            Cells(RowPointer, 4) = "<div id=""pending" & RowPointer & """><a href=""javascript:alert('" & EncodeJavascript(ResultMessage) & ";return false');"">error</a></div>"
+                            Cells(RowPointer, 4) = "<div id=""pending" & RowPointer & """><a href=""javascript:alert('" & genericController.EncodeJavascript(ResultMessage) & ";return false');"">error</a></div>"
                         End If
                         RowPointer = RowPointer + 1
                         Call cpCore.db.cs_goNext(CS)
@@ -11850,13 +11852,13 @@ ErrorTrap:
                     ReDim HelpCustomCache(HelpCnt)
                     fieldId = -1
                     For HelpPtr = 0 To HelpCnt - 1
-                        fieldId = EncodeInteger(TempVar(0, HelpPtr))
+                        fieldId = genericController.EncodeInteger(TempVar(0, HelpPtr))
                         If fieldId <> LastFieldID Then
                             LastFieldID = fieldId
                             HelpIDCache(HelpPtr) = fieldId
                             Call helpIdIndex.setPtr(CStr(fieldId), HelpPtr)
-                            helpDefaultCache(HelpPtr) = EncodeText(TempVar(1, HelpPtr))
-                            HelpCustomCache(HelpPtr) = EncodeText(TempVar(2, HelpPtr))
+                            helpDefaultCache(HelpPtr) = genericController.encodeText(TempVar(1, HelpPtr))
+                            HelpCustomCache(HelpPtr) = genericController.encodeText(TempVar(2, HelpPtr))
                         End If
                     Next
                     AllowHelpMsgCustom = True
@@ -11893,9 +11895,9 @@ ErrorTrap:
                             & "&ReadOnly=" & readOnlyField _
                             & "&IsLandingPage=" & IsLandingPage _
                             & "&IsRootPage=" & IsRootPage _
-                            & "&EditTab=" & EncodeRequestVariable(field.editTabName) _
+                            & "&EditTab=" & genericController.EncodeRequestVariable(field.editTabName) _
                             & "&EditorContext=" & EditorContext _
-                            & "&NewFormFieldList=" & EncodeRequestVariable(NewFormFieldList)
+                            & "&NewFormFieldList=" & genericController.EncodeRequestVariable(NewFormFieldList)
                             returnHtml &= GetForm_Edit_AddTab2(editTabCaption, "", True, AjaxLink)
                         End If
                         If NewFormFieldList <> "" Then
@@ -11948,28 +11950,28 @@ ErrorTrap:
         '            CS = cpCore.main_OpenCSContentRecord("Dynamic Menus", MenuID)
         '            If cpCore.app.IsCSOK(CS) Then
         '                StylePrefix = cpCore.db.cs_getText(CS, "StylePrefix")
-        '                If StylePrefix <> "" And vbUCase(StylePrefix) <> "CCFLYOUT" Then
+        '                If StylePrefix <> "" And genericController.vbUCase(StylePrefix) <> "CCFLYOUT" Then
         '                    if true then ' 3.3.951" Then
         '                        TestSTyles = cpCore.app.cs_get(CS, "StylesFilename")
         '                    Else
         '                        TestSTyles = cpCore.main_GetStyleSheet
         '                    End If
-        '                    If vbInstr(1, TestSTyles, "." & StylePrefix, vbTextCompare) = 0 Then
+        '                    If genericController.vbInstr(1, TestSTyles, "." & StylePrefix, vbTextCompare) = 0 Then
         '                        '
         '                        ' style not found, get the default ccFlyout styles
         '                        '
         '                        DefaultStyles = RemoveStyleTags(cpCore.cluster.programDataFiles.ReadFile("ccLib\" & "Styles\" & defaultStyleFilename))
-        '                        'DefaultStyles = vbReplace(DefaultStyles, vbCrLf, " ")
-        '                        Do While vbInstr(1, DefaultStyles, "  ") <> 0
-        '                            DefaultStyles = vbReplace(DefaultStyles, "  ", " ")
+        '                        'DefaultStyles = genericController.vbReplace(DefaultStyles, vbCrLf, " ")
+        '                        Do While genericController.vbInstr(1, DefaultStyles, "  ") <> 0
+        '                            DefaultStyles = genericController.vbReplace(DefaultStyles, "  ", " ")
         '                        Loop
         '                        StyleSplit = Split(DefaultStyles, "}")
         '                        For StylePtr = 0 To UBound(StyleSplit)
         '                            StyleLine = StyleSplit(StylePtr)
         '                            If StyleLine <> "" Then
-        '                                If vbInstr(1, StyleLine, ".ccflyout", vbTextCompare) <> 0 Then
-        '                                    StyleLine = vbReplace(StyleLine, vbCrLf, " ")
-        '                                    StyleLine = vbReplace(StyleLine, ".ccflyout", "." & StylePrefix, vbTextCompare)
+        '                                If genericController.vbInstr(1, StyleLine, ".ccflyout", vbTextCompare) <> 0 Then
+        '                                    StyleLine = genericController.vbReplace(StyleLine, vbCrLf, " ")
+        '                                    StyleLine = genericController.vbReplace(StyleLine, ".ccflyout", "." & StylePrefix, vbTextCompare)
         '                                    Do While Left(StyleLine, 1) = " "
         '                                        StyleLine = Mid(StyleLine, 2)
         '                                    Loop
@@ -12196,7 +12198,7 @@ ErrorTrap:
                                         CS = cpCore.InsertCSContent("Tasks")
                                         If cpCore.db.cs_ok(CS) Then
                                             RecordName = "CSV Download, Custom Report [" & Name & "]"
-                                            Filename = "CustomReport_" & CStr(dateToSeconds(cpCore.app_startTime)) & CStr(GetRandomInteger()) & ".csv"
+                                            Filename = "CustomReport_" & CStr(genericController.dateToSeconds(cpCore.app_startTime)) & CStr(genericController.GetRandomInteger()) & ".csv"
                                             Call cpCore.db.cs_set(CS, "Name", RecordName)
                                             Call cpCore.db.cs_set(CS, "Filename", Filename)
                                             If Format = "XML" Then
@@ -12632,7 +12634,7 @@ ErrorTrap:
                                 For Each kvp In .FindWords
                                     Dim findWord As indexConfigFindWordClass = kvp.Value
                                     If Not String.IsNullOrEmpty(findWord.Name) Then
-                                        FieldCaption = EncodeText(cpCore.GetContentFieldProperty(adminContent.Name, findWord.Name, "caption"))
+                                        FieldCaption = genericController.encodeText(cpCore.GetContentFieldProperty(adminContent.Name, findWord.Name, "caption"))
                                         Select Case findWord.MatchOption
                                             Case FindWordMatchEnum.MatchEmpty
                                                 SubTitle = SubTitle & ", " & FieldCaption & " is empty"
@@ -12796,7 +12798,7 @@ ErrorTrap:
                                         & vbCrLf & "<div id=""IndexFilterContentMinWidth"" style=""display:none;""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""200"" height=""1"" style=""clear:both""></div>" _
                                         & vbCrLf & "</div>"
                                     AjaxQS = cpCore.web_RefreshQueryString
-                                    AjaxQS = ModifyQueryString(AjaxQS, RequestNameAjaxFunction, AjaxOpenIndexFilterGetContent)
+                                    AjaxQS = genericController.ModifyQueryString(AjaxQS, RequestNameAjaxFunction, AjaxOpenIndexFilterGetContent)
                                     IndexFilterJS = "" _
                                         & vbCrLf & "<script Language=""JavaScript"" type=""text/javascript"">" _
                                         & vbCrLf & "var IndexFilterPop=false;" _
@@ -12871,7 +12873,7 @@ ErrorTrap:
                                     Next
                                 End If
                                 ButtonFace = adminContent.fields(FieldName.ToLower()).caption
-                                ButtonFace = vbReplace(ButtonFace, " ", "&nbsp;")
+                                ButtonFace = genericController.vbReplace(ButtonFace, " ", "&nbsp;")
                                 SortTitle = "Sort A-Z"
                                 '
                                 If IndexConfig.Sorts.ContainsKey(FieldName) Then
@@ -12956,7 +12958,7 @@ ErrorTrap:
                                         If FieldUsedInColumns.ContainsKey(columnNameLc) Then
                                             If FieldUsedInColumns.Item(columnNameLc) Then
                                                 DataTable_DataRows &= (vbCrLf & "<td valign=""middle"" " & RowColor & " align=""left"">" & SpanClassAdminNormal)
-                                                DataTable_DataRows &= GetForm_Index_GetCell(adminContent, editRecord, column.Name, CS, IsLookupFieldValid(columnNameLc), vbLCase(adminContent.ContentTableName) = "ccemail")
+                                                DataTable_DataRows &= GetForm_Index_GetCell(adminContent, editRecord, column.Name, CS, IsLookupFieldValid(columnNameLc), genericController.vbLCase(adminContent.ContentTableName) = "ccemail")
                                                 DataTable_DataRows &= ("&nbsp;</span></td>")
                                             End If
                                         End If
@@ -13020,7 +13022,7 @@ ErrorTrap:
                             'ReDim Findstring(IndexConfig.Columns.Count)
                             'For ColumnPointer = 0 To IndexConfig.Columns.Count - 1
                             '    FieldName = IndexConfig.Columns(ColumnPointer).Name
-                            '    If vbLCase(FieldName) = FindWordName Then
+                            '    If genericController.vbLCase(FieldName) = FindWordName Then
                             '        Findstring(ColumnPointer) = FindWordValue
                             '    End If
                             'Next
@@ -13028,7 +13030,7 @@ ErrorTrap:
                             '        For ColumnPointer = 0 To CustomAdminColumnCount - 1
                             '            FieldPtr = CustomAdminColumn(ColumnPointer).FieldPointer
                             '            With AdminContent.fields(FieldPtr)
-                            '                If vbLCase(.Name) = FindWordName Then
+                            '                If genericController.vbLCase(.Name) = FindWordName Then
                             '                    Findstring(ColumnPointer) = FindWordValue
                             '                End If
                             '            End With
@@ -13057,7 +13059,7 @@ ErrorTrap:
                                 With column
                                     ColumnWidth = .Width
                                     'fieldId = .FieldId
-                                    FieldName = vbLCase(.Name)
+                                    FieldName = genericController.vbLCase(.Name)
                                 End With
                                 FindWordValue = ""
                                 If IndexConfig.FindWords.ContainsKey(FieldName) Then
@@ -13143,9 +13145,9 @@ ErrorTrap:
             Found = False
             ResultNode = Node.Attributes.GetNamedItem(Name)
             If (ResultNode Is Nothing) Then
-                UcaseName = vbUCase(Name)
+                UcaseName = genericController.vbUCase(Name)
                 For Each NodeAttribute In Node.Attributes
-                    If vbUCase(NodeAttribute.Name) = UcaseName Then
+                    If genericController.vbUCase(NodeAttribute.Name) = UcaseName Then
                         GetXMLAttribute = NodeAttribute.Value
                         Found = True
                         Exit For
@@ -13223,7 +13225,7 @@ ErrorTrap:
                         '
                         returnContent &= "<div class=""ccFilterHead"">Remove&nbsp;Filters</div>"
                         QS = RQS
-                        QS = ModifyQueryString(QS, "IndexFilterRemoveAll", "1")
+                        QS = genericController.ModifyQueryString(QS, "IndexFilterRemoveAll", "1")
                         Link = cpCore.siteProperties.adminURL & "?" & QS
                         returnContent &= "<div class=""ccFilterSubHead""><a class=""ccFilterLink"" href=""" & Link & """><img src=""/ccLib/images/delete1313.gif"" width=13 height=13 border=0 style=""vertical-align:middle;"">&nbsp;Remove All</a></div>"
                         '
@@ -13232,25 +13234,25 @@ ErrorTrap:
                         SubFilterList = ""
                         If .LastEditedByMe Then
                             QS = RQS
-                            QS = ModifyQueryString(QS, "IndexFilterLastEditedByMe", CStr(0), True)
+                            QS = genericController.ModifyQueryString(QS, "IndexFilterLastEditedByMe", CStr(0), True)
                             Link = cpCore.siteProperties.adminURL & "?" & QS
                             SubFilterList = SubFilterList & "<div class=""ccFilterIndent ccFilterList""><a class=""ccFilterLink"" href=""" & Link & """><img src=""/ccLib/images/delete1313.gif"" width=13 height=13 border=0 style=""vertical-align:middle;"">By&nbsp;Me</a></div>"
                         End If
                         If .LastEditedToday Then
                             QS = RQS
-                            QS = ModifyQueryString(QS, "IndexFilterLastEditedToday", CStr(0), True)
+                            QS = genericController.ModifyQueryString(QS, "IndexFilterLastEditedToday", CStr(0), True)
                             Link = cpCore.siteProperties.adminURL & "?" & QS
                             SubFilterList = SubFilterList & "<div class=""ccFilterIndent ccFilterList""><a class=""ccFilterLink"" href=""" & Link & """><img src=""/ccLib/images/delete1313.gif"" width=13 height=13 border=0 style=""vertical-align:middle;"">Today</a></div>"
                         End If
                         If .LastEditedPast7Days Then
                             QS = RQS
-                            QS = ModifyQueryString(QS, "IndexFilterLastEditedPast7Days", CStr(0), True)
+                            QS = genericController.ModifyQueryString(QS, "IndexFilterLastEditedPast7Days", CStr(0), True)
                             Link = cpCore.siteProperties.adminURL & "?" & QS
                             SubFilterList = SubFilterList & "<div class=""ccFilterIndent ccFilterList""><a class=""ccFilterLink"" href=""" & Link & """><img src=""/ccLib/images/delete1313.gif"" width=13 height=13 border=0 style=""vertical-align:middle;"">Past Week</a></div>"
                         End If
                         If .LastEditedPast30Days Then
                             QS = RQS
-                            QS = ModifyQueryString(QS, "IndexFilterLastEditedPast30Days", CStr(0), True)
+                            QS = genericController.ModifyQueryString(QS, "IndexFilterLastEditedPast30Days", CStr(0), True)
                             Link = cpCore.siteProperties.adminURL & "?" & QS
                             SubFilterList = SubFilterList & "<div class=""ccFilterIndent ccFilterList""><a class=""ccFilterLink"" href=""" & Link & """><img src=""/ccLib/images/delete1313.gif"" width=13 height=13 border=0 style=""vertical-align:middle;"">Past 30 Days</a></div>"
                         End If
@@ -13265,7 +13267,7 @@ ErrorTrap:
                         If .SubCDefID > 0 Then
                             SubContentName = cpCore.metaData.getContentNameByID(.SubCDefID)
                             QS = RQS
-                            QS = ModifyQueryString(QS, "IndexFilterRemoveCDef", CStr(.SubCDefID))
+                            QS = genericController.ModifyQueryString(QS, "IndexFilterRemoveCDef", CStr(.SubCDefID))
                             Link = cpCore.siteProperties.adminURL & "?" & QS
                             SubFilterList = SubFilterList & "<div class=""ccFilterIndent""><a class=""ccFilterLink"" href=""" & Link & """><img src=""/ccLib/images/delete1313.gif"" width=13 height=13 border=0 style=""vertical-align:middle;"">" & SubContentName & "</a></div>"
                         End If
@@ -13285,7 +13287,7 @@ ErrorTrap:
                                         GroupName = Left(GroupName, 15) & "..." & Right(GroupName, 15)
                                     End If
                                     QS = RQS
-                                    QS = ModifyQueryString(QS, "IndexFilterRemoveGroup", .GroupList(Ptr))
+                                    QS = genericController.ModifyQueryString(QS, "IndexFilterRemoveGroup", .GroupList(Ptr))
                                     Link = cpCore.siteProperties.adminURL & "?" & QS
                                     SubFilterList = SubFilterList & "<div class=""ccFilterIndent""><a class=""ccFilterLink"" href=""" & Link & """><img src=""/ccLib/images/delete1313.gif"" width=13 height=13 border=0 style=""vertical-align:middle;"">" & GroupName & "</a></div>"
                                 End If
@@ -13300,7 +13302,7 @@ ErrorTrap:
                         SubFilterList = ""
                         If .ActiveOnly Then
                             QS = RQS
-                            QS = ModifyQueryString(QS, "IndexFilterActiveOnly", CStr(0), True)
+                            QS = genericController.ModifyQueryString(QS, "IndexFilterActiveOnly", CStr(0), True)
                             Link = cpCore.siteProperties.adminURL & "?" & QS
                             SubFilterList = SubFilterList & "<div class=""ccFilterIndent ccFilterList""><a class=""ccFilterLink"" href=""" & Link & """><img src=""/ccLib/images/delete1313.gif"" width=13 height=13 border=0 style=""vertical-align:middle;"">Active&nbsp;Only</a></div>"
                         End If
@@ -13312,10 +13314,10 @@ ErrorTrap:
                         '
                         If .ContentCategoryID <> 0 Then
                             ContentCategoryName = cpCore.content_GetRecordName("Content Categories", .ContentCategoryID)
-                            Copy = vbReplace(ContentCategoryName, " ", "&nbsp;")
+                            Copy = genericController.vbReplace(ContentCategoryName, " ", "&nbsp;")
                             returnContent &= "<div class=""ccFilterSubHead"">Content&nbsp;Category</div>"
                             QS = RQS
-                            QS = ModifyQueryString(QS, "IndexFilterCategoryID", CStr(0), True)
+                            QS = genericController.ModifyQueryString(QS, "IndexFilterCategoryID", CStr(0), True)
                             Link = cpCore.siteProperties.adminURL & "?" & QS
                             returnContent &= "<div class=""ccFilterIndent""><a class=""ccFilterLink"" href=""" & Link & """><img src=""/ccLib/images/delete1313.gif"" width=13 height=13 border=0 style=""vertical-align:middle;"">&nbsp;" & Copy & "</a></div>"
                         End If
@@ -13324,9 +13326,9 @@ ErrorTrap:
                         '
                         For Each findWordKvp In .FindWords
                             Dim findWord As indexConfigFindWordClass = findWordKvp.Value
-                            FieldCaption = EncodeText(cpCore.GetContentFieldProperty(ContentName, findWord.Name, "caption"))
+                            FieldCaption = genericController.encodeText(cpCore.GetContentFieldProperty(ContentName, findWord.Name, "caption"))
                             QS = RQS
-                            QS = ModifyQueryString(QS, "IndexFilterRemoveFind", findWord.Name)
+                            QS = genericController.ModifyQueryString(QS, "IndexFilterRemoveFind", findWord.Name)
                             Link = cpCore.siteProperties.adminURL & "?" & QS
                             Select Case findWord.MatchOption
                                 Case FindWordMatchEnum.matchincludes
@@ -13372,13 +13374,13 @@ ErrorTrap:
                             Id = cpCore.db.cs_getInteger(CS, "ID")
                             CurrentFolderID = cpCore.db.cs_getInteger(CS, "ContentCategoryID")
                             '
-                            Caption = vbReplace(Caption, " ", "&nbsp;")
+                            Caption = genericController.vbReplace(Caption, " ", "&nbsp;")
                             If FirstCaption = "" Then
                                 FirstCaption = Caption
                             End If
-                            JSCaption = EncodeJavascript(Caption)
+                            JSCaption = genericController.EncodeJavascript(Caption)
                             QS = RQS
-                            QS = ModifyQueryString(QS, "SetIndexFilterCategoryID", CStr(Id), True)
+                            QS = genericController.ModifyQueryString(QS, "SetIndexFilterCategoryID", CStr(Id), True)
                             Link = cpCore.siteProperties.adminURL & "?" & QS
                             lis = lis & cr & "<li class=""ccAdminSmall ccPanel""><a href=""" & Link & """>" & Caption & "</a></li>"
                             'Call Tree.AddEntry(CStr(Id), CStr(CurrentFolderID), , , Link, Caption)
@@ -13391,7 +13393,7 @@ ErrorTrap:
                     End If
                     returnContent &= "<div class=""ccFilterSubHead"">Content&nbsp;Categories</div>"
                     If FirstCaption <> "" Then
-                        returnContent &= cr & "<ul class=""ccFilterList"">" & kmaIndent(lis) & cr & "</ul>"
+                        returnContent &= cr & "<ul class=""ccFilterList"">" & genericController.kmaIndent(lis) & cr & "</ul>"
                         'S &="<div class=""ccFilterIndent"">" & Tree.GetTree(CStr(0), OpenMenuName) & "</div>"
                     Else
                         returnContent &= "<div class=""ccFilterIndent ccFilterList"">not defined</div>"
@@ -13402,25 +13404,25 @@ ErrorTrap:
                     SubFilterList = ""
                     If Not .LastEditedByMe Then
                         QS = RQS
-                        QS = ModifyQueryString(QS, "IndexFilterLastEditedByMe", "1", True)
+                        QS = genericController.ModifyQueryString(QS, "IndexFilterLastEditedByMe", "1", True)
                         Link = cpCore.siteProperties.adminURL & "?" & QS
                         SubFilterList = SubFilterList & "<div class=""ccFilterIndent""><a class=""ccFilterLink"" href=""" & Link & """>By&nbsp;Me</a></div>"
                     End If
                     If Not .LastEditedToday Then
                         QS = RQS
-                        QS = ModifyQueryString(QS, "IndexFilterLastEditedToday", "1", True)
+                        QS = genericController.ModifyQueryString(QS, "IndexFilterLastEditedToday", "1", True)
                         Link = cpCore.siteProperties.adminURL & "?" & QS
                         SubFilterList = SubFilterList & "<div class=""ccFilterIndent""><a class=""ccFilterLink"" href=""" & Link & """>Today</a></div>"
                     End If
                     If Not .LastEditedPast7Days Then
                         QS = RQS
-                        QS = ModifyQueryString(QS, "IndexFilterLastEditedPast7Days", "1", True)
+                        QS = genericController.ModifyQueryString(QS, "IndexFilterLastEditedPast7Days", "1", True)
                         Link = cpCore.siteProperties.adminURL & "?" & QS
                         SubFilterList = SubFilterList & "<div class=""ccFilterIndent""><a class=""ccFilterLink"" href=""" & Link & """>Past Week</a></div>"
                     End If
                     If Not .LastEditedPast30Days Then
                         QS = RQS
-                        QS = ModifyQueryString(QS, "IndexFilterLastEditedPast30Days", "1", True)
+                        QS = genericController.ModifyQueryString(QS, "IndexFilterLastEditedPast30Days", "1", True)
                         Link = cpCore.siteProperties.adminURL & "?" & QS
                         SubFilterList = SubFilterList & "<div class=""ccFilterIndent""><a class=""ccFilterLink"" href=""" & Link & """>Past 30 Days</a></div>"
                     End If
@@ -13437,13 +13439,13 @@ ErrorTrap:
                         Cnt = UBound(ListSplit) + 1
                         If Cnt > 0 Then
                             For Ptr = 0 To Cnt - 1
-                                Pos = vbInstr(1, ListSplit(Ptr), ")")
+                                Pos = genericController.vbInstr(1, ListSplit(Ptr), ")")
                                 If Pos > 0 Then
-                                    subContentID = EncodeInteger(Mid(ListSplit(Ptr), 1, Pos - 1))
+                                    subContentID = genericController.EncodeInteger(Mid(ListSplit(Ptr), 1, Pos - 1))
                                     If subContentID > 0 And (subContentID <> adminContent.Id) And (subContentID <> .SubCDefID) Then
                                         Caption = "<span style=""white-space:nowrap;"">" & cpCore.metaData.getContentNameByID(subContentID) & "</span>"
                                         QS = RQS
-                                        QS = ModifyQueryString(QS, "IndexFilterAddCDef", CStr(subContentID), True)
+                                        QS = genericController.ModifyQueryString(QS, "IndexFilterAddCDef", CStr(subContentID), True)
                                         Link = cpCore.siteProperties.adminURL & "?" & QS
                                         SubFilterList = SubFilterList & "<div class=""ccFilterIndent""><a class=""ccFilterLink"" href=""" & Link & """>" & Caption & "</a></div>"
                                     End If
@@ -13459,7 +13461,7 @@ ErrorTrap:
                     '
                     TableName = cpCore.GetContentTablename(ContentName)
                     SubFilterList = ""
-                    If vbLCase(TableName) = vbLCase("ccMembers") Then
+                    If genericController.vbLCase(TableName) = genericController.vbLCase("ccMembers") Then
                         SQL = cpCore.GetSQLSelect("default", "ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name")
                         CS = cpCore.db.cs_openCsSql_rev("default", SQL)
                         Do While cpCore.db.cs_ok(CS)
@@ -13487,9 +13489,9 @@ ErrorTrap:
                                 Caption = "<span style=""white-space:nowrap;"">" & Caption & "</span>"
                                 QS = RQS
                                 If Trim(Name) <> "" Then
-                                    QS = ModifyQueryString(QS, "IndexFilterAddGroup", Name, True)
+                                    QS = genericController.ModifyQueryString(QS, "IndexFilterAddGroup", Name, True)
                                 Else
-                                    QS = ModifyQueryString(QS, "IndexFilterAddGroup", CStr(RecordID), True)
+                                    QS = genericController.ModifyQueryString(QS, "IndexFilterAddGroup", CStr(RecordID), True)
                                 End If
                                 Link = cpCore.siteProperties.adminURL & "?" & QS
                                 SubFilterList = SubFilterList & "<div class=""ccFilterIndent""><a class=""ccFilterLink"" href=""" & Link & """>" & Caption & "</a></div>"
@@ -13506,7 +13508,7 @@ ErrorTrap:
                     SubFilterList = ""
                     If Not .ActiveOnly Then
                         QS = RQS
-                        QS = ModifyQueryString(QS, "IndexFilterActiveOnly", "1", True)
+                        QS = genericController.ModifyQueryString(QS, "IndexFilterActiveOnly", "1", True)
                         Link = cpCore.siteProperties.adminURL & "?" & QS
                         SubFilterList = SubFilterList & "<div class=""ccFilterIndent""><a class=""ccFilterLink"" href=""" & Link & """>Active&nbsp;Only</a></div>"
                     End If
@@ -13519,7 +13521,7 @@ ErrorTrap:
                     ' Advanced Search Link
                     '
                     QS = RQS
-                    QS = ModifyQueryString(QS, RequestNameAdminSubForm, AdminFormIndex_SubFormAdvancedSearch, True)
+                    QS = genericController.ModifyQueryString(QS, RequestNameAdminSubForm, AdminFormIndex_SubFormAdvancedSearch, True)
                     Link = cpCore.siteProperties.adminURL & "?" & QS
                     returnContent &= "<div class=""ccFilterHead""><a class=""ccFilterLink"" href=""" & Link & """>Advanced&nbsp;Search</a></div>"
                     '
@@ -13528,7 +13530,7 @@ ErrorTrap:
                     ' Set Column Link
                     '
                     QS = RQS
-                    QS = ModifyQueryString(QS, RequestNameAdminSubForm, AdminFormIndex_SubFormSetColumns, True)
+                    QS = genericController.ModifyQueryString(QS, RequestNameAdminSubForm, AdminFormIndex_SubFormSetColumns, True)
                     Link = cpCore.siteProperties.adminURL & "?" & QS
                     returnContent &= "<div class=""ccFilterHead""><a class=""ccFilterLink"" href=""" & Link & """>Set&nbsp;Columns</a></div>"
                     '
@@ -13537,7 +13539,7 @@ ErrorTrap:
                     ' Import Link
                     '
                     QS = RQS
-                    QS = ModifyQueryString(QS, RequestNameAdminForm, AdminFormImportWizard, True)
+                    QS = genericController.ModifyQueryString(QS, RequestNameAdminForm, AdminFormImportWizard, True)
                     Link = cpCore.siteProperties.adminURL & "?" & QS
                     returnContent &= "<div class=""ccFilterHead""><a class=""ccFilterLink"" href=""" & Link & """>Import</a></div>"
                     '
@@ -13546,7 +13548,7 @@ ErrorTrap:
                     ' Export Link
                     '
                     QS = RQS
-                    QS = ModifyQueryString(QS, RequestNameAdminSubForm, AdminFormIndex_SubFormExport, True)
+                    QS = genericController.ModifyQueryString(QS, RequestNameAdminSubForm, AdminFormIndex_SubFormExport, True)
                     Link = cpCore.siteProperties.adminURL & "?" & QS
                     returnContent &= "<div class=""ccFilterHead""><a class=""ccFilterLink"" href=""" & Link & """>Export</a></div>"
                     '
@@ -13605,13 +13607,13 @@ ErrorTrap:
                         ' load values
                         '
                         ConfigList = ConfigList & vbCrLf
-                        ConfigListLines = SplitCRLF(ConfigList)
+                        ConfigListLines = genericController.SplitCRLF(ConfigList)
                         Ptr = 0
                         Do While Ptr < UBound(ConfigListLines)
                             '
                             ' check next line
                             '
-                            ConfigListLine = vbLCase(ConfigListLines(Ptr))
+                            ConfigListLine = genericController.vbLCase(ConfigListLines(Ptr))
                             If ConfigListLine <> "" Then
                                 Select Case ConfigListLine
                                     Case "columns"
@@ -13622,7 +13624,7 @@ ErrorTrap:
                                             If UBound(LineSplit) > 0 Then
                                                 Dim column As New indexConfigColumnClass
                                                 column.Name = LineSplit(0).Trim()
-                                                column.Width = EncodeInteger(LineSplit(1))
+                                                column.Width = genericController.EncodeInteger(LineSplit(1))
                                                 .Columns.Add(column.Name.ToLower(), column)
                                             End If
                                             Ptr = Ptr + 1
@@ -13636,7 +13638,7 @@ ErrorTrap:
                                             If UBound(LineSplit) = 1 Then
                                                 Dim sort As New indexConfigSortClass
                                                 sort.fieldName = LineSplit(0)
-                                                If EncodeBoolean(LineSplit(1)) Then
+                                                If genericController.EncodeBoolean(LineSplit(1)) Then
                                                     sort.Forward = True
                                                 End If
                                                 .Sorts.Add(sort.fieldName.ToLower, sort)
@@ -13661,13 +13663,13 @@ ErrorTrap:
                         ' load values
                         '
                         ConfigList = ConfigList & vbCrLf
-                        ConfigListLines = SplitCRLF(ConfigList)
+                        ConfigListLines = genericController.SplitCRLF(ConfigList)
                         Ptr = 0
                         Do While Ptr < UBound(ConfigListLines)
                             '
                             ' check next line
                             '
-                            ConfigListLine = vbLCase(ConfigListLines(Ptr))
+                            ConfigListLine = genericController.vbLCase(ConfigListLines(Ptr))
                             If ConfigListLine <> "" Then
                                 Select Case ConfigListLine
                                     Case "findwordlist"
@@ -13680,7 +13682,7 @@ ErrorTrap:
                                                 Dim findWord As New indexConfigFindWordClass
                                                 findWord.Name = LineSplit(0)
                                                 findWord.Value = LineSplit(1)
-                                                findWord.MatchOption = DirectCast(EncodeInteger(LineSplit(2)), FindWordMatchEnum)
+                                                findWord.MatchOption = DirectCast(genericController.EncodeInteger(LineSplit(2)), FindWordMatchEnum)
                                                 .FindWords.Add(findWord.Name, findWord)
                                             End If
                                             Ptr = Ptr + 1
@@ -13695,10 +13697,10 @@ ErrorTrap:
                                         Loop
                                     Case "cdeflist"
                                         Ptr = Ptr + 1
-                                        .SubCDefID = EncodeInteger(ConfigListLines(Ptr))
+                                        .SubCDefID = genericController.EncodeInteger(ConfigListLines(Ptr))
                                     Case "indexfiltercategoryid"
                                         Ptr = Ptr + 1
-                                        .ContentCategoryID = EncodeInteger(ConfigListLines(Ptr))
+                                        .ContentCategoryID = genericController.EncodeInteger(ConfigListLines(Ptr))
                                     Case "indexfilteractiveonly"
                                         .ActiveOnly = True
                                     Case "indexfilterlasteditedbyme"
@@ -13713,14 +13715,14 @@ ErrorTrap:
                                         .Open = True
                                     Case "recordsperpage"
                                         Ptr = Ptr + 1
-                                        .RecordsPerPage = EncodeInteger(ConfigListLines(Ptr))
+                                        .RecordsPerPage = genericController.EncodeInteger(ConfigListLines(Ptr))
                                         If .RecordsPerPage <= 0 Then
                                             .RecordsPerPage = 50
                                         End If
                                         .RecordTop = ((.PageNumber - 1) * .RecordsPerPage)
                                     Case "pagenumber"
                                         Ptr = Ptr + 1
-                                        .PageNumber = EncodeInteger(ConfigListLines(Ptr))
+                                        .PageNumber = genericController.EncodeInteger(ConfigListLines(Ptr))
                                         If .PageNumber <= 0 Then
                                             .PageNumber = 1
                                         End If
@@ -13758,7 +13760,7 @@ ErrorTrap:
                     '    If .Columns.Count > 0 Then
                     '        For Ptr = 0 To .Columns.Count - 1
                     '            With .Columns(Ptr)
-                    '                If vbLCase(.Name) = field.Name.ToLower Then
+                    '                If genericController.vbLCase(.Name) = field.Name.ToLower Then
                     '                    .FieldId = SrcPtr
                     '                    Exit For
                     '                End If
@@ -13769,7 +13771,7 @@ ErrorTrap:
                     '    If .SortCnt > 0 Then
                     '        For Ptr = 0 To .SortCnt - 1
                     '            With .Sorts(Ptr)
-                    '                If vbLCase(.FieldName) = field.Name Then
+                    '                If genericController.vbLCase(.FieldName) = field.Name Then
                     '                    .FieldPtr = SrcPtr
                     '                    Exit For
                     '                End If
@@ -13799,7 +13801,7 @@ ErrorTrap:
                     '            For Ptr = 0 To .SortCnt - 1
                     '                With .Sorts(Ptr)
                     '                    For SrcPtr = 0 To AdminContent.fields.count - 1
-                    '                        If vbLCase(.FieldName) = vbLCase(AdminContent.fields(SrcPtr).Name) Then
+                    '                        If genericController.vbLCase(.FieldName) = genericController.vbLCase(AdminContent.fields(SrcPtr).Name) Then
                     '                            .FieldPtr = SrcPtr
                     '                            Exit For
                     '                        End If
@@ -13853,12 +13855,12 @@ ErrorTrap:
                 '
                 VarText = cpCore.docProperties.getText("rt")
                 If VarText <> "" Then
-                    .RecordTop = EncodeInteger(VarText)
+                    .RecordTop = genericController.EncodeInteger(VarText)
                 End If
                 '
                 VarText = cpCore.docProperties.getText("RS")
                 If VarText <> "" Then
-                    .RecordsPerPage = EncodeInteger(VarText)
+                    .RecordsPerPage = genericController.EncodeInteger(VarText)
                 End If
                 If .RecordsPerPage <= 0 Then
                     .RecordsPerPage = RecordsPerPageDefault
@@ -13909,7 +13911,7 @@ ErrorTrap:
                                 If (ColumnCnt > 0) Then
                                     For ColumnPtr = 0 To ColumnCnt - 1
                                         FindValue = Trim(cpCore.docProperties.getText("FindValue" & ColumnPtr))
-                                        FindName = vbLCase(cpCore.docProperties.getText("FindName" & ColumnPtr))
+                                        FindName = genericController.vbLCase(cpCore.docProperties.getText("FindName" & ColumnPtr))
                                         If (Not String.IsNullOrEmpty(FindValue)) And (Not String.IsNullOrEmpty(FindName)) Then
                                             If Not .FindWords.ContainsKey(FindName) Then
                                                 Dim findWord As New indexConfigFindWordClass
@@ -14074,12 +14076,12 @@ ErrorTrap:
                     '
                     VarText = cpCore.docProperties.getText("IndexFilterCategoryID")
                     If VarText <> "" Then
-                        .ContentCategoryID = EncodeInteger(VarText)
+                        .ContentCategoryID = genericController.EncodeInteger(VarText)
                         .PageNumber = 1
                     End If
                     VarText = cpCore.docProperties.getText("SetIndexFilterCategoryID")
                     If VarText <> "" Then
-                        .ContentCategoryID = EncodeInteger(VarText)
+                        .ContentCategoryID = genericController.EncodeInteger(VarText)
                         .PageNumber = 1
                     End If
                     '
@@ -14087,7 +14089,7 @@ ErrorTrap:
                     '
                     VarText = cpCore.docProperties.getText("IndexFilterActiveOnly")
                     If VarText <> "" Then
-                        .ActiveOnly = EncodeBoolean(VarText)
+                        .ActiveOnly = genericController.EncodeBoolean(VarText)
                         .PageNumber = 1
                     End If
                     '
@@ -14095,7 +14097,7 @@ ErrorTrap:
                     '
                     VarText = cpCore.docProperties.getText("IndexFilterLastEditedByMe")
                     If VarText <> "" Then
-                        .LastEditedByMe = EncodeBoolean(VarText)
+                        .LastEditedByMe = genericController.EncodeBoolean(VarText)
                         .PageNumber = 1
                     End If
                     '
@@ -14103,7 +14105,7 @@ ErrorTrap:
                     '
                     VarText = cpCore.docProperties.getText("IndexFilterLastEditedPast30Days")
                     If VarText <> "" Then
-                        .LastEditedPast30Days = EncodeBoolean(VarText)
+                        .LastEditedPast30Days = genericController.EncodeBoolean(VarText)
                         .LastEditedPast7Days = False
                         .LastEditedToday = False
                         .PageNumber = 1
@@ -14114,7 +14116,7 @@ ErrorTrap:
                         VarText = cpCore.docProperties.getText("IndexFilterLastEditedPast7Days")
                         If VarText <> "" Then
                             .LastEditedPast30Days = False
-                            .LastEditedPast7Days = EncodeBoolean(VarText)
+                            .LastEditedPast7Days = genericController.EncodeBoolean(VarText)
                             .LastEditedToday = False
                             .PageNumber = 1
                         Else
@@ -14125,7 +14127,7 @@ ErrorTrap:
                             If VarText <> "" Then
                                 .LastEditedPast30Days = False
                                 .LastEditedPast7Days = False
-                                .LastEditedToday = EncodeBoolean(VarText)
+                                .LastEditedToday = genericController.EncodeBoolean(VarText)
                                 .PageNumber = 1
                             End If
                         End If
@@ -14135,7 +14137,7 @@ ErrorTrap:
                     '
                     VarText = cpCore.docProperties.getText("IndexFilterOpen")
                     If VarText <> "" Then
-                        .Open = EncodeBoolean(VarText)
+                        .Open = genericController.EncodeBoolean(VarText)
                         .PageNumber = 1
                     End If
                     '
@@ -14153,7 +14155,7 @@ ErrorTrap:
                             sort.Forward = Not sortReverse
                             .Sorts.Add(VarText, sort)
                         End If
-                        'VarText = vbLCase(VarText)
+                        'VarText = genericController.vbLCase(VarText)
                         'If .SortCnt > 0 Then
                         '    For Ptr = 0 To .SortCnt - 1
                         '        If .Sorts(Ptr).FieldName = VarText Then
@@ -14182,7 +14184,7 @@ ErrorTrap:
                         '    '
                         '    .SortCnt = 1
                         '    ReDim .Sorts(0)
-                        '    .Sorts(0).FieldName = vbLCase(VarText)
+                        '    .Sorts(0).FieldName = genericController.vbLCase(VarText)
                         '    .Sorts(0).Forward = True
                         '    .PageNumber = 1
                         'End If
@@ -14263,7 +14265,7 @@ ErrorTrap:
                 '        If .Columns.Count > 0 Then
                 '            For Ptr = 0 To .Columns.Count - 1
                 '                With .Columns(Ptr)
-                '                    If vbLCase(.Name) = field.Name Then
+                '                    If genericController.vbLCase(.Name) = field.Name Then
                 '                        .FieldId = SrcPtr
                 '                        Exit For
                 '                    End If
@@ -14274,7 +14276,7 @@ ErrorTrap:
                 '        If .SortCnt > 0 Then
                 '            For Ptr = 0 To .SortCnt - 1
                 '                With .Sorts(Ptr)
-                '                    If vbLCase(.FieldName) = field.Name Then
+                '                    If genericController.vbLCase(.FieldName) = field.Name Then
                 '                        .FieldPtr = SrcPtr
                 '                        Exit For
                 '                    End If
@@ -14448,10 +14450,10 @@ ErrorTrap:
         Private Function GetFormInputWithFocus2(ByVal ElementName As String, Optional ByVal CurrentValue As String = "", Optional ByVal Height As Integer = -1, Optional ByVal Width As Integer = -1, Optional ByVal ElementID As String = "", Optional ByVal OnFocusJavascript As String = "", Optional ByVal HtmlClass As String = "") As String
             GetFormInputWithFocus2 = cpCore.html_GetFormInputText2(ElementName, CurrentValue, Height, Width, ElementID)
             If OnFocusJavascript <> "" Then
-                GetFormInputWithFocus2 = vbReplace(GetFormInputWithFocus2, ">", " onFocus=""" & OnFocusJavascript & """>")
+                GetFormInputWithFocus2 = genericController.vbReplace(GetFormInputWithFocus2, ">", " onFocus=""" & OnFocusJavascript & """>")
             End If
             If HtmlClass <> "" Then
-                GetFormInputWithFocus2 = vbReplace(GetFormInputWithFocus2, ">", " class=""" & HtmlClass & """>")
+                GetFormInputWithFocus2 = genericController.vbReplace(GetFormInputWithFocus2, ">", " class=""" & HtmlClass & """>")
             End If
         End Function
         '
@@ -14466,10 +14468,10 @@ ErrorTrap:
         Private Function GetFormInputDateWithFocus2(ByVal ElementName As String, Optional ByVal CurrentValue As String = "", Optional ByVal Width As String = "", Optional ByVal ElementID As String = "", Optional ByVal OnFocusJavascript As String = "", Optional ByVal HtmlClass As String = "") As String
             GetFormInputDateWithFocus2 = cpCore.html_GetFormInputDate(ElementName, CurrentValue, Width, ElementID)
             If OnFocusJavascript <> "" Then
-                GetFormInputDateWithFocus2 = vbReplace(GetFormInputDateWithFocus2, ">", " onFocus=""" & OnFocusJavascript & """>")
+                GetFormInputDateWithFocus2 = genericController.vbReplace(GetFormInputDateWithFocus2, ">", " onFocus=""" & OnFocusJavascript & """>")
             End If
             If HtmlClass <> "" Then
-                GetFormInputDateWithFocus2 = vbReplace(GetFormInputDateWithFocus2, ">", " class=""" & HtmlClass & """>")
+                GetFormInputDateWithFocus2 = genericController.vbReplace(GetFormInputDateWithFocus2, ">", " class=""" & HtmlClass & """>")
             End If
         End Function
         '
@@ -14533,7 +14535,7 @@ ErrorTrap:
                                     FormFieldCnt = cpCore.docProperties.getInteger("fieldcnt")
                                     If FormFieldCnt > 0 Then
                                         For FormFieldPtr = 0 To FormFieldCnt - 1
-                                            FieldName = vbLCase(cpCore.docProperties.getText("fieldname" & FormFieldPtr))
+                                            FieldName = genericController.vbLCase(cpCore.docProperties.getText("fieldname" & FormFieldPtr))
                                             MatchOption = DirectCast(cpCore.docProperties.getInteger("FieldMatch" & FormFieldPtr), FindWordMatchEnum)
                                             Select Case MatchOption
                                                 Case FindWordMatchEnum.MatchEquals, FindWordMatchEnum.MatchGreaterThan, FindWordMatchEnum.matchincludes, FindWordMatchEnum.MatchLessThan
@@ -14620,7 +14622,7 @@ ErrorTrap:
                             ReDim Preserve FieldLookupList(FieldSize)
                         End If
                         With field
-                            FieldName = vbLCase(.nameLc)
+                            FieldName = genericController.vbLCase(.nameLc)
                             FieldNames(FieldPtr) = FieldName
                             FieldCaption(FieldPtr) = .caption
                             fieldId(FieldPtr) = .id
@@ -14659,7 +14661,7 @@ ErrorTrap:
                     '                ReDim Preserve FieldLookupContentName(FieldSize)
                     '                ReDim Preserve FieldLookupList(FieldSize)
                     '            End If
-                    '            FieldName = vbLCase(cpCore.db.cs_getText(CS, "name"))
+                    '            FieldName = genericController.vbLCase(cpCore.db.cs_getText(CS, "name"))
                     '            FieldNames(FieldPtr) = FieldName
                     '            FieldCaption(FieldPtr) = cpCore.db.cs_getText(CS, "Caption")
                     '            FieldID(FieldPtr) = cpCore.app.cs_getInteger(CS, "ID")
@@ -14688,15 +14690,15 @@ ErrorTrap:
                     ''            If CriteriaCount > 0 Then
                     ''                For CriteriaPointer = 0 To CriteriaCount - 1
                     ''                    FieldMatchOptions(FieldPtr) = 0
-                    ''                    If vbInstr(1, CriteriaValues(CriteriaPointer), FieldNames(FieldPtr) & "=", vbTextCompare) = 1 Then
+                    ''                    If genericController.vbInstr(1, CriteriaValues(CriteriaPointer), FieldNames(FieldPtr) & "=", vbTextCompare) = 1 Then
                     ''                        NameValues = Split(CriteriaValues(CriteriaPointer), "=")
                     ''                        FieldValue(FieldPtr) = NameValues(1)
                     ''                        FieldMatchOptions(FieldPtr) = 1
-                    ''                    ElseIf vbInstr(1, CriteriaValues(CriteriaPointer), FieldNames(FieldPtr) & ">", vbTextCompare) = 1 Then
+                    ''                    ElseIf genericController.vbInstr(1, CriteriaValues(CriteriaPointer), FieldNames(FieldPtr) & ">", vbTextCompare) = 1 Then
                     ''                        NameValues = Split(CriteriaValues(CriteriaPointer), ">")
                     ''                        FieldValue(FieldPtr) = NameValues(1)
                     ''                        FieldMatchOptions(FieldPtr) = 2
-                    ''                    ElseIf vbInstr(1, CriteriaValues(CriteriaPointer), FieldNames(FieldPtr) & "<", vbTextCompare) = 1 Then
+                    ''                    ElseIf genericController.vbInstr(1, CriteriaValues(CriteriaPointer), FieldNames(FieldPtr) & "<", vbTextCompare) = 1 Then
                     ''                        NameValues = Split(CriteriaValues(CriteriaPointer), "<")
                     ''                        FieldValue(FieldPtr) = NameValues(1)
                     ''                        FieldMatchOptions(FieldPtr) = 3
@@ -14910,7 +14912,7 @@ ErrorTrap:
                                 'Else
                                 '    selector = cpCore.main_GetFormInputSelectList2("FieldValue" & FieldPtr, FieldValue(FieldPtr), FieldLookupList(FieldPtr))
                                 'End If
-                                'selector = vbReplace(selector, ">", "onFocus=""var e=getElementById('t" & FieldPtr & "');e.checked=1;"">")
+                                'selector = genericController.vbReplace(selector, ">", "onFocus=""var e=getElementById('t" & FieldPtr & "');e.checked=1;"">")
                                 returnForm = returnForm _
                                 & "<tr>" _
                                 & "<td class=""ccAdminEditCaption"">" & FieldCaption(FieldPtr) & "</td>" _
@@ -14961,9 +14963,9 @@ ErrorTrap:
                                 RowPointer = RowPointer + 1
                         End Select
                     Next
-                    returnForm = returnForm & StartTableRow()
-                    returnForm = returnForm & StartTableCell("120", 1, RowEven, "right") & "<img src=/ccLib/images/spacer.gif width=120 height=1></td>"
-                    returnForm = returnForm & StartTableCell("99%", 1, RowEven, "left") & "<img src=/ccLib/images/spacer.gif width=1 height=1></td>"
+                    returnForm = returnForm & genericController.StartTableRow()
+                    returnForm = returnForm & genericController.StartTableCell("120", 1, RowEven, "right") & "<img src=/ccLib/images/spacer.gif width=120 height=1></td>"
+                    returnForm = returnForm & genericController.StartTableCell("99%", 1, RowEven, "left") & "<img src=/ccLib/images/spacer.gif width=1 height=1></td>"
                     returnForm = returnForm & kmaEndTableRow
                     returnForm = returnForm & "</table>"
                     Content = returnForm
@@ -15068,7 +15070,7 @@ ErrorTrap:
                         RecordLimitText = cpCore.docProperties.getText("RecordLimit")
                         If RecordLimitText <> "" Then
                             IsRecordLimitSet = True
-                            RecordLimit = EncodeInteger(RecordLimitText)
+                            RecordLimit = genericController.EncodeInteger(RecordLimitText)
                         End If
                     End If
                     If ExportName = "" Then
@@ -15176,7 +15178,7 @@ ErrorTrap:
                             '
                             Content = "" _
                                 & cr & "<table>" _
-                                & kmaIndent(Content) _
+                                & genericController.kmaIndent(Content) _
                                 & cr & "</table>" _
                                 & ""
                             '
@@ -15335,7 +15337,7 @@ ErrorTrap:
             TargetFieldID = cpCore.docProperties.getInteger("fi")
             TargetFieldName = cpCore.docProperties.getText("FieldName")
             ColumnPointer = cpCore.docProperties.getInteger("dtcn")
-            FieldNameToAdd = vbUCase(cpCore.docProperties.getText(RequestNameAddField))
+            FieldNameToAdd = genericController.vbUCase(cpCore.docProperties.getText(RequestNameAddField))
             FieldIDToAdd = cpCore.docProperties.getInteger(RequestNameAddFieldID)
             'ButtonList = ButtonCancel & "," & ButtonSelect
             NeedToReloadConfig = cpCore.doc_getBoolean2("NeedToReloadConfig")
@@ -15781,7 +15783,7 @@ ErrorTrap:
             'FormPanel = FormPanel & cpCore.main_GetFormInputSelect2("ContentID", ContentID, "Content")
             'Call Stream.Add(cpCore.main_GetPanel(FormPanel))
             ''
-            Call cpCore.siteProperties.setProperty("AllowContentAutoLoad", EncodeText(AllowContentAutoLoad))
+            Call cpCore.siteProperties.setProperty("AllowContentAutoLoad", genericController.encodeText(AllowContentAutoLoad))
             'Stream.Add( cpCore.main_GetFormInputHidden("NeedToReloadConfig", NeedToReloadConfig))
 
             Content = "" _
@@ -15868,7 +15870,7 @@ ErrorTrap:
                     ' Throw out all the details of what happened, and add one simple error
                     '
                     ErrorList = cpCore.error_GetUserError
-                    ErrorList = vbReplace(ErrorList, UserErrorHeadline, "", 1, 99, vbTextCompare)
+                    ErrorList = genericController.vbReplace(ErrorList, UserErrorHeadline, "", 1, 99, vbTextCompare)
                     Call cpCore.error_AddUserError("The following errors occurred while verifying Link Alias entries for your existing pages." & ErrorList)
                     'Call cpCore.main_AddUserError(ErrorList)
                 End If
@@ -15957,7 +15959,7 @@ ErrorTrap:
                         '
                         For Ptr = 0 To UBound(DefaultFeatures)
                             FeatureName = DefaultFeatures(Ptr)
-                            If vbLCase(FeatureName) = "styleandformatting" Then
+                            If genericController.vbLCase(FeatureName) = "styleandformatting" Then
                                 '
                                 ' must always be on or it throws js error (editor bug I guess)
                                 '
@@ -15980,12 +15982,12 @@ ErrorTrap:
                         '
                         ' Clear the editor style rules template cache so next edit gets new background color
                         '
-                        EditorStyleRulesFilename = vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, vbTextCompare)
+                        EditorStyleRulesFilename = genericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, vbTextCompare)
                         Call cpCore.privateFiles.deleteFile(EditorStyleRulesFilename)
                         '
                         CS = cpCore.db.cs_openCsSql_rev("default", "select id from cctemplates")
                         Do While cpCore.db.cs_ok(CS)
-                            EditorStyleRulesFilename = vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", cpCore.main_cs_get2Text(CS, "ID"), 1, 99, vbTextCompare)
+                            EditorStyleRulesFilename = genericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", cpCore.main_cs_get2Text(CS, "ID"), 1, 99, vbTextCompare)
                             Call cpCore.privateFiles.deleteFile(EditorStyleRulesFilename)
                             Call cpCore.db.cs_goNext(CS)
                         Loop
@@ -16011,11 +16013,11 @@ ErrorTrap:
                         End If
                         If FeatureList <> "" Then
                             Features = Split(FeatureList, vbCrLf)
-                            AdminList = vbReplace(Features(0), "admin:", "", 1, 99, vbTextCompare)
+                            AdminList = genericController.vbReplace(Features(0), "admin:", "", 1, 99, vbTextCompare)
                             If UBound(Features) > 0 Then
-                                CMList = vbReplace(Features(1), "contentmanager:", "", 1, 99, vbTextCompare)
+                                CMList = genericController.vbReplace(Features(1), "contentmanager:", "", 1, 99, vbTextCompare)
                                 If UBound(Features) > 1 Then
-                                    PublicList = vbReplace(Features(2), "public:", "", 1, 99, vbTextCompare)
+                                    PublicList = genericController.vbReplace(Features(2), "public:", "", 1, 99, vbTextCompare)
                                 End If
                             End If
                         End If
@@ -16030,16 +16032,16 @@ ErrorTrap:
                         RowPtr = 0
                         For Ptr = 0 To UBound(DefaultFeatures)
                             FeatureName = DefaultFeatures(Ptr)
-                            If vbLCase(FeatureName) = "styleandformatting" Then
+                            If genericController.vbLCase(FeatureName) = "styleandformatting" Then
                                 '
                                 ' hide and force on during process - editor bug I think.
                                 '
                             Else
-                                TDLeft = StartTableCell(, , CBool(RowPtr Mod 2), "left")
-                                TDCenter = StartTableCell(, , CBool(RowPtr Mod 2), "center")
-                                AllowAdmin = EncodeBoolean(InStr(1, "," & AdminList & ",", "," & FeatureName & ",", vbTextCompare))
-                                AllowCM = EncodeBoolean(InStr(1, "," & CMList & ",", "," & FeatureName & ",", vbTextCompare))
-                                AllowPublic = EncodeBoolean(InStr(1, "," & PublicList & ",", "," & FeatureName & ",", vbTextCompare))
+                                TDLeft = genericController.StartTableCell(, , CBool(RowPtr Mod 2), "left")
+                                TDCenter = genericController.StartTableCell(, , CBool(RowPtr Mod 2), "center")
+                                AllowAdmin = genericController.EncodeBoolean(InStr(1, "," & AdminList & ",", "," & FeatureName & ",", vbTextCompare))
+                                AllowCM = genericController.EncodeBoolean(InStr(1, "," & CMList & ",", "," & FeatureName & ",", vbTextCompare))
+                                AllowPublic = genericController.EncodeBoolean(InStr(1, "," & PublicList & ",", "," & FeatureName & ",", vbTextCompare))
                                 Copy = Copy & vbCrLf _
                                     & "<tr>" _
                                     & TDLeft & FeatureName & "</td>" _
@@ -16055,8 +16057,8 @@ ErrorTrap:
                             & vbCrLf & "<div>" & cpCore.html_GetFormInputText2("editorbackgroundcolor", cpCore.siteProperties.getText("Editor Background Color", "white")) & "</div>" _
                             & vbCrLf & "<div>&nbsp;</div>" _
                             & vbCrLf & "<div><b>Toolbar features available</b></div>" _
-                            & vbCrLf & "<table border=""0"" cellpadding=""4"" cellspacing=""0"" width=""500px"" align=left>" & kmaIndent(Copy) & vbCrLf & kmaEndTable
-                        Copy = vbCrLf & StartTable(20, 0, 0) & "<tr><td>" & kmaIndent(Copy) & "</td></tr>" & vbCrLf & kmaEndTable
+                            & vbCrLf & "<table border=""0"" cellpadding=""4"" cellspacing=""0"" width=""500px"" align=left>" & genericController.kmaIndent(Copy) & vbCrLf & kmaEndTable
+                        Copy = vbCrLf & genericController.StartTable(20, 0, 0) & "<tr><td>" & genericController.kmaIndent(Copy) & "</td></tr>" & vbCrLf & kmaEndTable
                         Content.Add(Copy)
                         ButtonList = ButtonCancel & "," & ButtonRefresh & "," & ButtonSave & "," & ButtonOK
                         Content.Add(cpCore.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormEditorConfig))
@@ -16118,7 +16120,7 @@ ErrorTrap:
                         '
                         AllowAutoLogin = cpCore.doc_getBoolean2("AllowAutoLogin")
                         '
-                        Call cpCore.siteProperties.setProperty("AllowAutoLogin", EncodeText(AllowAutoLogin))
+                        Call cpCore.siteProperties.setProperty("AllowAutoLogin", genericController.encodeText(AllowAutoLogin))
                 End Select
                 If (Button = ButtonOK) Then
                     '
@@ -16246,7 +16248,7 @@ ErrorTrap:
         '                s.Add( "<td class=""ccAdminEditField"">"
         '                    s.Add( "<table border=0 cellpadding=0 cellspacing=0 width=""100%"" ><tr>"
         '                    If editrecord.read_only Then
-        '                        s.Add( "<td width=""50%"">" & encodeText(DefaultValue) & "&nbsp;" & FeedName & "</td>"
+        '                        s.Add( "<td width=""50%"">" & genericController.encodeText(DefaultValue) & "&nbsp;" & FeedName & "</td>"
         '                    Else
         '                        s.Add( "<td width=""50%"">" & cpCore.main_GetFormInputHidden("RSSFeedWas." & Cnt, DefaultValue) & cpCore.main_GetFormInputHidden("RSSFeedID." & Cnt, FeedID) & cpCore.main_GetFormInputCheckBox2("RSSFeed." & Cnt, DefaultValue) & FeedName & "</td>"
         '                    End If
@@ -16668,7 +16670,7 @@ ErrorTrap:
                         Dim CS As Integer
                         KeywordList = cpCore.docProperties.getText("KeywordList")
                         If KeywordList <> "" Then
-                            KeywordList = vbReplace(KeywordList, vbCrLf, ",")
+                            KeywordList = genericController.vbReplace(KeywordList, vbCrLf, ",")
                             Keywords = Split(KeywordList, ",")
                             Cnt = UBound(Keywords) + 1
                             For Ptr = 0 To Cnt - 1
@@ -16758,7 +16760,7 @@ ErrorTrap:
                 Dim helpLink As String = ""
                 Dim FoundAddon As Boolean
                 '
-                If vbInstr(1, "," & UsedIDString & ",", "," & CStr(HelpAddonID) & ",") = 0 Then
+                If genericController.vbInstr(1, "," & UsedIDString & ",", "," & CStr(HelpAddonID) & ",") = 0 Then
                     CS = cpCore.csOpen(cnAddons, HelpAddonID)
                     If cpCore.db.cs_ok(CS) Then
                         FoundAddon = True
@@ -16776,7 +16778,7 @@ ErrorTrap:
                         IconHeight = cpCore.db.cs_getInteger(CS, "IconHeight")
                         IconSprites = cpCore.db.cs_getInteger(CS, "IconSprites")
                         IconIsInline = cpCore.db.cs_getBoolean(CS, "IsInline")
-                        IconImg = GetAddonIconImg(cpCore.siteProperties.adminURL, IconWidth, IconHeight, IconSprites, IconIsInline, "", IconFilename, cpCore.serverConfig.appConfig.cdnFilesNetprefix, AddonName, AddonName, "", 0)
+                        IconImg = genericController.GetAddonIconImg(cpCore.siteProperties.adminURL, IconWidth, IconHeight, IconSprites, IconIsInline, "", IconFilename, cpCore.serverConfig.appConfig.cdnFilesNetprefix, AddonName, AddonName, "", 0)
                         helpLink = cpCore.db.cs_get(CS, "helpLink")
                     End If
                     Call cpCore.db.cs_Close(CS)
@@ -16837,7 +16839,7 @@ ErrorTrap:
                 Dim IncludeHelp As String = ""
                 Dim addonId As Integer
                 '
-                If vbInstr(1, "," & UsedIDString & ",", "," & CStr(HelpCollectionID) & ",") = 0 Then
+                If genericController.vbInstr(1, "," & UsedIDString & ",", "," & CStr(HelpCollectionID) & ",") = 0 Then
                     CS = cpCore.csOpen("Add-on Collections", HelpCollectionID)
                     If cpCore.db.cs_ok(CS) Then
                         Collectionname = cpCore.db.cs_get(CS, "Name")
@@ -17026,7 +17028,7 @@ ErrorTrap:
                             Case FieldTypeIdFileCSS, FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdFileJavascript, FieldTypeIdLongText, FieldTypeIdManyToMany, FieldTypeIdRedirect, FieldTypeIdFileTextPrivate, FieldTypeIdFileXML, FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
                                 IncludedInColumns = False
                         End Select
-                        'FieldName = vbLCase(.Name)
+                        'FieldName = genericController.vbLCase(.Name)
                         If (.fieldTypeId = FieldTypeIdMemberSelect) Or ((.fieldTypeId = FieldTypeIdLookup) And (.lookupContentID <> 0)) Then
                             '
                             ' This is a lookup field -- test if IncludedInLeftJoins
@@ -17098,16 +17100,16 @@ ErrorTrap:
                 Dim rightNow As Date
                 rightNow = DateTime.Now()
                 sqlRightNow = cpCore.db.encodeSQLDate(rightNow)
-                If vbLCase(adminContent.ContentTableName) = vbLCase("ccMembers") Then
-                    'If vbLCase(AdminContent.ContentTableName) = "ccmembers" Then
+                If genericController.vbLCase(adminContent.ContentTableName) = genericController.vbLCase("ccMembers") Then
+                    'If genericController.vbLCase(AdminContent.ContentTableName) = "ccmembers" Then
                     With IndexConfig
                         If .GroupListCnt > 0 Then
                             For Ptr = 0 To .GroupListCnt - 1
                                 GroupName = .GroupList(Ptr)
                                 If GroupName <> "" Then
                                     GroupID = cpCore.main_GetRecordID("Groups", GroupName)
-                                    If GroupID = 0 And vbIsNumeric(GroupName) Then
-                                        GroupID = EncodeInteger(GroupName)
+                                    If GroupID = 0 And genericController.vbIsNumeric(GroupName) Then
+                                        GroupID = genericController.EncodeInteger(GroupName)
                                     End If
                                     groupTableAlias = "GroupFilter" & Ptr
                                     return_SQLWhere &= "AND(" & groupTableAlias & ".GroupID=" & GroupID & ")and((" & groupTableAlias & ".dateExpires is null)or(" & groupTableAlias & ".dateExpires>" & sqlRightNow & "))"
@@ -17150,9 +17152,9 @@ ErrorTrap:
                         Cnt = UBound(ListSplit) + 1
                         If Cnt > 0 Then
                             For Ptr = 0 To Cnt - 1
-                                Pos = vbInstr(1, ListSplit(Ptr), ")")
+                                Pos = genericController.vbInstr(1, ListSplit(Ptr), ")")
                                 If Pos > 0 Then
-                                    ContentID = EncodeInteger(Mid(ListSplit(Ptr), 1, Pos - 1))
+                                    ContentID = genericController.EncodeInteger(Mid(ListSplit(Ptr), 1, Pos - 1))
                                     If ContentID > 0 And (ContentID <> adminContent.Id) And userHasContentAccess(ContentID) Then
                                         SubQuery = SubQuery & "OR(" & adminContent.ContentTableName & ".ContentControlID=" & ContentID & ")"
                                         return_ContentAccessLimitMessage = return_ContentAccessLimitMessage & ", '<a href=""?cid=" & ContentID & """>" & cpCore.metaData.getContentNameByID(ContentID) & "</a>'"
@@ -17239,12 +17241,12 @@ ErrorTrap:
                             For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In adminContent.fields
                                 Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
                                 With field
-                                    If vbUCase(.nameLc) = vbUCase(WherePair(0, WCount)) Then
+                                    If genericController.vbUCase(.nameLc) = genericController.vbUCase(WherePair(0, WCount)) Then
                                         '
                                         ' found it, add it in the sql
                                         '
                                         return_SQLWhere &= "AND(" & adminContent.ContentTableName & "." & WherePair(0, WCount) & "="
-                                        If vbIsNumeric(WherePair(1, WCount)) Then
+                                        If genericController.vbIsNumeric(WherePair(1, WCount)) Then
                                             return_SQLWhere &= WherePair(1, WCount) & ")"
                                         Else
                                             return_SQLWhere &= "'" & WherePair(1, WCount) & "')"
@@ -17264,7 +17266,7 @@ ErrorTrap:
                         Dim findword As indexConfigFindWordClass = kvp.Value
                         FindMatchOption = findword.MatchOption
                         If FindMatchOption <> FindWordMatchEnum.MatchIgnore Then
-                            FindWordName = vbLCase(findword.Name)
+                            FindWordName = genericController.vbLCase(findword.Name)
                             FindWordValue = findword.Value
                             '
                             ' Get FieldType
@@ -17274,14 +17276,14 @@ ErrorTrap:
                                     Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
                                     With field
                                         FieldPtr = .id ' quick fix for a replacement for the old fieldPtr (so multiple for loops will always use the same "table"+ptr string
-                                        If vbLCase(.nameLc) = FindWordName Then
+                                        If genericController.vbLCase(.nameLc) = FindWordName Then
                                             Select Case .fieldTypeId
                                                 Case FieldTypeIdAutoIdIncrement, FieldTypeIdInteger
                                                     '
                                                     ' integer
                                                     '
-                                                    Dim FindWordValueInteger As Integer = EncodeInteger(FindWordValue)
-                                                    If SupportWorkflowFields And vbLCase(.nameLc) = "id" Then
+                                                    Dim FindWordValueInteger As Integer = genericController.EncodeInteger(FindWordValue)
+                                                    If SupportWorkflowFields And genericController.vbLCase(.nameLc) = "id" Then
                                                         FindWordName = "EditSourceID"
                                                     End If
                                                     Select Case FindMatchOption
@@ -17302,7 +17304,7 @@ ErrorTrap:
                                                     '
                                                     ' double
                                                     '
-                                                    Dim FindWordValueDouble As Double = EncodeNumber(FindWordValue)
+                                                    Dim FindWordValueDouble As Double = genericController.EncodeNumber(FindWordValue)
                                                     Select Case FindMatchOption
                                                         Case FindWordMatchEnum.MatchEmpty
                                                             return_SQLWhere &= "AND(" & adminContent.ContentTableName & "." & FindWordName & " is null)"
@@ -17379,7 +17381,7 @@ ErrorTrap:
                                                                 lookups = Split(.lookupList, ",")
                                                                 LookupQuery = ""
                                                                 For LookupPtr = 0 To UBound(lookups)
-                                                                    If vbInstr(1, lookups(LookupPtr), FindWordValue, vbTextCompare) <> 0 Then
+                                                                    If genericController.vbInstr(1, lookups(LookupPtr), FindWordValue, vbTextCompare) <> 0 Then
                                                                         LookupQuery = LookupQuery & "OR(" & adminContent.ContentTableName & "." & FindWordName & "=" & cpCore.db.encodeSQLNumber(LookupPtr + 1) & ")"
                                                                     End If
                                                                 Next
@@ -17395,7 +17397,7 @@ ErrorTrap:
                                                     '
                                                     Select Case FindMatchOption
                                                         Case FindWordMatchEnum.matchincludes
-                                                            If EncodeBoolean(FindWordValue) Then
+                                                            If genericController.EncodeBoolean(FindWordValue) Then
                                                                 return_SQLWhere &= "AND(" & adminContent.ContentTableName & "." & FindWordName & "<>0)"
                                                             Else
                                                                 return_SQLWhere &= "AND((" & adminContent.ContentTableName & "." & FindWordName & "=0)or(" & adminContent.ContentTableName & "." & FindWordName & " is null))"
@@ -17440,7 +17442,7 @@ ErrorTrap:
                 Dim orderByDelim As String = " "
                 For Each kvp In IndexConfig.Sorts
                     Dim sort As indexConfigSortClass = kvp.Value
-                    SortFieldName = vbLCase(sort.fieldName)
+                    SortFieldName = genericController.vbLCase(sort.fieldName)
                     '
                     ' Get FieldType
                     '

@@ -1,7 +1,9 @@
 ﻿
 Option Explicit On
 Option Strict On
-'
+
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 Imports Contensive.Core.coreCommonModule
 Imports System.Xml
 Imports Contensive.Core
@@ -56,8 +58,8 @@ Namespace Contensive.Core.Controllers
                 Dim iRecordID As Integer
                 Dim IsEditingLocal As Boolean
                 '
-                iContentName = EncodeText(ContentName)
-                iRecordID = EncodeInteger(RecordID)
+                iContentName = genericController.encodeText(ContentName)
+                iRecordID = genericController.EncodeInteger(RecordID)
                 '
                 MethodName = "result"
                 '
@@ -82,7 +84,7 @@ Namespace Contensive.Core.Controllers
                             SeeAlsoLink = (cpcore.db.cs_getText(CS, "Link"))
                             If SeeAlsoLink <> "" Then
                                 result = result & cr & "<li class=""ccListItem"">"
-                                If vbInstr(1, SeeAlsoLink, "://") = 0 Then
+                                If genericController.vbInstr(1, SeeAlsoLink, "://") = 0 Then
                                     SeeAlsoLink = cpcore.webServerIO_requestProtocol & SeeAlsoLink
                                 End If
                                 If IsEditingLocal Then
@@ -126,7 +128,7 @@ Namespace Contensive.Core.Controllers
         Public Shared Function main_GetMoreInfo(cpcore As coreClass, ByVal contactMemberID As Integer) As String
             Dim result As String = ""
             Try
-                main_GetMoreInfo = pageManager_getMoreInfoHtml(cpcore, EncodeInteger(contactMemberID))
+                main_GetMoreInfo = pageManager_getMoreInfoHtml(cpcore, genericController.EncodeInteger(contactMemberID))
             Catch ex As Exception
                 cpcore.handleExceptionAndContinue(ex)
             End Try
@@ -157,9 +159,9 @@ Namespace Contensive.Core.Controllers
                 Dim iToMemberID As Integer
                 Dim iHeadline As String
                 '
-                iContentName = EncodeText(ContentName)
-                iRecordID = EncodeInteger(RecordID)
-                iToMemberID = EncodeInteger(ToMemberID)
+                iContentName = genericController.encodeText(ContentName)
+                iRecordID = genericController.EncodeInteger(RecordID)
+                iToMemberID = genericController.EncodeInteger(ToMemberID)
                 iHeadline = encodeEmptyText(headline, "")
                 '
                 Const FeedbackButtonSubmit = "Submit"
@@ -289,19 +291,19 @@ Namespace Contensive.Core.Controllers
                 '
                 ' ----- Add tablename to the front of SortFieldList fieldnames
                 '
-                iSortFieldList = " " & vbReplace(iSortFieldList, ",", " , ") & " "
-                iSortFieldList = vbReplace(iSortFieldList, " ID ", " ccContentWatch.ID ", 1, 99, vbTextCompare)
-                iSortFieldList = vbReplace(iSortFieldList, " Link ", " ccContentWatch.Link ", 1, 99, vbTextCompare)
-                iSortFieldList = vbReplace(iSortFieldList, " LinkLabel ", " ccContentWatch.LinkLabel ", 1, 99, vbTextCompare)
-                iSortFieldList = vbReplace(iSortFieldList, " SortOrder ", " ccContentWatch.SortOrder ", 1, 99, vbTextCompare)
-                iSortFieldList = vbReplace(iSortFieldList, " DateAdded ", " ccContentWatch.DateAdded ", 1, 99, vbTextCompare)
-                iSortFieldList = vbReplace(iSortFieldList, " ContentID ", " ccContentWatch.ContentID ", 1, 99, vbTextCompare)
-                iSortFieldList = vbReplace(iSortFieldList, " RecordID ", " ccContentWatch.RecordID ", 1, 99, vbTextCompare)
-                iSortFieldList = vbReplace(iSortFieldList, " ModifiedDate ", " ccContentWatch.ModifiedDate ", 1, 99, vbTextCompare)
+                iSortFieldList = " " & genericController.vbReplace(iSortFieldList, ",", " , ") & " "
+                iSortFieldList = genericController.vbReplace(iSortFieldList, " ID ", " ccContentWatch.ID ", 1, 99, vbTextCompare)
+                iSortFieldList = genericController.vbReplace(iSortFieldList, " Link ", " ccContentWatch.Link ", 1, 99, vbTextCompare)
+                iSortFieldList = genericController.vbReplace(iSortFieldList, " LinkLabel ", " ccContentWatch.LinkLabel ", 1, 99, vbTextCompare)
+                iSortFieldList = genericController.vbReplace(iSortFieldList, " SortOrder ", " ccContentWatch.SortOrder ", 1, 99, vbTextCompare)
+                iSortFieldList = genericController.vbReplace(iSortFieldList, " DateAdded ", " ccContentWatch.DateAdded ", 1, 99, vbTextCompare)
+                iSortFieldList = genericController.vbReplace(iSortFieldList, " ContentID ", " ccContentWatch.ContentID ", 1, 99, vbTextCompare)
+                iSortFieldList = genericController.vbReplace(iSortFieldList, " RecordID ", " ccContentWatch.RecordID ", 1, 99, vbTextCompare)
+                iSortFieldList = genericController.vbReplace(iSortFieldList, " ModifiedDate ", " ccContentWatch.ModifiedDate ", 1, 99, vbTextCompare)
                 '
                 ' ----- Special case
                 '
-                iSortFieldList = vbReplace(iSortFieldList, " name ", " ccContentWatch.LinkLabel ", 1, 99, vbTextCompare)
+                iSortFieldList = genericController.vbReplace(iSortFieldList, " name ", " ccContentWatch.LinkLabel ", 1, 99, vbTextCompare)
                 '
                 SQL = "SELECT" _
                     & " ccContentWatch.ID AS ID" _
@@ -370,7 +372,7 @@ Namespace Contensive.Core.Controllers
                         If (LinkLabel <> "") Then
                             result = result & cr & "<li class=""ccListItem"">"
                             If (Link <> "") Then
-                                result = result & cpcore.main_GetLinkedText("<a href=""" & cpcore.html.html_EncodeHTML(cpcore.webServerIO_requestPage & "?rc=" & ContentID & "&ri=" & RecordID) & """>", LinkLabel)
+                                result = result & cpcore.csv_GetLinkedText("<a href=""" & cpcore.html.html_EncodeHTML(cpcore.webServerIO_requestPage & "?rc=" & ContentID & "&ri=" & RecordID) & """>", LinkLabel)
                             Else
                                 result = result & LinkLabel
                             End If

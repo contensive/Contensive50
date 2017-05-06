@@ -84,7 +84,7 @@ Namespace Contensive.Core
                 ReDim errors(0)
                 '
                 ClearAppErrors = (Left(LCase(RequestPath), 6) = "/reset")
-                DisplayStatusMethod = ClearAppErrors Or (Left(LCase(RequestPath), Len(monitorConfig.StatusMethod) + 1) = "/" & vbLCase(monitorConfig.StatusMethod))
+                DisplayStatusMethod = ClearAppErrors Or (Left(LCase(RequestPath), Len(monitorConfig.StatusMethod) + 1) = "/" & genericController.vbLCase(monitorConfig.StatusMethod))
                 logMessage = "GetStatusPage hit, RequestPath=" & RequestPath & ", from " & remoteHost
                 If Not (DisplayStatusMethod Or ClearAppErrors) Then
                     '
@@ -184,7 +184,7 @@ Namespace Contensive.Core
                         LogFileStruct = cpCore.appRootFiles.getFileList(cp.core.serverConfig.programFilesPath & "logs")
                         For Each logFile As IO.FileInfo In LogFileStruct
                             If logFile.Length > LargestLogSize Then
-                                LargestLogSize = EncodeInteger(logFile.Length)
+                                LargestLogSize = genericController.EncodeInteger(logFile.Length)
                             End If
                             If logFile.Length > monitorConfig.LogFileSizeMax Then
                                 ReDim Preserve errors(ErrorCount)

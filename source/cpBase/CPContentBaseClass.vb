@@ -218,13 +218,6 @@ Namespace Contensive.BaseClasses
         ''' <param name="SQLCriteria"></param>
         ''' <remarks></remarks>
         '''
-        Public MustOverride Sub DeleteRecords(ByVal ContentName As String, ByVal SQLCriteria As String)
-        ''' <summary>
-        ''' Create a new content with sqlTable, return the contentId
-        ''' </summary>
-        ''' <param name="ContentName"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
         Public MustOverride Function AddContent(ByVal ContentName As String) As Integer
         Public MustOverride Function AddContent(ByVal ContentName As String, sqlTableName As String) As Integer
         Public MustOverride Function AddContent(ByVal ContentName As String, sqlTableName As String, dataSource As String) As Integer
@@ -248,8 +241,6 @@ Namespace Contensive.BaseClasses
         ''' <param name="ContentName"></param>
         ''' <param name="SQLCriteria"></param>
         ''' <remarks></remarks>
-        '''
-        <Obsolete("Delete is deprecated, please use DeleteRecord instead.", True)>
         Public MustOverride Sub Delete(ByVal ContentName As String, ByVal SQLCriteria As String)
         ''' <summary>
         ''' Returns a linked icon to the admin list page for the content

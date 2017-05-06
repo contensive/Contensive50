@@ -1,4 +1,6 @@
 
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 Imports Contensive.BaseClasses
 Imports System.Runtime.InteropServices
 
@@ -114,7 +116,7 @@ Namespace Contensive.Core
 
         Public Overrides Sub SendUser(ByVal toUserId As String, ByVal FromAddress As String, ByVal Subject As String, ByVal Body As String, Optional ByVal SendImmediately As Boolean = True, Optional ByVal BodyIsHTML As Boolean = True) 'Inherits BaseClasses.CPEmailBaseClass.SendUser
             Dim userId As Integer = 0
-            If vbIsNumeric(toUserId) Then
+            If genericController.vbIsNumeric(toUserId) Then
                 userId = CInt(toUserId)
                 Call cpCore.email_sendMemberEmail3(userId, FromAddress, Subject, Body, SendImmediately, BodyIsHTML, 0, "", False)
             End If

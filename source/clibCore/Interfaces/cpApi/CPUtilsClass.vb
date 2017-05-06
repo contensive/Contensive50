@@ -2,7 +2,8 @@
 Option Strict On
 Option Explicit On
 
-Imports cl = Contensive.Core.coreCommonModule
+Imports Contensive.Core.coreCommonModule
+Imports Contensive.Core.Controllers
 Imports System.Web.Security.FormsAuthentication
 Imports System.Guid
 Imports Contensive.BaseClasses
@@ -90,7 +91,7 @@ Namespace Contensive.Core
         End Function
 
         Public Overrides Function DecodeUrl(ByVal Url As String) As String
-            Return cl.DecodeURL(Url)
+            Return genericController.DecodeURL(Url)
             'return System.Web.HttpServerUtility.
             'If true Then
             '    DecodeUrl = cmc.main_DecodeUrl(Url)
@@ -108,7 +109,7 @@ Namespace Contensive.Core
         End Function
 
         Public Overrides Function DecodeHtml(ByVal Source As String) As String
-            Return cl.decodeHtml(Source)
+            Return genericController.decodeHtml(Source)
             'If true Then
             '    DecodeHtml = cmc.main_DecodeHtml(Source)
             'Else
@@ -126,7 +127,7 @@ Namespace Contensive.Core
         End Function
 
         Public Overrides Function EncodeUrl(ByVal Source As String) As String
-            Return cl.EncodeURL(Source)
+            Return genericController.EncodeURL(Source)
             'If true Then
             '    EncodeUrl = cmc.main_EncodeURL(Source)
             'Else
@@ -160,20 +161,7 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Function EncodeInteger(ByVal Expression As Object) As Integer
-            EncodeInteger = 0
-            Try
-                If (Expression Is Nothing) Then
-                    EncodeInteger = 0
-                ElseIf vbIsNumeric(Expression) Then
-                    EncodeInteger = CInt(Expression)
-                ElseIf TypeOf Expression Is Boolean Then
-                    If DirectCast(Expression, Boolean) Then
-                        EncodeInteger = 1
-                    End If
-                End If
-            Catch ex As Exception
-                EncodeInteger = 0
-            End Try
+            Return genericController.EncodeInteger(Expression)
         End Function
         '
         '
@@ -183,7 +171,7 @@ Namespace Contensive.Core
             Try
                 If (Expression Is Nothing) Then
                     EncodeNumber = 0
-                ElseIf vbIsNumeric(Expression) Then
+                ElseIf genericController.vbIsNumeric(Expression) Then
                     EncodeNumber = CDbl(Expression)
                 ElseIf TypeOf Expression Is Boolean Then
                     If DirectCast(Expression, Boolean) Then
@@ -197,18 +185,18 @@ Namespace Contensive.Core
         '
         '
         '
-        Public Overrides Function EncodeText(ByVal Expression As Object) As String
-            EncodeText = ""
+        Public Overrides Function encodeText(ByVal Expression As Object) As String
+            encodeText = ""
             Try
                 If (Expression Is Nothing) Then
-                    EncodeText = ""
+                    encodeText = ""
                 ElseIf (Expression Is DBNull.Value) Then
-                    EncodeText = ""
+                    encodeText = ""
                 Else
-                    EncodeText = CStr(Expression)
+                    encodeText = CStr(Expression)
                 End If
             Catch
-                EncodeText = ""
+                encodeText = ""
             End Try
 
         End Function
@@ -222,7 +210,7 @@ Namespace Contensive.Core
                     EncodeBoolean = False
                 ElseIf TypeOf Expression Is Boolean Then
                     EncodeBoolean = DirectCast(Expression, Boolean)
-                ElseIf vbIsNumeric(Expression) Then
+                ElseIf genericController.vbIsNumeric(Expression) Then
                     EncodeBoolean = (CStr(Expression) <> "0")
                 ElseIf TypeOf Expression Is String Then
                     Select Case Expression.ToString.ToLower.Trim
@@ -238,19 +226,20 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Function EncodeDate(ByVal Expression As Object) As Date
-            EncodeDate = Date.MinValue
+            Dim result As Date = Date.MinValue
             Try
                 If (Expression Is Nothing) Then
-                    EncodeDate = Date.MinValue
+                    result = Date.MinValue
                 ElseIf IsDate(Expression) Then
-                    EncodeDate = CDate(Expression)
+                    result = CDate(Expression)
                 End If
-                If EncodeDate < #1/1/1900# Then
-                    EncodeDate = Date.MinValue
+                If result < #1/1/1900# Then
+                    result = Date.MinValue
                 End If
             Catch ex As Exception
-                EncodeDate = Date.MinValue
+                result = Date.MinValue
             End Try
+            Return result
         End Function
         '
         '
@@ -285,35 +274,35 @@ Namespace Contensive.Core
         End Sub
 
         Public Overrides Function ConvertLinkToShortLink(ByVal URL As String, ByVal ServerHost As String, ByVal ServerVirtualPath As String) As String
-            ConvertLinkToShortLink = cl.ConvertLinkToShortLink(URL, ServerHost, ServerVirtualPath)
+            ConvertLinkToShortLink = genericController.ConvertLinkToShortLink(URL, ServerHost, ServerVirtualPath)
         End Function
 
         Public Overrides Function ConvertShortLinkToLink(ByVal URL As String, ByVal PathPagePrefix As String) As String
-            ConvertShortLinkToLink = cl.ConvertShortLinkToLink(URL, PathPagePrefix)
+            ConvertShortLinkToLink = genericController.ConvertShortLinkToLink(URL, PathPagePrefix)
         End Function
 
         Public Overrides Function DecodeGMTDate(ByVal GMTDate As String) As Date
-            DecodeGMTDate = cl.DecodeGMTDate(GMTDate)
+            DecodeGMTDate = genericController.DecodeGMTDate(GMTDate)
         End Function
 
         Public Overrides Function DecodeResponseVariable(ByVal Source As String) As String
-            DecodeResponseVariable = cl.DecodeResponseVariable(Source)
+            DecodeResponseVariable = genericController.DecodeResponseVariable(Source)
         End Function
 
         Public Overrides Function EncodeJavascript(ByVal Source As String) As String
-            EncodeJavascript = cl.EncodeJavascript(Source)
+            EncodeJavascript = genericController.EncodeJavascript(Source)
         End Function
 
         Public Overrides Function EncodeQueryString(ByVal Source As String) As String
-            EncodeQueryString = cl.EncodeQueryString(Source)
+            EncodeQueryString = genericController.EncodeQueryString(Source)
         End Function
 
         Public Overrides Function EncodeRequestVariable(ByVal Source As String) As String
-            EncodeRequestVariable = cl.EncodeRequestVariable(Source)
+            EncodeRequestVariable = genericController.EncodeRequestVariable(Source)
         End Function
 
         Public Overrides Function GetArgument(ByVal Name As String, ByVal ArgumentString As String, Optional ByVal DefaultValue As String = "", Optional ByVal Delimiter As String = "") As String
-            GetArgument = cl.GetArgument(Name, ArgumentString, DefaultValue, Delimiter)
+            GetArgument = genericController.GetArgument(Name, ArgumentString, DefaultValue, Delimiter)
         End Function
 
         Public Overrides Function GetFilename(ByVal PathFilename As String) As String
@@ -324,55 +313,55 @@ Namespace Contensive.Core
         End Function
 
         Public Overrides Function GetFirstNonZeroDate(ByVal Date0 As Date, ByVal Date1 As Date) As Date
-            GetFirstNonZeroDate = cl.GetFirstNonZeroDate(Date0, Date1)
+            GetFirstNonZeroDate = genericController.GetFirstNonZeroDate(Date0, Date1)
         End Function
 
         Public Overrides Function GetFirstNonZeroInteger(ByVal Integer0 As Integer, ByVal Integer1 As Integer) As Integer
-            GetFirstNonZeroInteger = cl.GetFirstNonZeroInteger(Integer0, Integer1)
+            GetFirstNonZeroInteger = genericController.GetFirstNonZeroInteger(Integer0, Integer1)
         End Function
 
         Public Overrides Function GetIntegerString(ByVal Value As Integer, ByVal DigitCount As Integer) As String
-            GetIntegerString = cl.GetIntegerString(Value, DigitCount)
+            GetIntegerString = genericController.GetIntegerString(Value, DigitCount)
         End Function
 
         Public Overrides Function GetLine(ByVal Body As String) As String
-            GetLine = cl.getLine(Body)
+            GetLine = genericController.getLine(Body)
         End Function
 
         Public Overrides Function GetListIndex(ByVal Item As String, ByVal ListOfItems As String) As Integer
-            GetListIndex = cl.GetListIndex(Item, ListOfItems)
+            GetListIndex = genericController.GetListIndex(Item, ListOfItems)
         End Function
 
         Public Overrides Function GetProcessID() As Integer
-            GetProcessID = cl.GetProcessID()
+            GetProcessID = genericController.GetProcessID()
         End Function
 
         Public Overrides Function GetRandomInteger() As Integer
-            GetRandomInteger = cl.GetRandomInteger()
+            GetRandomInteger = genericController.GetRandomInteger()
         End Function
 
         Public Overrides Function IsInDelimitedString(ByVal DelimitedString As String, ByVal TestString As String, ByVal Delimiter As String) As Boolean
-            IsInDelimitedString = cl.IsInDelimitedString(DelimitedString, TestString, Delimiter)
+            IsInDelimitedString = genericController.IsInDelimitedString(DelimitedString, TestString, Delimiter)
         End Function
 
         Public Overrides Function ModifyLinkQueryString(ByVal Link As String, ByVal QueryName As String, ByVal QueryValue As String, Optional ByVal AddIfMissing As Boolean = True) As String
-            ModifyLinkQueryString = cl.ModifyLinkQueryString(Link, QueryName, QueryValue, AddIfMissing)
+            ModifyLinkQueryString = genericController.ModifyLinkQueryString(Link, QueryName, QueryValue, AddIfMissing)
         End Function
 
         Public Overrides Function ModifyQueryString(ByVal WorkingQuery As String, ByVal QueryName As String, ByVal QueryValue As String, Optional ByVal AddIfMissing As Boolean = True) As String
-            ModifyQueryString = cl.ModifyQueryString(WorkingQuery, QueryName, QueryValue, AddIfMissing)
+            ModifyQueryString = genericController.ModifyQueryString(WorkingQuery, QueryName, QueryValue, AddIfMissing)
         End Function
 
         Public Overrides Sub ParseURL(ByVal SourceURL As String, ByRef Protocol As String, ByRef Host As String, ByRef Port As String, ByRef Path As String, ByRef Page As String, ByRef QueryString As String)
-            Call cl.ParseURL(SourceURL, Protocol, Host, Port, Path, Page, QueryString)
+            Call genericController.ParseURL(SourceURL, Protocol, Host, Port, Path, Page, QueryString)
         End Sub
 
         Public Overrides Sub SeparateURL(ByVal SourceURL As String, ByRef Protocol As String, ByRef Host As String, ByRef Path As String, ByRef Page As String, ByRef QueryString As String)
-            Call cl.SeparateURL(SourceURL, Protocol, Host, Path, Page, QueryString)
+            Call genericController.SeparateURL(SourceURL, Protocol, Host, Path, Page, QueryString)
         End Sub
 
         Public Overrides Function SplitDelimited(ByVal WordList As String, ByVal Delimiter As String) As Object
-            SplitDelimited = cl.SplitDelimited(WordList, Delimiter)
+            SplitDelimited = genericController.SplitDelimited(WordList, Delimiter)
         End Function
         '
         Public Overrides Sub Sleep(timeMSec As Integer)

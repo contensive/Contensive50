@@ -171,11 +171,11 @@ Namespace Contensive.Core.Models.Entity
                     Else
                         returnModel.appConfig = returnModel.apps(appName.ToLower())
                     End If
-                    'If vbInstr(1, returnModel.appConfig.domainList(0), ",") > 1 Then
+                    'If genericController.vbInstr(1, returnModel.appConfig.domainList(0), ",") > 1 Then
                     '    '
                     '    ' if first entry in domain list is comma delimited, save only the first entry
                     '    '
-                    '    returnModel.appConfig.domainList(0) = Mid(returnModel.appConfig.domainList(0), 1, vbInstr(1, returnModel.appConfig.domainList(0), ",") - 1)
+                    '    returnModel.appConfig.domainList(0) = Mid(returnModel.appConfig.domainList(0), 1, genericController.vbInstr(1, returnModel.appConfig.domainList(0), ",") - 1)
                     'End If
                     returnModel.appConfig.appStatus = applicationStatusEnum.ApplicationStatusReady
                 End If
@@ -190,21 +190,21 @@ Namespace Contensive.Core.Models.Entity
         ''' called only from getObject. Load the model from the Db without cache. If there are any properties or objects that cannot be used from cache, do not include them here either, load in getObject()
         ''' </summary>
         ''' <param name="recordId"></param>
-        Private Shared Function getObjectNoCache(cp As CPBaseClass, recordId As Integer) As Models.Entity.blankCachedModel
+        Private Shared Function getObjectNoCache(cpcore As coreClass, recordId As Integer) As Models.Entity.blankCachedModel
             Dim returnNewModel As New blankCachedModel()
             Try
-                Dim cs As CPCSBaseClass = cp.CSNew()
+                Dim cs As New csController(cpcore)
                 returnNewModel.id = 0
                 If recordId <> 0 Then
-                    cs.Open(cnBlank, "(ID=" & recordId & ")")
-                    If cs.OK() Then
+                    cs.open(cnBlank, "(ID=" & recordId & ")")
+                    If cs.ok() Then
                         returnNewModel.id = recordId
-                        returnNewModel.name = cs.GetText("Name")
+                        returnNewModel.name = cs.getText("Name")
                     End If
                     Call cs.Close()
                 End If
             Catch ex As Exception
-                cp.Site.ErrorReport(ex)
+                cpcore.handleExceptionAndRethrow(ex)
             End Try
             Return returnNewModel
         End Function

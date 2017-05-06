@@ -5,6 +5,7 @@ Option Strict On
 Imports System.Reflection
 Imports System.Timers
 Imports System.Threading
+Imports Contensive.Core.Controllers
 
 Namespace Contensive.Core
     Public Class siteCheckClass
@@ -161,7 +162,7 @@ Namespace Contensive.Core
             HTTPResponseTickCountStart = CInt(GetTickCount)
             HTTPInProcess = True
             HTTPLastError = 0
-            URLWorking = EncodeURL(Link)
+            URLWorking = Controllers.genericController.EncodeURL(Link)
             On Error Resume Next
             kmaHTTP.timeout = RequestTimeout
             GetDoc = kmaHTTP.getURL(URLWorking)
@@ -196,7 +197,7 @@ Namespace Contensive.Core
                 If UBound(ResponseLines) > 0 Then
                     ResponseStatus = ResponseLines(0)
                 End If
-                If vbInstr(1, ResponseStatus, "200 OK", vbTextCompare) = 0 Then
+                If genericController.vbInstr(1, ResponseStatus, "200 OK", vbTextCompare) = 0 Then
                     '
                     ' Not a 200, this is an error
                     '
@@ -485,7 +486,7 @@ ErrorTrap:
                         Call appendMonitorLog("GetApplicationList call return less than " & AppListCount & " arguments, aborting monitor pass for this application [" & AppLine(AppPtr) & "]")
                     Else
                         AppName = AppDetails(AppList_Name)
-                        If Not EncodeBoolean(AppDetails(AppList_AllowSiteMonitor)) Then
+                        If Not genericController.EncodeBoolean(AppDetails(AppList_AllowSiteMonitor)) Then
                             '
                             ' Monitoring Disabled
                             '
@@ -494,7 +495,7 @@ ErrorTrap:
                             '
                             ' Monitor site
                             '
-                            AppStatus = EncodeInteger(AppDetails(AppList_Status))
+                            AppStatus = genericController.EncodeInteger(AppDetails(AppList_Status))
                             If False Then
                                 '
                                 'ElseIf AppStatus = applicationStatusEnum.ApplicationStatusPaused Then
@@ -542,7 +543,7 @@ ErrorTrap:
                                     AppLog(AppLogPtr).ErrorCount = AppLog(AppLogPtr).ErrorCount + 1
                                     Call appendMonitorLog(AppName & " has no valid domain name")
                                 Else
-                                    If vbInstr(1, DomainName, "http://", CompareMethod.Text) = 0 Then
+                                    If genericController.vbInstr(1, DomainName, "http://", CompareMethod.Text) = 0 Then
                                         DomainName = "http://" & DomainName
                                     End If
                                     DomainName = DomainName & AppRootPath & DefaultPageName
@@ -557,7 +558,7 @@ ErrorTrap:
                                     Response = GetDoc(DomainName, AppName, SiteTimeout, needsErrorRecovery)
                                     ResponseStatusLine = getLine(Response)
                                     AppLog(AppLogPtr).LastStatusResponse = ResponseStatusLine
-                                    If vbInstr(1, ResponseStatusLine, "Contensive OK", vbTextCompare) = 1 Then
+                                    If genericController.vbInstr(1, ResponseStatusLine, "Contensive OK", vbTextCompare) = 1 Then
                                         '
                                         ' no error
                                         '
@@ -615,7 +616,7 @@ ErrorTrap:
                                             Response = GetDoc(DomainName, AppName, SiteTimeout, needsErrorRecovery)
                                             ResponseStatusLine = getLine(Response)
                                             AppLog(AppLogPtr).LastStatusResponse = "[" & AppLog(AppLogPtr).LastStatusResponse & "], after recovery [" & ResponseStatusLine & "]"
-                                            If vbInstr(1, ResponseStatusLine, "Contensive OK", vbTextCompare) = 1 Then
+                                            If genericController.vbInstr(1, ResponseStatusLine, "Contensive OK", vbTextCompare) = 1 Then
                                                 '
                                                 ' recovered, continue without error
                                                 '
@@ -683,12 +684,12 @@ ErrorTrap:
         '    ListSplit = Split(DomainNameList, ",")
         '    DomainName = ListSplit(0)
         '    If DomainName <> "" Then
-        '        If vbInstr(1, DomainName, "http://", 1) = 0 Then
+        '        If genericController.vbInstr(1, DomainName, "http://", 1) = 0 Then
         '            DomainName = "http://" & DomainName
         '        End If
         '        DomainName = DomainName & "/" & DefaultPageName & "?method=status"
         '        Response = GetDoc(DomainName, AppName, SiteTimeout, ErrorMessageResponse)
-        '        If vbInstr(1, Response, "Contensive OK", vbTextCompare) <> 0 Then
+        '        If genericController.vbInstr(1, Response, "Contensive OK", vbTextCompare) <> 0 Then
         '            IsSiteOK = True
         '        Else
         '            IsSiteOK = False

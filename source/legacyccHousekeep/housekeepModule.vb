@@ -1,5 +1,10 @@
 ﻿
+Option Explicit On
+Option Strict On
+
 Imports Contensive.Core
+Imports Contensive.Core.constants
+Imports Contensive.Core.Controllers
 
 Namespace Contensive.Core
     Module housekeepModule
@@ -16,7 +21,7 @@ Namespace Contensive.Core
                 Args = Command()
                 Args = Trim(Args)
                 If Args <> "" Then
-                    DebugMode = EncodeBoolean(InStr(1, Args, "now") <> 0)
+                    DebugMode = genericController.EncodeBoolean(InStr(1, Args, "now") <> 0)
                 End If
 
 

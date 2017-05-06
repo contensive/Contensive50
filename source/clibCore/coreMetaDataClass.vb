@@ -3,6 +3,7 @@ Option Explicit On
 Option Strict On
 
 Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 
 Namespace Contensive.Core
     Public Class coreMetaDataClass
@@ -452,9 +453,9 @@ Namespace Contensive.Core
                     dt = cpCore.db.executeSql("select id,name from ccContent where (active<>0)")
                     If dt.Rows.Count > 0 Then
                         For Each row As DataRow In dt.Rows
-                            recordName = EncodeText(row.Item("name")).ToLower
+                            recordName = genericController.encodeText(row.Item("name")).ToLower
                             If Not cdefNameIdXref.ContainsKey(recordName) Then
-                                cdefNameIdXref.Add(recordName, EncodeInteger(row.Item("id")))
+                                cdefNameIdXref.Add(recordName, genericController.EncodeInteger(row.Item("id")))
                             End If
                         Next
                     End If
@@ -577,31 +578,31 @@ Namespace Contensive.Core
                                 ' ----- save values in definition
                                 '
                                 row = dt.Rows(0)
-                                contentName = Trim(EncodeText(row.Item(1)))
-                                'contentId = EncodeInteger(row.Item(0))
-                                contentTablename = EncodeText(row.Item(10))
+                                contentName = Trim(genericController.encodeText(row.Item(1)))
+                                'contentId = genericController.EncodeInteger(row.Item(0))
+                                contentTablename = genericController.encodeText(row.Item(10))
                                 .Name = contentName
                                 .Id = contentId
-                                .AllowAdd = EncodeBoolean(row.Item(3))
-                                .DeveloperOnly = EncodeBoolean(row.Item(4))
-                                .AdminOnly = EncodeBoolean(row.Item(5))
-                                .AllowDelete = EncodeBoolean(row.Item(6))
-                                .parentID = EncodeInteger(row.Item(7))
-                                .DropDownFieldList = vbUCase(EncodeText(row.Item(9)))
-                                .ContentTableName = EncodeText(contentTablename)
+                                .AllowAdd = genericController.EncodeBoolean(row.Item(3))
+                                .DeveloperOnly = genericController.EncodeBoolean(row.Item(4))
+                                .AdminOnly = genericController.EncodeBoolean(row.Item(5))
+                                .AllowDelete = genericController.EncodeBoolean(row.Item(6))
+                                .parentID = genericController.EncodeInteger(row.Item(7))
+                                .DropDownFieldList = genericController.vbUCase(genericController.encodeText(row.Item(9)))
+                                .ContentTableName = genericController.encodeText(contentTablename)
                                 .ContentDataSourceName = "default"
                                 .AuthoringDataSourceName = "default"
-                                .AuthoringTableName = EncodeText(row.Item(12))
-                                .AllowWorkflowAuthoring = EncodeBoolean(row.Item(14))
-                                .AllowCalendarEvents = EncodeBoolean(row.Item(15))
-                                .DefaultSortMethod = EncodeText(row.Item(17))
+                                .AuthoringTableName = genericController.encodeText(row.Item(12))
+                                .AllowWorkflowAuthoring = genericController.EncodeBoolean(row.Item(14))
+                                .AllowCalendarEvents = genericController.EncodeBoolean(row.Item(15))
+                                .DefaultSortMethod = genericController.encodeText(row.Item(17))
                                 If .DefaultSortMethod = "" Then
                                     .DefaultSortMethod = "name"
                                 End If
-                                .EditorGroupName = EncodeText(row.Item(18))
-                                .AllowContentTracking = EncodeBoolean(row.Item(19))
-                                .AllowTopicRules = EncodeBoolean(row.Item(20))
-                                .AllowMetaContent = EncodeBoolean(row.Item(21))
+                                .EditorGroupName = genericController.encodeText(row.Item(18))
+                                .AllowContentTracking = genericController.EncodeBoolean(row.Item(19))
+                                .AllowTopicRules = genericController.EncodeBoolean(row.Item(20))
+                                .AllowMetaContent = genericController.EncodeBoolean(row.Item(21))
                                 '
                                 .ActiveOnly = True
                                 .AliasID = "ID"
@@ -714,8 +715,8 @@ Namespace Contensive.Core
                                     Dim usedFields As New List(Of String)
                                     For Each row In dt.Rows
                                         Dim skipDuplicateField As Boolean = False
-                                        fieldName = EncodeText(row.Item(13))
-                                        fieldId = EncodeInteger(row.Item(12))
+                                        fieldName = genericController.encodeText(row.Item(13))
+                                        fieldId = genericController.EncodeInteger(row.Item(12))
                                         Dim fieldNameLower As String = fieldName.ToLower()
                                         If usedFields.Contains(fieldNameLower) Then
                                             '
@@ -746,17 +747,17 @@ Namespace Contensive.Core
                                             field = New CDefFieldClass
                                             With field
                                                 Dim fieldIndexColumn As Integer
-                                                fieldTypeId = EncodeInteger(row.Item(15))
-                                                If (EncodeText(row.Item(4)) = "") Then
+                                                fieldTypeId = genericController.EncodeInteger(row.Item(15))
+                                                If (genericController.encodeText(row.Item(4)) = "") Then
                                                     fieldIndexColumn = -1
                                                 Else
-                                                    fieldIndexColumn = EncodeInteger(row.Item(4))
+                                                    fieldIndexColumn = genericController.EncodeInteger(row.Item(4))
                                                 End If
                                                 '
                                                 ' translate htmlContent to fieldtypehtml
                                                 '   this is also converted in upgrade, daily housekeep, addon install
                                                 '
-                                                fieldHtmlContent = EncodeBoolean(row.Item(25))
+                                                fieldHtmlContent = genericController.EncodeBoolean(row.Item(25))
                                                 If fieldHtmlContent Then
                                                     If fieldTypeId = FieldTypeIdLongText Then
                                                         fieldTypeId = FieldTypeIdHTML
@@ -764,58 +765,58 @@ Namespace Contensive.Core
                                                         fieldTypeId = FieldTypeIdFileHTMLPrivate
                                                     End If
                                                 End If
-                                                .active = EncodeBoolean(row.Item(24))
-                                                .adminOnly = EncodeBoolean(row.Item(8))
-                                                .authorable = EncodeBoolean(row.Item(27))
-                                                .blockAccess = EncodeBoolean(row.Item(38))
-                                                .caption = EncodeText(row.Item(16))
+                                                .active = genericController.EncodeBoolean(row.Item(24))
+                                                .adminOnly = genericController.EncodeBoolean(row.Item(8))
+                                                .authorable = genericController.EncodeBoolean(row.Item(27))
+                                                .blockAccess = genericController.EncodeBoolean(row.Item(38))
+                                                .caption = genericController.encodeText(row.Item(16))
                                                 .dataChanged = False
                                                 '.Changed
                                                 .contentId = contentId
-                                                .defaultValue = EncodeText(row.Item(22))
-                                                .developerOnly = EncodeBoolean(row.Item(0))
-                                                .editSortPriority = EncodeInteger(row.Item(10))
-                                                .editTabName = EncodeText(row.Item(34))
+                                                .defaultValue = genericController.encodeText(row.Item(22))
+                                                .developerOnly = genericController.EncodeBoolean(row.Item(0))
+                                                .editSortPriority = genericController.EncodeInteger(row.Item(10))
+                                                .editTabName = genericController.encodeText(row.Item(34))
                                                 .fieldTypeId = fieldTypeId
                                                 .htmlContent = fieldHtmlContent
                                                 .id = fieldId
                                                 .indexColumn = fieldIndexColumn
-                                                .indexSortDirection = EncodeInteger(row.Item(7))
-                                                .indexSortOrder = EncodeInteger(row.Item(6))
-                                                .indexWidth = EncodeText(EncodeInteger(Replace(EncodeText(row.Item(5)), "%", "")))
+                                                .indexSortDirection = genericController.EncodeInteger(row.Item(7))
+                                                .indexSortOrder = genericController.EncodeInteger(row.Item(6))
+                                                .indexWidth = genericController.encodeText(EncodeInteger(Replace(genericController.encodeText(row.Item(5)), "%", "")))
                                                 .inherited = False
-                                                .installedByCollectionGuid = EncodeText(row.Item(39))
-                                                .isBaseField = EncodeBoolean(row.Item(38))
+                                                .installedByCollectionGuid = genericController.encodeText(row.Item(39))
+                                                .isBaseField = genericController.EncodeBoolean(row.Item(38))
                                                 .isModifiedSinceInstalled = False
-                                                .lookupContentID = EncodeInteger(row.Item(18))
+                                                .lookupContentID = genericController.EncodeInteger(row.Item(18))
                                                 .lookupContentName = ""
-                                                .lookupList = EncodeText(row.Item(37))
-                                                .manyToManyContentID = EncodeInteger(row.Item(28))
-                                                .manyToManyRuleContentID = EncodeInteger(row.Item(29))
-                                                .ManyToManyRulePrimaryField = EncodeText(row.Item(30))
-                                                .ManyToManyRuleSecondaryField = EncodeText(row.Item(31))
+                                                .lookupList = genericController.encodeText(row.Item(37))
+                                                .manyToManyContentID = genericController.EncodeInteger(row.Item(28))
+                                                .manyToManyRuleContentID = genericController.EncodeInteger(row.Item(29))
+                                                .ManyToManyRulePrimaryField = genericController.encodeText(row.Item(30))
+                                                .ManyToManyRuleSecondaryField = genericController.encodeText(row.Item(31))
                                                 .ManyToManyContentName = ""
                                                 .ManyToManyRuleContentName = ""
-                                                .MemberSelectGroupID = EncodeInteger(row.Item(36))
+                                                .MemberSelectGroupID = genericController.EncodeInteger(row.Item(36))
                                                 .MemberSelectGroupName = ""
                                                 .nameLc = fieldNameLower
-                                                .NotEditable = EncodeBoolean(row.Item(26))
-                                                .Password = EncodeBoolean(row.Item(3))
-                                                .ReadOnly = EncodeBoolean(row.Item(17))
-                                                .RedirectContentID = EncodeInteger(row.Item(19))
+                                                .NotEditable = genericController.EncodeBoolean(row.Item(26))
+                                                .Password = genericController.EncodeBoolean(row.Item(3))
+                                                .ReadOnly = genericController.EncodeBoolean(row.Item(17))
+                                                .RedirectContentID = genericController.EncodeInteger(row.Item(19))
                                                 .RedirectContentName = ""
-                                                .RedirectID = EncodeText(row.Item(21))
-                                                .RedirectPath = EncodeText(row.Item(20))
-                                                .Required = EncodeBoolean(row.Item(14))
-                                                .RSSTitleField = EncodeBoolean(row.Item(32))
-                                                .RSSDescriptionField = EncodeBoolean(row.Item(33))
-                                                .Scramble = EncodeBoolean(row.Item(35))
-                                                .TextBuffered = EncodeBoolean(row.Item(2))
-                                                .UniqueName = EncodeBoolean(row.Item(1))
+                                                .RedirectID = genericController.encodeText(row.Item(21))
+                                                .RedirectPath = genericController.encodeText(row.Item(20))
+                                                .Required = genericController.EncodeBoolean(row.Item(14))
+                                                .RSSTitleField = genericController.EncodeBoolean(row.Item(32))
+                                                .RSSDescriptionField = genericController.EncodeBoolean(row.Item(33))
+                                                .Scramble = genericController.EncodeBoolean(row.Item(35))
+                                                .TextBuffered = genericController.EncodeBoolean(row.Item(2))
+                                                .UniqueName = genericController.EncodeBoolean(row.Item(1))
                                                 '.ValueVariant
                                                 '
-                                                .HelpCustom = EncodeText(row.Item(41))
-                                                .HelpDefault = EncodeText(row.Item(40))
+                                                .HelpCustom = genericController.encodeText(row.Item(41))
+                                                .HelpDefault = genericController.encodeText(row.Item(40))
                                                 If .HelpCustom = "" Then
                                                     .HelpMessage = .HelpDefault
                                                 Else
@@ -825,31 +826,31 @@ Namespace Contensive.Core
                                                 If .lookupContentID > 0 Then
                                                     dt = cpCore.db.executeSql("select name from cccontent where id=" & .lookupContentID)
                                                     If dt.Rows.Count > 0 Then
-                                                        .lookupContentName = EncodeText(dt.Rows(0).Item(0))
+                                                        .lookupContentName = genericController.encodeText(dt.Rows(0).Item(0))
                                                     End If
                                                 End If
                                                 If .manyToManyContentID > 0 Then
                                                     dt = cpCore.db.executeSql("select name from cccontent where id=" & .manyToManyContentID)
                                                     If dt.Rows.Count > 0 Then
-                                                        .ManyToManyContentName = EncodeText(dt.Rows(0).Item(0))
+                                                        .ManyToManyContentName = genericController.encodeText(dt.Rows(0).Item(0))
                                                     End If
                                                 End If
                                                 If .manyToManyRuleContentID > 0 Then
                                                     dt = cpCore.db.executeSql("select name from cccontent where id=" & .manyToManyRuleContentID)
                                                     If dt.Rows.Count > 0 Then
-                                                        .ManyToManyRuleContentName = EncodeText(dt.Rows(0).Item(0))
+                                                        .ManyToManyRuleContentName = genericController.encodeText(dt.Rows(0).Item(0))
                                                     End If
                                                 End If
                                                 If .MemberSelectGroupID > 0 Then
                                                     dt = cpCore.db.executeSql("select name from ccgroups where id=" & .MemberSelectGroupID)
                                                     If dt.Rows.Count > 0 Then
-                                                        .MemberSelectGroupName = EncodeText(dt.Rows(0).Item(0))
+                                                        .MemberSelectGroupName = genericController.encodeText(dt.Rows(0).Item(0))
                                                     End If
                                                 End If
                                                 If .RedirectContentID > 0 Then
                                                     dt = cpCore.db.executeSql("select name from cccontent where id=" & .RedirectContentID)
                                                     If dt.Rows.Count > 0 Then
-                                                        .RedirectContentName = EncodeText(dt.Rows(0).Item(0))
+                                                        .RedirectContentName = genericController.encodeText(dt.Rows(0).Item(0))
                                                     End If
                                                 End If
                                                 dt.Dispose()
@@ -985,7 +986,7 @@ Namespace Contensive.Core
                         returnCriteria = "((" & contentTableName & ".contentcontrolId=" & contentId & ")"
                         dt = cpCore.db.executeSql("select id from cccontent where parentid=" & contentId, contentDAtaSourceName)
                         For Each datarow As DataRow In dt.Rows
-                            childContentId = EncodeInteger(datarow.Item(0))
+                            childContentId = genericController.EncodeInteger(datarow.Item(0))
                             returnCriteria &= "OR" & getContentControlCriteria(childContentId, contentTableName, contentDAtaSourceName, parentIdList)
                         Next
                         dt.Dispose()
@@ -1065,10 +1066,10 @@ Namespace Contensive.Core
         '        '
         '        RowMax = dt.Rows.Count - 1
         '        For RowPointer = 0 To RowMax
-        '            ContentName = Trim(EncodeText(dt.Rows(RowPointer).Item(1)))
-        '            UcaseContentName = vbUCase(ContentName)
-        '            ContentID = EncodeInteger(dt.Rows(RowPointer).Item(0))
-        '            ContentTableName = EncodeText(dt.Rows(RowPointer).Item(10))
+        '            ContentName = Trim(genericController.encodeText(dt.Rows(RowPointer).Item(1)))
+        '            UcaseContentName = genericController.vbUCase(ContentName)
+        '            ContentID = genericController.EncodeInteger(dt.Rows(RowPointer).Item(0))
+        '            ContentTableName = genericController.encodeText(dt.Rows(RowPointer).Item(10))
         '            '
         '            ContentPointer = metaCache.cdefContentIDIndex.getPtr(CStr(ContentID))
         '            If ContentPointer = -1 Then
@@ -1082,42 +1083,42 @@ Namespace Contensive.Core
         '                ' ----- save values in definition
         '                '
         '                '.SingleRecord = True ' marked this record touched
-        '                '.WhereClause = encodeText(RSRows(2, RowPointer))
-        '                .AllowAdd = EncodeBoolean(dt.Rows(RowPointer).Item(3))
-        '                .DeveloperOnly = EncodeBoolean(dt.Rows(RowPointer).Item(4))
-        '                .AdminOnly = EncodeBoolean(dt.Rows(RowPointer).Item(5))
-        '                .AllowDelete = EncodeBoolean(dt.Rows(RowPointer).Item(6))
-        '                .ParentID = EncodeInteger(dt.Rows(RowPointer).Item(7))
-        '                .DropDownFieldList = vbUCase(EncodeText(dt.Rows(RowPointer).Item(9)))
+        '                '.WhereClause = genericController.encodeText(RSRows(2, RowPointer))
+        '                .AllowAdd = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(3))
+        '                .DeveloperOnly = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(4))
+        '                .AdminOnly = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(5))
+        '                .AllowDelete = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(6))
+        '                .ParentID = genericController.EncodeInteger(dt.Rows(RowPointer).Item(7))
+        '                .DropDownFieldList = genericController.vbUCase(genericController.encodeText(dt.Rows(RowPointer).Item(9)))
         '                '
-        '                .ContentTableName = EncodeText(ContentTableName)
+        '                .ContentTableName = genericController.encodeText(ContentTableName)
         '                '.TableName = .ContentTableName
         '                '
-        '                DataSourceName = EncodeText(dt.Rows(RowPointer).Item(11))
+        '                DataSourceName = genericController.encodeText(dt.Rows(RowPointer).Item(11))
         '                If DataSourceName = "" Then
         '                    DataSourceName = "DEFAULT"
         '                End If
         '                .ContentDataSourceName = DataSourceName
         '                '
-        '                .AuthoringTableName = EncodeText(dt.Rows(RowPointer).Item(12))
+        '                .AuthoringTableName = genericController.encodeText(dt.Rows(RowPointer).Item(12))
         '                '
-        '                DataSourceName = EncodeText(dt.Rows(RowPointer).Item(13))
+        '                DataSourceName = genericController.encodeText(dt.Rows(RowPointer).Item(13))
         '                If DataSourceName = "" Then
         '                    DataSourceName = "DEFAULT"
         '                End If
         '                .AuthoringDataSourceName = DataSourceName
-        '                .AllowWorkflowAuthoring = EncodeBoolean(dt.Rows(RowPointer).Item(14))
-        '                .AllowCalendarEvents = EncodeBoolean(dt.Rows(RowPointer).Item(15))
-        '                .dataSourceId = EncodeInteger(dt.Rows(RowPointer).Item(16))
-        '                .DefaultSortMethod = EncodeText(dt.Rows(RowPointer).Item(17))
+        '                .AllowWorkflowAuthoring = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(14))
+        '                .AllowCalendarEvents = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(15))
+        '                .dataSourceId = genericController.EncodeInteger(dt.Rows(RowPointer).Item(16))
+        '                .DefaultSortMethod = genericController.encodeText(dt.Rows(RowPointer).Item(17))
         '                If .DefaultSortMethod = "" Then
         '                    .DefaultSortMethod = "Name"
         '                End If
-        '                .EditorGroupName = EncodeText(dt.Rows(RowPointer).Item(18))
+        '                .EditorGroupName = genericController.encodeText(dt.Rows(RowPointer).Item(18))
         '                '
-        '                .AllowContentTracking = EncodeBoolean(dt.Rows(RowPointer).Item(19))
-        '                .AllowTopicRules = EncodeBoolean(dt.Rows(RowPointer).Item(20))
-        '                .AllowMetaContent = EncodeBoolean(dt.Rows(RowPointer).Item(21))
+        '                .AllowContentTracking = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(19))
+        '                .AllowTopicRules = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(20))
+        '                .AllowMetaContent = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(21))
         '                '
         '                ' future
         '                '
@@ -1203,15 +1204,15 @@ Namespace Contensive.Core
         '        rowMax = dt.Rows.Count - 1
         '        LastFieldContentID = -1
         '        For RowPointer = 0 To rowMax
-        '            FieldName = EncodeText(dt.Rows(RowPointer).Item(13)).ToLower
+        '            FieldName = genericController.encodeText(dt.Rows(RowPointer).Item(13)).ToLower
         '            If Not String.IsNullOrEmpty(FieldName) Then
         '                IsSelectField = True
-        '                FieldEditSortPriority = EncodeInteger(dt.Rows(RowPointer).Item(10))
-        '                FieldContentID = EncodeInteger(dt.Rows(RowPointer).Item(11))
-        '                fieldId = EncodeInteger(dt.Rows(RowPointer).Item(12))
-        '                fieldType = EncodeInteger(dt.Rows(RowPointer).Item(15))
-        '                fieldHtmlContent = EncodeBoolean(dt.Rows(RowPointer).Item(25))
-        '                fieldActive = EncodeBoolean(dt.Rows(RowPointer).Item(24))
+        '                FieldEditSortPriority = genericController.EncodeInteger(dt.Rows(RowPointer).Item(10))
+        '                FieldContentID = genericController.EncodeInteger(dt.Rows(RowPointer).Item(11))
+        '                fieldId = genericController.EncodeInteger(dt.Rows(RowPointer).Item(12))
+        '                fieldType = genericController.EncodeInteger(dt.Rows(RowPointer).Item(15))
+        '                fieldHtmlContent = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(25))
+        '                fieldActive = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(24))
         '                '
         '                ' translate htmlContent to fieldtypehtml
         '                '   this is also converted in upgrade, daily housekeep, addon install
@@ -1261,51 +1262,51 @@ Namespace Contensive.Core
         '                End If
 
         '                With field
-        '                    .DeveloperOnly = EncodeBoolean(dt.Rows(RowPointer).Item(0))
-        '                    .UniqueName = EncodeBoolean(dt.Rows(RowPointer).Item(1))
-        '                    .TextBuffered = EncodeBoolean(dt.Rows(RowPointer).Item(2))
-        '                    .Password = EncodeBoolean(dt.Rows(RowPointer).Item(3))
-        '                    If (EncodeText(dt.Rows(RowPointer).Item(4)) = "") Then
+        '                    .DeveloperOnly = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(0))
+        '                    .UniqueName = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(1))
+        '                    .TextBuffered = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(2))
+        '                    .Password = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(3))
+        '                    If (genericController.encodeText(dt.Rows(RowPointer).Item(4)) = "") Then
         '                        .IndexColumn = -1
         '                    Else
-        '                        .IndexColumn = EncodeInteger(dt.Rows(RowPointer).Item(4))
+        '                        .IndexColumn = genericController.EncodeInteger(dt.Rows(RowPointer).Item(4))
         '                    End If
-        '                    .IndexWidth = EncodeText(dt.Rows(RowPointer).Item(5))
-        '                    .IndexWidth = EncodeText(EncodeInteger(Replace(.IndexWidth, "%", "")))
-        '                    .IndexSortOrder = EncodeText(dt.Rows(RowPointer).Item(6))
-        '                    .IndexSortDirection = EncodeInteger(dt.Rows(RowPointer).Item(7))
-        '                    .AdminOnly = EncodeBoolean(dt.Rows(RowPointer).Item(8))
+        '                    .IndexWidth = genericController.encodeText(dt.Rows(RowPointer).Item(5))
+        '                    .IndexWidth = genericController.encodeText(EncodeInteger(Replace(.IndexWidth, "%", "")))
+        '                    .IndexSortOrder = genericController.encodeText(dt.Rows(RowPointer).Item(6))
+        '                    .IndexSortDirection = genericController.EncodeInteger(dt.Rows(RowPointer).Item(7))
+        '                    .AdminOnly = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(8))
         '                    ' sortorder
         '                    .EditSortPriority = FieldEditSortPriority
         '                    .ContentID = FieldContentID
         '                    .Id = fieldId
         '                    ' name
-        '                    .Required = EncodeBoolean(dt.Rows(RowPointer).Item(14))
+        '                    .Required = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(14))
         '                    .fieldType = fieldType
-        '                    .Caption = EncodeText(dt.Rows(RowPointer).Item(16))
-        '                    .ReadOnlyField = EncodeBoolean(dt.Rows(RowPointer).Item(17))
-        '                    .LookupContentID = EncodeInteger(dt.Rows(RowPointer).Item(18))
-        '                    .RedirectContentID = EncodeInteger(dt.Rows(RowPointer).Item(19))
-        '                    .RedirectPath = EncodeText(dt.Rows(RowPointer).Item(20))
-        '                    .RedirectID = EncodeText(dt.Rows(RowPointer).Item(21))
+        '                    .Caption = genericController.encodeText(dt.Rows(RowPointer).Item(16))
+        '                    .ReadOnlyField = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(17))
+        '                    .LookupContentID = genericController.EncodeInteger(dt.Rows(RowPointer).Item(18))
+        '                    .RedirectContentID = genericController.EncodeInteger(dt.Rows(RowPointer).Item(19))
+        '                    .RedirectPath = genericController.encodeText(dt.Rows(RowPointer).Item(20))
+        '                    .RedirectID = genericController.encodeText(dt.Rows(RowPointer).Item(21))
         '                    .DefaultValueObject = dt.Rows(RowPointer).Item(22)
         '                    .HelpMessage = "deprecated"
         '                    .active = fieldActive
         '                    .htmlContent = fieldHtmlContent
-        '                    .NotEditable = EncodeBoolean(dt.Rows(RowPointer).Item(26))
-        '                    .Authorable = EncodeBoolean(dt.Rows(RowPointer).Item(27))
+        '                    .NotEditable = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(26))
+        '                    .Authorable = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(27))
         '                    '
-        '                    .ManyToManyContentID = EncodeInteger(dt.Rows(RowPointer).Item(28))
-        '                    .ManyToManyRuleContentID = EncodeInteger(dt.Rows(RowPointer).Item(29))
-        '                    .ManyToManyRulePrimaryField = EncodeText(dt.Rows(RowPointer).Item(30))
-        '                    .ManyToManyRuleSecondaryField = EncodeText(dt.Rows(RowPointer).Item(31))
+        '                    .ManyToManyContentID = genericController.EncodeInteger(dt.Rows(RowPointer).Item(28))
+        '                    .ManyToManyRuleContentID = genericController.EncodeInteger(dt.Rows(RowPointer).Item(29))
+        '                    .ManyToManyRulePrimaryField = genericController.encodeText(dt.Rows(RowPointer).Item(30))
+        '                    .ManyToManyRuleSecondaryField = genericController.encodeText(dt.Rows(RowPointer).Item(31))
         '                    '
-        '                    .RSSTitleField = EncodeBoolean(dt.Rows(RowPointer).Item(32))
-        '                    .RSSDescriptionField = EncodeBoolean(dt.Rows(RowPointer).Item(33))
-        '                    .EditTab = EncodeText(dt.Rows(RowPointer).Item(34))
-        '                    .Scramble = EncodeBoolean(dt.Rows(RowPointer).Item(35))
-        '                    .MemberSelectGroupID = EncodeInteger(dt.Rows(RowPointer).Item(36))
-        '                    .LookupList = EncodeText(dt.Rows(RowPointer).Item(37))
+        '                    .RSSTitleField = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(32))
+        '                    .RSSDescriptionField = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(33))
+        '                    .EditTab = genericController.encodeText(dt.Rows(RowPointer).Item(34))
+        '                    .Scramble = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(35))
+        '                    .MemberSelectGroupID = genericController.EncodeInteger(dt.Rows(RowPointer).Item(36))
+        '                    .LookupList = genericController.encodeText(dt.Rows(RowPointer).Item(37))
         '                    '
         '                    .Inherited = False
         '                    Dim testFieldList As String
@@ -1321,7 +1322,7 @@ Namespace Contensive.Core
         '                    '
         '                    ' IsBaseField - true this is a custom field, false is it a cdef field
         '                    '
-        '                    .BlockAccess = EncodeBoolean(dt.Rows(RowPointer).Item(38))
+        '                    .BlockAccess = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(38))
         '                End With
         '            End If
         '        Next
@@ -1425,7 +1426,7 @@ Namespace Contensive.Core
         '                    '
         '                    ' inherit the parent definition fields to this child definition
         '                    '
-        '                    ChildCDefPointer = EncodeInteger(ChildCDefPointerArray(ChildCDefPointerArray_Pointer))
+        '                    ChildCDefPointer = genericController.EncodeInteger(ChildCDefPointerArray(ChildCDefPointerArray_Pointer))
         '                    '
         '                    ' Create a string of Child FieldNames to search
         '                    '
@@ -1448,7 +1449,7 @@ Namespace Contensive.Core
         '                            metaCache.cdef(ChildCDefPointer).fields(ChildFieldPointer) = metaCache.cdef(ParentCDefPointer).fields(ParentFieldPointer)
         '                            With metaCache.cdef(ChildCDefPointer).fields(ChildFieldPointer)
         '                                .Inherited = True
-        '                                lcaseName = vbLCase(.Name)
+        '                                lcaseName = genericController.vbLCase(.Name)
         '                                ' 20151114 - dont understand why id is excluded
         '                                If .active And (.fieldType <> FieldTypeRedirect) And (.fieldType <> FieldTypeManyToMany) And (.Name <> "") Then
         '                                    'If .active And (.fieldType <> FieldTypeRedirect) And (.fieldType <> FieldTypeManyToMany) And (.Name <> "") And (lcaseName <> "id") Then
@@ -1511,9 +1512,9 @@ Namespace Contensive.Core
         '        returnPtr = -1
         '        With metaCache.cdef(ContentPointer)
         '            If .fields.Count > 0 Then
-        '                UcaseFieldName = vbUCase(FieldName)
+        '                UcaseFieldName = genericController.vbUCase(FieldName)
         '                For returnPtr = 0 To .fields.Count - 1
-        '                    If vbUCase(.fields(returnPtr).Name) = UcaseFieldName Then
+        '                    If genericController.vbUCase(.fields(returnPtr).Name) = UcaseFieldName Then
         '                        Exit For
         '                    End If
         '                    '''DoEvents()
@@ -1685,14 +1686,14 @@ Namespace Contensive.Core
                         For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In cdef.fields
                             Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
                             FieldActive = field.active
-                            FieldWidth = EncodeInteger(field.indexWidth)
+                            FieldWidth = genericController.EncodeInteger(field.indexWidth)
                             If FieldActive And (FieldWidth > 0) Then
                                 FieldWidthTotal = FieldWidthTotal + FieldWidth
                                 adminColumn = New CDefAdminColumnClass
                                 With adminColumn
                                     .Name = field.nameLc
                                     .SortDirection = field.indexSortDirection
-                                    .SortPriority = EncodeInteger(field.indexSortOrder)
+                                    .SortPriority = genericController.EncodeInteger(field.indexSortOrder)
                                     .Width = FieldWidth
                                     FieldWidthTotal = FieldWidthTotal + .Width
                                 End With
@@ -1977,7 +1978,7 @@ Namespace Contensive.Core
             If Not (dt Is Nothing) Then
                 For Each row As DataRow In dt.Rows
                     Dim cdef As CDefClass = getCdef(EncodeInteger(row("id")))
-                    'If vbUCase(cdef.Name) = "PAGE CONTENT" Then
+                    'If genericController.vbUCase(cdef.Name) = "PAGE CONTENT" Then
                     '    Copy = Copy
                     '    End If
                     ContentName = cdef.Name
@@ -2031,7 +2032,7 @@ Namespace Contensive.Core
                                         ' Create sqlFieldList array for each live record
                                         '
                                         EditRecordID = cpCore.db.insertTableRecordGetId(AuthoringDataSourceName, AuthoringTableName, SystemMemberID)
-                                        LiveRecordID = EncodeInteger(dtContent.Rows(rowPtr).Item("ID"))
+                                        LiveRecordID = genericController.EncodeInteger(dtContent.Rows(rowPtr).Item("ID"))
                                         If LiveRecordID = 159 Then
                                             LiveRecordID = LiveRecordID
                                         End If
@@ -2055,7 +2056,7 @@ Namespace Contensive.Core
                                                                 ' create new text file and copy field - private files
                                                                 '
                                                                 EditFilename = ""
-                                                                LiveFilename = EncodeText(FieldValueVariant)
+                                                                LiveFilename = genericController.encodeText(FieldValueVariant)
                                                                 If LiveFilename <> "" Then
                                                                     EditFilename = csv_GetVirtualFilenameByTable(AuthoringTableName, field.nameLc, EditRecordID, "", field.fieldTypeId)
                                                                     FieldValueVariant = EditFilename
@@ -2074,7 +2075,7 @@ Namespace Contensive.Core
                                                                 ' create new text file and copy field - public files
                                                                 '
                                                                 EditFilename = ""
-                                                                LiveFilename = EncodeText(FieldValueVariant)
+                                                                LiveFilename = genericController.encodeText(FieldValueVariant)
                                                                 If LiveFilename <> "" Then
                                                                     EditFilename = csv_GetVirtualFilenameByTable(AuthoringTableName, field.nameLc, EditRecordID, "", field.fieldTypeId)
                                                                     FieldValueVariant = EditFilename
@@ -2261,7 +2262,7 @@ ErrorTrap:
                 cidDataTable = cpCore.db.executeSql(SQL)
                 CIDCount = cidDataTable.Rows.Count
                 For CIDPointer = 0 To CIDCount - 1
-                    ContentID = EncodeInteger(cidDataTable.Rows(CIDPointer).Item(0))
+                    ContentID = genericController.EncodeInteger(cidDataTable.Rows(CIDPointer).Item(0))
                     returnList.Add(ContentID)
                     CDef = getCdef(ContentID)
                     If Not (CDef Is Nothing) Then
@@ -2354,7 +2355,7 @@ ErrorTrap:
                                 dt = cpCore.db.getColumnSchemaData(TableName)
                                 If dt.Rows.Count > 0 Then
                                     For Each row As DataRow In dt.Rows
-                                        tableSchema.columns.Add(EncodeText(row("COLUMN_NAME")).ToLower)
+                                        tableSchema.columns.Add(genericController.encodeText(row("COLUMN_NAME")).ToLower)
                                     Next
                                 End If
                                 '
@@ -2363,7 +2364,7 @@ ErrorTrap:
                                 dt = cpCore.db.getIndexSchemaData(TableName)
                                 If dt.Rows.Count > 0 Then
                                     For Each row As DataRow In dt.Rows
-                                        tableSchema.indexes.Add(EncodeText(row("INDEX_NAME")).ToLower)
+                                        tableSchema.indexes.Add(genericController.encodeText(row("INDEX_NAME")).ToLower)
                                     Next
                                 End If
                             End If
@@ -2456,7 +2457,7 @@ ErrorTrap:
                 SQL = "select ID from ccContent where name=" & cpCore.db.encodeSQLText(ChildContentName) & ";"
                 rs = cpCore.db.executeSql(SQL)
                 If isDataTableOk(rs) Then
-                    ChildContentID = EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "ID"))
+                    ChildContentID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "ID"))
                     '
                     ' mark the record touched so upgrade will not delete it
                     '
@@ -2476,7 +2477,7 @@ ErrorTrap:
                     SQL = "select ID from ccContent where name=" & cpCore.db.encodeSQLText(ParentContentName) & ";"
                     rs = cpCore.db.executeSql(SQL, DataSourceName)
                     If isDataTableOk(rs) Then
-                        ParentContentID = EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "ID"))
+                        ParentContentID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "ID"))
                         '
                         ' mark the record touched so upgrade will not delete it
                         '
@@ -2513,7 +2514,7 @@ ErrorTrap:
                                     DateNow = DateTime.Now()
                                     For FieldPointer = 0 To UBound(Fields)
                                         FieldName = Fields(FieldPointer)
-                                        Select Case vbUCase(FieldName)
+                                        Select Case genericController.vbUCase(FieldName)
                                             Case "ID"
                                             ' do nothing
                                             Case "NAME"
@@ -2779,9 +2780,9 @@ ErrorTrap:
                         SQL = "select ID,ccguid,IsBaseContent from ccContent where (name=" & cpCore.db.encodeSQLText(contentName) & ") order by id;"
                         dt = cpCore.db.executeSql(SQL)
                         If dt.Rows.Count > 0 Then
-                            returnContentId = EncodeInteger(dt.Rows(0).Item("ID"))
-                            LcContentGuid = vbLCase(EncodeText(dt.Rows(0).Item("ccguid")))
-                            ContentIsBaseContent = EncodeBoolean(dt.Rows(0).Item("IsBaseContent"))
+                            returnContentId = genericController.EncodeInteger(dt.Rows(0).Item("ID"))
+                            LcContentGuid = genericController.vbLCase(genericController.encodeText(dt.Rows(0).Item("ccguid")))
+                            ContentIsBaseContent = genericController.EncodeBoolean(dt.Rows(0).Item("IsBaseContent"))
                         End If
                         dt.Dispose()
                         '
@@ -2794,7 +2795,7 @@ ErrorTrap:
                             SQL = "select ID from ccContent where (name='content') order by id;"
                             dt = cpCore.db.executeSql(SQL)
                             If dt.Rows.Count > 0 Then
-                                ContentIDofContent = EncodeInteger(dt.Rows(0).Item("ID"))
+                                ContentIDofContent = genericController.EncodeInteger(dt.Rows(0).Item("ID"))
                             End If
                             dt.Dispose()
                         End If
@@ -2805,7 +2806,7 @@ ErrorTrap:
                             SQL = "select id from ccContent where (name=" & cpCore.db.encodeSQLText(ParentName) & ") order by id;"
                             dt = cpCore.db.executeSql(SQL)
                             If dt.Rows.Count > 0 Then
-                                parentId = EncodeInteger(dt.Rows(0).Item(0))
+                                parentId = genericController.EncodeInteger(dt.Rows(0).Item(0))
                             End If
                             dt.Dispose()
                         End If
@@ -2817,7 +2818,7 @@ ErrorTrap:
                             SQL = "select id from ccAddonCollections where ccGuid=" & cpCore.db.encodeSQLText(installedByCollectionGuid)
                             dt = cpCore.db.executeSql(SQL)
                             If dt.Rows.Count > 0 Then
-                                InstalledByCollectionID = EncodeInteger(dt.Rows(0).Item("ID"))
+                                InstalledByCollectionID = genericController.EncodeInteger(dt.Rows(0).Item("ID"))
                             End If
                         End If
                         '
@@ -2842,7 +2843,7 @@ ErrorTrap:
                                 '
                                 ' ----- no table definition found, create one
                                 '
-                                If vbUCase(DataSourceName) = "DEFAULT" Then
+                                If genericController.vbUCase(DataSourceName) = "DEFAULT" Then
                                     DataSourceID = -1
                                 ElseIf DataSourceName = "" Then
                                     DataSourceID = -1
@@ -2862,7 +2863,7 @@ ErrorTrap:
                                 '
                                 Call cpCore.db.updateTableRecord("Default", "ccTables", "ID=" & TableID, sqlList)
                             Else
-                                TableID = EncodeInteger(dt.Rows(0).Item("ID"))
+                                TableID = genericController.EncodeInteger(dt.Rows(0).Item("ID"))
                             End If
                             '
                             ' ----- Get Sort Method ID from SortMethod
@@ -2876,7 +2877,7 @@ ErrorTrap:
                             Else
                                 dt = cpCore.db.openTable("Default", "ccSortMethods", "(name=" & cpCore.db.encodeSQLText(iDefaultSortMethod) & ")and(active<>0)", "ID", "ID", 1, 1)
                                 If dt.Rows.Count > 0 Then
-                                    DefaultSortMethodID = EncodeInteger(dt.Rows(0).Item("ID"))
+                                    DefaultSortMethodID = genericController.EncodeInteger(dt.Rows(0).Item("ID"))
                                 End If
                             End If
                             If DefaultSortMethodID = 0 Then
@@ -2885,7 +2886,7 @@ ErrorTrap:
                                 '
                                 dt = cpCore.db.openTable("Default", "ccSortMethods", "(OrderByClause=" & cpCore.db.encodeSQLText(iDefaultSortMethod) & ")and(active<>0)", "ID", "ID", 1, 1)
                                 If dt.Rows.Count > 0 Then
-                                    DefaultSortMethodID = EncodeInteger(dt.Rows(0).Item("ID"))
+                                    DefaultSortMethodID = genericController.EncodeInteger(dt.Rows(0).Item("ID"))
                                 End If
                             End If
                             '
@@ -2930,12 +2931,12 @@ ErrorTrap:
                                     ' if the new guid does no match te old guid
                                     '
                                     Call sqlList.add("ccGuid", cpCore.db.encodeSQLText(NewGuid))
-                                ElseIf (NewGuid <> "") And (LcContentGuid <> vbLCase(NewGuid)) Then
+                                ElseIf (NewGuid <> "") And (LcContentGuid <> genericController.vbLCase(NewGuid)) Then
                                     '
                                     ' new guid does not match current guid
                                     '
-                                    'cpCore.AppendLog("upgrading cdef [" & ContentName & "], the guid was not updated because the current guid [" & LcContentGuid & "] is not empty, and it did not match the new guid [" & vbLCase(NewGuid) & "]")
-                                    'Call AppendLog2(cpCore,appEnvironment.name, "upgrading cdef [" & ContentName & "], the guid was not updated because the current guid [" & LcContentGuid & "] is not empty, and it did not match the new guid [" & vbLCase(NewGuid) & "]", "dll", "cpCoreClass", "csv_CreateContent3", 0, "", "", False, True, "", "", "")
+                                    'cpCore.AppendLog("upgrading cdef [" & ContentName & "], the guid was not updated because the current guid [" & LcContentGuid & "] is not empty, and it did not match the new guid [" & genericController.vbLCase(NewGuid) & "]")
+                                    'Call AppendLog2(cpCore,appEnvironment.name, "upgrading cdef [" & ContentName & "], the guid was not updated because the current guid [" & LcContentGuid & "] is not empty, and it did not match the new guid [" & genericController.vbLCase(NewGuid) & "]", "dll", "cpCoreClass", "csv_CreateContent3", 0, "", "", False, True, "", "", "")
                                 End If
                             End If
                             If returnContentId = 54 Then
@@ -3243,8 +3244,8 @@ ErrorTrap:
                 SQL = "select ID,ContentTableID from ccContent where name=" & cpCore.db.encodeSQLText(ContentName) & ";"
                 rs = cpCore.db.executeSql(SQL)
                 If isDataTableOk(rs) Then
-                    ContentID = EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "ID"))
-                    TableID = EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "ContentTableID"))
+                    ContentID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "ID"))
+                    TableID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "ContentTableID"))
                 End If
                 '
                 ' test if field definition found or not
@@ -3255,8 +3256,8 @@ ErrorTrap:
                 rs = cpCore.db.executeSql(SQL)
                 If isDataTableOk(rs) Then
                     isNewFieldRecord = False
-                    RecordID = EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "ID"))
-                    RecordIsBaseField = EncodeBoolean(cpCore.db.getDataRowColumnName(rs.Rows(0), "IsBaseField"))
+                    RecordID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "ID"))
+                    RecordIsBaseField = genericController.EncodeBoolean(cpCore.db.getDataRowColumnName(rs.Rows(0), "IsBaseField"))
                 End If
                 '
                 ' check if this is a non-base field updating a base field
@@ -3277,7 +3278,7 @@ ErrorTrap:
                     fieldTypeId = field.fieldTypeId
                     'FieldSortOrder = field.indexSortOrder
                     FieldAuthorable = field.authorable
-                    DefaultValue = EncodeText(field.defaultValue)
+                    DefaultValue = genericController.encodeText(field.defaultValue)
                     NotEditable = field.NotEditable
                     LookupContentName = field.lookupContentName
                     'field.indexColumn = field.indexColumn
@@ -3356,8 +3357,8 @@ ErrorTrap:
                         If Not isDataTableOk(rs) Then
                             Call cpCore.handleExceptionAndRethrow(New ApplicationException("Could Not create Field [" & field.nameLc & "] because table For tableID [" & TableID & "] was Not found."))
                         Else
-                            DataSourceID = EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "DataSourceID"))
-                            TableName = EncodeText(cpCore.db.getDataRowColumnName(rs.Rows(0), "Name"))
+                            DataSourceID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "DataSourceID"))
+                            TableName = genericController.encodeText(cpCore.db.getDataRowColumnName(rs.Rows(0), "Name"))
                         End If
                         rs.Dispose()
                         If (TableName <> "") Then
@@ -3376,7 +3377,7 @@ ErrorTrap:
                                     ' resulting datasource does not have this data, then other errors will be generated anyway.
                                     'Call csv_HandleClassInternalError(MethodName, "Could Not create Field [" & field.name & "] because datasource For ID [" & DataSourceID & "] was Not found.")
                                 Else
-                                    DataSourceName = EncodeText(cpCore.db.getDataRowColumnName(rs.Rows(0), "Name"))
+                                    DataSourceName = genericController.encodeText(cpCore.db.getDataRowColumnName(rs.Rows(0), "Name"))
                                 End If
                                 rs.Dispose()
                             End If
@@ -3387,7 +3388,7 @@ ErrorTrap:
                             If (installedByCollectionGuid <> "") Then
                                 rs = cpCore.db.executeSql("Select id from ccAddonCollections where ccguid=" & cpCore.db.encodeSQLText(installedByCollectionGuid) & ";")
                                 If isDataTableOk(rs) Then
-                                    InstalledByCollectionID = EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "Id"))
+                                    InstalledByCollectionID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "Id"))
                                 End If
                                 rs.Dispose()
                             End If

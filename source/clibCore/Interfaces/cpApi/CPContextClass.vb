@@ -1,4 +1,7 @@
-﻿Imports Contensive.BaseClasses
+﻿
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
+Imports Contensive.BaseClasses
 Imports System.Runtime.InteropServices
 
 Namespace Contensive.Core

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using Contensive.Core;
 
-namespace  Contensive.Core {
+namespace  Contensive.CLI {
     class configureClass {
         public static void configure() {
             try

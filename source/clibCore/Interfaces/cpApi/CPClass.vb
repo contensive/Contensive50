@@ -2,6 +2,8 @@
 Option Explicit On
 Option Strict On
 
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 Imports System.Runtime.InteropServices
 Imports Contensive.BaseClasses
 

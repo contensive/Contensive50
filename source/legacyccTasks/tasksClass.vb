@@ -1,11 +1,13 @@
 ﻿
-'Imports Contensive.Core
-Imports Contensive.Core
+Option Explicit On
+Option Strict On
+
+Imports Contensive.Core.Controllers
 
 Namespace Contensive.Core
 
     Public Class tasksClass
-        Private cpCore As coreClass
+        Private cpCore As Contensive.Core.coreClass
         '
         Dim LogCheckDateLast As Date
         '
@@ -72,14 +74,14 @@ Namespace Contensive.Core
             '                            Else
             '                                SQLFieldName = "SQL"
             '                            End If
-            '                            Select Case vbUCase(cmc.cpCore.app.csv_cs_getText(CS, "Command"))
+            '                            Select Case genericController.vbUCase(cmc.cpCore.app.csv_cs_getText(CS, "Command"))
             '                                Case "BUILDCSV"
             '                                    '
             '                                    ' Build CSV
             '                                    '
             '                                    DataSource = cmc.cpCore.app.csv_cs_getText(CS, "DataSource")
             '                                    SQL = cmc.cpCore.app.csv_cs_getText(CS, SQLFieldName)
-            '                                    Filename = vbReplace(cmc.cpCore.app.csv_cs_getText(CS, "Filename"), "/", "\")
+            '                                    Filename = genericController.vbReplace(cmc.cpCore.app.csv_cs_getText(CS, "Filename"), "/", "\")
             '                                    ResultMessage = BuildCSV(cmc, DataSource, SQL, cmc.cpCore.app.config.physicalFilePath & Filename)
             '                                    If ResultMessage <> "" Then
             '                                        NotifyBody = "This email is to notify you that there was a problem with your export data [" & ResultMessage & "]  on [" & cmc.appEnvironment.name & "]"
@@ -94,7 +96,7 @@ Namespace Contensive.Core
             '                                    '
             '                                    DataSource = cmc.cpCore.app.csv_cs_getText(CS, "DataSource")
             '                                    SQL = cmc.cpCore.app.csv_cs_getText(CS, SQLFieldName)
-            '                                    Filename = vbReplace(cmc.cpCore.app.csv_cs_getText(CS, "Filename"), "/", "\")
+            '                                    Filename = genericController.vbReplace(cmc.cpCore.app.csv_cs_getText(CS, "Filename"), "/", "\")
             '                                    ResultMessage = BuildXML(cmc, DataSource, SQL, cmc.cpCore.app.config.physicalFilePath & Filename)
             '                                    NotifyBody = "This email is to notify you that your XML export is ready on [" & cmc.appEnvironment.name & "]"
             '                                    NotifySubject = "XML export is ready"
@@ -108,8 +110,8 @@ Namespace Contensive.Core
             '                                    ''
             '                                    'Set ImportProcessor = New ProcessImportClass
             '                                    ''
-            '                                    'CSVFilename = vbReplace(cmc.cpCore.app.csv_cs_getText(CS, "Filename"), "/", "\")
-            '                                    'ImportMapFilename = vbReplace(cmc.cpCore.app.csv_cs_getText(CS, "ImportMapFilename"), "/", "\")
+            '                                    'CSVFilename = genericController.vbReplace(cmc.cpCore.app.csv_cs_getText(CS, "Filename"), "/", "\")
+            '                                    'ImportMapFilename = genericController.vbReplace(cmc.cpCore.app.csv_cs_getText(CS, "ImportMapFilename"), "/", "\")
             '                                    ''
             '                                    'ResultMessage = ImportProcessor.ProcessCSV(cmc, CSVFilename, ImportMapFilename)
             '                                    'If ResultMessage <> "" Then
@@ -205,11 +207,11 @@ Namespace Contensive.Core
                         RowBuffer = ""
                         For FieldNamePtr = 0 To FieldNameCnt - 1
                             Copy = cpCore.db.cs_get(CS, FieldNames(FieldNamePtr))
-                            Copy = vbReplace(Copy, """", """""")
+                            Copy = genericController.vbReplace(Copy, """", """""")
                             ' if propertly quoted, line breaks can be preserved
-                            'Copy = vbReplace(Copy, vbCrLf, " ")
-                            'Copy = vbReplace(Copy, vbCr, " ")
-                            'Copy = vbReplace(Copy, vbLf, " ")
+                            'Copy = genericController.vbReplace(Copy, vbCrLf, " ")
+                            'Copy = genericController.vbReplace(Copy, vbCr, " ")
+                            'Copy = genericController.vbReplace(Copy, vbLf, " ")
                             RowBuffer = RowBuffer & ",""" & Copy & """"
                             'DoEvents()
                         Next
@@ -224,7 +226,7 @@ Namespace Contensive.Core
             '
             Exit Function
 ErrorTrap:
-            BuildCSV = "export failed, " & GetErrString(Err)
+            BuildCSV = "export failed, " & genericController.GetErrString(Err)
             Call HandleClassTrapErrorResumeNext("BuildCSV", BuildCSV, appName)
             Err.Clear()
         End Function
@@ -306,7 +308,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            BuildXML = "export failed, " & GetErrString(Err)
+            BuildXML = "export failed, " & genericController.GetErrString(Err)
             Call HandleClassTrapErrorResumeNext("BuildXML", BuildXML, appName)
             Err.Clear()
         End Function
@@ -326,7 +328,7 @@ ErrorTrap:
         ''' <summary>
         ''' constructor
         ''' </summary>
-        Public Sub New(cpCore As coreClass)
+        Public Sub New(cpCore As Contensive.Core.coreClass)
             MyBase.New()
             Me.cpCore = cpCore
         End Sub

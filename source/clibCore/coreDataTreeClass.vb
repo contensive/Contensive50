@@ -3,6 +3,8 @@ Option Explicit On
 Option Strict On
 
 
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 Imports Contensive.Core.coreCommonModule
 'Imports Contensive.Core
 Imports System.Xml
@@ -374,9 +376,9 @@ ErrorTrap:
             '
             AttrCnt = Tier(TierPtr).Node.Attributes.Count
             If AttrCnt > 0 And (AttrName <> "") Then
-                UCaseAttrName = vbUCase(AttrName)
+                UCaseAttrName = genericController.vbUCase(AttrName)
                 For AttrPtr = 0 To AttrCnt - 1
-                    If UCaseAttrName = vbUCase(Tier(TierPtr).Node.Attributes(AttrPtr).Name) Then
+                    If UCaseAttrName = genericController.vbUCase(Tier(TierPtr).Node.Attributes(AttrPtr).Name) Then
                         GetAttr = Tier(TierPtr).Node.Attributes(AttrPtr).Value
                         Exit For
                     End If

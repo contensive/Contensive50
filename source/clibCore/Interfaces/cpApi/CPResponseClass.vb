@@ -106,7 +106,7 @@ Namespace Contensive.Core
 
         Public Overrides Sub Flush() 'Inherits BaseClasses.CPResponseBaseClass.Flush
             If True Then
-                Call cpCore.main_FlushStream()
+                Call cpCore.webServerIO_FlushStream()
             End If
         End Sub
         Public Overrides Sub Redirect(ByVal Link As String) 'Inherits BaseClasses.CPResponseBaseClass.Redirect

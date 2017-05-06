@@ -2,6 +2,9 @@
 Option Explicit On
 Option Strict On
 
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
+
 Namespace Contensive.Core
     Public Class coreMenuComboTabClass
 
@@ -78,7 +81,7 @@ Namespace Contensive.Core
                     '
                     ' Create TabBar
                     '
-                    TabWrapperID = "TabWrapper" & GetRandomInteger()
+                    TabWrapperID = "TabWrapper" & genericController.GetRandomInteger()
                     TabBlank = GetTabBlank()
                     result = result & "<script language=""JavaScript"" src=""/ccLib/clientside/ccDynamicTab.js"" type=""text/javascript""></script>" & vbCrLf
                     result = result & "<table border=0 cellspacing=0 cellpadding=0 width=""100%""><tr>"
@@ -95,38 +98,38 @@ Namespace Contensive.Core
                         TabBodyWrapShowStyle = TabStyle & "BodyWrapShow"
                         TabBodyWrapHideStyle = TabStyle & "BodyWrapHide"
                         TabBodyCollectionWrapStyle = TabStyle & "BodyCollectionWrap"
-                        IDNumber = GetRandomInteger()
+                        IDNumber = genericController.GetRandomInteger()
                         LiveBodyID = "TabContent" & IDNumber
                         TabID = "Tab" & IDNumber
                         '
                         ' This tab is hit
                         '
                         result = result & "<td valign=bottom>" & TabBlank & "</td>"
-                        result = vbReplace(result, "Replace-TabID", TabID)
-                        result = vbReplace(result, "Replace-StyleEdge", TabEdgeStyle)
+                        result = genericController.vbReplace(result, "Replace-TabID", TabID)
+                        result = genericController.vbReplace(result, "Replace-StyleEdge", TabEdgeStyle)
                         If TabAjaxLink <> "" Then
                             '
                             ' Ajax tab
                             '
-                            result = vbReplace(result, "Replace-HotSpot", "<a href=# Class=""" & TabLinkStyle & """ name=tabLink onClick=""if(document.getElementById('unloaded_" & LiveBodyID & "')){GetURLAjax('" & TabAjaxLink & "','','" & LiveBodyID & "','','')};switchLiveTab2('" & LiveBodyID & "', this,'" & TabID & "','" & TabStyle & "','" & TabWrapperID & "');return false;"">" & Tabs(TabPtr).Caption & "</a>")
-                            result = vbReplace(result, "Replace-StyleHit", TabStyle)
+                            result = genericController.vbReplace(result, "Replace-HotSpot", "<a href=# Class=""" & TabLinkStyle & """ name=tabLink onClick=""if(document.getElementById('unloaded_" & LiveBodyID & "')){GetURLAjax('" & TabAjaxLink & "','','" & LiveBodyID & "','','')};switchLiveTab2('" & LiveBodyID & "', this,'" & TabID & "','" & TabStyle & "','" & TabWrapperID & "');return false;"">" & Tabs(TabPtr).Caption & "</a>")
+                            result = genericController.vbReplace(result, "Replace-StyleHit", TabStyle)
                             TabBody = TabBody & "<div id=""" & LiveBodyID & """ class=""" & TabBodyStyle & """ style=""display:none;text-align:center""><div id=""unloaded_" & LiveBodyID & """  style=""text-align:center;padding-top:50px;""><img src=""/ccLib/images/ajax-loader-big.gif"" border=0 width=32 height=32></div></div>"
                             'TabBody = TabBody & "<div onload=""alert('" & LiveBodyID & " onload');"" id=""" & LiveBodyID & """ class=""" & TabBodyStyle & """ style=""display:none;text-align:center""><div id=""unloaded_" & LiveBodyID & """  style=""text-align:center;padding-top:50px;""><img src=""/ccLib/images/ajax-loader-big.gif"" border=0 width=32 height=32></div></div>"
                         ElseIf TabLink <> "" Then
                             '
                             ' Link back to server tab
                             '
-                            result = vbReplace(result, "Replace-HotSpot", "<a href=""" & TabLink & """ Class=""" & TabHitLinkStyle & """>" & Tabs(TabPtr).Caption & "</a>")
-                            'result = vbReplace(result, "Replace-HotSpot", "<a href=# Class=""" & TabLinkStyle & """ name=tabLink onClick=""switchLiveTab2('" & LiveBodyID & "', this,'" & TabID & "','" & TabStyle & "','" & TabWrapperID & "');return false;"">" & Tabs(TabPtr).Caption & "</a>")
-                            result = vbReplace(result, "Replace-StyleHit", TabStyle)
+                            result = genericController.vbReplace(result, "Replace-HotSpot", "<a href=""" & TabLink & """ Class=""" & TabHitLinkStyle & """>" & Tabs(TabPtr).Caption & "</a>")
+                            'result = genericController.vbReplace(result, "Replace-HotSpot", "<a href=# Class=""" & TabLinkStyle & """ name=tabLink onClick=""switchLiveTab2('" & LiveBodyID & "', this,'" & TabID & "','" & TabStyle & "','" & TabWrapperID & "');return false;"">" & Tabs(TabPtr).Caption & "</a>")
+                            result = genericController.vbReplace(result, "Replace-StyleHit", TabStyle)
                         Else
                             '
                             ' Live Tab
                             '
                             If Not FirstLiveBodyShown Then
                                 FirstLiveBodyShown = True
-                                result = vbReplace(result, "Replace-HotSpot", "<a href=# Class=""" & TabHitLinkStyle & """ name=tabLink onClick=""switchLiveTab2('" & LiveBodyID & "', this,'" & TabID & "','" & TabStyle & "','" & TabWrapperID & "');return false;"">" & Tabs(TabPtr).Caption & "</a>")
-                                result = vbReplace(result, "Replace-StyleHit", TabHitStyle)
+                                result = genericController.vbReplace(result, "Replace-HotSpot", "<a href=# Class=""" & TabHitLinkStyle & """ name=tabLink onClick=""switchLiveTab2('" & LiveBodyID & "', this,'" & TabID & "','" & TabStyle & "','" & TabWrapperID & "');return false;"">" & Tabs(TabPtr).Caption & "</a>")
+                                result = genericController.vbReplace(result, "Replace-StyleHit", TabHitStyle)
                                 JSClose = JSClose & "ActiveTabTableID=""" & TabID & """;ActiveContentDivID=""" & LiveBodyID & """;"
                                 TabBody = TabBody _
                                 & "<div id=""" & LiveBodyID & """ class=""" & TabBodyWrapShowStyle & """>" _
@@ -136,8 +139,8 @@ Namespace Contensive.Core
                                 & "</div>" _
                                 & ""
                             Else
-                                result = vbReplace(result, "Replace-HotSpot", "<a href=# Class=""" & TabLinkStyle & """ name=tabLink onClick=""switchLiveTab2('" & LiveBodyID & "', this,'" & TabID & "','" & TabStyle & "','" & TabWrapperID & "');return false;"">" & Tabs(TabPtr).Caption & "</a>")
-                                result = vbReplace(result, "Replace-StyleHit", TabStyle)
+                                result = genericController.vbReplace(result, "Replace-HotSpot", "<a href=# Class=""" & TabLinkStyle & """ name=tabLink onClick=""switchLiveTab2('" & LiveBodyID & "', this,'" & TabID & "','" & TabStyle & "','" & TabWrapperID & "');return false;"">" & Tabs(TabPtr).Caption & "</a>")
+                                result = genericController.vbReplace(result, "Replace-StyleHit", TabStyle)
                                 TabBody = TabBody _
                                 & "<div id=""" & LiveBodyID & """ class=""" & TabBodyWrapHideStyle & """>" _
                                 & "<div class=""" & TabBodyStyle & """>" _

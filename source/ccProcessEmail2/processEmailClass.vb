@@ -1,4 +1,13 @@
 ﻿
+Option Strict On
+Option Explicit On
+
+Imports Contensive
+Imports Contensive.Core
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
+
+
 Namespace Contensive.Core
     Public Class processEmailClass
         '
@@ -6,26 +15,26 @@ Namespace Contensive.Core
         '
         ' copy of object from csv
         '
-        Private Enum AddonContextEnum
-            ' should have been addonContextPage, etc
-            ContextPage = 1
-            ContextAdmin = 2
-            ContextTemplate = 3
-            contextEmail = 4
-            ContextRemoteMethod = 5
-            ContextOnNewVisit = 6
-            ContextOnPageEnd = 7
-            ContextOnPageStart = 8
-            ContextEditor = 9
-            ContextHelpUser = 10
-            ContextHelpAdmin = 11
-            ContextHelpDeveloper = 12
-            ContextOnContentChange = 13
-            ContextFilter = 14
-            ContextSimple = 15
-            ContextOnBodyStart = 16
-            ContextOnBodyEnd = 17
-        End Enum
+        'Private Enum AddonContextEnum
+        '    ' should have been addonContextPage, etc
+        '    ContextPage = 1
+        '    ContextAdmin = 2
+        '    ContextTemplate = 3
+        '    contextEmail = 4
+        '    ContextRemoteMethod = 5
+        '    ContextOnNewVisit = 6
+        '    ContextOnPageEnd = 7
+        '    ContextOnPageStart = 8
+        '    ContextEditor = 9
+        '    ContextHelpUser = 10
+        '    ContextHelpAdmin = 11
+        '    ContextHelpDeveloper = 12
+        '    ContextOnContentChange = 13
+        '    ContextFilter = 14
+        '    ContextSimple = 15
+        '    ContextOnBodyStart = 16
+        '    ContextOnBodyEnd = 17
+        'End Enum
         '
         '
         '
@@ -106,11 +115,11 @@ ErrorTrap:
                         '
                         'hint = "4"
                         cpCore.db.sqlCommandTimeout = 120
-                        EmailServiceLastCheck = EncodeDate(cpCore.siteProperties.getText("EmailServiceLastCheck", 0))
+                        EmailServiceLastCheck = (cpCore.siteProperties.getDate("EmailServiceLastCheck"))
                         Call cpCore.siteProperties.setProperty("EmailServiceLastCheck", CStr(Now()))
                         'buildversion = cpCore.app.GetSiteProperty("BuildVersion", 0, 0)
                         IsNewHour = (Now - EmailServiceLastCheck).TotalHours > 1
-                        IsNewDay = Int(EmailServiceLastCheck) <> Int(Now())
+                        IsNewDay = EmailServiceLastCheck.Date <> Now().Date
                         '
                         ' Send Submitted Group Email (submitted, not sent, no conditions)
                         '
@@ -172,7 +181,7 @@ ErrorTrap:
             Dim EmailFrom As String
             '
             SQLDateNow = cpCore.db.encodeSQLDate(Now)
-            PrimaryLink = "http://" & GetPrimaryDomainName()
+            PrimaryLink = "http://" & cpCore.serverConfig.appConfig.domainList(0)
             '
             ' Open the email records
             '
@@ -391,7 +400,7 @@ ErrorTrap:
             siteStyles = cpCore.csv_getStyleSheetProcessed()
             '
             rightNow = DateTime.Now()
-            rightNowDate = Int(rightNow)
+            rightNowDate = rightNow.Date
 
 
 
@@ -556,7 +565,7 @@ ErrorTrap:
                         & " AND (" & SQLTablePeople & ".AllowBulkEmail <> 0)" _
                         & " AND (" & SQLTablePeople & ".BirthdayMonth=" & Month(Now) & ")" _
                         & " AND (" & SQLTablePeople & ".BirthdayDay=" & Day(Now) & ")" _
-                        & " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=" & SQLTablePeople & ".ID and ccEmailLog.DateAdded>=" & cpCore.db.encodeSQLDate(Int(Now())) & "))"
+                        & " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=" & SQLTablePeople & ".ID and ccEmailLog.DateAdded>=" & cpCore.db.encodeSQLDate(Now.Date) & "))"
                     CSEmailBig = cpCore.db.cs_openCsSql_rev("Default", SQL)
                     Do While cpCore.db.cs_ok(CSEmailBig)
                         emailID = cpCore.db.cs_getInteger(CSEmailBig, "EmailID")
@@ -674,8 +683,8 @@ ErrorTrap:
                         End If
                         '
                         emailWorkingStyles = emailStyles
-                        emailWorkingStyles = vbReplace(emailWorkingStyles, StyleSheetStart, StyleSheetStart & "<!-- ", 1, 99, vbTextCompare)
-                        emailWorkingStyles = vbReplace(emailWorkingStyles, StyleSheetEnd, " // -->" & StyleSheetEnd, 1, 99, vbTextCompare)
+                        emailWorkingStyles = genericController.vbReplace(emailWorkingStyles, StyleSheetStart, StyleSheetStart & "<!-- ", 1, 99, vbTextCompare)
+                        emailWorkingStyles = genericController.vbReplace(emailWorkingStyles, StyleSheetEnd, " // -->" & StyleSheetEnd, 1, 99, vbTextCompare)
                         '
                         ' Create the clickflag to be added to all anchors
                         '
@@ -683,13 +692,13 @@ ErrorTrap:
                         '
                         ' Encode body and subject
                         '
-                        EmailBodyEncoded = cpCore.html_executeContentCommands(Nothing, EmailBodyEncoded, AddonContextEnum.contextEmail, MemberID, True, errorMessage)
-                        EmailBodyEncoded = cpCore.html_encodeContent10(EmailBodyEncoded, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, 0, "", AddonContextEnum.contextEmail, True, Nothing, False)
-                        'EmailBodyEncoded = cpCore.csv_EncodeContent8(Nothing, EmailBodyEncoded, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, "", True, AddonContextEnum.contextEmail)
+                        EmailBodyEncoded = cpCore.html_executeContentCommands(Nothing, EmailBodyEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, True, errorMessage)
+                        EmailBodyEncoded = cpCore.html_encodeContent10(EmailBodyEncoded, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
+                        'EmailBodyEncoded = cpCore.csv_EncodeContent8(Nothing, EmailBodyEncoded, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
                         '
-                        EmailSubjectEncoded = cpCore.html_executeContentCommands(Nothing, EmailSubjectEncoded, AddonContextEnum.contextEmail, MemberID, True, errorMessage)
-                        EmailSubjectEncoded = cpCore.html_encodeContent10(EmailSubjectEncoded, MemberID, "", 0, 0, True, False, False, False, False, True, "", PrimaryLink, True, 0, "", AddonContextEnum.contextEmail, True, Nothing, False)
-                        'EmailSubjectEncoded = cpCore.csv_EncodeContent8(Nothing, EmailSubjectEncoded, MemberID, "", 0, 0, True, False, False, False, False, True, "", PrimaryLink, True, "", 0, "", True, AddonContextEnum.contextEmail)
+                        EmailSubjectEncoded = cpCore.html_executeContentCommands(Nothing, EmailSubjectEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, True, errorMessage)
+                        EmailSubjectEncoded = cpCore.html_encodeContent10(EmailSubjectEncoded, MemberID, "", 0, 0, True, False, False, False, False, True, "", PrimaryLink, True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
+                        'EmailSubjectEncoded = cpCore.csv_EncodeContent8(Nothing, EmailSubjectEncoded, MemberID, "", 0, 0, True, False, False, False, False, True, "", PrimaryLink, True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
                         '
                         ' Encode/Merge Template
                         '
@@ -702,17 +711,17 @@ ErrorTrap:
                             '
                             ' use provided template
                             '
-                            EmailTemplateEncoded = cpCore.html_executeContentCommands(Nothing, EmailTemplateEncoded, AddonContextEnum.contextEmail, MemberID, True, errorMessage)
-                            EmailTemplateEncoded = cpCore.html_encodeContent10(EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, 0, "", AddonContextEnum.contextEmail, True, Nothing, False)
-                            'EmailTemplateEncoded = cpCore.csv_EncodeContent8(Nothing, EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, "", True, AddonContextEnum.contextEmail)
-                            'EmailTemplateEncoded = cpCore.csv_encodecontent8(Nothing, EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, ContentPlaceHolder, True, addonContextEnum.contextemail)
-                            If vbInstr(1, EmailTemplateEncoded, fpoContentBox) <> 0 Then
-                                EmailBodyEncoded = vbReplace(EmailTemplateEncoded, fpoContentBox, EmailBodyEncoded)
+                            EmailTemplateEncoded = cpCore.html_executeContentCommands(Nothing, EmailTemplateEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, True, errorMessage)
+                            EmailTemplateEncoded = cpCore.html_encodeContent10(EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
+                            'EmailTemplateEncoded = cpCore.csv_EncodeContent8(Nothing, EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
+                            'EmailTemplateEncoded = cpCore.csv_encodecontent8(Nothing, EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, ContentPlaceHolder, True, CPUtilsClass.addonContext.contextemail)
+                            If genericController.vbInstr(1, EmailTemplateEncoded, fpoContentBox) <> 0 Then
+                                EmailBodyEncoded = genericController.vbReplace(EmailTemplateEncoded, fpoContentBox, EmailBodyEncoded)
                             Else
                                 EmailBodyEncoded = EmailTemplateEncoded & "<div style=""padding:10px;"">" & EmailBodyEncoded & "</div>"
                             End If
-                            '                If vbInstr(1, EmailTemplateEncoded, ContentPlaceHolder) <> 0 Then
-                            '                    EmailBodyEncoded = vbReplace(EmailTemplateEncoded, ContentPlaceHolder, EmailBodyEncoded)
+                            '                If genericController.vbInstr(1, EmailTemplateEncoded, ContentPlaceHolder) <> 0 Then
+                            '                    EmailBodyEncoded = genericController.vbReplace(EmailTemplateEncoded, ContentPlaceHolder, EmailBodyEncoded)
                             '                Else
                             '                    EmailBodyEncoded = EmailTemplateEncoded & "<div style=""padding:10px;"">" & EmailBodyEncoded & "</div>"
                             '                End If
@@ -721,7 +730,7 @@ ErrorTrap:
                         ' Spam Footer under template
                         ' remove the marker for any other place in the email then add it as needed
                         '
-                        EmailBodyEncoded = vbReplace(EmailBodyEncoded, RequestNameEmailSpamFlag, "", 1, 99, vbTextCompare)
+                        EmailBodyEncoded = genericController.vbReplace(EmailBodyEncoded, RequestNameEmailSpamFlag, "", 1, 99, vbTextCompare)
                         If AllowSpamFooter Then
                             '
                             ' non-authorable, default true - leave it as an option in case there is an important exception
@@ -732,8 +741,8 @@ ErrorTrap:
                         ' open trigger under footer (so it does not shake as the image comes in)
                         '
                         EmailBodyEncoded = EmailBodyEncoded & OpenTriggerCode
-                        EmailBodyEncoded = vbReplace(EmailBodyEncoded, "#member_id#", MemberID)
-                        EmailBodyEncoded = vbReplace(EmailBodyEncoded, "#member_email#", ToAddress)
+                        EmailBodyEncoded = genericController.vbReplace(EmailBodyEncoded, "#member_id#", MemberID)
+                        EmailBodyEncoded = genericController.vbReplace(EmailBodyEncoded, "#member_email#", ToAddress)
                         '
                         ' Now convert URLS to absolute
                         '
@@ -787,21 +796,7 @@ ErrorTrap:
         '======================================================================================
         '
         Private Function GetPrimaryDomainName() As String
-            On Error GoTo ErrorTrap
-            '
-            Dim CopySplit
-            '
-            GetPrimaryDomainName = cpCore.app_domainList
-            If vbInstr(1, GetPrimaryDomainName, ",", 1) <> 0 Then
-                CopySplit = Split(GetPrimaryDomainName, ",")
-                GetPrimaryDomainName = CopySplit(0)
-            End If
-            '
-            Exit Function
-            '
-ErrorTrap:
-            cpCore.handleLegacyError3(cpCore.serverconfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "GetPrimaryDomainName", Err.Number, Err.Source, Err.Description, True, True, "")
-            Err.Clear()
+            Return cpCore.serverConfig.appConfig.domainList(0)
         End Function
         '
         '
@@ -857,13 +852,13 @@ ErrorTrap:
                 If cpCore.db.cs_ok(CSPeople) Then
                     ClickFlagQuery = RequestNameEmailClickFlag & "=" & EmailDropID & "&" & RequestNameEmailMemberID & "=" & ConfirmationMemberID
                     '
-                    EmailSubject = cpCore.html_executeContentCommands(Nothing, EmailSubject, AddonContextEnum.contextEmail, ConfirmationMemberID, True, errorMessage)
-                    EmailSubject = cpCore.html_encodeContent10(EmailSubject, ConfirmationMemberID, "", 0, 0, True, False, False, False, False, True, "", "http://" & GetPrimaryDomainName(), True, 0, "", AddonContextEnum.contextEmail, True, Nothing, False)
-                    'EmailSubject = cpCore.csv_EncodeContent8(Nothing, EmailSubject, ConfirmationMemberID, "", 0, 0, True, False, False, False, False, True, "", "http://" & GetPrimaryDomainName(), True, "", 0, "", True, AddonContextEnum.contextEmail)
+                    EmailSubject = cpCore.html_executeContentCommands(Nothing, EmailSubject, CPUtilsClass.addonContext.ContextEmail, ConfirmationMemberID, True, errorMessage)
+                    EmailSubject = cpCore.html_encodeContent10(EmailSubject, ConfirmationMemberID, "", 0, 0, True, False, False, False, False, True, "", "http://" & GetPrimaryDomainName(), True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
+                    'EmailSubject = cpCore.csv_EncodeContent8(Nothing, EmailSubject, ConfirmationMemberID, "", 0, 0, True, False, False, False, False, True, "", "http://" & GetPrimaryDomainName(), True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
                     '
-                    EmailBody = cpCore.html_executeContentCommands(Nothing, EmailBody, AddonContextEnum.contextEmail, ConfirmationMemberID, True, errorMessage)
-                    EmailBody = cpCore.html_encodeContent10(EmailCopy, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & GetPrimaryDomainName(), True, 0, "", AddonContextEnum.contextEmail, True, Nothing, False)
-                    'EmailBody = cpCore.csv_EncodeContent8(Nothing, EmailCopy, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & GetPrimaryDomainName(), True, "", 0, "", True, AddonContextEnum.contextEmail)
+                    EmailBody = cpCore.html_executeContentCommands(Nothing, EmailBody, CPUtilsClass.addonContext.ContextEmail, ConfirmationMemberID, True, errorMessage)
+                    EmailBody = cpCore.html_encodeContent10(EmailCopy, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & GetPrimaryDomainName(), True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
+                    'EmailBody = cpCore.csv_EncodeContent8(Nothing, EmailCopy, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & GetPrimaryDomainName(), True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
                     '
                     ' Encode the template
                     '
@@ -874,16 +869,16 @@ ErrorTrap:
                         EmailBody = "<div style=""padding:10px"">" & EmailBody & "</div>"
                     Else
                         WorkingTemplate = EmailTemplate
-                        WorkingTemplate = cpCore.html_executeContentCommands(Nothing, WorkingTemplate, AddonContextEnum.contextEmail, ConfirmationMemberID, True, errorMessage)
-                        WorkingTemplate = cpCore.html_encodeContent10(WorkingTemplate, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, False, "http://" & GetPrimaryDomainName(), True, 0, "", AddonContextEnum.contextEmail, True, Nothing, False)
-                        'WorkingTemplate = cpCore.csv_encodecontent8(Nothing, EmailTemplate, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, False, "http://" & GetPrimaryDomainName(), True, "", 0, ContentPlaceHolder, True, addonContextEnum.contextemail)
-                        If vbInstr(1, WorkingTemplate, fpoContentBox) <> 0 Then
-                            EmailBody = vbReplace(WorkingTemplate, fpoContentBox, EmailBody)
+                        WorkingTemplate = cpCore.html_executeContentCommands(Nothing, WorkingTemplate, CPUtilsClass.addonContext.ContextEmail, ConfirmationMemberID, True, errorMessage)
+                        WorkingTemplate = cpCore.html_encodeContent10(WorkingTemplate, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & GetPrimaryDomainName(), True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
+                        'WorkingTemplate = cpCore.csv_encodecontent8(Nothing, EmailTemplate, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, False, "http://" & GetPrimaryDomainName(), True, "", 0, ContentPlaceHolder, True, CPUtilsClass.addonContext.contextemail)
+                        If genericController.vbInstr(1, WorkingTemplate, fpoContentBox) <> 0 Then
+                            EmailBody = genericController.vbReplace(WorkingTemplate, fpoContentBox, EmailBody)
                         Else
                             EmailBody = WorkingTemplate & "<div style=""padding:10px"">" & EmailBody & "</div>"
                         End If
-                        '            If vbInstr(1, WorkingTemplate, ContentPlaceHolder) <> 0 Then
-                        '                EmailBody = vbReplace(WorkingTemplate, ContentPlaceHolder, EmailBody)
+                        '            If genericController.vbInstr(1, WorkingTemplate, ContentPlaceHolder) <> 0 Then
+                        '                EmailBody = genericController.vbReplace(WorkingTemplate, ContentPlaceHolder, EmailBody)
                         '            Else
                         '                EmailBody = WorkingTemplate & "<div style=""padding:10px"">" & EmailBody & "</div>"
                         '            End If

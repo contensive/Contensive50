@@ -5,6 +5,8 @@ Option Strict On
 
 Imports Contensive.BaseClasses
 Imports Contensive.Core.coreCommonModule
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 
 '
 ' findReplace as integer to as integer
@@ -88,7 +90,7 @@ Namespace Contensive.Core.Controllers
                     If posStart <> 0 Then
                         posEnd = getTagEndPos(ignore, layout, posStart)
                         If posEnd > 0 Then
-                            posStart = vbInstr(posStart + 1, layout, ">")
+                            posStart = genericController.vbInstr(posStart + 1, layout, ">")
                             If posStart <> 0 Then
                                 posStart = posStart + 1
                                 posEnd = InStrRev(layout, "<", posEnd - 1)
@@ -132,7 +134,7 @@ Namespace Contensive.Core.Controllers
                     If posStart <> 0 Then
                         posEnd = getTagEndPos(ignore, layout, posStart)
                         If posEnd > 0 Then
-                            posStart = vbInstr(posStart + 1, layout, ">")
+                            posStart = genericController.vbInstr(posStart + 1, layout, ">")
                             If posStart <> 0 Then
                                 posStart = posStart + 1
                                 posEnd = InStrRev(layout, "<", posEnd - 1)
@@ -215,17 +217,17 @@ Namespace Contensive.Core.Controllers
                 Dim Ptr As Integer
                 '
                 returnValue = False
-                Pos = vbInstr(posStartTag, layout, ">")
+                Pos = genericController.vbInstr(posStartTag, layout, ">")
                 If Pos > 0 Then
                     returnValue = True
                     Tag = Mid(layout, posStartTag, Pos - posStartTag + 1)
-                    tagLower = vbLCase(Tag)
+                    tagLower = genericController.vbLCase(Tag)
                     tagLength = Len(Tag)
                     '
                     ' check searchId
                     '
                     If returnValue And (searchId <> "") Then
-                        Pos = vbInstr(1, tagLower, " id=", vbTextCompare)
+                        Pos = genericController.vbInstr(1, tagLower, " id=", vbTextCompare)
                         If Pos <= 0 Then
                             '
                             ' id required but this tag has no id attr
@@ -289,7 +291,7 @@ Namespace Contensive.Core.Controllers
                     ' check searchClass
                     '
                     If returnValue And (searchClass <> "") Then
-                        Pos = vbInstr(1, tagLower, " class=", vbTextCompare)
+                        Pos = genericController.vbInstr(1, tagLower, " class=", vbTextCompare)
                         If Pos <= 0 Then
                             '
                             ' class required but this tag has no class attr
@@ -380,34 +382,34 @@ Namespace Contensive.Core.Controllers
                 '
                 returnPos = 0
                 workingKey = Key
-                If vbInstr(1, workingKey, ">") <> 0 Then
+                If genericController.vbInstr(1, workingKey, ">") <> 0 Then
                     '
                     ' does not support > yet.
                     '
-                    workingKey = vbReplace(workingKey, ">", " ")
+                    workingKey = genericController.vbReplace(workingKey, ">", " ")
                 End If
                 '
                 ' eliminate whitespace
                 '
-                Do While vbInstr(1, workingKey, vbTab) <> 0
-                    workingKey = vbReplace(workingKey, vbTab, " ")
+                Do While genericController.vbInstr(1, workingKey, vbTab) <> 0
+                    workingKey = genericController.vbReplace(workingKey, vbTab, " ")
                 Loop
                 '
-                Do While vbInstr(1, workingKey, vbCr) <> 0
-                    workingKey = vbReplace(workingKey, vbCr, " ")
+                Do While genericController.vbInstr(1, workingKey, vbCr) <> 0
+                    workingKey = genericController.vbReplace(workingKey, vbCr, " ")
                 Loop
                 '
-                Do While vbInstr(1, workingKey, vbLf) <> 0
-                    workingKey = vbReplace(workingKey, vbLf, " ")
+                Do While genericController.vbInstr(1, workingKey, vbLf) <> 0
+                    workingKey = genericController.vbReplace(workingKey, vbLf, " ")
                 Loop
                 '
-                Do While vbInstr(1, workingKey, "  ") <> 0
-                    workingKey = vbReplace(workingKey, "  ", " ")
+                Do While genericController.vbInstr(1, workingKey, "  ") <> 0
+                    workingKey = genericController.vbReplace(workingKey, "  ", " ")
                 Loop
                 '
                 workingKey = Trim(workingKey)
                 '
-                If vbInstr(1, workingKey, " ") <> 0 Then
+                If genericController.vbInstr(1, workingKey, " ") <> 0 Then
                     '
                     ' if there are spaces, do them sequentially
                     '
@@ -436,7 +438,7 @@ Namespace Contensive.Core.Controllers
                         searchClass = Mid(workingKey, 2)
                         searchTag = ""
                         searchId = ""
-                        Pos = vbInstr(1, searchClass, "#")
+                        Pos = genericController.vbInstr(1, searchClass, "#")
                         If Pos <> 0 Then
                             searchId = Mid(searchClass, Pos)
                             searchClass = Mid(searchClass, 1, Pos - 1)
@@ -451,7 +453,7 @@ Namespace Contensive.Core.Controllers
                         searchClass = ""
                         searchTag = ""
                         searchId = Mid(workingKey, 2)
-                        Pos = vbInstr(1, searchId, ".")
+                        Pos = genericController.vbInstr(1, searchId, ".")
                         If Pos <> 0 Then
                             searchClass = Mid(searchId, Pos)
                             searchId = Mid(searchId, 1, Pos - 1)
@@ -467,21 +469,21 @@ Namespace Contensive.Core.Controllers
                         searchTag = workingKey
                         searchId = ""
                         '
-                        Pos = vbInstr(1, searchTag, "#")
+                        Pos = genericController.vbInstr(1, searchTag, "#")
                         If Pos <> 0 Then
                             searchId = Mid(searchTag, Pos + 1)
                             searchTag = Mid(searchTag, 1, Pos - 1)
-                            Pos = vbInstr(1, searchId, ".")
+                            Pos = genericController.vbInstr(1, searchId, ".")
                             If Pos <> 0 Then
                                 searchClass = Mid(searchId, Pos)
                                 searchId = Mid(searchId, 1, Pos - 1)
                             End If
                         End If
-                        Pos = vbInstr(1, searchTag, ".")
+                        Pos = genericController.vbInstr(1, searchTag, ".")
                         If Pos <> 0 Then
                             searchClass = Mid(searchTag, Pos + 1)
                             searchTag = Mid(searchTag, 1, Pos - 1)
-                            Pos = vbInstr(1, searchClass, "#")
+                            Pos = genericController.vbInstr(1, searchClass, "#")
                             If Pos <> 0 Then
                                 searchId = Mid(searchClass, Pos)
                                 searchClass = Mid(searchClass, 1, Pos - 1)
@@ -492,11 +494,11 @@ Namespace Contensive.Core.Controllers
                     End If
                     lenSearchKey = Len(searchKey)
                     Pos = layoutStartPos
-                    'posMatch = vbInstr(layoutStartPos, layout, searchKey)
+                    'posMatch = genericController.vbInstr(layoutStartPos, layout, searchKey)
                     'pos = posMatch
                     'searchIsOver = False
                     Do
-                        Pos = vbInstr(Pos, layout, searchKey)
+                        Pos = genericController.vbInstr(Pos, layout, searchKey)
                         If Pos = 0 Then
                             '
                             ' not found, return empty
@@ -581,13 +583,13 @@ Namespace Contensive.Core.Controllers
                 Dim posComment As Integer
                 Dim c As String
                 '
-                Pos = vbInstr(startPos, Source, "<")
+                Pos = genericController.vbInstr(startPos, Source, "<")
                 TagName = ""
                 returnValue = 0
                 If Pos <> 0 Then
                     Pos = Pos + 1
                     Do While Pos < Len(Source)
-                        c = vbLCase(Mid(Source, Pos, 1))
+                        c = genericController.vbLCase(Mid(Source, Pos, 1))
                         If (c >= "a") And (c <= "z") Then
                             TagName = TagName & c
                         Else
@@ -599,25 +601,25 @@ Namespace Contensive.Core.Controllers
                         endTag = "</" & TagName
                         startTag = "<" & TagName
                         Do While (Pos <> 0)
-                            posEnd = vbInstr(Pos + 1, Source, endTag, vbTextCompare)
+                            posEnd = genericController.vbInstr(Pos + 1, Source, endTag, vbTextCompare)
                             If posEnd = 0 Then
                                 '
                                 ' no end was found, return the tag or rest of the string
                                 '
-                                returnValue = vbInstr(Pos + 1, Source, ">") + 1
+                                returnValue = genericController.vbInstr(Pos + 1, Source, ">") + 1
                                 If posEnd = 1 Then
                                     returnValue = Len(Source)
                                 End If
                                 Exit Do
                             Else
-                                posNest = vbInstr(Pos + 1, Source, startTag, vbTextCompare)
+                                posNest = genericController.vbInstr(Pos + 1, Source, startTag, vbTextCompare)
                                 If posNest = 0 Then
                                     '
                                     ' no nest found, set to end
                                     '
                                     posNest = Len(Source)
                                 End If
-                                posComment = vbInstr(Pos + 1, Source, "<!--")
+                                posComment = genericController.vbInstr(Pos + 1, Source, "<!--")
                                 If posComment = 0 Then
                                     '
                                     ' no comment found, set to end
@@ -640,7 +642,7 @@ Namespace Contensive.Core.Controllers
                                     '
                                     ' ----- there is a comment between the tag and the first tagend, skip it
                                     '
-                                    Pos = vbInstr(posComment, Source, "-->")
+                                    Pos = genericController.vbInstr(posComment, Source, "-->")
                                     If Pos = 0 Then
                                         '
                                         ' start comment with no end, exit now
@@ -652,7 +654,7 @@ Namespace Contensive.Core.Controllers
                                     '
                                     ' ----- end position is here, go to the end of it and exit
                                     '
-                                    Pos = vbInstr(posEnd, Source, ">")
+                                    Pos = genericController.vbInstr(posEnd, Source, ">")
                                     If Pos = 0 Then
                                         '
                                         ' no end was found, just exit
@@ -688,11 +690,11 @@ Namespace Contensive.Core.Controllers
             ' ##### removed to catch err<>0 problem on error resume next
             '
             html_EncodeHTML = Source
-            html_EncodeHTML = vbReplace(html_EncodeHTML, "&", "&amp;")
-            html_EncodeHTML = vbReplace(html_EncodeHTML, "<", "&lt;")
-            html_EncodeHTML = vbReplace(html_EncodeHTML, ">", "&gt;")
-            html_EncodeHTML = vbReplace(html_EncodeHTML, """", "&quot;")
-            html_EncodeHTML = vbReplace(html_EncodeHTML, "'", "&apos;")
+            html_EncodeHTML = genericController.vbReplace(html_EncodeHTML, "&", "&amp;")
+            html_EncodeHTML = genericController.vbReplace(html_EncodeHTML, "<", "&lt;")
+            html_EncodeHTML = genericController.vbReplace(html_EncodeHTML, ">", "&gt;")
+            html_EncodeHTML = genericController.vbReplace(html_EncodeHTML, """", "&quot;")
+            html_EncodeHTML = genericController.vbReplace(html_EncodeHTML, "'", "&apos;")
             '
         End Function
         '
@@ -720,35 +722,35 @@ Namespace Contensive.Core.Controllers
             getTagInnerHTML = ""
             Pos = 1
             Do While (Pos > 0) And (LoopCnt < 100)
-                TagStart = vbInstr(Pos, PageSource, "<" & Tag, vbTextCompare)
+                TagStart = genericController.vbInstr(Pos, PageSource, "<" & Tag, vbTextCompare)
                 If TagStart = 0 Then
                     Pos = 0
                 Else
                     '
                     ' tag found, skip any comments that start between current position and the tag
                     '
-                    CommentPos = vbInstr(Pos, PageSource, "<!--")
+                    CommentPos = genericController.vbInstr(Pos, PageSource, "<!--")
                     If (CommentPos <> 0) And (CommentPos < TagStart) Then
                         '
                         ' skip comment and start again
                         '
-                        Pos = vbInstr(CommentPos, PageSource, "-->")
+                        Pos = genericController.vbInstr(CommentPos, PageSource, "-->")
                     Else
-                        ScriptPos = vbInstr(Pos, PageSource, "<script")
+                        ScriptPos = genericController.vbInstr(Pos, PageSource, "<script")
                         If (ScriptPos <> 0) And (ScriptPos < TagStart) Then
                             '
                             ' skip comment and start again
                             '
-                            Pos = vbInstr(ScriptPos, PageSource, "</script")
+                            Pos = genericController.vbInstr(ScriptPos, PageSource, "</script")
                         Else
                             '
                             ' Get the tags innerHTML
                             '
-                            TagStart = vbInstr(TagStart, PageSource, ">", vbTextCompare)
+                            TagStart = genericController.vbInstr(TagStart, PageSource, ">", vbTextCompare)
                             Pos = TagStart
                             If TagStart <> 0 Then
                                 TagStart = TagStart + 1
-                                TagEnd = vbInstr(TagStart, PageSource, "</" & Tag, vbTextCompare)
+                                TagEnd = genericController.vbInstr(TagStart, PageSource, "</" & Tag, vbTextCompare)
                                 If TagEnd <> 0 Then
                                     getTagInnerHTML &= Mid(PageSource, TagStart, TagEnd - TagStart)
                                 End If
@@ -757,7 +759,7 @@ Namespace Contensive.Core.Controllers
                     End If
                     LoopCnt = LoopCnt + 1
                     If ReturnAll Then
-                        TagStart = vbInstr(TagEnd, PageSource, "<" & Tag, vbTextCompare)
+                        TagStart = genericController.vbInstr(TagEnd, PageSource, "<" & Tag, vbTextCompare)
                     Else
                         TagStart = 0
                     End If

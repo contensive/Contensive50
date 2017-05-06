@@ -1,6 +1,8 @@
 Option Explicit On
 Option Strict On
 
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 Imports Contensive.BaseClasses
 Imports System.Runtime.InteropServices
 
@@ -205,7 +207,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function SelectContent(ByVal HtmlName As String, ByVal HtmlValue As String, ByVal ContentName As String, Optional ByVal SQLCriteria As String = "", Optional ByVal NoneCaption As String = "", Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Inherits BaseClasses.CPHtmlBaseClass.SelectContent
             If True Then
-                SelectContent = cpCore.main_GetFormInputSelect(HtmlName, EncodeInteger(HtmlValue), ContentName, SQLCriteria, NoneCaption)
+                SelectContent = cpCore.main_GetFormInputSelect(HtmlName, genericController.EncodeInteger(HtmlValue), ContentName, SQLCriteria, NoneCaption)
                 If HtmlClass <> "" Then
                     SelectContent = SelectContent.Replace("<select ", "<select class=""" & HtmlClass & """ ")
                 End If
@@ -313,7 +315,7 @@ Namespace Contensive.Core
         Public Overrides Function InputText(ByVal HtmlName As String, Optional ByVal HtmlValue As String = "", Optional ByVal Height As String = "", Optional ByVal Width As String = "", Optional ByVal IsPassword As Boolean = False, Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Inherits BaseClasses.CPHtmlBaseClass.InputText
             Dim returnValue As String = ""
             If True Then
-                returnValue = cpCore.html_GetFormInputText2(HtmlName, HtmlValue, EncodeInteger(Height), EncodeInteger(Width), HtmlId, IsPassword, False, HtmlClass)
+                returnValue = cpCore.html_GetFormInputText2(HtmlName, HtmlValue, genericController.EncodeInteger(Height), genericController.EncodeInteger(Width), HtmlId, IsPassword, False, HtmlClass)
                 returnValue = returnValue.Replace(" SIZE=""60""", "")
             End If
             Return returnValue
@@ -361,12 +363,12 @@ Namespace Contensive.Core
             Dim post As String
             Dim target As String
             '
-            posStart = vbInstr(1, SourceHtml, "<![CDATA[", CompareMethod.Text)
+            posStart = genericController.vbInstr(1, SourceHtml, "<![CDATA[", CompareMethod.Text)
             If posStart = 0 Then
                 '
                 ' no cdata
                 '
-                posStart = vbInstr(1, SourceHtml, "<textarea", CompareMethod.Text)
+                posStart = genericController.vbInstr(1, SourceHtml, "<textarea", CompareMethod.Text)
                 If posStart = 0 Then
                     '
                     ' no textarea
@@ -376,12 +378,12 @@ Namespace Contensive.Core
                     Else
                         Indent = SourceHtml.Replace(vbCrLf, vbCrLf & vbTab)
                     End If
-                    'Indent = vbReplace(SourceHtml, vbCrLf & vbTab, vbCrLf & vbTab & vbTab)
+                    'Indent = genericController.vbReplace(SourceHtml, vbCrLf & vbTab, vbCrLf & vbTab & vbTab)
                 Else
                     '
                     ' text area found, isolate it and indent before and after
                     '
-                    posEnd = vbInstr(posStart, SourceHtml, "</textarea>", CompareMethod.Text)
+                    posEnd = genericController.vbInstr(posStart, SourceHtml, "</textarea>", CompareMethod.Text)
                     pre = Mid(SourceHtml, 1, posStart - 1)
                     If posEnd = 0 Then
                         target = Mid(SourceHtml, posStart)
@@ -396,7 +398,7 @@ Namespace Contensive.Core
                 '
                 ' cdata found, isolate it and indent before and after
                 '
-                posEnd = vbInstr(posStart, SourceHtml, "]]>", CompareMethod.Text)
+                posEnd = genericController.vbInstr(posStart, SourceHtml, "]]>", CompareMethod.Text)
                 pre = Mid(SourceHtml, 1, posStart - 1)
                 If posEnd = 0 Then
                     target = Mid(SourceHtml, posStart)
@@ -454,7 +456,7 @@ Namespace Contensive.Core
                             & "<div  class=""ccHintWrapperContent"">" _
                             & "<b>Administrator</b>" _
                             & "<BR>" _
-                            & "<BR>" & cp.Utils.EncodeText(innerHtml) _
+                            & "<BR>" & cp.Utils.encodeText(innerHtml) _
                             & "</div>" _
                         & "</div>"
                 End If

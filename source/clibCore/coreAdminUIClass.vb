@@ -2,6 +2,9 @@
 Option Explicit On
 Option Strict On
 '
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
+'
 Namespace Contensive.Core
     '
     '====================================================================================================
@@ -44,7 +47,7 @@ Namespace Contensive.Core
             GetTitleBar = "<div class=""ccAdminTitleBar"">" & Title
             'GetTitleBar = "<div class=""ccAdminTitleBar"">" & Title & "</div>"
             Copy = Description
-            If vbInstr(1, Copy, "<p>", vbTextCompare) = 1 Then
+            If genericController.vbInstr(1, Copy, "<p>", vbTextCompare) = 1 Then
                 Copy = Mid(Copy, 4)
                 If InStrRev(Copy, "</p>", , vbTextCompare) = (Len(Copy) - 4) Then
                     Copy = Mid(Copy, 1, Len(Copy) - 4)
@@ -351,7 +354,7 @@ ErrorTrap:
             If NavEnd < PageCount Then
                 Nav = Nav & "<li class=""delim"">&#187;</li><li onclick=""bbj(this);"">" & PageCount & "</li>"
             End If
-            Nav = vbReplace(Nav, ">" & PageNumber & "<", " class=""hit"">" & PageNumber & "<")
+            Nav = genericController.vbReplace(Nav, ">" & PageNumber & "<", " class=""hit"">" & PageNumber & "<")
             GetButtonBarForIndex = GetButtonBarForIndex _
                 & cr & "<script language=""javascript"">function bbj(p){document.getElementsByName('indexGoToPage')[0].value=p.innerHTML;document.adminForm.submit();}</script>" _
                 & cr & "<div class=""ccJumpCon"">" _
@@ -680,7 +683,7 @@ ErrorTrap:
             If Title = "" Then
                 Copy = "&nbsp;"
             Else
-                Copy = vbReplace(Title, " ", "&nbsp;")
+                Copy = genericController.vbReplace(Title, " ", "&nbsp;")
                 'Copy = "<nobr>" & Title & "</nobr>"
             End If
             Style = "VERTICAL-ALIGN:bottom;"
@@ -691,21 +694,21 @@ ErrorTrap:
             '
             Select Case SortingState
                 Case SortingStateEnum.SortableNotSet
-                    QS = ModifyQueryString(RefreshQueryString, "ColSort", CStr(SortingStateEnum.SortableSetAZ), True)
-                    QS = ModifyQueryString(QS, "ColPtr", CStr(ColumnPtr), True)
+                    QS = genericController.ModifyQueryString(RefreshQueryString, "ColSort", CStr(SortingStateEnum.SortableSetAZ), True)
+                    QS = genericController.ModifyQueryString(QS, "ColPtr", CStr(ColumnPtr), True)
                     Copy = "<a href=""?" & QS & """ title=""Sort A-Z"" class=""ccAdminListCaption"">" & Copy & "</a>"
                 Case SortingStateEnum.SortableSetza
-                    QS = ModifyQueryString(RefreshQueryString, "ColSort", CStr(SortingStateEnum.SortableSetAZ), True)
-                    QS = ModifyQueryString(QS, "ColPtr", CStr(ColumnPtr), True)
+                    QS = genericController.ModifyQueryString(RefreshQueryString, "ColSort", CStr(SortingStateEnum.SortableSetAZ), True)
+                    QS = genericController.ModifyQueryString(QS, "ColPtr", CStr(ColumnPtr), True)
                     Copy = "<a href=""?" & QS & """ title=""Sort A-Z"" class=""ccAdminListCaption"">" & Copy & "<img src=""/ccLib/images/arrowup.gif"" width=8 height=8 border=0></a>"
                 Case SortingStateEnum.SortableSetAZ
-                    QS = ModifyQueryString(RefreshQueryString, "ColSort", CStr(SortingStateEnum.SortableSetza), True)
-                    QS = ModifyQueryString(QS, "ColPtr", CStr(ColumnPtr), True)
+                    QS = genericController.ModifyQueryString(RefreshQueryString, "ColSort", CStr(SortingStateEnum.SortableSetza), True)
+                    QS = genericController.ModifyQueryString(QS, "ColPtr", CStr(ColumnPtr), True)
                     Copy = "<a href=""?" & QS & """ title=""Sort Z-A"" class=""ccAdminListCaption"">" & Copy & "<img src=""/ccLib/images/arrowdown.gif"" width=8 height=8 border=0></a>"
             End Select
             '
             If Width <> "" Then
-                WidthTest = EncodeInteger(Replace(Width, "px", "", vbTextCompare))
+                WidthTest = genericController.EncodeInteger(Replace(Width, "px", "", vbTextCompare))
                 If WidthTest <> 0 Then
                     Style = Style & "width:" & WidthTest & "px;"
                     Copy = Copy & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""" & WidthTest & """ height=1 border=0>"
@@ -735,7 +738,7 @@ ErrorTrap:
             Dim VarText As String
             '
             VarText = cpCore.docProperties.getText("ColPtr")
-            GetReportSortColumnPtr = EncodeInteger(VarText)
+            GetReportSortColumnPtr = genericController.EncodeInteger(VarText)
             If (GetReportSortColumnPtr = 0) And (VarText <> "0") Then
                 GetReportSortColumnPtr = DefaultSortColumnPtr
             End If
@@ -932,27 +935,27 @@ ErrorTrap:
                     GetReport2 = GetReport2 & "<br>Go to Page "
                     If PagePointer <> 1 Then
                         WorkingQS = cpCore.web_RefreshQueryString
-                        WorkingQS = ModifyQueryString(WorkingQS, "GotoPage", "1", True)
+                        WorkingQS = genericController.ModifyQueryString(WorkingQS, "GotoPage", "1", True)
                         GetReport2 = GetReport2 & "<a href=""" & cpCore.webServerIO_requestPage & "?" & WorkingQS & """>1</A>...&nbsp;"
                     End If
                     WorkingQS = cpCore.web_RefreshQueryString
-                    WorkingQS = ModifyQueryString(WorkingQS, RequestNamePageSize, CStr(ReportPageSize), True)
+                    WorkingQS = genericController.ModifyQueryString(WorkingQS, RequestNamePageSize, CStr(ReportPageSize), True)
                     Do While (PagePointer <= PageCount) And (LinkCount < 20)
                         If PagePointer = ReportPageNumber Then
                             GetReport2 = GetReport2 & PagePointer & "&nbsp;"
                         Else
-                            WorkingQS = ModifyQueryString(WorkingQS, RequestNamePageNumber, CStr(PagePointer), True)
+                            WorkingQS = genericController.ModifyQueryString(WorkingQS, RequestNamePageNumber, CStr(PagePointer), True)
                             GetReport2 = GetReport2 & "<a href=""" & cpCore.webServerIO_requestPage & "?" & WorkingQS & """>" & PagePointer & "</A>&nbsp;"
                         End If
                         PagePointer = PagePointer + 1
                         LinkCount = LinkCount + 1
                     Loop
                     If PagePointer < PageCount Then
-                        WorkingQS = ModifyQueryString(WorkingQS, RequestNamePageNumber, CStr(PageCount), True)
+                        WorkingQS = genericController.ModifyQueryString(WorkingQS, RequestNamePageNumber, CStr(PageCount), True)
                         GetReport2 = GetReport2 & "...<a href=""" & cpCore.webServerIO_requestPage & "?" & WorkingQS & """>" & PageCount & "</A>&nbsp;"
                     End If
                     If ReportPageNumber < PageCount Then
-                        WorkingQS = ModifyQueryString(WorkingQS, RequestNamePageNumber, CStr(ReportPageNumber + 1), True)
+                        WorkingQS = genericController.ModifyQueryString(WorkingQS, RequestNamePageNumber, CStr(ReportPageNumber + 1), True)
                         GetReport2 = GetReport2 & "...<a href=""" & cpCore.webServerIO_requestPage & "?" & WorkingQS & """>next</A>&nbsp;"
                     End If
                     GetReport2 = GetReport2 & "<br>&nbsp;"

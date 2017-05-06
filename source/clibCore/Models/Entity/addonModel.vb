@@ -110,12 +110,12 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <param name="recordId"></param>
-        Public Shared Function getObject(cp As CPBaseClass, recordId As Integer, ByRef adminMessageList As List(Of String)) As addonModel
+        Public Shared Function getObject(cpcore As coreClass, recordId As Integer, ByRef adminMessageList As List(Of String)) As addonModel
             Dim returnModel As addonModel = Nothing
             Try
                 Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer
                 Dim recordCacheName As String = cnAddons & "CachedModelRecordId" & recordId
-                Dim recordCache As String = cp.Cache.Read(recordCacheName)
+                Dim recordCache As String = cpcore.cache.getString(recordCacheName)
                 Dim loadDbModel As Boolean = True
                 If Not String.IsNullOrEmpty(recordCache) Then
                     Try
@@ -131,11 +131,11 @@ Namespace Contensive.Core.Models.Entity
                     End Try
                 End If
                 If loadDbModel Or (returnModel Is Nothing) Then
-                    returnModel = getObjectNoCache(cp, recordId)
-                    Call cp.Cache.Save(recordCacheName, json_serializer.Serialize(returnModel), cacheTagList)
+                    returnModel = getObjectNoCache(cpcore, recordId)
+                    Call cpcore.cache.setKey(recordCacheName, json_serializer.Serialize(returnModel), cacheTagList)
                 End If
             Catch ex As Exception
-                cp.Site.ErrorReport(ex)
+                cpcore.handleExceptionAndRethrow(ex)
             End Try
             Return returnModel
         End Function
@@ -145,93 +145,93 @@ Namespace Contensive.Core.Models.Entity
         ''' called only from getObject. Load the model from the Db without cache. If there are any properties or objects that cannot be used from cache, do not include them here either, load in getObject()
         ''' </summary>
         ''' <param name="recordId"></param>
-        Private Shared Function getObjectNoCache(cp As CPBaseClass, recordId As Integer) As addonModel
+        Private Shared Function getObjectNoCache(cpcore As coreClass, recordId As Integer) As addonModel
             Dim returnNewModel As New addonModel()
             Try
-                Dim cs As CPCSBaseClass = cp.CSNew()
+                Dim cs As New csController(cpcore)
                 returnNewModel.id = 0
                 If recordId <> 0 Then
-                    cs.Open(cnAddons, "(ID=" & recordId & ")")
-                    If cs.OK() Then
+                    cs.open(cnAddons, "(ID=" & recordId & ")")
+                    If cs.ok() Then
                         With returnNewModel
                             .id = recordId
-                            .name = cs.GetText("Name")
-                            .active = cs.GetBoolean("active")
-                            .sortorder = cs.GetText("sortorder")
-                            .dateadded = cs.GetDate("dateadded")
-                            .createdby = cs.GetInteger("createdby")
-                            .modifieddate = cs.GetDate("modifieddate")
-                            .modifiedby = cs.GetInteger("modifiedby")
-                            .ContentControlID = cs.GetInteger("ContentControlID")
-                            .CreateKey = cs.GetInteger("CreateKey")
-                            .EditSourceID = cs.GetInteger("EditSourceID")
-                            .EditArchive = cs.GetBoolean("EditArchive")
-                            .EditBlank = cs.GetBoolean("EditBlank")
-                            .ContentCategoryID = cs.GetInteger("ContentCategoryID")
-                            .ccGuid = cs.GetText("ccGuid")
-                            .onpagestartevent = cs.GetBoolean("onpagestartevent")
-                            .blockdefaultstyles = cs.GetBoolean("blockdefaultstyles")
-                            .iconheight = cs.GetInteger("iconheight")
-                            .iconwidth = cs.GetInteger("iconwidth")
-                            .customstylesfilename = cs.GetText("customstylesfilename")
-                            .iconsprites = cs.GetInteger("iconsprites")
-                            .javascriptbodyend = cs.GetText("javascriptbodyend")
-                            .onnewvisitevent = cs.GetBoolean("onnewvisitevent")
-                            .remotemethod = cs.GetBoolean("remotemethod")
-                            .copytext = cs.GetText("copytext")
-                            .sharedstyles = cs.GetText("sharedstyles")
-                            .stylesfilename = cs.GetText("stylesfilename")
-                            .otherheadtags = cs.GetText("otherheadtags")
-                            .metakeywordlist = cs.GetText("metakeywordlist")
-                            .onpageendevent = cs.GetBoolean("onpageendevent")
-                            .pagetitle = cs.GetText("pagetitle")
-                            .iconfilename = cs.GetText("iconfilename")
-                            .javascriptonload = cs.GetText("javascriptonload")
-                            .admin = cs.GetBoolean("admin")
-                            .content = cs.GetBoolean("content")
-                            .template = cs.GetBoolean("template")
-                            .email = cs.GetBoolean("email")
-                            .helplink = cs.GetText("helplink")
-                            .navtypeid = cs.GetInteger("navtypeid")
-                            .help = cs.GetText("help")
-                            .metadescription = cs.GetText("metadescription")
-                            .scriptingcode = cs.GetText("scriptingcode")
-                            .scriptingtimeout = cs.GetText("scriptingtimeout")
-                            .inlinescript = cs.GetText("inlinescript")
-                            .collectionid = cs.GetInteger("collectionid")
-                            .onbodystart = cs.GetBoolean("onbodystart")
-                            .fieldtypeeditor = cs.GetText("fieldtypeeditor")
-                            .isinline = cs.GetBoolean("isinline")
-                            .dotnetclass = cs.GetText("dotnetclass")
-                            .copy = cs.GetText("copy")
-                            .argumentlist = cs.GetText("argumentlist")
-                            .link = cs.GetText("link")
-                            .onbodyend = cs.GetBoolean("onbodyend")
-                            .objectprogramid = cs.GetText("objectprogramid")
-                            .jsfilename = cs.GetText("jsfilename")
-                            .robotstxt = cs.GetText("robotstxt")
-                            .includedaddons = cs.GetText("includedaddons")
-                            .formxml = cs.GetText("formxml")
-                            .inframe = cs.GetBoolean("inframe")
-                            .filter = cs.GetBoolean("filter")
-                            .scriptinglanguageid = cs.GetInteger("scriptinglanguageid")
-                            .remoteassetlink = cs.GetText("remoteassetlink")
-                            .blockedittools = cs.GetBoolean("blockedittools")
-                            .asajax = cs.GetBoolean("asajax")
-                            .processserverkey = cs.GetText("processserverkey")
-                            .processinterval = cs.GetInteger("processinterval")
-                            .processrunonce = cs.GetBoolean("processrunonce")
-                            .processnextrun = cs.GetDate("processnextrun")
-                            .processcontenttriggers = cs.GetText("processcontenttriggers")
-                            .scriptingentrypoint = cs.GetText("scriptingentrypoint")
-                            .scriptingmodules = cs.GetText("scriptingmodules")
-                            .events = cs.GetText("events")
+                            .name = cs.getText("Name")
+                            .active = cs.getBoolean("active")
+                            .sortorder = cs.getText("sortorder")
+                            .dateadded = cs.getDate("dateadded")
+                            .createdby = cs.getInteger("createdby")
+                            .modifieddate = cs.getDate("modifieddate")
+                            .modifiedby = cs.getInteger("modifiedby")
+                            .ContentControlID = cs.getInteger("ContentControlID")
+                            .CreateKey = cs.getInteger("CreateKey")
+                            .EditSourceID = cs.getInteger("EditSourceID")
+                            .EditArchive = cs.getBoolean("EditArchive")
+                            .EditBlank = cs.getBoolean("EditBlank")
+                            .ContentCategoryID = cs.getInteger("ContentCategoryID")
+                            .ccGuid = cs.getText("ccGuid")
+                            .onpagestartevent = cs.getBoolean("onpagestartevent")
+                            .blockdefaultstyles = cs.getBoolean("blockdefaultstyles")
+                            .iconheight = cs.getInteger("iconheight")
+                            .iconwidth = cs.getInteger("iconwidth")
+                            .customstylesfilename = cs.getText("customstylesfilename")
+                            .iconsprites = cs.getInteger("iconsprites")
+                            .javascriptbodyend = cs.getText("javascriptbodyend")
+                            .onnewvisitevent = cs.getBoolean("onnewvisitevent")
+                            .remotemethod = cs.getBoolean("remotemethod")
+                            .copytext = cs.getText("copytext")
+                            .sharedstyles = cs.getText("sharedstyles")
+                            .stylesfilename = cs.getText("stylesfilename")
+                            .otherheadtags = cs.getText("otherheadtags")
+                            .metakeywordlist = cs.getText("metakeywordlist")
+                            .onpageendevent = cs.getBoolean("onpageendevent")
+                            .pagetitle = cs.getText("pagetitle")
+                            .iconfilename = cs.getText("iconfilename")
+                            .javascriptonload = cs.getText("javascriptonload")
+                            .admin = cs.getBoolean("admin")
+                            .content = cs.getBoolean("content")
+                            .template = cs.getBoolean("template")
+                            .email = cs.getBoolean("email")
+                            .helplink = cs.getText("helplink")
+                            .navtypeid = cs.getInteger("navtypeid")
+                            .help = cs.getText("help")
+                            .metadescription = cs.getText("metadescription")
+                            .scriptingcode = cs.getText("scriptingcode")
+                            .scriptingtimeout = cs.getText("scriptingtimeout")
+                            .inlinescript = cs.getText("inlinescript")
+                            .collectionid = cs.getInteger("collectionid")
+                            .onbodystart = cs.getBoolean("onbodystart")
+                            .fieldtypeeditor = cs.getText("fieldtypeeditor")
+                            .isinline = cs.getBoolean("isinline")
+                            .dotnetclass = cs.getText("dotnetclass")
+                            .copy = cs.getText("copy")
+                            .argumentlist = cs.getText("argumentlist")
+                            .link = cs.getText("link")
+                            .onbodyend = cs.getBoolean("onbodyend")
+                            .objectprogramid = cs.getText("objectprogramid")
+                            .jsfilename = cs.getText("jsfilename")
+                            .robotstxt = cs.getText("robotstxt")
+                            .includedaddons = cs.getText("includedaddons")
+                            .formxml = cs.getText("formxml")
+                            .inframe = cs.getBoolean("inframe")
+                            .filter = cs.getBoolean("filter")
+                            .scriptinglanguageid = cs.getInteger("scriptinglanguageid")
+                            .remoteassetlink = cs.getText("remoteassetlink")
+                            .blockedittools = cs.getBoolean("blockedittools")
+                            .asajax = cs.getBoolean("asajax")
+                            .processserverkey = cs.getText("processserverkey")
+                            .processinterval = cs.getInteger("processinterval")
+                            .processrunonce = cs.getBoolean("processrunonce")
+                            .processnextrun = cs.getDate("processnextrun")
+                            .processcontenttriggers = cs.getText("processcontenttriggers")
+                            .scriptingentrypoint = cs.getText("scriptingentrypoint")
+                            .scriptingmodules = cs.getText("scriptingmodules")
+                            .events = cs.getText("events")
                         End With
                     End If
                     Call cs.Close()
                 End If
             Catch ex As Exception
-                cp.Site.ErrorReport(ex)
+                cpcore.handleExceptionAndRethrow(ex)
             End Try
             Return returnNewModel
         End Function
@@ -242,11 +242,11 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <returns></returns>
-        Public Function saveObject(cp As CPBaseClass) As Integer
+        Public Function saveObject(cpcore As coreClass) As Integer
             Try
-                Dim cs As CPCSBaseClass = cp.CSNew()
+                Dim cs As New csController(cpcore)
                 If (id > 0) Then
-                    If Not cs.Open(cnAddons, "id=" & id) Then
+                    If Not cs.open(cnAddons, "id=" & id) Then
                         id = 0
                         cs.Close()
                         Throw New ApplicationException("Unable to open record [" & id & "]")
@@ -258,75 +258,75 @@ Namespace Contensive.Core.Models.Entity
                         Throw New ApplicationException("Unable to insert record")
                     End If
                 End If
-                If cs.OK() Then
-                    id = cs.GetInteger("id")
+                If cs.ok() Then
+                    id = cs.getInteger("id")
                     cs.SetField("Name", name)
-                    cs.SetField("active", active)
+                    cs.setField("active", active)
                     cs.SetField("sortorder", sortorder)
-                    cs.SetField("dateadded", dateadded)
-                    cs.SetField("createdby", createdby)
-                    cs.SetField("modifieddate", modifieddate)
-                    cs.SetField("modifiedby", modifiedby)
-                    cs.SetField("ContentControlID", ContentControlID)
-                    cs.SetField("CreateKey", CreateKey)
-                    cs.SetField("EditSourceID", EditSourceID)
-                    cs.SetField("EditArchive", EditArchive)
-                    cs.SetField("EditBlank", EditBlank)
-                    cs.SetField("ContentCategoryID", ContentCategoryID)
+                    cs.setField("dateadded", dateadded)
+                    cs.setField("createdby", createdby)
+                    cs.setField("modifieddate", modifieddate)
+                    cs.setField("modifiedby", modifiedby)
+                    cs.setField("ContentControlID", ContentControlID)
+                    cs.setField("CreateKey", CreateKey)
+                    cs.setField("EditSourceID", EditSourceID)
+                    cs.setField("EditArchive", EditArchive)
+                    cs.setField("EditBlank", EditBlank)
+                    cs.setField("ContentCategoryID", ContentCategoryID)
                     cs.SetField("ccGuid", ccGuid)
-                    cs.SetField("onpagestartevent", onpagestartevent)
-                    cs.SetField("blockdefaultstyles", blockdefaultstyles)
-                    cs.SetField("iconheight", iconheight)
-                    cs.SetField("iconwidth", iconwidth)
+                    cs.setField("onpagestartevent", onpagestartevent)
+                    cs.setField("blockdefaultstyles", blockdefaultstyles)
+                    cs.setField("iconheight", iconheight)
+                    cs.setField("iconwidth", iconwidth)
                     cs.SetField("customstylesfilename", customstylesfilename)
-                    cs.SetField("iconsprites", iconsprites)
+                    cs.setField("iconsprites", iconsprites)
                     cs.SetField("javascriptbodyend", javascriptbodyend)
-                    cs.SetField("onnewvisitevent", onnewvisitevent)
-                    cs.SetField("remotemethod", remotemethod)
+                    cs.setField("onnewvisitevent", onnewvisitevent)
+                    cs.setField("remotemethod", remotemethod)
                     cs.SetField("copytext", copytext)
                     cs.SetField("sharedstyles", sharedstyles)
                     cs.SetField("stylesfilename", stylesfilename)
                     cs.SetField("otherheadtags", otherheadtags)
                     cs.SetField("metakeywordlist", metakeywordlist)
-                    cs.SetField("onpageendevent", onpageendevent)
+                    cs.setField("onpageendevent", onpageendevent)
                     cs.SetField("pagetitle", pagetitle)
                     cs.SetField("iconfilename", iconfilename)
                     cs.SetField("javascriptonload", javascriptonload)
-                    cs.SetField("admin", admin)
-                    cs.SetField("content", content)
-                    cs.SetField("template", template)
-                    cs.SetField("email", email)
+                    cs.setField("admin", admin)
+                    cs.setField("content", content)
+                    cs.setField("template", template)
+                    cs.setField("email", email)
                     cs.SetField("helplink", helplink)
-                    cs.SetField("navtypeid", navtypeid)
+                    cs.setField("navtypeid", navtypeid)
                     cs.SetField("help", help)
                     cs.SetField("metadescription", metadescription)
                     cs.SetField("scriptingcode", scriptingcode)
                     cs.SetField("scriptingtimeout", scriptingtimeout)
                     cs.SetField("inlinescript", inlinescript)
-                    cs.SetField("collectionid", collectionid)
-                    cs.SetField("onbodystart", onbodystart)
+                    cs.setField("collectionid", collectionid)
+                    cs.setField("onbodystart", onbodystart)
                     cs.SetField("fieldtypeeditor", fieldtypeeditor)
-                    cs.SetField("isinline", isinline)
+                    cs.setField("isinline", isinline)
                     cs.SetField("dotnetclass", dotnetclass)
                     cs.SetField("copy", copy)
                     cs.SetField("argumentlist", argumentlist)
                     cs.SetField("link", link)
-                    cs.SetField("onbodyend", onbodyend)
+                    cs.setField("onbodyend", onbodyend)
                     cs.SetField("objectprogramid", objectprogramid)
                     cs.SetField("jsfilename", jsfilename)
                     cs.SetField("robotstxt", robotstxt)
                     cs.SetField("includedaddons", includedaddons)
                     cs.SetField("formxml", formxml)
-                    cs.SetField("inframe", inframe)
-                    cs.SetField("filter", filter)
-                    cs.SetField("scriptinglanguageid", scriptinglanguageid)
+                    cs.setField("inframe", inframe)
+                    cs.setField("filter", filter)
+                    cs.setField("scriptinglanguageid", scriptinglanguageid)
                     cs.SetField("remoteassetlink", remoteassetlink)
-                    cs.SetField("blockedittools", blockedittools)
-                    cs.SetField("asajax", asajax)
+                    cs.setField("blockedittools", blockedittools)
+                    cs.setField("asajax", asajax)
                     cs.SetField("processserverkey", processserverkey)
-                    cs.SetField("processinterval", processinterval)
-                    cs.SetField("processrunonce", processrunonce)
-                    cs.SetField("processnextrun", processnextrun)
+                    cs.setField("processinterval", processinterval)
+                    cs.setField("processrunonce", processrunonce)
+                    cs.setField("processnextrun", processnextrun)
                     cs.SetField("processcontenttriggers", processcontenttriggers)
                     cs.SetField("scriptingentrypoint", scriptingentrypoint)
                     cs.SetField("scriptingmodules", scriptingmodules)
@@ -334,7 +334,7 @@ Namespace Contensive.Core.Models.Entity
                 End If
                 Call cs.Close()
             Catch ex As Exception
-                cp.Site.ErrorReport(ex)
+                cpcore.handleExceptionAndRethrow(ex)
                 Throw
             End Try
             Return id
@@ -346,12 +346,12 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <returns></returns>
-        Public Shared Function getRemoteMethods(cp As CPBaseClass) As List(Of addonModel)
+        Public Shared Function getRemoteMethods(cpcore As coreClass) As List(Of addonModel)
             Dim result As List(Of addonModel) = Nothing
             Try
                 Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer
                 Dim recordCacheName As String = cnAddons & "CachedRemoteMethods"
-                Dim recordCache As String = cp.Cache.Read(recordCacheName)
+                Dim recordCache As String = cpcore.cache.getString(recordCacheName)
                 Dim loadDbModel As Boolean = True
                 If Not String.IsNullOrEmpty(recordCache) Then
                     Try
@@ -367,11 +367,11 @@ Namespace Contensive.Core.Models.Entity
                     End Try
                 End If
                 If loadDbModel Or (result Is Nothing) Then
-                    result = getRemoteMethodsNoCache(cp)
-                    Call cp.Cache.Save(recordCacheName, json_serializer.Serialize(result), cacheTagList)
+                    result = getRemoteMethodsNoCache(cpcore)
+                    Call cpcore.cache.setKey(recordCacheName, json_serializer.Serialize(result), cacheTagList)
                 End If
             Catch ex As Exception
-                cp.Site.ErrorReport(ex)
+                cpcore.handleExceptionAndRethrow(ex)
             End Try
             Return result
         End Function
@@ -382,19 +382,19 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <returns></returns>
-        Public Shared Function getRemoteMethodsNoCache(cp As CPBaseClass) As List(Of addonModel)
+        Public Shared Function getRemoteMethodsNoCache(cpcore As coreClass) As List(Of addonModel)
             Dim result As New List(Of addonModel)
             Try
-                Dim cs As CPCSBaseClass = cp.CSNew()
-                If (cs.Open(cnAddons, "(remoteMethod=1)", "name", True, "id")) Then
+                Dim cs As New csController(cpcore)
+                If (cs.open(cnAddons, "(remoteMethod=1)", "name", True, "id")) Then
                     Do
-                        result.Add(getObject(cp, cs.GetInteger("id"), New List(Of String)))
-                        cs.GoNext()
-                    Loop While cs.OK()
+                        result.Add(getObject(cpcore, cs.getInteger("id"), New List(Of String)))
+                        cs.goNext()
+                    Loop While cs.ok()
                 End If
 
             Catch ex As Exception
-                cp.Site.ErrorReport(ex)
+                cpcore.handleExceptionAndRethrow(ex)
             End Try
             Return result
         End Function
@@ -406,8 +406,8 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="cp"></param>
         ''' <param name="recordId"></param>record
         ''' <returns></returns>
-        Public Shared Function getRecordName(cp As CPBaseClass, recordId As Integer) As String
-            Return cp.Content.GetRecordName(cnAddons, recordId)
+        Public Shared Function getRecordName(cpcore As coreClass, recordId As Integer) As String
+            Return cpcore.content_GetRecordName(cnAddons, recordId)
         End Function
     End Class
 End Namespace

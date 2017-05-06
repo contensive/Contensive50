@@ -281,11 +281,11 @@ Namespace Contensive.Core
             Try
                 result = cpCore.main_cs_getRecordAddLink(CSPointer, PresetNameValueList, AllowPaste)
                 If result Is Nothing Then
-                    result = New String("")
+                    result = String.Empty
                 End If
             Catch ex As Exception
                 Call cp.core.handleExceptionAndRethrow(ex, "Unexpected error in cs.GetAddLink")
-                result = New String("")
+                result = String.Empty
             End Try
             Return result
         End Function
@@ -321,11 +321,11 @@ Namespace Contensive.Core
             Try
                 result = cpCore.cs_cs_getRecordEditLink(CSPointer, AllowCut)
                 If result Is Nothing Then
-                    result = New String("")
+                    result = String.Empty
                 End If
             Catch ex As Exception
                 Call cp.core.handleExceptionAndRethrow(ex, "Unexpected error in cs.GetEditLink")
-                result = New String("")
+                result = String.Empty
             End Try
             Return result
         End Function
@@ -335,15 +335,15 @@ Namespace Contensive.Core
         Public Overrides Function GetFilename(ByVal FieldName As String, Optional ByVal OriginalFilename As String = "", Optional ByVal ContentName As String = "") As String
             Dim result As Object
             '
-            result = New String("")
+            result = String.Empty
             Try
                 result = cpCore.db.cs_getFilename(CSPointer, FieldName, OriginalFilename, ContentName)
                 If result Is Nothing Then
-                    result = New String("")
+                    result = String.Empty
                 End If
             Catch ex As Exception
                 Call cp.core.handleExceptionAndRethrow(ex, "Unexpected error in cs.GetFilename")
-                result = New String("")
+                result = String.Empty
             End Try
             Return result
         End Function
@@ -392,15 +392,15 @@ Namespace Contensive.Core
         Public Overrides Function GetSQL() As String
             Dim result As Object
             '
-            result = New String("")
+            result = String.Empty
             Try
                 result = cpCore.db.cs_getSource(CSPointer)
                 If result Is Nothing Then
-                    result = New String("")
+                    result = String.Empty
                 End If
             Catch ex As Exception
                 Call cp.core.handleExceptionAndRethrow(ex, "Unexpected error in cs.GetSQL")
-                result = New String("")
+                result = String.Empty
             End Try
             Return result
         End Function
@@ -410,15 +410,15 @@ Namespace Contensive.Core
         Public Overrides Function GetText(ByVal FieldName As String) As String
             Dim result As Object
             '
-            result = New String("")
+            result = String.Empty
             Try
                 result = cpCore.db.cs_get(CSPointer, FieldName)
                 If result Is Nothing Then
-                    result = New String("")
+                    result = String.Empty
                 End If
             Catch ex As Exception
                 Call cp.core.handleExceptionAndRethrow(ex, "Unexpected error in cs.GetText")
-                result = New String("")
+                result = String.Empty
             End Try
             Return result
         End Function
@@ -434,11 +434,11 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Function GetTextFile(ByVal FieldName As String) As String
-            Dim result As String = New String("")
+            Dim result As String = String.Empty
             Try
                 result = cpCore.db.cs_getTextFile(CSPointer, FieldName)
                 If result Is Nothing Then
-                    result = New String("")
+                    result = String.Empty
                 End If
             Catch ex As Exception
                 Call cp.core.handleExceptionAndRethrow(ex, "Unexpected error in cs.GetTextFile")

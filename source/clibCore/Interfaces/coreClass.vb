@@ -7,6 +7,7 @@ Imports System.Reflection
 Imports HttpMultipartParser
 Imports Contensive.BaseClasses
 Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 '
 Namespace Contensive.Core
     Public Class coreClass
@@ -28,7 +29,6 @@ Namespace Contensive.Core
         ' application storage
         '
         Friend deleteOnDisposeFileList As New List(Of String)              ' tmp file list of files that need to be deleted during dispose
-
         '
         '===================================================================================================
         ''' <summary>
@@ -547,7 +547,7 @@ Namespace Contensive.Core
             serverConfig = Models.Entity.serverConfigModel.getObject(Me)
             Me.serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
             webServerIO.iisContext = Nothing
-            constructorCommonInitialize()
+            constructorInitialize()
         End Sub
         '
         '====================================================================================================
@@ -563,7 +563,7 @@ Namespace Contensive.Core
             Me.serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
             Me.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady
             webServerIO.iisContext = Nothing
-            constructorCommonInitialize()
+            constructorInitialize()
         End Sub
         '
         '====================================================================================================
@@ -579,7 +579,7 @@ Namespace Contensive.Core
             Me.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady
             Me.serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
             Call webServerIO.initWebContext(httpContext)
-            constructorCommonInitialize()
+            constructorInitialize()
         End Sub
         '
         '====================================================================================================
@@ -594,7 +594,7 @@ Namespace Contensive.Core
             serverConfig = Models.Entity.serverConfigModel.getObject(Me, applicationName)
             serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
             webServerIO.iisContext = Nothing
-            constructorCommonInitialize()
+            constructorInitialize()
         End Sub
         '====================================================================================================
         ''' <summary>
@@ -609,7 +609,7 @@ Namespace Contensive.Core
             Me.cp = cp
             serverConfig = Models.Entity.serverConfigModel.getObject(Me, applicationName)
             serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
-            constructorCommonInitialize()
+            constructorInitialize()
             Call webServerIO.initWebContext(httpContext)
         End Sub
         '
@@ -1700,7 +1700,7 @@ ErrorTrap:
                 Dim dt As DataTable
                 dt = db.executeSql(SQL)
                 If dt.Rows.Count > 0 Then
-                    CurrentCount = EncodeInteger(dt.Rows(0).Item(0))
+                    CurrentCount = genericController.EncodeInteger(dt.Rows(0).Item(0))
                 End If
                 Do While (CurrentCount <> 0) And (PreviousCount <> CurrentCount) And (LoopCount < iChunkCount)
                     If db.getDataSourceType(DataSourceName) = DataSourceTypeODBCMySQL Then
@@ -1713,7 +1713,7 @@ ErrorTrap:
                     SQL = "select count(*) as RecordCount from " & TableName & " where " & Criteria
                     dt = db.executeSql(SQL)
                     If dt.Rows.Count > 0 Then
-                        CurrentCount = EncodeInteger(dt.Rows(0).Item(0))
+                        CurrentCount = genericController.EncodeInteger(dt.Rows(0).Item(0))
                     End If
                     LoopCount = LoopCount + 1
                 Loop
@@ -1821,7 +1821,7 @@ ErrorTrap:
                     ' --- no records were found, add a blank if we can
                     '
                     DateAdded = DateTime.Now()
-                    CreateKey = getRandomLong()
+                    CreateKey = genericController.getRandomLong()
                     SQL = "INSERT INTO " & TableName & " (CreateKey,DateAdded" _
                         & ")VALUES(" _
                         & " " & db.encodeSQLNumber(CreateKey) _
@@ -1833,7 +1833,7 @@ ErrorTrap:
                     If dtTargetTable.Rows.Count = 0 Then
                         Call handleLegacyError25(MethodName, ("Could not locate a new re   cord added to table [" & TableName & "]"))
                     Else
-                        BlankRecordID = EncodeInteger(dtTargetTable.Rows(0).Item("id"))
+                        BlankRecordID = genericController.EncodeInteger(dtTargetTable.Rows(0).Item("id"))
                     End If
                     SQL = db.GetSQLSelect("default", TableName, , , , , 1)
                     dtTargetTable = db.executeSql(SQL, DataSourceName)
@@ -1848,15 +1848,15 @@ ErrorTrap:
                     '
                     For Each dr As DataRow In dtTargetTable.Rows
                         'dr.Columns("")
-                        ContentName = EncodeText(dt(dtColumnContentName))
-                        ContentID = EncodeInteger(dt(dtColumnContentId))
+                        ContentName = genericController.encodeText(dt(dtColumnContentName))
+                        ContentID = genericController.EncodeInteger(dt(dtColumnContentId))
                         For Each dc As DataColumn In dtTargetTable.Rows
                             TableFieldName = dc.ColumnName
                             SQL = "SELECT * FROM ccFields where (ContentID=" & ContentID & ")and(name=" & db.encodeSQLText(TableFieldName) & ")"
                             Dim dtField As DataTable = db.executeSql(SQL, "Default")
                             If dtField.Rows.Count = 0 Then
-                                Call db.createContentFieldFromTableField(ContentName, dc.ColumnName, EncodeInteger(dc.DataType))
-                                'Call CreateContentFieldFromTableField(ContentName, dc.ColumnName, EncodeInteger(dc.DataType))
+                                Call db.createContentFieldFromTableField(ContentName, dc.ColumnName, genericController.EncodeInteger(dc.DataType))
+                                'Call CreateContentFieldFromTableField(ContentName, dc.ColumnName, genericController.EncodeInteger(dc.DataType))
                             End If
                         Next
                     Next
@@ -2043,7 +2043,7 @@ ErrorTrap:
                     ' block
                 ElseIf (InStr(1, FromAddress, "@") = 0) Or (InStr(1, FromAddress, ".") = 0) Then
                     ' block
-                ElseIf 0 <> vbInstr(1, getEmailBlockList_InternalOnly, vbCrLf & ToAddress & vbCrLf, vbTextCompare) Then
+                ElseIf 0 <> genericController.vbInstr(1, getEmailBlockList_InternalOnly, vbCrLf & ToAddress & vbCrLf, vbTextCompare) Then
                     '
                     ' They are in the block list
                     '
@@ -2054,7 +2054,7 @@ ErrorTrap:
                     '
                     ' Test for from-address / to-address matches
                     '
-                    If vbLCase(FromAddress) = vbLCase(ToAddress) Then
+                    If genericController.vbLCase(FromAddress) = genericController.vbLCase(ToAddress) Then
                         FromAddress = siteProperties.getText("EmailFromAddress", "")
                         If FromAddress = "" Then
                             '
@@ -2062,7 +2062,7 @@ ErrorTrap:
                             '
                             FromAddress = ToAddress
                             WarningMsg = "The from-address matches the to-address. This email was sent, but may be blocked by spam filtering."
-                        ElseIf vbLCase(FromAddress) = vbLCase(ToAddress) Then
+                        ElseIf genericController.vbLCase(FromAddress) = genericController.vbLCase(ToAddress) Then
                             '
                             '
                             '
@@ -2080,7 +2080,7 @@ ErrorTrap:
                         ' Fix links for HTML send
                         '
                         rootUrl = "http://" & serverConfig.appConfig.domainList(0) & "/"
-                        BodyMessage = ConvertLinksToAbsolute(BodyMessage, rootUrl)
+                        BodyMessage = genericController.ConvertLinksToAbsolute(BodyMessage, rootUrl)
                         '
                         ' compose body
                         '
@@ -2147,8 +2147,8 @@ ErrorTrap:
         '            '
         '            filterDomainName = Link
         '            csv_DomainName = serverconfig.appConfig.domainList(0)
-        '            If vbInstr(1, csv_DomainName, ",") <> 0 Then
-        '                csv_DomainName = Mid(csv_DomainName, 1, vbInstr(1, csv_DomainName, ",") - 1)
+        '            If genericController.vbInstr(1, csv_DomainName, ",") <> 0 Then
+        '                csv_DomainName = Mid(csv_DomainName, 1, genericController.vbInstr(1, csv_DomainName, ",") - 1)
         '            End If
         '            '
         '            ' ----- set the Links Host to the Site Property Domain for consistancy with Spider
@@ -2304,7 +2304,7 @@ ErrorTrap:
         '        Dim Pointer As Integer
         '        '
         '        If Not (_db Is Nothing) Then
-        '            If vbUCase(DataSourceName) = "DEFAULT" Then
+        '            If genericController.vbUCase(DataSourceName) = "DEFAULT" Then
         '                GetConnectionString = db.DefaultConnectionString
         '            Else
         '                Pointer = db.GetDataSourcePointer(DataSourceName)
@@ -2525,7 +2525,7 @@ ErrorTrap:
                 ' Fixup Anchor Query (additional AddonOptionString pairs to add to the end)
                 '
                 If AddLinkEID And (personalizationPeopleId <> 0) Then
-                    AnchorQuery = AnchorQuery & "&EID=" & security.encodeToken(EncodeInteger(personalizationPeopleId), Now())
+                    AnchorQuery = AnchorQuery & "&EID=" & security.encodeToken(genericController.EncodeInteger(personalizationPeopleId), Now())
                 End If
                 '
                 If AddAnchorQuery <> "" Then
@@ -2539,7 +2539,7 @@ ErrorTrap:
                 ' ----- xml contensive process instruction
                 '
                 'TemplateBodyContent
-                'Pos = vbInstr(1, TemplateBodyContent, "<?contensive", vbTextCompare)
+                'Pos = genericController.vbInstr(1, TemplateBodyContent, "<?contensive", vbTextCompare)
                 'If Pos > 0 Then
                 '    '
                 '    ' convert template body if provided - this is the content that replaces the content box addon
@@ -2548,7 +2548,7 @@ ErrorTrap:
                 '    LayoutEngineOptionString = "data=" & encodeNvaArgument(TemplateBodyContent)
                 '    TemplateBodyContent = csv_ExecuteActiveX("aoPrimitives.StructuredDataClass", "Structured Data Engine", nothing, LayoutEngineOptionString, "data=(structured data)", LayoutErrorMessage)
                 'End If
-                Pos = vbInstr(1, workingContent, "<?contensive", vbTextCompare)
+                Pos = genericController.vbInstr(1, workingContent, "<?contensive", vbTextCompare)
                 If Pos > 0 Then
                     Throw New ApplicationException("Structured xml data commands are no longer supported")
                     ''
@@ -2565,18 +2565,18 @@ ErrorTrap:
                 ' Convert <!-- STARTGROUPACCESS 10,11,12 --> format to <AC type=GROUPACCESS AllowGroups="10,11,12">
                 ' Convert <!-- ENDGROUPACCESS --> format to <AC type=GROUPACCESSEND>
                 '
-                PosStart = vbInstr(1, workingContent, "<!-- STARTGROUPACCESS ", vbTextCompare)
+                PosStart = genericController.vbInstr(1, workingContent, "<!-- STARTGROUPACCESS ", vbTextCompare)
                 If PosStart > 0 Then
-                    PosEnd = vbInstr(PosStart, workingContent, "-->")
+                    PosEnd = genericController.vbInstr(PosStart, workingContent, "-->")
                     If PosEnd > 0 Then
                         AllowGroups = Mid(workingContent, PosStart + 22, PosEnd - PosStart - 23)
                         workingContent = Mid(workingContent, 1, PosStart - 1) & "<AC type=""" & ACTypeAggregateFunction & """ name=""block text"" querystring=""allowgroups=" & AllowGroups & """>" & Mid(workingContent, PosEnd + 3)
                     End If
                 End If
                 '
-                PosStart = vbInstr(1, workingContent, "<!-- ENDGROUPACCESS ", vbTextCompare)
+                PosStart = genericController.vbInstr(1, workingContent, "<!-- ENDGROUPACCESS ", vbTextCompare)
                 If PosStart > 0 Then
-                    PosEnd = vbInstr(PosStart, workingContent, "-->")
+                    PosEnd = genericController.vbInstr(PosStart, workingContent, "-->")
                     If PosEnd > 0 Then
                         workingContent = Mid(workingContent, 1, PosStart - 1) & "<AC type=""" & ACTypeAggregateFunction & """ name=""block text end"" >" & Mid(workingContent, PosEnd + 3)
                     End If
@@ -2591,27 +2591,27 @@ ErrorTrap:
                     ' replace {{DYNAMICMENU?menu=menu Name}} with <ac dynamic menu>
                     '
                     IconIDControlString = "AC," & ACTypeTemplateContent & "," & NotUsedID & "," & ACName & ","
-                    IconImg = GetAddonIconImg(AdminURL, 52, 64, 0, False, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as [Template Page Content]", "", 0)
-                    workingContent = vbReplace(workingContent, "{{content}}", IconImg, 1, 99, vbTextCompare)
-                    'WorkingContent = vbReplace(WorkingContent, "{{content}}", "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Page Content"" id=""AC," & ACTypeTemplateContent & "," & NotUsedID & "," & ACName & ","" src=""/ccLib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>", 1, -1, vbTextCompare)
+                    IconImg = genericController.GetAddonIconImg(AdminURL, 52, 64, 0, False, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as [Template Page Content]", "", 0)
+                    workingContent = genericController.vbReplace(workingContent, "{{content}}", IconImg, 1, 99, vbTextCompare)
+                    'WorkingContent = genericController.vbReplace(WorkingContent, "{{content}}", "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Page Content"" id=""AC," & ACTypeTemplateContent & "," & NotUsedID & "," & ACName & ","" src=""/ccLib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>", 1, -1, vbTextCompare)
                     '
                     ' replace all other {{...}}
                     '
                     LoopPtr = 0
                     Pos = 1
                     Do While Pos > 0 And LoopPtr < 100
-                        Pos = vbInstr(Pos, workingContent, "{{" & ACTypeDynamicMenu, vbTextCompare)
+                        Pos = genericController.vbInstr(Pos, workingContent, "{{" & ACTypeDynamicMenu, vbTextCompare)
                         If Pos > 0 Then
                             addonOptionString = ""
                             PosStart = Pos
                             If PosStart <> 0 Then
                                 'PosStart = PosStart + 2 + Len(ACTypeDynamicMenu)
-                                PosEnd = vbInstr(PosStart, workingContent, "}}", vbTextCompare)
+                                PosEnd = genericController.vbInstr(PosStart, workingContent, "}}", vbTextCompare)
                                 If PosEnd <> 0 Then
                                     Cmd = Mid(workingContent, PosStart + 2, PosEnd - PosStart - 2)
-                                    Pos = vbInstr(1, Cmd, "?")
+                                    Pos = genericController.vbInstr(1, Cmd, "?")
                                     If Pos <> 0 Then
-                                        addonOptionString = decodeHtml(Mid(Cmd, Pos + 1))
+                                        addonOptionString = genericController.decodeHtml(Mid(Cmd, Pos + 1))
                                     End If
                                     TextName = csv_GetAddonOptionStringValue("menu", addonOptionString)
                                     '
@@ -2619,7 +2619,7 @@ ErrorTrap:
                                     AddonOptionStringHTMLEncoded = html.html_EncodeHTML("Menu=" & TextName & "[" & csv_GetDynamicMenuACSelect() & "]&NewMenu=")
                                     '
                                     IconIDControlString = "AC," & ACTypeDynamicMenu & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
-                                    IconImg = GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as [Dynamic Menu]", "", 0)
+                                    IconImg = genericController.GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as [Dynamic Menu]", "", 0)
                                     workingContent = Mid(workingContent, 1, PosStart - 1) & IconImg & Mid(workingContent, PosEnd + 2)
                                 End If
                             End If
@@ -2649,9 +2649,9 @@ ErrorTrap:
                         Do While ElementPointer < KmaHTML.ElementCount
                             Copy = KmaHTML.Text(ElementPointer)
                             If KmaHTML.IsTag(ElementPointer) Then
-                                ElementTag = vbUCase(KmaHTML.TagName(ElementPointer))
+                                ElementTag = genericController.vbUCase(KmaHTML.TagName(ElementPointer))
                                 ACName = KmaHTML.ElementAttribute(ElementPointer, "NAME")
-                                UCaseACName = vbUCase(ACName)
+                                UCaseACName = genericController.vbUCase(ACName)
                                 Select Case ElementTag
                                     Case "FORM"
                                         '
@@ -2668,8 +2668,8 @@ ErrorTrap:
                                                 '
                                                 ' if it has "contensiveuserform=1" in the form tag, remove it from the form and add the hidden that makes it work
                                                 '
-                                                Copy = vbReplace(Copy, "ContensiveUserForm=1", "", 1, 99, vbTextCompare)
-                                                Copy = vbReplace(Copy, "ContensiveUserForm=""1""", "", 1, 99, vbTextCompare)
+                                                Copy = genericController.vbReplace(Copy, "ContensiveUserForm=1", "", 1, 99, vbTextCompare)
+                                                Copy = genericController.vbReplace(Copy, "ContensiveUserForm=""1""", "", 1, 99, vbTextCompare)
                                                 If Not EncodeEditIcons Then
                                                     Copy = Copy & "<input type=hidden name=ContensiveUserForm value=1>"
                                                 End If
@@ -2692,12 +2692,12 @@ ErrorTrap:
                                                 For AttributePointer = 0 To AttributeCount - 1
                                                     Name = KmaHTML.ElementAttributeName(ElementPointer, AttributePointer)
                                                     Value = KmaHTML.ElementAttributeValue(ElementPointer, AttributePointer)
-                                                    If vbUCase(Name) = "HREF" Then
+                                                    If genericController.vbUCase(Name) = "HREF" Then
                                                         Link = Value
-                                                        Pos = vbInstr(1, Link, "://")
+                                                        Pos = genericController.vbInstr(1, Link, "://")
                                                         If Pos > 0 Then
                                                             Link = Mid(Link, Pos + 3)
-                                                            Pos = vbInstr(1, Link, "/")
+                                                            Pos = genericController.vbInstr(1, Link, "/")
                                                             If Pos > 0 Then
                                                                 Link = Left(Link, Pos - 1)
                                                             End If
@@ -2711,12 +2711,12 @@ ErrorTrap:
                                                                 ' Ends in a questionmark, must be Dwayne (?)
                                                                 '
                                                                 Value = Value & AnchorQuery
-                                                            ElseIf vbInstr(1, Value, "mailto:", vbTextCompare) <> 0 Then
+                                                            ElseIf genericController.vbInstr(1, Value, "mailto:", vbTextCompare) <> 0 Then
                                                                 '
                                                                 ' catch mailto
                                                                 '
                                                                 'Value = Value & AnchorQuery
-                                                            ElseIf vbInstr(1, Value, "?") = 0 Then
+                                                            ElseIf genericController.vbInstr(1, Value, "?") = 0 Then
                                                                 '
                                                                 ' No questionmark there, add it
                                                                 '
@@ -2744,7 +2744,7 @@ ErrorTrap:
                                         ' if ACInstanceID=0, it can not create settings link in edit mode. ACInstanceID is added during edit save.
                                         ACInstanceID = KmaHTML.ElementAttribute(ElementPointer, "ACINSTANCEID")
                                         ACGuid = KmaHTML.ElementAttribute(ElementPointer, "GUID")
-                                        Select Case vbUCase(ACType)
+                                        Select Case genericController.vbUCase(ACType)
                                             Case ACTypeEnd
                                                 '
                                                 ' End Tag - Personalization
@@ -2763,7 +2763,7 @@ ErrorTrap:
                                                 '
                                                 If EncodeEditIcons Then
                                                     IconIDControlString = "AC," & ACTypeDate
-                                                    IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "Current Date", "Renders as [Current Date]", ACInstanceID, 0)
+                                                    IconImg = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "Current Date", "Renders as [Current Date]", ACInstanceID, 0)
                                                     Copy = IconImg
                                                     'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as the current date"" ID=""AC," & ACTypeDate & """ src=""/ccLib/images/ACDate.GIF"">"
                                                 ElseIf EncodeNonCachableTags Then
@@ -2774,39 +2774,39 @@ ErrorTrap:
                                                 ' Member Tag works regardless of authentication
                                                 ' cm must be sure not to reveal anything
                                                 '
-                                                ACField = vbUCase(KmaHTML.ElementAttribute(ElementPointer, "FIELD"))
+                                                ACField = genericController.vbUCase(KmaHTML.ElementAttribute(ElementPointer, "FIELD"))
                                                 If ACField = "" Then
                                                     ' compatibility for old personalization type
                                                     ACField = csv_GetAddonOptionStringValue("FIELD", KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING"))
                                                 End If
-                                                FieldName = EncodeInitialCaps(ACField)
+                                                FieldName = genericController.EncodeInitialCaps(ACField)
                                                 If (FieldName = "") Then
                                                     FieldName = "Name"
                                                 End If
                                                 If EncodeEditIcons Then
-                                                    Select Case vbUCase(FieldName)
+                                                    Select Case genericController.vbUCase(FieldName)
                                                         Case "FIRSTNAME"
                                                             '
                                                             IconIDControlString = "AC," & ACType & "," & FieldName
-                                                            IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "User's First Name", "Renders as [User's First Name]", ACInstanceID, 0)
+                                                            IconImg = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "User's First Name", "Renders as [User's First Name]", ACInstanceID, 0)
                                                             Copy = IconImg
                                                         '
                                                         Case "LASTNAME"
                                                             '
                                                             IconIDControlString = "AC," & ACType & "," & FieldName
-                                                            IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "User's Last Name", "Renders as [User's Last Name]", ACInstanceID, 0)
+                                                            IconImg = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "User's Last Name", "Renders as [User's Last Name]", ACInstanceID, 0)
                                                             Copy = IconImg
                                                             '
                                                         Case Else
                                                             '
                                                             IconIDControlString = "AC," & ACType & "," & FieldName
-                                                            IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "User's " & FieldName, "Renders as [User's " & FieldName & "]", ACInstanceID, 0)
+                                                            IconImg = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "User's " & FieldName, "Renders as [User's " & FieldName & "]", ACInstanceID, 0)
                                                             Copy = IconImg
                                                             '
                                                     End Select
                                                 ElseIf EncodeNonCachableTags Then
                                                     If personalizationPeopleId <> 0 Then
-                                                        If vbUCase(FieldName) = "EID" Then
+                                                        If genericController.vbUCase(FieldName) = "EID" Then
                                                             Copy = security.encodeToken(personalizationPeopleId, Now())
                                                         Else
                                                             If Not CSPeopleSet Then
@@ -2823,18 +2823,18 @@ ErrorTrap:
                                                 '
                                                 ' Child List
                                                 '
-                                                ListName = EncodeText((KmaHTML.ElementAttribute(ElementPointer, "name")))
+                                                ListName = genericController.encodeText((KmaHTML.ElementAttribute(ElementPointer, "name")))
 
                                                 If EncodeEditIcons Then
                                                     IconIDControlString = "AC," & ACType & ",," & ACName
-                                                    IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "List of Child Pages", "Renders as [List of Child Pages]", ACInstanceID, 0)
+                                                    IconImg = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "List of Child Pages", "Renders as [List of Child Pages]", ACInstanceID, 0)
                                                     Copy = IconImg
                                                 ElseIf EncodeCachableTags Then
                                                     '
                                                     ' Handle in webclient
                                                     '
                                                     ' removed sort method because all child pages are read in together in the order set by the parent - improve this later
-                                                    Copy = "{{" & ACTypeChildList & "?name=" & encodeNvaArgument(ListName) & "}}"
+                                                    Copy = "{{" & ACTypeChildList & "?name=" & genericController.encodeNvaArgument(ListName) & "}}"
                                                 End If
                                             Case ACTypeContact
                                                 '
@@ -2843,7 +2843,7 @@ ErrorTrap:
                                                 If EncodeEditIcons Then
                                                     '
                                                     IconIDControlString = "AC," & ACType
-                                                    IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "Contact Information Line", "Renders as [Contact Information Line]", ACInstanceID, 0)
+                                                    IconImg = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "Contact Information Line", "Renders as [Contact Information Line]", ACInstanceID, 0)
                                                     Copy = IconImg
                                                     '
                                                     'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a line of text with contact information for this record's primary contact"" id=""AC," & ACType & """ src=""/ccLib/images/ACContact.GIF"">"
@@ -2859,7 +2859,7 @@ ErrorTrap:
                                                 If EncodeEditIcons Then
                                                     '
                                                     IconIDControlString = "AC," & ACType
-                                                    IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, False, IconIDControlString, "", serverFilePath, "Feedback Form", "Renders as [Feedback Form]", ACInstanceID, 0)
+                                                    IconImg = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, False, IconIDControlString, "", serverFilePath, "Feedback Form", "Renders as [Feedback Form]", ACInstanceID, 0)
                                                     Copy = IconImg
                                                     '
                                                     'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a feedback form, sent to this record's primary contact."" id=""AC," & ACType & """ src=""/ccLib/images/ACFeedBack.GIF"">"
@@ -2872,13 +2872,13 @@ ErrorTrap:
                                                 '
                                                 ' Personalization Tag - block languages not from the visitor
                                                 '
-                                                ACLanguageName = vbUCase(KmaHTML.ElementAttribute(ElementPointer, "NAME"))
+                                                ACLanguageName = genericController.vbUCase(KmaHTML.ElementAttribute(ElementPointer, "NAME"))
                                                 If EncodeEditIcons Then
-                                                    Select Case vbUCase(ACLanguageName)
+                                                    Select Case genericController.vbUCase(ACLanguageName)
                                                         Case "ANY"
                                                             '
                                                             IconIDControlString = "AC," & ACType & ",," & ACLanguageName
-                                                            IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "All copy following this point is rendered, regardless of the member's language setting", "Renders as [Begin Rendering All Languages]", ACInstanceID, 0)
+                                                            IconImg = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "All copy following this point is rendered, regardless of the member's language setting", "Renders as [Begin Rendering All Languages]", ACInstanceID, 0)
                                                             Copy = IconImg
                                                             '
                                                             'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""All copy following this point is rendered, regardless of the member's language setting"" id=""AC," & ACType & ",," & ACLanguageName & """ src=""/ccLib/images/ACLanguageAny.GIF"">"
@@ -2887,7 +2887,7 @@ ErrorTrap:
                                                         Case Else
                                                             '
                                                             IconIDControlString = "AC," & ACType & ",," & ACLanguageName
-                                                            IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "All copy following this point is rendered if the member's language setting matchs [" & ACLanguageName & "]", "Begin Rendering for language [" & ACLanguageName & "]", ACInstanceID, 0)
+                                                            IconImg = genericController.GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "All copy following this point is rendered if the member's language setting matchs [" & ACLanguageName & "]", "Begin Rendering for language [" & ACLanguageName & "]", ACInstanceID, 0)
                                                             Copy = IconImg
                                                             '
                                                             'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""All copy following this point is rendered if the member's language setting matchs [" & ACLanguageName & "]"" id=""AC," & ACType & ",," & ACLanguageName & """ src=""/ccLib/images/ACLanguageOther.GIF"">"
@@ -2909,7 +2909,7 @@ ErrorTrap:
                                                             PeopleLanguageSet = True
                                                         End If
                                                     End If
-                                                    UcasePeopleLanguage = vbUCase(PeopleLanguage)
+                                                    UcasePeopleLanguage = genericController.vbUCase(PeopleLanguage)
                                                     If UcasePeopleLanguage = "ANY" Then
                                                         '
                                                         ' This person wants all the languages, put in language marker and continue
@@ -2922,9 +2922,9 @@ ErrorTrap:
                                                         Copy = ""
                                                         ElementPointer = ElementPointer + 1
                                                         Do While ElementPointer < KmaHTML.ElementCount
-                                                            ElementTag = vbUCase(KmaHTML.TagName(ElementPointer))
+                                                            ElementTag = genericController.vbUCase(KmaHTML.TagName(ElementPointer))
                                                             If (ElementTag = "AC") Then
-                                                                ACType = vbUCase(KmaHTML.ElementAttribute(ElementPointer, "TYPE"))
+                                                                ACType = genericController.vbUCase(KmaHTML.ElementAttribute(ElementPointer, "TYPE"))
                                                                 If (ACType = ACTypeLanguage) Then
                                                                     ElementPointer = ElementPointer - 1
                                                                     Exit Do
@@ -2947,7 +2947,7 @@ ErrorTrap:
                                                 '
                                                 NotUsedID = 0
                                                 AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING")
-                                                addonOptionString = decodeHtml(AddonOptionStringHTMLEncoded)
+                                                addonOptionString = genericController.decodeHtml(AddonOptionStringHTMLEncoded)
                                                 If IsEmailContent Then
                                                     '
                                                     ' Addon - for email
@@ -2956,7 +2956,7 @@ ErrorTrap:
                                                         '
                                                         ' Only hardcoded Add-ons can run in Emails
                                                         '
-                                                        Select Case vbLCase(ACName)
+                                                        Select Case genericController.vbLCase(ACName)
                                                             Case "block text"
                                                                 '
                                                                 ' Email is always considered authenticated bc they need their login credentials to get the email.
@@ -2971,11 +2971,11 @@ ErrorTrap:
                                                                     '
                                                                     ElementPointer = ElementPointer + 1
                                                                     Do While ElementPointer < KmaHTML.ElementCount
-                                                                        ElementTag = vbUCase(KmaHTML.TagName(ElementPointer))
+                                                                        ElementTag = genericController.vbUCase(KmaHTML.TagName(ElementPointer))
                                                                         If (ElementTag = "AC") Then
-                                                                            ACType = vbUCase(KmaHTML.ElementAttribute(ElementPointer, "TYPE"))
+                                                                            ACType = genericController.vbUCase(KmaHTML.ElementAttribute(ElementPointer, "TYPE"))
                                                                             If (ACType = ACTypeAggregateFunction) Then
-                                                                                If vbLCase(KmaHTML.ElementAttribute(ElementPointer, "name")) = "block text end" Then
+                                                                                If genericController.vbLCase(KmaHTML.ElementAttribute(ElementPointer, "name")) = "block text end" Then
                                                                                     Exit Do
                                                                                 End If
                                                                             End If
@@ -3036,7 +3036,7 @@ ErrorTrap:
                                                             IconAlt = ACName
                                                             IconTitle = "Rendered as the Add-on [" & ACName & "]"
                                                         Else
-                                                            Select Case vbLCase(ACName)
+                                                            Select Case genericController.vbLCase(ACName)
                                                                 Case "block text"
                                                                     IconFilename = ""
                                                                     SrcOptionList = AddonOptionConstructor_ForBlockText
@@ -3081,8 +3081,8 @@ ErrorTrap:
                                                         Else
                                                             ResultOptionListHTMLEncoded = ""
                                                             REsultOptionValue = ""
-                                                            SrcOptionList = vbReplace(SrcOptionList, vbCrLf, vbCr)
-                                                            SrcOptionList = vbReplace(SrcOptionList, vbLf, vbCr)
+                                                            SrcOptionList = genericController.vbReplace(SrcOptionList, vbCrLf, vbCr)
+                                                            SrcOptionList = genericController.vbReplace(SrcOptionList, vbLf, vbCr)
                                                             SrcOptions = Split(SrcOptionList, vbCr)
                                                             For Ptr = 0 To UBound(SrcOptions)
                                                                 SrcOptionName = SrcOptions(Ptr)
@@ -3095,12 +3095,12 @@ ErrorTrap:
                                                                 Loop
                                                                 SrcOptionValueSelector = ""
                                                                 SrcOptionSelector = ""
-                                                                Pos = vbInstr(1, SrcOptionName, "=")
+                                                                Pos = genericController.vbInstr(1, SrcOptionName, "=")
                                                                 If Pos > 0 Then
                                                                     SrcOptionValueSelector = Mid(SrcOptionName, Pos + 1)
                                                                     SrcOptionName = Mid(SrcOptionName, 1, Pos - 1)
                                                                     SrcOptionSelector = ""
-                                                                    Pos = vbInstr(1, SrcOptionValueSelector, "[")
+                                                                    Pos = genericController.vbInstr(1, SrcOptionValueSelector, "[")
                                                                     If Pos <> 0 Then
                                                                         SrcOptionSelector = Mid(SrcOptionValueSelector, Pos)
                                                                     End If
@@ -3110,7 +3110,7 @@ ErrorTrap:
                                                                     ' since AddonOptionString is encoded, InstanceOptionValue will be also
                                                                     InstanceOptionValue = csv_GetAddonOptionStringValue(SrcOptionName, addonOptionString)
                                                                     'InstanceOptionValue = csv_GetAddonOption(SrcOptionName, AddonOptionString)
-                                                                    ResultOptionSelector = pageManager_GetAddonSelector(SrcOptionName, encodeNvaArgument(InstanceOptionValue), SrcOptionSelector)
+                                                                    ResultOptionSelector = pageManager_GetAddonSelector(SrcOptionName, genericController.encodeNvaArgument(InstanceOptionValue), SrcOptionSelector)
                                                                     'ResultOptionSelector = csv_GetAddonSelector(SrcOptionName, InstanceOptionValue, SrcOptionValueSelector)
                                                                     ResultOptionListHTMLEncoded = ResultOptionListHTMLEncoded & "&" & ResultOptionSelector
                                                                 End If
@@ -3119,10 +3119,10 @@ ErrorTrap:
                                                                 ResultOptionListHTMLEncoded = Mid(ResultOptionListHTMLEncoded, 2)
                                                             End If
                                                         End If
-                                                        ACNameCaption = vbReplace(ACName, """", "")
+                                                        ACNameCaption = genericController.vbReplace(ACName, """", "")
                                                         ACNameCaption = html.html_EncodeHTML(ACNameCaption)
-                                                        IDControlString = "AC," & ACType & "," & NotUsedID & "," & encodeNvaArgument(ACName) & "," & ResultOptionListHTMLEncoded & "," & ACGuid
-                                                        Copy = GetAddonIconImg(AdminURL, IconWidth, IconHeight, IconSprites, AddonIsInline, IDControlString, IconFilename, serverFilePath, IconAlt, IconTitle, ACInstanceID, 0)
+                                                        IDControlString = "AC," & ACType & "," & NotUsedID & "," & genericController.encodeNvaArgument(ACName) & "," & ResultOptionListHTMLEncoded & "," & ACGuid
+                                                        Copy = genericController.GetAddonIconImg(AdminURL, IconWidth, IconHeight, IconSprites, AddonIsInline, IDControlString, IconFilename, serverFilePath, IconAlt, IconTitle, ACInstanceID, 0)
                                                     ElseIf EncodeNonCachableTags Then
                                                         '
                                                         ' Add-on Experiment - move all processing to the Webclient
@@ -3147,15 +3147,15 @@ ErrorTrap:
                                                 '
                                                 If EncodeImages Then
                                                     Copy = ""
-                                                    ACAttrRecordID = EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "RECORDID"))
-                                                    ACAttrWidth = EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "WIDTH"))
-                                                    ACAttrHeight = EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "HEIGHT"))
-                                                    ACAttrAlt = EncodeText(KmaHTML.ElementAttribute(ElementPointer, "ALT"))
-                                                    ACAttrBorder = EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "BORDER"))
-                                                    ACAttrLoop = EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "LOOP"))
-                                                    ACAttrVSpace = EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "VSPACE"))
-                                                    ACAttrHSpace = EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "HSPACE"))
-                                                    ACAttrAlign = EncodeText(KmaHTML.ElementAttribute(ElementPointer, "ALIGN"))
+                                                    ACAttrRecordID = genericController.EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "RECORDID"))
+                                                    ACAttrWidth = genericController.EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "WIDTH"))
+                                                    ACAttrHeight = genericController.EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "HEIGHT"))
+                                                    ACAttrAlt = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "ALT"))
+                                                    ACAttrBorder = genericController.EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "BORDER"))
+                                                    ACAttrLoop = genericController.EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "LOOP"))
+                                                    ACAttrVSpace = genericController.EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "VSPACE"))
+                                                    ACAttrHSpace = genericController.EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "HSPACE"))
+                                                    ACAttrAlign = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "ALIGN"))
                                                     '
                                                     Dim Attr As String
                                                     Dim lfPtr As Integer
@@ -3165,17 +3165,17 @@ ErrorTrap:
                                                     Call cache_libraryFiles_loadIfNeeded()
                                                     lfPtr = cache_libraryFilesIdIndex.getPtr(CStr(ACAttrRecordID))
                                                     If lfPtr >= 0 Then
-                                                        lfFilename = EncodeText(cache_libraryFiles(LibraryFilesCache_filename, lfPtr))
-                                                        lfWidth = EncodeInteger(cache_libraryFiles(LibraryFilesCache_width, lfPtr))
-                                                        lfHeight = EncodeInteger(cache_libraryFiles(LibraryFilesCache_height, lfPtr))
+                                                        lfFilename = genericController.encodeText(cache_libraryFiles(LibraryFilesCache_filename, lfPtr))
+                                                        lfWidth = genericController.EncodeInteger(cache_libraryFiles(LibraryFilesCache_width, lfPtr))
+                                                        lfHeight = genericController.EncodeInteger(cache_libraryFiles(LibraryFilesCache_height, lfPtr))
                                                         'CS = app.csOpen("Library Files", "ID=" & encodeSQLNumber(ACAttrRecordID), , , , , , "Filename,AltText,Width,Height")
                                                         'If app.csv_IsCSOK(CS) Then
                                                         'Filename = app.csv_cs_getField(CS, "FileName")
                                                         If Filename <> "" Then
                                                             Filename = lfFilename
-                                                            'Filename = vbReplace(Filename, " ", "%20")
-                                                            Filename = vbReplace(Filename, "\", "/")
-                                                            Filename = EncodeURL(Filename)
+                                                            'Filename = genericController.vbReplace(Filename, " ", "%20")
+                                                            Filename = genericController.vbReplace(Filename, "\", "/")
+                                                            Filename = genericController.EncodeURL(Filename)
                                                             Copy = Copy & "<img ID=""AC,IMAGE,," & ACAttrRecordID & """ src=""" & csv_getVirtualFileLink(serverFilePath, Filename) & """"
                                                             '
                                                             If ACAttrWidth = 0 Then
@@ -3220,12 +3220,12 @@ ErrorTrap:
                                                             End If
                                                             '
 
-                                                            Attr = EncodeText(KmaHTML.ElementAttribute(ElementPointer, "STYLE"))
+                                                            Attr = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "STYLE"))
                                                             If Attr <> "" Then
                                                                 Copy = Copy & " style=""" & Attr & """"
                                                             End If
                                                             '
-                                                            Attr = EncodeText(KmaHTML.ElementAttribute(ElementPointer, "CLASS"))
+                                                            Attr = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "CLASS"))
                                                             If Attr <> "" Then
                                                                 Copy = Copy & " class=""" & Attr & """"
                                                             End If
@@ -3242,15 +3242,15 @@ ErrorTrap:
                                                 '
                                                 ' ----- substitute and anchored download image for the AC-Download tag
                                                 '
-                                                ACAttrRecordID = EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "RECORDID"))
-                                                ACAttrAlt = EncodeText(KmaHTML.ElementAttribute(ElementPointer, "ALT"))
+                                                ACAttrRecordID = genericController.EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "RECORDID"))
+                                                ACAttrAlt = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "ALT"))
                                                 '
                                                 If EncodeEditIcons Then
                                                     '
                                                     ' Encoding the edit icons for the active editor form
                                                     '
                                                     IconIDControlString = "AC," & ACTypeDownload & ",," & ACAttrRecordID
-                                                    IconImg = GetAddonIconImg(AdminURL, 16, 16, 0, True, IconIDControlString, "/ccLib/images/IconDownload3.gif", serverFilePath, "Download Icon with a link to a resource", "Renders as [Download Icon with a link to a resource]", ACInstanceID, 0)
+                                                    IconImg = genericController.GetAddonIconImg(AdminURL, 16, 16, 0, True, IconIDControlString, "/ccLib/images/IconDownload3.gif", serverFilePath, "Download Icon with a link to a resource", "Renders as [Download Icon with a link to a resource]", ACInstanceID, 0)
                                                     Copy = IconImg
                                                     '
                                                     'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Renders as a download icon"" id=""AC," & ACTypeDownload & ",," & ACAttrRecordID & """ src=""/ccLib/images/IconDownload3.GIF"">"
@@ -3261,13 +3261,13 @@ ErrorTrap:
                                                         Call cache_libraryFiles_loadIfNeeded()
                                                         libraryFilePtr = cache_libraryFilesIdIndex.getPtr(CStr(ACAttrRecordID))
                                                         If libraryFilePtr >= 0 Then
-                                                            ACAttrAlt = EncodeText(cache_libraryFiles(LibraryFilesCache_alttext, libraryFilePtr))
+                                                            ACAttrAlt = genericController.encodeText(cache_libraryFiles(LibraryFilesCache_alttext, libraryFilePtr))
                                                         End If
                                                     End If
                                                     '                                        CS = app.csOpenRecord("Library Files", ACAttrRecordID, , , , "Filename,AltText")
                                                     '                                        If app.csv_IsCSOK(CS) Then
                                                     '                                            If ACAttrAlt = "" Then
-                                                    '                                                ACAttrAlt = encodeText(app.csv_cs_getText(CS, "AltText"))
+                                                    '                                                ACAttrAlt = genericController.encodeText(app.csv_cs_getText(CS, "AltText"))
                                                     '                                            End If
                                                     '                                        End If
                                                     '                                        Call app.csv_CloseCS(CS)
@@ -3278,14 +3278,14 @@ ErrorTrap:
                                                 '
                                                 ' ----- Create Template Content
                                                 '
-                                                'ACName = vbUCase(KmaHTML.ElementAttribute(ElementPointer, "NAME"))
+                                                'ACName = genericController.vbUCase(KmaHTML.ElementAttribute(ElementPointer, "NAME"))
                                                 AddonOptionStringHTMLEncoded = ""
                                                 addonOptionString = ""
                                                 NotUsedID = 0
                                                 If EncodeEditIcons Then
                                                     '
                                                     IconIDControlString = "AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
-                                                    IconImg = GetAddonIconImg(AdminURL, 52, 64, 0, False, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as the Template Page Content", ACInstanceID, 0)
+                                                    IconImg = genericController.GetAddonIconImg(AdminURL, 52, 64, 0, False, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as the Template Page Content", ACInstanceID, 0)
                                                     Copy = IconImg
                                                     '
                                                     'Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Page Content"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/ccLib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>"
@@ -3301,14 +3301,14 @@ ErrorTrap:
                                                 '
                                                 ' ----- Create Template Content
                                                 '
-                                                'ACName = vbUCase(KmaHTML.ElementAttribute(ElementPointer, "NAME"))
+                                                'ACName = genericController.vbUCase(KmaHTML.ElementAttribute(ElementPointer, "NAME"))
                                                 AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING")
-                                                addonOptionString = decodeHtml(AddonOptionStringHTMLEncoded)
+                                                addonOptionString = genericController.decodeHtml(AddonOptionStringHTMLEncoded)
                                                 NotUsedID = 0
                                                 If EncodeEditIcons Then
                                                     '
                                                     IconIDControlString = "AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
-                                                    IconImg = GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", serverFilePath, "Template Text", "Renders as a Template Text Box", ACInstanceID, 0)
+                                                    IconImg = genericController.GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", serverFilePath, "Template Text", "Renders as a Template Text Box", ACInstanceID, 0)
                                                     Copy = IconImg
                                                     '
                                                     'Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as Template Text"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/ccLib/images/ACTemplateTextIcon.gif"" WIDTH=52 HEIGHT=52>"
@@ -3319,13 +3319,13 @@ ErrorTrap:
                                                     '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                                                     'test - encoding changed
                                                     NewName = csv_GetAddonOptionStringValue("new", addonOptionString)
-                                                    'NewName = decodeResponseVariable(getSimpleNameValue("new", AddonOptionString, "", "&"))
+                                                    'NewName =  genericController.DecodeResponseVariable(getSimpleNameValue("new", AddonOptionString, "", "&"))
                                                     TextName = csv_GetAddonOptionStringValue("name", addonOptionString)
                                                     'TextName = getSimpleNameValue("name", AddonOptionString)
                                                     If TextName = "" Then
                                                         TextName = "Default"
                                                     End If
-                                                    Copy = "{{" & ACTypeTemplateText & "?name=" & encodeNvaArgument(TextName) & "&new=" & encodeNvaArgument(NewName) & "}}"
+                                                    Copy = "{{" & ACTypeTemplateText & "?name=" & genericController.encodeNvaArgument(TextName) & "&new=" & genericController.encodeNvaArgument(NewName) & "}}"
                                                     ' ***** can not add it here, if a web hit, it must be encoded from the web client for aggr objects
                                                     'Copy = csv_GetContentCopy(TextName, "Copy Content", "", personalizationpeopleId)
                                                 End If
@@ -3335,22 +3335,22 @@ ErrorTrap:
                                                 '
                                                 'ACName = KmaHTML.ElementAttribute(ElementPointer, "NAME")
                                                 AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING")
-                                                addonOptionString = decodeHtml(AddonOptionStringHTMLEncoded)
+                                                addonOptionString = genericController.decodeHtml(AddonOptionStringHTMLEncoded)
                                                 '
                                                 ' test for illegal characters (temporary patch to get around not addonencoding during the addon replacement
                                                 '
-                                                Pos = vbInstr(1, addonOptionString, "menunew=", vbTextCompare)
+                                                Pos = genericController.vbInstr(1, addonOptionString, "menunew=", vbTextCompare)
                                                 If Pos > 0 Then
                                                     NewName = Mid(addonOptionString, Pos + 8)
                                                     Dim IsOK As Boolean
-                                                    IsOK = (NewName = encodeNvaArgument(NewName))
+                                                    IsOK = (NewName = genericController.encodeNvaArgument(NewName))
                                                     If Not IsOK Then
-                                                        addonOptionString = Left(addonOptionString, Pos - 1) & "MenuNew=" & encodeNvaArgument(NewName)
+                                                        addonOptionString = Left(addonOptionString, Pos - 1) & "MenuNew=" & genericController.encodeNvaArgument(NewName)
                                                     End If
                                                 End If
                                                 NotUsedID = 0
                                                 If EncodeEditIcons Then
-                                                    If vbInstr(1, AddonOptionStringHTMLEncoded, "menu=", vbTextCompare) <> 0 Then
+                                                    If genericController.vbInstr(1, AddonOptionStringHTMLEncoded, "menu=", vbTextCompare) <> 0 Then
                                                         '
                                                         ' Dynamic Menu
                                                         '
@@ -3360,7 +3360,7 @@ ErrorTrap:
                                                         'TextName = csv_GetAddonOption("Menu", AddonOptionString)
                                                         '
                                                         IconIDControlString = "AC," & ACType & "," & NotUsedID & "," & ACName & ",Menu=" & TextName & "[" & csv_GetDynamicMenuACSelect() & "]&NewMenu="
-                                                        IconImg = GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as a Dynamic Menu", ACInstanceID, 0)
+                                                        IconImg = genericController.GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as a Dynamic Menu", ACInstanceID, 0)
                                                         Copy = IconImg
                                                         '
                                                         'Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as a Dynamic Menu"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & ",Menu=" & TextName & "[" & csv_GetDynamicMenuACSelect & "]&NewMenu="" src=""/ccLib/images/ACDynamicMenuIcon.gif"" WIDTH=52 HEIGHT=52>"
@@ -3369,7 +3369,7 @@ ErrorTrap:
                                                         ' Old Dynamic Menu - values are stored in the icon
                                                         '
                                                         IconIDControlString = "AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
-                                                        IconImg = GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as a Dynamic Menu", ACInstanceID, 0)
+                                                        IconImg = genericController.GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as a Dynamic Menu", ACInstanceID, 0)
                                                         Copy = IconImg
                                                         '
                                                         'Copy = "<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as a Dynamic Menu"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/ccLib/images/ACDynamicMenuIcon.gif"" WIDTH=52 HEIGHT=52>"
@@ -3388,14 +3388,14 @@ ErrorTrap:
                                                 ' Content Watch replacement
                                                 '   served by the web client because the
                                                 '
-                                                'UCaseACName = vbUCase(Trim(KmaHTML.ElementAttribute(ElementPointer, "NAME")))
+                                                'UCaseACName = genericController.vbUCase(Trim(KmaHTML.ElementAttribute(ElementPointer, "NAME")))
                                                 'ACName = encodeInitialCaps(UCaseACName)
                                                 AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING")
-                                                addonOptionString = decodeHtml(AddonOptionStringHTMLEncoded)
+                                                addonOptionString = genericController.decodeHtml(AddonOptionStringHTMLEncoded)
                                                 If EncodeEditIcons Then
                                                     '
                                                     IconIDControlString = "AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
-                                                    IconImg = GetAddonIconImg(AdminURL, 109, 10, 0, True, IconIDControlString, "/ccLib/images/ACWatchList.gif", serverFilePath, "Watch List", "Renders as the Watch List [" & ACName & "]", ACInstanceID, 0)
+                                                    IconImg = genericController.GetAddonIconImg(AdminURL, 109, 10, 0, True, IconIDControlString, "/ccLib/images/ACWatchList.gif", serverFilePath, "Watch List", "Renders as the Watch List [" & ACName & "]", ACInstanceID, 0)
                                                     Copy = IconImg
                                                     '
                                                     'Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Watch List [" & ACName & "]"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/ccLib/images/ACWatchList.GIF"">"
@@ -3556,10 +3556,10 @@ ErrorTrap:
                 ' leave this in to make sure old <acform tags are converted back
                 ' new editor deals with <form, so no more converting
                 '
-                html_DecodeActiveContent = vbReplace(html_DecodeActiveContent, "<ACFORM>", "<FORM>")
-                html_DecodeActiveContent = vbReplace(html_DecodeActiveContent, "<ACFORM ", "<FORM ")
-                html_DecodeActiveContent = vbReplace(html_DecodeActiveContent, "</ACFORM>", "</form>")
-                html_DecodeActiveContent = vbReplace(html_DecodeActiveContent, "</ACFORM ", "</FORM ")
+                html_DecodeActiveContent = genericController.vbReplace(html_DecodeActiveContent, "<ACFORM>", "<FORM>")
+                html_DecodeActiveContent = genericController.vbReplace(html_DecodeActiveContent, "<ACFORM ", "<FORM ")
+                html_DecodeActiveContent = genericController.vbReplace(html_DecodeActiveContent, "</ACFORM>", "</form>")
+                html_DecodeActiveContent = genericController.vbReplace(html_DecodeActiveContent, "</ACFORM ", "</FORM ")
                 If DHTML.Load(html_DecodeActiveContent) Then
                     html_DecodeActiveContent = ""
                     ElementCount = DHTML.ElementCount
@@ -3571,13 +3571,13 @@ ErrorTrap:
                         For ElementPointer = 0 To ElementCount - 1
                             ElementText = DHTML.Text(ElementPointer)
                             If DHTML.IsTag(ElementPointer) Then
-                                Select Case vbUCase(DHTML.TagName(ElementPointer))
+                                Select Case genericController.vbUCase(DHTML.TagName(ElementPointer))
                                     Case "FORM"
                                         '
                                         ' User created form - add the attribute "Contensive=1"
                                         '
                                         ' 5/14/2009 - DM said it is OK to remove UserResponseForm Processing
-                                        'ElementText = vbReplace(ElementText, "<FORM", "<FORM ContensiveUserForm=1 ", vbTextCompare)
+                                        'ElementText = genericController.vbReplace(ElementText, "<FORM", "<FORM ContensiveUserForm=1 ", vbTextCompare)
                                     Case "IMG"
                                         AttributeCount = DHTML.ElementAttributeCount(ElementPointer)
 
@@ -3586,14 +3586,14 @@ ErrorTrap:
                                             ImageSrcOriginal = DHTML.ElementAttribute(ElementPointer, "src")
                                             VirtualFilePathBad = serverConfig.appConfig.name & "/files/"
                                             serverFilePath = "/" & VirtualFilePathBad
-                                            If Left(LCase(ImageSrcOriginal), Len(VirtualFilePathBad)) = vbLCase(VirtualFilePathBad) Then
+                                            If Left(LCase(ImageSrcOriginal), Len(VirtualFilePathBad)) = genericController.vbLCase(VirtualFilePathBad) Then
                                                 '
                                                 ' if the image is from the virtual file path, but the editor did not include the root path, add it
                                                 '
-                                                ElementText = vbReplace(ElementText, VirtualFilePathBad, "/" & VirtualFilePathBad, 1, 99, vbTextCompare)
-                                                ImageSrcOriginal = vbReplace(ImageSrcOriginal, VirtualFilePathBad, "/" & VirtualFilePathBad, 1, 99, vbTextCompare)
+                                                ElementText = genericController.vbReplace(ElementText, VirtualFilePathBad, "/" & VirtualFilePathBad, 1, 99, vbTextCompare)
+                                                ImageSrcOriginal = genericController.vbReplace(ImageSrcOriginal, VirtualFilePathBad, "/" & VirtualFilePathBad, 1, 99, vbTextCompare)
                                             End If
-                                            ImageSrc = decodeHtml(ImageSrcOriginal)
+                                            ImageSrc = genericController.decodeHtml(ImageSrcOriginal)
                                             ImageSrc = DecodeURL(ImageSrc)
                                             '
                                             ' problem with this case is if the addon icon image is from another site.
@@ -3606,7 +3606,7 @@ ErrorTrap:
                                             ACInstanceName = ""
                                             ACGuid = ""
                                             ImageIDArrayCount = 0
-                                            If 0 <> vbInstr(1, ImageID, ",") Then
+                                            If 0 <> genericController.vbInstr(1, ImageID, ",") Then
                                                 ImageIDArray = Split(ImageID, ",")
                                                 ImageIDArrayCount = UBound(ImageIDArray) + 1
                                                 If ImageIDArrayCount > 5 Then
@@ -3632,7 +3632,7 @@ ErrorTrap:
                                                     Next
                                                 End If
                                                 If (ImageIDArrayCount > 1) Then
-                                                    ACIdentifier = vbUCase(ImageIDArray(0))
+                                                    ACIdentifier = genericController.vbUCase(ImageIDArray(0))
                                                     ACType = ImageIDArray(1)
                                                     If ImageIDArrayCount > 2 Then
                                                         ACFieldName = ImageIDArray(2)
@@ -3662,18 +3662,18 @@ ErrorTrap:
                                                         End If
                                                         ElementText = ""
                                                         '----------------------------- change to ACType
-                                                        Select Case vbUCase(ACType)
+                                                        Select Case genericController.vbUCase(ACType)
                                                             Case "IMAGE"
                                                                 '
                                                                 ' ----- AC Image, Decode Active Images to Resource Library references
                                                                 '
                                                                 If ImageIDArrayCount >= 4 Then
-                                                                    RecordID = EncodeInteger(ACInstanceName)
+                                                                    RecordID = genericController.EncodeInteger(ACInstanceName)
                                                                     ImageWidthText = DHTML.ElementAttribute(ElementPointer, "WIDTH")
                                                                     ImageHeightText = DHTML.ElementAttribute(ElementPointer, "HEIGHT")
                                                                     ImageAlt = html.html_EncodeHTML(DHTML.ElementAttribute(ElementPointer, "Alt"))
-                                                                    ImageVSpace = EncodeInteger(DHTML.ElementAttribute(ElementPointer, "vspace"))
-                                                                    ImageHSpace = EncodeInteger(DHTML.ElementAttribute(ElementPointer, "hspace"))
+                                                                    ImageVSpace = genericController.EncodeInteger(DHTML.ElementAttribute(ElementPointer, "vspace"))
+                                                                    ImageHSpace = genericController.EncodeInteger(DHTML.ElementAttribute(ElementPointer, "hspace"))
                                                                     ImageAlign = DHTML.ElementAttribute(ElementPointer, "Align")
                                                                     ImageBorder = DHTML.ElementAttribute(ElementPointer, "BORDER")
                                                                     ImageLoop = DHTML.ElementAttribute(ElementPointer, "LOOP")
@@ -3687,19 +3687,19 @@ ErrorTrap:
                                                                         ImageStyleArrayCount = UBound(IMageStyleArray) + 1
                                                                         For ImageStyleArrayPointer = 0 To ImageStyleArrayCount - 1
                                                                             ImageStylePair = Trim(IMageStyleArray(ImageStyleArrayPointer))
-                                                                            PositionColon = vbInstr(1, ImageStylePair, ":")
+                                                                            PositionColon = genericController.vbInstr(1, ImageStylePair, ":")
                                                                             If PositionColon > 1 Then
                                                                                 ImageStylePairName = Trim(Mid(ImageStylePair, 1, PositionColon - 1))
                                                                                 ImageStylePairValue = Trim(Mid(ImageStylePair, PositionColon + 1))
-                                                                                Select Case vbUCase(ImageStylePairName)
+                                                                                Select Case genericController.vbUCase(ImageStylePairName)
                                                                                     Case "WIDTH"
-                                                                                        ImageStylePairValue = vbReplace(ImageStylePairValue, "px", "")
+                                                                                        ImageStylePairValue = genericController.vbReplace(ImageStylePairValue, "px", "")
                                                                                         ImageWidthText = ImageStylePairValue
                                                                                     Case "HEIGHT"
-                                                                                        ImageStylePairValue = vbReplace(ImageStylePairValue, "px", "")
+                                                                                        ImageStylePairValue = genericController.vbReplace(ImageStylePairValue, "px", "")
                                                                                         ImageHeightText = ImageStylePairValue
                                                                                 End Select
-                                                                                'If vbInstr(1, ImageStylePair, "WIDTH", vbTextCompare) = 1 Then
+                                                                                'If genericController.vbInstr(1, ImageStylePair, "WIDTH", vbTextCompare) = 1 Then
                                                                                 '    End If
                                                                             End If
                                                                         Next
@@ -3711,7 +3711,7 @@ ErrorTrap:
                                                                 ' AC Download
                                                                 '
                                                                 If ImageIDArrayCount >= 4 Then
-                                                                    RecordID = EncodeInteger(ACInstanceName)
+                                                                    RecordID = genericController.EncodeInteger(ACInstanceName)
                                                                     ElementText = "<AC type=""DOWNLOAD"" ACInstanceID=""" & ACInstanceID & """ RecordID=""" & RecordID & """>"
                                                                 End If
                                                             Case ACTypeDate
@@ -3729,7 +3729,7 @@ ErrorTrap:
                                                                 ' ChildList, Language
                                                                 '
                                                                 If ACInstanceName = "0" Then
-                                                                    ACInstanceName = getRandomLong().ToString()
+                                                                    ACInstanceName = genericController.getRandomLong().ToString()
                                                                 End If
                                                                 ElementText = "<AC type=""" & ACType & """ name=""" & ACInstanceName & """ ACInstanceID=""" & ACInstanceID & """>"
                                                             Case ACTypeAggregateFunction
@@ -3742,11 +3742,11 @@ ErrorTrap:
                                                                     ' I had added an Add-on and was saving
                                                                     ' I find it VERY odd that this could be the case
                                                                     '
-                                                                    QSHTMLEncoded = EncodeText(ACQueryString)
-                                                                    QueryString = decodeHtml(QSHTMLEncoded)
+                                                                    QSHTMLEncoded = genericController.encodeText(ACQueryString)
+                                                                    QueryString = genericController.decodeHtml(QSHTMLEncoded)
                                                                     QSSplit = Split(QueryString, "&")
                                                                     For QSPtr = 0 To UBound(QSSplit)
-                                                                        Pos = vbInstr(1, QSSplit(QSPtr), "[")
+                                                                        Pos = genericController.vbInstr(1, QSSplit(QSPtr), "[")
                                                                         If Pos > 0 Then
                                                                             QSSplit(QSPtr) = Mid(QSSplit(QSPtr), 1, Pos - 1)
                                                                         End If
@@ -3766,7 +3766,7 @@ ErrorTrap:
                                                                 '
                                                                 QueryString = ""
                                                                 If ImageIDArrayCount > 4 Then
-                                                                    QueryString = EncodeText(ImageIDArray(4))
+                                                                    QueryString = genericController.encodeText(ImageIDArray(4))
                                                                     QSSplit = Split(QueryString, "&")
                                                                     For QSPtr = 0 To UBound(QSSplit)
                                                                         QSSplit(QSPtr) = html.html_EncodeHTML(QSSplit(QSPtr))
@@ -3781,8 +3781,8 @@ ErrorTrap:
                                                                 '
                                                                 QueryString = ""
                                                                 If ImageIDArrayCount > 4 Then
-                                                                    QueryString = EncodeText(ImageIDArray(4))
-                                                                    QueryString = decodeHtml(QueryString)
+                                                                    QueryString = genericController.encodeText(ImageIDArray(4))
+                                                                    QueryString = genericController.decodeHtml(QueryString)
                                                                     QueryString = html_DecodeActiveContent_ProcessDynamicMenu(QueryString)
                                                                     QSSplit = Split(QueryString, "&")
                                                                     For QSPtr = 0 To UBound(QSSplit)
@@ -3794,12 +3794,12 @@ ErrorTrap:
                                                                     '
                                                                     ' convert to new menu type
                                                                     '
-                                                                    Pos = vbInstr(1, QueryString, "[")
+                                                                    Pos = genericController.vbInstr(1, QueryString, "[")
                                                                     If Pos > 0 Then
                                                                         QueryString = Mid(QueryString, 1, Pos - 1)
                                                                     End If
 
-                                                                    QueryString = vbReplace(QueryString, "menu=", "Menu Name=", 1, 99, vbTextCompare) & "&Create New Menu="
+                                                                    QueryString = genericController.vbReplace(QueryString, "menu=", "Menu Name=", 1, 99, vbTextCompare) & "&Create New Menu="
                                                                     ElementText = "<AC type=""" & ACTypeAggregateFunction & """ name=""Dynamic Menu"" ACInstanceID=""" & ACInstanceID & """ querystring=""" & QueryString & """ guid=""" & ACGuid & """>"
                                                                 Else
                                                                     ElementText = "<AC type=""" & ACType & """ name=""" & ACInstanceName & """ ACInstanceID=""" & ACInstanceID & """ querystring=""" & QueryString & """>"
@@ -3810,8 +3810,8 @@ ErrorTrap:
                                                                 '
                                                                 QueryString = ""
                                                                 If ImageIDArrayCount > 4 Then
-                                                                    QueryString = EncodeText(ImageIDArray(4))
-                                                                    QueryString = decodeHtml(QueryString)
+                                                                    QueryString = genericController.encodeText(ImageIDArray(4))
+                                                                    QueryString = genericController.decodeHtml(QueryString)
                                                                     QSSplit = Split(QueryString, "&")
                                                                     For QSPtr = 0 To UBound(QSSplit)
                                                                         QSSplit(QSPtr) = html.html_EncodeHTML(QSSplit(QSPtr))
@@ -3825,8 +3825,8 @@ ErrorTrap:
                                                                 '
                                                                 QueryString = ""
                                                                 If ImageIDArrayCount > 4 Then
-                                                                    QueryString = EncodeText(ImageIDArray(4))
-                                                                    QueryString = decodeHtml(QueryString)
+                                                                    QueryString = genericController.encodeText(ImageIDArray(4))
+                                                                    QueryString = genericController.decodeHtml(QueryString)
                                                                     QSSplit = Split(QueryString, "&")
                                                                     For QSPtr = 0 To UBound(QSSplit)
                                                                         QSSplit(QSPtr) = html.html_EncodeHTML(QSSplit(QSPtr))
@@ -3840,8 +3840,8 @@ ErrorTrap:
                                                                 '
                                                                 QueryString = ""
                                                                 If ImageIDArrayCount > 4 Then
-                                                                    QueryString = EncodeText(ImageIDArray(4))
-                                                                    QueryString = decodeHtml(QueryString)
+                                                                    QueryString = genericController.encodeText(ImageIDArray(4))
+                                                                    QueryString = genericController.decodeHtml(QueryString)
                                                                     QSSplit = Split(QueryString, "&")
                                                                     For QSPtr = 0 To UBound(QSSplit)
                                                                         QSSplit(QSPtr) = html.html_EncodeHTML(QSSplit(QSPtr))
@@ -3855,8 +3855,8 @@ ErrorTrap:
                                                                 '
                                                                 QueryString = ""
                                                                 If ImageIDArrayCount > 4 Then
-                                                                    QueryString = EncodeText(ImageIDArray(4))
-                                                                    QueryString = decodeHtml(QueryString)
+                                                                    QueryString = genericController.encodeText(ImageIDArray(4))
+                                                                    QueryString = genericController.decodeHtml(QueryString)
                                                                     QSSplit = Split(QueryString, "&")
                                                                     For QSPtr = 0 To UBound(QSSplit)
                                                                         QSSplit(QSPtr) = html.html_EncodeHTML(QSSplit(QSPtr))
@@ -3867,22 +3867,22 @@ ErrorTrap:
                                                         End Select
                                                     End If
                                                 End If
-                                            ElseIf vbInstr(1, ImageSrc, "cclibraryfiles", vbTextCompare) <> 0 Then
+                                            ElseIf genericController.vbInstr(1, ImageSrc, "cclibraryfiles", vbTextCompare) <> 0 Then
                                                 ImageAllowSFResize = siteProperties.getBoolean("ImageAllowSFResize", True)
                                                 If ImageAllowSFResize And True Then
                                                     '
                                                     ' if it is a real image, check for resize
                                                     '
-                                                    Pos = vbInstr(1, ImageSrc, "cclibraryfiles", vbTextCompare)
+                                                    Pos = genericController.vbInstr(1, ImageSrc, "cclibraryfiles", vbTextCompare)
                                                     If Pos <> 0 Then
                                                         ImageVirtualFilename = Mid(ImageSrc, Pos)
                                                         Paths = Split(ImageVirtualFilename, "/")
                                                         If UBound(Paths) > 2 Then
-                                                            If vbLCase(Paths(1)) = "filename" Then
-                                                                RecordID = EncodeInteger(Paths(2))
+                                                            If genericController.vbLCase(Paths(1)) = "filename" Then
+                                                                RecordID = genericController.EncodeInteger(Paths(2))
                                                                 If RecordID <> 0 Then
                                                                     ImageFilename = Paths(3)
-                                                                    ImageVirtualFilePath = vbReplace(ImageVirtualFilename, ImageFilename, "")
+                                                                    ImageVirtualFilePath = genericController.vbReplace(ImageVirtualFilename, ImageFilename, "")
                                                                     Pos = InStrRev(ImageFilename, ".")
                                                                     If Pos > 0 Then
                                                                         ImageFilenameExt = Mid(ImageFilename, Pos + 1)
@@ -3901,7 +3901,7 @@ ErrorTrap:
                                                                             If UBound(SizeTest) <> 1 Then
                                                                                 ImageFilenameAltSize = ""
                                                                             Else
-                                                                                If vbIsNumeric(SizeTest(0)) And vbIsNumeric(SizeTest(1)) Then
+                                                                                If genericController.vbIsNumeric(SizeTest(0)) And genericController.vbIsNumeric(SizeTest(1)) Then
                                                                                     ImageFilenameNoExt = Mid(ImageFilenameNoExt, 1, Pos - 1)
                                                                                     'RecordVirtualFilenameNoExt = Mid(RecordVirtualFilename, 1, Pos - 1)
                                                                                 Else
@@ -3910,30 +3910,30 @@ ErrorTrap:
                                                                             End If
                                                                             'ImageFilenameNoExt = Mid(ImageFilenameNoExt, 1, Pos - 1)
                                                                         End If
-                                                                        If vbInstr(1, sfImageExtList, ImageFilenameExt, vbTextCompare) <> 0 Then
+                                                                        If genericController.vbInstr(1, sfImageExtList, ImageFilenameExt, vbTextCompare) <> 0 Then
                                                                             '
                                                                             ' Determine ImageWidth and ImageHeight
                                                                             '
                                                                             ImageStyle = DHTML.ElementAttribute(ElementPointer, "style")
-                                                                            ImageWidth = EncodeInteger(DHTML.ElementAttribute(ElementPointer, "width"))
-                                                                            ImageHeight = EncodeInteger(DHTML.ElementAttribute(ElementPointer, "height"))
+                                                                            ImageWidth = genericController.EncodeInteger(DHTML.ElementAttribute(ElementPointer, "width"))
+                                                                            ImageHeight = genericController.EncodeInteger(DHTML.ElementAttribute(ElementPointer, "height"))
                                                                             If ImageStyle <> "" Then
                                                                                 Styles = Split(ImageStyle, ";")
                                                                                 For Ptr = 0 To UBound(Styles)
                                                                                     Style = Split(Styles(Ptr), ":")
                                                                                     If UBound(Style) > 0 Then
-                                                                                        StyleName = vbLCase(Trim(Style(0)))
+                                                                                        StyleName = genericController.vbLCase(Trim(Style(0)))
                                                                                         If StyleName = "width" Then
-                                                                                            StyleValue = vbLCase(Trim(Style(1)))
-                                                                                            StyleValue = vbReplace(StyleValue, "px", "")
-                                                                                            StyleValueInt = EncodeInteger(StyleValue)
+                                                                                            StyleValue = genericController.vbLCase(Trim(Style(1)))
+                                                                                            StyleValue = genericController.vbReplace(StyleValue, "px", "")
+                                                                                            StyleValueInt = genericController.EncodeInteger(StyleValue)
                                                                                             If StyleValueInt > 0 Then
                                                                                                 ImageWidth = StyleValueInt
                                                                                             End If
                                                                                         ElseIf StyleName = "height" Then
-                                                                                            StyleValue = vbLCase(Trim(Style(1)))
-                                                                                            StyleValue = vbReplace(StyleValue, "px", "")
-                                                                                            StyleValueInt = EncodeInteger(StyleValue)
+                                                                                            StyleValue = genericController.vbLCase(Trim(Style(1)))
+                                                                                            StyleValue = genericController.vbReplace(StyleValue, "px", "")
+                                                                                            StyleValueInt = genericController.EncodeInteger(StyleValue)
                                                                                             If StyleValueInt > 0 Then
                                                                                                 ImageHeight = StyleValueInt
                                                                                             End If
@@ -3955,13 +3955,13 @@ ErrorTrap:
                                                                                 '
                                                                                 ElementText = ""
                                                                             Else
-                                                                                RecordVirtualFilename = EncodeText(cache_libraryFiles(LibraryFilesCache_filename, libraryFilePtr))
+                                                                                RecordVirtualFilename = genericController.encodeText(cache_libraryFiles(LibraryFilesCache_filename, libraryFilePtr))
                                                                                 'RecordVirtualFilename = app.csv_cs_get(CS, "filename")
-                                                                                RecordWidth = EncodeInteger(cache_libraryFiles(LibraryFilesCache_width, libraryFilePtr))
+                                                                                RecordWidth = genericController.EncodeInteger(cache_libraryFiles(LibraryFilesCache_width, libraryFilePtr))
                                                                                 'RecordWidth = app.csv_cs_getInteger(CS, "width")
-                                                                                RecordHeight = EncodeInteger(cache_libraryFiles(LibraryFilesCache_height, libraryFilePtr))
+                                                                                RecordHeight = genericController.EncodeInteger(cache_libraryFiles(LibraryFilesCache_height, libraryFilePtr))
                                                                                 'RecordHeight = app.csv_cs_getInteger(CS, "height")
-                                                                                RecordAltSizeList = EncodeText(cache_libraryFiles(LibraryFilesCache_altsizelist, libraryFilePtr))
+                                                                                RecordAltSizeList = genericController.encodeText(cache_libraryFiles(LibraryFilesCache_altsizelist, libraryFilePtr))
                                                                                 'RecordAltSizeList = app.csv_cs_get(CS, "altsizelist")
                                                                                 RecordFilename = RecordVirtualFilename
                                                                                 Pos = InStrRev(RecordVirtualFilename, "/")
@@ -4023,10 +4023,10 @@ ErrorTrap:
                                                                                         sf = Nothing
                                                                                         On Error GoTo ErrorTrap
                                                                                         If (ImageHeight = 0) And (ImageWidth = 0) Then
-                                                                                            Pos = vbInstr(1, ImageFilenameAltSize, "x")
+                                                                                            Pos = genericController.vbInstr(1, ImageFilenameAltSize, "x")
                                                                                             If Pos <> 0 Then
-                                                                                                ImageWidth = EncodeInteger(Mid(ImageFilenameAltSize, 1, Pos - 1))
-                                                                                                ImageHeight = EncodeInteger(Mid(ImageFilenameAltSize, Pos + 1))
+                                                                                                ImageWidth = genericController.EncodeInteger(Mid(ImageFilenameAltSize, 1, Pos - 1))
+                                                                                                ImageHeight = genericController.EncodeInteger(Mid(ImageFilenameAltSize, Pos + 1))
                                                                                             End If
                                                                                         End If
                                                                                         If ImageHeight = 0 And ImageWidth = 0 Then
@@ -4057,15 +4057,15 @@ ErrorTrap:
                                                                                         '
                                                                                         NewImageFilename = ImageFilenameNoExt & "-" & ImageAltSize & "." & ImageFilenameExt
                                                                                         ' images included in email have spaces that must be converted to "%20" or they 404
-                                                                                        imageNewLink = EncodeURL(csv_getVirtualFileLink(serverFilePath, ImageVirtualFilePath) & NewImageFilename)
-                                                                                        ElementText = vbReplace(ElementText, ImageSrcOriginal, html.html_EncodeHTML(imageNewLink))
+                                                                                        imageNewLink = genericController.EncodeURL(csv_getVirtualFileLink(serverFilePath, ImageVirtualFilePath) & NewImageFilename)
+                                                                                        ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, html.html_EncodeHTML(imageNewLink))
                                                                                     ElseIf (RecordWidth < ImageWidth) Or (RecordHeight < ImageHeight) Then
                                                                                         '
                                                                                         ' OK
                                                                                         ' reize image larger then original - go with it as is
                                                                                         '
                                                                                         ' images included in email have spaces that must be converted to "%20" or they 404
-                                                                                        ElementText = vbReplace(ElementText, ImageSrcOriginal, html.html_EncodeHTML(EncodeURL(csv_getVirtualFileLink(serverFilePath, RecordVirtualFilename))))
+                                                                                        ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, html.html_EncodeHTML(genericController.EncodeURL(csv_getVirtualFileLink(serverFilePath, RecordVirtualFilename))))
                                                                                     Else
                                                                                         '
                                                                                         ' resized image - create NewImageFilename (and add new alt size to the record)
@@ -4075,7 +4075,7 @@ ErrorTrap:
                                                                                             ' set back to Raw image untouched, use the record image filename
                                                                                             '
                                                                                             ElementText = ElementText
-                                                                                            'ElementText = vbReplace(ElementText, ImageVirtualFilename, RecordVirtualFilename)
+                                                                                            'ElementText = genericController.vbReplace(ElementText, ImageVirtualFilename, RecordVirtualFilename)
                                                                                         Else
                                                                                             '
                                                                                             ' Raw image filename in content, but it is resized, switch to an alternate size
@@ -4134,11 +4134,11 @@ ErrorTrap:
                                                                                                     '
                                                                                                     ' set HTML attributes so image properties will display
                                                                                                     '
-                                                                                                    If vbInstr(1, ElementText, "height=", vbTextCompare) = 0 Then
-                                                                                                        ElementText = vbReplace(ElementText, ">", " height=""" & ImageHeight & """>")
+                                                                                                    If genericController.vbInstr(1, ElementText, "height=", vbTextCompare) = 0 Then
+                                                                                                        ElementText = genericController.vbReplace(ElementText, ">", " height=""" & ImageHeight & """>")
                                                                                                     End If
-                                                                                                    If vbInstr(1, ElementText, "width=", vbTextCompare) = 0 Then
-                                                                                                        ElementText = vbReplace(ElementText, ">", " width=""" & ImageWidth & """>")
+                                                                                                    If genericController.vbInstr(1, ElementText, "width=", vbTextCompare) = 0 Then
+                                                                                                        ElementText = genericController.vbReplace(ElementText, ">", " width=""" & ImageWidth & """>")
                                                                                                     End If
                                                                                                     '
                                                                                                     ' Save new file
@@ -4157,7 +4157,7 @@ ErrorTrap:
                                                                                             '
                                                                                             ' Change the image src to the AltSize
                                                                                             '
-                                                                                            ElementText = vbReplace(ElementText, ImageSrcOriginal, html.html_EncodeHTML(EncodeURL(csv_getVirtualFileLink(serverFilePath, ImageVirtualFilePath) & NewImageFilename)))
+                                                                                            ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, html.html_EncodeHTML(genericController.EncodeURL(csv_getVirtualFileLink(serverFilePath, ImageVirtualFilePath) & NewImageFilename)))
                                                                                         End If
                                                                                     End If
                                                                                 End If
@@ -4250,7 +4250,7 @@ ErrorTrap:
             If ExportName = "" Then
                 TaskName = CStr(Now()) & " snapshot of unnamed data"
             Else
-                TaskName = CStr(Now()) & " snapshot of " & vbLCase(ExportName)
+                TaskName = CStr(Now()) & " snapshot of " & genericController.vbLCase(ExportName)
             End If
             CS = db.cs_insertRecord("Tasks", RequestedByMemberID)
             If db.cs_ok(CS) Then
@@ -4286,21 +4286,21 @@ ErrorTrap:
                 SortFieldList = "DateAdded"
             End If
             'iActiveOnly = encodeMissingText(ActiveOnly, True)
-            'ListName = Trim(EncodeText(ListName))
+            'ListName = Trim(genericController.encodeText(ListName))
             '
             MethodName = "csOpenWatchList( " & ListName & ", " & SortFieldList & ", " & ActiveOnly & " )"
             '
             ' ----- Add tablename to the front of SortFieldList fieldnames
             '
-            SortFieldList = " " & vbReplace(SortFieldList, ",", " , ") & " "
-            SortFieldList = vbReplace(SortFieldList, " ID ", " ccContentWatch.ID ")
-            SortFieldList = vbReplace(SortFieldList, " Link ", " ccContentWatch.Link ")
-            SortFieldList = vbReplace(SortFieldList, " LinkLabel ", " ccContentWatch.LinkLabel ")
-            SortFieldList = vbReplace(SortFieldList, " SortOrder ", " ccContentWatch.SortOrder ")
-            SortFieldList = vbReplace(SortFieldList, " DateAdded ", " ccContentWatch.DateAdded ")
-            SortFieldList = vbReplace(SortFieldList, " ContentID ", " ccContentWatch.ContentID ")
-            SortFieldList = vbReplace(SortFieldList, " RecordID ", " ccContentWatch.RecordID ")
-            SortFieldList = vbReplace(SortFieldList, " ModifiedDate ", " ccContentWatch.ModifiedDate ")
+            SortFieldList = " " & genericController.vbReplace(SortFieldList, ",", " , ") & " "
+            SortFieldList = genericController.vbReplace(SortFieldList, " ID ", " ccContentWatch.ID ")
+            SortFieldList = genericController.vbReplace(SortFieldList, " Link ", " ccContentWatch.Link ")
+            SortFieldList = genericController.vbReplace(SortFieldList, " LinkLabel ", " ccContentWatch.LinkLabel ")
+            SortFieldList = genericController.vbReplace(SortFieldList, " SortOrder ", " ccContentWatch.SortOrder ")
+            SortFieldList = genericController.vbReplace(SortFieldList, " DateAdded ", " ccContentWatch.DateAdded ")
+            SortFieldList = genericController.vbReplace(SortFieldList, " ContentID ", " ccContentWatch.ContentID ")
+            SortFieldList = genericController.vbReplace(SortFieldList, " RecordID ", " ccContentWatch.RecordID ")
+            SortFieldList = genericController.vbReplace(SortFieldList, " ModifiedDate ", " ccContentWatch.ModifiedDate ")
             '
             SQL = "SELECT ccContentWatch.ID AS ID, ccContentWatch.Link as Link, ccContentWatch.LinkLabel as LinkLabel, ccContentWatch.SortOrder as SortOrder, ccContentWatch.DateAdded as DateAdded, ccContentWatch.ContentID as ContentID, ccContentWatch.RecordID as RecordID, ccContentWatch.ModifiedDate as ModifiedDate" _
                 & " FROM (ccContentWatchLists LEFT JOIN ccContentWatchListRules ON ccContentWatchLists.ID = ccContentWatchListRules.ContentWatchListID) LEFT JOIN ccContentWatch ON ccContentWatchListRules.ContentWatchID = ccContentWatch.ID" _
@@ -4495,7 +4495,7 @@ ErrorTrap:
                     End If
                     Call db.cs_Close(CS)
                     '
-                    If vbUCase(iMenuName) = "DEFAULT" Then
+                    If genericController.vbUCase(iMenuName) = "DEFAULT" Then
                         '
                         ' Adding the Default menu - put all sections into this when it is created
                         '
@@ -4590,7 +4590,7 @@ ErrorTrap:
             '
             QS = QueryString
             If True Then
-                If vbInstr(1, QS, "Menu=", vbTextCompare) <> 0 Then
+                If genericController.vbInstr(1, QS, "Menu=", vbTextCompare) <> 0 Then
                     '
                     ' New menu
                     '
@@ -4607,7 +4607,7 @@ ErrorTrap:
                     ' fixup the tag so next encode it pulls a new list of Dynamic Menus
                     '
                     QS = "Menu=" & Menu
-                ElseIf vbInstr(1, QS, "MenuName=", vbTextCompare) <> 0 Then
+                ElseIf genericController.vbInstr(1, QS, "MenuName=", vbTextCompare) <> 0 Then
                     '
                     ' Old Style Menu Icon
                     '
@@ -4661,7 +4661,7 @@ ErrorTrap:
                     & vbCrLf & "/*" _
                     & vbCrLf & "Site Styles" _
                     & vbCrLf & "*/" _
-                    & vbCrLf & RemoveStyleTags(cdnFiles.readFile("templates\styles.css"))
+                    & vbCrLf & genericController.RemoveStyleTags(cdnFiles.readFile("templates\styles.css"))
                 '
                 ' shared styles marked AlwaysInclude
                 '
@@ -4670,18 +4670,18 @@ ErrorTrap:
                 dt = db.executeSql(SQL)
                 If dt.Rows.Count > 0 Then
                     For Each row As DataRow In dt.Rows
-                        styleId = EncodeInteger(row("id"))
-                        StyleName = EncodeText(row("name"))
-                        StyleName = vbReplace(StyleName, "*/", "*-/")
+                        styleId = genericController.EncodeInteger(row("id"))
+                        StyleName = genericController.encodeText(row("name"))
+                        StyleName = genericController.vbReplace(StyleName, "*/", "*-/")
                         If (InStr(1, usedSharedStyleList & ",", "," & styleId & ",") = 0) Then
                             usedSharedStyleList = usedSharedStyleList & "," & styleId
-                            Filename = EncodeText(row("stylefilename"))
+                            Filename = genericController.encodeText(row("stylefilename"))
                             If Filename <> "" Then
                                 sharedStyles = sharedStyles _
                                     & vbCrLf & "/*" _
                                     & vbCrLf & "Shared Style " & StyleName & " marked always include" _
                                     & vbCrLf & "*/" _
-                                    & vbCrLf & RemoveStyleTags(cdnFiles.readFile(Filename))
+                                    & vbCrLf & genericController.RemoveStyleTags(cdnFiles.readFile(Filename))
                             End If
                         End If
                     Next
@@ -4696,15 +4696,15 @@ ErrorTrap:
                     dt = db.executeSql(SQL)
                     If dt.Rows.Count > 0 Then
                         For Each dr As DataRow In dt.Rows
-                            Filename = EncodeText(dr("stylesfilename"))
-                            StyleName = EncodeText(dr("name"))
-                            StyleName = vbReplace(StyleName, "*/", "*-/")
+                            Filename = genericController.encodeText(dr("stylesfilename"))
+                            StyleName = genericController.encodeText(dr("name"))
+                            StyleName = genericController.vbReplace(StyleName, "*/", "*-/")
                             If Filename <> "" Then
                                 templateStyles = templateStyles _
                                     & vbCrLf & "/*" _
                                     & vbCrLf & "Template Styles" _
                                     & vbCrLf & "*/" _
-                                    & vbCrLf & RemoveStyleTags(cdnFiles.readFile(Filename))
+                                    & vbCrLf & genericController.RemoveStyleTags(cdnFiles.readFile(Filename))
                             End If
 
                         Next
@@ -4717,18 +4717,18 @@ ErrorTrap:
                     SQL = "select s.name,s.id,s.StyleFilename from ccSharedStyles s left join ccSharedStylesTemplateRules r on s.id=r.styleid where (s.active<>0)and(r.templateid=" & templateId & ")and((s.AlwaysInclude=0)or(s.AlwaysInclude is null))"
                     rs = db.executeSql(SQL)
                     If rs.Rows.Count > 0 Then
-                        styleId = EncodeInteger(rs.Rows(0).Item("id"))
-                        StyleName = EncodeText(rs.Rows(0).Item("name"))
-                        StyleName = vbReplace(StyleName, "*/", "*-/")
+                        styleId = genericController.EncodeInteger(rs.Rows(0).Item("id"))
+                        StyleName = genericController.encodeText(rs.Rows(0).Item("name"))
+                        StyleName = genericController.vbReplace(StyleName, "*/", "*-/")
                         If (InStr(1, usedSharedStyleList & ",", "," & styleId & ",") = 0) Then
                             usedSharedStyleList = usedSharedStyleList & "," & styleId
-                            Filename = EncodeText(rs.Rows(0).Item("stylefilename"))
+                            Filename = genericController.encodeText(rs.Rows(0).Item("stylefilename"))
                             If Filename <> "" Then
                                 sharedStyles = sharedStyles _
                                     & vbCrLf & "/*" _
                                     & vbCrLf & "Shared Style " & StyleName & " included in template" _
                                     & vbCrLf & "*/" _
-                                    & vbCrLf & RemoveStyleTags(cdnFiles.readFile(Filename))
+                                    & vbCrLf & genericController.RemoveStyleTags(cdnFiles.readFile(Filename))
                             End If
                         End If
                     End If
@@ -4744,18 +4744,18 @@ ErrorTrap:
                     dt = db.executeSql(SQL)
                     If dt.Rows.Count > 0 Then
                         For Each rsDr As DataRow In dt.Rows
-                            blockStyles = EncodeBoolean(rsDr("blockSiteStyles"))
+                            blockStyles = genericController.EncodeBoolean(rsDr("blockSiteStyles"))
                             If Not blockStyles Then
-                                EMailTemplateID = EncodeInteger("EmailTemplateID")
-                                Filename = EncodeText(rsDr("stylesFilename"))
-                                StyleName = EncodeText(rsDr("name"))
-                                StyleName = vbReplace(StyleName, "*/", "*-/")
+                                EMailTemplateID = genericController.EncodeInteger("EmailTemplateID")
+                                Filename = genericController.encodeText(rsDr("stylesFilename"))
+                                StyleName = genericController.encodeText(rsDr("name"))
+                                StyleName = genericController.vbReplace(StyleName, "*/", "*-/")
                                 If Filename <> "" Then
                                     emailstyles = emailstyles _
                                         & vbCrLf & "/*" _
                                         & vbCrLf & "Email Styles" _
                                         & vbCrLf & "*/" _
-                                        & vbCrLf & RemoveStyleTags(cdnFiles.readFile(Filename))
+                                        & vbCrLf & genericController.RemoveStyleTags(cdnFiles.readFile(Filename))
                                 End If
                             End If
                         Next
@@ -4766,18 +4766,18 @@ ErrorTrap:
                     SQL = "select s.name,s.id,s.StyleFilename from ccSharedStyles s left join ccEmailStyleRules r on s.id=r.sharedstylesid where (s.active<>0)and(r.emailid=" & EmailID & ")and((s.AlwaysInclude=0)or(s.AlwaysInclude is null))"
                     dt = db.executeSql(SQL)
                     For Each rsDr As DataRow In dt.Rows
-                        styleId = EncodeInteger(rsDr("id"))
-                        StyleName = EncodeText(rsDr("name"))
-                        StyleName = vbReplace(StyleName, "*/", "*-/")
+                        styleId = genericController.EncodeInteger(rsDr("id"))
+                        StyleName = genericController.encodeText(rsDr("name"))
+                        StyleName = genericController.vbReplace(StyleName, "*/", "*-/")
                         If (InStr(1, usedSharedStyleList & ",", "," & styleId & ",") = 0) Then
                             usedSharedStyleList = usedSharedStyleList & "," & styleId
-                            Filename = EncodeText(rsDr("stylefilename"))
+                            Filename = genericController.encodeText(rsDr("stylefilename"))
                             If Filename <> "" Then
                                 sharedStyles = sharedStyles _
                                     & vbCrLf & "/*" _
                                     & vbCrLf & "Shared Styles included in email" _
                                     & vbCrLf & "*/" _
-                                    & vbCrLf & RemoveStyleTags(cdnFiles.readFile(Filename))
+                                    & vbCrLf & genericController.RemoveStyleTags(cdnFiles.readFile(Filename))
                             End If
                         End If
                     Next
@@ -4832,13 +4832,13 @@ ErrorTrap:
                     & vbCrLf & "/*" _
                     & vbCrLf & "Reset Styles" _
                     & vbCrLf & "*/" _
-                    & vbCrLf & RemoveStyleTags(appRootFiles.readFile("\cclib\styles\ccreset.css"))
+                    & vbCrLf & genericController.RemoveStyleTags(appRootFiles.readFile("\cclib\styles\ccreset.css"))
             End If
             pageManager_GetStyleSheetDefault2 = pageManager_GetStyleSheetDefault2 _
                 & vbCrLf & "/*" _
                 & vbCrLf & "Contensive Styles" _
                 & vbCrLf & "*/" _
-                & vbCrLf & RemoveStyleTags(appRootFiles.readFile("\cclib\styles\" & defaultStyleFilename))
+                & vbCrLf & genericController.RemoveStyleTags(appRootFiles.readFile("\cclib\styles\" & defaultStyleFilename))
             '
             Exit Function
 ErrorTrap:
@@ -4906,9 +4906,9 @@ ErrorTrap:
             SrcSelectorInner = SrcSelector
             Dim PosLeft As Integer
             Dim PosRight As Integer
-            PosLeft = vbInstr(1, SrcSelector, "[")
+            PosLeft = genericController.vbInstr(1, SrcSelector, "[")
             If PosLeft <> 0 Then
-                PosRight = vbInstr(1, SrcSelector, "]")
+                PosRight = genericController.vbInstr(1, SrcSelector, "]")
                 If PosRight <> 0 Then
                     If (PosRight < Len(SrcSelector)) Then
                         SrcSelectorSuffix = Mid(SrcSelector, PosRight + 1)
@@ -4934,7 +4934,7 @@ ErrorTrap:
                     '
                     Pos = 0
                     If Pos = 0 Then
-                        Pos = vbInstr(1, Choice, ACFunctionList1 & "(", vbTextCompare)
+                        Pos = genericController.vbInstr(1, Choice, ACFunctionList1 & "(", vbTextCompare)
                         If Pos > 0 Then
                             IsContentList = True
                             IncludeID = False
@@ -4942,7 +4942,7 @@ ErrorTrap:
                         End If
                     End If
                     If Pos = 0 Then
-                        Pos = vbInstr(1, Choice, ACFunctionList2 & "(", vbTextCompare)
+                        Pos = genericController.vbInstr(1, Choice, ACFunctionList2 & "(", vbTextCompare)
                         If Pos > 0 Then
                             IsContentList = True
                             IncludeID = False
@@ -4950,7 +4950,7 @@ ErrorTrap:
                         End If
                     End If
                     If Pos = 0 Then
-                        Pos = vbInstr(1, Choice, ACFunctionList3 & "(", vbTextCompare)
+                        Pos = genericController.vbInstr(1, Choice, ACFunctionList3 & "(", vbTextCompare)
                         If Pos > 0 Then
                             IsContentList = True
                             IncludeID = False
@@ -4958,7 +4958,7 @@ ErrorTrap:
                         End If
                     End If
                     If Pos = 0 Then
-                        Pos = vbInstr(1, Choice, ACFunctionListID & "(", vbTextCompare)
+                        Pos = genericController.vbInstr(1, Choice, ACFunctionListID & "(", vbTextCompare)
                         If Pos > 0 Then
                             IsContentList = True
                             IncludeID = True
@@ -4966,7 +4966,7 @@ ErrorTrap:
                         End If
                     End If
                     If Pos = 0 Then
-                        Pos = vbInstr(1, Choice, ACFunctionList & "(", vbTextCompare)
+                        Pos = genericController.vbInstr(1, Choice, ACFunctionList & "(", vbTextCompare)
                         If Pos > 0 Then
                             IsContentList = True
                             IncludeID = False
@@ -4974,7 +4974,7 @@ ErrorTrap:
                         End If
                     End If
                     If Pos = 0 Then
-                        Pos = vbInstr(1, Choice, ACFunctionListFields & "(", vbTextCompare)
+                        Pos = genericController.vbInstr(1, Choice, ACFunctionListFields & "(", vbTextCompare)
                         If Pos > 0 Then
                             IsListField = True
                             IncludeID = False
@@ -4992,7 +4992,7 @@ ErrorTrap:
                             ' set ContentName and ContentCriteria from argument list
                             '
                             FnArgList = Mid(FnArgList, 2, Len(FnArgList) - 2)
-                            FnArgs = SplitDelimited(FnArgList, ",")
+                            FnArgs = genericController.SplitDelimited(FnArgList, ",")
                             FnArgCnt = UBound(FnArgs) + 1
                             If FnArgCnt > 0 Then
                                 ContentName = Trim(FnArgs(0))
@@ -5036,15 +5036,15 @@ ErrorTrap:
                             RowCnt = UBound(Cell, 2) + 1
                             For RowPtr = 0 To RowCnt - 1
                                 '
-                                RecordName = EncodeText(Cell(1, RowPtr))
-                                RecordName = vbReplace(RecordName, vbCrLf, " ")
-                                RecordID = EncodeInteger(Cell(0, RowPtr))
+                                RecordName = genericController.encodeText(Cell(1, RowPtr))
+                                RecordName = genericController.vbReplace(RecordName, vbCrLf, " ")
+                                RecordID = genericController.EncodeInteger(Cell(0, RowPtr))
                                 If RecordName = "" Then
                                     RecordName = "record " & RecordID
                                 ElseIf Len(RecordName) > 50 Then
                                     RecordName = Left(RecordName, 50) & "..."
                                 End If
-                                RecordName = encodeNvaArgument(RecordName)
+                                RecordName = genericController.encodeNvaArgument(RecordName)
                                 list = list & "|" & RecordName
                                 If IncludeID Then
                                     list = list & ":" & RecordID
@@ -5067,7 +5067,7 @@ ErrorTrap:
             ' Build output string
             '
             'csv_GetAddonSelector = encodeNvaArgument(SrcOptionName)
-            pageManager_GetAddonSelector = html.html_EncodeHTML(encodeNvaArgument(SrcOptionName)) & "="
+            pageManager_GetAddonSelector = html.html_EncodeHTML(genericController.encodeNvaArgument(SrcOptionName)) & "="
             If InstanceOptionValue_AddonEncoded <> "" Then
                 pageManager_GetAddonSelector = pageManager_GetAddonSelector & html.html_EncodeHTML(InstanceOptionValue_AddonEncoded)
             End If
@@ -5075,7 +5075,7 @@ ErrorTrap:
                 '
                 ' empty list with no suffix, return with name=value
                 '
-            ElseIf vbLCase(SrcSelectorSuffix) = "resourcelink" Then
+            ElseIf genericController.vbLCase(SrcSelectorSuffix) = "resourcelink" Then
                 '
                 ' resource link, exit with empty list
                 '
@@ -5134,7 +5134,7 @@ ErrorTrap:
                 '
                 ' bad email address
                 '
-            ElseIf vbInstr(1, getEmailBlockList_InternalOnly(), vbCrLf & EmailAddress & vbTab, vbTextCompare) <> 0 Then
+            ElseIf genericController.vbInstr(1, getEmailBlockList_InternalOnly(), vbCrLf & EmailAddress & vbTab, vbTextCompare) <> 0 Then
                 '
                 ' They are already in the list
                 '
@@ -5207,14 +5207,14 @@ ErrorTrap:
             WorkingString = OptionString
             csv_GetAddonOption = ""
             If WorkingString <> "" Then
-                TargetName = vbLCase(OptionName)
-                'targetName = vbLCase(encodeNvaArgument(OptionName))
+                TargetName = genericController.vbLCase(OptionName)
+                'targetName = genericController.vbLCase(encodeNvaArgument(OptionName))
                 Options = Split(OptionString, "&")
                 'Options = Split(OptionString, vbCrLf)
                 For Ptr = 0 To UBound(Options)
-                    Pos = vbInstr(1, Options(Ptr), "=")
+                    Pos = genericController.vbInstr(1, Options(Ptr), "=")
                     If Pos > 0 Then
-                        TestName = vbLCase(Trim(Left(Options(Ptr), Pos - 1)))
+                        TestName = genericController.vbLCase(Trim(Left(Options(Ptr), Pos - 1)))
                         Do While (TestName <> "") And (Left(TestName, 1) = vbTab)
                             TestName = Trim(Mid(TestName, 2))
                         Loop
@@ -5222,7 +5222,7 @@ ErrorTrap:
                             TestName = Trim(Mid(TestName, 1, Len(TestName) - 1))
                         Loop
                         If TestName = TargetName Then
-                            csv_GetAddonOption = decodeNvaArgument(Trim(Mid(Options(Ptr), Pos + 1)))
+                            csv_GetAddonOption = genericController.decodeNvaArgument(Trim(Mid(Options(Ptr), Pos + 1)))
                             'csv_GetAddonOption = Trim(Mid(Options(Ptr), Pos + 1))
                             Exit For
                         End If
@@ -5555,8 +5555,8 @@ ErrorTrap:
                     ' For now, skip the ones in content
                     '
                     ''hint = hint & ",020"
-                    TagPosEnd = vbInstr(1, LinkSplit(LinkPtr), ">")
-                    TagPosStart = vbInstr(1, LinkSplit(LinkPtr), "<")
+                    TagPosEnd = genericController.vbInstr(1, LinkSplit(LinkPtr), ">")
+                    TagPosStart = genericController.vbInstr(1, LinkSplit(LinkPtr), "<")
                     If TagPosEnd = 0 And TagPosStart = 0 Then
                         '
                         ' no tags found, skip it
@@ -5584,7 +5584,7 @@ ErrorTrap:
                         If UBound(TableSplit) > 2 Then
                             TableName = TableSplit(0)
                             FieldName = TableSplit(1)
-                            RecordID = EncodeInteger(TableSplit(2))
+                            RecordID = genericController.EncodeInteger(TableSplit(2))
                             FilenameSegment = TableSplit(3)
                             If (LCase(TableName) = "cclibraryfiles") And (LCase(FieldName) = "filename") And (RecordID <> 0) Then
                                 Dim lfRecordId As Integer
@@ -5619,12 +5619,12 @@ ErrorTrap:
                                         '   URL( /image.jpg) -
                                         '
                                         ''hint = hint & ",070"
-                                        RecordVirtualFilename = EncodeText(cache_libraryFiles(LibraryFilesCache_filename, lfPtr))
+                                        RecordVirtualFilename = genericController.encodeText(cache_libraryFiles(LibraryFilesCache_filename, lfPtr))
                                         ''hint = hint & ",071"
-                                        RecordAltSizeList = EncodeText(cache_libraryFiles(LibraryFilesCache_altsizelist, lfPtr))
+                                        RecordAltSizeList = genericController.encodeText(cache_libraryFiles(LibraryFilesCache_altsizelist, lfPtr))
                                         'RecordVirtualFilename = app.csv_cs_get(CS, FieldName)
                                         ''hint = hint & ",072"
-                                        If RecordVirtualFilename = EncodeJavascript(RecordVirtualFilename) Then
+                                        If RecordVirtualFilename = genericController.EncodeJavascript(RecordVirtualFilename) Then
                                             '
                                             ' The javascript version of the filename must match the filename, since we have no way
                                             ' of differentiating a ligitimate file, from a block of javascript. If the file
@@ -5658,8 +5658,8 @@ ErrorTrap:
                                             End If
                                             Pos = InStrRev(RecordFilename, ".")
                                             If Pos > 0 Then
-                                                RecordFilenameExt = vbLCase(Mid(RecordFilename, Pos + 1))
-                                                RecordFilenameNoExt = vbLCase(Mid(RecordFilename, 1, Pos - 1))
+                                                RecordFilenameExt = genericController.vbLCase(Mid(RecordFilename, Pos + 1))
+                                                RecordFilenameNoExt = genericController.vbLCase(Mid(RecordFilename, 1, Pos - 1))
                                             End If
                                             'Pos = InStrRev(RecordFilenameNoExt, "-")
                                             'If Pos > 0 Then
@@ -5668,7 +5668,7 @@ ErrorTrap:
                                             '    If UBound(SizeTest) <> 1 Then
                                             '        RecordFilenameAltSize = ""
                                             '    Else
-                                            '        If vbIsNumeric(SizeTest(0)) And vbIsNumeric(SizeTest(1)) Then
+                                            '        If genericController.vbIsNumeric(SizeTest(0)) And genericController.vbIsNumeric(SizeTest(1)) Then
                                             '            RecordFilenameNoExt = Mid(RecordFilenameNoExt, 1, Pos - 1)
                                             '            'RecordFilenameNoExt = Mid(RecordFilename, 1, Pos - 1)
                                             '        Else
@@ -5686,7 +5686,7 @@ ErrorTrap:
                                                 ''hint = hint & ",090"
                                                 Pos = InStrRev(FilePrefixSegment, "<")
                                                 If Pos > 0 Then
-                                                    If vbLCase(Mid(FilePrefixSegment, Pos + 1, 3)) <> "ac " Then
+                                                    If genericController.vbLCase(Mid(FilePrefixSegment, Pos + 1, 3)) <> "ac " Then
                                                         '
                                                         ' look back in the FilePrefixSegment to find the character before the link
                                                         '
@@ -5698,8 +5698,8 @@ ErrorTrap:
                                                                     '
                                                                     ' Ends in ' ' or '>', find the first
                                                                     '
-                                                                    EndPos1 = vbInstr(1, FilenameSegment, " ")
-                                                                    EndPos2 = vbInstr(1, FilenameSegment, ">")
+                                                                    EndPos1 = genericController.vbInstr(1, FilenameSegment, " ")
+                                                                    EndPos2 = genericController.vbInstr(1, FilenameSegment, ">")
                                                                     If EndPos1 <> 0 And EndPos2 <> 0 Then
                                                                         If EndPos1 < EndPos2 Then
                                                                             EndPos = EndPos1
@@ -5729,7 +5729,7 @@ ErrorTrap:
                                                                     '
                                                                     ' Quoted, ends is '"'
                                                                     '
-                                                                    EndPos = vbInstr(1, FilenameSegment, """")
+                                                                    EndPos = genericController.vbInstr(1, FilenameSegment, """")
                                                                     'If EndPos <= 0 Then
                                                                     '    ParseError = True
                                                                     '    Exit For
@@ -5746,14 +5746,14 @@ ErrorTrap:
                                                                     '
                                                                     ' url() style, ends in ')' or a ' '
                                                                     '
-                                                                    If vbLCase(Mid(FilePrefixSegment, Ptr, 7)) = "(&quot;" Then
-                                                                        EndPos = vbInstr(1, FilenameSegment, "&quot;)")
-                                                                    ElseIf vbLCase(Mid(FilePrefixSegment, Ptr, 2)) = "('" Then
-                                                                        EndPos = vbInstr(1, FilenameSegment, "')")
-                                                                    ElseIf vbLCase(Mid(FilePrefixSegment, Ptr, 2)) = "(""" Then
-                                                                        EndPos = vbInstr(1, FilenameSegment, """)")
+                                                                    If genericController.vbLCase(Mid(FilePrefixSegment, Ptr, 7)) = "(&quot;" Then
+                                                                        EndPos = genericController.vbInstr(1, FilenameSegment, "&quot;)")
+                                                                    ElseIf genericController.vbLCase(Mid(FilePrefixSegment, Ptr, 2)) = "('" Then
+                                                                        EndPos = genericController.vbInstr(1, FilenameSegment, "')")
+                                                                    ElseIf genericController.vbLCase(Mid(FilePrefixSegment, Ptr, 2)) = "(""" Then
+                                                                        EndPos = genericController.vbInstr(1, FilenameSegment, """)")
                                                                     Else
-                                                                        EndPos = vbInstr(1, FilenameSegment, ")")
+                                                                        EndPos = genericController.vbInstr(1, FilenameSegment, ")")
                                                                     End If
 
                                                                     'If EndPos <= 0 Then
@@ -5771,7 +5771,7 @@ ErrorTrap:
                                                                     '
                                                                     ' Delimited within a javascript pair of apostophys
                                                                     '
-                                                                    EndPos = vbInstr(1, FilenameSegment, "'")
+                                                                    EndPos = genericController.vbInstr(1, FilenameSegment, "'")
                                                                     'If EndPos <= 0 Then
                                                                     '    ParseError = True
                                                                     '    Exit For
@@ -5811,13 +5811,13 @@ ErrorTrap:
 
                                                             ''hint = hint & ",120"
                                                             SegmentAfterImage = Mid(FilenameSegment, EndPos)
-                                                            ImageFilename = DecodeResponseVariable(Mid(FilenameSegment, 1, EndPos - 1))
+                                                            ImageFilename = genericController.DecodeResponseVariable(Mid(FilenameSegment, 1, EndPos - 1))
                                                             ImageFilenameNoExt = ImageFilename
                                                             ImageFilenameExt = ""
                                                             Pos = InStrRev(ImageFilename, ".")
                                                             If Pos > 0 Then
-                                                                ImageFilenameNoExt = vbLCase(Mid(ImageFilename, 1, Pos - 1))
-                                                                ImageFilenameExt = vbLCase(Mid(ImageFilename, Pos + 1))
+                                                                ImageFilenameNoExt = genericController.vbLCase(Mid(ImageFilename, 1, Pos - 1))
+                                                                ImageFilenameExt = genericController.vbLCase(Mid(ImageFilename, Pos + 1))
                                                             End If
                                                             '
                                                             ' Get ImageAltSize
@@ -5828,7 +5828,7 @@ ErrorTrap:
                                                                 '
                                                                 ' Exact match
                                                                 '
-                                                            ElseIf vbInstr(1, ImageFilenameNoExt, RecordFilenameNoExt, vbTextCompare) <> 1 Then
+                                                            ElseIf genericController.vbInstr(1, ImageFilenameNoExt, RecordFilenameNoExt, vbTextCompare) <> 1 Then
                                                                 '
                                                                 ' There was a change and the recordfilename is not part of the imagefilename
                                                                 '
@@ -5845,7 +5845,7 @@ ErrorTrap:
                                                                     If UBound(SizeTest) <> 1 Then
                                                                         ImageAltSize = ""
                                                                     Else
-                                                                        If vbIsNumeric(SizeTest(0)) And vbIsNumeric(SizeTest(1)) Then
+                                                                        If genericController.vbIsNumeric(SizeTest(0)) And genericController.vbIsNumeric(SizeTest(1)) Then
                                                                             ImageFilenameNoExt = RecordFilenameNoExt
                                                                             'ImageFilenameNoExt = Mid(ImageFilenameNoExt, 1, Pos - 1)
                                                                             'RecordFilenameNoExt = Mid(RecordFilename, 1, Pos - 1)
@@ -5876,7 +5876,7 @@ ErrorTrap:
                                                                 TableSplit(1) = ""
                                                                 TableSplit(2) = ""
                                                                 TableSplit(3) = SegmentAfterImage
-                                                                NewRecordFilename = EncodeURL(NewRecordFilename) & Mid(Join(TableSplit, "/"), 4)
+                                                                NewRecordFilename = genericController.EncodeURL(NewRecordFilename) & Mid(Join(TableSplit, "/"), 4)
                                                                 LinkSplit(LinkPtr) = NewRecordFilename
                                                                 SaveChanges = True
                                                             End If
@@ -5906,9 +5906,9 @@ ErrorTrap:
                 '
                 ' Convert ACTypeDynamicForm to Add-on
                 '
-                If vbInstr(1, html_EncodeContentUpgrades, "<ac type=""" & ACTypeDynamicForm, vbTextCompare) <> 0 Then
-                    html_EncodeContentUpgrades = vbReplace(html_EncodeContentUpgrades, "type=""DYNAMICFORM""", "TYPE=""aggregatefunction""", 1, 99, vbTextCompare)
-                    html_EncodeContentUpgrades = vbReplace(html_EncodeContentUpgrades, "name=""DYNAMICFORM""", "name=""DYNAMIC FORM""", 1, 99, vbTextCompare)
+                If genericController.vbInstr(1, html_EncodeContentUpgrades, "<ac type=""" & ACTypeDynamicForm, vbTextCompare) <> 0 Then
+                    html_EncodeContentUpgrades = genericController.vbReplace(html_EncodeContentUpgrades, "type=""DYNAMICFORM""", "TYPE=""aggregatefunction""", 1, 99, vbTextCompare)
+                    html_EncodeContentUpgrades = genericController.vbReplace(html_EncodeContentUpgrades, "name=""DYNAMICFORM""", "name=""DYNAMIC FORM""", 1, 99, vbTextCompare)
                 End If
             End If
             ''hint = hint & ",930"
@@ -5923,8 +5923,8 @@ ErrorTrap:
             ' the merge is now handled in csv_EncodeActiveContent, but some sites have hand {{content}} tags entered
             '
             ''hint = hint & ",940"
-            If vbInstr(1, html_EncodeContentUpgrades, "{{content}}", vbTextCompare) <> 0 Then
-                html_EncodeContentUpgrades = vbReplace(html_EncodeContentUpgrades, "{{content}}", "<AC type=""" & ACTypeTemplateContent & """>", 1, 99, vbTextCompare)
+            If genericController.vbInstr(1, html_EncodeContentUpgrades, "{{content}}", vbTextCompare) <> 0 Then
+                html_EncodeContentUpgrades = genericController.vbReplace(html_EncodeContentUpgrades, "{{content}}", "<AC type=""" & ACTypeTemplateContent & """>", 1, 99, vbTextCompare)
             End If
             '
             'Call main_testPoint(hint)
@@ -5974,7 +5974,7 @@ ErrorTrap:
             Try
                 Dim Algorithm As Integer
                 '
-                Algorithm = EncodeInteger(siteProperties.getText("ImageResizeSFAlgorithm", "5"))
+                Algorithm = genericController.EncodeInteger(siteProperties.getText("ImageResizeSFAlgorithm", "5"))
                 Call image_ResizeImage2(SrcFilename, DstFilename, Width, Height, DirectCast(Algorithm, csv_SfImageResizeAlgorithms))
             Catch ex As Exception
                 handleExceptionAndRethrow(ex)
@@ -5986,7 +5986,7 @@ ErrorTrap:
         Public Function email_getEmailStyles(ByVal EmailID As Integer) As String
             On Error GoTo ErrorTrap 'Const Tn = "getEmailStyles": 'Dim th as integer: th = profileLogMethodEnter(Tn)
             '
-            email_getEmailStyles = html_getStyleSheet2(csv_contentTypeEnum.contentTypeEmail, 0, EncodeInteger(EmailID))
+            email_getEmailStyles = html_getStyleSheet2(csv_contentTypeEnum.contentTypeEmail, 0, genericController.EncodeInteger(EmailID))
             If email_getEmailStyles <> "" Then
                 email_getEmailStyles = "" _
                     & vbCrLf & StyleSheetStart _
@@ -6072,8 +6072,8 @@ ErrorTrap:
         ''       AddonOptionString is a & delimited string of name=value[selector]descriptor
         ''------------------------------------------------------------------------------------------------------------
         ''
-        'Public Function decodeNvaArgument(EncodedArg As String) As String
-        '    decodeNvaArgument = decodeNvaArgument(EncodedArg)
+        'Public Function genericController.decodeNvaArgument(EncodedArg As String) As String
+        '    decodeNvaArgument = genericController.decodeNvaArgument(EncodedArg)
         'End Function
         '
         '=================================================================================================================
@@ -6090,12 +6090,12 @@ ErrorTrap:
             Dim Pos As Integer
             Dim s As String
             '
-            s = getSimpleNameValue(OptionName, addonOptionString, "", "&")
-            Pos = vbInstr(1, s, "[")
+            s = genericController.getSimpleNameValue(OptionName, addonOptionString, "", "&")
+            Pos = genericController.vbInstr(1, s, "[")
             If Pos > 0 Then
                 s = Left(s, Pos - 1)
             End If
-            s = decodeNvaArgument(s)
+            s = genericController.decodeNvaArgument(s)
             '
             csv_GetAddonOptionStringValue = Trim(s)
             '
@@ -6151,7 +6151,7 @@ ErrorTrap:
             Dim dt As DataTable
             dt = db.executeSql(SQL)
             If dt.Rows.Count > 0 Then
-                warningId = EncodeInteger(dt.Rows(0).Item("id"))
+                warningId = genericController.EncodeInteger(dt.Rows(0).Item("id"))
             End If
             '
             If warningId <> 0 Then
@@ -6207,8 +6207,8 @@ ErrorTrap:
         ''       - other characters are reserved to do further parsing, see encodeNvaArgument
         ''------------------------------------------------------------------------------------------------------------
         ''
-        'Public Function decodeNvaArgument(EncodedArg As String) As String
-        '    decodeNvaArgument = decodeNvaArgument(EncodedArg)
+        'Public Function genericController.decodeNvaArgument(EncodedArg As String) As String
+        '    decodeNvaArgument = genericController.decodeNvaArgument(EncodedArg)
         'End Function
 
         '
@@ -6266,20 +6266,20 @@ ErrorTrap:
                     ' remove nonsafe URL characters
                     '
                     Src = WorkingLinkAlias
-                    Src = vbReplace(Src, "’", "'")
-                    Src = vbReplace(Src, vbTab, " ")
+                    Src = genericController.vbReplace(Src, "’", "'")
+                    Src = genericController.vbReplace(Src, vbTab, " ")
                     WorkingLinkAlias = ""
                     For Ptr = 1 To Len(Src) + 1
                         TestChr = Mid(Src, Ptr, 1)
-                        If vbInstr(1, SafeString, TestChr, vbTextCompare) <> 0 Then
+                        If genericController.vbInstr(1, SafeString, TestChr, vbTextCompare) <> 0 Then
                         Else
                             TestChr = vbTab
                         End If
                         WorkingLinkAlias = WorkingLinkAlias & TestChr
                     Next
                     Ptr = 0
-                    Do While vbInstr(1, WorkingLinkAlias, vbTab & vbTab) <> 0 And (Ptr < 100)
-                        WorkingLinkAlias = vbReplace(WorkingLinkAlias, vbTab & vbTab, vbTab)
+                    Do While genericController.vbInstr(1, WorkingLinkAlias, vbTab & vbTab) <> 0 And (Ptr < 100)
+                        WorkingLinkAlias = genericController.vbReplace(WorkingLinkAlias, vbTab & vbTab, vbTab)
                         Ptr = Ptr + 1
                     Loop
                     If Right(WorkingLinkAlias, 1) = vbTab Then
@@ -6288,7 +6288,7 @@ ErrorTrap:
                     If Left(WorkingLinkAlias, 1) = vbTab Then
                         WorkingLinkAlias = Mid(WorkingLinkAlias, 2)
                     End If
-                    WorkingLinkAlias = vbReplace(WorkingLinkAlias, vbTab, "-")
+                    WorkingLinkAlias = genericController.vbReplace(WorkingLinkAlias, vbTab, "-")
                     If (WorkingLinkAlias <> "") Then
                         '
                         ' Make sure there is not a folder or page in the wwwroot that matches this Alias
@@ -6297,7 +6297,7 @@ ErrorTrap:
                             WorkingLinkAlias = "/" & WorkingLinkAlias
                         End If
                         '
-                        If vbLCase(WorkingLinkAlias) = vbLCase("/" & serverConfig.appConfig.name) Then
+                        If genericController.vbLCase(WorkingLinkAlias) = genericController.vbLCase("/" & serverConfig.appConfig.name) Then
                             '
                             ' This alias points to the cclib folder
                             '
@@ -6306,7 +6306,7 @@ ErrorTrap:
                                     & "The Link Alias being created (" & WorkingLinkAlias & ") can not be used because there is a virtual directory in your website directory that already uses this name." _
                                     & " Please change it to ensure the Link Alias is unique. To set or change the Link Alias, use the Link Alias tab and select a name not used by another page."
                             End If
-                        ElseIf vbLCase(WorkingLinkAlias) = "/cclib" Then
+                        ElseIf genericController.vbLCase(WorkingLinkAlias) = "/cclib" Then
                             '
                             ' This alias points to the cclib folder
                             '
@@ -6513,8 +6513,8 @@ ErrorTrap:
                 '
                 'hint = hint & ",010"
                 If siteProperties.getBoolean("ConvertContentCRLF2BR", False) And (Not PlainText) Then
-                    returnValue = vbReplace(returnValue, vbCr, "")
-                    returnValue = vbReplace(returnValue, vbLf, "<br>")
+                    returnValue = genericController.vbReplace(returnValue, vbCr, "")
+                    returnValue = genericController.vbReplace(returnValue, vbLf, "<br>")
                 End If
                 '
                 ' ----- Do upgrade conversions (upgrade legacy objects and upgrade old images)
@@ -6556,7 +6556,7 @@ ErrorTrap:
                             '
                             returnValue = returnValue & Segment
                         ElseIf (Segment <> "") Then
-                            If vbInstr(1, Segment, "}}") = 0 Then
+                            If genericController.vbInstr(1, Segment, "}}") = 0 Then
                                 '
                                 ' No command found, return the marker and deliver the Segment
                                 '
@@ -6582,12 +6582,12 @@ ErrorTrap:
                                         addonOptionString = ""
                                     Else
                                         addonOptionString = AcCmdSplit(1)
-                                        addonOptionString = decodeHtml(addonOptionString)
+                                        addonOptionString = genericController.decodeHtml(addonOptionString)
                                     End If
                                     '
                                     ' execute the command
                                     '
-                                    Select Case vbUCase(ACType)
+                                    Select Case genericController.vbUCase(ACType)
                                         Case ACTypeDynamicForm
                                             '
                                             ' Dynamic Form - run the core addon replacement instead
@@ -6626,7 +6626,7 @@ ErrorTrap:
                                             'hint = hint & ",330"
                                             ListName = csv_GetAddonOption("LISTNAME", addonOptionString)
                                             SortField = csv_GetAddonOption("SORTFIELD", addonOptionString)
-                                            SortReverse = EncodeBoolean(csv_GetAddonOption("SORTDIRECTION", addonOptionString))
+                                            SortReverse = genericController.EncodeBoolean(csv_GetAddonOption("SORTDIRECTION", addonOptionString))
                                             returnValue = returnValue & Controllers.pageManagerController.main_GetWatchList(Me, ListName, SortField, SortReverse)
                                         Case Else
                                             '
@@ -6662,8 +6662,8 @@ ErrorTrap:
                 '
                 If (InStr(1, returnValue, StartFlag) <> 0) Then
                     Do While (InStr(1, returnValue, StartFlag) <> 0)
-                        LineStart = vbInstr(1, returnValue, StartFlag)
-                        LineEnd = vbInstr(LineStart, returnValue, EndFlag)
+                        LineStart = genericController.vbInstr(1, returnValue, StartFlag)
+                        LineEnd = genericController.vbInstr(LineStart, returnValue, EndFlag)
                         If LineEnd = 0 Then
                             log_appendLog("csv_EncodeContent9, Addon could not be inserted into content because the HTML comment holding the position is not formated correctly")
                             Exit Do
@@ -6673,14 +6673,14 @@ ErrorTrap:
                             ACInstanceID = ""
                             AddonGuid = ""
                             Copy = Mid(returnValue, LineStart + 11, LineEnd - LineStart - 11)
-                            ArgSplit = SplitDelimited(Copy, ",")
+                            ArgSplit = genericController.SplitDelimited(Copy, ",")
                             ArgCnt = UBound(ArgSplit) + 1
                             If ArgSplit(0) <> "" Then
                                 AddonName = Mid(ArgSplit(0), 2, Len(ArgSplit(0)) - 2)
                                 If ArgCnt > 1 Then
                                     If ArgSplit(1) <> "" Then
                                         addonOptionString = Mid(ArgSplit(1), 2, Len(ArgSplit(1)) - 2)
-                                        addonOptionString = decodeHtml(Trim(addonOptionString))
+                                        addonOptionString = genericController.decodeHtml(Trim(addonOptionString))
                                     End If
                                     If ArgCnt > 2 Then
                                         If ArgSplit(2) <> "" Then
@@ -6714,16 +6714,16 @@ ErrorTrap:
                 If (Not isEditingAnything) And (returnValue <> BlockTextStartMarker) Then
                     DoAnotherPass = True
                     Do While (InStr(1, returnValue, BlockTextStartMarker, vbTextCompare) <> 0) And DoAnotherPass
-                        LineStart = vbInstr(1, returnValue, BlockTextStartMarker, vbTextCompare)
+                        LineStart = genericController.vbInstr(1, returnValue, BlockTextStartMarker, vbTextCompare)
                         If LineStart = 0 Then
                             DoAnotherPass = False
                         Else
-                            LineEnd = vbInstr(LineStart, returnValue, BlockTextEndMarker, vbTextCompare)
+                            LineEnd = genericController.vbInstr(LineStart, returnValue, BlockTextEndMarker, vbTextCompare)
                             If LineEnd <= 0 Then
                                 DoAnotherPass = False
                                 returnValue = Mid(returnValue, 1, LineStart - 1)
                             Else
-                                LineEnd = vbInstr(LineEnd, returnValue, " -->")
+                                LineEnd = genericController.vbInstr(LineEnd, returnValue, " -->")
                                 If LineEnd <= 0 Then
                                     DoAnotherPass = False
                                 Else
@@ -6750,23 +6750,23 @@ ErrorTrap:
                             Call handleLegacyError7("returnValue", "AFScript Style edit wrappers are not supported")
                             Copy = main_GetEditWrapper("Aggregate Script", "##MARKER##")
                             Wrapper = Split(Copy, "##MARKER##")
-                            returnValue = vbReplace(returnValue, "<!-- AFScript -->", Wrapper(0), 1, 99, vbTextCompare)
-                            returnValue = vbReplace(returnValue, "<!-- /AFScript -->", Wrapper(1), 1, 99, vbTextCompare)
+                            returnValue = genericController.vbReplace(returnValue, "<!-- AFScript -->", Wrapper(0), 1, 99, vbTextCompare)
+                            returnValue = genericController.vbReplace(returnValue, "<!-- /AFScript -->", Wrapper(1), 1, 99, vbTextCompare)
                         End If
                         If (InStr(1, returnValue, "<!-- AFReplacement -->", vbTextCompare) <> 0) Then
                             Call handleLegacyError7("returnValue", "AFReplacement Style edit wrappers are not supported")
                             Copy = main_GetEditWrapper("Aggregate Replacement", "##MARKER##")
                             Wrapper = Split(Copy, "##MARKER##")
-                            returnValue = vbReplace(returnValue, "<!-- AFReplacement -->", Wrapper(0), 1, 99, vbTextCompare)
-                            returnValue = vbReplace(returnValue, "<!-- /AFReplacement -->", Wrapper(1), 1, 99, vbTextCompare)
+                            returnValue = genericController.vbReplace(returnValue, "<!-- AFReplacement -->", Wrapper(0), 1, 99, vbTextCompare)
+                            returnValue = genericController.vbReplace(returnValue, "<!-- /AFReplacement -->", Wrapper(1), 1, 99, vbTextCompare)
                         End If
                     End If
                     '
                     ' Process Feedback form
                     '
                     'hint = hint & ",600, Handle webclient features"
-                    If vbInstr(1, returnValue, FeedbackFormNotSupportedComment, vbTextCompare) <> 0 Then
-                        returnValue = vbReplace(returnValue, FeedbackFormNotSupportedComment, Controllers.pageManagerController.main_GetFeedbackForm(Me, ContextContentName, ContextRecordID, ContextContactPeopleID), 1, 99, vbTextCompare)
+                    If genericController.vbInstr(1, returnValue, FeedbackFormNotSupportedComment, vbTextCompare) <> 0 Then
+                        returnValue = genericController.vbReplace(returnValue, FeedbackFormNotSupportedComment, Controllers.pageManagerController.main_GetFeedbackForm(Me, ContextContentName, ContextRecordID, ContextContactPeopleID), 1, 99, vbTextCompare)
                     End If
                     '
                     ' if call from webpage, push addon js and css out to cpCoreClass
@@ -6791,7 +6791,7 @@ ErrorTrap:
                     '
                     Copy = csv_GetEncodeContent_JSFilename()
                     Do While Copy <> ""
-                        If vbInstr(1, Copy, "://") <> 0 Then
+                        If genericController.vbInstr(1, Copy, "://") <> 0 Then
                         ElseIf Left(Copy, 1) = "/" Then
                         Else
                             Copy = webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, Copy)
@@ -6808,7 +6808,7 @@ ErrorTrap:
                     '
                     Copy = csv_GetEncodeContent_StyleFilenames()
                     Do While Copy <> ""
-                        If vbInstr(1, Copy, "://") <> 0 Then
+                        If genericController.vbInstr(1, Copy, "://") <> 0 Then
                         ElseIf Left(Copy, 1) = "/" Then
                         Else
                             Copy = webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, Copy)
@@ -6892,13 +6892,13 @@ ErrorTrap:
                             templateEncoded = html_encodeContent10(templateEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
                             '
                             If (InStr(1, templateEncoded, fpoContentBox) <> 0) Then
-                                bodyEncoded = vbReplace(templateEncoded, fpoContentBox, bodyEncoded)
+                                bodyEncoded = genericController.vbReplace(templateEncoded, fpoContentBox, bodyEncoded)
                             Else
                                 bodyEncoded = templateEncoded & bodyEncoded
                             End If
                         End If
-                        bodyEncoded = vbReplace(bodyEncoded, "#member_id#", ToMemberID.ToString)
-                        bodyEncoded = vbReplace(bodyEncoded, "#member_email#", ToAddress)
+                        bodyEncoded = genericController.vbReplace(bodyEncoded, "#member_id#", ToMemberID.ToString)
+                        bodyEncoded = genericController.vbReplace(bodyEncoded, "#member_email#", ToAddress)
                         '
                         returnStatus = email_send3(ToAddress, FromAddress, subjectEncoded, bodyEncoded, "", "", "", Immediate, HTML, emailIdOrZeroForLog)
                     End If
@@ -7206,9 +7206,9 @@ ErrorTrap:
             MethodName = "csv_GetLinkedText"
             '
             csv_GetLinkedText = ""
-            iAnchorTag = EncodeText(AnchorTag)
-            iAnchorText = EncodeText(AnchorText)
-            UcaseAnchorText = vbUCase(iAnchorText)
+            iAnchorTag = genericController.encodeText(AnchorTag)
+            iAnchorText = genericController.encodeText(AnchorText)
+            UcaseAnchorText = genericController.vbUCase(iAnchorText)
             If (iAnchorTag <> "") And (iAnchorText <> "") Then
                 LinkPosition = InStrRev(UcaseAnchorText, "<LINK>", -1)
                 If LinkPosition = 0 Then
@@ -7248,8 +7248,8 @@ ErrorTrap:
             Dim returnLink As String
             '
             returnLink = virtualFile
-            returnLink = vbReplace(returnLink, "\", "/")
-            If vbInstr(1, returnLink, "://") <> 0 Then
+            returnLink = genericController.vbReplace(returnLink, "\", "/")
+            If genericController.vbInstr(1, returnLink, "://") <> 0 Then
                 '
                 ' icon is an Absolute URL - leave it
                 '
@@ -7275,7 +7275,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function csv_getPhysicalFilename(ByVal VirtualFilename As String) As String
-            Return convertCdnUrlToCdnPathFilename(VirtualFilename)
+            Return genericController.convertCdnUrlToCdnPathFilename(VirtualFilename)
         End Function
         '
         '========================================================================
@@ -7334,7 +7334,7 @@ ErrorTrap:
                     ' Sest to blank
                     '
                     AllowChange = True
-                ElseIf vbUCase(Newusername) <> vbUCase(user.username) Then
+                ElseIf genericController.vbUCase(Newusername) <> genericController.vbUCase(user.username) Then
                     '
                     ' ----- username changed, check if change is allowed
                     '
@@ -7442,7 +7442,7 @@ ErrorTrap:
                             '
                             ' --- Update Group Records
                             '
-                            Call main_ProcessCheckList("MemberRules", "Members", EncodeText(user.id), "Groups", "Member Rules", "MemberID", "GroupID")
+                            Call main_ProcessCheckList("MemberRules", "Members", genericController.encodeText(user.id), "Groups", "Member Rules", "MemberID", "GroupID")
                             '
                             '
                             '
@@ -7522,10 +7522,10 @@ ErrorTrap:
         '===========================================================================================
         '
         Public Sub main_RedirectHTTP(ByVal Link As String)
-            If Not isInStr(1, Link, "://") Then
+            If Not genericController.isInStr(1, Link, "://") Then
                 Link = webServerIO_requestProtocol & Link
             End If
-            Call webServerIO_Redirect2(Link, "call to main_RedirectHTTP(" & EncodeText(Link) & "), no reason given.", False)
+            Call webServerIO_Redirect2(Link, "call to main_RedirectHTTP(" & genericController.encodeText(Link) & "), no reason given.", False)
         End Sub
         '
         '===========================================================================================
@@ -7533,7 +7533,7 @@ ErrorTrap:
         '===========================================================================================
         '
         Public Sub main_Redirect(ByVal Link As Object)
-            Call webServerIO_Redirect2(EncodeText(Link), "No explaination provided", False)
+            Call webServerIO_Redirect2(genericController.encodeText(Link), "No explaination provided", False)
         End Sub
         '
         '===========================================================================================
@@ -7571,12 +7571,12 @@ ErrorTrap:
                 '
                 ' convert link to a long link on this domain
                 '
-                If vbLCase(Mid(NonEncodedLink, 1, 4)) = "http" Then
+                If genericController.vbLCase(Mid(NonEncodedLink, 1, 4)) = "http" Then
                     FullLink = NonEncodedLink
                 Else
                     ShortLink = NonEncodedLink
-                    ShortLink = ConvertLinkToShortLink(ShortLink, webServerIO.requestDomain, webServerIO_requestVirtualFilePath)
-                    ShortLink = coreCommonModule.EncodeAppRootPath(ShortLink, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
+                    ShortLink = genericController.ConvertLinkToShortLink(ShortLink, webServerIO.requestDomain, webServerIO_requestVirtualFilePath)
+                    ShortLink = genericController.EncodeAppRootPath(ShortLink, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
                     FullLink = webServerIO_requestProtocol & webServerIO.requestDomain & ShortLink
                 End If
                 If (NonEncodedLink = "") Then
@@ -7647,7 +7647,7 @@ ErrorTrap:
                         ' Redirect now
                         '
                         Call main_ClearStream()
-                        EncodedLink = EncodeURL(NonEncodedLink)
+                        EncodedLink = genericController.EncodeURL(NonEncodedLink)
 
                         If (Not webServerIO.iisContext Is Nothing) Then
                             '
@@ -7699,14 +7699,14 @@ ErrorTrap:
             If docOpen Then
                 Select Case webServerIO_OutStreamDevice
                     Case webServerIO_OutStreamJavaScript
-                        Call webServerIO_JavaStream_Add(EncodeText(Message))
+                        Call webServerIO_JavaStream_Add(genericController.encodeText(Message))
                     Case Else
 
                         If (webServerIO.iisContext IsNot Nothing) Then
                             main_IsStreamWritten = True
-                            Call webServerIO.iisContext.Response.Write(EncodeText(Message))
+                            Call webServerIO.iisContext.Response.Write(genericController.encodeText(Message))
                         Else
-                            _docBuffer = _docBuffer & EncodeText(Message)
+                            _docBuffer = _docBuffer & genericController.encodeText(Message)
                         End If
                 End Select
             End If
@@ -7730,7 +7730,7 @@ ErrorTrap:
             '
             MethodName = "main_RemoveControlCharacters"
             '
-            iDirtyText = EncodeText(DirtyText)
+            iDirtyText = genericController.encodeText(DirtyText)
             main_RemoveControlCharacters = ""
             If (iDirtyText <> "") Then
                 main_RemoveControlCharacters = ""
@@ -7750,14 +7750,14 @@ ErrorTrap:
                 '
                 ' limit CRLF to 2
                 '
-                Do While vbInstr(main_RemoveControlCharacters, vbLf & vbLf & vbLf) <> 0
-                    main_RemoveControlCharacters = vbReplace(main_RemoveControlCharacters, vbLf & vbLf & vbLf, vbLf & vbLf)
+                Do While genericController.vbInstr(main_RemoveControlCharacters, vbLf & vbLf & vbLf) <> 0
+                    main_RemoveControlCharacters = genericController.vbReplace(main_RemoveControlCharacters, vbLf & vbLf & vbLf, vbLf & vbLf)
                 Loop
                 '
                 ' limit spaces to 1
                 '
-                Do While vbInstr(main_RemoveControlCharacters, "  ") <> 0
-                    main_RemoveControlCharacters = vbReplace(main_RemoveControlCharacters, "  ", " ")
+                Do While genericController.vbInstr(main_RemoveControlCharacters, "  ") <> 0
+                    main_RemoveControlCharacters = genericController.vbReplace(main_RemoveControlCharacters, "  ", " ")
                 Loop
             End If
             Exit Function
@@ -7779,12 +7779,12 @@ ErrorTrap:
             '
             Dim iSource As String
             '
-            iSource = EncodeText(Source)
+            iSource = genericController.encodeText(Source)
             main_EncodeCRLF = ""
             If (iSource <> "") Then
                 main_EncodeCRLF = iSource
-                main_EncodeCRLF = vbReplace(main_EncodeCRLF, vbCr, "")
-                main_EncodeCRLF = vbReplace(main_EncodeCRLF, vbLf, "<br >")
+                main_EncodeCRLF = genericController.vbReplace(main_EncodeCRLF, vbCr, "")
+                main_EncodeCRLF = genericController.vbReplace(main_EncodeCRLF, vbLf, "<br >")
             End If
             Exit Function
             '
@@ -7805,7 +7805,7 @@ ErrorTrap:
         Public Function main_encodeHTML(ByVal Source As Object) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("encodeHTML")
             '
-            main_encodeHTML = html.html_EncodeHTML(EncodeText(Source))
+            main_encodeHTML = html.html_EncodeHTML(genericController.encodeText(Source))
             Exit Function
             '
             ' ----- Error Trap
@@ -7824,7 +7824,7 @@ ErrorTrap:
         Public Function html_convertText2HTML(ByVal Source As Object) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("ConvertText2HTML")
             '
-            html_convertText2HTML = html.html_EncodeHTML(EncodeText(Source))
+            html_convertText2HTML = html.html_EncodeHTML(genericController.encodeText(Source))
             html_convertText2HTML = main_EncodeCRLF(html_convertText2HTML)
             '
             Exit Function
@@ -7846,13 +7846,13 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            main_DecodeHTML = decodeHtml(EncodeText(Source))
+            main_DecodeHTML = genericController.decodeHtml(genericController.encodeText(Source))
             '
             '    '
             '    Dim Decoder As htmlDecodeClass
             '    Dim iSource As String
             '    '
-            '    iSource = encodeText(Source)
+            '    iSource = genericController.encodeText(Source)
             '    '
             '    Decoder = New htmlDecodeClass
             '    main_DecodeHTML = Decoder.Decode(iSource)
@@ -7887,7 +7887,7 @@ ErrorTrap:
         Public Function main_EncodeRequestVariable(Source As String) As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("EncodeRequestVariable")
             '
-            main_EncodeRequestVariable = EncodeRequestVariable(EncodeText(Source))
+            main_EncodeRequestVariable = genericController.EncodeRequestVariable(genericController.encodeText(Source))
             '
             Exit Function
             '
@@ -7906,7 +7906,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            main_EncodeURL = EncodeURL(EncodeText(Source))
+            main_EncodeURL = genericController.EncodeURL(genericController.encodeText(Source))
             Exit Function
             '
             ' ----- Error Trap
@@ -7922,7 +7922,7 @@ ErrorTrap:
         Public Function main_DecodeUrl(ByVal sUrl As String) As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("DecodeUrl")
             '
-            main_DecodeUrl = DecodeResponseVariable(EncodeText(sUrl))
+            main_DecodeUrl = genericController.DecodeResponseVariable(genericController.encodeText(sUrl))
             Exit Function
             '
             ' ----- Error Trap
@@ -7950,7 +7950,7 @@ ErrorTrap:
                 ' write to stream
                 '
                 ElapsedTime = CSng(GetTickCount - app_startTickCount) / 1000
-                iMessage = EncodeText(Message)
+                iMessage = genericController.encodeText(Message)
                 iMessage = Format((ElapsedTime), "00.000") & " - " & New String(debug_TestPointTabChr, debug_TestPointIndent) & iMessage
                 main_testPointMessage = main_testPointMessage & "<nobr>" & iMessage & "</nobr><br >"
                 'writeAltBuffer ("<nobr>" & iMessage & "</nobr><br >")
@@ -7959,10 +7959,10 @@ ErrorTrap:
                 '
                 ' write to debug log in virtual files - to read from a test verbose viewer
                 '
-                iMessage = EncodeText(Message)
-                iMessage = vbReplace(iMessage, vbCrLf, " ")
-                iMessage = vbReplace(iMessage, vbCr, " ")
-                iMessage = vbReplace(iMessage, vbLf, " ")
+                iMessage = genericController.encodeText(Message)
+                iMessage = genericController.vbReplace(iMessage, vbCrLf, " ")
+                iMessage = genericController.vbReplace(iMessage, vbCr, " ")
+                iMessage = genericController.vbReplace(iMessage, vbLf, " ")
                 iMessage = FormatDateTime(Now, vbShortTime) & vbTab & Format((ElapsedTime), "00.000") & vbTab & visit_Id & vbTab & iMessage
                 '
                 Call log_appendLog(iMessage, "", "testPoints_" & serverConfig.appConfig.name)
@@ -8015,11 +8015,11 @@ ErrorTrap:
             Dim NonEncodedLink As String = ""
             Dim RecordActive As Boolean
             '
-            iContentName = EncodeText(ContentName)
-            iRecordID = EncodeInteger(RecordID)
-            iFieldName = encodeEmptyText(FieldName, "link")
+            iContentName = genericController.encodeText(ContentName)
+            iRecordID = genericController.EncodeInteger(RecordID)
+            iFieldName = genericController.encodeEmptyText(FieldName, "link")
             '
-            MethodName = "main_RedirectByRecord_ReturnStatus( " & iContentName & ", " & iRecordID & ", " & encodeEmptyText(FieldName, "(fieldname empty)") & ")"
+            MethodName = "main_RedirectByRecord_ReturnStatus( " & iContentName & ", " & iRecordID & ", " & genericController.encodeEmptyText(FieldName, "(fieldname empty)") & ")"
             '
             main_RedirectByRecord_ReturnStatus = False
             BlockRedirect = False
@@ -8037,7 +8037,7 @@ ErrorTrap:
                     ' ----- handle content special cases (prevent redirect to deleted records)
                     '
                     NonEncodedLink = main_DecodeUrl(EncodedLink)
-                    Select Case vbUCase(iContentName)
+                    Select Case genericController.vbUCase(iContentName)
                         Case "CONTENT WATCH"
                             '
                             ' ----- special case
@@ -8085,7 +8085,7 @@ ErrorTrap:
                     '
                     ' If link incorrectly includes the LinkPrefix, take it off first, then add it back
                     '
-                    NonEncodedLink = ConvertShortLinkToLink(NonEncodedLink, LinkPrefix)
+                    NonEncodedLink = genericController.ConvertShortLinkToLink(NonEncodedLink, LinkPrefix)
                     If db.cs_isFieldSupported(CSPointer, "Clicks") Then
                         Call db.cs_set(CSPointer, "Clicks", (db.cs_getNumber(CSPointer, "Clicks")) + 1)
                     End If
@@ -8169,7 +8169,7 @@ ErrorTrap:
             '
             MethodName = "main_GetFormInputSelect2"
             '
-            LcaseCriteria = vbLCase(Criteria)
+            LcaseCriteria = genericController.vbLCase(Criteria)
             return_IsEmptyList = True
             '
             CurrentValueText = CStr(CurrentValue)
@@ -8212,7 +8212,7 @@ ErrorTrap:
                 Dim dt As DataTable
                 dt = db.executeSql(SQL)
                 If dt.Rows.Count > 0 Then
-                    RowCnt = EncodeInteger(dt.Rows(0).Item("cnt"))
+                    RowCnt = genericController.EncodeInteger(dt.Rows(0).Item("cnt"))
                 End If
                 If RowCnt = 0 Then
                     RowMax = -1
@@ -8254,7 +8254,7 @@ ErrorTrap:
                     DropDownFieldListLength = Len(DropDownFieldList)
                     For CharPointer = 1 To DropDownFieldListLength
                         CharTest = Mid(DropDownFieldList, CharPointer, 1)
-                        If vbInstr(1, CharAllowed, CharTest) = 0 Then
+                        If genericController.vbInstr(1, CharAllowed, CharTest) = 0 Then
                             '
                             ' Character not allowed, delimit Field name here
                             '
@@ -8342,7 +8342,7 @@ ErrorTrap:
                             '
                             UcaseFieldName = "ID"
                             For ColumnPointer = 0 To ColumnMax
-                                If UcaseFieldName = vbUCase(RowFieldArray(ColumnPointer)) Then
+                                If UcaseFieldName = genericController.vbUCase(RowFieldArray(ColumnPointer)) Then
                                     IDFieldPointer = ColumnPointer
                                     Exit For
                                 End If
@@ -8351,9 +8351,9 @@ ErrorTrap:
                             ' setup DropDownFieldPointer()
                             '
                             For FieldPointer = 0 To DropDownFieldCount - 1
-                                UcaseFieldName = vbUCase(DropDownFieldName(FieldPointer))
+                                UcaseFieldName = genericController.vbUCase(DropDownFieldName(FieldPointer))
                                 For ColumnPointer = 0 To ColumnMax
-                                    If UcaseFieldName = vbUCase(RowFieldArray(ColumnPointer)) Then
+                                    If UcaseFieldName = genericController.vbUCase(RowFieldArray(ColumnPointer)) Then
                                         DropDownFieldPointer(FieldPointer) = ColumnPointer
                                         Exit For
                                     End If
@@ -8364,7 +8364,7 @@ ErrorTrap:
                             '
                             SelectedFound = False
                             For RowPointer = 0 To RowMax
-                                RecordID = EncodeInteger(RowsArray(IDFieldPointer, RowPointer))
+                                RecordID = genericController.EncodeInteger(RowsArray(IDFieldPointer, RowPointer))
                                 Copy = DropDownPreField
                                 For FieldPointer = 0 To DropDownFieldCount - 1
                                     Copy = Copy & RowsArray(DropDownFieldPointer(FieldPointer), RowPointer) & DropDownDelimiter(FieldPointer)
@@ -8389,7 +8389,7 @@ ErrorTrap:
                                 If Criteria <> "" Then
                                     Criteria = Criteria & "and"
                                 End If
-                                Criteria = Criteria & "(id=" & EncodeInteger(CurrentValue) & ")"
+                                Criteria = Criteria & "(id=" & genericController.EncodeInteger(CurrentValue) & ")"
                                 CSPointer = db.cs_open(ContentName, Criteria, SortFieldList, False, , , , SelectFields)
                                 If db.cs_ok(CSPointer) Then
                                     Call debug_testPoint("main_GetFormInputSelect2, 110")
@@ -8401,7 +8401,7 @@ ErrorTrap:
                                     Call debug_testPoint("main_GetFormInputSelect2, 140")
                                     ColumnMax = UBound(RowsArray, 1)
                                     Call debug_testPoint("main_GetFormInputSelect2, 150")
-                                    RecordID = EncodeInteger(RowsArray(IDFieldPointer, 0))
+                                    RecordID = genericController.EncodeInteger(RowsArray(IDFieldPointer, 0))
                                     Call debug_testPoint("main_GetFormInputSelect2, 160")
                                     Copy = DropDownPreField
                                     For FieldPointer = 0 To DropDownFieldCount - 1
@@ -8441,10 +8441,10 @@ ErrorTrap:
                 End If
             End If
             '
-            SelectRaw = vbReplace(SelectRaw, MenuNameFPO, MenuName)
-            SelectRaw = vbReplace(SelectRaw, NoneCaptionFPO, NoneCaption)
+            SelectRaw = genericController.vbReplace(SelectRaw, MenuNameFPO, MenuName)
+            SelectRaw = genericController.vbReplace(SelectRaw, NoneCaptionFPO, NoneCaption)
             If HtmlClass <> "" Then
-                SelectRaw = vbReplace(SelectRaw, "<select ", "<select class=""" & HtmlClass & """")
+                SelectRaw = genericController.vbReplace(SelectRaw, "<select ", "<select class=""" & HtmlClass & """")
             End If
             main_GetFormInputSelect2 = SelectRaw
             '
@@ -8523,15 +8523,15 @@ ErrorTrap:
             '
             MethodName = "main_GetFormInputMemberSelect2"
             '
-            iMenuName = EncodeText(MenuName)
-            iCurrentValue = EncodeInteger(CurrentValue)
-            iNoneCaption = encodeEmptyText(NoneCaption, "Select One")
-            'iCriteria = vbLCase(encodeMissingText(Criteria, ""))
+            iMenuName = genericController.encodeText(MenuName)
+            iCurrentValue = genericController.EncodeInteger(CurrentValue)
+            iNoneCaption = genericController.encodeEmptyText(NoneCaption, "Select One")
+            'iCriteria = genericController.vbLCase(encodeMissingText(Criteria, ""))
             '
             If main_InputSelectCacheCnt > 0 Then
                 For CachePtr = 0 To main_InputSelectCacheCnt - 1
                     With main_InputSelectCache(CachePtr)
-                        If (.ContentName = "Group:" & GroupID) And (.Criteria = iCriteria) And (EncodeInteger(.CurrentValue) = iCurrentValue) Then
+                        If (.ContentName = "Group:" & GroupID) And (.Criteria = iCriteria) And (genericController.EncodeInteger(.CurrentValue) = iCurrentValue) Then
                             SelectRaw = .SelectRaw
                             Exit For
                         End If
@@ -8599,7 +8599,7 @@ ErrorTrap:
                     DropDownFieldListLength = Len(DropDownFieldList)
                     For CharPointer = 1 To DropDownFieldListLength
                         CharTest = Mid(DropDownFieldList, CharPointer, 1)
-                        If vbInstr(1, CharAllowed, CharTest) = 0 Then
+                        If genericController.vbInstr(1, CharAllowed, CharTest) = 0 Then
                             '
                             ' Character not allowed, delimit Field name here
                             '
@@ -8661,13 +8661,13 @@ ErrorTrap:
                         ' ----- Start select box
                         '
                         TagClass = ""
-                        If encodeEmptyText(HtmlClass, "") <> "" Then
-                            TagClass = " Class=""" & encodeEmptyText(HtmlClass, "") & """"
+                        If genericController.encodeEmptyText(HtmlClass, "") <> "" Then
+                            TagClass = " Class=""" & genericController.encodeEmptyText(HtmlClass, "") & """"
                         End If
                         '
                         TagID = ""
-                        If encodeEmptyText(HtmlId, "") <> "" Then
-                            TagID = " ID=""" & encodeEmptyText(HtmlId, "") & """"
+                        If genericController.encodeEmptyText(HtmlId, "") <> "" Then
+                            TagID = " ID=""" & genericController.encodeEmptyText(HtmlId, "") & """"
                         End If
                         '
                         Call FastString.Add("<select size=""1"" name=""" & MenuNameFPO & """" & TagID & TagClass & ">")
@@ -8709,7 +8709,7 @@ ErrorTrap:
                             '
                             UcaseFieldName = "ID"
                             For ColumnPointer = 0 To ColumnMax
-                                If UcaseFieldName = vbUCase(RowFieldArray(ColumnPointer)) Then
+                                If UcaseFieldName = genericController.vbUCase(RowFieldArray(ColumnPointer)) Then
                                     IDFieldPointer = ColumnPointer
                                     Exit For
                                 End If
@@ -8718,9 +8718,9 @@ ErrorTrap:
                             ' setup DropDownFieldPointer()
                             '
                             For FieldPointer = 0 To DropDownFieldCount - 1
-                                UcaseFieldName = vbUCase(DropDownFieldName(FieldPointer))
+                                UcaseFieldName = genericController.vbUCase(DropDownFieldName(FieldPointer))
                                 For ColumnPointer = 0 To ColumnMax
-                                    If UcaseFieldName = vbUCase(RowFieldArray(ColumnPointer)) Then
+                                    If UcaseFieldName = genericController.vbUCase(RowFieldArray(ColumnPointer)) Then
                                         DropDownFieldPointer(FieldPointer) = ColumnPointer
                                         Exit For
                                     End If
@@ -8732,7 +8732,7 @@ ErrorTrap:
                             SelectedFound = False
                             LastRecordID = -1
                             For RowPointer = 0 To RowMax
-                                RecordID = EncodeInteger(RowsArray(IDFieldPointer, RowPointer))
+                                RecordID = genericController.EncodeInteger(RowsArray(IDFieldPointer, RowPointer))
                                 If RecordID <> LastRecordID Then
                                     Copy = DropDownPreField
                                     For FieldPointer = 0 To DropDownFieldCount - 1
@@ -8774,8 +8774,8 @@ ErrorTrap:
                 main_InputSelectCache(CachePtr).SelectRaw = SelectRaw
             End If
             '
-            SelectRaw = vbReplace(SelectRaw, MenuNameFPO, iMenuName)
-            SelectRaw = vbReplace(SelectRaw, NoneCaptionFPO, iNoneCaption)
+            SelectRaw = genericController.vbReplace(SelectRaw, MenuNameFPO, iMenuName)
+            SelectRaw = genericController.vbReplace(SelectRaw, NoneCaptionFPO, iNoneCaption)
             html_GetFormInputMemberSelect2 = SelectRaw
             '
             Exit Function
@@ -8791,7 +8791,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function main_GetFormInputSelectList(ByVal MenuName As String, ByVal CurrentValue As String, ByVal SelectList As String, Optional ByVal NoneCaption As String = "", Optional ByVal htmlId As String = "") As String
-            main_GetFormInputSelectList = main_GetFormInputSelectList2(EncodeText(MenuName), EncodeInteger(CurrentValue), EncodeText(SelectList), EncodeText(NoneCaption), EncodeText(htmlId))
+            main_GetFormInputSelectList = main_GetFormInputSelectList2(genericController.encodeText(MenuName), genericController.EncodeInteger(CurrentValue), genericController.encodeText(SelectList), genericController.encodeText(NoneCaption), genericController.encodeText(htmlId))
         End Function
         '
         '========================================================================
@@ -8818,7 +8818,7 @@ ErrorTrap:
                 SelectFieldWidthLimit = 256
             End If
             '
-            'iSelectList = encodeText(SelectList)
+            'iSelectList = genericController.encodeText(SelectList)
             '
             ' ----- Start select box
             '
@@ -8877,15 +8877,15 @@ ErrorTrap:
                     main_GetLoginLink = main_GetLoginLink & "<a href=""" & html.html_EncodeHTML(siteProperties.adminURL) & """ target=""_blank"">"
                 Else
                     Link = webServerIO_requestPage & "?" & web_RefreshQueryString
-                    Link = modifyLinkQuery(Link, RequestNameHardCodedPage, HardCodedPageLogin, True)
-                    'Link = modifyLinkQuery(Link, RequestNameInterceptpage, LegacyInterceptPageSNLogin, True)
+                    Link = genericController.modifyLinkQuery(Link, RequestNameHardCodedPage, HardCodedPageLogin, True)
+                    'Link = genericController.modifyLinkQuery(Link, RequestNameInterceptpage, LegacyInterceptPageSNLogin, True)
                     main_GetLoginLink = main_GetLoginLink & "<a href=""" & html.html_EncodeHTML(Link) & """ >"
                 End If
                 If (main_LoginIconFilename <> "") Then
                     main_GetLoginLink = main_GetLoginLink & "<img alt=""Login"" src=""" & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, main_LoginIconFilename) & """ border=""0"" >"
                 Else
                     IconFilename = siteProperties.getText("LoginIconFilename", "/ccLib/images/ccLibLogin.GIF")
-                    If vbLCase(Mid(IconFilename, 1, 7)) <> "/ccLib/" Then
+                    If genericController.vbLCase(Mid(IconFilename, 1, 7)) <> "/ccLib/" Then
                         IconFilename = csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, IconFilename)
                     End If
                     main_GetLoginLink = main_GetLoginLink & "<img alt=""Login"" src=""" & IconFilename & """ border=""0"" >"
@@ -8992,7 +8992,7 @@ ErrorTrap:
                         If autoPrintText = "" Then
                             autoPrintText = siteProperties.getText("AllowAutoPrintDialog", "1")
                         End If
-                        If EncodeBoolean(autoPrintText) Then
+                        If genericController.EncodeBoolean(autoPrintText) Then
                             Call main_AddOnLoadJavascript2("window.print(); window.close()", "Print Page")
                         End If
                     End If
@@ -9042,7 +9042,7 @@ ErrorTrap:
                             If html_PageErrorWithoutCsv Then
                                 main_TrapLogMessage = "" _
                                     & "<div style=""padding: 20px;"">" _
-                                    & vbReplace(main_TrapLogMessage, vbCrLf, "<br>") _
+                                    & genericController.vbReplace(main_TrapLogMessage, vbCrLf, "<br>") _
                                     & "</div>"
                                 '  s = s & main_GetPopupMessage(main_TrapLogMessage, 600, 400, True, True)
                             ElseIf (app_errorCount > 0) Then
@@ -9076,10 +9076,10 @@ ErrorTrap:
                                 End If
                                 If Not .IsLink Then
                                     JSCodeAsString = .Text
-                                    JSCodeAsString = vbReplace(JSCodeAsString, "'", "'+""'""+'")
-                                    JSCodeAsString = vbReplace(JSCodeAsString, vbCrLf, "\n")
-                                    JSCodeAsString = vbReplace(JSCodeAsString, vbCr, "\n")
-                                    JSCodeAsString = vbReplace(JSCodeAsString, vbLf, "\n")
+                                    JSCodeAsString = genericController.vbReplace(JSCodeAsString, "'", "'+""'""+'")
+                                    JSCodeAsString = genericController.vbReplace(JSCodeAsString, vbCrLf, "\n")
+                                    JSCodeAsString = genericController.vbReplace(JSCodeAsString, vbCr, "\n")
+                                    JSCodeAsString = genericController.vbReplace(JSCodeAsString, vbLf, "\n")
                                     JS = JS & vbCrLf & "cj.addHeadScriptCode('" & JSCodeAsString & "');"
                                     'JS = JS & vbCrLf & "cjAddHeadScriptCode('" & JSCodeAsString & "');"
                                 Else
@@ -9104,7 +9104,7 @@ ErrorTrap:
                     '
                     If (main_MetaContent_StyleSheetTags <> "") Then
                         headTags = headTags & cr & main_MetaContent_StyleSheetTags
-                        'JS = JS & vbCrLf & vbTab & "cjAddHeadTag('" & encodeJavascript(main_MetaContent_StyleSheetTags) & "');"
+                        'JS = JS & vbCrLf & vbTab & "cjAddHeadTag('" & genericController.EncodeJavascript(main_MetaContent_StyleSheetTags) & "');"
                         main_MetaContent_StyleSheetTags = ""
                     End If
                     '
@@ -9122,11 +9122,11 @@ ErrorTrap:
                                 If Files(Ptr) <> "" Then
                                     Parts = Split(Files(Ptr) & "<<", "<")
                                     If Parts(1) <> "" Then
-                                        headTags = headTags & cr & decodeHtml(Parts(1))
+                                        headTags = headTags & cr & genericController.decodeHtml(Parts(1))
                                     End If
                                     headTags = headTags & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, Parts(0)) & """ >"
                                     If Parts(2) <> "" Then
-                                        headTags = headTags & cr & decodeHtml(Parts(2))
+                                        headTags = headTags & cr & genericController.decodeHtml(Parts(2))
                                     End If
                                     'End If
                                 End If
@@ -9147,12 +9147,12 @@ ErrorTrap:
                     '
                     If (main_MetaContent_OtherHeadTags <> "") Then
                         headTags = headTags & cr & main_MetaContent_OtherHeadTags
-                        'JS = JS & vbCrLf & vbTab & "cjAddHeadTag('" & encodeJavascript(main_MetaContent_OtherHeadTags) & "');"
+                        'JS = JS & vbCrLf & vbTab & "cjAddHeadTag('" & genericController.EncodeJavascript(main_MetaContent_OtherHeadTags) & "');"
                         main_MetaContent_OtherHeadTags = ""
                     End If
                     If (headTags <> "") Then
-                        JS = JS & vbCrLf & vbTab & "cj.addHeadTag('" & EncodeJavascript(headTags) & "');"
-                        'JS = JS & vbCrLf & vbTab & "cjAddHeadTag('" & encodeJavascript(headTags) & "');"
+                        JS = JS & vbCrLf & vbTab & "cj.addHeadTag('" & genericController.EncodeJavascript(headTags) & "');"
+                        'JS = JS & vbCrLf & vbTab & "cjAddHeadTag('" & genericController.EncodeJavascript(headTags) & "');"
                     End If
                     '
                     ' ----- Add end of body javascript
@@ -9226,16 +9226,16 @@ ErrorTrap:
             '            Dim iTableName As String
             '            Dim iRecordID As Integer
             '            '
-            '            iDataSourceName = EncodeText(main_encodeMissingText(DataSourceName, "Default"))
-            '            iFieldName = EncodeText(FieldName)
-            '            iTableName = EncodeText(TableName)
-            '            iRecordID = encodeInteger(RecordID)
+            '            iDataSourceName = genericController.encodeText(main_encodeMissingText(DataSourceName, "Default"))
+            '            iFieldName = genericController.encodeText(FieldName)
+            '            iTableName = genericController.encodeText(TableName)
+            '            iRecordID = genericController.EncodeInteger(RecordID)
             '            '
             '            SQL = "Select " & iFieldName & " FROM " & iTableName & " where ID=" & iRecordID & ";"
             '            RS = main_OpenRSSQL(iDataSourceName, SQL)
             '            If (isDataTableOk(rs)) Then
             '                If Not rs.rows.count=0 Then
-            '                    RecordValue = EncodeInteger(RS(iFieldName)) + 1
+            '                    RecordValue = genericController.EncodeInteger(RS(iFieldName)) + 1
             '                    SQL = "Update " & iTableName & " set " & iFieldName & "=" & RecordValue & " where ID=" & iRecordID & ";"
             '                    Call main_ExecuteSQL(iDataSourceName, SQL)
             '                End If
@@ -9259,7 +9259,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetNameValue")
             '
             'If Not (true) Then Exit Function
-            main_GetNameValue = main_GetNameValue_Internal(EncodeText(Tag), EncodeText(Name))
+            main_GetNameValue = main_GetNameValue_Internal(genericController.encodeText(Tag), genericController.encodeText(Name))
             Exit Function
             '
 ErrorTrap:
@@ -9293,20 +9293,20 @@ ErrorTrap:
             MethodName = "main_GetNameValue_Internal"
             '
             If ((NameValueString <> "") And (Name <> "")) Then
-                Do While vbInstr(1, NameValueStringWorking, " =") <> 0
-                    NameValueStringWorking = vbReplace(NameValueStringWorking, " =", "=")
+                Do While genericController.vbInstr(1, NameValueStringWorking, " =") <> 0
+                    NameValueStringWorking = genericController.vbReplace(NameValueStringWorking, " =", "=")
                 Loop
-                Do While vbInstr(1, NameValueStringWorking, "= ") <> 0
-                    NameValueStringWorking = vbReplace(NameValueStringWorking, "= ", "=")
+                Do While genericController.vbInstr(1, NameValueStringWorking, "= ") <> 0
+                    NameValueStringWorking = genericController.vbReplace(NameValueStringWorking, "= ", "=")
                 Loop
-                Do While vbInstr(1, NameValueStringWorking, "& ") <> 0
-                    NameValueStringWorking = vbReplace(NameValueStringWorking, "& ", "&")
+                Do While genericController.vbInstr(1, NameValueStringWorking, "& ") <> 0
+                    NameValueStringWorking = genericController.vbReplace(NameValueStringWorking, "& ", "&")
                 Loop
-                Do While vbInstr(1, NameValueStringWorking, " &") <> 0
-                    NameValueStringWorking = vbReplace(NameValueStringWorking, " &", "&")
+                Do While genericController.vbInstr(1, NameValueStringWorking, " &") <> 0
+                    NameValueStringWorking = genericController.vbReplace(NameValueStringWorking, " &", "&")
                 Loop
                 NameValueStringWorking = NameValueString & "&"
-                UcaseNameValueStringWorking = vbUCase(NameValueStringWorking)
+                UcaseNameValueStringWorking = genericController.vbUCase(NameValueStringWorking)
                 '
                 main_GetNameValue_Internal = ""
                 If NameValueStringWorking <> "" Then
@@ -9314,7 +9314,7 @@ ErrorTrap:
                     PairCount = UBound(pairs) + 1
                     For PairPointer = 0 To PairCount - 1
                         PairSplit = Split(pairs(PairPointer), "=")
-                        If vbUCase(PairSplit(0)) = vbUCase(Name) Then
+                        If genericController.vbUCase(PairSplit(0)) = genericController.vbUCase(Name) Then
                             If UBound(PairSplit) > 0 Then
                                 main_GetNameValue_Internal = PairSplit(1)
                             End If
@@ -9361,14 +9361,14 @@ ErrorTrap:
             '
             MethodName = "main_GetPanelTop"
             '
-            MyStylePanel = encodeEmptyText(StylePanel, "ccPanel")
-            MyStyleHilite = encodeEmptyText(StyleHilite, "ccPanelHilite")
-            MyStyleShadow = encodeEmptyText(StyleShadow, "ccPanelShadow")
-            MyWidth = encodeEmptyText(Width, "100%")
+            MyStylePanel = genericController.encodeEmptyText(StylePanel, "ccPanel")
+            MyStyleHilite = genericController.encodeEmptyText(StyleHilite, "ccPanelHilite")
+            MyStyleShadow = genericController.encodeEmptyText(StyleShadow, "ccPanelShadow")
+            MyWidth = genericController.encodeEmptyText(Width, "100%")
             MyPadding = Padding.ToString
             MyHeightMin = HeightMin.ToString
             '
-            If vbIsNumeric(MyWidth) Then
+            If genericController.vbIsNumeric(MyWidth) Then
                 ContentPanelWidth = (CInt(MyWidth) - 2).ToString
                 contentPanelWidthStyle = ContentPanelWidth & "px"
             Else
@@ -9380,24 +9380,24 @@ ErrorTrap:
             '
             s0 = "" _
                 & cr & "<td style=""padding:" & MyPadding & "px;vertical-align:top"" class=""" & MyStylePanel & """>" _
-                & kmaIndent(EncodeText(Panel)) _
+                & genericController.kmaIndent(genericController.encodeText(Panel)) _
                 & cr & "</td>" _
                 & ""
             '
             s1 = "" _
                 & cr & "<tr>" _
-                & kmaIndent(s0) _
+                & genericController.kmaIndent(s0) _
                 & cr & "</tr>" _
                 & ""
             s2 = "" _
                 & cr & "<table style=""width:" & contentPanelWidthStyle & ";border:0px;"" class=""" & MyStylePanel & """ cellspacing=""0"">" _
-                & kmaIndent(s1) _
+                & genericController.kmaIndent(s1) _
                 & cr & "</table>" _
                 & ""
             s3 = "" _
                 & cr & "<td width=""1"" height=""" & MyHeightMin & """ class=""" & MyStyleHilite & """><img alt=""space"" src=""/ccLib/images/spacer.gif"" height=""" & MyHeightMin & """ width=""1"" ></td>" _
                 & cr & "<td width=""" & ContentPanelWidth & """ valign=""top"" align=""left"" class=""" & MyStylePanel & """>" _
-                & kmaIndent(s2) _
+                & genericController.kmaIndent(s2) _
                 & cr & "</td>" _
                 & cr & "<td width=""1"" class=""" & MyStyleShadow & """><img alt=""space"" src=""/ccLib/images/spacer.gif"" height=""1"" width=""1"" ></td>" _
                 & ""
@@ -9406,7 +9406,7 @@ ErrorTrap:
                 & cr2 & "<td colspan=""3"" class=""" & MyStyleHilite & """><img alt=""space"" src=""/ccLib/images/spacer.gif"" height=""1"" width=""" & MyWidth & """ ></td>" _
                 & cr & "</tr>" _
                 & cr & "<tr>" _
-                & kmaIndent(s3) _
+                & genericController.kmaIndent(s3) _
                 & cr & "</tr>" _
                 & cr & "<tr>" _
                 & cr2 & "<td colspan=""3"" class=""" & MyStyleShadow & """><img alt=""space"" src=""/ccLib/images/spacer.gif"" height=""1"" width=""" & MyWidth & """ ></td>" _
@@ -9414,7 +9414,7 @@ ErrorTrap:
                 & ""
             main_GetPanel = "" _
                 & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""" & MyWidth & """ class=""" & MyStylePanel & """>" _
-                & kmaIndent(s4) _
+                & genericController.kmaIndent(s4) _
                 & cr & "</table>" _
                 & ""
 
@@ -9422,7 +9422,7 @@ ErrorTrap:
             '
             '    main_GetPanel = "" _
             '        & cr & main_GetPanelTop(StylePanel, StyleHilite, StyleShadow, Width, Padding, HeightMin) _
-            '        & KmaIndent(encodeText(Panel)) _
+            '        & genericController.kmaIndent(genericController.encodeText(Panel)) _
             '        & cr & main_GetPanelBottom(StylePanel, StyleHilite, StyleShadow, Width, Padding)
             '
             Exit Function
@@ -9444,11 +9444,11 @@ ErrorTrap:
             Dim MyStyleHilite As String
             Dim MyStyleShadow As String
             '
-            MyStyleHilite = encodeEmptyText(StyleHilite, "ccPanelShadow")
-            MyStyleShadow = encodeEmptyText(StyleShadow, "ccPanelHilite")
+            MyStyleHilite = genericController.encodeEmptyText(StyleHilite, "ccPanelShadow")
+            MyStyleShadow = genericController.encodeEmptyText(StyleShadow, "ccPanelHilite")
 
             main_GetReversePanel = main_GetPanelTop(StylePanel, MyStyleHilite, MyStyleShadow, Width, Padding, HeightMin) _
-                & EncodeText(Panel) _
+                & genericController.encodeText(Panel) _
                 & main_GetPanelBottom(StylePanel, MyStyleHilite, MyStyleShadow, Width, Padding)
             '
             Exit Function
@@ -9470,8 +9470,8 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            iHeaderMessage = EncodeText(HeaderMessage)
-            iRightSideMessage = encodeEmptyText(RightSideMessage, FormatDateTime(app_startTime))
+            iHeaderMessage = genericController.encodeText(HeaderMessage)
+            iRightSideMessage = genericController.encodeEmptyText(RightSideMessage, FormatDateTime(app_startTime))
             main_GetPanelHeader = Adminui.GetHeader(iHeaderMessage, iRightSideMessage)
             '
             Exit Function
@@ -9501,14 +9501,14 @@ ErrorTrap:
             Dim MyHeightMin As String
             '
             main_GetPanelTop = ""
-            MyStylePanel = encodeEmptyText(StylePanel, "ccPanel")
-            MyStyleHilite = encodeEmptyText(StyleHilite, "ccPanelHilite")
-            MyStyleShadow = encodeEmptyText(StyleShadow, "ccPanelShadow")
-            MyWidth = encodeEmptyText(Width, "100%")
-            MyPadding = encodeEmptyText(Padding, "5")
-            MyHeightMin = encodeEmptyText(HeightMin, "1")
+            MyStylePanel = genericController.encodeEmptyText(StylePanel, "ccPanel")
+            MyStyleHilite = genericController.encodeEmptyText(StyleHilite, "ccPanelHilite")
+            MyStyleShadow = genericController.encodeEmptyText(StyleShadow, "ccPanelShadow")
+            MyWidth = genericController.encodeEmptyText(Width, "100%")
+            MyPadding = genericController.encodeEmptyText(Padding, "5")
+            MyHeightMin = genericController.encodeEmptyText(HeightMin, "1")
             MethodName = "main_GetPanelTop"
-            If vbIsNumeric(MyWidth) Then
+            If genericController.vbIsNumeric(MyWidth) Then
                 ContentPanelWidth = (CInt(MyWidth) - 2).ToString
             Else
                 ContentPanelWidth = "100%"
@@ -9557,11 +9557,11 @@ ErrorTrap:
             Dim MyWidth As String
             Dim MyPadding As String
             '
-            MyStylePanel = encodeEmptyText(StylePanel, "ccPanel")
-            MyStyleHilite = encodeEmptyText(StyleHilite, "ccPanelHilite")
-            MyStyleShadow = encodeEmptyText(StyleShadow, "ccPanelShadow")
-            MyWidth = encodeEmptyText(Width, "100%")
-            MyPadding = encodeEmptyText(Padding, "5")
+            MyStylePanel = genericController.encodeEmptyText(StylePanel, "ccPanel")
+            MyStyleHilite = genericController.encodeEmptyText(StyleHilite, "ccPanelHilite")
+            MyStyleShadow = genericController.encodeEmptyText(StyleShadow, "ccPanelShadow")
+            MyWidth = genericController.encodeEmptyText(Width, "100%")
+            MyPadding = genericController.encodeEmptyText(Padding, "5")
             MethodName = "main_GetPanelBottom"
             '
             main_GetPanelBottom = main_GetPanelBottom _
@@ -9599,8 +9599,8 @@ ErrorTrap:
             Dim MethodName As String
             Dim Adminui As New coreAdminUIClass(Me)
             '
-            iButtonValueList = EncodeText(ButtonValueList)
-            iButtonName = EncodeText(ButtonName)
+            iButtonValueList = genericController.encodeText(ButtonValueList)
+            iButtonName = genericController.encodeText(ButtonName)
             '
             MethodName = "main_GetPanelButtons()"
             '
@@ -9621,7 +9621,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            main_GetPanelRev = main_GetPanel(PanelContent, "ccPanel", "ccPanelShadow", "ccPanelHilite", PanelWidth, 2, EncodeInteger(PanelHeightMin))
+            main_GetPanelRev = main_GetPanel(PanelContent, "ccPanel", "ccPanelShadow", "ccPanelHilite", PanelWidth, 2, genericController.EncodeInteger(PanelHeightMin))
             Exit Function
             '
 ErrorTrap:
@@ -9635,7 +9635,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            main_GetPanelInput = main_GetPanel(PanelContent, "ccPanelInput", "ccPanelShadow", "ccPanelHilite", PanelWidth, 2, EncodeInteger(PanelHeightMin))
+            main_GetPanelInput = main_GetPanel(PanelContent, "ccPanelInput", "ccPanelShadow", "ccPanelHilite", PanelWidth, 2, genericController.EncodeInteger(PanelHeightMin))
             Exit Function
             '
 ErrorTrap:
@@ -9707,11 +9707,11 @@ ErrorTrap:
                 If siteProperties.getBoolean("AllowMobileTemplates", False) Then
                     If visit_browserIsMobile Then
                         QS = web_RefreshQueryString
-                        QS = ModifyQueryString(QS, "method", "forcenonmobile")
+                        QS = genericController.ModifyQueryString(QS, "method", "forcenonmobile")
                         LinkPanel.Add("<a class=""ccAdminLink"" href=""?" & QS & """>Non-Mobile Version</A> | ")
                     Else
                         QS = web_RefreshQueryString
-                        QS = ModifyQueryString(QS, "method", "forcemobile")
+                        QS = genericController.ModifyQueryString(QS, "method", "forcemobile")
                         LinkPanel.Add("<a class=""ccAdminLink"" href=""?" & QS & """>Mobile Version</A> | ")
                     End If
                 End If
@@ -9719,7 +9719,7 @@ ErrorTrap:
                 '
                 If ShowLegacyToolsPanel Then
                     ToolsPanel = New coreFastStringClass
-                    WorkingQueryString = ModifyQueryString(web_RefreshQueryString, "ma", "", False)
+                    WorkingQueryString = genericController.ModifyQueryString(web_RefreshQueryString, "ma", "", False)
                     '
                     ' ----- Tools Panel Caption
                     '
@@ -9758,7 +9758,7 @@ ErrorTrap:
                         'helpLink = main_GetHelpLink(7, "Enable Editing", "Display the edit tools for basic content, such as pages, copy and sections. ")
                         iValueBoolean = visitProperty.getBoolean("AllowEditing")
                         Tag = html_GetFormInputCheckBox2(EditTagID, iValueBoolean, EditTagID)
-                        Tag = vbReplace(Tag, ">", " onClick=""document.getElementById('" & QuickEditTagID & "').checked=false;document.getElementById('" & AdvancedEditTagID & "').checked=false;"">")
+                        Tag = genericController.vbReplace(Tag, ">", " onClick=""document.getElementById('" & QuickEditTagID & "').checked=false;document.getElementById('" & AdvancedEditTagID & "').checked=false;"">")
                         OptionsPanel = OptionsPanel _
                             & cr & "<div class=""ccAdminSmall"">" _
                             & cr2 & "<LABEL for=""" & EditTagID & """>" & Tag & "&nbsp;Edit</LABEL>" & helpLink _
@@ -9770,7 +9770,7 @@ ErrorTrap:
                         'helpLink = main_GetHelpLink(8, "Enable Quick Edit", "Display the quick editor to edit the main page content.")
                         iValueBoolean = visitProperty.getBoolean("AllowQuickEditor")
                         Tag = html_GetFormInputCheckBox2(QuickEditTagID, iValueBoolean, QuickEditTagID)
-                        Tag = vbReplace(Tag, ">", " onClick=""document.getElementById('" & EditTagID & "').checked=false;document.getElementById('" & AdvancedEditTagID & "').checked=false;"">")
+                        Tag = genericController.vbReplace(Tag, ">", " onClick=""document.getElementById('" & EditTagID & "').checked=false;document.getElementById('" & AdvancedEditTagID & "').checked=false;"">")
                         OptionsPanel = OptionsPanel _
                             & cr & "<div class=""ccAdminSmall"">" _
                             & cr2 & "<LABEL for=""" & QuickEditTagID & """>" & Tag & "&nbsp;Quick Edit</LABEL>" & helpLink _
@@ -9782,7 +9782,7 @@ ErrorTrap:
                         'helpLink = main_GetHelpLink(0, "Enable Advanced Edit", "Display the edit tools for advanced content, such as templates and add-ons. Basic content edit tools are also displayed.")
                         iValueBoolean = visitProperty.getBoolean("AllowAdvancedEditor")
                         Tag = html_GetFormInputCheckBox2(AdvancedEditTagID, iValueBoolean, AdvancedEditTagID)
-                        Tag = vbReplace(Tag, ">", " onClick=""document.getElementById('" & QuickEditTagID & "').checked=false;document.getElementById('" & EditTagID & "').checked=false;"">")
+                        Tag = genericController.vbReplace(Tag, ">", " onClick=""document.getElementById('" & QuickEditTagID & "').checked=false;document.getElementById('" & EditTagID & "').checked=false;"">")
                         OptionsPanel = OptionsPanel _
                             & cr & "<div class=""ccAdminSmall"">" _
                             & cr2 & "<LABEL for=""" & AdvancedEditTagID & """>" & Tag & "&nbsp;Advanced Edit</LABEL>" & helpLink _
@@ -9911,19 +9911,19 @@ ErrorTrap:
                     '
                     Copy = "" _
                         & cr & "<td width=""50%"" class=""ccPanelInput"" style=""vertical-align:bottom;"">" _
-                        & kmaIndent(LoginPanel) _
+                        & genericController.kmaIndent(LoginPanel) _
                         & cr & "</td>" _
                         & cr & "<td width=""50%"" class=""ccPanelInput"" style=""vertical-align:bottom;"">" _
-                        & kmaIndent(OptionsPanel) _
+                        & genericController.kmaIndent(OptionsPanel) _
                         & cr & "</td>"
                     Copy = "" _
                         & cr & "<tr>" _
-                        & kmaIndent(Copy) _
+                        & genericController.kmaIndent(Copy) _
                         & cr & "</tr>" _
                         & ""
                     Copy = "" _
                         & cr & "<table border=""0"" cellpadding=""3"" cellspacing=""0"" width=""100%"">" _
-                        & kmaIndent(Copy) _
+                        & genericController.kmaIndent(Copy) _
                         & cr & "</table>"
                     ToolsPanel.Add(main_GetPanelInput(Copy))
                     ToolsPanel.Add(html_GetFormEnd)
@@ -9980,10 +9980,10 @@ ErrorTrap:
                             copyNameValue = CopySplit(Ptr)
                             If copyNameValue <> "" Then
                                 copyNameValueSplit = Split(copyNameValue, "=")
-                                CopyName = DecodeResponseVariable(copyNameValueSplit(0))
+                                CopyName = genericController.DecodeResponseVariable(copyNameValueSplit(0))
                                 copyValue = ""
                                 If UBound(copyNameValueSplit) > 0 Then
-                                    copyValue = DecodeResponseVariable(copyNameValueSplit(1))
+                                    copyValue = genericController.DecodeResponseVariable(copyNameValueSplit(1))
                                 End If
                                 Copy = Copy & cr & "<br>" & html.html_EncodeHTML(CopyName & "=" & copyValue)
                             End If
@@ -10004,16 +10004,16 @@ ErrorTrap:
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Referrer", html.html_EncodeHTML(web.requestReferrer))
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Cookies", html.html_EncodeHTML(web.requestCookieString))
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Visit Id", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("visits") & "&af=4&id=" & main_VisitId & """>" & main_VisitId & "</a>")
-                    'DebugPanel = DebugPanel & main_DebugPanelRow("Visit Start Date", EncodeText(main_VisitStartDateValue))
-                    'DebugPanel = DebugPanel & main_DebugPanelRow("Visit Start Time", EncodeText(main_VisitStartTime))
-                    'DebugPanel = DebugPanel & main_DebugPanelRow("Visit Last Time", EncodeText(main_VisitLastTime))
-                    'DebugPanel = DebugPanel & main_DebugPanelRow("Visit Cookies Supported", EncodeText(main_VisitCookieSupport))
-                    'DebugPanel = DebugPanel & main_DebugPanelRow("Visit Pages", EncodeText(main_VisitPages))
+                    'DebugPanel = DebugPanel & main_DebugPanelRow("Visit Start Date", genericController.encodeText(main_VisitStartDateValue))
+                    'DebugPanel = DebugPanel & main_DebugPanelRow("Visit Start Time", genericController.encodeText(main_VisitStartTime))
+                    'DebugPanel = DebugPanel & main_DebugPanelRow("Visit Last Time", genericController.encodeText(main_VisitLastTime))
+                    'DebugPanel = DebugPanel & main_DebugPanelRow("Visit Cookies Supported", genericController.encodeText(main_VisitCookieSupport))
+                    'DebugPanel = DebugPanel & main_DebugPanelRow("Visit Pages", genericController.encodeText(main_VisitPages))
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Visitor ID", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("visitors") & "&af=4&id=" & main_VisitorID & """>" & main_VisitorID & "</a>")
-                    'DebugPanel = DebugPanel & main_DebugPanelRow("Visitor New", EncodeText(main_VisitorNew))
+                    'DebugPanel = DebugPanel & main_DebugPanelRow("Visitor New", genericController.encodeText(main_VisitorNew))
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Member ID", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("people") & "&af=4&id=" & user.userId & """>" & user.userId & "</a>")
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Member Name", html.html_EncodeHTML(user.userName))
-                    'DebugPanel = DebugPanel & main_DebugPanelRow("Member New", EncodeText(user.userIsNew))
+                    'DebugPanel = DebugPanel & main_DebugPanelRow("Member New", genericController.encodeText(user.userIsNew))
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Member Language", user.userLanguage)
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Page", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("page content") & "&af=4&id=" & main_RenderedPageID & """>" & main_RenderedPageID & ", " & main_RenderedPageName & "</a>")
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Section", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("site sections") & "&af=4&id=" & main_RenderedSectionID & """>" & main_RenderedSectionID & ", " & main_RenderedSectionName & "</a>")
@@ -10021,7 +10021,7 @@ ErrorTrap:
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Domain", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("domains") & "&af=4&id=" & domains.domainDetails.id & """>" & domains.domainDetails.id & ", " & main_ServerDomain & "</a>")
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Template Reason", pageManager_TemplateReason)
                     'DebugPanel = DebugPanel & main_DebugPanelRow("ProcessID", GetProcessID.ToString())
-                    'DebugPanel = DebugPanel & main_DebugPanelRow("Krnl ProcessID", encodeText(csv_HostServiceProcessID))
+                    'DebugPanel = DebugPanel & main_DebugPanelRow("Krnl ProcessID", genericController.encodeText(csv_HostServiceProcessID))
                     DebugPanel = DebugPanel & main_DebugPanelRow("Render Time &gt;= ", Format((GetTickCount - app_startTickCount) / 1000, "0.000") & " sec")
                     If True Then
                         VisitHrs = CInt(visit_timeToLastHit / 3600)
@@ -10050,7 +10050,7 @@ ErrorTrap:
                             & main_GetPanel(DebugPanel, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5)
                     End If
                 End If
-                main_GetToolsPanel = cr & "<div class=""ccCon"">" & kmaIndent(main_GetToolsPanel) & cr & "</div>"
+                main_GetToolsPanel = cr & "<div class=""ccCon"">" & genericController.kmaIndent(main_GetToolsPanel) & cr & "</div>"
             End If
             '
             Exit Function
@@ -10096,14 +10096,14 @@ ErrorTrap:
         '            Dim iRecordID As Integer
         '            '
         '            If Not main_GetStreamBoolean2(RequestNameBlockContentTracking) Then
-        '                iContentName = EncodeText(ContentName)
-        '                iRecordID = EncodeInteger(RecordID)
+        '                iContentName = genericController.encodeText(ContentName)
+        '                iRecordID = genericController.EncodeInteger(RecordID)
         '                '
         '                MethodName = "main_TrackContent"
         '                '
         '                CSPointer = main_OpenCSContentRecord2(iContentName, iRecordID)
         '                If Not app.IsCSOK(CSPointer) Then
-        '                    Call handleLegacyError14(MethodName, "main_TrackContent, Error opening ContentSet from Content/Record [" & iContentName & "/" & EncodeText(iRecordID) & "].")
+        '                    Call handleLegacyError14(MethodName, "main_TrackContent, Error opening ContentSet from Content/Record [" & iContentName & "/" & genericController.encodeText(iRecordID) & "].")
         '                Else
         '                    Call main_TrackContentSet(CSPointer)
         '                End If
@@ -10130,7 +10130,7 @@ ErrorTrap:
         '            '
         '            Dim iTitle As String
         '            '
-        '            iTitle = EncodeText(Title)
+        '            iTitle = genericController.encodeText(Title)
         '            If iTitle <> "" Then
         '                main_GetTitle = "<p>" & AddSpan(iTitle, "ccHeadline") & "</p>"
         '            End If
@@ -10191,12 +10191,12 @@ ErrorTrap:
         '                        '
         '                        Dim QS As String
         '                        FirstName = db.cs_getText(CSPeople, "firstName")
-        '                        If vbLCase(FirstName) = "guest" Then
+        '                        If genericController.vbLCase(FirstName) = "guest" Then
         '                            FirstName = ""
         '                        End If
         '                        QS = web_RefreshQueryString
-        '                        QS = ModifyQueryString(QS, "S", "")
-        '                        QS = ModifyQueryString(QS, "ccIPage", "")
+        '                        QS = genericController.ModifyQueryString(QS, "S", "")
+        '                        QS = genericController.ModifyQueryString(QS, "ccIPage", "")
         '                        returnHtml = returnHtml & main_GetFormStart(QS)
         '                        returnHtml = returnHtml & html_GetFormInputHidden("Type", FormTypeJoin)
         '                        returnHtml = returnHtml & "<table border=""0"" cellpadding=""5"" cellspacing=""0"" width=""100%"">"
@@ -10266,7 +10266,7 @@ ErrorTrap:
         '            Dim ContentID As Integer
         '            Dim s As coreFastStringClass
         '            '
-        '            iPeopleID = EncodeInteger(PeopleID)
+        '            iPeopleID = genericController.EncodeInteger(PeopleID)
         '            '
         '            MethodName = "main_GetMyProfileForm"
         '            '
@@ -10344,7 +10344,7 @@ ErrorTrap:
         '                    ' 6/18/2009 - removed notes from base
         '                    '            s.Add( main_GetMyProfileForm_RowCS(CSMember, "People", "sendnotes", "If checked, notes sent to you as a site member will be emailed. Otherwise, they are available only when you have logged on.", RowCount) & vbCrLf
         '                    s.Add(main_GetMyProfileForm_RowCS(CSMember, "People", "LanguageID", "select your prefered language. If content is aviable in your language, is will be displayed. Otherwise, the default language will be used.", RowCount) & vbCrLf)
-        '                    If EncodeBoolean(app.siteProperty_getBoolean("AllowAutoLogin", False)) Then
+        '                    If genericController.EncodeBoolean(app.siteProperty_getBoolean("AllowAutoLogin", False)) Then
         '                        s.Add(main_GetMyProfileForm_RowCS(CSMember, "People", "autologin", "This site allows automatic login. If this box is check, you will enable this function for your member account.", RowCount) & vbCrLf)
         '                    End If
         '                    If user.main_IsContentManager() Then
@@ -10376,9 +10376,9 @@ ErrorTrap:
         '                    '
         '                    s = New coreFastStringClass
         '                    s.Add(TableOpen)
-        '                    s.Add(main_GetMyProfileForm_Row("Member Number", EncodeText(user.userid)) & vbCrLf)
-        '                    s.Add(main_GetMyProfileForm_Row("Visitor Number", EncodeText(main_VisitorID)) & vbCrLf)
-        '                    s.Add(main_GetMyProfileForm_Row("Visit Number", EncodeText(main_VisitId)) & vbCrLf)
+        '                    s.Add(main_GetMyProfileForm_Row("Member Number", genericController.encodeText(user.userid)) & vbCrLf)
+        '                    s.Add(main_GetMyProfileForm_Row("Visitor Number", genericController.encodeText(main_VisitorID)) & vbCrLf)
+        '                    s.Add(main_GetMyProfileForm_Row("Visit Number", genericController.encodeText(main_VisitId)) & vbCrLf)
         '                    CSLastVisit = app.csOpen("Visits", "MemberID=" & iPeopleID, "ID DESC")
         '                    If app.csOk(CSLastVisit) Then
         '                        s.Add(main_GetMyProfileForm_RowCS(CSLastVisit, "Visits", "StartTime", "", RowCount, "Start Time", True) & vbCrLf)
@@ -10441,7 +10441,7 @@ ErrorTrap:
         '            Dim ContentID As Integer
         '            Dim tabContent(5) As String
         '            '
-        '            iPeopleID = EncodeInteger(PeopleID)
+        '            iPeopleID = genericController.EncodeInteger(PeopleID)
         '            '
         '            MethodName = "main_Get_old_MyProfileForm"
         '            '
@@ -10547,9 +10547,9 @@ ErrorTrap:
         '                    ' ----- Records
         '                    '
         '                    Stream.Add("<tr><td colspan=""2"">" & SpanClassAdminNormal & "<b>Statistics</b></span><br ><img src=""/ccLib/images/black.gif"" width=""100%"" height=""1"" ></td></tr>" & vbCrLf)
-        '                    Stream.Add(main_GetMyProfileForm_Row("Member Number", EncodeText(user.userId)) & vbCrLf)
-        '                    Stream.Add(main_GetMyProfileForm_Row("Visitor Number", EncodeText(main_VisitorID)) & vbCrLf)
-        '                    Stream.Add(main_GetMyProfileForm_Row("Visit Number", EncodeText(main_VisitId)) & vbCrLf)
+        '                    Stream.Add(main_GetMyProfileForm_Row("Member Number", genericController.encodeText(user.userId)) & vbCrLf)
+        '                    Stream.Add(main_GetMyProfileForm_Row("Visitor Number", genericController.encodeText(main_VisitorID)) & vbCrLf)
+        '                    Stream.Add(main_GetMyProfileForm_Row("Visit Number", genericController.encodeText(main_VisitId)) & vbCrLf)
         '                    CSLastVisit = db.csOpen("Visits", "MemberID=" & iPeopleID, "ID DESC")
         '                    If db.csOk(CSLastVisit) Then
         '                        'Stream.Add( main_GetMyProfileForm_RowCS(CSLastVisit, "Visits", "main_VisitorID", "", RowCount) & vbcrlf )
@@ -10694,7 +10694,7 @@ ErrorTrap:
         '                & " Order by ccTopics.Name"
         '            CS = db.csOpenSql(SQL)
         '            Do While db.csOk(CS)
-        '                Stream = Stream & SpanClassAdminNormal & db.cs_getText(CS, "name") & " = " & EncodeText(db.cs_getInteger(CS, "score")) & "</span><BR >"
+        '                Stream = Stream & SpanClassAdminNormal & db.cs_getText(CS, "name") & " = " & genericController.encodeText(db.cs_getInteger(CS, "score")) & "</span><BR >"
         '                Call db.csGoNext(CS)
         '                TopicCount = TopicCount + 1
         '            Loop
@@ -10772,7 +10772,7 @@ ErrorTrap:
             Dim MethodName As String
             Dim iGroupName As String
             '
-            iGroupName = EncodeText(GroupName)
+            iGroupName = genericController.encodeText(GroupName)
             '
             MethodName = "main_GetGroupID"
             '
@@ -10783,7 +10783,7 @@ ErrorTrap:
                 '
                 dt = db.executeSql("select top 1 id from ccGroups where name=" & db.encodeSQLText(iGroupName))
                 If dt.Rows.Count > 0 Then
-                    group_GetGroupID = EncodeInteger(dt.Rows(0).Item(0))
+                    group_GetGroupID = genericController.EncodeInteger(dt.Rows(0).Item(0))
                 End If
             End If
             '
@@ -10806,7 +10806,7 @@ ErrorTrap:
             Dim MethodName As String
             Dim iGroupID As Integer
             '
-            iGroupID = EncodeInteger(GroupID)
+            iGroupID = genericController.EncodeInteger(GroupID)
             '
             MethodName = "main_GetGroupByID"
             '
@@ -10817,7 +10817,7 @@ ErrorTrap:
                 '
                 CS = csOpenRecord("Groups", iGroupID)
                 If db.cs_ok(CS) Then
-                    group_GetGroupName = EncodeText(cs_GetField(CS, "Name"))
+                    group_GetGroupName = genericController.encodeText(cs_GetField(CS, "Name"))
                 End If
                 Call db.cs_Close(CS)
             End If
@@ -10847,18 +10847,18 @@ ErrorTrap:
             '
             MethodName = "main_AddGroup"
             '
-            iGroupName = EncodeText(GroupName)
-            iGroupCaption = encodeEmptyText(GroupCaption, iGroupName)
+            iGroupName = genericController.encodeText(GroupName)
+            iGroupCaption = genericController.encodeEmptyText(GroupCaption, iGroupName)
             '
             group_Add = -1
             Dim dt As DataTable
             dt = db.executeSql("SELECT ID FROM ccgroups WHERE NAME=" & db.encodeSQLText(iGroupName))
             If dt.Rows.Count > 0 Then
-                group_Add = EncodeInteger(dt.Rows(0).Item(0))
+                group_Add = genericController.EncodeInteger(dt.Rows(0).Item(0))
             Else
                 CS = db.cs_insertRecord("Groups", SystemMemberID)
                 If db.cs_ok(CS) Then
-                    group_Add = EncodeInteger(db.cs_getField(CS, "ID"))
+                    group_Add = genericController.EncodeInteger(db.cs_getField(CS, "ID"))
                     Call db.cs_set(CS, "name", iGroupName)
                     Call db.cs_set(CS, "caption", iGroupCaption)
                     Call db.cs_set(CS, "active", True)
@@ -10910,7 +10910,7 @@ ErrorTrap:
             '
             MethodName = "main_AddGroupMember"
             '
-            iGroupName = EncodeText(GroupName)
+            iGroupName = genericController.encodeText(GroupName)
             iDateExpires = DateExpires 'encodeMissingDate(DateExpires, Date.MinValue)
             '
             If iGroupName <> "" Then
@@ -10964,7 +10964,7 @@ ErrorTrap:
             Dim MethodName As String
             Dim iGroupName As String
             '
-            iGroupName = EncodeText(GroupName)
+            iGroupName = genericController.encodeText(GroupName)
             '
             MethodName = "main_DeleteGroupMember"
             '
@@ -11057,8 +11057,8 @@ ErrorTrap:
             If False Then '.3.210" Then
                 handleExceptionAndRethrow(New Exception("Contensive database was created with version " & siteProperties.dataBuildVersion & ". main_SetContentCopy requires an builder."))
             Else
-                iCopyName = EncodeText(CopyName)
-                iContent = EncodeText(Content)
+                iCopyName = genericController.encodeText(CopyName)
+                iContent = genericController.encodeText(Content)
                 CS = db.cs_open(ContentName, "name=" & EncodeSQLText(iCopyName))
                 If Not db.cs_ok(CS) Then
                     Call db.cs_Close(CS)
@@ -11105,12 +11105,12 @@ ErrorTrap:
         '            ' ----- Type the input
         '            '
         '            '$$$$$ cache this - somewhere it opens cs with icontentname
-        '            iContentName = encodeEmptyText(ContentName, "Page Content")
-        '            iRootPageName = Trim(EncodeText(RootPageName))
+        '            iContentName = genericController.encodeEmptyText(ContentName, "Page Content")
+        '            iRootPageName = Trim(genericController.encodeText(RootPageName))
         '            If iRootPageName <> "" Then
         '                rootPageId = main_GetRecordID(iContentName, iRootPageName)
         '            End If
-        '            iOrderByClause = EncodeText(OrderByClause)
+        '            iOrderByClause = genericController.encodeText(OrderByClause)
         '            If (Bid = 0) Then
         '                pageId = docProperties.getInteger("bid")
         '            Else
@@ -11134,13 +11134,13 @@ ErrorTrap:
         '                '
         '                ' quick editor
         '                '
-        '                FieldRows = EncodeInteger(properties_user_getText(ContentName & ".copyFilename.PixelHeight", "500"))
+        '                FieldRows = genericController.EncodeInteger(properties_user_getText(ContentName & ".copyFilename.PixelHeight", "500"))
         '                If FieldRows < 50 Then
         '                    FieldRows = 50
         '                    Call properties_SetMemberProperty(ContentName & ".copyFilename.PixelHeight", 50)
         '                End If
         '                quickEditor = html_GetFormInputHTML("copyFilename", main_QuickEditCopy)
-        '                main_GetContentPage = vbReplace(main_GetContentPage, main_fpo_QuickEditing, quickEditor)
+        '                main_GetContentPage = genericController.vbReplace(main_GetContentPage, main_fpo_QuickEditing, quickEditor)
         '            End If
         '            Exit Function
         '            '
@@ -11168,14 +11168,14 @@ ErrorTrap:
         '            Dim PageRecordID As Integer
         '            Dim iContentName As String
         '            '
-        '            iRootPageName = Trim(EncodeText(RootPageName))
-        '            iContentName = encodeEmptyText(ContentName, "Page Content")
+        '            iRootPageName = Trim(genericController.encodeText(RootPageName))
+        '            iContentName = genericController.encodeEmptyText(ContentName, "Page Content")
         '            PageRecordID = docProperties.getInteger("bid")
         '            If iRootPageName <> "" Then
         '                rootPageId = main_GetRecordID(iContentName, iRootPageName)
         '            End If
         '            '
-        '            main_GetContentPageArchive = main_GetHtmlBody_GetSection_GetContent(PageRecordID, rootPageId, iContentName, EncodeText(OrderByClause), True, True, True, 0, siteProperties.useContentWatchLink, False)
+        '            main_GetContentPageArchive = main_GetHtmlBody_GetSection_GetContent(PageRecordID, rootPageId, iContentName, genericController.encodeText(OrderByClause), True, True, True, 0, siteProperties.useContentWatchLink, False)
         '            '
         '            If pageManager_RedirectLink <> "" Then
         '                Call web_Redirect2(pageManager_RedirectLink, "Redirecting due to a main_GetContentPageArchive condition. (" & pageManager_RedirectReason & ")", pageManager_RedirectBecausePageNotFound)
@@ -11212,12 +11212,12 @@ ErrorTrap:
         '            Dim IMenuImage As String
         '            Dim UseContentWatchLink As Boolean
         '            '
-        '            RootPageNameLocal = Trim(EncodeText(RootPageName))
-        '            ContentNameLocal = encodeEmptyText(ContentName, "Page Content")
-        '            PageLink = encodeEmptyText(Link, "")
+        '            RootPageNameLocal = Trim(genericController.encodeText(RootPageName))
+        '            ContentNameLocal = genericController.encodeEmptyText(ContentName, "Page Content")
+        '            PageLink = genericController.encodeEmptyText(Link, "")
         '            MenuStyleLocal = encodeEmptyInteger(MenuStyle, 1)
-        '            StyleSheetPrefixLocal = encodeEmptyText(StyleSheetPrefix, "ccFlyout")
-        '            IMenuImage = encodeEmptyText(MenuImage, "")
+        '            StyleSheetPrefixLocal = genericController.encodeEmptyText(StyleSheetPrefix, "ccFlyout")
+        '            IMenuImage = genericController.encodeEmptyText(MenuImage, "")
         '            UseContentWatchLink = siteProperties.useContentWatchLink
         '            '
         '            main_GetContentPageMenu = main_GetSectionMenu_NameMenu(RootPageNameLocal, ContentNameLocal, PageLink, RootPageRecordID, DepthLimit, MenuStyleLocal, StyleSheetPrefixLocal, IMenuImage, IMenuImage, "", 0, UseContentWatchLink)
@@ -11237,7 +11237,7 @@ ErrorTrap:
         '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("OpenContent")
         '            '
         '            'If Not (true) Then Exit Function
-        '            main_OpenContent = db.csOpen(EncodeText(ContentName), Criteria, SortFieldList, ActiveOnly)
+        '            main_OpenContent = db.csOpen(genericController.encodeText(ContentName), Criteria, SortFieldList, ActiveOnly)
         '            '
         '            Exit Function
         'ErrorTrap:
@@ -11260,7 +11260,7 @@ ErrorTrap:
             Dim MethodName As String
             Dim iCSPointer As Integer
             '
-            iCSPointer = EncodeInteger(CSPointer)
+            iCSPointer = genericController.EncodeInteger(CSPointer)
             '
             MethodName = "main_cs_getRecordEditLink"
             '
@@ -11278,7 +11278,7 @@ ErrorTrap:
                     ContentControlID = (db.cs_getInteger(iCSPointer, "contentcontrolid"))
                     ContentName = metaData.getContentNameByID(ContentControlID)
                     If ContentName <> "" Then
-                        cs_cs_getRecordEditLink = main_GetRecordEditLink2(ContentName, RecordID, EncodeBoolean(AllowCut), RecordName, user.isEditing(ContentName))
+                        cs_cs_getRecordEditLink = main_GetRecordEditLink2(ContentName, RecordID, genericController.EncodeBoolean(AllowCut), RecordName, user.isEditing(ContentName))
                     End If
                 End If
             End If
@@ -11338,7 +11338,7 @@ ErrorTrap:
             Else
                 ActionQS = ActionQueryString
             End If
-            iMethod = vbLCase(htmlMethod)
+            iMethod = genericController.vbLCase(htmlMethod)
             If iMethod = "" Then
                 iMethod = "post"
             End If
@@ -11359,10 +11359,10 @@ ErrorTrap:
                     For Ptr = 0 To UBound(QSParts)
                         QSNameValues = Split(QSParts(Ptr), "=")
                         If UBound(QSNameValues) = 0 Then
-                            QSName = DecodeResponseVariable(QSNameValues(0))
+                            QSName = genericController.DecodeResponseVariable(QSNameValues(0))
                         Else
-                            QSName = DecodeResponseVariable(QSNameValues(0))
-                            QSValue = DecodeResponseVariable(QSNameValues(1))
+                            QSName = genericController.DecodeResponseVariable(QSNameValues(0))
+                            QSValue = genericController.DecodeResponseVariable(QSNameValues(1))
                             RefreshHiddens = RefreshHiddens & cr & "<input type=""hidden"" name=""" & html.html_EncodeHTML(QSName) & """ value=""" & html.html_EncodeHTML(QSValue) & """>"
                         End If
                     Next
@@ -11396,7 +11396,7 @@ ErrorTrap:
         '
         '
         Public Function html_GetFormInputText(ByVal TagName As String, Optional ByVal DefaultValue As String = "", Optional ByVal Height As String = "", Optional ByVal Width As String = "", Optional ByVal Id As String = "", Optional ByVal PasswordField As Boolean = False) As String
-            html_GetFormInputText = html_GetFormInputText2(EncodeText(TagName), EncodeText(DefaultValue), EncodeInteger(Height), EncodeInteger(Width), EncodeText(Id), PasswordField, False)
+            html_GetFormInputText = html_GetFormInputText2(genericController.encodeText(TagName), genericController.encodeText(DefaultValue), genericController.EncodeInteger(Height), genericController.EncodeInteger(Width), genericController.encodeText(Id), PasswordField, False)
         End Function
         '
         '
@@ -11415,7 +11415,7 @@ ErrorTrap:
                 '
                 iDefaultValue = html.html_EncodeHTML(DefaultValue)
                 If HtmlId <> "" Then
-                    TagID = TagID & " id=""" & encodeEmptyText(HtmlId, "") & """"
+                    TagID = TagID & " id=""" & genericController.encodeEmptyText(HtmlId, "") & """"
                 End If
                 '
                 If HtmlClass <> "" Then
@@ -11522,8 +11522,8 @@ ErrorTrap:
             '
             html_GetFormInputTextExpandable2 = "" _
                 & "<div class=""" & HtmlClass & """>" _
-                & kmaIndent(EditorClosed) _
-                & kmaIndent(EditorOpened) _
+                & genericController.kmaIndent(EditorClosed) _
+                & genericController.kmaIndent(EditorOpened) _
                 & "</div>"
             main_FormInputTextCnt = main_FormInputTextCnt + 1
             Exit Function
@@ -11555,18 +11555,18 @@ ErrorTrap:
             '
             MethodName = "main_GetFormInputDate"
             '
-            iTagName = EncodeText(TagName)
-            iDefaultValue = encodeEmptyText(DefaultValue, "")
+            iTagName = genericController.encodeText(TagName)
+            iDefaultValue = genericController.encodeEmptyText(DefaultValue, "")
             If (iDefaultValue = "0") Or (iDefaultValue = "12:00:00 AM") Then
                 iDefaultValue = ""
             Else
                 iDefaultValue = html.html_EncodeHTML(iDefaultValue)
             End If
-            If encodeEmptyText(Id, "") <> "" Then
-                TagID = " ID=""" & encodeEmptyText(Id, "") & """"
+            If genericController.encodeEmptyText(Id, "") <> "" Then
+                TagID = " ID=""" & genericController.encodeEmptyText(Id, "") & """"
             End If
             '
-            iWidth = encodeEmptyInteger(Width, 20)
+            iWidth = genericController.encodeEmptyInteger(Width, 20)
             If iWidth = 0 Then
                 iWidth = 20
             End If
@@ -11586,7 +11586,7 @@ ErrorTrap:
             End If
 
             If IsDate(iDefaultValue) Then
-                DateValue = EncodeDate(iDefaultValue)
+                DateValue = genericController.EncodeDate(iDefaultValue)
                 If Month(DateValue) < 10 Then
                     DateString = DateString & "0"
                 End If
@@ -11647,10 +11647,10 @@ ErrorTrap:
             Dim ihtmlId As String
             Dim TagID As String
             '
-            iTagName = EncodeText(TagName)
-            iTagValue = EncodeText(TagValue)
-            iCurrentValue = EncodeText(CurrentValue)
-            ihtmlId = encodeEmptyText(htmlId, "")
+            iTagName = genericController.encodeText(TagName)
+            iTagValue = genericController.encodeText(TagValue)
+            iCurrentValue = genericController.encodeText(CurrentValue)
+            ihtmlId = genericController.encodeEmptyText(htmlId, "")
             If ihtmlId <> "" Then
                 TagID = " ID=""" & ihtmlId & """"
             End If
@@ -11677,7 +11677,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function html_GetFormInputCheckBox(ByVal TagName As String, Optional ByVal DefaultValue As String = "", Optional ByVal htmlId As String = "") As String
-            html_GetFormInputCheckBox = html_GetFormInputCheckBox2(EncodeText(TagName), EncodeBoolean(DefaultValue), EncodeText(htmlId))
+            html_GetFormInputCheckBox = html_GetFormInputCheckBox2(genericController.encodeText(TagName), genericController.EncodeBoolean(DefaultValue), genericController.encodeText(htmlId))
         End Function
         '
         '========================================================================
@@ -11751,7 +11751,7 @@ ErrorTrap:
             '
             MethodName = "main_GetFormInputCheckListByIDList"
             '
-            iCaptionFieldName = encodeEmptyText(CaptionFieldName, "name")
+            iCaptionFieldName = genericController.encodeEmptyText(CaptionFieldName, "name")
             '
             ' ----- Gather all the SecondaryContent that associates to the PrimaryContent
             '
@@ -11759,7 +11759,7 @@ ErrorTrap:
             SecondaryTablename = SecondaryCDef.ContentTableName
             SecondaryContentID = SecondaryCDef.Id
             SecondaryCDef.childIdList.Add(SecondaryContentID)
-            SingularPrefix = GetSingular(SecondaryContentName) & "&nbsp;"
+            SingularPrefix = genericController.GetSingular(SecondaryContentName) & "&nbsp;"
             '
             ' ----- Gather all the records, sorted by ContentName
             '
@@ -11791,7 +11791,7 @@ ErrorTrap:
                             ' leave this between checkboxes - it is searched in the admin page
                             Result = Result & "<br >" & vbCrLf
                         End If
-                        If IsInDelimitedString(CheckedIDList, CStr(RecordID), ",") Then
+                        If genericController.IsInDelimitedString(CheckedIDList, CStr(RecordID), ",") Then
                             Found = True
                         Else
                             Found = False
@@ -11859,7 +11859,7 @@ ErrorTrap:
                     For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In Contentdefinition.fields
                         Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
                         With field
-                            If vbUCase(.nameLc) = vbUCase(FieldName) Then
+                            If genericController.vbUCase(.nameLc) = genericController.vbUCase(FieldName) Then
                                 FieldValueVariant = .defaultValue
                                 fieldTypeId = .fieldTypeId
                                 FieldReadOnly = .ReadOnly
@@ -11887,7 +11887,7 @@ ErrorTrap:
                             '
                             ' Handle Password Fields
                             '
-                            FieldValueText = EncodeText(FieldValueVariant)
+                            FieldValueText = genericController.encodeText(FieldValueVariant)
                             returnResult = html_GetFormInputText2(FieldName, FieldValueText, Height, Width, , True)
                         Else
                             '
@@ -11898,7 +11898,7 @@ ErrorTrap:
                             '
                             '
                                 Case FieldTypeIdHTML
-                                    FieldValueText = EncodeText(FieldValueVariant)
+                                    FieldValueText = genericController.encodeText(FieldValueVariant)
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
                                     Else
@@ -11908,7 +11908,7 @@ ErrorTrap:
                                 ' html private files, read from privatefiles and use html editor
                                 '
                                 Case FieldTypeIdFileHTMLPrivate
-                                    FieldValueText = EncodeText(FieldValueVariant)
+                                    FieldValueText = genericController.encodeText(FieldValueVariant)
                                     If FieldValueText <> "" Then
                                         FieldValueText = privateFiles.readFile(FieldValueText)
                                     End If
@@ -11922,7 +11922,7 @@ ErrorTrap:
                                 ' text private files, read from privatefiles and use text editor
                                 '
                                 Case FieldTypeIdFileTextPrivate
-                                    FieldValueText = EncodeText(FieldValueVariant)
+                                    FieldValueText = genericController.encodeText(FieldValueVariant)
                                     If FieldValueText <> "" Then
                                         FieldValueText = privateFiles.readFile(FieldValueText)
                                     End If
@@ -11936,7 +11936,7 @@ ErrorTrap:
                                 ' text public files, read from cdnfiles and use text editor
                                 '
                                 Case FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript
-                                    FieldValueText = EncodeText(FieldValueVariant)
+                                    FieldValueText = genericController.encodeText(FieldValueVariant)
                                     If FieldValueText <> "" Then
                                         FieldValueText = cdnFiles.readFile(FieldValueText)
                                     End If
@@ -11951,50 +11951,50 @@ ErrorTrap:
                                 '
                                 Case FieldTypeIdBoolean
                                     If FieldReadOnly Then
-                                        returnResult = EncodeText(EncodeBoolean(FieldValueVariant))
+                                        returnResult = genericController.encodeText(genericController.EncodeBoolean(FieldValueVariant))
                                     Else
-                                        returnResult = html_GetFormInputCheckBox2(FieldName, EncodeBoolean(FieldValueVariant))
+                                        returnResult = html_GetFormInputCheckBox2(FieldName, genericController.EncodeBoolean(FieldValueVariant))
                                     End If
                                 '
                                 '
                                 '
                                 Case FieldTypeIdAutoIdIncrement
-                                    returnResult = EncodeText(EncodeNumber(FieldValueVariant))
+                                    returnResult = genericController.encodeText(genericController.EncodeNumber(FieldValueVariant))
                                 '
                                 '
                                 '
                                 Case FieldTypeIdFloat, FieldTypeIdCurrency, FieldTypeIdInteger
-                                    FieldValueVariant = EncodeNumber(FieldValueVariant)
+                                    FieldValueVariant = genericController.EncodeNumber(FieldValueVariant)
                                     If FieldReadOnly Then
-                                        returnResult = EncodeText(FieldValueVariant)
+                                        returnResult = genericController.encodeText(FieldValueVariant)
                                     Else
-                                        returnResult = html_GetFormInputText2(FieldName, EncodeText(FieldValueVariant), Height, Width)
+                                        returnResult = html_GetFormInputText2(FieldName, genericController.encodeText(FieldValueVariant), Height, Width)
                                     End If
                                 '
                                 '
                                 '
                                 Case FieldTypeIdFile
-                                    FieldValueText = EncodeText(FieldValueVariant)
+                                    FieldValueText = genericController.encodeText(FieldValueVariant)
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
                                     Else
-                                        returnResult = FieldValueText & "<BR >change: " & html_GetFormInputFile(FieldName, EncodeText(FieldValueVariant))
+                                        returnResult = FieldValueText & "<BR >change: " & html_GetFormInputFile(FieldName, genericController.encodeText(FieldValueVariant))
                                     End If
                                 '
                                 '
                                 '
                                 Case FieldTypeIdFileImage
-                                    FieldValueText = EncodeText(FieldValueVariant)
+                                    FieldValueText = genericController.encodeText(FieldValueVariant)
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
                                     Else
-                                        returnResult = "<img src=""" & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, FieldValueText) & """><BR >change: " & html_GetFormInputFile(FieldName, EncodeText(FieldValueVariant))
+                                        returnResult = "<img src=""" & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, FieldValueText) & """><BR >change: " & html_GetFormInputFile(FieldName, genericController.encodeText(FieldValueVariant))
                                     End If
                                 '
                                 '
                                 '
                                 Case FieldTypeIdLookup
-                                    FieldValueInteger = EncodeInteger(FieldValueVariant)
+                                    FieldValueInteger = genericController.EncodeInteger(FieldValueVariant)
                                     FieldLookupContentName = metaData.getContentNameByID(FieldLookupContentID)
                                     If FieldLookupContentName <> "" Then
                                         '
@@ -12024,13 +12024,13 @@ ErrorTrap:
                                 '
                                 '
                                 Case FieldTypeIdMemberSelect
-                                    FieldValueInteger = EncodeInteger(FieldValueVariant)
+                                    FieldValueInteger = genericController.EncodeInteger(FieldValueVariant)
                                     returnResult = html_GetFormInputMemberSelect(FieldName, FieldValueInteger, FieldMemberSelectGroupID)
                                     '
                                     '
                                     '
                                 Case Else
-                                    FieldValueText = EncodeText(FieldValueVariant)
+                                    FieldValueText = genericController.encodeText(FieldValueVariant)
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
                                     Else
@@ -12075,10 +12075,10 @@ ErrorTrap:
             MethodName = "main_GetFormButton2"
             '
             s = "<input TYPE=""SUBMIT""" _
-                & " NAME=""" & encodeEmptyText(Name, "button") & """" _
-                & " VALUE=""" & EncodeText(ButtonLabel) & """" _
-                & " OnClick=""" & encodeEmptyText(OnClick, "") & """" _
-                & " ID=""" & encodeEmptyText(htmlId, "") & """"
+                & " NAME=""" & genericController.encodeEmptyText(Name, "button") & """" _
+                & " VALUE=""" & genericController.encodeText(ButtonLabel) & """" _
+                & " OnClick=""" & genericController.encodeEmptyText(OnClick, "") & """" _
+                & " ID=""" & genericController.encodeEmptyText(htmlId, "") & """"
             If Disabled Then
                 s = s & " disabled=""disabled"""
             End If
@@ -12106,14 +12106,14 @@ ErrorTrap:
             Dim ihtmlId As String
             Dim s As String
             '
-            s = cr & "<input type=""hidden"" NAME=""" & html.html_EncodeHTML(EncodeText(TagName)) & """"
+            s = cr & "<input type=""hidden"" NAME=""" & html.html_EncodeHTML(genericController.encodeText(TagName)) & """"
             '
-            iTagValue = html.html_EncodeHTML(EncodeText(TagValue))
+            iTagValue = html.html_EncodeHTML(genericController.encodeText(TagValue))
             If iTagValue <> "" Then
                 s = s & " VALUE=""" & iTagValue & """"
             End If
             '
-            ihtmlId = EncodeText(htmlId)
+            ihtmlId = genericController.encodeText(htmlId)
             If ihtmlId <> "" Then
                 s = s & " ID=""" & html.html_EncodeHTML(ihtmlId) & """"
             End If
@@ -12146,7 +12146,7 @@ ErrorTrap:
             Dim MethodName As String
             '
             html_GetWindowOpenJScript = ""
-            WindowName = encodeEmptyText(WindowName, "_blank")
+            WindowName = genericController.encodeEmptyText(WindowName, "_blank")
             '
             MethodName = "main_GetWindowOpenJScript()"
             '
@@ -12155,19 +12155,19 @@ ErrorTrap:
             html_GetWindowOpenJScript = html_GetWindowOpenJScript & "window.open('" & URI & "', '" & WindowName & "'"
             html_GetWindowOpenJScript = html_GetWindowOpenJScript & ",'menubar=no,toolbar=no,location=no,status=no"
             Delimiter = ","
-            If Not isMissing(WindowWidth) Then
+            If Not genericController.isMissing(WindowWidth) Then
                 If WindowWidth <> "" Then
                     html_GetWindowOpenJScript = html_GetWindowOpenJScript & Delimiter & "width=" & WindowWidth
                     Delimiter = ","
                 End If
             End If
-            If Not isMissing(WindowHeight) Then
+            If Not genericController.isMissing(WindowHeight) Then
                 If WindowHeight <> "" Then
                     html_GetWindowOpenJScript = html_GetWindowOpenJScript & Delimiter & "height=" & WindowHeight
                     Delimiter = ","
                 End If
             End If
-            If Not isMissing(WindowScrollBars) Then
+            If Not genericController.isMissing(WindowScrollBars) Then
                 If WindowScrollBars <> "" Then
                     html_GetWindowOpenJScript = html_GetWindowOpenJScript & Delimiter & "scrollbars=" & WindowScrollBars
                     Delimiter = ","
@@ -12198,7 +12198,7 @@ ErrorTrap:
             Dim iWindowName As String
             Dim MethodName As String
             '
-            iWindowName = encodeEmptyText(WindowName, "_blank")
+            iWindowName = genericController.encodeEmptyText(WindowName, "_blank")
             '
             MethodName = "main_GetWindowDialogJScript()"
             '
@@ -12207,12 +12207,12 @@ ErrorTrap:
             html_GetWindowDialogJScript = ""
             html_GetWindowDialogJScript = html_GetWindowDialogJScript & "showModalDialog('" & URI & "', '" & iWindowName & "'"
             html_GetWindowDialogJScript = html_GetWindowDialogJScript & ",'status:false"
-            If Not isMissing(WindowWidth) Then
+            If Not genericController.isMissing(WindowWidth) Then
                 If WindowWidth <> "" Then
                     html_GetWindowDialogJScript = html_GetWindowDialogJScript & ";dialogWidth:" & WindowWidth & "px"
                 End If
             End If
-            If Not isMissing(WindowHeight) Then
+            If Not genericController.isMissing(WindowHeight) Then
                 If WindowHeight <> "" Then
                     html_GetWindowDialogJScript = html_GetWindowDialogJScript & ";dialogHeight:" & WindowHeight & "px"
                 End If
@@ -12262,7 +12262,7 @@ ErrorTrap:
             '
             TestFilename = "AsciiExport" & common_GetRandomLong_Internal() & ".txt"
             '
-            iContentName = EncodeText(ContentName)
+            iContentName = genericController.encodeText(ContentName)
             'PageSize = encodeEmptyInteger(PageSize, 1000)
             If PageSize = 0 Then
                 PageSize = 1000
@@ -12278,8 +12278,8 @@ ErrorTrap:
             '
             Call webServerIO_setResponseContentType("text/plain")
             Call webServerIO_SetStreamBuffer(False)
-            TableName = GetDbObjectTableName(GetContentTablename(iContentName))
-            Select Case vbUCase(TableName)
+            TableName = genericController.GetDbObjectTableName(GetContentTablename(iContentName))
+            Select Case genericController.vbUCase(TableName)
                 Case "CCMEMBERS"
                     '
                     ' ----- People and member content export
@@ -12296,8 +12296,8 @@ ErrorTrap:
                             Delimiter = ","
                             FieldNameVariant = db.cs_getFirstFieldName(CSPointer)
                             Do While (FieldNameVariant <> "")
-                                FieldName = EncodeText(FieldNameVariant)
-                                UcaseFieldName = vbUCase(FieldName)
+                                FieldName = genericController.encodeText(FieldNameVariant)
+                                UcaseFieldName = genericController.vbUCase(FieldName)
                                 If (UcaseFieldName <> "USERNAME") And (UcaseFieldName <> "PASSWORD") Then
                                     Call sb.Append(Delimiter & """" & FieldName & """")
                                 End If
@@ -12316,15 +12316,15 @@ ErrorTrap:
                                 Delimiter = ","
                                 FieldNameVariant = db.cs_getFirstFieldName(CSPointer)
                                 Do While (FieldNameVariant <> "")
-                                    FieldName = EncodeText(FieldNameVariant)
-                                    UcaseFieldName = vbUCase(FieldName)
+                                    FieldName = genericController.encodeText(FieldNameVariant)
+                                    UcaseFieldName = genericController.vbUCase(FieldName)
                                     If (UcaseFieldName <> "USERNAME") And (UcaseFieldName <> "PASSWORD") Then
                                         Copy = db.cs_get(CSPointer, FieldName)
                                         If Copy <> "" Then
-                                            Copy = vbReplace(Copy, """", "'")
-                                            Copy = vbReplace(Copy, vbCrLf, " ")
-                                            Copy = vbReplace(Copy, vbCr, " ")
-                                            Copy = vbReplace(Copy, vbLf, " ")
+                                            Copy = genericController.vbReplace(Copy, """", "'")
+                                            Copy = genericController.vbReplace(Copy, vbCrLf, " ")
+                                            Copy = genericController.vbReplace(Copy, vbCr, " ")
+                                            Copy = genericController.vbReplace(Copy, vbLf, " ")
                                         End If
                                         Call sb.Append(Delimiter & """" & Copy & """")
                                     End If
@@ -12367,20 +12367,20 @@ ErrorTrap:
                             Delimiter = ""
                             FieldNameVariant = db.cs_getFirstFieldName(CSPointer)
                             Do While (FieldNameVariant <> "")
-                                Select Case db.cs_getFieldTypeId(CSPointer, EncodeText(FieldNameVariant))
+                                Select Case db.cs_getFieldTypeId(CSPointer, genericController.encodeText(FieldNameVariant))
                                     Case FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdFileHTMLPrivate
-                                        Copy = main_cs_getEncodedField(CSPointer, EncodeText(FieldNameVariant))
+                                        Copy = main_cs_getEncodedField(CSPointer, genericController.encodeText(FieldNameVariant))
                                     Case FieldTypeIdLookup
-                                        Copy = db.cs_getLookup(CSPointer, EncodeText(FieldNameVariant))
+                                        Copy = db.cs_getLookup(CSPointer, genericController.encodeText(FieldNameVariant))
                                     Case FieldTypeIdRedirect, FieldTypeIdManyToMany
                                     Case Else
-                                        Copy = db.cs_getText(CSPointer, EncodeText(FieldNameVariant))
+                                        Copy = db.cs_getText(CSPointer, genericController.encodeText(FieldNameVariant))
                                 End Select
                                 If Copy <> "" Then
-                                    Copy = vbReplace(Copy, """", "'")
-                                    Copy = vbReplace(Copy, vbCrLf, " ")
-                                    Copy = vbReplace(Copy, vbCr, " ")
-                                    Copy = vbReplace(Copy, vbLf, " ")
+                                    Copy = genericController.vbReplace(Copy, """", "'")
+                                    Copy = genericController.vbReplace(Copy, vbCrLf, " ")
+                                    Copy = genericController.vbReplace(Copy, vbCr, " ")
+                                    Copy = genericController.vbReplace(Copy, vbLf, " ")
                                 End If
                                 Call appRootFiles.appendFile(TestFilename, Delimiter & """" & Copy & """")
                                 Delimiter = ","
@@ -12415,7 +12415,7 @@ ErrorTrap:
         '            Dim MethodName As String
         '            Dim iPeopleID As Integer
         '            '
-        '            iPeopleID = EncodeInteger(PeopleID)
+        '            iPeopleID = genericController.EncodeInteger(PeopleID)
         '            '
         '            MethodName = "main_SetMember"
         '            '
@@ -12477,8 +12477,8 @@ ErrorTrap:
                     _docBufferResponseHeader = _docBufferResponseHeader & vbCrLf
                 End If
                 _docBufferResponseHeader = _docBufferResponseHeader _
-                    & vbReplace(EncodeText(HeaderName), vbCrLf, "") _
-                    & vbCrLf & vbReplace(EncodeText(HeaderValue), vbCrLf, "")
+                    & genericController.vbReplace(genericController.encodeText(HeaderName), vbCrLf, "") _
+                    & vbCrLf & genericController.vbReplace(genericController.encodeText(HeaderValue), vbCrLf, "")
             End If
             '
             Exit Sub
@@ -12508,68 +12508,12 @@ ErrorTrap:
             '
         End Sub
         '
-        '
-        '
-        Public Sub main_FlushStream()
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("FlushStream")
-            '
+        Public Sub webServerIO_FlushStream()
             If (webServerIO.iisContext IsNot Nothing) Then
-                '
-                ' ASP flush
-                '
                 webServerIO.iisContext.Response.Flush()
-            Else
-                '
-                ' No Buffer equivalent
-                '
             End If
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18("main_FlushStream")
-            '
         End Sub
-        '
-        '========================================================================
-        '   Creates the site-wide standard filename for textfiles and uploaded files and images
-        '
-        '   May or may not contain directory slashes
-        '========================================================================
-        '
-        Public Function main_GetVirtualFilename(ByVal ContentName As String, ByVal FieldName As String, ByVal RecordID As Integer, Optional ByVal OriginalFilename As String = "") As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetVirtualFilename")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim MethodName As String
-            Dim iContentName As String
-            Dim iFieldName As String
-            Dim iRecordID As Integer
-            '
-            iContentName = EncodeText(ContentName)
-            iFieldName = EncodeText(FieldName)
-            iRecordID = EncodeInteger(RecordID)
-            '
-            MethodName = "main_GetVirtualFilename"
-            '
-            main_GetVirtualFilename = db.GetVirtualFilename(iContentName, iFieldName, iRecordID, OriginalFilename)
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18(MethodName)
-        End Function
-        '
-        '
-        '
-        Public Function main_GetLinkedText(AnchorTag As Object, AnchorText As Object) As String
-            main_GetLinkedText = csv_GetLinkedText(EncodeText(AnchorTag), EncodeText(AnchorText))
-            Exit Function
-        End Function
+
         '
         '=============================================================================
         ' Save Visit
@@ -12722,7 +12666,7 @@ ErrorTrap:
                 Dim AuthDomain As String
                 Dim main_appNameCookiePrefix As String
                 '
-                main_appNameCookiePrefix = vbLCase(main_encodeCookieName(serverConfig.appConfig.name))
+                main_appNameCookiePrefix = genericController.vbLCase(main_encodeCookieName(serverConfig.appConfig.name))
 
                 ' ----- Visit Defaults
                 '
@@ -13026,11 +12970,11 @@ ErrorTrap:
                         'hint = "320"
                         If webServerIO.requestReferrer <> "" Then
                             WorkingReferer = webServerIO.requestReferrer
-                            SlashPosition = vbInstr(1, WorkingReferer, "//")
+                            SlashPosition = genericController.vbInstr(1, WorkingReferer, "//")
                             If (SlashPosition <> 0) And (Len(WorkingReferer) > (SlashPosition + 2)) Then
                                 WorkingReferer = Mid(WorkingReferer, SlashPosition + 2)
                             End If
-                            SlashPosition = vbInstr(1, WorkingReferer, "/")
+                            SlashPosition = genericController.vbInstr(1, WorkingReferer, "/")
                             If SlashPosition = 0 Then
                                 visit_refererPathPage = ""
                                 visit_refererHost = WorkingReferer
@@ -13045,7 +12989,7 @@ ErrorTrap:
                         '--------------------------------------------------------------------------
                         '
                         'hint = "330"
-                        CookieVisitor = EncodeText(webServerIO.getRequestCookie(main_appNameCookiePrefix & main_cookieNameVisitor))
+                        CookieVisitor = genericController.encodeText(webServerIO.getRequestCookie(main_appNameCookiePrefix & main_cookieNameVisitor))
                         '
                         'Call AppendLog("main_InitVisit(), 2480")
                         '
@@ -13217,7 +13161,7 @@ ErrorTrap:
                         If (LCase(Left(visit_name, 5)) <> "visit") Then
                             DefaultMemberName = visit_name
                         Else
-                            DefaultMemberName = EncodeText(GetContentFieldProperty("people", "name", "default"))
+                            DefaultMemberName = genericController.encodeText(GetContentFieldProperty("people", "name", "default"))
                         End If
                         If (False) Then
                             '
@@ -13441,7 +13385,7 @@ ErrorTrap:
         '            '
         '            MethodName = "main_SaveVirtualFile"
         '            '
-        '            Call app.publicFiles.SaveFile(EncodeText(Filename), EncodeText(FileContent))
+        '            Call app.publicFiles.SaveFile(genericController.encodeText(Filename), genericController.encodeText(FileContent))
         '            '
         '            Exit Sub
         '            '
@@ -13463,7 +13407,7 @@ ErrorTrap:
         '            '
         '            MethodName = "main_DeleteVirtualFile"
         '            '
-        '        Call app.publicFiles.DeleteFile(EncodeText(Filename))
+        '        Call app.publicFiles.DeleteFile(genericController.encodeText(Filename))
         '            Exit Sub
         '            '
         '            ' ----- Error Trap
@@ -13486,7 +13430,7 @@ ErrorTrap:
         '            '
         '            MethodName = "main_CopyVirtualFilename"
         '            '
-        '            Call app.contentFiles.copyFile(EncodeText(SourceFilename), EncodeText(DestinationFilename))
+        '            Call app.contentFiles.copyFile(genericController.encodeText(SourceFilename), genericController.encodeText(DestinationFilename))
         '            Exit Sub
         '            '
         '            ' ----- Error Trap
@@ -13508,7 +13452,7 @@ ErrorTrap:
         '            '
         '            MethodName = "main_AppendVirtualFile"
         '            '
-        '            Call app.publicFiles.appendFile(EncodeText(Filename), EncodeText(FileContent))
+        '            Call app.publicFiles.appendFile(genericController.encodeText(Filename), genericController.encodeText(FileContent))
         '            Exit Sub
         '            '
         '            ' ----- Error Trap
@@ -13529,7 +13473,7 @@ ErrorTrap:
         '            '
         '            MethodName = "main_SaveFile"
         '            '
-        '        Call app.publicFiles.SaveFile(EncodeText(Filename), EncodeText(FileContent))
+        '        Call app.publicFiles.SaveFile(genericController.encodeText(Filename), genericController.encodeText(FileContent))
         '            Exit Sub
         '            '
         '            ' ----- Error Trap
@@ -13551,7 +13495,7 @@ ErrorTrap:
         '            '
         '            MethodName = "main_CreateFileFolder"
         '            '
-        '        Call app.publicFiles.createPath(EncodeText(FolderPath))
+        '        Call app.publicFiles.createPath(genericController.encodeText(FolderPath))
         '            Exit Sub
         '            '
         '            ' ----- Error Trap
@@ -13573,7 +13517,7 @@ ErrorTrap:
         '            '
         '            MethodName = "main_DeleteFile"
         '            '
-        '            Call app.csv_DeleteFile(EncodeText(Filename))
+        '            Call app.csv_DeleteFile(genericController.encodeText(Filename))
         '            Exit Sub
         '            '
         '            ' ----- Error Trap
@@ -13595,7 +13539,7 @@ ErrorTrap:
         '            '
         '            MethodName = "main_copyFile"
         '            '
-        '            Call app.csv_CopyFile(EncodeText(SourcePathFilename), EncodeText(DestinationPathFilename))
+        '            Call app.csv_CopyFile(genericController.encodeText(SourcePathFilename), genericController.encodeText(DestinationPathFilename))
         '            Exit Sub
         '            '
         '            ' ----- Error Trap
@@ -13617,7 +13561,7 @@ ErrorTrap:
         '            '
         '            MethodName = "main_renameFile"
         '            '
-        '            Call app.csv_renameFile(EncodeText(SourcePathFilename), EncodeText(DestinationFilename))
+        '            Call app.csv_renameFile(genericController.encodeText(SourcePathFilename), genericController.encodeText(DestinationFilename))
         '            Exit Sub
         '            '
         '            ' ----- Error Trap
@@ -13636,7 +13580,7 @@ ErrorTrap:
         '            '
         '            'If Not (true) Then Exit Function
         '            '
-        '            main_GetFileList = app.csv_GetFileList(EncodeText(FolderPath), EncodeInteger(PageSize), EncodeInteger(PageNumber))
+        '            main_GetFileList = app.csv_GetFileList(genericController.encodeText(FolderPath), genericController.EncodeInteger(PageSize), genericController.EncodeInteger(PageNumber))
         '            '
         '            Exit Function
         '            '
@@ -13655,7 +13599,7 @@ ErrorTrap:
         '            '
         '            'If Not (true) Then Exit Function
         '            '
-        '            main_GetFileCount = app.getPublicFileCount(EncodeText(FolderPath))
+        '            main_GetFileCount = app.getPublicFileCount(genericController.encodeText(FolderPath))
         '            '
         '            Exit Function
         '            '
@@ -13674,7 +13618,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            getFolderNameList = appRootFiles.getFolderNameList(EncodeText(FolderPath))
+            getFolderNameList = appRootFiles.getFolderNameList(genericController.encodeText(FolderPath))
             '
             Exit Function
             '
@@ -13693,7 +13637,7 @@ ErrorTrap:
         '            '
         '            'If Not (true) Then Exit Function
         '            '
-        '            main_GetVirtualFileList = app.publicFiles.GetFolderFiles(EncodeText(FolderPath))
+        '            main_GetVirtualFileList = app.publicFiles.GetFolderFiles(genericController.encodeText(FolderPath))
         '            '
         '            Exit Function
         '            '
@@ -13712,7 +13656,7 @@ ErrorTrap:
         '            '
         '            'If Not (true) Then Exit Function
         '            '
-        '            main_GetVirtualFileCount = app.csv_GetVirtualFileCount(EncodeText(FolderPath))
+        '            main_GetVirtualFileCount = app.csv_GetVirtualFileCount(genericController.encodeText(FolderPath))
         '            '
         '            Exit Function
         '            '
@@ -13731,7 +13675,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            main_GetVirtualFolderList = cdnFiles.getFolderNameList(EncodeText(FolderPath))
+            main_GetVirtualFolderList = cdnFiles.getFolderNameList(genericController.encodeText(FolderPath))
             '
             Exit Function
             '
@@ -13754,7 +13698,7 @@ ErrorTrap:
             '
             MethodName = "main_GetContentID"
             '
-            main_GetContentID = metaData.getContentId(EncodeText(ContentName))
+            main_GetContentID = metaData.getContentId(genericController.encodeText(ContentName))
             Exit Function
             '
             ' ----- Error Trap
@@ -13782,7 +13726,7 @@ ErrorTrap:
             '
             MethodName = "main_GetContentDataSource"
             '
-            main_GetContentDataSource = metaData.getContentDataSource(EncodeText(ContentName))
+            main_GetContentDataSource = metaData.getContentDataSource(genericController.encodeText(ContentName))
             Exit Function
             '
             ' ----- Error Trap
@@ -13809,16 +13753,16 @@ ErrorTrap:
             Dim iRecordID As Integer
             Dim iContentName As String
             '
-            iRecordID = EncodeInteger(RecordID)
-            iContentName = EncodeText(ContentName)
+            iRecordID = genericController.EncodeInteger(RecordID)
+            iContentName = genericController.encodeText(ContentName)
             '
             MethodName = "main_DeleteContentRecord"
             '
             If (iContentName = "") Or (iRecordID = 0) Then
-                If (EncodeText(RecordID) <> "") And (EncodeText(RecordID) <> "0") Then
+                If (genericController.encodeText(RecordID) <> "") And (genericController.encodeText(RecordID) <> "0") Then
                     Call db.deleteContentRecord(ContentName, RecordID)
                 Else
-                    handleExceptionAndRethrow(New Exception("Invalid ContentName [" & iContentName & "] or RecordID [" & EncodeText(RecordID) & "]"))
+                    handleExceptionAndRethrow(New Exception("Invalid ContentName [" & iContentName & "] or RecordID [" & genericController.encodeText(RecordID) & "]"))
                 End If
             Else
                 Call db.deleteContentRecord(iContentName, iRecordID, user.id)
@@ -13846,7 +13790,7 @@ ErrorTrap:
             '
             MethodName = "main_DeleteCSRecord"
             '
-            Call db.cs_deleteRecord(EncodeInteger(CSPointer))
+            Call db.cs_deleteRecord(genericController.EncodeInteger(CSPointer))
             Exit Sub
             '
             ' ----- Error Trap
@@ -13863,7 +13807,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function metaData_InsertContentRecordGetID(ByVal ContentName As String) As Integer
-            metaData_InsertContentRecordGetID = db.metaData_InsertContentRecordGetID(EncodeText(ContentName), user.id)
+            metaData_InsertContentRecordGetID = db.metaData_InsertContentRecordGetID(genericController.encodeText(ContentName), user.id)
         End Function
         '
         '=============================================================================
@@ -13874,13 +13818,13 @@ ErrorTrap:
         '=============================================================================
         '
         Public Sub metaData_CreateContentChild(ByVal ChildContentName As String, ByVal ParentContentName As String)
-            Call metaData.CreateContentChild(EncodeText(ChildContentName), EncodeText(ParentContentName), user.id)
+            Call metaData.CreateContentChild(genericController.encodeText(ChildContentName), genericController.encodeText(ParentContentName), user.id)
         End Sub
         '
         ' ----- alternate name
         '
         Public Function InsertCSContent(ByVal ContentName As String) As Integer
-            InsertCSContent = db.cs_insertRecord(EncodeText(ContentName))
+            InsertCSContent = db.cs_insertRecord(genericController.encodeText(ContentName))
         End Function
         '
         '========================================================================
@@ -13920,17 +13864,17 @@ ErrorTrap:
             '
             ' ----- Determine Language by browser
             '
-            AcceptLanguageString = EncodeText(webServerIO.RequestLanguage) & ","
-            CommaPosition = vbInstr(1, AcceptLanguageString, ",")
+            AcceptLanguageString = genericController.encodeText(webServerIO.RequestLanguage) & ","
+            CommaPosition = genericController.vbInstr(1, AcceptLanguageString, ",")
             Do While CommaPosition <> 0 And LanguageID = 0
                 AcceptLanguage = Trim(Mid(AcceptLanguageString, 1, CommaPosition - 1))
                 AcceptLanguageString = Mid(AcceptLanguageString, CommaPosition + 1)
                 If Len(AcceptLanguage) > 0 Then
-                    DashPosition = vbInstr(1, AcceptLanguage, "-")
+                    DashPosition = genericController.vbInstr(1, AcceptLanguage, "-")
                     If DashPosition > 1 Then
                         AcceptLanguage = Mid(AcceptLanguage, 1, DashPosition - 1)
                     End If
-                    DashPosition = vbInstr(1, AcceptLanguage, ";")
+                    DashPosition = genericController.vbInstr(1, AcceptLanguage, ";")
                     If DashPosition > 1 Then
                         AcceptLanguage = Mid(AcceptLanguage, 1, DashPosition - 1)
                     End If
@@ -13943,7 +13887,7 @@ ErrorTrap:
                         Call db.cs_Close(CS)
                     End If
                 End If
-                CommaPosition = vbInstr(1, AcceptLanguageString, ",")
+                CommaPosition = genericController.vbInstr(1, AcceptLanguageString, ",")
             Loop
             '
             If LanguageID = 0 Then
@@ -13974,7 +13918,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function main_GetRecordEditLink(ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal AllowCut As Boolean = False) As String
-            main_GetRecordEditLink = main_GetRecordEditLink2(ContentName, RecordID, EncodeBoolean(AllowCut), "", user.isEditing(EncodeText(ContentName)))
+            main_GetRecordEditLink = main_GetRecordEditLink2(ContentName, RecordID, genericController.EncodeBoolean(AllowCut), "", user.isEditing(genericController.encodeText(ContentName)))
         End Function
         '
         '========================================================================
@@ -14006,14 +13950,14 @@ ErrorTrap:
             Dim Icon As String
             Dim ContentCaption As String
             '
-            iContentName = EncodeText(ContentName)
-            iRecordID = EncodeInteger(RecordID)
-            iAllowCut = EncodeBoolean(AllowCut)
+            iContentName = genericController.encodeText(ContentName)
+            iRecordID = genericController.EncodeInteger(RecordID)
+            iAllowCut = genericController.EncodeBoolean(AllowCut)
             ContentCaption = html.html_EncodeHTML(iContentName)
-            If vbLCase(ContentCaption) = "aggregate functions" Then
+            If genericController.vbLCase(ContentCaption) = "aggregate functions" Then
                 ContentCaption = "Add-on"
             End If
-            If vbLCase(ContentCaption) = "aggregate function objects" Then
+            If genericController.vbLCase(ContentCaption) = "aggregate function objects" Then
                 ContentCaption = "Add-on"
             End If
             ContentCaption = ContentCaption & " record"
@@ -14056,7 +14000,7 @@ ErrorTrap:
                         ' Cut Link if enabled
                         '
                         If iAllowCut Then
-                            WorkingLink = modifyLinkQuery(webServerIO_requestPage & "?" & web_RefreshQueryString, RequestNameCut, EncodeText(ContentID) & "." & EncodeText(RecordID), True)
+                            WorkingLink = genericController.modifyLinkQuery(webServerIO_requestPage & "?" & web_RefreshQueryString, RequestNameCut, genericController.encodeText(ContentID) & "." & genericController.encodeText(RecordID), True)
                             main_GetRecordEditLink2 = "" _
                                 & main_GetRecordEditLink2 _
                                 & "<a class=""ccRecordCutLink"" TabIndex=""-1"" href=""" & html.html_EncodeHTML(WorkingLink) & """><img src=""/ccLib/images/Contentcut.gif"" border=""0"" alt=""Cut this " & ContentCaption & " to clipboard"" title=""Cut this " & ContentCaption & " to clipboard"" align=""absmiddle""></a>"
@@ -14075,12 +14019,12 @@ ErrorTrap:
                         ''
                         'main_GetRecordEditLink2 = "" _
                         '    & cr & "<div style=""position:absolute;"">" _
-                        '    & KmaIndent(main_GetRecordEditLink2) _
+                        '    & genericController.kmaIndent(main_GetRecordEditLink2) _
                         '    & cr & "</div>"
                         '
                         'main_GetRecordEditLink2 = "" _
                         '    & cr & "<div style=""position:relative;display:inline;"">" _
-                        '    & KmaIndent(main_GetRecordEditLink2) _
+                        '    & genericController.kmaIndent(main_GetRecordEditLink2) _
                         '    & cr & "</div>"
                     End If
 
@@ -14112,8 +14056,8 @@ ErrorTrap:
             Dim MethodName As String
             Dim iCSPointer As Integer
             '
-            iCSPointer = EncodeInteger(CSPointer)
-            iPresetNameValueList = encodeEmptyText(PresetNameValueList, "")
+            iCSPointer = genericController.EncodeInteger(CSPointer)
+            iPresetNameValueList = genericController.encodeEmptyText(PresetNameValueList, "")
             '
             MethodName = "main_cs_getRecordAddLink"
             '
@@ -14160,7 +14104,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function main_GetRecordAddLink(ByVal ContentName As String, ByVal PresetNameValueList As String, Optional ByVal AllowPaste As Boolean = False) As String
-            main_GetRecordAddLink = main_GetRecordAddLink2(EncodeText(ContentName), EncodeText(PresetNameValueList), AllowPaste, user.isEditing(EncodeText(ContentName)))
+            main_GetRecordAddLink = main_GetRecordAddLink2(genericController.encodeText(ContentName), genericController.encodeText(PresetNameValueList), AllowPaste, user.isEditing(genericController.encodeText(ContentName)))
         End Function
         '
         '========================================================================
@@ -14212,10 +14156,10 @@ ErrorTrap:
             '
             main_GetRecordAddLink2 = ""
             If IsEditing Then
-                iContentName = EncodeText(ContentName)
-                iPresetNameValueList = EncodeText(PresetNameValueList)
-                iPresetNameValueList = vbReplace(iPresetNameValueList, "&", ",")
-                iAllowPaste = EncodeBoolean(AllowPaste)
+                iContentName = genericController.encodeText(ContentName)
+                iPresetNameValueList = genericController.encodeText(PresetNameValueList)
+                iPresetNameValueList = genericController.vbReplace(iPresetNameValueList, "&", ",")
+                iAllowPaste = genericController.EncodeBoolean(AllowPaste)
 
                 If iContentName = "" Then
                     Call handleLegacyError14(MethodName, "Method called with blank ContentName")
@@ -14257,23 +14201,23 @@ ErrorTrap:
                     If iAllowPaste Then
                         ClipBoard = visitProperty.getText("Clipboard", "")
                         If ClipBoard <> "" Then
-                            Position = vbInstr(1, ClipBoard, ".")
+                            Position = genericController.vbInstr(1, ClipBoard, ".")
                             If Position <> 0 Then
                                 ClipBoardArray = Split(ClipBoard, ".")
                                 If UBound(ClipBoardArray) > 0 Then
-                                    ClipboardContentID = EncodeInteger(ClipBoardArray(0))
-                                    ClipChildRecordID = EncodeInteger(ClipBoardArray(1))
+                                    ClipboardContentID = genericController.EncodeInteger(ClipBoardArray(0))
+                                    ClipChildRecordID = genericController.EncodeInteger(ClipBoardArray(1))
                                     'iContentID = main_GetContentID(iContentName)
                                     If IsWithinContent(ClipboardContentID, iContentID) Then
-                                        If vbInstr(1, iPresetNameValueList, "PARENTID=", vbTextCompare) <> 0 Then
+                                        If genericController.vbInstr(1, iPresetNameValueList, "PARENTID=", vbTextCompare) <> 0 Then
                                             '
                                             ' must test for main_IsChildRecord
                                             '
                                             BufferString = iPresetNameValueList
-                                            BufferString = vbReplace(BufferString, "(", "")
-                                            BufferString = vbReplace(BufferString, ")", "")
-                                            BufferString = vbReplace(BufferString, ",", "&")
-                                            ParentID = EncodeInteger(main_GetNameValue_Internal(BufferString, "Parentid"))
+                                            BufferString = genericController.vbReplace(BufferString, "(", "")
+                                            BufferString = genericController.vbReplace(BufferString, ")", "")
+                                            BufferString = genericController.vbReplace(BufferString, ",", "&")
+                                            ParentID = genericController.EncodeInteger(main_GetNameValue_Internal(BufferString, "Parentid"))
                                         End If
 
 
@@ -14282,10 +14226,10 @@ ErrorTrap:
                                             ' Can not paste as child of itself
                                             '
                                             PasteLink = webServerIO_requestPage & "?" & web_RefreshQueryString
-                                            PasteLink = modifyLinkQuery(PasteLink, RequestNamePaste, "1", True)
-                                            PasteLink = modifyLinkQuery(PasteLink, RequestNamePasteParentContentID, CStr(iContentID), True)
-                                            PasteLink = modifyLinkQuery(PasteLink, RequestNamePasteParentRecordID, CStr(ParentID), True)
-                                            PasteLink = modifyLinkQuery(PasteLink, RequestNamePasteFieldList, iPresetNameValueList, True)
+                                            PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePaste, "1", True)
+                                            PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteParentContentID, CStr(iContentID), True)
+                                            PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteParentRecordID, CStr(ParentID), True)
+                                            PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteFieldList, iPresetNameValueList, True)
                                             main_GetRecordAddLink2 = main_GetRecordAddLink2 _
                                                 & "<a class=""ccRecordCutLink"" TabIndex=""-1"" href=""" & html.html_EncodeHTML(PasteLink) & """><img src=""/ccLib/images/ContentPaste.gif"" border=""0"" alt=""Paste record in clipboard here"" title=""Paste record in clipboard here"" align=""absmiddle""></a>"
                                         End If
@@ -14299,7 +14243,7 @@ ErrorTrap:
                     '
                     If LowestRequiredMenuName <> "" Then
                         main_GetRecordAddLink2 = main_GetRecordAddLink2 & menuFlyout.getMenu(LowestRequiredMenuName, 0)
-                        main_GetRecordAddLink2 = vbReplace(main_GetRecordAddLink2, "class=""ccFlyoutButton"" ", "", 1, 99, vbTextCompare)
+                        main_GetRecordAddLink2 = genericController.vbReplace(main_GetRecordAddLink2, "class=""ccFlyoutButton"" ", "", 1, 99, vbTextCompare)
                         If PasteLink <> "" Then
                             main_GetRecordAddLink2 = main_GetRecordAddLink2 & "<a TabIndex=-1 href=""" & html.html_EncodeHTML(PasteLink) & """><img src=""/ccLib/images/ContentPaste.gif"" border=""0"" alt=""Paste content from clipboard"" align=""absmiddle""></a>"
                         End If
@@ -14314,7 +14258,7 @@ ErrorTrap:
                     If main_GetRecordAddLink2 <> "" Then
                         main_GetRecordAddLink2 = "" _
                             & vbCrLf & vbTab & "<div style=""display:inline;"">" _
-                            & kmaIndent(main_GetRecordAddLink2) _
+                            & genericController.kmaIndent(main_GetRecordAddLink2) _
                             & vbCrLf & vbTab & "</div>"
                     End If
                     '
@@ -14323,12 +14267,12 @@ ErrorTrap:
                     '
                     If LowestRequiredMenuName <> "" Then
                         main_GetRecordAddLink2 = main_GetRecordAddLink2 & menu_GetClose()
-                        If vbInstr(1, main_GetRecordAddLink2, "IconContentAdd.gif", vbTextCompare) <> 0 Then
-                            main_GetRecordAddLink2 = vbReplace(main_GetRecordAddLink2, "IconContentAdd.gif"" ", "IconContentAdd.gif"" align=""absmiddle"" ")
+                        If genericController.vbInstr(1, main_GetRecordAddLink2, "IconContentAdd.gif", vbTextCompare) <> 0 Then
+                            main_GetRecordAddLink2 = genericController.vbReplace(main_GetRecordAddLink2, "IconContentAdd.gif"" ", "IconContentAdd.gif"" align=""absmiddle"" ")
                         End If
                     End If
                     If main_ReturnAfterEdit Then
-                        main_GetRecordAddLink2 = vbReplace(main_GetRecordAddLink2, "target=", "xtarget=", 1, 99, vbTextCompare)
+                        main_GetRecordAddLink2 = genericController.vbReplace(main_GetRecordAddLink2, "target=", "xtarget=", 1, 99, vbTextCompare)
                     End If
                     'End If
                 End If
@@ -14357,7 +14301,7 @@ ErrorTrap:
             main_IsChildRecord = (ChildRecordID = ParentRecordID)
             If Not main_IsChildRecord Then
                 CDef = metaData.getCdef(ContentName)
-                If IsInDelimitedString(UCase(CDef.SelectCommaList), "PARENTID", ",") Then
+                If genericController.IsInDelimitedString(UCase(CDef.SelectCommaList), "PARENTID", ",") Then
                     main_IsChildRecord = main_IsChildRecord_Recurse(CDef.ContentDataSourceName, CDef.ContentTableName, ChildRecordID, ParentRecordID, "")
                 End If
             End If
@@ -14388,7 +14332,7 @@ ErrorTrap:
                 ChildRecordParentID = db.cs_getInteger(CS, "ParentID")
             End If
             Call db.cs_Close(CS)
-            If (ChildRecordParentID <> 0) And (Not IsInDelimitedString(History, CStr(ChildRecordID), ",")) Then
+            If (ChildRecordParentID <> 0) And (Not genericController.IsInDelimitedString(History, CStr(ChildRecordID), ",")) Then
                 main_IsChildRecord_Recurse = (ParentRecordID = ChildRecordParentID)
                 If Not main_IsChildRecord_Recurse Then
                     main_IsChildRecord_Recurse = main_IsChildRecord_Recurse(DataSourceName, TableName, ChildRecordParentID, ParentRecordID, History & "," & CStr(ChildRecordID))
@@ -14446,10 +14390,10 @@ ErrorTrap:
             If (ContentName = "") Then
                 Call handleLegacyError14(MethodName, "main_GetRecordAddLink, ContentName is empty")
             Else
-                If (InStr(1, MyContentNameList, "," & vbUCase(ContentName) & ",") >= 0) Then
+                If (InStr(1, MyContentNameList, "," & genericController.vbUCase(ContentName) & ",") >= 0) Then
                     Call handleLegacyError14(MethodName, "main_GetRecordAddLink_AddMenuEntry, Content Child [" & ContentName & "] is one of its own parents")
                 Else
-                    MyContentNameList = MyContentNameList & "," & vbUCase(ContentName) & ","
+                    MyContentNameList = MyContentNameList & "," & genericController.vbUCase(ContentName) & ","
                     '
                     ' ----- Select the Content Record for the Menu Entry selected
                     '
@@ -14600,8 +14544,8 @@ ErrorTrap:
             '
             ContentName = metaData.getContentNameByID(ContentID)
             If ContentName <> "" Then
-                If Not IsNull(RecordIDVariant) Then
-                    main_GetRecordEditLinkByContent = main_GetRecordEditLink2(ContentName, EncodeInteger(RecordIDVariant), False, "", user.isEditing(ContentName))
+                If Not genericController.IsNull(RecordIDVariant) Then
+                    main_GetRecordEditLinkByContent = main_GetRecordEditLink2(ContentName, genericController.EncodeInteger(RecordIDVariant), False, "", user.isEditing(ContentName))
                 Else
                     main_GetRecordEditLinkByContent = main_GetRecordAddLink(ContentName, Criteria)
                 End If
@@ -14626,16 +14570,16 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            If db.cs_ok(EncodeInteger(CSPointer)) Then
+            If db.cs_ok(genericController.EncodeInteger(CSPointer)) Then
                 '
                 ' Just do a text box with the value
                 '
-                main_GetFormCSInput = html_GetFormInputText2(FieldName, EncodeText(db.cs_getField(CSPointer, FieldName)))
+                main_GetFormCSInput = html_GetFormInputText2(FieldName, genericController.encodeText(db.cs_getField(CSPointer, FieldName)))
             Else
                 '
                 ' Just do a text box with a blank
                 '
-                main_GetFormCSInput = html_GetFormInputText2(EncodeText(FieldName), "")
+                main_GetFormCSInput = html_GetFormInputText2(genericController.encodeText(FieldName), "")
             End If
             Exit Function
             '
@@ -14654,9 +14598,9 @@ ErrorTrap:
                 '
                 If (InStr(1, Name, "=") > 0) Then
                     temp = Split(Name, "=")
-                    _webServerIO_RefreshQueryString = ModifyQueryString(_webServerIO_RefreshQueryString, temp(0), temp(1), True)
+                    _webServerIO_RefreshQueryString = genericController.ModifyQueryString(_webServerIO_RefreshQueryString, temp(0), temp(1), True)
                 Else
-                    _webServerIO_RefreshQueryString = ModifyQueryString(_webServerIO_RefreshQueryString, Name, Value, True)
+                    _webServerIO_RefreshQueryString = genericController.ModifyQueryString(_webServerIO_RefreshQueryString, Name, Value, True)
                 End If
             Catch ex As Exception
                 handleExceptionAndRethrow(ex)
@@ -14678,7 +14622,7 @@ ErrorTrap:
             '
             MethodName = "main_DeleteContentTracking( " & ContentName & ", " & RecordID & " )"
             '
-            Call csv_DeleteContentTracking(EncodeText(ContentName), EncodeInteger(RecordID), EncodeBoolean(Permanent))
+            Call csv_DeleteContentTracking(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), genericController.EncodeBoolean(Permanent))
             Exit Sub
             '
             ' ----- Error Trap
@@ -14731,7 +14675,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function html_GetFormInputHTML(ByVal TagName As String, Optional ByVal DefaultValue As String = "", Optional ByVal Height As String = "", Optional ByVal Width As String = "") As String
-            html_GetFormInputHTML = html_GetFormInputHTML3(EncodeText(TagName), EncodeText(DefaultValue), EncodeText(Height), EncodeText(Width))
+            html_GetFormInputHTML = html_GetFormInputHTML3(genericController.encodeText(TagName), genericController.encodeText(DefaultValue), genericController.encodeText(Height), genericController.encodeText(Width))
         End Function
         '
         '========================================================================
@@ -14751,7 +14695,7 @@ ErrorTrap:
                 '
                 FieldTypeDefaultEditorAddonIdList = getFieldTypeDefaultEditorAddonIdList()
                 FieldTypeDefaultEditorAddonIds = Split(FieldTypeDefaultEditorAddonIdList, ",")
-                FieldTypeDefaultEditorAddonId = EncodeInteger(FieldTypeDefaultEditorAddonIds(FieldTypeIdHTML))
+                FieldTypeDefaultEditorAddonId = genericController.EncodeInteger(FieldTypeDefaultEditorAddonIds(FieldTypeIdHTML))
 
                 If FieldTypeDefaultEditorAddonId = 0 Then
                     '
@@ -14763,19 +14707,19 @@ ErrorTrap:
                     ' use addon editor
                     '
                     addonOption_String = "" _
-                        & "editorName=" & encodeNvaArgument(htmlName) _
-                        & "&editorValue=" & encodeNvaArgument(DefaultValue) _
+                        & "editorName=" & genericController.encodeNvaArgument(htmlName) _
+                        & "&editorValue=" & genericController.encodeNvaArgument(DefaultValue) _
                         & "&editorFieldType=" & FieldTypeIdHTML _
                         & "&editorReadOnly=" & readOnlyfield _
                         & "&editorWidth=" & styleWidth _
                         & "&editorHeight=" & styleHeight _
                         & ""
                     addonOption_String = addonOption_String _
-                        & "&editorAllowResourceLibrary=" & encodeNvaArgument(CStr(allowResourceLibrary)) _
-                        & "&editorAllowActiveContent=" & encodeNvaArgument(CStr(allowActiveContent)) _
-                        & "&editorAddonList=" & encodeNvaArgument(addonListJSON) _
-                        & "&editorStyles=" & encodeNvaArgument(styleList) _
-                        & "&editorStyleOptions=" & encodeNvaArgument(styleOptionList) _
+                        & "&editorAllowResourceLibrary=" & genericController.encodeNvaArgument(CStr(allowResourceLibrary)) _
+                        & "&editorAllowActiveContent=" & genericController.encodeNvaArgument(CStr(allowActiveContent)) _
+                        & "&editorAddonList=" & genericController.encodeNvaArgument(addonListJSON) _
+                        & "&editorStyles=" & genericController.encodeNvaArgument(styleList) _
+                        & "&editorStyleOptions=" & genericController.encodeNvaArgument(styleOptionList) _
                         & ""
                     returnHtml = addon.execute_legacy4(FieldTypeDefaultEditorAddonId.ToString, addonOption_String, CPUtilsBaseClass.addonContext.ContextEditor)
                 End If
@@ -14837,23 +14781,23 @@ ErrorTrap:
                             '
                             ' ----- AllowAdminLinks
                             '
-                            Call visitProperty.setProperty("AllowEditing", EncodeText(doc_getBoolean2("AllowEditing")))
+                            Call visitProperty.setProperty("AllowEditing", genericController.encodeText(doc_getBoolean2("AllowEditing")))
                             '
                             ' ----- Quick Editor
                             '
-                            Call visitProperty.setProperty("AllowQuickEditor", EncodeText(doc_getBoolean2("AllowQuickEditor")))
+                            Call visitProperty.setProperty("AllowQuickEditor", genericController.encodeText(doc_getBoolean2("AllowQuickEditor")))
                             '
                             ' ----- Advanced Editor
                             '
-                            Call visitProperty.setProperty("AllowAdvancedEditor", EncodeText(doc_getBoolean2("AllowAdvancedEditor")))
+                            Call visitProperty.setProperty("AllowAdvancedEditor", genericController.encodeText(doc_getBoolean2("AllowAdvancedEditor")))
                             '
                             ' ----- Allow Workflow authoring Render Mode - Visit Property
                             '
-                            Call visitProperty.setProperty("AllowWorkflowRendering", EncodeText(doc_getBoolean2("AllowWorkflowRendering")))
+                            Call visitProperty.setProperty("AllowWorkflowRendering", genericController.encodeText(doc_getBoolean2("AllowWorkflowRendering")))
                             '
                             ' ----- developer Only parts
                             '
-                            Call visitProperty.setProperty("AllowDebugging", EncodeText(doc_getBoolean2("AllowDebugging")))
+                            Call visitProperty.setProperty("AllowDebugging", genericController.encodeText(doc_getBoolean2("AllowDebugging")))
                             If user.isAuthenticatedDeveloper() Then
                                 '
                                 ' ----- Create Path Block record, if requested
@@ -14957,9 +14901,9 @@ ErrorTrap:
                     If db.cs_ok(CSAddon) Then
                         FoundAddon = True
                         AddonOptionConstructor = db.cs_getText(CSAddon, "ArgumentList")
-                        AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
-                        AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbLf, vbCr)
-                        AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
+                        AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
+                        AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbLf, vbCr)
+                        AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
                         If True Then
                             If AddonOptionConstructor <> "" Then
                                 AddonOptionConstructor = AddonOptionConstructor & vbCrLf
@@ -14985,7 +14929,7 @@ ErrorTrap:
                                 For OptionPtr = 0 To OptionCnt - 1
                                     ArgValue = docProperties.getText(ArgName & OptionPtr)
                                     If ArgValue <> "" Then
-                                        ArgValueAddonEncoded = ArgValueAddonEncoded & "," & encodeNvaArgument(ArgValue)
+                                        ArgValueAddonEncoded = ArgValueAddonEncoded & "," & genericController.encodeNvaArgument(ArgValue)
                                     End If
                                 Next
                                 If ArgValueAddonEncoded <> "" Then
@@ -14993,9 +14937,9 @@ ErrorTrap:
                                 End If
                             Else
                                 ArgValue = docProperties.getText(ArgName)
-                                ArgValueAddonEncoded = encodeNvaArgument(ArgValue)
+                                ArgValueAddonEncoded = genericController.encodeNvaArgument(ArgValue)
                             End If
-                            addonOption_String = addonOption_String & "&" & encodeNvaArgument(ArgName) & "=" & ArgValueAddonEncoded
+                            addonOption_String = addonOption_String & "&" & genericController.encodeNvaArgument(ArgName) & "=" & ArgValueAddonEncoded
                         Next
                         If addonOption_String <> "" Then
                             addonOption_String = Mid(addonOption_String, 2)
@@ -15023,13 +14967,13 @@ ErrorTrap:
                 If addonPtr >= 0 Then
                     FoundAddon = True
                     AddonOptionConstructor = addonCache.localCache.addonList(addonPtr.ToString).addonCache_ArgumentList
-                    AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
-                    AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbLf, vbCr)
-                    AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
+                    AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
+                    AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbLf, vbCr)
+                    AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
                     If AddonOptionConstructor <> "" Then
                         AddonOptionConstructor = AddonOptionConstructor & vbCrLf
                     End If
-                    If EncodeBoolean(addonCache.localCache.addonList(addonPtr.ToString).addonCache_IsInline) Then
+                    If genericController.EncodeBoolean(addonCache.localCache.addonList(addonPtr.ToString).addonCache_IsInline) Then
                         AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Inline
                     Else
                         AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Block
@@ -15040,9 +14984,9 @@ ErrorTrap:
                 '        If app.csv_IsCSOK(CSAddon) Then
                 '            FoundAddon = True
                 '            AddonOptionConstructor = db.cs_getText(CSAddon, "ArgumentList")
-                '            AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
-                '            AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbLf, vbCr)
-                '            AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
+                '            AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
+                '            AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbLf, vbCr)
+                '            AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
                 '            If AddonOptionConstructor <> "" Then
                 '                AddonOptionConstructor = AddonOptionConstructor & vbCrLf
                 '            End If
@@ -15057,7 +15001,7 @@ ErrorTrap:
                     '
                     ' Hardcoded Addons
                     '
-                    Select Case vbLCase(AddonName)
+                    Select Case genericController.vbLCase(AddonName)
                         Case "block text"
                             FoundAddon = True
                             AddonOptionConstructor = AddonOptionConstructor_ForBlockText
@@ -15082,7 +15026,7 @@ ErrorTrap:
                                 For OptionPtr = 0 To OptionCnt - 1
                                     ArgValue = docProperties.getText(ArgName & OptionPtr)
                                     If ArgValue <> "" Then
-                                        ArgValueAddonEncoded = ArgValueAddonEncoded & "," & encodeNvaArgument(ArgValue)
+                                        ArgValueAddonEncoded = ArgValueAddonEncoded & "," & genericController.encodeNvaArgument(ArgValue)
                                     End If
                                 Next
                                 If ArgValueAddonEncoded <> "" Then
@@ -15090,9 +15034,9 @@ ErrorTrap:
                                 End If
                             Else
                                 ArgValue = docProperties.getText(ArgName)
-                                ArgValueAddonEncoded = encodeNvaArgument(ArgValue)
+                                ArgValueAddonEncoded = genericController.encodeNvaArgument(ArgValue)
                             End If
-                            addonOption_String = addonOption_String & "&" & encodeNvaArgument(ArgName) & "=" & ArgValueAddonEncoded
+                            addonOption_String = addonOption_String & "&" & genericController.encodeNvaArgument(ArgName) & "=" & ArgValueAddonEncoded
                         End If
                     Next
                     If addonOption_String <> "" Then
@@ -15119,7 +15063,7 @@ ErrorTrap:
                         ' Field is given, find the position
                         '
                         Copy = db.cs_get(CS, FieldName)
-                        PosACInstanceID = vbInstr(1, Copy, "=""" & ACInstanceID & """ ", vbTextCompare)
+                        PosACInstanceID = genericController.vbInstr(1, Copy, "=""" & ACInstanceID & """ ", vbTextCompare)
                     Else
                         '
                         ' Find the field, then find the position
@@ -15130,7 +15074,7 @@ ErrorTrap:
                             Select Case fieldType
                                 Case FieldTypeIdLongText, FieldTypeIdText, FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
                                     Copy = db.cs_get(CS, FieldName)
-                                    PosACInstanceID = vbInstr(1, Copy, "ACInstanceID=""" & ACInstanceID & """", vbTextCompare)
+                                    PosACInstanceID = genericController.vbInstr(1, Copy, "ACInstanceID=""" & ACInstanceID & """", vbTextCompare)
                                     If PosACInstanceID <> 0 Then
                                         '
                                         ' found the instance
@@ -15155,10 +15099,10 @@ ErrorTrap:
                             '
                             ' main_Get Addon Name to lookup Addon and main_Get most recent Argument List
                             '
-                            PosNameStart = vbInstr(PosStart, Copy, " name=", vbTextCompare)
+                            PosNameStart = genericController.vbInstr(PosStart, Copy, " name=", vbTextCompare)
                             If PosNameStart <> 0 Then
                                 PosNameStart = PosNameStart + 7
-                                PosNameEnd = vbInstr(PosNameStart, Copy, """")
+                                PosNameEnd = genericController.vbInstr(PosNameStart, Copy, """")
                                 If PosNameEnd <> 0 Then
                                     AddonName = Mid(Copy, PosNameStart, PosNameEnd - PosNameStart)
                                     '????? test this
@@ -15166,14 +15110,14 @@ ErrorTrap:
                                     addonPtr = addonCache.getPtr(AddonName)
                                     If addonPtr >= 0 Then
                                         FoundAddon = True
-                                        AddonOptionConstructor = EncodeText(addonCache.localCache.addonList(addonPtr.ToString).addonCache_ArgumentList)
-                                        AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
-                                        AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbLf, vbCr)
-                                        AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
+                                        AddonOptionConstructor = genericController.encodeText(addonCache.localCache.addonList(addonPtr.ToString).addonCache_ArgumentList)
+                                        AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
+                                        AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbLf, vbCr)
+                                        AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
                                         If AddonOptionConstructor <> "" Then
                                             AddonOptionConstructor = AddonOptionConstructor & vbCrLf
                                         End If
-                                        If EncodeBoolean(addonCache.localCache.addonList(addonPtr.ToString).addonCache_IsInline) Then
+                                        If genericController.EncodeBoolean(addonCache.localCache.addonList(addonPtr.ToString).addonCache_IsInline) Then
                                             AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Inline
                                         Else
                                             AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Block
@@ -15183,7 +15127,7 @@ ErrorTrap:
                                         '
                                         ' Hardcoded Addons
                                         '
-                                        Select Case vbLCase(AddonName)
+                                        Select Case genericController.vbLCase(AddonName)
                                             Case "block text"
                                                 FoundAddon = True
                                                 AddonOptionConstructor = AddonOptionConstructor_ForBlockText
@@ -15207,7 +15151,7 @@ ErrorTrap:
                                                     For OptionPtr = 0 To OptionCnt - 1
                                                         ArgValue = docProperties.getText(ArgName & OptionPtr)
                                                         If ArgValue <> "" Then
-                                                            ArgValueAddonEncoded = ArgValueAddonEncoded & "," & encodeNvaArgument(ArgValue)
+                                                            ArgValueAddonEncoded = ArgValueAddonEncoded & "," & genericController.encodeNvaArgument(ArgValue)
                                                         End If
                                                     Next
                                                     If ArgValueAddonEncoded <> "" Then
@@ -15215,10 +15159,10 @@ ErrorTrap:
                                                     End If
                                                 Else
                                                     ArgValue = docProperties.getText(ArgName)
-                                                    ArgValueAddonEncoded = encodeNvaArgument(ArgValue)
+                                                    ArgValueAddonEncoded = genericController.encodeNvaArgument(ArgValue)
                                                 End If
 
-                                                addonOption_String = addonOption_String & "&" & encodeNvaArgument(ArgName) & "=" & ArgValueAddonEncoded
+                                                addonOption_String = addonOption_String & "&" & genericController.encodeNvaArgument(ArgName) & "=" & ArgValueAddonEncoded
                                             End If
                                         Next
                                         If addonOption_String <> "" Then
@@ -15230,11 +15174,11 @@ ErrorTrap:
                             '
                             ' Replace the new querystring into the AC tag in the content
                             '
-                            PosIDStart = vbInstr(PosStart, Copy, " querystring=", vbTextCompare)
+                            PosIDStart = genericController.vbInstr(PosStart, Copy, " querystring=", vbTextCompare)
                             If PosIDStart <> 0 Then
                                 PosIDStart = PosIDStart + 14
                                 If PosIDStart <> 0 Then
-                                    PosIDEnd = vbInstr(PosIDStart, Copy, """")
+                                    PosIDEnd = genericController.vbInstr(PosIDStart, Copy, """")
                                     If PosIDEnd <> 0 Then
                                         ParseOK = True
                                         Copy = Mid(Copy, 1, PosIDStart - 1) & html.html_EncodeHTML(addonOption_String) & Mid(Copy, PosIDEnd)
@@ -15262,11 +15206,11 @@ ErrorTrap:
                 If ContentName <> "" Then
                     Call cache.invalidateTagCommaList(ContentName)
                     TableName = GetContentTablename(ContentName)
-                    If vbLCase(TableName) = "cctemplates" Then
+                    If genericController.vbLCase(TableName) = "cctemplates" Then
                         Call cache.setKey(pageManager_cache_pageTemplate_cacheName, EmptyVariant)
                         Call pageManager_cache_pageTemplate_load()
                     End If
-                    If vbLCase(TableName) = "ccpagecontent" Then
+                    If genericController.vbLCase(TableName) = "ccpagecontent" Then
                         Call pageManager_cache_pageContent_updateRow(RecordID, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
                     End If
                 End If
@@ -15304,13 +15248,13 @@ ErrorTrap:
             '
             HelpBubbleID = docProperties.getText("HelpBubbleID")
             IDSplit = Split(HelpBubbleID, "-")
-            Select Case vbLCase(IDSplit(0))
+            Select Case genericController.vbLCase(IDSplit(0))
                 Case "userfield"
                     '
                     ' main_Get the id of the field, and save the input as the caption and help
                     '
                     If UBound(IDSplit) > 0 Then
-                        RecordID = EncodeInteger(IDSplit(1))
+                        RecordID = genericController.EncodeInteger(IDSplit(1))
                         If RecordID > 0 Then
                             HelpCaption = docProperties.getText("helpcaption")
                             HelpMessage = docProperties.getText("helptext")
@@ -15407,14 +15351,14 @@ ErrorTrap:
             '
             MethodName = "AddMenu()"
             '
-            Image = EncodeText(ImageLink)
+            Image = genericController.encodeText(ImageLink)
             If Image <> "" Then
-                ImageOver = EncodeText(ImageOverLink)
+                ImageOver = genericController.encodeText(ImageOverLink)
                 If Image = ImageOver Then
                     ImageOver = ""
                 End If
             End If
-            Call menuFlyout.AddEntry(EncodeText(Name), ParentName, Image, ImageOver, Link, Caption, , NewWindow)
+            Call menuFlyout.AddEntry(genericController.encodeText(Name), ParentName, Image, ImageOver, Link, Caption, , NewWindow)
             '
             Exit Sub
             '
@@ -15445,7 +15389,7 @@ ErrorTrap:
                 menu_GetClose = menu_GetClose & menuFlyout.GetMenuClose()
                 MenuFlyoutIcon = siteProperties.getText("MenuFlyoutIcon", "&#187;")
                 If MenuFlyoutIcon <> "&#187;" Then
-                    menu_GetClose = vbReplace(menu_GetClose, "&#187;</a>", MenuFlyoutIcon & "</a>")
+                    menu_GetClose = genericController.vbReplace(menu_GetClose, "&#187;</a>", MenuFlyoutIcon & "</a>")
                 End If
             End If
             Exit Function
@@ -15487,7 +15431,7 @@ ErrorTrap:
         End Function
         '
         Public Function properties_user_getInteger(ByVal PropertyName As String, Optional ByVal DefaultValue As Integer = 0, Optional ByVal TargetMemberID As Integer = SystemMemberID) As Integer
-            Return EncodeInteger(properties_user_getText(PropertyName, DefaultValue.ToString, TargetMemberID))
+            Return genericController.EncodeInteger(properties_user_getText(PropertyName, DefaultValue.ToString, TargetMemberID))
         End Function
         ''
         ''========================================================================
@@ -15567,7 +15511,7 @@ ErrorTrap:
         Public Sub error_AddUserError(ByVal Message As String)
             '
             If (InStr(1, debug_iUserError, Message, vbTextCompare) = 0) Then
-                debug_iUserError = debug_iUserError & cr & "<li class=""ccError"">" & EncodeText(Message) & "</LI>"
+                debug_iUserError = debug_iUserError & cr & "<li class=""ccError"">" & genericController.encodeText(Message) & "</LI>"
             End If
             '
         End Sub
@@ -15586,9 +15530,9 @@ ErrorTrap:
             '
             MethodName = "main_GetUserError"
             '
-            error_GetUserError = EncodeText(debug_iUserError)
+            error_GetUserError = genericController.encodeText(debug_iUserError)
             If error_GetUserError <> "" Then
-                error_GetUserError = "<ul class=""ccError"">" & kmaIndent(error_GetUserError) & cr & "</ul>"
+                error_GetUserError = "<ul class=""ccError"">" & genericController.kmaIndent(error_GetUserError) & cr & "</ul>"
                 error_GetUserError = UserErrorHeadline & "" & error_GetUserError
                 debug_iUserError = ""
             End If
@@ -15639,7 +15583,7 @@ ErrorTrap:
             '
             MethodName = "main_CopyCSRecord"
             '
-            Call db.cs_copyRecord(EncodeInteger(CSSource), EncodeInteger(CSDestination))
+            Call db.cs_copyRecord(genericController.EncodeInteger(CSSource), genericController.EncodeInteger(CSDestination))
             Exit Sub
             '
             ' ----- Error Trap
@@ -15663,8 +15607,8 @@ ErrorTrap:
             '
             MethodName = "main_GetContentProperty"
             '
-            Contentdefinition = metaData.getCdef(EncodeText(ContentName))
-            Select Case vbUCase(EncodeText(PropertyName))
+            Contentdefinition = metaData.getCdef(genericController.encodeText(ContentName))
+            Select Case genericController.vbUCase(genericController.encodeText(PropertyName))
                 Case "CONTENTCONTROLCRITERIA"
                     GetContentProperty = Contentdefinition.ContentControlCriteria
                 Case "ACTIVEONLY"
@@ -15718,7 +15662,7 @@ ErrorTrap:
                 Case "SELECTFIELDLIST"
                     GetContentProperty = Contentdefinition.SelectCommaList
                 Case Else
-                    Call handleLegacyError14(MethodName, "Content Property [" & EncodeText(PropertyName) & "] was not found in content [" & EncodeText(ContentName) & "]")
+                    Call handleLegacyError14(MethodName, "Content Property [" & genericController.encodeText(PropertyName) & "] was not found in content [" & genericController.encodeText(ContentName) & "]")
             End Select
             '
             Exit Function
@@ -15748,16 +15692,16 @@ ErrorTrap:
             '
             GetContentFieldProperty = ""
             If True Then
-                UcaseFieldName = vbUCase(EncodeText(FieldName))
-                Contentdefinition = metaData.getCdef(EncodeText(ContentName))
+                UcaseFieldName = genericController.vbUCase(genericController.encodeText(FieldName))
+                Contentdefinition = metaData.getCdef(genericController.encodeText(ContentName))
                 If (UcaseFieldName = "") Or (Contentdefinition.fields.Count < 1) Then
-                    Call handleLegacyError14(MethodName, "Content Name [" & EncodeText(ContentName) & "] or FieldName [" & EncodeText(FieldName) & "] was not valid")
+                    Call handleLegacyError14(MethodName, "Content Name [" & genericController.encodeText(ContentName) & "] or FieldName [" & genericController.encodeText(FieldName) & "] was not valid")
                 Else
                     For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In Contentdefinition.fields
                         Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
                         With field
-                            If UcaseFieldName = vbUCase(.nameLc) Then
-                                Select Case vbUCase(EncodeText(PropertyName))
+                            If UcaseFieldName = genericController.vbUCase(.nameLc) Then
+                                Select Case genericController.vbUCase(genericController.encodeText(PropertyName))
                                     Case "FIELDTYPE", "TYPE"
                                         GetContentFieldProperty = .fieldTypeId
                                     Case "HTMLCONTENT"
@@ -15778,11 +15722,11 @@ ErrorTrap:
                                         '
                                         GetContentFieldProperty = .UniqueName
                                     Case "DEFAULT"
-                                        GetContentFieldProperty = EncodeText(.defaultValue)
+                                        GetContentFieldProperty = genericController.encodeText(.defaultValue)
                                     Case "MEMBERSELECTGROUPID"
-                                        GetContentFieldProperty = EncodeText(.MemberSelectGroupID)
+                                        GetContentFieldProperty = genericController.encodeText(.MemberSelectGroupID)
                                     Case Else
-                                        Call handleLegacyError14(MethodName, "Content Property [" & EncodeText(PropertyName) & "] was not found in content [" & EncodeText(ContentName) & "]")
+                                        Call handleLegacyError14(MethodName, "Content Property [" & genericController.encodeText(PropertyName) & "] was not found in content [" & genericController.encodeText(ContentName) & "]")
                                 End Select
                                 Exit For
                             End If
@@ -15811,19 +15755,19 @@ ErrorTrap:
             Dim returnTrue As Boolean = False
             Try
                 Dim ExpressionString As String = web_ReadStreamText(Key)
-                If Not IsNull(ExpressionString) Then
+                If Not genericController.IsNull(ExpressionString) Then
                     If ExpressionString <> "" Then
-                        If vbIsNumeric(ExpressionString) Then
+                        If genericController.vbIsNumeric(ExpressionString) Then
                             If ExpressionString <> "0" Then
                                 returnTrue = True
                             Else
                                 returnTrue = False
                             End If
-                        ElseIf vbUCase(ExpressionString) = "ON" Then
+                        ElseIf genericController.vbUCase(ExpressionString) = "ON" Then
                             returnTrue = True
-                        ElseIf vbUCase(ExpressionString) = "YES" Then
+                        ElseIf genericController.vbUCase(ExpressionString) = "YES" Then
                             returnTrue = True
-                        ElseIf vbUCase(ExpressionString) = "TRUE" Then
+                        ElseIf genericController.vbUCase(ExpressionString) = "TRUE" Then
                             returnTrue = True
                         Else
                             returnTrue = False
@@ -15854,7 +15798,7 @@ ErrorTrap:
             MethodName = "main_ReadStreamDate"
             '
             testDate = web_ReadStreamText(Key)
-            If Not IsNull(testDate) Then
+            If Not genericController.IsNull(testDate) Then
                 If Not IsDate(testDate) Then
                     web_ReadStreamDate = Nothing
                 Else
@@ -15889,15 +15833,15 @@ ErrorTrap:
             MethodName = "main_ReadStreamNumber"
             '
             testResults = web_ReadStreamText(Key)
-            If Not IsNull(web_ReadStreamNumber) Then
-                If vbIsNumeric(testResults) Then
+            If Not genericController.IsNull(web_ReadStreamNumber) Then
+                If genericController.vbIsNumeric(testResults) Then
                     web_ReadStreamNumber = CDbl(testResults)
                 Else
                     web_ReadStreamNumber = 0
                 End If
             End If
             '
-            debug_testPoint("main_ReadStreamNumber( " & EncodeText(Key) & " )  = " & web_ReadStreamNumber)
+            debug_testPoint("main_ReadStreamNumber( " & genericController.encodeText(Key) & " )  = " & web_ReadStreamNumber)
             '
             Exit Function
             '
@@ -15937,7 +15881,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            GetContentTablename = EncodeText(GetContentProperty(EncodeText(ContentName), "ContentTableName"))
+            GetContentTablename = genericController.encodeText(GetContentProperty(genericController.encodeText(ContentName), "ContentTableName"))
             '
             Exit Function
 ErrorTrap:
@@ -15985,7 +15929,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            csOpen = db.cs_open(EncodeText(ContentName), "(ID=" & db.encodeSQLNumber(RecordID) & ")", , False, user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
+            csOpen = db.cs_open(genericController.encodeText(ContentName), "(ID=" & db.encodeSQLNumber(RecordID) & ")", , False, user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
             '
             Exit Function
             '
@@ -16027,7 +15971,7 @@ ErrorTrap:
             '
             MethodName = "IsWithinContent"
             '
-            IsWithinContent = metaData.isWithinContent(EncodeInteger(ChildContentID), EncodeInteger(ParentContentID))
+            IsWithinContent = metaData.isWithinContent(genericController.EncodeInteger(ChildContentID), genericController.EncodeInteger(ParentContentID))
             Exit Function
             '
             ' ----- Error Trap
@@ -16049,11 +15993,11 @@ ErrorTrap:
             Dim iRecordID As Integer
             Dim iFieldName As String
             '
-            iContentName = EncodeText(ContentName)
-            iRecordID = EncodeInteger(RecordID)
-            iFieldName = EncodeText(FieldName)
+            iContentName = genericController.encodeText(ContentName)
+            iRecordID = genericController.EncodeInteger(RecordID)
+            iFieldName = genericController.encodeText(FieldName)
             '
-            MethodName = "main_IncrementContentField( " & iContentName & "," & EncodeText(iRecordID) & "," & iFieldName & " )"
+            MethodName = "main_IncrementContentField( " & iContentName & "," & genericController.encodeText(iRecordID) & "," & iFieldName & " )"
             '
             Call IncrementContentField_Internal(iContentName, iRecordID, iFieldName)
             '
@@ -16097,7 +16041,7 @@ ErrorTrap:
             Dim MethodName As String
             Dim iSourceText As String
             '
-            iSourceText = EncodeText(SourceText)
+            iSourceText = genericController.encodeText(SourceText)
             '
             MethodName = "main_EncodeSQLText( " & iSourceText & " )"
             '
@@ -16396,12 +16340,12 @@ ErrorTrap:
             CDef = metaData.getCdef(ContentName)
             Link = siteProperties.adminURL & "?af=" & AdminFormPublishing
             Copy = Msg_AuthoringSubmittedNotification
-            Copy = vbReplace(Copy, "<DOMAINNAME>", "<a href=""" & html.html_EncodeHTML(Link) & """>" & webServerIO_requestDomain & "</a>")
-            Copy = vbReplace(Copy, "<RECORDNAME>", RecordName)
-            Copy = vbReplace(Copy, "<CONTENTNAME>", ContentName)
-            Copy = vbReplace(Copy, "<RECORDID>", RecordID.ToString)
-            Copy = vbReplace(Copy, "<SUBMITTEDDATE>", app_startTime.ToString)
-            Copy = vbReplace(Copy, "<SUBMITTEDNAME>", user.name)
+            Copy = genericController.vbReplace(Copy, "<DOMAINNAME>", "<a href=""" & html.html_EncodeHTML(Link) & """>" & webServerIO_requestDomain & "</a>")
+            Copy = genericController.vbReplace(Copy, "<RECORDNAME>", RecordName)
+            Copy = genericController.vbReplace(Copy, "<CONTENTNAME>", ContentName)
+            Copy = genericController.vbReplace(Copy, "<RECORDID>", RecordID.ToString)
+            Copy = genericController.vbReplace(Copy, "<SUBMITTEDDATE>", app_startTime.ToString)
+            Copy = genericController.vbReplace(Copy, "<SUBMITTEDNAME>", user.name)
             '
             Call main_SendGroupEmail(siteProperties.getText("WorkflowEditorGroup", "Content Editors"), FromAddress, "Authoring Submitted Notification", Copy, False, True)
             '
@@ -16468,9 +16412,9 @@ ErrorTrap:
                 ' ----- site does not support workflow authoring
                 '
                 If RecordEditLocked Then
-                    Copy = vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
-                    Copy = vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
-                    Copy = vbReplace(Copy, "<EDITEXPIRESMINUTES>", EncodeText(main_EditLockExpiresMinutes))
+                    Copy = genericController.vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
+                    Copy = genericController.vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
+                    Copy = genericController.vbReplace(Copy, "<EDITEXPIRESMINUTES>", genericController.encodeText(main_EditLockExpiresMinutes))
                     main_GetAuthoringStatusMessage &= Delimiter & Copy
                     Delimiter = "<BR >"
                 End If
@@ -16481,9 +16425,9 @@ ErrorTrap:
                 ' ----- content does not support workflow authoring
                 '
                 If RecordEditLocked Then
-                    Copy = vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
-                    Copy = vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
-                    Copy = vbReplace(Copy, "<EDITEXPIRESMINUTES>", EncodeText(main_EditLockExpiresMinutes))
+                    Copy = genericController.vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
+                    Copy = genericController.vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
+                    Copy = genericController.vbReplace(Copy, "<EDITEXPIRESMINUTES>", genericController.encodeText(main_EditLockExpiresMinutes))
                     main_GetAuthoringStatusMessage &= Delimiter & Copy
                     Delimiter = "<BR >"
                 End If
@@ -16498,11 +16442,11 @@ ErrorTrap:
                     ' Approved
                     '
                     If user.isAuthenticatedAdmin() Then
-                        Copy = vbReplace(Msg_AuthoringApprovedAdmin, "<EDITNAME>", ApprovedBy)
+                        Copy = genericController.vbReplace(Msg_AuthoringApprovedAdmin, "<EDITNAME>", ApprovedBy)
                         main_GetAuthoringStatusMessage &= Delimiter & Copy
                         Delimiter = "<BR >"
                     Else
-                        Copy = vbReplace(Msg_AuthoringApproved, "<EDITNAME>", ApprovedBy)
+                        Copy = genericController.vbReplace(Msg_AuthoringApproved, "<EDITNAME>", ApprovedBy)
                         main_GetAuthoringStatusMessage &= Delimiter & Copy
                         Delimiter = "<BR >"
                     End If
@@ -16511,11 +16455,11 @@ ErrorTrap:
                     ' Submitted
                     '
                     If user.isAuthenticatedAdmin() Then
-                        Copy = vbReplace(Msg_AuthoringSubmittedAdmin, "<EDITNAME>", SubmittedBy)
+                        Copy = genericController.vbReplace(Msg_AuthoringSubmittedAdmin, "<EDITNAME>", SubmittedBy)
                         main_GetAuthoringStatusMessage &= Delimiter & Copy
                         Delimiter = "<BR >"
                     Else
-                        Copy = vbReplace(Msg_AuthoringSubmitted, "<EDITNAME>", SubmittedBy)
+                        Copy = genericController.vbReplace(Msg_AuthoringSubmitted, "<EDITNAME>", SubmittedBy)
                         main_GetAuthoringStatusMessage &= Delimiter & Copy
                         Delimiter = "<BR >"
                     End If
@@ -16537,25 +16481,25 @@ ErrorTrap:
                     '
                     If user.isAuthenticatedAdmin() Then
                         If RecordEditLocked Then
-                            Copy = vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
-                            Copy = vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
-                            Copy = vbReplace(Copy, "<EDITEXPIRESMINUTES>", EncodeText(main_EditLockExpiresMinutes))
+                            Copy = genericController.vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
+                            Copy = genericController.vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
+                            Copy = genericController.vbReplace(Copy, "<EDITEXPIRESMINUTES>", genericController.encodeText(main_EditLockExpiresMinutes))
                             main_GetAuthoringStatusMessage &= Delimiter & Copy
                             Delimiter = "<BR >"
                         End If
-                        Copy = vbReplace(Msg_AuthoringRecordModifedAdmin, "<EDITNAME>", ModifiedBy)
+                        Copy = genericController.vbReplace(Msg_AuthoringRecordModifedAdmin, "<EDITNAME>", ModifiedBy)
                         main_GetAuthoringStatusMessage &= Delimiter & Copy
                         'main_GetAuthoringStatusMessage &=  Delimiter & Msg_AuthoringRecordModifedAdmin
                         Delimiter = "<BR >"
                     Else
                         If RecordEditLocked Then
-                            Copy = vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
-                            Copy = vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
-                            Copy = vbReplace(Copy, "<EDITEXPIRESMINUTES>", EncodeText(main_EditLockExpiresMinutes))
+                            Copy = genericController.vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
+                            Copy = genericController.vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
+                            Copy = genericController.vbReplace(Copy, "<EDITEXPIRESMINUTES>", genericController.encodeText(main_EditLockExpiresMinutes))
                             main_GetAuthoringStatusMessage &= Delimiter & Copy
                             Delimiter = "<BR >"
                         End If
-                        Copy = vbReplace(Msg_AuthoringRecordModifed, "<EDITNAME>", ModifiedBy)
+                        Copy = genericController.vbReplace(Msg_AuthoringRecordModifed, "<EDITNAME>", ModifiedBy)
                         main_GetAuthoringStatusMessage &= Delimiter & Copy
                         'main_GetAuthoringStatusMessage &=  Delimiter & Msg_AuthoringRecordModifed
                         Delimiter = "<BR >"
@@ -16569,9 +16513,9 @@ ErrorTrap:
                     ' no changes
                     '
                     If RecordEditLocked Then
-                        Copy = vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
-                        Copy = vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
-                        Copy = vbReplace(Copy, "<EDITEXPIRESMINUTES>", EncodeText(main_EditLockExpiresMinutes))
+                        Copy = genericController.vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
+                        Copy = genericController.vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
+                        Copy = genericController.vbReplace(Copy, "<EDITEXPIRESMINUTES>", genericController.encodeText(main_EditLockExpiresMinutes))
                         main_GetAuthoringStatusMessage &= Delimiter & Copy
                         Delimiter = "<BR >"
                     End If
@@ -16735,7 +16679,7 @@ ErrorTrap:
                     RuleId = 0
                     TestRecordIDLast = 0
                     For Ptr = 0 To currentRulesCnt - 1
-                        TestRecordID = EncodeInteger(currentRules.Rows(Ptr).Item(0))
+                        TestRecordID = genericController.EncodeInteger(currentRules.Rows(Ptr).Item(0))
                         If TestRecordID = 0 Then
                             '
                             ' skip
@@ -16745,13 +16689,13 @@ ErrorTrap:
                             ' hit
                             '
                             RuleFound = True
-                            RuleId = EncodeInteger(currentRules.Rows(Ptr).Item(1))
+                            RuleId = genericController.EncodeInteger(currentRules.Rows(Ptr).Item(1))
                             Exit For
                         ElseIf TestRecordID = TestRecordIDLast Then
                             '
                             ' dup
                             '
-                            dupRuleIdList = dupRuleIdList & "," & EncodeInteger(currentRules.Rows(Ptr).Item(1))
+                            dupRuleIdList = dupRuleIdList & "," & genericController.EncodeInteger(currentRules.Rows(Ptr).Item(1))
                             currentRules.Rows(Ptr).Item(0) = 0
                         End If
                         TestRecordIDLast = TestRecordID
@@ -16863,7 +16807,7 @@ ErrorTrap:
                 RecordID = db.cs_getInteger(CSPointer, "id")
                 ContentName = metaData.getContentNameByID(db.cs_getInteger(CSPointer, "contentcontrolId"))
             End If
-            main_cs_getEncodedField = html_encodeContent10(db.cs_get(EncodeInteger(CSPointer), EncodeText(FieldName)), user.id, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & webServerIO.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, user.isAuthenticated, Nothing, user.isEditingAnything)
+            main_cs_getEncodedField = html_encodeContent10(db.cs_get(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName)), user.id, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & webServerIO.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, user.isAuthenticated, Nothing, user.isEditingAnything)
             Exit Function
             '
             ' ----- Error Trap
@@ -16881,8 +16825,8 @@ ErrorTrap:
         '            '
         '            'If Not (true) Then Exit Function
         '            '
-        '            main_cs_getText = db.cs_getText(EncodeInteger(CSPointer), EncodeText(FieldName))
-        '            'main_cs_getText = encodeText(main_cs_getField_Internal(encodeInteger(CSPointer), encodeText(FieldName)))
+        '            main_cs_getText = db.cs_getText(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName))
+        '            'main_cs_getText = genericController.encodeText(main_cs_getField_Internal(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName)))
         '            '
         '            Exit Function
         'ErrorTrap:
@@ -16898,7 +16842,7 @@ ErrorTrap:
         '            '
         '            'If Not (true) Then Exit Function
         '            '
-        '            db.cs_getFilename = db.cs_getFilename(EncodeInteger(CSPointer), EncodeText(FieldName), EncodeText(OriginalFilename), encodeEmptyText(ContentName, ""))
+        '            db.cs_getFilename = db.cs_getFilename(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName), genericController.encodeText(OriginalFilename), genericController.encodeEmptyText(ContentName, ""))
         '            '
         '            Exit Function
         'ErrorTrap:
@@ -16908,7 +16852,7 @@ ErrorTrap:
         '        Public Function db.cs_getBoolean(ByVal CSPointer As Integer, ByVal FieldName As String) As Boolean
         '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("cs_getBoolean")
         '            '
-        '            main_cs_getBoolean = db.cs_getBoolean((CSPointer), EncodeText(FieldName))
+        '            main_cs_getBoolean = db.cs_getBoolean((CSPointer), genericController.encodeText(FieldName))
         '            '
         '            Exit Function
         'ErrorTrap:
@@ -16918,13 +16862,13 @@ ErrorTrap:
 
         ''
         'Public Function db.cs_getNumber(ByVal CSPointer As Integer, ByVal FieldName As String) As Double
-        '    xxcs_getNumber = db.cs_getNumber(EncodeInteger(CSPointer), EncodeText(FieldName))
+        '    xxcs_getNumber = db.cs_getNumber(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName))
         'End Function
         ''
         ''
         ''
         'Public Function db.cs_getLookup(ByVal CSPointer As Integer, ByVal FieldName As String) As String
-        '    xxcs_getLookup = db.cs_getLookup(EncodeInteger(CSPointer), EncodeText(FieldName))
+        '    xxcs_getLookup = db.cs_getLookup(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName))
         'End Function
         '
         '
@@ -16932,7 +16876,7 @@ ErrorTrap:
         Public Function cs_getSource(ByVal CSPointer As Integer) As String
             Dim iCS As Integer
             '
-            iCS = EncodeInteger(CSPointer)
+            iCS = genericController.EncodeInteger(CSPointer)
             If Not db.cs_ok(iCS) Then
                 Call Err.Raise(ignoreInteger, "dll", "ContentSet is not main_CSOK")
             Else
@@ -16949,7 +16893,7 @@ ErrorTrap:
         '            '
         '            'If Not (true) Then Exit Sub
         '            '
-        '            Call db.workflow.workflow_AbortEdit(EncodeText(ContentName), EncodeInteger(RecordID), user.userid)
+        '            Call db.workflow.workflow_AbortEdit(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), user.userid)
         '            '
         '            Exit Sub
         '            '
@@ -16967,7 +16911,7 @@ ErrorTrap:
         '            '
         '            'If Not (true) Then Exit Function
         '            '
-        '            main_cs_getRow = db.cs_getRow(EncodeInteger(CSPointer))
+        '            main_cs_getRow = db.cs_getRow(genericController.EncodeInteger(CSPointer))
         '            '
         '            Exit Function
         '            '
@@ -16981,13 +16925,13 @@ ErrorTrap:
         ''
         ''
         'Public Function db.cs_getRows(ByVal CSPointer As Integer) As Object
-        '    main_cs_getRows = db.cs_getRows(EncodeInteger(CSPointer))
+        '    main_cs_getRows = db.cs_getRows(genericController.EncodeInteger(CSPointer))
         'End Function
         ''
         ''
         ''
         'Public Function main_cs_getRowCount(ByVal CSPointer As Integer) As Integer
-        '    main_cs_getRowCount = db.cs_getRowCount(EncodeInteger(CSPointer))
+        '    main_cs_getRowCount = db.cs_getRowCount(genericController.EncodeInteger(CSPointer))
         'End Function
         ''
         ''   Leave interface
@@ -17004,7 +16948,7 @@ ErrorTrap:
         '    Get
         '        If user.isAuthenticated() Then
         '            If Not property_visit_allowHelpIcon_isLoaded Then
-        '                property_visit_allowHelpIcon_Local = EncodeBoolean(visitProperty.getBoolean("AllowHelpIcon")
+        '                property_visit_allowHelpIcon_Local = genericController.EncodeBoolean(visitProperty.getBoolean("AllowHelpIcon")
         '                property_visit_allowHelpIcon_isLoaded = True
         '            End If
         '        End If
@@ -17029,7 +16973,7 @@ ErrorTrap:
         '    Get
         '        If user.isAuthenticated() Then
         '            If Not property_visit_allowQuickEditor_isLoaded Then
-        '                property_visit_allowQuickEditor = EncodeBoolean(
+        '                property_visit_allowQuickEditor = genericController.EncodeBoolean(
         '                property_visit_allowQuickEditor_isLoaded = True
         '            End If
         '            visitProperty_AllowQuickEditor = property_visit_allowQuickEditor
@@ -17070,7 +17014,7 @@ ErrorTrap:
         '    Get
         '        If user.isAuthenticated() Then
         '            If Not property_visit_allowWorkflowRendering_isLoaded Then
-        '                property_visit_allowWorkflowRendering = EncodeBoolean(
+        '                property_visit_allowWorkflowRendering = genericController.EncodeBoolean(
         '                property_visit_allowWorkflowRendering_isLoaded = True
         '            End If
         '            visitProperty_AllowWorkflowRendering = property_visit_allowWorkflowRendering
@@ -17086,7 +17030,7 @@ ErrorTrap:
         '        visitProperty.getBoolean("AllowDebugging") = False
         '        If user.isAuthenticated() Then
         '            If Not property_visit_allowDebugging_isLoaded Then
-        '                property_visit_allowDebugging_Local = EncodeBoolean(
+        '                property_visit_allowDebugging_Local = genericController.EncodeBoolean(
         '                property_visit_allowDebugging_isLoaded = True
         '            End If
         '            visitProperty.getBoolean("AllowDebugging") = property_visit_allowDebugging_Local
@@ -17116,9 +17060,9 @@ ErrorTrap:
         '            Dim rs As DataTable
         '            '
         '            returnString = ""
-        '            rs = db.executeSql("select " & EncodeText(FieldName) & " from ccpagecontent where id=" & main_RenderedPageID)
+        '            rs = db.executeSql("select " & genericController.encodeText(FieldName) & " from ccpagecontent where id=" & main_RenderedPageID)
         '            If rs.Rows.Count > 0 Then
-        '                returnString = EncodeText(rs.Rows(0).Item(0))
+        '                returnString = genericController.encodeText(rs.Rows(0).Item(0))
         '            End If
         '            '
         '            main_GetContentPageField = returnString
@@ -17127,12 +17071,12 @@ ErrorTrap:
         '            '    ' converted array to dictionary - Dim FieldPointer As Integer
         '            '    Dim UcaseFieldName As String
         '            '    '
-        '            '    UcaseFieldName = vbUCase(encodeText(FieldName))
+        '            '    UcaseFieldName = genericController.vbUCase(genericController.encodeText(FieldName))
         '            '    If Not IsEmpty(main_oldCacheRS_FieldValues) Then
         '            '        FieldCount = UBound(main_oldCacheRS_FieldNames)
         '            '        If FieldCount > 0 Then
         '            '            For FieldPointer = 0 To FieldCount - 1
-        '            '                If UcaseFieldName = vbUCase(main_oldCacheRS_FieldNames(FieldPointer)) Then
+        '            '                If UcaseFieldName = genericController.vbUCase(main_oldCacheRS_FieldNames(FieldPointer)) Then
         '            '                    main_GetContentPageField = main_oldCacheRS_FieldValues(FieldPointer)
         '            '                    Exit For
         '            '                    End If
@@ -17202,7 +17146,7 @@ ErrorTrap:
         '            '
         '            'If Not (true) Then Exit Function
         '            '
-        '            main_GetConnectionString = GetConnectionString(EncodeText(DataSourceName))
+        '            main_GetConnectionString = GetConnectionString(genericController.encodeText(DataSourceName))
         '            '
         '            Exit Function
         '            '
@@ -17260,7 +17204,7 @@ ErrorTrap:
             '
             Dim iActionQueryString As String
             '
-            iActionQueryString = ModifyQueryString(ActionQueryString, RequestNameRequestBinary, True, True)
+            iActionQueryString = genericController.ModifyQueryString(ActionQueryString, RequestNameRequestBinary, True, True)
             '
             html_GetUploadFormStart = "<form action=""" & webServerIO_ServerFormActionURL & "?" & iActionQueryString & """ ENCTYPE=""MULTIPART/FORM-DATA"" METHOD=""POST""  style=""display: inline;"" >"
             '
@@ -17332,7 +17276,7 @@ ErrorTrap:
                             ' If x_wap, set mobile true
                             '
                             visit_browserIsMobile = True
-                        ElseIf vbInstr(1, webServerIO.requestHttpAccept, "wap", vbTextCompare) <> 0 Then
+                        ElseIf genericController.vbInstr(1, webServerIO.requestHttpAccept, "wap", vbTextCompare) <> 0 Then
                             '
                             ' If main_HTTP_Accept, set mobile true
                             '
@@ -17343,12 +17287,12 @@ ErrorTrap:
                             '
                             UserAgentSubstrings = main_GetMobileBrowserList()
                             If UserAgentSubstrings <> "" Then
-                                UserAgentSubstrings = vbReplace(UserAgentSubstrings, vbCrLf, vbLf)
+                                UserAgentSubstrings = genericController.vbReplace(UserAgentSubstrings, vbCrLf, vbLf)
                                 Subs = Split(UserAgentSubstrings, vbLf)
                                 Cnt = UBound(Subs) + 1
                                 If Cnt > 0 Then
                                     For Ptr = 0 To Cnt - 1
-                                        If vbInstr(1, BrowserUserAgent, Subs(Ptr), vbTextCompare) <> 0 Then
+                                        If genericController.vbInstr(1, BrowserUserAgent, Subs(Ptr), vbTextCompare) <> 0 Then
                                             visit_browserIsMobile = True
                                             Exit For
                                         End If
@@ -17371,7 +17315,7 @@ ErrorTrap:
                 visit_isBot = True
                 visit_isBadBot = False
             Else
-                DetailsStart = vbInstr(1, BrowserUserAgent, "(")
+                DetailsStart = genericController.vbInstr(1, BrowserUserAgent, "(")
                 '
                 If DetailsStart = 0 Then
                     '
@@ -17382,7 +17326,7 @@ ErrorTrap:
                     '"CompatibleAgent (details) DetailTail" format
                     '
                     Details = Mid(BrowserUserAgent, DetailsStart + 1)
-                    DetailsEnd = vbInstr(1, Details, ")")
+                    DetailsEnd = genericController.vbInstr(1, Details, ")")
                     If DetailsEnd <> 0 Then
                         If Len(Details) > DetailsEnd Then
                             DetailTail = Trim(Mid(Details, DetailsEnd + 1))
@@ -17393,10 +17337,10 @@ ErrorTrap:
                     '
                     ' Netscape puts phrase in the DetailTail
                     '
-                    PositionStart = vbInstr(1, DetailTail, "netscape", vbTextCompare)
+                    PositionStart = genericController.vbInstr(1, DetailTail, "netscape", vbTextCompare)
                     If PositionStart <> 0 Then
                         visit_browserIsNS = True
-                        PositionEnd = vbInstr(PositionStart, DetailTail, " ")
+                        PositionEnd = genericController.vbInstr(PositionStart, DetailTail, " ")
                         If PositionEnd = 0 Then
                             Agent = Mid(DetailTail, PositionStart)
                         Else
@@ -17419,31 +17363,31 @@ ErrorTrap:
                             If UBound(DetailsVersionSection) > 0 Then
                                 visit_browserVersion = Trim(DetailsVersionSection(1))
                             End If
-                        ElseIf vbInstr(1, Details, "netscape", vbTextCompare) <> 0 Then
+                        ElseIf genericController.vbInstr(1, Details, "netscape", vbTextCompare) <> 0 Then
                             '
                             visit_browserIsNS = True
                         End If
                         '
-                        If vbInstr(1, Detail, "win", vbTextCompare) <> 0 Then
+                        If genericController.vbInstr(1, Detail, "win", vbTextCompare) <> 0 Then
                             visit_browserIsWindows = True
                         End If
                         '
-                        If vbInstr(1, Detail, "mac", vbTextCompare) <> 0 Then
+                        If genericController.vbInstr(1, Detail, "mac", vbTextCompare) <> 0 Then
                             visit_browserIsMac = True
                         End If
                         '
-                        If vbInstr(1, Detail, "linux", vbTextCompare) <> 0 Then
+                        If genericController.vbInstr(1, Detail, "linux", vbTextCompare) <> 0 Then
                             visit_browserIsLinux = True
                         End If
                     Next
                 End If
                 '
-                BotList = EncodeText(cache.getObject(Of String)("DefaultBotNameList"))
+                BotList = genericController.encodeText(cache.getObject(Of String)("DefaultBotNameList"))
                 If BotList <> "" Then
                     '
                     ' First line of Persistent variant is the expiration date (1 hour in the future)
                     '
-                    DateExpires = EncodeDate(getLine(BotList))
+                    DateExpires = genericController.EncodeDate(genericController.getLine(BotList))
                     If DateExpires = Date.MinValue Then
                         BotList = ""
                     ElseIf DateExpires < app_startTime Then
@@ -17482,7 +17426,7 @@ ErrorTrap:
                 End If
                 '
                 If BotList <> "" Then
-                    BotList = vbReplace(BotList, vbCrLf, vbLf)
+                    BotList = genericController.vbReplace(BotList, vbCrLf, vbLf)
                     Bots = Split(BotList, vbLf)
                     If UBound(Bots) >= 0 Then
                         For Ptr = 0 To UBound(Bots)
@@ -17494,7 +17438,7 @@ ErrorTrap:
                                 Args = Split(Arg, vbTab)
                                 If UBound(Args) > 0 Then
                                     If Trim(Args(1)) <> "" Then
-                                        If vbInstr(1, BrowserUserAgent, Args(1), vbTextCompare) <> 0 Then
+                                        If genericController.vbInstr(1, BrowserUserAgent, Args(1), vbTextCompare) <> 0 Then
                                             visit_name = Args(0)
                                             visitNameFound = True
                                             Exit For
@@ -17502,7 +17446,7 @@ ErrorTrap:
                                     End If
                                     If UBound(Args) > 1 Then
                                         If Trim(Args(2)) <> "" Then
-                                            If vbInstr(1, webServerIO.requestRemoteIP, Args(2), vbTextCompare) <> 0 Then
+                                            If genericController.vbInstr(1, webServerIO.requestRemoteIP, Args(2), vbTextCompare) <> 0 Then
                                                 visit_name = Args(0)
                                                 visitNameFound = True
                                                 Exit For
@@ -17576,8 +17520,8 @@ ErrorTrap:
             '
             'DepthLimit = encodeEmptyInteger(DepthLimit, 3)
             'MenuStyle = encodeEmptyInteger(MenuStyle, 1)
-            StyleSheetPrefixLocal = encodeEmptyText(StyleSheetPrefix, "ccFlyout")
-            MenuNameLocal = encodeEmptyText(MenuName, "Default")
+            StyleSheetPrefixLocal = genericController.encodeEmptyText(StyleSheetPrefix, "ccFlyout")
+            MenuNameLocal = genericController.encodeEmptyText(MenuName, "Default")
             If MenuNameLocal = "" Then
                 MenuNameLocal = "Default"
             End If
@@ -17622,15 +17566,15 @@ ErrorTrap:
             CSPointer = db.cs_open("Content Watch", "ContentRecordKey=" & db.encodeSQLText(ContentRecordKey), , , , , , "Link,Clicks")
             If db.cs_ok(CSPointer) Then
                 main_GetContentWatchLinkByKey = db.cs_getText(CSPointer, "Link")
-                If EncodeBoolean(IncrementClicks) Then
+                If genericController.EncodeBoolean(IncrementClicks) Then
                     Call db.cs_set(CSPointer, "Clicks", db.cs_getInteger(CSPointer, "clicks") + 1)
                 End If
             Else
-                main_GetContentWatchLinkByKey = EncodeText(DefaultLink)
+                main_GetContentWatchLinkByKey = genericController.encodeText(DefaultLink)
             End If
             Call db.cs_Close(CSPointer)
             '
-            main_GetContentWatchLinkByKey = coreCommonModule.EncodeAppRootPath(main_GetContentWatchLinkByKey, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
+            main_GetContentWatchLinkByKey = genericController.EncodeAppRootPath(main_GetContentWatchLinkByKey, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
             '
             Exit Function
             '
@@ -17649,7 +17593,7 @@ ErrorTrap:
             '
             Dim ContentRecordKey As String
             '
-            ContentRecordKey = main_GetContentID(EncodeText(ContentName)) & "." & EncodeInteger(RecordID)
+            ContentRecordKey = main_GetContentID(genericController.encodeText(ContentName)) & "." & genericController.EncodeInteger(RecordID)
             main_GetContentWatchLinkByName = main_GetContentWatchLinkByKey(ContentRecordKey, DefaultLink, IncrementClicks)
             '
             Exit Function
@@ -17663,7 +17607,7 @@ ErrorTrap:
         '=============================================================================
         '
         Public Function main_GetContentWatchLinkByID(ByVal ContentID As Integer, ByVal RecordID As Integer, Optional ByVal DefaultLink As String = "", Optional ByVal IncrementClicks As Boolean = True) As String
-            main_GetContentWatchLinkByID = main_GetContentWatchLinkByKey(EncodeText(ContentID) & "." & EncodeText(RecordID), DefaultLink, IncrementClicks)
+            main_GetContentWatchLinkByID = main_GetContentWatchLinkByKey(genericController.encodeText(ContentID) & "." & genericController.encodeText(RecordID), DefaultLink, IncrementClicks)
         End Function
         '
         '
@@ -17683,7 +17627,7 @@ ErrorTrap:
                 CopyResult = "&nbsp;"
             End If
             '
-            main_GetHtmlBody_GetSection_GetContent_GetTableRow = GetTableCell("<nobr>" & CopyCaption & "</nobr>", "150", , EvenRow, "right") & GetTableCell(CopyResult, "100%", , EvenRow, "left") & kmaEndTableRow
+            main_GetHtmlBody_GetSection_GetContent_GetTableRow = genericController.GetTableCell("<nobr>" & CopyCaption & "</nobr>", "150", , EvenRow, "right") & genericController.GetTableCell(CopyResult, "100%", , EvenRow, "left") & kmaEndTableRow
         End Function
         '
         '=============================================================================
@@ -17704,7 +17648,7 @@ ErrorTrap:
                         & cr & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0>" _
                         & cr2 & "<tr>" _
                         & cr3 & "<td style=""padding:" & ContentPadding & "px"">" _
-                        & kmaIndent(kmaIndent(kmaIndent(pageManager_GetContentBoxWrapper))) _
+                        & genericController.kmaIndent(genericController.kmaIndent(genericController.kmaIndent(pageManager_GetContentBoxWrapper))) _
                         & cr3 & "</td>" _
                         & cr2 & "</tr>" _
                         & cr & "</table>"
@@ -17712,20 +17656,20 @@ ErrorTrap:
                     '                & cr & "<table border=0 width=""100%"" cellspacing=0 cellpadding=" & ContentPadding & ">" _
                     '                & cr2 & "<tr>" _
                     '                & cr3 & "<td>" _
-                    '                & KmaIndent(KmaIndent(KmaIndent(main_GetContentBoxWrapper))) _
+                    '                & genericController.kmaIndent(KmaIndent(KmaIndent(main_GetContentBoxWrapper))) _
                     '                & cr3 & "</td>" _
                     '                & cr2 & "</tr>" _
                     '                & cr & "</table>"
                 End If
                 pageManager_GetContentBoxWrapper = "" _
                     & cr & "<div class=""contentBox"">" _
-                    & kmaIndent(pageManager_GetContentBoxWrapper) _
+                    & genericController.kmaIndent(pageManager_GetContentBoxWrapper) _
                     & cr & "</div>"
             Else
                 '
                 pageManager_GetContentBoxWrapper = "" _
                     & cr & "<div class=""contentBox"" style=""padding:" & ContentPadding & "px"">" _
-                    & kmaIndent(pageManager_GetContentBoxWrapper) _
+                    & genericController.kmaIndent(pageManager_GetContentBoxWrapper) _
                     & cr & "</div>"
             End If
         End Function
@@ -17894,7 +17838,7 @@ ErrorTrap:
                         'Link = main_GetPageLink(RecordID)
                         If main_WorkflowSupport Then
                             If Not pagemanager_IsWorkflowRendering() Then
-                                Link = modifyLinkQuery(Link, "main_AdminWarningMsg", "This new unpublished page has been added and Workflow Rendering has been enabled so you can edit this page.", True)
+                                Link = genericController.modifyLinkQuery(Link, "main_AdminWarningMsg", "This new unpublished page has been added and Workflow Rendering has been enabled so you can edit this page.", True)
                                 Call siteProperties.setProperty("AllowWorkflowRendering", True)
                             End If
                         End If
@@ -17930,7 +17874,7 @@ ErrorTrap:
                             'Link = main_GetPageLink(RecordID)
                             If main_WorkflowSupport Then
                                 If Not pagemanager_IsWorkflowRendering() Then
-                                    Link = modifyLinkQuery(Link, "main_AdminWarningMsg", "This new unpublished page has been added and Workflow Rendering has been enabled so you can edit this page.", True)
+                                    Link = genericController.modifyLinkQuery(Link, "main_AdminWarningMsg", "This new unpublished page has been added and Workflow Rendering has been enabled so you can edit this page.", True)
                                     Call siteProperties.setProperty("AllowWorkflowRendering", True)
                                 End If
                             End If
@@ -17962,7 +17906,7 @@ ErrorTrap:
                     If Not main_WorkflowSupport Then
                         Link = pageManager_GetPageLink4(ParentID, "", True, False)
                         'Link = main_GetPageLink(ParentID)
-                        Link = modifyLinkQuery(Link, "main_AdminWarningMsg", "The page has been deleted, and you have been redirected to the parent of the deleted page.", True)
+                        Link = genericController.modifyLinkQuery(Link, "main_AdminWarningMsg", "The page has been deleted, and you have been redirected to the parent of the deleted page.", True)
                         Call webServerIO_Redirect2(Link, "Redirecting to the parent page because the page was deleted with the quick editor.", pageManager_RedirectBecausePageNotFound)
                         Exit Sub
                     End If
@@ -18044,11 +17988,11 @@ ErrorTrap:
                 ' ----- Read Bake Version
                 '
                 BakeName = "main_GetMenu-" & webServerIO_requestProtocol & "-" & webServerIO.requestDomain & "-" & PageName & "-" & ContentName & "-" & DefaultLink & "-" & RootPageRecordID & "-" & DepthLimit & "-" & MenuStyle & "-" & StyleSheetPrefix
-                BakeName = vbReplace(BakeName, "/", "_")
-                BakeName = vbReplace(BakeName, ":", "_")
-                BakeName = vbReplace(BakeName, ".", "_")
-                BakeName = vbReplace(BakeName, " ", "_")
-                pageManager_GetSectionMenu_NameMenu = EncodeText(cache.getObject(Of String)(BakeName))
+                BakeName = genericController.vbReplace(BakeName, "/", "_")
+                BakeName = genericController.vbReplace(BakeName, ":", "_")
+                BakeName = genericController.vbReplace(BakeName, ".", "_")
+                BakeName = genericController.vbReplace(BakeName, " ", "_")
+                pageManager_GetSectionMenu_NameMenu = genericController.encodeText(cache.getObject(Of String)(BakeName))
                 If pageManager_GetSectionMenu_NameMenu <> "" Then
                     pageManager_GetSectionMenu_NameMenu = pageManager_GetSectionMenu_NameMenu
                 Else
@@ -18067,9 +18011,9 @@ ErrorTrap:
                     '
                     PageFound = False
                     Do While PCCPtr >= 0 And Not PageFound
-                        DateExpires = EncodeDate(cache_pageContent(PCC_DateExpires, PCCPtr))
-                        dateArchive = EncodeDate(cache_pageContent(PCC_DateArchive, PCCPtr))
-                        PubDate = EncodeDate(cache_pageContent(PCC_PubDate, PCCPtr))
+                        DateExpires = genericController.EncodeDate(cache_pageContent(PCC_DateExpires, PCCPtr))
+                        dateArchive = genericController.EncodeDate(cache_pageContent(PCC_DateArchive, PCCPtr))
+                        PubDate = genericController.EncodeDate(cache_pageContent(PCC_PubDate, PCCPtr))
                         PageFound = ((DateExpires = Date.MinValue) Or (DateExpires > app_startTime)) And ((PubDate = Date.MinValue) Or (PubDate < app_startTime))
                         'PageFound = ((DateExpires = Date.MinValue) Or (DateExpires > main_PageStartTime)) And ((DateArchive = Date.MinValue) Or (DateArchive > main_PageStartTime)) And ((PubDate = Date.MinValue) Or (PubDate < main_PageStartTime))
                         If (Not PageFound) Then
@@ -18086,9 +18030,9 @@ ErrorTrap:
                         '
                         AllowInMenus = True
                         LinkWorking = DefaultLink
-                        LinkWorking = coreCommonModule.EncodeAppRootPath(LinkWorking, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
-                        LinkWorking = modifyLinkQuery(LinkWorking, "bid", "", False)
-                        MenuNamePrefix = EncodeText(GetRandomInteger) & "_"
+                        LinkWorking = genericController.EncodeAppRootPath(LinkWorking, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
+                        LinkWorking = genericController.modifyLinkQuery(LinkWorking, "bid", "", False)
+                        MenuNamePrefix = genericController.encodeText(genericController.GetRandomInteger) & "_"
                         MenuID = 0
                         childListSortMethodId = 0
                         ParentID = 0
@@ -18097,25 +18041,25 @@ ErrorTrap:
                         MenuLinkOverRide = ""
                         ChildPagesFound = False
                     Else
-                        AllowInMenus = EncodeBoolean(cache_pageContent(PCC_AllowInMenus, PCCPtr))
+                        AllowInMenus = genericController.EncodeBoolean(cache_pageContent(PCC_AllowInMenus, PCCPtr))
                         If AllowInMenus Then
-                            MenuNamePrefix = EncodeText(GetRandomInteger) & "_"
-                            MenuID = EncodeInteger(cache_pageContent(PCC_ID, PCCPtr))
-                            childListSortMethodId = EncodeInteger(cache_pageContent(PCC_ChildListSortMethodID, PCCPtr))
-                            Tier1MenuCaption = EncodeText(cache_pageContent(PCC_MenuHeadline, PCCPtr))
+                            MenuNamePrefix = genericController.encodeText(genericController.GetRandomInteger) & "_"
+                            MenuID = genericController.EncodeInteger(cache_pageContent(PCC_ID, PCCPtr))
+                            childListSortMethodId = genericController.EncodeInteger(cache_pageContent(PCC_ChildListSortMethodID, PCCPtr))
+                            Tier1MenuCaption = genericController.encodeText(cache_pageContent(PCC_MenuHeadline, PCCPtr))
                             If Tier1MenuCaption = "" Then
-                                Tier1MenuCaption = EncodeText(cache_pageContent(PCC_Headline, PCCPtr))
+                                Tier1MenuCaption = genericController.encodeText(cache_pageContent(PCC_Headline, PCCPtr))
                                 If Tier1MenuCaption = "" Then
-                                    Tier1MenuCaption = EncodeText(cache_pageContent(PCC_Name, PCCPtr))
+                                    Tier1MenuCaption = genericController.encodeText(cache_pageContent(PCC_Name, PCCPtr))
                                     If Tier1MenuCaption = "" Then
                                         Tier1MenuCaption = "Page " & CStr(MenuID)
                                     End If
                                 End If
                             End If
-                            ContentControlID = EncodeInteger(cache_pageContent(PCC_ContentControlID, PCCPtr))
-                            templateId = EncodeInteger(cache_pageContent(PCC_TemplateID, PCCPtr))
-                            allowChildListDisplay = EncodeBoolean(cache_pageContent(PCC_AllowChildListDisplay, PCCPtr))
-                            MenuLinkOverRide = EncodeText(cache_pageContent(PCC_Link, PCCPtr))
+                            ContentControlID = genericController.EncodeInteger(cache_pageContent(PCC_ContentControlID, PCCPtr))
+                            templateId = genericController.EncodeInteger(cache_pageContent(PCC_TemplateID, PCCPtr))
+                            allowChildListDisplay = genericController.EncodeBoolean(cache_pageContent(PCC_AllowChildListDisplay, PCCPtr))
+                            MenuLinkOverRide = genericController.encodeText(cache_pageContent(PCC_Link, PCCPtr))
                             ChildPagesFoundTest = cache_pageContent(PCC_ChildPagesFound, PCCPtr)
                             If ChildPagesFoundTest = "" Then
                                 '
@@ -18123,12 +18067,12 @@ ErrorTrap:
                                 '
                                 ChildPagesFound = True
                             Else
-                                ChildPagesFound = EncodeBoolean(ChildPagesFoundTest)
+                                ChildPagesFound = genericController.EncodeBoolean(ChildPagesFoundTest)
                             End If
                             '
                             ' Use parentid to detect if this record needs to be called with the bid
                             '
-                            ParentID = EncodeInteger(cache_pageContent(PCC_ParentID, PCCPtr))
+                            ParentID = genericController.EncodeInteger(cache_pageContent(PCC_ParentID, PCCPtr))
                             '
                             ' main_Get the Link
                             '
@@ -18198,12 +18142,12 @@ ErrorTrap:
                         End If
                         ' ##### can not block, this is being used
                         If ChildPagesFound Then
-                            ChildPageCount = main_GetSectionMenu_AddChildMenu_ReturnChildCount(MenuID, ContentName, LinkWorking, Tier1MenuCaption, "," & EncodeText(MenuID), MenuNamePrefix, 1, DepthLimit, childListSortMethodId, SectionID, AddRootButton, UseContentWatchLink)
+                            ChildPageCount = main_GetSectionMenu_AddChildMenu_ReturnChildCount(MenuID, ContentName, LinkWorking, Tier1MenuCaption, "," & genericController.encodeText(MenuID), MenuNamePrefix, 1, DepthLimit, childListSortMethodId, SectionID, AddRootButton, UseContentWatchLink)
                             If (ChildPageCount = 0) And (True) Then
                                 Call db.executeSql("update ccpagecontent set ChildPagesFound=0 where id=" & MenuID)
                             End If
                         End If
-                        pageManager_GetSectionMenu_NameMenu = pageManager_GetSectionMenu_NameMenu & vbReplace(menuFlyout.getMenu(MenuNamePrefix & EncodeText(MenuID), MenuStyle, StyleSheetPrefix), vbCrLf, "")
+                        pageManager_GetSectionMenu_NameMenu = pageManager_GetSectionMenu_NameMenu & genericController.vbReplace(menuFlyout.getMenu(MenuNamePrefix & genericController.encodeText(MenuID), MenuStyle, StyleSheetPrefix), vbCrLf, "")
                         pageManager_GetSectionMenu_NameMenu = pageManager_GetSectionMenu_NameMenu & menu_GetClose()
                         Call cache.setKey(BakeName, pageManager_GetSectionMenu_NameMenu, ContentName & ",Site Sections,Dynamic Menus,Dynamic Menu Section Rules")
                     End If
@@ -18266,11 +18210,11 @@ ErrorTrap:
                 ' ----- Read Bake Version
                 '
                 BakeName = "main_GetMenu-" & webServerIO_requestProtocol & "-" & webServerIO.requestDomain & "-" & RootPageRecordID & "-" & DefaultLink & "-" & DepthLimit & "-" & MenuStyle & "-" & StyleSheetPrefix
-                BakeName = vbReplace(BakeName, "/", "_")
-                BakeName = vbReplace(BakeName, ":", "_")
-                BakeName = vbReplace(BakeName, ".", "_")
-                BakeName = vbReplace(BakeName, " ", "_")
-                pageManager_GetSectionMenu_IdMenu = EncodeText(cache.getObject(Of String)(BakeName))
+                BakeName = genericController.vbReplace(BakeName, "/", "_")
+                BakeName = genericController.vbReplace(BakeName, ":", "_")
+                BakeName = genericController.vbReplace(BakeName, ".", "_")
+                BakeName = genericController.vbReplace(BakeName, " ", "_")
+                pageManager_GetSectionMenu_IdMenu = genericController.encodeText(cache.getObject(Of String)(BakeName))
                 If pageManager_GetSectionMenu_IdMenu <> "" Then
                     pageManager_GetSectionMenu_IdMenu = pageManager_GetSectionMenu_IdMenu
                 Else
@@ -18283,9 +18227,9 @@ ErrorTrap:
                     ' Skip if expired, archive and non-published
                     '
                     If PageFound Then
-                        DateExpires = EncodeDate(cache_pageContent(PCC_DateExpires, PCCPtr))
-                        dateArchive = EncodeDate(cache_pageContent(PCC_DateArchive, PCCPtr))
-                        PubDate = EncodeDate(cache_pageContent(PCC_PubDate, PCCPtr))
+                        DateExpires = genericController.EncodeDate(cache_pageContent(PCC_DateExpires, PCCPtr))
+                        dateArchive = genericController.EncodeDate(cache_pageContent(PCC_DateArchive, PCCPtr))
+                        PubDate = genericController.EncodeDate(cache_pageContent(PCC_PubDate, PCCPtr))
                         PageFound = ((DateExpires = Date.MinValue) Or (DateExpires > app_startTime)) And ((PubDate = Date.MinValue) Or (PubDate < app_startTime))
                         'PageFound = ((DateExpires = Date.MinValue) Or (DateExpires > main_PageStartTime)) And ((DateArchive = Date.MinValue) Or (DateArchive > main_PageStartTime)) And ((PubDate = Date.MinValue) Or (PubDate < main_PageStartTime))
                     End If
@@ -18296,9 +18240,9 @@ ErrorTrap:
                         AllowInMenus = True
                         LinkWorking = DefaultLink
                         LinkWorkingNoRedirect = LinkWorking
-                        LinkWorking = coreCommonModule.EncodeAppRootPath(LinkWorking, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
-                        LinkWorking = modifyLinkQuery(LinkWorking, "bid", "", False)
-                        MenuNamePrefix = EncodeText(GetRandomInteger) & "_"
+                        LinkWorking = genericController.EncodeAppRootPath(LinkWorking, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
+                        LinkWorking = genericController.modifyLinkQuery(LinkWorking, "bid", "", False)
+                        MenuNamePrefix = genericController.encodeText(genericController.GetRandomInteger) & "_"
                         ' ***** just want to know what would happen here
                         PageID = RootPageRecordID
                         'pageId = 0
@@ -18314,33 +18258,33 @@ ErrorTrap:
                         '
                         AllowInMenus = True
                         If AllowInMenus Then
-                            MenuNamePrefix = EncodeText(GetRandomInteger) & "_"
-                            PageID = EncodeInteger(cache_pageContent(PCC_ID, PCCPtr))
-                            childListSortMethodId = EncodeInteger(cache_pageContent(PCC_ChildListSortMethodID, PCCPtr))
-                            Tier1MenuCaption = EncodeText(cache_pageContent(PCC_MenuHeadline, PCCPtr))
+                            MenuNamePrefix = genericController.encodeText(genericController.GetRandomInteger) & "_"
+                            PageID = genericController.EncodeInteger(cache_pageContent(PCC_ID, PCCPtr))
+                            childListSortMethodId = genericController.EncodeInteger(cache_pageContent(PCC_ChildListSortMethodID, PCCPtr))
+                            Tier1MenuCaption = genericController.encodeText(cache_pageContent(PCC_MenuHeadline, PCCPtr))
                             If Tier1MenuCaption = "" Then
-                                Tier1MenuCaption = EncodeText(cache_pageContent(PCC_Name, PCCPtr))
+                                Tier1MenuCaption = genericController.encodeText(cache_pageContent(PCC_Name, PCCPtr))
                                 If Tier1MenuCaption = "" Then
                                     Tier1MenuCaption = "Page " & CStr(PageID)
                                 End If
                             End If
-                            ContentControlID = EncodeInteger(cache_pageContent(PCC_ContentControlID, PCCPtr))
-                            templateId = EncodeInteger(cache_pageContent(PCC_TemplateID, PCCPtr))
-                            allowChildListDisplay = EncodeBoolean(cache_pageContent(PCC_AllowChildListDisplay, PCCPtr))
-                            MenuLinkOverRide = EncodeText(cache_pageContent(PCC_Link, PCCPtr))
-                            ChildPagesFoundTest = EncodeText(cache_pageContent(PCC_ChildPagesFound, PCCPtr))
+                            ContentControlID = genericController.EncodeInteger(cache_pageContent(PCC_ContentControlID, PCCPtr))
+                            templateId = genericController.EncodeInteger(cache_pageContent(PCC_TemplateID, PCCPtr))
+                            allowChildListDisplay = genericController.EncodeBoolean(cache_pageContent(PCC_AllowChildListDisplay, PCCPtr))
+                            MenuLinkOverRide = genericController.encodeText(cache_pageContent(PCC_Link, PCCPtr))
+                            ChildPagesFoundTest = genericController.encodeText(cache_pageContent(PCC_ChildPagesFound, PCCPtr))
                             If ChildPagesFoundTest = "" Then
                                 '
                                 ' Not initialized, assume true
                                 '
                                 ChildPagesFound = True
                             Else
-                                ChildPagesFound = EncodeBoolean(ChildPagesFoundTest)
+                                ChildPagesFound = genericController.EncodeBoolean(ChildPagesFoundTest)
                             End If
                             '
                             ' Use parentid to detect if this record needs to be called with the bid
                             '
-                            ParentID = EncodeInteger(cache_pageContent(PCC_ParentID, PCCPtr))
+                            ParentID = genericController.EncodeInteger(cache_pageContent(PCC_ParentID, PCCPtr))
                             '
                             ' main_Get the Link
                             '
@@ -18427,7 +18371,7 @@ ErrorTrap:
                             '
                             ' If workflow mode, just assume there are child pages
                             '
-                            ChildPageCount = main_GetSectionMenu_AddChildMenu_ReturnChildCount(PageID, ContentName, LinkWorking, Tier1MenuCaption, "," & EncodeText(PageID), MenuNamePrefix, 1, DepthLimit, childListSortMethodId, SectionID, AddRootButton, UseContentWatchLink)
+                            ChildPageCount = main_GetSectionMenu_AddChildMenu_ReturnChildCount(PageID, ContentName, LinkWorking, Tier1MenuCaption, "," & genericController.encodeText(PageID), MenuNamePrefix, 1, DepthLimit, childListSortMethodId, SectionID, AddRootButton, UseContentWatchLink)
                         Else
                             '
                             ' In production mode, use the ChildPagesFound field
@@ -18447,8 +18391,8 @@ ErrorTrap:
                                 '
                                 ' Child pages were found, create child menu
                                 '
-                                ChildPageCount = main_GetSectionMenu_AddChildMenu_ReturnChildCount(PageID, ContentName, LinkWorking, Tier1MenuCaption, "," & EncodeText(PageID), MenuNamePrefix, 1, DepthLimit, childListSortMethodId, SectionID, AddRootButton, UseContentWatchLink)
-                                'ChildPageCount = main_GetSectionMenu_AddChildMenu_ReturnChildCount(pageId, ContentName, LinkWorkingNoRedirect, Tier1MenuCaption, "," & encodeText(pageId), MenuNamePrefix, 1, DepthLimit, ChildListSortMethodID, SectionID, AddRootButton, UseContentWatchLink)
+                                ChildPageCount = main_GetSectionMenu_AddChildMenu_ReturnChildCount(PageID, ContentName, LinkWorking, Tier1MenuCaption, "," & genericController.encodeText(PageID), MenuNamePrefix, 1, DepthLimit, childListSortMethodId, SectionID, AddRootButton, UseContentWatchLink)
+                                'ChildPageCount = main_GetSectionMenu_AddChildMenu_ReturnChildCount(pageId, ContentName, LinkWorkingNoRedirect, Tier1MenuCaption, "," & genericController.encodeText(pageId), MenuNamePrefix, 1, DepthLimit, ChildListSortMethodID, SectionID, AddRootButton, UseContentWatchLink)
                                 If (True) Then
                                     If (ChildPageCount = 0) And (ChildPagesFound) Then
                                         '
@@ -18471,7 +18415,7 @@ ErrorTrap:
                         '
                         ' ----- main_Get the Menu Header
                         '
-                        pageManager_GetSectionMenu_IdMenu = pageManager_GetSectionMenu_IdMenu & vbReplace(menuFlyout.getMenu(MenuNamePrefix & EncodeText(PageID), MenuStyle, StyleSheetPrefix), vbCrLf, "")
+                        pageManager_GetSectionMenu_IdMenu = pageManager_GetSectionMenu_IdMenu & genericController.vbReplace(menuFlyout.getMenu(MenuNamePrefix & genericController.encodeText(PageID), MenuStyle, StyleSheetPrefix), vbCrLf, "")
                         '
                         ' ----- Add in the rest of the menu details
                         ' ##### this must be here because it must go into the bake, else a baked page fails without he menus
@@ -18579,29 +18523,29 @@ ErrorTrap:
                 Ptr = 0
                 Do While Ptr < PtrCnt
                     PCCPtr = PCCPtrsSorted(Ptr)
-                    DateExpires = EncodeDate(cache_pageContent(PCC_DateExpires, PCCPtr))
-                    dateArchive = EncodeDate(cache_pageContent(PCC_DateArchive, PCCPtr))
-                    PubDate = EncodeDate(cache_pageContent(PCC_PubDate, PCCPtr))
-                    MenuCaption = Trim(EncodeText(cache_pageContent(PCC_MenuHeadline, PCCPtr)))
+                    DateExpires = genericController.EncodeDate(cache_pageContent(PCC_DateExpires, PCCPtr))
+                    dateArchive = genericController.EncodeDate(cache_pageContent(PCC_DateArchive, PCCPtr))
+                    PubDate = genericController.EncodeDate(cache_pageContent(PCC_PubDate, PCCPtr))
+                    MenuCaption = Trim(genericController.encodeText(cache_pageContent(PCC_MenuHeadline, PCCPtr)))
                     If False Then '.3.752" Then
                         AllowInMenus = (MenuCaption <> "")
                     Else
-                        AllowInMenus = EncodeBoolean(cache_pageContent(PCC_AllowInMenus, PCCPtr))
+                        AllowInMenus = genericController.EncodeBoolean(cache_pageContent(PCC_AllowInMenus, PCCPtr))
                     End If
-                    Active = EncodeBoolean(cache_pageContent(PCC_Active, PCCPtr))
+                    Active = genericController.EncodeBoolean(cache_pageContent(PCC_Active, PCCPtr))
                     IsIncludedInMenu = Active And AllowInMenus And ((PubDate = Date.MinValue) Or (PubDate < app_startTime)) And ((DateExpires = Date.MinValue) Or (DateExpires > app_startTime))
                     'IsIncludedInMenu = Active And AllowInMenus And ((PubDate = Date.MinValue) Or (PubDate < main_PageStartTime)) And ((DateExpires = Date.MinValue) Or (DateExpires > main_PageStartTime)) And ((DateArchive = Date.MinValue) Or (DateArchive > main_PageStartTime))
                     If IsIncludedInMenu Then
                         If MenuCaption = "" Then
-                            MenuCaption = Trim(EncodeText(cache_pageContent(PCC_Name, PCCPtr)))
+                            MenuCaption = Trim(genericController.encodeText(cache_pageContent(PCC_Name, PCCPtr)))
                         End If
                         If MenuCaption = "" Then
                             MenuCaption = "Related Page"
                         End If
                         If (MenuCaption <> "") Then
-                            PageID = EncodeInteger(cache_pageContent(PCC_ID, PCCPtr))
-                            If vbInstr(1, UsedPageIDStringLocal & ",", "," & EncodeText(PageID) & ",") = 0 Then
-                                UsedPageIDStringLocal = UsedPageIDStringLocal & "," & EncodeText(PageID)
+                            PageID = genericController.EncodeInteger(cache_pageContent(PCC_ID, PCCPtr))
+                            If genericController.vbInstr(1, UsedPageIDStringLocal & ",", "," & genericController.encodeText(PageID) & ",") = 0 Then
+                                UsedPageIDStringLocal = UsedPageIDStringLocal & "," & genericController.encodeText(PageID)
                                 If ChildCount >= ChildSize Then
                                     ChildSize = ChildSize + 100
                                     ReDim Preserve ChildID(ChildSize)
@@ -18611,14 +18555,14 @@ ErrorTrap:
                                     ReDim Preserve ChildAllowChild(ChildSize)
                                     ReDim Preserve ChildChildPagesFound(ChildSize)
                                 End If
-                                ContentControlID = EncodeInteger(cache_pageContent(PCC_ContentControlID, PCCPtr))
-                                MenuLinkOverRide = EncodeText(cache_pageContent(PCC_Link, PCCPtr))
+                                ContentControlID = genericController.EncodeInteger(cache_pageContent(PCC_ContentControlID, PCCPtr))
+                                MenuLinkOverRide = genericController.encodeText(cache_pageContent(PCC_Link, PCCPtr))
                                 '
                                 ChildCaption(ChildCount) = MenuCaption
                                 ChildID(ChildCount) = PageID
-                                ChildAllowChild(ChildCount) = EncodeBoolean(cache_pageContent(PCC_AllowChildListDisplay, PCCPtr))
-                                ChildSortMethodID(ChildCount) = EncodeInteger(cache_pageContent(PCC_ChildListSortMethodID, PCCPtr))
-                                templateId = EncodeInteger(cache_pageContent(PCC_TemplateID, PCCPtr))
+                                ChildAllowChild(ChildCount) = genericController.EncodeBoolean(cache_pageContent(PCC_AllowChildListDisplay, PCCPtr))
+                                ChildSortMethodID(ChildCount) = genericController.EncodeInteger(cache_pageContent(PCC_ChildListSortMethodID, PCCPtr))
+                                templateId = genericController.EncodeInteger(cache_pageContent(PCC_TemplateID, PCCPtr))
                                 '
                                 Link = pageManager_GetPageLink4(PageID, "", True, UseContentWatchLink)
                                 'Link = main_GetPageDynamicLinkWithArgs(contentcontrolid, PageID, DefaultLink, False, TemplateID, SectionID, MenuLinkOverRide, UseContentWatchLink)
@@ -18630,7 +18574,7 @@ ErrorTrap:
                                     '
                                     ChildChildPagesFound(ChildCount) = True
                                 Else
-                                    ChildChildPagesFound(ChildCount) = EncodeBoolean(ChildPagesFoundTest)
+                                    ChildChildPagesFound(ChildCount) = genericController.EncodeBoolean(ChildPagesFoundTest)
                                 End If
                                 ChildCount = ChildCount + 1
                             End If
@@ -18776,7 +18720,7 @@ ErrorTrap:
             Dim pageAllowBrief As Boolean
             '
             ChildListCount = 0
-            UcaseRequestedListName = vbUCase(RequestedListName)
+            UcaseRequestedListName = genericController.vbUCase(RequestedListName)
             If (UcaseRequestedListName = "NONE") Or (UcaseRequestedListName = "ORPHAN") Then
                 UcaseRequestedListName = ""
             End If
@@ -18785,38 +18729,38 @@ ErrorTrap:
             End If
             '
             archiveLink = webServerIO.requestPathPage
-            archiveLink = ConvertLinkToShortLink(archiveLink, webServerIO.requestDomain, webServerIO_requestVirtualFilePath)
-            archiveLink = coreCommonModule.EncodeAppRootPath(archiveLink, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
+            archiveLink = genericController.ConvertLinkToShortLink(archiveLink, webServerIO.requestDomain, webServerIO_requestVirtualFilePath)
+            archiveLink = genericController.EncodeAppRootPath(archiveLink, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
             '
             For childBranchPtr = 0 To main_RenderCache_ChildBranch_PCCPtrCnt - 1
-                PCCPtr = EncodeInteger(main_RenderCache_ChildBranch_PCCPtrs(childBranchPtr))
-                PageName = EncodeText(cache_pageContent(PCC_Name, PCCPtr))
-                PageID = EncodeInteger(cache_pageContent(PCC_ID, PCCPtr))
+                PCCPtr = genericController.EncodeInteger(main_RenderCache_ChildBranch_PCCPtrs(childBranchPtr))
+                PageName = genericController.encodeText(cache_pageContent(PCC_Name, PCCPtr))
+                PageID = genericController.EncodeInteger(cache_pageContent(PCC_ID, PCCPtr))
                 PageLink = pageManager_GetPageLink4(PageID, "", True, False)
-                pageBlockContent = EncodeBoolean(cache_pageContent(PCC_BlockContent, PCCPtr))
-                pageBlockPage = EncodeBoolean(cache_pageContent(PCC_BlockPage, PCCPtr))
-                pageContentControlId = EncodeInteger(cache_pageContent(PCC_ContentControlID, PCCPtr))
-                pageMenuHeadline = EncodeText(cache_pageContent(PCC_MenuHeadline, PCCPtr))
+                pageBlockContent = genericController.EncodeBoolean(cache_pageContent(PCC_BlockContent, PCCPtr))
+                pageBlockPage = genericController.EncodeBoolean(cache_pageContent(PCC_BlockPage, PCCPtr))
+                pageContentControlId = genericController.EncodeInteger(cache_pageContent(PCC_ContentControlID, PCCPtr))
+                pageMenuHeadline = genericController.encodeText(cache_pageContent(PCC_MenuHeadline, PCCPtr))
                 If pageMenuHeadline = "" Then
                     pageMenuHeadline = Trim(PageName)
                     If pageMenuHeadline = "" Then
                         pageMenuHeadline = "Related Page"
                     End If
                 End If
-                pageParentListName = EncodeText(cache_pageContent(PCC_ParentListName, PCCPtr))
+                pageParentListName = genericController.encodeText(cache_pageContent(PCC_ParentListName, PCCPtr))
                 pageEditLink = ""
                 If user.isEditing(ContentName) Then
                     pageEditLink = main_GetRecordEditLink2(ContentName, PageID, True, PageName, True)
                 End If
-                pageAllowInChildLists = EncodeBoolean(cache_pageContent(PCC_AllowInChildLists, PCCPtr))
-                pageActive = EncodeBoolean(cache_pageContent(PCC_Active, PCCPtr))
-                pagePubDate = EncodeDate(cache_pageContent(PCC_PubDate, PCCPtr))
-                pageDateExpires = EncodeDate(cache_pageContent(PCC_DateExpires, PCCPtr))
-                pageBriefFilename = EncodeText(cache_pageContent(PCC_BriefFilename, PCCPtr))
-                pageAllowBrief = EncodeBoolean(cache_pageContent(PCC_AllowBrief, PCCPtr))
+                pageAllowInChildLists = genericController.EncodeBoolean(cache_pageContent(PCC_AllowInChildLists, PCCPtr))
+                pageActive = genericController.EncodeBoolean(cache_pageContent(PCC_Active, PCCPtr))
+                pagePubDate = genericController.EncodeDate(cache_pageContent(PCC_PubDate, PCCPtr))
+                pageDateExpires = genericController.EncodeDate(cache_pageContent(PCC_DateExpires, PCCPtr))
+                pageBriefFilename = genericController.encodeText(cache_pageContent(PCC_BriefFilename, PCCPtr))
+                pageAllowBrief = genericController.EncodeBoolean(cache_pageContent(PCC_AllowBrief, PCCPtr))
                 '
                 If ArchivePages Then
-                    Link = modifyLinkQuery(archiveLink, "bid", CStr(PageID), True)
+                    Link = genericController.modifyLinkQuery(archiveLink, "bid", CStr(PageID), True)
                 Else
                     Link = PageLink
                 End If
@@ -18825,7 +18769,7 @@ ErrorTrap:
                 Else
                     BlockContentComposite = False
                 End If
-                LinkedText = main_GetLinkedText("<a href=""" & html.html_EncodeHTML(Link) & """>", pageMenuHeadline)
+                LinkedText = csv_GetLinkedText("<a href=""" & html.html_EncodeHTML(Link) & """>", pageMenuHeadline)
                 If (UcaseRequestedListName = "") And (pageParentListName <> "") And (Not main_RenderCache_CurrentPage_IsAuthoring) Then
                     '
                     ' ----- Requested orphan list, and this record is in a named list, and not editing, do not display
@@ -18844,7 +18788,7 @@ ErrorTrap:
                     '
                     ' ----- Requested orphan List, Not AllowChildListDisplay, not Authoring, do not display
                     '
-                ElseIf (UcaseRequestedListName <> "") And (UcaseRequestedListName <> vbUCase(pageParentListName)) Then
+                ElseIf (UcaseRequestedListName <> "") And (UcaseRequestedListName <> genericController.vbUCase(pageParentListName)) Then
                     '
                     ' ----- requested named list and wrong RequestedListName, do not display
                     '
@@ -18941,10 +18885,10 @@ ErrorTrap:
             '
             main_GetChildPageList = ""
             If ActiveList <> "" Then
-                main_GetChildPageList = main_GetChildPageList & cr & "<ul id=""childPageList" & parentPageID & "_" & RequestedListName & """ class=""ccChildList"">" & kmaIndent(ActiveList) & cr & "</ul>"
+                main_GetChildPageList = main_GetChildPageList & cr & "<ul id=""childPageList" & parentPageID & "_" & RequestedListName & """ class=""ccChildList"">" & genericController.kmaIndent(ActiveList) & cr & "</ul>"
             End If
             If InactiveList <> "" Then
-                main_GetChildPageList = main_GetChildPageList & cr & "<ul id=""childPageList" & parentPageID & "_" & RequestedListName & """ class=""ccChildListInactive"">" & kmaIndent(InactiveList) & cr & "</ul>"
+                main_GetChildPageList = main_GetChildPageList & cr & "<ul id=""childPageList" & parentPageID & "_" & RequestedListName & """ class=""ccChildListInactive"">" & genericController.kmaIndent(InactiveList) & cr & "</ul>"
             End If
             '
             ' ----- if non-orphan list, authoring and none found, print none message
@@ -19181,10 +19125,10 @@ ErrorTrap:
                         'CSPage = main_OpenCSContentRecord_Internal(ContentName, RootPageID, , , SelectFieldList)
                     End If
                     If PCCPtr >= 0 Then
-                        rootPageId = EncodeInteger(cache_pageContent(PCC_ID, PCCPtr))
-                        templateId = EncodeInteger(cache_pageContent(PCC_TemplateID, PCCPtr))
-                        BlockPage = EncodeBoolean(cache_pageContent(PCC_BlockPage, PCCPtr))
-                        pageActive = EncodeBoolean(cache_pageContent(PCC_Active, PCCPtr))
+                        rootPageId = genericController.EncodeInteger(cache_pageContent(PCC_ID, PCCPtr))
+                        templateId = genericController.EncodeInteger(cache_pageContent(PCC_TemplateID, PCCPtr))
+                        BlockPage = genericController.EncodeBoolean(cache_pageContent(PCC_BlockPage, PCCPtr))
+                        pageActive = genericController.EncodeBoolean(cache_pageContent(PCC_Active, PCCPtr))
                     End If
                     If pageActive Or ShowHiddenMenu Then
                         If PCCPtr < 0 Then
@@ -19207,7 +19151,7 @@ ErrorTrap:
                         If templateId <> 0 Then
                             TCPtr = pageManager_cache_pageTemplate_getPtr(templateId)
                             If TCPtr >= 0 Then
-                                Link = EncodeText(cache_pageTemplate(TC_Link, TCPtr))
+                                Link = genericController.encodeText(cache_pageTemplate(TC_Link, TCPtr))
                             End If
                             'Link = main_GetTCLink(TCPtr)
                         End If
@@ -19215,12 +19159,12 @@ ErrorTrap:
                             Link = DefaultTemplateLink
                         End If
                         AuthoringTag = main_GetRecordEditLink2("Site Sections", SectionID, False, SectionName, user.isEditing("Site Sections"))
-                        Link = modifyLinkQuery(Link, "sid", CStr(SectionID), True)
+                        Link = genericController.modifyLinkQuery(Link, "sid", CStr(SectionID), True)
                         '
                         ' main_Get Menu, remove crlf, and parse the line with crlf
                         '
                         MenuString = pageManager_GetSectionMenu_IdMenu(rootPageId, Link, DepthLimit, MenuStyle, StyleSheetPrefix, MenuImage, MenuImageOver, SectionCaption, SectionID, UseContentWatchLink)
-                        MenuString = vbReplace(AuthoringTag & MenuString, vbCrLf, "")
+                        MenuString = genericController.vbReplace(AuthoringTag & MenuString, vbCrLf, "")
                         If (MenuString <> "") Then
                             If (pageManager_GetSectionMenu = "") Then
                                 pageManager_GetSectionMenu = MenuString
@@ -19285,7 +19229,7 @@ ErrorTrap:
         '
         '
         Public Function encodeAppRootPath(ByVal Link As String) As String
-            encodeAppRootPath = coreCommonModule.EncodeAppRootPath(EncodeText(Link), webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
+            encodeAppRootPath = genericController.EncodeAppRootPath(genericController.encodeText(Link), webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
         End Function
         '
         '
@@ -19311,13 +19255,13 @@ ErrorTrap:
             Get
                 Dim MsgLabel As String
                 '
-                MsgLabel = "Msg" & EncodeText(GetRandomInteger)
+                MsgLabel = "Msg" & genericController.encodeText(genericController.GetRandomInteger)
                 '
                 webServerIO_JavaStream_Text = Join(main_JavaStreamHolder, "")
-                webServerIO_JavaStream_Text = vbReplace(webServerIO_JavaStream_Text, "'", "'+""'""+'")
-                webServerIO_JavaStream_Text = vbReplace(webServerIO_JavaStream_Text, vbCrLf, "\n")
-                webServerIO_JavaStream_Text = vbReplace(webServerIO_JavaStream_Text, vbCr, "\n")
-                webServerIO_JavaStream_Text = vbReplace(webServerIO_JavaStream_Text, vbLf, "\n")
+                webServerIO_JavaStream_Text = genericController.vbReplace(webServerIO_JavaStream_Text, "'", "'+""'""+'")
+                webServerIO_JavaStream_Text = genericController.vbReplace(webServerIO_JavaStream_Text, vbCrLf, "\n")
+                webServerIO_JavaStream_Text = genericController.vbReplace(webServerIO_JavaStream_Text, vbCr, "\n")
+                webServerIO_JavaStream_Text = genericController.vbReplace(webServerIO_JavaStream_Text, vbLf, "\n")
                 webServerIO_JavaStream_Text = "var " & MsgLabel & " = '" & webServerIO_JavaStream_Text & "'; document.write( " & MsgLabel & " ); " & vbCrLf
 
             End Get
@@ -19343,12 +19287,12 @@ ErrorTrap:
             PCCPtr = pageManager_cache_pageContent_getPtr(PageID, isWorkflowRendering, isQuickEditing)
             If PCCPtr >= 0 Then
                 PageFound = True
-                return_CCID = EncodeInteger(cache_pageContent(PCC_ContentControlID, PCCPtr))
-                pagetemplateID = EncodeInteger(cache_pageContent(PCC_TemplateID, PCCPtr))
-                return_ParentID = EncodeInteger(cache_pageContent(PCC_ParentID, PCCPtr))
-                return_MenuLinkOverRide = EncodeText(cache_pageContent(PCC_Link, PCCPtr))
+                return_CCID = genericController.EncodeInteger(cache_pageContent(PCC_ContentControlID, PCCPtr))
+                pagetemplateID = genericController.EncodeInteger(cache_pageContent(PCC_TemplateID, PCCPtr))
+                return_ParentID = genericController.EncodeInteger(cache_pageContent(PCC_ParentID, PCCPtr))
+                return_MenuLinkOverRide = genericController.encodeText(cache_pageContent(PCC_Link, PCCPtr))
                 If UBound(cache_pageContent, 1) >= PCC_IsSecure Then
-                    return_PageIsSecure = EncodeBoolean(cache_pageContent(PCC_IsSecure, PCCPtr))
+                    return_PageIsSecure = genericController.EncodeBoolean(cache_pageContent(PCC_IsSecure, PCCPtr))
                 End If
                 return_IsRootPage = (return_ParentID = 0)
             End If
@@ -19363,14 +19307,14 @@ ErrorTrap:
                     End If
                     Ptr = pageManager_cache_siteSection_RootPageIDIndex.getPtr(CStr(PageID))
                     If Ptr >= 0 Then
-                        return_SectionID = EncodeInteger(cache_siteSection(SSC_ID, Ptr))
-                        SectionTemplateID = EncodeInteger(cache_siteSection(SSC_TemplateID, Ptr))
+                        return_SectionID = genericController.EncodeInteger(cache_siteSection(SSC_ID, Ptr))
+                        SectionTemplateID = genericController.EncodeInteger(cache_siteSection(SSC_TemplateID, Ptr))
                     End If
                 Else
                     '
                     ' chase further
                     '
-                    If Not IsInDelimitedString(UsedIDList, CStr(return_ParentID), ",") Then
+                    If Not genericController.IsInDelimitedString(UsedIDList, CStr(return_ParentID), ",") Then
                         Call pageManager_GetPageArgs(return_ParentID, isWorkflowRendering, isQuickEditing, IgnoreInteger, return_TemplateID, IgnoreInteger, IgnoreString, IgnoreBoolean, return_SectionID, IgnoreBoolean, UsedIDList & "," & return_ParentID)
                     End If
                 End If
@@ -19386,12 +19330,12 @@ ErrorTrap:
                     '
                     If pageManager_cache_pageTemplate_rows > 0 Then
                         For TCPtr = 0 To pageManager_cache_pageTemplate_rows - 1
-                            If vbLCase(EncodeText(cache_pageTemplate(TC_Name, TCPtr))) = "default" Then
+                            If genericController.vbLCase(genericController.encodeText(cache_pageTemplate(TC_Name, TCPtr))) = "default" Then
                                 Exit For
                             End If
                         Next
                         If TCPtr < pageManager_cache_pageTemplate_rows Then
-                            return_TemplateID = EncodeInteger(cache_pageTemplate(TC_ID, TCPtr))
+                            return_TemplateID = genericController.EncodeInteger(cache_pageTemplate(TC_ID, TCPtr))
                         End If
                     End If
                     'End If
@@ -19424,8 +19368,8 @@ ErrorTrap:
             '
             PCCPtr = pageManager_cache_pageContent_getPtr(PageID, pagemanager_IsWorkflowRendering, user.isQuickEditing(""))
             If PCCPtr >= 0 Then
-                PageName2 = EncodeText(cache_pageContent(PCC_Name, PCCPtr))
-                ParentID = EncodeInteger(cache_pageContent(PCC_ParentID, PCCPtr))
+                PageName2 = genericController.encodeText(cache_pageContent(PCC_Name, PCCPtr))
+                ParentID = genericController.EncodeInteger(cache_pageContent(PCC_ParentID, PCCPtr))
             End If
             '
             '    CS = main_OpenCSContentRecord("Page Content", PageID, , , "Name,ParentID")
@@ -19446,7 +19390,7 @@ ErrorTrap:
                 End If
                 Ptr = pageManager_cache_siteSection_RootPageIDIndex.getPtr(CStr(PageID))
                 If Ptr >= 0 Then
-                    main_GetPageDynamicLink_GetSectionID = EncodeInteger(cache_siteSection(SSC_ID, Ptr))
+                    main_GetPageDynamicLink_GetSectionID = genericController.EncodeInteger(cache_siteSection(SSC_ID, Ptr))
                 End If
                 '        '
                 '        CS = app.csOpen("Site Sections", "rootpageid=" & PageID, "ID", , , , "ID")
@@ -19459,7 +19403,7 @@ ErrorTrap:
                 '
                 ' chase further
                 '
-                If Not IsInDelimitedString(UsedIDList, CStr(ParentID), ",") Then
+                If Not genericController.IsInDelimitedString(UsedIDList, CStr(ParentID), ",") Then
                     main_GetPageDynamicLink_GetSectionID = main_GetPageDynamicLink_GetSectionID(ParentID, UsedIDList & "," & ParentID)
                 End If
             End If
@@ -19494,7 +19438,7 @@ ErrorTrap:
             ' Chase page tree to main_Get templateid
             '
             If templateId = 0 And ParentID <> 0 Then
-                If Not IsInDelimitedString(UsedIDList, CStr(ParentID), ",") Then
+                If Not genericController.IsInDelimitedString(UsedIDList, CStr(ParentID), ",") Then
                     main_GetPageDynamicLink_GetTemplateID = main_GetPageDynamicLink_GetTemplateID(ParentID, UsedIDList & "," & ParentID)
                 End If
             End If
@@ -19594,7 +19538,7 @@ ErrorTrap:
             '
             defaultPathPage = siteProperties.serverPageDefault
             If defaultPathPage <> "" Then
-                Pos = vbInstr(1, defaultPathPage, "?")
+                Pos = genericController.vbInstr(1, defaultPathPage, "?")
                 If Pos <> 0 Then
                     defaultPathPage = Mid(defaultPathPage, 1, Pos - 1)
                 End If
@@ -19616,7 +19560,7 @@ ErrorTrap:
             Else
                 If pageManager_cache_pageTemplate_rows > 0 Then
                     For TCPtr = 0 To pageManager_cache_pageTemplate_rows - 1
-                        If vbLCase(EncodeText(cache_pageTemplate(TC_Name, TCPtr))) = "default" Then
+                        If genericController.vbLCase(genericController.encodeText(cache_pageTemplate(TC_Name, TCPtr))) = "default" Then
                             Exit For
                         End If
                     Next
@@ -19627,10 +19571,10 @@ ErrorTrap:
                 'End If
             End If
             If TCPtr >= 0 Then
-                templateLink = EncodeText(cache_pageTemplate(TC_Link, TCPtr))
-                templateSecure = EncodeBoolean(cache_pageTemplate(TC_IsSecure, TCPtr))
+                templateLink = genericController.encodeText(cache_pageTemplate(TC_Link, TCPtr))
+                templateSecure = genericController.EncodeBoolean(cache_pageTemplate(TC_IsSecure, TCPtr))
                 templateLinkIncludesProtocol = (InStr(1, templateLink, "://") <> 0)
-                templatedomainIdList = EncodeText(cache_pageTemplate(TC_DomainIdList, TCPtr))
+                templatedomainIdList = genericController.encodeText(cache_pageTemplate(TC_DomainIdList, TCPtr))
             End If
             '
             ' calc linkQS (cleared in come cases later)
@@ -19655,10 +19599,10 @@ ErrorTrap:
                         Call cache_linkAlias_load()
                     End If
                     If cache_linkAliasCnt > 0 Then
-                        Key = vbLCase(CStr(PageID) & QueryStringSuffix)
+                        Key = genericController.vbLCase(CStr(PageID) & QueryStringSuffix)
                         Ptr = cache_linkAlias_PageIdQSSIndex.getPtr(Key)
                         If Ptr >= 0 Then
-                            linkAlias = EncodeText(cache_linkAlias(1, Ptr))
+                            linkAlias = genericController.encodeText(cache_linkAlias(1, Ptr))
                             If Mid(linkAlias, 1, 1) <> "/" Then
                                 linkAlias = "/" & linkAlias
                             End If
@@ -19695,7 +19639,7 @@ ErrorTrap:
                     '
                     main_domainIds = Split(templatedomainIdList, ",")
                     For Ptr = 0 To UBound(main_domainIds)
-                        setdomainId = EncodeInteger(main_domainIds(Ptr))
+                        setdomainId = genericController.EncodeInteger(main_domainIds(Ptr))
                         If setdomainId <> 0 Then
                             Exit For
                         End If
@@ -19799,10 +19743,10 @@ ErrorTrap:
             '    PCCPtr = pageManager_cache_pageContent_getPtr(PageID, main_IsWorkflowRendering, main_IsQuickEditing(""))
             '    If PCCPtr >= 0 Then
             '        PageFound = True
-            '        CCID = encodeInteger(main_pcc(PCC_ContentControlID, PCCPtr))
-            '        TemplateID = encodeInteger(main_pcc(PCC_TemplateID, PCCPtr))
-            '        ParentID = encodeInteger(main_pcc(PCC_ParentID, PCCPtr))
-            '        MenuLinkOverRide = encodeText(main_pcc(PCC_Link, PCCPtr))
+            '        CCID = genericController.EncodeInteger(main_pcc(PCC_ContentControlID, PCCPtr))
+            '        TemplateID = genericController.EncodeInteger(main_pcc(PCC_TemplateID, PCCPtr))
+            '        ParentID = genericController.EncodeInteger(main_pcc(PCC_ParentID, PCCPtr))
+            '        MenuLinkOverRide = genericController.encodeText(main_pcc(PCC_Link, PCCPtr))
             '        IsRootPage = (ParentID = 0)
             '    End If
             '    If TemplateID = 0 And ParentID <> 0 Then
@@ -19857,7 +19801,7 @@ ErrorTrap:
                         TCPtr = pageManager_cache_pageTemplate_getPtr(templateId)
                         ' test ???????????????????????????????????????
                         If TCPtr >= 0 Then
-                            main_GetPageDynamicLinkWithArgs = EncodeText(cache_pageTemplate(TC_Link, TCPtr))
+                            main_GetPageDynamicLinkWithArgs = genericController.encodeText(cache_pageTemplate(TC_Link, TCPtr))
                         End If
                         'main_GetPageDynamicLinkWithArgs = main_GetTCLink(TCPtr)
                     End If
@@ -19881,22 +19825,22 @@ ErrorTrap:
                         ' Link to Root Page, no bid, and include sectionid if not 0
                         '
                         If IsRootPage And (SectionID <> 0) Then
-                            main_GetPageDynamicLinkWithArgs = modifyLinkQuery(main_GetPageDynamicLinkWithArgs, "sid", CStr(SectionID), True)
+                            main_GetPageDynamicLinkWithArgs = genericController.modifyLinkQuery(main_GetPageDynamicLinkWithArgs, "sid", CStr(SectionID), True)
                         End If
-                        main_GetPageDynamicLinkWithArgs = modifyLinkQuery(main_GetPageDynamicLinkWithArgs, "bid", "", False)
+                        main_GetPageDynamicLinkWithArgs = genericController.modifyLinkQuery(main_GetPageDynamicLinkWithArgs, "bid", "", False)
                     Else
-                        main_GetPageDynamicLinkWithArgs = modifyLinkQuery(main_GetPageDynamicLinkWithArgs, "bid", EncodeText(PageID), True)
+                        main_GetPageDynamicLinkWithArgs = genericController.modifyLinkQuery(main_GetPageDynamicLinkWithArgs, "bid", genericController.encodeText(PageID), True)
                         ' ##### no, leave this in if bid<>0
                         ' ##### take this out, in main_GetSectionPage, this is handled through the main_RefreshQueryString
                         If PageID <> 0 Then
-                            main_GetPageDynamicLinkWithArgs = modifyLinkQuery(main_GetPageDynamicLinkWithArgs, "sid", "", False)
+                            main_GetPageDynamicLinkWithArgs = genericController.modifyLinkQuery(main_GetPageDynamicLinkWithArgs, "sid", "", False)
                         End If
                     End If
                 End If
             End If
             ' ##### if the default is long, leave it long -- move this to just the content watch tree
             'main_GetPageDynamicLinkWithArgs = ConvertLinkToShortLink(main_GetPageDynamicLinkWithArgs, main_ServerHost, main_ServerVirtualPath)
-            main_GetPageDynamicLinkWithArgs = coreCommonModule.EncodeAppRootPath(main_GetPageDynamicLinkWithArgs, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
+            main_GetPageDynamicLinkWithArgs = genericController.EncodeAppRootPath(main_GetPageDynamicLinkWithArgs, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
             '
             Exit Function
             '
@@ -19921,23 +19865,23 @@ ErrorTrap:
                 For QSplitPointer = 0 To QSPlitCount - 1
                     NVSplit = Split(QSplit(QSplitPointer), "=")
                     If UBound(NVSplit) > 0 Then
-                        pageManager_GetSectionLink = modifyLinkQuery(pageManager_GetSectionLink, NVSplit(0), NVSplit(1), True)
+                        pageManager_GetSectionLink = genericController.modifyLinkQuery(pageManager_GetSectionLink, NVSplit(0), NVSplit(1), True)
                     End If
                 Next
             End If
             If PageID = 0 Then
-                pageManager_GetSectionLink = modifyLinkQuery(pageManager_GetSectionLink, "bid", "", False)
+                pageManager_GetSectionLink = genericController.modifyLinkQuery(pageManager_GetSectionLink, "bid", "", False)
                 If SectionID = 0 Then
-                    pageManager_GetSectionLink = modifyLinkQuery(pageManager_GetSectionLink, "sid", "", False)
+                    pageManager_GetSectionLink = genericController.modifyLinkQuery(pageManager_GetSectionLink, "sid", "", False)
                 Else
-                    pageManager_GetSectionLink = modifyLinkQuery(pageManager_GetSectionLink, "sid", CStr(SectionID), True)
+                    pageManager_GetSectionLink = genericController.modifyLinkQuery(pageManager_GetSectionLink, "sid", CStr(SectionID), True)
                 End If
             Else
                 '
                 ' If I have a pageID, block the sectionID
                 '
-                pageManager_GetSectionLink = modifyLinkQuery(pageManager_GetSectionLink, "bid", CStr(PageID), True)
-                pageManager_GetSectionLink = modifyLinkQuery(pageManager_GetSectionLink, "sid", "", False)
+                pageManager_GetSectionLink = genericController.modifyLinkQuery(pageManager_GetSectionLink, "bid", CStr(PageID), True)
+                pageManager_GetSectionLink = genericController.modifyLinkQuery(pageManager_GetSectionLink, "sid", "", False)
             End If
             '
             Exit Function
@@ -20087,7 +20031,7 @@ ErrorTrap:
         '
         '
         Public Function main_cs_get2Text(ByVal CSPointer As Integer, ByVal FieldName As String) As String
-            main_cs_get2Text = db.cs_get(EncodeInteger(CSPointer), EncodeText(FieldName))
+            main_cs_get2Text = db.cs_get(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName))
         End Function
         '        '
         '        '=============================================================================================
@@ -20100,7 +20044,7 @@ ErrorTrap:
         '            '
         '            'If Not (true) Then Exit Sub
         '            '
-        '            Call app.SetCS(EncodeInteger(CSPointer), EncodeText(FieldName), FieldValue)
+        '            Call app.SetCS(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName), FieldValue)
         '            '
         '            Exit Sub
         'ErrorTrap:
@@ -20148,7 +20092,7 @@ ErrorTrap:
             Dim StyleSheetCopy As String
             '
             BakeName = "AutoSiteTemplate" & templateId
-            main_GetAutoSite_Template = EncodeText(cache.getObject(Of String)(BakeName))
+            main_GetAutoSite_Template = genericController.encodeText(cache.getObject(Of String)(BakeName))
             If main_GetAutoSite_Template = "" Then
                 If templateId = 0 Then
                     '
@@ -20171,7 +20115,7 @@ ErrorTrap:
                     CS = csOpen("AutoSite Templates", templateId, , , "Copy,StyleSheetID")
                     If db.cs_ok(CS) Then
                         main_GetAutoSite_Template = db.cs_get(CS, "Copy")
-                        StyleSheetID = EncodeInteger(db.cs_get(CS, "StyleSheetID"))
+                        StyleSheetID = genericController.EncodeInteger(db.cs_get(CS, "StyleSheetID"))
                     End If
                     Call db.cs_Close(CS)
                     '
@@ -20214,8 +20158,8 @@ ErrorTrap:
             Dim MetaContentID As Integer
             '
             main_MetaContent_Set = True
-            iContentID = EncodeInteger(ContentID)
-            iRecordID = EncodeInteger(RecordID)
+            iContentID = genericController.EncodeInteger(ContentID)
+            iRecordID = genericController.EncodeInteger(RecordID)
             If (iContentID <> 0) And (iRecordID <> 0) Then
                 '
                 ' main_Get ID, Description, Title
@@ -20235,7 +20179,7 @@ ErrorTrap:
                     Call main_addMetaDescription2(html.html_EncodeHTML(db.cs_getText(CS, "MetaDescription")), "page content")
                     Call main_AddHeadTag2(db.cs_getText(CS, "OtherHeadTags"), "page content")
                     If True Then
-                        KeywordList = vbReplace(db.cs_getText(CS, "MetaKeywordList"), vbCrLf, ",")
+                        KeywordList = genericController.vbReplace(db.cs_getText(CS, "MetaKeywordList"), vbCrLf, ",")
                     End If
                     'main_MetaContent_Title = encodeHTML(app.csv_cs_getText(CS, "Name"))
                     'main_MetaContent_Description = encodeHTML(app.csv_cs_getText(CS, "MetaDescription"))
@@ -20404,12 +20348,12 @@ ErrorTrap:
             Dim BodyStart As Integer
             Dim BodyEnd As Integer
             '
-            BodyStart = vbInstr(1, PageSource, "<body", vbTextCompare)
+            BodyStart = genericController.vbInstr(1, PageSource, "<body", vbTextCompare)
             If BodyStart <> 0 Then
-                BodyStart = vbInstr(BodyStart, PageSource, ">", vbTextCompare)
+                BodyStart = genericController.vbInstr(BodyStart, PageSource, ">", vbTextCompare)
                 If BodyStart <> 0 Then
                     BodyStart = BodyStart + 1
-                    BodyEnd = vbInstr(BodyStart, PageSource, "</body", vbTextCompare)
+                    BodyEnd = genericController.vbInstr(BodyStart, PageSource, "</body", vbTextCompare)
                     If BodyEnd <> 0 Then
                         PageSourceBody = Mid(PageSource, BodyStart, BodyEnd - BodyStart)
                         PageSourcePreBody = Left(PageSource, BodyStart - 1)
@@ -20606,8 +20550,8 @@ ErrorTrap:
                             Call cache_libraryFiles_loadIfNeeded()
                             libraryFilePtr = cache_libraryFilesIdIndex.getPtr(CStr(downloadId))
                             If libraryFilePtr >= 0 Then
-                                libraryFileClicks = EncodeInteger(cache_libraryFiles(LibraryFilesCache_clicks, libraryFilePtr))
-                                link = EncodeText(cache_libraryFiles(LibraryFilesCache_filename, libraryFilePtr))
+                                libraryFileClicks = genericController.EncodeInteger(cache_libraryFiles(LibraryFilesCache_clicks, libraryFilePtr))
+                                link = genericController.encodeText(cache_libraryFiles(LibraryFilesCache_filename, libraryFilePtr))
                                 Call db.executeSql("update cclibraryfiles set clicks=" & (libraryFileClicks + 1) & " where id=" & downloadId)
                             End If
                             If link <> "" Then
@@ -20639,7 +20583,7 @@ ErrorTrap:
                         ' if a cut, load the clipboard
                         '
                         Call visitProperty.setProperty("Clipboard", Clip)
-                        Call modifyLinkQuery(web_RefreshQueryString, RequestNameCut, "")
+                        Call genericController.modifyLinkQuery(web_RefreshQueryString, RequestNameCut, "")
                     End If
                     ClipParentContentID = docProperties.getInteger(RequestNamePasteParentContentID)
                     ClipParentRecordID = docProperties.getInteger(RequestNamePasteParentRecordID)
@@ -20650,8 +20594,8 @@ ErrorTrap:
                         '
                         ClipBoard = visitProperty.getText("Clipboard", "")
                         Call visitProperty.setProperty("Clipboard", "")
-                        Call ModifyQueryString(web_RefreshQueryString, RequestNamePasteParentContentID, "")
-                        Call ModifyQueryString(web_RefreshQueryString, RequestNamePasteParentRecordID, "")
+                        Call genericController.ModifyQueryString(web_RefreshQueryString, RequestNamePasteParentContentID, "")
+                        Call genericController.ModifyQueryString(web_RefreshQueryString, RequestNamePasteParentRecordID, "")
                         ClipParentContentName = metaData.getContentNameByID(ClipParentContentID)
                         If (ClipParentContentName = "") Then
                             ' state not working...
@@ -20664,7 +20608,7 @@ ErrorTrap:
                                 '
                                 ' Current identity is a content manager for this content
                                 '
-                                Dim Position As Integer = vbInstr(1, ClipBoard, ".")
+                                Dim Position As Integer = genericController.vbInstr(1, ClipBoard, ".")
                                 If Position = 0 Then
                                     Call error_AddUserError("The paste operation failed because the clipboard data is configured incorrectly.")
                                 Else
@@ -20672,8 +20616,8 @@ ErrorTrap:
                                     If UBound(ClipBoardArray) = 0 Then
                                         Call error_AddUserError("The paste operation failed because the clipboard data is configured incorrectly.")
                                     Else
-                                        ClipChildContentID = EncodeInteger(ClipBoardArray(0))
-                                        ClipChildRecordID = EncodeInteger(ClipBoardArray(1))
+                                        ClipChildContentID = genericController.EncodeInteger(ClipBoardArray(0))
+                                        ClipChildRecordID = genericController.EncodeInteger(ClipBoardArray(1))
                                         If Not IsWithinContent(ClipChildContentID, ClipParentContentID) Then
                                             Call error_AddUserError("The paste operation failed because the destination location is not compatible with the clipboard data.")
                                         Else
@@ -20739,7 +20683,7 @@ ErrorTrap:
                                                         ''
                                                         'ShortLink = main_ServerPathPage
                                                         'ShortLink = ConvertLinkToShortLink(ShortLink, main_ServerHost, main_ServerVirtualPath)
-                                                        'ShortLink = modifyLinkQuery(ShortLink, "bid", CStr(ClipChildRecordID), True)
+                                                        'ShortLink = genericController.modifyLinkQuery(ShortLink, "bid", CStr(ClipChildRecordID), True)
                                                         'Call main_TrackContentSet(CSClip, ShortLink)
                                                     End If
                                                     Call db.cs_Close(CSClip)
@@ -20778,7 +20722,7 @@ ErrorTrap:
                         '
                         Call visitProperty.setProperty("Clipboard", "")
                         Clip = visitProperty.getText("Clipboard", "")
-                        Call modifyLinkQuery(web_RefreshQueryString, RequestNameCutClear, "")
+                        Call genericController.modifyLinkQuery(web_RefreshQueryString, RequestNameCutClear, "")
                     End If
                     '
                     ' link alias and link forward
@@ -20825,17 +20769,17 @@ ErrorTrap:
                                 ' build link variations needed later
                                 '
                                 '
-                                Pos = vbInstr(1, webServerIO.requestPathPage, "://", vbTextCompare)
+                                Pos = genericController.vbInstr(1, webServerIO.requestPathPage, "://", vbTextCompare)
                                 If Pos <> 0 Then
                                     LinkNoProtocol = Mid(webServerIO.requestPathPage, Pos + 3)
-                                    Pos = vbInstr(Pos + 3, webServerIO.requestPathPage, "/", vbBinaryCompare)
+                                    Pos = genericController.vbInstr(Pos + 3, webServerIO.requestPathPage, "/", vbBinaryCompare)
                                     If Pos <> 0 Then
                                         linkDomain = Mid(webServerIO.requestPathPage, 1, Pos - 1)
                                         LinkFullPath = Mid(webServerIO.requestPathPage, Pos)
                                         '
                                         ' strip off leading or trailing slashes, and return only the string between the leading and secton slash
                                         '
-                                        If vbInstr(1, LinkFullPath, "/") <> 0 Then
+                                        If genericController.vbInstr(1, LinkFullPath, "/") <> 0 Then
                                             LinkSplit = Split(LinkFullPath, "/")
                                             LinkFullPathNoSlash = LinkSplit(0)
                                             If LinkFullPathNoSlash = "" Then
@@ -20856,19 +20800,19 @@ ErrorTrap:
                                 '
                                 Call cache_linkForward_load()
                                 If cache_linkForward <> "" Then
-                                    If 0 < vbInstr(1, cache_linkForward, "," & webServerIO.requestPathPage & ",", vbTextCompare) Then
+                                    If 0 < genericController.vbInstr(1, cache_linkForward, "," & webServerIO.requestPathPage & ",", vbTextCompare) Then
                                         isLinkForward = True
                                         LinkForwardCriteria = "(active<>0)and(SourceLink=" & db.encodeSQLText(webServerIO.requestPathPage) & ")"
-                                    ElseIf 0 < vbInstr(1, cache_linkForward, "," & webServerIO.requestPathPage & "/,", vbTextCompare) Then
+                                    ElseIf 0 < genericController.vbInstr(1, cache_linkForward, "," & webServerIO.requestPathPage & "/,", vbTextCompare) Then
                                         isLinkForward = True
                                         LinkForwardCriteria = "(active<>0)and(SourceLink=" & db.encodeSQLText(webServerIO.requestPathPage & "/") & ")"
-                                    ElseIf 0 < vbInstr(1, cache_linkForward, "," & LinkNoProtocol & ",", vbTextCompare) Then
+                                    ElseIf 0 < genericController.vbInstr(1, cache_linkForward, "," & LinkNoProtocol & ",", vbTextCompare) Then
                                         isLinkForward = True
                                         LinkForwardCriteria = "(active<>0)and(SourceLink=" & db.encodeSQLText(LinkNoProtocol) & ")"
-                                    ElseIf 0 < vbInstr(1, cache_linkForward, "," & LinkFullPath & ",", vbTextCompare) Then
+                                    ElseIf 0 < genericController.vbInstr(1, cache_linkForward, "," & LinkFullPath & ",", vbTextCompare) Then
                                         isLinkForward = True
                                         LinkForwardCriteria = "(active<>0)and(SourceLink=" & db.encodeSQLText(LinkFullPath) & ")"
-                                    ElseIf 0 < vbInstr(1, cache_linkForward, "," & LinkFullPathNoSlash & ",", vbTextCompare) Then
+                                    ElseIf 0 < genericController.vbInstr(1, cache_linkForward, "," & LinkFullPathNoSlash & ",", vbTextCompare) Then
                                         isLinkForward = True
                                         LinkForwardCriteria = "(active<>0)and(SourceLink=" & db.encodeSQLText(LinkFullPathNoSlash) & ")"
                                     End If
@@ -21023,12 +20967,12 @@ ErrorTrap:
                     ' ----- do anonymous access blocking
                     '
                     If Not user.isAuthenticated() Then
-                        If (webServerIO_requestPath <> "/") And vbInstr(1, siteProperties.adminURL, webServerIO_requestPath, vbTextCompare) <> 0 Then
+                        If (webServerIO_requestPath <> "/") And genericController.vbInstr(1, siteProperties.adminURL, webServerIO_requestPath, vbTextCompare) <> 0 Then
                             '
                             ' admin page is excluded from custom blocking
                             '
                         Else
-                            Dim AnonymousUserResponseID As Integer = EncodeInteger(siteProperties.getText("AnonymousUserResponseID", "0"))
+                            Dim AnonymousUserResponseID As Integer = genericController.EncodeInteger(siteProperties.getText("AnonymousUserResponseID", "0"))
                             Select Case AnonymousUserResponseID
                                 Case 1
                                     '
@@ -21057,10 +21001,10 @@ ErrorTrap:
                                             & main_docType _
                                             & vbCrLf & "<html>" _
                                             & cr & "<head>" _
-                                            & kmaIndent(main_GetHTMLHead()) _
+                                            & genericController.kmaIndent(main_GetHTMLHead()) _
                                             & cr & "</head>" _
                                             & cr & TemplateDefaultBodyTag _
-                                            & kmaIndent(Copy) _
+                                            & genericController.kmaIndent(Copy) _
                                             & cr2 & "<div>" _
                                             & cr3 & html_GetEndOfBody(True, True, False, False) _
                                             & cr2 & "</div>" _
@@ -21077,7 +21021,7 @@ ErrorTrap:
                     '
                     ' run the appropriate body addon
                     '
-                    bodyAddonId = EncodeInteger(siteProperties.getText("Html Body AddonId", "0"))
+                    bodyAddonId = genericController.EncodeInteger(siteProperties.getText("Html Body AddonId", "0"))
                     If bodyAddonId <> 0 Then
                         htmlBody = addon.execute(bodyAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", bodyAddonStatusOK, Nothing, "", Nothing, "", user.id, user.isAuthenticated)
                     Else
@@ -21096,7 +21040,7 @@ ErrorTrap:
                         '
                         ' Add tools panel to body
                         '
-                        htmlBody = htmlBody & cr & "<div>" & kmaIndent(html_GetEndOfBody(True, True, False, False)) & cr & "</div>"
+                        htmlBody = htmlBody & cr & "<div>" & genericController.kmaIndent(html_GetEndOfBody(True, True, False, False)) & cr & "</div>"
                         '
                         ' build doc
                         '
@@ -21120,7 +21064,7 @@ ErrorTrap:
                     '
                     '--------------------------------------------------------------------------
                     '
-                    If vbLCase(webServerIO.requestPathPage) = vbLCase(requestAppRootPath & siteProperties.serverPageDefault) Then
+                    If genericController.vbLCase(webServerIO.requestPathPage) = genericController.vbLCase(requestAppRootPath & siteProperties.serverPageDefault) Then
                         '
                         ' This is a 404 caused by Contensive returning a 404
                         '   possibly because the pageid was not found or was inactive.
@@ -21150,7 +21094,7 @@ ErrorTrap:
                         Dim Position As Integer
                         main_ServerReferrerURL = webServerIO.requestReferrer
                         main_ServerReferrerQs = ""
-                        Position = vbInstr(1, main_ServerReferrerURL, "?")
+                        Position = genericController.vbInstr(1, main_ServerReferrerURL, "?")
                         If Position <> 0 Then
                             main_ServerReferrerQs = Mid(main_ServerReferrerURL, Position + 1)
                             main_ServerReferrerURL = Mid(main_ServerReferrerURL, 1, Position - 1)
@@ -21179,7 +21123,7 @@ ErrorTrap:
                             linkDst = webServerIO_requestReferer
                             If main_ServerReferrerQs <> "" Then
                                 linkDst = main_ServerReferrerURL
-                                main_ServerReferrerQs = ModifyQueryString(main_ServerReferrerQs, "method", "")
+                                main_ServerReferrerQs = genericController.ModifyQueryString(main_ServerReferrerQs, "method", "")
                                 If main_ServerReferrerQs <> "" Then
                                     linkDst = linkDst & "?" & main_ServerReferrerQs
                                 End If
@@ -21236,10 +21180,10 @@ ErrorTrap:
                 & docType _
                 & vbCrLf & "<html>" _
                 & cr & "<head>" _
-                & kmaIndent(head) _
+                & genericController.kmaIndent(head) _
                 & cr & "</head>" _
                 & cr & bodyTag _
-                & kmaIndent(Body) _
+                & genericController.kmaIndent(Body) _
                 & cr & "</body>" _
                 & vbCrLf & "</html>"
         End Function
@@ -21306,11 +21250,11 @@ ErrorTrap:
                     If Files(Ptr) <> "" Then
                         Parts = Split(Files(Ptr) & "<<", "<")
                         If Parts(1) <> "" Then
-                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & decodeHtml(Parts(1))
+                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & genericController.decodeHtml(Parts(1))
                         End If
                         webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, Parts(0)) & """ >"
                         If Parts(2) <> "" Then
-                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & decodeHtml(Parts(2))
+                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & genericController.decodeHtml(Parts(2))
                         End If
                         'End If
                     End If
@@ -21360,7 +21304,7 @@ ErrorTrap:
             If VirtualFilename <> "" Then
                 Pos = InStrRev(VirtualFilename, ".")
                 If Pos > 0 Then
-                    Ext = vbLCase(Mid(VirtualFilename, Pos))
+                    Ext = genericController.vbLCase(Mid(VirtualFilename, Pos))
                     Select Case Ext
                         Case ".ico"
                             webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/vnd.microsoft.icon"" href=""" & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
@@ -21438,7 +21382,7 @@ ErrorTrap:
                 If Left(OtherHeadTags, 2) <> vbCrLf Then
                     OtherHeadTags = vbCrLf & OtherHeadTags
                 End If
-                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & vbReplace(OtherHeadTags, vbCrLf, cr)
+                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & genericController.vbReplace(OtherHeadTags, vbCrLf, cr)
             End If
             '
             Exit Function
@@ -21455,7 +21399,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetRecordID_Internal")
             '
             If True Then
-                main_GetRecordID_Internal = GetRecordID(EncodeText(ContentName), EncodeText(RecordName))
+                main_GetRecordID_Internal = GetRecordID(genericController.encodeText(ContentName), genericController.encodeText(RecordName))
             End If
 
             Exit Function
@@ -21470,7 +21414,7 @@ ErrorTrap:
         Public Function main_GetRecordID(ByVal ContentName As String, ByVal RecordName As String) As Integer
             On Error GoTo ErrorTrap
             '
-            main_GetRecordID = main_GetRecordID_Internal(EncodeText(ContentName), EncodeText(RecordName))
+            main_GetRecordID = main_GetRecordID_Internal(genericController.encodeText(ContentName), genericController.encodeText(RecordName))
             '
             Exit Function
 ErrorTrap:
@@ -21484,7 +21428,7 @@ ErrorTrap:
         Public Function content_GetRecordName(ByVal ContentName As String, ByVal RecordID As Integer) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00414")
             '
-            content_GetRecordName = GetRecordName(EncodeText(ContentName), EncodeInteger(RecordID))
+            content_GetRecordName = GetRecordName(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID))
 
             Exit Function
 ErrorTrap:
@@ -21508,7 +21452,7 @@ ErrorTrap:
                         & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccHintWrapperContent"">" _
                         & "<b>Administrator</b>" _
                         & "<br>" _
-                        & "<br>" & EncodeText(Content) _
+                        & "<br>" & genericController.encodeText(Content) _
                         & "</td></tr></table>" _
                     & "</td></tr></table>"
             End If
@@ -21660,7 +21604,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Sub
             '
-            Call db.cs_rollBack(EncodeInteger(CSPointer))
+            Call db.cs_rollBack(genericController.EncodeInteger(CSPointer))
             '
             Exit Sub
 ErrorTrap:
@@ -21736,7 +21680,7 @@ ErrorTrap:
         Public Sub main_RequestTask(ByVal Command As String, ByVal SQL As String, ByVal ExportName As String, ByVal Filename As String)
             On Error GoTo ErrorTrap 'Const Tn = "RequestTask" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
-            Call tasks_RequestTask(EncodeText(Command), EncodeText(SQL), EncodeText(ExportName), EncodeText(Filename), EncodeInteger(user.id))
+            Call tasks_RequestTask(genericController.encodeText(Command), genericController.encodeText(SQL), genericController.encodeText(ExportName), genericController.encodeText(Filename), genericController.EncodeInteger(user.id))
             '
             Exit Sub
 ErrorTrap:
@@ -21782,10 +21726,10 @@ ErrorTrap:
                     '
                     KeySplit = Split(ContentRecordKey, ".")
                     If UBound(KeySplit) = 1 Then
-                        ContentID = EncodeInteger(KeySplit(0))
+                        ContentID = genericController.EncodeInteger(KeySplit(0))
                         If ContentID <> 0 Then
                             ContentName = metaData.getContentNameByID(ContentID)
-                            RecordID = EncodeInteger(KeySplit(1))
+                            RecordID = genericController.EncodeInteger(KeySplit(1))
                             If ContentName <> "" And RecordID <> 0 Then
                                 If GetContentTablename(ContentName) = "ccPageContent" Then
                                     CSPointer = csOpen(ContentName, RecordID, , , "TemplateID,ParentID")
@@ -21817,7 +21761,7 @@ ErrorTrap:
                                             DataSource = main_GetContentDataSource(ContentName)
                                             CSPointer = db.cs_openCsSql_rev(DataSource, "Select ContentControlID from " & TableName & " where ID=" & RecordID)
                                             If db.cs_ok(CSPointer) Then
-                                                ParentContentID = EncodeInteger(db.cs_getText(CSPointer, "ContentControlID"))
+                                                ParentContentID = genericController.EncodeInteger(db.cs_getText(CSPointer, "ContentControlID"))
                                             End If
                                             Call db.cs_Close(CSPointer)
                                             If ParentContentID <> 0 Then
@@ -21833,7 +21777,7 @@ ErrorTrap:
                         End If
                     End If
                     If main_GetLinkByContentRecordKey <> "" Then
-                        main_GetLinkByContentRecordKey = modifyLinkQuery(main_GetLinkByContentRecordKey, "bid", CStr(RecordID), True)
+                        main_GetLinkByContentRecordKey = genericController.modifyLinkQuery(main_GetLinkByContentRecordKey, "bid", CStr(RecordID), True)
                     End If
                 End If
             End If
@@ -21842,7 +21786,7 @@ ErrorTrap:
                 main_GetLinkByContentRecordKey = DefaultLink
             End If
             '
-            main_GetLinkByContentRecordKey = coreCommonModule.EncodeAppRootPath(main_GetLinkByContentRecordKey, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
+            main_GetLinkByContentRecordKey = genericController.EncodeAppRootPath(main_GetLinkByContentRecordKey, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
             '
             Exit Function
             '
@@ -21857,9 +21801,9 @@ ErrorTrap:
             '
             ' should use the ccNav object, no the ccCommon module for this code
             '
-            Call menuTab.AddEntry(EncodeText(Caption), EncodeText(Link), EncodeBoolean(IsHit), EncodeText(StylePrefix))
+            Call menuTab.AddEntry(genericController.encodeText(Caption), genericController.encodeText(Link), genericController.EncodeBoolean(IsHit), genericController.encodeText(StylePrefix))
 
-            'Call ccAddTabEntry(encodeText(Caption), encodeText(Link), encodeBoolean(IsHit), encodeText(StylePrefix), encodeText(LiveBody))
+            'Call ccAddTabEntry(genericController.encodeText(Caption), genericController.encodeText(Link), genericController.EncodeBoolean(IsHit), genericController.encodeText(StylePrefix), genericController.encodeText(LiveBody))
             '
             Exit Sub
 ErrorTrap:
@@ -21892,7 +21836,7 @@ ErrorTrap:
             If (main_LiveTabObject Is Nothing) Then
                 main_LiveTabObject = New coreMenuLiveTabClass
             End If
-            Call main_LiveTabObject.AddEntry(EncodeText(Caption), EncodeText(LiveBody), EncodeText(StylePrefix))
+            Call main_LiveTabObject.AddEntry(genericController.encodeText(Caption), genericController.encodeText(LiveBody), genericController.encodeText(StylePrefix))
             '
             Exit Sub
 ErrorTrap:
@@ -21970,7 +21914,7 @@ ErrorTrap:
             Dim RecordContentName As String
             Dim DataSourceName As String
             '
-            If Not IsInDelimitedString(UsedIDString, CStr(RecordID), ",") Then
+            If Not genericController.IsInDelimitedString(UsedIDString, CStr(RecordID), ",") Then
                 ContentName = metaData.getContentNameByID(ContentID)
                 CS = csOpen(ContentName, RecordID, False, False)
                 If db.cs_ok(CS) Then
@@ -22027,7 +21971,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            menu_VerifyDynamicMenu = csv_VerifyDynamicMenu(EncodeText(MenuName))
+            menu_VerifyDynamicMenu = csv_VerifyDynamicMenu(genericController.encodeText(MenuName))
             '
             Exit Function
 ErrorTrap:
@@ -22123,7 +22067,7 @@ ErrorTrap:
                 Call db.cs_set(CS, "Name", ContentBlockCopyName)
                 Call db.cs_set(CS, "Copy", pageManager_GetDefaultBlockMessage)
                 Call db.cs_save2(CS)
-                Call workflow.publishEdit("Copy Content", EncodeInteger(db.cs_get(CS, "ID")))
+                Call workflow.publishEdit("Copy Content", genericController.EncodeInteger(db.cs_get(CS, "ID")))
             End If
             '
             Exit Function
@@ -22181,28 +22125,28 @@ ErrorTrap:
             Dim f As main_FormPagetype
             '
             If True Then
-                PtrFront = vbInstr(1, Formhtml, "{{REPEATSTART", vbTextCompare)
+                PtrFront = genericController.vbInstr(1, Formhtml, "{{REPEATSTART", vbTextCompare)
                 If PtrFront > 0 Then
-                    PtrBack = vbInstr(PtrFront, Formhtml, "}}")
+                    PtrBack = genericController.vbInstr(PtrFront, Formhtml, "}}")
                     If PtrBack > 0 Then
                         f.PreRepeat = Mid(Formhtml, 1, PtrFront - 1)
-                        PtrFront = vbInstr(PtrBack, Formhtml, "{{REPEATEND", vbTextCompare)
+                        PtrFront = genericController.vbInstr(PtrBack, Formhtml, "{{REPEATEND", vbTextCompare)
                         If PtrFront > 0 Then
                             f.RepeatCell = Mid(Formhtml, PtrBack + 2, PtrFront - PtrBack - 2)
-                            PtrBack = vbInstr(PtrFront, Formhtml, "}}")
+                            PtrBack = genericController.vbInstr(PtrFront, Formhtml, "}}")
                             If PtrBack > 0 Then
                                 f.PostRepeat = Mid(Formhtml, PtrBack + 2)
                                 '
                                 ' Decode instructions and build output
                                 '
-                                i = SplitCRLF(FormInstructions)
+                                i = genericController.SplitCRLF(FormInstructions)
                                 If UBound(i) > 0 Then
                                     If Trim(i(0)) >= "1" Then
                                         '
                                         ' decode Version 1 arguments, then start instructions line at line 1
                                         '
-                                        f.AddGroupNameList = EncodeText(i(1))
-                                        f.AuthenticateOnFormProcess = EncodeBoolean(i(2))
+                                        f.AddGroupNameList = genericController.encodeText(i(1))
+                                        f.AuthenticateOnFormProcess = genericController.EncodeBoolean(i(2))
                                         IStart = 3
                                     End If
                                     '
@@ -22217,8 +22161,8 @@ ErrorTrap:
                                             IArgs = Split(i(IPtr + IStart), ",")
                                             If UBound(IArgs) >= main_IPosMax Then
                                                 .Caption = IArgs(main_IPosCaption)
-                                                .Type = EncodeInteger(IArgs(main_IPosType))
-                                                .REquired = EncodeBoolean(IArgs(main_IPosRequired))
+                                                .Type = genericController.EncodeInteger(IArgs(main_IPosType))
+                                                .REquired = genericController.EncodeBoolean(IArgs(main_IPosRequired))
                                                 Select Case .Type
                                                     Case 1
                                                         '
@@ -22316,13 +22260,13 @@ ErrorTrap:
                                 CSPeople = csOpen("people", user.id)
                             End If
                             Caption = .Caption
-                            If .REquired Or EncodeBoolean(GetContentFieldProperty("People", .PeopleField, "Required")) Then
+                            If .REquired Or genericController.EncodeBoolean(GetContentFieldProperty("People", .PeopleField, "Required")) Then
                                 Caption = "*" & Caption
                             End If
                             If db.cs_ok(CSPeople) Then
                                 Body = f.RepeatCell
-                                Body = vbReplace(Body, "{{CAPTION}}", CaptionSpan & Caption & "</span>", 1, 99, vbTextCompare)
-                                Body = vbReplace(Body, "{{FIELD}}", html_GetFormInputCS(CSPeople, "People", .PeopleField), 1, 99, vbTextCompare)
+                                Body = genericController.vbReplace(Body, "{{CAPTION}}", CaptionSpan & Caption & "</span>", 1, 99, vbTextCompare)
+                                Body = genericController.vbReplace(Body, "{{FIELD}}", html_GetFormInputCS(CSPeople, "People", .PeopleField), 1, 99, vbTextCompare)
                                 RepeatBody = RepeatBody & Body
                                 HasRequiredFields = HasRequiredFields Or .REquired
                             End If
@@ -22332,8 +22276,8 @@ ErrorTrap:
                             '
                             GroupValue = user.IsMemberOfGroup2(.GroupName)
                             Body = f.RepeatCell
-                            Body = vbReplace(Body, "{{CAPTION}}", html_GetFormInputCheckBox2("Group" & .GroupName, GroupValue), 1, 99, vbTextCompare)
-                            Body = vbReplace(Body, "{{FIELD}}", .Caption)
+                            Body = genericController.vbReplace(Body, "{{CAPTION}}", html_GetFormInputCheckBox2("Group" & .GroupName, GroupValue), 1, 99, vbTextCompare)
+                            Body = genericController.vbReplace(Body, "{{FIELD}}", .Caption)
                             RepeatBody = RepeatBody & Body
                             GroupRowPtr = GroupRowPtr + 1
                             HasRequiredFields = HasRequiredFields Or .REquired
@@ -22343,8 +22287,8 @@ ErrorTrap:
             Call db.cs_Close(CSPeople)
             If HasRequiredFields Then
                 Body = f.RepeatCell
-                Body = vbReplace(Body, "{{CAPTION}}", "&nbsp;", 1, 99, vbTextCompare)
-                Body = vbReplace(Body, "{{FIELD}}", "*&nbsp;Required Fields")
+                Body = genericController.vbReplace(Body, "{{CAPTION}}", "&nbsp;", 1, 99, vbTextCompare)
+                Body = genericController.vbReplace(Body, "{{FIELD}}", "*&nbsp;Required Fields")
                 RepeatBody = RepeatBody & Body
             End If
             '
@@ -22421,7 +22365,7 @@ ErrorTrap:
                                 ' People Record
                                 '
                                 FormValue = docProperties.getText(.PeopleField)
-                                If (FormValue <> "") And EncodeBoolean(GetContentFieldProperty("people", .PeopleField, "uniquename")) Then
+                                If (FormValue <> "") And genericController.EncodeBoolean(GetContentFieldProperty("people", .PeopleField, "uniquename")) Then
                                     SQL = "select count(*) from ccMembers where " & .PeopleField & "=" & db.encodeSQLText(FormValue)
                                     CS = db.cs_openSql(SQL)
                                     If db.cs_ok(CS) Then
@@ -22432,7 +22376,7 @@ ErrorTrap:
                                         error_AddUserError("The field [" & .Caption & "] must be unique, and the value [" & html.html_EncodeHTML(FormValue) & "] has already been used.")
                                     End If
                                 End If
-                                If (.REquired Or EncodeBoolean(GetContentFieldProperty("people", .PeopleField, "required"))) And FormValue = "" Then
+                                If (.REquired Or genericController.EncodeBoolean(GetContentFieldProperty("people", .PeopleField, "required"))) And FormValue = "" Then
                                     Success = False
                                     error_AddUserError("The field [" & html.html_EncodeHTML(.Caption) & "] is required.")
                                 Else
@@ -22440,7 +22384,7 @@ ErrorTrap:
                                         CSPeople = csOpen("people", user.id)
                                     End If
                                     If db.cs_ok(CSPeople) Then
-                                        Select Case vbUCase(.PeopleField)
+                                        Select Case genericController.vbUCase(.PeopleField)
                                             Case "NAME"
                                                 PeopleName = FormValue
                                                 Call db.cs_set(CSPeople, .PeopleField, FormValue)
@@ -22632,9 +22576,9 @@ ErrorTrap:
             '
             ' Check for MenuID - if present, arguments are in the Dynamic Menu content - else it is old, and they are in the addonOption_String
             '
-            If True And vbInstr(1, addonOption_String, "menu=", vbTextCompare) <> 0 Then
+            If True And genericController.vbInstr(1, addonOption_String, "menu=", vbTextCompare) <> 0 Then
                 MenuNew = main_GetAddonOption("menunew", addonOption_String)
-                'MenuNew = Trim(decodeResponseVariable(main_GetArgument("menunew", addonOption_String, "", "&")))
+                'MenuNew = Trim( genericController.DecodeResponseVariable(main_GetArgument("menunew", addonOption_String, "", "&")))
                 If MenuNew <> "" Then
                     '
                     ' Create New Menu
@@ -22646,7 +22590,7 @@ ErrorTrap:
                     ' No new menu, try a selected menu
                     '
                     Menu = main_GetAddonOption("menu", addonOption_String)
-                    'Menu = Trim(decodeResponseVariable(main_GetArgument("menu", addonOption_String, "", "&")))
+                    'Menu = Trim( genericController.DecodeResponseVariable(main_GetArgument("menu", addonOption_String, "", "&")))
                     If Menu = "" Then
                         '
                         ' No selected, use Default
@@ -22686,7 +22630,7 @@ ErrorTrap:
                     If True Then
                         StylesFilename = db.cs_getText(CS, "StylesFilename")
                         If StylesFilename <> "" Then
-                            If vbLCase(Right(StylesFilename, 4)) <> ".css" Then
+                            If genericController.vbLCase(Right(StylesFilename, 4)) <> ".css" Then
                                 Call handleLegacyError15("Dynamic Menu [" & MenuName & "] StylesFilename is not a '.css' file, and will not display correct. Check that the field is setup as a CSSFile.", "main_GetDynamicMenu")
                             Else
                                 Call main_AddStylesheetLink2(webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, StylesFilename), "dynamic menu")
@@ -22703,7 +22647,7 @@ ErrorTrap:
                 IsOldMenu = True
                 MenuName = ""
                 '
-                MenuDepth = EncodeInteger(main_GetAddonOption("DEPTH", addonOption_String))
+                MenuDepth = genericController.EncodeInteger(main_GetAddonOption("DEPTH", addonOption_String))
                 MenuStylePrefix = Trim(main_GetAddonOption("STYLEPREFIX", addonOption_String))
                 MenuDelimiter = main_GetAddonOption("DELIMITER", addonOption_String)
                 FlyoutOnHover = main_GetAddonOption("FlyoutOnHover", addonOption_String)
@@ -22712,7 +22656,7 @@ ErrorTrap:
                 '
                 ' really old value
                 '
-                MenuStyle = EncodeInteger(main_GetAddonOption("FORMAT", addonOption_String))
+                MenuStyle = genericController.EncodeInteger(main_GetAddonOption("FORMAT", addonOption_String))
             End If
             '
             ' Check values
@@ -22724,12 +22668,12 @@ ErrorTrap:
             ' determine MenuStyle from input
             '
             If MenuStyle = 0 Then
-                If EncodeBoolean(FlyoutOnHover) Then
+                If genericController.EncodeBoolean(FlyoutOnHover) Then
                     MenuStyle = 8
                 Else
                     MenuStyle = 4
                 End If
-                Select Case vbUCase(FlyoutDirection)
+                Select Case genericController.vbUCase(FlyoutDirection)
                     Case "RIGHT"
                         MenuStyle = MenuStyle + 1
                     Case "UP"
@@ -22742,11 +22686,11 @@ ErrorTrap:
             '
             ' Now adjust results using arguments
             '
-            If vbUCase(Layout) = "VERTICAL" Then
+            If genericController.vbUCase(Layout) = "VERTICAL" Then
                 '
                 ' vertical menu: Set dislay block
                 '
-                pageManager_GetDynamicMenu = vbReplace(pageManager_GetDynamicMenu, "class=""" & MenuStylePrefix & "Button""", "style=""display:block;"" class=""" & MenuStylePrefix & "Button""")
+                pageManager_GetDynamicMenu = genericController.vbReplace(pageManager_GetDynamicMenu, "class=""" & MenuStylePrefix & "Button""", "style=""display:block;"" class=""" & MenuStylePrefix & "Button""")
                 '
                 PreButton = "<div style=""WHITE-SPACE: nowrap;"">"
                 PostButton = "</div>"
@@ -22758,7 +22702,7 @@ ErrorTrap:
                 '
                 ' horizontal menu: Set dislay inline
                 '
-                pageManager_GetDynamicMenu = vbReplace(pageManager_GetDynamicMenu, "class=""" & MenuStylePrefix & "Button""", "style=""display:inline;"" class=""" & MenuStylePrefix & "Button""")
+                pageManager_GetDynamicMenu = genericController.vbReplace(pageManager_GetDynamicMenu, "class=""" & MenuStylePrefix & "Button""", "style=""display:inline;"" class=""" & MenuStylePrefix & "Button""")
                 '
                 If CompatibilitySpanAroundButton Then
                     PreButton = "<span style=""WHITE-SPACE: nowrap"">"
@@ -22769,7 +22713,7 @@ ErrorTrap:
                     MenuDelimiter = "<span style=""WHITE-SPACE: nowrap;"" class=""" & MenuStylePrefix & "Delimiter"">" & MenuDelimiter & "</span>"
                 End If
             End If
-            pageManager_GetDynamicMenu = PreButton & vbReplace(pageManager_GetDynamicMenu, vbCrLf, PostButton & MenuDelimiter & PreButton) & PostButton
+            pageManager_GetDynamicMenu = PreButton & genericController.vbReplace(pageManager_GetDynamicMenu, vbCrLf, PostButton & MenuDelimiter & PreButton) & PostButton
             If user.isAdvancedEditing("") Then
                 pageManager_GetDynamicMenu = "<div style=""border-bottom:1px dashed #404040; padding:5px;margin-bottom:5px;"">Dynamic Menu [" & MenuName & "]" & EditLink & "</div><div>" & pageManager_GetDynamicMenu & "</div>"
             End If
@@ -22877,8 +22821,8 @@ ErrorTrap:
                         If Filename <> "" Then
                             Path = db.cs_getFilename(CSPointer, FieldName, Filename)
                             Call db.cs_setField(CSPointer, FieldName, Path)
-                            Path = vbReplace(Path, "\", "/")
-                            Path = vbReplace(Path, "/" & Filename, "")
+                            Path = genericController.vbReplace(Path, "\", "/")
+                            Path = genericController.vbReplace(Path, "/" & Filename, "")
                             Call appRootFiles.saveUpload(LocalRequestName, Path, Filename)
                         End If
                     Case Else
@@ -22929,7 +22873,7 @@ ErrorTrap:
             If siteProperties.getBoolean("Allow CSS Reset") Then
                 pageManager_GetStyleTagPublic = pageManager_GetStyleTagPublic & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & webServerIO_requestDomain & "/ccLib/styles/ccreset.css"" >"
             End If
-            StyleSN = EncodeInteger(siteProperties.getText("StylesheetSerialNumber", "0"))
+            StyleSN = genericController.EncodeInteger(siteProperties.getText("StylesheetSerialNumber", "0"))
             If StyleSN < 0 Then
                 '
                 ' Linked Styles
@@ -22941,8 +22885,8 @@ ErrorTrap:
                 ' Save new public stylesheet
                 '
                 'Dim kmafs As New fileSystemClass
-                Call cdnFiles.saveFile(convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), csv_getStyleSheetProcessed)
-                Call cdnFiles.saveFile(convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css"), pageManager_GetStyleSheetDefault2)
+                Call cdnFiles.saveFile(genericController.convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), csv_getStyleSheetProcessed)
+                Call cdnFiles.saveFile(genericController.convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css"), pageManager_GetStyleSheetDefault2)
 
             End If
             If (StyleSN = 0) Then
@@ -22968,7 +22912,7 @@ ErrorTrap:
         Private Function admin_GetStyleTagAdmin() As String
             Dim StyleSN As Integer
             '
-            StyleSN = EncodeInteger(siteProperties.getText("StylesheetSerialNumber", "0"))
+            StyleSN = genericController.EncodeInteger(siteProperties.getText("StylesheetSerialNumber", "0"))
             If StyleSN = 0 Then
                 admin_GetStyleTagAdmin = cr & StyleSheetStart & pageManager_GetStyleSheetDefault() & cr & StyleSheetEnd
             ElseIf (siteProperties.dataBuildVersion <> cp.Version()) Then
@@ -22985,8 +22929,8 @@ ErrorTrap:
                     ' Save new public stylesheet
                     '
                     'Dim kmafs As New fileSystemClass
-                    Call cdnFiles.saveFile(convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), csv_getStyleSheetProcessed)
-                    Call cdnFiles.saveFile(convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css"), pageManager_GetStyleSheetDefault2)
+                    Call cdnFiles.saveFile(genericController.convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), csv_getStyleSheetProcessed)
+                    Call cdnFiles.saveFile(genericController.convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css"), pageManager_GetStyleSheetDefault2)
                 End If
                 admin_GetStyleTagAdmin = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & webServerIO_requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, "templates/Admin" & StyleSN & ".css") & """ >"
             End If
@@ -22997,8 +22941,8 @@ ErrorTrap:
         Private Function pageManager_GetLandingLink() As String
             If pageManager_LandingLink = "" Then
                 pageManager_LandingLink = siteProperties.getText("SectionLandingLink", requestAppRootPath & siteProperties.serverPageDefault)
-                pageManager_LandingLink = ConvertLinkToShortLink(pageManager_LandingLink, webServerIO.requestDomain, webServerIO_requestVirtualFilePath)
-                pageManager_LandingLink = coreCommonModule.EncodeAppRootPath(pageManager_LandingLink, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
+                pageManager_LandingLink = genericController.ConvertLinkToShortLink(pageManager_LandingLink, webServerIO.requestDomain, webServerIO_requestVirtualFilePath)
+                pageManager_LandingLink = genericController.EncodeAppRootPath(pageManager_LandingLink, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
             End If
             pageManager_GetLandingLink = pageManager_LandingLink
         End Function
@@ -23083,7 +23027,7 @@ ErrorTrap:
         '                    End If
         '                End If
         '            End If
-        '            main_EncodeContent = main_EncodeContent5(EncodeText(Source), EncodeInteger(ForMemberID), ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, False, app.siteProperty_DefaultWrapperID)
+        '            main_EncodeContent = main_EncodeContent5(genericController.encodeText(Source), genericController.EncodeInteger(ForMemberID), ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, False, app.siteProperty_DefaultWrapperID)
         '            '
         '            Exit Function
         '            '
@@ -23102,7 +23046,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            html_DecodeContent = html_DecodeContent2(EncodeText(Source))
+            html_DecodeContent = html_DecodeContent2(genericController.encodeText(Source))
             '
             Exit Function
             '
@@ -23146,7 +23090,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function main_GetFormInputCheckList(ByVal TagName As String, ByVal PrimaryContentName As String, ByVal PrimaryRecordID As Integer, ByVal SecondaryContentName As String, ByVal RulesContentName As String, ByVal RulesPrimaryFieldname As String, ByVal RulesSecondaryFieldName As String, Optional ByVal SecondaryContentSelectCriteria As String = "", Optional ByVal CaptionFieldName As String = "", Optional ByVal readOnlyfield As Boolean = False) As String
-            main_GetFormInputCheckList = main_GetFormInputCheckListCategories_Content(TagName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectCriteria, EncodeText(CaptionFieldName), readOnlyfield, False, "")
+            main_GetFormInputCheckList = main_GetFormInputCheckListCategories_Content(TagName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectCriteria, genericController.encodeText(CaptionFieldName), readOnlyfield, False, "")
         End Function
         '
         '========================================================================
@@ -23229,7 +23173,7 @@ ErrorTrap:
                 If CaptionFieldName = "" Then
                     CaptionFieldName = "name"
                 End If
-                CaptionFieldName = encodeEmptyText(CaptionFieldName, "name")
+                CaptionFieldName = genericController.encodeEmptyText(CaptionFieldName, "name")
                 If PrimaryContentName = "" Or SecondaryContentName = "" Or RulesContentName = "" Or RulesPrimaryFieldname = "" Or RulesSecondaryFieldName = "" Then
                     returnHtml = "[Checklist not configured]"
                     handleExceptionAndRethrow(New Exception("Creating checklist, all required fields were not supplied, Caption=[" & CaptionFieldName & "], PrimaryContentName=[" & PrimaryContentName & "], SecondaryContentName=[" & SecondaryContentName & "], RulesContentName=[" & RulesContentName & "], RulesPrimaryFieldName=[" & RulesPrimaryFieldname & "], RulesSecondaryFieldName=[" & RulesSecondaryFieldName & "]"))
@@ -23247,7 +23191,7 @@ ErrorTrap:
                     '
                     '
                     rulesTablename = GetContentTablename(RulesContentName)
-                    SingularPrefixHtmlEncoded = html.html_EncodeHTML(GetSingular(SecondaryContentName)) & "&nbsp;"
+                    SingularPrefixHtmlEncoded = html.html_EncodeHTML(genericController.GetSingular(SecondaryContentName)) & "&nbsp;"
                     '
                     main_MemberShipCount = 0
                     main_MemberShipSize = 0
@@ -23263,7 +23207,7 @@ ErrorTrap:
 
                                 main_MemberShipText = Split(DefaultSecondaryIDList, ",")
                                 For Ptr = 0 To UBound(main_MemberShipText)
-                                    main_MemberShipID = EncodeInteger(main_MemberShipText(Ptr))
+                                    main_MemberShipID = genericController.EncodeInteger(main_MemberShipText(Ptr))
                                     If main_MemberShipID <> 0 Then
                                         ReDim Preserve main_MemberShip(Ptr)
                                         main_MemberShip(Ptr) = main_MemberShipID
@@ -23560,11 +23504,11 @@ ErrorTrap:
                         Id = db.cs_getInteger(CS, "ID")
                         CurrentFolderID = db.cs_getInteger(CS, "ContentCategoryID")
                         '
-                        Caption = vbReplace(Caption, " ", "&nbsp;")
+                        Caption = genericController.vbReplace(Caption, " ", "&nbsp;")
                         If FirstCaption = "" Then
                             FirstCaption = Caption
                         End If
-                        JSCaption = EncodeJavascript(Caption)
+                        JSCaption = genericController.EncodeJavascript(Caption)
                         JSSwitch = "switchContentFolderDiv( '" & TagName & ".ContentCategoryID" & Id & "',OldFolder" & main_CheckListCnt & ",'" & TagName & ".ContentCaption','" & JSCaption & "','" & EmptyDivID & "'); OldFolder" & main_CheckListCnt & "='" & TagName & ".ContentCategoryID" & Id & "';return false;"
                         If JSSwitchFirst = "" Then
                             JSSwitchFirst = JSSwitch
@@ -23575,14 +23519,14 @@ ErrorTrap:
                         Call db.cs_goNext(CS)
                     Loop
                     Call db.cs_Close(CS)
-                    LeftPane = cr & "<ul>" & kmaIndent(s) & cr & "</ul>"
+                    LeftPane = cr & "<ul>" & genericController.kmaIndent(s) & cr & "</ul>"
                     'LeftPane = Tree.GetTree(CStr(0), OpenMenuName)
                     '
                     ' Add the top 'All' node
                     '
                     JSCaption = "All"
                     JSSwitchAll = "switchContentFolderDiv( '" & TagName & ".All',  OldFolder" & main_CheckListCnt & ",'" & TagName & ".ContentCaption','" & JSCaption & "','" & EmptyDivID & "'); OldFolder" & main_CheckListCnt & "='" & TagName & ".All';"
-                    If vbInstr(1, LeftPane, "<LI", vbTextCompare) = 0 Then
+                    If genericController.vbInstr(1, LeftPane, "<LI", vbTextCompare) = 0 Then
                         AllNode = "<div class=""caption""><a href=""#"" onClick=""" & JSSwitchAll & ";return false;"">Show all</a></div>"
                         LeftPane = cr & AllNode & LeftPane
                     Else
@@ -23593,10 +23537,10 @@ ErrorTrap:
                     ' + Add Category
                     '
                     If user.isAuthenticatedContentManager("Content Categories") Then
-                        LeftPane = LeftPane & cr & "<div class=""caption""><a href=""" & siteProperties.adminURL & "?editreferer=" & EncodeRequestVariable("?" & web_RefreshQueryString) & "&cid=" & main_GetContentID("Content Categories") & "&af=4&aa=2"">+&nbsp;Add&nbsp;Category</a></div>"
+                        LeftPane = LeftPane & cr & "<div class=""caption""><a href=""" & siteProperties.adminURL & "?editreferer=" & genericController.EncodeRequestVariable("?" & web_RefreshQueryString) & "&cid=" & main_GetContentID("Content Categories") & "&af=4&aa=2"">+&nbsp;Add&nbsp;Category</a></div>"
                     End If
                     '
-                    LeftPane = cr & "<div class=""ccCategoryListCon"">" & kmaIndent(LeftPane) & cr & "</div>"
+                    LeftPane = cr & "<div class=""ccCategoryListCon"">" & genericController.kmaIndent(LeftPane) & cr & "</div>"
                     '
                     ' open the current node
                     '
@@ -23608,7 +23552,7 @@ ErrorTrap:
                         & "<tr>" _
                         & "<td class=""ccAdminTab"" style=""width:100px;padding:5px;text-align:left"">Categories<br ><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=90 height=1></td>" _
                         & "<td class=""ccAdminTab"" style=""width:1px;""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=1 height=1></td>" _
-                        & "<td class=""ccAdminTab"" style=""width:90%;padding:5px;text-align:left"" ID=""" & TagName & ".ContentCaption"">" & encodeEmptyText(RightSideHeader, "&nbsp;") & "</td>" _
+                        & "<td class=""ccAdminTab"" style=""width:90%;padding:5px;text-align:left"" ID=""" & TagName & ".ContentCaption"">" & genericController.encodeEmptyText(RightSideHeader, "&nbsp;") & "</td>" _
                         & "</td></tr>" _
                         & "<tr>" _
                         & "<td style=""width:100px;padding:10px;Background-color:white;border:0px solid #808080;vertical-align:top;text-align:left"">" & LeftPane & "</td>" _
@@ -23650,7 +23594,7 @@ ErrorTrap:
             Dim s As String
             '
             s = main_OnLoadJavascript
-            If NewCode <> "" And vbInstr(1, s, NewCode, vbTextCompare) = 0 Then
+            If NewCode <> "" And genericController.vbInstr(1, s, NewCode, vbTextCompare) = 0 Then
                 If s <> "" Then
                     s = s & ";"
                 End If
@@ -23684,7 +23628,7 @@ ErrorTrap:
             Dim s As String
             '
             s = ""
-            If NewCode <> "" And vbInstr(1, main_endOfBodyJavascript, NewCode, vbTextCompare) = 0 Then
+            If NewCode <> "" And genericController.vbInstr(1, main_endOfBodyJavascript, NewCode, vbTextCompare) = 0 Then
                 's = s & vbCrLf
                 If (addedByMessage <> "") And visitProperty.getBoolean("AllowDebugging") Then
                     s = s & "/* from " & addedByMessage & "*/"
@@ -23719,11 +23663,11 @@ ErrorTrap:
             '
             If NewCode <> "" Then
                 s = NewCode
-                StartPos = vbInstr(1, s, "<script", vbTextCompare)
+                StartPos = genericController.vbInstr(1, s, "<script", vbTextCompare)
                 If StartPos <> 0 Then
-                    EndPos = vbInstr(StartPos, s, "</script", vbTextCompare)
+                    EndPos = genericController.vbInstr(StartPos, s, "</script", vbTextCompare)
                     If EndPos <> 0 Then
-                        EndPos = vbInstr(EndPos, s, ">", vbTextCompare)
+                        EndPos = genericController.vbInstr(EndPos, s, ">", vbTextCompare)
                         If EndPos <> 0 Then
                             s = Left(s, StartPos - 1) & Mid(s, EndPos + 1)
                         End If
@@ -23732,28 +23676,28 @@ ErrorTrap:
                 '
                 ' I am going to regret this...
                 '
-                Do While vbInstr(1, NewCode, vbTab & vbTab) <> 0
-                    NewCode = vbReplace(NewCode, vbTab & vbTab, vbTab)
+                Do While genericController.vbInstr(1, NewCode, vbTab & vbTab) <> 0
+                    NewCode = genericController.vbReplace(NewCode, vbTab & vbTab, vbTab)
                 Loop
-                Do While vbInstr(1, NewCode, cr) <> 0
-                    NewCode = vbReplace(NewCode, cr, vbCrLf)
+                Do While genericController.vbInstr(1, NewCode, cr) <> 0
+                    NewCode = genericController.vbReplace(NewCode, cr, vbCrLf)
                 Loop
-                NewCode = vbReplace(NewCode, vbCrLf & vbCrLf, vbCrLf)
-                NewCode = vbReplace(NewCode, vbCrLf & vbCrLf, vbCrLf)
-                NewCode = vbReplace(NewCode, vbCrLf, cr2)
+                NewCode = genericController.vbReplace(NewCode, vbCrLf & vbCrLf, vbCrLf)
+                NewCode = genericController.vbReplace(NewCode, vbCrLf & vbCrLf, vbCrLf)
+                NewCode = genericController.vbReplace(NewCode, vbCrLf, cr2)
                 ReDim Preserve main_HeadScripts(main_HeadScriptCnt)
                 main_HeadScripts(main_HeadScriptCnt).IsLink = False
                 main_HeadScripts(main_HeadScriptCnt).Text = NewCode
-                main_HeadScripts(main_HeadScriptCnt).addedByMessage = vbLCase(addedByMessage)
+                main_HeadScripts(main_HeadScriptCnt).addedByMessage = genericController.vbLCase(addedByMessage)
                 main_HeadScriptCnt = main_HeadScriptCnt + 1
             End If
-            '    If NewCode <> "" And vbInstr(1, main_HeadScriptCode, NewCode, vbTextCompare) = 0 Then
+            '    If NewCode <> "" And genericController.vbInstr(1, main_HeadScriptCode, NewCode, vbTextCompare) = 0 Then
             '        s = NewCode
-            '        StartPos = vbInstr(1, s, "<script", vbTextCompare)
+            '        StartPos = genericController.vbInstr(1, s, "<script", vbTextCompare)
             '        If StartPos <> 0 Then
-            '            EndPos = vbInstr(StartPos, s, "</script", vbTextCompare)
+            '            EndPos = genericController.vbInstr(StartPos, s, "</script", vbTextCompare)
             '            If EndPos <> 0 Then
-            '                EndPos = vbInstr(EndPos, s, ">", vbTextCompare)
+            '                EndPos = genericController.vbInstr(EndPos, s, ">", vbTextCompare)
             '                If EndPos <> 0 Then
             '                    s = Left(s, StartPos - 1) & Mid(s, EndPos + 1)
             '                End If
@@ -23790,7 +23734,7 @@ ErrorTrap:
                 main_HeadScripts(main_HeadScriptCnt).addedByMessage = addedByMessage
                 main_HeadScriptCnt = main_HeadScriptCnt + 1
             End If
-            '    If Filename <> "" And vbInstr(1, s, Filename, vbTextCompare) = 0 Then
+            '    If Filename <> "" And genericController.vbInstr(1, s, Filename, vbTextCompare) = 0 Then
             '
             '        main_HeadScriptLinkList = main_HeadScriptLinkList & vbCrLf & Filename & vbTab & AddedByMessage
             '    End If
@@ -23813,7 +23757,7 @@ ErrorTrap:
         Public Sub main_AddPagetitle2(PageTitle As String, addedByMessage As String)
             On Error GoTo ErrorTrap
             '
-            If PageTitle <> "" And vbInstr(1, main_MetaContent_Title, PageTitle, vbTextCompare) = 0 Then
+            If PageTitle <> "" And genericController.vbInstr(1, main_MetaContent_Title, PageTitle, vbTextCompare) = 0 Then
                 If (addedByMessage <> "") And visitProperty.getBoolean("AllowDebugging") Then
                     Call main_AddHeadTag2("<!-- title from " & addedByMessage & " -->", "")
                 End If
@@ -23842,7 +23786,7 @@ ErrorTrap:
         Public Sub main_addMetaDescription2(MetaDescription As String, addedByMessage As String)
             On Error GoTo ErrorTrap
             '
-            If MetaDescription <> "" And vbInstr(1, main_MetaContent_Description, MetaDescription, vbTextCompare) = 0 Then
+            If MetaDescription <> "" And genericController.vbInstr(1, main_MetaContent_Description, MetaDescription, vbTextCompare) = 0 Then
                 If (addedByMessage <> "") And visitProperty.getBoolean("AllowDebugging") Then
                     Call main_AddHeadTag2("<!-- meta description from " & addedByMessage & " -->", "")
                 End If
@@ -23876,7 +23820,7 @@ ErrorTrap:
                     main_MetaContent_StyleSheetTags = main_MetaContent_StyleSheetTags & "<!-- from " & addedByMessage & " -->"
                 End If
                 If visitProperty.getBoolean("AllowAdvancedEditor") Then
-                    If vbInstr(1, StyleSheetLink, "&") <> 0 Then
+                    If genericController.vbInstr(1, StyleSheetLink, "&") <> 0 Then
                         main_MetaContent_StyleSheetTags = main_MetaContent_StyleSheetTags & "<link rel=""stylesheet"" type=""text/css"" href=""" & StyleSheetLink & """>"
                     Else
                         main_MetaContent_StyleSheetTags = main_MetaContent_StyleSheetTags & "<link rel=""stylesheet"" type=""text/css"" href=""" & StyleSheetLink & """>"
@@ -23904,7 +23848,7 @@ ErrorTrap:
         Public Sub main_AddSharedStyleID2(ByVal styleId As Integer, Optional ByVal addedByMessage As String = "")
             On Error GoTo ErrorTrap
             '
-            If vbInstr(1, main_MetaContent_SharedStyleIDList & ",", "," & styleId & ",") = 0 Then
+            If genericController.vbInstr(1, main_MetaContent_SharedStyleIDList & ",", "," & styleId & ",") = 0 Then
                 If (addedByMessage <> "") And visitProperty.getBoolean("AllowDebugging") Then
                     Call main_AddHeadTag2("<!-- shared style " & styleId & " from " & addedByMessage & " -->", "")
                 End If
@@ -23929,7 +23873,7 @@ ErrorTrap:
         Public Sub main_addMetaKeywordList2(MetaKeywordList As String, addedByMessage As String)
             On Error GoTo ErrorTrap
             '
-            If MetaKeywordList <> "" And vbInstr(1, main_MetaContent_KeyWordList, MetaKeywordList, vbTextCompare) = 0 Then
+            If MetaKeywordList <> "" And genericController.vbInstr(1, main_MetaContent_KeyWordList, MetaKeywordList, vbTextCompare) = 0 Then
                 If (addedByMessage <> "") And visitProperty.getBoolean("AllowDebugging") Then
                     Call main_AddHeadTag2("<!-- meta keyword list from " & addedByMessage & " -->", "")
                 End If
@@ -23957,7 +23901,7 @@ ErrorTrap:
         Public Sub main_AddHeadTag2(HeadTag As String, addedByMessage As String)
             On Error GoTo ErrorTrap
             '
-            If HeadTag <> "" And vbInstr(1, main_MetaContent_OtherHeadTags, HeadTag, vbTextCompare) = 0 Then
+            If HeadTag <> "" And genericController.vbInstr(1, main_MetaContent_OtherHeadTags, HeadTag, vbTextCompare) = 0 Then
                 If main_MetaContent_OtherHeadTags <> "" Then
                     main_MetaContent_OtherHeadTags = main_MetaContent_OtherHeadTags & vbCrLf
                 End If
@@ -24011,11 +23955,11 @@ ErrorTrap:
                         & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapper"">" _
                         & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapperInner"">" _
                             & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapperCaption"">" _
-                            & EncodeText(Caption) _
+                            & genericController.encodeText(Caption) _
                             & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=1 height=22 align=absmiddle>" _
                             & "</td></tr></table>" _
                             & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapperContent"" id=""editWrapper" & pageManager_EditWrapperCnt & """>" _
-                            & EncodeText(Content) _
+                            & genericController.encodeText(Content) _
                             & "</td></tr></table>" _
                         & "</td></tr></table>" _
                         & "</td></tr></table>"
@@ -24025,13 +23969,13 @@ ErrorTrap:
                     If Caption <> "" Then
                         main_GetEditWrapper = main_GetEditWrapper _
                                 & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapperCaption"">" _
-                                & EncodeText(Caption) _
+                                & genericController.encodeText(Caption) _
                                 & "<!-- <img alt=""space"" src=""/ccLib/images/spacer.gif"" width=1 height=22 align=absmiddle> -->" _
                                 & "</td></tr></table>"
                     End If
                     main_GetEditWrapper = main_GetEditWrapper _
                             & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapperContent"" id=""editWrapper" & pageManager_EditWrapperCnt & """>" _
-                            & EncodeText(Content) _
+                            & genericController.encodeText(Content) _
                             & "</td></tr></table>" _
                         & "</td></tr></table>"
                 End If
@@ -24110,12 +24054,12 @@ ErrorTrap:
                         cache_linkAlias(3, Ptr) = row(3).ToString
                         cache_linkAlias(4, Ptr) = row(4).ToString
                         '
-                        LinkAliasName = EncodeText(cache_linkAlias(1, Ptr))
-                        LinkAliasPageID = EncodeText(cache_linkAlias(3, Ptr))
-                        LinkAliasQueryStringSuffix = EncodeText(cache_linkAlias(4, Ptr))
+                        LinkAliasName = genericController.encodeText(cache_linkAlias(1, Ptr))
+                        LinkAliasPageID = genericController.encodeText(cache_linkAlias(3, Ptr))
+                        LinkAliasQueryStringSuffix = genericController.encodeText(cache_linkAlias(4, Ptr))
                         Call cache_linkAlias_NameIndex.setPtr(LCase(LinkAliasName), Ptr)
-                        Key = vbLCase(LinkAliasPageID & LinkAliasQueryStringSuffix)
-                        If vbInstr(1, "," & usedKeys & ",", "," & Key & ",") = 0 Then
+                        Key = genericController.vbLCase(LinkAliasPageID & LinkAliasQueryStringSuffix)
+                        If genericController.vbInstr(1, "," & usedKeys & ",", "," & Key & ",") = 0 Then
                             usedKeys = usedKeys & "," & Key
                             Call cache_linkAlias_PageIdQSSIndex.setPtr(Key, Ptr)
                         End If
@@ -24128,12 +24072,12 @@ ErrorTrap:
                     cache_linkAlias_NameIndex = New coreKeyPtrIndexClass
                     cache_linkAlias_PageIdQSSIndex = New coreKeyPtrIndexClass
                     For Ptr = 0 To cache_linkAliasCnt - 1
-                        LinkAliasName = EncodeText(cache_linkAlias(1, Ptr))
-                        LinkAliasPageID = EncodeText(cache_linkAlias(3, Ptr))
-                        LinkAliasQueryStringSuffix = EncodeText(cache_linkAlias(4, Ptr))
+                        LinkAliasName = genericController.encodeText(cache_linkAlias(1, Ptr))
+                        LinkAliasPageID = genericController.encodeText(cache_linkAlias(3, Ptr))
+                        LinkAliasQueryStringSuffix = genericController.encodeText(cache_linkAlias(4, Ptr))
                         Call cache_linkAlias_NameIndex.setPtr(LCase(LinkAliasName), Ptr)
-                        Key = vbLCase(LinkAliasPageID & LinkAliasQueryStringSuffix)
-                        If vbInstr(1, "," & usedKeys & ",", "," & Key & ",") = 0 Then
+                        Key = genericController.vbLCase(LinkAliasPageID & LinkAliasQueryStringSuffix)
+                        If genericController.vbInstr(1, "," & usedKeys & ",", "," & Key & ",") = 0 Then
                             usedKeys = usedKeys & "," & Key
                             Call cache_linkAlias_PageIdQSSIndex.setPtr(Key, Ptr)
                         End If
@@ -24198,7 +24142,7 @@ ErrorTrap:
                 Call cache_linkAlias_load()
             End If
             If cache_linkAliasCnt > 0 Then
-                Key = vbLCase(CStr(PageID) & QueryStringSuffix)
+                Key = genericController.vbLCase(CStr(PageID) & QueryStringSuffix)
                 cache_linkAlias_getPtrByPageIdQss = cache_linkAlias_PageIdQSSIndex.getPtr(Key)
             End If
             '
@@ -24222,7 +24166,7 @@ ErrorTrap:
                 Call cache_linkAlias_load()
             End If
             If cache_linkAliasCnt > 0 Then
-                Key = vbLCase(aliasName)
+                Key = genericController.vbLCase(aliasName)
                 cache_linkAlias_getPtrByName = cache_linkAlias_NameIndex.getPtr(Key)
             End If
             '
@@ -24250,7 +24194,7 @@ ErrorTrap:
             If siteProperties.allowLinkAlias Then
                 Ptr = cache_linkAlias_getPtrByPageIdQss(PageID, QueryStringSuffix)
                 If Ptr >= 0 Then
-                    main_GetLinkAliasByPageID = EncodeText(cache_linkAlias(1, Ptr))
+                    main_GetLinkAliasByPageID = genericController.encodeText(cache_linkAlias(1, Ptr))
                     If Mid(main_GetLinkAliasByPageID, 1, 1) <> "/" Then
                         main_GetLinkAliasByPageID = "/" & main_GetLinkAliasByPageID
                     End If
@@ -24279,7 +24223,7 @@ ErrorTrap:
                 End If
                 If cache_linkAliasCnt > 0 Then
                     Ptr = cache_linkAlias_NameIndex.getPtr(LCase(linkAlias))
-                    main_GetURLRewriteLink = EncodeText(cache_linkAlias(2, Ptr))
+                    main_GetURLRewriteLink = genericController.encodeText(cache_linkAlias(2, Ptr))
                 End If
             End If
             '
@@ -24380,15 +24324,15 @@ ErrorTrap:
                 ' Add the Referrer to the Admin Msg
                 '
                 If webServerIO_requestReferer <> "" Then
-                    Pos = vbInstr(1, webServerIO.requestReferrer, "main_AdminWarningPageID=", vbTextCompare)
+                    Pos = genericController.vbInstr(1, webServerIO.requestReferrer, "main_AdminWarningPageID=", vbTextCompare)
                     If Pos <> 0 Then
                         webServerIO.requestReferrer = Left(webServerIO.requestReferrer, Pos - 2)
                     End If
-                    Pos = vbInstr(1, webServerIO.requestReferrer, "main_AdminWarningMsg=", vbTextCompare)
+                    Pos = genericController.vbInstr(1, webServerIO.requestReferrer, "main_AdminWarningMsg=", vbTextCompare)
                     If Pos <> 0 Then
                         webServerIO.requestReferrer = Left(webServerIO.requestReferrer, Pos - 2)
                     End If
-                    Pos = vbInstr(1, webServerIO.requestReferrer, "blockcontenttracking=", vbTextCompare)
+                    Pos = genericController.vbInstr(1, webServerIO.requestReferrer, "blockcontenttracking=", vbTextCompare)
                     If Pos <> 0 Then
                         webServerIO.requestReferrer = Left(webServerIO.requestReferrer, Pos - 2)
                     End If
@@ -24398,15 +24342,15 @@ ErrorTrap:
                 adminMessage = adminMessage & "</p>"
                 '
                 If EditPageID <> 0 Then
-                    Link = modifyLinkQuery(Link, "main_AdminWarningPageID", CStr(EditPageID), True)
+                    Link = genericController.modifyLinkQuery(Link, "main_AdminWarningPageID", CStr(EditPageID), True)
                 End If
                 '
                 If EditSectionID <> 0 Then
-                    Link = modifyLinkQuery(Link, "main_AdminWarningSectionID", CStr(EditSectionID), True)
+                    Link = genericController.modifyLinkQuery(Link, "main_AdminWarningSectionID", CStr(EditSectionID), True)
                 End If
                 '
-                Link = modifyLinkQuery(Link, RequestNameBlockContentTracking, "1", True)
-                Link = modifyLinkQuery(Link, "main_AdminWarningMsg", "<p>" & adminMessage & "</p>", True)
+                Link = genericController.modifyLinkQuery(Link, RequestNameBlockContentTracking, "1", True)
+                Link = genericController.modifyLinkQuery(Link, "main_AdminWarningMsg", "<p>" & adminMessage & "</p>", True)
             End If
             '
             main_ProcessPageNotFound_GetLink = Link
@@ -24432,7 +24376,7 @@ ErrorTrap:
                     '
                     CS = db.cs_open("Domains", "(name=" & db.encodeSQLText(webServerIO.requestDomain) & ")", , , , , , "RootPageID")
                     If db.cs_ok(CS) Then
-                        pageManager_LandingPageID = EncodeInteger(db.cs_getText(CS, "RootPageID"))
+                        pageManager_LandingPageID = genericController.EncodeInteger(db.cs_getText(CS, "RootPageID"))
                     End If
                     Call db.cs_Close(CS)
                     If pageManager_LandingPageID = 0 Then
@@ -24502,7 +24446,7 @@ ErrorTrap:
         '    '
         '    If main_IsAuthenticated Then
         '        If visitProperty.getboolean("AllowHelpIcon") Then
-        '            LocalCaption = encodeText(Caption)
+        '            LocalCaption = genericController.encodeText(Caption)
         '            LocalBubbleCopy = "<img src=""/ccLib/images/ajax-loader-small.gif"" width=16 height=16>"
         '            BubbleJS = " onMouseOver=""HelpBubbleAjaxOn('HelpBubble" & main_HelpCodeCount & "',this,'" & ContentName & "','" & FieldName & "');return false;"" onMouseOut=""HelpBubbleOff('HelpBubble" & main_HelpCodeCount & "');return false;"""
         '            main_ClosePageHTML = main_ClosePageHTML & "<div id=""HelpBubble" & main_HelpCodeCount & """ class=""ccPanel"" style=""visibility:hidden; position:absolute; width: 200px; border-right: 1px solid #000000; border-left: 1px solid #000000;border-bottom: 1px solid #000000;border-top: 1px solid #000000;"" >" & main_GetPanel(LocalBubbleCopy) & "</div>"
@@ -24536,7 +24480,7 @@ ErrorTrap:
         '       see main_executeAddon for explaination of string parsing
         '
         '       use main_GetAddonOption to main_Get a value from an AddonOptionList
-        '       use decodeNvaArgument( main_GetArgument( name, string, default, "&" )) for AddonOptionStrings
+        '       use genericController.decodeNvaArgument( main_GetArgument( name, string, default, "&" )) for AddonOptionStrings
         '=================================================================================
         '
         Public Function main_GetAggrOption(Name As String, Option_String As String) As String
@@ -24615,7 +24559,7 @@ ErrorTrap:
             LinkBase = web_RefreshQueryString
             LeftPane = "List of Styles"
             RightPane = "Style Tag Editor"
-            TempFilename = "AppCache\StyleTemp" & GetRandomInteger() & ".css"
+            TempFilename = "AppCache\StyleTemp" & genericController.GetRandomInteger() & ".css"
             '
             StyleFile = cdnFiles.readFile(TempFilename)
             If StyleFile <> "" Then
@@ -24624,27 +24568,27 @@ ErrorTrap:
                 '
                 ' remove crlf
                 '
-                StyleFile = vbReplace(StyleFile, vbCrLf, vbLf)
+                StyleFile = genericController.vbReplace(StyleFile, vbCrLf, vbLf)
                 Do
-                    Pos = vbInstr(1, StyleFile, vbLf)
+                    Pos = genericController.vbInstr(1, StyleFile, vbLf)
                     If Pos > 0 Then
-                        StyleFile = vbReplace(StyleFile, vbLf, " ")
+                        StyleFile = genericController.vbReplace(StyleFile, vbLf, " ")
                     End If
                 Loop While Pos > 0
                 '
                 ' remove double spaces
                 '
                 Do
-                    Pos = vbInstr(1, StyleFile, "  ")
+                    Pos = genericController.vbInstr(1, StyleFile, "  ")
                     If Pos > 0 Then
-                        StyleFile = vbReplace(StyleFile, "  ", " ")
+                        StyleFile = genericController.vbReplace(StyleFile, "  ", " ")
                     End If
                 Loop While Pos > 0
                 StyleLines = Split(StyleFile, "}")
                 StyleCnt = UBound(StyleLines) + 1
                 For Ptr = 0 To StyleCnt - 1
                     StyleLine = StyleLines(Ptr)
-                    Pos = vbInstr(1, StyleLine, "{")
+                    Pos = genericController.vbInstr(1, StyleLine, "{")
                     If Pos > 0 Then
                         StyleNameList = StyleNameList & vbCrLf & "<div>" & Mid(StyleLine, 1, Pos - 1) & "</div>"
                     End If
@@ -24668,7 +24612,7 @@ ErrorTrap:
                 & "<tr>" _
                 & "<td class=""ccAdminTab"" style=""min-width:100px;padding:5px;text-align:left"">Styles<br ><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=90 height=1></td>" _
                 & "<td class=""ccAdminTab"" style=""width:1px;""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=1 height=1></td>" _
-                & "<td class=""ccAdminTab"" style=""padding:5px;text-align:left"" ID=""" & TagName & ".ContentCaption"">" & encodeEmptyText(RightSideHeader, "&nbsp;") & "</td>" _
+                & "<td class=""ccAdminTab"" style=""padding:5px;text-align:left"" ID=""" & TagName & ".ContentCaption"">" & genericController.encodeEmptyText(RightSideHeader, "&nbsp;") & "</td>" _
                 & "</td></tr>" _
                 & "<tr>" _
                 & "<td style=""padding:10px;Background-color:white;border:0px solid #808080;vertical-align:top;text-align:left"">" & StyleNameList & "</td>" _
@@ -24779,17 +24723,17 @@ ErrorTrap:
                         '
                         Ticks = GetTickCount
                         For Ptr = 0 To pageManager_cache_pageContent_rows - 1
-                            Id = EncodeInteger(cache_pageContent(PCC_ID, Ptr))
-                            PageName = EncodeText(cache_pageContent(PCC_Name, Ptr))
+                            Id = genericController.EncodeInteger(cache_pageContent(PCC_ID, Ptr))
+                            PageName = genericController.encodeText(cache_pageContent(PCC_Name, Ptr))
                             IDList2.Add("," & CStr(Id))
-                            Call pageManager_cache_pageContent_idIndex.setPtr(EncodeText(Id), Ptr)
+                            Call pageManager_cache_pageContent_idIndex.setPtr(genericController.encodeText(Id), Ptr)
                             If PageName <> "" Then
                                 Call pageManager_cache_pageContent_nameIndex.setPtr(PageName, Ptr)
                             End If
                             '
                             ' if menulinkoverride is encoded, decode it
                             '
-                            If vbInstr(1, cache_pageContent(PCC_Link, Ptr), "%") <> 0 Then
+                            If genericController.vbInstr(1, cache_pageContent(PCC_Link, Ptr), "%") <> 0 Then
                                 cache_pageContent(PCC_Link, Ptr) = main_DecodeUrl(cache_pageContent(PCC_Link, Ptr))
                             End If
                         Next
@@ -24798,11 +24742,11 @@ ErrorTrap:
                         ' build parentid list -- after id list to check for orphas
                         '
                         For Ptr = 0 To pageManager_cache_pageContent_rows - 1
-                            ParentID = EncodeInteger(cache_pageContent(PCC_ParentID, Ptr))
+                            ParentID = genericController.EncodeInteger(cache_pageContent(PCC_ParentID, Ptr))
                             If (InStr(1, "," & IDList & ",", "," & ParentID & ",") = 0) Then
                                 ParentID = 0
                             End If
-                            Call pageManager_cache_pageContent_parentIdIndex.setPtr(EncodeText(ParentID), Ptr)
+                            Call pageManager_cache_pageContent_parentIdIndex.setPtr(genericController.encodeText(ParentID), Ptr)
                         Next
                         Call pageManager_cache_pageContent_save()
                     End If
@@ -25003,7 +24947,7 @@ ErrorTrap:
             If pageManager_cache_pageContent_rows > 0 Then
                 SelectList = pageManager_cache_pageContent_fieldList
                 For RowPtr = 0 To pageManager_cache_pageContent_rows - 1
-                    If EncodeInteger(cache_pageContent(PCC_ID, RowPtr)) = PageID Then
+                    If genericController.EncodeInteger(cache_pageContent(PCC_ID, RowPtr)) = PageID Then
                         Exit For
                     End If
                 Next
@@ -25035,21 +24979,21 @@ ErrorTrap:
                     '
                     ' build id and name indexes
                     '
-                    Id = EncodeInteger(cache_pageContent(PCC_ID, RowPtr))
-                    PageName = EncodeText(cache_pageContent(PCC_Name, RowPtr))
+                    Id = genericController.EncodeInteger(cache_pageContent(PCC_ID, RowPtr))
+                    PageName = genericController.encodeText(cache_pageContent(PCC_Name, RowPtr))
                     '
-                    Call pageManager_cache_pageContent_idIndex.setPtr(EncodeText(Id), RowPtr)
+                    Call pageManager_cache_pageContent_idIndex.setPtr(genericController.encodeText(Id), RowPtr)
                     '
                     If PageName <> "" Then
                         Call pageManager_cache_pageContent_nameIndex.setPtr(PageName, RowPtr)
                     End If
                     '
-                    If vbInstr(1, cache_pageContent(PCC_Link, RowPtr), "%") <> 0 Then
+                    If genericController.vbInstr(1, cache_pageContent(PCC_Link, RowPtr), "%") <> 0 Then
                         cache_pageContent(PCC_Link, RowPtr) = main_DecodeUrl(cache_pageContent(PCC_Link, RowPtr))
                     End If
                     '
-                    ParentID = EncodeInteger(cache_pageContent(PCC_ParentID, RowPtr))
-                    Call pageManager_cache_pageContent_parentIdIndex.setPtr(EncodeText(ParentID), RowPtr)
+                    ParentID = genericController.EncodeInteger(cache_pageContent(PCC_ParentID, RowPtr))
+                    Call pageManager_cache_pageContent_parentIdIndex.setPtr(genericController.encodeText(ParentID), RowPtr)
                     '
                     Call pageManager_cache_pageContent_save()
                 End If
@@ -25094,7 +25038,7 @@ ErrorTrap:
                 ' Find the row in the PCC
                 '
                 For RowPtr = 0 To pageManager_cache_pageContent_rows - 1
-                    If EncodeInteger(cache_pageContent(PCC_ID, RowPtr)) = PageID Then
+                    If genericController.EncodeInteger(cache_pageContent(PCC_ID, RowPtr)) = PageID Then
                         Exit For
                     End If
                 Next
@@ -25157,12 +25101,12 @@ ErrorTrap:
                 SortSplit = Split(OrderByCriteria, ",")
                 SortSplitCnt = UBound(SortSplit) + 1
                 For SortPtr = 0 To SortSplitCnt - 1
-                    SortFieldName = vbLCase(SortSplit(SortPtr))
+                    SortFieldName = genericController.vbLCase(SortSplit(SortPtr))
                     SortForward = True
-                    If vbInstr(1, SortFieldName, " asc", vbTextCompare) <> 0 Then
-                        SortFieldName = vbReplace(SortFieldName, " asc", "")
-                    ElseIf vbInstr(1, SortFieldName, " desc", vbTextCompare) <> 0 Then
-                        SortFieldName = vbReplace(SortFieldName, " desc", "")
+                    If genericController.vbInstr(1, SortFieldName, " asc", vbTextCompare) <> 0 Then
+                        SortFieldName = genericController.vbReplace(SortFieldName, " asc", "")
+                    ElseIf genericController.vbInstr(1, SortFieldName, " desc", vbTextCompare) <> 0 Then
+                        SortFieldName = genericController.vbReplace(SortFieldName, " desc", "")
                         SortForward = False
                     End If
                     PCCSortFieldPtr = pageManager_cache_pageContent_getColPtr(SortFieldName)
@@ -25182,11 +25126,11 @@ ErrorTrap:
                         Index = New coreKeyPtrIndexClass
                         For Ptr = 0 To PCCPtrCnt - 1
                             PCCRowPtr = PCCPtrs(Ptr)
-                            StringValue = EncodeText(cache_pageContent(PCCSortFieldPtr, PCCRowPtr))
+                            StringValue = genericController.encodeText(cache_pageContent(PCCSortFieldPtr, PCCRowPtr))
                             Select Case fieldType
                                 Case FieldTypeIdInteger
                                     LongValue = CInt(DblValue)
-                                    SortFieldValue = GetIntegerString(LongValue, 10)
+                                    SortFieldValue = genericController.GetIntegerString(LongValue, 10)
                                 Case FieldTypeIdDate
                                     If Not IsDate(StringValue) Then
                                         SortFieldValue = "000000000000000000"
@@ -25194,7 +25138,7 @@ ErrorTrap:
                                         DateValue = CDate(StringValue)
                                         DblValue = DateValue.ToOADate * CDbl(1440)
                                         LongValue = CInt(DblValue)
-                                        SortFieldValue = GetIntegerString(LongValue, 10)
+                                        SortFieldValue = genericController.GetIntegerString(LongValue, 10)
                                     End If
                                 Case Else
                                     SortFieldValue = StringValue
@@ -25218,7 +25162,7 @@ ErrorTrap:
                         PCCRowPtr = Index.getFirstPtr
                         For Ptr = PtrStart To PtrEnd Step PtrStep
                             PCCPtrs(Ptr) = PCCRowPtr
-                            PCCRowPtr = EncodeInteger(Index.getNextPtr)
+                            PCCRowPtr = genericController.EncodeInteger(Index.getNextPtr)
                         Next
                     End If
                 Next
@@ -25236,7 +25180,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetPCCColPtr")
             '
             pageManager_cache_pageContent_getColPtr = -1
-            Select Case vbLCase(FieldName)
+            Select Case genericController.vbLCase(FieldName)
                 Case "active"
                     pageManager_cache_pageContent_getColPtr = PCC_Active
                 Case "allowchildlistdisplay"
@@ -25462,19 +25406,19 @@ ErrorTrap:
                     '
                     ' ID Index
                     '
-                    IDText = EncodeText(cache_siteSection(SSC_ID, Ptr))
+                    IDText = genericController.encodeText(cache_siteSection(SSC_ID, Ptr))
                     Call pageManager_cache_siteSection_IDIndex.setPtr(IDText, Ptr)
                     '
                     ' RootPageID Index
                     '
-                    Id = EncodeInteger(cache_siteSection(SSC_RootPageID, Ptr))
+                    Id = genericController.EncodeInteger(cache_siteSection(SSC_RootPageID, Ptr))
                     If Id <> 0 Then
-                        Call pageManager_cache_siteSection_RootPageIDIndex.setPtr(EncodeText(Id), Ptr)
+                        Call pageManager_cache_siteSection_RootPageIDIndex.setPtr(genericController.encodeText(Id), Ptr)
                     End If
                     '
                     ' Name Index
                     '
-                    Name = EncodeText(cache_siteSection(SSC_Name, Ptr))
+                    Name = genericController.encodeText(cache_siteSection(SSC_Name, Ptr))
                     If Name <> "" Then
                         Call pageManager_cache_siteSection_NameIndex.setPtr(Name, Ptr)
                     End If
@@ -25653,8 +25597,8 @@ ErrorTrap:
                 Dim dt As DataTable = db.executeSql(SQL)
                 If dt.Rows.Count > 0 Then
                     For Each rsDr As DataRow In dt.Rows
-                        templateId = EncodeInteger(rsDr("ID"))
-                        styleId = EncodeInteger(rsDr("styleid"))
+                        templateId = genericController.EncodeInteger(rsDr("ID"))
+                        styleId = genericController.EncodeInteger(rsDr("styleid"))
                         If (templateId = LastTemplateID) Then
                             '
                             ' Another style for the same template
@@ -25676,32 +25620,32 @@ ErrorTrap:
                                 ReDim Preserve cacheArray(TC_cnt, TCSize)
                             End If
                             Ptr = pageManager_cache_pageTemplate_rows
-                            cacheArray(TC_ID, Ptr) = EncodeInteger(rsDr("ID")).ToString
-                            cacheArray(TC_JSEndBody, Ptr) = EncodeText(rsDr("JSEndBody"))
-                            cacheArray(TC_JSInHeadLegacy, Ptr) = EncodeText(rsDr("JSHead"))
-                            cacheArray(TC_JSInHeadFilename, Ptr) = EncodeText(rsDr("JSFilename"))
-                            cacheArray(TC_JSOnLoad, Ptr) = EncodeText(rsDr("JSOnLoad"))
-                            cacheArray(TC_Name, Ptr) = EncodeText(rsDr("Name"))
-                            cacheArray(TC_Link, Ptr) = main_verifyTemplateLink(EncodeText(rsDr("Link")))
+                            cacheArray(TC_ID, Ptr) = genericController.EncodeInteger(rsDr("ID")).ToString
+                            cacheArray(TC_JSEndBody, Ptr) = genericController.encodeText(rsDr("JSEndBody"))
+                            cacheArray(TC_JSInHeadLegacy, Ptr) = genericController.encodeText(rsDr("JSHead"))
+                            cacheArray(TC_JSInHeadFilename, Ptr) = genericController.encodeText(rsDr("JSFilename"))
+                            cacheArray(TC_JSOnLoad, Ptr) = genericController.encodeText(rsDr("JSOnLoad"))
+                            cacheArray(TC_Name, Ptr) = genericController.encodeText(rsDr("Name"))
+                            cacheArray(TC_Link, Ptr) = main_verifyTemplateLink(genericController.encodeText(rsDr("Link")))
                             '
-                            cacheArray(TC_BodyHTML, Ptr) = EncodeText(rsDr("BodyHTML"))
+                            cacheArray(TC_BodyHTML, Ptr) = genericController.encodeText(rsDr("BodyHTML"))
                             cacheArray(TC_SharedStylesIDList, Ptr) = styleId.ToString
-                            cacheArray(TC_StylesFilename, Ptr) = EncodeText(rsDr("StylesFilename"))
+                            cacheArray(TC_StylesFilename, Ptr) = genericController.encodeText(rsDr("StylesFilename"))
                             '
-                            cacheArray(TC_MobileBodyHTML, Ptr) = EncodeText(rsDr("MobileBodyHTML"))
+                            cacheArray(TC_MobileBodyHTML, Ptr) = genericController.encodeText(rsDr("MobileBodyHTML"))
                             ' do not support shared styles on Mobile templates yet
                             'cacheArray(TC_MobileSharedStylesIDList, Ptr) = StyleID
-                            cacheArray(TC_MobileStylesFilename, Ptr) = EncodeText(rsDr("MobileStylesFilename"))
-                            cacheArray(TC_OtherHeadTags, Ptr) = EncodeText(rsDr("OtherHeadTags"))
-                            cacheArray(TC_BodyTag, Ptr) = EncodeText(rsDr("BodyTag"))
-                            cacheArray(TC_IsSecure, Ptr) = EncodeBoolean(rsDr("IsSecure")).ToString
+                            cacheArray(TC_MobileStylesFilename, Ptr) = genericController.encodeText(rsDr("MobileStylesFilename"))
+                            cacheArray(TC_OtherHeadTags, Ptr) = genericController.encodeText(rsDr("OtherHeadTags"))
+                            cacheArray(TC_BodyTag, Ptr) = genericController.encodeText(rsDr("BodyTag"))
+                            cacheArray(TC_IsSecure, Ptr) = genericController.EncodeBoolean(rsDr("IsSecure")).ToString
                             '
                             ' gather domains for this templates
                             '
                             SQL = "select domainid from ccDomainTemplateRules where templateid=" & templateId
                             Dim dtdomains As DataTable = db.executeSql(SQL)
                             If dtdomains.Rows.Count > 0 Then
-                                cacheArray(TC_DomainIdList, Ptr) = EncodeText(dtdomains.Rows.Item(0))
+                                cacheArray(TC_DomainIdList, Ptr) = genericController.encodeText(dtdomains.Rows.Item(0))
                                 'cacheArray(TC_DomainIdList, Ptr) = rsdomains.GetString(StringFormatEnum.adClipString, , "", ",")
                             Else
                                 cacheArray(TC_DomainIdList, Ptr) = ""
@@ -25719,8 +25663,8 @@ ErrorTrap:
                 If pageManager_cache_pageTemplate_rows > 0 Then
                     pageManager_cache_pageTemplate_contentIdindex = New coreKeyPtrIndexClass
                     For Ptr = 0 To pageManager_cache_pageTemplate_rows - 1
-                        Id = EncodeInteger(cache_pageTemplate(TC_ID, Ptr))
-                        Call pageManager_cache_pageTemplate_contentIdindex.setPtr(EncodeText(Id), Ptr)
+                        Id = genericController.EncodeInteger(cache_pageTemplate(TC_ID, Ptr))
+                        Call pageManager_cache_pageTemplate_contentIdindex.setPtr(genericController.encodeText(Id), Ptr)
                     Next
                 End If
                 If Not pagemanager_IsWorkflowRendering() Then
@@ -25813,7 +25757,7 @@ ErrorTrap:
                 End If
                 Ptr = pageManager_cache_pageTemplate_getPtr(templateId)
                 If Ptr >= 0 Then
-                    main_GetTemplateLink = EncodeText(cache_pageTemplate(TC_Link, Ptr))
+                    main_GetTemplateLink = genericController.encodeText(cache_pageTemplate(TC_Link, Ptr))
                 End If
             End If
             '
@@ -25833,7 +25777,7 @@ ErrorTrap:
         Private Function main_GetTCLink(TCPtr As Integer) As String
             '
             If TCPtr >= 0 Then
-                main_GetTCLink = EncodeText(cache_pageTemplate(TC_Link, TCPtr))
+                main_GetTCLink = genericController.encodeText(cache_pageTemplate(TC_Link, TCPtr))
             End If
             Exit Function
             '
@@ -25845,13 +25789,13 @@ ErrorTrap:
             Dim templateSecure As Boolean
             '
             If TCPtr >= 0 Then
-                Link = EncodeText(cache_pageTemplate(TC_Link, TCPtr))
-                templateSecure = EncodeBoolean(cache_pageTemplate(TC_IsSecure, TCPtr))
+                Link = genericController.encodeText(cache_pageTemplate(TC_Link, TCPtr))
+                templateSecure = genericController.EncodeBoolean(cache_pageTemplate(TC_IsSecure, TCPtr))
                 If Link <> "" Then
                     '
                     ' Link is included in template
                     '
-                    If vbInstr(1, Link, "://", vbTextCompare) <> 0 Then
+                    If genericController.vbInstr(1, Link, "://", vbTextCompare) <> 0 Then
                         '
                         ' Template link is Full URL, IsSecure checkbox does nothing
                         '
@@ -25862,8 +25806,8 @@ ErrorTrap:
                         If Mid(Link, 1, 1) <> "/" Then
                             Link = "/" & Link
                         End If
-                        Link = ConvertLinkToShortLink(Link, webServerIO.requestDomain, webServerIO_requestVirtualFilePath)
-                        Link = coreCommonModule.EncodeAppRootPath(Link, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
+                        Link = genericController.ConvertLinkToShortLink(Link, webServerIO.requestDomain, webServerIO_requestVirtualFilePath)
+                        Link = genericController.EncodeAppRootPath(Link, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
                         If templateSecure And (Not webServerIO.requestSecure) Then
                             '
                             ' Short Link, and IsSecure checked but current page is not secure
@@ -25950,10 +25894,10 @@ ErrorTrap:
             Dim DateExpires As Date
             Dim datetext As String
             '
-            main_GetMobileBrowserList = EncodeText(cache.getObject(Of String)("MobileBrowserList"))
+            main_GetMobileBrowserList = genericController.encodeText(cache.getObject(Of String)("MobileBrowserList"))
             If main_GetMobileBrowserList <> "" Then
-                datetext = getLine(main_GetMobileBrowserList)
-                If EncodeDate(datetext) < Now() Then
+                datetext = genericController.getLine(main_GetMobileBrowserList)
+                If genericController.EncodeDate(datetext) < Now() Then
                     main_GetMobileBrowserList = ""
                 End If
             End If
@@ -25962,7 +25906,7 @@ ErrorTrap:
                 main_GetMobileBrowserList = privateFiles.readFile(Filename)
                 If main_GetMobileBrowserList = "" Then
                     main_GetMobileBrowserList = "midp,j2me,avantg,docomo,novarra,palmos,palmsource,240x320,opwv,chtml,pda,windows ce,mmp/,blackberry,mib/,symbian,wireless,nokia,hand,mobi,phone,cdm,up.b,audio,SIE-,SEC-,samsung,HTC,mot-,mitsu,sagem,sony,alcatel,lg,erics,vx,NEC,philips,mmm,xx,panasonic,sharp,wap,sch,rover,pocket,benq,java,pt,pg,vox,amoi,bird,compal,kg,voda,sany,kdd,dbt,sendo,sgh,gradi,jb,moto"
-                    main_GetMobileBrowserList = vbReplace(main_GetMobileBrowserList, ",", vbCrLf)
+                    main_GetMobileBrowserList = genericController.vbReplace(main_GetMobileBrowserList, ",", vbCrLf)
                     'Call app.publicFiles.SaveFile(Filename, main_GetMobileBrowserList)
                 End If
                 datetext = DateTime.Now.AddHours(1).ToString
@@ -26008,11 +25952,11 @@ ErrorTrap:
             Dim s As String
             '
             s = main_GetAddonOption(OptionName, AddonOptionConstructorList)
-            Pos = vbInstr(1, s, "[")
+            Pos = genericController.vbInstr(1, s, "[")
             If Pos > 0 Then
                 s = Left(s, Pos - 1)
             End If
-            s = decodeNvaArgument(s)
+            s = genericController.decodeNvaArgument(s)
             '
             main_GetAddonOptionConstructorValue = s
             '
@@ -26058,7 +26002,7 @@ ErrorTrap:
                 IDCnt = UBound(IDs) + 1
                 SingleEntry = (IDCnt = 1)
                 For Ptr = 0 To IDCnt - 1
-                    ChildList = pageManager_DeleteChildRecords(ContentName, EncodeInteger(IDs(Ptr)), True)
+                    ChildList = pageManager_DeleteChildRecords(ContentName, genericController.EncodeInteger(IDs(Ptr)), True)
                     If ChildList <> "" Then
                         pageManager_DeleteChildRecords = pageManager_DeleteChildRecords & "," & ChildList
                         SingleEntry = False
@@ -26073,8 +26017,8 @@ ErrorTrap:
                     SingleEntry = (IDCnt = 1)
                     QuickEditing = user.isQuickEditing("page content")
                     For Ptr = 0 To IDCnt - 1
-                        Call DeleteContentRecord("page content", EncodeInteger(IDs(Ptr)))
-                        Call pageManager_cache_pageContent_removeRow(EncodeInteger(IDs(Ptr)), pagemanager_IsWorkflowRendering, QuickEditing)
+                        Call DeleteContentRecord("page content", genericController.EncodeInteger(IDs(Ptr)))
+                        Call pageManager_cache_pageContent_removeRow(genericController.EncodeInteger(IDs(Ptr)), pagemanager_IsWorkflowRendering, QuickEditing)
                     Next
                 End If
             End If
@@ -26130,7 +26074,7 @@ ErrorTrap:
             '
             '    End If
             'hint = hint & ",100"
-            Select Case vbLCase(TableName)
+            Select Case genericController.vbLCase(TableName)
                 Case "linkaliases"
                     'Call cache_linkAlias_clear
                 Case "ccmembers"
@@ -26163,7 +26107,7 @@ ErrorTrap:
                     ' Site Properties
                     '
                     'hint = hint & ",130"
-                    Select Case vbLCase(RecordName)
+                    Select Case genericController.vbLCase(RecordName)
                         Case "allowlinkalias"
                             Call cache.invalidateTagCommaList("Page Content")
                         Case "sectionlandinglink"
@@ -26195,12 +26139,12 @@ ErrorTrap:
                         ' Clear the Landing page and page not found site properties
                         '
 
-                        If vbLCase(TableName) = "ccpagecontent" Then
+                        If genericController.vbLCase(TableName) = "ccpagecontent" Then
                             Call pageManager_cache_pageContent_removeRow(RecordID, pagemanager_IsWorkflowRendering, False)
-                            If RecordID = EncodeInteger(siteProperties.getText("PageNotFoundPageID", "0")) Then
+                            If RecordID = genericController.EncodeInteger(siteProperties.getText("PageNotFoundPageID", "0")) Then
                                 Call siteProperties.setProperty("PageNotFoundPageID", "0")
                             End If
-                            If RecordID = EncodeInteger(siteProperties.getText("LandingPageID", "0")) Then
+                            If RecordID = genericController.EncodeInteger(siteProperties.getText("LandingPageID", "0")) Then
                                 Call siteProperties.setProperty("LandingPageID", "0")
                             End If
                         End If
@@ -26294,7 +26238,7 @@ ErrorTrap:
                                 If Pos > 0 Then
                                     FilenameExt = Mid(Filename, Pos + 1)
                                     FilenameNoExt = Mid(Filename, 1, Pos - 1)
-                                    If vbInstr(1, "jpg,gif,png", FilenameExt, vbTextCompare) <> 0 Then
+                                    If genericController.vbInstr(1, "jpg,gif,png", FilenameExt, vbTextCompare) <> 0 Then
                                         sf = New coreImageEditClass
                                         If sf.load(appRootFiles.rootLocalPath & FilePath & Filename) Then
                                             '
@@ -26348,7 +26292,7 @@ ErrorTrap:
                                             Call sf.Dispose()
                                             sf = Nothing
                                         End If
-                                        '                                sf.Algorithm = encodeInteger(main_GetSiteProperty("ImageResizeSFAlgorithm", "5"))
+                                        '                                sf.Algorithm = genericController.EncodeInteger(main_GetSiteProperty("ImageResizeSFAlgorithm", "5"))
                                         '                                On Error Resume Next
                                         '                                sf.LoadFromFile (app.publicFiles.rootFullPath & FilePath & Filename)
                                         '                                If Err.Number = 0 Then
@@ -26493,7 +26437,7 @@ ErrorTrap:
             Else
                 BakeName = "SharedStyleMap-Public"
             End If
-            MapList = EncodeText(cache.getObject(Of String)(BakeName))
+            MapList = genericController.encodeText(cache.getObject(Of String)(BakeName))
             If MapList = "" Then
                 '
                 ' BuildMap
@@ -26515,8 +26459,8 @@ ErrorTrap:
                     styleId = db.cs_getInteger(CS, "ID")
                     If styleId <> LastStyleID Then
                         Filename = db.cs_get(CS, "StyleFilename")
-                        Prefix = vbReplace(main_encodeHTML(db.cs_get(CS, "Prefix")), ",", "&#44;")
-                        Suffix = vbReplace(main_encodeHTML(db.cs_get(CS, "Suffix")), ",", "&#44;")
+                        Prefix = genericController.vbReplace(main_encodeHTML(db.cs_get(CS, "Prefix")), ",", "&#44;")
+                        Suffix = genericController.vbReplace(main_encodeHTML(db.cs_get(CS, "Suffix")), ",", "&#44;")
                         If (Not main_IsAdminSite) And db.cs_getBoolean(CS, "alwaysinclude") Then
                             MapList = MapList & vbCrLf & "0" & vbTab & Filename & "<" & Prefix & "<" & Suffix
                         Else
@@ -26546,8 +26490,8 @@ ErrorTrap:
                 '
                 FileList = ""
                 For MapRow = 0 To MapCnt - 1
-                    If vbInstr(1, Map(MapRow), "0" & vbTab) = 1 Then
-                        Pos = vbInstr(1, Map(MapRow), vbTab)
+                    If genericController.vbInstr(1, Map(MapRow), "0" & vbTab) = 1 Then
+                        Pos = genericController.vbInstr(1, Map(MapRow), vbTab)
                         If Pos > 0 Then
                             FileList = FileList & "," & Mid(Map(MapRow), Pos + 1)
                         End If
@@ -26557,11 +26501,11 @@ ErrorTrap:
                 ' create a filelist of everything that is needed, might be duplicates
                 '
                 For Ptr = 0 To SrcCnt - 1
-                    SrcID = EncodeInteger(Srcs(Ptr))
+                    SrcID = genericController.EncodeInteger(Srcs(Ptr))
                     If SrcID <> 0 Then
                         For MapRow = 0 To MapCnt - 1
-                            If vbInstr(1, Map(MapRow), SrcID & vbTab) <> 0 Then
-                                Pos = vbInstr(1, Map(MapRow), vbTab)
+                            If genericController.vbInstr(1, Map(MapRow), SrcID & vbTab) <> 0 Then
+                                Pos = genericController.vbInstr(1, Map(MapRow), vbTab)
                                 If Pos > 0 Then
                                     FileList = FileList & "," & Mid(Map(MapRow), Pos + 1)
                                 End If
@@ -26576,7 +26520,7 @@ ErrorTrap:
                     Files = Split(FileList, ",")
                     For Ptr = 0 To UBound(Files)
                         Filename = Files(Ptr)
-                        If vbInstr(1, main_GetSharedStyleFileList, Filename, vbTextCompare) = 0 Then
+                        If genericController.vbInstr(1, main_GetSharedStyleFileList, Filename, vbTextCompare) = 0 Then
                             main_GetSharedStyleFileList = main_GetSharedStyleFileList & vbCrLf & Filename
                         End If
                     Next
@@ -26622,13 +26566,13 @@ ErrorTrap:
                 If kmaParse.IsTag(ElementPointer) Then
                     TagCount = TagCount + 1
                     TagName = kmaParse.TagName(ElementPointer)
-                    Select Case vbUCase(TagName)
+                    Select Case genericController.vbUCase(TagName)
                         Case "LINK"
                             '
                             Link = kmaParse.ElementAttribute(ElementPointer, "HREF")
                             LinkType = kmaParse.ElementAttribute(ElementPointer, "TYPE")
-                            If (IsLinkToThisHost(SourceHost, Link)) And (LCase(LinkType) = "text/css") Then
-                                RootRelativeLink = ConvertLinkToRootRelative(Link, BasePath)
+                            If (genericController.IsLinkToThisHost(SourceHost, Link)) And (LCase(LinkType) = "text/css") Then
+                                RootRelativeLink = genericController.ConvertLinkToRootRelative(Link, BasePath)
                                 main_GetStyleListFromHTML = main_GetStyleListFromHTML & vbCrLf & main_GetStyleListFromLink(Link, BasePath, SourceHost, "")
                             End If
                         Case "STYLE"
@@ -26688,14 +26632,14 @@ ErrorTrap:
             Dim ImportLink As String
             Dim LinkPath As String
             '
-            RootRelativeLink = ConvertLinkToRootRelative(Link, BasePath)
+            RootRelativeLink = genericController.ConvertLinkToRootRelative(Link, BasePath)
             main_GetStyleListFromLink = ""
-            If vbInstr(1, BlockRootRelativeLinkList, RootRelativeLink, vbTextCompare) = 0 Then
+            If genericController.vbInstr(1, BlockRootRelativeLinkList, RootRelativeLink, vbTextCompare) = 0 Then
                 ImportLink = SourceHost & RootRelativeLink
                 ImportedStyle = HTTP.getURL(ImportLink)
                 Dim HTTPStatus As String
-                HTTPStatus = getLine(HTTP.responseHeader)
-                If vbInstr(1, HTTPStatus, "200") = 0 Then
+                HTTPStatus = genericController.getLine(HTTP.responseHeader)
+                If genericController.vbInstr(1, HTTPStatus, "200") = 0 Then
                     main_GetStyleListFromLink = ""
                 Else
                 End If
@@ -26749,17 +26693,17 @@ ErrorTrap:
             ' convert imports
             '
             Do While (Pos <> 0) And LoopCnt < 100
-                Pos = vbInstr(Pos, StyleSheet, "@import", vbTextCompare)
+                Pos = genericController.vbInstr(Pos, StyleSheet, "@import", vbTextCompare)
                 If Pos <> 0 Then
                     '
                     ' style includes an import -- convert filename and load the file
                     '
-                    Pos = vbInstr(Pos, StyleSheet, "url", vbTextCompare)
+                    Pos = genericController.vbInstr(Pos, StyleSheet, "url", vbTextCompare)
                     If Pos <> 0 Then
-                        PosStart = vbInstr(Pos, StyleSheet, "(", vbTextCompare)
+                        PosStart = genericController.vbInstr(Pos, StyleSheet, "(", vbTextCompare)
                         If PosStart <> 0 Then
                             PosStart = PosStart + 1
-                            PosEnd = vbInstr(PosStart, StyleSheet, ")", vbTextCompare)
+                            PosEnd = genericController.vbInstr(PosStart, StyleSheet, ")", vbTextCompare)
                             If PosEnd <> 0 Then
                                 PosEnd = PosEnd - 1
                                 Link = Mid(StyleSheet, PosStart, PosEnd - PosStart + 1)
@@ -26867,7 +26811,7 @@ ErrorTrap:
             If Not main_PleaseWaitStarted Then
                 main_PleaseWaitStarted = True
                 Call writeAltBuffer(main_GetPleaseWaitStart)
-                Call main_FlushStream()
+                Call webServerIO_FlushStream()
             End If
             '
         End Sub
@@ -26884,7 +26828,7 @@ ErrorTrap:
         Public Sub main_WritePleaseWaitEnd()
             If main_PleaseWaitStarted Then
                 Call writeAltBuffer(main_GetPleaseWaitEnd)
-                Call main_FlushStream()
+                Call webServerIO_FlushStream()
             End If
         End Sub
         ''
@@ -26989,7 +26933,7 @@ ErrorTrap:
 
                 PageSize = docProperties.getInteger("pagesize")
                 PageNumber = docProperties.getInteger("pagenumber")
-                Select Case vbLCase(docProperties.getText("responseformat"))
+                Select Case genericController.vbLCase(docProperties.getText("responseformat"))
                     Case "jsonnamevalue"
                         RemoteFormat = RemoteFormatEnum.RemoteFormatJsonNameValue
                     Case "jsonnamearray"
@@ -27017,10 +26961,10 @@ ErrorTrap:
                     ReDim ArgName(ArgCnt)
                     ReDim ArgValue(ArgCnt)
                     For Ptr = 0 To ArgCnt - 1
-                        Pos = vbInstr(1, ArgArray(Ptr), "=")
+                        Pos = genericController.vbInstr(1, ArgArray(Ptr), "=")
                         If Pos > 0 Then
-                            ArgName(Ptr) = DecodeResponseVariable(Mid(ArgArray(Ptr), 1, Pos - 1))
-                            ArgValue(Ptr) = DecodeResponseVariable(Mid(ArgArray(Ptr), Pos + 1))
+                            ArgName(Ptr) = genericController.DecodeResponseVariable(Mid(ArgArray(Ptr), 1, Pos - 1))
+                            ArgValue(Ptr) = genericController.DecodeResponseVariable(Mid(ArgArray(Ptr), Pos + 1))
                         End If
                     Next
                 End If
@@ -27047,7 +26991,7 @@ ErrorTrap:
                         '
                         ' Try Hardcoded queries
                         '
-                        Select Case vbLCase(RemoteKey)
+                        Select Case genericController.vbLCase(RemoteKey)
                             Case "ccfieldhelpupdate"
                                 '
                                 ' developers editing field help
@@ -27091,8 +27035,8 @@ ErrorTrap:
                         '    '
                         '    If SQLQuery <> "" Then
                         '        For Ptr = 0 To ArgCnt - 1
-                        '            SQLQuery = vbReplace(SQLQuery, ArgName(Ptr), ArgValue(Ptr), vbTextCompare)
-                        '            'Criteria = vbReplace(Criteria, ArgName(Ptr), ArgValue(Ptr), vbTextCompare)
+                        '            SQLQuery = genericController.vbReplace(SQLQuery, ArgName(Ptr), ArgValue(Ptr), vbTextCompare)
+                        '            'Criteria = genericController.vbReplace(Criteria, ArgName(Ptr), ArgValue(Ptr), vbTextCompare)
                         '        Next
                         '        On Error Resume Next
                         '        RS = main_ExecuteSQLCommand(DataSource, SQLQuery, 30, PageSize, PageNumber)
@@ -27147,7 +27091,7 @@ ErrorTrap:
                         '                With gd.row(RowPtr)
                         '                    ReDim .Cell(ColMax)
                         '                    For ColPtr = 0 To ColMax
-                        '                        .Cell(ColPtr).v = EncodeText(Cells(ColPtr, RowPtr))
+                        '                        .Cell(ColPtr).v = genericController.encodeText(Cells(ColPtr, RowPtr))
                         '                    Next
                         '                End With
                         '            Next
@@ -27175,7 +27119,7 @@ ErrorTrap:
                         '        '
                         '        ' Single result, display with no table
                         '        '
-                        '        Copy = EncodeText(Cells(0, 0))
+                        '        Copy = genericController.encodeText(Cells(0, 0))
                         '    Else
                         '        '
                         '        ' Build headers
@@ -27217,9 +27161,9 @@ ErrorTrap:
                                 SetPairString = ""
                                 Criteria = ""
                                 For Ptr = 0 To ArgCnt - 1
-                                    If vbLCase(ArgName(Ptr)) = "setpairs" Then
+                                    If genericController.vbLCase(ArgName(Ptr)) = "setpairs" Then
                                         SetPairString = ArgValue(Ptr)
-                                    ElseIf vbLCase(ArgName(Ptr)) = "criteria" Then
+                                    ElseIf genericController.vbLCase(ArgName(Ptr)) = "criteria" Then
                                         Criteria = ArgValue(Ptr)
                                     End If
                                 Next
@@ -27234,10 +27178,10 @@ ErrorTrap:
                                     SetPairs = Split(SetPairString, "&")
                                     For Ptr = 0 To UBound(SetPairs)
                                         If SetPairs(Ptr) <> "" Then
-                                            Pos = vbInstr(1, SetPairs(Ptr), "=")
+                                            Pos = genericController.vbInstr(1, SetPairs(Ptr), "=")
                                             If Pos > 0 Then
-                                                FieldValue = DecodeResponseVariable(Mid(SetPairs(Ptr), Pos + 1))
-                                                FieldName = DecodeResponseVariable(Mid(SetPairs(Ptr), 1, Pos - 1))
+                                                FieldValue = genericController.DecodeResponseVariable(Mid(SetPairs(Ptr), Pos + 1))
+                                                FieldName = genericController.DecodeResponseVariable(Mid(SetPairs(Ptr), 1, Pos - 1))
                                                 If Not main_IsContentFieldSupported(ContentName, FieldName) Then
                                                     Dim errorMessage As String = "result, QueryTypeUpdateContent, key [" & RemoteKey & "], bad field [" & FieldName & "] skipped"
                                                     Call handleExceptionAndRethrow(New ApplicationException(errorMessage))
@@ -27368,7 +27312,7 @@ ErrorTrap:
                         ColDelim = ""
                         For ColPtr = 0 To UBound(gd.col)
                             With gd.col(ColPtr)
-                                Call s.Add(ColDelim & "{id: '" & EncodeJavascript(.Id) & "', label: '" & EncodeJavascript(.Label) & "', type: '" & EncodeJavascript(.Type) & "'}")
+                                Call s.Add(ColDelim & "{id: '" & genericController.EncodeJavascript(.Id) & "', label: '" & genericController.EncodeJavascript(.Label) & "', type: '" & genericController.EncodeJavascript(.Type) & "'}")
                                 ColDelim = ","
                             End With
                         Next
@@ -27380,7 +27324,7 @@ ErrorTrap:
                             ColDelim = ""
                             For ColPtr = 0 To UBound(gd.col)
                                 With gd.row(RowPtr).Cell(ColPtr)
-                                    Call s.Add(ColDelim & "{v: '" & EncodeJavascript(.v) & "'}")
+                                    Call s.Add(ColDelim & "{v: '" & genericController.EncodeJavascript(.v) & "'}")
                                     ColDelim = ","
                                 End With
                             Next
@@ -27429,7 +27373,7 @@ ErrorTrap:
         '    '
         '    Dim iArgument As String
         '    '
-        '    iArgument = encodeText(Argument)
+        '    iArgument = genericController.encodeText(Argument)
         '    '
         '    Exit Sub
         '    '
@@ -27453,9 +27397,9 @@ ErrorTrap:
             Found = False
             ResultNode = Node.Attributes.GetNamedItem(Name)
             If (ResultNode Is Nothing) Then
-                UcaseName = vbUCase(Name)
+                UcaseName = genericController.vbUCase(Name)
                 For Each NodeAttribute In Node.Attributes
-                    If vbUCase(NodeAttribute.Name) = UcaseName Then
+                    If genericController.vbUCase(NodeAttribute.Name) = UcaseName Then
                         main_GetXMLAttribute = NodeAttribute.Value
                         Found = True
                         Exit For
@@ -27483,7 +27427,7 @@ ErrorTrap:
         '        Public Function main_GetStreamText2(ByVal RequestName As String) As String
         '            On Error GoTo ErrorTrap
         '            '
-        '            main_GetStreamText = main_GetStreamText2(EncodeText(RequestName))
+        '            main_GetStreamText = main_GetStreamText2(genericController.encodeText(RequestName))
         '            '
         '            Exit Function
         'ErrorTrap:
@@ -27497,7 +27441,7 @@ ErrorTrap:
         Public Function main_GetStreamNumber(ByVal RequestName As String) As Double
             On Error GoTo ErrorTrap
             '
-            main_GetStreamNumber = EncodeNumber(docProperties.getText(EncodeText(RequestName)))
+            main_GetStreamNumber = genericController.EncodeNumber(docProperties.getText(genericController.encodeText(RequestName)))
             '
             Exit Function
 ErrorTrap:
@@ -27511,7 +27455,7 @@ ErrorTrap:
         Public Function doc_getInteger(ByVal RequestName As String) As Integer
             On Error GoTo ErrorTrap
             '
-            doc_getInteger = EncodeInteger(docProperties.getText(EncodeText(RequestName)))
+            doc_getInteger = genericController.EncodeInteger(docProperties.getText(genericController.encodeText(RequestName)))
             '
             Exit Function
 ErrorTrap:
@@ -27525,7 +27469,7 @@ ErrorTrap:
         Public Function doc_getBoolean(ByVal RequestName As String) As Boolean
             On Error GoTo ErrorTrap
             '
-            doc_getBoolean = EncodeBoolean(docProperties.getText(RequestName))
+            doc_getBoolean = genericController.EncodeBoolean(docProperties.getText(RequestName))
             '
             Exit Function
 ErrorTrap:
@@ -27546,7 +27490,7 @@ ErrorTrap:
             If True Then
                 doc_getActiveContent = docProperties.getText(RequestName)
                 If doc_getActiveContent <> "" Then
-                    doc_getActiveContent = html_DecodeContent2(EncodeText(doc_getActiveContent))
+                    doc_getActiveContent = html_DecodeContent2(genericController.encodeText(doc_getActiveContent))
                 End If
             End If
             '
@@ -27562,7 +27506,7 @@ ErrorTrap:
         Public Function doc_getDate(ByVal RequestName As String) As Date
             On Error GoTo ErrorTrap
             '
-            doc_getDate = EncodeDate(docProperties.getText(EncodeText(RequestName)))
+            doc_getDate = genericController.EncodeDate(docProperties.getText(genericController.encodeText(RequestName)))
             '
             Exit Function
 ErrorTrap:
@@ -27576,7 +27520,7 @@ ErrorTrap:
         Public Function main_GetStreamDate2(ByVal RequestName As String) As Date
             On Error GoTo ErrorTrap
             '
-            main_GetStreamDate2 = EncodeDate(docProperties.getText(RequestName))
+            main_GetStreamDate2 = genericController.EncodeDate(docProperties.getText(RequestName))
             '
             Exit Function
 ErrorTrap:
@@ -27590,7 +27534,7 @@ ErrorTrap:
         Public Function doc_getBoolean2(ByVal RequestName As String) As Boolean
             On Error GoTo ErrorTrap
             '
-            doc_getBoolean2 = EncodeBoolean(docProperties.getText(RequestName))
+            doc_getBoolean2 = genericController.EncodeBoolean(docProperties.getText(RequestName))
             '
             Exit Function
 ErrorTrap:
@@ -27604,7 +27548,7 @@ ErrorTrap:
         Public Function main_GetStreamNumber2(ByVal RequestName As String) As Double
             On Error GoTo ErrorTrap
             '
-            main_GetStreamNumber2 = EncodeNumber(docProperties.getText(RequestName))
+            main_GetStreamNumber2 = genericController.EncodeNumber(docProperties.getText(RequestName))
             '
             Exit Function
 ErrorTrap:
@@ -27618,7 +27562,7 @@ ErrorTrap:
         '        Public Function app.cs_get(ByVal CSPointer As Integer, ByVal FieldName As String) As String
         '            On Error GoTo ErrorTrap
         '            '
-        '            main_cs_get = app.cs_get(EncodeInteger(CSPointer), EncodeText(FieldName))
+        '            main_cs_get = app.cs_get(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName))
         '            '
         '            Exit Function
         'ErrorTrap:
@@ -27738,7 +27682,7 @@ ErrorTrap:
             Dim PageCopy As String
             Dim OrderByClause As String
             '
-            Select Case vbLCase(HardCodedPage)
+            Select Case genericController.vbLCase(HardCodedPage)
                 Case HardCodedPageSendPassword
                     '
                     ' send password to the email address in the querystring
@@ -27791,7 +27735,7 @@ ErrorTrap:
                         'PageCopy = main_GetContentPage(RootPageName, ContentName, OrderByClause, AllowChildPage, False, PageID)
                     End If
                     '
-                    If EncodeBoolean(autoPrintText) Then
+                    If genericController.EncodeBoolean(autoPrintText) Then
                         Call main_AddOnLoadJavascript2("window.print(); window.close()", "Print Page")
                     End If
                     BodyOpen = "<body class=""ccBodyPrint"">"
@@ -27806,11 +27750,11 @@ ErrorTrap:
                         & cr & "<div align=""left"">" _
                         & cr2 & "<table border=""0"" cellpadding=""20"" cellspacing=""0"" width=""100%""><tr><td width=""100%"">" _
                         & cr3 & "<p>" _
-                        & kmaIndent(PageCopy) _
+                        & genericController.kmaIndent(PageCopy) _
                         & cr3 & "</p>" _
                         & cr2 & "</td></tr></table>" _
                         & cr & "</div>" _
-                        & kmaIndent(html_GetEndOfBody(False, False, False, False)) _
+                        & genericController.kmaIndent(html_GetEndOfBody(False, False, False, False)) _
                         & cr & "</body>" _
                         & vbCrLf & "</html>" _
                         & "")
@@ -27845,16 +27789,16 @@ ErrorTrap:
                             & main_docType _
                             & "<html>" _
                             & cr & "<head>" _
-                            & kmaIndent(main_GetHTMLHead()) _
+                            & genericController.kmaIndent(main_GetHTMLHead()) _
                             & cr & "</head>" _
                             & cr & "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">" _
-                            & kmaIndent(main_GetPanelHeader("Contensive Resource Library")) _
+                            & genericController.kmaIndent(main_GetPanelHeader("Contensive Resource Library")) _
                             & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td>" _
                             & cr2 & "<div style=""border-top:1px solid white;border-bottom:1px solid black;height:2px""><img alt=""spacer"" src=""/ccLib/images/spacer.gif"" width=1 height=1></div>" _
-                            & kmaIndent(Copy) _
+                            & genericController.kmaIndent(Copy) _
                             & cr & "</td></tr>" _
                             & cr & "<tr><td>" _
-                            & kmaIndent(html_GetEndOfBody(False, False, False, False)) _
+                            & genericController.kmaIndent(html_GetEndOfBody(False, False, False, False)) _
                             & cr & "</td></tr></table>" _
                             & cr & "<script language=javascript type=""text/javascript"">fixDialog();</script>" _
                             & cr & "</body>" _
@@ -27883,7 +27827,7 @@ ErrorTrap:
                             & main_docType _
                             & cr & "<html>" _
                             & cr & "<head>" _
-                            & kmaIndent(main_GetHTMLHead()) _
+                            & genericController.kmaIndent(main_GetHTMLHead()) _
                             & cr & "</head>" _
                             & cr & "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">" _
                             & main_GetPanelHeader("Contensive Resource Library") _
@@ -27911,7 +27855,7 @@ ErrorTrap:
                     ' Special case - set the current URL to the Refresh Query String
                     ' Because you want the form created to save the refresh values
                     '
-                    If vbUCase(HardCodedPage) = "LOGOUTLOGIN" Then
+                    If genericController.vbUCase(HardCodedPage) = "LOGOUTLOGIN" Then
                         Call user.logout()
                     End If
                     web_RefreshQueryString = webServerIO.requestQueryString
@@ -27945,12 +27889,12 @@ ErrorTrap:
                             & main_docType _
                             & cr & "<html>" _
                             & cr & "<head>" _
-                            & kmaIndent(main_GetHTMLHead()) _
+                            & genericController.kmaIndent(main_GetHTMLHead()) _
                             & cr & "</head>" _
                             & cr & "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">" _
-                            & kmaIndent(main_GetPanelHeader("Contensive Site Explorer")) _
+                            & genericController.kmaIndent(main_GetPanelHeader("Contensive Site Explorer")) _
                             & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td>" _
-                            & kmaIndent(Copy) _
+                            & genericController.kmaIndent(Copy) _
                             & cr & "</td></tr><tr><td>" & html_GetEndOfBody(False, False, False, False) & "</td></tr></table>" _
                             & cr & "</body>" _
                             & cr & "</html>"
@@ -27985,7 +27929,7 @@ ErrorTrap:
                         End If
                     End If
                     If Err.Number <> 0 Then
-                        Call handleLegacyError10(ignoreInteger, "dll", "Error during Status. After traplog insert, " & GetErrString(Err), "Init", False, True)
+                        Call handleLegacyError10(ignoreInteger, "dll", "Error during Status. After traplog insert, " & genericController.GetErrString(Err), "Init", False, True)
                         Err.Clear()
                     End If
                     '
@@ -28013,14 +27957,14 @@ ErrorTrap:
                         ' Determine bid (PageID) from referer querystring
                         '
                         Copy = webServerIO.requestReferrer
-                        Pos = vbInstr(1, Copy, "bid=")
+                        Pos = genericController.vbInstr(1, Copy, "bid=")
                         If Pos <> 0 Then
                             Copy = Trim(Mid(Copy, Pos + 4))
-                            Pos = vbInstr(1, Copy, "&")
+                            Pos = genericController.vbInstr(1, Copy, "&")
                             If Pos <> 0 Then
                                 Copy = Trim(Mid(Copy, 1, Pos))
                             End If
-                            PageID = EncodeInteger(Copy)
+                            PageID = genericController.EncodeInteger(Copy)
                         End If
                         '
                         ' main_Get the page
@@ -28033,13 +27977,13 @@ ErrorTrap:
                         Copy = main_GetHtmlBody_GetSection_GetContent(PageID, rootPageId, "Page Content", "", True, True, False, 0, siteProperties.useContentWatchLink, allowPageWithoutSectionDisplay)
                         'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2g")
                         Copy = Copy & html_GetEndOfBody(False, True, False, False)
-                        Copy = vbReplace(Copy, "'", "'+""'""+'")
-                        Copy = vbReplace(Copy, vbCr, "\n")
-                        Copy = vbReplace(Copy, vbLf, " ")
+                        Copy = genericController.vbReplace(Copy, "'", "'+""'""+'")
+                        Copy = genericController.vbReplace(Copy, vbCr, "\n")
+                        Copy = genericController.vbReplace(Copy, vbLf, " ")
                         '
                         ' Write the page to the stream, with a javascript wrapper
                         '
-                        MsgLabel = "Msg" & EncodeText(GetRandomInteger)
+                        MsgLabel = "Msg" & genericController.encodeText(genericController.GetRandomInteger)
                         Call webServerIO_setResponseContentType("text/plain")
                         Call writeAltBuffer("var " & MsgLabel & " = '" & Copy & "'; " & vbCrLf)
                         Call writeAltBuffer("document.write( " & MsgLabel & " ); " & vbCrLf)
@@ -28061,14 +28005,14 @@ ErrorTrap:
                     'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2h")
                     Copy = Copy & html_GetEndOfBody(True, True, False, False)
                     Copy = Copy & "</CENTER></p>"
-                    Copy = vbReplace(Copy, "'", "'+""'""+'")
-                    Copy = vbReplace(Copy, vbCr, "")
-                    Copy = vbReplace(Copy, vbLf, "")
+                    Copy = genericController.vbReplace(Copy, "'", "'+""'""+'")
+                    Copy = genericController.vbReplace(Copy, vbCr, "")
+                    Copy = genericController.vbReplace(Copy, vbLf, "")
                     'Copy = "<b>login Page</b>"
                     '
                     ' Write the page to the stream, with a javascript wrapper
                     '
-                    MsgLabel = "Msg" & EncodeText(GetRandomInteger)
+                    MsgLabel = "Msg" & genericController.encodeText(genericController.GetRandomInteger)
                     Call webServerIO_setResponseContentType("text/plain")
                     Call writeAltBuffer("var " & MsgLabel & " = '" & Copy & "'; " & vbCrLf)
                     Call writeAltBuffer("document.write( " & MsgLabel & " ); " & vbCrLf)
@@ -28166,7 +28110,7 @@ ErrorTrap:
                         ' TEmp fix until HardCodedPage is complete
                         '
                         Recipient = siteProperties.getText("EmailOrderNotifyAddress", siteProperties.emailAdmin)
-                        If vbInstr(EncodeText(Recipient), "@") = 0 Then
+                        If genericController.vbInstr(genericController.encodeText(Recipient), "@") = 0 Then
                             Call handleLegacyError12("Init", "PayPal confirmation Order Process Notification email was not sent because EmailOrderNotifyAddress SiteProperty is not valid")
                         Else
                             Sender = siteProperties.getText("EmailOrderFromAddress")
@@ -28214,9 +28158,9 @@ ErrorTrap:
             Dim intRecordId As Integer
             Dim strFieldName As String
             '
-            intContentName = EncodeText(ContentName)
-            intRecordId = EncodeInteger(RecordID)
-            strFieldName = EncodeText(FieldName)
+            intContentName = genericController.encodeText(ContentName)
+            intRecordId = genericController.EncodeInteger(RecordID)
+            strFieldName = genericController.encodeText(FieldName)
             '
             EditorPanel = ""
             ContentID = main_GetContentID(intContentName)
@@ -28236,7 +28180,7 @@ ErrorTrap:
                         EditorPanel = EditorPanel & html_GetFormInputHidden("cid", ContentID)
                         EditorPanel = EditorPanel & html_GetFormInputHidden("ID", intRecordId)
                         EditorPanel = EditorPanel & html_GetFormInputHidden("fn", strFieldName)
-                        EditorPanel = EditorPanel & EncodeText(FormElements)
+                        EditorPanel = EditorPanel & genericController.encodeText(FormElements)
                         EditorPanel = EditorPanel & html_GetFormInputHTML3("ContentCopy", Copy, "3", "45", False, True)
                         'EditorPanel = EditorPanel & main_GetFormInputActiveContent( "ContentCopy", Copy, 3, 45)
                         ButtonPanel = main_GetPanelButtons(ButtonCancel & "," & ButtonSave, "button")
@@ -28343,10 +28287,10 @@ ErrorTrap:
             Dim JSCodeAsString As String
             '
             JSCodeAsString = Javascript
-            JSCodeAsString = vbReplace(JSCodeAsString, "'", "'+""'""+'")
-            JSCodeAsString = vbReplace(JSCodeAsString, vbCrLf, "\n")
-            JSCodeAsString = vbReplace(JSCodeAsString, vbCr, "\n")
-            JSCodeAsString = vbReplace(JSCodeAsString, vbLf, "\n")
+            JSCodeAsString = genericController.vbReplace(JSCodeAsString, "'", "'+""'""+'")
+            JSCodeAsString = genericController.vbReplace(JSCodeAsString, vbCrLf, "\n")
+            JSCodeAsString = genericController.vbReplace(JSCodeAsString, vbCr, "\n")
+            JSCodeAsString = genericController.vbReplace(JSCodeAsString, vbLf, "\n")
             JSCodeAsString = "'" & JSCodeAsString & "'"
             '
             Call main_AddOnLoadJavascript("" _
@@ -28388,15 +28332,15 @@ ErrorTrap:
                 InputName = FieldName
             End If
             '
-            fieldType = EncodeInteger(GetContentFieldProperty(ContentName, FieldName, "type"))
+            fieldType = genericController.EncodeInteger(GetContentFieldProperty(ContentName, FieldName, "type"))
             Select Case fieldType
                 Case FieldTypeIdBoolean
                     '
                     '
                     '
-                    html_GetFormInputField = html_GetFormInputCheckBox2(InputName, EncodeBoolean(HtmlValue) = True, HtmlId, False, HtmlClass)
+                    html_GetFormInputField = html_GetFormInputCheckBox2(InputName, genericController.EncodeBoolean(HtmlValue) = True, HtmlId, False, HtmlClass)
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = genericController.vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdFileCSS
                     '
@@ -28404,7 +28348,7 @@ ErrorTrap:
                     '
                     html_GetFormInputField = html_GetFormInputTextExpandable2(InputName, HtmlValue, , , HtmlId, False, False, HtmlClass)
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = genericController.vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdCurrency
                     '
@@ -28412,7 +28356,7 @@ ErrorTrap:
                     '
                     html_GetFormInputField = html_GetFormInputText2(InputName, HtmlValue, , , HtmlId, False, False, HtmlClass)
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = genericController.vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdDate
                     '
@@ -28420,10 +28364,10 @@ ErrorTrap:
                     '
                     html_GetFormInputField = html_GetFormInputDate(InputName, HtmlValue, , HtmlId)
                     If HtmlClass <> "" Then
-                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " class=""" & HtmlClass & """>")
+                        html_GetFormInputField = genericController.vbReplace(html_GetFormInputField, ">", " class=""" & HtmlClass & """>")
                     End If
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = genericController.vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdFile
                     '
@@ -28436,12 +28380,12 @@ ErrorTrap:
                         Dim FieldValuefilename As String = ""
                         Dim FieldValuePath As String = ""
                         privateFiles.splitPathFilename(HtmlValue, FieldValuePath, FieldValuefilename)
-                        html_GetFormInputField = html_GetFormInputField & "<a href=""http://" & EncodeURL(webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & FieldValuefilename & "]</A>"
+                        html_GetFormInputField = html_GetFormInputField & "<a href=""http://" & genericController.EncodeURL(webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & FieldValuefilename & "]</A>"
                         html_GetFormInputField = html_GetFormInputField & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & html_GetFormInputCheckBox2(InputName & ".Delete", False)
                         html_GetFormInputField = html_GetFormInputField & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & html_GetFormInputFile2(InputName, HtmlId, HtmlClass)
                     End If
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = genericController.vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdFloat
                     '
@@ -28449,7 +28393,7 @@ ErrorTrap:
                     '
                     html_GetFormInputField = html_GetFormInputText2(InputName, HtmlValue, , , HtmlId, False, False, HtmlClass)
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = genericController.vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdFileImage
                     '
@@ -28461,12 +28405,12 @@ ErrorTrap:
                         Dim FieldValuefilename As String = ""
                         Dim FieldValuePath As String = ""
                         privateFiles.splitPathFilename(HtmlValue, FieldValuePath, FieldValuefilename)
-                        html_GetFormInputField = html_GetFormInputField & "<a href=""http://" & EncodeURL(webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & FieldValuefilename & "]</A>"
+                        html_GetFormInputField = html_GetFormInputField & "<a href=""http://" & genericController.EncodeURL(webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & FieldValuefilename & "]</A>"
                         html_GetFormInputField = html_GetFormInputField & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & html_GetFormInputCheckBox2(InputName & ".Delete", False)
                         html_GetFormInputField = html_GetFormInputField & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & html_GetFormInputFile2(InputName, HtmlId, HtmlClass)
                     End If
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = genericController.vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdInteger
                     '
@@ -28474,7 +28418,7 @@ ErrorTrap:
                     '
                     html_GetFormInputField = html_GetFormInputText2(InputName, HtmlValue, , , HtmlId, False, False, HtmlClass)
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = genericController.vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdFileJavascript
                     '
@@ -28482,7 +28426,7 @@ ErrorTrap:
                     '
                     html_GetFormInputField = html_GetFormInputTextExpandable2(InputName, HtmlValue, , , HtmlId, False, False, HtmlClass)
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = genericController.vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdLink
                     '
@@ -28490,7 +28434,7 @@ ErrorTrap:
                     '
                     html_GetFormInputField = html_GetFormInputText2(InputName, HtmlValue, , , HtmlId, False, False, HtmlClass)
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = genericController.vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdLookup
                     '
@@ -28502,17 +28446,17 @@ ErrorTrap:
                         For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In CDef.fields
                             Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
                             With field
-                                If vbUCase(.nameLc) = vbUCase(FieldName) Then
+                                If genericController.vbUCase(.nameLc) = genericController.vbUCase(FieldName) Then
                                     If .lookupContentID <> 0 Then
-                                        LookupContentName = EncodeText(metaData.getContentNameByID(.lookupContentID))
+                                        LookupContentName = genericController.encodeText(metaData.getContentNameByID(.lookupContentID))
                                     End If
                                     If LookupContentName <> "" Then
-                                        html_GetFormInputField = main_GetFormInputSelect2(InputName, EncodeInteger(HtmlValue), LookupContentName, "", "Select One", HtmlId, IgnoreBoolean, HtmlClass)
+                                        html_GetFormInputField = main_GetFormInputSelect2(InputName, genericController.EncodeInteger(HtmlValue), LookupContentName, "", "Select One", HtmlId, IgnoreBoolean, HtmlClass)
                                     ElseIf .lookupList <> "" Then
-                                        html_GetFormInputField = main_GetFormInputSelectList2(InputName, EncodeInteger(HtmlValue), .lookupList, "Select One", HtmlId, HtmlClass)
+                                        html_GetFormInputField = main_GetFormInputSelectList2(InputName, genericController.EncodeInteger(HtmlValue), .lookupList, "Select One", HtmlId, HtmlClass)
                                     End If
                                     If HtmlStyle <> "" Then
-                                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                                        html_GetFormInputField = genericController.vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                                     End If
                                     Exit For
                                 End If
@@ -28536,13 +28480,13 @@ ErrorTrap:
                     '
                     '
                     '
-                    GroupID = EncodeInteger(GetContentFieldProperty(ContentName, FieldName, "memberselectgroupid"))
-                    html_GetFormInputField = html_GetFormInputMemberSelect(InputName, EncodeInteger(HtmlValue), GroupID, , , HtmlId)
+                    GroupID = genericController.EncodeInteger(GetContentFieldProperty(ContentName, FieldName, "memberselectgroupid"))
+                    html_GetFormInputField = html_GetFormInputMemberSelect(InputName, genericController.EncodeInteger(HtmlValue), GroupID, , , HtmlId)
                     If HtmlClass <> "" Then
-                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " class=""" & HtmlClass & """>")
+                        html_GetFormInputField = genericController.vbReplace(html_GetFormInputField, ">", " class=""" & HtmlClass & """>")
                     End If
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = genericController.vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdResourceLink
                     '
@@ -28550,7 +28494,7 @@ ErrorTrap:
                     '
                     html_GetFormInputField = html_GetFormInputText2(InputName, HtmlValue, , , HtmlId, False, False, HtmlClass)
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = genericController.vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdText
                     '
@@ -28558,7 +28502,7 @@ ErrorTrap:
                     '
                     html_GetFormInputField = html_GetFormInputText2(InputName, HtmlValue, , , HtmlId, False, False, HtmlClass)
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = genericController.vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdLongText, FieldTypeIdFileTextPrivate
                     '
@@ -28566,7 +28510,7 @@ ErrorTrap:
                     '
                     html_GetFormInputField = html_GetFormInputTextExpandable2(InputName, HtmlValue, , , HtmlId, False, False, HtmlClass)
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = genericController.vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdFileXML
                     '
@@ -28574,7 +28518,7 @@ ErrorTrap:
                     '
                     html_GetFormInputField = html_GetFormInputTextExpandable2(InputName, HtmlValue, , , HtmlId, False, False, HtmlClass)
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = genericController.vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
                     '
@@ -28582,10 +28526,10 @@ ErrorTrap:
                     '
                     html_GetFormInputField = html_GetFormInputHTML(InputName, HtmlValue)
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = genericController.vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                     If HtmlClass <> "" Then
-                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " class=""" & HtmlClass & """>")
+                        html_GetFormInputField = genericController.vbReplace(html_GetFormInputField, ">", " class=""" & HtmlClass & """>")
                     End If
                 Case Else
                     '
@@ -28719,8 +28663,8 @@ ErrorTrap:
                 ' AC StartBlockText
                 '
                 IconIDControlString = "AC," & ACTypeAggregateFunction & ",0,Block Text,"
-                IconImg = GetAddonIconImg(siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", serverConfig.appConfig.cdnFilesNetprefix, "Text Block Start", "Block text to all except selected groups starting at this point", "", 0)
-                IconImg = EncodeJavascript(IconImg)
+                IconImg = genericController.GetAddonIconImg(siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", serverConfig.appConfig.cdnFilesNetprefix, "Text Block Start", "Block text to all except selected groups starting at this point", "", 0)
+                IconImg = genericController.EncodeJavascript(IconImg)
                 Items(ItemsCnt) = "['Block Text','" & IconImg & "']"
                 Call Index.setPtr("Block Text", ItemsCnt)
                 ItemsCnt = ItemsCnt + 1
@@ -28728,8 +28672,8 @@ ErrorTrap:
                 ' AC EndBlockText
                 '
                 IconIDControlString = "AC," & ACTypeAggregateFunction & ",0,Block Text End,"
-                IconImg = GetAddonIconImg(siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", serverConfig.appConfig.cdnFilesNetprefix, "Text Block End", "End of text block", "", 0)
-                IconImg = EncodeJavascript(IconImg)
+                IconImg = genericController.GetAddonIconImg(siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", serverConfig.appConfig.cdnFilesNetprefix, "Text Block End", "End of text block", "", 0)
+                IconImg = genericController.EncodeJavascript(IconImg)
                 Items(ItemsCnt) = "['Block Text End','" & IconImg & "']"
                 Call Index.setPtr("Block Text", ItemsCnt)
                 ItemsCnt = ItemsCnt + 1
@@ -28743,10 +28687,10 @@ ErrorTrap:
                     ' Personalization Tag
                     '
                     FieldList = GetContentProperty("people", "SelectFieldList")
-                    FieldList = vbReplace(FieldList, ",", "|")
+                    FieldList = genericController.vbReplace(FieldList, ",", "|")
                     IconIDControlString = "AC,PERSONALIZATION,0,Personalization,field=[" & FieldList & "]"
-                    IconImg = GetAddonIconImg(siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", serverConfig.appConfig.cdnFilesNetprefix, "Any Personalization Field", "Renders as any Personalization Field", "", 0)
-                    IconImg = EncodeJavascript(IconImg)
+                    IconImg = genericController.GetAddonIconImg(siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", serverConfig.appConfig.cdnFilesNetprefix, "Any Personalization Field", "Renders as any Personalization Field", "", 0)
+                    IconImg = genericController.EncodeJavascript(IconImg)
                     Items(ItemsCnt) = "['Personalization','" & IconImg & "']"
                     Call Index.setPtr("Personalization", ItemsCnt)
                     ItemsCnt = ItemsCnt + 1
@@ -28760,16 +28704,16 @@ ErrorTrap:
                         '   Need a more consistant solution later
                         '
                         IconIDControlString = "AC," & ACTypeTemplateContent & ",0,Template Content,"
-                        IconImg = GetAddonIconImg(siteProperties.adminURL, 52, 64, 0, False, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", serverConfig.appConfig.cdnFilesNetprefix, "Content Box", "Renders as the content for a template", "", 0)
-                        IconImg = EncodeJavascript(IconImg)
+                        IconImg = genericController.GetAddonIconImg(siteProperties.adminURL, 52, 64, 0, False, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", serverConfig.appConfig.cdnFilesNetprefix, "Content Box", "Renders as the content for a template", "", 0)
+                        IconImg = genericController.EncodeJavascript(IconImg)
                         Items(ItemsCnt) = "['Content Box','" & IconImg & "']"
                         'Items(ItemsCnt) = "['Template Content','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Content"" id=""AC," & ACTypeTemplateContent & ",0,Template Content,"" src=""/ccLib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>']"
                         Call Index.setPtr("Content Box", ItemsCnt)
                         ItemsCnt = ItemsCnt + 1
                         '
                         IconIDControlString = "AC," & ACTypeTemplateText & ",0,Template Text,Name=Default"
-                        IconImg = GetAddonIconImg(siteProperties.adminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", serverConfig.appConfig.cdnFilesNetprefix, "Template Text", "Renders as a template text block", "", 0)
-                        IconImg = EncodeJavascript(IconImg)
+                        IconImg = genericController.GetAddonIconImg(siteProperties.adminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", serverConfig.appConfig.cdnFilesNetprefix, "Template Text", "Renders as a template text block", "", 0)
+                        IconImg = genericController.EncodeJavascript(IconImg)
                         Items(ItemsCnt) = "['Template Text','" & IconImg & "']"
                         'Items(ItemsCnt) = "['Template Text','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Text"" id=""AC," & ACTypeTemplateText & ",0,Template Text,Name=Default"" src=""/ccLib/images/ACTemplateTextIcon.gif"" WIDTH=52 HEIGHT=52>']"
                         Call Index.setPtr("Template Text", ItemsCnt)
@@ -28788,9 +28732,9 @@ ErrorTrap:
                             If FieldName <> "" Then
                                 FieldCaption = "Watch List [" & FieldName & "]"
                                 IconIDControlString = "AC,WATCHLIST,0," & FieldName & ",ListName=" & FieldName & "&SortField=[DateAdded|Link|LinkLabel|Clicks|WhatsNewDateExpires]&SortDirection=Z-A[A-Z|Z-A]"
-                                IconImg = GetAddonIconImg(siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", serverConfig.appConfig.cdnFilesNetprefix, FieldCaption, "Rendered as the " & FieldCaption, "", 0)
-                                IconImg = EncodeJavascript(IconImg)
-                                FieldCaption = EncodeJavascript(FieldCaption)
+                                IconImg = genericController.GetAddonIconImg(siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", serverConfig.appConfig.cdnFilesNetprefix, FieldCaption, "Rendered as the " & FieldCaption, "", 0)
+                                IconImg = genericController.EncodeJavascript(IconImg)
+                                FieldCaption = genericController.EncodeJavascript(FieldCaption)
                                 Items(ItemsCnt) = "['" & FieldCaption & "','" & IconImg & "']"
                                 'Items(ItemsCnt) = "['" & FieldCaption & "','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the " & FieldCaption & """ id=""AC,WATCHLIST,0," & FieldName & ",ListName=" & FieldName & "&SortField=[DateAdded|Link|LinkLabel|Clicks|WhatsNewDateExpires]&SortDirection=Z-A[A-Z|Z-A]"" src=""/ccLib/images/ACWatchList.GIF"">']"
                                 Call Index.setPtr(FieldCaption, ItemsCnt)
@@ -28884,8 +28828,8 @@ ErrorTrap:
                                     '
                                     LastAddonName = AddonName
                                     IconIDControlString = "AC,AGGREGATEFUNCTION,0," & AddonName & "," & DefaultAddonOption_String & "," & AddonGuid
-                                    IconImg = GetAddonIconImg(siteProperties.adminURL, IconWidth, IconHeight, IconSprites, IsInline, IconIDControlString, IconFilename, serverConfig.appConfig.cdnFilesNetprefix, AddonName, "Rendered as the Add-on [" & AddonName & "]", "", 0)
-                                    Items(ItemsCnt) = "['" & EncodeJavascript(AddonName) & "','" & EncodeJavascript(IconImg) & "']"
+                                    IconImg = genericController.GetAddonIconImg(siteProperties.adminURL, IconWidth, IconHeight, IconSprites, IsInline, IconIDControlString, IconFilename, serverConfig.appConfig.cdnFilesNetprefix, AddonName, "Rendered as the Add-on [" & AddonName & "]", "", 0)
+                                    Items(ItemsCnt) = "['" & genericController.EncodeJavascript(AddonName) & "','" & genericController.EncodeJavascript(IconImg) & "']"
                                     Call Index.setPtr(AddonName, ItemsCnt)
                                     ItemsCnt = ItemsCnt + 1
                                     If ItemsCnt >= ItemsSize Then
@@ -28947,9 +28891,9 @@ ErrorTrap:
             Dim NameValue As String
             Dim Ptr As Integer
             '
-            ArgumentList = vbReplace(ArgumentList, vbCrLf, vbCr)
-            ArgumentList = vbReplace(ArgumentList, vbLf, vbCr)
-            ArgumentList = vbReplace(ArgumentList, vbCr, vbCrLf)
+            ArgumentList = genericController.vbReplace(ArgumentList, vbCrLf, vbCr)
+            ArgumentList = genericController.vbReplace(ArgumentList, vbLf, vbCr)
+            ArgumentList = genericController.vbReplace(ArgumentList, vbCr, vbCrLf)
             If (InStr(1, ArgumentList, "wrapper", vbTextCompare) = 0) Then
                 '
                 ' Add in default constructors, like wrapper
@@ -28957,7 +28901,7 @@ ErrorTrap:
                 If ArgumentList <> "" Then
                     ArgumentList = ArgumentList & vbCrLf
                 End If
-                If vbLCase(AddonGuid) = vbLCase(ContentBoxGuid) Then
+                If genericController.vbLCase(AddonGuid) = genericController.vbLCase(ContentBoxGuid) Then
                     ArgumentList = ArgumentList & AddonOptionConstructor_BlockNoAjax
                 ElseIf IsInline Then
                     ArgumentList = ArgumentList & AddonOptionConstructor_Inline
@@ -28969,7 +28913,7 @@ ErrorTrap:
                 '
                 ' Argument list is present, translate from AddonConstructor to AddonOption format (see main_executeAddon for details)
                 '
-                QuerySplit = SplitCRLF(ArgumentList)
+                QuerySplit = genericController.SplitCRLF(ArgumentList)
                 main_GetDefaultAddonOption_String = ""
                 For Ptr = 0 To UBound(QuerySplit)
                     NameValue = QuerySplit(Ptr)
@@ -28983,45 +28927,45 @@ ErrorTrap:
                         '
                         ' split on equal
                         '
-                        NameValue = vbReplace(NameValue, "\=", vbCrLf)
-                        Pos = vbInstr(1, NameValue, "=")
+                        NameValue = genericController.vbReplace(NameValue, "\=", vbCrLf)
+                        Pos = genericController.vbInstr(1, NameValue, "=")
                         If Pos = 0 Then
                             OptionName = NameValue
                         Else
                             OptionName = Mid(NameValue, 1, Pos - 1)
                             OptionValue = Mid(NameValue, Pos + 1)
                         End If
-                        OptionName = vbReplace(OptionName, vbCrLf, "\=")
-                        OptionValue = vbReplace(OptionValue, vbCrLf, "\=")
+                        OptionName = genericController.vbReplace(OptionName, vbCrLf, "\=")
+                        OptionValue = genericController.vbReplace(OptionValue, vbCrLf, "\=")
                         '
                         ' split optionvalue on [
                         '
-                        OptionValue = vbReplace(OptionValue, "\[", vbCrLf)
-                        Pos = vbInstr(1, OptionValue, "[")
+                        OptionValue = genericController.vbReplace(OptionValue, "\[", vbCrLf)
+                        Pos = genericController.vbInstr(1, OptionValue, "[")
                         If Pos <> 0 Then
                             OptionSelector = Mid(OptionValue, Pos)
                             OptionValue = Mid(OptionValue, 1, Pos - 1)
                         End If
-                        OptionValue = vbReplace(OptionValue, vbCrLf, "\[")
-                        OptionSelector = vbReplace(OptionSelector, vbCrLf, "\[")
+                        OptionValue = genericController.vbReplace(OptionValue, vbCrLf, "\[")
+                        OptionSelector = genericController.vbReplace(OptionSelector, vbCrLf, "\[")
                         '
                         ' Decode AddonConstructor format
                         '
-                        OptionName = DecodeAddonConstructorArgument(OptionName)
-                        OptionValue = DecodeAddonConstructorArgument(OptionValue)
+                        OptionName = genericController.DecodeAddonConstructorArgument(OptionName)
+                        OptionValue = genericController.DecodeAddonConstructorArgument(OptionValue)
                         '
                         ' Encode AddonOption format
                         '
                         'main_GetAddonSelector expects value to be encoded, but not name
                         'OptionName = encodeNvaArgument(OptionName)
-                        OptionValue = encodeNvaArgument(OptionValue)
+                        OptionValue = genericController.encodeNvaArgument(OptionValue)
                         '
                         ' rejoin
                         '
                         NameValuePair = pageManager_GetAddonSelector(OptionName, OptionValue, OptionSelector)
-                        NameValuePair = EncodeJavascript(NameValuePair)
+                        NameValuePair = genericController.EncodeJavascript(NameValuePair)
                         main_GetDefaultAddonOption_String = main_GetDefaultAddonOption_String & "&" & NameValuePair
-                        If vbInstr(1, NameValuePair, "=") = 0 Then
+                        If genericController.vbInstr(1, NameValuePair, "=") = 0 Then
                             main_GetDefaultAddonOption_String = main_GetDefaultAddonOption_String & "="
                         End If
                     End If
@@ -29076,9 +29020,9 @@ ErrorTrap:
                     & " where (t.active<>0)and(a.active<>0) order by t.id"
                 RS = db.executeSql(SQL)
                 For Each dr As DataRow In RS.Rows
-                    fieldTypeID = EncodeInteger(dr("id"))
+                    fieldTypeID = genericController.EncodeInteger(dr("id"))
                     If (fieldTypeID <= FieldTypeIdMax) Then
-                        editorAddonIds(fieldTypeID) = EncodeText(dr("editorAddonId"))
+                        editorAddonIds(fieldTypeID) = genericController.encodeText(dr("editorAddonId"))
                     End If
                 Next
                 pageManager_Private_FieldEditorList = Join(editorAddonIds, ",")
@@ -29100,7 +29044,7 @@ ErrorTrap:
         '------------------------------------------------------------------------------------------------------------
         '
         Public Function main_encodeNvaArgument(ByVal Arg As String) As String
-            main_encodeNvaArgument = encodeNvaArgument(Arg)
+            main_encodeNvaArgument = genericController.encodeNvaArgument(Arg)
         End Function
         '
         '------------------------------------------------------------------------------------------------------------
@@ -29110,7 +29054,7 @@ ErrorTrap:
         '------------------------------------------------------------------------------------------------------------
         '
         Public Function main_decodeNvaArgument(ByVal EncodedArg As String) As String
-            main_decodeNvaArgument = decodeNvaArgument(EncodedArg)
+            main_decodeNvaArgument = genericController.decodeNvaArgument(EncodedArg)
         End Function
         '
         '=================================================================================================================
@@ -29124,9 +29068,9 @@ ErrorTrap:
             Dim s As String
             Dim encodedName As String
             '
-            encodedName = encodeNvaArgument(Name)
-            s = getSimpleNameValue(encodedName, nvaEncodedString, "", "&")
-            s = decodeNvaArgument(s)
+            encodedName = genericController.encodeNvaArgument(Name)
+            s = genericController.getSimpleNameValue(encodedName, nvaEncodedString, "", "&")
+            s = genericController.decodeNvaArgument(s)
             main_GetNvaValue = Trim(s)
             '
             Exit Function
@@ -29150,11 +29094,11 @@ ErrorTrap:
             '
             main_verifyTemplateLink = linkSrc
             If main_verifyTemplateLink <> "" Then
-                If vbInstr(1, main_verifyTemplateLink, "://") <> 0 Then
+                If genericController.vbInstr(1, main_verifyTemplateLink, "://") <> 0 Then
                     '
                     ' protocol provided, do not fixup
                     '
-                    main_verifyTemplateLink = coreCommonModule.EncodeAppRootPath(main_verifyTemplateLink, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
+                    main_verifyTemplateLink = genericController.EncodeAppRootPath(main_verifyTemplateLink, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
                 Else
                     '
                     ' no protocol, convert to short link
@@ -29165,8 +29109,8 @@ ErrorTrap:
                         '
                         main_verifyTemplateLink = "/" & main_verifyTemplateLink
                     End If
-                    main_verifyTemplateLink = ConvertLinkToShortLink(main_verifyTemplateLink, webServerIO.requestDomain, webServerIO_requestVirtualFilePath)
-                    main_verifyTemplateLink = coreCommonModule.EncodeAppRootPath(main_verifyTemplateLink, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
+                    main_verifyTemplateLink = genericController.ConvertLinkToShortLink(main_verifyTemplateLink, webServerIO.requestDomain, webServerIO_requestVirtualFilePath)
+                    main_verifyTemplateLink = genericController.EncodeAppRootPath(main_verifyTemplateLink, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
                 End If
             End If
             '
@@ -29188,7 +29132,7 @@ ErrorTrap:
                 Const cacheName = "Domain Content Cross List Cache"
                 '
                 If Not pageManager_Private_ServerDomainCrossList_Loaded Then
-                    pageManager_Private_ServerDomainCrossList = EncodeText(cache.getObject(Of String)(cacheName))
+                    pageManager_Private_ServerDomainCrossList = genericController.encodeText(cache.getObject(Of String)(cacheName))
                     If True And (pageManager_Private_ServerDomainCrossList = "") Then
                         pageManager_Private_ServerDomainCrossList = ","
                         SQL = "select name from ccDomains where (typeId=1)and(allowCrossLogin<>0)"
@@ -29265,7 +29209,7 @@ ErrorTrap:
         '                For ampSplitPointer = 0 To ampSplitCount - 1
         '                    newNameValue = ampSplit(ampSplitPointer)
         '                    If newNameValue <> "" Then
-        '                        equalPtr = vbInstr(1, newNameValue, "=")
+        '                        equalPtr = genericController.vbInstr(1, newNameValue, "=")
         '                        If equalPtr > 0 Then
         '                            NewName = main_DecodeUrl(Mid(newNameValue, 1, equalPtr - 1))
         '                            NewValue = Mid(newNameValue, equalPtr + 1)
@@ -29275,7 +29219,7 @@ ErrorTrap:
         '                        End If
         '                        If docPropertiesArrayCount > 0 Then
         '                            For inStreamPtr = 0 To docPropertiesArrayCount - 1
-        '                                If vbLCase(NewName) = vbLCase(docPropertiesDict(inStreamPtr).Name) Then
+        '                                If genericController.vbLCase(NewName) = genericController.vbLCase(docPropertiesDict(inStreamPtr).Name) Then
         '                                    '
         '                                    ' Current entry found
         '                                    '
@@ -29292,7 +29236,7 @@ ErrorTrap:
         '                                ReDim Preserve docPropertiesDict(docPropertiesArraySize)
         '                            End If
         '                            docPropertiesArrayCount = docPropertiesArrayCount + 1
-        '                            web.requestQueryString = ModifyQueryString(web.requestQueryString, NewName, NewValue)
+        '                            web.requestQueryString = genericController.ModifyQueryString(web.requestQueryString, NewName, NewValue)
         '                        End If
         '                        '
         '                        ' Populate the entry at InStreamPtr
@@ -29330,7 +29274,7 @@ ErrorTrap:
                 localSource = Source
                 For SourcePointer = 1 To Len(localSource)
                     Character = Mid(localSource, SourcePointer, 1)
-                    If vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_!*()", Character, vbTextCompare) <> 0 Then
+                    If genericController.vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_!*()", Character, vbTextCompare) <> 0 Then
                         main_encodeCookieName = main_encodeCookieName & Character
                     Else
                         main_encodeCookieName = main_encodeCookieName & "%" & Hex(Asc(Character))
@@ -29361,7 +29305,7 @@ ErrorTrap:
         '            '
         '            'If Not (true) Then Exit Function
         '            '
-        '            main_SendMemberEmail2 = csv_SendMemberEmail3(EncodeInteger(ToMemberID), EncodeText(From), EncodeText(subject), EncodeText(Body), EncodeBoolean(Immediate), EncodeBoolean(HTML), emailIdForLog, "", False)
+        '            main_SendMemberEmail2 = csv_SendMemberEmail3(genericController.EncodeInteger(ToMemberID), genericController.encodeText(From), genericController.encodeText(subject), genericController.encodeText(Body), genericController.EncodeBoolean(Immediate), genericController.EncodeBoolean(HTML), emailIdForLog, "", False)
         '            '
         '            Exit Function
         '            '
@@ -29392,7 +29336,7 @@ ErrorTrap:
         Public Function main_SendEmail(ByVal ToAddress As String, ByVal FromAddress As String, ByVal SubjectMessage As String, ByVal BodyMessage As String, Optional ByVal optionalEmailIdForLog As Integer = 0, Optional ByVal Immediate As Boolean = True, Optional ByVal HTML As Boolean = False) As String
             Dim returnStatus As String = ""
             Try
-                returnStatus = email_send3(EncodeText(ToAddress), EncodeText(FromAddress), EncodeText(SubjectMessage), EncodeText(BodyMessage), "", "", "", Immediate, EncodeBoolean(HTML), EncodeInteger(optionalEmailIdForLog))
+                returnStatus = email_send3(genericController.encodeText(ToAddress), genericController.encodeText(FromAddress), genericController.encodeText(SubjectMessage), genericController.encodeText(BodyMessage), "", "", "", Immediate, genericController.EncodeBoolean(HTML), genericController.EncodeInteger(optionalEmailIdForLog))
             Catch ex As Exception
                 handleExceptionAndRethrow(ex)
             End Try
@@ -29471,8 +29415,8 @@ ErrorTrap:
                         ' This field is default true, and non-authorable
                         ' It will be true in all cases, except a possible unforseen exception
                         '
-                        EmailBody = EmailBody & "<div style=""clear:both;padding:10px;"">" & main_GetLinkedText("<a href=""" & html.html_EncodeHTML(webServerIO_requestProtocol & webServerIO.requestDomain & requestAppRootPath & siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
-                        EmailBody = vbReplace(EmailBody, "#member_email#", "UserEmailAddress")
+                        EmailBody = EmailBody & "<div style=""clear:both;padding:10px;"">" & csv_GetLinkedText("<a href=""" & html.html_EncodeHTML(webServerIO_requestProtocol & webServerIO.requestDomain & requestAppRootPath & siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
+                        EmailBody = genericController.vbReplace(EmailBody, "#member_email#", "UserEmailAddress")
                     End If
                     '
                     ' Confirm footer
@@ -29505,7 +29449,7 @@ ErrorTrap:
                                 End If
                             End If
                             EmailLen = Len(Email)
-                            Posat = vbInstr(1, Email, "@")
+                            Posat = genericController.vbInstr(1, Email, "@")
                             PosDot = InStrRev(Email, ".")
                             If EmailLen < 6 Then
                                 BadCnt = BadCnt + 1
@@ -29594,9 +29538,9 @@ ErrorTrap:
             Dim iSendSubject As String
             Dim Pointer As Integer
             '
-            iSendTo = EncodeText(SendTo)
-            iSendFrom = EncodeText(SendFrom)
-            iSendSubject = EncodeText(SendSubject)
+            iSendTo = genericController.encodeText(SendTo)
+            iSendFrom = genericController.encodeText(SendFrom)
+            iSendSubject = genericController.encodeText(SendSubject)
             '
             MethodName = "main_SendFormEmail"
             '
@@ -29615,7 +29559,7 @@ ErrorTrap:
             For Each key As String In docProperties.getKeyList
                 With docProperties.getProperty(key)
                     If .IsForm Then
-                        If vbUCase(.Value) = "ON" Then
+                        If genericController.vbUCase(.Value) = "ON" Then
                             Message = Message & .Name & ": Yes" & vbCrLf & vbCrLf
                         Else
                             Message = Message & .Name & ": " & .Value & vbCrLf & vbCrLf
@@ -29663,17 +29607,17 @@ ErrorTrap:
             '
             MethodName = "main_SendGroupEmail"
             '
-            iGroupList = EncodeText(GroupList)
-            iFromAddress = EncodeText(FromAddress)
-            iSubjectSource = EncodeText(subject)
-            iBodySource = EncodeText(Body)
-            iImmediate = EncodeBoolean(Immediate)
-            iHTML = EncodeBoolean(HTML)
+            iGroupList = genericController.encodeText(GroupList)
+            iFromAddress = genericController.encodeText(FromAddress)
+            iSubjectSource = genericController.encodeText(subject)
+            iBodySource = genericController.encodeText(Body)
+            iImmediate = genericController.EncodeBoolean(Immediate)
+            iHTML = genericController.EncodeBoolean(HTML)
             '
             ' Fix links for HTML send - must do it now before encodehtml so eid links will attach
             '
             rootUrl = "http://" & webServerIO_requestDomain & requestAppRootPath
-            iBodySource = ConvertLinksToAbsolute(iBodySource, rootUrl)
+            iBodySource = genericController.ConvertLinksToAbsolute(iBodySource, rootUrl)
             '
             ' Build the list of groups
             '
@@ -29681,7 +29625,7 @@ ErrorTrap:
                 iiGroupList = iGroupList
                 Do While iiGroupList <> ""
                     ReDim Preserve Groups(GroupCount)
-                    ParsePosition = vbInstr(1, iiGroupList, ",")
+                    ParsePosition = genericController.vbInstr(1, iiGroupList, ",")
                     If ParsePosition = 0 Then
                         Groups(GroupCount) = iiGroupList
                         iiGroupList = ""
@@ -29709,7 +29653,7 @@ ErrorTrap:
                 SQL &= "));"
                 CSPointer = db.cs_openSql(SQL)
                 Do While db.cs_ok(CSPointer)
-                    ToMemberID = EncodeInteger(db.cs_getInteger(CSPointer, "ID"))
+                    ToMemberID = genericController.EncodeInteger(db.cs_getInteger(CSPointer, "ID"))
                     iSubject = iSubjectSource
                     iBody = iBodySource
                     '
@@ -29739,7 +29683,7 @@ ErrorTrap:
         Public Sub main_SendSystemEmail(ByVal EMailName As String, Optional ByVal AdditionalCopy As String = "", Optional ByVal AdditionalMemberID As Integer = 0)
             Dim EmailStatus As String
             '
-            EmailStatus = csv_SendSystemEmail(EncodeText(EMailName), EncodeText(AdditionalCopy), EncodeInteger(AdditionalMemberID))
+            EmailStatus = csv_SendSystemEmail(genericController.encodeText(EMailName), genericController.encodeText(AdditionalCopy), genericController.EncodeInteger(AdditionalMemberID))
             If user.isAuthenticatedAdmin() And (EmailStatus <> "") Then
                 error_AddUserError("Administrator: There was a problem sending the confirmation email, " & EmailStatus)
             End If
@@ -29771,9 +29715,9 @@ ErrorTrap:
             Found = False
             ResultNode = Node.Attributes.GetNamedItem(Name)
             If (ResultNode Is Nothing) Then
-                UcaseName = vbUCase(Name)
+                UcaseName = genericController.vbUCase(Name)
                 For Each NodeAttribute In Node.Attributes
-                    If vbUCase(NodeAttribute.Name) = UcaseName Then
+                    If genericController.vbUCase(NodeAttribute.Name) = UcaseName Then
                         csv_GetXMLAttribute = NodeAttribute.Value
                         Found = True
                         Exit For
@@ -29933,10 +29877,10 @@ ErrorTrap:
                         'hint = hint & ",23"
                         cache_addonIncludeRules.addonIdIndex = New coreKeyPtrIndexClass
                         For Ptr = 0 To cache_addonIncludeRules.itemCnt - 1
-                            RecordAddonID = EncodeInteger(cache_addonIncludeRules.item(addonIncludeRulesCache_addonId, Ptr))
-                            'RecordIncludedAddonID = encodeInteger(cache_addonIncludeRules(addonIncludeRulesCache_includedAddonId, Ptr))
+                            RecordAddonID = genericController.EncodeInteger(cache_addonIncludeRules.item(addonIncludeRulesCache_addonId, Ptr))
+                            'RecordIncludedAddonID = genericController.EncodeInteger(cache_addonIncludeRules(addonIncludeRulesCache_includedAddonId, Ptr))
                             'hint = hint & ",24 set AddonIdIndex recordAddonId[" & RecordAddonID & "] to ptr[" & Ptr & "]"
-                            Call cache_addonIncludeRules.addonIdIndex.setPtr(EncodeText(RecordAddonID), Ptr)
+                            Call cache_addonIncludeRules.addonIdIndex.setPtr(genericController.encodeText(RecordAddonID), Ptr)
                         Next
                         Call cache_addonIncludeRules_save()
                     End If
@@ -30010,7 +29954,7 @@ ErrorTrap:
                     cacheValue &= "," & dr.Item("sourceLink").ToString
                 Next
                 If cacheValue <> "" Then
-                    cacheValue = vbReplace(cacheValue, "\", "/")
+                    cacheValue = genericController.vbReplace(cacheValue, "\", "/")
                     Call cache.setKey(cache_linkForward_cacheName, cacheValue)
                     'Call cache.cache_savex("dummyValue", "dummyKey")
                 End If
@@ -30108,7 +30052,7 @@ ErrorTrap:
                 If Not IsNothing(cacheTest) Then
                     cacheArray = DirectCast(cacheTest, Object())
                     cache_libraryFiles = DirectCast(cacheArray(0), String(,))
-                    bag = EncodeText(cacheArray(1))
+                    bag = genericController.encodeText(cacheArray(1))
                     Call cache_libraryFilesIdIndex.importPropertyBag(bag)
                     cache_libraryFilesCnt = UBound(cache_libraryFiles, 2) + 1
                 End If
@@ -30142,8 +30086,8 @@ ErrorTrap:
                             'hint = hint & ",reloaded cache_libraryFilesCnt=" & cache_libraryFilesCnt
                             cache_libraryFilesIdIndex = New coreKeyPtrIndexClass
                             For Ptr = 0 To cache_libraryFilesCnt - 1
-                                RecordID = EncodeInteger(cache_libraryFiles(LibraryFilesCache_Id, Ptr))
-                                Call cache_libraryFilesIdIndex.setPtr(EncodeText(RecordID), Ptr)
+                                RecordID = genericController.EncodeInteger(cache_libraryFiles(LibraryFilesCache_Id, Ptr))
+                                Call cache_libraryFilesIdIndex.setPtr(genericController.encodeText(RecordID), Ptr)
                             Next
                             Call cache_libraryFiles_save()
                         End If
@@ -30233,22 +30177,22 @@ ErrorTrap:
                         '
                         main_RenderCache_CurrentPage_PCCPtr = main_RenderCache_CurrentPage_PCCPtr
                     Else
-                        RecordName = Trim(EncodeText(cache_pageContent(PCC_Name, main_RenderCache_CurrentPage_PCCPtr)))
-                        ContentControlID = EncodeInteger(cache_pageContent(PCC_ContentControlID, main_RenderCache_CurrentPage_PCCPtr))
-                        DateExpires = EncodeDate(cache_pageContent(PCC_DateExpires, main_RenderCache_CurrentPage_PCCPtr))
-                        dateArchive = EncodeDate(cache_pageContent(PCC_DateArchive, main_RenderCache_CurrentPage_PCCPtr))
-                        PubDate = EncodeDate(cache_pageContent(PCC_PubDate, main_RenderCache_CurrentPage_PCCPtr))
-                        Active = EncodeBoolean(cache_pageContent(PCC_Active, main_RenderCache_CurrentPage_PCCPtr))
-                        RecordID = EncodeInteger(cache_pageContent(PCC_ID, main_RenderCache_CurrentPage_PCCPtr))
-                        ParentID = EncodeInteger(cache_pageContent(PCC_ParentID, main_RenderCache_CurrentPage_PCCPtr))
-                        MenuLinkOverRide = Trim(EncodeText(cache_pageContent(PCC_Link, main_RenderCache_CurrentPage_PCCPtr)))
+                        RecordName = Trim(genericController.encodeText(cache_pageContent(PCC_Name, main_RenderCache_CurrentPage_PCCPtr)))
+                        ContentControlID = genericController.EncodeInteger(cache_pageContent(PCC_ContentControlID, main_RenderCache_CurrentPage_PCCPtr))
+                        DateExpires = genericController.EncodeDate(cache_pageContent(PCC_DateExpires, main_RenderCache_CurrentPage_PCCPtr))
+                        dateArchive = genericController.EncodeDate(cache_pageContent(PCC_DateArchive, main_RenderCache_CurrentPage_PCCPtr))
+                        PubDate = genericController.EncodeDate(cache_pageContent(PCC_PubDate, main_RenderCache_CurrentPage_PCCPtr))
+                        Active = genericController.EncodeBoolean(cache_pageContent(PCC_Active, main_RenderCache_CurrentPage_PCCPtr))
+                        RecordID = genericController.EncodeInteger(cache_pageContent(PCC_ID, main_RenderCache_CurrentPage_PCCPtr))
+                        ParentID = genericController.EncodeInteger(cache_pageContent(PCC_ParentID, main_RenderCache_CurrentPage_PCCPtr))
+                        MenuLinkOverRide = Trim(genericController.encodeText(cache_pageContent(PCC_Link, main_RenderCache_CurrentPage_PCCPtr)))
                         IsNotActive = (Not Active)
                         IsExpired = ((DateExpires > Date.MinValue) And (DateExpires < app_startTime))
                         IsNotPublished = ((PubDate > Date.MinValue) And (PubDate > app_startTime))
                         'IsArchived = ((DateArchive > Date.MinValue) And (DateArchive < main_PageStartTime))
                         '
-                        RecordName = vbReplace(RecordName, vbCrLf, " ")
-                        RecordName = vbReplace(RecordName, vbTab, " ")
+                        RecordName = genericController.vbReplace(RecordName, vbCrLf, " ")
+                        RecordName = genericController.vbReplace(RecordName, vbTab, " ")
                         '
                         If IsNotActive Or IsExpired Or IsNotPublished Then
                             pageManager_RedirectSourcePageID = PageID
@@ -30313,35 +30257,35 @@ ErrorTrap:
                             '                        .Id = RecordID
                             '                        .Active = Active
                             '                        .parentId = parentId
-                            '                        .headline = Trim(encodeText(main_pcc(PCC_Headline, main_RenderCache_CurrentPage_PCCPtr)))
-                            '                        .headline = vbReplace(.headline, vbCrLf, " ")
-                            '                        .headline = vbReplace(.headline, vbTab, " ")
-                            '                        .MenuHeadline = Trim(encodeText(main_pcc(PCC_MenuHeadline, main_RenderCache_CurrentPage_PCCPtr)))
-                            '                        .MenuHeadline = vbReplace(.MenuHeadline, vbCrLf, " ")
-                            '                        .MenuHeadline = vbReplace(.MenuHeadline, vbTab, " ")
+                            '                        .headline = Trim(genericController.encodeText(main_pcc(PCC_Headline, main_RenderCache_CurrentPage_PCCPtr)))
+                            '                        .headline = genericController.vbReplace(.headline, vbCrLf, " ")
+                            '                        .headline = genericController.vbReplace(.headline, vbTab, " ")
+                            '                        .MenuHeadline = Trim(genericController.encodeText(main_pcc(PCC_MenuHeadline, main_RenderCache_CurrentPage_PCCPtr)))
+                            '                        .MenuHeadline = genericController.vbReplace(.MenuHeadline, vbCrLf, " ")
+                            '                        .MenuHeadline = genericController.vbReplace(.MenuHeadline, vbTab, " ")
                             '                        .dateArchive = dateArchive
                             '                        .DateExpires = DateExpires
                             '                        .PubDate = PubDate
-                            '                        .childListSortMethodId = encodeInteger(main_pcc(PCC_ChildListSortMethodID, main_RenderCache_CurrentPage_PCCPtr))
-                            '                        .ChildListInstanceOptions = encodeText(main_pcc(PCC_ChildListInstanceOptions, main_RenderCache_CurrentPage_PCCPtr))
+                            '                        .childListSortMethodId = genericController.EncodeInteger(main_pcc(PCC_ChildListSortMethodID, main_RenderCache_CurrentPage_PCCPtr))
+                            '                        .ChildListInstanceOptions = genericController.encodeText(main_pcc(PCC_ChildListInstanceOptions, main_RenderCache_CurrentPage_PCCPtr))
                             '                        .ContentControlID = ContentControlID
-                            '                        .templateId = encodeInteger(main_pcc(PCC_TemplateID, main_RenderCache_CurrentPage_PCCPtr))
-                            '                        .BlockContent = encodeBoolean(main_pcc(PCC_BlockContent, main_RenderCache_CurrentPage_PCCPtr))
-                            '                        .BlockPage = encodeBoolean(main_pcc(PCC_BlockPage, main_RenderCache_CurrentPage_PCCPtr))
+                            '                        .templateId = genericController.EncodeInteger(main_pcc(PCC_TemplateID, main_RenderCache_CurrentPage_PCCPtr))
+                            '                        .BlockContent = genericController.EncodeBoolean(main_pcc(PCC_BlockContent, main_RenderCache_CurrentPage_PCCPtr))
+                            '                        .BlockPage = genericController.EncodeBoolean(main_pcc(PCC_BlockPage, main_RenderCache_CurrentPage_PCCPtr))
                             '                        .LinkOverride = MenuLinkOverRide
                             '                        '.LinkDynamic = main_GetPageDynamicLinkWithArgs(.ContentControlID, RecordID, main_ServerPathPage & "?" & main_RefreshQueryString, (.Id = RootPageID), .TemplateID, SectionID, MenuLinkOverRide, UseContentWatchLink)
                             '                        .Link = main_GetPageLink4(.Id, "", True, False)
                             '                        '.Link = main_GetLinkAliasByPageID(.Id, "", .LinkDynamic)
-                            '                        .MetaContentNoFollow = encodeBoolean(main_pcc(PCC_AllowMetaContentNoFollow, main_RenderCache_CurrentPage_PCCPtr))
-                            '                        .BlockSourceID = encodeInteger(main_pcc(PCC_BlockSourceID, main_RenderCache_CurrentPage_PCCPtr))
-                            '                        .CustomBlockMessageFilename = Trim(encodeText(main_pcc(PCC_CustomBlockMessageFilename, main_RenderCache_CurrentPage_PCCPtr)))
-                            '                        .RegistrationGroupID = encodeInteger(main_pcc(PCC_RegistrationGroupID, main_RenderCache_CurrentPage_PCCPtr))
-                            '                        .JSOnLoad = encodeText(main_pcc(PCC_JSOnLoad, main_RenderCache_CurrentPage_PCCPtr))
-                            '                        .JSHead = encodeText(main_pcc(PCC_JSHead, main_RenderCache_CurrentPage_PCCPtr))
-                            '                        .JSFilename = encodeText(main_pcc(PCC_JSFilename, main_RenderCache_CurrentPage_PCCPtr))
-                            '                        .JSEndBody = encodeText(main_pcc(PCC_JSEndBody, main_RenderCache_CurrentPage_PCCPtr))
-                            '                        .AllowInMenus = encodeBoolean(main_pcc(PCC_AllowInMenus, main_RenderCache_CurrentPage_PCCPtr))
-                            '                        .DateModified = encodeDate(main_pcc(PCC_ModifiedDate, main_RenderCache_CurrentPage_PCCPtr))
+                            '                        .MetaContentNoFollow = genericController.EncodeBoolean(main_pcc(PCC_AllowMetaContentNoFollow, main_RenderCache_CurrentPage_PCCPtr))
+                            '                        .BlockSourceID = genericController.EncodeInteger(main_pcc(PCC_BlockSourceID, main_RenderCache_CurrentPage_PCCPtr))
+                            '                        .CustomBlockMessageFilename = Trim(genericController.encodeText(main_pcc(PCC_CustomBlockMessageFilename, main_RenderCache_CurrentPage_PCCPtr)))
+                            '                        .RegistrationGroupID = genericController.EncodeInteger(main_pcc(PCC_RegistrationGroupID, main_RenderCache_CurrentPage_PCCPtr))
+                            '                        .JSOnLoad = genericController.encodeText(main_pcc(PCC_JSOnLoad, main_RenderCache_CurrentPage_PCCPtr))
+                            '                        .JSHead = genericController.encodeText(main_pcc(PCC_JSHead, main_RenderCache_CurrentPage_PCCPtr))
+                            '                        .JSFilename = genericController.encodeText(main_pcc(PCC_JSFilename, main_RenderCache_CurrentPage_PCCPtr))
+                            '                        .JSEndBody = genericController.encodeText(main_pcc(PCC_JSEndBody, main_RenderCache_CurrentPage_PCCPtr))
+                            '                        .AllowInMenus = genericController.EncodeBoolean(main_pcc(PCC_AllowInMenus, main_RenderCache_CurrentPage_PCCPtr))
+                            '                        .DateModified =  genericController.EncodeDate(main_pcc(PCC_ModifiedDate, main_RenderCache_CurrentPage_PCCPtr))
                             '                    End With
                             '                    main_oldCacheArray_CurrentPageCount = main_oldCacheArray_CurrentPageCount + 1
                         End If
@@ -30372,16 +30316,16 @@ ErrorTrap:
                     loadPageCnt = loadPageCnt + 1
                 Loop
                 '
-                main_RenderedPageID = EncodeInteger(cache_pageContent(PCC_ID, main_RenderCache_CurrentPage_PCCPtr))
-                main_RenderedParentID = EncodeInteger(cache_pageContent(PCC_ParentID, main_RenderCache_CurrentPage_PCCPtr))
-                main_RenderedPageName = EncodeText(cache_pageContent(PCC_Name, main_RenderCache_CurrentPage_PCCPtr))
+                main_RenderedPageID = genericController.EncodeInteger(cache_pageContent(PCC_ID, main_RenderCache_CurrentPage_PCCPtr))
+                main_RenderedParentID = genericController.EncodeInteger(cache_pageContent(PCC_ParentID, main_RenderCache_CurrentPage_PCCPtr))
+                main_RenderedPageName = genericController.encodeText(cache_pageContent(PCC_Name, main_RenderCache_CurrentPage_PCCPtr))
                 main_RenderCache_CurrentPage_IsRootPage = (main_RenderedPageID = rootPageId) And (main_RenderedParentID = 0)
-                main_RenderCache_CurrentPage_ContentId = EncodeInteger(cache_pageContent(PCC_ContentControlID, main_RenderCache_CurrentPage_PCCPtr))
+                main_RenderCache_CurrentPage_ContentId = genericController.EncodeInteger(cache_pageContent(PCC_ContentControlID, main_RenderCache_CurrentPage_PCCPtr))
                 main_RenderCache_CurrentPage_ContentName = metaData.getContentNameByID(main_RenderCache_CurrentPage_ContentId)
                 main_RenderCache_CurrentPage_IsEditing = user.isEditing(main_RenderCache_CurrentPage_ContentName)
                 main_RenderCache_CurrentPage_IsQuickEditing = user.isQuickEditing(main_RenderCache_CurrentPage_ContentName)
                 main_RenderCache_CurrentPage_IsAuthoring = main_RenderCache_CurrentPage_IsEditing Or main_RenderCache_CurrentPage_IsQuickEditing
-                webServerIO_response_NoFollow = EncodeBoolean(cache_pageContent(PCC_AllowMetaContentNoFollow, main_RenderCache_CurrentPage_PCCPtr)) Or webServerIO_response_NoFollow
+                webServerIO_response_NoFollow = genericController.EncodeBoolean(cache_pageContent(PCC_AllowMetaContentNoFollow, main_RenderCache_CurrentPage_PCCPtr)) Or webServerIO_response_NoFollow
                 '
                 '        If main_oldCacheArray_CurrentPagePtr <> -1 Then
                 '            With main_oldCacheArray_CurrentPage(main_oldCacheArray_CurrentPagePtr)
@@ -30436,13 +30380,13 @@ ErrorTrap:
                 ' this page does not exist, end of branch
                 '
                 'hint = hint & ",10"
-            ElseIf PageID = EncodeInteger(cache_pageContent(PCC_ID, main_RenderCache_CurrentPage_PCCPtr)) Then
+            ElseIf PageID = genericController.EncodeInteger(cache_pageContent(PCC_ID, main_RenderCache_CurrentPage_PCCPtr)) Then
                 'hint = hint & ",20"
                 'ElseIf PageID = main_oldCacheArray_CurrentPage(main_oldCacheArray_CurrentPagePtr).Id Then
                 '
                 ' This is the current page, main_Get the branch and process it depending on archivepage
                 '
-                ParentID = EncodeInteger(cache_pageContent(PCC_ParentID, main_RenderCache_CurrentPage_PCCPtr))
+                ParentID = genericController.EncodeInteger(cache_pageContent(PCC_ParentID, main_RenderCache_CurrentPage_PCCPtr))
                 'ParentID = main_oldCacheArray_CurrentPage(main_oldCacheArray_CurrentPagePtr).ParentID
                 If ArchivePage Then
                     Call handleLegacyError12("main_LoadRenderCache_ParentBranch", "The Archive API is no longer supported. The current URL is [" & webServerIO_ServerLink & "]")
@@ -30456,7 +30400,7 @@ ErrorTrap:
                         Call pageManager_LoadRenderCache_ParentBranch(ParentID, rootPageId, RootPageContentName, ArchivePage, ParentIDPath & "," & PageID, SectionID, UseContentWatchLink)
                     End If
                 End If
-            ElseIf IsInDelimitedString(ParentIDPath, CStr(PageID), ",") Then
+            ElseIf genericController.IsInDelimitedString(ParentIDPath, CStr(PageID), ",") Then
                 '
                 ' this page has been fetched before, end the branch here
                 '
@@ -30477,24 +30421,24 @@ ErrorTrap:
                     main_RenderCache_ParentBranch_PCCPtrs(main_RenderCache_ParentBranch_PCCPtrCnt) = PCCPtr
                     main_RenderCache_ParentBranch_PCCPtrCnt = main_RenderCache_ParentBranch_PCCPtrCnt + 1
                     '
-                    ParentID = EncodeInteger(cache_pageContent(PCC_ParentID, PCCPtr))
-                    PageName = EncodeText(cache_pageContent(PCC_Name, PCCPtr))
-                    dateArchive = EncodeDate(cache_pageContent(PCC_DateArchive, PCCPtr))
-                    DateExpires = EncodeDate(cache_pageContent(PCC_DateExpires, PCCPtr))
-                    PubDate = EncodeDate(cache_pageContent(PCC_PubDate, PCCPtr))
-                    ContentControlID = EncodeInteger(cache_pageContent(PCC_ContentControlID, PCCPtr))
-                    templateId = EncodeInteger(cache_pageContent(PCC_TemplateID, PCCPtr))
-                    pageCaption = Trim(EncodeText(cache_pageContent(PCC_MenuHeadline, PCCPtr)))
+                    ParentID = genericController.EncodeInteger(cache_pageContent(PCC_ParentID, PCCPtr))
+                    PageName = genericController.encodeText(cache_pageContent(PCC_Name, PCCPtr))
+                    dateArchive = genericController.EncodeDate(cache_pageContent(PCC_DateArchive, PCCPtr))
+                    DateExpires = genericController.EncodeDate(cache_pageContent(PCC_DateExpires, PCCPtr))
+                    PubDate = genericController.EncodeDate(cache_pageContent(PCC_PubDate, PCCPtr))
+                    ContentControlID = genericController.EncodeInteger(cache_pageContent(PCC_ContentControlID, PCCPtr))
+                    templateId = genericController.EncodeInteger(cache_pageContent(PCC_TemplateID, PCCPtr))
+                    pageCaption = Trim(genericController.encodeText(cache_pageContent(PCC_MenuHeadline, PCCPtr)))
                     If pageCaption = "" Then
                         pageCaption = Trim(PageName)
                         If pageCaption = "" Then
                             pageCaption = "Related Page"
                         End If
                     End If
-                    PageName = vbReplace(PageName, vbCrLf, " ")
-                    PageName = vbReplace(PageName, vbTab, " ")
-                    pageCaption = vbReplace(pageCaption, vbCrLf, " ")
-                    pageCaption = vbReplace(pageCaption, vbTab, " ")
+                    PageName = genericController.vbReplace(PageName, vbCrLf, " ")
+                    PageName = genericController.vbReplace(PageName, vbTab, " ")
+                    pageCaption = genericController.vbReplace(pageCaption, vbCrLf, " ")
+                    pageCaption = genericController.vbReplace(pageCaption, vbTab, " ")
                     '
                     ' Store results in main_oldCacheArray_ParentBranch Storage
                     '
@@ -30503,20 +30447,20 @@ ErrorTrap:
                     '    ReDim Preserve main_oldCacheArray_ParentBranch(main_oldCacheArray_ParentBranchSize)
                     'End If
                     'With main_oldCacheArray_ParentBranch(main_oldCacheArray_ParentBranchCount)
-                    '    .Id = encodeInteger(main_pcc(PCC_ID, PCCPtr))
+                    '    .Id = genericController.EncodeInteger(main_pcc(PCC_ID, PCCPtr))
                     '    .Name = PageName
                     '    .Caption = pageCaption
                     '    .dateArchive = dateArchive
                     '    .DateExpires = DateExpires
                     '    .PubDate = PubDate
-                    '    .childListSortMethodId = encodeInteger(main_pcc(PCC_ChildListSortMethodID, PCCPtr))
+                    '    .childListSortMethodId = genericController.EncodeInteger(main_pcc(PCC_ChildListSortMethodID, PCCPtr))
                     '    .ContentControlID = ContentControlID
                     '    .parentId = parentId
                     '    .templateId = templateId
-                    '    .BlockContent = encodeBoolean(main_pcc(PCC_BlockContent, PCCPtr))
-                    '    .BlockPage = encodeBoolean(main_pcc(PCC_BlockPage, PCCPtr))
-                    '    .AllowInMenus = encodeBoolean(main_pcc(PCC_AllowInMenus, PCCPtr))
-                    '    MenuLinkOverRide = encodeText(main_pcc(PCC_Link, PCCPtr))
+                    '    .BlockContent = genericController.EncodeBoolean(main_pcc(PCC_BlockContent, PCCPtr))
+                    '    .BlockPage = genericController.EncodeBoolean(main_pcc(PCC_BlockPage, PCCPtr))
+                    '    .AllowInMenus = genericController.EncodeBoolean(main_pcc(PCC_AllowInMenus, PCCPtr))
+                    '    MenuLinkOverRide = genericController.encodeText(main_pcc(PCC_Link, PCCPtr))
                     '    IsRootPage = (.Id = rootPageId)
                     '    '.LinkDynamic = main_GetPageDynamicLinkWithArgs(.ContentControlID, .Id, main_ServerPathPage & "?" & main_RefreshQueryString, IsRootPage, TemplateID, SectionID, MenuLinkOverRide, UseContentWatchLink)
                     '    .Link = main_GetPageLink4(.Id, "", True, False)
@@ -30526,7 +30470,7 @@ ErrorTrap:
                     '
                     'Call app.closeCS(CS)
                     '
-                    IsRootPage = (EncodeInteger(cache_pageContent(PCC_ID, PCCPtr)) = rootPageId)
+                    IsRootPage = (genericController.EncodeInteger(cache_pageContent(PCC_ID, PCCPtr)) = rootPageId)
                     If IsRootPage Then
                         '
                         ' The top of a page tree
@@ -30603,7 +30547,7 @@ ErrorTrap:
                 If ChildOrderByClause <> "" Then
                     SQLOrderBy = ChildOrderByClause
                 Else
-                    childListSortMethodId = EncodeInteger(cache_pageContent(PCC_ChildListSortMethodID, main_RenderCache_CurrentPage_PCCPtr))
+                    childListSortMethodId = genericController.EncodeInteger(cache_pageContent(PCC_ChildListSortMethodID, main_RenderCache_CurrentPage_PCCPtr))
                     'childListSortMethodId = main_oldCacheArray_CurrentPage(main_oldCacheArray_CurrentPagePtr).childListSortMethodId
                     If childListSortMethodId <> 0 Then
                         SQLOrderBy = GetSortMethodByID(childListSortMethodId)
@@ -30615,11 +30559,11 @@ ErrorTrap:
                 ParentContentID = 0
                 ParentContentName = ""
                 IsParentEditing = False
-                ParentID = EncodeInteger(cache_pageContent(PCC_ParentID, main_RenderCache_CurrentPage_PCCPtr))
+                ParentID = genericController.EncodeInteger(cache_pageContent(PCC_ParentID, main_RenderCache_CurrentPage_PCCPtr))
                 If ParentID > 0 Then
                     parentPCCPtr = main_GetPCCPtr(ParentID, pagemanager_IsWorkflowRendering, False)
                     If parentPCCPtr > -1 Then
-                        ParentContentID = EncodeInteger(cache_pageContent(PCC_ContentControlID, parentPCCPtr))
+                        ParentContentID = genericController.EncodeInteger(cache_pageContent(PCC_ContentControlID, parentPCCPtr))
                         ParentContentName = metaData.getContentNameByID(ParentContentID)
                         If ParentContentName <> "" Then
                             IsParentEditing = user.isEditing(ParentContentName)
@@ -30632,7 +30576,7 @@ ErrorTrap:
                 '
                 ' Child criteria is all children with main_oldCacheArray_CurrentPage as parentid
                 '
-                PageID = EncodeInteger(cache_pageContent(PCC_ID, main_RenderCache_CurrentPage_PCCPtr))
+                PageID = genericController.EncodeInteger(cache_pageContent(PCC_ID, main_RenderCache_CurrentPage_PCCPtr))
                 Criteria = "(ParentID=" & PageID & ")and(id<>" & PageID & ")"
                 '
                 'PageID = main_oldCacheArray_CurrentPage(main_oldCacheArray_CurrentPagePtr).Id
@@ -30663,50 +30607,50 @@ ErrorTrap:
                         '    ReDim Preserve main_oldCacheArray_ChildBranch(main_oldCacheArray_ChildBranchSize)
                         'End If
                         'With main_oldCacheArray_ChildBranch(main_oldCacheArray_ChildBranchCount)
-                        '    PageName = encodeText(main_pcc(PCC_Name, PCCPtr))
+                        '    PageName = genericController.encodeText(main_pcc(PCC_Name, PCCPtr))
                         '    pageCaption = ""
-                        '    pageCaption = encodeText(main_pcc(PCC_MenuHeadline, PCCPtr))
+                        '    pageCaption = genericController.encodeText(main_pcc(PCC_MenuHeadline, PCCPtr))
                         '    If pageCaption = "" Then
                         '        pageCaption = Trim(PageName)
                         '        If pageCaption = "" Then
                         '            pageCaption = "Related Page"
                         '        End If
                         '    End If
-                        '    If vbInstr(1, pageCaption, "<ac", vbTextCompare) <> 0 Then
+                        '    If genericController.vbInstr(1, pageCaption, "<ac", vbTextCompare) <> 0 Then
                         '        pageCaption = pageCaption & ACTagEnd
                         '    End If
                         '    '
                         '    ' remove crlf because not allowed (in main_RenderedNavigationStructure if nothing else)
                         '    '
-                        '    PageName = vbReplace(PageName, vbCrLf, " ")
-                        '    PageName = vbReplace(PageName, vbTab, " ")
-                        '    pageCaption = vbReplace(pageCaption, vbCrLf, " ")
-                        '    pageCaption = vbReplace(pageCaption, vbTab, " ")
+                        '    PageName = genericController.vbReplace(PageName, vbCrLf, " ")
+                        '    PageName = genericController.vbReplace(PageName, vbTab, " ")
+                        '    pageCaption = genericController.vbReplace(pageCaption, vbCrLf, " ")
+                        '    pageCaption = genericController.vbReplace(pageCaption, vbTab, " ")
                         '    '
                         '    .Name = PageName
-                        '    .Active = encodeBoolean(main_pcc(PCC_Active, PCCPtr))
-                        '    .AllowInChildLists = encodeBoolean(main_pcc(PCC_AllowInChildLists, PCCPtr))
-                        '    .AllowInMenus = encodeBoolean(main_pcc(PCC_AllowInMenus, PCCPtr))
+                        '    .Active = genericController.EncodeBoolean(main_pcc(PCC_Active, PCCPtr))
+                        '    .AllowInChildLists = genericController.EncodeBoolean(main_pcc(PCC_AllowInChildLists, PCCPtr))
+                        '    .AllowInMenus = genericController.EncodeBoolean(main_pcc(PCC_AllowInMenus, PCCPtr))
                         '    .MenuCaption = pageCaption
-                        '    .Id = encodeInteger(main_pcc(PCC_ID, PCCPtr))
-                        '    .ListName = encodeText(main_pcc(PCC_ParentListName, PCCPtr))
-                        '    .dateArchive = encodeDate(main_pcc(PCC_DateArchive, PCCPtr))
-                        '    .DateExpires = encodeDate(main_pcc(PCC_DateExpires, PCCPtr))
-                        '    .PubDate = encodeDate(main_pcc(PCC_PubDate, PCCPtr))
-                        '    .copyFilename = encodeText(main_pcc(PCC_CopyFilename, PCCPtr))
-                        '    .ContentControlID = encodeInteger(main_pcc(PCC_ContentControlID, PCCPtr))
+                        '    .Id = genericController.EncodeInteger(main_pcc(PCC_ID, PCCPtr))
+                        '    .ListName = genericController.encodeText(main_pcc(PCC_ParentListName, PCCPtr))
+                        '    .dateArchive =  genericController.EncodeDate(main_pcc(PCC_DateArchive, PCCPtr))
+                        '    .DateExpires =  genericController.EncodeDate(main_pcc(PCC_DateExpires, PCCPtr))
+                        '    .PubDate =  genericController.EncodeDate(main_pcc(PCC_PubDate, PCCPtr))
+                        '    .copyFilename = genericController.encodeText(main_pcc(PCC_CopyFilename, PCCPtr))
+                        '    .ContentControlID = genericController.EncodeInteger(main_pcc(PCC_ContentControlID, PCCPtr))
                         '    .IsDisplayed = False
-                        '    .BriefFilename = encodeText(main_pcc(PCC_BriefFilename, PCCPtr))
-                        '    .AllowBrief = encodeBoolean(main_pcc(PCC_AllowBrief, PCCPtr))
+                        '    .BriefFilename = genericController.encodeText(main_pcc(PCC_BriefFilename, PCCPtr))
+                        '    .AllowBrief = genericController.EncodeBoolean(main_pcc(PCC_AllowBrief, PCCPtr))
                         '    ContentName = metaData.getContentNameByID(.ContentControlID)
                         '    If main_IsEditing(ContentName) Then
                         '        .RecordEditLink = main_GetRecordEditLink2(ContentName, .Id, True, .Name, True)
                         '    End If
-                        '    .templateId = encodeInteger(main_pcc(PCC_TemplateID, PCCPtr))
-                        '    .BlockContent = encodeBoolean(main_pcc(PCC_BlockContent, PCCPtr))
-                        '    .BlockPage = encodeBoolean(main_pcc(PCC_BlockPage, PCCPtr))
-                        '    .headline = encodeText(main_pcc(PCC_Headline, PCCPtr))
-                        '    MenuLinkOverRide = encodeText(main_pcc(PCC_Link, PCCPtr))
+                        '    .templateId = genericController.EncodeInteger(main_pcc(PCC_TemplateID, PCCPtr))
+                        '    .BlockContent = genericController.EncodeBoolean(main_pcc(PCC_BlockContent, PCCPtr))
+                        '    .BlockPage = genericController.EncodeBoolean(main_pcc(PCC_BlockPage, PCCPtr))
+                        '    .headline = genericController.encodeText(main_pcc(PCC_Headline, PCCPtr))
+                        '    MenuLinkOverRide = genericController.encodeText(main_pcc(PCC_Link, PCCPtr))
                         '
                         '    .LinkOverride = MenuLinkOverRide
                         '    .Link = main_GetPageLink4(.Id, "", True, False)
@@ -30751,7 +30695,7 @@ ErrorTrap:
                 '
                 ' ----- Load Parent Branch
                 '
-                ParentID = EncodeInteger(cache_pageContent(PCC_ParentID, main_RenderCache_CurrentPage_PCCPtr))
+                ParentID = genericController.EncodeInteger(cache_pageContent(PCC_ParentID, main_RenderCache_CurrentPage_PCCPtr))
                 If (Not main_RenderCache_CurrentPage_IsRootPage) Then
                     If ParentID = 0 Then
                         '
@@ -30777,10 +30721,10 @@ ErrorTrap:
                     '
                     ' ----- load the child branch
                     '
-                    childListSortMethodId = EncodeInteger(cache_pageContent(PCC_ChildListSortMethodID, main_RenderCache_CurrentPage_PCCPtr))
+                    childListSortMethodId = genericController.EncodeInteger(cache_pageContent(PCC_ChildListSortMethodID, main_RenderCache_CurrentPage_PCCPtr))
                     SortOrder = GetSortMethodByID(childListSortMethodId)
                     If SortOrder = "" Then
-                        SortOrder = EncodeText(OrderByClause)
+                        SortOrder = genericController.encodeText(OrderByClause)
                     End If
                     Call pageManager_LoadRenderCache_ChildBranch(SortOrder, main_RenderCache_CurrentPage_IsRenderingMode, ArchivePage, SectionID, UseContentWatchLink)
                     main_RenderCache_Loaded = True
@@ -30858,7 +30802,7 @@ ErrorTrap:
                     '
                     returnHtmlBody = "" _
                         & cr & "<div class=""ccLoginPageCon"">" _
-                        & kmaIndent(PageContent) _
+                        & genericController.kmaIndent(PageContent) _
                         & cr & "</div>" _
                         & ""
                 ElseIf Not docOpen Then
@@ -30870,7 +30814,7 @@ ErrorTrap:
                     '
                     ' no section block, continue
                     '
-                    'PageContent = CR & "<!-- Page Content -->" & KmaIndent(main_GetHtmlBody_GetSection(True, True, False)) & CR & "<!-- /Page Content -->"
+                    'PageContent = CR & "<!-- Page Content -->" & genericController.kmaIndent(main_GetHtmlBody_GetSection(True, True, False)) & CR & "<!-- /Page Content -->"
 
                     Call pageManager_LoadTemplateGetID(main_RenderedTemplateID)
                     '
@@ -30897,7 +30841,7 @@ ErrorTrap:
                     ' If Content was not found, add it to the end
                     '
                     If (InStr(1, returnHtmlBody, fpoContentBox) <> 0) Then
-                        returnHtmlBody = vbReplace(returnHtmlBody, fpoContentBox, PageContent)
+                        returnHtmlBody = genericController.vbReplace(returnHtmlBody, fpoContentBox, PageContent)
                     Else
                         returnHtmlBody = returnHtmlBody & PageContent
                     End If
@@ -30961,16 +30905,16 @@ ErrorTrap:
                                                 Result.Add(ContentIndent)
                                                 ContentIndent = ""
                                             End If
-                                            Content = vbReplace(Content, vbCrLf, " ")
-                                            Content = vbReplace(Content, vbTab, " ")
-                                            Content = vbReplace(Content, vbCr, " ")
-                                            Content = vbReplace(Content, vbLf, " ")
+                                            Content = genericController.vbReplace(Content, vbCrLf, " ")
+                                            Content = genericController.vbReplace(Content, vbTab, " ")
+                                            Content = genericController.vbReplace(Content, vbCr, " ")
+                                            Content = genericController.vbReplace(Content, vbLf, " ")
                                             Result.Add(Content)
                                             ContentCnt = ContentCnt + 1
                                         End If
                                     End If
                                 Else
-                                    Select Case vbLCase(Parse.TagName(Ptr))
+                                    Select Case genericController.vbLCase(Parse.TagName(Ptr))
                                         Case "pre", "script"
                                             '
                                             ' End block formating
@@ -30993,7 +30937,7 @@ ErrorTrap:
                                                 '
                                                 ' format the tag
                                                 '
-                                                Select Case vbLCase(Parse.TagName(Ptr))
+                                                Select Case genericController.vbLCase(Parse.TagName(Ptr))
                                                     Case "p", "h1", "h2", "h3", "h4", "h5", "h6", "li", "br"
                                                         '
                                                         ' new line
@@ -31043,7 +30987,7 @@ ErrorTrap:
                                 '
                                 ' Add to 'Asset Errors' Table - a merge with Spider Doc Errors
                                 '
-                                'Call main_AppendClassErrorLog("cpCoreClass(" & appEnvironment.name & ").GetHTMLBody AutoIndent error. At the end of the document, the last tag was still indented (more start tags than end tags). Link=[" & decodeHtml(main_ServerLink) & "], ")
+                                'Call main_AppendClassErrorLog("cpCoreClass(" & appEnvironment.name & ").GetHTMLBody AutoIndent error. At the end of the document, the last tag was still indented (more start tags than end tags). Link=[" & genericController.decodeHtml(main_ServerLink) & "], ")
                             End If
                             returnHtmlBody = Result.Text
                         End If
@@ -31190,15 +31134,15 @@ ErrorTrap:
                 If Ptr < 0 Then
                     SectionID = 0
                 Else
-                    SectionID = EncodeInteger(cache_siteSection(SSC_ID, Ptr))
-                    SectionName = EncodeText(cache_siteSection(SSC_Name, Ptr))
-                    SectionTemplateID = EncodeInteger(cache_siteSection(SSC_TemplateID, Ptr))
-                    SectionContentID = EncodeInteger(cache_siteSection(SSC_ContentID, Ptr))
-                    SectionBlock = EncodeBoolean(cache_siteSection(SSC_BlockSection, Ptr))
-                    Call main_AddOnLoadJavascript2(EncodeText(cache_siteSection(SSC_JSOnLoad, Ptr)), "site section")
-                    Call main_AddHeadScriptCode(EncodeText(cache_siteSection(SSC_JSHead, Ptr)), "site section")
-                    Call main_AddEndOfBodyJavascript2(EncodeText(cache_siteSection(SSC_JSEndBody, Ptr)), "site section")
-                    JSFilename = EncodeText(cache_siteSection(SSC_JSFilename, Ptr))
+                    SectionID = genericController.EncodeInteger(cache_siteSection(SSC_ID, Ptr))
+                    SectionName = genericController.encodeText(cache_siteSection(SSC_Name, Ptr))
+                    SectionTemplateID = genericController.EncodeInteger(cache_siteSection(SSC_TemplateID, Ptr))
+                    SectionContentID = genericController.EncodeInteger(cache_siteSection(SSC_ContentID, Ptr))
+                    SectionBlock = genericController.EncodeBoolean(cache_siteSection(SSC_BlockSection, Ptr))
+                    Call main_AddOnLoadJavascript2(genericController.encodeText(cache_siteSection(SSC_JSOnLoad, Ptr)), "site section")
+                    Call main_AddHeadScriptCode(genericController.encodeText(cache_siteSection(SSC_JSHead, Ptr)), "site section")
+                    Call main_AddEndOfBodyJavascript2(genericController.encodeText(cache_siteSection(SSC_JSEndBody, Ptr)), "site section")
+                    JSFilename = genericController.encodeText(cache_siteSection(SSC_JSFilename, Ptr))
                     If JSFilename <> "" Then
                         JSFilename = webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
                         Call main_AddHeadScriptLink(JSFilename, "site section")
@@ -31226,15 +31170,15 @@ ErrorTrap:
                     Exit Function
                     'SectionID = 0
                 Else
-                    SectionName = EncodeText(cache_siteSection(SSC_Name, Ptr))
-                    rootPageId = EncodeInteger(cache_siteSection(SSC_RootPageID, Ptr))
-                    SectionTemplateID = EncodeInteger(cache_siteSection(SSC_TemplateID, Ptr))
-                    SectionContentID = EncodeInteger(cache_siteSection(SSC_ContentID, Ptr))
-                    SectionBlock = EncodeBoolean(cache_siteSection(SSC_BlockSection, Ptr))
-                    Call main_AddOnLoadJavascript2(EncodeText(cache_siteSection(SSC_JSOnLoad, Ptr)), "site section")
-                    Call main_AddHeadScriptCode(EncodeText(cache_siteSection(SSC_JSHead, Ptr)), "site section")
-                    Call main_AddEndOfBodyJavascript2(EncodeText(cache_siteSection(SSC_JSEndBody, Ptr)), "site section")
-                    JSFilename = EncodeText(cache_siteSection(SSC_JSFilename, Ptr))
+                    SectionName = genericController.encodeText(cache_siteSection(SSC_Name, Ptr))
+                    rootPageId = genericController.EncodeInteger(cache_siteSection(SSC_RootPageID, Ptr))
+                    SectionTemplateID = genericController.EncodeInteger(cache_siteSection(SSC_TemplateID, Ptr))
+                    SectionContentID = genericController.EncodeInteger(cache_siteSection(SSC_ContentID, Ptr))
+                    SectionBlock = genericController.EncodeBoolean(cache_siteSection(SSC_BlockSection, Ptr))
+                    Call main_AddOnLoadJavascript2(genericController.encodeText(cache_siteSection(SSC_JSOnLoad, Ptr)), "site section")
+                    Call main_AddHeadScriptCode(genericController.encodeText(cache_siteSection(SSC_JSHead, Ptr)), "site section")
+                    Call main_AddEndOfBodyJavascript2(genericController.encodeText(cache_siteSection(SSC_JSEndBody, Ptr)), "site section")
+                    JSFilename = genericController.encodeText(cache_siteSection(SSC_JSFilename, Ptr))
                     If JSFilename <> "" Then
                         JSFilename = webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
                         Call main_AddHeadScriptLink(JSFilename, "site section")
@@ -31398,14 +31342,14 @@ ErrorTrap:
             '
             'hint = "6"
             If PageID <> 0 Then
-                web_RefreshQueryString = ModifyQueryString(web_RefreshQueryString, "bid", CStr(PageID), True)
-                web_RefreshQueryString = ModifyQueryString(web_RefreshQueryString, "sid", "")
+                web_RefreshQueryString = genericController.ModifyQueryString(web_RefreshQueryString, "bid", CStr(PageID), True)
+                web_RefreshQueryString = genericController.ModifyQueryString(web_RefreshQueryString, "sid", "")
             ElseIf SectionID <> 0 Then
-                web_RefreshQueryString = ModifyQueryString(web_RefreshQueryString, "bid", "")
-                web_RefreshQueryString = ModifyQueryString(web_RefreshQueryString, "sid", CStr(SectionID), True)
+                web_RefreshQueryString = genericController.ModifyQueryString(web_RefreshQueryString, "bid", "")
+                web_RefreshQueryString = genericController.ModifyQueryString(web_RefreshQueryString, "sid", CStr(SectionID), True)
             Else
-                web_RefreshQueryString = ModifyQueryString(web_RefreshQueryString, "bid", "")
-                web_RefreshQueryString = ModifyQueryString(web_RefreshQueryString, "sid", "")
+                web_RefreshQueryString = genericController.ModifyQueryString(web_RefreshQueryString, "bid", "")
+                web_RefreshQueryString = genericController.ModifyQueryString(web_RefreshQueryString, "sid", "")
             End If
             '
             '------------------------------------------------------------------------------------
@@ -31452,15 +31396,15 @@ ErrorTrap:
                             If Right(test, 2) = vbCrLf Then
                                 test = Mid(test, 1, Len(test) - 2)
                             End If
-                            PageRow = SplitCRLF(test)
+                            PageRow = genericController.SplitCRLF(test)
                             PageRowCnt = UBound(PageRow) + 1
                             For Ptr = PageRowCnt - 1 To 0 Step -1
                                 navStruc = Split(PageRow(Ptr), vbTab)
                                 If UBound(navStruc) > 6 Then
-                                    If EncodeInteger(navStruc(pageManager_NavStruc_Descriptor)) < pageManager_NavStruc_Descriptor_ChildPage Then
+                                    If genericController.EncodeInteger(navStruc(pageManager_NavStruc_Descriptor)) < pageManager_NavStruc_Descriptor_ChildPage Then
                                         If navStruc(pageManager_NavStruc_TemplateId) <> "0" Then
-                                            templateId = EncodeInteger(navStruc(pageManager_NavStruc_TemplateId))
-                                            If EncodeInteger(navStruc(pageManager_NavStruc_Descriptor)) = pageManager_NavStruc_Descriptor_CurrentPage Then
+                                            templateId = genericController.EncodeInteger(navStruc(pageManager_NavStruc_TemplateId))
+                                            If genericController.EncodeInteger(navStruc(pageManager_NavStruc_Descriptor)) = pageManager_NavStruc_Descriptor_CurrentPage Then
                                                 pageManager_TemplateReason = "This template was used because it is selected by the current page."
                                             Else
                                                 pageManager_TemplateReason = "This template was used because it is selected one of this page's parents."
@@ -31479,8 +31423,8 @@ ErrorTrap:
                             If TCPtr < 0 Then
                                 templateId = 0
                             Else
-                                main_RenderedTemplateID = EncodeInteger(cache_pageTemplate(TC_ID, TCPtr))
-                                main_RenderedTemplateName = EncodeText(cache_pageTemplate(TC_Name, TCPtr))
+                                main_RenderedTemplateID = genericController.EncodeInteger(cache_pageTemplate(TC_ID, TCPtr))
+                                main_RenderedTemplateName = genericController.encodeText(cache_pageTemplate(TC_Name, TCPtr))
                             End If
                         End If
                         If templateId = 0 Then
@@ -31493,8 +31437,8 @@ ErrorTrap:
                                 If TCPtr < 0 Then
                                     templateId = 0
                                 Else
-                                    main_RenderedTemplateID = EncodeInteger(cache_pageTemplate(TC_ID, TCPtr))
-                                    main_RenderedTemplateName = EncodeText(cache_pageTemplate(TC_Name, TCPtr))
+                                    main_RenderedTemplateID = genericController.EncodeInteger(cache_pageTemplate(TC_ID, TCPtr))
+                                    main_RenderedTemplateName = genericController.encodeText(cache_pageTemplate(TC_Name, TCPtr))
                                     pageManager_TemplateReason = "This template [" & main_RenderedTemplateName & "] was used because it is selected by the current section [" & main_RenderedSectionName & "]."
                                 End If
                             End If
@@ -31507,8 +31451,8 @@ ErrorTrap:
                                 If TCPtr < 0 Then
                                     templateId = 0
                                 Else
-                                    main_RenderedTemplateID = EncodeInteger(cache_pageTemplate(TC_ID, TCPtr))
-                                    main_RenderedTemplateName = EncodeText(cache_pageTemplate(TC_Name, TCPtr))
+                                    main_RenderedTemplateID = genericController.EncodeInteger(cache_pageTemplate(TC_ID, TCPtr))
+                                    main_RenderedTemplateName = genericController.encodeText(cache_pageTemplate(TC_Name, TCPtr))
                                     pageManager_TemplateReason = "This template [" & main_RenderedTemplateName & "] was used because it is selected as the default template for the current domain [" & webServerIO_requestDomain & "]."
                                 End If
                             End If
@@ -31518,16 +31462,16 @@ ErrorTrap:
                                 '
                                 Call pageManager_cache_pageTemplate_load()
                                 For TCPtr = 0 To pageManager_cache_pageTemplate_rows - 1
-                                    If vbLCase(EncodeText(cache_pageTemplate(TC_Name, TCPtr))) = "default" Then
-                                        templateId = EncodeInteger(cache_pageTemplate(TC_ID, TCPtr))
+                                    If genericController.vbLCase(genericController.encodeText(cache_pageTemplate(TC_Name, TCPtr))) = "default" Then
+                                        templateId = genericController.EncodeInteger(cache_pageTemplate(TC_ID, TCPtr))
                                         Exit For
                                     End If
                                 Next
                                 If TCPtr >= pageManager_cache_pageTemplate_rows Then
                                     TCPtr = -1
                                 Else
-                                    main_RenderedTemplateID = EncodeInteger(cache_pageTemplate(TC_ID, TCPtr))
-                                    main_RenderedTemplateName = EncodeText(cache_pageTemplate(TC_Name, TCPtr))
+                                    main_RenderedTemplateID = genericController.EncodeInteger(cache_pageTemplate(TC_ID, TCPtr))
+                                    main_RenderedTemplateName = genericController.encodeText(cache_pageTemplate(TC_Name, TCPtr))
                                     pageManager_TemplateReason = "This template was used because it is the default template for the site and no other template was selected [" & main_RenderedTemplateName & "]."
                                 End If
                             End If
@@ -31541,9 +31485,9 @@ ErrorTrap:
                                     '
                                     ' set Mobile Template
                                     '
-                                    pageManager_TemplateBody = EncodeText(cache_pageTemplate(TC_MobileBodyHTML, TCPtr))
+                                    pageManager_TemplateBody = genericController.encodeText(cache_pageTemplate(TC_MobileBodyHTML, TCPtr))
                                     If pageManager_TemplateBody <> "" Then
-                                        StylesFilename = EncodeText(cache_pageTemplate(TC_MobileStylesFilename, TCPtr))
+                                        StylesFilename = genericController.encodeText(cache_pageTemplate(TC_MobileStylesFilename, TCPtr))
                                     End If
                                 End If
                             End If
@@ -31551,17 +31495,17 @@ ErrorTrap:
                                 '
                                 ' set web template if no other template sets it
                                 '
-                                pageManager_TemplateBody = EncodeText(cache_pageTemplate(TC_BodyHTML, TCPtr))
-                                StylesFilename = EncodeText(cache_pageTemplate(TC_StylesFilename, TCPtr))
+                                pageManager_TemplateBody = genericController.encodeText(cache_pageTemplate(TC_BodyHTML, TCPtr))
+                                StylesFilename = genericController.encodeText(cache_pageTemplate(TC_StylesFilename, TCPtr))
                             End If
-                            pageManager_TemplateLink = EncodeText(cache_pageTemplate(TC_Link, TCPtr))
-                            pageManager_TemplateName = EncodeText(cache_pageTemplate(TC_Name, TCPtr))
-                            Call main_AddOnLoadJavascript2(EncodeText(cache_pageTemplate(TC_JSOnLoad, TCPtr)), "template")
-                            Call main_AddHeadScriptCode(EncodeText(cache_pageTemplate(TC_JSInHeadLegacy, TCPtr)), "template")
-                            Call main_AddEndOfBodyJavascript2(EncodeText(cache_pageTemplate(TC_JSEndBody, TCPtr)), "template")
-                            Call main_AddHeadTag2(EncodeText(cache_pageTemplate(TC_OtherHeadTags, TCPtr)), "template")
-                            pageManager_TemplateBodyTag = EncodeText(cache_pageTemplate(TC_BodyTag, TCPtr))
-                            JSFilename = EncodeText(cache_pageTemplate(TC_JSInHeadFilename, TCPtr))
+                            pageManager_TemplateLink = genericController.encodeText(cache_pageTemplate(TC_Link, TCPtr))
+                            pageManager_TemplateName = genericController.encodeText(cache_pageTemplate(TC_Name, TCPtr))
+                            Call main_AddOnLoadJavascript2(genericController.encodeText(cache_pageTemplate(TC_JSOnLoad, TCPtr)), "template")
+                            Call main_AddHeadScriptCode(genericController.encodeText(cache_pageTemplate(TC_JSInHeadLegacy, TCPtr)), "template")
+                            Call main_AddEndOfBodyJavascript2(genericController.encodeText(cache_pageTemplate(TC_JSEndBody, TCPtr)), "template")
+                            Call main_AddHeadTag2(genericController.encodeText(cache_pageTemplate(TC_OtherHeadTags, TCPtr)), "template")
+                            pageManager_TemplateBodyTag = genericController.encodeText(cache_pageTemplate(TC_BodyTag, TCPtr))
+                            JSFilename = genericController.encodeText(cache_pageTemplate(TC_JSInHeadFilename, TCPtr))
                             If JSFilename <> "" Then
                                 JSFilename = webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
                                 Call main_AddHeadScriptLink(JSFilename, "template")
@@ -31570,7 +31514,7 @@ ErrorTrap:
                             ' Add exclusive styles
                             '
                             If StylesFilename <> "" Then
-                                If vbLCase(Right(StylesFilename, 4)) <> ".css" Then
+                                If genericController.vbLCase(Right(StylesFilename, 4)) <> ".css" Then
                                     Call handleLegacyError15("Template [" & pageManager_TemplateName & "] StylesFilename is not a '.css' file, and will not display correct. Check that the field is setup as a CSSFile.", "main_GetHtmlBody_GetSection")
                                 Else
                                     main_MetaContent_TemplateStyleSheetTag = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, StylesFilename) & """ >"
@@ -31580,13 +31524,13 @@ ErrorTrap:
                             ' Add shared styles
                             '
 
-                            SharedStylesIDList = EncodeText(cache_pageTemplate(TC_SharedStylesIDList, TCPtr))
+                            SharedStylesIDList = genericController.encodeText(cache_pageTemplate(TC_SharedStylesIDList, TCPtr))
                             If SharedStylesIDList <> "" Then
                                 ListSplit = Split(SharedStylesIDList, ",")
                                 For Ptr = 0 To UBound(ListSplit)
-                                    styleId = EncodeInteger(ListSplit(Ptr))
+                                    styleId = genericController.EncodeInteger(ListSplit(Ptr))
                                     If styleId <> 0 Then
-                                        Call main_AddSharedStyleID2(EncodeInteger(ListSplit(Ptr)), "template")
+                                        Call main_AddSharedStyleID2(genericController.EncodeInteger(ListSplit(Ptr)), "template")
                                     End If
                                 Next
                             End If
@@ -31601,8 +31545,8 @@ ErrorTrap:
                                 PCCPtr = pageManager_cache_pageContent_getPtr(main_RenderedPageID, pagemanager_IsWorkflowRendering, user.isQuickEditing(""))
                                 '$$$$$ must check for PPtr<0
                                 SecureLink_CurrentURL = (Left(LCase(webServerIO_ServerLink), 8) = "https://")
-                                SecureLink_Template_Required = EncodeBoolean(cache_pageTemplate(TC_IsSecure, TCPtr))
-                                SecureLink_Page_Required = EncodeBoolean(cache_pageContent(PCC_IsSecure, PCCPtr))
+                                SecureLink_Template_Required = genericController.EncodeBoolean(cache_pageTemplate(TC_IsSecure, TCPtr))
+                                SecureLink_Page_Required = genericController.EncodeBoolean(cache_pageContent(PCC_IsSecure, PCCPtr))
                                 SecureLink_Required = SecureLink_Template_Required Or SecureLink_Page_Required
                                 If (templateLink = "") Then
                                     '
@@ -31614,10 +31558,10 @@ ErrorTrap:
                                         ' redirect because protocol is wrong
                                         '
                                         If SecureLink_CurrentURL Then
-                                            pageManager_RedirectLink = vbReplace(webServerIO_ServerLink, "https://", "http://")
+                                            pageManager_RedirectLink = genericController.vbReplace(webServerIO_ServerLink, "https://", "http://")
                                             pageManager_RedirectReason = "Redirecting because neither the page or the template requires a secure link."
                                         Else
-                                            pageManager_RedirectLink = vbReplace(webServerIO_ServerLink, "http://", "https://")
+                                            pageManager_RedirectLink = genericController.vbReplace(webServerIO_ServerLink, "http://", "https://")
                                             If SecureLink_Page_Required Then
                                                 pageManager_RedirectReason = "Redirecting because this page [" & main_RenderedPageName & "] requires a secure link."
                                             Else
@@ -31630,7 +31574,7 @@ ErrorTrap:
                                     ' ----- TemplateLink given
                                     '
                                     CurrentLink = webServerIO_ServerLink
-                                    If vbInstr(1, templateLink, "://", vbTextCompare) <> 0 Then
+                                    If genericController.vbInstr(1, templateLink, "://", vbTextCompare) <> 0 Then
                                         '
                                         ' ----- TemplateLink is full
                                         '       this includes a short template with the secure checked case
@@ -31638,7 +31582,7 @@ ErrorTrap:
                                         '
                                         LinkSplit = Split(CurrentLink, "?")
                                         CurrentLinkNoQuery = LinkSplit(0)
-                                        If (UCase(templateLink) <> vbUCase(CurrentLinkNoQuery)) Then
+                                        If (UCase(templateLink) <> genericController.vbUCase(CurrentLinkNoQuery)) Then
                                             '
                                             ' redirect to template link
                                             '
@@ -31659,12 +31603,12 @@ ErrorTrap:
                                         ' ----- TemplateLink is short
                                         '       test current short link vs template short link, and protocols
                                         '
-                                        CurrentLink = vbReplace(CurrentLink, "https://", "http://", 1, 99, vbTextCompare)
-                                        CurrentLink = ConvertLinkToShortLink(CurrentLink, webServerIO.requestDomain, webServerIO_requestVirtualFilePath)
-                                        CurrentLink = coreCommonModule.EncodeAppRootPath(CurrentLink, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
+                                        CurrentLink = genericController.vbReplace(CurrentLink, "https://", "http://", 1, 99, vbTextCompare)
+                                        CurrentLink = genericController.ConvertLinkToShortLink(CurrentLink, webServerIO.requestDomain, webServerIO_requestVirtualFilePath)
+                                        CurrentLink = genericController.EncodeAppRootPath(CurrentLink, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
                                         LinkSplit = Split(CurrentLink, "?")
                                         CurrentLinkNoQuery = LinkSplit(0)
-                                        If (SecureLink_CurrentURL <> SecureLink_Required) Or (UCase(templateLink) <> vbUCase(CurrentLinkNoQuery)) Then
+                                        If (SecureLink_CurrentURL <> SecureLink_Required) Or (UCase(templateLink) <> genericController.vbUCase(CurrentLinkNoQuery)) Then
                                             '
                                             ' This is not the correct page for this content, redirect
                                             ' This is NOT a pagenotfound - but a correctable condition that can not be avoided
@@ -31675,11 +31619,11 @@ ErrorTrap:
                                                 '
                                                 ' Redirect to Secure
                                                 '
-                                                If vbInstr(1, pageManager_RedirectLink, "http", vbTextCompare) = 1 Then
+                                                If genericController.vbInstr(1, pageManager_RedirectLink, "http", vbTextCompare) = 1 Then
                                                     '
                                                     ' link is full
                                                     '
-                                                    pageManager_RedirectLink = vbReplace(pageManager_RedirectLink, "http://", "https://", 1, 99, vbTextCompare)
+                                                    pageManager_RedirectLink = genericController.vbReplace(pageManager_RedirectLink, "http://", "https://", 1, 99, vbTextCompare)
                                                 Else
                                                     '
                                                     ' link is root relative
@@ -31690,11 +31634,11 @@ ErrorTrap:
                                                 '
                                                 ' Redirect to non-Secure
                                                 '
-                                                If vbInstr(1, pageManager_RedirectLink, "http", vbTextCompare) = 1 Then
+                                                If genericController.vbInstr(1, pageManager_RedirectLink, "http", vbTextCompare) = 1 Then
                                                     '
                                                     ' link is full
                                                     '
-                                                    pageManager_RedirectLink = vbReplace(pageManager_RedirectLink, "https://", "http://", 1, 99, vbTextCompare)
+                                                    pageManager_RedirectLink = genericController.vbReplace(pageManager_RedirectLink, "https://", "http://", 1, 99, vbTextCompare)
                                                 Else
                                                     '
                                                     ' link is root relative
@@ -31712,7 +31656,7 @@ ErrorTrap:
                                 ' check template domain requirements
                                 '
                                 If pageManager_RedirectLink = "" Then
-                                    templatedomainIdList = EncodeText(cache_pageTemplate(TC_DomainIdList, TCPtr))
+                                    templatedomainIdList = genericController.encodeText(cache_pageTemplate(TC_DomainIdList, TCPtr))
                                     If (domains.domainDetails.id = 0) Then
                                         '
                                         ' current domain not recognized or default, use current
@@ -31731,14 +31675,14 @@ ErrorTrap:
                                         '
                                         domainIds = Split(templatedomainIdList, ",")
                                         For Ptr = 0 To UBound(domainIds)
-                                            setdomainId = EncodeInteger(domainIds(Ptr))
+                                            setdomainId = genericController.EncodeInteger(domainIds(Ptr))
                                             If setdomainId <> 0 Then
                                                 Exit For
                                             End If
                                         Next
                                         linkDomain = content_GetRecordName("domains", setdomainId)
                                         If linkDomain <> "" Then
-                                            pageManager_RedirectLink = vbReplace(webServerIO_ServerLink, "://" & webServerIO.requestDomain, "://" & linkDomain, 1, 99, vbTextCompare)
+                                            pageManager_RedirectLink = genericController.vbReplace(webServerIO_ServerLink, "://" & webServerIO.requestDomain, "://" & linkDomain, 1, 99, vbTextCompare)
                                             pageManager_RedirectBecausePageNotFound = False
                                             pageManager_RedirectReason = "Redirecting because this template [" & main_RenderedTemplateName & "] requires a different domain [" & linkDomain & "]." & pageManager_TemplateReason
                                         End If
@@ -31756,7 +31700,7 @@ ErrorTrap:
                     Dim addonListJSON As String
 
                     If pageManager_RedirectLink = "" And (InStr(1, returnHtml, pageManager_quickEdit_fpo) <> 0) Then
-                        FieldRows = EncodeInteger(properties_user_getText("Page Content.copyFilename.PixelHeight", "500"))
+                        FieldRows = genericController.EncodeInteger(properties_user_getText("Page Content.copyFilename.PixelHeight", "500"))
                         If FieldRows < 50 Then
                             FieldRows = 50
                             Call userProperty.setProperty("Page Content.copyFilename.PixelHeight", 50)
@@ -31764,7 +31708,7 @@ ErrorTrap:
                         styleList = main_GetStyleSheet2(csv_contentTypeEnum.contentTypeWeb, templateId, 0)
                         addonListJSON = main_GetEditorAddonListJSON(csv_contentTypeEnum.contentTypeWeb)
                         Editor = html_GetFormInputHTML3("copyFilename", pageManager_quickEdit_copy, CStr(FieldRows), "100%", False, True, addonListJSON, styleList, styleOptionList)
-                        returnHtml = vbReplace(returnHtml, pageManager_quickEdit_fpo, Editor)
+                        returnHtml = genericController.vbReplace(returnHtml, pageManager_quickEdit_fpo, Editor)
                     End If
                 End If
             End If
@@ -31823,7 +31767,7 @@ ErrorTrap:
             Dim Ptr As Integer
             Dim rootPageId As Integer
             '
-            If (PageID = 0) Or IsInDelimitedString(UsedIDString, CStr(PageID), ",") Then
+            If (PageID = 0) Or genericController.IsInDelimitedString(UsedIDString, CStr(PageID), ",") Then
                 rootPageId = PageID
             Else
                 If pageManager_cache_pageContent_rows = 0 Then
@@ -31832,7 +31776,7 @@ ErrorTrap:
                 Ptr = pageManager_cache_pageContent_idIndex.getPtr(CStr(PageID))
                 If Ptr >= 0 Then
                     PageFound = True
-                    ParentID = EncodeInteger(cache_pageContent(PCC_ParentID, Ptr))
+                    ParentID = genericController.EncodeInteger(cache_pageContent(PCC_ParentID, Ptr))
                 End If
                 If PageFound Then
                     If ParentID = 0 Then
@@ -31985,14 +31929,14 @@ ErrorTrap:
                         ' Build the BlockedRecordIDList
                         '
                         PCCPtr = main_RenderCache_CurrentPage_PCCPtr
-                        If EncodeBoolean(cache_pageContent(PCC_BlockContent, PCCPtr)) Or EncodeBoolean(cache_pageContent(PCC_BlockPage, PCCPtr)) Then
-                            BlockedRecordIDList = BlockedRecordIDList & "," & EncodeText(cache_pageContent(PCC_ID, PCCPtr))
+                        If genericController.EncodeBoolean(cache_pageContent(PCC_BlockContent, PCCPtr)) Or genericController.EncodeBoolean(cache_pageContent(PCC_BlockPage, PCCPtr)) Then
+                            BlockedRecordIDList = BlockedRecordIDList & "," & genericController.encodeText(cache_pageContent(PCC_ID, PCCPtr))
                         End If
                         If main_RenderCache_ParentBranch_PCCPtrCnt > 0 Then
                             For ParentPtr = 0 To main_RenderCache_ParentBranch_PCCPtrCnt - 1
-                                PCCPtr = EncodeInteger(main_RenderCache_ParentBranch_PCCPtrs(ParentPtr))
-                                If EncodeBoolean(cache_pageContent(PCC_BlockContent, PCCPtr)) Or EncodeBoolean(cache_pageContent(PCC_BlockPage, PCCPtr)) Then
-                                    BlockedRecordIDList = BlockedRecordIDList & "," & EncodeText(cache_pageContent(PCC_ID, PCCPtr))
+                                PCCPtr = genericController.EncodeInteger(main_RenderCache_ParentBranch_PCCPtrs(ParentPtr))
+                                If genericController.EncodeBoolean(cache_pageContent(PCC_BlockContent, PCCPtr)) Or genericController.EncodeBoolean(cache_pageContent(PCC_BlockPage, PCCPtr)) Then
+                                    BlockedRecordIDList = BlockedRecordIDList & "," & genericController.encodeText(cache_pageContent(PCC_ID, PCCPtr))
                                 End If
                             Next
                         End If
@@ -32002,11 +31946,11 @@ ErrorTrap:
                     End If
                 End If
                 '
-                JSOnLoad = EncodeText(cache_pageContent(PCC_JSOnLoad, main_RenderCache_CurrentPage_PCCPtr))
-                JSHead = EncodeText(cache_pageContent(PCC_JSHead, main_RenderCache_CurrentPage_PCCPtr))
-                JSFilename = EncodeText(cache_pageContent(PCC_JSFilename, main_RenderCache_CurrentPage_PCCPtr))
-                JSEndBody = EncodeText(cache_pageContent(PCC_JSEndBody, main_RenderCache_CurrentPage_PCCPtr))
-                DateModified = EncodeDate(cache_pageContent(PCC_ModifiedDate, main_RenderCache_CurrentPage_PCCPtr))
+                JSOnLoad = genericController.encodeText(cache_pageContent(PCC_JSOnLoad, main_RenderCache_CurrentPage_PCCPtr))
+                JSHead = genericController.encodeText(cache_pageContent(PCC_JSHead, main_RenderCache_CurrentPage_PCCPtr))
+                JSFilename = genericController.encodeText(cache_pageContent(PCC_JSFilename, main_RenderCache_CurrentPage_PCCPtr))
+                JSEndBody = genericController.encodeText(cache_pageContent(PCC_JSEndBody, main_RenderCache_CurrentPage_PCCPtr))
+                DateModified = genericController.EncodeDate(cache_pageContent(PCC_ModifiedDate, main_RenderCache_CurrentPage_PCCPtr))
                 '
                 ' Save main_RenderedNavigationStructure in the Legacy Name
                 '
@@ -32018,7 +31962,7 @@ ErrorTrap:
                 '
                 Dim Link As String
                 If (pageManager_RedirectLink = "") Then
-                    Link = EncodeText(cache_pageContent(PCC_Link, main_RenderCache_CurrentPage_PCCPtr))
+                    Link = genericController.encodeText(cache_pageContent(PCC_Link, main_RenderCache_CurrentPage_PCCPtr))
                     If (Link <> "") Then
                         Call db.executeSql("update ccpagecontent set clicks=clicks+1 where id=" & main_RenderedPageID)
                         pageManager_RedirectLink = Link
@@ -32065,7 +32009,7 @@ ErrorTrap:
                         CS = db.cs_openSql(SQL)
                         BlockedRecordIDList = "," & BlockedRecordIDList
                         Do While db.cs_ok(CS)
-                            BlockedRecordIDList = vbReplace(BlockedRecordIDList, "," & db.cs_getText(CS, "RecordID"), "")
+                            BlockedRecordIDList = genericController.vbReplace(BlockedRecordIDList, "," & db.cs_getText(CS, "RecordID"), "")
                             db.cs_goNext(CS)
                         Loop
                         Call db.cs_Close(CS)
@@ -32088,7 +32032,7 @@ ErrorTrap:
                                 & " AND ((ManagementMemberRules.MemberID)=" & user.id & " ));"
                             CS = db.cs_openSql(SQL)
                             Do While db.cs_ok(CS)
-                                BlockedRecordIDList = vbReplace(BlockedRecordIDList, "," & db.cs_getText(CS, "RecordID"), "")
+                                BlockedRecordIDList = genericController.vbReplace(BlockedRecordIDList, "," & db.cs_getText(CS, "RecordID"), "")
                                 db.cs_goNext(CS)
                             Loop
                             Call db.cs_Close(CS)
@@ -32106,7 +32050,7 @@ ErrorTrap:
                     BlockSourceID = main_BlockSourceDefaultMessage
                     ContentPadding = 20
                     BlockedPages = Split(BlockedRecordIDList, ",")
-                    BlockedPageRecordID = EncodeInteger(BlockedPages(UBound(BlockedPages)))
+                    BlockedPageRecordID = genericController.EncodeInteger(BlockedPages(UBound(BlockedPages)))
                     If True Then
                         If BlockedPageRecordID <> 0 Then
                             '$$$$$ cache this
@@ -32246,7 +32190,7 @@ ErrorTrap:
                     'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, 0, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
                     RQS = web_RefreshQueryString
                     If RQS <> "" Then
-                        returnHtml = vbReplace(returnHtml, "?method=login", "?method=Login&" & RQS, 1, 99, vbTextCompare)
+                        returnHtml = genericController.vbReplace(returnHtml, "?method=login", "?method=Login&" & RQS, 1, 99, vbTextCompare)
                     End If
                     '
                     ' Add in content padding required for integration with the template
@@ -32280,8 +32224,8 @@ ErrorTrap:
                         '                    CS = main_OpenCSContentRecord_Internal(main_RenderCache_CurrentPage_ContentName, PageRecordID, , , SelectFieldList)
                         '                End If
                         'If app.csv_IsCSOK(CS) Then
-                        contactMemberID = EncodeInteger(cache_pageContent(PCC_ContactMemberID, main_RenderCache_CurrentPage_PCCPtr))
-                        pageViewings = EncodeInteger(cache_pageContent(PCC_Viewings, main_RenderCache_CurrentPage_PCCPtr))
+                        contactMemberID = genericController.EncodeInteger(cache_pageContent(PCC_ContactMemberID, main_RenderCache_CurrentPage_PCCPtr))
+                        pageViewings = genericController.EncodeInteger(cache_pageContent(PCC_Viewings, main_RenderCache_CurrentPage_PCCPtr))
                         'contactMemberID = app.csv_cs_getInteger(CS, "ContactMemberID")
                         If user.isEditing(main_RenderCache_CurrentPage_ContentName) Or visitProperty.getBoolean("AllowWorkflowRendering") Then
                             '
@@ -32318,14 +32262,14 @@ ErrorTrap:
                         ' Page Hit Notification
                         '
                         If (Not visit_excludeFromAnalytics) And (contactMemberID <> 0) And (InStr(1, webServerIO.requestBrowser, "kmahttp", vbTextCompare) = 0) Then
-                            AllowHitNotification = EncodeBoolean(cache_pageContent(PCC_AllowHitNotification, main_RenderCache_CurrentPage_PCCPtr))
+                            AllowHitNotification = genericController.EncodeBoolean(cache_pageContent(PCC_AllowHitNotification, main_RenderCache_CurrentPage_PCCPtr))
                             'AllowHitNotification = app.csv_cs_getBoolean(CS, "AllowHitNotification")
                             If AllowHitNotification Then
-                                PageName = EncodeText(cache_pageContent(PCC_Name, main_RenderCache_CurrentPage_PCCPtr))
+                                PageName = genericController.encodeText(cache_pageContent(PCC_Name, main_RenderCache_CurrentPage_PCCPtr))
                                 If PageName = "" Then
-                                    PageName = EncodeText(cache_pageContent(PCC_MenuHeadline, main_RenderCache_CurrentPage_PCCPtr))
+                                    PageName = genericController.encodeText(cache_pageContent(PCC_MenuHeadline, main_RenderCache_CurrentPage_PCCPtr))
                                     If PageName = "" Then
-                                        PageName = EncodeText(cache_pageContent(PCC_Headline, main_RenderCache_CurrentPage_PCCPtr))
+                                        PageName = genericController.encodeText(cache_pageContent(PCC_Headline, main_RenderCache_CurrentPage_PCCPtr))
                                         If PageName = "" Then
                                             PageName = "[no name]"
                                         End If
@@ -32333,7 +32277,7 @@ ErrorTrap:
                                 End If
                                 Body = Body & "<p><b>Page Hit Notification.</b></p>"
                                 Body = Body & "<p>This email was sent to you by the Contensive Server as a notification of the following content viewing details.</p>"
-                                Body = Body & StartTable(4, 1, 1)
+                                Body = Body & genericController.StartTable(4, 1, 1)
                                 Body = Body & "<tr><td align=""right"" width=""150"" Class=""ccPanelHeader"">Description<br><img alt=""image"" src=""http://" & webServerIO.requestDomain & "/ccLib/images/spacer.gif"" width=""150"" height=""1""></td><td align=""left"" width=""100%"" Class=""ccPanelHeader"">Value</td></tr>"
                                 Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Domain", webServerIO_requestDomain, True)
                                 Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Link", webServerIO_ServerLink, False)
@@ -32359,15 +32303,15 @@ ErrorTrap:
                         '   3) Then Add to Group
                         '   4) Then Remove From Group
                         '
-                        ConditionID = EncodeInteger(cache_pageContent(PCC_TriggerConditionID, main_RenderCache_CurrentPage_PCCPtr))
+                        ConditionID = genericController.EncodeInteger(cache_pageContent(PCC_TriggerConditionID, main_RenderCache_CurrentPage_PCCPtr))
                         'ConditionID = app.csv_cs_getInteger(CS, "TriggerConditionID")
-                        ConditionGroupID = EncodeInteger(cache_pageContent(PCC_TriggerConditionGroupID, main_RenderCache_CurrentPage_PCCPtr))
+                        ConditionGroupID = genericController.EncodeInteger(cache_pageContent(PCC_TriggerConditionGroupID, main_RenderCache_CurrentPage_PCCPtr))
                         'ConditionGroupID = app.csv_cs_getInteger(CS, "TriggerConditionGroupID")
-                        main_AddGroupID = EncodeInteger(cache_pageContent(PCC_TriggerAddGroupID, main_RenderCache_CurrentPage_PCCPtr))
+                        main_AddGroupID = genericController.EncodeInteger(cache_pageContent(PCC_TriggerAddGroupID, main_RenderCache_CurrentPage_PCCPtr))
                         'main_AddGroupID = app.csv_cs_getInteger(CS, "TriggerAddGroupID")
-                        RemoveGroupID = EncodeInteger(cache_pageContent(PCC_TriggerRemoveGroupID, main_RenderCache_CurrentPage_PCCPtr))
+                        RemoveGroupID = genericController.EncodeInteger(cache_pageContent(PCC_TriggerRemoveGroupID, main_RenderCache_CurrentPage_PCCPtr))
                         'RemoveGroupID = app.csv_cs_getInteger(CS, "TriggerRemoveGroupID")
-                        SystemEMailID = EncodeInteger(cache_pageContent(PCC_TriggerSendSystemEmailID, main_RenderCache_CurrentPage_PCCPtr))
+                        SystemEMailID = genericController.EncodeInteger(cache_pageContent(PCC_TriggerSendSystemEmailID, main_RenderCache_CurrentPage_PCCPtr))
                         'SystemEMailID = app.csv_cs_getInteger(CS, "TriggerSendSystemEmailID")
                         Select Case ConditionID
                             Case 1
@@ -32427,7 +32371,7 @@ ErrorTrap:
                     '---------------------------------------------------------------------------------
                     '
                     If True And (returnHtml <> "") Then
-                        ContentPadding = EncodeInteger(cache_pageContent(PCC_ContentPadding, main_RenderCache_CurrentPage_PCCPtr))
+                        ContentPadding = genericController.EncodeInteger(cache_pageContent(PCC_ContentPadding, main_RenderCache_CurrentPage_PCCPtr))
                         returnHtml = pageManager_GetContentBoxWrapper(returnHtml, ContentPadding)
                     End If
 
@@ -32438,7 +32382,7 @@ ErrorTrap:
                     '---------------------------------------------------------------------------------
                     '
                     If DateModified <> Date.MinValue Then
-                        Call web_addResponseHeader("LAST-MODIFIED", GetGMTFromDate(DateModified))
+                        Call web_addResponseHeader("LAST-MODIFIED", genericController.GetGMTFromDate(DateModified))
                         'Date: Sun, 07 Dec 2008 21:06:14 GMT
                     End If
                     '
@@ -32540,7 +32484,7 @@ ErrorTrap:
             Err_Number = Err.Number
             Err_Source = Err.Source
             Err_Description = Err.Description
-            ErrString = GetErrString(Err)
+            ErrString = genericController.GetErrString(Err)
             Call handleLegacyError19("main_GetHtmlBody_GetSection_GetContent", "Trap", Err_Number, Err_Source, Err_Description, True)
             Err.Clear()
             If user.isAuthenticatedAdmin() Then
@@ -32639,8 +32583,8 @@ ErrorTrap:
                             '
                             '????? test
                             'hint = hint & ",80"
-                            topOfParentBranchPtr = EncodeInteger(main_RenderCache_ParentBranch_PCCPtrs(main_RenderCache_ParentBranch_PCCPtrCnt - 1))
-                            topOfParentBranchPageId = EncodeInteger(cache_pageContent(PCC_ID, topOfParentBranchPtr))
+                            topOfParentBranchPtr = genericController.EncodeInteger(main_RenderCache_ParentBranch_PCCPtrs(main_RenderCache_ParentBranch_PCCPtrCnt - 1))
+                            topOfParentBranchPageId = genericController.EncodeInteger(cache_pageContent(PCC_ID, topOfParentBranchPtr))
                             isPageWithoutSection = (topOfParentBranchPageId <> rootPageId)
                         Else
                             '
@@ -32648,7 +32592,7 @@ ErrorTrap:
                             '
                             '????? test
                             'hint = hint & ",90"
-                            isPageWithoutSection = (EncodeInteger(cache_pageContent(PCC_ID, main_RenderCache_CurrentPage_PCCPtr)) <> rootPageId)
+                            isPageWithoutSection = (genericController.EncodeInteger(cache_pageContent(PCC_ID, main_RenderCache_CurrentPage_PCCPtr)) <> rootPageId)
                         End If
                         'hint = hint & ",100"
                         If isPageWithoutSection Then
@@ -32657,7 +32601,7 @@ ErrorTrap:
                             '
                             '????? test this
                             'hint = hint & ",110"
-                            currentPageContentName = metaData.getContentNameByID(EncodeInteger(cache_pageContent(PCC_ContentControlID, main_RenderCache_CurrentPage_PCCPtr)))
+                            currentPageContentName = metaData.getContentNameByID(genericController.EncodeInteger(cache_pageContent(PCC_ContentControlID, main_RenderCache_CurrentPage_PCCPtr)))
                             If user.isAuthenticatedContentManager(currentPageContentName) Then
                                 '
                                 ' allow page without section because this is a content manager -- but give them a message
@@ -32716,7 +32660,7 @@ ErrorTrap:
                     '                'main_oldCacheRS_FieldNames = Split(SelectFieldList, ",")
                     '                'main_oldCacheRS_FieldValues = db.cs_getRow(main_oldCacheRS_cs)
                     '                'For Pointer = 0 To UBound(main_oldCacheRS_FieldValues)
-                    '                '    main_oldCacheRS_FieldValues(Pointer) = vbReplace(Replace(main_oldCacheRS_FieldValues(Pointer), vbTab, ""), vbCrLf, "")
+                    '                '    main_oldCacheRS_FieldValues(Pointer) = genericController.vbReplace(Replace(main_oldCacheRS_FieldValues(Pointer), vbTab, ""), vbCrLf, "")
                     '                'Next
                     '            End If
                     '
@@ -32733,7 +32677,7 @@ ErrorTrap:
                     If user.isAdvancedEditing("") Then
                         returnHtml = returnHtml & main_GetRecordEditLink(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage)) & LiveBody
                     ElseIf iIsEditing Then
-                        PageName = EncodeText(cache_pageContent(PCC_Name, main_RenderCache_CurrentPage_PCCPtr))
+                        PageName = genericController.encodeText(cache_pageContent(PCC_Name, main_RenderCache_CurrentPage_PCCPtr))
                         EditLink = main_GetRecordEditLink2(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage), PageName, user.isEditing(ContentName))
                         returnHtml = returnHtml & main_GetEditWrapper("", main_GetRecordEditLink(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage)) & LiveBody)
                     Else
@@ -32754,30 +32698,30 @@ ErrorTrap:
                             Else
                                 main_RenderedNavigationStructure = main_RenderedNavigationStructure & vbTab & "1"
                             End If
-                            pagePCCPtr = EncodeInteger(main_RenderCache_ParentBranch_PCCPtrs(Pointer))
+                            pagePCCPtr = genericController.EncodeInteger(main_RenderCache_ParentBranch_PCCPtrs(Pointer))
                             '
                             ' buffer text fields because this excode format does not allow them
                             '
-                            PageName = EncodeText(cache_pageContent(PCC_Name, pagePCCPtr))
-                            PageName = vbReplace(PageName, vbCrLf, " ")
-                            PageName = vbReplace(PageName, vbCr, " ")
-                            PageName = vbReplace(PageName, vbLf, " ")
-                            PageName = vbReplace(PageName, vbTab, " ")
+                            PageName = genericController.encodeText(cache_pageContent(PCC_Name, pagePCCPtr))
+                            PageName = genericController.vbReplace(PageName, vbCrLf, " ")
+                            PageName = genericController.vbReplace(PageName, vbCr, " ")
+                            PageName = genericController.vbReplace(PageName, vbLf, " ")
+                            PageName = genericController.vbReplace(PageName, vbTab, " ")
                             PageName = Trim(PageName)
                             '
-                            PageLink = EncodeText(cache_pageContent(PCC_Link, pagePCCPtr))
-                            PageLink = vbReplace(PageLink, vbCrLf, " ")
-                            PageLink = vbReplace(PageLink, vbCr, " ")
-                            PageLink = vbReplace(PageLink, vbLf, " ")
-                            PageLink = vbReplace(PageLink, vbTab, " ")
+                            PageLink = genericController.encodeText(cache_pageContent(PCC_Link, pagePCCPtr))
+                            PageLink = genericController.vbReplace(PageLink, vbCrLf, " ")
+                            PageLink = genericController.vbReplace(PageLink, vbCr, " ")
+                            PageLink = genericController.vbReplace(PageLink, vbLf, " ")
+                            PageLink = genericController.vbReplace(PageLink, vbTab, " ")
                             PageLink = Trim(PageLink)
                             '
-                            pageMenuHeadline = Trim(EncodeText(cache_pageContent(PCC_MenuHeadline, pagePCCPtr)))
+                            pageMenuHeadline = Trim(genericController.encodeText(cache_pageContent(PCC_MenuHeadline, pagePCCPtr)))
                             If pageMenuHeadline <> "" Then
-                                pageMenuHeadline = vbReplace(pageMenuHeadline, vbCrLf, " ")
-                                pageMenuHeadline = vbReplace(pageMenuHeadline, vbCr, " ")
-                                pageMenuHeadline = vbReplace(pageMenuHeadline, vbLf, " ")
-                                pageMenuHeadline = vbReplace(pageMenuHeadline, vbTab, " ")
+                                pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbCrLf, " ")
+                                pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbCr, " ")
+                                pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbLf, " ")
+                                pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbTab, " ")
                                 pageMenuHeadline = Trim(pageMenuHeadline)
                             Else
                                 pageMenuHeadline = PageName
@@ -32786,13 +32730,13 @@ ErrorTrap:
                                 End If
                             End If
                             main_RenderedNavigationStructure = main_RenderedNavigationStructure _
-                            & vbTab & EncodeInteger(cache_pageContent(PCC_ID, pagePCCPtr)) _
-                            & vbTab & EncodeInteger(cache_pageContent(PCC_ParentID, pagePCCPtr)) _
+                            & vbTab & genericController.EncodeInteger(cache_pageContent(PCC_ID, pagePCCPtr)) _
+                            & vbTab & genericController.EncodeInteger(cache_pageContent(PCC_ParentID, pagePCCPtr)) _
                             & vbTab & pageMenuHeadline _
                             & vbTab & PageName _
                             & vbTab & PageLink _
-                            & vbTab & EncodeInteger(cache_pageContent(PCC_TemplateID, pagePCCPtr)) _
-                            & vbTab & EncodeBoolean(cache_pageContent(PCC_AllowInMenus, pagePCCPtr)) _
+                            & vbTab & genericController.EncodeInteger(cache_pageContent(PCC_TemplateID, pagePCCPtr)) _
+                            & vbTab & genericController.EncodeBoolean(cache_pageContent(PCC_AllowInMenus, pagePCCPtr)) _
                             & vbCrLf
                         Next
                     End If
@@ -32800,30 +32744,30 @@ ErrorTrap:
                     If main_RenderCache_CurrentPage_PCCPtr > -1 Then
                         'hint = hint & ",310"
                         pagePCCPtr = main_RenderCache_CurrentPage_PCCPtr
-                        main_RenderedPageID = EncodeInteger(cache_pageContent(PCC_ID, pagePCCPtr))
+                        main_RenderedPageID = genericController.EncodeInteger(cache_pageContent(PCC_ID, pagePCCPtr))
                         '
                         ' buffer text fields because this excode format does not allow them
                         '
-                        PageName = EncodeText(cache_pageContent(PCC_Name, pagePCCPtr))
-                        PageName = vbReplace(PageName, vbCrLf, " ")
-                        PageName = vbReplace(PageName, vbCr, " ")
-                        PageName = vbReplace(PageName, vbLf, " ")
-                        PageName = vbReplace(PageName, vbTab, " ")
+                        PageName = genericController.encodeText(cache_pageContent(PCC_Name, pagePCCPtr))
+                        PageName = genericController.vbReplace(PageName, vbCrLf, " ")
+                        PageName = genericController.vbReplace(PageName, vbCr, " ")
+                        PageName = genericController.vbReplace(PageName, vbLf, " ")
+                        PageName = genericController.vbReplace(PageName, vbTab, " ")
                         PageName = Trim(PageName)
                         '
-                        PageLink = EncodeText(cache_pageContent(PCC_Link, pagePCCPtr))
-                        PageLink = vbReplace(PageLink, vbCrLf, " ")
-                        PageLink = vbReplace(PageLink, vbCr, " ")
-                        PageLink = vbReplace(PageLink, vbLf, " ")
-                        PageLink = vbReplace(PageLink, vbTab, " ")
+                        PageLink = genericController.encodeText(cache_pageContent(PCC_Link, pagePCCPtr))
+                        PageLink = genericController.vbReplace(PageLink, vbCrLf, " ")
+                        PageLink = genericController.vbReplace(PageLink, vbCr, " ")
+                        PageLink = genericController.vbReplace(PageLink, vbLf, " ")
+                        PageLink = genericController.vbReplace(PageLink, vbTab, " ")
                         PageLink = Trim(PageLink)
                         '
-                        pageMenuHeadline = Trim(EncodeText(cache_pageContent(PCC_MenuHeadline, pagePCCPtr)))
+                        pageMenuHeadline = Trim(genericController.encodeText(cache_pageContent(PCC_MenuHeadline, pagePCCPtr)))
                         If pageMenuHeadline <> "" Then
-                            pageMenuHeadline = vbReplace(pageMenuHeadline, vbCrLf, " ")
-                            pageMenuHeadline = vbReplace(pageMenuHeadline, vbCr, " ")
-                            pageMenuHeadline = vbReplace(pageMenuHeadline, vbLf, " ")
-                            pageMenuHeadline = vbReplace(pageMenuHeadline, vbTab, " ")
+                            pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbCrLf, " ")
+                            pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbCr, " ")
+                            pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbLf, " ")
+                            pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbTab, " ")
                             pageMenuHeadline = Trim(pageMenuHeadline)
                         Else
                             pageMenuHeadline = PageName
@@ -32834,12 +32778,12 @@ ErrorTrap:
                         main_RenderedNavigationStructure = main_RenderedNavigationStructure _
                         & vbTab & "2" _
                         & vbTab & main_RenderedPageID _
-                        & vbTab & EncodeInteger(cache_pageContent(PCC_ParentID, pagePCCPtr)) _
+                        & vbTab & genericController.EncodeInteger(cache_pageContent(PCC_ParentID, pagePCCPtr)) _
                         & vbTab & pageMenuHeadline _
                         & vbTab & PageName _
                         & vbTab & PageLink _
-                        & vbTab & EncodeInteger(cache_pageContent(PCC_TemplateID, pagePCCPtr)) _
-                        & vbTab & EncodeBoolean(cache_pageContent(PCC_AllowInMenus, pagePCCPtr)) _
+                        & vbTab & genericController.EncodeInteger(cache_pageContent(PCC_TemplateID, pagePCCPtr)) _
+                        & vbTab & genericController.EncodeBoolean(cache_pageContent(PCC_AllowInMenus, pagePCCPtr)) _
                         & vbCrLf
                     End If
                     'hint = hint & ",400"
@@ -32847,31 +32791,31 @@ ErrorTrap:
                         'hint = hint & ",410 main_RenderCache_ChildBranch_PCCPtrCnt=" & main_RenderCache_ChildBranch_PCCPtrCnt
                         For Pointer = main_RenderCache_ChildBranch_PCCPtrCnt - 1 To 0 Step -1
                             'hint = hint & ",420 Pointer=" & Pointer
-                            pagePCCPtr = EncodeInteger(main_RenderCache_ChildBranch_PCCPtrs(Pointer))
+                            pagePCCPtr = genericController.EncodeInteger(main_RenderCache_ChildBranch_PCCPtrs(Pointer))
                             '
                             ' buffer text fields because this excode format does not allow them
                             '
                             'hint = hint & ",430 pagePCCPtr=" & pagePCCPtr
-                            PageName = EncodeText(cache_pageContent(PCC_Name, pagePCCPtr))
-                            PageName = vbReplace(PageName, vbCrLf, " ")
-                            PageName = vbReplace(PageName, vbCr, " ")
-                            PageName = vbReplace(PageName, vbLf, " ")
-                            PageName = vbReplace(PageName, vbTab, " ")
+                            PageName = genericController.encodeText(cache_pageContent(PCC_Name, pagePCCPtr))
+                            PageName = genericController.vbReplace(PageName, vbCrLf, " ")
+                            PageName = genericController.vbReplace(PageName, vbCr, " ")
+                            PageName = genericController.vbReplace(PageName, vbLf, " ")
+                            PageName = genericController.vbReplace(PageName, vbTab, " ")
                             PageName = Trim(PageName)
                             '
-                            PageLink = EncodeText(cache_pageContent(PCC_Link, pagePCCPtr))
-                            PageLink = vbReplace(PageLink, vbCrLf, " ")
-                            PageLink = vbReplace(PageLink, vbCr, " ")
-                            PageLink = vbReplace(PageLink, vbLf, " ")
-                            PageLink = vbReplace(PageLink, vbTab, " ")
+                            PageLink = genericController.encodeText(cache_pageContent(PCC_Link, pagePCCPtr))
+                            PageLink = genericController.vbReplace(PageLink, vbCrLf, " ")
+                            PageLink = genericController.vbReplace(PageLink, vbCr, " ")
+                            PageLink = genericController.vbReplace(PageLink, vbLf, " ")
+                            PageLink = genericController.vbReplace(PageLink, vbTab, " ")
                             PageLink = Trim(PageLink)
                             '
-                            pageMenuHeadline = Trim(EncodeText(cache_pageContent(PCC_MenuHeadline, pagePCCPtr)))
+                            pageMenuHeadline = Trim(genericController.encodeText(cache_pageContent(PCC_MenuHeadline, pagePCCPtr)))
                             If pageMenuHeadline <> "" Then
-                                pageMenuHeadline = vbReplace(pageMenuHeadline, vbCrLf, " ")
-                                pageMenuHeadline = vbReplace(pageMenuHeadline, vbCr, " ")
-                                pageMenuHeadline = vbReplace(pageMenuHeadline, vbLf, " ")
-                                pageMenuHeadline = vbReplace(pageMenuHeadline, vbTab, " ")
+                                pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbCrLf, " ")
+                                pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbCr, " ")
+                                pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbLf, " ")
+                                pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbTab, " ")
                                 pageMenuHeadline = Trim(pageMenuHeadline)
                             Else
                                 pageMenuHeadline = PageName
@@ -32882,13 +32826,13 @@ ErrorTrap:
                             'hint = hint & ",440"
                             main_RenderedNavigationStructure = main_RenderedNavigationStructure _
                             & vbTab & "3" _
-                            & vbTab & EncodeInteger(cache_pageContent(PCC_ID, pagePCCPtr)) _
+                            & vbTab & genericController.EncodeInteger(cache_pageContent(PCC_ID, pagePCCPtr)) _
                             & vbTab & main_RenderedPageID _
                             & vbTab & pageMenuHeadline _
                             & vbTab & PageName _
                             & vbTab & PageLink _
-                            & vbTab & EncodeInteger(cache_pageContent(PCC_TemplateID, pagePCCPtr)) _
-                            & vbTab & EncodeBoolean(cache_pageContent(PCC_AllowInMenus, pagePCCPtr)) _
+                            & vbTab & genericController.EncodeInteger(cache_pageContent(PCC_TemplateID, pagePCCPtr)) _
+                            & vbTab & genericController.EncodeBoolean(cache_pageContent(PCC_AllowInMenus, pagePCCPtr)) _
                             & vbCrLf
                             'hint = hint & ",450"
                         Next
@@ -32977,14 +32921,14 @@ ErrorTrap:
             'hint = hint & "main_GetHtmlBody_GetSection_GetContentBox_Live_Body,010"
             MethodName = "main_GetHtmlBody_GetSection_GetContentBox_Live_Body"
             '
-            ' ContentID = encodeInteger(main_GetContentID(ContentName))
+            ' ContentID = genericController.EncodeInteger(main_GetContentID(ContentName))
             '
             If True Then
                 'If app.csv_IsCSOK(CSPointer) Then
                 '
                 ' ----- A page was found
                 '
-                PageID = EncodeInteger(cache_pageContent(PCC_ID, main_RenderCache_CurrentPage_PCCPtr))
+                PageID = genericController.EncodeInteger(cache_pageContent(PCC_ID, main_RenderCache_CurrentPage_PCCPtr))
                 'pageID = (app.csv_cs_getInteger(CSPointer, "ID"))
                 '        s = "" _
                 '            & "<div>main_RenderedPageID=" & main_RenderedPageID & "</div>" _
@@ -32992,51 +32936,51 @@ ErrorTrap:
                 '            & "<div>main_RenderCache_CurrentPage_PCCPtr=" & main_RenderCache_CurrentPage_PCCPtr & "</div>" _
                 '            & "<div>main_pcc(PCC_ID, main_RenderCache_CurrentPage_PCCPtr )=" & main_pcc(PCC_ID, main_RenderCache_CurrentPage_PCCPtr) & "</div>" _
                 '            & ""
-                parentPageID = EncodeInteger(cache_pageContent(PCC_ParentID, main_RenderCache_CurrentPage_PCCPtr))
+                parentPageID = genericController.EncodeInteger(cache_pageContent(PCC_ParentID, main_RenderCache_CurrentPage_PCCPtr))
                 'ParentPageID = (app.csv_cs_getInteger(CSPointer, "parentid"))
-                contactMemberID = EncodeInteger(cache_pageContent(PCC_ContactMemberID, main_RenderCache_CurrentPage_PCCPtr))
+                contactMemberID = genericController.EncodeInteger(cache_pageContent(PCC_ContactMemberID, main_RenderCache_CurrentPage_PCCPtr))
                 'contactMemberID = (app.csv_cs_getInteger(CSPointer, "ContactMemberID"))
-                allowChildListDisplay = EncodeBoolean(cache_pageContent(PCC_AllowChildListDisplay, main_RenderCache_CurrentPage_PCCPtr))
+                allowChildListDisplay = genericController.EncodeBoolean(cache_pageContent(PCC_AllowChildListDisplay, main_RenderCache_CurrentPage_PCCPtr))
                 allowChildListComposite = AllowChildList And allowChildListDisplay
                 'allowChildListComposite = AllowChildList And (app.csv_cs_getBoolean(CSPointer, "AllowChildListDisplay"))
-                dateArchive = EncodeDate(cache_pageContent(PCC_DateArchive, main_RenderCache_CurrentPage_PCCPtr))
+                dateArchive = genericController.EncodeDate(cache_pageContent(PCC_DateArchive, main_RenderCache_CurrentPage_PCCPtr))
                 'DateArchive = app.csv_cs_getDate(CSPointer, "DateArchive")
-                'Compatibility21 = encodeBoolean(csv_GetSiteProperty("ContentPageCompatibility21", False))
-                childListSortMethodId = EncodeInteger(cache_pageContent(PCC_ChildListSortMethodID, main_RenderCache_CurrentPage_PCCPtr))
+                'Compatibility21 = genericController.EncodeBoolean(csv_GetSiteProperty("ContentPageCompatibility21", False))
+                childListSortMethodId = genericController.EncodeInteger(cache_pageContent(PCC_ChildListSortMethodID, main_RenderCache_CurrentPage_PCCPtr))
                 'ChildListSortMethodID = app.csv_cs_getInteger(CSPointer, "ChildListSortMethodID")
-                allowReturnLinkDisplay = EncodeBoolean(cache_pageContent(PCC_allowReturnLinkDisplay, main_RenderCache_CurrentPage_PCCPtr))
+                allowReturnLinkDisplay = genericController.EncodeBoolean(cache_pageContent(PCC_allowReturnLinkDisplay, main_RenderCache_CurrentPage_PCCPtr))
                 allowReturnLinkComposite = AllowReturnLink And allowReturnLinkDisplay
                 '
-                AllowPrinterVersion = EncodeBoolean(cache_pageContent(pcc_allowPrinterVersion, main_RenderCache_CurrentPage_PCCPtr))
+                AllowPrinterVersion = genericController.EncodeBoolean(cache_pageContent(pcc_allowPrinterVersion, main_RenderCache_CurrentPage_PCCPtr))
                 'AllowPrinterVersion = app.csv_cs_getBoolean(CSPointer, "AllowPrinterVersion")
-                AllowEmailPage = EncodeBoolean(cache_pageContent(pcc_allowEmailPage, main_RenderCache_CurrentPage_PCCPtr))
+                AllowEmailPage = genericController.EncodeBoolean(cache_pageContent(pcc_allowEmailPage, main_RenderCache_CurrentPage_PCCPtr))
                 'AllowEmailPage = app.csv_cs_getBoolean(CSPointer, "AllowEmailPage")
-                headline = EncodeText(cache_pageContent(PCC_Headline, main_RenderCache_CurrentPage_PCCPtr))
+                headline = genericController.encodeText(cache_pageContent(PCC_Headline, main_RenderCache_CurrentPage_PCCPtr))
                 'headline = app.csv_cs_get(CSPointer, "Headline")
-                copyFilename = EncodeText(cache_pageContent(PCC_CopyFilename, main_RenderCache_CurrentPage_PCCPtr))
+                copyFilename = genericController.encodeText(cache_pageContent(PCC_CopyFilename, main_RenderCache_CurrentPage_PCCPtr))
                 If copyFilename <> "" Then
                     Copy = cdnFiles.readFile(copyFilename)
                 End If
                 'copy = app.csv_cs_get(CSPointer, "copyFilename")
-                allowSeeAlso = EncodeBoolean(cache_pageContent(pcc_allowSeeAlso, main_RenderCache_CurrentPage_PCCPtr))
-                'allowSeeAlso = encodeBoolean(app.csv_cs_getBoolean(CSPointer, "AllowSeeAlso"))        '
-                allowMoreInfo = EncodeBoolean(cache_pageContent(pcc_allowMoreInfo, main_RenderCache_CurrentPage_PCCPtr))
-                'allowMoreInfo = encodeBoolean(app.csv_cs_getBoolean(CSPointer, "AllowMoreInfo"))
-                allowFeedback = EncodeBoolean(cache_pageContent(pcc_allowFeedback, main_RenderCache_CurrentPage_PCCPtr))
-                'AllowFeedBack = encodeBoolean(app.csv_cs_getBoolean(CSPointer, "AllowFeedBack"))
-                LastModified = EncodeDate(cache_pageContent(PCC_ModifiedDate, main_RenderCache_CurrentPage_PCCPtr))
+                allowSeeAlso = genericController.EncodeBoolean(cache_pageContent(pcc_allowSeeAlso, main_RenderCache_CurrentPage_PCCPtr))
+                'allowSeeAlso = genericController.EncodeBoolean(app.csv_cs_getBoolean(CSPointer, "AllowSeeAlso"))        '
+                allowMoreInfo = genericController.EncodeBoolean(cache_pageContent(pcc_allowMoreInfo, main_RenderCache_CurrentPage_PCCPtr))
+                'allowMoreInfo = genericController.EncodeBoolean(app.csv_cs_getBoolean(CSPointer, "AllowMoreInfo"))
+                allowFeedback = genericController.EncodeBoolean(cache_pageContent(pcc_allowFeedback, main_RenderCache_CurrentPage_PCCPtr))
+                'AllowFeedBack = genericController.EncodeBoolean(app.csv_cs_getBoolean(CSPointer, "AllowFeedBack"))
+                LastModified = genericController.EncodeDate(cache_pageContent(PCC_ModifiedDate, main_RenderCache_CurrentPage_PCCPtr))
                 'LastModified = app.csv_cs_getDate(CSPointer, "ModifiedDate")
-                allowLastModifiedFooter = EncodeBoolean(cache_pageContent(pcc_allowLastModifiedFooter, main_RenderCache_CurrentPage_PCCPtr))
+                allowLastModifiedFooter = genericController.EncodeBoolean(cache_pageContent(pcc_allowLastModifiedFooter, main_RenderCache_CurrentPage_PCCPtr))
                 'AllowLastModifiedFooter = app.csv_cs_getBoolean(CSPointer, "AllowLastModifiedFooter")
-                ModifiedBy = EncodeInteger(cache_pageContent(PCC_ModifiedBy, main_RenderCache_CurrentPage_PCCPtr))
+                ModifiedBy = genericController.EncodeInteger(cache_pageContent(PCC_ModifiedBy, main_RenderCache_CurrentPage_PCCPtr))
                 'ModifiedBy = app.cs_getInteger(CSPointer, "ModifiedBy")
-                DateReviewed = EncodeDate(cache_pageContent(PCC_DateReviewed, main_RenderCache_CurrentPage_PCCPtr))
+                DateReviewed = genericController.EncodeDate(cache_pageContent(PCC_DateReviewed, main_RenderCache_CurrentPage_PCCPtr))
                 'DateReviewed = app.csv_cs_getDate(CSPointer, "DateReviewed")
-                ReviewedBy = EncodeInteger(cache_pageContent(PCC_ReviewedBy, main_RenderCache_CurrentPage_PCCPtr))
+                ReviewedBy = genericController.EncodeInteger(cache_pageContent(PCC_ReviewedBy, main_RenderCache_CurrentPage_PCCPtr))
                 'ReviewedBy = app.cs_getInteger(CSPointer, "ReviewedBy")
-                allowReviewedFooter = EncodeBoolean(cache_pageContent(PCC_allowReviewedFooter, main_RenderCache_CurrentPage_PCCPtr))
+                allowReviewedFooter = genericController.EncodeBoolean(cache_pageContent(PCC_allowReviewedFooter, main_RenderCache_CurrentPage_PCCPtr))
                 'allowReviewedFooter = (app.csv_cs_getBoolean(CSPointer, "AllowReviewedFooter"))
-                allowMessageFooter = EncodeBoolean(cache_pageContent(PCC_allowMessageFooter, main_RenderCache_CurrentPage_PCCPtr))
+                allowMessageFooter = genericController.EncodeBoolean(cache_pageContent(PCC_allowMessageFooter, main_RenderCache_CurrentPage_PCCPtr))
                 'allowMessageFooter = (app.csv_cs_getBoolean(CSPointer, "AllowMessageFooter"))
                 '
                 ' ----- Print Breadcrumb if not at root Page
@@ -33070,20 +33014,20 @@ ErrorTrap:
                         '
                         If AllowPrinterVersion Then
                             QueryString = web_RefreshQueryString
-                            'QueryString = ModifyQueryString(QueryString, RequestNameRootPageID, CStr(RootPageID), True)
-                            QueryString = ModifyQueryString(QueryString, "bid", EncodeText(PageID), True)
-                            'QueryString = ModifyQueryString(QueryString, RequestNameAllowChildPageList, encodeText(allowChildListComposite), True)
-                            'QueryString = ModifyQueryString(QueryString, RequestNameContent, RootPageContentName, True)
-                            'QueryString = ModifyQueryString(QueryString, RequestNameOrderByClause, OrderByClause, True)
-                            QueryString = ModifyQueryString(QueryString, RequestNameHardCodedPage, HardCodedPagePrinterVersion, True)
-                            '                    QueryString = ModifyQueryString(QueryString, RequestNameRootPageID, CStr(RootPageID), True)
-                            '                    QueryString = ModifyQueryString(QueryString, "bid", encodeText(pageId), True)
-                            '                    QueryString = ModifyQueryString(QueryString, RequestNameAllowChildPageList, encodeText(allowChildListComposite), True)
-                            '                    QueryString = ModifyQueryString(QueryString, RequestNameContent, RootPageContentName, True)
-                            '                    QueryString = ModifyQueryString(QueryString, RequestNameOrderByClause, OrderByClause, True)
-                            '                    QueryString = ModifyQueryString(QueryString, RequestNameHardCodedPage, HardCodedPagePrinterVersion, True)
+                            'QueryString = genericController.ModifyQueryString(QueryString, RequestNameRootPageID, CStr(RootPageID), True)
+                            QueryString = genericController.ModifyQueryString(QueryString, "bid", genericController.encodeText(PageID), True)
+                            'QueryString = genericController.ModifyQueryString(QueryString, RequestNameAllowChildPageList, genericController.encodeText(allowChildListComposite), True)
+                            'QueryString = genericController.ModifyQueryString(QueryString, RequestNameContent, RootPageContentName, True)
+                            'QueryString = genericController.ModifyQueryString(QueryString, RequestNameOrderByClause, OrderByClause, True)
+                            QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, HardCodedPagePrinterVersion, True)
+                            '                    QueryString = genericController.ModifyQueryString(QueryString, RequestNameRootPageID, CStr(RootPageID), True)
+                            '                    QueryString = genericController.ModifyQueryString(QueryString, "bid", genericController.encodeText(pageId), True)
+                            '                    QueryString = genericController.ModifyQueryString(QueryString, RequestNameAllowChildPageList, genericController.encodeText(allowChildListComposite), True)
+                            '                    QueryString = genericController.ModifyQueryString(QueryString, RequestNameContent, RootPageContentName, True)
+                            '                    QueryString = genericController.ModifyQueryString(QueryString, RequestNameOrderByClause, OrderByClause, True)
+                            '                    QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, HardCodedPagePrinterVersion, True)
                             Caption = siteProperties.getText("PagePrinterVersionCaption", "Printer Version")
-                            Caption = vbReplace(Caption, " ", "&nbsp;")
+                            Caption = genericController.vbReplace(Caption, " ", "&nbsp;")
                             IconRow = IconRow & cr & "&nbsp;&nbsp;<a href=""" & html.html_EncodeHTML(webServerIO_requestPage & "?" & QueryString) & """ target=""_blank""><img alt=""image"" src=""/ccLib/images/IconSmallPrinter.gif"" width=""13"" height=""13"" border=""0"" align=""absmiddle""></a>&nbsp<a href=""" & html.html_EncodeHTML(webServerIO_requestPage & "?" & QueryString) & """ target=""_blank"" style=""text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;"">" & Caption & "</a>"
                         End If
                         If AllowEmailPage Then
@@ -33093,14 +33037,14 @@ ErrorTrap:
                             End If
                             EmailBody = webServerIO_requestProtocol & webServerIO.requestDomain & webServerIO.requestPathPage & QueryString
                             Caption = siteProperties.getText("PageAllowEmailCaption", "Email This Page")
-                            Caption = vbReplace(Caption, " ", "&nbsp;")
+                            Caption = genericController.vbReplace(Caption, " ", "&nbsp;")
                             IconRow = IconRow & cr & "&nbsp;&nbsp;<a HREF=""mailto:?SUBJECT=You might be interested in this&amp;BODY=" & EmailBody & """><img alt=""image"" src=""/ccLib/images/IconSmallEmail.gif"" width=""13"" height=""13"" border=""0"" align=""absmiddle""></a>&nbsp;<a HREF=""mailto:?SUBJECT=You might be interested in this&amp;BODY=" & EmailBody & """ style=""text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;"">" & Caption & "</a>"
                         End If
                     End If
                     If IconRow <> "" Then
                         s = s _
                         & cr & "<div style=""text-align:right;"">" _
-                        & kmaIndent(IconRow) _
+                        & genericController.kmaIndent(IconRow) _
                         & cr & "</div>"
                     End If
                 End If
@@ -33156,7 +33100,7 @@ ErrorTrap:
                     '
                     Cell = Cell _
                     & cr & "<!-- ContentBoxBodyStart -->" _
-                    & kmaIndent(Body) _
+                    & genericController.kmaIndent(Body) _
                     & cr & "<!-- ContentBoxBodyEnd -->"
                     '
                     ' ----- Child pages
@@ -33168,7 +33112,7 @@ ErrorTrap:
                             Cell = Cell & html_GetAdminHintWrapper("Automatic Child List display is disabled for this page. It is displayed here because you are in editing mode. To enable automatic child list display, see the features tab for this page.")
                         End If
                         'hint = hint & ",048"
-                        ChildListInstanceOptions = EncodeText(cache_pageContent(PCC_ChildListInstanceOptions, main_RenderCache_CurrentPage_PCCPtr))
+                        ChildListInstanceOptions = genericController.encodeText(cache_pageContent(PCC_ChildListInstanceOptions, main_RenderCache_CurrentPage_PCCPtr))
                         'hint = hint & ",049"
                         Cell = Cell & addon.execute_legacy2(siteProperties.childListAddonID, "", ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, ContentName, PageID, "", PageChildListInstanceID, False, siteProperties.defaultWrapperID, "", AddonStatusOK, Nothing)
                     End If
@@ -33179,7 +33123,7 @@ ErrorTrap:
                 'hint = hint & ",050"
                 s = s _
                 & cr & "<!-- TextSearchStart -->" _
-                & kmaIndent(Cell) _
+                & genericController.kmaIndent(Cell) _
                 & cr & "<!-- TextSearchEnd -->"
                 '
                 ' ----- Page See Also
@@ -33187,7 +33131,7 @@ ErrorTrap:
                 If allowSeeAlso Then
                     s = s _
                     & cr & "<div>" _
-                    & kmaIndent(Controllers.pageManagerController.main_GetSeeAlso(Me, main_RenderCache_CurrentPage_ContentName, PageID)) _
+                    & genericController.kmaIndent(Controllers.pageManagerController.main_GetSeeAlso(Me, main_RenderCache_CurrentPage_ContentName, PageID)) _
                     & cr & "</div>"
                 End If
                 '
@@ -33333,8 +33277,8 @@ ErrorTrap:
             '
             ' ----- First Active Record - Output Quick Editor form
             '
-            RecordID = EncodeInteger(cache_pageContent(PCC_ID, main_RenderCache_CurrentPage_PCCPtr))
-            ParentID = EncodeInteger(cache_pageContent(PCC_ParentID, main_RenderCache_CurrentPage_PCCPtr))
+            RecordID = genericController.EncodeInteger(cache_pageContent(PCC_ID, main_RenderCache_CurrentPage_PCCPtr))
+            ParentID = genericController.EncodeInteger(cache_pageContent(PCC_ParentID, main_RenderCache_CurrentPage_PCCPtr))
             CDef = metaData.getCdef(LiveRecordContentName)
             '
             ' main_Get Authoring Status and permissions
@@ -33342,7 +33286,7 @@ ErrorTrap:
             IsEditLocked = workflow.GetEditLockStatus(LiveRecordContentName, RecordID)
             If IsEditLocked Then
                 main_EditLockMemberName = workflow.GetEditLockMemberName(LiveRecordContentName, RecordID)
-                main_EditLockDateExpires = EncodeDate(workflow.GetEditLockMemberName(LiveRecordContentName, RecordID))
+                main_EditLockDateExpires = genericController.EncodeDate(workflow.GetEditLockMemberName(LiveRecordContentName, RecordID))
             End If
             Call pageManager_GetAuthoringStatus(LiveRecordContentName, RecordID, IsSubmitted, IsApproved, SubmittedMemberName, ApprovedMemberName, IsInserted, IsDeleted, IsModified, ModifiedMemberName, ModifiedDate, SubmittedDate, ApprovedDate)
             Call pageManager_GetAuthoringPermissions(LiveRecordContentName, RecordID, AllowInsert, AllowCancel, allowSave, AllowDelete, AllowPublish, AllowAbort, AllowSubmit, AllowApprove, readOnlyField)
@@ -33350,7 +33294,7 @@ ErrorTrap:
             OptionsPanelAuthoringStatus = main_GetAuthoringStatusMessage(CDef.AllowWorkflowAuthoring, IsEditLocked, main_EditLockMemberName, main_EditLockDateExpires, IsApproved, ApprovedMemberName, IsSubmitted, SubmittedMemberName, IsDeleted, IsInserted, IsModified, ModifiedMemberName)
             IsRootPage = (ParentID = 0)
             If Not IsRootPage Then
-                IsRootPage = EncodeInteger(pageManager_cache_siteSection_RootPageIDIndex.getPtr(CStr(RecordID))) <> -1
+                IsRootPage = genericController.EncodeInteger(pageManager_cache_siteSection_RootPageIDIndex.getPtr(CStr(RecordID))) <> -1
                 'CSParent = app.csOpen("Site Sections", "RootPageID=" & RecordID, , , , , "ID")
                 'IsRootPage = app.csv_IsCSOK(CSParent)
                 'Call app.closeCS(CSParent)
@@ -33413,11 +33357,11 @@ ErrorTrap:
             s = s _
             & cr & "<tr>" _
             & cr2 & "<td class=""qeRow qeLeft"" style=""padding-top:10px;"">Name</td>" _
-            & cr2 & "<td class=""qeRow qeRight"">" & html_GetFormInputText2("name", EncodeText(cache_pageContent(PCC_Name, main_RenderCache_CurrentPage_PCCPtr)), 1, , , , readOnlyField) & "</td>" _
+            & cr2 & "<td class=""qeRow qeRight"">" & html_GetFormInputText2("name", genericController.encodeText(cache_pageContent(PCC_Name, main_RenderCache_CurrentPage_PCCPtr)), 1, , , , readOnlyField) & "</td>" _
             & cr & "</tr>" _
             & cr & "<tr>" _
             & cr2 & "<td class=""qeRow qeLeft"" style=""padding-top:10px;"">Headline</td>" _
-            & cr2 & "<td class=""qeRow qeRight"">" & html_GetFormInputText2("headline", EncodeText(cache_pageContent(PCC_Headline, main_RenderCache_CurrentPage_PCCPtr)), 1, , , , readOnlyField) & "</td>" _
+            & cr2 & "<td class=""qeRow qeRight"">" & html_GetFormInputText2("headline", genericController.encodeText(cache_pageContent(PCC_Headline, main_RenderCache_CurrentPage_PCCPtr)), 1, , , , readOnlyField) & "</td>" _
             & cr & "</tr>" _
             & ""
             If readOnlyField Then
@@ -33441,12 +33385,12 @@ ErrorTrap:
             Else
                 PageList = "<ul class=""qeListUL""><li class=""qeListLI"">Current Page</li></ul>"
                 For Ptr = 0 To main_RenderCache_ParentBranch_PCCPtrCnt - 1
-                    PCCPtr = EncodeInteger(main_RenderCache_ParentBranch_PCCPtrs(Ptr))
-                    Link = EncodeText(cache_pageContent(PCC_Name, PCCPtr))
+                    PCCPtr = genericController.EncodeInteger(main_RenderCache_ParentBranch_PCCPtrs(Ptr))
+                    Link = genericController.encodeText(cache_pageContent(PCC_Name, PCCPtr))
                     If Link = "" Then
-                        Link = "no name #" & EncodeText(cache_pageContent(PCC_ID, PCCPtr))
+                        Link = "no name #" & genericController.encodeText(cache_pageContent(PCC_ID, PCCPtr))
                     End If
-                    Link = "<a href=""" & EncodeText(cache_pageContent(PCC_Link, PCCPtr)) & """>" & Link & "</a>"
+                    Link = "<a href=""" & genericController.encodeText(cache_pageContent(PCC_Link, PCCPtr)) & """>" & Link & "</a>"
                     PageList = "<ul class=""qeListUL""><li class=""qeListLI"">" & Link & PageList & "</li></ul>"
                 Next
             End If
@@ -33458,9 +33402,9 @@ ErrorTrap:
             '
             ' ----- Child pages
             '
-            ChildListInstanceOptions = EncodeText(cache_pageContent(PCC_ChildListInstanceOptions, main_RenderCache_CurrentPage_PCCPtr))
+            ChildListInstanceOptions = genericController.encodeText(cache_pageContent(PCC_ChildListInstanceOptions, main_RenderCache_CurrentPage_PCCPtr))
             PageList = addon.execute_legacy2(siteProperties.childListAddonID, "", ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, ContentName, RecordID, "", PageChildListInstanceID, False, -1, "", AddonStatusOK, Nothing)
-            If vbInstr(1, PageList, "<ul", vbTextCompare) = 0 Then
+            If genericController.vbInstr(1, PageList, "<ul", vbTextCompare) = 0 Then
                 PageList = "(there are no child pages)"
             End If
             s = s _
@@ -33470,7 +33414,7 @@ ErrorTrap:
             & cr & "</tr>"
             s = "" _
             & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"">" _
-            & kmaIndent(s) _
+            & genericController.kmaIndent(s) _
             & cr & "</table>"
             s = "" _
             & ButtonList _
@@ -33492,7 +33436,7 @@ ErrorTrap:
 
             main_GetHtmlBody_GetSection_GetContentBox_QuickEditing = "" _
             & cr & "<div class=""ccCon"">" _
-            & kmaIndent(s) _
+            & genericController.kmaIndent(s) _
             & cr & "</div>"
             '
             Exit Function
@@ -33520,17 +33464,17 @@ ErrorTrap:
             Dim styleOptionList As String
             Const InputTextWidth = 60
             '
-            PageID = EncodeInteger(cache_pageContent(PCC_ID, main_RenderCache_CurrentPage_PCCPtr))
-            parentPageID = EncodeInteger(cache_pageContent(PCC_ParentID, main_RenderCache_CurrentPage_PCCPtr))
-            dateArchive = EncodeDate(cache_pageContent(PCC_DateArchive, main_RenderCache_CurrentPage_PCCPtr))
-            copyFilename = EncodeText(cache_pageContent(PCC_CopyFilename, main_RenderCache_CurrentPage_PCCPtr))
+            PageID = genericController.EncodeInteger(cache_pageContent(PCC_ID, main_RenderCache_CurrentPage_PCCPtr))
+            parentPageID = genericController.EncodeInteger(cache_pageContent(PCC_ParentID, main_RenderCache_CurrentPage_PCCPtr))
+            dateArchive = genericController.EncodeDate(cache_pageContent(PCC_DateArchive, main_RenderCache_CurrentPage_PCCPtr))
+            copyFilename = genericController.encodeText(cache_pageContent(PCC_CopyFilename, main_RenderCache_CurrentPage_PCCPtr))
             If copyFilename <> "" Then
                 Copy = cdnFiles.readFile(copyFilename)
             End If
             '
             ' ----- Page Copy
             '
-            FieldRows = EncodeInteger(properties_user_getText(ContentName & ".copyFilename.PixelHeight", "500"))
+            FieldRows = genericController.EncodeInteger(properties_user_getText(ContentName & ".copyFilename.PixelHeight", "500"))
             If FieldRows < 50 Then
                 FieldRows = 50
                 Call userProperty.setProperty(ContentName & ".copyFilename.PixelHeight", 50)
@@ -33569,11 +33513,11 @@ ErrorTrap:
             '
             parentBranchPtr = 0
             Do While (parentBranchPtr < main_RenderCache_ParentBranch_PCCPtrCnt)
-                PCCPtr = EncodeInteger(main_RenderCache_ParentBranch_PCCPtrs(parentBranchPtr))
-                PageID = EncodeInteger(cache_pageContent(PCC_ID, PCCPtr))
-                pageCaption = EncodeText(cache_pageContent(PCC_MenuHeadline, PCCPtr))
+                PCCPtr = genericController.EncodeInteger(main_RenderCache_ParentBranch_PCCPtrs(parentBranchPtr))
+                PageID = genericController.EncodeInteger(cache_pageContent(PCC_ID, PCCPtr))
+                pageCaption = genericController.encodeText(cache_pageContent(PCC_MenuHeadline, PCCPtr))
                 If pageCaption = "" Then
-                    pageCaption = EncodeText(cache_pageContent(PCC_Name, PCCPtr))
+                    pageCaption = genericController.encodeText(cache_pageContent(PCC_Name, PCCPtr))
                 End If
                 Link = pageManager_GetPageLink4(PageID, "", True, False)
                 If returnHtml <> "" Then
@@ -33631,7 +33575,7 @@ ErrorTrap:
                 '
                 ' normalize route to /path/page or /path
                 '
-                workingRoute = normalizeRoute(workingRoute)
+                workingRoute = genericController.normalizeRoute(workingRoute)
                 '
                 ' call with no addon route returns admin site
                 '
@@ -33703,8 +33647,8 @@ ErrorTrap:
                                 Dim refPage As String = ""
                                 Dim refQueryString As String = ""
                                 Dim cs As Integer
-                                Call SeparateURL(webServerIO.requestReferrer, refProtocol, refHost, refPath, refPage, refQueryString)
-                                If vbUCase(refHost) <> vbUCase(webServerIO.requestDomain) Then
+                                Call genericController.SeparateURL(webServerIO.requestReferrer, refProtocol, refHost, refPath, refPage, refQueryString)
+                                If genericController.vbUCase(refHost) <> genericController.vbUCase(webServerIO.requestDomain) Then
                                     '
                                     ' Not from this site
                                     '
@@ -33762,12 +33706,12 @@ ErrorTrap:
                                     For addonPtr = 0 To UBound(pairs)
                                         pairName = pairs(addonPtr)
                                         pairValue = ""
-                                        pos = vbInstr(1, pairName, "=")
+                                        pos = genericController.vbInstr(1, pairName, "=")
                                         If pos > 0 Then
-                                            pairValue = DecodeResponseVariable(Mid(pairName, pos + 1))
-                                            pairName = DecodeResponseVariable(Mid(pairName, 1, pos - 1))
+                                            pairValue = genericController.DecodeResponseVariable(Mid(pairName, pos + 1))
+                                            pairName = genericController.DecodeResponseVariable(Mid(pairName, 1, pos - 1))
                                         End If
-                                        Option_String = Option_String & "&" & encodeNvaArgument(pairName) & "=" & encodeNvaArgument(pairValue)
+                                        Option_String = Option_String & "&" & genericController.encodeNvaArgument(pairName) & "=" & genericController.encodeNvaArgument(pairValue)
                                     Next
                                     Option_String = Mid(Option_String, 2)
                                 End If
@@ -33789,15 +33733,15 @@ ErrorTrap:
                         webServerIO_BlockClosePageCopyright = True
                         html_BlockClosePageLink = True
                         If (webServerIO_OutStreamDevice = webServerIO_OutStreamJavaScript) Then
-                            If vbInstr(1, returnResult, "<form ", vbTextCompare) <> 0 Then
+                            If genericController.vbInstr(1, returnResult, "<form ", vbTextCompare) <> 0 Then
                                 Dim FormSplit As String() = Split(returnResult, "<form ", , vbTextCompare)
                                 returnResult = FormSplit(0)
                                 For addonPtr = 1 To UBound(FormSplit)
-                                    Dim FormEndPos As Integer = vbInstr(1, FormSplit(addonPtr), ">")
+                                    Dim FormEndPos As Integer = genericController.vbInstr(1, FormSplit(addonPtr), ">")
                                     Dim FormInner As String = Mid(FormSplit(addonPtr), 1, FormEndPos)
                                     Dim FormSuffix As String = Mid(FormSplit(addonPtr), FormEndPos + 1)
-                                    FormInner = vbReplace(FormInner, "method=""post""", "method=""main_Get""", 1, 99, vbTextCompare)
-                                    FormInner = vbReplace(FormInner, "method=post", "method=""main_Get""", 1, 99, vbTextCompare)
+                                    FormInner = genericController.vbReplace(FormInner, "method=""post""", "method=""main_Get""", 1, 99, vbTextCompare)
+                                    FormInner = genericController.vbReplace(FormInner, "method=post", "method=""main_Get""", 1, 99, vbTextCompare)
                                     returnResult = returnResult & "<form " & FormInner & FormSuffix
                                 Next
                             End If
@@ -33849,8 +33793,8 @@ ErrorTrap:
                                     dt = db.executeSql(Sql)
                                     If dt.Rows.Count > 0 Then
                                         For Each rsDr As DataRow In dt.Rows
-                                            addonDefaultEditorName = "&nbsp;(" & EncodeText(rsDr("name")) & ")"
-                                            addonDefaultEditorId = EncodeInteger(rsDr("id"))
+                                            addonDefaultEditorName = "&nbsp;(" & genericController.encodeText(rsDr("name")) & ")"
+                                            addonDefaultEditorId = genericController.EncodeInteger(rsDr("id"))
                                         Next
                                     End If
                                     '
@@ -33867,10 +33811,10 @@ ErrorTrap:
                                     dt = db.executeSql(Sql)
                                     If dt.Rows.Count > 0 Then
                                         For Each rsDr As DataRow In dt.Rows
-                                            Dim addonId As Integer = EncodeInteger(rsDr("addonid"))
+                                            Dim addonId As Integer = genericController.EncodeInteger(rsDr("addonid"))
                                             If (addonId <> 0) And (addonId <> addonDefaultEditorId) Then
                                                 returnResult = returnResult _
-                                                    & vbCrLf & vbTab & "<div class=""radioCon"">" & html_GetFormInputRadioBox(radioGroupName, EncodeText(addonId), CStr(currentEditorAddonId)) & "&nbsp;Use " & EncodeText(rsDr("addonName")) & "</div>" _
+                                                    & vbCrLf & vbTab & "<div class=""radioCon"">" & html_GetFormInputRadioBox(radioGroupName, genericController.encodeText(addonId), CStr(currentEditorAddonId)) & "&nbsp;Use " & genericController.encodeText(rsDr("addonName")) & "</div>" _
                                                     & ""
                                             End If
 
@@ -34128,7 +34072,7 @@ ErrorTrap:
                                             '
                                             StyleSN = siteProperties.getinteger("StylesheetSerialNumber", 0)
                                             StyleSN = StyleSN + 1
-                                            Call siteProperties.setProperty("StylesheetSerialNumber", EncodeText(StyleSN))
+                                            Call siteProperties.setProperty("StylesheetSerialNumber", genericController.encodeText(StyleSN))
                                             '
                                             ' Save new public stylesheet
                                             '
@@ -34162,7 +34106,7 @@ ErrorTrap:
                                         If contentName <> "" Then
                                             Call cache.invalidateTagCommaList(contentName)
                                             tableName = GetContentTablename(contentName)
-                                            If vbLCase(tableName) = "cctemplates" Then
+                                            If genericController.vbLCase(tableName) = "cctemplates" Then
                                                 Call cache.setKey(pageManager_cache_pageTemplate_cacheName, nothingObject)
                                                 Call pageManager_cache_pageTemplate_load()
                                             End If
@@ -34257,7 +34201,7 @@ ErrorTrap:
                     ' normalize adminRoute and test for hit
                     '--------------------------------------------------------------------------
                     '
-                    If (workingRoute = normalizeRoute(adminRoute)) Then
+                    If (workingRoute = genericController.normalizeRoute(adminRoute)) Then
                         '
                         'debugLog("executeRoute, route is admin")
                         '
@@ -34313,7 +34257,7 @@ ErrorTrap:
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <remarks></remarks>
-        Private Sub constructorCommonInitialize()
+        Private Sub constructorInitialize()
             Try
                 app_startTickCount = GetTickCount
                 CPTickCountBase = GetTickCount
@@ -34412,8 +34356,8 @@ ErrorTrap:
                             Do While (Not SaveOK) And (RetryCnt < 10)
                                 SaveOK = True
                                 Try
-                                    Dim absFile As String = vbLCase(logPathRoot & PathFilenameNoExt & FileSuffix & ".log")
-                                    Dim absContent As String = LogFileCopyPrep(FormatDateTime(Now(), vbGeneralDate)) & vbTab & threadName & vbTab & LogLine & vbCrLf
+                                    Dim absFile As String = genericController.vbLCase(logPathRoot & PathFilenameNoExt & FileSuffix & ".log")
+                                    Dim absContent As String = genericController.LogFileCopyPrep(FormatDateTime(Now(), vbGeneralDate)) & vbTab & threadName & vbTab & LogLine & vbCrLf
 
                                     If Not IO.File.Exists(absFile) Then
                                         ' Create a file to write to.
@@ -34427,7 +34371,7 @@ ErrorTrap:
                                     End If
                                     'System.IO.File.AppendAllText(absFile, absContent)
                                     'Call cluster.files.appendFile(absFile, absContent)
-                                    'My.Computer.FileSystem.WriteAllText(LCase(PathFilenameNoExt & FileSuffix & ".log"), LogFileCopyPrep(FormatDateTime(Now(), vbGeneralDate)) & vbTab & threadName & vbTab & LogLine & vbCrLf, True)
+                                    'My.Computer.FileSystem.WriteAllText(LCase(PathFilenameNoExt & FileSuffix & ".log"), genericController.LogFileCopyPrep(FormatDateTime(Now(), vbGeneralDate)) & vbTab & threadName & vbTab & LogLine & vbCrLf, True)
                                 Catch ex As IO.IOException
                                     '
                                     ' permission denied - happens when more then one process are writing at once, go to the next suffix
@@ -34498,17 +34442,17 @@ ErrorTrap:
                 End If
                 '
                 LogLine = "" _
-                    & LogFileCopyPrep(ContensiveAppName) _
-                    & vbTab & LogFileCopyPrep(processName) _
-                    & vbTab & LogFileCopyPrep(ClassName) _
-                    & vbTab & LogFileCopyPrep(MethodName) _
-                    & vbTab & LogFileCopyPrep(contextDescription) _
-                    & vbTab & LogFileCopyPrep(ErrorMessage) _
-                    & vbTab & LogFileCopyPrep(ResumeMessage) _
-                    & vbTab & LogFileCopyPrep(ErrSource) _
-                    & vbTab & LogFileCopyPrep(ErrNumber.ToString) _
-                    & vbTab & LogFileCopyPrep(ErrDescription) _
-                    & vbTab & LogFileCopyPrep(URL) _
+                    & genericController.LogFileCopyPrep(ContensiveAppName) _
+                    & vbTab & genericController.LogFileCopyPrep(processName) _
+                    & vbTab & genericController.LogFileCopyPrep(ClassName) _
+                    & vbTab & genericController.LogFileCopyPrep(MethodName) _
+                    & vbTab & genericController.LogFileCopyPrep(contextDescription) _
+                    & vbTab & genericController.LogFileCopyPrep(ErrorMessage) _
+                    & vbTab & genericController.LogFileCopyPrep(ResumeMessage) _
+                    & vbTab & genericController.LogFileCopyPrep(ErrSource) _
+                    & vbTab & genericController.LogFileCopyPrep(ErrNumber.ToString) _
+                    & vbTab & genericController.LogFileCopyPrep(ErrDescription) _
+                    & vbTab & genericController.LogFileCopyPrep(URL) _
                     & ""
                 '
                 log_appendLog(LogLine, LogFolder, LogNamePrefix)
@@ -34976,17 +34920,17 @@ ErrorTrap:
                 '
                 dt = db.executeSql("SELECT ID FROM CCGROUPS WHERE NAME=" & sqlGroupName & "")
                 If dt.Rows.Count > 0 Then
-                    returnGroupId = EncodeInteger(dt.Rows(0).Item("ID"))
+                    returnGroupId = genericController.EncodeInteger(dt.Rows(0).Item("ID"))
                 Else
                     cid = metaData.getContentId("groups")
-                    createkey = GetRandomInteger()
+                    createkey = genericController.GetRandomInteger()
                     sql = "insert into ccgroups (contentcontrolid,active,createkey,name,caption) values (" & cid & ",1," & createkey & "," & sqlGroupName & "," & sqlGroupName & ")"
                     Call db.executeSql(sql)
                     '
                     sql = "select top 1 id from ccgroups where createkey=" & createkey & " order by id desc"
                     dt = db.executeSql(sql)
                     If dt.Rows.Count > 0 Then
-                        returnGroupId = EncodeInteger(dt.Rows(0).Item(0))
+                        returnGroupId = genericController.EncodeInteger(dt.Rows(0).Item(0))
                     End If
                 End If
                 dt.Dispose()
@@ -35007,7 +34951,7 @@ ErrorTrap:
             Dim returnGroupId As Integer = 0
             Try
                 '
-                Dim cs As CPCSBaseClass = cp.CSNew
+                Dim cs As New csController(Me)
                 Dim IsAlreadyThere As Boolean = False
                 Dim sqlCriteria As String = db.getNameIdOrGuidSqlCriteria(GroupNameOrGuid)
                 Dim groupName As String
@@ -35164,7 +35108,7 @@ ErrorTrap:
             Try
                 Dim sqlCriteria As String = db.getNameIdOrGuidSqlCriteria(GroupNameIdOrGuid)
                 If sqlCriteria <> "" Then
-                    Call cp.Content.DeleteRecords("Groups", sqlCriteria)
+                    Call cp.Content.Delete("Groups", sqlCriteria)
                 End If
             Catch ex As Exception
                 handleExceptionAndRethrow(ex)
@@ -35212,7 +35156,7 @@ ErrorTrap:
                     If db.cs_ok(CS) Then
                         RecordID = db.cs_getInteger(CS, "ID")
                         Call db.cs_set(CS, "name", CopyName)
-                        Call db.cs_set(CS, "copy", EncodeText(DefaultContent))
+                        Call db.cs_set(CS, "copy", genericController.encodeText(DefaultContent))
                         Call db.cs_save2(CS)
                         Call workflow.publishEdit("copy content", RecordID)
                     End If
@@ -35313,18 +35257,18 @@ ErrorTrap:
             Dim a As String = ""
             If Not String.IsNullOrEmpty(Arg) Then
                 a = Arg
-                a = vbReplace(a, vbCrLf, "#0013#")
-                a = vbReplace(a, vbLf, "#0013#")
-                a = vbReplace(a, vbCr, "#0013#")
-                a = vbReplace(a, "&", "#0038#")
-                a = vbReplace(a, "=", "#0061#")
-                a = vbReplace(a, ",", "#0044#")
-                a = vbReplace(a, """", "#0034#")
-                a = vbReplace(a, "'", "#0039#")
-                a = vbReplace(a, "|", "#0124#")
-                a = vbReplace(a, "[", "#0091#")
-                a = vbReplace(a, "]", "#0093#")
-                a = vbReplace(a, ":", "#0058#")
+                a = genericController.vbReplace(a, vbCrLf, "#0013#")
+                a = genericController.vbReplace(a, vbLf, "#0013#")
+                a = genericController.vbReplace(a, vbCr, "#0013#")
+                a = genericController.vbReplace(a, "&", "#0038#")
+                a = genericController.vbReplace(a, "=", "#0061#")
+                a = genericController.vbReplace(a, ",", "#0044#")
+                a = genericController.vbReplace(a, """", "#0034#")
+                a = genericController.vbReplace(a, "'", "#0039#")
+                a = genericController.vbReplace(a, "|", "#0124#")
+                a = genericController.vbReplace(a, "[", "#0091#")
+                a = genericController.vbReplace(a, "]", "#0093#")
+                a = genericController.vbReplace(a, ":", "#0058#")
             End If
             Return a
         End Function

@@ -75,29 +75,29 @@ Namespace Contensive
                 LineCnt = UBound(Lines) + 1
                 For LinePtr = 0 To LineCnt - 1
                     LineBuffer = Lines(LinePtr)
-                    Pos = vbInstr(1, LineBuffer, "//")
+                    Pos = genericController.vbInstr(1, LineBuffer, "//")
                     If Pos <> 0 Then
                         LineBuffer = Mid(LineBuffer, 1, Pos - 1)
                     End If
-                    Pos = vbInstr(1, LineBuffer, "=")
+                    Pos = genericController.vbInstr(1, LineBuffer, "=")
                     If Pos <> 0 Then
                         NameValue = Split(LineBuffer, "=")
                         If UBound(NameValue) > 0 Then
-                            Select Case vbUCase(Trim(NameValue(0)))
+                            Select Case genericController.vbUCase(Trim(NameValue(0)))
                                 Case "STATUSMETHOD"
                                     StatusMethod = Trim(NameValue(1))
                                 Case "LISTENPORT"
-                                    ListenPort = EncodeInteger(Trim(NameValue(1)))
+                                    ListenPort = genericController.EncodeInteger(Trim(NameValue(1)))
                                 Case "TIMERINTERVALSEC"
-                                    TimerIntervalSec = EncodeInteger(Trim(NameValue(1)))
+                                    TimerIntervalSec = genericController.EncodeInteger(Trim(NameValue(1)))
                                 Case "ALLOWERRORRECOVERY"
-                                    allowErrorRecovery = EncodeBoolean(Trim(NameValue(1)))
+                                    allowErrorRecovery = genericController.EncodeBoolean(Trim(NameValue(1)))
                                 Case "ALLOWIISRESET"
-                                    allowIISReset = EncodeBoolean(Trim(NameValue(1)))
+                                    allowIISReset = genericController.EncodeBoolean(Trim(NameValue(1)))
                                 Case "DISKSPACEMINMB"
-                                    DiskSpaceMinMb = EncodeInteger(Trim(NameValue(1)))
+                                    DiskSpaceMinMb = genericController.EncodeInteger(Trim(NameValue(1)))
                                 Case "CLEARERRORSONMONITORHIT"
-                                    ClearErrorsOnMonitorHit = EncodeBoolean(Trim(NameValue(1)))
+                                    ClearErrorsOnMonitorHit = genericController.EncodeBoolean(Trim(NameValue(1)))
                                 Case "ALARMEMAILLIST"
                                     AlarmEmailList = Trim(NameValue(1))
                                 Case "ALARMEMAILSERVER"
@@ -105,9 +105,9 @@ Namespace Contensive
                                 Case "SERVERNAME"
                                     ServerName = Trim(NameValue(1))
                                 Case "LOGFILESIZEMAX"
-                                    LogFileSizeMax = EncodeInteger(NameValue(1))
+                                    LogFileSizeMax = genericController.EncodeInteger(NameValue(1))
                                 Case "SITETIMEOUT"
-                                    SiteTimeout = EncodeInteger(NameValue(1))
+                                    SiteTimeout = genericController.EncodeInteger(NameValue(1))
                                 Case "SCHEDULE"
                                     scheduleList = Trim(NameValue(1))
                                 Case "HTTPSTATUSONERROR"
@@ -247,16 +247,16 @@ ErrorTrap:
                     For Ptr = 0 To UBound(schedulePeriods)
                         schedulePeriod = Trim(schedulePeriods(Ptr))
                         If schedulePeriod <> "" Then
-                            If vbInstr(1, schedulePeriod, "-") <> 0 Then
+                            If genericController.vbInstr(1, schedulePeriod, "-") <> 0 Then
                                 schedulePeriodTimes = Split(schedulePeriod, "-")
                                 Ptr = schedulePeriodTimes(0).IndexOf(":")
                                 schedulePeriodStartTime = schedulePeriodTimes(0)
                                 If Ptr = -1 Then
-                                    timeHours = EncodeInteger(schedulePeriodStartTime)
+                                    timeHours = genericController.EncodeInteger(schedulePeriodStartTime)
                                     timeMinutes = 0
                                 Else
-                                    timeHours = EncodeInteger(schedulePeriodStartTime.Substring(0, Ptr))
-                                    timeMinutes = EncodeInteger(schedulePeriodStartTime.Substring(Ptr))
+                                    timeHours = genericController.EncodeInteger(schedulePeriodStartTime.Substring(0, Ptr))
+                                    timeMinutes = genericController.EncodeInteger(schedulePeriodStartTime.Substring(Ptr))
                                 End If
                                 If timeHours >= 24 Then
                                     timeHours = 23
@@ -269,11 +269,11 @@ ErrorTrap:
                                     If schedulePeriodTimes.GetUpperBound(0) > 0 Then
                                         Ptr = schedulePeriodTimes(1).IndexOf(":")
                                         If Ptr = -1 Then
-                                            timeHours = EncodeInteger(schedulePeriodTimes(1))
+                                            timeHours = genericController.EncodeInteger(schedulePeriodTimes(1))
                                             timeMinutes = 0
                                         Else
-                                            timeHours = EncodeInteger(schedulePeriodTimes(1).Substring(0, Ptr))
-                                            timeMinutes = EncodeInteger(schedulePeriodTimes(1).Substring(Ptr))
+                                            timeHours = genericController.EncodeInteger(schedulePeriodTimes(1).Substring(0, Ptr))
+                                            timeMinutes = genericController.EncodeInteger(schedulePeriodTimes(1).Substring(Ptr))
                                         End If
                                         If timeHours >= 24 Then
                                             timeHours = 23

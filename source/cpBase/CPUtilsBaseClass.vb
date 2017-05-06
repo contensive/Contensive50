@@ -39,7 +39,7 @@ Namespace Contensive.BaseClasses
         Public MustOverride Sub IISReset()
         Public MustOverride Function EncodeInteger(ByVal Expression As Object) As Integer
         Public MustOverride Function EncodeNumber(ByVal Expression As Object) As Double
-        Public MustOverride Function EncodeText(ByVal Expression As Object) As String
+        Public MustOverride Function encodeText(ByVal Expression As Object) As String
         Public MustOverride Function EncodeBoolean(ByVal Expression As Object) As Boolean
         Public MustOverride Function EncodeDate(ByVal Expression As Object) As Date
         Public MustOverride Function ExecuteAddon(ByVal IdGuidOrName As String) As String

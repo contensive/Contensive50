@@ -2,6 +2,9 @@
 Option Explicit On
 Option Strict On
 
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
+
 Namespace Contensive.Core
     '
     '====================================================================================================
@@ -96,7 +99,7 @@ Namespace Contensive.Core
         '
         Public Function getInteger(ByVal RequestName As String) As Integer
             Try
-                Return EncodeInteger(getProperty(RequestName).Value)
+                Return genericController.EncodeInteger(getProperty(RequestName).Value)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -107,7 +110,7 @@ Namespace Contensive.Core
         '
         Public Function getText(ByVal RequestName As String) As String
             Try
-                Return EncodeText(getProperty(RequestName).Value)
+                Return genericController.encodeText(getProperty(RequestName).Value)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -140,10 +143,10 @@ Namespace Contensive.Core
                 If Not String.IsNullOrEmpty(sourceKey) Then
                     returnResult = sourceKey.ToLower()
                     If cpCore.webServerIO.requestSpaceAsUnderscore Then
-                        returnResult = vbReplace(returnResult, " ", "_")
+                        returnResult = genericController.vbReplace(returnResult, " ", "_")
                     End If
                     If cpCore.webServerIO.requestDotAsUnderscore Then
-                        returnResult = vbReplace(returnResult, ".", "_")
+                        returnResult = genericController.vbReplace(returnResult, ".", "_")
                     End If
                 End If
             Catch ex As Exception
@@ -175,7 +178,7 @@ Namespace Contensive.Core
                     Dim docProperty As New docPropertiesClass
                     With docProperty
                         If Not String.IsNullOrEmpty(nameValuePair) Then
-                            If vbInstr(1, nameValuePair, "=") <> 0 Then
+                            If genericController.vbInstr(1, nameValuePair, "=") <> 0 Then
                                 ValuePair = Split(nameValuePair, "=")
                                 key = DecodeResponseVariable(CStr(ValuePair(0)))
                                 If key <> "" Then
@@ -185,8 +188,8 @@ Namespace Contensive.Core
                                     End If
                                     .IsForm = False
                                     .IsFile = False
-                                    cpCore.webServerIO_ReadStreamJSForm = cpCore.webServerIO_ReadStreamJSForm Or (UCase(.Name) = vbUCase(RequestNameJSForm))
-                                    cpCore.main_ReadStreamJSProcess = cpCore.main_ReadStreamJSProcess Or (UCase(.Name) = vbUCase(RequestNameJSProcess))
+                                    cpCore.webServerIO_ReadStreamJSForm = cpCore.webServerIO_ReadStreamJSForm Or (UCase(.Name) = genericController.vbUCase(RequestNameJSForm))
+                                    cpCore.main_ReadStreamJSProcess = cpCore.main_ReadStreamJSProcess Or (UCase(.Name) = genericController.vbUCase(RequestNameJSProcess))
                                     cpCore.docProperties.setProperty(key, docProperty)
                                 End If
                             End If

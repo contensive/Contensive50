@@ -10,6 +10,8 @@ Imports System.Web
 Imports Microsoft.VisualBasic
 'Imports Contensive.Core
 Imports Contensive.Core
+Imports Contensive.Core.constants
+Imports Contensive.Core.Controllers.genericController
 
 Namespace Contensive
 #Const includeTracing = False
@@ -741,7 +743,7 @@ Namespace Contensive
         '        Dim CopySplit() As String
         '        '
         '        returnString = DomainNameList
-        '        If vbInstr(1, returnString, ",", 1) <> 0 Then
+        '        If genericController.vbInstr(1, returnString, ",", 1) <> 0 Then
         '            CopySplit = Split(returnString, ",")
         '            returnString = CopySplit(0)
         '        End If
@@ -792,7 +794,7 @@ Namespace Contensive
                     ' authenticated
                     '
                     cpCore.log_appendLog("serverClass.executeServerCmd, switch on method=[" & Method & "]")
-                    Select Case vbUCase(Method)
+                    Select Case genericController.vbUCase(Method)
                         Case "CONNECT"
                             '
                             ' Connect
@@ -819,20 +821,20 @@ Namespace Contensive
                             '
                             ' SetConnectInfo
                             '
-                            If vbInstr(1, queryString, "serverListenerPort=", vbTextCompare) <> 0 Then
+                            If genericController.vbInstr(1, queryString, "serverListenerPort=", vbTextCompare) <> 0 Then
                                 serverListenerPort = getCommandArgument("serverListenerPort", queryString)
                             End If
                             '
-                            If vbInstr(1, queryString, "AdminUsername=", vbTextCompare) <> 0 Then
+                            If genericController.vbInstr(1, queryString, "AdminUsername=", vbTextCompare) <> 0 Then
                                 AdminUsername = getCommandArgument("AdminUsername", queryString)
                             End If
                             '
-                            If vbInstr(1, queryString, "AdminPassword=", vbTextCompare) <> 0 Then
+                            If genericController.vbInstr(1, queryString, "AdminPassword=", vbTextCompare) <> 0 Then
                                 AdminPassword = getCommandArgument("AdminPassword", queryString)
                             End If
                             '
-                            If vbInstr(1, queryString, "maxCmdInstances=", vbTextCompare) <> 0 Then
-                                maxCmdInstances = EncodeInteger(getCommandArgument("maxCmdInstances", queryString))
+                            If genericController.vbInstr(1, queryString, "maxCmdInstances=", vbTextCompare) <> 0 Then
+                                maxCmdInstances = genericController.EncodeInteger(getCommandArgument("maxCmdInstances", queryString))
                                 If maxCmdInstances <= 0 Then
                                     maxCmdInstances = 1
                                 End If
@@ -897,12 +899,12 @@ Namespace Contensive
                             '            If (AppServices Is Nothing) Then
                             '                returnString = "ERROR " & ccError_InvalidAppName
                             '            Else
-                            '                Select Case vbUCase(Name)
+                            '                Select Case genericController.vbUCase(Name)
                             '                    Case "NAME"
                             '                        appServices.config.name = Value
                             '                        returnString = "ok"
                             '                    Case "AUTOSTART"
-                            '                        AppServices.AutoStart = EncodeBoolean(Value)
+                            '                        AppServices.AutoStart = genericController.EncodeBoolean(Value)
                             '                        returnString = "ok"
                             '                    Case "CONNECTIONSTRING"
                             '                        AppServices.ConnectionString = Value
@@ -920,7 +922,7 @@ Namespace Contensive
                             '                        AppServices.RootPath = Value
                             '                        returnString = "ok"
                             '                    Case "ALLOWMONITORING"
-                            '                        AppServices.AllowMonitoring = EncodeBoolean(Value)
+                            '                        AppServices.AllowMonitoring = genericController.EncodeBoolean(Value)
                             '                        returnString = "ok"
                             '                    Case Else
                             '                        returnString = "ERROR " & ccError_InvalidFieldName
@@ -1024,7 +1026,7 @@ Namespace Contensive
                             QSPairs = Split(queryString, "&")
                             If UBound(QSPairs) >= 0 Then
                                 For Ptr = 0 To UBound(QSPairs)
-                                    Pos = vbInstr(1, QSPairs(Ptr), "=")
+                                    Pos = genericController.vbInstr(1, QSPairs(Ptr), "=")
                                     QSValue = ""
                                     If Pos > 0 Then
                                         '
@@ -1039,7 +1041,7 @@ Namespace Contensive
                                         QSValue = decodeNvaArgument(QSValue)
                                         '
                                         'QSValue = decodeNvaArgument(Mid(QSPairs(Ptr), Pos + 1))
-                                        QSValue = vbReplace(QSValue, """", """""")
+                                        QSValue = genericController.vbReplace(QSValue, """", """""")
                                         '
                                         ' !!!! should have commandLine- encode/decode pair
                                         '   handle quote
@@ -1054,7 +1056,7 @@ Namespace Contensive
                                     End If
                                 Next
                             End If
-                            If vbUCase(Method) = "RUNPROCESS" Then
+                            If genericController.vbUCase(Method) = "RUNPROCESS" Then
                                 Method = Method
                             End If
                             '
@@ -1157,7 +1159,7 @@ Namespace Contensive
                             '    RemoteNameAlarmTime = NowTime + RemoteNameInterval
                             'ElseIf NowTime > RemoteNameAlarmTime Then
                             '    Call addAsyncCmd(cp,"UPDATEREMOTENAMES", True)
-                            '    RemoteNameLabel.Caption = EncodeInteger(RemoteNameLabel.Caption) + 1
+                            '    RemoteNameLabel.Caption = genericController.EncodeInteger(RemoteNameLabel.Caption) + 1
                             '    RemoteNameAlarmTime = RemoteNameAlarmTime + RemoteNameInterval
                             '    If NowTime > RemoteNameAlarmTime Then
                             '        RemoteNameAlarmTime = NowTime + RemoteNameInterval
@@ -1319,7 +1321,7 @@ Namespace Contensive
                 cpCore.log_appendLog("serverClass.addAsyncCmd, command=[" & Command & "], BlockDuplicates=[" & BlockDuplicates & "]")
                 '
                 returnBoolean = True
-                LcaseCommand = vbLCase(Command)
+                LcaseCommand = genericController.vbLCase(Command)
                 If asyncCmdQueueCnt >= asyncCmdQueueLimit Then
                     '
                     ' Server Queue is too large, block the add
@@ -1331,7 +1333,7 @@ Namespace Contensive
                     ' Search for a duplicate
                     '
                     For Ptr = 0 To asyncCmdQueueCnt - 1
-                        If vbLCase(asyncCmdQueue(Ptr)) = LcaseCommand Then
+                        If genericController.vbLCase(asyncCmdQueue(Ptr)) = LcaseCommand Then
                             returnBoolean = False
                             cpCore.log_appendLog("addAsyncCmd, Server Cmd was blocked because there is a duplicate in the queue already, [" & Command & "]")
                             Exit For

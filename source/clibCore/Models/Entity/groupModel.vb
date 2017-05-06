@@ -17,10 +17,10 @@ Namespace Contensive.Core.Models.Entity
     '   create( cp, id ) - to loads instance properties
     '   saveObject( cp ) - saves instance properties
     '
-    Public Class _blankModel
+    Public Class groupModel
         '
         '-- const
-        Public Const cnPrimaryContent As String = ""
+        Public Const cnPrimaryContent As String = "groups"
         '
         ' -- instance properties
         Public id As Integer
@@ -44,8 +44,8 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <param name="recordId"></param>
-        Public Shared Function create(cpCore As coreClass, recordId As Integer) As _blankModel
-            Dim result As _blankModel = Nothing
+        Public Shared Function create(cpCore As coreClass, recordId As Integer) As groupModel
+            Dim result As groupModel = Nothing
             Try
                 If recordId <> 0 Then
                     result = loadObject2(cpCore, "id=" & recordId.ToString())
@@ -63,8 +63,8 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <param name="recordGuid"></param>
-        Public Shared Function create(cpCore As coreClass, recordGuid As String) As _blankModel
-            Dim result As _blankModel = Nothing
+        Public Shared Function create(cpCore As coreClass, recordGuid As String) As groupModel
+            Dim result As groupModel = Nothing
             Try
                 If Not String.IsNullOrEmpty(recordGuid) Then
                     result = loadObject2(cpCore, "ccGuid=" & cpCore.db.encodeSQLText(recordGuid))
@@ -82,17 +82,17 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <param name="sqlCriteria"></param>
-        Private Shared Function loadObject2(cpCore As coreClass, sqlCriteria As String) As _blankModel
-            Dim result As _blankModel = Nothing
+        Private Shared Function loadObject2(cpCore As coreClass, sqlCriteria As String) As groupModel
+            Dim result As groupModel = Nothing
             Try
                 Dim cs As New csController(cpCore)
-                If cs.open(cnPrimaryContent, sqlCriteria) Then
-                    result = New _blankModel
+                If cs.Open(cnPrimaryContent, sqlCriteria) Then
+                    result = New groupModel
                     With result
-                        .id = cs.getInteger("id")
-                        .name = cs.getText("name")
-                        .requestKey = cs.getText("ccGuid")
-                        .createKey = cs.getInteger("createKey")
+                        .id = cs.GetInteger("id")
+                        .name = cs.GetText("name")
+                        .requestKey = cs.GetText("ccGuid")
+                        .createKey = cs.GetInteger("createKey")
                     End With
                 End If
                 Call cs.Close()
@@ -176,19 +176,19 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="cp"></param>
         ''' <param name="someCriteria"></param>
         ''' <returns></returns>
-        Public Shared Function getObjectList(cpCore As coreClass, someCriteria As Integer) As List(Of _blankModel)
-            Dim result As New List(Of _blankModel)
+        Public Shared Function getObjectList(cpCore As coreClass, someCriteria As Integer) As List(Of groupModel)
+            Dim result As New List(Of groupModel)
             Try
                 Dim cs As New csController(cpCore)
-                If (cs.open(cnPrimaryContent, "(someCriteria=" & someCriteria & ")", "name", True, "id")) Then
-                    Dim instance As _blankModel
+                If (cs.Open(cnPrimaryContent, "(someCriteria=" & someCriteria & ")", "name", True, "id")) Then
+                    Dim instance As groupModel
                     Do
-                        instance = _blankModel.create(cpCore, cs.getInteger("id"))
+                        instance = groupModel.create(cpCore, cs.GetInteger("id"))
                         If (instance IsNot Nothing) Then
                             result.Add(instance)
                         End If
-                        cs.goNext()
-                    Loop While cs.ok()
+                        cs.GoNext()
+                    Loop While cs.OK()
                 End If
                 cs.Close()
             Catch ex As Exception

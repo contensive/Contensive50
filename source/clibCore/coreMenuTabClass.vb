@@ -2,7 +2,8 @@
 Option Explicit On
 Option Strict On
 
-
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 
 Namespace Contensive.Core
     '
@@ -107,7 +108,7 @@ Namespace Contensive.Core
                     TabEdgeStyle = "ccTabEdge"
                     result = result & "<table border=0 cellspacing=0 cellpadding=0><tr>"
                     For TabPtr = 0 To TabsCnt - 1
-                        TabID = "Tab" & CStr(GetRandomInteger())
+                        TabID = "Tab" & CStr(genericController.GetRandomInteger())
                         TabStyle = Tabs(TabPtr).StylePrefix
                         TabHitStyle = TabStyle & "Hit"
                         TabLinkStyle = TabStyle & "Link"
@@ -133,20 +134,20 @@ Namespace Contensive.Core
                             End If
                         End If
                         TabCurrent = TabBlank
-                        TabCurrent = vbReplace(TabCurrent, "Replace-TabID", TabID)
-                        TabCurrent = vbReplace(TabCurrent, "Replace-StyleEdge", TabEdgeStyle)
+                        TabCurrent = genericController.vbReplace(TabCurrent, "Replace-TabID", TabID)
+                        TabCurrent = genericController.vbReplace(TabCurrent, "Replace-StyleEdge", TabEdgeStyle)
 
                         If Tabs(TabPtr).IsHit And (HitPtr = 0) Then
                             '
                             ' This tab is hit
                             '
 
-                            TabCurrent = vbReplace(TabCurrent, "Replace-HotSpot", "<a href=""" & TabLink & """ Class=""" & TabHitLinkStyle & """>" & Tabs(TabPtr).Caption & "</a>")
-                            TabCurrent = vbReplace(TabCurrent, "Replace-StyleHit", TabHitStyle)
+                            TabCurrent = genericController.vbReplace(TabCurrent, "Replace-HotSpot", "<a href=""" & TabLink & """ Class=""" & TabHitLinkStyle & """>" & Tabs(TabPtr).Caption & "</a>")
+                            TabCurrent = genericController.vbReplace(TabCurrent, "Replace-StyleHit", TabHitStyle)
                         Else
 
-                            TabCurrent = vbReplace(TabCurrent, "Replace-HotSpot", "<a href=""" & TabLink & """ Class=""" & TabLinkStyle & """>" & Tabs(TabPtr).Caption & "</a>")
-                            TabCurrent = vbReplace(TabCurrent, "Replace-StyleHit", TabStyle)
+                            TabCurrent = genericController.vbReplace(TabCurrent, "Replace-HotSpot", "<a href=""" & TabLink & """ Class=""" & TabLinkStyle & """>" & Tabs(TabPtr).Caption & "</a>")
+                            TabCurrent = genericController.vbReplace(TabCurrent, "Replace-StyleHit", TabStyle)
                         End If
                         result = result & "<td valign=bottom>" & TabCurrent & "</td>"
                     Next

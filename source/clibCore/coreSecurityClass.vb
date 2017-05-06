@@ -2,6 +2,8 @@
 Option Explicit On
 Option Strict On
 
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 Imports System.Text
 Imports System.Security.Cryptography
 
@@ -473,8 +475,8 @@ Namespace Contensive.Core
                 decodedString = twoWayDecrypt(token)
                 parts = decodedString.Split(CChar(vbTab))
                 If parts.Length = 2 Then '
-                    returnNumber = EncodeInteger(parts(0))
-                    returnDate = EncodeDate(parts(1))
+                    returnNumber = genericController.EncodeInteger(parts(0))
+                    returnDate =  genericController.EncodeDate(parts(1))
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex, "DecodeToken failure. Returning blank result for token [" & token & "]")

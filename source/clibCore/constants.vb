@@ -5,7 +5,7 @@ Option Strict On
 Imports Contensive.BaseClasses
 
 Namespace Contensive.Core
-    Public Module constantsModule
+    Public Module constants
         '
         ' code version for this build. This is saved in a site property and checked in the housekeeping event - checkDataVersion
         '
@@ -1056,6 +1056,566 @@ Namespace Contensive.Core
         Public Const ToolsActionDefineContentFieldFromTableFieldsFromTable = 13
         Public Const ToolsActionFindAndReplace = 14
         Public Const ToolsActionIISReset = 15
+        '
+        '=======================================================================
+        '   sitepropertyNames
+        '=======================================================================
+        '
+        Public Const siteproperty_serverPageDefault_name = "serverPageDefault"
+        Public Const siteproperty_serverPageDefault_defaultValue = "default.aspx"
+        Public Const spAllowPageWithoutSectionDisplay As String = "Allow Page Without Section Display"
+        Public Const spAllowPageWithoutSectionDisplay_default As Boolean = True
+        '
+        '=======================================================================
+        '   content replacements
+        '=======================================================================
+        '
+        Public Const contentReplaceEscapeStart = "{%"
+        Public Const contentReplaceEscapeEnd = "%}"
+        '
+        Public Class fieldEditorType
+            Public fieldId As Integer
+            Public addonid As Integer
+        End Class
+        '
+        ' ----- Dataset for graphing
+        '
+        Public Class ColumnDataType
+            Dim Name As String
+            Dim row() As Integer
+        End Class
+        '
+        Public Class ChartDataType
+            Dim Title As String
+            Dim XLabel As String
+            Dim YLabel As String
+            Dim RowCount As Integer
+            Dim RowLabel() As String
+            Dim ColumnCount As Integer
+            Dim Column() As ColumnDataType
+        End Class
+        ''
+        ' PrivateStorage to hold the DebugTimer
+        '
+        Class TimerStackType
+            Dim Label As String
+            Dim StartTicks As Integer
+        End Class
+        Private Const TimerStackMax = 20
+        Private TimerStack(TimerStackMax) As TimerStackType
+        Private TimerStackCount As Integer
+        '
+        Public Const TextSearchStartTagDefault = "<!--TextSearchStart-->"
+        Public Const TextSearchEndTagDefault = "<!--TextSearchEnd-->"
+        '
+        '-------------------------------------------------------------------------------------
+        '   IPDaemon communication objects
+        '-------------------------------------------------------------------------------------
+        '
+        Class IPDaemonConnectionType
+            Dim ConnectionID As Integer
+            Dim BytesToSend As Integer
+            Dim HTTPVersion As String
+            Dim HTTPMethod As String
+            Dim Path As String
+            Dim Query As String
+            Dim Headers As String
+            Dim PostData As String
+            Dim SendData As Boolean
+            Dim State As Integer
+            Dim ContentLength As Integer
+        End Class
+        '
+        '-------------------------------------------------------------------------------------
+        '   Email
+        '-------------------------------------------------------------------------------------
+        '
+        Public Const EmailLogTypeDrop = 1                   ' Email was dropped
+        Public Const EmailLogTypeOpen = 2                   ' System detected the email was opened
+        Public Const EmailLogTypeClick = 3                  ' System detected a click from a link on the email
+        Public Const EmailLogTypeBounce = 4                 ' Email was processed by bounce processing
+        Public Const EmailLogTypeBlockRequest = 5           ' recipient asked us to stop sending email
+        Public Const EmailLogTypeImmediateSend = 6        ' Email was dropped
+        '
+        Public Const DefaultSpamFooter = "<p>To block future emails from this site, <link>click here</link></p>"
+        '
+        Public Const FeedbackFormNotSupportedComment = "<!--" & vbCrLf & "Feedback form is not supported in this context" & vbCrLf & "-->"
+        '
+        '-------------------------------------------------------------------------------------
+        '   Page Content constants
+        '-------------------------------------------------------------------------------------
+        '
+        Public Const ContentBlockCopyName = "Content Block Copy"
+        '
+        Public Const BubbleCopy_AdminAddPage = "Use the Add page to create new content records. The save button puts you in edit mode. The OK button creates the record and exits."
+        Public Const BubbleCopy_AdminIndexPage = "Use the Admin Listing page to locate content records through the Admin Site."
+        Public Const BubbleCopy_SpellCheckPage = "Use the Spell Check page to verify and correct spelling throught the content."
+        Public Const BubbleCopy_AdminEditPage = "Use the Edit page to add and modify content."
+        '
+        '
+        Public Const TemplateDefaultName = "Default"
+        'Public Const TemplateDefaultBody = "<!--" & vbCrLf & "Default Template - edit this Page Template, or select a different template for your page or section" & vbCrLf & "-->{{DYNAMICMENU?MENU=}}<br>{{CONTENT}}"
+        Public Const TemplateDefaultBody = "" _
+            & vbCrLf & vbTab & "<!--" _
+            & vbCrLf & vbTab & "Default Template - edit this Page Template, or select a different template for your page or section" _
+            & vbCrLf & vbTab & "-->" _
+            & vbCrLf & vbTab & "<ac type=""AGGREGATEFUNCTION"" name=""Dynamic Menu"" querystring=""Menu Name=Default"" acinstanceid=""{6CBADABB-5B0D-43E1-B3CA-46A3D60DA3E1}"" >" _
+            & vbCrLf & vbTab & "<ac type=""AGGREGATEFUNCTION"" name=""Content Box"" acinstanceid=""{49E0D0C0-D323-49B6-B211-B9599673A265}"" >"
+        Public Const TemplateDefaultBodyTag = "<body class=""ccBodyWeb"">"
+        '
+        '=======================================================================
+        '   Internal Tab interface storage
+        '=======================================================================
+        '
+        Private Class TabType
+            Dim Caption As String
+            Dim Link As String
+            Dim StylePrefix As String
+            Dim IsHit As Boolean
+            Dim LiveBody As String
+        End Class
+        '
+        Private Tabs() As TabType
+        Private TabsCnt As Integer
+        Private TabsSize As Integer
+        '
+        ' Admin Navigator Nodes
+        '
+        Public Const NavigatorNodeCollectionList = -1
+        Public Const NavigatorNodeAddonList = -1
+        ''
+        '' Pointers into index of PCC (Page Content Cache) array
+        ''
+        'Public Const PCC_ID = 0
+        'Public Const PCC_Active = 1
+        'Public Const PCC_ParentID = 2
+        'Public Const PCC_Name = 3
+        'Public Const PCC_Headline = 4
+        'Public Const PCC_MenuHeadline = 5
+        'Public Const PCC_DateArchive = 6
+        'Public Const PCC_DateExpires = 7
+        'Public Const PCC_PubDate = 8
+        'Public Const PCC_ChildListSortMethodID = 9
+        'Public Const PCC_ContentControlID = 10
+        'Public Const PCC_TemplateID = 11
+        'Public Const PCC_BlockContent = 12
+        'Public Const PCC_BlockPage = 13
+        'Public Const PCC_Link = 14
+        'Public Const PCC_RegistrationGroupID = 15
+        'Public Const PCC_BlockSourceID = 16
+        'Public Const PCC_CustomBlockMessageFilename = 17
+        'Public Const PCC_JSOnLoad = 18
+        'Public Const PCC_JSHead = 19
+        'Public Const PCC_JSEndBody = 20
+        'Public Const PCC_Viewings = 21
+        'Public Const PCC_ContactMemberID = 22
+        'Public Const PCC_AllowHitNotification = 23
+        'Public Const PCC_TriggerSendSystemEmailID = 24
+        'Public Const PCC_TriggerConditionID = 25
+        'Public Const PCC_TriggerConditionGroupID = 26
+        'Public Const PCC_TriggerAddGroupID = 27
+        'Public Const PCC_TriggerRemoveGroupID = 28
+        'Public Const PCC_AllowMetaContentNoFollow = 29
+        'Public Const PCC_ParentListName = 30
+        'Public Const PCC_CopyFilename = 31
+        'Public Const PCC_BriefFilename = 32
+        'Public Const PCC_AllowChildListDisplay = 33
+        'Public Const PCC_SortOrder = 34
+        'Public Const PCC_DateAdded = 35
+        'Public Const PCC_ModifiedDate = 36
+        'Public Const PCC_ChildPagesFound = 37
+        'Public Const PCC_AllowInMenus = 38
+        'Public Const PCC_AllowInChildLists = 39
+        'Public Const PCC_JSFilename = 40
+        'Public Const PCC_ChildListInstanceOptions = 41
+        'Public Const PCC_IsSecure = 42
+        'Public Const PCC_AllowBrief = 43
+        'Public Const PCC_ColCnt = 44
+        '
+        ' Indexes into the SiteSectionCache
+        ' Created from "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,BlockSection,RootPageID,JSOnLoad,JSHead,JSEndBody"
+        '
+        Public Const SSC_ID = 0
+        Public Const SSC_Name = 1
+        Public Const SSC_TemplateID = 2
+        Public Const SSC_ContentID = 3
+        Public Const SSC_MenuImageFilename = 4
+        Public Const SSC_Caption = 5
+        Public Const SSC_MenuImageOverFilename = 6
+        Public Const SSC_HideMenu = 7
+        Public Const SSC_BlockSection = 8
+        Public Const SSC_RootPageID = 9
+        Public Const SSC_JSOnLoad = 10
+        Public Const SSC_JSHead = 11
+        Public Const SSC_JSEndBody = 12
+        Public Const SSC_JSFilename = 13
+        Public Const SSC_cnt = 14
+        '
+        ' Indexes into the TemplateCache
+        ' Created from "t.ID,t.Name,t.Link,t.BodyHTML,t.JSOnLoad,t.JSHead,t.JSEndBody,t.StylesFilename,r.StyleID"
+        '
+        Public Const TC_ID = 0
+        Public Const TC_Name = 1
+        Public Const TC_Link = 2
+        Public Const TC_BodyHTML = 3
+        Public Const TC_JSOnLoad = 4
+        Public Const TC_JSInHeadLegacy = 5
+        'Public Const TC_JSHead = 5
+        Public Const TC_JSEndBody = 6
+        Public Const TC_StylesFilename = 7
+        Public Const TC_SharedStylesIDList = 8
+        Public Const TC_MobileBodyHTML = 9
+        Public Const TC_MobileStylesFilename = 10
+        Public Const TC_OtherHeadTags = 11
+        Public Const TC_BodyTag = 12
+        Public Const TC_JSInHeadFilename = 13
+        'Public Const TC_JSFilename = 13
+        Public Const TC_IsSecure = 14
+        Public Const TC_DomainIdList = 15
+        ' for now, Mobile templates do not have shared styles
+        'Public Const TC_MobileSharedStylesIDList = 11
+        Public Const TC_cnt = 16
+        '
+        ' DTD
+        '
+        Public Const DTDDefault = "<!DOCTYPE HTML PUBLIC ""-//W3C//DTD HTML 4.01 Transitional//EN"" ""http://www.w3.org/TR/html4/loose.dtd"">"
+        Public Const DTDDefaultAdmin = "<!DOCTYPE HTML PUBLIC ""-//W3C//DTD HTML 4.01 Transitional//EN"" ""http://www.w3.org/TR/html4/loose.dtd"">"
+        '
+        ' innova Editor feature list
+        '
+        Public Const InnovaEditorFeaturefilename = "innova\EditorConfig.txt"
+        Public Const InnovaEditorFeatureList = "FullScreen,Preview,Print,Search,Cut,Copy,Paste,PasteWord,PasteText,SpellCheck,Undo,Redo,Image,Flash,Media,CustomObject,CustomTag,Bookmark,Hyperlink,HTMLSource,XHTMLSource,Numbering,Bullets,Indent,Outdent,JustifyLeft,JustifyCenter,JustifyRight,JustifyFull,Table,Guidelines,Absolute,Characters,Line,Form,RemoveFormat,ClearAll,StyleAndFormatting,TextFormatting,ListFormatting,BoxFormatting,ParagraphFormatting,CssText,Styles,Paragraph,FontName,FontSize,Bold,Italic,Underline,Strikethrough,Superscript,Subscript,ForeColor,BackColor"
+        Public Const InnovaEditorPublicFeatureList = "FullScreen,Preview,Print,Search,Cut,Copy,Paste,PasteWord,PasteText,SpellCheck,Undo,Redo,Bookmark,Hyperlink,HTMLSource,XHTMLSource,Numbering,Bullets,Indent,Outdent,JustifyLeft,JustifyCenter,JustifyRight,JustifyFull,Table,Guidelines,Absolute,Characters,Line,Form,RemoveFormat,ClearAll,StyleAndFormatting,TextFormatting,ListFormatting,BoxFormatting,ParagraphFormatting,CssText,Styles,Paragraph,FontName,FontSize,Bold,Italic,Underline,Strikethrough,Superscript,Subscript,ForeColor,BackColor"
+        ''
+        '' Content Type
+        ''
+        'Enum contentTypeEnum
+        '    contentTypeWeb = 1
+        '    ContentTypeEmail = 2
+        '    contentTypeWebTemplate = 3
+        '    contentTypeEmailTemplate = 4
+        'End Enum
+        'Public EditorContext As contentTypeEnum
+        'Enum EditorContextEnum
+        '    contentTypeWeb = 1
+        '    contentTypeEmail = 2
+        'End Enum
+        'Public EditorContext As EditorContextEnum
+        ''
+        'Public Const EditorAddonMenuEmailTemplateFilename = "templates/EditorAddonMenuTemplateEmail.js"
+        'Public Const EditorAddonMenuEmailContentFilename = "templates/EditorAddonMenuContentEmail.js"
+        'Public Const EditorAddonMenuWebTemplateFilename = "templates/EditorAddonMenuTemplateWeb.js"
+        'Public Const EditorAddonMenuWebContentFilename = "templates/EditorAddonMenuContentWeb.js"
+        '
+        Public Const DynamicStylesFilename = "templates/styles.css"
+        Public Const AdminSiteStylesFilename = "templates/AdminSiteStyles.css"
+        Public Const EditorStyleRulesFilenamePattern = "templates/EditorStyleRules$TemplateID$.js"
+        ' deprecated 11/24/3009 - StyleRules destinction between web/email not needed b/c body background blocked
+        'Public Const EditorStyleWebRulesFilename = "templates/EditorStyleWebRules.js"
+        'Public Const EditorStyleEmailRulesFilename = "templates/EditorStyleEmailRules.js"
+        '
+        ' ----- ccGroupRules storage for list of Content that a group can author
+        '
+        Public Class ContentGroupRuleType
+            Dim ContentID As Integer
+            Dim GroupID As Integer
+            Dim AllowAdd As Boolean
+            Dim AllowDelete As Boolean
+        End Class
+        '
+        ' ----- This should match the Lookup List in the NavIconType field in the Navigator Entry content definition
+        '
+        Public Const navTypeIDList = "Add-on,Report,Setting,Tool"
+        Public Const NavTypeIDAddon = 1
+        Public Const NavTypeIDReport = 2
+        Public Const NavTypeIDSetting = 3
+        Public Const NavTypeIDTool = 4
+        '
+        Public Const NavIconTypeList = "Custom,Advanced,Content,Folder,Email,User,Report,Setting,Tool,Record,Addon,help"
+        Public Const NavIconTypeCustom = 1
+        Public Const NavIconTypeAdvanced = 2
+        Public Const NavIconTypeContent = 3
+        Public Const NavIconTypeFolder = 4
+        Public Const NavIconTypeEmail = 5
+        Public Const NavIconTypeUser = 6
+        Public Const NavIconTypeReport = 7
+        Public Const NavIconTypeSetting = 8
+        Public Const NavIconTypeTool = 9
+        Public Const NavIconTypeRecord = 10
+        Public Const NavIconTypeAddon = 11
+        Public Const NavIconTypeHelp = 12
+        '
+        Public Const QueryTypeSQL = 1
+        Public Const QueryTypeOpenContent = 2
+        Public Const QueryTypeUpdateContent = 3
+        Public Const QueryTypeInsertContent = 4
+        '
+        ' Google Data Object construction in GetRemoteQuery
+        '
+        Public Class ColsType
+            Public Type As String
+            Public Id As String
+            Public Label As String
+            Public Pattern As String
+        End Class
+        '
+        Public Class CellType
+            Public v As String
+            Public f As String
+            Public p As String
+        End Class
+        '
+        Public Class RowsType
+            Public Cell() As CellType
+        End Class
+        '
+        Public Class GoogleDataType
+            Public IsEmpty As Boolean
+            Public col() As ColsType
+            Public row() As RowsType
+        End Class
+        '
+        Public Enum GoogleVisualizationStatusEnum
+            OK = 1
+            warning = 2
+            ErrorStatus = 3
+        End Enum
+        '
+        Public Class GoogleVisualizationType
+            Public version As String
+            Public reqid As String
+            Public status As GoogleVisualizationStatusEnum
+            Public warnings() As String
+            Public errors() As String
+            Public sig As String
+            Public table As GoogleDataType
+        End Class
+
+        'Public Const ReturnFormatTypeGoogleTable = 1
+        'Public Const ReturnFormatTypeNameValue = 2
+
+        Public Enum RemoteFormatEnum
+            RemoteFormatJsonTable = 1
+            RemoteFormatJsonNameArray = 2
+            RemoteFormatJsonNameValue = 3
+        End Enum
+        'Private Enum GoogleVisualizationStatusEnum
+        '    OK = 1
+        '    warning = 2
+        '    ErrorStatus = 3
+        'End Enum
+        ''
+        'Private Structure GoogleVisualizationType
+        '    Dim version As String
+        '    Dim reqid As String
+        '    Dim status As GoogleVisualizationStatusEnum
+        '    Dim warnings() As String
+        '    Dim errors() As String
+        '    Dim sig As String
+        '    Dim table As GoogleDataType
+        'End Structure        '
+        '
+        '
+        Public Declare Function RegCloseKey& Lib "advapi32.dll" (ByVal hKey&)
+        Public Declare Function RegOpenKeyExA& Lib "advapi32.dll" (ByVal hKey&, ByVal lpszSubKey$, ByVal dwOptions&, ByVal samDesired&, ByVal lpHKey&)
+        Public Declare Function RegQueryValueExA& Lib "advapi32.dll" (ByVal hKey&, ByVal lpszValueName$, ByVal lpdwRes&, ByVal lpdwType&, ByVal lpDataBuff$, ByVal nSize&)
+        Public Declare Function RegQueryValueEx& Lib "advapi32.dll" Alias "RegQueryValueExA" (ByVal hKey&, ByVal lpszValueName$, ByVal lpdwRes&, ByVal lpdwType&, ByVal lpDataBuff&, ByVal nSize&)
+
+        Public Const HKEY_CLASSES_ROOT = &H80000000
+        Public Const HKEY_CURRENT_USER = &H80000001
+        Public Const HKEY_LOCAL_MACHINE = &H80000002
+        Public Const HKEY_USERS = &H80000003
+
+        Public Const ERROR_SUCCESS = 0&
+        Public Const REG_SZ = 1&                          ' Unicode nul terminated string
+        Public Const REG_DWORD = 4&                       ' 32-bit number
+
+        Public Const KEY_QUERY_VALUE = &H1&
+        Public Const KEY_SET_VALUE = &H2&
+        Public Const KEY_CREATE_SUB_KEY = &H4&
+        Public Const KEY_ENUMERATE_SUB_KEYS = &H8&
+        Public Const KEY_NOTIFY = &H10&
+        Public Const KEY_CREATE_LINK = &H20&
+        Public Const READ_CONTROL = &H20000
+        Public Const WRITE_DAC = &H40000
+        Public Const WRITE_OWNER = &H80000
+        Public Const SYNCHRONIZE = &H100000
+        Public Const STANDARD_RIGHTS_REQUIRED = &HF0000
+        Public Const STANDARD_RIGHTS_READ = READ_CONTROL
+        Public Const STANDARD_RIGHTS_WRITE = READ_CONTROL
+        Public Const STANDARD_RIGHTS_EXECUTE = READ_CONTROL
+        Public Const KEY_READ = STANDARD_RIGHTS_READ Or KEY_QUERY_VALUE Or KEY_ENUMERATE_SUB_KEYS Or KEY_NOTIFY
+        Public Const KEY_WRITE = STANDARD_RIGHTS_WRITE Or KEY_SET_VALUE Or KEY_CREATE_SUB_KEY
+        Public Const KEY_EXECUTE = KEY_READ
+        Public Const maxLongValue = 2147483647
+        '
+        ' Error Definitions
+        '
+        Public Const ERR_UNKNOWN As Integer = vbObjectError + 101
+        Public Const ERR_FIELD_DOES_NOT_EXIST As Integer = vbObjectError + 102
+        Public Const ERR_FILESIZE_NOT_ALLOWED As Integer = vbObjectError + 103
+        Public Const ERR_FOLDER_DOES_NOT_EXIST As Integer = vbObjectError + 104
+        Public Const ERR_FILE_ALREADY_EXISTS As Integer = vbObjectError + 105
+        Public Const ERR_FILE_TYPE_NOT_ALLOWED As Integer = vbObjectError + 106
+        '
+        ' page content cache
+        '
+        Public Const pageManager_cache_pageContent_cacheName = "cache_pageContent"
+        Public Const pageManager_cache_pageContent_fieldList = "ID,Active,ParentID,Name,Headline,MenuHeadline,DateArchive,DateExpires,PubDate,ChildListSortMethodID,ContentControlID,TemplateID" _
+                & ",BlockContent,BlockPage,Link,RegistrationGroupID,BlockSourceID,CustomBlockMessage,JSOnLoad,JSHead,JSEndBody,Viewings,ContactMemberID" _
+                & ",AllowHitNotification,TriggerSendSystemEmailID,TriggerConditionID,TriggerConditionGroupID,TriggerAddGroupID,TriggerRemoveGroupID,AllowMetaContentNoFollow" _
+                & ",ParentListName,copyFilename,BriefFilename,AllowChildListDisplay,SortOrder,DateAdded,ModifiedDate,ChildPagesFound,AllowInMenus,AllowInChildLists" _
+                & ",JSFilename,ChildListInstanceOptions,IsSecure,AllowBrief,allowReturnLinkDisplay,AllowPrinterVersion,allowEmailPage,allowSeeAlso,allowMoreInfo" _
+                & ",allowFeedback,allowLastModifiedFooter,modifiedBy,DateReviewed,ReviewedBy,allowReviewedFooter,allowMessageFooter,contentpadding"
+        Public Const PCC_ID = 0
+        Public Const PCC_Active = 1
+        Public Const PCC_ParentID = 2
+        Public Const PCC_Name = 3
+        Public Const PCC_Headline = 4
+        Public Const PCC_MenuHeadline = 5
+        Public Const PCC_DateArchive = 6
+        Public Const PCC_DateExpires = 7
+        Public Const PCC_PubDate = 8
+        Public Const PCC_ChildListSortMethodID = 9
+        Public Const PCC_ContentControlID = 10
+        Public Const PCC_TemplateID = 11
+        Public Const PCC_BlockContent = 12
+        Public Const PCC_BlockPage = 13
+        Public Const PCC_Link = 14
+        Public Const PCC_RegistrationGroupID = 15
+        Public Const PCC_BlockSourceID = 16
+        Public Const PCC_CustomBlockMessageFilename = 17
+        Public Const PCC_JSOnLoad = 18
+        Public Const PCC_JSHead = 19
+        Public Const PCC_JSEndBody = 20
+        Public Const PCC_Viewings = 21
+        Public Const PCC_ContactMemberID = 22
+        Public Const PCC_AllowHitNotification = 23
+        Public Const PCC_TriggerSendSystemEmailID = 24
+        Public Const PCC_TriggerConditionID = 25
+        Public Const PCC_TriggerConditionGroupID = 26
+        Public Const PCC_TriggerAddGroupID = 27
+        Public Const PCC_TriggerRemoveGroupID = 28
+        Public Const PCC_AllowMetaContentNoFollow = 29
+        Public Const PCC_ParentListName = 30
+        Public Const PCC_CopyFilename = 31
+        Public Const PCC_BriefFilename = 32
+        Public Const PCC_AllowChildListDisplay = 33
+        Public Const PCC_SortOrder = 34
+        Public Const PCC_DateAdded = 35
+        Public Const PCC_ModifiedDate = 36
+        Public Const PCC_ChildPagesFound = 37
+        Public Const PCC_AllowInMenus = 38
+        Public Const PCC_AllowInChildLists = 39
+        Public Const PCC_JSFilename = 40
+        Public Const PCC_ChildListInstanceOptions = 41
+        Public Const PCC_IsSecure = 42
+        Public Const PCC_AllowBrief = 43
+        Public Const PCC_allowReturnLinkDisplay = 44
+        Public Const pcc_allowPrinterVersion = 45
+        Public Const pcc_allowEmailPage = 46
+        Public Const pcc_allowSeeAlso = 47
+        Public Const pcc_allowMoreInfo = 48
+        Public Const pcc_allowFeedback = 49
+        Public Const pcc_allowLastModifiedFooter = 50
+        Public Const PCC_ModifiedBy = 51
+        Public Const PCC_DateReviewed = 52
+        Public Const PCC_ReviewedBy = 53
+        Public Const PCC_allowReviewedFooter = 54
+        Public Const PCC_allowMessageFooter = 55
+        Public Const PCC_ContentPadding = 56
+        Public Const PCC_ColCnt = 57
+        '
+        ' addonIncludeRules cache
+        '
+        Public Const cache_sharedStylesAddonRules_cacheName = "cache_sharedStylesAddonRules"
+        Public Const cache_sharedStylesAddonRules_fieldList = "addonId,styleId"
+        Public Const sharedStylesAddonRulesCache_addonId = 0
+        Public Const sharedStylesAddonRulesCache_styleId = 1
+        Public Const sharedStylesAddonRulesCacheColCnt = 2
+        '
+        ' linkalias cache
+        '
+        Public Const cache_linkAlias_fieldList = "ID,Name,Link,PageID,QueryStringSuffix"
+        Public Const linkAliasCache_id = 0
+        Public Const linkAliasCache_name = 1
+        Public Const linkAliasCache_link = 2
+        Public Const linkAliasCache_pageId = 3
+        Public Const linkAliasCache_queryStringSuffix = 4
+        Public Const linkAliasCacheColCnt = 5
+        '
+        '   addonCache
+        '
+        'Public Const cache_addon_cacheName = "cache_addon"
+        'Public Const cache_addon_fieldList = "id,active,name,ccguid,collectionid,Copy,ccguid,Link,ObjectProgramID,DotNetClass,ArgumentList,CopyText,IsInline,BlockDefaultStyles,StylesFilename,CustomStylesFilename,formxml,RemoteAssetLink,AsAjax,InFrame,ScriptingEntryPoint,ScriptingLanguageID,ScriptingCode,BlockEditTools,ScriptingTimeout,inlineScript,help,helplink,JavaScriptOnLoad,JavaScriptBodyEnd,PageTitle,MetaDescription,MetaKeywordList,OtherHeadTags,JSFilename,remoteMethod,onBodyStart,onBodyEnd,OnPageStartEvent,OnPageEndEvent,robotsTxt"
+        'Public Const addonCache_Id = 0
+        'Public Const addonCache_active = 1
+        'Public Const addonCache_name = 2
+        'Public Const addonCache_guid = 3
+        'Public Const addonCache_collectionid = 4
+        'Public Const addonCache_Copy = 5
+        'Public Const addonCache_ccguid = 6
+        'Public Const addonCache_Link = 7
+        'Public Const addonCache_ObjectProgramID = 8
+        'Public Const addonCache_DotNetClass = 9
+        'Public Const addonCache_ArgumentList = 10
+        'Public Const addonCache_CopyText = 11
+        'Public Const addonCache_IsInline = 12
+        'Public Const addonCache_BlockDefaultStyles = 13
+        'Public Const addonCache_StylesFilename = 14
+        'Public Const addonCache_CustomStylesFilename = 15
+        'Public Const addonCache_formxml = 16
+        'Public Const addonCache_RemoteAssetLink = 17
+        'Public Const addonCache_AsAjax = 18
+        'Public Const addonCache_InFrame = 19
+        'Public Const addonCache_ScriptingEntryPoint = 20
+        'Public Const addonCache_ScriptingLanguageID = 21
+        'Public Const addonCache_ScriptingCode = 22
+        'Public Const addonCache_BlockEditTools = 23
+        'Public Const addonCache_ScriptingTimeout = 24
+        'Public Const addonCache_inlineScript = 25
+        'Public Const addonCache_help = 26
+        'Public Const addonCache_helpLink = 27
+        'Public Const addonCache_JavaScriptOnLoad = 28
+        'Public Const addonCache_JavaScriptBodyEnd = 29
+        'Public Const addonCache_PageTitle = 30
+        'Public Const addonCache_MetaDescription = 31
+        'Public Const addonCache_MetaKeywordList = 32
+        'Public Const addonCache_OtherHeadTags = 33
+        'Public Const addonCache_JSFilename = 34
+        'Public Const addonCache_remoteMethod = 35
+        'Public Const addoncache_OnBodyStart = 36
+        'Public Const addoncache_OnBodyEnd = 37
+        'Public Const addoncache_OnPageStart = 38
+        'Public Const addoncache_OnPageEnd = 39
+        'Public Const addoncache_robotsTxt = 40
+        'Public Const addonCacheColCnt = 41
+        '
+        ' addonIncludeRules cache
+        '
+        Public Const cache_addonIncludeRules_cacheName = "cache_addonIncludeRules"
+        Public Const cache_addonIncludeRules_fieldList = "addonId,includedAddonId"
+        Public Const addonIncludeRulesCache_addonId = 0
+        Public Const addonIncludeRulesCache_includedAddonId = 1
+        Public Const addonIncludeRulesCacheColCnt = 2
+        '
+        ' addonIncludeRules cache
+        '
+        Public Const cache_LibraryFiles_cacheName = "cache_LibraryFiles"
+        Public Const cache_LibraryFiles_fieldList = "id,ccguid,clicks,filename,width,height,AltText,altsizelist"
+        Public Const LibraryFilesCache_Id = 0
+        Public Const LibraryFilesCache_ccGuid = 1
+        Public Const LibraryFilesCache_clicks = 2
+        Public Const LibraryFilesCache_filename = 3
+        Public Const LibraryFilesCache_width = 4
+        Public Const LibraryFilesCache_height = 5
+        Public Const LibraryFilesCache_alttext = 6
+        Public Const LibraryFilesCache_altsizelist = 7
+        Public Const LibraryFilesCacheColCnt = 8
+        '
+        ' link forward cache
+        '
+        Public Const cache_linkForward_cacheName = "cache_linkForward"
     End Module
     '
 End Namespace

@@ -1,6 +1,10 @@
 ﻿
 Option Explicit On
 Option Strict On
+
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
+
 '
 Namespace Contensive.Core
     Public Class coreUploadClass
@@ -53,7 +57,7 @@ Namespace Contensive.Core
             '
             FieldExists = False
             If (ItemCount > 0) And Not IsNull(Key) Then
-                UcaseKey = vbUCase(Key)
+                UcaseKey = genericController.vbUCase(Key)
                 For ItemPointer = 0 To ItemCount - 1
                     If ItemNames(ItemPointer) = UcaseKey Then
                         FieldExists = True

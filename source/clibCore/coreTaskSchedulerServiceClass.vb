@@ -3,6 +3,7 @@ Option Explicit On
 Option Strict On
 '
 Imports Contensive.Core
+Imports Contensive.Core.Controllers
 '
 Namespace Contensive
 #Const includeTracing = False
@@ -279,7 +280,7 @@ Namespace Contensive
                 appendLog(cpSiteCore, "taskScheduler.addTaskToQueue, application=[" & cpSiteCore.serverConfig.appConfig.name & "], command=[" & Command & "], cmdDetail=[" & cmdDetailJson & "]")
                 '
                 returnTaskAdded = True
-                LcaseCommand = vbLCase(Command)
+                LcaseCommand = genericController.vbLCase(Command)
                 If BlockDuplicates Then
                     '
                     ' Search for a duplicate
@@ -331,7 +332,7 @@ Namespace Contensive
                         key = SrcOptions(Ptr).Replace(vbTab, "")
                         If Not String.IsNullOrEmpty(key) Then
                             value = ""
-                            Pos = vbInstr(1, key, "=")
+                            Pos = genericController.vbInstr(1, key, "=")
                             If Pos > 0 Then
                                 value = Mid(key, Pos + 1)
                                 key = Mid(key, 1, Pos - 1)

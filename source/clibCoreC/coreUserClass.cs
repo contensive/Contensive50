@@ -235,19 +235,19 @@
 //                        //
 //                        // always false until visit loaded
 //                        //
-//                        localContentNameOrId = EncodeText(ContentNameOrId);
+//                        localContentNameOrId = genericController.encodeText(ContentNameOrId);
 //                        cacheTestName = localContentNameOrId;
 //                        if (string.IsNullOrEmpty(cacheTestName))
 //                        {
 //                            cacheTestName = "iseditingall";
 //                        }
-//                        cacheTestName = vbLCase(cacheTestName);
-//                        if (coreCommonModule.IsInDelimitedString(main_IsEditingContentList, cacheTestName, ","))
+//                        cacheTestName = genericController.vbLCase(cacheTestName);
+//                        if (genericController.IsInDelimitedString(main_IsEditingContentList, cacheTestName, ","))
 //                        {
 //                            cpCore.testPoint("...is in main_IsEditingContentList");
 //                            returnResult = true;
 //                        }
-//                        else if (coreCommonModule.IsInDelimitedString(main_IsNotEditingContentList, cacheTestName, ","))
+//                        else if (genericController.IsInDelimitedString(main_IsNotEditingContentList, cacheTestName, ","))
 //                        {
 //                            cpCore.testPoint("...is in main_IsNotEditingContentList");
 //                        }
@@ -260,7 +260,7 @@
 //                                    {
 //                                        if (!string.IsNullOrEmpty(localContentNameOrId))
 //                                        {
-//                                            if (vbIsNumeric(localContentNameOrId))
+//                                            if (genericController.vbIsNumeric(localContentNameOrId))
 //                                            {
 //                                                localContentNameOrId = cpCore.metaData.getContentNameByID(EncodeInteger(localContentNameOrId));
 //                                            }
@@ -300,7 +300,7 @@
 //            {
 //                if ((!cpCore.pageManager_printVersion))
 //                {
-//                    if (isAuthenticatedContentManager(EncodeText(ContentName)))
+//                    if (isAuthenticatedContentManager(genericController.encodeText(ContentName)))
 //                    {
 //                        returnResult = cpCore.visitProperty.getBoolean("AllowQuickEditor");
 //                    }
@@ -327,7 +327,7 @@
 //            {
 //                if ((!cpCore.pageManager_printVersion))
 //                {
-//                    if (isAuthenticatedContentManager(EncodeText(ContentName)))
+//                    if (isAuthenticatedContentManager(genericController.encodeText(ContentName)))
 //                    {
 //                        returnResult = cpCore.visitProperty.getBoolean("AllowAdvancedEditor");
 //                    }
@@ -465,8 +465,8 @@
 //                        // login successful, redirect back to this page (without a method)
 //                        //
 //                        QS = cpCore.web_RefreshQueryString;
-//                        QS = ModifyQueryString(QS, "method", "");
-//                        QS = ModifyQueryString(QS, "RequestBinary", "");
+//                        QS = genericController.ModifyQueryString(QS, "method", "");
+//                        QS = genericController.ModifyQueryString(QS, "RequestBinary", "");
 //                        //
 //                        cpCore.web_Redirect2("?" + QS, "Login form success", false);
 //                    }
@@ -528,8 +528,8 @@
 //                    }
 //                    //
 //                    QueryString = cpCore.web_RefreshQueryString;
-//                    QueryString = ModifyQueryString(QueryString, "S", "");
-//                    QueryString = ModifyQueryString(QueryString, "ccIPage", "");
+//                    QueryString = genericController.ModifyQueryString(QueryString, "S", "");
+//                    QueryString = genericController.ModifyQueryString(QueryString, "ccIPage", "");
 //                    returnResult = "" + cpCore.html_GetFormStart(QueryString) + kmaIndent(returnResult) + cr + "</form>" + "";
 //                }
 //            }
@@ -569,10 +569,10 @@
 //                if (isAuthenticated)
 //                {
 //                    WorkingIDList = GroupIDList;
-//                    WorkingIDList = vbReplace(WorkingIDList, " ", "");
-//                    while (vbInstr(1, WorkingIDList, ",,") != 0)
+//                    WorkingIDList = genericController.vbReplace(WorkingIDList, " ", "");
+//                    while (genericController.vbInstr(1, WorkingIDList, ",,") != 0)
 //                    {
-//                        WorkingIDList = vbReplace(WorkingIDList, ",,", ",");
+//                        WorkingIDList = genericController.vbReplace(WorkingIDList, ",,", ",");
 //                    }
 //                    if ((!string.IsNullOrEmpty(WorkingIDList)))
 //                    {
@@ -617,7 +617,7 @@
 //                        //
 //                        // check if they are admin or in the group list
 //                        //
-//                        if (vbInstr(1, WorkingIDList, ",") != 0)
+//                        if (genericController.vbInstr(1, WorkingIDList, ",") != 0)
 //                        {
 //                            Criteria = "r.GroupID in (" + WorkingIDList + ")";
 //                        }
@@ -728,12 +728,12 @@
 //            try
 //            {
 //                int iMemberID = 0;
-//                iMemberID = EncodeInteger(checkMemberID);
+//                iMemberID = genericController.EncodeInteger(checkMemberID);
 //                if (iMemberID == 0)
 //                {
 //                    iMemberID = id;
 //                }
-//                returnREsult = isMemberOfGroupList("," + cpCore.group_GetGroupID(EncodeText(GroupName)), iMemberID, true);
+//                returnREsult = isMemberOfGroupList("," + cpCore.group_GetGroupID(genericController.encodeText(GroupName)), iMemberID, true);
 //            }
 //            catch (Exception ex)
 //            {
@@ -757,7 +757,7 @@
 //                {
 //                    iMemberID = id;
 //                }
-//                returnREsult = isMemberOfGroupList("," + cpCore.group_GetGroupID(EncodeText(GroupName)), iMemberID, adminReturnsTrue);
+//                returnREsult = isMemberOfGroupList("," + cpCore.group_GetGroupID(genericController.encodeText(GroupName)), iMemberID, adminReturnsTrue);
 //            }
 //            catch (Exception ex)
 //            {
@@ -918,7 +918,7 @@
 //                const int passwordChrsLength = 62;
 //                //
 //                //hint = "100"
-//                workingEmail = EncodeText(Email);
+//                workingEmail = genericController.encodeText(Email);
 //                //
 //                returnREsult = false;
 //                if (string.IsNullOrEmpty(workingEmail))
@@ -928,7 +928,7 @@
 //                }
 //                else {
 //                    //hint = "120"
-//                    atPtr = vbInstr(1, workingEmail, "@");
+//                    atPtr = genericController.vbInstr(1, workingEmail, "@");
 //                    if (atPtr < 2)
 //                    {
 //                        //
@@ -1573,7 +1573,7 @@
 //                loginForm_Username = cpCore.docProperties.getText("username");
 //                loginForm_Password = cpCore.docProperties.getText("password");
 //                //
-//                if (!EncodeBoolean(cpCore.siteProperties.getBoolean("AllowMemberJoin", false)))
+//                if (!genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("AllowMemberJoin", false)))
 //                {
 //                    cpCore.error_AddUserError("This site does not accept public main_MemberShip.");
 //                }
@@ -1711,7 +1711,7 @@
 //                    //
 //                    // ----- Error Messages
 //                    //
-//                    if (EncodeBoolean(cpCore.siteProperties.getBoolean("allowEmailLogin", false)))
+//                    if (genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("allowEmailLogin", false)))
 //                    {
 //                        usernameMsg = "<b>To login, enter your username or email address with your password.</b></p>";
 //                    }
@@ -1720,12 +1720,12 @@
 //                    }
 //                    //
 //                    QueryString = cpCore.webServer.requestQueryString;
-//                    QueryString = ModifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
-//                    QueryString = ModifyQueryString(QueryString, "requestbinary", "", false);
+//                    QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
+//                    QueryString = genericController.ModifyQueryString(QueryString, "requestbinary", "", false);
 //                    //
 //                    // ----- Username
 //                    //
-//                    if (EncodeBoolean(cpCore.siteProperties.getBoolean("allowEmailLogin", false)))
+//                    if (genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("allowEmailLogin", false)))
 //                    {
 //                        Caption = "Username&nbsp;or&nbsp;Email";
 //                    }
@@ -1737,7 +1737,7 @@
 //                    //
 //                    // ----- Password
 //                    //
-//                    if (EncodeBoolean(cpCore.siteProperties.getBoolean("allowNoPasswordLogin", false)))
+//                    if (genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("allowNoPasswordLogin", false)))
 //                    {
 //                        Caption = "Password&nbsp;(optional)";
 //                    }
@@ -1748,7 +1748,7 @@
 //                    //
 //                    // ----- autologin support
 //                    //
-//                    if (EncodeBoolean(cpCore.siteProperties.getBoolean("AllowAutoLogin", false)))
+//                    if (genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("AllowAutoLogin", false)))
 //                    {
 //                        loginForm = loginForm + cr + "<tr>" + cr2 + "<td align=\"right\">&nbsp;</td>" + cr2 + "<td align=\"left\" >" + cr3 + "<table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" width=\"100%\">" + cr4 + "<tr>" + cr5 + "<td valign=\"top\" width=\"20\"><input type=\"checkbox\" name=\"" + "autologin\" value=\"ON\" checked></td>" + cr5 + "<td valign=\"top\" width=\"100%\">" + SpanClassAdminNormal + "Login automatically from this computer</span></td>" + cr4 + "</tr>" + cr3 + "</table>" + cr2 + "</td>" + cr + "</tr>";
 //                    }
@@ -1763,7 +1763,7 @@
 //                    //
 //                    // ----- Password Form
 //                    //
-//                    if (EncodeBoolean(cpCore.siteProperties.getBoolean("allowPasswordEmail", true)))
+//                    if (genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("allowPasswordEmail", true)))
 //                    {
 //                        Panel = "" + Panel + cr + "<p class=\"ccAdminNormal\"><b>Forget your password?</b></p>" + cr + "<p class=\"ccAdminNormal\">If you are a member of the system and can not remember your password, enter your email address below and we will email your matching username and password.</p>" + getSendPasswordForm() + "";
 //                    }
@@ -1828,8 +1828,8 @@
 //                bool allowNoPasswordLogin = false;
 //                string iLoginFieldValue = null;
 //                //
-//                iLoginFieldValue = EncodeText(username);
-//                iPassword = EncodeText(password);
+//                iLoginFieldValue = genericController.encodeText(username);
+//                iPassword = genericController.encodeText(password);
 //                //
 //                returnUserId = 0;
 //                allowEmailLogin = cpCore.siteProperties.getBoolean("allowEmailLogin");
@@ -1887,7 +1887,7 @@
 //                        //
 //                        cpCore.error_AddUserError(badLoginUserError);
 //                    }
-//                    else if ((!EncodeBoolean(cpCore.siteProperties.getBoolean("AllowDuplicateUsernames", false))) & (cpCore.db.cs_getRowCount(CS) > 1))
+//                    else if ((!genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("AllowDuplicateUsernames", false))) & (cpCore.db.cs_getRowCount(CS) > 1))
 //                    {
 //                        //
 //                        // ----- AllowDuplicates is false, and there are more then one record
@@ -1930,7 +1930,7 @@
 //                                //
 //                                // password login
 //                                //
-//                                if (vbLCase(cpCore.db.cs_getText(CS, "password")) == vbLCase(iPassword))
+//                                if (vbLCase(cpCore.db.cs_getText(CS, "password")) == genericController.vbLCase(iPassword))
 //                                {
 //                                    returnUserId = cpCore.db.cs_getInteger(CS, "ID");
 //                                }
@@ -2102,7 +2102,7 @@
 //                returnAllowEdit = false;
 //                returnAllowAdd = false;
 //                returnAllowDelete = false;
-//                if (coreCommonModule.IsInDelimitedString(usedContentIdList, Convert.ToString(ContentID), ","))
+//                if (genericController.IsInDelimitedString(usedContentIdList, Convert.ToString(ContentID), ","))
 //                {
 //                    //
 //                    // failed usedContentIdList test, this content id was in the child path
@@ -2115,20 +2115,20 @@
 //                    // ----- not a valid contentname
 //                    //
 //                }
-//                else if (coreCommonModule.IsInDelimitedString(contentAccessRights_NotList, Convert.ToString(ContentID), ","))
+//                else if (genericController.IsInDelimitedString(contentAccessRights_NotList, Convert.ToString(ContentID), ","))
 //                {
 //                    //
 //                    // ----- was previously found to not be a Content Manager
 //                    //
 //                }
-//                else if (coreCommonModule.IsInDelimitedString(contentAccessRights_List, Convert.ToString(ContentID), ","))
+//                else if (genericController.IsInDelimitedString(contentAccessRights_List, Convert.ToString(ContentID), ","))
 //                {
 //                    //
 //                    // ----- was previously found to be a Content Manager
 //                    //
 //                    returnAllowEdit = true;
-//                    returnAllowAdd = coreCommonModule.IsInDelimitedString(contentAccessRights_AllowAddList, Convert.ToString(ContentID), ",");
-//                    returnAllowDelete = coreCommonModule.IsInDelimitedString(contentAccessRights_AllowDeleteList, Convert.ToString(ContentID), ",");
+//                    returnAllowAdd = genericController.IsInDelimitedString(contentAccessRights_AllowAddList, Convert.ToString(ContentID), ",");
+//                    returnAllowDelete = genericController.IsInDelimitedString(contentAccessRights_AllowDeleteList, Convert.ToString(ContentID), ",");
 //                }
 //                else {
 //                    //

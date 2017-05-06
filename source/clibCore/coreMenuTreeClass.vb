@@ -1,6 +1,9 @@
 ﻿
 Option Explicit On
 Option Strict On
+
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 '
 Namespace Contensive.Core
     Public Class coreMenuTreeClass
@@ -113,8 +116,8 @@ Namespace Contensive.Core
             Dim UcaseEntryName As String
             Dim iNewWindow As Boolean
             '
-            iEntryName = vbReplace(encodeEmptyText(EntryName, ""), ",", " ")
-            UcaseEntryName = vbUCase(iEntryName)
+            iEntryName = genericController.vbReplace(encodeEmptyText(EntryName, ""), ",", " ")
+            UcaseEntryName = genericController.vbUCase(iEntryName)
             '
             If (iEntryName <> "") And (InStr(1, UsedEntries & ",", "," & UcaseEntryName & ",", vbBinaryCompare) = 0) Then
                 UsedEntries = UsedEntries & "," & UcaseEntryName
@@ -138,7 +141,7 @@ Namespace Contensive.Core
                         .Caption = encodeEmptyText(Caption, "")
                     End If
                     .Name = UcaseEntryName
-                    .ParentName = vbUCase(encodeEmptyText(ParentiEntryName, ""))
+                    .ParentName = genericController.vbUCase(encodeEmptyText(ParentiEntryName, ""))
                     .ImageOver = encodeEmptyText(ImageOverLink, "")
                     .ImageOpen = encodeEmptyText(ImageOpenLink, "")
                     .NewWindow = NewWindow
@@ -288,7 +291,7 @@ ErrorTrap:
             ' ----- Get the menu pointer
             '
             If iEntryCount > 0 Then
-                UcaseMenuName = vbUCase(MenuName)
+                UcaseMenuName = genericController.vbUCase(MenuName)
                 EntryPointer = EntryIndexName.getPtr(UcaseMenuName)
                 GetMenuTreeList = GetMenuTreeListBranch2(EntryPointer, "", OpenNodesList)
                 Exit Function
@@ -317,7 +320,7 @@ ErrorTrap:
                     '
                     ' Output this node
                     '
-                    If vbInstr(1, "," & CStr(NodePointer) & ",", "," & UsedEntriesList & ",") = 0 Then
+                    If genericController.vbInstr(1, "," & CStr(NodePointer) & ",", "," & UsedEntriesList & ",") = 0 Then
                         result = result & "<ul Style=""list-style-type: none; margin-left: 20px"">"
                         '
                         ' The Node has not already been used in this branch
@@ -328,7 +331,7 @@ ErrorTrap:
                             Caption = "<A TARGET=""_blank"" HREF=""" & Link & """>" & Caption & "</A>"
                         End If
                         '
-                        If vbInstr(1, "," & OpenNodesList & ",", "," & CStr(NodePointer) & ",") = 0 Then
+                        If genericController.vbInstr(1, "," & OpenNodesList & ",", "," & CStr(NodePointer) & ",") = 0 Then
                             '
                             ' The branch is closed
                             '
@@ -350,7 +353,7 @@ ErrorTrap:
                             '
                             ' Now output any child branches of this node
                             '
-                            UcaseNodeName = vbUCase(iEntry(NodePointer).Name)
+                            UcaseNodeName = genericController.vbUCase(iEntry(NodePointer).Name)
                             For EntryPointer = 0 To iEntryCount - 1
                                 If (iEntry(EntryPointer).ParentName = UcaseNodeName) Then
                                     result = result & GetMenuTreeListBranch2(EntryPointer, UsedEntriesList & "," & NodePointer, OpenNodesList)
@@ -387,7 +390,7 @@ ErrorTrap:
         '            ' ----- Get the menu pointer
         '            '
         '            If iEntryCount > 0 Then
-        '                UcaseMenuName = vbUCase(MenuName)
+        '                UcaseMenuName = genericController.vbUCase(MenuName)
         '                If StyleSheetPrefix = "" Then
         '                    StyleSheetPrefix = "ccTree"
         '                End If
@@ -438,10 +441,10 @@ ErrorTrap:
         '                        & GetTree
         '                    GetTree = GetTree & "<script type=""text/javascript"">convertTrees();"
         '                    If OpenMenuName <> "" Then
-        '                        JSString = vbUCase(OpenMenuName)
-        '                        JSString = vbReplace(JSString, "\", "\\")
-        '                        JSString = vbReplace(JSString, vbCrLf, "\n")
-        '                        JSString = vbReplace(JSString, "'", "\'")
+        '                        JSString = genericController.vbUCase(OpenMenuName)
+        '                        JSString = genericController.vbReplace(JSString, "\", "\\")
+        '                        JSString = genericController.vbReplace(JSString, vbCrLf, "\n")
+        '                        JSString = genericController.vbReplace(JSString, "'", "\'")
         '                        'Call cmc.main_AddOnLoadJavascript("expandToItem('tree" & iTreeCount & "','" & JSString & "');")
         '                        GetTree = GetTree & "expandToItem('tree" & iTreeCount & "','" & JSString & "');"
         '                    End If

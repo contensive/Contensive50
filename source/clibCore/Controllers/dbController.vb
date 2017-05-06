@@ -10,24 +10,13 @@ Namespace Contensive.Core.Controllers
         Implements IDisposable
         '
         ' refactor -- replace all err.raise and handleLegacy... errors with throw new exception
-        '
-        '
-        '------------------------------------------------------------------------------------------------------------------------
-        ' objects created locally and must be disposed on exit
-        '------------------------------------------------------------------------------------------------------------------------
-        '
-        Private _addonInstall As addonInstallClass
+
         '
         '------------------------------------------------------------------------------------------------------------------------
         ' objects passed in that are not disposed
         '------------------------------------------------------------------------------------------------------------------------
         '
         Private cpCore As coreClass
-        '
-        '------------------------------------------------------------------------------------------------------------------------
-        ' objects created within class to dispose in dispose
-        '------------------------------------------------------------------------------------------------------------------------
-        '
         '
         '------------------------------------------------------------------------------------------------------------------------
         ' internal storage
@@ -530,7 +519,7 @@ Namespace Contensive.Core.Controllers
             Try
                 Using dt As DataTable = insertTableRecordGetDataTable(DataSourceName, TableName, MemberID)
                     If dt.Rows.Count > 0 Then
-                        returnId = EncodeInteger(dt.Rows(0).Item("id"))
+                        returnId = genericController.EncodeInteger(dt.Rows(0).Item("id"))
                     End If
                 End Using
             Catch ex As Exception
@@ -554,7 +543,7 @@ Namespace Contensive.Core.Controllers
                 Dim CreateKeyString As String
                 Dim DateAddedString As String
                 '
-                CreateKeyString = encodeSQLNumber(getRandomLong)
+                CreateKeyString = encodeSQLNumber(genericController.getRandomLong)
                 DateAddedString = encodeSQLDate(Now)
                 '
                 sqlList.add("createkey", CreateKeyString)
@@ -639,7 +628,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="TransactionTickCount"></param>
         ''' <param name="SQL"></param>
         Private Sub saveSlowQueryLog(ByVal TransactionTickCount As Integer, ByVal SQL As String)
-            cpCore.appendLogWithLegacyRow(cpCore.serverConfig.appConfig.name, "query time  " & GetIntegerString(TransactionTickCount, 7) & "ms: " & SQL, "dll", "cpCoreClass", "csv_ExecuteSQL", 0, "", SQL, False, True, "", "Performance", "SlowSQL")
+            cpCore.appendLogWithLegacyRow(cpCore.serverConfig.appConfig.name, "query time  " & genericController.GetIntegerString(TransactionTickCount, 7) & "ms: " & SQL, "dll", "cpCoreClass", "csv_ExecuteSQL", 0, "", SQL, False, True, "", "Performance", "SlowSQL")
         End Sub
         '
         '====================================================================================================
@@ -664,7 +653,7 @@ Namespace Contensive.Core.Controllers
         Private Function getSQLWherePosition(ByVal SQL As String) As Integer
             Dim returnPos As Integer = 0
             Try
-                If isInStr(1, SQL, "WHERE", vbTextCompare) Then
+                If genericController.isInStr(1, SQL, "WHERE", vbTextCompare) Then
                     '
                     ' ----- contains the word "WHERE", now weed out if not a where clause
                     '
@@ -745,7 +734,7 @@ Namespace Contensive.Core.Controllers
                     ' tablename required
                     '
                     Throw New ArgumentException("Tablename can not be blank.")
-                ElseIf vbInstr(1, TableName, ".") <> 0 Then
+                ElseIf genericController.vbInstr(1, TableName, ".") <> 0 Then
                     '
                     ' Remote table -- remote system controls remote tables
                     '
@@ -830,7 +819,7 @@ Namespace Contensive.Core.Controllers
                     ' Bad fieldtype
                     '
                     Throw New ArgumentException("invalid fieldtype [" & fieldType & "]")
-                ElseIf vbInstr(1, TableName, ".") <> 0 Then
+                ElseIf genericController.vbInstr(1, TableName, ".") <> 0 Then
                     '
                     ' External table
                     '
@@ -843,7 +832,7 @@ Namespace Contensive.Core.Controllers
                 Else
                     If Not isSQLTableField(DataSourceName, TableName, FieldName) Then
                         Dim SQL As String = "ALTER TABLE " & TableName & " ADD " & FieldName & " "
-                        If Not vbIsNumeric(fieldType) Then
+                        If Not genericController.vbIsNumeric(fieldType) Then
                             '
                             ' ----- support old calls
                             '
@@ -979,7 +968,7 @@ Namespace Contensive.Core.Controllers
             Try
                 Dim CS As Integer = cs_open(ContentName, "name=" & encodeSQLText(RecordName), "ID", , , , , "ID")
                 If cs_ok(CS) Then
-                    returnValue = EncodeInteger(cs_get(CS, "ID"))
+                    returnValue = genericController.EncodeInteger(cs_get(CS, "ID"))
                     If returnValue = 0 Then
                         Throw New ApplicationException("getRecordId, contentname [" & ContentName & "], recordName [" & RecordName & "]), a record was found but id returned 0")
                     End If
@@ -1107,7 +1096,7 @@ Namespace Contensive.Core.Controllers
             Dim returnOk As Boolean = False
             Try
                 Dim dt As DataTable = executeSql("Select top 1 id from ccFields where name=" & encodeSQLText(FieldName) & " And contentid=" & ContentID)
-                isCdefField = isDataTableOk(dt)
+                isCdefField = genericController.isDataTableOk(dt)
                 dt.Dispose()
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -1175,7 +1164,7 @@ Namespace Contensive.Core.Controllers
         Public Function getFieldTypeIdFromFieldTypeName(ByVal FieldTypeName As String) As Integer
             Dim returnTypeId As Integer = 0
             Try
-                Select Case vbLCase(FieldTypeName)
+                Select Case genericController.vbLCase(FieldTypeName)
                     Case FieldTypeNameLcaseBoolean
                         returnTypeId = FieldTypeIdBoolean
                     Case FieldTypeNameLcaseCurrency
@@ -1287,12 +1276,12 @@ Namespace Contensive.Core.Controllers
                         '
                         'hint = hint & ", 100"
                         iActiveOnly = ((ActiveOnly))
-                        iSortFieldList = encodeEmptyText(SortFieldList, CDef.DefaultSortMethod)
+                        iSortFieldList = genericController.encodeEmptyText(SortFieldList, CDef.DefaultSortMethod)
                         iWorkflowRenderingMode = cpCore.siteProperties.allowWorkflowAuthoring And CDef.AllowWorkflowAuthoring And (WorkflowRenderingMode)
                         AllowWorkflowSave = iWorkflowRenderingMode And (WorkflowEditingMode)
                         iMemberID = MemberID
-                        iCriteria = encodeEmptyText(Criteria, "")
-                        iSelectFieldList = encodeEmptyText(SelectFieldList, CDef.SelectCommaList)
+                        iCriteria = genericController.encodeEmptyText(Criteria, "")
+                        iSelectFieldList = genericController.encodeEmptyText(SelectFieldList, CDef.SelectCommaList)
                         If AllowWorkflowSave Then
                             AllowWorkflowSave = AllowWorkflowSave
                         End If
@@ -1304,8 +1293,8 @@ Namespace Contensive.Core.Controllers
                             Cnt = UBound(SortFields) + 1
                             For Ptr = 0 To Cnt - 1
                                 SortField = SortFields(Ptr).ToLower
-                                SortField = vbReplace(SortField, "asc", "", 1, 99, vbTextCompare)
-                                SortField = vbReplace(SortField, "desc", "", 1, 99, vbTextCompare)
+                                SortField = genericController.vbReplace(SortField, "asc", "", 1, 99, vbTextCompare)
+                                SortField = genericController.vbReplace(SortField, "desc", "", 1, 99, vbTextCompare)
                                 SortField = Trim(SortField)
                                 If Not CDef.selectList.Contains(SortField) Then
                                     'throw (New ApplicationException(""))
@@ -1324,7 +1313,7 @@ Namespace Contensive.Core.Controllers
                             ' remove tablename from contentcontrolcriteria - if in workflow mode, and authoringtable is different, this would be wrong
                             ' also makes sql smaller, and is not necessary
                             '
-                            ContentCriteria = vbReplace(ContentCriteria, CDef.ContentTableName & ".", "")
+                            ContentCriteria = genericController.vbReplace(ContentCriteria, CDef.ContentTableName & ".", "")
                         End If
                         If iCriteria <> "" Then
                             ContentCriteria = ContentCriteria & "And(" & iCriteria & ")"
@@ -1339,25 +1328,25 @@ Namespace Contensive.Core.Controllers
                         '
                         ' ----- Process Select Fields, make sure ContentControlID,ID,Name,Active are included
                         '
-                        iSelectFieldList = vbReplace(iSelectFieldList, vbTab, " ")
-                        Do While vbInstr(1, iSelectFieldList, " ,") <> 0
-                            iSelectFieldList = vbReplace(iSelectFieldList, " ,", ",")
+                        iSelectFieldList = genericController.vbReplace(iSelectFieldList, vbTab, " ")
+                        Do While genericController.vbInstr(1, iSelectFieldList, " ,") <> 0
+                            iSelectFieldList = genericController.vbReplace(iSelectFieldList, " ,", ",")
                         Loop
-                        Do While vbInstr(1, iSelectFieldList, ", ") <> 0
-                            iSelectFieldList = vbReplace(iSelectFieldList, ", ", ",")
+                        Do While genericController.vbInstr(1, iSelectFieldList, ", ") <> 0
+                            iSelectFieldList = genericController.vbReplace(iSelectFieldList, ", ", ",")
                         Loop
                         If (iSelectFieldList <> "") And (InStr(1, iSelectFieldList, "*", vbTextCompare) = 0) Then
-                            TestUcaseFieldList = vbUCase("," & iSelectFieldList & ",")
-                            If vbInstr(1, TestUcaseFieldList, ",CONTENTCONTROLID,", vbTextCompare) = 0 Then
+                            TestUcaseFieldList = genericController.vbUCase("," & iSelectFieldList & ",")
+                            If genericController.vbInstr(1, TestUcaseFieldList, ",CONTENTCONTROLID,", vbTextCompare) = 0 Then
                                 iSelectFieldList = iSelectFieldList & ",ContentControlID"
                             End If
-                            If vbInstr(1, TestUcaseFieldList, ",NAME,", vbTextCompare) = 0 Then
+                            If genericController.vbInstr(1, TestUcaseFieldList, ",NAME,", vbTextCompare) = 0 Then
                                 iSelectFieldList = iSelectFieldList & ",Name"
                             End If
-                            If vbInstr(1, TestUcaseFieldList, ",ID,", vbTextCompare) = 0 Then
+                            If genericController.vbInstr(1, TestUcaseFieldList, ",ID,", vbTextCompare) = 0 Then
                                 iSelectFieldList = iSelectFieldList & ",ID"
                             End If
-                            If vbInstr(1, TestUcaseFieldList, ",ACTIVE,", vbTextCompare) = 0 Then
+                            If genericController.vbInstr(1, TestUcaseFieldList, ",ACTIVE,", vbTextCompare) = 0 Then
                                 iSelectFieldList = iSelectFieldList & ",ACTIVE"
                             End If
                         End If
@@ -1397,19 +1386,19 @@ Namespace Contensive.Core.Controllers
                             '
                             'hint = hint & ",300"
                             TableName = CDef.AuthoringTableName
-                            'UcaseTablename = vbUCase(TableName)
+                            'UcaseTablename = genericController.vbUCase(TableName)
                             DataSourceName = CDef.AuthoringDataSourceName
                             '
                             ' Substitute ID for EditSourceID in criteria
                             '
-                            ContentCriteria = vbReplace(ContentCriteria, " ID=", " " & TableName & ".EditSourceID=")
-                            ContentCriteria = vbReplace(ContentCriteria, " ID>", " " & TableName & ".EditSourceID>")
-                            ContentCriteria = vbReplace(ContentCriteria, " ID<", " " & TableName & ".EditSourceID<")
-                            ContentCriteria = vbReplace(ContentCriteria, " ID ", " " & TableName & ".EditSourceID ")
-                            ContentCriteria = vbReplace(ContentCriteria, "(ID=", "(" & TableName & ".EditSourceID=")
-                            ContentCriteria = vbReplace(ContentCriteria, "(ID>", "(" & TableName & ".EditSourceID>")
-                            ContentCriteria = vbReplace(ContentCriteria, "(ID<", "(" & TableName & ".EditSourceID<")
-                            ContentCriteria = vbReplace(ContentCriteria, "(ID ", "(" & TableName & ".EditSourceID ")
+                            ContentCriteria = genericController.vbReplace(ContentCriteria, " ID=", " " & TableName & ".EditSourceID=")
+                            ContentCriteria = genericController.vbReplace(ContentCriteria, " ID>", " " & TableName & ".EditSourceID>")
+                            ContentCriteria = genericController.vbReplace(ContentCriteria, " ID<", " " & TableName & ".EditSourceID<")
+                            ContentCriteria = genericController.vbReplace(ContentCriteria, " ID ", " " & TableName & ".EditSourceID ")
+                            ContentCriteria = genericController.vbReplace(ContentCriteria, "(ID=", "(" & TableName & ".EditSourceID=")
+                            ContentCriteria = genericController.vbReplace(ContentCriteria, "(ID>", "(" & TableName & ".EditSourceID>")
+                            ContentCriteria = genericController.vbReplace(ContentCriteria, "(ID<", "(" & TableName & ".EditSourceID<")
+                            ContentCriteria = genericController.vbReplace(ContentCriteria, "(ID ", "(" & TableName & ".EditSourceID ")
                             '
                             ' Require non-null editsourceid and editarchive false
                             ' include tablename so fields are used, not aliases created for phantomID
@@ -1427,8 +1416,8 @@ Namespace Contensive.Core.Controllers
                             '
                             If iSortFieldList <> "" Then
                                 iSortFieldList = "," & iSortFieldList & ","
-                                iSortFieldList = vbReplace(iSortFieldList, ",ID,", "," & TableName & ".EditSourceID,")
-                                iSortFieldList = vbReplace(iSortFieldList, ",ID ", "," & TableName & ".EditSourceID ")
+                                iSortFieldList = genericController.vbReplace(iSortFieldList, ",ID,", "," & TableName & ".EditSourceID,")
+                                iSortFieldList = genericController.vbReplace(iSortFieldList, ",ID ", "," & TableName & ".EditSourceID ")
                                 iSortFieldList = Mid(iSortFieldList, 2, Len(iSortFieldList) - 2)
                             End If
                             '
@@ -1442,7 +1431,7 @@ Namespace Contensive.Core.Controllers
                                 ' this was done in the csv_cs_getField, but then a csv_cs_getrows call would return incorrect
                                 ' values because there is no translation
                                 '
-                                If vbInstr(1, iSelectFieldList, ",ID,", vbTextCompare) = 0 Then
+                                If genericController.vbInstr(1, iSelectFieldList, ",ID,", vbTextCompare) = 0 Then
                                     '
                                     ' Add ID select if not there
                                     '
@@ -1451,26 +1440,26 @@ Namespace Contensive.Core.Controllers
                                     '
                                     ' remove ID, and add ID alias to return EditSourceID (the live records id)
                                     '
-                                    iSelectFieldList = vbReplace(iSelectFieldList, ",ID,", "," & TableName & ".EditSourceID As ID,")
+                                    iSelectFieldList = genericController.vbReplace(iSelectFieldList, ",ID,", "," & TableName & ".EditSourceID As ID,")
                                 End If
                                 '
                                 ' Add the edit fields to the select
                                 '
                                 Copy2 = TableName & ".EDITSOURCEID,"
                                 If (InStr(1, iSelectFieldList, ",EDITSOURCEID,", vbTextCompare) <> 0) Then
-                                    iSelectFieldList = vbReplace(iSelectFieldList, ",EDITSOURCEID,", "," & Copy2, 1, 99, vbTextCompare)
+                                    iSelectFieldList = genericController.vbReplace(iSelectFieldList, ",EDITSOURCEID,", "," & Copy2, 1, 99, vbTextCompare)
                                 Else
                                     iSelectFieldList = iSelectFieldList & Copy2
                                 End If
                                 Copy2 = TableName & ".EDITARCHIVE,"
                                 If (InStr(1, iSelectFieldList, ",EDITARCHIVE,", vbTextCompare) <> 0) Then
-                                    iSelectFieldList = vbReplace(iSelectFieldList, ",EDITARCHIVE,", "," & Copy2, 1, 99, vbTextCompare)
+                                    iSelectFieldList = genericController.vbReplace(iSelectFieldList, ",EDITARCHIVE,", "," & Copy2, 1, 99, vbTextCompare)
                                 Else
                                     iSelectFieldList = iSelectFieldList & Copy2
                                 End If
                                 Copy2 = TableName & ".EDITBLANK,"
                                 If (InStr(1, iSelectFieldList, ",EDITBLANK,", vbTextCompare) <> 0) Then
-                                    iSelectFieldList = vbReplace(iSelectFieldList, ",EDITBLANK,", "," & Copy2, 1, 99, vbTextCompare)
+                                    iSelectFieldList = genericController.vbReplace(iSelectFieldList, ",EDITBLANK,", "," & Copy2, 1, 99, vbTextCompare)
                                 Else
                                     iSelectFieldList = iSelectFieldList & Copy2
                                 End If
@@ -1888,7 +1877,7 @@ Namespace Contensive.Core.Controllers
                 Dim fieldNameTrim As String
                 '
                 fieldNameTrim = FieldName.Trim()
-                fieldNameTrimUpper = vbUCase(fieldNameTrim)
+                fieldNameTrimUpper = genericController.vbUCase(fieldNameTrim)
                 If Not cs_ok(CSPointer) Then
                     Throw New ApplicationException("Attempt To getField fieldname[" & FieldName & "], but the dataset Is empty Or does Not point To a valid row")
                 Else
@@ -1927,7 +1916,7 @@ Namespace Contensive.Core.Controllers
                                 If Not .dt.Columns.Contains(FieldName.ToLower) Then
                                     Throw New ApplicationException("Field [" & fieldNameTrim & "] was Not found In csv_ContentSet from source [" & .Source & "]")
                                 Else
-                                    returnValue = EncodeText(.dt.Rows(.readCacheRowPtr).Item(FieldName.ToLower))
+                                    returnValue = genericController.encodeText(.dt.Rows(.readCacheRowPtr).Item(FieldName.ToLower))
                                 End If
                             Else
                                 '
@@ -1939,7 +1928,7 @@ Namespace Contensive.Core.Controllers
                                             returnValue = .readCache(ColumnPointer, 0)
                                             If .Updateable And (.ContentName <> "") And (FieldName <> "") Then
                                                 If .CDef.fields(FieldName.ToLower()).Scramble Then
-                                                    returnValue = cpCore.metaData.TextDeScramble(EncodeText(returnValue))
+                                                    returnValue = cpCore.metaData.TextDeScramble(genericController.encodeText(returnValue))
                                                 End If
                                             End If
                                             Exit For
@@ -2116,7 +2105,7 @@ Namespace Contensive.Core.Controllers
                     Throw New ArgumentException("dataset is not valid")
                 Else
                     Dim CSSelectFieldList As String = cs_getSelectFieldList(CSPointer)
-                    returnResult = IsInDelimitedString(CSSelectFieldList, FieldName, ",")
+                    returnResult = genericController.IsInDelimitedString(CSSelectFieldList, FieldName, ",")
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -2152,7 +2141,7 @@ Namespace Contensive.Core.Controllers
                 ElseIf FieldName = "" Then
                     Throw New ArgumentException("Fieldname Is blank")
                 Else
-                    fieldNameUpper = vbUCase(Trim(FieldName))
+                    fieldNameUpper = genericController.vbUCase(Trim(FieldName))
                     returnFilename = cs_getField(CSPointer, fieldNameUpper)
                     If returnFilename <> "" Then
                         '
@@ -2185,7 +2174,7 @@ Namespace Contensive.Core.Controllers
                             '
                             If .ResultColumnCount > 0 Then
                                 For FieldPointer = 0 To .ResultColumnCount - 1
-                                    If vbUCase(.fieldNames(FieldPointer)) = "ID" Then
+                                    If genericController.vbUCase(.fieldNames(FieldPointer)) = "ID" Then
                                         RecordID = cs_getInteger(CSPointer, "ID")
                                         Exit For
                                     End If
@@ -2227,7 +2216,7 @@ Namespace Contensive.Core.Controllers
                             Else
                                 fieldTypeId = .CDef.fields(FieldName.ToLower()).fieldTypeId
                             End If
-                            returnFilename = csv_GetVirtualFilenameByTable(TableName, FieldName, RecordID, OriginalFilename, fieldTypeId)
+                            returnFilename = genericController.csv_GetVirtualFilenameByTable(TableName, FieldName, RecordID, OriginalFilename, fieldTypeId)
                             Call cs_setField(CSPointer, fieldNameUpper, returnFilename)
                         End With
                     End If
@@ -2241,34 +2230,34 @@ Namespace Contensive.Core.Controllers
         '   csv_cs_getText
         '
         Public Function cs_getText(ByVal CSPointer As Integer, ByVal FieldName As String) As String
-            cs_getText = EncodeText(cs_getField(CSPointer, FieldName))
+            cs_getText = genericController.encodeText(cs_getField(CSPointer, FieldName))
         End Function
         '
-        '   encodeInteger( csv_cs_getField )
+        '   genericController.EncodeInteger( csv_cs_getField )
         '
         Public Function cs_getInteger(ByVal CSPointer As Integer, ByVal FieldName As String) As Integer
-            cs_getInteger = EncodeInteger(cs_getField(CSPointer, FieldName))
+            cs_getInteger = genericController.EncodeInteger(cs_getField(CSPointer, FieldName))
         End Function
         '
         '   encodeNumber( csv_cs_getField )
         '
         Public Function cs_getNumber(ByVal CSPointer As Integer, ByVal FieldName As String) As Double
-            cs_getNumber = EncodeNumber(cs_getField(CSPointer, FieldName))
+            cs_getNumber = genericController.EncodeNumber(cs_getField(CSPointer, FieldName))
         End Function
         '
-        '   encodeDate( csv_cs_getField )
+        '    genericController.EncodeDate( csv_cs_getField )
         '
         Public Function cs_getDate(ByVal CSPointer As Integer, ByVal FieldName As String) As Date
-            cs_getDate = EncodeDate(cs_getField(CSPointer, FieldName))
+            cs_getDate =  genericController.EncodeDate(cs_getField(CSPointer, FieldName))
         End Function
         '
-        '   encodeBoolean( csv_cs_getField )
+        '   genericController.EncodeBoolean( csv_cs_getField )
         '
         Public Function cs_getBoolean(ByVal CSPointer As Integer, ByVal FieldName As String) As Boolean
-            cs_getBoolean = EncodeBoolean(cs_getField(CSPointer, FieldName))
+            cs_getBoolean = genericController.EncodeBoolean(cs_getField(CSPointer, FieldName))
         End Function
         '
-        '   encodeBoolean( csv_cs_getField )
+        '   genericController.EncodeBoolean( csv_cs_getField )
         '
         Public Function cs_getLookup(ByVal CSPointer As Integer, ByVal FieldName As String) As String
             cs_getLookup = cs_get(CSPointer, FieldName)
@@ -2377,7 +2366,7 @@ Namespace Contensive.Core.Controllers
                             Throw New ApplicationException("Attempting To update an unupdateable Content Set")
                         Else
                             FieldNameLocal = Trim(FieldName)
-                            FieldNameLocalUcase = vbUCase(FieldNameLocal)
+                            FieldNameLocalUcase = genericController.vbUCase(FieldNameLocal)
                             With .CDef
                                 If String.IsNullOrEmpty(.Name) Then
                                     Throw New ApplicationException("Dataset must specify the content to update and cannot be created from a query.")
@@ -2401,14 +2390,14 @@ Namespace Contensive.Core.Controllers
                                         Case FieldTypeIdBoolean
                                             '
                                             ' Boolean - sepcial case, block on typed GetAlways set
-                                            If EncodeBoolean(FieldValue) <> cs_getBoolean(CSPointer, FieldName) Then
+                                            If genericController.EncodeBoolean(FieldValue) <> cs_getBoolean(CSPointer, FieldName) Then
                                                 SetNeeded = True
                                             End If
                                         Case Else
                                             '
                                             ' Set if text of value changes
                                             '
-                                            If EncodeText(FieldValue) <> cs_getText(CSPointer, FieldName) Then
+                                            If genericController.encodeText(FieldValue) <> cs_getText(CSPointer, FieldName) Then
                                                 SetNeeded = True
                                             End If
                                     End Select
@@ -2423,13 +2412,13 @@ Namespace Contensive.Core.Controllers
                                     '
                                     If FieldNameLocalUcase = "ID" Then
                                         FieldNameLocal = "EditSourceID"
-                                        FieldNameLocalUcase = vbUCase(FieldNameLocal)
+                                        FieldNameLocalUcase = genericController.vbUCase(FieldNameLocal)
                                     End If
                                 End If
                                 If .writeCache.ContainsKey(FieldName.ToLower) Then
-                                    .writeCache.Item(FieldName.ToLower) = EncodeText(FieldValue)
+                                    .writeCache.Item(FieldName.ToLower) = genericController.encodeText(FieldValue)
                                 Else
-                                    .writeCache.Add(FieldName.ToLower, EncodeText(FieldValue))
+                                    .writeCache.Add(FieldName.ToLower, genericController.encodeText(FieldValue))
                                 End If
                                 .LastUsed = DateTime.Now
                             End If
@@ -2638,7 +2627,7 @@ Namespace Contensive.Core.Controllers
                                     With field
                                         FieldName = .nameLc
                                         If (FieldName <> "") And (Not String.IsNullOrEmpty(.defaultValue)) Then
-                                            Select Case vbUCase(FieldName)
+                                            Select Case genericController.vbUCase(FieldName)
                                                 Case "CREATEKEY", "DATEADDED", "CREATEDBY", "CONTENTCONTROLID", "EDITSOURCEID", "EDITARCHIVE", "EDITBLANK", "ID"
                                                     '
                                                     ' Block control fields
@@ -2657,20 +2646,20 @@ Namespace Contensive.Core.Controllers
                                                             ' ignore these fields, they have no associated DB field
                                                             '
                                                         Case FieldTypeIdBoolean
-                                                            sqlList.add(FieldName, encodeSQLBoolean(EncodeBoolean(.defaultValue)))
+                                                            sqlList.add(FieldName, encodeSQLBoolean(genericController.EncodeBoolean(.defaultValue)))
                                                         Case FieldTypeIdCurrency, FieldTypeIdFloat
-                                                            sqlList.add(FieldName, encodeSQLNumber(EncodeNumber(.defaultValue)))
+                                                            sqlList.add(FieldName, encodeSQLNumber(genericController.EncodeNumber(.defaultValue)))
                                                         Case FieldTypeIdInteger, FieldTypeIdMemberSelect
-                                                            sqlList.add(FieldName, encodeSQLNumber(EncodeInteger(.defaultValue)))
+                                                            sqlList.add(FieldName, encodeSQLNumber(genericController.EncodeInteger(.defaultValue)))
                                                         Case FieldTypeIdDate
-                                                            sqlList.add(FieldName, encodeSQLDate(EncodeDate(.defaultValue)))
+                                                            sqlList.add(FieldName, encodeSQLDate( genericController.EncodeDate(.defaultValue)))
                                                         Case FieldTypeIdLookup
                                                             '
                                                             ' refactor --
                                                             ' This is a problem - the defaults should come in as the ID values, not the names
                                                             '   so a select can be added to the default configuration page
                                                             '
-                                                            DefaultValueText = EncodeText(.defaultValue)
+                                                            DefaultValueText = genericController.encodeText(.defaultValue)
                                                             If DefaultValueText = "" Then
                                                                 DefaultValueText = "null"
                                                             Else
@@ -2680,10 +2669,10 @@ Namespace Contensive.Core.Controllers
                                                                         DefaultValueText = getRecordID(LookupContentName, DefaultValueText).ToString()
                                                                     End If
                                                                 ElseIf .lookupList <> "" Then
-                                                                    UCaseDefaultValueText = vbUCase(DefaultValueText)
+                                                                    UCaseDefaultValueText = genericController.vbUCase(DefaultValueText)
                                                                     lookups = Split(.lookupList, ",")
                                                                     For Ptr = 0 To UBound(lookups)
-                                                                        If UCaseDefaultValueText = vbUCase(lookups(Ptr)) Then
+                                                                        If UCaseDefaultValueText = genericController.vbUCase(lookups(Ptr)) Then
                                                                             DefaultValueText = (Ptr + 1).ToString()
                                                                         End If
                                                                     Next
@@ -2712,7 +2701,7 @@ Namespace Contensive.Core.Controllers
                                 Call sqlList.add("EDITBLANK", SQLFalse) ' ArrayPointer)
                             End If
                             '
-                            CreateKeyString = encodeSQLNumber(getRandomLong)
+                            CreateKeyString = encodeSQLNumber(genericController.getRandomLong)
                             DateAddedString = encodeSQLDate(Now)
                             '
                             Call sqlList.add("CREATEKEY", CreateKeyString) ' ArrayPointer)
@@ -2814,7 +2803,7 @@ Namespace Contensive.Core.Controllers
                     DestRecordID = cs_getInteger(CSDestination, "ID")
                     FieldName = cs_getFirstFieldName(CSSource)
                     Do While (Not String.IsNullOrEmpty(FieldName))
-                        Select Case vbUCase(FieldName)
+                        Select Case genericController.vbUCase(FieldName)
                             Case "ID", "EDITSOURCEID", "EDITARCHIVE"
                             Case Else
                                 '
@@ -2919,7 +2908,7 @@ Namespace Contensive.Core.Controllers
                             ' Not updateable -- Just return what is there as a string
                             '
                             Try
-                                fieldValue = EncodeText(cs_getField(CSPointer, FieldName))
+                                fieldValue = genericController.encodeText(cs_getField(CSPointer, FieldName))
                             Catch ex As Exception
                                 Throw New ApplicationException("Error [" & ex.Message & "] reading field [" & FieldName.ToLower & "] In source [" & .Source & "")
                             End Try
@@ -2931,7 +2920,7 @@ Namespace Contensive.Core.Controllers
                             Dim field As coreMetaDataClass.CDefFieldClass
                             If Not .CDef.fields.ContainsKey(FieldName.ToLower()) Then
                                 Try
-                                    fieldValue = EncodeText(cs_getField(CSPointer, FieldName))
+                                    fieldValue = genericController.encodeText(cs_getField(CSPointer, FieldName))
                                 Catch ex As Exception
                                     Throw New ApplicationException("Error [" & ex.Message & "] reading field [" & FieldName.ToLower & "] In content [" & .CDef.Name & "] With custom field list [" & .SelectTableFieldList & "")
                                 End Try
@@ -2948,13 +2937,13 @@ Namespace Contensive.Core.Controllers
                                     Dim SQL As String
                                     Dim rs As DataTable
                                     If .CDef.fields.ContainsKey("id") Then
-                                        RecordID = EncodeInteger(cs_getField(CSPointer, "id"))
+                                        RecordID = genericController.EncodeInteger(cs_getField(CSPointer, "id"))
                                         With field
                                             ContentName = cpCore.metaData.getContentNameByID(.manyToManyRuleContentID)
                                             DbTable = cpCore.metaData.getContentTablename(ContentName)
                                             SQL = "Select " & .ManyToManyRuleSecondaryField & " from " & DbTable & " where " & .ManyToManyRulePrimaryField & "=" & RecordID
                                             rs = executeSql(SQL)
-                                            If (isDataTableOk(rs)) Then
+                                            If (genericController.isDataTableOk(rs)) Then
                                                 For Each dr As DataRow In rs.Rows
                                                     fieldValue &= "," & dr.Item(0).ToString
                                                 Next
@@ -2969,7 +2958,7 @@ Namespace Contensive.Core.Controllers
                                     fieldTypeId = fieldTypeId
                                 Else
                                     FieldValueVariant = cs_getField(CSPointer, FieldName)
-                                    If Not IsNull(FieldValueVariant) Then
+                                    If Not genericController.IsNull(FieldValueVariant) Then
                                         '
                                         ' Field is good
                                         '
@@ -2978,7 +2967,7 @@ Namespace Contensive.Core.Controllers
                                                 '
                                                 '
                                                 '
-                                                If EncodeBoolean(FieldValueVariant) Then
+                                                If genericController.EncodeBoolean(FieldValueVariant) Then
                                                     fieldValue = "Yes"
                                                 Else
                                                     fieldValue = "No"
@@ -2992,13 +2981,13 @@ Namespace Contensive.Core.Controllers
                                                     '
                                                     ' formatdatetime returns 'wednesday june 5, 1990', which fails IsDate()!!
                                                     '
-                                                    fieldValue = EncodeDate(FieldValueVariant).ToString()
+                                                    fieldValue = genericController.EncodeDate(FieldValueVariant).ToString()
                                                 End If
                                             Case FieldTypeIdLookup
                                                 '
                                                 '
                                                 '
-                                                If vbIsNumeric(FieldValueVariant) Then
+                                                If genericController.vbIsNumeric(FieldValueVariant) Then
                                                     fieldLookupId = field.lookupContentID
                                                     LookupContentName = cpCore.metaData.getContentNameByID(fieldLookupId)
                                                     LookupList = field.lookupList
@@ -3006,7 +2995,7 @@ Namespace Contensive.Core.Controllers
                                                         '
                                                         ' First try Lookup Content
                                                         '
-                                                        CSLookup = cs_open(LookupContentName, "ID=" & encodeSQLNumber(EncodeInteger(FieldValueVariant)), , , , , , "name", 1)
+                                                        CSLookup = cs_open(LookupContentName, "ID=" & encodeSQLNumber(genericController.EncodeInteger(FieldValueVariant)), , , , , , "name", 1)
                                                         If cs_ok(CSLookup) Then
                                                             fieldValue = cs_getText(CSLookup, "name")
                                                         End If
@@ -3015,7 +3004,7 @@ Namespace Contensive.Core.Controllers
                                                         '
                                                         ' Next try lookup list
                                                         '
-                                                        FieldValueInteger = EncodeInteger(FieldValueVariant) - 1
+                                                        FieldValueInteger = genericController.EncodeInteger(FieldValueVariant) - 1
                                                         lookups = Split(LookupList, ",")
                                                         If UBound(lookups) >= FieldValueInteger Then
                                                             fieldValue = lookups(FieldValueInteger)
@@ -3026,14 +3015,14 @@ Namespace Contensive.Core.Controllers
                                                 '
                                                 '
                                                 '
-                                                If vbIsNumeric(FieldValueVariant) Then
-                                                    fieldValue = getRecordName("people", EncodeInteger(FieldValueVariant))
+                                                If genericController.vbIsNumeric(FieldValueVariant) Then
+                                                    fieldValue = getRecordName("people", genericController.EncodeInteger(FieldValueVariant))
                                                 End If
                                             Case FieldTypeIdCurrency
                                                 '
                                                 '
                                                 '
-                                                If vbIsNumeric(FieldValueVariant) Then
+                                                If genericController.vbIsNumeric(FieldValueVariant) Then
                                                     fieldValue = FormatCurrency(FieldValueVariant, 2, vbFalse, vbFalse, vbFalse)
                                                 End If
                                             'NeedsHTMLEncode = False
@@ -3041,23 +3030,23 @@ Namespace Contensive.Core.Controllers
                                                 '
                                                 '
                                                 '
-                                                fieldValue = cpCore.privateFiles.readFile(EncodeText(FieldValueVariant))
+                                                fieldValue = cpCore.privateFiles.readFile(genericController.encodeText(FieldValueVariant))
                                             Case FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript
                                                 '
                                                 '
                                                 '
-                                                fieldValue = cpCore.cdnFiles.readFile(EncodeText(FieldValueVariant))
+                                                fieldValue = cpCore.cdnFiles.readFile(genericController.encodeText(FieldValueVariant))
                                             'NeedsHTMLEncode = False
                                             Case FieldTypeIdText, FieldTypeIdLongText, FieldTypeIdHTML
                                                 '
                                                 '
                                                 '
-                                                fieldValue = EncodeText(FieldValueVariant)
+                                                fieldValue = genericController.encodeText(FieldValueVariant)
                                             Case FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdAutoIdIncrement, FieldTypeIdFloat, FieldTypeIdInteger
                                                 '
                                                 '
                                                 '
-                                                fieldValue = EncodeText(FieldValueVariant)
+                                                fieldValue = genericController.encodeText(FieldValueVariant)
                                             'NeedsHTMLEncode = False
                                             Case FieldTypeIdRedirect, FieldTypeIdManyToMany
                                                 '
@@ -3148,7 +3137,7 @@ Namespace Contensive.Core.Controllers
                                                 ' csv_SetCSTextFile uses this method to set the row changed, so leave this here.
                                                 '
                                                 fileNameNoExt = cs_getText(CSPointer, FieldNameLc)
-                                                FieldValueText = EncodeText(FieldValueVariantLocal)
+                                                FieldValueText = genericController.encodeText(FieldValueVariantLocal)
                                                 If FieldValueText = "" Then
                                                     If fileNameNoExt <> "" Then
                                                         Call cpCore.privateFiles.deleteFile(fileNameNoExt)
@@ -3175,12 +3164,12 @@ Namespace Contensive.Core.Controllers
                                                 Dim Pos As Integer
                                                 pathFilenameOriginal = cs_getText(CSPointer, FieldNameLc)
                                                 PathFilename = pathFilenameOriginal
-                                                FieldValueText = EncodeText(FieldValueVariantLocal)
+                                                FieldValueText = genericController.encodeText(FieldValueVariantLocal)
                                                 BlankTest = FieldValueText
-                                                BlankTest = vbReplace(BlankTest, " ", "")
-                                                BlankTest = vbReplace(BlankTest, vbCr, "")
-                                                BlankTest = vbReplace(BlankTest, vbLf, "")
-                                                BlankTest = vbReplace(BlankTest, vbTab, "")
+                                                BlankTest = genericController.vbReplace(BlankTest, " ", "")
+                                                BlankTest = genericController.vbReplace(BlankTest, vbCr, "")
+                                                BlankTest = genericController.vbReplace(BlankTest, vbLf, "")
+                                                BlankTest = genericController.vbReplace(BlankTest, vbTab, "")
                                                 If BlankTest = "" Then
                                                     If PathFilename <> "" Then
                                                         Call cpCore.cdnFiles.deleteFile(PathFilename)
@@ -3208,26 +3197,26 @@ Namespace Contensive.Core.Controllers
                                                                 fileNameNoExt = Mid(fileNameNoExt, Pos + 1)
                                                                 path = Mid(PathFilename, 1, Pos)
                                                                 FilenameRev = 1
-                                                                If Not vbIsNumeric(fileNameNoExt) Then
-                                                                    Pos = vbInstr(1, fileNameNoExt, ".r", vbTextCompare)
+                                                                If Not genericController.vbIsNumeric(fileNameNoExt) Then
+                                                                    Pos = genericController.vbInstr(1, fileNameNoExt, ".r", vbTextCompare)
                                                                     If Pos > 0 Then
-                                                                        FilenameRev = EncodeInteger(Mid(fileNameNoExt, Pos + 2))
+                                                                        FilenameRev = genericController.EncodeInteger(Mid(fileNameNoExt, Pos + 2))
                                                                         FilenameRev = FilenameRev + 1
                                                                         fileNameNoExt = Mid(fileNameNoExt, 1, Pos - 1)
                                                                     End If
                                                                 End If
                                                                 fileName = fileNameNoExt & ".r" & FilenameRev & "." & FileExt
                                                                 'PathFilename = PathFilename & dstFilename
-                                                                path = convertCdnUrlToCdnPathFilename(path)
-                                                                'srcSysFile = config.physicalFilePath & vbReplace(srcPathFilename, "/", "\")
-                                                                'dstSysFile = config.physicalFilePath & vbReplace(PathFilename, "/", "\")
+                                                                path = genericController.convertCdnUrlToCdnPathFilename(path)
+                                                                'srcSysFile = config.physicalFilePath & genericController.vbReplace(srcPathFilename, "/", "\")
+                                                                'dstSysFile = config.physicalFilePath & genericController.vbReplace(PathFilename, "/", "\")
                                                                 PathFilename = path & fileName
                                                                 'Call publicFiles.renameFile(pathFilenameOriginal, fileName)
                                                             End If
                                                         End If
                                                     End If
                                                     If (pathFilenameOriginal <> "") And (pathFilenameOriginal <> PathFilename) Then
-                                                        pathFilenameOriginal = convertCdnUrlToCdnPathFilename(pathFilenameOriginal)
+                                                        pathFilenameOriginal = genericController.convertCdnUrlToCdnPathFilename(pathFilenameOriginal)
                                                         Call cpCore.cdnFiles.deleteFile(pathFilenameOriginal)
                                                     End If
                                                     Call cpCore.cdnFiles.saveFile(PathFilename, FieldValueText)
@@ -3237,31 +3226,31 @@ Namespace Contensive.Core.Controllers
                                             Case FieldTypeIdBoolean
                                                 '
                                                 ' Boolean - sepcial case, block on typed GetAlways set
-                                                FieldValueVariantLocal = EncodeBoolean(FieldValueVariantLocal)
-                                                If EncodeBoolean(FieldValueVariantLocal) <> cs_getBoolean(CSPointer, FieldNameLc) Then
+                                                FieldValueVariantLocal = genericController.EncodeBoolean(FieldValueVariantLocal)
+                                                If genericController.EncodeBoolean(FieldValueVariantLocal) <> cs_getBoolean(CSPointer, FieldNameLc) Then
                                                     SetNeeded = True
                                                 End If
                                             Case FieldTypeIdText
                                                 '
                                                 ' Set if text of value changes
                                                 '
-                                                FieldValueVariantLocal = Left(EncodeText(FieldValueVariantLocal), 255)
-                                                If EncodeText(FieldValueVariantLocal) <> cs_getText(CSPointer, FieldNameLc) Then
+                                                FieldValueVariantLocal = Left(genericController.encodeText(FieldValueVariantLocal), 255)
+                                                If genericController.encodeText(FieldValueVariantLocal) <> cs_getText(CSPointer, FieldNameLc) Then
                                                     SetNeeded = True
                                                 End If
                                             Case FieldTypeIdLongText, FieldTypeIdHTML
                                                 '
                                                 ' Set if text of value changes
                                                 '
-                                                FieldValueVariantLocal = Left(EncodeText(FieldValueVariantLocal), 65535)
-                                                If EncodeText(FieldValueVariantLocal) <> cs_getText(CSPointer, FieldNameLc) Then
+                                                FieldValueVariantLocal = Left(genericController.encodeText(FieldValueVariantLocal), 65535)
+                                                If genericController.encodeText(FieldValueVariantLocal) <> cs_getText(CSPointer, FieldNameLc) Then
                                                     SetNeeded = True
                                                 End If
                                             Case Else
                                                 '
                                                 ' Set if text of value changes
                                                 '
-                                                If EncodeText(FieldValueVariantLocal) <> cs_getText(CSPointer, FieldNameLc) Then
+                                                If genericController.encodeText(FieldValueVariantLocal) <> cs_getText(CSPointer, FieldNameLc) Then
                                                     SetNeeded = True
                                                 End If
                                         End Select
@@ -3430,8 +3419,8 @@ Namespace Contensive.Core.Controllers
                                 & " And (EditArchive=0) And (editblank=0)" _
                                 & " order by id desc;"
                             dt = executeSql(SQL, EditDataSourceName)
-                            If isDataTableOk(dt) Then
-                                EditRecordID = EncodeInteger(getDataRowColumnName(dt.Rows(0), "ID"))
+                            If genericController.isDataTableOk(dt) Then
+                                EditRecordID = genericController.EncodeInteger(getDataRowColumnName(dt.Rows(0), "ID"))
                             End If
                             dt.Dispose()
                         Else
@@ -3453,7 +3442,7 @@ Namespace Contensive.Core.Controllers
                         FieldFoundCount = 0
                         For Each keyValuePair In .writeCache
                             FieldName = keyValuePair.Key
-                            UcaseFieldName = vbUCase(FieldName)
+                            UcaseFieldName = genericController.vbUCase(FieldName)
                             writeCacheValueVariant = keyValuePair.Value
                             '
                             ' field has changed
@@ -3463,18 +3452,18 @@ Namespace Contensive.Core.Controllers
                                 ' capture and block it - it is hardcoded in sql
                                 '
                                 AuthorableFieldUpdate = True
-                                sqlModifiedBy = EncodeInteger(writeCacheValueVariant)
+                                sqlModifiedBy = genericController.EncodeInteger(writeCacheValueVariant)
                             ElseIf UcaseFieldName = "MODIFIEDDATE" Then
                                 '
                                 ' capture and block it - it is hardcoded in sql
                                 '
                                 AuthorableFieldUpdate = True
-                                sqlModifiedDate = EncodeDate(writeCacheValueVariant)
+                                sqlModifiedDate =  genericController.EncodeDate(writeCacheValueVariant)
                             Else
                                 '
                                 ' let these field be added to the sql
                                 '
-                                If UcaseFieldName = "ACTIVE" And (Not EncodeBoolean(writeCacheValueVariant)) Then
+                                If UcaseFieldName = "ACTIVE" And (Not genericController.EncodeBoolean(writeCacheValueVariant)) Then
                                     '
                                     ' Record being saved inactive
                                     '
@@ -3494,24 +3483,24 @@ Namespace Contensive.Core.Controllers
                                         Select Case .fieldTypeId
                                             Case FieldTypeIdRedirect, FieldTypeIdManyToMany
                                             Case FieldTypeIdInteger, FieldTypeIdLookup, FieldTypeIdAutoIdIncrement, FieldTypeIdMemberSelect
-                                                SQLSetPair = FieldName & "=" & encodeSQLNumber(EncodeInteger(writeCacheValueVariant))
+                                                SQLSetPair = FieldName & "=" & encodeSQLNumber(genericController.EncodeInteger(writeCacheValueVariant))
                                             Case FieldTypeIdCurrency, FieldTypeIdFloat
-                                                SQLSetPair = FieldName & "=" & encodeSQLNumber(EncodeNumber(writeCacheValueVariant))
+                                                SQLSetPair = FieldName & "=" & encodeSQLNumber(genericController.EncodeNumber(writeCacheValueVariant))
                                             Case FieldTypeIdBoolean
-                                                SQLSetPair = FieldName & "=" & encodeSQLBoolean(EncodeBoolean(writeCacheValueVariant))
+                                                SQLSetPair = FieldName & "=" & encodeSQLBoolean(genericController.EncodeBoolean(writeCacheValueVariant))
                                             Case FieldTypeIdDate
-                                                SQLSetPair = FieldName & "=" & encodeSQLDate(EncodeDate(writeCacheValueVariant))
+                                                SQLSetPair = FieldName & "=" & encodeSQLDate( genericController.EncodeDate(writeCacheValueVariant))
                                             Case FieldTypeIdText
-                                                Copy = Left(EncodeText(writeCacheValueVariant), 255)
+                                                Copy = Left(genericController.encodeText(writeCacheValueVariant), 255)
                                                 If .Scramble Then
                                                     Copy = cpCore.metaData.TextScramble(Copy)
                                                 End If
                                                 SQLSetPair = FieldName & "=" & encodeSQLText(Copy)
                                             Case FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdFileHTMLPrivate
-                                                Copy = Left(EncodeText(writeCacheValueVariant), 255)
+                                                Copy = Left(genericController.encodeText(writeCacheValueVariant), 255)
                                                 SQLSetPair = FieldName & "=" & encodeSQLText(Copy)
                                             Case FieldTypeIdLongText, FieldTypeIdHTML
-                                                SQLSetPair = FieldName & "=" & encodeSQLText(EncodeText(writeCacheValueVariant))
+                                                SQLSetPair = FieldName & "=" & encodeSQLText(genericController.encodeText(writeCacheValueVariant))
                                             Case Else
                                                 '
                                                 ' Invalid fieldtype
@@ -3536,7 +3525,7 @@ Namespace Contensive.Core.Controllers
                                                     Next
                                                 End If
                                             End With
-                                            If .UniqueName And (EncodeText(writeCacheValueVariant) <> "") Then
+                                            If .UniqueName And (genericController.encodeText(writeCacheValueVariant) <> "") Then
                                                 '
                                                 ' ----- set up for unique name check
                                                 '
@@ -3544,7 +3533,7 @@ Namespace Contensive.Core.Controllers
                                                     SQLUnique &= "Or"
                                                     UniqueViolationFieldList &= ","
                                                 End If
-                                                writeCacheValueText = EncodeText(writeCacheValueVariant)
+                                                writeCacheValueText = genericController.encodeText(writeCacheValueVariant)
                                                 If Len(writeCacheValueText) < 255 Then
                                                     UniqueViolationFieldList &= .nameLc & "=""" & writeCacheValueText & """"
                                                 Else
@@ -3734,7 +3723,7 @@ Namespace Contensive.Core.Controllers
                         ColumnPtr = 0
                         ReDim .fieldNames(.ResultColumnCount)
                         For Each dc As DataColumn In .dt.Columns
-                            .fieldNames(ColumnPtr) = vbUCase(dc.ColumnName)
+                            .fieldNames(ColumnPtr) = genericController.vbUCase(dc.ColumnName)
                             ColumnPtr = ColumnPtr + 1
                         Next
                         ' refactor -- convert interal storage to dt and assign -- will speedup open
@@ -3784,20 +3773,20 @@ Namespace Contensive.Core.Controllers
             Try
                 Select Case fieldType
                     Case FieldTypeIdBoolean
-                        returnResult = encodeSQLBoolean(EncodeBoolean(expression))
+                        returnResult = encodeSQLBoolean(genericController.EncodeBoolean(expression))
                     Case FieldTypeIdCurrency, FieldTypeIdFloat
-                        returnResult = encodeSQLNumber(EncodeNumber(expression))
+                        returnResult = encodeSQLNumber(genericController.EncodeNumber(expression))
                     Case FieldTypeIdAutoIdIncrement, FieldTypeIdInteger, FieldTypeIdLookup, FieldTypeIdMemberSelect
-                        returnResult = encodeSQLNumber(EncodeInteger(expression))
+                        returnResult = encodeSQLNumber(genericController.EncodeInteger(expression))
                     Case FieldTypeIdDate
-                        returnResult = encodeSQLDate(EncodeDate(expression))
+                        returnResult = encodeSQLDate( genericController.EncodeDate(expression))
                     Case FieldTypeIdLongText, FieldTypeIdHTML
-                        returnResult = encodeSQLText(EncodeText(expression))
+                        returnResult = encodeSQLText(genericController.encodeText(expression))
                     Case FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdRedirect, FieldTypeIdManyToMany, FieldTypeIdText, FieldTypeIdFileTextPrivate, FieldTypeIdFileJavascript, FieldTypeIdFileXML, FieldTypeIdFileCSS, FieldTypeIdFileHTMLPrivate
-                        returnResult = encodeSQLText(EncodeText(expression))
+                        returnResult = encodeSQLText(genericController.encodeText(expression))
                     Case Else
                         cpCore.handleExceptionAndContinue(New ApplicationException("Unknown Field Type [" & fieldType & ""))
-                        returnResult = encodeSQLText(EncodeText(expression))
+                        returnResult = encodeSQLText(genericController.encodeText(expression))
                 End Select
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -3811,23 +3800,22 @@ Namespace Contensive.Core.Controllers
         ''' </summary>
         ''' <param name="expression"></param>
         ''' <returns></returns>
-        Public Function encodeSQLText(ByVal expression As String) As String
+        Public Shared Function encodeSQLText(ByVal expression As String) As String
             Dim returnResult As String = ""
-            Try
-                If expression Is Nothing Then
+            If expression Is Nothing Then
+                returnResult = "null"
+            Else
+                returnResult = genericController.encodeText(expression)
+                If returnResult = "" Then
                     returnResult = "null"
                 Else
-                    returnResult = EncodeText(expression)
-                    If returnResult = "" Then
-                        returnResult = "null"
-                    Else
-                        returnResult = "'" & vbReplace(returnResult, "'", "''") & "'"
-                    End If
+                    returnResult = "'" & genericController.vbReplace(returnResult, "'", "''") & "'"
                 End If
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
+            End If
             Return returnResult
+        End Function
+        Public Shared Function encodeSqlTextLike(cpcore As coreClass, source As String) As String
+            Return encodeSQLText("%" & source & "%")
         End Function
         '
         '========================================================================
@@ -3843,7 +3831,7 @@ Namespace Contensive.Core.Controllers
                 If IsDBNull(expression) Then
                     returnResult = "null"
                 Else
-                    Dim expressionDate As Date = EncodeDate(expression)
+                    Dim expressionDate As Date =  genericController.EncodeDate(expression)
                     If (expressionDate = Date.MinValue) Then
                         returnResult = "null"
                     Else
@@ -3871,12 +3859,12 @@ Namespace Contensive.Core.Controllers
             '        'If expression Is Nothing Then
             '        'returnResult = "null"
             '        'ElseIf VarType(expression) = vbBoolean Then
-            '        '    If EncodeBoolean(expression) Then
+            '        '    If genericController.EncodeBoolean(expression) Then
             '        '        returnResult = SQLTrue
             '        '    Else
             '        '        returnResult = SQLFalse
             '        '    End If
-            '    ElseIf Not vbIsNumeric(expression) Then
+            '    ElseIf Not genericController.vbIsNumeric(expression) Then
             '        returnResult = "null"
             '    Else
             '        returnResult = expression.ToString
@@ -3945,11 +3933,11 @@ Namespace Contensive.Core.Controllers
                             TableName = ContentName
                         End If
                         '
-                        iOriginalFilename = encodeEmptyText(OriginalFilename, "")
+                        iOriginalFilename = genericController.encodeEmptyText(OriginalFilename, "")
                         '
                         fieldTypeId = CDef.fields(FieldName.ToLower()).fieldTypeId
                         '
-                        returnResult = csv_GetVirtualFilenameByTable(TableName, FieldName, RecordID, iOriginalFilename, fieldTypeId)
+                        returnResult = genericController.csv_GetVirtualFilenameByTable(TableName, FieldName, RecordID, iOriginalFilename, fieldTypeId)
                     End If
                 End If
             Catch ex As Exception
@@ -4048,10 +4036,10 @@ Namespace Contensive.Core.Controllers
             Dim returnResult As Integer
             Try
                 Dim dt As DataTable = executeSql("select ContentTableID from ccContent where name=" & encodeSQLText(ContentName))
-                If Not isDataTableOk(dt) Then
+                If Not genericController.isDataTableOk(dt) Then
                     Throw New ApplicationException("Content [" & ContentName & "] was not found in ccContent table")
                 Else
-                    returnResult = EncodeInteger(dt.Rows(0).Item("ContentTableID"))
+                    returnResult = genericController.EncodeInteger(dt.Rows(0).Item("ContentTableID"))
                 End If
                 dt.Dispose()
             Catch ex As Exception
@@ -4124,7 +4112,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' ----- Table Specific rules
                     '
-                    Select Case vbUCase(TableName)
+                    Select Case genericController.vbUCase(TableName)
                         Case "CCCALENDARS"
                             '
                             Call deleteContentRecords("Calendar Event Rules", "CalendarID=" & RecordID)
@@ -4235,11 +4223,11 @@ Namespace Contensive.Core.Controllers
         '                    ReDim Row(.ResultColumnCount)
         '                    If useCSReadCacheMultiRow Then
         '                        For ColumnPointer = 0 To .ResultColumnCount - 1
-        '                            Row(ColumnPointer) = EncodeText(.readCache(ColumnPointer, .readCacheRowPtr))
+        '                            Row(ColumnPointer) = genericController.encodeText(.readCache(ColumnPointer, .readCacheRowPtr))
         '                        Next
         '                    Else
         '                        For ColumnPointer = 0 To .ResultColumnCount - 1
-        '                            Row(ColumnPointer) = EncodeText(.readCache(ColumnPointer, 0))
+        '                            Row(ColumnPointer) = genericController.encodeText(.readCache(ColumnPointer, 0))
         '                        Next
         '                    End If
         '                    cs_getRow = Row
@@ -4465,7 +4453,7 @@ Namespace Contensive.Core.Controllers
         '                    ' ----- Wrong Field Type
         '                    '
         '                    Call handleLegacyClassError3(MethodName, ("csv_OpenCSJoin only supports Content Definition Fields set as 'Lookup' type. Field [ " & FieldName & " ] is not a 'Lookup'."))
-        '                ElseIf vbIsNumeric(FieldValueVariant) Then
+        '                ElseIf genericController.vbIsNumeric(FieldValueVariant) Then
         '                    '
         '                    '
         '                    '
@@ -4574,7 +4562,7 @@ Namespace Contensive.Core.Controllers
                         With field
                             FieldName = .nameLc
                             If (FieldName <> "") And (Not String.IsNullOrEmpty(.defaultValue)) Then
-                                Select Case vbUCase(FieldName)
+                                Select Case genericController.vbUCase(FieldName)
                                     Case "ID", "CCGUID", "CREATEKEY", "DATEADDED", "CREATEDBY", "CONTENTCONTROLID", "EDITSOURCEID", "EDITARCHIVE", "EDITBLANK"
                                         '
                                         ' Block control fields
@@ -4591,7 +4579,7 @@ Namespace Contensive.Core.Controllers
                                                 '   so a select can be added to the default configuration page
                                                 ' *******************************
                                                 '
-                                                DefaultValueText = EncodeText(.defaultValue)
+                                                DefaultValueText = genericController.encodeText(.defaultValue)
                                                 Call cs_set(CS, FieldName, "null")
                                                 If DefaultValueText <> "" Then
                                                     If .lookupContentID <> 0 Then
@@ -4600,10 +4588,10 @@ Namespace Contensive.Core.Controllers
                                                             Call cs_set(CS, FieldName, getRecordID(LookupContentName, DefaultValueText))
                                                         End If
                                                     ElseIf .lookupList <> "" Then
-                                                        UCaseDefaultValueText = vbUCase(DefaultValueText)
+                                                        UCaseDefaultValueText = genericController.vbUCase(DefaultValueText)
                                                         lookups = Split(.lookupList, ",")
                                                         For Ptr = 0 To UBound(lookups)
-                                                            If UCaseDefaultValueText = vbUCase(lookups(Ptr)) Then
+                                                            If UCaseDefaultValueText = genericController.vbUCase(lookups(Ptr)) Then
                                                                 Call cs_set(CS, FieldName, Ptr + 1)
                                                                 Exit For
                                                             End If
@@ -4824,7 +4812,7 @@ Namespace Contensive.Core.Controllers
         Public Function getNameIdOrGuidSqlCriteria(nameIdOrGuid As String) As String
             Dim sqlCriteria As String = ""
             Try
-                If vbIsNumeric(nameIdOrGuid) Then
+                If genericController.vbIsNumeric(nameIdOrGuid) Then
                     sqlCriteria = "id=" & encodeSQLNumber(CDbl(nameIdOrGuid))
                 ElseIf cpCore.common_isGuid(nameIdOrGuid) Then
                     sqlCriteria = "ccGuid=" & encodeSQLText(nameIdOrGuid)
@@ -4848,7 +4836,7 @@ Namespace Contensive.Core.Controllers
             Try
                 Dim dt As DataTable = executeSql("Select ID from ccContent where name=" & encodeSQLText(ContentName))
                 If dt.Rows.Count > 0 Then
-                    returnContentId = EncodeInteger(dt.Rows(0).Item("id"))
+                    returnContentId = genericController.EncodeInteger(dt.Rows(0).Item("id"))
                 End If
                 dt.Dispose()
             Catch ex As Exception
@@ -4877,9 +4865,9 @@ Namespace Contensive.Core.Controllers
                             If dt.Rows.Count > 0 Then
                                 Dim dataSource As New Models.Entity.dataSourceModel
                                 With dataSource
-                                    .id = EncodeInteger(dt(0).Item("id"))
-                                    .connStringOLEDB = EncodeText(dt(0).Item("connString"))
-                                    .name = Models.Entity.dataSourceModel.normalizeDataSourceName(EncodeText(dt(0).Item("name")))
+                                    .id = genericController.EncodeInteger(dt(0).Item("id"))
+                                    .connStringOLEDB = genericController.encodeText(dt(0).Item("connString"))
+                                    .name = Models.Entity.dataSourceModel.normalizeDataSourceName(genericController.encodeText(dt(0).Item("name")))
                                     returndataSourceName = .name
                                 End With
                             End If
@@ -4921,7 +4909,7 @@ Namespace Contensive.Core.Controllers
                 '
                 'DataSourceID = cpCore.db.GetDataSourceID(DataSourceName)
                 DateAddedString = cpCore.db.encodeSQLDate(Now())
-                CreateKeyString = cpCore.db.encodeSQLNumber(getRandomLong)
+                CreateKeyString = cpCore.db.encodeSQLNumber(genericController.getRandomLong)
                 '
                 '----------------------------------------------------------------
                 ' ----- Read in a record from the table to get fields
@@ -4935,7 +4923,7 @@ Namespace Contensive.Core.Controllers
                     '
                     dt = cpCore.db.insertTableRecordGetDataTable(DataSourceName, TableName, cpCore.user.id)
                     If dt.Rows.Count > 0 Then
-                        RecordID = EncodeInteger(dt.Rows(0).Item("ID"))
+                        RecordID = genericController.EncodeInteger(dt.Rows(0).Item("ID"))
                         Call cpCore.db.executeSql("Update " & TableName & " Set active=0 where id=" & RecordID & ";", DataSourceName)
                     End If
                 End If
@@ -4960,7 +4948,7 @@ Namespace Contensive.Core.Controllers
                         If dt.Rows.Count = 0 Then
                             Throw New ApplicationException("Content Definition [" & ContentName & "] could Not be selected by name after it was inserted")
                         Else
-                            ContentID = EncodeInteger(dt(0).Item("ID"))
+                            ContentID = genericController.EncodeInteger(dt(0).Item("ID"))
                             Call cpCore.db.executeSql("update ccContent Set CreateKey=0 where id=" & ContentID)
                         End If
                         dt.Dispose()
@@ -4984,10 +4972,10 @@ Namespace Contensive.Core.Controllers
                         ' ----- see if the field is already in the content fields
                         '
                         Dim UcaseTableColumnName As String
-                        UcaseTableColumnName = vbUCase(dcTableColumns.ColumnName)
+                        UcaseTableColumnName = genericController.vbUCase(dcTableColumns.ColumnName)
                         ContentFieldFound = False
                         For Each drContentRecords As DataRow In dtFields.Rows
-                            If vbUCase(EncodeText(drContentRecords("name"))) = UcaseTableColumnName Then
+                            If genericController.vbUCase(genericController.encodeText(drContentRecords("name"))) = UcaseTableColumnName Then
                                 ContentFieldFound = True
                                 Exit For
                             End If
@@ -4996,7 +4984,7 @@ Namespace Contensive.Core.Controllers
                             '
                             ' create the content field
                             '
-                            Call createContentFieldFromTableField(ContentName, dcTableColumns.ColumnName, EncodeInteger(dcTableColumns.DataType))
+                            Call createContentFieldFromTableField(ContentName, dcTableColumns.ColumnName, genericController.EncodeInteger(dcTableColumns.DataType))
                         Else
                             '
                             ' touch field so upgrade does not delete it
@@ -5045,7 +5033,7 @@ Namespace Contensive.Core.Controllers
                 field.TextBuffered = False
                 field.htmlContent = False
                 '
-                Select Case vbUCase(FieldName)
+                Select Case genericController.vbUCase(FieldName)
                 '
                 ' --- Core fields
                 '
@@ -5254,7 +5242,7 @@ Namespace Contensive.Core.Controllers
                     For Each dr As DataRow In dt.Rows
                         cPtr = 0
                         For Each cell As DataColumn In dt.Columns
-                            rows(cPtr, rPtr) = EncodeText(dr(cell))
+                            rows(cPtr, rPtr) = genericController.encodeText(dr(cell))
                             cPtr += 1
                         Next
                         rPtr += 1

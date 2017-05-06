@@ -2,7 +2,8 @@
 Option Explicit On
 Option Strict On
 
-
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 Imports Contensive.Core.coreCommonModule
 
 '
@@ -84,10 +85,10 @@ Namespace Contensive.Core
                                 If Not Parse.IsTag(ElementPointer) Then
                                     ElementText = Parse.Text(ElementPointer)
                                     TextTest = ElementText
-                                    TextTest = vbReplace(TextTest, " ", "")
-                                    TextTest = vbReplace(TextTest, vbCr, "")
-                                    TextTest = vbReplace(TextTest, vbLf, "")
-                                    TextTest = vbReplace(TextTest, vbTab, "")
+                                    TextTest = genericController.vbReplace(TextTest, " ", "")
+                                    TextTest = genericController.vbReplace(TextTest, vbCr, "")
+                                    TextTest = genericController.vbReplace(TextTest, vbLf, "")
+                                    TextTest = genericController.vbReplace(TextTest, vbTab, "")
                                     If TextTest <> "" Then
                                         '
                                         ' if there is non-white space between tags, last element was no longer blockopen or closed
@@ -101,7 +102,7 @@ Namespace Contensive.Core
                                     BlockCloseLast = BlockClose
                                     BlockOpen = False
                                     BlockClose = False
-                                    Select Case vbUCase(Parse.TagName(ElementPointer))
+                                    Select Case genericController.vbUCase(Parse.TagName(ElementPointer))
                                         Case "BR"
                                             '
                                             ' ----- break
@@ -167,7 +168,7 @@ Namespace Contensive.Core
                                             AttrCount = Parse.ElementAttributeCount(ElementPointer)
                                             If AttrCount > 0 Then
                                                 For AttrPointer = 0 To AttrCount - 1
-                                                    If vbUCase(Parse.ElementAttributeName(ElementPointer, AttrPointer)) = "HREF" Then
+                                                    If genericController.vbUCase(Parse.ElementAttributeName(ElementPointer, AttrPointer)) = "HREF" Then
                                                         LastHRef = Parse.ElementAttributeValue(ElementPointer, AttrPointer)
                                                         Exit For
                                                     End If
@@ -182,7 +183,7 @@ Namespace Contensive.Core
                                             '
                                             Do While ElementPointer < ElementCount
                                                 If Parse.IsTag(ElementPointer) Then
-                                                    If vbUCase(Parse.TagName(ElementPointer)) = "/SCRIPT" Then
+                                                    If genericController.vbUCase(Parse.TagName(ElementPointer)) = "/SCRIPT" Then
                                                         Exit Do
                                                     End If
                                                 End If
@@ -195,7 +196,7 @@ Namespace Contensive.Core
                                             '
                                             Do While ElementPointer < ElementCount
                                                 If Parse.IsTag(ElementPointer) Then
-                                                    If vbUCase(Parse.TagName(ElementPointer)) = "/STYLE" Then
+                                                    If genericController.vbUCase(Parse.TagName(ElementPointer)) = "/STYLE" Then
                                                         Exit Do
                                                     End If
                                                 End If
@@ -208,7 +209,7 @@ Namespace Contensive.Core
                                             '
                                             Do While ElementPointer < ElementCount
                                                 If Parse.IsTag(ElementPointer) Then
-                                                    If vbUCase(Parse.TagName(ElementPointer)) = "/HEAD" Then
+                                                    If genericController.vbUCase(Parse.TagName(ElementPointer)) = "/HEAD" Then
                                                         Exit Do
                                                     End If
                                                 End If
@@ -232,17 +233,17 @@ Namespace Contensive.Core
                     '
                     ' do HTML character substitutions
                     '
-                    result = vbReplace(result, "&quot;", """")
-                    result = vbReplace(result, "&nbsp;", " ")
-                    result = vbReplace(result, "&lt;", "<")
-                    result = vbReplace(result, "&gt;", ">")
-                    result = vbReplace(result, "&amp;", "&")
+                    result = genericController.vbReplace(result, "&quot;", """")
+                    result = genericController.vbReplace(result, "&nbsp;", " ")
+                    result = genericController.vbReplace(result, "&lt;", "<")
+                    result = genericController.vbReplace(result, "&gt;", ">")
+                    result = genericController.vbReplace(result, "&amp;", "&")
                     '
                     ' remove duplicate spaces
                     '
                     LoopCount = 0
                     Do While (InStr(1, result, "  ") <> 0) And (LoopCount < 1000)
-                        result = vbReplace(result, "  ", " ")
+                        result = genericController.vbReplace(result, "  ", " ")
                         LoopCount += 1
                     Loop
                     '
@@ -250,7 +251,7 @@ Namespace Contensive.Core
                     '
                     LoopCount = 0
                     Do While (InStr(1, result, vbCrLf & " ") <> 0) And (LoopCount < 1000)
-                        result = vbReplace(result, vbCrLf & " ", vbCrLf)
+                        result = genericController.vbReplace(result, vbCrLf & " ", vbCrLf)
                         LoopCount += 1
                     Loop
                     '
@@ -258,7 +259,7 @@ Namespace Contensive.Core
                     '
                     LoopCount = 0
                     Do While (InStr(1, result, vbCrLf & vbCrLf & vbCrLf) <> 0) And (LoopCount < 1000)
-                        result = vbReplace(result, vbCrLf & vbCrLf & vbCrLf, vbCrLf & vbCrLf)
+                        result = genericController.vbReplace(result, vbCrLf & vbCrLf & vbCrLf, vbCrLf & vbCrLf)
                         LoopCount += 1
                     Loop
                     '
@@ -291,9 +292,9 @@ Namespace Contensive.Core
         '            '
         '            ' Remove all html tags
         '            '
-        '            UcaseBody = vbUCase(Body)
+        '            UcaseBody = genericController.vbUCase(Body)
         '            Body2 = ""
-        '            TagStart = vbInstr(1, UcaseBody, "<")
+        '            TagStart = genericController.vbInstr(1, UcaseBody, "<")
         '            TagEnd = 0
         '            ReplaceChar = ""
         '            Do While TagStart <> 0
@@ -301,13 +302,13 @@ Namespace Contensive.Core
         '                '
         '                ' Find the TagEnd
         '                '
-        '                TagEnd = vbInstr(TagStart, UcaseBody, ">")
+        '                TagEnd = genericController.vbInstr(TagStart, UcaseBody, ">")
         '                ReplaceChar = ""
         '                If Mid(UcaseBody, TagStart, 4) = "<!--" Then
         '                    '
         '                    ' tag is a comment, skip over it
         '                    '
-        '                    TagEnd = vbInstr(TagStart, UcaseBody, "-->")
+        '                    TagEnd = genericController.vbInstr(TagStart, UcaseBody, "-->")
         '                    If TagEnd <> 0 Then
         '                        TagEnd = TagEnd + 2
         '                    End If
@@ -315,7 +316,7 @@ Namespace Contensive.Core
         '                    '
         '                    ' tag is a comment, skip over it
         '                    '
-        '                    TagEnd = vbInstr(TagStart, UcaseBody, "/SCRIPT>")
+        '                    TagEnd = genericController.vbInstr(TagStart, UcaseBody, "/SCRIPT>")
         '                    If TagEnd <> 0 Then
         '                        TagEnd = TagEnd + 7
         '                    End If
@@ -344,7 +345,7 @@ Namespace Contensive.Core
         '                End If
         '                '
         '                TagString = Mid(UcaseBody, TagStart, TagEnd - TagStart + 1)
-        '                TagStart = vbInstr(TagEnd, UcaseBody, "<")
+        '                TagStart = genericController.vbInstr(TagEnd, UcaseBody, "<")
         '            Loop
         '            Body2 = Body2 & ReplaceChar & Mid(Body, TagEnd + 1)
         '            DecodeHTML_RemoveHTMLTags = Body2
@@ -376,8 +377,8 @@ Namespace Contensive.Core
             DecodeHTML_RemoveWhiteSpace = ""
             If Not IsNull(DirtyText) Then
                 If DirtyText <> "" Then
-                    BodyBuffer = vbReplace(DirtyText, vbCrLf, vbCr)
-                    BodyBuffer = vbReplace(BodyBuffer, vbLf, vbCr)
+                    BodyBuffer = genericController.vbReplace(DirtyText, vbCrLf, vbCr)
+                    BodyBuffer = genericController.vbReplace(BodyBuffer, vbLf, vbCr)
                     For Pointer = 1 To Len(BodyBuffer)
                         ChrTest = Mid(BodyBuffer, Pointer, 1)
                         AscTest = Asc(ChrTest)

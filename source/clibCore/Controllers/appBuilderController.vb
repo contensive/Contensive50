@@ -4,6 +4,7 @@ Option Strict On
 
 Imports System.Xml
 Imports Microsoft.Web.Administration
+Imports Contensive.Core.Controllers.genericController
 '
 Namespace Contensive.Core.Controllers
     '
@@ -396,7 +397,7 @@ Namespace Contensive.Core.Controllers
                     If True Then
                         Call appendBuildLog(cpcore, "Verify Site Properties")
                         '
-                        Copy = cpcore.siteProperties.getText("AllowAutoHomeSectionOnce", EncodeText(isNewBuild))
+                        Copy = cpcore.siteProperties.getText("AllowAutoHomeSectionOnce", genericController.encodeText(isNewBuild))
                         Copy = cpcore.siteProperties.getText("AllowAutoLogin", "False")
                         Copy = cpcore.siteProperties.getText("AllowBake", "True")
                         Copy = cpcore.siteProperties.getText("AllowChildMenuHeadline", "True")
@@ -542,11 +543,11 @@ Namespace Contensive.Core.Controllers
                                 Doc = New XmlDocument
                                 Call Doc.LoadXml(addonInstall.getCollectionListFile)
                                 If True Then
-                                    If vbLCase(Doc.DocumentElement.Name) <> vbLCase(CollectionListRootNode) Then
+                                    If genericController.vbLCase(Doc.DocumentElement.Name) <> genericController.vbLCase(CollectionListRootNode) Then
                                         cpcore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "Error loading Collection config file. The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.", "dll", "builderClass", "Upgrade", 0, "", "", False, True, "")
                                     Else
                                         With Doc.DocumentElement
-                                            If vbLCase(.Name) = "collectionlist" Then
+                                            If genericController.vbLCase(.Name) = "collectionlist" Then
                                                 '
                                                 ' now go through each collection in this app and check the last updated agains the one here
                                                 '
@@ -558,7 +559,7 @@ Namespace Contensive.Core.Controllers
                                                     For rowptr = 0 To dt.Rows.Count - 1
 
                                                         ErrorMessage = ""
-                                                        CollectionGuid = vbLCase(dt.Rows(rowptr).Item("ccguid").ToString)
+                                                        CollectionGuid = genericController.vbLCase(dt.Rows(rowptr).Item("ccguid").ToString)
                                                         Collectionname = dt.Rows(rowptr).Item("name").ToString
                                                         Call appendBuildLog(cpcore, "...checking collection [" & Collectionname & "], guid [" & CollectionGuid & "]")
                                                         If CollectionGuid <> "{7c6601a7-9d52-40a3-9570-774d0d43d758}" Then
@@ -567,7 +568,7 @@ Namespace Contensive.Core.Controllers
                                                             '
                                                             localCollectionFound = False
                                                             upgradeCollection = False
-                                                            LastChangeDate = EncodeDate(dt.Rows(rowptr).Item("LastChangeDate"))
+                                                            LastChangeDate =  genericController.EncodeDate(dt.Rows(rowptr).Item("LastChangeDate"))
                                                             If LastChangeDate = Date.MinValue Then
                                                                 '
                                                                 ' app version has no lastchangedate
@@ -581,20 +582,20 @@ Namespace Contensive.Core.Controllers
                                                                 LocalGuid = ""
                                                                 LocalLastChangeDate = Date.MinValue
                                                                 For Each LocalListNode In .ChildNodes
-                                                                    Select Case vbLCase(LocalListNode.Name)
+                                                                    Select Case genericController.vbLCase(LocalListNode.Name)
                                                                         Case "collection"
                                                                             For Each CollectionNode In LocalListNode.ChildNodes
-                                                                                Select Case vbLCase(CollectionNode.Name)
+                                                                                Select Case genericController.vbLCase(CollectionNode.Name)
                                                                                     Case "guid"
                                                                                         '
-                                                                                        LocalGuid = vbLCase(CollectionNode.InnerText)
+                                                                                        LocalGuid = genericController.vbLCase(CollectionNode.InnerText)
                                                                                     Case "lastchangedate"
                                                                                         '
-                                                                                        LocalLastChangeDate = EncodeDate(CollectionNode.InnerText)
+                                                                                        LocalLastChangeDate =  genericController.EncodeDate(CollectionNode.InnerText)
                                                                                 End Select
                                                                             Next
                                                                     End Select
-                                                                    If CollectionGuid = vbLCase(LocalGuid) Then
+                                                                    If CollectionGuid = genericController.vbLCase(LocalGuid) Then
                                                                         localCollectionFound = True
                                                                         Call appendBuildLog(cpcore, "...local collection found")
                                                                         If LocalLastChangeDate <> Date.MinValue Then
@@ -738,7 +739,7 @@ Namespace Contensive.Core.Controllers
         '            If dt.Rows.Count > 0 Then
 
         '                For FieldPointer = 1 To dt.Rows.Count - 1
-        '                    If UcaseFieldName = vbUCase(dt.Rows(FieldPointer).Item("name")) Then
+        '                    If UcaseFieldName = genericController.vbUCase(dt.Rows(FieldPointer).Item("name")) Then
         '                        ExistsSQLTableField = True
         '                        Exit For
         '                    End If
@@ -829,10 +830,10 @@ Namespace Contensive.Core.Controllers
         '                    ' if no error, field exists, and it is OK to continue
         '                    '
         '                    Do While Not rs.rows.count=0
-        '                        TableName = EncodeText(cpcore.app.getDataRowColumnName(RS.rows(0), "sqlTable"))
+        '                        TableName = genericController.encodeText(cpcore.app.getDataRowColumnName(RS.rows(0), "sqlTable"))
         '                        TableID = 0
-        '                        DataSourceID = EncodeInteger(cpcore.app.getDataRowColumnName(RS.rows(0), "DataSourceID"))
-        '                        ContentID = EncodeInteger(cpcore.app.getDataRowColumnName(RS.rows(0), "ID"))
+        '                        DataSourceID = genericController.EncodeInteger(cpcore.app.getDataRowColumnName(RS.rows(0), "DataSourceID"))
+        '                        ContentID = genericController.EncodeInteger(cpcore.app.getDataRowColumnName(RS.rows(0), "ID"))
         '                        If TableName <> "" Then
         '                            '
         '                            ' ----- Get TableID from TableName
@@ -1171,11 +1172,11 @@ Namespace Contensive.Core.Controllers
         '            RSTables = cpcore.app.ExecuteSQL(DataSourceName, "SELECT ID from ccTables where name='" & TableName & "';")
         '            If Not (RSTables Is Nothing) Then
         '                Do While Not RSTables.EOF
-        '                    TableID = EncodeInteger(RSTables("ID"))
+        '                    TableID = genericController.EncodeInteger(RSTables("ID"))
         '                    RSContent = cpcore.app.ExecuteSQL(DataSourceName, "Select ID from ccContent where (ContentTableID=" & TableID & ")or(AuthoringTableID=" & TableID & ");")
         '                    If Not (RSContent Is Nothing) Then
         '                        Do While Not RSContent.EOF
-        '                            ContentID = EncodeInteger(RSContent("ID"))
+        '                            ContentID = genericController.EncodeInteger(RSContent("ID"))
         '                            Call cpcore.app.ExecuteSQL(DataSourceName, "Delete From ccFields where (ContentID=" & ContentID & ")and(name=" & encodeSQLText(FieldName) & ");")
         '                            RSContent.MoveNext()
         '                        Loop
@@ -1228,13 +1229,13 @@ Namespace Contensive.Core.Controllers
         '            '
         '            Dim dt As DataTable
         '            Dim sql As String
-        '            Dim createkey As Integer = GetRandomInteger()
+        '            Dim createkey As Integer = genericController.GetRandomInteger()
         '            Dim cid As Integer
         '            '
         '            core_group_add = 0
         '            dt = cpCore.app.executeSql("SELECT ID FROM CCGROUPS WHERE NAME='" & GroupName & "';")
         '            If dt.Rows.Count > 0 Then
-        '                core_group_add = EncodeInteger(dt.Rows(0).Item("ID"))
+        '                core_group_add = genericController.EncodeInteger(dt.Rows(0).Item("ID"))
         '            Else
         '                cid = GetContentID("groups")
         '                sql = "insert into ccgroups (contentcontrolid,active,createkey,name,caption) values (" & cid & ",1," & createkey & "," & EncodeSQLText(GroupName) & "," & EncodeSQLText(GroupName) & ")"
@@ -1242,7 +1243,7 @@ Namespace Contensive.Core.Controllers
         '                sql = "select id from ccgroups where createkey=" & createkey & " order by id desc"
         '                dt = cpCore.app.executeSql(sql)
         '                If dt.Rows.Count > 0 Then
-        '                    core_group_add = EncodeInteger(dt.Rows(0).Item("id"))
+        '                    core_group_add = genericController.EncodeInteger(dt.Rows(0).Item("id"))
         '                End If
 
         '            End If
@@ -1269,9 +1270,9 @@ Namespace Contensive.Core.Controllers
                 If dt.Rows.Count > 0 Then
                     FieldLast = ""
                     For rowptr = 0 To dt.Rows.Count - 1
-                        FieldNew = EncodeText(dt.Rows(rowptr).Item("name")) & "." & EncodeText(dt.Rows(rowptr).Item("parentid"))
+                        FieldNew = genericController.encodeText(dt.Rows(rowptr).Item("name")) & "." & genericController.encodeText(dt.Rows(rowptr).Item("parentid"))
                         If (FieldNew = FieldLast) Then
-                            FieldRecordID = EncodeInteger(dt.Rows(rowptr).Item("ID"))
+                            FieldRecordID = genericController.EncodeInteger(dt.Rows(rowptr).Item("ID"))
                             Call cpCore.db.executeSql("Update ccMenuEntries set active=0 where ID=" & FieldRecordID & ";")
                         End If
                         FieldLast = FieldNew
@@ -1386,16 +1387,16 @@ Namespace Contensive.Core.Controllers
                 dt = cpCore.db.executeSql(SQL)
                 ptr = 0
                 Do While (ptr < dt.Rows.Count)
-                    IDVariant = EncodeInteger(dt.Rows(ptr).Item("DataSourceID"))
+                    IDVariant = genericController.EncodeInteger(dt.Rows(ptr).Item("DataSourceID"))
                     If (IDVariant = 0) Then
                         Active = True
                         DataSourceName = "Default"
                     Else
-                        Active = EncodeBoolean(dt.Rows(ptr).Item("DataSourceActive"))
-                        DataSourceName = EncodeText(dt.Rows(ptr).Item("DataSourcename"))
+                        Active = genericController.EncodeBoolean(dt.Rows(ptr).Item("DataSourceActive"))
+                        DataSourceName = genericController.encodeText(dt.Rows(ptr).Item("DataSourcename"))
                     End If
                     If Active Then
-                        Call cpCore.db.createSQLTable(DataSourceName, EncodeText(dt.Rows(ptr).Item("Tablename")))
+                        Call cpCore.db.createSQLTable(DataSourceName, genericController.encodeText(dt.Rows(ptr).Item("Tablename")))
                     End If
                     ptr += 1
                 Loop
@@ -1516,7 +1517,7 @@ Namespace Contensive.Core.Controllers
         '            RowsFound = 0
         '            For Each rsDr As DataRow In rs.Rows
         '                RowsFound = RowsFound + 1
-        '                If RowsFound <> EncodeInteger(rsDr("ID")) Then
+        '                If RowsFound <> genericController.EncodeInteger(rsDr("ID")) Then
         '                    '
         '                    ' Bad Table
         '                    '
@@ -1609,7 +1610,7 @@ Namespace Contensive.Core.Controllers
                 '
                 rs = cpCore.db.executeSql("Select ID from " & TableName & " where name=" & cpCore.db.encodeSQLText(RecordName))
                 If isDataTableOk(rs) Then
-                    GetIDBYName = EncodeInteger(rs.Rows(0).Item("ID"))
+                    GetIDBYName = genericController.EncodeInteger(rs.Rows(0).Item("ID"))
                 End If
                 rs.Dispose()
             Catch ex As Exception
@@ -1827,7 +1828,7 @@ Namespace Contensive.Core.Controllers
                 If cpCore.db.cs_ok(CS) Then
                     Call cpCore.db.cs_setField(CS, "NAME", Name)
                     Call cpCore.db.cs_setField(CS, "Abbreviation", Abbreviation)
-                    If vbLCase(Name) = "united states" Then
+                    If genericController.vbLCase(Name) = "united states" Then
                         Call cpCore.db.cs_set(CS, "DomesticShipping", "1")
                     End If
                 End If

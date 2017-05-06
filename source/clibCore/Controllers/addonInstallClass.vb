@@ -4,6 +4,7 @@ Option Strict On
 
 Imports System.Xml
 Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 '
 Namespace Contensive.Core
     '
@@ -179,7 +180,7 @@ Namespace Contensive.Core
                     ' continue if no errors
                     '
                     With Doc.DocumentElement
-                        If (LCase(Doc.DocumentElement.Name) <> vbLCase(DownloadFileRootNode)) Then
+                        If (LCase(Doc.DocumentElement.Name) <> genericController.vbLCase(DownloadFileRootNode)) Then
                             return_ErrorMessage = "The collection file from the server was Not valid for collection [" & CollectionGuid & "]"
                             DownloadCollectionFiles = False
                             Call appendInstallLog("Server", "AddonInstallClass", errorPrefix & "The response has a basename [" & Doc.DocumentElement.Name & "] but [" & DownloadFileRootNode & "] was expected.")
@@ -196,7 +197,7 @@ Namespace Contensive.Core
                             Else
                                 With Doc.DocumentElement
                                     For Each CDefSection In .ChildNodes
-                                        Select Case vbLCase(CDefSection.Name)
+                                        Select Case genericController.vbLCase(CDefSection.Name)
                                             Case "collection"
                                                 '
                                                 ' Read in the interfaces and save to Add-ons
@@ -208,7 +209,7 @@ Namespace Contensive.Core
                                                 CollectionVersion = ""
                                                 CollectionFileLink = ""
                                                 For Each CDefInterfaces In CDefSection.ChildNodes
-                                                    Select Case vbLCase(CDefInterfaces.Name)
+                                                    Select Case genericController.vbLCase(CDefInterfaces.Name)
                                                         Case "name"
                                                             Collectionname = CDefInterfaces.InnerText
                                                         Case "help"
@@ -217,7 +218,7 @@ Namespace Contensive.Core
                                                         Case "guid"
                                                             CollectionGuid = CDefInterfaces.InnerText
                                                         Case "lastchangedate"
-                                                            return_CollectionLastChangeDate = EncodeDate(CDefInterfaces.InnerText)
+                                                            return_CollectionLastChangeDate =  genericController.EncodeDate(CDefInterfaces.InnerText)
                                                         Case "version"
                                                             CollectionVersion = CDefInterfaces.InnerText
                                                         Case "collectionfilelink"
@@ -234,7 +235,7 @@ Namespace Contensive.Core
                                                                     CollectionFilePath = workingPath & Mid(CollectionFileLink, Pos + 1)
                                                                     Call cpCore.privateFiles.SaveRemoteFile(CollectionFileLink, CollectionFilePath)
                                                                     ' BuildCollectionFolder takes care of the unzipping.
-                                                                    'If vbLCase(Right(CollectionFilePath, 4)) = ".zip" Then
+                                                                    'If genericController.vbLCase(Right(CollectionFilePath, 4)) = ".zip" Then
                                                                     '    Call UnzipAndDeleteFile_AndWait(CollectionFilePath)
                                                                     'End If
                                                                     'DownloadCollectionFiles = True
@@ -247,7 +248,7 @@ Namespace Contensive.Core
                                                             ResourceFilename = ""
                                                             ResourceLink = ""
                                                             For Each ActiveXNode In CDefInterfaces.ChildNodes
-                                                                Select Case vbLCase(ActiveXNode.Name)
+                                                                Select Case genericController.vbLCase(ActiveXNode.Name)
                                                                     Case "filename"
                                                                         ResourceFilename = ActiveXNode.InnerText
                                                                     Case "link"
@@ -349,7 +350,7 @@ Namespace Contensive.Core
                     '
                     ' Download all files for this collection and build the collection folder(s)
                     '
-                    workingPath = cpCore.addon.getPrivateFilesAddonPath() & "temp_" & GetRandomInteger() & "\"
+                    workingPath = cpCore.addon.getPrivateFilesAddonPath() & "temp_" & genericController.GetRandomInteger() & "\"
                     Call cpCore.privateFiles.createPath(workingPath)
                     '
                     UpgradeOK = DownloadCollectionFiles(workingPath, CollectionGuid, CollectionLastChangeDate, return_ErrorMessage)
@@ -429,7 +430,7 @@ Namespace Contensive.Core
                         returnOk = False
                     End Try
                     If returnOk Then
-                        If vbLCase(LocalCollections.DocumentElement.Name) <> vbLCase(CollectionListRootNode) Then
+                        If genericController.vbLCase(LocalCollections.DocumentElement.Name) <> genericController.vbLCase(CollectionListRootNode) Then
                             If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), The addons\Collections.xml file has an invalid root node")
                             Copy = "The addons\Collections.xml has an invalid root node, [" & LocalCollections.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected."
                             'Copy = "The LocalCollections file [" & App.Path & "\Addons\Collections.xml] has an invalid root node, [" & LocalCollections.DocumentElement.name & "] was received and [" & CollectionListRootNode & "] was expected."
@@ -443,12 +444,12 @@ Namespace Contensive.Core
 
                             GuidCnt = 0
                             With LocalCollections.DocumentElement
-                                If vbLCase(.Name) = "collectionlist" Then
+                                If genericController.vbLCase(.Name) = "collectionlist" Then
                                     For Each LocalListNode In .ChildNodes
-                                        Select Case vbLCase(LocalListNode.Name)
+                                        Select Case genericController.vbLCase(LocalListNode.Name)
                                             Case "collection"
                                                 For Each CollectionNode In LocalListNode.ChildNodes
-                                                    If vbLCase(CollectionNode.Name) = "guid" Then
+                                                    If genericController.vbLCase(CollectionNode.Name) = "guid" Then
                                                         ReDim Preserve GuidArray(GuidCnt)
                                                         GuidArray(GuidCnt) = CollectionNode.InnerText
                                                         GuidCnt = GuidCnt + 1
@@ -476,7 +477,7 @@ Namespace Contensive.Core
                                     '
                                     ' Request these 10 from the support library
                                     '
-                                    'If vbInstr(1, GuidList, "58c9", vbTextCompare) <> 0 Then
+                                    'If genericController.vbInstr(1, GuidList, "58c9", vbTextCompare) <> 0 Then
                                     '    GuidList = GuidList
                                     'End If
                                     If GuidList <> "" Then
@@ -507,7 +508,7 @@ Namespace Contensive.Core
                                         End Try
                                         If loadOK Then
                                             If True Then
-                                                If vbLCase(LibraryCollections.DocumentElement.Name) <> vbLCase(CollectionListRootNode) Then
+                                                If genericController.vbLCase(LibraryCollections.DocumentElement.Name) <> genericController.vbLCase(CollectionListRootNode) Then
                                                     Copy = "The GetCollectionList support site remote method returned an xml file with an invalid root node, [" & LibraryCollections.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected."
                                                     If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), " & Copy)
                                                     Call appendInstallLog("Server", "UpgradeAllLocalCollecionFilesFileLib2", Copy & ", the request was [" & SupportURL & "]")
@@ -515,7 +516,7 @@ Namespace Contensive.Core
                                                     returnOk = False
                                                 Else
                                                     With LocalCollections.DocumentElement
-                                                        If vbLCase(.Name) <> "collectionlist" Then
+                                                        If genericController.vbLCase(.Name) <> "collectionlist" Then
                                                             cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), The Library response did not have a collectioinlist top node, the request was [" & SupportURL & "]")
                                                         Else
                                                             '
@@ -526,20 +527,20 @@ Namespace Contensive.Core
                                                             For Each LocalListNode In .ChildNodes
                                                                 localCollectionUpToDate = False
                                                                 If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), Process local collection.xml node [" & LocalListNode.Name & "]")
-                                                                Select Case vbLCase(LocalListNode.Name)
+                                                                Select Case genericController.vbLCase(LocalListNode.Name)
                                                                     Case "collection"
                                                                         LocalGuid = ""
                                                                         LocalLastChangeDateStr = ""
                                                                         LocalLastChangeDate = Date.MinValue
                                                                         LocalLastChangeNode = Nothing
                                                                         For Each CollectionNode In LocalListNode.ChildNodes
-                                                                            Select Case vbLCase(CollectionNode.Name)
+                                                                            Select Case genericController.vbLCase(CollectionNode.Name)
                                                                                 Case "guid"
                                                                                     '
-                                                                                    LocalGuid = vbLCase(CollectionNode.InnerText)
-                                                                                    'LocalGUID = vbReplace(LocalGUID, "{", "")
-                                                                                    'LocalGUID = vbReplace(LocalGUID, "}", "")
-                                                                                    'LocalGUID = vbReplace(LocalGUID, "-", "")
+                                                                                    LocalGuid = genericController.vbLCase(CollectionNode.InnerText)
+                                                                                    'LocalGUID = genericController.vbReplace(LocalGUID, "{", "")
+                                                                                    'LocalGUID = genericController.vbReplace(LocalGUID, "}", "")
+                                                                                    'LocalGUID = genericController.vbReplace(LocalGUID, "-", "")
                                                                                 Case "lastchangedate"
                                                                                     '
                                                                                     LocalLastChangeDateStr = CollectionNode.InnerText
@@ -550,7 +551,7 @@ Namespace Contensive.Core
                                                                             If Not IsDate(LocalLastChangeDateStr) Then
                                                                                 LocalLastChangeDate = Date.MinValue
                                                                             Else
-                                                                                LocalLastChangeDate = EncodeDate(LocalLastChangeDateStr)
+                                                                                LocalLastChangeDate =  genericController.EncodeDate(LocalLastChangeDateStr)
                                                                             End If
                                                                         End If
                                                                         If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), node is collection, LocalGuid [" & LocalGuid & "], LocalLastChangeDateStr [" & LocalLastChangeDateStr & "]")
@@ -561,25 +562,25 @@ Namespace Contensive.Core
                                                                             If localCollectionUpToDate Then
                                                                                 Exit For
                                                                             End If
-                                                                            Select Case vbLCase(LibListNode.Name)
+                                                                            Select Case genericController.vbLCase(LibListNode.Name)
                                                                                 Case "collection"
                                                                                     LibGUID = ""
                                                                                     LibLastChangeDateStr = ""
                                                                                     LibLastChangeDate = Date.MinValue
                                                                                     For Each CollectionNode In LibListNode.ChildNodes
-                                                                                        Select Case vbLCase(CollectionNode.Name)
+                                                                                        Select Case genericController.vbLCase(CollectionNode.Name)
                                                                                             Case "name"
                                                                                                 '
-                                                                                                LibName = vbLCase(CollectionNode.InnerText)
+                                                                                                LibName = genericController.vbLCase(CollectionNode.InnerText)
                                                                                             Case "system"
                                                                                                 '
-                                                                                                LibSystem = EncodeBoolean(CollectionNode.InnerText)
+                                                                                                LibSystem = genericController.EncodeBoolean(CollectionNode.InnerText)
                                                                                             Case "guid"
                                                                                                 '
-                                                                                                LibGUID = vbLCase(CollectionNode.InnerText)
-                                                                                                'LibGUID = vbReplace(LibGUID, "{", "")
-                                                                                                'LibGUID = vbReplace(LibGUID, "}", "")
-                                                                                                'LibGUID = vbReplace(LibGUID, "-", "")
+                                                                                                LibGUID = genericController.vbLCase(CollectionNode.InnerText)
+                                                                                                'LibGUID = genericController.vbReplace(LibGUID, "{", "")
+                                                                                                'LibGUID = genericController.vbReplace(LibGUID, "}", "")
+                                                                                                'LibGUID = genericController.vbReplace(LibGUID, "-", "")
                                                                                             Case "lastchangedate"
                                                                                                 '
                                                                                                 LibLastChangeDateStr = CollectionNode.InnerText
@@ -590,7 +591,7 @@ Namespace Contensive.Core
                                                                                         End Select
                                                                                     Next
                                                                                     If LibGUID <> "" Then
-                                                                                        If vbInstr(1, LibGUID, "58c9", vbTextCompare) <> 0 Then
+                                                                                        If genericController.vbInstr(1, LibGUID, "58c9", vbTextCompare) <> 0 Then
                                                                                             LibGUID = LibGUID
                                                                                         End If
                                                                                         If (LibGUID <> "") And (LibGUID = LocalGuid) And ((LibContensiveVersion = "") Or (LibContensiveVersion <= cpCore.common_version())) Then
@@ -598,20 +599,20 @@ Namespace Contensive.Core
                                                                                             ' LibCollection matches the LocalCollection - process the upgrade
                                                                                             '
                                                                                             If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), Library collection node found that matches")
-                                                                                            If vbInstr(1, LibGUID, "58c9", vbTextCompare) <> 0 Then
+                                                                                            If genericController.vbInstr(1, LibGUID, "58c9", vbTextCompare) <> 0 Then
                                                                                                 LibGUID = LibGUID
                                                                                             End If
                                                                                             If Not IsDate(LibLastChangeDateStr) Then
                                                                                                 LibLastChangeDate = Date.MinValue
                                                                                             Else
-                                                                                                LibLastChangeDate = EncodeDate(LibLastChangeDateStr)
+                                                                                                LibLastChangeDate =  genericController.EncodeDate(LibLastChangeDateStr)
                                                                                             End If
                                                                                             ' TestPoint 1.1 - Test each collection for upgrade
                                                                                             If LibLastChangeDate > LocalLastChangeDate Then
                                                                                                 '
                                                                                                 ' LibLastChangeDate <>0, and it is > local lastchangedate
                                                                                                 '
-                                                                                                workingPath = cpCore.addon.getPrivateFilesAddonPath() & "\temp_" & GetRandomInteger() & "\"
+                                                                                                workingPath = cpCore.addon.getPrivateFilesAddonPath() & "\temp_" & genericController.GetRandomInteger() & "\"
                                                                                                 If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), matching library collection is newer, start upgrade [" & workingPath & "].")
                                                                                                 Call appendInstallLog("server", "UpgradeAllLocalCollectionsFromLib3", "Upgrading Collection [" & LibGUID & "], Library name [" & LibName & "], because LocalChangeDate [" & LocalLastChangeDate & "] < LibraryChangeDate [" & LibLastChangeDate & "]")
                                                                                                 '
@@ -789,7 +790,7 @@ Namespace Contensive.Core
                         For Each file As IO.FileInfo In SrcFileNamelist
                             Filename = file.Name
                             Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, processing files, filename=[" & Filename & "]")
-                            If vbLCase(Right(Filename, 4)) = ".xml" Then
+                            If genericController.vbLCase(Right(Filename, 4)) = ".xml" Then
                                 '
                                 Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, processing xml file [" & Filename & "]")
                                 'hint = hint & ",320"
@@ -811,8 +812,8 @@ Namespace Contensive.Core
                                 End Try
                                 If loadOk Then
                                     'hint = hint & ",400"
-                                    CollectionFileBaseName = vbLCase(CollectionFile.DocumentElement.Name)
-                                    If (CollectionFileBaseName <> "contensivecdef") And (CollectionFileBaseName <> CollectionFileRootNode) And (CollectionFileBaseName <> vbLCase(CollectionFileRootNodeOld)) Then
+                                    CollectionFileBaseName = genericController.vbLCase(CollectionFile.DocumentElement.Name)
+                                    If (CollectionFileBaseName <> "contensivecdef") And (CollectionFileBaseName <> CollectionFileRootNode) And (CollectionFileBaseName <> genericController.vbLCase(CollectionFileRootNodeOld)) Then
                                         '
                                         ' Not a problem, this is just not a collection file
                                         '
@@ -854,7 +855,7 @@ Namespace Contensive.Core
                                                     '
                                                     'hint = hint & ",450"
                                                     UpdatingCollection = True
-                                                    Pos = vbInstr(1, CollectionVersionFolderName, "\")
+                                                    Pos = genericController.vbInstr(1, CollectionVersionFolderName, "\")
                                                     If Pos > 0 Then
                                                         CollectionFolderName = Mid(CollectionVersionFolderName, 1, Pos - 1)
                                                     End If
@@ -864,10 +865,10 @@ Namespace Contensive.Core
                                                     '
                                                     'hint = hint & ",460"
                                                     CollectionFolderName = CollectionGuid
-                                                    CollectionFolderName = vbReplace(CollectionFolderName, "{", "")
-                                                    CollectionFolderName = vbReplace(CollectionFolderName, "}", "")
-                                                    CollectionFolderName = vbReplace(CollectionFolderName, "-", "")
-                                                    CollectionFolderName = vbReplace(CollectionFolderName, " ", "")
+                                                    CollectionFolderName = genericController.vbReplace(CollectionFolderName, "{", "")
+                                                    CollectionFolderName = genericController.vbReplace(CollectionFolderName, "}", "")
+                                                    CollectionFolderName = genericController.vbReplace(CollectionFolderName, "-", "")
+                                                    CollectionFolderName = genericController.vbReplace(CollectionFolderName, " ", "")
                                                     CollectionFolderName = Collectionname & "_" & CollectionFolderName
                                                 End If
                                                 CollectionFolder = cpCore.addon.getPrivateFilesAddonPath() & CollectionFolderName & "\"
@@ -912,13 +913,13 @@ Namespace Contensive.Core
                                                 '
                                                 'hint = hint & ",500"
                                                 For Each CDefSection In CollectionFile.DocumentElement.ChildNodes
-                                                    Select Case vbLCase(CDefSection.Name)
+                                                    Select Case genericController.vbLCase(CDefSection.Name)
                                                         Case "resource"
                                                             '
                                                             ' resource node, if executable node, save to RegisterList
                                                             '
                                                             'hint = hint & ",510"
-                                                            ResourceType = vbLCase(GetXMLAttribute(IsFound, CDefSection, "type", ""))
+                                                            ResourceType = genericController.vbLCase(GetXMLAttribute(IsFound, CDefSection, "type", ""))
                                                             Dim resourceFilename As String = Trim(GetXMLAttribute(IsFound, CDefSection, "name", ""))
                                                             Dim resourcePathFilename As String = CollectionVersionPath & resourceFilename
                                                             If resourceFilename = "" Then
@@ -980,7 +981,7 @@ Namespace Contensive.Core
                                                                 ChildCollectionGUID = CDefSection.InnerText
                                                             End If
                                                             Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, getCollection or importcollection, childCollectionName [" & ChildCollectionName & "], childCollectionGuid [" & ChildCollectionGUID & "]")
-                                                            If vbInstr(1, CollectionVersionPath, ChildCollectionGUID, vbTextCompare) = 0 Then
+                                                            If genericController.vbInstr(1, CollectionVersionPath, ChildCollectionGUID, vbTextCompare) = 0 Then
                                                                 If ChildCollectionGUID = "" Then
                                                                     '
                                                                     ' -- Needs a GUID to install
@@ -1231,7 +1232,7 @@ Namespace Contensive.Core
                                 ' Read in the help file
                                 '
                                 For Each file As IO.FileInfo In srcFileInfoArray
-                                    If vbLCase(file.Name) = "collection.hlp" Then
+                                    If genericController.vbLCase(file.Name) = "collection.hlp" Then
                                         CollectionHelp = CollectionHelp & cpCore.privateFiles.readFile(CollectionVersionFolder & file.Name)
                                     End If
                                 Next
@@ -1240,7 +1241,7 @@ Namespace Contensive.Core
                                 '
                                 For Each file As IO.FileInfo In srcFileInfoArray
                                     Filename = file.Name
-                                    If vbLCase(Right(Filename, 4)) = ".xml" Then
+                                    If genericController.vbLCase(Right(Filename, 4)) = ".xml" Then
                                         '
                                         ' XML file -- open it to figure out if it is one we can use
                                         '
@@ -1260,7 +1261,7 @@ Namespace Contensive.Core
                                         End Try
                                         If loadOK Then
                                             With Doc.DocumentElement
-                                                If (LCase(.Name) = vbLCase(CollectionFileRootNode)) Or (LCase(.Name) = vbLCase(CollectionFileRootNodeOld)) Then
+                                                If (LCase(.Name) = genericController.vbLCase(CollectionFileRootNode)) Or (LCase(.Name) = genericController.vbLCase(CollectionFileRootNodeOld)) Then
                                                     '
                                                     '------------------------------------------------------------------------------------------------------
                                                     ' Collection File - import from sub so it can be re-entrant
@@ -1276,19 +1277,19 @@ Namespace Contensive.Core
                                                         UpgradeOK = False
                                                         return_ErrorMessage = return_ErrorMessage & "<P>The collection was not installed because the collection name in the xml collection file is blank</P>"
                                                     Else
-                                                        CollectionSystem = EncodeBoolean(GetXMLAttribute(CollectionSystem_fileValueOK, Doc.DocumentElement, "system", ""))
+                                                        CollectionSystem = genericController.EncodeBoolean(GetXMLAttribute(CollectionSystem_fileValueOK, Doc.DocumentElement, "system", ""))
                                                         Parent_NavID = GetManageAddonNavID()
                                                         If CollectionSystem Then
                                                             Parent_NavID = GetNonRootNavigatorID("System", Parent_NavID, 0, 0, NavIconTypeFolder, "System Collections", True, 0, "", 0, 0, 0, True)
                                                         End If
-                                                        CollectionUpdatable = EncodeBoolean(GetXMLAttribute(CollectionUpdatable_fileValueOK, Doc.DocumentElement, "updatable", ""))
-                                                        CollectionblockNavigatorNode = EncodeBoolean(GetXMLAttribute(CollectionblockNavigatorNode_fileValueOK, Doc.DocumentElement, "blockNavigatorNode", ""))
+                                                        CollectionUpdatable = genericController.EncodeBoolean(GetXMLAttribute(CollectionUpdatable_fileValueOK, Doc.DocumentElement, "updatable", ""))
+                                                        CollectionblockNavigatorNode = genericController.EncodeBoolean(GetXMLAttribute(CollectionblockNavigatorNode_fileValueOK, Doc.DocumentElement, "blockNavigatorNode", ""))
                                                         FileGuid = GetXMLAttribute(IsFound, Doc.DocumentElement, "guid", Collectionname)
                                                         'FileGuid = GetXMLAttribute(IsFound, Doc.documentElement, "guid")
                                                         If FileGuid = "" Then
                                                             FileGuid = Collectionname
                                                         End If
-                                                        If (LCase(CollectionGuid) <> vbLCase(FileGuid)) Then
+                                                        If (LCase(CollectionGuid) <> genericController.vbLCase(FileGuid)) Then
                                                             '
                                                             '
                                                             '
@@ -1317,19 +1318,19 @@ Namespace Contensive.Core
                                                             ContentFileList = ""
                                                             ExecFileList = ""
                                                             For Each CDefSection In .ChildNodes
-                                                                Select Case vbLCase(CDefSection.Name)
+                                                                Select Case genericController.vbLCase(CDefSection.Name)
                                                                     Case "resource"
                                                                         '
                                                                         ' set wwwfilelist, contentfilelist, execfilelist
                                                                         '
-                                                                        ResourceType = vbLCase(GetXMLAttribute(IsFound, CDefSection, "type", ""))
-                                                                        ResourcePath = vbLCase(GetXMLAttribute(IsFound, CDefSection, "path", ""))
-                                                                        Filename = vbLCase(GetXMLAttribute(IsFound, CDefSection, "name", ""))
+                                                                        ResourceType = genericController.vbLCase(GetXMLAttribute(IsFound, CDefSection, "type", ""))
+                                                                        ResourcePath = genericController.vbLCase(GetXMLAttribute(IsFound, CDefSection, "path", ""))
+                                                                        Filename = genericController.vbLCase(GetXMLAttribute(IsFound, CDefSection, "name", ""))
                                                                         Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 1, resource found, name [" & Filename & "], type [" & ResourceType & "], path [" & ResourcePath & "]")
-                                                                        Filename = vbReplace(Filename, "/", "\")
+                                                                        Filename = genericController.vbReplace(Filename, "/", "\")
                                                                         SrcPath = ""
                                                                         DstPath = ResourcePath
-                                                                        Pos = vbInstr(1, Filename, "\")
+                                                                        Pos = genericController.vbInstr(1, Filename, "\")
                                                                         If Pos <> 0 Then
                                                                             '
                                                                             ' Source path is in filename
@@ -1349,7 +1350,7 @@ Namespace Contensive.Core
                                                                             End If
                                                                         End If
 
-                                                                        DstFilePath = vbReplace(DstPath, "/", "\")
+                                                                        DstFilePath = genericController.vbReplace(DstPath, "/", "\")
                                                                         If DstFilePath = "\" Then
                                                                             DstFilePath = ""
                                                                         End If
@@ -1368,7 +1369,7 @@ Namespace Contensive.Core
                                                                                 Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, copying file to www, src [" & CollectionVersionFolder & SrcPath & "], dst [" & cpCore.serverConfig.appConfig.appRootFilesPath & DstFilePath & "].")
                                                                                 'Call appendInstallLog(cpCore.serverconfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, copying file to www, src [" & CollectionVersionFolder & SrcPath & "], dst [" & cpCore.serverConfig.clusterPath & cpCore.serverconfig.appConfig.appRootFilesPath & DstFilePath & "].")
                                                                                 Call cpCore.privateFiles.copyFile(CollectionVersionFolder & SrcPath & Filename, DstFilePath & Filename, cpCore.appRootFiles)
-                                                                                If vbLCase(Right(Filename, 4)) = ".zip" Then
+                                                                                If genericController.vbLCase(Right(Filename, 4)) = ".zip" Then
                                                                                     Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, unzipping www file [" & cpCore.serverConfig.appConfig.appRootFilesPath & DstFilePath & Filename & "].")
                                                                                     'Call appendInstallLog(cpCore.serverconfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, unzipping www file [" & cpCore.serverConfig.clusterPath & cpCore.serverconfig.appConfig.appRootFilesPath & DstFilePath & Filename & "].")
                                                                                     Call cpCore.privateFiles.UnzipFile(DstFilePath & Filename)
@@ -1377,7 +1378,7 @@ Namespace Contensive.Core
                                                                                 ContentFileList = ContentFileList & vbCrLf & DstFilePath & Filename
                                                                                 Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, copying file to content, src [" & CollectionVersionFolder & SrcPath & "], dst [" & DstFilePath & "].")
                                                                                 Call cpCore.privateFiles.copyFile(CollectionVersionFolder & SrcPath & Filename, DstFilePath & Filename, cpCore.cdnFiles)
-                                                                                If vbLCase(Right(Filename, 4)) = ".zip" Then
+                                                                                If genericController.vbLCase(Right(Filename, 4)) = ".zip" Then
                                                                                     Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, unzipping content file [" & DstFilePath & Filename & "].")
                                                                                     Call cpCore.cdnFiles.UnzipFile(DstFilePath & Filename)
                                                                                 End If
@@ -1480,7 +1481,7 @@ Namespace Contensive.Core
                                                                 ' ----- gather help nodes
                                                                 '
                                                                 For Each CDefSection In .ChildNodes
-                                                                    If vbLCase(CDefSection.Name) = "help" Then
+                                                                    If genericController.vbLCase(CDefSection.Name) = "help" Then
                                                                         CollectionHelp = CollectionHelp & CDefSection.InnerText
                                                                     End If
                                                                     If (CollectionHelpLink = "") And (LCase(CDefSection.Name) = "helplink") Then
@@ -1551,13 +1552,13 @@ Namespace Contensive.Core
                                                                         For Ptr = 0 To UBound(Files)
                                                                             PathFilename = Files(Ptr)
                                                                             If Trim(PathFilename) <> "" Then
-                                                                                PathFilename = vbReplace(PathFilename, "/", "\")
+                                                                                PathFilename = genericController.vbReplace(PathFilename, "/", "\")
                                                                                 FileExt = ""
                                                                                 Filename = PathFilename
                                                                                 FilePath = ""
                                                                                 Pos = InStrRev(PathFilename, ".")
                                                                                 If Pos > 0 Then
-                                                                                    FileExt = vbLCase(Mid(PathFilename, Pos + 1))
+                                                                                    FileExt = genericController.vbLCase(Mid(PathFilename, Pos + 1))
                                                                                 End If
                                                                                 Pos = InStrRev(PathFilename, "\")
                                                                                 If Pos > 0 Then
@@ -1609,7 +1610,7 @@ Namespace Contensive.Core
                                                                     CollectionWrapper = ""
                                                                     Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 2")
                                                                     For Each CDefSection In .ChildNodes
-                                                                        Select Case vbLCase(CDefSection.Name)
+                                                                        Select Case genericController.vbLCase(CDefSection.Name)
                                                                             Case "contensivecdef"
                                                                                 '
                                                                                 ' old cdef xection -- take the inner
@@ -1665,7 +1666,7 @@ Namespace Contensive.Core
                                                                         If loadOK Then
                                                                             With NavDoc.DocumentElement
                                                                                 For Each CDefNode In .ChildNodes
-                                                                                    Select Case vbLCase(CDefNode.Name)
+                                                                                    Select Case genericController.vbLCase(CDefNode.Name)
                                                                                         Case "cdef"
                                                                                             ContentName = GetXMLAttribute(IsFound, CDefNode, "name", "")
                                                                                             '
@@ -1683,7 +1684,7 @@ Namespace Contensive.Core
                                                                                             '
                                                                                             ' create navigator entry
                                                                                             '
-                                                                                            DeveloperOnly = EncodeBoolean(GetXMLAttribute(IsFound, CDefNode, "developeronly", ""))
+                                                                                            DeveloperOnly = genericController.EncodeBoolean(GetXMLAttribute(IsFound, CDefNode, "developeronly", ""))
                                                                                             NavIconTypeString = GetXMLAttribute(IsFound, CDefNode, "navicontype", "Content")
                                                                                             EntryName = EncodeInitialCaps(ContentName)
                                                                                             NavIconTypeID = GetListIndex(NavIconTypeString, NavIconTypeList)
@@ -1716,14 +1717,14 @@ Namespace Contensive.Core
                                                                     '
                                                                     Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 3")
                                                                     For Each CDefSection In .ChildNodes
-                                                                        Select Case vbLCase(CDefSection.Name)
+                                                                        Select Case genericController.vbLCase(CDefSection.Name)
                                                                             Case "data"
                                                                                 '
                                                                                 ' import content
                                                                                 '   This can only be done with matching guid
                                                                                 '
                                                                                 For Each ContentNode In CDefSection.ChildNodes
-                                                                                    If vbLCase(ContentNode.Name) = "record" Then
+                                                                                    If genericController.vbLCase(ContentNode.Name) = "record" Then
                                                                                         '
                                                                                         ' Data.Record node
                                                                                         '
@@ -1798,7 +1799,7 @@ Namespace Contensive.Core
                                                                     '
                                                                     Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 4")
                                                                     For Each CDefSection In .ChildNodes
-                                                                        Select Case vbLCase(CDefSection.Name)
+                                                                        Select Case genericController.vbLCase(CDefSection.Name)
                                                                             Case "data"
                                                                                 '
                                                                                 ' import content
@@ -1807,7 +1808,7 @@ Namespace Contensive.Core
                                                                                 'OtherXML = OtherXML & vbCrLf & CDefSection.xml
                                                                                 '
                                                                                 For Each ContentNode In CDefSection.ChildNodes
-                                                                                    If vbLCase(ContentNode.Name) = "record" Then
+                                                                                    If genericController.vbLCase(ContentNode.Name) = "record" Then
                                                                                         '
                                                                                         ' Data.Record node
                                                                                         '
@@ -1833,12 +1834,12 @@ Namespace Contensive.Core
                                                                                                     ' Update the record
                                                                                                     '
                                                                                                     For Each FieldNode In ContentNode.ChildNodes
-                                                                                                        If vbLCase(FieldNode.Name) = "field" Then
+                                                                                                        If genericController.vbLCase(FieldNode.Name) = "field" Then
                                                                                                             IsFieldFound = False
-                                                                                                            FieldName = vbLCase(GetXMLAttribute(IsFound, FieldNode, "name", ""))
+                                                                                                            FieldName = genericController.vbLCase(GetXMLAttribute(IsFound, FieldNode, "name", ""))
                                                                                                             For Each keyValuePair In CDef.fields
                                                                                                                 Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
-                                                                                                                If vbLCase(field.nameLc) = FieldName Then
+                                                                                                                If genericController.vbLCase(field.nameLc) = FieldName Then
                                                                                                                     fieldTypeId = field.fieldTypeId
                                                                                                                     FieldLookupContentID = field.lookupContentID
                                                                                                                     IsFieldFound = True
@@ -1847,7 +1848,7 @@ Namespace Contensive.Core
                                                                                                             Next
                                                                                                             'For Ptr = 0 To CDef.fields.count - 1
                                                                                                             '    CDefField = CDef.fields(Ptr)
-                                                                                                            '    If vbLCase(CDefField.Name) = FieldName Then
+                                                                                                            '    If genericController.vbLCase(CDefField.Name) = FieldName Then
                                                                                                             '        fieldType = CDefField.fieldType
                                                                                                             '        FieldLookupContentID = CDefField.LookupContentID
                                                                                                             '        IsFieldFound = True
@@ -1872,7 +1873,7 @@ Namespace Contensive.Core
                                                                                                                                     '
                                                                                                                                     ' Lookup by guid
                                                                                                                                     '
-                                                                                                                                    fieldLookupId = EncodeInteger(cpCore.db.GetRecordIDByGuid(FieldLookupContentName, FieldValue))
+                                                                                                                                    fieldLookupId = genericController.EncodeInteger(cpCore.db.GetRecordIDByGuid(FieldLookupContentName, FieldValue))
                                                                                                                                     If fieldLookupId <= 0 Then
                                                                                                                                         return_ErrorMessage = return_ErrorMessage & "<P>Warning: There was a problem translating field [" & FieldName & "] in record [" & ContentName & "] because the record it refers to was not found in this site.</P>"
                                                                                                                                     Else
@@ -1892,7 +1893,7 @@ Namespace Contensive.Core
                                                                                                                                     End If
                                                                                                                                 End If
                                                                                                                             End If
-                                                                                                                        ElseIf (vbIsNumeric(FieldValue)) Then
+                                                                                                                        ElseIf (genericController.vbIsNumeric(FieldValue)) Then
                                                                                                                             '
                                                                                                                             ' must be lookup list
                                                                                                                             '
@@ -1922,7 +1923,7 @@ Namespace Contensive.Core
                                                                     '
                                                                     Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 5")
                                                                     For Each CDefSection In .ChildNodes
-                                                                        Select Case vbLCase(CDefSection.Name)
+                                                                        Select Case genericController.vbLCase(CDefSection.Name)
                                                                             Case "cdef", "data", "help", "resource", "helplink"
                                                                                 '
                                                                                 ' ignore - processed in previous passes
@@ -2095,7 +2096,7 @@ Namespace Contensive.Core
                                                                                 '
                                                                                 ' otherxml
                                                                                 '
-                                                                                If vbLCase(CDefSection.OuterXml) <> "<otherxml></otherxml>" Then
+                                                                                If genericController.vbLCase(CDefSection.OuterXml) <> "<otherxml></otherxml>" Then
                                                                                     OtherXML = OtherXML & vbCrLf & CDefSection.OuterXml
                                                                                 End If
                                                                             Case Else
@@ -2117,7 +2118,7 @@ Namespace Contensive.Core
                                                                     '
                                                                     Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 6")
                                                                     For Each CDefSection In .ChildNodes
-                                                                        Select Case vbLCase(CDefSection.Name)
+                                                                        Select Case genericController.vbLCase(CDefSection.Name)
                                                                             Case "addon", "add-on"
                                                                                 '
                                                                                 ' Add-on Node, do part 1 of 2
@@ -2202,12 +2203,12 @@ Namespace Contensive.Core
                     If FolderList.Count > 0 Then
                         For Each folder As IO.DirectoryInfo In FolderList
                             FolderName = folder.Name
-                            Pos = vbInstr(1, FolderName, vbTab)
+                            Pos = genericController.vbInstr(1, FolderName, vbTab)
                             If Pos > 1 Then
                                 'hint = hint & ",800"
                                 FolderName = Mid(FolderName, 1, Pos - 1)
                                 If Len(FolderName) > 34 Then
-                                    If vbLCase(Left(FolderName, 4)) <> "temp" Then
+                                    If genericController.vbLCase(Left(FolderName, 4)) <> "temp" Then
                                         CollectionGuid = Right(FolderName, 32)
                                         Collectionname = Left(FolderName, Len(FolderName) - Len(CollectionGuid) - 1)
                                         CollectionGuid = Mid(CollectionGuid, 1, 8) & "-" & Mid(CollectionGuid, 9, 4) & "-" & Mid(CollectionGuid, 13, 4) & "-" & Mid(CollectionGuid, 17, 4) & "-" & Mid(CollectionGuid, 21)
@@ -2264,28 +2265,28 @@ Namespace Contensive.Core
                     Call appendInstallLog("Server", "", "UpdateConfig, Error loading Collections.xml file.")
                 End Try
                 If loadOK Then
-                    If vbLCase(Doc.DocumentElement.Name) <> vbLCase(CollectionListRootNode) Then
+                    If genericController.vbLCase(Doc.DocumentElement.Name) <> genericController.vbLCase(CollectionListRootNode) Then
                         Call appendInstallLog("Server", "", "UpdateConfig, The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.")
                     Else
                         With Doc.DocumentElement
-                            If vbLCase(.Name) = "collectionlist" Then
+                            If genericController.vbLCase(.Name) = "collectionlist" Then
                                 CollectionFound = False
                                 For Each LocalListNode In .ChildNodes
-                                    Select Case vbLCase(LocalListNode.Name)
+                                    Select Case genericController.vbLCase(LocalListNode.Name)
                                         Case "collection"
                                             LocalGuid = ""
                                             For Each CollectionNode In LocalListNode.ChildNodes
-                                                Select Case vbLCase(CollectionNode.Name)
+                                                Select Case genericController.vbLCase(CollectionNode.Name)
                                                     Case "guid"
                                                         '
-                                                        LocalGuid = vbLCase(CollectionNode.InnerText)
+                                                        LocalGuid = genericController.vbLCase(CollectionNode.InnerText)
                                                         Exit For
                                                 End Select
                                             Next
-                                            If vbLCase(LocalGuid) = vbLCase(CollectionGuid) Then
+                                            If genericController.vbLCase(LocalGuid) = genericController.vbLCase(CollectionGuid) Then
                                                 CollectionFound = True
                                                 For Each CollectionNode In LocalListNode.ChildNodes
-                                                    Select Case vbLCase(CollectionNode.Name)
+                                                    Select Case genericController.vbLCase(CollectionNode.Name)
                                                         Case "name"
                                                             CollectionNode.InnerText = Collectionname
                                                         Case "lastchangedate"
@@ -2383,12 +2384,12 @@ Namespace Contensive.Core
                     loadOK = False
                 End Try
                 If loadOK Then
-                    If vbLCase(Doc.DocumentElement.Name) <> vbLCase(CollectionListRootNode) Then
+                    If genericController.vbLCase(Doc.DocumentElement.Name) <> genericController.vbLCase(CollectionListRootNode) Then
                         Call appendInstallLog("Server", "GetCollectionConfig", "Hint=[" & hint & "], The Collections.xml file has an invalid root node")
                     Else
                         With Doc.DocumentElement
                             If True Then
-                                'If vbLCase(.name) <> "collectionlist" Then
+                                'If genericController.vbLCase(.name) <> "collectionlist" Then
                                 '    Call AppendClassLogFile("Server", "GetCollectionConfig", "Collections.xml file error, root node was not collectionlist, [" & .name & "].")
                                 'Else
                                 CollectionFound = False
@@ -2396,27 +2397,27 @@ Namespace Contensive.Core
                                 For Each LocalListNode In .ChildNodes
                                     LocalName = "no name found"
                                     LocalPath = ""
-                                    Select Case vbLCase(LocalListNode.Name)
+                                    Select Case genericController.vbLCase(LocalListNode.Name)
                                         Case "collection"
                                             LocalGuid = ""
                                             For Each CollectionNode In LocalListNode.ChildNodes
-                                                Select Case vbLCase(CollectionNode.Name)
+                                                Select Case genericController.vbLCase(CollectionNode.Name)
                                                     Case "name"
                                                         '
-                                                        LocalName = vbLCase(CollectionNode.InnerText)
+                                                        LocalName = genericController.vbLCase(CollectionNode.InnerText)
                                                     Case "guid"
                                                         '
-                                                        LocalGuid = vbLCase(CollectionNode.InnerText)
+                                                        LocalGuid = genericController.vbLCase(CollectionNode.InnerText)
                                                     Case "path"
                                                         '
-                                                        CollectionPath = vbLCase(CollectionNode.InnerText)
+                                                        CollectionPath = genericController.vbLCase(CollectionNode.InnerText)
                                                     Case "lastchangedate"
-                                                        LastChangeDate = EncodeDate(CollectionNode.InnerText)
+                                                        LastChangeDate =  genericController.EncodeDate(CollectionNode.InnerText)
                                                 End Select
                                             Next
                                     End Select
                                     'hint = hint & ",checking node [" & LocalName & "]"
-                                    If vbLCase(CollectionGuid) = LocalGuid Then
+                                    If genericController.vbLCase(CollectionGuid) = LocalGuid Then
                                         return_CollectionPath = CollectionPath
                                         return_LastChagnedate = LastChangeDate
                                         return_CollectionName = LocalName
@@ -2696,7 +2697,7 @@ Namespace Contensive.Core
                 Dim Basename As String
                 Dim Doc As XmlDocument
                 '
-                Basename = vbLCase(AddonNode.Name)
+                Basename = genericController.vbLCase(AddonNode.Name)
                 If (Basename = "page") Or (Basename = "process") Or (Basename = "addon") Or (Basename = "add-on") Then
                     addonName = GetXMLAttribute(IsFound, AddonNode, "name", "No Name")
                     If addonName = "" Then
@@ -2764,7 +2765,7 @@ Namespace Contensive.Core
                         NavDeveloperOnly = True
                         If AddonNode.ChildNodes.Count > 0 Then
                             For Each PageInterface In AddonNode.ChildNodes
-                                Select Case vbLCase(PageInterface.Name)
+                                Select Case genericController.vbLCase(PageInterface.Name)
                                     Case "activexdll"
                                         '
                                         ' This is handled in BuildLocalCollectionFolder
@@ -2774,7 +2775,7 @@ Namespace Contensive.Core
                                         ' list of editors
                                         '
                                         For Each TriggerNode In PageInterface.ChildNodes
-                                            Select Case vbLCase(TriggerNode.Name)
+                                            Select Case genericController.vbLCase(TriggerNode.Name)
                                                 Case "type"
                                                     fieldType = TriggerNode.InnerText
                                                     fieldTypeID = cpCore.db.getRecordID("Content Field Types", fieldType)
@@ -2798,7 +2799,7 @@ Namespace Contensive.Core
                                         ' list of events that trigger a process run for this addon
                                         '
                                         For Each TriggerNode In PageInterface.ChildNodes
-                                            Select Case vbLCase(TriggerNode.Name)
+                                            Select Case genericController.vbLCase(TriggerNode.Name)
                                                 Case "contentchange"
                                                     TriggerContentID = 0
                                                     ContentNameorGuid = TriggerNode.InnerText
@@ -2857,12 +2858,12 @@ Namespace Contensive.Core
                                         Call cpCore.db.cs_set(CS, "scriptinglanguageid", scriptinglanguageid)
                                         ScriptingEntryPoint = GetXMLAttribute(IsFound, PageInterface, "entrypoint", "")
                                         Call cpCore.db.cs_set(CS, "ScriptingEntryPoint", ScriptingEntryPoint)
-                                        ScriptingTimeout = EncodeInteger(GetXMLAttribute(IsFound, PageInterface, "timeout", "5000"))
+                                        ScriptingTimeout = genericController.EncodeInteger(GetXMLAttribute(IsFound, PageInterface, "timeout", "5000"))
                                         Call cpCore.db.cs_set(CS, "ScriptingTimeout", ScriptingTimeout)
                                         ScriptingCode = ""
                                         'Call cpCore.app.csv_SetCS(CS, "ScriptingCode", ScriptingCode)
                                         For Each ScriptingNode In PageInterface.ChildNodes
-                                            Select Case vbLCase(ScriptingNode.Name)
+                                            Select Case genericController.vbLCase(ScriptingNode.Name)
                                                 Case "code"
                                                     ScriptingCode = ScriptingCode & ScriptingNode.InnerText
                                                 Case "includemodule"
@@ -2999,10 +3000,10 @@ Namespace Contensive.Core
                                         ' import exclusive stylesheet if more then whitespace
                                         '
                                         test = PageInterface.InnerText
-                                        test = vbReplace(test, " ", "")
-                                        test = vbReplace(test, vbCr, "")
-                                        test = vbReplace(test, vbLf, "")
-                                        test = vbReplace(test, vbTab, "")
+                                        test = genericController.vbReplace(test, " ", "")
+                                        test = genericController.vbReplace(test, vbCr, "")
+                                        test = genericController.vbReplace(test, vbLf, "")
+                                        test = genericController.vbReplace(test, vbTab, "")
                                         If test <> "" Then
                                             StyleSheet = StyleSheet & vbCrLf & PageInterface.InnerText
                                         End If
@@ -3018,7 +3019,7 @@ Namespace Contensive.Core
                                             '
                                         Else
                                             Call cpCore.db.cs_set(CS, FieldName, FieldValue)
-                                            If EncodeBoolean(PageInterface.InnerText) Then
+                                            If genericController.EncodeBoolean(PageInterface.InnerText) Then
                                                 '
                                                 ' if template, admin or content - let non-developers have navigator entry
                                                 '
@@ -3034,8 +3035,8 @@ Namespace Contensive.Core
                                             '
                                             ' Icons can be either in the root of the website or in content files
                                             '
-                                            FieldValue = vbReplace(FieldValue, "\", "/")   ' make it a link, not a file
-                                            If vbInstr(1, FieldValue, "://") <> 0 Then
+                                            FieldValue = genericController.vbReplace(FieldValue, "\", "/")   ' make it a link, not a file
+                                            If genericController.vbInstr(1, FieldValue, "://") <> 0 Then
                                                 '
                                                 ' the link is an absolute URL, leave it link this
                                                 '
@@ -3055,9 +3056,9 @@ Namespace Contensive.Core
                                             End If
                                             Call cpCore.db.cs_set(CS, "IconFilename", FieldValue)
                                             If True Then
-                                                Call cpCore.db.cs_set(CS, "IconWidth", EncodeInteger(GetXMLAttribute(IsFound, PageInterface, "width", "0")))
-                                                Call cpCore.db.cs_set(CS, "IconHeight", EncodeInteger(GetXMLAttribute(IsFound, PageInterface, "height", "0")))
-                                                Call cpCore.db.cs_set(CS, "IconSprites", EncodeInteger(GetXMLAttribute(IsFound, PageInterface, "sprites", "0")))
+                                                Call cpCore.db.cs_set(CS, "IconWidth", genericController.EncodeInteger(GetXMLAttribute(IsFound, PageInterface, "width", "0")))
+                                                Call cpCore.db.cs_set(CS, "IconHeight", genericController.EncodeInteger(GetXMLAttribute(IsFound, PageInterface, "height", "0")))
+                                                Call cpCore.db.cs_set(CS, "IconSprites", genericController.EncodeInteger(GetXMLAttribute(IsFound, PageInterface, "sprites", "0")))
                                             End If
                                         End If
                                     Case "includeaddon", "includeadd-on", "include addon", "include add-on"
@@ -3142,7 +3143,7 @@ Namespace Contensive.Core
                                         '
                                         If (TypeOf (TestObject) Is XmlElement) Then
                                             SrcMainNode = DirectCast(TestObject, XmlElement)
-                                            If vbLCase(SrcMainNode.Name) = "addon" Then
+                                            If genericController.vbLCase(SrcMainNode.Name) = "addon" Then
                                                 SrcAddonGuid = SrcMainNode.GetAttribute("guid")
                                                 SrcAddonName = SrcMainNode.GetAttribute("name")
                                                 If SrcMainNode.HasChildNodes Then
@@ -3157,7 +3158,7 @@ Namespace Contensive.Core
                                                                 '    Err.Clear
                                                                 'Else
                                                                 'On Error GoTo ErrorTrap
-                                                                If vbLCase(SrcAddonNode.Name) = "includeaddon" Then
+                                                                If genericController.vbLCase(SrcAddonNode.Name) = "includeaddon" Then
                                                                     TestGuid = SrcAddonNode.GetAttribute("guid")
                                                                     TestName = SrcAddonNode.GetAttribute("name")
                                                                     Criteria = ""
@@ -3247,7 +3248,7 @@ Namespace Contensive.Core
                 Dim addonId As Integer
                 Dim Basename As String
                 '
-                Basename = vbLCase(AddonNode.Name)
+                Basename = genericController.vbLCase(AddonNode.Name)
                 If (Basename = "page") Or (Basename = "process") Or (Basename = "addon") Or (Basename = "add-on") Then
                     AOName = GetXMLAttribute(IsFound, AddonNode, "name", "No Name")
                     If AOName = "" Then
@@ -3285,7 +3286,7 @@ Namespace Contensive.Core
                         NavDeveloperOnly = True
                         If AddonNode.ChildNodes.Count > 0 Then
                             For Each PageInterface In AddonNode.ChildNodes
-                                Select Case vbLCase(PageInterface.Name)
+                                Select Case genericController.vbLCase(PageInterface.Name)
                                     Case "includeaddon", "includeadd-on", "include addon", "include add-on"
                                         '
                                         ' include add-ons - NOTE - import collections must be run before interfaces
@@ -3383,7 +3384,7 @@ Namespace Contensive.Core
         '            '
         '            Call AppendClassLogFile("Server", "RegisterAddonFolder", "Collection.xml loaded ok")
         '            '
-        '            If vbLCase(Doc.DocumentElement.Name) <> vbLCase(CollectionListRootNode) Then
+        '            If genericController.vbLCase(Doc.DocumentElement.Name) <> genericController.vbLCase(CollectionListRootNode) Then
         '                Call AppendClassLogFile("Server", "", "RegisterAddonFolder, Hint=[" & hint & "], The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.")
         '            Else
         '                '
@@ -3391,7 +3392,7 @@ Namespace Contensive.Core
         '                '
         '                With Doc.DocumentElement
         '                    If True Then
-        '                        'If vbLCase(.name) <> "collectionlist" Then
+        '                        'If genericController.vbLCase(.name) <> "collectionlist" Then
         '                        '    Call AppendClassLogFile("Server", "", "RegisterAddonFolder, basename was not collectionlist, [" & .name & "].")
         '                        'Else
         '                        NodeCnt = 0
@@ -3404,22 +3405,22 @@ Namespace Contensive.Core
         '                            LocalGuid = ""
         '                            LocalName = "no name found"
         '                            LocalPath = ""
-        '                            Select Case vbLCase(LocalListNode.Name)
+        '                            Select Case genericController.vbLCase(LocalListNode.Name)
         '                                Case "collection"
         '                                    LocalGuid = ""
         '                                    For Each CollectionNode In LocalListNode.ChildNodes
-        '                                        Select Case vbLCase(CollectionNode.Name)
+        '                                        Select Case genericController.vbLCase(CollectionNode.Name)
         '                                            Case "name"
         '                                                '
-        '                                                LocalName = vbLCase(CollectionNode.InnerText)
+        '                                                LocalName = genericController.vbLCase(CollectionNode.InnerText)
         '                                            Case "guid"
         '                                                '
-        '                                                LocalGuid = vbLCase(CollectionNode.InnerText)
+        '                                                LocalGuid = genericController.vbLCase(CollectionNode.InnerText)
         '                                            Case "path"
         '                                                '
-        '                                                CollectionPath = vbLCase(CollectionNode.InnerText)
+        '                                                CollectionPath = genericController.vbLCase(CollectionNode.InnerText)
         '                                            Case "lastchangedate"
-        '                                                LastChangeDate = EncodeDate(CollectionNode.InnerText)
+        '                                                LastChangeDate =  genericController.EncodeDate(CollectionNode.InnerText)
         '                                        End Select
         '                                    Next
         '                            End Select
@@ -3434,7 +3435,7 @@ Namespace Contensive.Core
         '                                Call AppendClassLogFile("Server", "RegisterAddonFolder", "no collection path, skipping")
         '                                '
         '                            Else
-        '                                CollectionPath = vbLCase(CollectionPath)
+        '                                CollectionPath = genericController.vbLCase(CollectionPath)
         '                                CollectionRootPath = CollectionPath
         '                                Pos = InStrRev(CollectionRootPath, "\")
         '                                If Pos <= 0 Then
@@ -3595,7 +3596,7 @@ Namespace Contensive.Core
         '            Dim SupportInstalledByCollectionID As Boolean
         '            '
         '            If Trim(EntryName) <> "" Then
-        '                If vbLCase(EntryName) = "manage add-ons" Then
+        '                If genericController.vbLCase(EntryName) = "manage add-ons" Then
         '                    EntryName = EntryName
         '                End If
         '                '
@@ -3868,7 +3869,7 @@ Namespace Contensive.Core
         '
         Public Sub installBaseCollection(isNewBuild As Boolean)
             Try
-                Dim tmpFolderPath As String = "tmp" & GetRandomInteger().ToString & "\"
+                Dim tmpFolderPath As String = "tmp" & genericController.GetRandomInteger().ToString & "\"
                 Dim ignoreString As String = ""
                 Dim returnErrorMessage As String = ""
                 'Dim builder As New coreBuilderClass(cpCore)
@@ -4073,7 +4074,7 @@ Namespace Contensive.Core
                             '
                             For Each CDef_Node In .ChildNodes
                                 'isCdefTarget = False
-                                NodeName = vbLCase(CDef_Node.Name)
+                                NodeName = genericController.vbLCase(CDef_Node.Name)
                                 'hint = "read node " & NodeName
                                 Select Case NodeName
                                     Case "cdef"
@@ -4081,7 +4082,7 @@ Namespace Contensive.Core
                                         ' Content Definitions
                                         '
                                         ContentName = GetXMLAttribute(Found, CDef_Node, "name", "")
-                                        contentNameLc = vbLCase(ContentName)
+                                        contentNameLc = genericController.vbLCase(ContentName)
                                         If ContentName = "" Then
                                             cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "collection file contains a CDEF node with no name attribute. This is not allowed.", "dll", "builderClass", "UpgradeCDef_LoadDataToCollection", 0, "", "", False, True, "")
                                         Else
@@ -4119,7 +4120,7 @@ Namespace Contensive.Core
                                                     If ActiveText = "" Then
                                                         ActiveText = "1"
                                                     End If
-                                                    .Active = EncodeBoolean(ActiveText)
+                                                    .Active = genericController.EncodeBoolean(ActiveText)
                                                     .ActiveOnly = True
                                                     '.adminColumns = ?
                                                     .AdminOnly = GetXMLAttributeBoolean(Found, CDef_Node, "AdminOnly", DefaultCDef.AdminOnly)
@@ -4145,9 +4146,9 @@ Namespace Contensive.Core
                                                     .DefaultSortMethod = GetXMLAttribute(Found, CDef_Node, "DefaultSortMethod", DefaultCDef.DefaultSortMethod)
                                                     If (.DefaultSortMethod = "") Or (LCase(.DefaultSortMethod) = "name") Then
                                                         .DefaultSortMethod = "By Name"
-                                                    ElseIf vbLCase(.DefaultSortMethod) = "sortorder" Then
+                                                    ElseIf genericController.vbLCase(.DefaultSortMethod) = "sortorder" Then
                                                         .DefaultSortMethod = "By Alpha Sort Order Field"
-                                                    ElseIf vbLCase(.DefaultSortMethod) = "date" Then
+                                                    ElseIf genericController.vbLCase(.DefaultSortMethod) = "date" Then
                                                         .DefaultSortMethod = "By Date"
                                                     End If
                                                     .DeveloperOnly = GetXMLAttributeBoolean(Found, CDef_Node, "DeveloperOnly", DefaultCDef.DeveloperOnly)
@@ -4201,7 +4202,7 @@ Namespace Contensive.Core
                                                             If ActiveText = "" Then
                                                                 ActiveText = "1"
                                                             End If
-                                                            .active = EncodeBoolean(ActiveText)
+                                                            .active = genericController.EncodeBoolean(ActiveText)
                                                             '
                                                             ' Convert Field Descriptor (text) to field type (integer)
                                                             '
@@ -4209,8 +4210,8 @@ Namespace Contensive.Core
                                                             Dim fieldTypeName As String = GetXMLAttribute(Found, CDefChildNode, "FieldType", defaultFieldTypeName)
                                                             .fieldTypeId = cpCore.db.getFieldTypeIdFromFieldTypeName(fieldTypeName)
                                                             'FieldTypeDescriptor = GetXMLAttribute(Found, CDefChildNode, "FieldType", DefaultCDefField.fieldType)
-                                                            'If vbIsNumeric(FieldTypeDescriptor) Then
-                                                            '    .fieldType = EncodeInteger(FieldTypeDescriptor)
+                                                            'If genericController.vbIsNumeric(FieldTypeDescriptor) Then
+                                                            '    .fieldType = genericController.EncodeInteger(FieldTypeDescriptor)
                                                             'Else
                                                             '    .fieldType = cpCore.app.csv_GetFieldTypeByDescriptor(FieldTypeDescriptor)
                                                             'End If
@@ -4321,9 +4322,9 @@ Namespace Contensive.Core
                                         ' make a local out of getdatabuildversion
                                         '
                                         If Not IsNavigator Then
-                                            MenuKey = vbLCase(MenuName)
+                                            MenuKey = genericController.vbLCase(MenuName)
                                         ElseIf False Then
-                                            MenuKey = vbLCase("nav." & menuNameSpace & "." & MenuName)
+                                            MenuKey = genericController.vbLCase("nav." & menuNameSpace & "." & MenuName)
                                         Else
                                             MenuKey = MenuGuid
                                         End If
@@ -4362,7 +4363,7 @@ Namespace Contensive.Core
                                                 .Name = MenuName
                                                 .Guid = MenuGuid
                                                 .Key = MenuKey
-                                                .Active = EncodeBoolean(ActiveText)
+                                                .Active = genericController.EncodeBoolean(ActiveText)
                                                 .menuNameSpace = GetXMLAttribute(Found, CDef_Node, "NameSpace", "")
                                                 .ParentName = GetXMLAttribute(Found, CDef_Node, "ParentName", "")
                                                 .ContentName = GetXMLAttribute(Found, CDef_Node, "ContentName", "")
@@ -4598,9 +4599,9 @@ Namespace Contensive.Core
                         With workingCdef
                             If .dataChanged Then
                                 Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "creating sql table [" & .ContentTableName & "], datasource [" & .ContentDataSourceName & "]")
-                                If vbLCase(.ContentDataSourceName) = "default" Or .ContentDataSourceName = "" Then
+                                If genericController.vbLCase(.ContentDataSourceName) = "default" Or .ContentDataSourceName = "" Then
                                     TableName = .ContentTableName
-                                    If vbInstr(1, "," & UsedTables & ",", "," & TableName & ",", vbTextCompare) <> 0 Then
+                                    If genericController.vbInstr(1, "," & UsedTables & ",", "," & TableName & ",", vbTextCompare) <> 0 Then
                                         TableName = TableName
                                     Else
                                         UsedTables = UsedTables & "," & TableName
@@ -4633,7 +4634,7 @@ Namespace Contensive.Core
                             With workingCdef
                                 Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "adding cdef name [" & .Name & "]")
                                 ContentName = .Name
-                                If vbInstr(1, "," & UsedTables & ",", "," & ContentName & ",", vbTextCompare) = 0 Then
+                                If genericController.vbInstr(1, "," & UsedTables & ",", "," & ContentName & ",", vbTextCompare) = 0 Then
                                     SQL = "Insert into ccContent (name,active,createkey)values(" & cpCore.db.encodeSQLText(ContentName) & ",1,0);"
                                     Call cpCore.db.executeSql(SQL)
                                     UsedTables = UsedTables & "," & ContentName
@@ -4662,7 +4663,7 @@ Namespace Contensive.Core
                         Dim workingCdef As coreMetaDataClass.CDefClass = keypairvalue.Value
                         ContentName = workingCdef.Name
                         With workingCdef
-                            ContentName = vbLCase(.Name)
+                            ContentName = genericController.vbLCase(.Name)
                             If ContentName = "content" Then
                                 Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "adding cdef [" & .Name & "]")
                                 '
@@ -4691,7 +4692,7 @@ Namespace Contensive.Core
                                 If ContentName.ToLower() = "people" Then
                                     ContentName = ContentName
                                 End If
-                                If vbLCase(ContentName) <> "content" Then
+                                If genericController.vbLCase(ContentName) <> "content" Then
                                     Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "adding cdef [" & .Name & "]")
                                     '
                                     ' stop the errors here, so a bad field does not block the upgrade
@@ -4723,7 +4724,7 @@ Namespace Contensive.Core
                                     SQL = "select f.id from ccfields f left join cccontent c on c.id=f.contentid where (f.name=" & cpCore.db.encodeSQLText(FieldName) & ")and(c.name=" & cpCore.db.encodeSQLText(ContentName) & ") order by f.id"
                                     rs = cpCore.db.executeSql(SQL)
                                     If isDataTableOk(rs) Then
-                                        fieldId = EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "id"))
+                                        fieldId = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "id"))
                                     End If
                                     rs.Dispose()
                                     If fieldId = 0 Then
@@ -4732,7 +4733,7 @@ Namespace Contensive.Core
                                         SQL = "select id from ccfieldhelp where fieldid=" & fieldId & " order by id"
                                         rs = cpCore.db.executeSql(SQL)
                                         If isDataTableOk(rs) Then
-                                            FieldHelpID = EncodeInteger(rs.Rows(0).Item("id"))
+                                            FieldHelpID = genericController.EncodeInteger(rs.Rows(0).Item("id"))
                                         Else
                                             FieldHelpID = cpCore.db.insertTableRecordGetId("default", "ccfieldhelp", 0)
                                         End If
@@ -4784,7 +4785,7 @@ Namespace Contensive.Core
                             If Ptr = 140 Then
                                 Ptr = Ptr
                             End If
-                            If vbLCase(.Name) = "manage add-ons" And .IsNavigator Then
+                            If genericController.vbLCase(.Name) = "manage add-ons" And .IsNavigator Then
                                 .Name = .Name
                             End If
                             If .dataChanged Then
@@ -4901,8 +4902,8 @@ Namespace Contensive.Core
                                 If .dataChanged Then
                                     NewStyleName = .Name
                                     NewStyleValue = .Copy
-                                    NewStyleValue = vbReplace(NewStyleValue, "}", "")
-                                    NewStyleValue = vbReplace(NewStyleValue, "{", "")
+                                    NewStyleValue = genericController.vbReplace(NewStyleValue, "}", "")
+                                    NewStyleValue = genericController.vbReplace(NewStyleValue, "{", "")
                                     If SiteStyleCnt > 0 Then
                                         For SiteStylePtr = 0 To SiteStyleCnt - 1
                                             StyleLine = SiteStyleSplit(SiteStylePtr)
@@ -4915,7 +4916,7 @@ Namespace Contensive.Core
                                                     '
                                                     PosNameLineStart = PosNameLineStart + 2
                                                     TestStyleName = Trim(Mid(StyleLine, PosNameLineStart, PosNameLineEnd - PosNameLineStart))
-                                                    If vbLCase(TestStyleName) = vbLCase(NewStyleName) Then
+                                                    If genericController.vbLCase(TestStyleName) = genericController.vbLCase(NewStyleName) Then
                                                         Found = True
                                                         If .Overwrite Then
                                                             '
@@ -5032,8 +5033,8 @@ Namespace Contensive.Core
                         If (isDataTableOk(rs)) Then
                             If rs.Rows.Count > 0 Then
                                 'EditorGroupID = cpcore.app.getDataRowColumnName(RS.rows(0), "ID")
-                                ContentID = EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "ID"))
-                                ContentIsBaseContent = EncodeBoolean(cpCore.db.getDataRowColumnName(rs.Rows(0), "IsBaseContent"))
+                                ContentID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "ID"))
+                                ContentIsBaseContent = genericController.EncodeBoolean(cpCore.db.getDataRowColumnName(rs.Rows(0), "IsBaseContent"))
                             End If
                         End If
                         rs.Dispose()
@@ -5091,7 +5092,7 @@ Namespace Contensive.Core
                                     rs = cpCore.db.executeSql("select ID from ccGroups where name=" & cpCore.db.encodeSQLText(.EditorGroupName))
                                     If (isDataTableOk(rs)) Then
                                         If rs.Rows.Count > 0 Then
-                                            EditorGroupID = EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "ID"))
+                                            EditorGroupID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "ID"))
                                         End If
                                     End If
                                     rs.Dispose()
@@ -5131,7 +5132,7 @@ Namespace Contensive.Core
                                         rs = cpCore.db.executeSql("select ID from ccFieldHelp where fieldid=" & fieldId)
                                         If (isDataTableOk(rs)) Then
                                             If rs.Rows.Count > 0 Then
-                                                FieldHelpID = EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "ID"))
+                                                FieldHelpID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "ID"))
                                             End If
                                         End If
                                         rs.Dispose()
@@ -5273,11 +5274,11 @@ Namespace Contensive.Core
                     srcCollectionCdef = srcKeyValuePair.Value
 
                     SrcContentName = srcCollectionCdef.Name
-                    If vbLCase(SrcContentName) = "site sections" Then
+                    If genericController.vbLCase(SrcContentName) = "site sections" Then
                         SrcContentName = SrcContentName
                     End If
                     DebugSrcFound = False
-                    If vbInstr(1, SrcContentName, DebugName, vbTextCompare) <> 0 Then
+                    If genericController.vbInstr(1, SrcContentName, DebugName, vbTextCompare) <> 0 Then
                         DebugSrcFound = True
                     End If
                     '
@@ -5531,7 +5532,7 @@ Namespace Contensive.Core
                                             okToUpdateDstFromSrc = okToUpdateDstFromSrc Or (.indexSortDirection <> dstCollectionCdefField.indexSortDirection)
                                             '
                                             If Not okToUpdateDstFromSrc Then n = "IndexSortOrder"
-                                            okToUpdateDstFromSrc = okToUpdateDstFromSrc Or (EncodeInteger(.indexSortOrder) <> EncodeInteger(dstCollectionCdefField.indexSortOrder))
+                                            okToUpdateDstFromSrc = okToUpdateDstFromSrc Or (EncodeInteger(.indexSortOrder) <> genericController.EncodeInteger(dstCollectionCdefField.indexSortOrder))
                                             '
                                             If Not okToUpdateDstFromSrc Then n = "IndexWidth"
                                             okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(.indexWidth, dstCollectionCdefField.indexWidth)
@@ -5591,7 +5592,7 @@ Namespace Contensive.Core
                                             okToUpdateDstFromSrc = okToUpdateDstFromSrc Or (.TextBuffered <> dstCollectionCdefField.TextBuffered)
                                             '
                                             If Not okToUpdateDstFromSrc Then n = "DefaultValue"
-                                            okToUpdateDstFromSrc = okToUpdateDstFromSrc Or (EncodeText(.defaultValue) <> EncodeText(dstCollectionCdefField.defaultValue))
+                                            okToUpdateDstFromSrc = okToUpdateDstFromSrc Or (genericController.encodeText(.defaultValue) <> genericController.encodeText(dstCollectionCdefField.defaultValue))
                                             '
                                             If Not okToUpdateDstFromSrc Then n = "UniqueName"
                                             okToUpdateDstFromSrc = okToUpdateDstFromSrc Or (.UniqueName <> dstCollectionCdefField.UniqueName)
@@ -5761,9 +5762,9 @@ Namespace Contensive.Core
                 DataBuildVersion = cpCore.siteProperties.dataBuildVersion
                 For SrcMenuPtr = 0 To srcCollection.MenuCnt - 1
                     DstMenuPtr = 0
-                    SrcContentName = vbLCase(srcCollection.Menus(SrcMenuPtr).Name)
-                    SrcParentName = vbLCase(srcCollection.Menus(SrcMenuPtr).ParentName)
-                    SrcNameSpace = vbLCase(srcCollection.Menus(SrcMenuPtr).menuNameSpace)
+                    SrcContentName = genericController.vbLCase(srcCollection.Menus(SrcMenuPtr).Name)
+                    SrcParentName = genericController.vbLCase(srcCollection.Menus(SrcMenuPtr).ParentName)
+                    SrcNameSpace = genericController.vbLCase(srcCollection.Menus(SrcMenuPtr).menuNameSpace)
                     SrcIsNavigator = srcCollection.Menus(SrcMenuPtr).IsNavigator
                     If SrcIsNavigator Then
                         If (SrcContentName = "manage add-ons") Then
@@ -5772,18 +5773,18 @@ Namespace Contensive.Core
                     End If
                     okToUpdateDstFromSrc = False
                     '
-                    SrcKey = vbLCase(srcCollection.Menus(SrcMenuPtr).Key)
+                    SrcKey = genericController.vbLCase(srcCollection.Menus(SrcMenuPtr).Key)
                     '
                     ' Search for match using guid
                     '
                     IsMatch = False
                     For DstMenuPtr = 0 To dstCollection.MenuCnt - 1
-                        DstName = vbLCase(dstCollection.Menus(DstMenuPtr).Name)
+                        DstName = genericController.vbLCase(dstCollection.Menus(DstMenuPtr).Name)
                         If DstName = SrcContentName Then
                             DstName = DstName
                             DstIsNavigator = dstCollection.Menus(DstMenuPtr).IsNavigator
-                            DstKey = vbLCase(dstCollection.Menus(DstMenuPtr).Key)
-                            If vbLCase(DstName) = "settings" Then
+                            DstKey = genericController.vbLCase(dstCollection.Menus(DstMenuPtr).Key)
+                            If genericController.vbLCase(DstName) = "settings" Then
                                 DstName = DstName
                             End If
                             IsMatch = (DstKey = SrcKey) And (SrcIsNavigator = DstIsNavigator)
@@ -5797,8 +5798,8 @@ Namespace Contensive.Core
                         ' no match found on guid, try name and ( either namespace or parentname )
                         '
                         For DstMenuPtr = 0 To dstCollection.MenuCnt - 1
-                            DstName = vbLCase(dstCollection.Menus(DstMenuPtr).Name)
-                            If vbLCase(DstName) = "settings" Then
+                            DstName = genericController.vbLCase(dstCollection.Menus(DstMenuPtr).Name)
+                            If genericController.vbLCase(DstName) = "settings" Then
                                 DstName = DstName
                             End If
                             If ((SrcContentName = DstName) And (SrcIsNavigator = DstIsNavigator)) Then
@@ -5806,12 +5807,12 @@ Namespace Contensive.Core
                                     '
                                     ' Navigator - check namespace if Dst.guid is blank (builder to new version of menu)
                                     '
-                                    IsMatch = (SrcNameSpace = vbLCase(dstCollection.Menus(DstMenuPtr).menuNameSpace)) And (dstCollection.Menus(DstMenuPtr).Guid = "")
+                                    IsMatch = (SrcNameSpace = genericController.vbLCase(dstCollection.Menus(DstMenuPtr).menuNameSpace)) And (dstCollection.Menus(DstMenuPtr).Guid = "")
                                 Else
                                     '
                                     ' AdminMenu - check parentname
                                     '
-                                    IsMatch = (SrcParentName = vbLCase(dstCollection.Menus(DstMenuPtr).ParentName))
+                                    IsMatch = (SrcParentName = genericController.vbLCase(dstCollection.Menus(DstMenuPtr).ParentName))
                                 End If
                                 If IsMatch Then
                                     Exit For
@@ -5894,13 +5895,13 @@ Namespace Contensive.Core
                 '    '
                 '    '
                 '    For SrcPtr = 0 To srcCollection.AddOnCnt - 1
-                '        SrcContentName = vbLCase(srcCollection.AddOns(SrcPtr).Name)
+                '        SrcContentName = genericController.vbLCase(srcCollection.AddOns(SrcPtr).Name)
                 '        okToUpdateDstFromSrc = False
                 '        '
                 '        ' Search for this name in the Dst
                 '        '
                 '        For DstPtr = 0 To dstCollection.AddOnCnt - 1
-                '            DstName = vbLCase(dstCollection.AddOns(DstPtr).Name)
+                '            DstName = genericController.vbLCase(dstCollection.AddOns(DstPtr).Name)
                 '            If DstName = SrcContentName Then
                 '                '
                 '                ' found a match between Src and Dst
@@ -5953,13 +5954,13 @@ Namespace Contensive.Core
                 Dim srcStylePtr As Integer
                 Dim dstStylePtr As Integer
                 For srcStylePtr = 0 To srcCollection.StyleCnt - 1
-                    SrcContentName = vbLCase(srcCollection.Styles(srcStylePtr).Name)
+                    SrcContentName = genericController.vbLCase(srcCollection.Styles(srcStylePtr).Name)
                     okToUpdateDstFromSrc = False
                     '
                     ' Search for this name in the Dst
                     '
                     For dstStylePtr = 0 To dstCollection.StyleCnt - 1
-                        DstName = vbLCase(dstCollection.Styles(dstStylePtr).Name)
+                        DstName = genericController.vbLCase(dstCollection.Styles(dstStylePtr).Name)
                         If DstName = SrcContentName Then
                             '
                             ' found a match between Src and Dst
@@ -6064,7 +6065,7 @@ Namespace Contensive.Core
                     '
                     ' if this is not an empty database, get the application collection, else return empty
                     '
-                    ExportFilename = "cdef_export_" & CStr(GetRandomInteger()) & ".xml"
+                    ExportFilename = "cdef_export_" & CStr(genericController.GetRandomInteger()) & ".xml"
                     ExportPathPage = "tmp\" & ExportFilename
                     Call exportApplicationCDefXml(ExportPathPage, True)
                     CollectionData = cpCore.privateFiles.readFile(ExportPathPage)
@@ -6091,9 +6092,9 @@ Namespace Contensive.Core
                 Found = False
                 ResultNode = Node.Attributes.GetNamedItem(Name)
                 If (ResultNode Is Nothing) Then
-                    UcaseName = vbUCase(Name)
+                    UcaseName = genericController.vbUCase(Name)
                     For Each NodeAttribute In Node.Attributes
-                        If vbUCase(NodeAttribute.Name) = UcaseName Then
+                        If genericController.vbUCase(NodeAttribute.Name) = UcaseName Then
                             returnAttr = NodeAttribute.Value
                             Found = True
                             Exit For
@@ -6125,7 +6126,7 @@ Namespace Contensive.Core
         '========================================================================
         '
         Private Function GetXMLAttributeBoolean(ByVal Found As Boolean, ByVal Node As XmlNode, ByVal Name As String, ByVal DefaultIfNotFound As Boolean) As Boolean
-            GetXMLAttributeBoolean = EncodeBoolean(GetXMLAttribute(Found, Node, Name, CStr(DefaultIfNotFound)))
+            GetXMLAttributeBoolean = genericController.EncodeBoolean(GetXMLAttribute(Found, Node, Name, CStr(DefaultIfNotFound)))
         End Function
         '
         '========================================================================
@@ -6133,7 +6134,7 @@ Namespace Contensive.Core
         '========================================================================
         '
         Private Function GetXMLAttributeInteger(ByVal Found As Boolean, ByVal Node As XmlNode, ByVal Name As String, ByVal DefaultIfNotFound As Integer) As Integer
-            GetXMLAttributeInteger = EncodeInteger(GetXMLAttribute(Found, Node, Name, CStr(DefaultIfNotFound)))
+            GetXMLAttributeInteger = genericController.EncodeInteger(GetXMLAttribute(Found, Node, Name, CStr(DefaultIfNotFound)))
         End Function
         '
         '==================================================================================================================
@@ -6141,7 +6142,7 @@ Namespace Contensive.Core
         '==================================================================================================================
         '
         Private Function TextMatch(ByVal Source1 As String, ByVal Source2 As String) As Boolean
-            TextMatch = (LCase(Source1) = vbLCase(Source2))
+            TextMatch = (LCase(Source1) = genericController.vbLCase(Source2))
         End Function
         '
         '
@@ -6158,10 +6159,10 @@ Namespace Contensive.Core
                 With Collection
                     ParentName = .Menus(MenuPtr).ParentName
                     If ParentName <> "" Then
-                        LCaseParentName = vbLCase(ParentName)
+                        LCaseParentName = genericController.vbLCase(ParentName)
                         For Ptr = 0 To .MenuCnt - 1
-                            If vbInstr(1, "," & UsedIDList & ",", "," & CStr(Ptr) & ",") = 0 Then
-                                If LCaseParentName = vbLCase(.Menus(Ptr).Name) And (IsNavigator = .Menus(Ptr).IsNavigator) Then
+                            If genericController.vbInstr(1, "," & UsedIDList & ",", "," & CStr(Ptr) & ",") = 0 Then
+                                If LCaseParentName = genericController.vbLCase(.Menus(Ptr).Name) And (IsNavigator = .Menus(Ptr).IsNavigator) Then
                                     Prefix = GetMenuNameSpace(Collection, Ptr, IsNavigator, UsedIDList & "," & MenuPtr)
                                     If Prefix = "" Then
                                         returnAttr = ParentName
@@ -6201,7 +6202,7 @@ Namespace Contensive.Core
                     '
                     ' update sort method
                     '
-                    Call cpCore.db.updateTableRecord("Default", "ccSortMethods", "ID=" & EncodeInteger(dt.Rows(0).Item("ID")).ToString, sqlList)
+                    Call cpCore.db.updateTableRecord("Default", "ccSortMethods", "ID=" & genericController.EncodeInteger(dt.Rows(0).Item("ID")).ToString, sqlList)
                 Else
                     '
                     ' Create the new sort method
@@ -6261,7 +6262,7 @@ Namespace Contensive.Core
                         RowsFound = 0
                         For Each dr As DataRow In rs.Rows
                             RowsFound = RowsFound + 1
-                            If RowsFound <> EncodeInteger(dr.Item("ID")) Then
+                            If RowsFound <> genericController.EncodeInteger(dr.Item("ID")) Then
                                 '
                                 ' Bad Table
                                 '
@@ -6366,7 +6367,7 @@ Namespace Contensive.Core
                 Dim SupportInstalledByCollectionID As Boolean
                 '
                 If Trim(EntryName) <> "" Then
-                    If vbLCase(EntryName) = "manage add-ons" Then
+                    If genericController.vbLCase(EntryName) = "manage add-ons" Then
                         EntryName = EntryName
                     End If
                     '
