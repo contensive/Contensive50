@@ -1,12 +1,13 @@
 
+
 <script runat="server">
     Sub Page_Load()
         Dim test As String = "test"
         Dim cp As Contensive.Core.CPClass
         Dim doc As String
-        Dim serverConfig As Contensive.Core.Models.Entity.serverConfigModel = DefaultApp.configurationClass.getServerConfig()
         '
-        cp = New Contensive.Core.CPClass(serverConfig, HttpContext.Current)
+        cp = New Contensive.Core.CPClass("DefaultSiteName", HttpContext.Current)
+        '** cp = New Contensive.Core.CPClass(DefaultSite.configurationClass.getServerConfig(), HttpContext.Current)
         doc = cp.executeRoute()
         If cp.Response.isOpen() Then
             '

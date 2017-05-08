@@ -139,12 +139,12 @@ namespace  Contensive.CLI {
                     //  - this is clib running, so they are setting up new application which may or may not have a webrole here.
                     //  - setup a basic webrole just in case this will include one -- maybe later make it an option
                     //
-                    cp.core.programFiles.copyFolder("resources\\aspxDefaultApp\\", "\\", cp.core.appRootFiles);
+                    cp.core.programFiles.copyFolder("resources\\iisDefaultSite\\", "\\", cp.core.appRootFiles);
                     //
                     // replace "appName" with the name of this app in the default document in the apps public folder
                     //
                     string defaultContent = cp.core.appRootFiles.readFile(iisDefaultDoc);
-                    defaultContent = defaultContent.Replace("DefaultAppName", appName);
+                    defaultContent = defaultContent.Replace("defaultSiteName", appName);
                     cp.core.appRootFiles.saveFile(iisDefaultDoc, defaultContent);
                 }
                 //

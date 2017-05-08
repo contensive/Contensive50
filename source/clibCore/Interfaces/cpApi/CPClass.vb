@@ -28,7 +28,7 @@ Namespace Contensive.Core
         '
         '=========================================================================================================
         ''' <summary>
-        ''' cp constructor for cluster use. Provide the authentication token for cluster authorization.
+        ''' constructor for server use. No application context will be available. Use to create new apps.
         ''' </summary>
         ''' <remarks></remarks>
         Public Sub New()
@@ -38,7 +38,7 @@ Namespace Contensive.Core
         '
         '=========================================================================================================
         ''' <summary>
-        ''' cp constructor for app, non-Internet use. Provide the authentication token for cluster authorization.
+        ''' constructor for non-Internet app use. Configuration read from programdata json
         ''' </summary>
         ''' <remarks></remarks>
         Public Sub New(appName As String)
@@ -48,7 +48,7 @@ Namespace Contensive.Core
         '
         '=========================================================================================================
         ''' <summary>
-        ''' cp constructor for app, non-Internet use. Provide the authentication token for cluster authorization.
+        ''' constructor for non-Internet app use. Configuration provided manually
         ''' </summary>
         ''' <remarks></remarks>
         Public Sub New(serverConfig As Models.Entity.serverConfigModel)
@@ -58,7 +58,7 @@ Namespace Contensive.Core
         '
         '=========================================================================================================
         ''' <summary>
-        ''' cp constructor for application use associated to a web request/response. Provide the authentication token which authorizes access to this application.
+        ''' constructor for iis site use. Configuration provided manually (maybe from webconfig)
         ''' </summary>
         ''' <param name="httpContext"></param>
         ''' <remarks></remarks>
@@ -69,7 +69,7 @@ Namespace Contensive.Core
         '
         '=========================================================================================================
         ''' <summary>
-        ''' cp constructor for application use associated to a web request/response. Provide the authentication token which authorizes access to this application.
+        ''' constructor for iis site use. Configuration read from programdata json
         ''' </summary>
         ''' <param name="httpContext"></param>
         ''' <remarks></remarks>

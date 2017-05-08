@@ -17,15 +17,19 @@ Public Class Global_asax
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     Sub Application_Start(ByVal sender As Object, ByVal e As EventArgs)
-        Trace.WriteLine(getAppDescription("Application_Start"))
-        Dim cp As Contensive.Core.CPClass
-        Dim serverConfig As Contensive.Core.Models.Entity.serverConfigModel = DefaultApp.configurationClass.getServerConfig()
-        cp = New Contensive.Core.CPClass(serverConfig)
-        cp.Utils.AppendLog("Application_Start")
-        If (cp.appOk) Then
-            DefaultApp.configurationClass.RegisterRoutes(cp, serverConfig, RouteTable.Routes)
-        End If
-        cp.Dispose()
+        Try
+            Trace.WriteLine(getAppDescription("Application_Start"))
+            Dim cp As Contensive.Core.CPClass
+            Dim serverConfig As Contensive.Core.Models.Entity.serverConfigModel = DefaultSite.configurationClass.getServerConfig()
+            cp = New Contensive.Core.CPClass(serverConfig)
+            cp.Utils.AppendLog("Application_Start")
+            If (cp.appOk) Then
+                DefaultSite.configurationClass.RegisterRoutes(cp, serverConfig, RouteTable.Routes)
+            End If
+            cp.Dispose()
+        Catch ex As Exception
+            Trace.WriteLine(getAppDescription("Application_Start ERROR exit"))
+        End Try
     End Sub
 
     Sub Session_Start(ByVal sender As Object, ByVal e As EventArgs)
