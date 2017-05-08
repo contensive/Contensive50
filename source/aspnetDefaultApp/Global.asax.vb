@@ -1,4 +1,8 @@
-﻿Imports System.Web.SessionState
+﻿
+Option Explicit On
+Option Strict On
+
+Imports System.Web.SessionState
 Imports System.Web.Routing
 
 Public Class Global_asax

@@ -860,7 +860,7 @@ Namespace Contensive.Core
 
         '
         '====================================================================================================
-        Friend Function isinPhysicalPath(path As String) As Boolean
+        public function isinPhysicalPath(path As String) As Boolean
             Return (normalizePath(path).ToLower().IndexOf(rootLocalPath.ToLower()) = 0)
         End Function
         '

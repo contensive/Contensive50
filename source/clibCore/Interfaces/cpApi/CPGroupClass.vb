@@ -75,7 +75,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub Delete(ByVal GroupNameIdOrGuid As String)
             Try
-                cpCore.group_delete(GroupNameIdOrGuid)
+                Models.Entity.groupModel.delete(cpCore, GroupNameIdOrGuid)
             Catch ex As Exception
                 cp.core.handleExceptionAndRethrow(ex)
             End Try

@@ -1,4 +1,10 @@
 ﻿
+Option Explicit On
+Option Strict On
+
+Imports Contensive.Core
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 Imports System.Web.Routing
 Public Class configurationClass
     Public Shared Function getServerConfig() As Contensive.Core.Models.Entity.serverConfigModel
@@ -35,7 +41,7 @@ Public Class configurationClass
         Return serverConfig
     End Function
     '
-    Public Shared Sub RegisterRoutes(cp As Contensive.BaseClasses.CPBaseClass, serverConfig As Contensive.Core.Models.Entity.serverConfigModel, ByVal routes As RouteCollection)
+    Public Shared Sub RegisterRoutes(cp As Contensive.Core.CPClass, serverConfig As Contensive.Core.Models.Entity.serverConfigModel, ByVal routes As RouteCollection)
         Dim cs As Contensive.BaseClasses.CPCSBaseClass = cp.CSNew
         '
         ' -- drive all routes to the default page
@@ -56,7 +62,7 @@ Public Class configurationClass
             End Try
         End If
         '
-        Dim remoteMethods As List(Of Contensive.Core.Models.Entity.addonModel) = Contensive.Core.Models.Entity.addonModel.getRemoteMethods(cp)
+        Dim remoteMethods As List(Of Contensive.Core.Models.Entity.addonModel) = Contensive.Core.Models.Entity.addonModel.getRemoteMethods(cp.core)
         cp.Utils.AppendLog("RegisterRoutes, remoteMethods.Count=" & remoteMethods.Count.ToString())
         For Each remoteMethod As Contensive.Core.Models.Entity.addonModel In remoteMethods
             '

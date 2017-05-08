@@ -20,7 +20,9 @@ Namespace Contensive.Core
         '   objects passed by constructor - do not dispose
         '------------------------------------------------------------------------
         '
-        Friend cp As CPClass                                   ' constructor -- top-level cp
+        ' -- yes, cp is needed to pass int addon execution and script execution - but DO NOT call if from anything else
+        ' -- no, cpCore should never call up to cp. cp is the api that calls core.
+        Friend cp_forAddonExecutionOnly As CPClass                                   ' constructor -- top-level cp
         '
         ' ----- shared globals
         '
@@ -317,7 +319,7 @@ Namespace Contensive.Core
                 If (_programFiles Is Nothing) Then
                     '
                     ' -- always local
-                    _programFiles = New coreFileSystemClass(Me, True, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(cp.core.serverConfig.programFilesPath))
+                    _programFiles = New coreFileSystemClass(Me, True, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.programFilesPath))
                 End If
                 Return _programFiles
             End Get
@@ -543,7 +545,7 @@ Namespace Contensive.Core
         ''' <remarks></remarks>
         Public Sub New(cp As CPClass)
             MyBase.New()
-            Me.cp = cp
+            Me.cp_forAddonExecutionOnly = cp
             serverConfig = Models.Entity.serverConfigModel.getObject(Me)
             Me.serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
             webServerIO.iisContext = Nothing
@@ -558,7 +560,7 @@ Namespace Contensive.Core
         ''' <remarks></remarks>
         Public Sub New(cp As CPClass, serverConfig As Models.Entity.serverConfigModel)
             MyBase.New()
-            Me.cp = cp
+            Me.cp_forAddonExecutionOnly = cp
             Me.serverConfig = serverConfig
             Me.serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
             Me.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady
@@ -574,7 +576,7 @@ Namespace Contensive.Core
         ''' <remarks></remarks>
         Public Sub New(cp As CPClass, serverConfig As Models.Entity.serverConfigModel, httpContext As System.Web.HttpContext)
             MyBase.New()
-            Me.cp = cp
+            Me.cp_forAddonExecutionOnly = cp
             Me.serverConfig = serverConfig
             Me.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady
             Me.serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
@@ -590,7 +592,7 @@ Namespace Contensive.Core
         ''' <remarks></remarks>
         Public Sub New(cp As CPClass, applicationName As String)
             MyBase.New()
-            Me.cp = cp
+            Me.cp_forAddonExecutionOnly = cp
             serverConfig = Models.Entity.serverConfigModel.getObject(Me, applicationName)
             serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
             webServerIO.iisContext = Nothing
@@ -606,7 +608,7 @@ Namespace Contensive.Core
         ''' </remarks>
         Public Sub New(cp As CPClass, applicationName As String, httpContext As System.Web.HttpContext)
             MyBase.New()
-            Me.cp = cp
+            Me.cp_forAddonExecutionOnly = cp
             serverConfig = Models.Entity.serverConfigModel.getObject(Me, applicationName)
             serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
             constructorInitialize()
@@ -2333,7 +2335,7 @@ ErrorTrap:
         '=============================================================================
         '
         Public Sub admin_VerifyAdminMenu(ByVal ParentName As String, ByVal EntryName As String, ByVal ContentName As String, ByVal LinkPage As String, ByVal SortOrder As String, Optional ByVal AdminOnly As Boolean = False, Optional ByVal DeveloperOnly As Boolean = False, Optional ByVal NewWindow As Boolean = False, Optional ByVal Active As Boolean = True)
-            Call Controllers.appBuilderController.admin_VerifyMenuEntry(cp.core, ParentName, EntryName, ContentName, LinkPage, SortOrder, AdminOnly, DeveloperOnly, NewWindow, Active, "Menu Entries", "")
+            Call Controllers.appBuilderController.admin_VerifyMenuEntry(Me, ParentName, EntryName, ContentName, LinkPage, SortOrder, AdminOnly, DeveloperOnly, NewWindow, Active, "Menu Entries", "")
         End Sub
         '
         '========================================================================
@@ -9027,7 +9029,7 @@ ErrorTrap:
                     End If
                     '
                     If Not webServerIO_BlockClosePageCopyright Then
-                        s = s & vbCrLf & vbTab & "<!--" & vbCrLf & vbCrLf & vbTab & "Contensive Framework/" & cp.Version() & ", copyright 1999-2012 Contensive, www.Contensive.com, " & RenderTimeString & vbCrLf & vbCrLf & vbTab & "-->"
+                        s = s & vbCrLf & vbTab & "<!--" & vbCrLf & vbCrLf & vbTab & "Contensive Framework/" & codeVersion() & ", copyright 1999-2012 Contensive, www.Contensive.com, " & RenderTimeString & vbCrLf & vbCrLf & vbTab & "-->"
                     End If
                     '
                     If Not html_BlockClosePageLink Then
@@ -9698,7 +9700,7 @@ ErrorTrap:
                 '
                 LinkPanel = New coreFastStringClass
                 LinkPanel.Add(SpanClassAdminSmall)
-                LinkPanel.Add("Contensive " & cp.Version() & " | ")
+                LinkPanel.Add("Contensive " & codeVersion() & " | ")
                 LinkPanel.Add(FormatDateTime(app_startTime) & " | ")
                 LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""http://support.Contensive.com/"">Support</A> | ")
                 LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html.html_EncodeHTML(siteProperties.adminURL) & """>Admin Home</A> | ")
@@ -9945,7 +9947,7 @@ ErrorTrap:
                     LinkPanel = New coreFastStringClass
                     LinkPanel.Add(SpanClassAdminSmall)
                     'LinkPanel.Add( "WebClient " & main_WebClientVersion & " | "
-                    LinkPanel.Add("Contensive " & cp.Version() & " | ")
+                    LinkPanel.Add("Contensive " & codeVersion() & " | ")
                     LinkPanel.Add(FormatDateTime(app_startTime) & " | ")
                     LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""http: //support.Contensive.com/"">Support</A> | ")
                     LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html.html_EncodeHTML(siteProperties.adminURL) & """>Admin Home</A> | ")
@@ -22894,7 +22896,7 @@ ErrorTrap:
                 ' Put styles inline if requested, and if there has been an upgrade
                 '
                 pageManager_GetStyleTagPublic = pageManager_GetStyleTagPublic & cr & StyleSheetStart & pageManager_GetStyleSheet() & cr & StyleSheetEnd
-            ElseIf (siteProperties.dataBuildVersion <> cp.Version()) Then
+            ElseIf (siteProperties.dataBuildVersion <> codeVersion) Then
                 '
                 ' Put styles inline if requested, and if there has been an upgrade
                 '
@@ -22915,7 +22917,7 @@ ErrorTrap:
             StyleSN = genericController.EncodeInteger(siteProperties.getText("StylesheetSerialNumber", "0"))
             If StyleSN = 0 Then
                 admin_GetStyleTagAdmin = cr & StyleSheetStart & pageManager_GetStyleSheetDefault() & cr & StyleSheetEnd
-            ElseIf (siteProperties.dataBuildVersion <> cp.Version()) Then
+            ElseIf (siteProperties.dataBuildVersion <> codeVersion) Then
                 admin_GetStyleTagAdmin = cr & "<!-- styles forced inline because database upgrade needed -->" & StyleSheetStart & pageManager_GetStyleSheetDefault() & cr & StyleSheetEnd
             Else
                 If StyleSN < 0 Then
@@ -27387,7 +27389,7 @@ ErrorTrap:
         ' ----- main_Get an XML nodes attribute based on its name
         '========================================================================
         '
-        Friend Function main_GetXMLAttribute(ByVal Found As Boolean, ByVal Node As XmlNode, ByVal Name As String, ByVal DefaultIfNotFound As String) As String
+        Public Function main_GetXMLAttribute(ByVal Found As Boolean, ByVal Node As XmlNode, ByVal Name As String, ByVal DefaultIfNotFound As String) As String
             On Error GoTo ErrorTrap
             '
             Dim NodeAttribute As XmlAttribute
@@ -29705,7 +29707,7 @@ ErrorTrap:
         ' ----- Get an XML nodes attribute based on its name
         '========================================================================
         '
-        Friend Function csv_GetXMLAttribute(ByVal Found As Boolean, ByVal Node As XmlNode, ByVal Name As String, ByVal DefaultIfNotFound As String) As String
+        Public Function csv_GetXMLAttribute(ByVal Found As Boolean, ByVal Node As XmlNode, ByVal Name As String, ByVal DefaultIfNotFound As String) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("csv_GetXMLAttribute")
             '
             Dim NodeAttribute As XmlAttribute
@@ -33570,7 +33572,7 @@ ErrorTrap:
                     '
                     ' routine comes from the url
                     '
-                    workingRoute = cp.Context.pathPage.ToLower
+                    workingRoute = webServerIO.requestPathPage.ToLower
                 End If
                 '
                 ' normalize route to /path/page or /path
@@ -33922,7 +33924,7 @@ ErrorTrap:
                                     ' should be converted to adminClass remoteMethod
                                     '
                                     Call visitProperty.setProperty("IndexFilterOpen", "1")
-                                    Dim adminSite As New Contensive.Addons.addon_AdminSiteClass(cp)
+                                    Dim adminSite As New Contensive.Addons.addon_AdminSiteClass(cp_forAddonExecutionOnly)
                                     Dim ContentID As Integer = docProperties.getInteger("cid")
                                     If ContentID = 0 Then
                                         returnResult = "No filter is available"
@@ -34220,7 +34222,7 @@ ErrorTrap:
                         ' until then, run it as an internal class
                         '
                         Dim admin As New Contensive.Addons.addon_AdminSiteClass()
-                        returnResult = admin.execute(cp).ToString()
+                        returnResult = admin.execute(cp_forAddonExecutionOnly).ToString()
                     Else
                         '--------------------------------------------------------------------------
                         ' default routing addon takes what is left
@@ -34231,7 +34233,7 @@ ErrorTrap:
                         '
                         'debugLog("executeRoute, route is Default Route AddonId")
                         '
-                        Dim defaultAddonId As Integer = cp.Site.GetInteger("Default Route AddonId")
+                        Dim defaultAddonId As Integer = siteProperties.getinteger("Default Route AddonId")
                         If defaultAddonId <> 0 Then
                             Dim addonStatusOk As Boolean = False
                             returnResult = addon.execute(defaultAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", addonStatusOk, Nothing, "", Nothing, "", user.id, visit_isAuthenticated)
@@ -34281,7 +34283,7 @@ ErrorTrap:
         ''' version for cpCore assembly
         ''' </summary>
         ''' <remarks></remarks>
-        Public Function common_version() As String
+        Public Function codeVersion() As String
             Dim myType As Type = GetType(coreClass)
             Dim myAssembly As Assembly = Assembly.GetAssembly(myType)
             Dim myAssemblyname As AssemblyName = myAssembly.GetName()
@@ -34301,11 +34303,7 @@ ErrorTrap:
         ''' <param name="allowErrorHandling"></param>
         ''' <remarks></remarks>
         Public Sub log_appendLog(ByVal LogLine As String, Optional ByVal LogFolder As String = "", Optional ByVal LogNamePrefix As String = "", Optional allowErrorHandling As Boolean = True)
-            'Dim fs As New fileSystemClass
             Try
-                '
-                ' dependant on app.privateFiles
-                '
                 Dim logPath As String
                 Dim MonthNumber As Integer
                 Dim DayNumber As Integer
@@ -34316,91 +34314,65 @@ ErrorTrap:
                 Dim SaveOK As Boolean
                 Dim FileSuffix As String
                 Dim threadId As Integer = System.Threading.Thread.CurrentThread.ManagedThreadId
-                Dim logPathRoot As String = "c:\"
-                '
                 Dim threadName As String = Format(threadId, "00000000")
                 '
                 Try
+                    DayNumber = Day(Now)
+                    MonthNumber = Month(Now)
+                    FilenameNoExt = log_getDateString(Now)
+                    logPath = LogFolder
+                    If logPath <> "" Then
+                        logPath = logPath & "\"
+                    End If
+                    logPath = "logs\" & logPath
+                    ' logPathRoot = privatefiles.rootLocalPath
+                    If Not privateFiles.pathExists(logPath) Then
+                        Call privateFiles.createPath(logPath)
+                    Else
+                        Dim logFiles As IO.FileInfo() = privateFiles.getFileList(logPath)
+                        For Each fileInfo As IO.FileInfo In logFiles
+                            If fileInfo.Name.ToLower = FilenameNoExt.ToLower & ".log" Then
+                                FileSize = CInt(fileInfo.Length)
+                                Exit For
+                            End If
+                        Next
+                    End If
+                    PathFilenameNoExt = logPath & FilenameNoExt
                     '
-                    ' attempt to get cluster data, else go wtih defaults
-                    '
-                    If True Then
-                        DayNumber = Day(Now)
-                        MonthNumber = Month(Now)
-                        FilenameNoExt = log_getDateString(Now)
-                        logPath = LogFolder
-                        If logPath <> "" Then
-                            logPath = logPath & "\"
-                        End If
-                        logPath = "logs\" & logPath
-                        logPathRoot = programDataFiles.rootLocalPath
-                        If Not programDataFiles.pathExists(logPath) Then
-                            Call programDataFiles.createPath(logPath)
-                        Else
-                            Dim logFiles As IO.FileInfo() = programDataFiles.getFileList(logPath)
-                            For Each fileInfo As IO.FileInfo In logFiles
-                                If fileInfo.Name.ToLower = FilenameNoExt.ToLower & ".log" Then
-                                    FileSize = CInt(fileInfo.Length)
-                                    Exit For
-                                End If
-                            Next
-                        End If
-                        PathFilenameNoExt = logPath & FilenameNoExt
-                        '
-                        ' add to log file
-                        '
-                        If FileSize < 10000000 Then
-                            RetryCnt = 0
-                            SaveOK = False
-                            FileSuffix = ""
-                            Do While (Not SaveOK) And (RetryCnt < 10)
-                                SaveOK = True
-                                Try
-                                    Dim absFile As String = genericController.vbLCase(logPathRoot & PathFilenameNoExt & FileSuffix & ".log")
-                                    Dim absContent As String = genericController.LogFileCopyPrep(FormatDateTime(Now(), vbGeneralDate)) & vbTab & threadName & vbTab & LogLine & vbCrLf
-
-                                    If Not IO.File.Exists(absFile) Then
-                                        ' Create a file to write to.
-                                        Using sw As IO.StreamWriter = IO.File.CreateText(absFile)
-                                            sw.Write(absContent)
-                                        End Using
-                                    Else
-                                        Using sw As IO.StreamWriter = IO.File.AppendText(absFile)
-                                            sw.Write(absContent)
-                                        End Using
-                                    End If
-                                    'System.IO.File.AppendAllText(absFile, absContent)
-                                    'Call cluster.files.appendFile(absFile, absContent)
-                                    'My.Computer.FileSystem.WriteAllText(LCase(PathFilenameNoExt & FileSuffix & ".log"), genericController.LogFileCopyPrep(FormatDateTime(Now(), vbGeneralDate)) & vbTab & threadName & vbTab & LogLine & vbCrLf, True)
-                                Catch ex As IO.IOException
-                                    '
-                                    ' permission denied - happens when more then one process are writing at once, go to the next suffix
-                                    '
-                                    FileSuffix = "-" & CStr(RetryCnt + 1)
-                                    RetryCnt = RetryCnt + 1
-                                    SaveOK = False
-                                Catch ex As Exception
-                                    '
-                                    ' unknown error
-                                    '
-                                    FileSuffix = "-" & CStr(RetryCnt + 1)
-                                    RetryCnt = RetryCnt + 1
-                                    SaveOK = False
-                                End Try
-                            Loop
-                        End If
+                    ' -- add to log file
+                    If FileSize < 10000000 Then
+                        RetryCnt = 0
+                        SaveOK = False
+                        FileSuffix = ""
+                        Do While (Not SaveOK) And (RetryCnt < 10)
+                            SaveOK = True
+                            Try
+                                Dim absContent As String = genericController.LogFileCopyPrep(FormatDateTime(Now(), vbGeneralDate)) & vbTab & threadName & vbTab & LogLine & vbCrLf
+                                privateFiles.appendFile(PathFilenameNoExt & FileSuffix & ".log", absContent)
+                            Catch ex As IO.IOException
+                                '
+                                ' permission denied - happens when more then one process are writing at once, go to the next suffix
+                                '
+                                FileSuffix = "-" & CStr(RetryCnt + 1)
+                                RetryCnt = RetryCnt + 1
+                                SaveOK = False
+                            Catch ex As Exception
+                                '
+                                ' unknown error
+                                '
+                                FileSuffix = "-" & CStr(RetryCnt + 1)
+                                RetryCnt = RetryCnt + 1
+                                SaveOK = False
+                            End Try
+                        Loop
                     End If
                 Catch ex As Exception
-                    '
-                    '
-                    '
+                    ' -- ignore errors in error handling
                 End Try
             Catch ex As Exception
-                '
-                ' cannot use execption handler because this routine is called by handleException
-                '
+                ' -- ignore errors in error handling
             Finally
-                'Call cluster.files.Dispose()
+                '
             End Try
         End Sub
         '
@@ -34960,17 +34932,17 @@ ErrorTrap:
                 If (GroupNameOrGuid = "") Then
                     handleExceptionAndRethrow(New ApplicationException("A group cannot be added with a blank name"))
                 Else
-                    cs.Open("Groups", sqlCriteria, , False, "id")
-                    IsAlreadyThere = cs.OK
+                    cs.open("Groups", sqlCriteria, , False, "id")
+                    IsAlreadyThere = cs.ok
                     Call cs.Close()
                     If Not IsAlreadyThere Then
                         Call cs.Insert("Groups")
-                        If Not cs.OK Then
+                        If Not cs.ok Then
                             handleExceptionAndRethrow(New ApplicationException("There was an error inserting a new group record"))
                         Else
-                            returnGroupId = cs.GetInteger("id")
-                            If cp.Utils.isGuid(GroupNameOrGuid) Then
-                                groupName = "Group " & cs.GetInteger("id")
+                            returnGroupId = cs.getInteger("id")
+                            If genericController.isGuid(GroupNameOrGuid) Then
+                                groupName = "Group " & cs.getInteger("id")
                                 groupGuid = GroupNameOrGuid
                             Else
                                 groupName = GroupNameOrGuid
@@ -35000,7 +34972,6 @@ ErrorTrap:
         Public Sub group_addUser(ByVal groupId As Integer, Optional ByVal userid As Integer = 0, Optional ByVal dateExpires As Date = #12:00:00 AM#)
             Try
                 '
-                Dim CS As CPCSBaseClass
                 Dim groupName As String
                 '
                 If True Then
@@ -35008,28 +34979,29 @@ ErrorTrap:
                         handleExceptionAndRethrow(New ApplicationException("Could not find or create the group with id [" & groupId & "]"))
                     Else
                         If userid = 0 Then
-                            userid = cp.User.Id
+                            userid = user.id
                         End If
-                        CS = cp.CSNew()
-                        CS.Open("Member Rules", "(MemberID=" & userid.ToString & ")and(GroupID=" & groupId.ToString & ")", , False)
-                        If Not CS.OK Then
-                            Call CS.Close()
-                            Call CS.Insert("Member Rules")
-                        End If
-                        If Not CS.OK Then
-                            groupName = GetRecordName("groups", groupId)
-                            handleExceptionAndRethrow(New ApplicationException("Could not find or create the Member Rule to add this member [" & userid & "] to the Group [" & groupId & ", " & groupName & "]"))
-                        Else
-                            Call CS.SetField("active", "1")
-                            Call CS.SetField("memberid", userid.ToString)
-                            Call CS.SetField("groupid", groupId.ToString)
-                            If dateExpires <> #12:00:00 AM# Then
-                                Call CS.SetField("DateExpires", dateExpires.ToString)
-                            Else
-                                Call CS.SetField("DateExpires", Nothing)
+                        Using cs As New csController(Me)
+                            cs.open("Member Rules", "(MemberID=" & userid.ToString & ")and(GroupID=" & groupId.ToString & ")", , False)
+                            If Not cs.ok Then
+                                Call cs.Close()
+                                Call cs.Insert("Member Rules")
                             End If
-                        End If
-                        Call CS.Close()
+                            If Not cs.ok Then
+                                groupName = GetRecordName("groups", groupId)
+                                handleExceptionAndRethrow(New ApplicationException("Could not find or create the Member Rule to add this member [" & userid & "] to the Group [" & groupId & ", " & groupName & "]"))
+                            Else
+                                Call cs.SetField("active", "1")
+                                Call cs.SetField("memberid", userid.ToString)
+                                Call cs.SetField("groupid", groupId.ToString)
+                                If dateExpires <> #12:00:00 AM# Then
+                                    Call cs.SetField("DateExpires", dateExpires.ToString)
+                                Else
+                                    Call cs.SetField("DateExpires", Nothing)
+                                End If
+                            End If
+                            Call cs.Close()
+                        End Using
                     End If
                 End If
             Catch ex As Exception
@@ -35043,7 +35015,6 @@ ErrorTrap:
             Try
                 '
                 Dim GroupID As Integer
-                Dim CS As CPCSBaseClass
                 '
                 If groupNameOrGuid <> "" Then
                     GroupID = db.getRecordID("groups", groupNameOrGuid)
@@ -35055,27 +35026,28 @@ ErrorTrap:
                         handleExceptionAndRethrow(New ApplicationException("Could not find or create the group [" & groupNameOrGuid & "]"))
                     Else
                         If userid = 0 Then
-                            userid = cp.User.Id
+                            userid = user.id
                         End If
-                        CS = cp.CSNew()
-                        CS.Open("Member Rules", "(MemberID=" & userid.ToString & ")and(GroupID=" & GroupID.ToString & ")", , False)
-                        If Not CS.OK Then
-                            Call CS.Close()
-                            Call CS.Insert("Member Rules")
-                        End If
-                        If Not CS.OK Then
-                            handleExceptionAndRethrow(New ApplicationException("Could not find or create the Member Rule to add this member [" & userid & "] to the Group [" & GroupID & ", " & groupNameOrGuid & "]"))
-                        Else
-                            Call CS.SetField("active", "1")
-                            Call CS.SetField("memberid", userid.ToString)
-                            Call CS.SetField("groupid", GroupID.ToString)
-                            If dateExpires <> #12:00:00 AM# Then
-                                Call CS.SetField("DateExpires", dateExpires.ToString)
-                            Else
-                                Call CS.SetField("DateExpires", Nothing)
+                        Using cs As New csController(Me)
+                            cs.open("Member Rules", "(MemberID=" & userid.ToString & ")and(GroupID=" & GroupID.ToString & ")", , False)
+                            If Not cs.ok Then
+                                Call cs.Close()
+                                Call cs.Insert("Member Rules")
                             End If
-                        End If
-                        Call CS.Close()
+                            If Not cs.ok Then
+                                handleExceptionAndRethrow(New ApplicationException("Could not find or create the Member Rule to add this member [" & userid & "] to the Group [" & GroupID & ", " & groupNameOrGuid & "]"))
+                            Else
+                                Call cs.SetField("active", "1")
+                                Call cs.SetField("memberid", userid.ToString)
+                                Call cs.SetField("groupid", GroupID.ToString)
+                                If dateExpires <> #12:00:00 AM# Then
+                                    Call cs.SetField("DateExpires", dateExpires.ToString)
+                                Else
+                                    Call cs.SetField("DateExpires", Nothing)
+                                End If
+                            End If
+                            Call cs.Close()
+                        End Using
                     End If
                 End If
             Catch ex As Exception
@@ -35098,22 +35070,6 @@ ErrorTrap:
             End Try
             Return returnIsGuid
         End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Delete a group matching the argument. If the argument is a number it is assumed to be an id, else if it is guid compatible a guid match is tried, else name.
-        ''' </summary>
-        ''' <param name="GroupNameIdOrGuid"></param>
-        Public Sub group_delete(ByVal GroupNameIdOrGuid As String)
-            Try
-                Dim sqlCriteria As String = db.getNameIdOrGuidSqlCriteria(GroupNameIdOrGuid)
-                If sqlCriteria <> "" Then
-                    Call cp.Content.Delete("Groups", sqlCriteria)
-                End If
-            Catch ex As Exception
-                handleExceptionAndRethrow(ex)
-            End Try
-        End Sub
         '
         '============================================================================
         '

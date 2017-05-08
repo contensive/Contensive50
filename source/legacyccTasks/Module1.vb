@@ -1,6 +1,10 @@
 ﻿
-'Imports Contensive.Core
-Imports Contensive.Core
+Option Explicit On
+Option Strict On
+
+Imports Contensive.Core.constants
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 
 Namespace Contensive.Core
 

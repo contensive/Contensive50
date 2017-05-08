@@ -1,5 +1,12 @@
 ﻿
-Imports System
+Option Explicit On
+Option Strict On
+
+Imports Contensive.Core
+Imports Contensive.Core.constants
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
+
 Imports System.IO
 Imports System.Diagnostics
 Imports System.Net
@@ -8,10 +15,6 @@ Imports System.Text
 Imports System.Threading
 Imports System.Web
 Imports Microsoft.VisualBasic
-'Imports Contensive.Core
-Imports Contensive.Core
-Imports Contensive.Core.constants
-Imports Contensive.Core.Controllers.genericController
 
 Namespace Contensive
 #Const includeTracing = False
@@ -103,6 +106,7 @@ Namespace Contensive
         Private tcpListenterListenThread As Thread
         Private tcpListenerListening As Boolean = False
         '
+        '
         '========================================================================================================
         ''' <summary>
         ''' constructor
@@ -121,10 +125,14 @@ Namespace Contensive
             LocalIPList = vbCrLf & getIpAddressList.Replace(",", vbCrLf) & vbCrLf & "127.0.0.1" & vbCrLf
             '
             processTimer = New System.Timers.Timer(5000)
-            AddHandler processTimer.Elapsed, AddressOf processTimerTick
+            AddHandler processTimer.Elapsed, New Timers.ElapsedEventHandler(AddressOf processTimerTick)
             '
             startTimer = New System.Timers.Timer(5000)
-            AddHandler startTimer.Elapsed, AddressOf startTimerTick
+            AddHandler startTimer.Elapsed, New Timers.ElapsedEventHandler(AddressOf startTimerTick)
+        End Sub
+        '
+        Private Sub delegateTest(test As Object, e As System.Timers.ElapsedEventArgs)
+
         End Sub
         '
         '========================================================================================================
@@ -693,7 +701,7 @@ Namespace Contensive
                         '
                         'Errorhint = "StartService Success, Logging Status"
                         startTimer.Enabled = False
-                        StatusMessage = "Contensive v" & cpCore.common_version() & " started"
+                        StatusMessage = "Contensive v" & cpCore.codeVersion() & " started"
                         'cpCore.AppendLog("StartService", StatusMessage)
                     Else
                         '
@@ -721,7 +729,7 @@ Namespace Contensive
         '
         '======================================================================================
         '
-        Private Sub startTimerTick()
+        Private Sub startTimerTick(sender As Object, e As System.Timers.ElapsedEventArgs)
             Try
                 startTimer.Enabled = False
                 startTimer.Interval = 60000
@@ -781,8 +789,8 @@ Namespace Contensive
                 '
                 Authenticated = False
                 IsLocalRemote = (InStr(1, LocalIPList, vbCrLf & RemoteIP & vbCrLf, vbBinaryCompare) <> 0)
-                RemoteUsername = getCommandArgument("un", queryString)
-                RemotePassword = getCommandArgument("pw", queryString)
+                RemoteUsername = getCommandArgumentText("un", queryString)
+                RemotePassword = getCommandArgumentText("pw", queryString)
                 If (Not IsLocalRemote) And ((RemoteUsername = "") Or (RemoteUsername <> AdminUsername) Or (RemotePassword <> AdminPassword)) Then
                     '
                     ' Bad username and password
@@ -814,7 +822,7 @@ Namespace Contensive
                                 & vbCrLf & "" _
                                 & vbCrLf & AdminUsername _
                                 & vbCrLf & AdminPassword _
-                                & vbCrLf & cpCore.common_version() _
+                                & vbCrLf & cpCore.codeVersion() _
                                 & vbCrLf & maxCmdInstances _
                                 & ""
                         Case "SETSERVERCONFIG"
@@ -822,19 +830,19 @@ Namespace Contensive
                             ' SetConnectInfo
                             '
                             If genericController.vbInstr(1, queryString, "serverListenerPort=", vbTextCompare) <> 0 Then
-                                serverListenerPort = getCommandArgument("serverListenerPort", queryString)
+                                serverListenerPort = getCommandArgumentInteger("serverListenerPort", queryString)
                             End If
                             '
                             If genericController.vbInstr(1, queryString, "AdminUsername=", vbTextCompare) <> 0 Then
-                                AdminUsername = getCommandArgument("AdminUsername", queryString)
+                                AdminUsername = getCommandArgumentText("AdminUsername", queryString)
                             End If
                             '
                             If genericController.vbInstr(1, queryString, "AdminPassword=", vbTextCompare) <> 0 Then
-                                AdminPassword = getCommandArgument("AdminPassword", queryString)
+                                AdminPassword = getCommandArgumentText("AdminPassword", queryString)
                             End If
                             '
                             If genericController.vbInstr(1, queryString, "maxCmdInstances=", vbTextCompare) <> 0 Then
-                                maxCmdInstances = genericController.EncodeInteger(getCommandArgument("maxCmdInstances", queryString))
+                                maxCmdInstances = genericController.EncodeInteger(getCommandArgumentText("maxCmdInstances", queryString))
                                 If maxCmdInstances <= 0 Then
                                     maxCmdInstances = 1
                                 End If
@@ -962,11 +970,11 @@ Namespace Contensive
                             ' File Copy
                             '
                         Case "COPYFILE"
-                            SrcFile = getCommandArgument("SrcFile", queryString)
+                            SrcFile = getCommandArgumentText("SrcFile", queryString)
                             If SrcFile = "" Then
                                 returnString = "ERROR: Source file is not valid"
                             Else
-                                DstFile = getCommandArgument("DstFile", queryString)
+                                DstFile = getCommandArgumentText("DstFile", queryString)
                                 If DstFile = "" Then
                                     returnString = "ERROR: Destination file is not valid"
                                 Else
@@ -981,7 +989,7 @@ Namespace Contensive
                             '
 
                         Case "DELETEFILE"
-                            File = getCommandArgument("File", queryString)
+                            File = getCommandArgumentText("File", queryString)
                             If File = "" Then
                                 returnString = "ERROR: file is empty"
                             Else
@@ -993,7 +1001,7 @@ Namespace Contensive
                             ' Create Folder
                             '
                         Case "CREATEFOLDER"
-                            FolderPath = getCommandArgument("Folder", queryString)
+                            FolderPath = getCommandArgumentText("Folder", queryString)
                             If FolderPath = "" Then
                                 returnString = "ERROR: Folder is empty"
                             Else
@@ -1005,7 +1013,7 @@ Namespace Contensive
                             ' Delete Folder
                             '
                         Case "DELETEFOLDER"
-                            FolderPath = getCommandArgument("Folder", queryString)
+                            FolderPath = getCommandArgumentText("Folder", queryString)
                             If FolderPath = "" Then
                                 returnString = "ERROR: Folder is empty"
                             Else
@@ -1084,7 +1092,7 @@ Namespace Contensive
             Return returnString
         End Function
 
-        Private Sub processTimerTick()
+        Private Sub processTimerTick(sender As Object, e As System.Timers.ElapsedEventArgs)
             Try
                 '
                 Dim Slice As Double
@@ -1391,8 +1399,12 @@ Namespace Contensive
         '
         '
         '
-        Private Function getCommandArgument(ByVal argName As String, ByVal cmdQueryString As String) As String
-            getCommandArgument = decodeNvaArgument(DecodeResponseVariable(getSimpleNameValue(argName, cmdQueryString, "", "&")))
+        Private Function getCommandArgumentText(ByVal argName As String, ByVal cmdQueryString As String) As String
+            Return decodeNvaArgument(DecodeResponseVariable(getSimpleNameValue(argName, cmdQueryString, "", "&")))
+        End Function
+        '
+        Private Function getCommandArgumentInteger(ByVal argName As String, ByVal cmdQueryString As String) As Integer
+            Return genericController.EncodeInteger(getCommandArgumentText(argName, cmdQueryString))
         End Function
         '
         '==========================================================================================

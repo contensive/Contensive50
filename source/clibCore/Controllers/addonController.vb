@@ -2421,7 +2421,7 @@ ErrorTrap:
                             If True Then
                                 If True Then
                                     Try
-                                        Call sc.AddObject("cp", cpCore.cp)
+                                        Call sc.AddObject("cp", cpCore.cp_forAddonExecutionOnly)
                                     Catch ex As Exception
                                         '
                                         ' Error adding cp object
@@ -2657,7 +2657,7 @@ ErrorTrap:
                                                                 '
                                                                 ' Call Execute
                                                                 '
-                                                                AddonReturnObj = AddonObj.Execute(cpCore.cp)
+                                                                AddonReturnObj = AddonObj.Execute(cpCore.cp_forAddonExecutionOnly)
                                                                 If Not (AddonReturnObj Is Nothing) Then
                                                                     Select Case AddonReturnObj.GetType().ToString
                                                                         Case "System.Object[,]"
@@ -4560,7 +4560,7 @@ ErrorTrap:
         '       AddonOptionExpandedConstructor = pass this to the bubble editor to create the the selectr
         '===================================================================================================
         '
-        Friend Sub buildAddonOptionLists(Option_String_ForObjectCall As String, AddonOptionExpandedConstructor As String, AddonOptionConstructor As String, InstanceOptionList As String, InstanceID As String, IncludeEditWrapper As Boolean)
+        Public Sub buildAddonOptionLists(Option_String_ForObjectCall As String, AddonOptionExpandedConstructor As String, AddonOptionConstructor As String, InstanceOptionList As String, InstanceID As String, IncludeEditWrapper As Boolean)
             Call buildAddonOptionLists2(Option_String_ForObjectCall, AddonOptionExpandedConstructor, AddonOptionConstructor, InstanceOptionList, InstanceID, IncludeEditWrapper)
         End Sub
         '

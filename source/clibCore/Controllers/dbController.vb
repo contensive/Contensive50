@@ -162,7 +162,7 @@ Namespace Contensive.Core.Controllers
         ''' </summary>
         ''' <returns>
         ''' </returns>
-        Friend Function getConnectionStringADONET(catalogName As String, Optional dataSourceName As String = "") As String
+        Public Function getConnectionStringADONET(catalogName As String, Optional dataSourceName As String = "") As String
             '
             ' (OLEDB) OLE DB Provider for SQL Server > "Provider=sqloledb;Data Source=MyServerName;Initial Catalog=MyDatabaseName;User Id=MyUsername;Password=MyPassword;"
             '     https://www.codeproject.com/Articles/2304/ADO-Connection-Strings#OLE%20DB%20SqlServer
@@ -3800,7 +3800,7 @@ Namespace Contensive.Core.Controllers
         ''' </summary>
         ''' <param name="expression"></param>
         ''' <returns></returns>
-        Public Shared Function encodeSQLText(ByVal expression As String) As String
+        Public Function encodeSQLText(ByVal expression As String) As String
             Dim returnResult As String = ""
             If expression Is Nothing Then
                 returnResult = "null"
@@ -3814,7 +3814,7 @@ Namespace Contensive.Core.Controllers
             End If
             Return returnResult
         End Function
-        Public Shared Function encodeSqlTextLike(cpcore As coreClass, source As String) As String
+        Public Function encodeSqlTextLike(cpcore As coreClass, source As String) As String
             Return encodeSQLText("%" & source & "%")
         End Function
         '

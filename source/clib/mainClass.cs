@@ -1,14 +1,9 @@
 ﻿
-using Contensive.Core.Controllers;
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-
-namespace Contensive.Core
+namespace Contensive.CLI
 {
     class mainClass
     {
@@ -29,7 +24,7 @@ namespace Contensive.Core
                 {
                     //
                     // -- create an instance of cp to execute commands
-                    using (CPClass cp = new CPClass())
+                    using (Core.CPClass cp = new Core.CPClass())
                     {
                         //
                         // start by creating an application event log entry - because you must be admin to make this entry so making it here will create the "source"
@@ -72,7 +67,7 @@ namespace Contensive.Core
                                 case "-v":
                                     //
                                     // display core version
-                                    Console.WriteLine("version " + cp.core.common_version());
+                                    Console.WriteLine("version " + cp.core.codeVersion());
                                     exitArgumentProcessing = true;
                                     break;
                                 case "--newapp":
@@ -111,9 +106,9 @@ namespace Contensive.Core
                                         Console.WriteLine("isLocalCache: " + cp.core.serverConfig.isLocalCache.ToString());
                                         Console.WriteLine("maxConcurrentTasksPerServer: " + cp.core.serverConfig.maxConcurrentTasksPerServer.ToString());
                                         Console.WriteLine("apps.Count: " + cp.core.serverConfig.apps.Count);
-                                        foreach (KeyValuePair<string, Models.Entity.serverConfigModel.appConfigModel> kvp in cp.core.serverConfig.apps)
+                                        foreach (KeyValuePair<string, Core.Models.Entity.serverConfigModel.appConfigModel> kvp in cp.core.serverConfig.apps)
                                         {
-                                            Models.Entity.serverConfigModel.appConfigModel app = kvp.Value;
+                                            Core.Models.Entity.serverConfigModel.appConfigModel app = kvp.Value;
                                             Console.WriteLine("----------app name: " + app.name);
                                             Console.WriteLine("\tenabled: " + app.enabled);
                                             Console.WriteLine("\tadminRoute: " + app.adminRoute);
@@ -151,9 +146,9 @@ namespace Contensive.Core
                                     }
                                     else
                                     {
-                                        using (CPClass cpApp = new CPClass(appName))
+                                        using (Contensive.Core.CPClass cpApp = new Contensive.Core.CPClass(appName))
                                         {
-                                            Controllers.appBuilderController.upgrade(cpApp.core, false);
+                                            Core.Controllers.appBuilderController.upgrade(cpApp.core, false);
                                         }
                                         //installFiles = new coreFileSystemClass(cp.core, cp.core.serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
                                         //installFiles.Dispose();
@@ -163,12 +158,12 @@ namespace Contensive.Core
                                 case "--upgradeall":
                                     //
                                     // upgrade all apps in the server group
-                                    foreach (KeyValuePair<String, Models.Entity.serverConfigModel.appConfigModel> kvp in cp.core.serverConfig.apps)
+                                    foreach (KeyValuePair<String, Core.Models.Entity.serverConfigModel.appConfigModel> kvp in cp.core.serverConfig.apps)
                                     {
                                         String upgradeAppName = kvp.Key;
-                                        using (CPClass upgradeApp = new CPClass(upgradeAppName))
+                                        using (Contensive.Core.CPClass upgradeApp = new Contensive.Core.CPClass(upgradeAppName))
                                         {
-                                            Controllers.appBuilderController.upgrade(cp.core,false);
+                                            Core.Controllers.appBuilderController.upgrade(cp.core,false);
                                         }
                                     }
                                     exitArgumentProcessing = true;
@@ -196,7 +191,7 @@ namespace Contensive.Core
                                         {
                                             //
                                             // turn the windows service scheduler on/off
-                                            cp.core.serverConfig.allowTaskSchedulerService = genericController.EncodeBoolean(args[argPtr]);
+                                            cp.core.serverConfig.allowTaskSchedulerService = Contensive.Core.Controllers.genericController.EncodeBoolean(args[argPtr]);
                                             cp.core.serverConfig.saveObject(cp.core);
                                             Console.WriteLine("allowtaskscheduler set " + cp.core.serverConfig.allowTaskSchedulerService.ToString());
                                         }
@@ -225,7 +220,7 @@ namespace Contensive.Core
                                         {
                                             //
                                             // -- turn the windows service scheduler on/off
-                                            cp.core.serverConfig.allowTaskRunnerService = genericController.EncodeBoolean(args[argPtr]);
+                                            cp.core.serverConfig.allowTaskRunnerService = Contensive.Core.Controllers.genericController.EncodeBoolean(args[argPtr]);
                                             cp.core.serverConfig.saveObject(cp.core);
                                             Console.WriteLine("allowtaskrunner set " + cp.core.serverConfig.allowTaskRunnerService.ToString());
                                         }
@@ -263,8 +258,8 @@ namespace Contensive.Core
                                             //
                                             // turn the windows service scheduler on/off
                                             //
-                                            cp.core.serverConfig.allowTaskSchedulerService = genericController.EncodeBoolean(args[argPtr]);
-                                            cp.core.serverConfig.allowTaskRunnerService = genericController.EncodeBoolean(args[argPtr]);
+                                            cp.core.serverConfig.allowTaskSchedulerService = Contensive.Core.Controllers.genericController.EncodeBoolean(args[argPtr]);
+                                            cp.core.serverConfig.allowTaskRunnerService = Contensive.Core.Controllers.genericController.EncodeBoolean(args[argPtr]);
                                             cp.core.serverConfig.saveObject(cp.core);
                                             Console.WriteLine("allowTaskScheduler set " + cp.core.serverConfig.allowTaskSchedulerService.ToString());
                                             Console.WriteLine("allowTaskRunner set " + cp.core.serverConfig.allowTaskRunnerService.ToString());

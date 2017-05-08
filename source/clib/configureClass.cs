@@ -29,20 +29,20 @@ namespace  Contensive.CLI {
                     // -- serverGroup name
                     prompt = "Enter the server group name (alpha-numeric string). For stand-alone servers, this can be the name of the server. For scaling configurations, this is a name for the group of servers:";
                     defaultValue = cp.core.serverConfig.name;
-                    cp.core.serverConfig.name = Controllers.genericController.promptForReply(prompt, defaultValue);
+                    cp.core.serverConfig.name = cliController.promptForReply(prompt, defaultValue);
                     //
                     // -- local or multiserver mode
                     Console.WriteLine("\n\nSingle-Server or Multi-Server Mode");
                     Console.WriteLine("Single server installations run applications from a single server and store their data on that machine. Multi-server configurations run on multiple servers and require outside resources to store their data.");
                     prompt = "Single-Server Application (y/n)?";
                     if (cp.core.serverConfig.isLocalFileSystem) { defaultValue = "y"; } else { defaultValue = "n"; }
-                    cp.core.serverConfig.isLocalFileSystem = Equals(Controllers.genericController.promptForReply(prompt, defaultValue).ToLower(), "y");
+                    cp.core.serverConfig.isLocalFileSystem = Equals(cliController.promptForReply(prompt, defaultValue).ToLower(), "y");
                     //
                     // -- local file location
                     Console.WriteLine("\n\nData Storage Locations");
                     if (string.IsNullOrEmpty(cp.core.serverConfig.localDataDriveLetter)) cp.core.serverConfig.localDataDriveLetter = "d";
                     if (!(new System.IO.DriveInfo(cp.core.serverConfig.localDataDriveLetter).IsReady)) cp.core.serverConfig.localDataDriveLetter = "c";
-                    cp.core.serverConfig.localDataDriveLetter = Controllers.genericController.promptForReply("Enter the Drive letter for data storage (c/d/etc)", cp.core.serverConfig.localDataDriveLetter);
+                    cp.core.serverConfig.localDataDriveLetter = cliController.promptForReply("Enter the Drive letter for data storage (c/d/etc)", cp.core.serverConfig.localDataDriveLetter);
                     //
                     // -- Sql Server Driver
                     cp.core.serverConfig.defaultDataSourceType = Contensive.Core.Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative;

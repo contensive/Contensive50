@@ -120,7 +120,7 @@ Namespace Contensive.Core
                 '
                 ' BuildVersion = cpcore.app.dataBuildVersion
                 Dim dataBuildVersion As String = cpCore.siteProperties.dataBuildVersion
-                Dim coreVersion As String = cpCore.common_version()
+                Dim coreVersion As String = cpCore.codeVersion()
 
                 DbUpToDate = (dataBuildVersion = coreVersion)
                 '
@@ -610,7 +610,7 @@ Namespace Contensive.Core
                                     LibCollections = New XmlDocument
                                     Dim parseError As Boolean = False
                                     Try
-                                        LibCollections.Load("http://support.contensive.com/GetCollectionList?iv=" & cpCore.common_version())
+                                        LibCollections.Load("http://support.contensive.com/GetCollectionList?iv=" & cpCore.codeVersion())
                                     Catch ex As Exception
                                         UserError = "There was an error reading the Collection Library. The site may be unavailable."
                                         Call HandleClassAppendLog("AddonManager", UserError)
@@ -706,7 +706,7 @@ Namespace Contensive.Core
                                                                     Cells3(RowPtr, 1) = Collectionname & "&nbsp;(installed already)"
                                                                     Cells3(RowPtr, 2) = CollectionLastChangeDate & "&nbsp;"
                                                                     Cells3(RowPtr, 3) = CollectionDescription & "&nbsp;"
-                                                                ElseIf ((CollectionContensiveVersion <> "") And (CollectionContensiveVersion > cpCore.common_version())) Then
+                                                                ElseIf ((CollectionContensiveVersion <> "") And (CollectionContensiveVersion > cpCore.codeVersion())) Then
                                                                     '
                                                                     ' wrong version
                                                                     '

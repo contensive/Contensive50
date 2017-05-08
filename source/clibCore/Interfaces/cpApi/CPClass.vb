@@ -208,7 +208,7 @@ Namespace Contensive.Core
         '
         Public Overrides ReadOnly Property Version() As String
             Get
-                Return core.common_version()
+                Return core.codeVersion()
             End Get
         End Property
         '

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Contensive.CLI {
-    class genericController
+    class cliController
     {
         //
         public static String promptForReply(String prompt, String defaultValue)

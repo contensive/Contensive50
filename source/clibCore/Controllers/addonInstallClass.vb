@@ -148,7 +148,7 @@ Namespace Contensive.Core
                 '
                 Doc = New XmlDocument
                 DownloadCollectionFiles = True
-                URL = "http://support.contensive.com/GetCollection?iv=" & cpCore.common_version() & "&guid=" & CollectionGuid
+                URL = "http://support.contensive.com/GetCollection?iv=" & cpCore.codeVersion() & "&guid=" & CollectionGuid
                 errorPrefix = "DownloadCollectionFiles, Error reading the collection library status file from the server for Collection [" & CollectionGuid & "], download URL [" & URL & "]. "
                 return_ErrorMessage = ""
                 downloadRetry = 0
@@ -492,7 +492,7 @@ Namespace Contensive.Core
                                         End If
                                         'hint = "Getting CollectionList"
                                         LibraryCollections = New XmlDocument
-                                        SupportURL = "http://support.contensive.com/GetCollectionList?iv=" & cpCore.common_version() & "&guidlist=" & EncodeRequestVariable(GuidList)
+                                        SupportURL = "http://support.contensive.com/GetCollectionList?iv=" & cpCore.codeVersion() & "&guidlist=" & EncodeRequestVariable(GuidList)
                                         Dim loadOK As Boolean = True
                                         Try
                                             LibraryCollections.Load(SupportURL)
@@ -594,7 +594,7 @@ Namespace Contensive.Core
                                                                                         If genericController.vbInstr(1, LibGUID, "58c9", vbTextCompare) <> 0 Then
                                                                                             LibGUID = LibGUID
                                                                                         End If
-                                                                                        If (LibGUID <> "") And (LibGUID = LocalGuid) And ((LibContensiveVersion = "") Or (LibContensiveVersion <= cpCore.common_version())) Then
+                                                                                        If (LibGUID <> "") And (LibGUID = LocalGuid) And ((LibContensiveVersion = "") Or (LibContensiveVersion <= cpCore.codeVersion())) Then
                                                                                             '
                                                                                             ' LibCollection matches the LocalCollection - process the upgrade
                                                                                             '
@@ -4866,7 +4866,7 @@ Namespace Contensive.Core
                                     '
                                     ' This collection is installed locally, install from local collections
                                     '
-                                    Call installCollectionFromLocalRepo(Guid, cpCore.common_version, errorMessage, "", isNewBuild)
+                                    Call installCollectionFromLocalRepo(Guid, cpCore.codeVersion, errorMessage, "", isNewBuild)
                                 Else
                                     '
                                     ' This is a new collection, install to the server and force it on this site

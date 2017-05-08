@@ -38,7 +38,7 @@ Namespace Contensive.Core.Controllers
         ''' </summary>
         ''' <returns>
         ''' </returns>
-        Friend Function getConnectionStringADONET() As String
+        Public Function getConnectionStringADONET() As String
             '
             ' (OLEDB) OLE DB Provider for SQL Server > "Provider=sqloledb;Data Source=MyServerName;Initial Catalog=MyDatabaseName;User Id=MyUsername;Password=MyPassword;"
             '     https://www.codeproject.com/Articles/2304/ADO-Connection-Strings#OLE%20DB%20SqlServer

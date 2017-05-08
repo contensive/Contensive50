@@ -1,6 +1,9 @@
 ﻿
-'Imports Contensive.Core
-'Imports Contensive.Core
+Option Explicit On
+Option Strict On
+
+Imports Contensive.Core
+Imports Contensive.Core.Controllers
 
 Namespace Contensive.Core
     Public Class statusServerClass

@@ -7221,7 +7221,7 @@ ErrorTrap:
                     returnHtml = returnHtml _
                     & vbCrLf & "<div style=""padding:20px;height:450px"">" _
                     & vbCrLf & "<div><a href=http://www.Contensive.com target=_blank><img style=""border:1px solid #000;"" src=""/ccLib/images/ContensiveAdminLogo.GIF"" border=0 ></A></div>" _
-                    & vbCrLf & "<div><strong>Contensive/" & cpCore.common_version & "</strong></div>" _
+                    & vbCrLf & "<div><strong>Contensive/" & cpCore.codeVersion & "</strong></div>" _
                     & vbCrLf & "<div style=""clear:both;height:18px;margin-top:10px""><div style=""float:left;width:200px;"">Domain Name</div><div style=""float:left;"">" & cpCore.webServerIO_requestDomain & "</div></div>" _
                     & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;"">Login Member Name</div><div style=""float:left;"">" & cpCore.user.name & "</div></div>" _
                     & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;"">Quick Reports</div><div style=""float:left;""><a Href=""?" & RequestNameAdminForm & "=" & AdminFormQuickStats & """>Real-Time Activity</A></div></div>" _

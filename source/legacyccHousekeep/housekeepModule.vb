@@ -5,6 +5,7 @@ Option Strict On
 Imports Contensive.Core
 Imports Contensive.Core.constants
 Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
 
 Namespace Contensive.Core
     Module housekeepModule

@@ -315,7 +315,7 @@ Namespace Contensive.Core.Controllers
                     Call appendBuildLog(cpcore, "VerifyCoreTables...")
                     Call VerifyCoreTables(cpcore)
                     DataBuildVersion = cpcore.siteProperties.dataBuildVersion
-                    Call appendBuildLog(cpcore, "Upgrade, isNewBuild=[" & isNewBuild & "], data buildVersion=[" & DataBuildVersion & "], code buildVersion=[" & cpcore.common_version & "]")
+                    Call appendBuildLog(cpcore, "Upgrade, isNewBuild=[" & isNewBuild & "], data buildVersion=[" & DataBuildVersion & "], code buildVersion=[" & cpcore.codeVersion & "]")
                     '
                     '---------------------------------------------------------------------
                     ' ----- build/verify Content Definitions
@@ -355,8 +355,8 @@ Namespace Contensive.Core.Controllers
                         '
                         ' set build version so a scratch build will not go through data conversion
                         '
-                        DataBuildVersion = cpcore.common_version()
-                        Call cpcore.siteProperties.setProperty("BuildVersion", cpcore.common_version)
+                        DataBuildVersion = cpcore.codeVersion()
+                        Call cpcore.siteProperties.setProperty("BuildVersion", cpcore.codeVersion)
                         cpcore.siteProperties._dataBuildVersion_Loaded = False
                     End If
                     '
@@ -364,9 +364,9 @@ Namespace Contensive.Core.Controllers
                     ' ----- Upgrade Database fields if not new
                     '---------------------------------------------------------------------
                     '
-                    If DataBuildVersion < cpcore.common_version() Then
+                    If DataBuildVersion < cpcore.codeVersion() Then
                         '
-                        Call appendBuildLog(cpcore, "Calling database conversion, DataBuildVersion [" & DataBuildVersion & "], software version [" & cpcore.common_version() & "]")
+                        Call appendBuildLog(cpcore, "Calling database conversion, DataBuildVersion [" & DataBuildVersion & "], software version [" & cpcore.codeVersion() & "]")
                         '
                         Call Upgrade_Conversion(cpcore, DataBuildVersion)
                     End If
@@ -463,8 +463,8 @@ Namespace Contensive.Core.Controllers
                     '---------------------------------------------------------------------
                     '
                     If True Then
-                        Call appendBuildLog(cpcore, "Internal upgrade complete, set Buildversion to " & cpcore.common_version)
-                        Call cpcore.siteProperties.setProperty("BuildVersion", cpcore.common_version)
+                        Call appendBuildLog(cpcore, "Internal upgrade complete, set Buildversion to " & cpcore.codeVersion)
+                        Call cpcore.siteProperties.setProperty("BuildVersion", cpcore.codeVersion)
                         cpcore.siteProperties._dataBuildVersion_Loaded = False
                         '
                         '---------------------------------------------------------------------
@@ -621,7 +621,7 @@ Namespace Contensive.Core.Controllers
                                                             Else
                                                                 If upgradeCollection Then
                                                                     Call appendBuildLog(cpcore, "...upgrading collection")
-                                                                    Call addonInstall.installCollectionFromLocalRepo(CollectionGuid, cpcore.common_version, ErrorMessage, "", isNewBuild)
+                                                                    Call addonInstall.installCollectionFromLocalRepo(CollectionGuid, cpcore.codeVersion, ErrorMessage, "", isNewBuild)
                                                                 End If
                                                             End If
                                                         End If

@@ -87,7 +87,7 @@ Namespace Contensive.Core.Models.Entity
             Public propertyBag_guidIndex As String
         End Class
         '
-        Friend localCache As addonsCacheClass
+        Public localCache As addonsCacheClass
         '
         '====================================================================================================
         ''' <summary>

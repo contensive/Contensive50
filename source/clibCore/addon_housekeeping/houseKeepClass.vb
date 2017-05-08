@@ -9,11 +9,17 @@ Imports Contensive.Core.Controllers.genericController
 Imports System.Xml
 
 Namespace Contensive.Core
+    '
+    '====================================================================================================
+    ''' <summary>
+    ''' support for housekeeping functions
+    ''' </summary>
+
     Public Class houseKeepClass
         '
         '
         '
-        Private cp As cpclass
+        Private cp As CPClass
         Dim LogCheckDateLast As Date
         '
         '
@@ -27,7 +33,7 @@ Namespace Contensive.Core
             Dim DomainNameList As String
             Dim DomainNamePrimary As String
             Dim MissingDatePtr As Integer
-            Dim DateNumberWorking As Integer
+            Dim workingDate As Date
             Dim OldestVisitSummaryWeCareAbout As Date
             Dim DefaultMemberName As String
             Dim PeopleCID As Integer
@@ -43,7 +49,7 @@ Namespace Contensive.Core
             Dim NextSummaryStartDate As Date
             Dim RightNowHour As Date
             Dim ALittleWhileAgo As Date
-            Dim PeriodStart As Date
+            Dim PeriodStartDate As Date
             Dim PeriodDatePtr As Double
             Dim PeriodStep As Double
             Dim StartOfHour As Date
@@ -86,9 +92,9 @@ Namespace Contensive.Core
             Dim LibGUID As String
             Dim LibLastChangeDateStr As String
             Dim LibLastChangeDate As Date
-            Dim LibListNode As xmlNode
-            Dim LocalListNode As xmlNode
-            Dim CollectionNode As xmlNode
+            Dim LibListNode As XmlNode
+            Dim LocalListNode As XmlNode
+            Dim CollectionNode As XmlNode
             Dim LibraryCollections As New XmlDocument
             Dim LocalCollections As New XmlDocument
             Dim Doc As New XmlDocument
@@ -135,7 +141,7 @@ Namespace Contensive.Core
             Dim SQL As String
             Dim DataSourceType As Integer
             'Dim KernelService As New KernelServicesClass
-            Dim DatePtr As Integer
+            'Dim DatePtr As Integer
             Dim AddonInstall As addonInstallClass
             Dim cp As CPClass
             Dim appList As List(Of String)
@@ -180,7 +186,7 @@ Namespace Contensive.Core
                             End If
                             If Trim(LCase(NameValue(0))) = "serverhousekeeptime" Then
                                 If IsDate(NameValue(1)) Then
-                                    ServerHousekeepTime = rightNow.Date.Add( genericController.EncodeDate(NameValue(1)).TimeOfDay)
+                                    ServerHousekeepTime = rightNow.Date.Add(genericController.EncodeDate(NameValue(1)).TimeOfDay)
                                 End If
                             End If
                         End If
@@ -216,7 +222,7 @@ Namespace Contensive.Core
                 Dim subDir As New System.IO.DirectoryInfo(cp.core.privateFiles.rootLocalPath & "\logs\")
                 For Each SubDirInfo As System.IO.DirectoryInfo In subDir.GetDirectories
                     FolderName = "logs\" & SubDirInfo.Name
-                Call HousekeepLogFolder("server", FolderName)
+                    Call HousekeepLogFolder("server", FolderName)
                 Next
                 'FolderName = "Logs\Email"
                 'Call HousekeepLogFolder("server", FolderName)
@@ -234,7 +240,7 @@ Namespace Contensive.Core
                 'Call HousekeepLogFolder("server", FolderName)
                 ''
                 'FolderName = "Logs\Admin"
-                'Call HousekeepLogFolder("server", FolderName)
+                'Call HousekeepLogFolder("server", FolderName)LogCheckDateLast = now.date
                 ''
                 'FolderName = "Logs\Process"
                 'Call HousekeepLogFolder("server", FolderName)
@@ -245,7 +251,7 @@ Namespace Contensive.Core
                 '
                 ' Set LogCheckDate
                 '
-                LogCheckDateLast = Int(Now)
+                LogCheckDateLast = Now.Date
             End If
             '
             ' Housekeep each application
@@ -283,9 +289,10 @@ Namespace Contensive.Core
                                 '
                                 ErrorMessage = ""
                                 Call AppendClassLog("", "HouseKeep", "Updating local collections from library, see Upgrade log for details during this period.")
-                                Dim ignoreRefactor As String = ""
+                                Dim ignoreRefactorText As String = ""
+                                Dim ignoreRefactorBoolean As Boolean = False
                                 AddonInstall = New addonInstallClass(cp.core)
-                                If Not AddonInstall.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(ErrorMessage, ignoreRefactor, ignoreRefactor, False) Then
+                                If Not AddonInstall.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(ErrorMessage, ignoreRefactorText, ignoreRefactorBoolean, False) Then
                                     If ErrorMessage = "" Then
                                         ErrorMessage = "No detailed error message was returned from UpgradeAllLocalCollectionsFromLib2 although it returned 'not ok' status."
                                     End If
@@ -324,11 +331,11 @@ Namespace Contensive.Core
                                     Call cp.core.siteProperties.setProperty("ArchiveRecordAgeDays", "2")
                                 End If
                                 VisitArchiveDate = rightNow.AddDays(-VisitArchiveAgeDays).Date
-                                OldestVisitSummaryWeCareAbout = Int(Now) - 120
+                                OldestVisitSummaryWeCareAbout = Now.Date.AddDays(-120)
                                 If OldestVisitSummaryWeCareAbout < VisitArchiveDate Then
                                     OldestVisitSummaryWeCareAbout = VisitArchiveDate
                                 End If
-                                'OldestVisitSummaryWeCareAbout = Int(Now) - VisitArchiveAgeDays
+                                'OldestVisitSummaryWeCareAbout = now.date - VisitArchiveAgeDays
                                 '
                                 ' Get GuestArchiveAgeDays
                                 '
@@ -399,26 +406,21 @@ Namespace Contensive.Core
                                         '
                                         SQL = cp.core.db.GetSQLSelect("default", "ccVisitSummary", "DateNumber", "TimeDuration=24 and DateNumber>=" & OldestVisitSummaryWeCareAbout.Date.ToOADate, "DateNumber,TimeNumber")
                                         CS = cp.core.db.cs_openCsSql_rev("default", SQL)
-                                        'If Not cp.Core.app.csv_IsCSOK(CS) Then
-                                        '    '
-                                        '    ' No data was found for this period, summarize the entire period
-                                        '    '
-                                        '    DatePtr = OldestVisitSummaryWeCareAbout
-                                        'Else
-                                        For DatePtr = OldestVisitSummaryWeCareAbout.ToOADate To Yesterday.ToOADate
+                                        Dim datePtr As DateTime = OldestVisitSummaryWeCareAbout
+                                        Do While (datePtr <= Yesterday)
                                             If Not cp.core.db.cs_ok(CS) Then
                                                 '
                                                 ' Out of data, start with this DatePtr
                                                 '
-                                                Call HouseKeep_VisitSummary(Date.FromOADate(DatePtr), Date.FromOADate(DatePtr), 24, cp.core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout)
+                                                Call HouseKeep_VisitSummary(datePtr, datePtr, 24, cp.core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout)
                                                 'Exit For
                                             Else
-                                                DateNumberWorking = cp.core.db.cs_getInteger(CS, "DateNumber")
-                                                If DatePtr < DateNumberWorking Then
+                                                workingDate = Date.MinValue.AddDays(cp.core.db.cs_getInteger(CS, "DateNumber"))
+                                                If datePtr < workingDate Then
                                                     '
                                                     ' There are missing dates, update them
                                                     '
-                                                    Call HouseKeep_VisitSummary(Date.FromOADate(DatePtr), Date.FromOADate(DateNumberWorking - 1), 24, cp.core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout)
+                                                    Call HouseKeep_VisitSummary(datePtr, workingDate.AddDays(-1), 24, cp.core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout)
                                                 End If
                                             End If
                                             If cp.core.db.cs_ok(CS) Then
@@ -427,32 +429,15 @@ Namespace Contensive.Core
                                                 '
                                                 Call cp.core.db.cs_goNext(CS)
                                             End If
-                                        Next
-                                        'End If
+                                            datePtr = datePtr.AddDays(1).Date
+                                        Loop
                                         Call cp.core.db.cs_Close(CS)
-                                        'Call HouseKeep_VisitSummary( CDate(DatePtr), RightNow, 24, BuildVersion, OldestVisitSummaryWeCareAbout)
-
-                                        '                    SQL = cp.Core.app.csv_GetSQLSelect("default", "ccVisitSummary", "DateNumber", "TimeDuration=24 and DateNumber>=" & Int(CDbl(OldestVisitSummaryWeCareAbout)), "DateNumber Desc", , 1)
-                                        '                    CS = cp.Core.app.csv_OpenCSSQL("default", SQL)
-                                        '                    If Not cp.Core.app.csv_IsCSOK(CS) Then
-                                        '                        OldestSummarizedDateNumber = OldestVisitSummaryWeCareAbout
-                                        '                    Else
-                                        '                        OldestSummarizedDateNumber = cp.Core.app.csv_cs_getNumber(CS, "DateNumber")
-                                        '                        If OldestSummarizedDateNumber > OldestVisitSummaryWeCareAbout Then
-                                        '                            OldestSummarizedDateNumber = OldestVisitSummaryWeCareAbout
-                                        '                        End If
-                                        '                    End If
-                                        '                    Call cp.Core.app.csv_CloseCS(CS)
-                                        '                    Call HouseKeep_VisitSummary( CDate(OldestSummarizedDateNumber), RightNow, 24, BuildVersion, OldestVisitSummaryWeCareAbout)
-
                                     End If
-                                    If True Then
-                                        '
-                                        ' Remote Query Expiration
-                                        '
-                                        SQL = "delete from ccRemoteQueries where (DateExpires is not null)and(DateExpires<" & cp.core.db.encodeSQLDate(Now()) & ")"
-                                        Call cp.core.db.executeSql(SQL)
-                                    End If
+                                    '
+                                    ' Remote Query Expiration
+                                    '
+                                    SQL = "delete from ccRemoteQueries where (DateExpires is not null)and(DateExpires<" & cp.core.db.encodeSQLDate(Now()) & ")"
+                                    Call cp.core.db.executeSql(SQL)
                                     If True Then
                                         '
                                         ' Clean Navigation
@@ -500,42 +485,21 @@ Namespace Contensive.Core
                                         ' Find the day of the last entry in the viewing summary table as start there
                                         ' PageViewSummary should always add at least one entry for each day, even if 0
                                         '
-                                        SQL = cp.core.db.GetSQLSelect("default", "ccviewingsummary", "DateNumber", "TimeDuration=24 and DateNumber>=" & OldestVisitSummaryWeCareAbout.Date.ToOADate, "DateNumber Desc", , 1)
-                                        CS = cp.core.db.cs_openCsSql_rev("default", SQL)
-                                        If Not cp.core.db.cs_ok(CS) Then
-                                            DatePtr = CInt(DateDiff(DateInterval.Day, OldestVisitSummaryWeCareAbout, Date.MinValue))
-                                        Else
-                                            DatePtr = cp.core.db.cs_getInteger(CS, "DateNumber")
+                                        If True Then
+                                            Dim datePtr As Date
+                                            SQL = cp.core.db.GetSQLSelect("default", "ccviewingsummary", "DateNumber", "TimeDuration=24 and DateNumber>=" & OldestVisitSummaryWeCareAbout.Date.ToOADate, "DateNumber Desc", , 1)
+                                            CS = cp.core.db.cs_openCsSql_rev("default", SQL)
+                                            If Not cp.core.db.cs_ok(CS) Then
+                                                datePtr = OldestVisitSummaryWeCareAbout
+                                            Else
+                                                datePtr = Date.MinValue.AddDays(cp.core.db.cs_getInteger(CS, "DateNumber"))
+                                            End If
+                                            Call cp.core.db.cs_Close(CS)
+                                            If datePtr < OldestVisitSummaryWeCareAbout Then
+                                                datePtr = OldestVisitSummaryWeCareAbout
+                                            End If
+                                            Call HouseKeep_PageViewSummary(datePtr, Yesterday, 24, cp.core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout)
                                         End If
-                                        Call cp.core.db.cs_Close(CS)
-                                        If DatePtr < genericController.convertDateToDayPtr(OldestVisitSummaryWeCareAbout) Then
-                                            DatePtr = genericController.convertDateToDayPtr(OldestVisitSummaryWeCareAbout)
-                                        End If
-                                        Call HouseKeep_PageViewSummary(Date.FromOADate(DatePtr), Yesterday, 24, cp.core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout)
-                                        '                    For DatePtr = OldestVisitSummaryWeCareAbout To Int(Yesterday)
-                                        '                        If Not cp.Core.app.csv_IsCSOK(CS) Then
-                                        '                            '
-                                        '                            ' Out of data, start with this DatePtr
-                                        '                            '
-                                        '                            Call HouseKeep_PageViewSummary( CDate(DatePtr), CDate(DatePtr), 24, BuildVersion, OldestVisitSummaryWeCareAbout)
-                                        '                            'Exit For
-                                        '                        Else
-                                        '                            DateNumberWorking = cp.Core.app.csv_cs_getInteger(CS, "DateNumber")
-                                        '                            If DatePtr < DateNumberWorking Then
-                                        '                                '
-                                        '                                ' There are missing dates, update them
-                                        '                                '
-                                        '                                Call HouseKeep_PageViewSummary( CDate(DatePtr), CDate(DateNumberWorking - 1), 24, BuildVersion, OldestVisitSummaryWeCareAbout)
-                                        '                            End If
-                                        '                        End If
-                                        '                        If cp.Core.app.csv_IsCSOK(CS) Then
-                                        '                            '
-                                        '                            ' if there is more data, go to the next record
-                                        '                            '
-                                        '                            Call cp.Core.app.csv_NextCSRecord(CS)
-                                        '                        End If
-                                        '                    Next
-                                        '                    Call cp.Core.app.csv_CloseCS(CS)
                                     End If
                                 End If
                                 '
@@ -587,9 +551,9 @@ Namespace Contensive.Core
                                     Dim DateofMissingSummary As Date
                                     DateofMissingSummary = Date.MinValue
                                     'Call AppendClassLog(cp.Core.appEnvironment.name, "HouseKeep", "Verify there are 24 hour records for the past 90 days")
-                                    PeriodStart = Int(rightNow) - 90
+                                    PeriodStartDate = rightNow.Date.AddDays(-90)
                                     PeriodStep = 1
-                                    For PeriodDatePtr = PeriodStart.ToOADate To OldestDateAdded.ToOADate Step PeriodStep
+                                    For PeriodDatePtr = PeriodStartDate.ToOADate To OldestDateAdded.ToOADate Step PeriodStep
                                         SQL = "select count(id) as HoursPerDay from ccVisitSummary where TimeDuration=1 and DateNumber=" & CLng(PeriodDatePtr) & " group by DateNumber"
                                         'SQL = "select count(id) as HoursPerDay from ccVisitSummary group by DateNumber having DateNumber=" & CLng(PeriodDatePtr)
                                         CS = cp.core.db.cs_openCsSql_rev("default", SQL)
@@ -638,7 +602,7 @@ Namespace Contensive.Core
                                         AlarmTimeString = "12:00:00 AM"
                                         Call cp.core.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString)
                                     End If
-                                    AlarmTimeMinutesSinceMidnight =  genericController.EncodeDate(AlarmTimeString).TimeOfDay.TotalMinutes
+                                    AlarmTimeMinutesSinceMidnight = genericController.EncodeDate(AlarmTimeString).TimeOfDay.TotalMinutes
                                     minutesSinceMidnight = rightNow.TimeOfDay.TotalMinutes
                                     LastCheckMinutesFromMidnight = LastCheckDateTime.TimeOfDay.TotalMinutes
                                     If (minutesSinceMidnight > LastCheckMinutesFromMidnight) And (LastCheckMinutesFromMidnight >= LastCheckMinutesFromMidnight) And (LastCheckMinutesFromMidnight < minutesSinceMidnight) Then
@@ -683,7 +647,7 @@ ErrorTrap:
             Dim FilenameAltSize As String
             Dim FileList As IO.FileInfo()
             '
-            Dim FileSize As Integer
+            Dim FileSize As Long
             Dim PathNameRev As String
             Dim FilenameDim() As String
             '
@@ -912,7 +876,7 @@ ErrorTrap:
             ' Visits with no DateAdded
             '
             Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting visits with no DateAdded")
-            Call cp.core.DeleteTableRecordChunks("default", "ccvisits", "(DateAdded is null)or(DateAdded<=" & cp.core.db.encodeSQLDate("1/1/1995") & ")", 1000, 10000)
+            Call cp.core.DeleteTableRecordChunks("default", "ccvisits", "(DateAdded is null)or(DateAdded<=" & cp.core.db.encodeSQLDate(#1/1/1995#) & ")", 1000, 10000)
             '
             ' Visits with no visitor
             '
@@ -930,7 +894,7 @@ ErrorTrap:
             SQL = cp.core.db.GetSQLSelect("default", "ccVisits", "DateAdded", , "dateadded", , 1)
             CS = cp.core.db.cs_openCsSql_rev("default", SQL)
             If cp.core.db.cs_ok(CS) Then
-                OldestVisitDate = Int(cp.core.db.cs_getDate(CS, "DateAdded"))
+                OldestVisitDate = cp.core.db.cs_getDate(CS, "DateAdded").Date
             End If
             Call cp.core.db.cs_Close(CS)
             '
@@ -944,7 +908,7 @@ ErrorTrap:
                 Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "No records were removed because Housekeep ArchiveRecordAgeDays is 0.")
             Else
                 ArchiveDate = rightNow.AddDays(-VisitArchiveAgeDays).Date
-                DaystoRemove = (ArchiveDate - OldestVisitDate).TotalDays
+                DaystoRemove = CInt(ArchiveDate.Subtract(OldestVisitDate).TotalDays)
                 If DaystoRemove > 30 Then
                     ArchiveDate = OldestVisitDate.AddDays(30)
                 End If
@@ -1978,7 +1942,7 @@ ErrorTrap:
             'Dim StartDate As Date
             Dim StartTimeHoursSinceMidnight As Double
             Dim PeriodStart As Date
-            Dim TotalTimeOnSite
+            Dim TotalTimeOnSite As Double
             Dim MultiPageVisitCnt As Integer
             Dim MultiPageHitCnt As Integer
             Dim MultiPageTimetoLastHitSum As Double
@@ -2083,8 +2047,8 @@ ErrorTrap:
                 PeriodDatePtr = PeriodStart
                 Do While PeriodDatePtr < EndTimeDate
                     '
-                    DateNumber = Int(PeriodDatePtr.AddHours(HourDuration / 2).ToOADate)
-                    TimeNumber = PeriodDatePtr.TimeOfDay.TotalHours
+                    DateNumber = CInt(PeriodDatePtr.AddHours(HourDuration / 2).ToOADate)
+                    TimeNumber = CInt(PeriodDatePtr.TimeOfDay.TotalHours)
                     DateStart = PeriodDatePtr.Date
                     DateEnd = PeriodDatePtr.AddHours(HourDuration).Date
                     '
@@ -2244,7 +2208,7 @@ ErrorTrap:
                         End If
                         '
                         If (MultiPageHitCnt > MultiPageVisitCnt) And (HitCnt > 0) Then
-                            AveReadTime = MultiPageTimetoLastHitSum / (MultiPageHitCnt - MultiPageVisitCnt)
+                            AveReadTime = CInt(MultiPageTimetoLastHitSum / (MultiPageHitCnt - MultiPageVisitCnt))
                             TotalTimeOnSite = MultiPageTimetoLastHitSum + (AveReadTime * VisitCnt)
                             AveTimeOnSite = TotalTimeOnSite / VisitCnt
                         End If
@@ -2440,7 +2404,7 @@ ErrorTrap:
             Dim StartDate As Date
             'Dim StartTime As Date
             Dim PeriodStart As Date
-            Dim TotalTimeOnSite
+            'Dim TotalTimeOnSite
             Dim MultiPageVisitCnt As Integer
             Dim MultiPageHitCnt As Integer
             Dim MultiPageTimetoLastHitSum As Double
@@ -2546,14 +2510,12 @@ ErrorTrap:
                 If PeriodStart < OldestVisitSummaryWeCareAbout Then
                     PeriodStart = OldestVisitSummaryWeCareAbout
                 End If
-                StartDate = Int(PeriodStart)
-                'StartTime = Int((PeriodStart - StartDate) * 24) / 24
-                'PeriodStart = StartDate + StartTime
+                StartDate = PeriodStart.Date
                 PeriodStep = CDbl(HourDuration) / 24.0!
                 Do While PeriodDatePtr < EndTimeDate
                     '
-                    DateNumber = Int(PeriodDatePtr.AddHours(HourDuration / 2).ToOADate)
-                    TimeNumber = PeriodDatePtr.TimeOfDay.TotalHours
+                    DateNumber = CInt(PeriodDatePtr.AddHours(HourDuration / 2).ToOADate)
+                    TimeNumber = CInt(PeriodDatePtr.TimeOfDay.TotalHours)
                     DateStart = PeriodDatePtr.Date
                     DateEnd = PeriodDatePtr.AddHours(HourDuration).Date
                     '
@@ -2830,7 +2792,7 @@ ErrorTrap:
                                                         '
                                                         CollectionPath = genericController.vbLCase(CollectionNode.InnerText)
                                                     Case "lastchangedate"
-                                                        LastChangeDate =  genericController.EncodeDate(CollectionNode.InnerText)
+                                                        LastChangeDate = genericController.EncodeDate(CollectionNode.InnerText)
                                                 End Select
                                             Next
                                     End Select

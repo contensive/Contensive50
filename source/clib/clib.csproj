@@ -120,7 +120,7 @@
     <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>Contensive.Core.mainClass</StartupObject>
+    <StartupObject>Contensive.CLI.mainClass</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
     <TargetZone>LocalIntranet</TargetZone>

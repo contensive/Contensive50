@@ -257,7 +257,7 @@ Namespace Contensive.Core
                         Case AdminFormToolConfigureEdit
                             '
                             'Call Stream.Add(cpCore.addon.execute(guid_ToolConfigureEdit))
-                            Call Stream.Add(GetForm_ConfigureEdit(cpCore.cp))
+                            Call Stream.Add(GetForm_ConfigureEdit(cpCore.cp_forAddonExecutionOnly))
                         Case AdminFormToolManualQuery
                             '
                             Call Stream.Add(GetForm_ManualQuery)

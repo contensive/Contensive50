@@ -5084,7 +5084,7 @@ ErrorTrap:
         End Function
         '
         '==============================================================================
-        Public Shared Function isGuid(ignore As Object, Source As String) As Boolean
+        Public Shared Function isGuid(Source As String) As Boolean
             Dim returnValue As Boolean = False
             Try
                 If (Len(Source) = 38) And (Left(Source, 1) = "{") And (Right(Source, 1) = "}") Then

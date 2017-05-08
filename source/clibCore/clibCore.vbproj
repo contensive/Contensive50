@@ -393,6 +393,8 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="addon_emailProcess\processEmailClass.vb" />
+    <Compile Include="addon_housekeeping\houseKeepClass.vb" />
     <Compile Include="constants.vb" />
     <Compile Include="Controllers\csController.vb" />
     <Compile Include="Controllers\dbEngineController.vb" />
