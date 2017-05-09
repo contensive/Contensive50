@@ -19,14 +19,12 @@ Public Class Global_asax
     Sub Application_Start(ByVal sender As Object, ByVal e As EventArgs)
         Try
             Trace.WriteLine(getAppDescription("Application_Start"))
-            Dim cp As Contensive.Core.CPClass
-            Dim serverConfig As Contensive.Core.Models.Entity.serverConfigModel = DefaultSite.configurationClass.getServerConfig()
-            cp = New Contensive.Core.CPClass(serverConfig)
-            cp.Utils.AppendLog("Application_Start")
-            If (cp.appOk) Then
-                DefaultSite.configurationClass.RegisterRoutes(cp, serverConfig, RouteTable.Routes)
-            End If
-            cp.Dispose()
+            Using cp As New Contensive.Core.CPClass(ConfigurationManager.AppSettings("ContensiveAppName"))
+                cp.Utils.AppendLog("Application_Start")
+                If (cp.appOk) Then
+                    DefaultSite.configurationClass.RegisterRoutes(cp, RouteTable.Routes)
+                End If
+            End Using
         Catch ex As Exception
             Trace.WriteLine(getAppDescription("Application_Start ERROR exit"))
         End Try

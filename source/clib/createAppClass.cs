@@ -143,9 +143,9 @@ namespace  Contensive.CLI {
                     //
                     // replace "appName" with the name of this app in the default document in the apps public folder
                     //
-                    string defaultContent = cp.core.appRootFiles.readFile(iisDefaultDoc);
-                    defaultContent = defaultContent.Replace("defaultSiteName", appName);
-                    cp.core.appRootFiles.saveFile(iisDefaultDoc, defaultContent);
+                    string defaultContent = cp.core.appRootFiles.readFile("web.config");
+                    defaultContent = defaultContent.Replace("{{appName}}", appName);
+                    cp.core.appRootFiles.saveFile(iisDefaultDoc, "web.config");
                 }
                 //
                 // initialize the new app, use the save authentication that was used to authorize this object

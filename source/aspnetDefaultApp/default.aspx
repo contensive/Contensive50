@@ -2,20 +2,21 @@
 
 <script runat="server">
     Sub Page_Load()
-        Dim test As String = "test"
-        Dim cp As Contensive.Core.CPClass
-        Dim doc As String
         '
-        cp = New Contensive.Core.CPClass("DefaultSiteName", HttpContext.Current)
-        '** cp = New Contensive.Core.CPClass(DefaultSite.configurationClass.getServerConfig(), HttpContext.Current)
-        doc = cp.executeRoute()
-        If cp.Response.isOpen() Then
+        ' -- two possible initialization methods 
+        Dim useWebConfig As Boolean = (ConfigurationManager.AppSettings("ContensiveUseWebConfig").ToLower = "true")
+        If useWebConfig Then
             '
-            ' page is open, modify it
+            ' -- initialize with appSettings in web.config
+            Using cp As New Contensive.Core.CPClass(DefaultSite.configurationClass.getServerConfig(), HttpContext.Current)
+                Response.Write(cp.executeRoute())
+            End Using
+        Else
             '
-            doc = Replace(doc, "$myCustomTag$", "<div>cp.user.name = " & cp.User.Name & "</div>")
+            ' -- initialize with contensive c:\programdata\contensive\serverConfig.json setup during installation
+            Using cp As New Contensive.Core.CPClass(ConfigurationManager.AppSettings("ContensiveAppName"), HttpContext.Current)
+                Response.Write(cp.executeRoute())
+            End Using
         End If
-        cp.Dispose()
-        Response.Write(doc)
     End Sub
 </script>

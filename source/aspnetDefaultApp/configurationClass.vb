@@ -6,48 +6,55 @@ Imports Contensive.Core
 Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
 Imports System.Web.Routing
+Imports System.IO
+
 Public Class configurationClass
     Public Shared Function getServerConfig() As Contensive.Core.Models.Entity.serverConfigModel
-        Dim serverConfig As Contensive.Core.Models.Entity.serverConfigModel
-        '
-        serverConfig = New Contensive.Core.Models.Entity.serverConfigModel
-        serverConfig.appConfig = New Contensive.Core.Models.Entity.serverConfigModel.appConfigModel
-        '
-        serverConfig.allowTaskRunnerService = False
-        serverConfig.allowTaskSchedulerService = False
-        serverConfig.appConfig.adminRoute = ConfigurationManager.AppSettings("ContensiveAdminRoute")
-        serverConfig.appConfig.appRootFilesPath = ConfigurationManager.AppSettings("ContensiveAppRootFilesPath")
-        serverConfig.appConfig.cdnFilesNetprefix = ConfigurationManager.AppSettings("ContensiveCdnFilesNetprefix")
-        serverConfig.appConfig.cdnFilesPath = ConfigurationManager.AppSettings("ContensiveCdnFilesPath")
-        serverConfig.appConfig.domainList.Add(ConfigurationManager.AppSettings("ContensivePrimaryDomain"))
-        serverConfig.appConfig.enableCache = genericController.EncodeBoolean(ConfigurationManager.AppSettings("ContensiveEnableCache"))
-        serverConfig.appConfig.enabled = True
-        serverConfig.appConfig.name = ConfigurationManager.AppSettings("ContensiveAppName")
-        serverConfig.appConfig.privateFilesPath = ConfigurationManager.AppSettings("ContensivePrivateFilesPath")
-        serverConfig.appConfig.privateKey = ConfigurationManager.AppSettings("ContensivePrivateKey")
-        serverConfig.apps.Add(serverConfig.appConfig.name, serverConfig.appConfig)
-        serverConfig.cdnFilesRemoteEndpoint = ConfigurationManager.AppSettings("ContensiveCdnFilesRemoteEndpoint")
-        serverConfig.defaultDataSourceAddress = ConfigurationManager.AppSettings("ContensiveDefaultDataSourceAddress")
-        serverConfig.defaultDataSourcePassword = ConfigurationManager.AppSettings("ContensiveDefaultDataSourcePassword")
-        'serverConfig.defaultDataSourceType = genericController.EncodeInteger(ConfigurationManager.AppSettings("ContensiveDefaultDataSourceType"))
-        serverConfig.defaultDataSourceUsername = ConfigurationManager.AppSettings("ContensiveDefaultDataSourceUsername")
-        serverConfig.isLocalCache = genericController.EncodeBoolean(ConfigurationManager.AppSettings("ContensiveIsLocalCache"))
-        serverConfig.isLocalFileSystem = genericController.EncodeBoolean(ConfigurationManager.AppSettings("ContensiveIsLocalFileSystem"))
-        serverConfig.localDataDriveLetter = ConfigurationManager.AppSettings("ContensiveLocalDataDriveLetter")
-        serverConfig.name = ConfigurationManager.AppSettings("ContensiveServerGroupName")
-        serverConfig.password = ConfigurationManager.AppSettings("ContensiveServerGroupPassword")
-        serverConfig.programFilesPath = ""
-        serverConfig.username = ConfigurationManager.AppSettings("ContensiveServerGroupUsername")
+        Logger.LogInfo("getServerConfig")
+        Dim serverConfig As Contensive.Core.Models.Entity.serverConfigModel = Nothing
+        Try
+            serverConfig = New Contensive.Core.Models.Entity.serverConfigModel
+            serverConfig.appConfig = New Contensive.Core.Models.Entity.serverConfigModel.appConfigModel
+            '
+            serverConfig.allowTaskRunnerService = False
+            serverConfig.allowTaskSchedulerService = False
+            serverConfig.appConfig.adminRoute = ConfigurationManager.AppSettings("ContensiveAdminRoute")
+            serverConfig.appConfig.appRootFilesPath = ConfigurationManager.AppSettings("ContensiveAppRootFilesPath")
+            serverConfig.appConfig.cdnFilesNetprefix = ConfigurationManager.AppSettings("ContensiveCdnFilesNetprefix")
+            serverConfig.appConfig.cdnFilesPath = ConfigurationManager.AppSettings("ContensiveCdnFilesPath")
+            serverConfig.appConfig.domainList.Add(ConfigurationManager.AppSettings("ContensivePrimaryDomain"))
+            serverConfig.appConfig.enableCache = genericController.EncodeBoolean(ConfigurationManager.AppSettings("ContensiveEnableCache"))
+            serverConfig.appConfig.enabled = True
+            serverConfig.appConfig.name = ConfigurationManager.AppSettings("ContensiveAppName")
+            serverConfig.appConfig.privateFilesPath = ConfigurationManager.AppSettings("ContensivePrivateFilesPath")
+            serverConfig.appConfig.privateKey = ConfigurationManager.AppSettings("ContensivePrivateKey")
+            serverConfig.apps.Add(serverConfig.appConfig.name, serverConfig.appConfig)
+            serverConfig.cdnFilesRemoteEndpoint = ConfigurationManager.AppSettings("ContensiveCdnFilesRemoteEndpoint")
+            serverConfig.defaultDataSourceAddress = ConfigurationManager.AppSettings("ContensiveDefaultDataSourceAddress")
+            serverConfig.defaultDataSourcePassword = ConfigurationManager.AppSettings("ContensiveDefaultDataSourcePassword")
+            'serverConfig.defaultDataSourceType = genericController.EncodeInteger(ConfigurationManager.AppSettings("ContensiveDefaultDataSourceType"))
+            serverConfig.defaultDataSourceUsername = ConfigurationManager.AppSettings("ContensiveDefaultDataSourceUsername")
+            serverConfig.isLocalCache = genericController.EncodeBoolean(ConfigurationManager.AppSettings("ContensiveIsLocalCache"))
+            serverConfig.isLocalFileSystem = genericController.EncodeBoolean(ConfigurationManager.AppSettings("ContensiveIsLocalFileSystem"))
+            serverConfig.localDataDriveLetter = ConfigurationManager.AppSettings("ContensiveLocalDataDriveLetter")
+            serverConfig.name = ConfigurationManager.AppSettings("ContensiveServerGroupName")
+            serverConfig.password = ConfigurationManager.AppSettings("ContensiveServerGroupPassword")
+            serverConfig.programFilesPath = ""
+            serverConfig.username = ConfigurationManager.AppSettings("ContensiveServerGroupUsername")
+        Catch ex As Exception
+            Logger.LogInfo(ex)
+        End Try
         Return serverConfig
     End Function
     '
-    Public Shared Sub RegisterRoutes(cp As Contensive.Core.CPClass, serverConfig As Contensive.Core.Models.Entity.serverConfigModel, ByVal routes As RouteCollection)
+    Public Shared Sub RegisterRoutes(cp As Contensive.Core.CPClass, ByVal routes As RouteCollection)
+        Logger.LogInfo("RegisterRoutes")
         Try
             Dim cs As Contensive.BaseClasses.CPCSBaseClass = cp.CSNew
             '
             ' -- drive all routes to the default page
             Dim physicalFile As String = "~/" & cp.Site.GetText("serverpagedefault")
-            Dim adminRoute As String = serverConfig.appConfig.adminRoute
+            Dim adminRoute As String = cp.core.serverConfig.appConfig.adminRoute
             If (Not String.IsNullOrEmpty(adminRoute)) Then
                 '
                 ' -- register admin route
@@ -56,8 +63,8 @@ Public Class configurationClass
                     If (adminRoute.Substring(0, 1) = "/"c) Then
                         adminRoute = adminRoute.Substring(1)
                     End If
-                    cp.Utils.AppendLog("RegisterRoutes, admin route, serverConfig.appConfig.adminRoute [" & serverConfig.appConfig.adminRoute & "]")
-                    routes.MapPageRoute("Admin Route", serverConfig.appConfig.adminRoute, physicalFile)
+                    cp.Utils.AppendLog("RegisterRoutes, admin route, serverConfig.appConfig.adminRoute [" & adminRoute & "]")
+                    routes.MapPageRoute("Admin Route", adminRoute, physicalFile)
                 Catch ex As Exception
                     cp.Site.ErrorReport(ex, "Exception while adding admin route")
                 End Try
@@ -102,12 +109,20 @@ Public Class configurationClass
             End If
             cs.Close()
         Catch ex As Exception
-            Trace.WriteLine("configurationClass, EXCEPTION")
+            Logger.LogInfo(ex)
         End Try
     End Sub
     '
     Private Shared Function EncodeBoolean(source As String) As Boolean
         Return Equals(source.ToLower(), "true") Or Equals(source.ToLower(), "yes") Or Equals(source.ToLower(), "on") Or (IsNumeric(source) And (source <> "0"))
     End Function
+    '
+
+    ' 
+
+    ' This class is responsible for tracing application errors during runtime. It writes information to log file describing cause of error, file name & line number etc 
+    '
+
+
     '
 End Class
