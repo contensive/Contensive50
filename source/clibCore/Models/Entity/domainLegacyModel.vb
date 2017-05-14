@@ -69,7 +69,7 @@ Namespace Contensive.Core.Models.Entity
                             For Each dr As DataRow In dt.Rows
                                 domainList_local.Add(dr(0).ToString)
                             Next
-                            Call cpCore.cache.setKey(cacheName, domainList_local, "domains")
+                            Call cpCore.cache.setObject(cacheName, domainList_local, "domains")
                             dt.Dispose()
                         End If
                         serverDomainList_localLoaded = True

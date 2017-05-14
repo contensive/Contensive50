@@ -1644,7 +1644,7 @@ Namespace Contensive.Core.Controllers
                             '
                             Call deleteTableRecord(ContentTableName, LiveRecordID, ContentDataSourceName)
                             If coreWorkflowClass.csv_AllowAutocsv_ClearContentTimeStamp Then
-                                Call cpCore.cache.invalidateTag(ContentName)
+                                Call cpCore.cache.invalidateObject(ContentName)
                             End If
                             Call deleteContentRules(ContentID, LiveRecordID)
                         Else
@@ -2548,7 +2548,7 @@ Namespace Contensive.Core.Controllers
                         '
                         Call DeleteTableRecords(CDef.ContentTableName, "(" & Criteria & ") And (" & CDef.ContentControlCriteria & ")", CDef.ContentDataSourceName)
                         If coreWorkflowClass.csv_AllowAutocsv_ClearContentTimeStamp Then
-                            Call cpCore.cache.invalidateTag(ContentName)
+                            Call cpCore.cache.invalidateObject(ContentName)
                         End If
                     End If
                 End If
@@ -2719,7 +2719,7 @@ Namespace Contensive.Core.Controllers
                             ' ----- Clear Time Stamp because a record changed
                             '
                             If coreWorkflowClass.csv_AllowAutocsv_ClearContentTimeStamp Then
-                                Call cpCore.cache.invalidateTag(ContentName)
+                                Call cpCore.cache.invalidateObject(ContentName)
                             End If
                         End With
                     End If
@@ -3681,7 +3681,7 @@ Namespace Contensive.Core.Controllers
                                 ' ----- reset the ContentTimeStamp to csv_ClearBake
                                 '
                                 If coreWorkflowClass.csv_AllowAutocsv_ClearContentTimeStamp And (Not Blockcsv_ClearBake) Then
-                                    Call cpCore.cache.invalidateTag(LiveRecordContentName)
+                                    Call cpCore.cache.invalidateObject(LiveRecordContentName)
                                 End If
                                 '
                                 ' ----- mark the record NOT UpToDate for SpiderDocs

@@ -1424,7 +1424,7 @@ Namespace Contensive.Core
                         End If
                     End If
                 End If
-                Call cpCore.cache.invalidateTagCommaList("People")
+                Call cpCore.cache.invalidateObjectList("People")
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try

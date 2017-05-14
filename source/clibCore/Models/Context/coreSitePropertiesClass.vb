@@ -460,7 +460,7 @@ Namespace Contensive.Core.Models.Context
                     SQL = "INSERT INTO ccSetup (ACTIVE,CONTENTCONTROLID,NAME,FIELDVALUE,ModifiedDate,DateAdded)VALUES(" & SQLTrue & "," & cpCore.db.encodeSQLNumber(ContentID) & "," & cpCore.db.encodeSQLText(UCase(propertyName)) & "," & cpCore.db.encodeSQLText(Value) & "," & SQLNow & "," & SQLNow & ");"
                     Call cpCore.db.executeSql(SQL)
                 End If
-                Call cpCore.cache.setKey(cacheName, Value, "site properties")
+                Call cpCore.cache.setObject(cacheName, Value, "site properties")
 
             Catch ex As Exception
                 Call cpCore.handleExceptionAndRethrow(ex)
@@ -548,7 +548,7 @@ Namespace Contensive.Core.Models.Context
                 If String.IsNullOrEmpty(returnString) Then
                     returnString = getText_noCache(PropertyName, DefaultValue, propertyFound)
                     If (propertyFound) And (returnString <> "") Then
-                        Call cpCore.cache.setKey(cacheName, returnString, "Site Properties")
+                        Call cpCore.cache.setObject(cacheName, returnString, "Site Properties")
                     End If
                 End If
             Catch ex As Exception

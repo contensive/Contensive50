@@ -669,7 +669,7 @@ Namespace Contensive.Core
                             '
                             SQL = "update ccdomains set visited=1 where name=" & cpCore.db.encodeSQLText(requestDomain)
                             Call cpCore.db.executeSql(SQL)
-                            Call cpCore.cache.setKey("domainContentList", "", "domains")
+                            Call cpCore.cache.setObject("domainContentList", "", "domains")
                         End If
                         If cpCore.domains.domainDetails.typeId = 1 Then
                             '
@@ -756,7 +756,7 @@ Namespace Contensive.Core
                         ' if there was a change, update the cache
                         '
                         domainDetailsListText = cpCore.json.Serialize(cpCore.domains.domainDetailsList)
-                        Call cpCore.cache.setKey("domainContentList", domainDetailsListText, "domains")
+                        Call cpCore.cache.setObject("domainContentList", domainDetailsListText, "domains")
                     End If
                     '
                     cpCore.webServerIO_requestVirtualFilePath = "/" & cpCore.serverconfig.appConfig.name

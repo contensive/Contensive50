@@ -382,8 +382,8 @@ Namespace Contensive.Core
                                         '
                                         If NeedToClearCache Then
                                             emptyData = Nothing
-                                            Call cp.core.cache.invalidateTag("Page Content")
-                                            Call cp.core.cache.setKey("PCC", emptyData)
+                                            Call cp.core.cache.invalidateObject("Page Content")
+                                            Call cp.core.cache.setObject("PCC", emptyData)
                                         End If
                                     End If
                                     If True Then

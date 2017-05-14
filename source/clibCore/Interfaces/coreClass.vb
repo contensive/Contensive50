@@ -2285,7 +2285,7 @@ ErrorTrap:
             '
             pageManager_cache_pageContent_rows = 0
             cache_pageContent = Nothing
-            Call cache.setKey(pageManager_cache_pageContent_cacheName, cache_pageContent)
+            Call cache.setObject(pageManager_cache_pageContent_cacheName, cache_pageContent)
             '
             Exit Sub
             '
@@ -7458,7 +7458,7 @@ ErrorTrap:
                                 End If
                             End If
                         End If
-                        Call cache.invalidateTagCommaList("People")
+                        Call cache.invalidateObjectList("People")
                     End If
                     Call db.cs_Close(CSMember)
                 End If
@@ -15204,12 +15204,12 @@ ErrorTrap:
                 Call pageManager_cache_pageContent_clear()
                 Call pageManager_cache_pageTemplate_clear()
                 Call pageManager_cache_siteSection_clear()
-                Call cache.invalidateTagCommaList("")
+                Call cache.invalidateObjectList("")
                 If ContentName <> "" Then
-                    Call cache.invalidateTagCommaList(ContentName)
+                    Call cache.invalidateObjectList(ContentName)
                     TableName = GetContentTablename(ContentName)
                     If genericController.vbLCase(TableName) = "cctemplates" Then
-                        Call cache.setKey(pageManager_cache_pageTemplate_cacheName, EmptyVariant)
+                        Call cache.setObject(pageManager_cache_pageTemplate_cacheName, EmptyVariant)
                         Call pageManager_cache_pageTemplate_load()
                     End If
                     If genericController.vbLCase(TableName) = "ccpagecontent" Then
@@ -16782,7 +16782,7 @@ ErrorTrap:
                 '        Next
             End If
             If RuleContentChanged Then
-                Call cache.invalidateTagCommaList(RulesContentName)
+                Call cache.invalidateObjectList(RulesContentName)
             End If
             Exit Sub
             '
@@ -17424,7 +17424,7 @@ ErrorTrap:
                         Call privateFiles.saveFile(Filename, BotList)
                     End If
                     DateExpires = app_startTime.AddHours(1)
-                    Call cache.setKey("DefaultBotNameList", CStr(DateExpires) & vbCrLf & BotList)
+                    Call cache.setObject("DefaultBotNameList", CStr(DateExpires) & vbCrLf & BotList)
                 End If
                 '
                 If BotList <> "" Then
@@ -17818,7 +17818,7 @@ ErrorTrap:
                         If Not SaveButNoChanges Then
                             Call main_ProcessSpecialCaseAfterSave(False, ContentName, RecordID, RecordName, RecordParentID, False)
                             Call pageManager_cache_pageContent_clear()
-                            Call cache.invalidateTagCommaList(ContentName)
+                            Call cache.invalidateObjectList(ContentName)
                         End If
                     End If
                 End If
@@ -17850,7 +17850,7 @@ ErrorTrap:
                     '
                     'Call AppendLog("pageManager_ProcessFormQuickEditor, 7-call pageManager_cache_pageContent_clear")
                     Call pageManager_cache_pageContent_clear()
-                    Call cache.invalidateTagCommaList(ContentName)
+                    Call cache.invalidateObjectList(ContentName)
                 End If
                 If (Button = ButtonAddSiblingPage) Then
                     '
@@ -17887,7 +17887,7 @@ ErrorTrap:
                     '
                     'Call AppendLog("pageManager_ProcessFormQuickEditor, 8-call pageManager_cache_pageContent_clear")
                     Call pageManager_cache_pageContent_clear()
-                    Call cache.invalidateTagCommaList(ContentName)
+                    Call cache.invalidateObjectList(ContentName)
                 End If
                 If (Button = ButtonDelete) Then
                     CSBlock = csOpen(ContentName, RecordID)
@@ -17902,7 +17902,7 @@ ErrorTrap:
                     If Not main_WorkflowSupport Then
                         'Call AppendLog("pageManager_ProcessFormQuickEditor, 9-call pageManager_cache_pageContent_clear")
                         Call pageManager_cache_pageContent_clear()
-                        Call cache.invalidateTagCommaList(ContentName)
+                        Call cache.invalidateObjectList(ContentName)
                     End If
                     '
                     If Not main_WorkflowSupport Then
@@ -17933,7 +17933,7 @@ ErrorTrap:
                     '
                     If (Button = ButtonPublish) Then
                         Call workflow.publishEdit(ContentName, RecordID)
-                        Call cache.invalidateTagCommaList(ContentName)
+                        Call cache.invalidateObjectList(ContentName)
                     End If
                     If (Button = ButtonPublishApprove) Then
                         Call workflow.approveEdit(ContentName, RecordID)
@@ -18151,7 +18151,7 @@ ErrorTrap:
                         End If
                         pageManager_GetSectionMenu_NameMenu = pageManager_GetSectionMenu_NameMenu & genericController.vbReplace(menuFlyout.getMenu(MenuNamePrefix & genericController.encodeText(MenuID), MenuStyle, StyleSheetPrefix), vbCrLf, "")
                         pageManager_GetSectionMenu_NameMenu = pageManager_GetSectionMenu_NameMenu & menu_GetClose()
-                        Call cache.setKey(BakeName, pageManager_GetSectionMenu_NameMenu, ContentName & ",Site Sections,Dynamic Menus,Dynamic Menu Section Rules")
+                        Call cache.setObject(BakeName, pageManager_GetSectionMenu_NameMenu, ContentName & ",Site Sections,Dynamic Menus,Dynamic Menu Section Rules")
                     End If
                 End If
             End If
@@ -18426,7 +18426,7 @@ ErrorTrap:
                         '
                         ' ----- Bake the completed menu
                         '
-                        Call cache.setKey(BakeName, pageManager_GetSectionMenu_IdMenu, ContentName & ",Site Sections,Dynamic Menus,Dynamic Menu Section Rules")
+                        Call cache.setObject(BakeName, pageManager_GetSectionMenu_IdMenu, ContentName & ",Site Sections,Dynamic Menus,Dynamic Menu Section Rules")
                     End If
                 End If
             End If
@@ -19945,7 +19945,7 @@ ErrorTrap:
                             ' the defaultemplateid in the domain is not valid
                             '
                             Call db.executeSql("update ccdomains set defaulttemplateid=0 where defaulttemplateid=" & domains.domainDetails.defaultTemplateId)
-                            Call cache.invalidateTagCommaList("domains")
+                            Call cache.invalidateObjectList("domains")
                         End If
                     End If
                     If Not db.cs_ok(CS) Then
@@ -20134,7 +20134,7 @@ ErrorTrap:
                     ' Assemble Template
                     '
                 End If
-                Call cache.setKey(BakeName, main_GetAutoSite_Template, "AutoSite Templates")
+                Call cache.setObject(BakeName, main_GetAutoSite_Template, "AutoSite Templates")
             End If
             '
             Exit Function
@@ -20706,7 +20706,7 @@ ErrorTrap:
                                                         '
                                                         ' Live Editing
                                                         '
-                                                        Call cache.invalidateTagCommaList(ClipChildContentName & "," & ClipParentContentName)
+                                                        Call cache.invalidateObjectList(ClipChildContentName & "," & ClipParentContentName)
                                                         Call pageManager_cache_pageContent_clear()
                                                     End If
                                                 End If
@@ -23564,7 +23564,7 @@ ErrorTrap:
                         & "</table>" _
                         & "</div>"
                     If Not IsAuthoringMode Then
-                        Call cache.setKey(BakeName, main_GetFormInputCheckListCategories, "Content Categories," & PrimaryContentName & "," & SecondaryContentName & "," & RulesContentName)
+                        Call cache.setObject(BakeName, main_GetFormInputCheckListCategories, "Content Categories," & PrimaryContentName & "," & SecondaryContentName & "," & RulesContentName)
                     End If
                     '
                     ' initialize with all open
@@ -24108,7 +24108,7 @@ ErrorTrap:
             cacheArray(0) = cache_linkAlias
             cacheArray(1) = cache_linkAlias_PageIdQSSIndex.exportPropertyBag
             cacheArray(2) = cache_linkAlias_NameIndex.exportPropertyBag
-            Call cache.setKey(cache_linkAlias_cacheName, cacheArray, "link aliases")
+            Call cache.setObject(cache_linkAlias_cacheName, cacheArray, "link aliases")
             '
             Exit Sub
 ErrorTrap:
@@ -24122,7 +24122,7 @@ ErrorTrap:
             '
             cache_linkAliasCnt = 0
             cache_linkAlias = {}
-            Call cache.setKey(cache_linkAlias_cacheName, cache_linkAlias)
+            Call cache.setObject(cache_linkAlias_cacheName, cache_linkAlias)
             '
             Exit Sub
             '
@@ -24780,7 +24780,7 @@ ErrorTrap:
                 cacheArray(1) = pageManager_cache_pageContent_idIndex.exportPropertyBag
                 cacheArray(2) = pageManager_cache_pageContent_nameIndex.exportPropertyBag
                 cacheArray(3) = pageManager_cache_pageContent_parentIdIndex.exportPropertyBag
-                Call cache.setKey(pageManager_cache_pageContent_cacheName, cacheArray)
+                Call cache.setObject(pageManager_cache_pageContent_cacheName, cacheArray)
             End If
             '
             Exit Sub
@@ -25061,7 +25061,7 @@ ErrorTrap:
                     End If
                 End If
                 If Not main_IsWorkflowRendering Then
-                    Call cache.setKey("PCC", cache_pageContent)
+                    Call cache.setObject("PCC", cache_pageContent)
                 End If
             End If
             '
@@ -25451,7 +25451,7 @@ ErrorTrap:
             cacheArray(1) = pageManager_cache_siteSection_IDIndex.exportPropertyBag
             cacheArray(2) = pageManager_cache_siteSection_RootPageIDIndex.exportPropertyBag
             cacheArray(3) = pageManager_cache_siteSection_NameIndex.exportPropertyBag
-            Call cache.setKey(pageManager_cache_siteSection_cacheName, cacheArray)
+            Call cache.setObject(pageManager_cache_siteSection_cacheName, cacheArray)
             '
             Exit Sub
 ErrorTrap:
@@ -25494,10 +25494,10 @@ ErrorTrap:
         Public Sub pageManager_cache_siteSection_clear()
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("pageManager_cache_siteSection_clear")
             '
-            Call cache.invalidateTagCommaList("site sections")
+            Call cache.invalidateObjectList("site sections")
             cache_siteSection = {}
             pageManager_cache_siteSection_rows = 0
-            Call cache.setKey(pageManager_cache_siteSection_cacheName, cache_siteSection)
+            Call cache.setObject(pageManager_cache_siteSection_cacheName, cache_siteSection)
             'Call cmc_siteSectionCache_clear
             '
             Exit Sub
@@ -25692,7 +25692,7 @@ ErrorTrap:
             '
             cacheArray(0) = cache_pageTemplate
             cacheArray(1) = pageManager_cache_pageTemplate_contentIdindex.exportPropertyBag
-            Call cache.setKey(pageManager_cache_pageTemplate_cacheName, cacheArray)
+            Call cache.setObject(pageManager_cache_pageTemplate_cacheName, cacheArray)
             '
             Exit Sub
 ErrorTrap:
@@ -25706,7 +25706,7 @@ ErrorTrap:
             '
             pageManager_cache_pageTemplate_rows = 0
             cache_pageTemplate = {}
-            Call cache.setKey(pageManager_cache_pageTemplate_cacheName, cache_pageTemplate)
+            Call cache.setObject(pageManager_cache_pageTemplate_cacheName, cache_pageTemplate)
             '
             Exit Sub
             '
@@ -25912,7 +25912,7 @@ ErrorTrap:
                     'Call app.publicFiles.SaveFile(Filename, main_GetMobileBrowserList)
                 End If
                 datetext = DateTime.Now.AddHours(1).ToString
-                Call cache.setKey("MobileBrowserList", datetext & vbCrLf & main_GetMobileBrowserList)
+                Call cache.setObject("MobileBrowserList", datetext & vbCrLf & main_GetMobileBrowserList)
             End If
             '
             Exit Function
@@ -26111,11 +26111,11 @@ ErrorTrap:
                     'hint = hint & ",130"
                     Select Case genericController.vbLCase(RecordName)
                         Case "allowlinkalias"
-                            Call cache.invalidateTagCommaList("Page Content")
+                            Call cache.invalidateObjectList("Page Content")
                         Case "sectionlandinglink"
-                            Call cache.invalidateTagCommaList("Page Content")
+                            Call cache.invalidateObjectList("Page Content")
                         Case siteproperty_serverPageDefault_name
-                            Call cache.invalidateTagCommaList("Page Content")
+                            Call cache.invalidateObjectList("Page Content")
                     End Select
                 Case "ccpagecontent"
                     '
@@ -26480,7 +26480,7 @@ ErrorTrap:
                 If MapList = "" Then
                     MapList = ","
                 End If
-                Call cache.setKey(BakeName, MapList, "Shared Styles")
+                Call cache.setObject(BakeName, MapList, "Shared Styles")
             End If
             If (MapList <> "") And (MapList <> ",") Then
                 Srcs = Split(SharedStyleIDList, ",")
@@ -29142,7 +29142,7 @@ ErrorTrap:
                         For Each dr As DataRow In dt.Rows
                             pageManager_Private_ServerDomainCrossList &= dr(0).ToString
                         Next
-                        Call cache.setKey(cacheName, pageManager_Private_ServerDomainCrossList, "domains")
+                        Call cache.setObject(cacheName, pageManager_Private_ServerDomainCrossList, "domains")
                     End If
                     pageManager_Private_ServerDomainCrossList_Loaded = True
                 End If
@@ -29768,7 +29768,7 @@ ErrorTrap:
             cache_addonIncludeRules = New addonIncludeRulesClass
             'cache_addonIncludeRules.itemCnt = 0
             'cache_addonIncludeRules.item = {}
-            Call cache.setKey(cache_addonIncludeRules_cacheName, cache_addonIncludeRules.item)
+            Call cache.setObject(cache_addonIncludeRules_cacheName, cache_addonIncludeRules.item)
             '
             Exit Sub
             '
@@ -29786,7 +29786,7 @@ ErrorTrap:
             '
             Call cache_addonIncludeRules.addonIdIndex.getPtr("test")
             '
-            Call cache.setKey(cache_addonIncludeRules_cacheName, cache_addonIncludeRules)
+            Call cache.setObject(cache_addonIncludeRules_cacheName, cache_addonIncludeRules)
             'cacheArray(0) = cache_addonIncludeRules.item
             'cacheArray(1) = cache_addonIncludeRules.addonIdIndex.exportPropertyBag
             'Call cache.cache_save(cache_addonIncludeRules_cacheName, cacheArray)
@@ -29957,7 +29957,7 @@ ErrorTrap:
                 Next
                 If cacheValue <> "" Then
                     cacheValue = genericController.vbReplace(cacheValue, "\", "/")
-                    Call cache.setKey(cache_linkForward_cacheName, cacheValue)
+                    Call cache.setObject(cache_linkForward_cacheName, cacheValue)
                     'Call cache.cache_savex("dummyValue", "dummyKey")
                 End If
             End If
@@ -29985,7 +29985,7 @@ ErrorTrap:
             '
             cache_libraryFilesCnt = 0
             cache_libraryFiles = {}
-            Call cache.setKey(cache_LibraryFiles_cacheName, cache_libraryFiles)
+            Call cache.setObject(cache_LibraryFiles_cacheName, cache_libraryFiles)
             '
             Exit Sub
             '
@@ -30007,7 +30007,7 @@ ErrorTrap:
             '
             cacheArray(0) = cache_libraryFiles
             cacheArray(1) = cache_libraryFilesIdIndex.exportPropertyBag
-            Call cache.setKey(cache_LibraryFiles_cacheName, cacheArray)
+            Call cache.setObject(cache_LibraryFiles_cacheName, cacheArray)
             '
             Exit Sub
 ErrorTrap:
@@ -34104,12 +34104,12 @@ ErrorTrap:
                                         Call pageManager_cache_pageContent_clear()
                                         Call pageManager_cache_pageTemplate_clear()
                                         Call pageManager_cache_siteSection_clear()
-                                        Call cache.invalidateTagCommaList("")
+                                        Call cache.invalidateObjectList("")
                                         If contentName <> "" Then
-                                            Call cache.invalidateTagCommaList(contentName)
+                                            Call cache.invalidateObjectList(contentName)
                                             tableName = GetContentTablename(contentName)
                                             If genericController.vbLCase(tableName) = "cctemplates" Then
-                                                Call cache.setKey(pageManager_cache_pageTemplate_cacheName, nothingObject)
+                                                Call cache.setObject(pageManager_cache_pageTemplate_cacheName, nothingObject)
                                                 Call pageManager_cache_pageTemplate_load()
                                             End If
                                         End If

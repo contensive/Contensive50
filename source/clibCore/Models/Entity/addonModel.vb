@@ -132,7 +132,7 @@ Namespace Contensive.Core.Models.Entity
                 End If
                 If loadDbModel Or (returnModel Is Nothing) Then
                     returnModel = getObjectNoCache(cpcore, recordId)
-                    Call cpcore.cache.setKey(recordCacheName, json_serializer.Serialize(returnModel), cacheTagList)
+                    Call cpcore.cache.setObject(recordCacheName, json_serializer.Serialize(returnModel), cacheTagList)
                 End If
             Catch ex As Exception
                 cpcore.handleExceptionAndRethrow(ex)
@@ -368,7 +368,7 @@ Namespace Contensive.Core.Models.Entity
                 End If
                 If loadDbModel Or (result Is Nothing) Then
                     result = getRemoteMethodsNoCache(cpcore)
-                    Call cpcore.cache.setKey(recordCacheName, json_serializer.Serialize(result), cacheTagList)
+                    Call cpcore.cache.setObject(recordCacheName, json_serializer.Serialize(result), cacheTagList)
                 End If
             Catch ex As Exception
                 cpcore.handleExceptionAndRethrow(ex)

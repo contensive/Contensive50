@@ -461,7 +461,7 @@ Namespace Contensive.Core
                     End If
                     dt.Dispose()
                     Try
-                        Call cpCore.cache.setKey("cdefNameIdXref", cdefNameIdXref, "content")
+                        Call cpCore.cache.setObject("cdefNameIdXref", cdefNameIdXref, "content")
                     Catch ex As Exception
                         cpCore.handleExceptionAndContinue(ex)
                     End Try
@@ -888,7 +888,7 @@ Namespace Contensive.Core
                             getCdef_SetAdminColumns(returnCdef)
                         End If
                         Try
-                            Call cpCore.cache.setKey("cdefId" & contentId.ToString, returnCdef, "content,content fields")
+                            Call cpCore.cache.setObject("cdefId" & contentId.ToString, returnCdef, "content,content fields")
                         Catch ex As Exception
                             cpCore.handleExceptionAndContinue(ex)
                         End Try
@@ -2397,7 +2397,7 @@ ErrorTrap:
         Public Sub deleteContent(contentNameOrGuid As String)
             Try
                 cpCore.db.executeSql("delete from cccontent where (name=" & cpCore.db.encodeSQLText(contentNameOrGuid) & ")or(ccguid=" & cpCore.db.encodeSQLText(contentNameOrGuid) & ")")
-                cpCore.cache.invalidateTag("content")
+                cpCore.cache.invalidateObject("content")
                 clear()
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -2412,7 +2412,7 @@ ErrorTrap:
         Public Sub deleteContent(contentid As Integer)
             Try
                 cpCore.db.executeSql("delete from cccontent where (id=" & cpCore.db.encodeSQLNumber(contentid) & ")")
-                cpCore.cache.invalidateTag("content")
+                cpCore.cache.invalidateObject("content")
                 clear()
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -3151,7 +3151,7 @@ ErrorTrap:
                             ' ----- Load CDef
                             '
                             If clearMetaCache Then
-                                cpCore.cache.invalidateTagCommaList("content,content fields")
+                                cpCore.cache.invalidateObjectList("content,content fields")
                                 cpCore.metaData.clear()
                             End If
                         End If

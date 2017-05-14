@@ -109,7 +109,7 @@ Namespace Contensive.Core.Models.Entity
                 localCache.propertyBag_guidIndex = ""
                 localCache.propertyBag_idIndex = ""
                 localCache.propertyBag_nameIndex = ""
-                Call cpCore.cache.setKey(cacheName, localCache, cnAddons)
+                Call cpCore.cache.setObject(cacheName, localCache, cnAddons)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -504,10 +504,10 @@ Namespace Contensive.Core.Models.Entity
                 Call localCache.guidIndex.getPtr("test")
                 localCache.propertyBag_guidIndex = localCache.guidIndex.exportPropertyBag()
                 '
-                Call cpCore.cache.setKey(cacheName, localCache, cnAddons)
-                Call cpCore.cache.setKey("testCache1", localCache, cnAddons)
-                Call cpCore.cache.setKey("testCache2", localCache)
-                Call cpCore.cache.setKey("testCache3", "sampleName")
+                Call cpCore.cache.setObject(cacheName, localCache, cnAddons)
+                Call cpCore.cache.setObject("testCache1", localCache, cnAddons)
+                Call cpCore.cache.setObject("testCache2", localCache)
+                Call cpCore.cache.setObject("testCache3", "sampleName")
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try            '

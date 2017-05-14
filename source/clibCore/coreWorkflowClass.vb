@@ -511,7 +511,7 @@ Namespace Contensive.Core
                                             ' ----- Clear Time Stamp because a record changed
                                             '
                                             If csv_AllowAutocsv_ClearContentTimeStamp Then
-                                                Call cpCore.cache.invalidateTag(ContentName)
+                                                Call cpCore.cache.invalidateObject(ContentName)
                                             End If
                                         End If
                                     End If
