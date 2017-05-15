@@ -24,13 +24,15 @@ Namespace Contensive.Core
         ' -- no, cpCore should never call up to cp. cp is the api that calls core.
         Friend cp_forAddonExecutionOnly As CPClass                                   ' constructor -- top-level cp
         '
-        ' ----- shared globals
+        ' -- shared globals
         '
         Public serverConfig As Models.Entity.serverConfigModel
+        Public docOpen As Boolean = False                                   ' when false, routines should not add to the output and immediately exit
         '
-        ' application storage
+        ' -- application storage
         '
-        Friend deleteOnDisposeFileList As New List(Of String)              ' tmp file list of files that need to be deleted during dispose
+        Friend deleteOnDisposeFileList As New List(Of String)               ' tmp file list of files that need to be deleted during dispose
+        Friend exceptionList As List(Of String)                             ' exceptions collected during document construction
         '
         '===================================================================================================
         ''' <summary>
@@ -158,15 +160,15 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property webServerIO As coreWebServerIOClass
+        Public ReadOnly Property webServerIO As webServerIOController
             Get
                 If (_webServer Is Nothing) Then
-                    _webServer = New coreWebServerIOClass(Me)
+                    _webServer = New webServerIOController(Me)
                 End If
                 Return _webServer
             End Get
         End Property
-        Private _webServer As coreWebServerIOClass
+        Private _webServer As webServerIOController
         '
         '===================================================================================================
         ''' <summary>
@@ -580,7 +582,7 @@ Namespace Contensive.Core
             Me.serverConfig = serverConfig
             Me.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady
             Me.serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
-            Call webServerIO.initWebContext(httpContext)
+            webServerIO.initWebContext(httpContext)
             constructorInitialize()
         End Sub
         '
@@ -616,12 +618,6 @@ Namespace Contensive.Core
         End Sub
         '
         '===================================================================================================
-        ' document being constructed
-        '
-        Public docOpen As Boolean = False                   ' when true, you can write to the output stream
-        Friend docExceptionList As List(Of String)
-
-        '
         '-----------------------------------------------------------------------
         ' responseBuffer, legacy system for holding values 'written' instead of concatinated in return arguments
         '-----------------------------------------------------------------------
@@ -6191,7 +6187,7 @@ ErrorTrap:
         '================================================================================================
         '
         Public Sub csv_reportAlarm(Cause As String)
-            Call log_appendLog(Cause, "Alarms", "alarm")
+            Call logController.log_appendLog(Me, Cause, "Alarms", "alarm")
         End Sub
         ''
         ''------------------------------------------------------------------------------------------------------------
@@ -6667,7 +6663,7 @@ ErrorTrap:
                         LineStart = genericController.vbInstr(1, returnValue, StartFlag)
                         LineEnd = genericController.vbInstr(LineStart, returnValue, EndFlag)
                         If LineEnd = 0 Then
-                            log_appendLog("csv_EncodeContent9, Addon could not be inserted into content because the HTML comment holding the position is not formated correctly")
+                            logController.log_appendLog(Me, "csv_EncodeContent9, Addon could not be inserted into content because the HTML comment holding the position is not formated correctly")
                             Exit Do
                         Else
                             AddonName = ""
@@ -7634,7 +7630,7 @@ ErrorTrap:
                     ' Go ahead and redirect
                     '
                     Copy = """" & FormatDateTime(app_startTime, vbGeneralDate) & """,""" & webServerIO.requestDomain & """,""" & webServerIO.requestLinkSource & """,""" & NonEncodedLink & """,""" & RedirectReason & """"
-                    log_appendLog(Copy, "performance", "redirects")
+                    logController.log_appendLog(Me, Copy, "performance", "redirects")
                     '
                     If webServerIO_PageTestPointPrinting Then
                         '
@@ -7689,7 +7685,6 @@ ErrorTrap:
             '
             docOpen = False
         End Sub
-
         '
         '========================================================================
         '   Write to the HTML stream
@@ -7967,7 +7962,7 @@ ErrorTrap:
                 iMessage = genericController.vbReplace(iMessage, vbLf, " ")
                 iMessage = FormatDateTime(Now, vbShortTime) & vbTab & Format((ElapsedTime), "00.000") & vbTab & visit_Id & vbTab & iMessage
                 '
-                Call log_appendLog(iMessage, "", "testPoints_" & serverConfig.appConfig.name)
+                logController.log_appendLog(Me, iMessage, "", "testPoints_" & serverConfig.appConfig.name)
             End If
             Exit Sub
             '
@@ -22896,7 +22891,7 @@ ErrorTrap:
                 ' Put styles inline if requested, and if there has been an upgrade
                 '
                 pageManager_GetStyleTagPublic = pageManager_GetStyleTagPublic & cr & StyleSheetStart & pageManager_GetStyleSheet() & cr & StyleSheetEnd
-            ElseIf (siteProperties.dataBuildVersion <> codeVersion) Then
+            ElseIf (siteProperties.dataBuildVersion <> codeVersion()) Then
                 '
                 ' Put styles inline if requested, and if there has been an upgrade
                 '
@@ -22917,7 +22912,7 @@ ErrorTrap:
             StyleSN = genericController.EncodeInteger(siteProperties.getText("StylesheetSerialNumber", "0"))
             If StyleSN = 0 Then
                 admin_GetStyleTagAdmin = cr & StyleSheetStart & pageManager_GetStyleSheetDefault() & cr & StyleSheetEnd
-            ElseIf (siteProperties.dataBuildVersion <> codeVersion) Then
+            ElseIf (siteProperties.dataBuildVersion <> codeVersion()) Then
                 admin_GetStyleTagAdmin = cr & "<!-- styles forced inline because database upgrade needed -->" & StyleSheetStart & pageManager_GetStyleSheetDefault() & cr & StyleSheetEnd
             Else
                 If StyleSN < 0 Then
@@ -24817,7 +24812,7 @@ ErrorTrap:
                         '
                         ' This PageID is missing from cache - try to reload
                         '
-                        Call log_appendLog("pageManager_cache_pageContent_getPtr, pageID[" & PageID & "] not found in index, attempting cache reload")
+                        Call logController.log_appendLog(Me, "pageManager_cache_pageContent_getPtr, pageID[" & PageID & "] not found in index, attempting cache reload")
                         Call pageManager_cache_pageContent_clear()
                         Call pageManager_cache_pageContent_load(main_IsWorkflowRendering, main_IsQuickEditing)
                         If pageManager_cache_pageContent_rows > 0 Then
@@ -24825,7 +24820,7 @@ ErrorTrap:
                         End If
                         If (pageManager_cache_pageContent_getPtr < 0) Then
                             ' do not through error, this can happen if someone deletes a page.
-                            Call log_appendLog("pageManager_cache_pageContent_getPtr, pageID[" & PageID & "] not found in cache after reload. ERROR")
+                            Call logController.log_appendLog(Me, "pageManager_cache_pageContent_getPtr, pageID[" & PageID & "] not found in cache after reload. ERROR")
                             'Call Err.Raise(ignoreInteger, "cpCoreClass", "pageManager_cache_pageContent_getPtr, pageID [" & PageID & "] reload failed. ERROR")
                             'Call AppendLog("pageManager_cache_pageContent_getPtr, pageID[" & PageID & "] reload failed. ERROR")
                         End If
@@ -27344,7 +27339,7 @@ ErrorTrap:
         '
         Private Sub log_appendLogPageNotFound(PageNotFoundLink As String)
             Try
-                Call log_appendLog("""" & FormatDateTime(app_startTime, vbGeneralDate) & """,""App=" & serverConfig.appConfig.name & """,""main_VisitId=" & visit_Id & """,""" & PageNotFoundLink & """,""Referrer=" & webServerIO.requestReferrer & """", "performance", "pagenotfound")
+                Call logController.log_appendLog(Me, """" & FormatDateTime(app_startTime, vbGeneralDate) & """,""App=" & serverConfig.appConfig.name & """,""main_VisitId=" & visit_Id & """,""" & PageNotFoundLink & """,""Referrer=" & webServerIO.requestReferrer & """", "performance", "pagenotfound")
             Catch ex As Exception
                 handleExceptionAndRethrow(ex)
             End Try
@@ -31252,7 +31247,7 @@ ErrorTrap:
                 '
                 allowPageWithoutSectionDislay = siteProperties.getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default)
                 allowPageWithoutSectionDislay = True
-                Call log_appendLog("hardcoded allowPageWithoutSectionDislay in getHtmlBody_getSection")
+                Call logController.log_appendLog(Me, "hardcoded allowPageWithoutSectionDislay in getHtmlBody_getSection")
                 If Not allowPageWithoutSectionDislay Then
                     '
                     ' the rootPageid is used to represent the section record's selection, and is used in main_GetPageRaw to check if the
@@ -34292,147 +34287,6 @@ ErrorTrap:
         End Function
 
         '
-        '=============================================================================
-        ''' <summary>
-        ''' add the log line to a log file with the folder and prefix
-        ''' </summary>
-        ''' <param name="cpCore"></param>
-        ''' <param name="LogLine"></param>
-        ''' <param name="LogFolder"></param>
-        ''' <param name="LogNamePrefix"></param>
-        ''' <param name="allowErrorHandling"></param>
-        ''' <remarks></remarks>
-        Public Sub log_appendLog(ByVal LogLine As String, Optional ByVal LogFolder As String = "", Optional ByVal LogNamePrefix As String = "", Optional allowErrorHandling As Boolean = True)
-            Try
-                Dim logPath As String
-                Dim MonthNumber As Integer
-                Dim DayNumber As Integer
-                Dim FilenameNoExt As String
-                Dim PathFilenameNoExt As String
-                Dim FileSize As Integer
-                Dim RetryCnt As Integer
-                Dim SaveOK As Boolean
-                Dim FileSuffix As String
-                Dim threadId As Integer = System.Threading.Thread.CurrentThread.ManagedThreadId
-                Dim threadName As String = Format(threadId, "00000000")
-                '
-                Try
-                    DayNumber = Day(Now)
-                    MonthNumber = Month(Now)
-                    FilenameNoExt = log_getDateString(Now)
-                    logPath = LogFolder
-                    If logPath <> "" Then
-                        logPath = logPath & "\"
-                    End If
-                    logPath = "logs\" & logPath
-                    ' logPathRoot = privatefiles.rootLocalPath
-                    If Not privateFiles.pathExists(logPath) Then
-                        Call privateFiles.createPath(logPath)
-                    Else
-                        Dim logFiles As IO.FileInfo() = privateFiles.getFileList(logPath)
-                        For Each fileInfo As IO.FileInfo In logFiles
-                            If fileInfo.Name.ToLower = FilenameNoExt.ToLower & ".log" Then
-                                FileSize = CInt(fileInfo.Length)
-                                Exit For
-                            End If
-                        Next
-                    End If
-                    PathFilenameNoExt = logPath & FilenameNoExt
-                    '
-                    ' -- add to log file
-                    If FileSize < 10000000 Then
-                        RetryCnt = 0
-                        SaveOK = False
-                        FileSuffix = ""
-                        Do While (Not SaveOK) And (RetryCnt < 10)
-                            SaveOK = True
-                            Try
-                                Dim absContent As String = genericController.LogFileCopyPrep(FormatDateTime(Now(), vbGeneralDate)) & vbTab & threadName & vbTab & LogLine & vbCrLf
-                                privateFiles.appendFile(PathFilenameNoExt & FileSuffix & ".log", absContent)
-                            Catch ex As IO.IOException
-                                '
-                                ' permission denied - happens when more then one process are writing at once, go to the next suffix
-                                '
-                                FileSuffix = "-" & CStr(RetryCnt + 1)
-                                RetryCnt = RetryCnt + 1
-                                SaveOK = False
-                            Catch ex As Exception
-                                '
-                                ' unknown error
-                                '
-                                FileSuffix = "-" & CStr(RetryCnt + 1)
-                                RetryCnt = RetryCnt + 1
-                                SaveOK = False
-                            End Try
-                        Loop
-                    End If
-                Catch ex As Exception
-                    ' -- ignore errors in error handling
-                End Try
-            Catch ex As Exception
-                ' -- ignore errors in error handling
-            Finally
-                '
-            End Try
-        End Sub
-        '
-        '========================================================================
-        ''' <summary>
-        ''' Append log, use the legacy row with tab delimited context
-        ''' </summary>
-        ''' <param name="cpCore"></param>
-        ''' <param name="ContensiveAppName"></param>
-        ''' <param name="contextDescription"></param>
-        ''' <param name="processName"></param>
-        ''' <param name="ClassName"></param>
-        ''' <param name="MethodName"></param>
-        ''' <param name="ErrNumber"></param>
-        ''' <param name="ErrSource"></param>
-        ''' <param name="ErrDescription"></param>
-        ''' <param name="ErrorTrap"></param>
-        ''' <param name="ResumeNextAfterLogging"></param>
-        ''' <param name="URL"></param>
-        ''' <param name="LogFolder"></param>
-        ''' <param name="LogNamePrefix"></param>
-        ''' <remarks></remarks>
-        Public Sub appendLogWithLegacyRow(ByVal ContensiveAppName As String, ByVal contextDescription As String, ByVal processName As String, ByVal ClassName As String, ByVal MethodName As String, ByVal ErrNumber As Integer, ByVal ErrSource As String, ByVal ErrDescription As String, ByVal ErrorTrap As Boolean, ByVal ResumeNextAfterLogging As Boolean, ByVal URL As String, ByVal LogFolder As String, ByVal LogNamePrefix As String)
-            Try
-                Dim ErrorMessage As String
-                Dim LogLine As String
-                Dim ResumeMessage As String
-                '
-                If ErrorTrap Then
-                    ErrorMessage = "Error Trap"
-                Else
-                    ErrorMessage = "Log Entry"
-                End If
-                '
-                If ResumeNextAfterLogging Then
-                    ResumeMessage = "Resume after logging"
-                Else
-                    ResumeMessage = "Abort after logging"
-                End If
-                '
-                LogLine = "" _
-                    & genericController.LogFileCopyPrep(ContensiveAppName) _
-                    & vbTab & genericController.LogFileCopyPrep(processName) _
-                    & vbTab & genericController.LogFileCopyPrep(ClassName) _
-                    & vbTab & genericController.LogFileCopyPrep(MethodName) _
-                    & vbTab & genericController.LogFileCopyPrep(contextDescription) _
-                    & vbTab & genericController.LogFileCopyPrep(ErrorMessage) _
-                    & vbTab & genericController.LogFileCopyPrep(ResumeMessage) _
-                    & vbTab & genericController.LogFileCopyPrep(ErrSource) _
-                    & vbTab & genericController.LogFileCopyPrep(ErrNumber.ToString) _
-                    & vbTab & genericController.LogFileCopyPrep(ErrDescription) _
-                    & vbTab & genericController.LogFileCopyPrep(URL) _
-                    & ""
-                '
-                log_appendLog(LogLine, LogFolder, LogNamePrefix)
-            Catch ex As Exception
-
-            End Try
-        End Sub
-        '
         '==========================================================================================
         ''' <summary>
         ''' return an html ul list of each eception produced during this document.
@@ -34442,9 +34296,9 @@ ErrorTrap:
         Public Function getDocExceptionHtmlList() As String
             Dim returnHtmlList As String = ""
             Try
-                If Not docExceptionList Is Nothing Then
-                    If docExceptionList.Count > 0 Then
-                        For Each exMsg As String In docExceptionList
+                If Not exceptionList Is Nothing Then
+                    If exceptionList.Count > 0 Then
+                        For Each exMsg As String In exceptionList
                             returnHtmlList &= cr2 & "<li class=""ccExceptionListRow"">" & cr3 & html_convertText2HTML(exMsg) & cr2 & "</li>"
                         Next
                         returnHtmlList = cr & "<ul class=""ccExceptionList"">" & returnHtmlList & cr & "</ul>"
@@ -34491,17 +34345,17 @@ ErrorTrap:
                 '
                 ' append to daily trace log
                 '
-                Call log_appendLog(errMsg)
+                logController.log_appendLog(Me, errMsg)
                 '
                 ' add to doc exception list to display at top of webpage
                 '
-                If docExceptionList Is Nothing Then
-                    docExceptionList = New List(Of String)
+                If exceptionList Is Nothing Then
+                    exceptionList = New List(Of String)
                 End If
-                If docExceptionList.Count = 10 Then
-                    docExceptionList.Add("Exception limit exceeded")
-                ElseIf docExceptionList.Count < 10 Then
-                    docExceptionList.Add(errMsg)
+                If exceptionList.Count = 10 Then
+                    exceptionList.Add("Exception limit exceeded")
+                ElseIf exceptionList.Count < 10 Then
+                    exceptionList.Add(errMsg)
                 End If
                 '
                 ' write consol for debugging
@@ -34861,19 +34715,6 @@ ErrorTrap:
             handleException(New Exception("Legacy error, cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
             Throw New ApplicationException("handleLegacyError")
         End Sub
-
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Create a string with year, month, date in the form 20151206
-        ''' </summary>
-        ''' <param name="sourceDate"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Function log_getDateString(sourceDate As Date) As String
-            Return sourceDate.Year & sourceDate.Month.ToString.PadLeft(2, CChar("0")) & sourceDate.Day.ToString.PadLeft(2, CChar("0"))
-
-        End Function
         '
         '====================================================================================================
         ''' <summary>

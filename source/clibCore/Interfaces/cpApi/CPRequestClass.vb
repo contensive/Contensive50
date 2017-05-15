@@ -120,7 +120,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property CookieString() As String 'Inherits BaseClasses.CPRequestBaseClass.CookieString
             Get
                 Dim returnCookies As String = ""
-                For Each kvp As KeyValuePair(Of String, coreWebServerIOClass.cookieClass) In cpCore.webServerIO.requestCookies
+                For Each kvp As KeyValuePair(Of String, webServerIOController.cookieClass) In cpCore.webServerIO.requestCookies
                     returnCookies &= "&" & kvp.Key & "=" & kvp.Value.value
                 Next
                 If returnCookies.Length > 0 Then

@@ -4484,7 +4484,7 @@ ErrorTrap:
             Dim returnResult As String = ""
             Dim p As Process = New Process()
             '
-            cpCore.log_appendLog("ccCommonModule.runProcess, cmd=[" & Cmd & "], Arguments=[" & Arguments & "], WaitForReturn=[" & WaitForReturn & "]")
+            logController.log_appendLog(cpCore, "ccCommonModule.runProcess, cmd=[" & Cmd & "], Arguments=[" & Arguments & "], WaitForReturn=[" & WaitForReturn & "]")
             '
             p.StartInfo.FileName = Cmd
             p.StartInfo.Arguments = Arguments
@@ -4573,16 +4573,6 @@ ErrorTrap:
             a = vbReplace(a, "#0038#", "&")
             a = vbReplace(a, "#0013#", vbCrLf)
             decodeNvaArgument = a
-        End Function
-        '
-        '
-        Public Shared Function LogFileCopyPrep(ByVal Source As String) As String
-            Dim Copy As String
-            Copy = Source
-            Copy = vbReplace(Copy, vbCrLf, " ")
-            Copy = vbReplace(Copy, vbLf, " ")
-            Copy = vbReplace(Copy, vbCr, " ")
-            LogFileCopyPrep = Copy
         End Function
         '        '
         '        '========================================================================

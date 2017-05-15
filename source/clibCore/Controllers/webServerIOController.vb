@@ -10,7 +10,7 @@ Namespace Contensive.Core
     ''' <summary>
     ''' Code dedicated to processing iis input and output. lazy Constructed. (see coreHtmlClass for html processing)
     ''' </summary>
-    Public Class coreWebServerIOClass
+    Public Class webServerIOController
         '
         Dim cpCore As coreClass
         '
@@ -568,8 +568,8 @@ Namespace Contensive.Core
                     '
                     ' set cpcore.main_ServerDomainPrmary to the first valid defaultDomain entry
                     '
-                    If cpCore.serverconfig.appConfig.domainList.Count > 0 Then
-                        cpCore.domains_ServerDomainPrimary = cpCore.serverconfig.appConfig.domainList(0)
+                    If cpCore.serverConfig.appConfig.domainList.Count > 0 Then
+                        cpCore.domains_ServerDomainPrimary = cpCore.serverConfig.appConfig.domainList(0)
                     Else
                         cpCore.domains_ServerDomainPrimary = ""
                     End If
@@ -622,7 +622,7 @@ Namespace Contensive.Core
                     '
                     ' verify app config domainlist is in the domainlist cache
                     '
-                    For Each domain As String In cpCore.serverconfig.appConfig.domainList
+                    For Each domain As String In cpCore.serverConfig.appConfig.domainList
                         If Not cpCore.domains.domainDetailsList.ContainsKey(domain.ToLower()) Then
                             Dim domainDetailsNew As New Models.Entity.domainLegacyModel.domainDetailsClass
                             domainDetailsNew.name = domain
@@ -759,7 +759,7 @@ Namespace Contensive.Core
                         Call cpCore.cache.setObject("domainContentList", domainDetailsListText, "domains")
                     End If
                     '
-                    cpCore.webServerIO_requestVirtualFilePath = "/" & cpCore.serverconfig.appConfig.name
+                    cpCore.webServerIO_requestVirtualFilePath = "/" & cpCore.serverConfig.appConfig.name
                     '
                     cpCore.webServerIO_requestContentWatchPrefix = cpCore.webServerIO_requestProtocol & requestDomain & requestAppRootPath
                     cpCore.webServerIO_requestContentWatchPrefix = Mid(cpCore.webServerIO_requestContentWatchPrefix, 1, Len(cpCore.webServerIO_requestContentWatchPrefix) - 1)
@@ -978,7 +978,7 @@ Namespace Contensive.Core
             If requestCookies.ContainsKey(cookieKey) Then
                 '
             Else
-                Dim newCookie As New coreWebServerIOClass.cookieClass
+                Dim newCookie As New webServerIOController.cookieClass
                 newCookie.name = cookieKey
                 newCookie.value = cookieValue
                 requestCookies.Add(cookieKey, newCookie)

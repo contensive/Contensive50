@@ -396,6 +396,8 @@
     <Compile Include="addon_emailProcess\processEmailClass.vb" />
     <Compile Include="addon_housekeeping\houseKeepClass.vb" />
     <Compile Include="constants.vb" />
+    <Compile Include="Controllers\logController.vb" />
+    <Compile Include="Controllers\_blankStaticController.vb" />
     <Compile Include="Controllers\csController.vb" />
     <Compile Include="Controllers\dbEngineController.vb" />
     <Compile Include="Controllers\genericController.vb" />
@@ -410,7 +412,7 @@
     <Compile Include="addon_tools\addon_toolConfigureEdit.vb" />
     <Compile Include="Models\Context\coreSitePropertiesClass.vb" />
     <Compile Include="coreUserClass.vb" />
-    <Compile Include="coreWebServerIOClass.vb" />
+    <Compile Include="Controllers\webServerIOController.vb" />
     <Compile Include="coreMetaDataClass.vb" />
     <Compile Include="coreCacheKeyPtrClass.vb" />
     <Compile Include="coreSecurityClass.vb" />

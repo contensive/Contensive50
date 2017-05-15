@@ -164,7 +164,7 @@ Namespace Contensive.Core.Controllers
                                 appendCacheLog("GetObject(" & cacheName & "), no taglist found")
                             Else
                                 For Each dependantObjectCacheName As String In cacheObject.dependantObjectList
-                                    Dim dependantObject As cacheObjectClass = getCacheObject(cacheName)
+                                    Dim dependantObject As cacheObjectClass = getCacheObject(dependantObjectCacheName)
                                     If (dependantObject IsNot Nothing) Then
                                         dateCompare = dependantObject.saveDate.CompareTo(cacheObject.saveDate)
                                         'Dim ticks As Long = ((tagInvalidationDate - cacheObject.saveDate).Ticks)
@@ -218,9 +218,7 @@ Namespace Contensive.Core.Controllers
                                 serializedDataObject = cpCore.privateFiles.readFile("appCache\" & genericController.encodeFilename(encodedCacheName & ".txt"))
                                 mutex.ReleaseMutex()
                             End Using
-                            If String.IsNullOrEmpty(serializedDataObject) Then
-                                returnObj = Nothing
-                            Else
+                            If Not String.IsNullOrEmpty(serializedDataObject) Then
                                 returnObj = Newtonsoft.Json.JsonConvert.DeserializeObject(Of cacheObjectClass)(serializedDataObject)
                             End If
                         Else
@@ -245,6 +243,13 @@ Namespace Contensive.Core.Controllers
                                     cpCore.handleExceptionAndRethrow(ex)
                                 End If
                             End Try
+                        End If
+                        If (returnObj IsNot Nothing) Then
+                            '
+                            ' -- empty objects return nothing, empty lists return count=0
+                            If (returnObj.dependantObjectList Is Nothing) Then
+                                returnObj.dependantObjectList = New List(Of String)
+                            End If
                         End If
                     End If
                 End If
@@ -499,14 +504,16 @@ Namespace Contensive.Core.Controllers
             returnKey = appName & "-" & sourceKey
             returnKey = Regex.Replace(returnKey, "0x[a-fA-F\d]{2}", "_")
             returnKey = returnKey.Replace(" ", "_")
-            returnKey = coreEncodingBase64Class.UTF8ToBase64(returnKey)
+            '
+            ' -- 20170515 JK tmp - makes it harder to debug. add back to ensure filenames use valid characters.
+            'returnKey = coreEncodingBase64Class.UTF8ToBase64(returnKey)
             Return returnKey
         End Function
         '
         '=======================================================================
         Private Sub appendCacheLog(line As String)
             Try
-                'cpCore.appendLog(line)
+                logController.log_appendLog(cpCore, line)
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(New ApplicationException("appendCacheLog exception", ex))
             End Try

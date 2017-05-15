@@ -50,7 +50,7 @@ Namespace Contensive.Core.Models.Entity
                 Dim SQL As String
                 Dim dt As DataTable
                 '
-                Const cacheName = "Domain Content List Cache"
+                Const cacheName = "ccdomains.normal.0"
                 '
                 Try
                     If Not serverDomainList_localLoaded Then

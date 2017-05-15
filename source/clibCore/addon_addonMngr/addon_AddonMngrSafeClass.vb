@@ -956,7 +956,7 @@ ErrorTrap:
         '
         '
         Private Sub HandleClassAppendLog(ByVal MethodName As String, ByVal Context As String)
-            cpCore.appendLogWithLegacyRow(cpCore.serverConfig.appConfig.name, Context, "dll", "AddonManClass", MethodName, 0, "", "", False, True, cpCore.webServerIO_ServerLink, "", "")
+            logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, Context, "dll", "AddonManClass", MethodName, 0, "", "", False, True, cpCore.webServerIO_ServerLink, "", "")
 
         End Sub
         '

@@ -231,7 +231,7 @@ Namespace Contensive.Core
         Public Property cookies() As String
             Get
                 Dim cookieString As String = ""
-                For Each kvp As KeyValuePair(Of String, coreWebServerIOClass.cookieClass) In cp.core.webServerIO.requestCookies
+                For Each kvp As KeyValuePair(Of String, webServerIOController.cookieClass) In cp.core.webServerIO.requestCookies
                     cookieString &= "&" & kvp.Key & "=" & kvp.Value.value
                 Next
                 If cookieString.Length > 0 Then
@@ -246,7 +246,7 @@ Namespace Contensive.Core
                     ampSplit = Split(value, "&")
                     ampSplitCount = UBound(ampSplit) + 1
                     For ampSplitPointer = 0 To ampSplitCount - 1
-                        Dim newCookie As New coreWebServerIOClass.cookieClass
+                        Dim newCookie As New webServerIOController.cookieClass
                         Dim cookieName As String
                         With newCookie
                             Dim NameValue As String = ampSplit(ampSplitPointer)
