@@ -163,7 +163,7 @@ namespace Contensive.CLI
                                         String upgradeAppName = kvp.Key;
                                         using (Contensive.Core.CPClass upgradeApp = new Contensive.Core.CPClass(upgradeAppName))
                                         {
-                                            Core.Controllers.appBuilderController.upgrade(cp.core,false);
+                                            Core.Controllers.appBuilderController.upgrade(upgradeApp.core,false);
                                         }
                                     }
                                     exitArgumentProcessing = true;

@@ -70,8 +70,8 @@ Namespace Contensive.Core
                 Dim LocalCollections As XmlDocument
                 Dim LibCollections As XmlDocument
                 Dim InstallFolder As String
-                Dim LibGuids() As String
-                Dim IISResetRequired As Boolean
+                'Dim LibGuids() As String
+                'Dim IISResetRequired As Boolean
                 Dim AddonNavigatorID As Integer
                 Dim TargetCollectionName As String
                 Dim Collectionname As String = ""

@@ -67,7 +67,7 @@ Namespace Contensive.Addons
                         & vbCrLf & BinaryHeaderString _
                         & vbCrLf
                 End If
-                cpCore.log_appendLog(SaveContent, "admin", cpCore.serverConfig.appConfig.name & "-request-")
+                logController.log_appendLog(cpCore, SaveContent, "admin", cpCore.serverConfig.appConfig.name & "-request-")
                 '
                 ' main_Get Content
                 '
@@ -117,7 +117,7 @@ Namespace Contensive.Addons
                     & vbCrLf & "----------" _
                     & vbCrLf & "response:" _
                     & vbCrLf & returnHtml
-                Call cpCore.log_appendLog(SaveContent, "admin", rightNow.Year & rightNow.Month.ToString("00") & rightNow.Day.ToString("00") & rightNow.Hour.ToString("00") & rightNow.Minute.ToString("00") & rightNow.Second.ToString("00"))
+                Call logController.log_appendLog(cpCore, SaveContent, "admin", rightNow.Year & rightNow.Month.ToString("00") & rightNow.Day.ToString("00") & rightNow.Hour.ToString("00") & rightNow.Minute.ToString("00") & rightNow.Second.ToString("00"))
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)
             End Try
@@ -17147,7 +17147,7 @@ ErrorTrap:
                     If list <> "" Then
                         Console.WriteLine("console - adminContent.contentControlCriteria=" & list)
                         Debug.WriteLine("debug - adminContent.contentControlCriteria=" & list)
-                        cpCore.log_appendLog("appendlog - adminContent.contentControlCriteria=" & list)
+                        logController.log_appendLog(cpCore, "appendlog - adminContent.contentControlCriteria=" & list)
                         ListSplit = Split(list, "=")
                         Cnt = UBound(ListSplit) + 1
                         If Cnt > 0 Then

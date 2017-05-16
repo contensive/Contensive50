@@ -129,7 +129,7 @@ Namespace Contensive.Core
                         ' ----- Update the System Email Log
                         '
                         LogLine = """" & CStr(Now()) & """,""To[" & EmailTo & "]"",""From[" & EmailFrom & "]"",""Bounce[" & BounceAddress & "]"",""Subject[" & EmailSubject & "]"",""Result[" & SendResult & "]""" & vbCrLf
-                        Call cpCore.log_appendLog(LogLine, "email")
+                        Call logController.log_appendLog(cpCore, LogLine, "email")
                     End If
                 End If
                 '

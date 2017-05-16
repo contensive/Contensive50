@@ -651,7 +651,7 @@ Namespace Contensive.Core.Controllers
                             '
                             ' This addon is running, can not reenter
                             '
-                            Call cpCore.log_appendLog("addon_execute, Addon [" & AddonName & "] was called by itself. This is not allowed. AddonID [" & addonId & "], AddonNameOrGuid [" & AddonNameOrGuid_Local & "]")
+                            Call logController.log_appendLog(cpcore,"addon_execute, Addon [" & AddonName & "] was called by itself. This is not allowed. AddonID [" & addonId & "], AddonNameOrGuid [" & AddonNameOrGuid_Local & "]")
                         Else
                             cpCore.addonsCurrentlyRunningIdList.Add(addonId)
                             'csv_addon_execute_AddonsCurrentlyRunningIdList = csv_addon_execute_AddonsCurrentlyRunningIdList & "," & addonId
@@ -2835,7 +2835,7 @@ ErrorTrap:
             '-----------------------------------------------------------------
             '
             'hint = hint & ",030"
-            cpCore.appendLogWithLegacyRow(cpCore.serverConfig.appConfig.name, "start: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
+            logController.appendLogWithLegacyRow( cpcore,cpCore.serverConfig.appConfig.name, "start: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
             '
             ' runAtServer = New runAtServerClass(Me)
             ' must nva encode because that is what the server-execute command expects
@@ -2852,7 +2852,7 @@ ErrorTrap:
             Call taskScheduler.addTaskToQueue(cpCore, taskQueueCommandEnumModule.runAddon, cmdDetail, False)
             'Call runAtServer.executeCmd("RunProcess", cmdQueryString)
             '
-            cpCore.appendLogWithLegacyRow(cpCore.serverConfig.appConfig.name, "end: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
+            logController.appendLogWithLegacyRow( cpcore,cpCore.serverConfig.appConfig.name, "end: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
             '
             Exit Function
 ErrorTrap:
@@ -2860,7 +2860,7 @@ ErrorTrap:
             ErrSource = Err.Source
             ErrDescription = Err.Description
             Call Err.Clear()
-            cpCore.appendLogWithLegacyRow(cpCore.serverConfig.appConfig.name, "errortrap exit(" & (GetTickCount - ProcessStartTick) & " msec): execute now, addon [" & AddonIDGuidOrName & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
+            logController.appendLogWithLegacyRow( cpcore,cpCore.serverConfig.appConfig.name, "errortrap exit(" & (GetTickCount - ProcessStartTick) & " msec): execute now, addon [" & AddonIDGuidOrName & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
             Call cpCore.handleLegacyError4(ErrNumber, ErrSource, ErrDescription, "unknownMethodNameLegacyCall" & ", hint=" & hint, True)
         End Function
         '

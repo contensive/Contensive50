@@ -99,7 +99,7 @@ Namespace Contensive.Core
             Dim LocalCollections As New XmlDocument
             Dim Doc As New XmlDocument
             ''Dim AppService As appServicesClass
-            Dim cpCore As coreClass
+            'Dim cpCore As coreClass
             '   Dim CSConnection As appEnvironmentStruc
             Dim AlarmTimeString As String
             Dim AlarmTimeMinutesSinceMidnight As Double
@@ -217,12 +217,12 @@ Namespace Contensive.Core
                 ' it is the next day, remove old log files
                 '
                 FolderName = "Logs"
-                Call HousekeepLogFolder("server", FolderName)
+                Call HousekeepLogFolder(cp.core, "server", FolderName)
                 '
                 Dim subDir As New System.IO.DirectoryInfo(cp.core.privateFiles.rootLocalPath & "\logs\")
                 For Each SubDirInfo As System.IO.DirectoryInfo In subDir.GetDirectories
                     FolderName = "logs\" & SubDirInfo.Name
-                    Call HousekeepLogFolder("server", FolderName)
+                    Call HousekeepLogFolder(cp.core, "server", FolderName)
                 Next
                 'FolderName = "Logs\Email"
                 'Call HousekeepLogFolder("server", FolderName)
@@ -278,17 +278,17 @@ Namespace Contensive.Core
                         If Not (cp Is Nothing) Then
                             '20151109 - removed but unsure what in initContext can/must be moved to cp constructor
                             'Call cp.execute_initContext()
-                            cpCore = cp.core
+                            'cpCore = cp.core
                             If True Then
                                 '
                                 ' Register and unregister files in the Addon folder
                                 '
-                                Call housekeepAddonFolder()
+                                Call housekeepAddonFolder(cp.core)
                                 '
                                 ' Upgrade Local Collections, and all applications that use them
                                 '
                                 ErrorMessage = ""
-                                Call AppendClassLog("", "HouseKeep", "Updating local collections from library, see Upgrade log for details during this period.")
+                                Call AppendClassLog(cp.core, "", "HouseKeep", "Updating local collections from library, see Upgrade log for details during this period.")
                                 Dim ignoreRefactorText As String = ""
                                 Dim ignoreRefactorBoolean As Boolean = False
                                 AddonInstall = New addonInstallClass(cp.core)
@@ -296,7 +296,7 @@ Namespace Contensive.Core
                                     If ErrorMessage = "" Then
                                         ErrorMessage = "No detailed error message was returned from UpgradeAllLocalCollectionsFromLib2 although it returned 'not ok' status."
                                     End If
-                                    Call AppendClassLog("", "HouseKeep", "Updating local collections from Library returned an error, " & ErrorMessage)
+                                    Call AppendClassLog(cp.Core, "", "HouseKeep", "Updating local collections from Library returned an error, " & ErrorMessage)
                                 End If
                                 '
                                 ' Verify core installation
@@ -360,7 +360,7 @@ Namespace Contensive.Core
                                         '
                                         ' Move Archived pages from their current parent to their archive parent
                                         '
-                                        Call AppendClassLog(appName, "HouseKeep", "Archive update for pages on [" & cp.core.serverConfig.appConfig.name & "]")
+                                        Call AppendClassLog(cp.core, appName, "HouseKeep", "Archive update for pages on [" & cp.core.serverConfig.appConfig.name & "]")
                                         SQL = "select * from ccpagecontent where (( DateArchive is not null )and(DateArchive<" & SQLNow & "))and(active<>0)"
                                         CS = cp.core.db.cs_openCsSql_rev("default", SQL)
                                         Do While cp.core.db.cs_ok(CS)
@@ -517,9 +517,9 @@ Namespace Contensive.Core
                                     CS = cp.core.db.cs_openCsSql_rev("default", SQL)
                                     If cp.core.db.cs_ok(CS) Then
                                         LastTimeSummaryWasRun = cp.core.db.cs_getDate(CS, "DateAdded")
-                                        Call AppendClassLog(cp.core.serverConfig.appConfig.name, "HouseKeep", "Update hourly visit summary, last time summary was run was [" & LastTimeSummaryWasRun & "]")
+                                        Call AppendClassLog(cp.core, cp.core.serverConfig.appConfig.name, "HouseKeep", "Update hourly visit summary, last time summary was run was [" & LastTimeSummaryWasRun & "]")
                                     Else
-                                        Call AppendClassLog(cp.core.serverConfig.appConfig.name, "HouseKeep", "Update hourly visit summary, no hourly summaries were found, set start to [" & LastTimeSummaryWasRun & "]")
+                                        Call AppendClassLog(cp.core, cp.core.serverConfig.appConfig.name, "HouseKeep", "Update hourly visit summary, no hourly summaries were found, set start to [" & LastTimeSummaryWasRun & "]")
                                     End If
                                     Call cp.core.db.cs_Close(CS)
                                     NextSummaryStartDate = LastTimeSummaryWasRun
@@ -541,7 +541,7 @@ Namespace Contensive.Core
                                         OldestDateAdded = cp.core.db.cs_getDate(CS, "DateAdded")
                                         If OldestDateAdded < NextSummaryStartDate Then
                                             NextSummaryStartDate = OldestDateAdded
-                                            Call AppendClassLog(cp.core.serverConfig.appConfig.name, "HouseKeep", "Update hourly visit summary, found a visit with the last viewing during the past hour. It started [" & OldestDateAdded & "], before the last summary was run.")
+                                            Call AppendClassLog(cp.core, cp.core.serverConfig.appConfig.name, "HouseKeep", "Update hourly visit summary, found a visit with the last viewing during the past hour. It started [" & OldestDateAdded & "], before the last summary was run.")
                                         End If
                                     End If
                                     Call cp.core.db.cs_Close(CS)
@@ -550,7 +550,7 @@ Namespace Contensive.Core
                                     '
                                     Dim DateofMissingSummary As Date
                                     DateofMissingSummary = Date.MinValue
-                                    'Call AppendClassLog(cp.Core.appEnvironment.name, "HouseKeep", "Verify there are 24 hour records for the past 90 days")
+                                    'Call AppendClassLog(cp.core, cp.core.appEnvironment.name, "HouseKeep", "Verify there are 24 hour records for the past 90 days")
                                     PeriodStartDate = rightNow.Date.AddDays(-90)
                                     PeriodStep = 1
                                     For PeriodDatePtr = PeriodStartDate.ToOADate To OldestDateAdded.ToOADate Step PeriodStep
@@ -568,13 +568,13 @@ Namespace Contensive.Core
                                         End If
                                     Next
                                     If (DateofMissingSummary <> Date.MinValue) And (DateofMissingSummary < NextSummaryStartDate) Then
-                                        Call AppendClassLog(cp.core.serverConfig.appConfig.name, "HouseKeep", "Found a missing hourly period in the visit summary table [" & DateofMissingSummary & "], it only has [" & HoursPerDay & "] hourly summaries.")
+                                        Call AppendClassLog(cp.core, cp.core.serverConfig.appConfig.name, "HouseKeep", "Found a missing hourly period in the visit summary table [" & DateofMissingSummary & "], it only has [" & HoursPerDay & "] hourly summaries.")
                                         NextSummaryStartDate = DateofMissingSummary
                                     End If
                                     '
                                     ' Now summarize all visits during all hourly periods between OldestDateAdded and the previous Hour
                                     '
-                                    Call AppendClassLog(cp.core.serverConfig.appConfig.name, "HouseKeep", "Summaryize visits hourly, starting [" & NextSummaryStartDate & "]")
+                                    Call AppendClassLog(cp.core, cp.core.serverConfig.appConfig.name, "HouseKeep", "Summaryize visits hourly, starting [" & NextSummaryStartDate & "]")
                                     PeriodStep = CDbl(1) / CDbl(24)
                                     'PeriodStart = (Int(OldestDateAdded * 24) / 24)
                                     Call HouseKeep_VisitSummary(NextSummaryStartDate, rightNow, 1, cp.core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout)
@@ -618,7 +618,6 @@ Namespace Contensive.Core
                                     End If
                                 End If
                             End If
-                            cpCore = Nothing
                         End If
                         Call cp.Dispose()
                         cp = Nothing
@@ -740,7 +739,7 @@ ErrorTrap:
                 ' delete members from the non-cookie visits
                 ' legacy records without createdbyvisit will have to be corrected by hand (or upgrade)
                 '
-                Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting members from visits with no cookie support older than Midnight, Two Days Ago")
+                Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting members from visits with no cookie support older than Midnight, Two Days Ago")
                 Select Case DataSourceType
                     Case DataSourceTypeODBCAccess
                         SQL = "delete m.*" _
@@ -811,7 +810,7 @@ ErrorTrap:
                 '
                 ' delete viewings from the non-cookie visits
                 '
-                Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting viewings from visits with no cookie support older than Midnight, Two Days Ago")
+                Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting viewings from visits with no cookie support older than Midnight, Two Days Ago")
                 Select Case DataSourceType
                     Case DataSourceTypeODBCAccess
                         SQL = "delete h.*" _
@@ -840,7 +839,7 @@ ErrorTrap:
                 '
                 ' delete visitors from the non-cookie visits
                 '
-                Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting visitors from visits with no cookie support older than Midnight, Two Days Ago")
+                Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting visitors from visits with no cookie support older than Midnight, Two Days Ago")
                 Select Case DataSourceType
                     Case DataSourceTypeODBCAccess
                         SQL = "delete r.*" _
@@ -869,23 +868,23 @@ ErrorTrap:
                 '
                 ' delete visits from the non-cookie visits
                 '
-                Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting visits with no cookie support older than Midnight, Two Days Ago")
+                Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting visits with no cookie support older than Midnight, Two Days Ago")
                 Call cp.core.DeleteTableRecordChunks("default", "ccvisits", "(CookieSupport=0)and(LastVisitTime<" & SQLDateMidnightTwoDaysAgo & ")", 1000, 10000)
             End If
             '
             ' Visits with no DateAdded
             '
-            Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting visits with no DateAdded")
+            Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting visits with no DateAdded")
             Call cp.core.DeleteTableRecordChunks("default", "ccvisits", "(DateAdded is null)or(DateAdded<=" & cp.core.db.encodeSQLDate(#1/1/1995#) & ")", 1000, 10000)
             '
             ' Visits with no visitor
             '
-            Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting visits with no DateAdded")
+            Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting visits with no DateAdded")
             Call cp.core.DeleteTableRecordChunks("default", "ccvisits", "(VisitorID is null)or(VisitorID=0)", 1000, 10000)
             '
             ' viewings with no visit
             '
-            Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting viewings with null or invalid VisitID")
+            Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting viewings with null or invalid VisitID")
             Call cp.core.DeleteTableRecordChunks("default", "ccviewings", "(visitid=0 or visitid is null)", 1000, 10000)
             '
             ' Get Oldest Visit
@@ -903,9 +902,9 @@ ErrorTrap:
             '   this is to prevent the entire server from being bogged down for one site change
             '
             If OldestVisitDate = Date.MinValue Then
-                Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "No records were removed because no visit records were found while requesting the oldest visit.")
+                Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "No records were removed because no visit records were found while requesting the oldest visit.")
             ElseIf (VisitArchiveAgeDays <= 0) Then
-                Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "No records were removed because Housekeep ArchiveRecordAgeDays is 0.")
+                Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "No records were removed because Housekeep ArchiveRecordAgeDays is 0.")
             Else
                 ArchiveDate = rightNow.AddDays(-VisitArchiveAgeDays).Date
                 DaystoRemove = CInt(ArchiveDate.Subtract(OldestVisitDate).TotalDays)
@@ -913,9 +912,9 @@ ErrorTrap:
                     ArchiveDate = OldestVisitDate.AddDays(30)
                 End If
                 If OldestVisitDate >= ArchiveDate Then
-                    Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "No records were removed because Oldest Visit Date [" & OldestVisitDate & "] >= ArchiveDate [" & ArchiveDate & "].")
+                    Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "No records were removed because Oldest Visit Date [" & OldestVisitDate & "] >= ArchiveDate [" & ArchiveDate & "].")
                 Else
-                    Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Removing records from [" & OldestVisitDate & "] to [" & ArchiveDate & "].")
+                    Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Removing records from [" & OldestVisitDate & "] to [" & ArchiveDate & "].")
                     SingleDate = OldestVisitDate
                     Do
                         Call HouseKeep_App_Daily_RemoveVisitRecords(SingleDate, DataSourceType)
@@ -931,7 +930,7 @@ ErrorTrap:
             '
             ' delete 'guests' Members with one visits but no valid visit record
             '
-            Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting 'guest' members with no visits (name is default name, visits=1, username null, email null,dateadded=lastvisit)")
+            Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting 'guest' members with no visits (name is default name, visits=1, username null, email null,dateadded=lastvisit)")
             Select Case DataSourceType
                 Case DataSourceTypeODBCAccess
                     SQL = "delete m.*" _
@@ -983,7 +982,7 @@ ErrorTrap:
             '
             ' delete 'guests' Members created before ArchivePeopleAgeDays
             '
-            Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting 'guest' members with no visits (name is default name, visits=1, username null, email null,dateadded=lastvisit)")
+            Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting 'guest' members with no visits (name is default name, visits=1, username null, email null,dateadded=lastvisit)")
             Select Case DataSourceType
                 Case DataSourceTypeODBCAccess
                     SQL = "delete m.*" _
@@ -1023,7 +1022,7 @@ ErrorTrap:
             '
             ' delete email drops older than archive.
             '
-            Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting email drops older then " & EmailDropArchiveAgeDays & " days")
+            Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting email drops older then " & EmailDropArchiveAgeDays & " days")
             ArchiveEmailDropDate = rightNow.AddDays(-EmailDropArchiveAgeDays).Date
             On Error Resume Next
             Call cp.core.db.deleteContentRecords("Email drops", "(DateAdded is null)or(DateAdded<=" & cp.core.db.encodeSQLDate(ArchiveEmailDropDate) & ")")
@@ -1035,7 +1034,7 @@ ErrorTrap:
             '
             ' delete email log entries not realted to a drop, older than archive.
             '
-            Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting non-drop email logs older then " & EmailDropArchiveAgeDays & " days")
+            Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting non-drop email logs older then " & EmailDropArchiveAgeDays & " days")
             ArchiveEmailDropDate = rightNow.AddDays(-EmailDropArchiveAgeDays).Date
             On Error Resume Next
             Call cp.core.db.deleteContentRecords("Email Log", "(emailDropId is null)and((DateAdded is null)or(DateAdded<=" & cp.core.db.encodeSQLDate(ArchiveEmailDropDate) & "))")
@@ -1047,7 +1046,7 @@ ErrorTrap:
             '
             ' delete email log entries without email drops
             '
-            Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting drop email log entries for drops without a valid drop record.")
+            Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting drop email log entries for drops without a valid drop record.")
             Select Case DataSourceType
                 Case DataSourceTypeODBCAccess
                     SQL = "delete l.*" _
@@ -1082,7 +1081,7 @@ ErrorTrap:
             '
             ' block duplicate redirect fields (match contentid+fieldtype+caption)
             '
-            Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Inactivate duplicate redirect fields")
+            Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Inactivate duplicate redirect fields")
             CS = cp.core.db.cs_openCsSql_rev("Default", "Select ID, ContentID, Type, Caption from ccFields where (active<>0)and(Type=" & FieldTypeIdRedirect & ") Order By ContentID, Caption, ID")
             FieldLast = ""
             Do While cp.core.db.cs_ok(CS)
@@ -1101,7 +1100,7 @@ ErrorTrap:
             '
             ' block duplicate non-redirect fields (match contentid+fieldtype+name)
             '
-            Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Inactivate duplicate non-redirect fields")
+            Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Inactivate duplicate non-redirect fields")
             CS = cp.core.db.cs_openCsSql_rev("Default", "Select ID, Name, ContentID, Type from ccFields where (active<>0)and(Type<>" & FieldTypeIdRedirect & ") Order By ContentID, Name, Type, ID")
             FieldLast = ""
             Do While cp.core.db.cs_ok(CS)
@@ -1120,7 +1119,7 @@ ErrorTrap:
             '
             ' Activities with no Member
             '
-            Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting activities with no member record.")
+            Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting activities with no member record.")
             Select Case DataSourceType
                 Case DataSourceTypeODBCAccess
                     SQL = "delete ccactivitylog.*" _
@@ -1141,7 +1140,7 @@ ErrorTrap:
             '
             ' Member Properties with no member
             '
-            Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting member properties with no member record.")
+            Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting member properties with no member record.")
             Select Case DataSourceType
                 Case DataSourceTypeODBCAccess
                     SQL = "delete ccProperties.*" _
@@ -1165,7 +1164,7 @@ ErrorTrap:
             '
             ' Visit Properties with no visits
             '
-            Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting visit properties with no visit record.")
+            Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting visit properties with no visit record.")
             Select Case DataSourceType
                 Case DataSourceTypeODBCAccess
                     SQL = "delete ccProperties.*" _
@@ -1189,7 +1188,7 @@ ErrorTrap:
             '
             ' Visitor Properties with no visitor
             '
-            Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting visitor properties with no visitor record.")
+            Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting visitor properties with no visitor record.")
             Select Case DataSourceType
                 Case DataSourceTypeODBCAccess
                     SQL = "delete ccProperties.*" _
@@ -1213,7 +1212,7 @@ ErrorTrap:
             '
             ' MemberRules with bad MemberID
             '
-            Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting Member Rules with bad MemberID.")
+            Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting Member Rules with bad MemberID.")
             Select Case DataSourceType
                 Case DataSourceTypeODBCAccess
                     SQL = "delete " & SQLTableMemberRules & ".*" _
@@ -1237,7 +1236,7 @@ ErrorTrap:
             '
             ' MemberRules with bad GroupID
             '
-            Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting Member Rules with bad GroupID.")
+            Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting Member Rules with bad GroupID.")
             Select Case DataSourceType
                 Case DataSourceTypeODBCAccess
                     SQL = "delete " & SQLTableMemberRules & ".*" _
@@ -1262,7 +1261,7 @@ ErrorTrap:
             ' GroupRules with bad ContentID
             '   Handled record by record removed to prevent CDEF reload
             '
-            Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting Group Rules with bad ContentID.")
+            Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting Group Rules with bad ContentID.")
             SQL = "Select ccGroupRules.ID" _
                 & " From ccGroupRules LEFT JOIN ccContent on ccContent.ID=ccGroupRules.ContentID" _
                 & " WHERE (ccContent.ID is null)"
@@ -1275,7 +1274,7 @@ ErrorTrap:
             '
             ' GroupRules with bad GroupID
             '
-            Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting Group Rules with bad GroupID.")
+            Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting Group Rules with bad GroupID.")
             Select Case DataSourceType
                 Case DataSourceTypeODBCAccess
                     SQL = "delete ccGroupRules.*" _
@@ -1342,7 +1341,7 @@ ErrorTrap:
                 ' calendar event is the calendar object now
                 ' move to a calendar process
                 '
-                Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting Calendar Event Rules with bad CalendarID.")
+                Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting Calendar Event Rules with bad CalendarID.")
                 Select Case DataSourceType
                     Case DataSourceTypeODBCAccess
                         SQL = "delete ccCalendarEventRules.*" _
@@ -1366,7 +1365,7 @@ ErrorTrap:
                 '
                 ' CalendarEventRules with bad CalendarEventID
                 '
-                Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting Calendar Event Rules with bad CalendarEventID.")
+                Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting Calendar Event Rules with bad CalendarEventID.")
                 Select Case DataSourceType
                     Case DataSourceTypeODBCAccess
                         SQL = "delete ccCalendarEventRules.*" _
@@ -1392,7 +1391,7 @@ ErrorTrap:
             ' ContentWatch with bad CContentID
             '     must be deleted manually
             '
-            Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting Content Watch with bad ContentID.")
+            Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting Content Watch with bad ContentID.")
             SQL = "Select ccContentWatch.ID" _
                 & " From ccContentWatch LEFT JOIN ccContent on ccContent.ID=ccContentWatch.ContentID" _
                 & " WHERE (ccContent.ID is null)or(ccContent.Active=0)or(ccContent.Active is null)"
@@ -1405,7 +1404,7 @@ ErrorTrap:
             '
             ' ContentWatchListRules with bad ContentWatchID
             '
-            Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting ContentWatchList Rules with bad ContentWatchID.")
+            Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting ContentWatchList Rules with bad ContentWatchID.")
             Select Case DataSourceType
                 Case DataSourceTypeODBCAccess
                     SQL = "delete ccContentWatchListRules.*" _
@@ -1429,7 +1428,7 @@ ErrorTrap:
             '
             ' ContentWatchListRules with bad ContentWatchListID
             '
-            Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting ContentWatchList Rules with bad ContentWatchListID.")
+            Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting ContentWatchList Rules with bad ContentWatchListID.")
             Select Case DataSourceType
                 Case DataSourceTypeODBCAccess
                     SQL = "delete ccContentWatchListRules.*" _
@@ -1453,7 +1452,7 @@ ErrorTrap:
             '
             ' Field help with no field
             '
-            Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting field help with no field.")
+            Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting field help with no field.")
             SQL = "" _
                 & "delete from ccfieldhelp where id in (" _
                 & " select h.id" _
@@ -1464,7 +1463,7 @@ ErrorTrap:
             '
             ' Field help duplicates - messy, but I am not sure where they are coming from, and this patchs the edit page performance problem
             '
-            Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting duplicate field help records.")
+            Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting duplicate field help records.")
             SQL = "" _
                 & "delete from ccfieldhelp where id in (" _
                 & " select b.id" _
@@ -1482,7 +1481,7 @@ ErrorTrap:
             '
             ' convert FieldTypeLongText + htmlContent to FieldTypeHTML
             '
-            Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "convert FieldTypeLongText + htmlContent to FieldTypeHTML.")
+            Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "convert FieldTypeLongText + htmlContent to FieldTypeHTML.")
             SQL = "update ccfields set type=" & FieldTypeIdHTML & " where type=" & FieldTypeIdLongText & " and ( htmlcontent<>0 )"
             Call cp.core.db.executeSql(SQL)
             ''
@@ -1507,7 +1506,7 @@ ErrorTrap:
                 '
                 Dim DSType As Integer
                 DSType = cp.core.db.getDataSourceType("")
-                Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Content TextFile types with no controlling record.")
+                Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Content TextFile types with no controlling record.")
                 SQL = "SELECT DISTINCT ccTables.Name as TableName, ccFields.Name as FieldName" _
                     & " FROM (ccFields LEFT JOIN ccContent ON ccFields.ContentID = ccContent.ID) LEFT JOIN ccTables ON ccContent.ContentTableID = ccTables.ID" _
                     & " Where (((ccFields.Type) = 10))" _
@@ -1716,17 +1715,17 @@ ErrorTrap:
                 '
                 ' Visits older then archive age
                 '
-                Call AppendClassLog(cp.core.serverConfig.appConfig.name, "HouseKeep_App_Daily_RemoveVisitRecords(" & appName & ")", "Deleting visits before [" & DeleteBeforeDateSQL & "]")
+                Call AppendClassLog(cp.core, cp.core.serverConfig.appConfig.name, "HouseKeep_App_Daily_RemoveVisitRecords(" & appName & ")", "Deleting visits before [" & DeleteBeforeDateSQL & "]")
                 Call cp.core.DeleteTableRecordChunks("default", "ccVisits", "(DateAdded<" & DeleteBeforeDateSQL & ")", 1000, 10000)
                 '
                 ' Viewings with visits before the first
                 '
-                Call AppendClassLog(appName, "HouseKeep_App_Daily_RemoveVisitRecords(" & appName & ")", "Deleting viewings with visitIDs lower then the lowest ccVisits.ID")
+                Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily_RemoveVisitRecords(" & appName & ")", "Deleting viewings with visitIDs lower then the lowest ccVisits.ID")
                 Call cp.core.DeleteTableRecordChunks("default", "ccviewings", "(visitid<(select min(ID) from ccvisits))", 1000, 10000)
                 '
                 ' Visitors with no visits
                 '
-                Call AppendClassLog(appName, "HouseKeep_App_Daily_RemoveVisitRecords(" & appName & ")", "Deleting visitors with no visits")
+                Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily_RemoveVisitRecords(" & appName & ")", "Deleting visitors with no visits")
                 Select Case DataSourceType
                     Case DataSourceTypeODBCAccess
                         SQL = "delete ccVisitors.*" _
@@ -1836,7 +1835,7 @@ ErrorTrap:
                 '        '
                 '        ' Visits older then archive age
                 '        '
-                '        Call AppendClassLog(cp.Core.appEnvironment.name, "HouseKeep_App_Daily_RemoveGuestRecords(" & AppName & ")", "Deleting visits before [" & DeleteBeforeDateSQL & "]")
+                '        Call AppendClassLog(cp.core, cp.core.appEnvironment.name, "HouseKeep_App_Daily_RemoveGuestRecords(" & AppName & ")", "Deleting visits before [" & DeleteBeforeDateSQL & "]")
                 '        Call cp.Core.csv_DeleteTableRecordChunks("default", "ccVisits", "(DateAdded<" & DeleteBeforeDateSQL & ")", 1000, 10000)
                 '        '
                 '        ' Viewings with visits before the first
@@ -1873,7 +1872,7 @@ ErrorTrap:
                 '   with no username (they are not planning on returning)
                 '   with 1 visit (not created with 0 visits, has not returned)
                 '
-                Call AppendClassLog(appName, "HouseKeep_App_Daily_RemoveGuestRecords(" & appName & ")", "Deleting members with  LastVisit before DeleteBeforeDate [" & DeleteBeforeDate & "], exactly one total visit, a null username and a null email address.")
+                Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily_RemoveGuestRecords(" & appName & ")", "Deleting members with  LastVisit before DeleteBeforeDate [" & DeleteBeforeDate & "], exactly one total visit, a null username and a null email address.")
                 SQLCriteria = "" _
                     & " (LastVisit<" & DeleteBeforeDateSQL & ")" _
                     & " and(createdbyvisit=1)" _
@@ -2254,20 +2253,13 @@ ErrorTrap:
         '   Log a reported error
         '======================================================================================
         '
-        Public Sub AppendClassLog(ByVal ApplicationName As String, ByVal MethodName As String, ByVal LogCopy As String)
-            On Error GoTo ErrorTrap
-            '
-            cp.core.appendLogWithLegacyRow(ApplicationName, LogCopy, "ccHouseKeep", "HouseKeepClass", MethodName, 0, "", "", False, True, "", "HouseKeep", "")
-            '
-            Exit Sub
-            '
-ErrorTrap:
-            Err.Clear()
+        Public Sub AppendClassLog(cpcore As coreClass, ByVal ApplicationName As String, ByVal MethodName As String, ByVal LogCopy As String)
+            logController.appendLogWithLegacyRow(cpcore, ApplicationName, LogCopy, "ccHouseKeep", "HouseKeepClass", MethodName, 0, "", "", False, True, "", "HouseKeep", "")
         End Sub
         '
         '
         '
-        Private Sub HousekeepLogFolder(ByVal appName As String, ByVal FolderName As String)
+        Private Sub HousekeepLogFolder(cpCore As coreClass, ByVal appName As String, ByVal FolderName As String)
             On Error GoTo ErrorTrap
             '
             Dim LogDate As Date
@@ -2275,7 +2267,7 @@ ErrorTrap:
             Dim FileList As IO.FileInfo()
             '
             LogDate = DateTime.Now.AddDays(-30)
-            Call AppendClassLog("", "HouseKeep", "Deleting Logs [" & FolderName & "] older than 30 days")
+            Call AppendClassLog(cpCore, "", "HouseKeep", "Deleting Logs [" & FolderName & "] older than 30 days")
             FileList = cp.core.programDataFiles.getFileList(FolderName)
             For Each file As IO.FileInfo In FileList
                 If file.CreationTime < LogDate Then
@@ -2315,7 +2307,7 @@ ErrorTrap:
             Dim FileArrayPointer As Integer
             Dim FileSplit() As String
             '
-            Call AppendClassLog(cp.core.serverConfig.appConfig.name, "HouseKeep_App_Daily_LogFolder(" & cp.core.serverConfig.appConfig.name & ")", "Deleting files from folder [" & FolderName & "] older than " & LastMonth)
+            Call AppendClassLog(cp.core, cp.core.serverConfig.appConfig.name, "HouseKeep_App_Daily_LogFolder(" & cp.core.serverConfig.appConfig.name & ")", "Deleting files from folder [" & FolderName & "] older than " & LastMonth)
             FileList = cp.core.privateFiles.getFileList(FolderName)
             For Each file As IO.FileInfo In FileList
                 If file.CreationTime < LastMonth Then
@@ -2716,7 +2708,7 @@ ErrorTrap:
         End Sub
         '
         '====================================================================================================
-        Public Sub housekeepAddonFolder()
+        Public Sub housekeepAddonFolder(cpcore As coreClass)
             Try
                 Dim RegisterPathList As String
                 Dim RegisterPath As String
@@ -2741,7 +2733,7 @@ ErrorTrap:
                 Dim Ptr As Integer
                 Dim collectionFileFilename As String
                 '
-                Call AppendClassLog("Server", "RegisterAddonFolder", "Entering RegisterAddonFolder")
+                Call AppendClassLog(cpcore, "Server", "RegisterAddonFolder", "Entering RegisterAddonFolder")
                 '
                 Dim loadOK As Boolean = True
                 Try
@@ -2749,23 +2741,23 @@ ErrorTrap:
                     Call Doc.LoadXml(collectionFileFilename)
                 Catch ex As Exception
                     'hint = hint & ",parse error"
-                    Call AppendClassLog("Server", "", "RegisterAddonFolder, Hint=[" & hint & "], Error loading Collections.xml file.")
+                    Call AppendClassLog(cpcore, "Server", "", "RegisterAddonFolder, Hint=[" & hint & "], Error loading Collections.xml file.")
                     loadOK = False
                 End Try
                 If loadOK Then
                     '
-                    Call AppendClassLog("Server", "RegisterAddonFolder", "Collection.xml loaded ok")
+                    Call AppendClassLog(cpcore, "Server", "RegisterAddonFolder", "Collection.xml loaded ok")
                     '
                     If genericController.vbLCase(Doc.DocumentElement.Name) <> genericController.vbLCase(CollectionListRootNode) Then
-                        Call AppendClassLog("Server", "", "RegisterAddonFolder, Hint=[" & hint & "], The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.")
+                        Call AppendClassLog(cpcore, "Server", "", "RegisterAddonFolder, Hint=[" & hint & "], The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.")
                     Else
                         '
-                        Call AppendClassLog("Server", "RegisterAddonFolder", "Collection.xml root name ok")
+                        Call AppendClassLog(cpcore, "Server", "RegisterAddonFolder", "Collection.xml root name ok")
                         '
                         With Doc.DocumentElement
                             If True Then
                                 'If genericController.vbLCase(.name) <> "collectionlist" Then
-                                '    Call AppendClassLog("Server", "", "RegisterAddonFolder, basename was not collectionlist, [" & .name & "].")
+                                '    Call AppendClassLog(cpcore,"Server", "", "RegisterAddonFolder, basename was not collectionlist, [" & .name & "].")
                                 'Else
                                 NodeCnt = 0
                                 RegisterPathList = ""
@@ -2797,14 +2789,14 @@ ErrorTrap:
                                             Next
                                     End Select
                                     '
-                                    Call AppendClassLog("Server", "RegisterAddonFolder", "Node[" & NodeCnt & "], LocalName=[" & LocalName & "], LastChangeDate=[" & LastChangeDate & "], CollectionPath=[" & CollectionPath & "], LocalGuid=[" & LocalGuid & "]")
+                                    Call AppendClassLog(cpcore, "Server", "RegisterAddonFolder", "Node[" & NodeCnt & "], LocalName=[" & LocalName & "], LastChangeDate=[" & LastChangeDate & "], CollectionPath=[" & CollectionPath & "], LocalGuid=[" & LocalGuid & "]")
                                     '
                                     ' Go through all subpaths of the collection path, register the version match, unregister all others
                                     '
                                     'fs = New fileSystemClass
                                     If CollectionPath = "" Then
                                         '
-                                        Call AppendClassLog("Server", "RegisterAddonFolder", "no collection path, skipping")
+                                        Call AppendClassLog(cpcore, "Server", "RegisterAddonFolder", "no collection path, skipping")
                                         '
                                     Else
                                         CollectionPath = genericController.vbLCase(CollectionPath)
@@ -2812,7 +2804,7 @@ ErrorTrap:
                                         Pos = InStrRev(CollectionRootPath, "\")
                                         If Pos <= 0 Then
                                             '
-                                            Call AppendClassLog("Server", "RegisterAddonFolder", "CollectionPath has no '\', skipping")
+                                            Call AppendClassLog(cpcore, "Server", "RegisterAddonFolder", "CollectionPath has no '\', skipping")
                                             '
                                         Else
                                             CollectionRootPath = Left(CollectionRootPath, Pos - 1)
@@ -2826,7 +2818,7 @@ ErrorTrap:
                                             End If
                                             If FolderList.Length = 0 Then
                                                 '
-                                                Call AppendClassLog("Server", "RegisterAddonFolder", "no subfolders found in physical path [" & Path & "], skipping")
+                                                Call AppendClassLog(cpcore, "Server", "RegisterAddonFolder", "no subfolders found in physical path [" & Path & "], skipping")
                                                 '
                                             Else
                                                 For Each dir As IO.DirectoryInfo In FolderList
@@ -2836,17 +2828,17 @@ ErrorTrap:
                                                     '
                                                     If dir.Name = "" Then
                                                         '
-                                                        Call AppendClassLog("Server", "RegisterAddonFolder", "....empty folder [" & dir.Name & "], skipping")
+                                                        Call AppendClassLog(cpcore, "Server", "RegisterAddonFolder", "....empty folder [" & dir.Name & "], skipping")
                                                         '
                                                     Else
                                                         '
-                                                        Call AppendClassLog("Server", "RegisterAddonFolder", "....Folder [" & dir.Name & "]")
+                                                        Call AppendClassLog(cpcore, "Server", "RegisterAddonFolder", "....Folder [" & dir.Name & "]")
                                                         IsActiveFolder = (CollectionRootPath & "\" & dir.Name = CollectionPath)
                                                         If IsActiveFolder And (FolderPtr <> (FolderList.Count - 1)) Then
                                                             '
                                                             ' This one is active, but not the last
                                                             '
-                                                            Call AppendClassLog("Server", "RegisterAddonFolder", "....Active addon is not the most current, this folder is the active folder, but there are more recent folders. This folder will be preserved.")
+                                                            Call AppendClassLog(cpcore, "Server", "RegisterAddonFolder", "....Active addon is not the most current, this folder is the active folder, but there are more recent folders. This folder will be preserved.")
                                                         End If
                                                         ' 20161005 - no longer need to register activeX
                                                         'FileList = cp.core.app.privateFiles.GetFolderFiles(Path & "\" & dir.Name)
@@ -2858,14 +2850,14 @@ ErrorTrap:
                                                         '            '
                                                         '            RegisterPathList = RegisterPathList & vbCrLf & Path & dir.Name & "\" & file.Name
                                                         '            '                                                                Cmd = "%comspec% /c regsvr32 """ & RegisterPathList & """ /s"
-                                                        '            '                                                                Call AppendClassLog("Server", "RegisterAddonFolder", "....Regsiter DLL [" & Cmd & "]")
+                                                        '            '                                                                Call AppendClassLog(cpcore,"Server", "RegisterAddonFolder", "....Regsiter DLL [" & Cmd & "]")
                                                         '            '                                                                Call runProcess(cp.core,Cmd, , True)
                                                         '        Else
                                                         '            '
                                                         '            ' unregister this file
                                                         '            '
                                                         '            Cmd = "%comspec% /c regsvr32 /u """ & Path & dir.Name & "\" & file.Name & """ /s"
-                                                        '            Call AppendClassLog("Server", "RegisterAddonFolder", "....Unregsiter DLL [" & Cmd & "]")
+                                                        '            Call AppendClassLog(cpcore,"Server", "RegisterAddonFolder", "....Unregsiter DLL [" & Cmd & "]")
                                                         '            Call runProcess(cp.core, Cmd, , True)
                                                         '        End If
                                                         '    End If
@@ -2877,7 +2869,7 @@ ErrorTrap:
                                                             IsActiveFolder = IsActiveFolder
                                                         Else
                                                             If FolderPtr < (FolderList.Count - 3) Then
-                                                                Call AppendClassLog("Server", "RegisterAddonFolder", "....Deleting path because non-active and not one of the newest 2 [" & Path & dir.Name & "]")
+                                                                Call AppendClassLog(cpcore, "Server", "RegisterAddonFolder", "....Deleting path because non-active and not one of the newest 2 [" & Path & dir.Name & "]")
                                                                 Call cp.core.privateFiles.DeleteFileFolder(Path & dir.Name)
                                                             End If
                                                         End If
@@ -2892,7 +2884,7 @@ ErrorTrap:
                                                         RegisterPath = Trim(RegisterPaths(Ptr))
                                                         If RegisterPath <> "" Then
                                                             Cmd = "%comspec% /c regsvr32 """ & RegisterPath & """ /s"
-                                                            Call AppendClassLog("Server", "RegisterAddonFolder", "....Register DLL [" & Cmd & "]")
+                                                            Call AppendClassLog(cpcore, "Server", "RegisterAddonFolder", "....Register DLL [" & Cmd & "]")
                                                             Call runProcess(cp.core, Cmd, , True)
                                                         End If
                                                     Next
@@ -2913,7 +2905,7 @@ ErrorTrap:
                                 '        RegisterPath = Trim(RegisterPaths(Ptr))
                                 '        If RegisterPath <> "" Then
                                 '            Cmd = "%comspec% /c regsvr32 """ & RegisterPath & """ /s"
-                                '            Call AppendClassLog("Server", "RegisterAddonFolder", "....Register DLL [" & Cmd & "]")
+                                '            Call AppendClassLog(cpcore,"Server", "RegisterAddonFolder", "....Register DLL [" & Cmd & "]")
                                 '            Call runProcess(cp.core, Cmd, , True)
                                 '        End If
                                 '    Next
@@ -2923,7 +2915,7 @@ ErrorTrap:
                     End If
                 End If
                 '
-                Call AppendClassLog("Server", "RegisterAddonFolder", "Exiting RegisterAddonFolder")
+                Call AppendClassLog(cpcore, "Server", "RegisterAddonFolder", "Exiting RegisterAddonFolder")
             Catch ex As Exception
                 cp.core.handleExceptionAndRethrow(ex)
             End Try

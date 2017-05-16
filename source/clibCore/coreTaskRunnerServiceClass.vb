@@ -3,6 +3,7 @@ Option Explicit On
 Option Strict On
 '
 Imports Contensive.Core
+Imports Contensive.Core.Controllers
 '
 Namespace Contensive
 #Const includeTracing = False
@@ -239,7 +240,7 @@ Namespace Contensive
         Private Sub appendLog(ByVal logText As String, Optional isImportant As Boolean = False)
             Using cp As New CPClass
                 If (isImportant Or allowVerboseLogging) Then
-                    cp.core.log_appendLog(logText, "", "trace")
+                    logController.log_appendLog(cp.core, logText, "", "trace")
                 End If
                 If (allowConsoleWrite) Then
                     Console.WriteLine(logText)

@@ -416,7 +416,7 @@ Namespace Contensive.Core
         '
         '
         Private Sub appendMonitorLog(ByVal message As String)
-            cpCore.log_appendLog(message, "Monitor")
+            logController.log_appendLog(cpCore, message, "Monitor")
         End Sub
         '
         '

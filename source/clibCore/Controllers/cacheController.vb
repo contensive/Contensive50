@@ -3,6 +3,7 @@ Option Explicit On
 Option Strict On
 '
 Imports System.Text.RegularExpressions
+Imports System.Runtime.Caching
 '
 Namespace Contensive.Core.Controllers
     '
@@ -115,7 +116,8 @@ Namespace Contensive.Core.Controllers
                         Dim encodedCacheName As String = encodeCacheName(cpCore.serverConfig.appConfig.name, cacheName)
                         If cpCore.serverConfig.isLocalCache Or remoteCacheDisabled Then
                             '
-                            ' -- implement a simple local cache using the filesystem
+                            ' -- implement a simple local cache using the filesystem+dotnet
+                            setCacheObjectDotNet(cacheName, data)
                             Dim serializedData As String = Newtonsoft.Json.JsonConvert.SerializeObject(data)
                             Using mutex As New System.Threading.Mutex(False, encodedCacheName)
                                 mutex.WaitOne()
@@ -134,6 +136,55 @@ Namespace Contensive.Core.Controllers
             End Try
         End Sub
         '
+        '====================================================================================================
+        ''' <summary>
+        ''' dotnet set cache object
+        ''' </summary>
+        ''' <param name="cacheName"></param>
+        ''' <param name="data"></param>
+        Public Sub setCacheObjectDotNet(ByVal cacheName As String, ByVal data As cacheObjectClass)
+            Dim cache As ObjectCache = MemoryCache.Default
+            Dim policy As New CacheItemPolicy()
+            policy.AbsoluteExpiration = Now.AddMinutes(100)
+            cache.Set(cacheName, data, policy)
+        End Sub
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' dotnet get cache object
+        ''' </summary>
+        ''' <typeparam name="T"></typeparam>
+        ''' <param name="cacheItemName"></param>
+        ''' <param name="cachetimeinminutes"></param>
+        ''' <param name="objectSettingFunction"></param>
+        ''' <returns></returns>
+        Public Function getCacheObjectDotNet(ByVal cacheName As String) As cacheObjectClass
+            Dim cache As ObjectCache = MemoryCache.Default
+            Dim cachedObject As cacheObjectClass = DirectCast(cache(cacheName), cacheObjectClass)
+            Return cachedObject
+        End Function
+        '/// <summary>
+        '/// A generic method for getting And setting objects to the memory cache.
+        '/// </summary>
+        '/// <typeparam name="T">The type of the object to be returned.</typeparam>
+        '/// <param name="cacheItemName">The name to be used when storing this object in the cache.</param>
+        '/// <param name="cacheTimeInMinutes">How long to cache this object for.</param>
+        '/// <param name="objectSettingFunction">A parameterless function to call if the object isn't in the cache and you need to set it.</param>
+        '/// <returns>An object of the type you asked for</returns>
+        'Public Static T GetObjectFromCache<T>(String cacheItemName, int cacheTimeInMinutes, Func<T> objectSettingFunction)
+        '{
+        '    ObjectCache cache = MemoryCache.Default;
+        '    var cachedObject = (T)cache[cacheItemName];
+        '    If (cachedObject == null)
+        '    {
+        '        CacheItemPolicy policy = New CacheItemPolicy();
+        '        policy.AbsoluteExpiration = DateTimeOffset.Now.AddMinutes(cacheTimeInMinutes);
+        '        cachedObject = objectSettingFunction();
+        '        cache.Set(cacheItemName, cachedObject, policy);
+        '    }
+        '    Return cachedObject;
+        '}
+        '
         '========================================================================
         ''' <summary>
         ''' get an object from cache. If the cache misses or is invalidated, nothing object is returned
@@ -145,7 +196,8 @@ Namespace Contensive.Core.Controllers
             Dim returnObject As objectClass = Nothing
             Try
                 Dim cacheObject As cacheObjectClass
-                Dim invalidate As Boolean = False
+                Dim cacheMiss As Boolean = False
+                Dim cacheMissReason As String = ""
                 Dim dateCompare As Integer
                 '
                 If Not (String.IsNullOrEmpty(cacheName)) Then
@@ -155,7 +207,8 @@ Namespace Contensive.Core.Controllers
                     If (cacheObject IsNot Nothing) Then
                         dateCompare = globalInvalidationDate.CompareTo(cacheObject.saveDate)
                         If (dateCompare >= 0) Then
-                            appendCacheLog("GetObject(" & cacheName & "), invalidated, cache_globalInvalidationDate[" & globalInvalidationDate & "] >= saveDate[" & cacheObject.saveDate & "], dateCompare[" & dateCompare & "]")
+                            cacheMissReason = "GetObject(" & cacheName & "), invalidated because the cacheObject's saveDate [" & cacheObject.saveDate.ToString() & "] is after the globalInvalidationDate [" & globalInvalidationDate & "]"
+                            appendCacheLog(cacheMissReason)
                         Else
                             '
                             ' if this data is newer that the last global invalidation, continue
@@ -170,19 +223,45 @@ Namespace Contensive.Core.Controllers
                                         'Dim ticks As Long = ((tagInvalidationDate - cacheObject.saveDate).Ticks)
                                         'appendCacheLog("GetObject(" & cacheName & "), tagInvalidationDate[" & tagInvalidationDate & "], cacheData.saveDate[" & cacheObject.saveDate & "], dateCompare[" & dateCompare & "], tick diff [" & ticks & "]")
                                         If (dateCompare >= 0) Then
-                                            invalidate = True
-                                            appendCacheLog("GetObject(" & cacheName & "), invalidated")
+                                            cacheMiss = True
+                                            cacheMissReason = "GetObject(" & cacheName & "), invalidated because the dependantobject [" & dependantObjectCacheName & "] has a saveDate [" & dependantObject.saveDate.ToString() & "] after the cacheObject's dateDate [" & cacheObject.saveDate.ToString() & "]"
+                                            appendCacheLog(cacheMissReason)
                                             Exit For
                                         End If
                                     End If
                                 Next
                             End If
-                            If Not invalidate Then
+                            If Not cacheMiss Then
                                 appendCacheLog("GetObject(" & cacheName & "), valid")
-                                If TypeOf cacheObject.data Is objectClass Then
+                                If (TypeOf cacheObject.data Is Newtonsoft.Json.Linq.JObject) Then
+                                    Dim data As Newtonsoft.Json.Linq.JObject = DirectCast(cacheObject.data, Newtonsoft.Json.Linq.JObject)
+                                    returnObject = data.ToObject(Of objectClass)()
+                                ElseIf (TypeOf cacheObject.data Is Newtonsoft.Json.Linq.JArray) Then
+                                    Dim data As Newtonsoft.Json.Linq.JArray = DirectCast(cacheObject.data, Newtonsoft.Json.Linq.JArray)
+                                    returnObject = data.ToObject(Of objectClass)()
+                                Else
                                     returnObject = DirectCast(cacheObject.data, objectClass)
-                                    'return_cacheHit = True
                                 End If
+                                'Try
+
+                                '    TryCast(cacheObject.data, Newtonsoft.Json.JsonToken.JObject)
+
+                                '    cacheObject.data.toObject
+
+
+                                '    returnObject = DirectCast(cacheObject.data, objectClass)
+                                '    'returnObject = TryCast(cacheObject.data, objectClass)
+                                'Catch ex As Exception
+                                '    cacheMissReason = "GetObject(" & cacheName & "), invalidated because the cacheObject.data type [" & cacheObject.data.GetType().ToString() & "] does not match the required return type. Over-writing the cache object."
+                                '    appendCacheLog(cacheMissReason)
+                                '    setCacheObject(cacheName, New cacheObjectClass With {.data = Nothing})
+                                'End Try
+                                'If TypeOf cacheObject.data Is objectClass Then
+                                '    returnObject = DirectCast(cacheObject.data, objectClass)
+                                'Else
+                                '    cacheMissReason = "GetObject(" & cacheName & "), invalidated because the cacheObject.data type [" & cacheObject.data.GetType().ToString() & "] does not match the required return type."
+                                '    appendCacheLog(cacheMissReason)
+                                'End If
                             End If
                         End If
                     End If
@@ -203,27 +282,39 @@ Namespace Contensive.Core.Controllers
         Private Function getCacheObject(ByVal cacheName As String) As cacheObjectClass
             Dim returnObj As cacheObjectClass = Nothing
             Try
+                appendCacheLog("getCacheObject, enter [" & cacheName & "]")
                 If (String.IsNullOrEmpty(cacheName)) Then
                     Throw New ArgumentException("CacheName cannot be blank")
                 Else
                     If (cpCore.serverConfig.appConfig.enableCache) And (cpCore.siteProperties.allowCache_notCached) Then
+                        appendCacheLog("getCacheObject, config.enableCache and siteproperty.allowCache")
                         Dim encodedCacheName As String = encodeCacheName(cpCore.serverConfig.appConfig.name, cacheName)
                         If cpCore.serverConfig.isLocalCache Or remoteCacheDisabled Then
+                            appendCacheLog("getCacheObject, local cache")
                             '
-                            ' implement a simple local cache using the filesystem
+                            ' implement a simple local cache using the filesystem/dotnet
                             '
-                            Dim serializedDataObject As String = Nothing
-                            Using mutex As New System.Threading.Mutex(False, encodedCacheName)
-                                mutex.WaitOne()
-                                serializedDataObject = cpCore.privateFiles.readFile("appCache\" & genericController.encodeFilename(encodedCacheName & ".txt"))
-                                mutex.ReleaseMutex()
-                            End Using
-                            If Not String.IsNullOrEmpty(serializedDataObject) Then
-                                returnObj = Newtonsoft.Json.JsonConvert.DeserializeObject(Of cacheObjectClass)(serializedDataObject)
+                            returnObj = getCacheObjectDotNet(cacheName)
+                            If (returnObj) Is Nothing Then
+                                appendCacheLog("getCacheObject, memory cache miss")
+                                Dim serializedDataObject As String = Nothing
+                                Using mutex As New System.Threading.Mutex(False, encodedCacheName)
+                                    mutex.WaitOne()
+                                    serializedDataObject = cpCore.privateFiles.readFile("appCache\" & genericController.encodeFilename(encodedCacheName & ".txt"))
+                                    mutex.ReleaseMutex()
+                                End Using
+                                If String.IsNullOrEmpty(serializedDataObject) Then
+                                    appendCacheLog("getCacheObject, file cache miss")
+                                Else
+                                    appendCacheLog("getCacheObject, file cache hit, write to memory cache")
+                                    returnObj = Newtonsoft.Json.JsonConvert.DeserializeObject(Of cacheObjectClass)(serializedDataObject)
+                                    setCacheObjectDotNet(cacheName, returnObj)
+                                End If
                             End If
                         Else
                             '
                             ' -- use remote cache
+                            appendCacheLog("getCacheObject, remote cache")
                             Try
                                 returnObj = cacheClient.Get(Of cacheObjectClass)(encodedCacheName)
                             Catch ex As Exception
@@ -253,6 +344,7 @@ Namespace Contensive.Core.Controllers
                         End If
                     End If
                 End If
+                appendCacheLog("getCacheObject, exit ")
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -513,7 +605,7 @@ Namespace Contensive.Core.Controllers
         '=======================================================================
         Private Sub appendCacheLog(line As String)
             Try
-                logController.log_appendLog(cpCore, line)
+                logController.log_appendLog(cpCore, line, "cache")
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(New ApplicationException("appendCacheLog exception", ex))
             End Try

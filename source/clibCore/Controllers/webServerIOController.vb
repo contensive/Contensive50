@@ -575,14 +575,16 @@ Namespace Contensive.Core
                     End If
                     '
                     ' REFACTOR -- move to cpcore.domains class 
-                    domainDetailsListText = genericController.encodeText(cpCore.cache.getObject(Of String)("domainContentList"))
-                    If Not String.IsNullOrEmpty(domainDetailsListText) Then
-                        Try
-                            cpCore.domains.domainDetailsList = cpCore.json.Deserialize(Of Dictionary(Of String, Models.Entity.domainLegacyModel.domainDetailsClass))(domainDetailsListText)
-                        Catch ex As Exception
-                            cpCore.domains.domainDetailsList = Nothing
-                        End Try
-                    End If
+                    cpCore.domains.domainDetailsList = cpCore.cache.getObject(Of Dictionary(Of String, Models.Entity.domainLegacyModel.domainDetailsClass))("domainContentList")
+
+                    'domainDetailsListText = genericController.encodeText(cpCore.cache.getObject(Of String)("domainContentList"))
+                    'If Not String.IsNullOrEmpty(domainDetailsListText) Then
+                    '    Try
+                    '        cpCore.domains.domainDetailsList = cpCore.json.Deserialize(Of Dictionary(Of String, Models.Entity.domainLegacyModel.domainDetailsClass))(domainDetailsListText)
+                    '    Catch ex As Exception
+                    '        cpCore.domains.domainDetailsList = Nothing
+                    '    End Try
+                    'End If
                     If (cpCore.domains.domainDetailsList Is Nothing) Then
                         '
                         '  no cache found, build domainContentList from database
@@ -755,8 +757,9 @@ Namespace Contensive.Core
                         '
                         ' if there was a change, update the cache
                         '
-                        domainDetailsListText = cpCore.json.Serialize(cpCore.domains.domainDetailsList)
-                        Call cpCore.cache.setObject("domainContentList", domainDetailsListText, "domains")
+                        Call cpCore.cache.setObject("domainContentList", cpCore.domains.domainDetailsList, "domains")
+                        'domainDetailsListText = cpCore.json.Serialize(cpCore.domains.domainDetailsList)
+                        'Call cpCore.cache.setObject("domainContentList", domainDetailsListText, "domains")
                     End If
                     '
                     cpCore.webServerIO_requestVirtualFilePath = "/" & cpCore.serverConfig.appConfig.name

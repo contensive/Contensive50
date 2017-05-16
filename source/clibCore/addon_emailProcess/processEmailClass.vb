@@ -61,7 +61,7 @@ Namespace Contensive.Core
                 '
                 ' log error and exit
                 '
-                cpCore.appendLogWithLegacyRow("server", "KernelService nothing after new KernelServicesClass", "App.EXEName", "ProcessEmailClass", "ProcessEmail", Err.Number, Err.Source, Err.Description, False, True, "", "", "")
+                logController.appendLogWithLegacyRow(cpCore, "server", "KernelService nothing after new KernelServicesClass", "App.EXEName", "ProcessEmailClass", "ProcessEmail", Err.Number, Err.Source, Err.Description, False, True, "", "", "")
             Else
                 ' !!!!! THIS WILL BE AN ADDON THAT RUNS FOR EACH ADDON
                 'For Each AppService In KernelService.AppServices

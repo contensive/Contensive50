@@ -7341,7 +7341,7 @@
 //            string returnResult = "";
 //            Process p = new Process();
 //            //
-//            cpCore.log_appendLog("ccCommonModule.runProcess, cmd=[" + Cmd + "], Arguments=[" + Arguments + "], WaitForReturn=[" + WaitForReturn + "]");
+//            logController.log_appendLog(cpcore,"ccCommonModule.runProcess, cmd=[" + Cmd + "], Arguments=[" + Arguments + "], WaitForReturn=[" + WaitForReturn + "]");
 //            //
 //            p.StartInfo.FileName = Cmd;
 //            p.StartInfo.Arguments = Arguments;

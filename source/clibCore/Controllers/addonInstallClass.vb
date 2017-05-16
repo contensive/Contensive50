@@ -416,14 +416,14 @@ Namespace Contensive.Core
                 '
                 allowLogging = False
                 '
-                If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), Enter")
+                If allowLogging Then logController.log_appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), Enter")
                 LocalFile = getCollectionListFile()
                 If LocalFile <> "" Then
                     LocalCollections = New XmlDocument
                     Try
                         LocalCollections.LoadXml(LocalFile)
                     Catch ex As Exception
-                        If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), parse error reading collections.xml")
+                        If allowLogging Then logController.log_appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), parse error reading collections.xml")
                         Copy = "Error loading privateFiles\addons\Collections.xml"
                         Call appendInstallLog("Server", "UpgradeAllLocalCollecionFilesFileLib2", Copy)
                         return_ErrorMessage = return_ErrorMessage & "<P>" & Copy & "</P>"
@@ -431,7 +431,7 @@ Namespace Contensive.Core
                     End Try
                     If returnOk Then
                         If genericController.vbLCase(LocalCollections.DocumentElement.Name) <> genericController.vbLCase(CollectionListRootNode) Then
-                            If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), The addons\Collections.xml file has an invalid root node")
+                            If allowLogging Then logController.log_appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), The addons\Collections.xml file has an invalid root node")
                             Copy = "The addons\Collections.xml has an invalid root node, [" & LocalCollections.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected."
                             'Copy = "The LocalCollections file [" & App.Path & "\Addons\Collections.xml] has an invalid root node, [" & LocalCollections.DocumentElement.name & "] was received and [" & CollectionListRootNode & "] was expected."
                             Call appendInstallLog("Server", "UpgradeAllLocalCollecionFilesFileLib2", Copy)
@@ -460,7 +460,7 @@ Namespace Contensive.Core
                                     Next
                                 End If
                             End With
-                            If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), collection.xml file has " & GuidCnt & " collection nodes.")
+                            If allowLogging Then logController.log_appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), collection.xml file has " & GuidCnt & " collection nodes.")
                             If GuidCnt > 0 Then
                                 '
                                 ' Request collection updates 10 at a time
@@ -488,7 +488,7 @@ Namespace Contensive.Core
                                         '-----------------------------------------------------------------------------------------------
                                         '
                                         If allowLogging Then
-                                            cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), requesting Library updates for [" & GuidList & "]")
+                                            logController.log_appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), requesting Library updates for [" & GuidList & "]")
                                         End If
                                         'hint = "Getting CollectionList"
                                         LibraryCollections = New XmlDocument
@@ -498,7 +498,7 @@ Namespace Contensive.Core
                                             LibraryCollections.Load(SupportURL)
                                         Catch ex As Exception
                                             If allowLogging Then
-                                                cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), Error downloading or loading GetCollectionList from Support.")
+                                                logController.log_appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), Error downloading or loading GetCollectionList from Support.")
                                             End If
                                             Copy = "Error downloading or loading GetCollectionList from Support."
                                             Call appendInstallLog("Server", "UpgradeAllLocalCollecionFilesFileLib2", Copy & ", the request was [" & SupportURL & "]")
@@ -510,14 +510,14 @@ Namespace Contensive.Core
                                             If True Then
                                                 If genericController.vbLCase(LibraryCollections.DocumentElement.Name) <> genericController.vbLCase(CollectionListRootNode) Then
                                                     Copy = "The GetCollectionList support site remote method returned an xml file with an invalid root node, [" & LibraryCollections.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected."
-                                                    If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), " & Copy)
+                                                    If allowLogging Then logController.log_appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), " & Copy)
                                                     Call appendInstallLog("Server", "UpgradeAllLocalCollecionFilesFileLib2", Copy & ", the request was [" & SupportURL & "]")
                                                     return_ErrorMessage = return_ErrorMessage & "<P>" & Copy & "</P>"
                                                     returnOk = False
                                                 Else
                                                     With LocalCollections.DocumentElement
                                                         If genericController.vbLCase(.Name) <> "collectionlist" Then
-                                                            cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), The Library response did not have a collectioinlist top node, the request was [" & SupportURL & "]")
+                                                            logController.log_appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), The Library response did not have a collectioinlist top node, the request was [" & SupportURL & "]")
                                                         Else
                                                             '
                                                             '-----------------------------------------------------------------------------------------------
@@ -526,7 +526,7 @@ Namespace Contensive.Core
                                                             '
                                                             For Each LocalListNode In .ChildNodes
                                                                 localCollectionUpToDate = False
-                                                                If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), Process local collection.xml node [" & LocalListNode.Name & "]")
+                                                                If allowLogging Then logController.log_appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), Process local collection.xml node [" & LocalListNode.Name & "]")
                                                                 Select Case genericController.vbLCase(LocalListNode.Name)
                                                                     Case "collection"
                                                                         LocalGuid = ""
@@ -551,10 +551,10 @@ Namespace Contensive.Core
                                                                             If Not IsDate(LocalLastChangeDateStr) Then
                                                                                 LocalLastChangeDate = Date.MinValue
                                                                             Else
-                                                                                LocalLastChangeDate =  genericController.EncodeDate(LocalLastChangeDateStr)
+                                                                                LocalLastChangeDate = genericController.EncodeDate(LocalLastChangeDateStr)
                                                                             End If
                                                                         End If
-                                                                        If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), node is collection, LocalGuid [" & LocalGuid & "], LocalLastChangeDateStr [" & LocalLastChangeDateStr & "]")
+                                                                        If allowLogging Then logController.log_appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), node is collection, LocalGuid [" & LocalGuid & "], LocalLastChangeDateStr [" & LocalLastChangeDateStr & "]")
                                                                         '
                                                                         ' go through each collection on the Library and find the local collection guid
                                                                         '
@@ -598,14 +598,14 @@ Namespace Contensive.Core
                                                                                             '
                                                                                             ' LibCollection matches the LocalCollection - process the upgrade
                                                                                             '
-                                                                                            If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), Library collection node found that matches")
+                                                                                            If allowLogging Then logController.log_appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), Library collection node found that matches")
                                                                                             If genericController.vbInstr(1, LibGUID, "58c9", vbTextCompare) <> 0 Then
                                                                                                 LibGUID = LibGUID
                                                                                             End If
                                                                                             If Not IsDate(LibLastChangeDateStr) Then
                                                                                                 LibLastChangeDate = Date.MinValue
                                                                                             Else
-                                                                                                LibLastChangeDate =  genericController.EncodeDate(LibLastChangeDateStr)
+                                                                                                LibLastChangeDate = genericController.EncodeDate(LibLastChangeDateStr)
                                                                                             End If
                                                                                             ' TestPoint 1.1 - Test each collection for upgrade
                                                                                             If LibLastChangeDate > LocalLastChangeDate Then
@@ -613,7 +613,7 @@ Namespace Contensive.Core
                                                                                                 ' LibLastChangeDate <>0, and it is > local lastchangedate
                                                                                                 '
                                                                                                 workingPath = cpCore.addon.getPrivateFilesAddonPath() & "\temp_" & genericController.GetRandomInteger() & "\"
-                                                                                                If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), matching library collection is newer, start upgrade [" & workingPath & "].")
+                                                                                                If allowLogging Then logController.log_appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), matching library collection is newer, start upgrade [" & workingPath & "].")
                                                                                                 Call appendInstallLog("server", "UpgradeAllLocalCollectionsFromLib3", "Upgrading Collection [" & LibGUID & "], Library name [" & LibName & "], because LocalChangeDate [" & LocalLastChangeDate & "] < LibraryChangeDate [" & LibLastChangeDate & "]")
                                                                                                 '
                                                                                                 ' Upgrade Needed
@@ -621,15 +621,15 @@ Namespace Contensive.Core
                                                                                                 Call cpCore.privateFiles.createPath(workingPath)
                                                                                                 '
                                                                                                 returnOk = DownloadCollectionFiles(workingPath, LibGUID, CollectionLastChangeDate, return_ErrorMessage)
-                                                                                                If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), DownloadCollectionFiles returned " & returnOk)
+                                                                                                If allowLogging Then logController.log_appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), DownloadCollectionFiles returned " & returnOk)
                                                                                                 If returnOk Then
                                                                                                     Dim listGuidList As New List(Of String)
                                                                                                     returnOk = BuildLocalCollectionReposFromFolder(workingPath, CollectionLastChangeDate, listGuidList, return_ErrorMessage, allowLogging)
-                                                                                                    If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), BuildLocalCollectionFolder returned " & returnOk)
+                                                                                                    If allowLogging Then logController.log_appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), BuildLocalCollectionFolder returned " & returnOk)
                                                                                                 End If
                                                                                                 '
                                                                                                 If allowLogging Then
-                                                                                                    cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), working folder not deleted because debugging. Delete tmp folders when finished.")
+                                                                                                    logController.log_appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), working folder not deleted because debugging. Delete tmp folders when finished.")
                                                                                                 Else
                                                                                                     Call cpCore.privateFiles.DeleteFileFolder(workingPath)
                                                                                                 End If
@@ -638,13 +638,13 @@ Namespace Contensive.Core
                                                                                                 '
                                                                                                 If returnOk Then
                                                                                                     returnOk = installCollectionFromLocalRepo(LibGUID, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, "", IsNewBuild)
-                                                                                                    If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), UpgradeAllAppsFromLocalCollection returned " & returnOk)
+                                                                                                    If allowLogging Then logController.log_appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), UpgradeAllAppsFromLocalCollection returned " & returnOk)
                                                                                                 End If
                                                                                                 '
                                                                                                 ' make sure this issue is logged and clear the flag to let other local collections install
                                                                                                 '
                                                                                                 If Not returnOk Then
-                                                                                                    If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), for this local collection, process returned " & returnOk)
+                                                                                                    If allowLogging Then logController.log_appendLog(cpCore, "UpgradeAllLocalCollectionsFromLib3(), for this local collection, process returned " & returnOk)
                                                                                                     Call appendInstallLog("server", "UpgradeAllLocalCollectionsFromLib3", "There was a problem upgrading Collection [" & LibGUID & "], Library name [" & LibName & "], error message [" & return_ErrorMessage & "], will clear error and continue with the next collection, the request was [" & SupportURL & "]")
                                                                                                     returnOk = True
                                                                                                 End If
@@ -757,7 +757,7 @@ Namespace Contensive.Core
                 '
                 ' process all xml files in this workingfolder
                 '
-                If allowLogging Then cpCore.log_appendLog("BuildLocalCollectionFolder(), Enter")
+                If allowLogging Then logController.log_appendLog(cpCore, "BuildLocalCollectionFolder(), Enter")
                 '
                 cpCore.privateFiles.splitPathFilename(collectionPathFilename, collectionPath, collectionFilename)
                 If Not cpCore.privateFiles.pathExists(collectionPath) Then
@@ -766,7 +766,7 @@ Namespace Contensive.Core
                     '
                     result = False
                     return_ErrorMessage = "<p>There was a problem with the installation. The installation folder is not valid.</p>"
-                    If allowLogging Then cpCore.log_appendLog("BuildLocalCollectionFolder(), " & return_ErrorMessage)
+                    If allowLogging Then logController.log_appendLog(cpCore, "BuildLocalCollectionFolder(), " & return_ErrorMessage)
                     Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, CheckFileFolder was false for the private folder [" & collectionPath & "]")
                 Else
                     Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, processing files in private folder [" & collectionPath & "]")
@@ -2412,7 +2412,7 @@ Namespace Contensive.Core
                                                         '
                                                         CollectionPath = genericController.vbLCase(CollectionNode.InnerText)
                                                     Case "lastchangedate"
-                                                        LastChangeDate =  genericController.EncodeDate(CollectionNode.InnerText)
+                                                        LastChangeDate = genericController.EncodeDate(CollectionNode.InnerText)
                                                 End Select
                                             Next
                                     End Select
@@ -3845,7 +3845,7 @@ Namespace Contensive.Core
         ''=========================================================================================================
         ''
         'private Sub AppendAddonFile(ByVal ApplicationName As String, ByVal Method As String, ByVal Cause As String)
-        '    cpCore.appendLogWithLegacyRow(ApplicationName, Cause, "dll", "AddonInstallClass", Method, 0, "", "", False, True, "", "AddonInstall", "")
+        '    logController.appendLogWithLegacyRow( cpcore,ApplicationName, Cause, "dll", "AddonInstallClass", Method, 0, "", "", False, True, "", "AddonInstall", "")
 
         'End Sub
         '
@@ -3856,7 +3856,7 @@ Namespace Contensive.Core
         Private Sub appendInstallLog(ByVal ignore As String, ByVal Method As String, ByVal LogMessage As String)
             Try
                 Console.WriteLine(Method & ", " & LogMessage)
-                cpCore.appendLogWithLegacyRow(cpCore.serverConfig.appConfig.name, LogMessage, "dll", "AddonInstallClass", Method, 0, "", "", False, True, "", "Build", "")
+                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, LogMessage, "dll", "AddonInstallClass", Method, 0, "", "", False, True, "", "Build", "")
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex)
             End Try
@@ -4038,7 +4038,7 @@ Namespace Contensive.Core
                     Try
                         srcXmlDom.LoadXml(srcCollecionXml)
                     Catch ex As Exception
-                        cpCore.log_appendLog("UpgradeCDef_LoadDataToCollection Error reading xml archive, ex=[" & ex.ToString & "]")
+                        logController.log_appendLog(cpCore, "UpgradeCDef_LoadDataToCollection Error reading xml archive, ex=[" & ex.ToString & "]")
                         Throw New Exception("Error in UpgradeCDef_LoadDataToCollection, during doc.loadXml()", ex)
                     End Try
                     With srcXmlDom.DocumentElement

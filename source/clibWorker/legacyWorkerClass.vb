@@ -597,7 +597,7 @@ Namespace Contensive
                     ' Attempting to start service, and it is still starting
                     '
                     StatusMessage = "Attempting a service start retry, but it is still starting"
-                    cpCore.log_appendLog(MethodName & ", " & StatusMessage)
+                    logController.log_appendLog(cpCore, MethodName & ", " & StatusMessage)
                 Else
                     StartServiceInProgress = True
                     '
@@ -622,7 +622,7 @@ Namespace Contensive
                         ' ----- Kernelservices failed to initialize
                         '
                         StatusMessage = "Contensive Kernel Services failed to initialize."
-                        cpCore.log_appendLog(MethodName & ", " & StatusMessage)
+                        logController.log_appendLog(cpCore, MethodName & ", " & StatusMessage)
                     Else
                         If False Then
                             'If KernelServices.HostServiceProcessID <> 0 Then
@@ -630,7 +630,7 @@ Namespace Contensive
                             ' ----- Already started by another HostService
                             '
                             StatusMessage = "Contensive Kernel Services is already running."
-                            cpCore.log_appendLog(MethodName & ", " & StatusMessage)
+                            logController.log_appendLog(cpCore, MethodName & ", " & StatusMessage)
                         Else
                             '
                             ' No license is trial license
@@ -795,13 +795,13 @@ Namespace Contensive
                     '
                     ' Bad username and password
                     '
-                    cpCore.log_appendLog("serverClass.executeServerCmd", "bad username/password.")
+                    logController.log_appendLog(cpcore,"serverClass.executeServerCmd", "bad username/password.")
                     returnString = "ERROR " & ignoreString
                 Else
                     '
                     ' authenticated
                     '
-                    cpCore.log_appendLog("serverClass.executeServerCmd, switch on method=[" & Method & "]")
+                    logController.log_appendLog(cpcore,"serverClass.executeServerCmd, switch on method=[" & Method & "]")
                     Select Case genericController.vbUCase(Method)
                         Case "CONNECT"
                             '
@@ -1028,7 +1028,7 @@ Namespace Contensive
                             '
                             ' ccCmd parse the command line with a "&". Quotes in the values need to be doubled
                             '
-                            cpCore.log_appendLog("serverClass.executeServerCmd, ccCMD method case")
+                            logController.log_appendLog(cpcore,"serverClass.executeServerCmd, ccCMD method case")
                             '
                             Cmd = Method
                             QSPairs = Split(queryString, "&")
@@ -1068,7 +1068,7 @@ Namespace Contensive
                                 Method = Method
                             End If
                             '
-                            cpCore.log_appendLog("serverClass.executeServerCmd, adding command to Queue [" & Cmd & "]")
+                            logController.log_appendLog(cpcore,"serverClass.executeServerCmd, adding command to Queue [" & Cmd & "]")
                             '
                             If Not addAsyncCmd(cpCore, Cmd, False) Then
                                 returnString = "Command was blocked because there are too many commands waiting, or this is a duplicate command."
@@ -1081,7 +1081,7 @@ Namespace Contensive
                         Case Else
                             returnString = "ERROR " & ignoreString & vbCrLf & "unknown command [" & Method & "]"
                             '
-                            cpCore.log_appendLog("serverClass.executeServerCmd, unknown cmd=[" & Cmd & "]")
+                            logController.log_appendLog(cpcore,"serverClass.executeServerCmd, unknown cmd=[" & Cmd & "]")
                             '
                     End Select
                 End If
@@ -1326,7 +1326,7 @@ Namespace Contensive
                 Dim Ptr As Integer
                 Dim LcaseCommand As String
                 '
-                cpCore.log_appendLog("serverClass.addAsyncCmd, command=[" & Command & "], BlockDuplicates=[" & BlockDuplicates & "]")
+                logController.log_appendLog(cpcore,"serverClass.addAsyncCmd, command=[" & Command & "], BlockDuplicates=[" & BlockDuplicates & "]")
                 '
                 returnBoolean = True
                 LcaseCommand = genericController.vbLCase(Command)
@@ -1335,7 +1335,7 @@ Namespace Contensive
                     ' Server Queue is too large, block the add
                     '
                     returnBoolean = False
-                    cpCore.log_appendLog("addAsyncCmd, Server Cmd was blocked because Server Queue is too long [" & asyncCmdQueueCnt & "], command was [" & Command & "]")
+                    logController.log_appendLog(cpcore,"addAsyncCmd, Server Cmd was blocked because Server Queue is too long [" & asyncCmdQueueCnt & "], command was [" & Command & "]")
                 ElseIf BlockDuplicates Then
                     '
                     ' Search for a duplicate
@@ -1343,7 +1343,7 @@ Namespace Contensive
                     For Ptr = 0 To asyncCmdQueueCnt - 1
                         If genericController.vbLCase(asyncCmdQueue(Ptr)) = LcaseCommand Then
                             returnBoolean = False
-                            cpCore.log_appendLog("addAsyncCmd, Server Cmd was blocked because there is a duplicate in the queue already, [" & Command & "]")
+                            logController.log_appendLog(cpcore,"addAsyncCmd, Server Cmd was blocked because there is a duplicate in the queue already, [" & Command & "]")
                             Exit For
                         End If
                     Next
@@ -1359,12 +1359,12 @@ Namespace Contensive
                     asyncCmdQueue(asyncCmdQueueCnt) = Command
                     asyncCmdQueueCnt = asyncCmdQueueCnt + 1
                     '
-                    cpCore.log_appendLog("serverClass.addAsyncCmd, command added to ServerCmds, index=[" & asyncCmdQueueCnt & "], call runProcess...")
+                    logController.log_appendLog(cpcore,"serverClass.addAsyncCmd, command added to ServerCmds, index=[" & asyncCmdQueueCnt & "], call runProcess...")
                     '
                     Call runProcess(cpCore, cpCore.serverConfig.programFilesPath & "\ccCmd.exe", "port=" & serverListenerPort & " max=" & maxCmdInstances)
                 End If
                 '
-                cpCore.log_appendLog("serverClass.addAsyncCmd, exit")
+                logController.log_appendLog(cpcore,"serverClass.addAsyncCmd, exit")
                 '
             Catch ex As Exception
                 Call handleExceptionResume(ex, "addAsyncCmd", "ErrorTrap")
@@ -1439,7 +1439,7 @@ Namespace Contensive
         '======================================================================================
         '
         Public Sub handleExceptionResume(ByVal ex As Exception, ByVal MethodName As String, ByVal LogCopy As String)
-            cpCore.appendLogWithLegacyRow("(server)", LogCopy, "server", "serverClass", MethodName, -1, ex.Source, ex.ToString, True, True, "", "", "")
+            logController.appendLogWithLegacyRow( cpcore,"(server)", LogCopy, "server", "serverClass", MethodName, -1, ex.Source, ex.ToString, True, True, "", "", "")
         End Sub
         ''
         ''======================================================================================
@@ -1482,7 +1482,7 @@ Namespace Contensive
         End Sub
         '
         Private Sub appendTraceLog(ByVal method As String, ByVal logText As String)
-            cpCore.log_appendLog(logText, "", "trace")
+            logController.log_appendLog(cpCore, logText, "", "trace")
         End Sub
 #Region " IDisposable Support "
         ' Do not change or add Overridable to these methods.

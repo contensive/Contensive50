@@ -628,7 +628,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="TransactionTickCount"></param>
         ''' <param name="SQL"></param>
         Private Sub saveSlowQueryLog(ByVal TransactionTickCount As Integer, ByVal SQL As String)
-            cpCore.appendLogWithLegacyRow(cpCore.serverConfig.appConfig.name, "query time  " & genericController.GetIntegerString(TransactionTickCount, 7) & "ms: " & SQL, "dll", "cpCoreClass", "csv_ExecuteSQL", 0, "", SQL, False, True, "", "Performance", "SlowSQL")
+            logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "query time  " & genericController.GetIntegerString(TransactionTickCount, 7) & "ms: " & SQL, "dll", "cpCoreClass", "csv_ExecuteSQL", 0, "", SQL, False, True, "", "Performance", "SlowSQL")
         End Sub
         '
         '====================================================================================================
@@ -640,7 +640,7 @@ Namespace Contensive.Core.Controllers
             If Not String.IsNullOrEmpty(LogEntry) Then
                 Dim Message As String = LogEntry.Replace(vbCr, "")
                 Message = Message.Replace(vbLf, "")
-                cpCore.log_appendLog(Message, "DbTransactions")
+                logController.log_appendLog(cpCore, Message, "DbTransactions")
             End If
         End Sub
         '
