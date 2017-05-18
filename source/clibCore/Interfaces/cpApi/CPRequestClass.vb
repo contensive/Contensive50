@@ -58,7 +58,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property BrowserIsIE() As Boolean 'Inherits BaseClasses.CPRequestBaseClass.BrowserIsIE
             Get
                 If True Then
-                    Return cpCore.visit_browserIsIE
+                    Return cpCore.visit.visit_browserIsIE
                 Else
                     Return False
                 End If
@@ -68,7 +68,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property BrowserIsMac() As Boolean 'Inherits BaseClasses.CPRequestBaseClass.BrowserIsMac
             Get
                 If True Then
-                    Return cpCore.visit_browserIsMac
+                    Return cpCore.visit.visit_browserIsMac
                 Else
                     Return False
                 End If
@@ -78,7 +78,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property BrowserIsMobile() As Boolean 'Inherits BaseClasses.CPRequestBaseClass.BrowserIsMobile
             Get
                 If True Then
-                    Return cpCore.visit_browserIsMobile
+                    Return cpCore.visit.visit_browserIsMobile
                 Else
                     Return False
                 End If
@@ -88,7 +88,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property BrowserIsWindows() As Boolean 'Inherits BaseClasses.CPRequestBaseClass.BrowserIsWindows
             Get
                 If True Then
-                    Return cpCore.visit_browserIsWindows
+                    Return cpCore.visit.visit_browserIsWindows
                 Else
                     Return False
                 End If
@@ -98,7 +98,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property BrowserVersion() As String 'Inherits BaseClasses.CPRequestBaseClass.BrowserVersion
             Get
                 If True Then
-                    Return cpCore.visit_browserVersion
+                    Return cpCore.visit.visit_browserVersion
                 Else
                     Return ""
                 End If
@@ -143,7 +143,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property FormAction() As String 'Inherits BaseClasses.CPRequestBaseClass.FormAction
             Get
                 If True Then
-                    Return cpCore.webServerIO_ServerFormActionURL
+                    Return cpCore.webServerIO.webServerIO_ServerFormActionURL
                 Else
                     Return ""
                 End If
@@ -253,7 +253,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Link() As String 'Inherits BaseClasses.CPRequestBaseClass.Link
             Get
                 If True Then
-                    Return cpCore.webServerIO_ServerLink
+                    Return cpCore.webServerIO.webServerIO_ServerLink
                 Else
                     Return ""
                 End If
@@ -263,7 +263,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property LinkForwardSource() As String 'Inherits BaseClasses.CPRequestBaseClass.LinkForwardSource
             Get
                 If True Then
-                    Return cpCore.webServerIO_LinkForwardSource
+                    Return cpCore.webServerIO.webServerIO_LinkForwardSource
                 Else
                     Return ""
                 End If
@@ -283,7 +283,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Page() As String 'Inherits BaseClasses.CPRequestBaseClass.Page
             Get
                 If True Then
-                    Return cpCore.webServerIO_requestPage
+                    Return cpCore.webServerIO.webServerIO_requestPage
                 Else
                     Return ""
                 End If
@@ -293,7 +293,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Path() As String 'Inherits BaseClasses.CPRequestBaseClass.Path
             Get
                 If True Then
-                    Return cpCore.webServerIO_requestPath
+                    Return cpCore.webServerIO.webServerIO_requestPath
                 Else
                     Return ""
                 End If
@@ -313,7 +313,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Protocol() As String 'Inherits BaseClasses.CPRequestBaseClass.Protocol
             Get
                 If True Then
-                    Return cpCore.webServerIO_requestProtocol
+                    Return cpCore.webServerIO.webServerIO_requestProtocol
                 Else
                     Return ""
                 End If
@@ -333,7 +333,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Referer() As String 'Inherits BaseClasses.CPRequestBaseClass.Referer
             Get
                 If True Then
-                    Return cpCore.webServerIO_requestReferer
+                    Return cpCore.webServerIO.webServerIO_requestReferer
                 Else
                     Return ""
                 End If

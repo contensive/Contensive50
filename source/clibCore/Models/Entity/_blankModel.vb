@@ -11,37 +11,57 @@ Imports Newtonsoft.Json
 Namespace Contensive.Core.Models.Entity
     '
     '====================================================================================================
-    ' simple entity model pattern
+    ' entity model pattern
     '   factory pattern load because if a record is not found, must rturn nothing
-    '   new() - to allow deserialization (so all methods must pass in cp)
-    '   create( cp, id ) - to loads instance properties
-    '   saveObject( cp ) - saves instance properties
+    '   new() - empty constructor to allow deserialization
+    '   saveObject() - saves instance properties (nonstatic method)
+    '   create() - loads instance properties and returns a model 
+    '   delete() - deletes the record that matches the argument
+    '   getObjectList() - a pattern for creating model lists.
+    '   invalidateFIELDNAMEcache() - method to invalide the model cache. One per cache
+    '
+    '	1) set the primary content name in const cnPrimaryContent. avoid constants Like cnAddons used outside model
+    '	2) find-And-replace "_blankModel" with the name for this model
+    '	3) when adding model fields, add in three places: the Public Property, the saveObject(), the loadObject()
+    '	4) when adding create() methods to support other fields/combinations of fields, 
+    '       - add a secondary cache For that new create method argument in loadObjec()
+    '       - add it to the injected cachename list in loadObject()
+    '       - add an invalidate
+    '
+    ' Model Caching
+    '   caching applies to model objects only, not lists of models (for now)
+    '       - this is because of the challenge of invalidating the list object when individual records are added or deleted
+    '
+    '   a model should have 1 primary cache object which stores the data and can have other secondary cacheObjects which do not hold data
+    '    the cacheName of the 'primary' cacheObject for models and db records (cacheNamePrefix + ".id." + #id)
+    '    'secondary' cacheName is (cacheNamePrefix + . + fieldName + . + #)
+    '
+    '   cacheobjects can be used to hold data (primary cacheobjects), or to hold only metadata (secondary cacheobjects)
+    '       - primary cacheobjects are like 'personModel.id.99' that holds the model for id=99
+    '           - it is primary because the .primaryobject is null
+    '           - invalidationData. This cacheobject is invalid after this datetime
+    '           - dependentobjectlist() - this object is invalid if any of those objects are invalid
+    '       - secondary cachobjects are like 'person.ccguid.12345678'. It does not hold data, just a reference to the primary cacheobject
+    '
+    '   cacheNames spaces are replaced with underscores, so "addon collections" should be addon_collections
+    '
+    '   cacheNames that match content names are treated as caches of "any" record in the content, so invalidating "people" can be used to invalidate
+    '       any non-specific cache in the people table, by including "people" as a dependant cachename. the "people" cachename should not clear
+    '       specific people caches, like people.id.99, but can be used to clear lists of records like "staff_list_group"
+    '       - this can be used as a fallback strategy to cache record lists: a remote method list can be cached with a dependancy on "add-ons".
+    '       - models should always clear this content name cache entry on all cache clears
+    '
+    '   when a model is created, the code first attempts to read the model's cacheobject. if it fails, it builds it and saves the cache object and tags
+    '       - when building the model, is writes object to the primary cacheobject, and writes all the secondaries to be used
+    '       - when building the model, if a database record is opened, a dependantObject Tag is created for the tablename+'id'+id
+    '       - when building the model, if another model is added, that model returns its cachenames in the cacheNameList to be added as dependentObjects
+    '
     '
     Public Class _blankModel
         '
         '-- const
-        Public Const cnPrimaryContent As String = "" '<------ set content name
-        Private Const cacheNamePrefix As String = "" '<------ set to unique name, maybe db table name or if complex object a unique name for this model
-        '
-        ' cache
-        '   caching applies to model objects only, not lists of models (for now)
-        '       - this is because of the challenge of invalidating the list object when individual records are added or deleted
-        '
-        '   a model should have 1 primary cache object which stores the data and can have other secondary cacheObjects which do not hold data
-        '    the cacheName of the 'primary' cacheObject for models and db records (cacheNamePrefix + ".id." + #id)
-        '    'secondary' cacheName is (cacheNamePrefix + . + fieldName + . + #)
-        '
-        '   cacheobjects can be used to hold data (primary cacheobjects), or to hold only metadata (secondary cacheobjects)
-        '       - primary cacheobjects are like 'personModel.id.99' that holds the model for id=99
-        '           - it is primary because the .primaryobject is null
-        '           - invalidationData. This cacheobject is invalid after this datetime
-        '           - dependentobjectlist() - this object is invalid if any of those objects are invalid
-        '       - secondary cachobjects are like 'person.ccguid.12345678'. It does not hold data, just a reference to the primary cacheobject
-        '
-        '   when a model is created, the code first attempts to read the model's cacheobject. if it fails, it builds it and saves the cache object and tags
-        '       - when building the model, is writes object to the primary cacheobject, and writes all the secondaries to be used
-        '       - when building the model, if a database record is opened, a dependantObject Tag is created for the tablename+'id'+id
-        '       - when building the model, if another model is added, that models cacheObject name is added to the dependentObjectList
+        Public Const primaryContentName As String = "" '<------ set content name
+        Private Const primaryContentTableName As String = "" '<------ set to tablename for the primary content (used for cache names)
         '
         Private cacheName As String = ""
         '
@@ -70,10 +90,6 @@ Namespace Contensive.Core.Models.Entity
             '
         End Sub
         '
-        Private Shared Function getCacheKeySuffix(fieldName As String, fieldValue As String) As String
-            Return ("." & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
-        End Function
-        '
         '====================================================================================================
         ''' <summary>
         ''' return a new model with the data selected. All cacheNames related to the object will be added to the cacheNameList.
@@ -85,14 +101,10 @@ Namespace Contensive.Core.Models.Entity
             Dim result As _blankModel = Nothing
             Try
                 If recordId > 0 Then
-                    Dim cacheName As String = GetType(_blankModel).FullName & getCacheKeySuffix("id", recordId.ToString())
+                    Dim cacheName As String = GetType(_blankModel).FullName & getCacheName("id", recordId.ToString())
                     result = cpCore.cache.getObject(Of _blankModel)(cacheName)
                     If (result Is Nothing) Then
-                        result = loadObject(cpCore, "id=" & recordId.ToString())
-                    End If
-                    If (result IsNot Nothing) Then
-                        cacheNameList.Add(GetType(_blankModel).FullName & getCacheKeySuffix("id", result.id.ToString()))
-                        cacheNameList.Add(GetType(_blankModel).FullName & getCacheKeySuffix("ccguid", result.guid))
+                        result = loadObject(cpCore, "id=" & recordId.ToString(), cacheNameList)
                     End If
                 End If
             Catch ex As Exception
@@ -112,14 +124,10 @@ Namespace Contensive.Core.Models.Entity
             Dim result As _blankModel = Nothing
             Try
                 If Not String.IsNullOrEmpty(recordGuid) Then
-                    Dim cacheName As String = GetType(_blankModel).FullName & getCacheKeySuffix("ccguid", recordGuid)
+                    Dim cacheName As String = GetType(_blankModel).FullName & getCacheName("ccguid", recordGuid)
                     result = cpCore.cache.getObject(Of _blankModel)(cacheName)
                     If (result Is Nothing) Then
-                        result = loadObject(cpCore, "ccGuid=" & cpCore.db.encodeSQLText(recordGuid))
-                    End If
-                    If (result IsNot Nothing) Then
-                        cacheNameList.Add(GetType(_blankModel).FullName & getCacheKeySuffix("id", result.id.ToString()))
-                        cacheNameList.Add(GetType(_blankModel).FullName & getCacheKeySuffix("ccguid", result.guid))
+                        result = loadObject(cpCore, "ccGuid=" & cpCore.db.encodeSQLText(recordGuid), cacheNameList)
                     End If
                 End If
             Catch ex As Exception
@@ -135,18 +143,32 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <param name="sqlCriteria"></param>
-        Private Shared Function loadObject(cpCore As coreClass, sqlCriteria As String) As _blankModel
+        Private Shared Function loadObject(cpCore As coreClass, sqlCriteria As String, ByRef cacheNameList As List(Of String)) As _blankModel
             Dim result As _blankModel = Nothing
             Try
                 Dim cs As New csController(cpCore)
-                If cs.open(cnPrimaryContent, sqlCriteria) Then
+                If cs.open(primaryContentName, sqlCriteria) Then
                     result = New _blankModel
                     With result
+                        '
+                        ' -- populate result model
                         .id = cs.getInteger("id")
                         .name = cs.getText("name")
                         .guid = cs.getText("ccGuid")
                         .createKey = cs.getInteger("createKey")
                     End With
+                    If (result IsNot Nothing) Then
+                        '
+                        ' -- set primary and secondary caches
+                        ' -- add all cachenames to the injected cachenamelist
+                        Dim cacheName0 As String = getCacheName("id", result.id.ToString())
+                        cacheNameList.Add(cacheName0)
+                        cpCore.cache.setObject(cacheName0, result)
+                        '
+                        Dim cacheName1 As String = getCacheName("ccguid", result.guid)
+                        cacheNameList.Add(cacheName1)
+                        cpCore.cache.setObject(cacheName1, Nothing, cacheName1)
+                    End If
                 End If
                 Call cs.Close()
             Catch ex As Exception
@@ -157,21 +179,25 @@ Namespace Contensive.Core.Models.Entity
         End Function
         '
         '====================================================================================================
-        '
+        ''' <summary>
+        ''' save the instance properties to a record with matching id. If id is not provided, a new record is created.
+        ''' </summary>
+        ''' <param name="cpCore"></param>
+        ''' <returns></returns>
         Public Function saveObject(cpCore As coreClass) As Integer
             Try
                 Dim cs As New csController(cpCore)
                 If (id > 0) Then
-                    If Not cs.open(cnPrimaryContent, "id=" & id) Then
+                    If Not cs.open(primaryContentName, "id=" & id) Then
                         id = 0
                         cs.Close()
-                        Throw New ApplicationException("Unable to open record in content [" & cnPrimaryContent & "], with id [" & id & "]")
+                        Throw New ApplicationException("Unable to open record in content [" & primaryContentName & "], with id [" & id & "]")
                     End If
                 Else
-                    If Not cs.Insert(cnPrimaryContent) Then
+                    If Not cs.Insert(primaryContentName) Then
                         cs.Close()
                         id = 0
-                        Throw New ApplicationException("Unable to insert record in content [" & cnPrimaryContent & "]")
+                        Throw New ApplicationException("Unable to insert record in content [" & primaryContentName & "]")
                     End If
                 End If
                 If cs.ok() Then
@@ -181,10 +207,10 @@ Namespace Contensive.Core.Models.Entity
                     Call cs.SetField("createKey", createKey.ToString())
                 End If
                 Call cs.Close()
-                Dim primaryKey As String = GetType(_blankModel).FullName & getCacheKeySuffix("id", id.ToString)
-                cpCore.cache.setObject(primaryKey, Me)
-
-                Dim secondaryKey As String = GetType(_blankModel).FullName & getCacheKeySuffix("ccguid", guid)
+                '
+                ' -- invalidate objects
+                cpCore.cache.invalidateObject(getCacheName("id", id.ToString))
+                cpCore.cache.invalidateObject(getCacheName("ccguid", guid))
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
                 Throw
@@ -194,14 +220,14 @@ Namespace Contensive.Core.Models.Entity
         '
         '====================================================================================================
         ''' <summary>
-        ''' delete an existing object
+        ''' delete an existing database record
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <param name="recordId"></param>
         Public Shared Sub delete(cpCore As coreClass, recordId As Integer)
             Try
                 If (recordId > 0) Then
-                    cpCore.db.deleteContentRecords(cnPrimaryContent, "id=" & recordId.ToString)
+                    cpCore.db.deleteContentRecords(primaryContentName, "id=" & recordId.ToString)
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -211,14 +237,14 @@ Namespace Contensive.Core.Models.Entity
         '
         '====================================================================================================
         ''' <summary>
-        ''' delete an existing object
+        ''' delete an existing database record
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <param name="recordId"></param>
         Public Shared Sub delete(cpCore As coreClass, guid As String)
             Try
                 If (Not String.IsNullOrEmpty(guid)) Then
-                    cpCore.db.deleteContentRecords(cnPrimaryContent, "(ccguid=" & cpCore.db.encodeSQLText(guid) & ")")
+                    cpCore.db.deleteContentRecords(primaryContentName, "(ccguid=" & cpCore.db.encodeSQLText(guid) & ")")
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -238,7 +264,7 @@ Namespace Contensive.Core.Models.Entity
             Try
                 Dim cs As New csController(cpCore)
                 Dim ignoreCacheNames As New List(Of String)
-                If (cs.open(cnPrimaryContent, "(someCriteria=" & someCriteria & ")", "name", True, "id")) Then
+                If (cs.open(primaryContentName, "(someCriteria=" & someCriteria & ")", "name", True, "id")) Then
                     Dim instance As _blankModel
                     Do
                         instance = _blankModel.create(cpCore, cs.getInteger("id"), ignoreCacheNames)
@@ -253,6 +279,44 @@ Namespace Contensive.Core.Models.Entity
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return result
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' invalidate the primary key (which depends on all secondary keys)
+        ''' </summary>
+        ''' <param name="cpCore"></param>
+        ''' <param name="recordId"></param>
+        Public Shared Sub invalidateIdCache(cpCore As coreClass, recordId As Integer)
+            cpCore.cache.invalidateObject(getCacheName("id", recordId.ToString))
+            '
+            ' -- always clear the cache with the content name
+            cpCore.cache.invalidateObject(primaryContentName)
+        End Sub
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' invalidate a secondary key (ccGuid field).
+        ''' </summary>
+        ''' <param name="cpCore"></param>
+        ''' <param name="guid"></param>
+        Public Shared Sub invalidateGuidCache(cpCore As coreClass, guid As String)
+            cpCore.cache.invalidateObject(getCacheName("ccguid", guid))
+            '
+            ' -- always clear the cache with the content name
+            cpCore.cache.invalidateObject(primaryContentName)
+        End Sub
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' produce a standard format cachename for this model
+        ''' </summary>
+        ''' <param name="fieldName"></param>
+        ''' <param name="fieldValue"></param>
+        ''' <returns></returns>
+        Private Shared Function getCacheName(fieldName As String, fieldValue As String) As String
+            Return (primaryContentTableName & "." & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
+            'Return (GetType(_blankModel).FullName & "." & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
         End Function
     End Class
 End Namespace

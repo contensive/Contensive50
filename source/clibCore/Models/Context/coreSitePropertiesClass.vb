@@ -326,7 +326,7 @@ Namespace Contensive.Core.Models.Context
         Public ReadOnly Property emailAdmin() As String
             Get
                 If Not _EmailAdmin_LocalLoaded Then
-                    _EmailAdmin_Local = getText("main_EmailAdmin", "webmaster@" & cpCore.webServerIO_requestDomain)
+                    _EmailAdmin_Local = getText("main_EmailAdmin", "webmaster@" & cpCore.webServerIO.webServerIO_requestDomain)
                     _EmailAdmin_LocalLoaded = True
                 End If
                 Return _EmailAdmin_Local

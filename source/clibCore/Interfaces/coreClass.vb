@@ -8,6 +8,9 @@ Imports HttpMultipartParser
 Imports Contensive.BaseClasses
 Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
+Imports Contensive.Core.Models
+Imports Contensive.Core.Models.Context
+Imports Contensive.Core.Models.Entity
 '
 Namespace Contensive.Core
     Public Class coreClass
@@ -27,12 +30,22 @@ Namespace Contensive.Core
         ' -- shared globals
         '
         Public serverConfig As Models.Entity.serverConfigModel
-        Public docOpen As Boolean = False                                   ' when false, routines should not add to the output and immediately exit
         '
         ' -- application storage
         '
         Friend deleteOnDisposeFileList As New List(Of String)               ' tmp file list of files that need to be deleted during dispose
         Friend exceptionList As List(Of String)                             ' exceptions collected during document construction
+        '
+        '===================================================================================================
+        Public ReadOnly Property visit As visitModel
+            Get
+                If (_visit Is Nothing) Then
+                    _visit = New visitModel(Me)
+                End If
+                Return _visit
+            End Get
+        End Property
+        Private _visit As visitModel
         '
         '===================================================================================================
         ''' <summary>
@@ -217,15 +230,11 @@ Namespace Contensive.Core
                     If serverConfig.isLocalFileSystem Then
                         '
                         ' local server -- everything is ephemeral
-                        '
                         _appRootFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.appRootFilesPath))
-                        '_appRootFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(serverconfig.appConfig.appRootFilesPath))
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
-                        '
                         _appRootFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.activeSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.appRootFilesPath))
-                        '_appRootFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.activeSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(serverconfig.appConfig.appRootFilesPath))
                     End If
                 End If
                 Return _appRootFiles
@@ -246,12 +255,10 @@ Namespace Contensive.Core
                     If serverConfig.isLocalFileSystem Then
                         '
                         ' local server -- everything is ephemeral
-                        '
                         _serverFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, "")
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
-                        '
                         _serverFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, "")
                     End If
                 End If
@@ -273,15 +280,11 @@ Namespace Contensive.Core
                     If serverConfig.isLocalFileSystem Then
                         '
                         ' local server -- everything is ephemeral
-                        '
                         _privateFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.privateFilesPath))
-                        '_privateFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(serverconfig.appConfig.privateFilesPath))
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
-                        '
                         _privateFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.privateFilesPath))
-                        '_privateFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(serverconfig.appConfig.privateFilesPath))
                     End If
                 End If
                 Return _privateFiles
@@ -341,15 +344,11 @@ Namespace Contensive.Core
                     If serverConfig.isLocalFileSystem Then
                         '
                         ' local server -- everything is ephemeral
-                        '
                         _cdnFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.cdnFilesPath))
-                        '_cdnFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(serverconfig.appConfig.cdnFilesPath))
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
-                        '
                         _cdnFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.cdnFilesPath))
-                        '_cdnFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(serverconfig.appConfig.cdnFilesPath))
                     End If
                 End If
                 Return _cdnFiles
@@ -475,25 +474,6 @@ Namespace Contensive.Core
             End Get
         End Property
         Private _cache As Controllers.cacheController = Nothing
-        ''
-        ''===================================================================================================
-        '''' <summary>
-        '''' returns the clusterServices object.  This property is public, but the constuctor is not. This property may not be available for appAccess (to limit access to only  this app). 
-        '''' </summary>
-        '''' <value></value>
-        '''' <returns></returns>
-        '''' <remarks>_cluster created during constructor.</remarks>
-        'Public ReadOnly Property cluster() As coreClusterClass
-        '    Get
-        '        If (_cluster Is Nothing) Then
-        '            _cluster = New coreClusterClass(Me)
-        '        End If
-        '        Return _cluster
-        '    End Get
-        'End Property
-        'Private _cluster As coreClusterClass
-        '
-        '===================================================================================================
         '
         Public ReadOnly Property metaData As coreMetaDataClass
             Get
@@ -529,7 +509,7 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>_app created duirng init(), after cp.context() is loaded</remarks>
-        Public ReadOnly Property dbEngine As dbEngineController
+        Public ReadOnly Property dbServer As dbEngineController
             Get
                 If (_dbEngine Is Nothing) Then
                     _dbEngine = New dbEngineController(Me)
@@ -618,17 +598,7 @@ Namespace Contensive.Core
         End Sub
         '
         '===================================================================================================
-        '-----------------------------------------------------------------------
-        ' responseBuffer, legacy system for holding values 'written' instead of concatinated in return arguments
-        '-----------------------------------------------------------------------
         '
-        Public docBufferEnabled As Boolean = True          ' when true (default), stream is buffered until page is done
-        Public _docBuffer As String = ""                   ' if any method calls writeAltBuffer, string concatinates here. If this is not empty at exit, it is used instead of returned string
-        Public _docBufferRedirect As String = ""
-        Public _docBufferContentType As String = ""
-        Public _docBufferCookies As String = ""
-        Public _docBufferResponseHeader As String = ""
-        Public _docBufferResponseStatus As String = ""
         '
         Const pageManager_quickEdit_fpo = "<quickeditor>"
         Private pageManager_quickEdit_copy As String = ""
@@ -655,41 +625,6 @@ Namespace Contensive.Core
         '-----------------------------------------------------------------------
         '
         Private menu_MenuSystemCloseCount As Integer = 0
-        '
-        '-----------------------------------------------------------------------
-        ' ----- Member Functionality
-        '-----------------------------------------------------------------------
-        '
-        Public webServerIO_MemberAction As Integer = 0              ' action to be performed during init
-        '
-        Public webServerIO_AdminMessage As String = ""          ' For more information message
-        '
-        Public visit_initialized As Boolean = False                ' true when visit has been initialized
-        '
-        Public visit_Id As Integer = 0                      ' Index into the visits table
-        Public visit_name As String = ""                  '
-        Public visit_startDateValue As Integer = 0          ' Long Integer representing date
-        Public visit_startTime As Date = Date.MinValue            ' Date/Time when visit started
-        Public visit_lastTime As Date = Date.MinValue                ' The date/time when the last page was created
-        Public visit_cookieSupport As Boolean = False        ' true if this visit has cookie support
-        Public visit_pages As Integer = 0                   ' how many pages have been viewed this visit
-        Public visit_referer As String = ""               ' the referer to this site
-        Public visit_refererHost As String = ""           '   derived during init
-        Public visit_refererPathPage As String = ""       '   derived during init
-        Public visit_loginAttempts As Integer = 0           ' number of times this visit/visitor has attempted member-login this visit
-        Public visit_isAuthenticated As Boolean = False
-        Public visit_browserIsIE As Boolean = False          ' if detail includes msie
-        Public visit_browserIsNS As Boolean = False          ' if detail or detailtail is netscape
-        Public visit_browserVersion As String = ""
-        Public visit_browserIsWindows As Boolean = False    ' if any browser detail includes "windows"
-        Public visit_browserIsMac As Boolean = False        ' if any browser deail includes "mac"
-        Public visit_browserIsLinux As Boolean = False      ' not sure
-        Public visit_browserIsMobile As Boolean = False     ' if a WAP Mobile device
-        Public visit_excludeFromAnalytics As Boolean = False ' if true, this visit is excluded from all reporting, like page hit notification, graphic, etc.
-        Public visit_isBot As Boolean = False               '
-        Public visit_isBadBot As Boolean = False            '
-        Public visit_stateOK As Boolean = False             ' if false, page is out of state (sequence)
-        Public visit_timeToLastHit As Integer = 0          ' seconds from first hit to last hit
         '
         '-----------------------------------------------------------------------
         ' ----- visitor (computer) values
@@ -732,16 +667,13 @@ Namespace Contensive.Core
         Public debug_iUserError As String = ""                              ' User Error String
         Public html_PageErrorWithoutCsv As Boolean = False  ' if true, the error occurred before Csv was available and main_TrapLogMessage needs to be saved and popedup
         Public main_TrapLogMessage As String = ""        ' The content of the current traplog (keep for popups if no Csv)
-        Public webServerIO_PageExcludeFromAnalytics As Boolean = False    ' For this page - true for remote methods and ajax
         Public main_ClosePageCounter As Integer = 0
-        Public webServerIO_BlockClosePageCopyright As Boolean = False ' if true, block the copyright message
         Public html_BlockClosePageLink As Boolean = False      ' if true,block the href to contensive
         '
         ' ------------------------------------------------------------------------
         ' ----- Storage that applies only to this one page
         ' ------------------------------------------------------------------------
         '
-        Public webServerIO_PageTestPointPrinting As Boolean = False    ' if true, send main_TestPoint messages to the stream
         Public main_ClosePageHTML As String = ""             ' Anything that needs to be written to the Page during main_GetClosePage
         '
         Public main_testPointMessage As String = ""          '
@@ -751,47 +683,14 @@ Namespace Contensive.Core
         '------------------------------------------------------------------------
         '
         '
-        Public webServerIO_ServerLink As String = ""                 ' The current URL, from protocol to end of quesrystring
-        'Public web.requestLinkSource As String = ""           ' The main_ServerLink, except when LinkAlias, then this is the original URL
-        Public webServerIO_requestVirtualFilePath As String = ""          ' The Virtual path for the site (host+main_ServerVirtualPath+"/" is site URI)
-        'Private main_defaultDomainList As String = ""         ' the domain list from the application manager,
-        '   The comma separated list of valid domains from the Contensive Server
         Public domains_ServerDomainPrimary As String = ""        ' The first entry in the main_defaultDomainList
-        '
-        Public webServerIO_requestDomain As String = ""               ' This is the proper domain for the site (may not always match the current SERVER_NAME
-        '   A - members.eatturkey.com
-        '   B - members.eatturkey.com
-        Public webServerIO_requestPath As String = ""                 ' The path part of the current URI
-        '   A - /ntf/thing/
-        '   B - /thing/
-        Public webServerIO_requestPage As String = ""                 ' The page part of the current URI
-        '   A - index.asp
-        '   B - index.asp
-        'Public web_requestAppPath As String = ""              ' The path from the AppRootPath of the current URI (working.Kma.net/ntf/index.asp is thing/)
-        '   A - thing/
-        '   B - thing/
-        'Public app.siteProperty_publicFileContentPathPrefix As String = ""             ' The path to the sites file storage
-        '   A - /ntf/files/
-        '   B - /ntf/files/
-        ' v5, , used for both file save/read path and url, between ./public and contentFilepathPage (table/field/etc)
-        '       - stored in site property
-        '      - for legacy compatibility, /appName/files/ - because many sites have this hardcoded into the urls
-        '      - for new sites, /contentFiles/
-        Public webServerIO_requestSecureURLRoot As String = ""        ' The URL to the root of the secure area for this site
 
         Public main_ServerFormOriginal As String = ""        ' Original String from an HTML form request - includes passwords
-        '
-        Public webServerIO_ServerFormActionURL As String = ""        ' The Action for all internal forms, if not set, default
         '
         'Public app.siteProperty_ServerPageDefault As String = ""          ' Set from site property during init, the page assumed for URLs with no page given
         '
         Public pageManager_printVersion As Boolean = False
         '
-        Public webServerIO_requestContentWatchPrefix As String = ""   ' The different between the URL and the main_ContentWatch Pathpage
-        '
-        Public webServerIO_requestProtocol As String = ""             ' Set in InitASPEnvironment, http or https
-        ' To set, the main_defaultDomainList (in Application Manager) should have the primary domain first, then include * as a domain name
-        ' if false, any domain used that is not in the domain list causes a redirect to the first domain name
         '
         '-----------------------------------------------------------------------
         '   Physical machine properties, set in InitASPEnvironment
@@ -800,23 +699,14 @@ Namespace Contensive.Core
         Public main_AppPath As String = ""                    ' The path to the application, used for cclib-path, etc.
         '
         '-----------------------------------------------------------------------
-        '   Link Forward publics, exposed so handling page can print error message
-        '-----------------------------------------------------------------------
-        '
-        Public webServerIO_LinkForwardSource As String = ""          ' main_ServerPathPage -- set during init
-        Public webServerIO_LinkForwardError As String = ""           ' always 404
-        '
-        '-----------------------------------------------------------------------
         '   QueryString, Form and cookie Processing variables
         '-----------------------------------------------------------------------
         '
         Public main_JavaStreamHolder() As String
         Public main_JavaStreamSize As Integer = 0
         Public main_JavaStreamCount As Integer = 0
-        Const main_JavaStreamChunk = 100
-        Public webServerIO_OutStreamDevice As Integer = 0
+        Public Const main_JavaStreamChunk = 100
         Public Const main_OutStreamStandard = 0
-        Public Const webServerIO_OutStreamJavaScript = 1
         Public main_IsStreamWritten As Boolean = False       ' true when anything has been writeAltBuffered.
         '
         '-----------------------------------------------------------------------
@@ -826,8 +716,6 @@ Namespace Contensive.Core
         'Public main_ApplicationName As String = "" ' ----- do not use ----- use appEnvironment.name
         'Public main_ApplicationStatus as integer = 0           ' set in init(), application status
         'Private main_appNameCookiePrefix As String = ""      ' added to cookie to prevent cross-site confusion.
-        Private Const main_cookieNameVisit = "visit"
-        Private Const main_cookieNameVisitor = "visitor"
         '
         Public main_ImportXMLFile As String = ""      ' filename of XML import file
         Public main_ExportXMLFile As String = ""      ' filename of XML export file
@@ -835,9 +723,6 @@ Namespace Contensive.Core
         '-----------------------------------------------------------------------
         ' ----- Compatibility
         '-----------------------------------------------------------------------
-        '
-        Public webServerIO_requestPageReferer As String = ""                    ' replaced by main_ServerReferrer
-        Public webServerIO_requestReferer As String = ""
         'Private main_OptionKeyString As String = ""
         Private main_OptionKeyLicenseType As Integer = 0
         Private main_OptionKeyTraceTimer As Boolean = False
@@ -860,24 +745,6 @@ Namespace Contensive.Core
         Public main_ReadStreamJSProcess As Boolean = False             ' When true, the Request is coming from the process of a JS form (aggregate scripts)
         '                                                   '       1) store the QS and Form
         '       2) redirect to the referrer
-        Public webServerIO_ReadStreamJSForm As Boolean = False                  ' When true, the request comes from a browser handling a JSPage script line
-        '       Stream is set up from
-        '           1) the referrer
-        '           2) QS or Form from the last ProcessJSForm call
-        '       The stream delivers javascript that writes the stream out
-        '       !! main_GetClosePage is requred to deliver the javascript
-        '
-        '------------------------------------------------------------------------
-        '
-        Private _webServerIO_RefreshQueryString As String = ""      ' the querystring required to return to the current state (perform a refresh)
-        Public webServerIO_AllowCookielessDetection As Boolean = False
-        '
-        '------------------------------------------------------------------------
-        ' ----- Automatic redirects
-        '------------------------------------------------------------------------
-        '
-        Private webServerIO_RedirectContentID As Integer = 0
-        Private webServerIO_RedirectRecordID As Integer = 0
         '
         '----- testing
         '
@@ -902,7 +769,6 @@ Namespace Contensive.Core
         Public main_MetaContent_Description As String = ""
         Public main_MetaContent_OtherHeadTags As String = ""
         Public main_MetaContent_KeyWordList As String = ""
-        Public webServerIO_response_NoFollow As Boolean = False   ' when set, Meta no follow is added
         Public main_MetaContent_StyleSheetTags As String = ""
         Public main_MetaContent_TemplateStyleSheetTag As String = ""
         Public main_MetaContent_SharedStyleIDList As String = ""
@@ -1062,13 +928,13 @@ Namespace Contensive.Core
         '
         ' block of js code that goes into a script tag
         '
-        Private Structure main_HeadScriptType
+        Public Structure main_HeadScriptType
             Dim IsLink As Boolean
             Dim Text As String
             Dim addedByMessage As String
         End Structure
-        Private main_HeadScriptCnt As Integer = 0
-        Private main_HeadScripts() As main_HeadScriptType
+        Public main_HeadScriptCnt As Integer = 0
+        Public main_HeadScripts() As main_HeadScriptType
         '
         ' Page Bake Header
         '
@@ -5348,7 +5214,7 @@ ErrorTrap:
         '
         ' ----- temp solution to convert error reporting without spending the time right now
         '
-        Private Sub handleLegacyError25(MethodName As String, ErrDescription As String)
+        Friend Sub handleLegacyError25(MethodName As String, ErrDescription As String)
             Throw New ApplicationException(MethodName & ", " & ErrDescription)
         End Sub
         '
@@ -6598,7 +6464,7 @@ ErrorTrap:
                                             '
                                             'hint = hint & ",320"
                                             ListName = csv_GetAddonOption("name", addonOptionString)
-                                            returnValue = returnValue & main_GetChildPageList(ListName, ContextContentName, ContextRecordID, True)
+                                            returnValue = returnValue & pageManager_GetChildPageList(ListName, ContextContentName, ContextRecordID, True)
                                         Case ACTypeTemplateText
                                             '
                                             ' Text Box = copied here from gethtmlbody
@@ -6792,7 +6658,7 @@ ErrorTrap:
                         If genericController.vbInstr(1, Copy, "://") <> 0 Then
                         ElseIf Left(Copy, 1) = "/" Then
                         Else
-                            Copy = webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, Copy)
+                            Copy = webServerIO.webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, Copy)
                         End If
                         Call main_AddHeadScriptLink(Copy, "embedded content")
                         Copy = csv_GetEncodeContent_JSFilename()
@@ -6809,7 +6675,7 @@ ErrorTrap:
                         If genericController.vbInstr(1, Copy, "://") <> 0 Then
                         ElseIf Left(Copy, 1) = "/" Then
                         Else
-                            Copy = webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, Copy)
+                            Copy = webServerIO.webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, Copy)
                         End If
                         Call main_AddStylesheetLink2(Copy, "")
                         Copy = csv_GetEncodeContent_StyleFilenames()
@@ -7521,9 +7387,9 @@ ErrorTrap:
         '
         Public Sub main_RedirectHTTP(ByVal Link As String)
             If Not genericController.isInStr(1, Link, "://") Then
-                Link = webServerIO_requestProtocol & Link
+                Link = webServerIO.webServerIO_requestProtocol & Link
             End If
-            Call webServerIO_Redirect2(Link, "call to main_RedirectHTTP(" & genericController.encodeText(Link) & "), no reason given.", False)
+            Call webServerIO.webServerIO_Redirect2(Link, "call to main_RedirectHTTP(" & genericController.encodeText(Link) & "), no reason given.", False)
         End Sub
         '
         '===========================================================================================
@@ -7531,148 +7397,7 @@ ErrorTrap:
         '===========================================================================================
         '
         Public Sub main_Redirect(ByVal Link As Object)
-            Call webServerIO_Redirect2(genericController.encodeText(Link), "No explaination provided", False)
-        End Sub
-        '
-        '===========================================================================================
-        ' ----- Redirect
-        '
-        '   Link is where you are going
-        '   The Link argument should NOT be encoded. (it should still include spaces)
-        '   Link may be '/index.asp', or 'index.asp' or 'http://www.docmc.main_com/index.asp'
-        '       ShortLink is '/index.asp'
-        '       FullLink is 'http://www.docmc.main_com/index.asp'
-        '===========================================================================================
-        '
-        Public Sub webServerIO_Redirect2(ByVal NonEncodedLink As String, ByVal RedirectReason As String, ByVal IsPageNotFound As Boolean)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Redirect2")
-            '
-            Const rnRedirectCycleFlag = "cycleFlag"
-            '
-            Dim MethodName As String
-            Dim Protocol As String
-            Dim ProtocolEnd As String
-            Dim EncodedLink As String
-            'Dim kmafs As fileSystemClass
-            Dim Copy As String
-            '
-            Dim RedirectLink As String
-            Dim PageNotFoundSource As String
-            Dim ShortLink As String
-            Dim ServerShortLink As String
-            Dim FullLink As String
-            Dim redirectCycles As Integer
-            '
-            MethodName = "main_Redirect2(" & NonEncodedLink & "," & RedirectReason & "," & IsPageNotFound & ")"
-            If docOpen Then
-                redirectCycles = doc_getInteger(rnRedirectCycleFlag)
-                '
-                ' convert link to a long link on this domain
-                '
-                If genericController.vbLCase(Mid(NonEncodedLink, 1, 4)) = "http" Then
-                    FullLink = NonEncodedLink
-                Else
-                    ShortLink = NonEncodedLink
-                    ShortLink = genericController.ConvertLinkToShortLink(ShortLink, webServerIO.requestDomain, webServerIO_requestVirtualFilePath)
-                    ShortLink = genericController.EncodeAppRootPath(ShortLink, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
-                    FullLink = webServerIO_requestProtocol & webServerIO.requestDomain & ShortLink
-                End If
-                If (NonEncodedLink = "") Then
-                    '
-                    ' Link is not valid
-                    '
-                    Call Err.Raise(ignoreInteger, "dll", "Redirect was called with a blank Link. Redirect Reason [" & RedirectReason & "]")
-                    Exit Sub
-                    '
-                    ' changed to main_ServerLinksource because if a redirect is caused by a link forward, and the host page for the iis 404 is
-                    ' the same as the destination of the link forward, this throws an error and does not forward. the only case where main_ServerLinksource is different
-                    ' then main_ServerLink is the linkfforward/linkalias case.
-                    '
-                ElseIf (webServerIO.requestFormString = "") And (webServerIO.requestLinkSource = FullLink) Then
-                    '
-                    ' Loop redirect error, throw trap and block redirect to prevent loop
-                    '
-                    Call Err.Raise(ignoreInteger, "dll", "Redirect was called to the same URL, main_ServerLink is [" & webServerIO_ServerLink & "], main_ServerLinkSource is [" & webServerIO.requestLinkSource & "]. This redirect is only allowed if either the form or querystring has change to prevent cyclic redirects. Redirect Reason [" & RedirectReason & "]")
-                    Exit Sub
-                ElseIf IsPageNotFound Then
-                    '
-                    ' Do a PageNotFound then redirect
-                    '
-                    Call log_appendLogPageNotFound(webServerIO.requestLinkSource)
-                    If ShortLink <> "" Then
-                        Call db.executeSql("Update ccContentWatch set link=null where link=" & db.encodeSQLText(ShortLink))
-                    End If
-                    '
-                    If webServerIO_PageTestPointPrinting Then
-                        '
-                        ' Verbose - do not redirect, just print the link
-                        '
-                        EncodedLink = NonEncodedLink
-                        'EncodedLink = encodeURL(NonEncodedLink)
-                        'writeAltBuffer("<div style=""padding:20px;border:1px dashed black;background-color:white;color:black;"">" & RedirectReason & "<p>Click to continue the redirect to <a href=" & EncodedLink & ">" & EncodeHTML(NonEncodedLink) & "</a>...</p></div>")
-                    Else
-                        '
-                        Call web_setResponseStatus("404 Not Found")
-                        'Call writeAltBuffer("" _
-                        '    & "<html>" _
-                        '    & "<head>" _
-                        '    & "<meta http-equiv=""Refresh"" content=""0; url=" & NonEncodedLink & """>" _
-                        '    & "</head>" _
-                        '    & "<body>" _
-                        '    & "The page you requested could not be found. If you are not automatically forwarded, please click <a href=""" & NonEncodedLink & """>here</a>." _
-                        '    & "</body>" _
-                        '    & "</html>" _
-                        '    & "")
-                    End If
-                Else
-
-                    '
-                    ' Go ahead and redirect
-                    '
-                    Copy = """" & FormatDateTime(app_startTime, vbGeneralDate) & """,""" & webServerIO.requestDomain & """,""" & webServerIO.requestLinkSource & """,""" & NonEncodedLink & """,""" & RedirectReason & """"
-                    logController.log_appendLog(Me, Copy, "performance", "redirects")
-                    '
-                    If webServerIO_PageTestPointPrinting Then
-                        '
-                        ' Verbose - do not redirect, just print the link
-                        '
-
-                        EncodedLink = NonEncodedLink
-                        'EncodedLink = encodeURL(NonEncodedLink)
-                        writeAltBuffer("<div style=""padding:20px;border:1px dashed black;background-color:white;color:black;"">" & RedirectReason & "<p>Click to continue the redirect to <a href=" & EncodedLink & ">" & html.html_EncodeHTML(NonEncodedLink) & "</a>...</p></div>")
-                    Else
-                        '
-                        ' Redirect now
-                        '
-                        Call main_ClearStream()
-                        EncodedLink = genericController.EncodeURL(NonEncodedLink)
-
-                        If (Not webServerIO.iisContext Is Nothing) Then
-                            '
-                            ' redirect and release application. HOWEVER -- the thread will continue so use responseOpen=false to abort as much activity as possible
-                            '
-                            webServerIO.iisContext.Response.Redirect(NonEncodedLink, False)
-                            webServerIO.iisContext.ApplicationInstance.CompleteRequest()
-                        Else
-                            _docBufferRedirect = NonEncodedLink
-                        End If
-                        'responseBufferRedirect = NonEncodedLink
-                    End If
-                End If
-                '
-                ' ----- close the output stream
-                '
-                Call doc_close()
-            End If
-            '
-            ' Edit
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError13(MethodName)
+            Call webServerIO.webServerIO_Redirect2(genericController.encodeText(Link), "No explaination provided", False)
         End Sub
         '
         '========================================================================
@@ -7683,34 +7408,7 @@ ErrorTrap:
             '
             ' 2011/3/11 - just stop future Contensive output, do not end the parent's response object, developer may want to add more
             '
-            docOpen = False
-        End Sub
-        '
-        '========================================================================
-        '   Write to the HTML stream
-        '========================================================================
-        ' refactor -- if this conversion goes correctly, all writeStream will mvoe to teh executeRoute which returns the string 
-        Public Sub writeAltBuffer(ByVal Message As Object)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("WriteStream")
-            '
-            If docOpen Then
-                Select Case webServerIO_OutStreamDevice
-                    Case webServerIO_OutStreamJavaScript
-                        Call webServerIO_JavaStream_Add(genericController.encodeText(Message))
-                    Case Else
-
-                        If (webServerIO.iisContext IsNot Nothing) Then
-                            main_IsStreamWritten = True
-                            Call webServerIO.iisContext.Response.Write(genericController.encodeText(Message))
-                        Else
-                            _docBuffer = _docBuffer & genericController.encodeText(Message)
-                        End If
-                End Select
-            End If
-            '
-            Exit Sub
-ErrorTrap:
-            Call handleLegacyError18("writeAltBuffer")
+            webServerIO.docOpen = False
         End Sub
         '
         '=============================================================================
@@ -7942,7 +7640,7 @@ ErrorTrap:
             '
             ' ----- If not main_PageTestPointPrinting, exit right away
             '
-            If webServerIO_PageTestPointPrinting Then
+            If webServerIO.webServerIO_PageTestPointPrinting Then
                 '
                 ' write to stream
                 '
@@ -7960,7 +7658,7 @@ ErrorTrap:
                 iMessage = genericController.vbReplace(iMessage, vbCrLf, " ")
                 iMessage = genericController.vbReplace(iMessage, vbCr, " ")
                 iMessage = genericController.vbReplace(iMessage, vbLf, " ")
-                iMessage = FormatDateTime(Now, vbShortTime) & vbTab & Format((ElapsedTime), "00.000") & vbTab & visit_Id & vbTab & iMessage
+                iMessage = FormatDateTime(Now, vbShortTime) & vbTab & Format((ElapsedTime), "00.000") & vbTab & visit.visit_Id & vbTab & iMessage
                 '
                 logController.log_appendLog(Me, iMessage, "", "testPoints_" & serverConfig.appConfig.name)
             End If
@@ -8041,7 +7739,7 @@ ErrorTrap:
                             '       if this is a content watch record, check the underlying content for
                             '       inactive or expired before redirecting
                             '
-                            LinkPrefix = webServerIO_requestContentWatchPrefix
+                            LinkPrefix = webServerIO.webServerIO_requestContentWatchPrefix
                             ContentID = (db.cs_getInteger(CSPointer, "ContentID"))
                             HostContentName = metaData.getContentNameByID(ContentID)
                             If (HostContentName = "") Then
@@ -8086,7 +7784,7 @@ ErrorTrap:
                     If db.cs_isFieldSupported(CSPointer, "Clicks") Then
                         Call db.cs_set(CSPointer, "Clicks", (db.cs_getNumber(CSPointer, "Clicks")) + 1)
                     End If
-                    Call webServerIO_Redirect2(LinkPrefix & NonEncodedLink, "Call to " & MethodName & ", no reason given.", False)
+                    Call webServerIO.webServerIO_Redirect2(LinkPrefix & NonEncodedLink, "Call to " & MethodName & ", no reason given.", False)
                     main_RedirectByRecord_ReturnStatus = True
                 End If
             End If
@@ -8873,7 +8571,7 @@ ErrorTrap:
                 If user.isAuthenticatedContentManager() Then
                     main_GetLoginLink = main_GetLoginLink & "<a href=""" & html.html_EncodeHTML(siteProperties.adminURL) & """ target=""_blank"">"
                 Else
-                    Link = webServerIO_requestPage & "?" & web_RefreshQueryString
+                    Link = webServerIO.webServerIO_requestPage & "?" & web_RefreshQueryString
                     Link = genericController.modifyLinkQuery(Link, RequestNameHardCodedPage, HardCodedPageLogin, True)
                     'Link = genericController.modifyLinkQuery(Link, RequestNameInterceptpage, LegacyInterceptPageSNLogin, True)
                     main_GetLoginLink = main_GetLoginLink & "<a href=""" & html.html_EncodeHTML(Link) & """ >"
@@ -9023,7 +8721,7 @@ ErrorTrap:
                         End If
                     End If
                     '
-                    If Not webServerIO_BlockClosePageCopyright Then
+                    If Not webServerIO.webServerIO_BlockClosePageCopyright Then
                         s = s & vbCrLf & vbTab & "<!--" & vbCrLf & vbCrLf & vbTab & "Contensive Framework/" & codeVersion() & ", copyright 1999-2012 Contensive, www.Contensive.com, " & RenderTimeString & vbCrLf & vbCrLf & vbTab & "-->"
                     End If
                     '
@@ -9121,7 +8819,7 @@ ErrorTrap:
                                     If Parts(1) <> "" Then
                                         headTags = headTags & cr & genericController.decodeHtml(Parts(1))
                                     End If
-                                    headTags = headTags & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, Parts(0)) & """ >"
+                                    headTags = headTags & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO.webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, Parts(0)) & """ >"
                                     If Parts(2) <> "" Then
                                         headTags = headTags & cr & genericController.decodeHtml(Parts(2))
                                     End If
@@ -9161,15 +8859,15 @@ ErrorTrap:
                     '
                     ' ----- If javascript stream, output it all now
                     '
-                    If (webServerIO_OutStreamDevice = webServerIO_OutStreamJavaScript) Then
+                    If (webServerIO.webServerIO_OutStreamDevice = webServerIO.webServerIO_OutStreamJavaScript) Then
                         '
                         ' This is a js output stream from a <script src=url></script>
                         ' process everything into a var=msg;document.write(var)
                         ' any js from the page should be added to this group
                         '
-                        Call writeAltBuffer(s)
-                        webServerIO_OutStreamDevice = main_OutStreamStandard
-                        s = webServerIO_JavaStream_Text
+                        Call webServerIO.writeAltBuffer(s)
+                        webServerIO.webServerIO_OutStreamDevice = main_OutStreamStandard
+                        s = webServerIO.webServerIO_JavaStream_Text
                         If JS <> "" Then
                             s = s & vbCrLf & JS
                             JS = ""
@@ -9699,10 +9397,10 @@ ErrorTrap:
                 LinkPanel.Add(FormatDateTime(app_startTime) & " | ")
                 LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""http://support.Contensive.com/"">Support</A> | ")
                 LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html.html_EncodeHTML(siteProperties.adminURL) & """>Admin Home</A> | ")
-                LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html.html_EncodeHTML("http://" & webServerIO_requestDomain) & """>Public Home</A> | ")
+                LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html.html_EncodeHTML("http://" & webServerIO.webServerIO_requestDomain) & """>Public Home</A> | ")
                 LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & html.html_EncodeHTML(siteProperties.adminURL & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
                 If siteProperties.getBoolean("AllowMobileTemplates", False) Then
-                    If visit_browserIsMobile Then
+                    If visit.visit_browserIsMobile Then
                         QS = web_RefreshQueryString
                         QS = genericController.ModifyQueryString(QS, "method", "forcenonmobile")
                         LinkPanel.Add("<a class=""ccAdminLink"" href=""?" & QS & """>Non-Mobile Version</A> | ")
@@ -9815,7 +9513,7 @@ ErrorTrap:
                                 ' Path blocking allowed
                                 '
                                 'OptionsPanel = OptionsPanel & SpanClassAdminSmall & "<LABEL for=""" & TagID & """>"
-                                CS = db.cs_open("Paths", "name=" & db.encodeSQLText(webServerIO_requestPath), , , , , , "ID")
+                                CS = db.cs_open("Paths", "name=" & db.encodeSQLText(webServerIO.webServerIO_requestPath), , , , , , "ID")
                                 If db.cs_ok(CS) Then
                                     PathID = (db.cs_getInteger(CS, "ID"))
                                 End If
@@ -9824,12 +9522,12 @@ ErrorTrap:
                                     '
                                     ' Path is blocked
                                     '
-                                    Tag = html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & webServerIO_requestPath & "] [<a href=""" & html.html_EncodeHTML(siteProperties.adminURL & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & main_GetContentID("paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
+                                    Tag = html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & webServerIO.webServerIO_requestPath & "] [<a href=""" & html.html_EncodeHTML(siteProperties.adminURL & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & main_GetContentID("paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
                                 Else
                                     '
                                     ' Path is not blocked
                                     '
-                                    Tag = html_GetFormInputCheckBox2(TagID, False, TagID) & "&nbsp;Block this path [" & webServerIO_requestPath & "]</LABEL>"
+                                    Tag = html_GetFormInputCheckBox2(TagID, False, TagID) & "&nbsp;Block this path [" & webServerIO.webServerIO_requestPath & "]</LABEL>"
                                 End If
                                 helpLink = ""
                                 'helpLink = main_GetHelpLink(10, "Enable Debugging", "Debugging is a developer only debugging tool. With Debugging enabled, ccLib.TestPoints(...) will print, ErrorTrapping will be displayed, redirections are blocked, and more.")
@@ -9891,7 +9589,7 @@ ErrorTrap:
                     ' Autologin checkbox
                     '
                     If siteProperties.getBoolean("AllowAutoLogin", False) Then
-                        If visit_cookieSupport Then
+                        If visit.visit_cookieSupport Then
                             TagID = "autologin"
                             LoginPanel = LoginPanel & "" _
                                 & cr & "<div class=""ccAdminSmall"">" _
@@ -9946,7 +9644,7 @@ ErrorTrap:
                     LinkPanel.Add(FormatDateTime(app_startTime) & " | ")
                     LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""http: //support.Contensive.com/"">Support</A> | ")
                     LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html.html_EncodeHTML(siteProperties.adminURL) & """>Admin Home</A> | ")
-                    LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html.html_EncodeHTML("http://" & webServerIO_requestDomain) & """>Public Home</A> | ")
+                    LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html.html_EncodeHTML("http://" & webServerIO.webServerIO_requestDomain) & """>Public Home</A> | ")
                     LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & html.html_EncodeHTML(siteProperties.adminURL & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
                     LinkPanel.Add("</span>")
                     '
@@ -9964,12 +9662,12 @@ ErrorTrap:
                     DebugPanel = DebugPanel & main_DebugPanelRow("DOM", "<a class=""ccAdminLink"" href=""/ccLib/clientside/DOMViewer.htm"" target=""_blank"">Click</A>")
                     DebugPanel = DebugPanel & main_DebugPanelRow("Trap Errors", html.html_EncodeHTML(siteProperties.trapErrors.ToString))
                     DebugPanel = DebugPanel & main_DebugPanelRow("Trap Email", html.html_EncodeHTML(siteProperties.getText("TrapEmail")))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerLink", html.html_EncodeHTML(webServerIO_ServerLink))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerDomain", html.html_EncodeHTML(webServerIO_requestDomain))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerProtocol", html.html_EncodeHTML(webServerIO_requestProtocol))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerLink", html.html_EncodeHTML(webServerIO.webServerIO_ServerLink))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerDomain", html.html_EncodeHTML(webServerIO.webServerIO_requestDomain))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerProtocol", html.html_EncodeHTML(webServerIO.webServerIO_requestProtocol))
                     DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerHost", html.html_EncodeHTML(webServerIO.requestDomain))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerPath", html.html_EncodeHTML(webServerIO_requestPath))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerPage", html.html_EncodeHTML(webServerIO_requestPage))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerPath", html.html_EncodeHTML(webServerIO.webServerIO_requestPath))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerPage", html.html_EncodeHTML(webServerIO.webServerIO_requestPage))
                     Copy = ""
                     If webServerIO.requestQueryString <> "" Then
                         CopySplit = Split(webServerIO.requestQueryString, "&")
@@ -10021,10 +9719,10 @@ ErrorTrap:
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Krnl ProcessID", genericController.encodeText(csv_HostServiceProcessID))
                     DebugPanel = DebugPanel & main_DebugPanelRow("Render Time &gt;= ", Format((GetTickCount - app_startTickCount) / 1000, "0.000") & " sec")
                     If True Then
-                        VisitHrs = CInt(visit_timeToLastHit / 3600)
-                        VisitMin = CInt(visit_timeToLastHit / 60) - (60 * VisitHrs)
-                        VisitSec = visit_timeToLastHit Mod 60
-                        DebugPanel = DebugPanel & main_DebugPanelRow("Visit Length", CStr(visit_timeToLastHit) & " sec, (" & VisitHrs & " hrs " & VisitMin & " mins " & VisitSec & " secs)")
+                        VisitHrs = CInt(visit.visit_timeToLastHit / 3600)
+                        VisitMin = CInt(visit.visit_timeToLastHit / 60) - (60 * VisitHrs)
+                        VisitSec = visit.visit_timeToLastHit Mod 60
+                        DebugPanel = DebugPanel & main_DebugPanelRow("Visit Length", CStr(visit.visit_timeToLastHit) & " sec, (" & VisitHrs & " hrs " & VisitMin & " mins " & VisitSec & " secs)")
                         'DebugPanel = DebugPanel & main_DebugPanelRow("Visit Length", CStr(main_VisitTimeToLastHit) & " sec, (" & Int(main_VisitTimeToLastHit / 60) & " min " & (main_VisitTimeToLastHit Mod 60) & " sec)")
                     End If
                     DebugPanel = DebugPanel & main_DebugPanelRow("Addon Profile", "<hr><ul class=""ccPanel"">" & "<li>tbd</li>" & cr & "</ul>")
@@ -11340,7 +11038,7 @@ ErrorTrap:
                 iMethod = "post"
             End If
             RefreshHiddens = ""
-            Action = webServerIO_ServerFormActionURL
+            Action = webServerIO.webServerIO_ServerFormActionURL
             '
             If (ActionQS <> "") Then
                 If (iMethod <> "main_Get") Then
@@ -12273,8 +11971,8 @@ ErrorTrap:
             '
             ' ----- Check for special case iContentNames
             '
-            Call webServerIO_setResponseContentType("text/plain")
-            Call webServerIO_SetStreamBuffer(False)
+            Call webServerIO.webServerIO_setResponseContentType("text/plain")
+            Call webServerIO.webServerIO_SetStreamBuffer(False)
             TableName = genericController.GetDbObjectTableName(GetContentTablename(iContentName))
             Select Case genericController.vbUCase(TableName)
                 Case "CCMEMBERS"
@@ -12434,67 +12132,12 @@ ErrorTrap:
         '
         '
         '
-        Public Sub webServerIO_SetStreamBuffer(BufferOn As Boolean)
-            Try
-                If docBufferEnabled Then
-                    '
-                    ' ----- once on, can not be turned off Response Object
-                    '
-                    docBufferEnabled = BufferOn
-                Else
-                    '
-                    ' ----- StreamBuffer off, allow on and off
-                    '
-                    docBufferEnabled = BufferOn
-                End If
-            Catch ex As Exception
-                handleExceptionAndRethrow(ex)
-            End Try
-        End Sub
-        '
-        '
-        '
-        Public Sub web_setResponseStatus(status As String)
-            _docBufferResponseStatus = status
-        End Sub
-        '
-        '
-        '
-        Public Sub webServerIO_setResponseContentType(ContentType As Object)
-            _docBufferContentType = CStr(ContentType)
-        End Sub
-        '
-        '
-        '
-        Public Sub web_addResponseHeader(HeaderName As Object, HeaderValue As Object)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SetStreamHeader")
-            '
-            If docOpen Then
-                If _docBufferResponseHeader <> "" Then
-                    _docBufferResponseHeader = _docBufferResponseHeader & vbCrLf
-                End If
-                _docBufferResponseHeader = _docBufferResponseHeader _
-                    & genericController.vbReplace(genericController.encodeText(HeaderName), vbCrLf, "") _
-                    & vbCrLf & genericController.vbReplace(genericController.encodeText(HeaderValue), vbCrLf, "")
-            End If
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18("main_SetStreamHeader")
-            '
-        End Sub
-        '
-        '
-        '
         Public Sub main_ClearStream()
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("ClearStream")
             '
-            _docBuffer = ""
-            _docBufferRedirect = ""
-            _docBufferResponseHeader = ""
+            webServerIO.webServerIO_buffer = ""
+            webServerIO.webServerIO_bufferRedirect = ""
+            webServerIO.webServerIO_bufferResponseHeader = ""
             '
             Exit Sub
             '
@@ -12502,87 +12145,6 @@ ErrorTrap:
             '
 ErrorTrap:
             Call handleLegacyError18("main_ClearStream")
-            '
-        End Sub
-        '
-        Public Sub webServerIO_FlushStream()
-            If (webServerIO.iisContext IsNot Nothing) Then
-                webServerIO.iisContext.Response.Flush()
-            End If
-        End Sub
-
-        '
-        '=============================================================================
-        ' Save Visit
-        '   If main_VisitId = 0, create new visit entry and set main_VisitId
-        '=============================================================================
-        '
-        Public Sub visit_save()
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SaveVisit")
-            '
-            'If Not (true) Then Exit Sub
-            '
-            Dim SQL As String
-            Dim MethodName As String
-            ' 'dim buildversion As String
-            '
-            MethodName = "main_SaveVisit"
-            '
-            If visit_initialized Then
-                '
-                ' initialized means the main_InitVisit has completed, so all the other visit values are real
-                '
-                'BuildVersion = app.dataBuildVersion
-                '
-                ' ----- set the default Visit Name if nothing else
-                '
-                If visit_name = "" Then
-                    visit_name = "Visit" & visit_Id
-                End If
-                '
-                ' ----- save existing visit
-                '
-                SQL = "UPDATE ccVisits SET " _
-                    & " LastVisitTime=" & db.encodeSQLDate(app_startTime) _
-                    & ",PageVisits=" & (visit_pages) _
-                    & ",CookieSupport=" & db.encodeSQLBoolean(visit_cookieSupport) _
-                    & ",LoginAttempts=" & visit_loginAttempts _
-                    & ",VisitAuthenticated=" & db.encodeSQLBoolean(visit_isAuthenticated) _
-                    & ",MemberID=" & user.id _
-                    & ",MemberNew=" & db.encodeSQLBoolean(user.isNew) _
-                    & ",TimeToLastHit=" & db.encodeSQLNumber(visit_timeToLastHit) _
-                    & ",ExcludeFromAnalytics=" & db.encodeSQLBoolean(visit_excludeFromAnalytics) _
-                    & ",Mobile=" & db.encodeSQLBoolean(visit_browserIsMobile) _
-                    & ",Bot=" & db.encodeSQLBoolean(visit_isBot Or visit_isBadBot) _
-                    & ""
-                If visit_pages <= 1 Then
-                    '
-                    ' First page of the visit, save everything
-                    '
-                    SQL &= "" _
-                        & ",VisitorID=" & visitor_id _
-                        & ",Name=" & db.encodeSQLText(visit_name) _
-                        & ",VisitorNew=" & db.encodeSQLBoolean(visitor_new) _
-                        & ",StartTime=" & db.encodeSQLDate(visit_startTime) _
-                        & ",StartDateValue=" & visit_startDateValue _
-                        & ",DateAdded=" & db.encodeSQLDate(visit_startTime) _
-                        & ",Remote_Addr=" & db.encodeSQLText(webServerIO.requestRemoteIP) _
-                        & ",Browser=" & db.encodeSQLText(Left(webServerIO.requestBrowser, 255)) _
-                        & ",HTTP_Via=" & db.encodeSQLText(Left(webServerIO.requestHTTPVia, 255)) _
-                        & ",HTTP_From=" & db.encodeSQLText(Left(webServerIO.requestHTTPFrom, 255)) _
-                        & ",HTTP_REFERER=" & db.encodeSQLText(Left(visit_refererHost, 255)) _
-                        & ",RefererPathPage=" & db.encodeSQLText(Left(visit_refererPathPage, 255)) _
-                        & ""
-                End If
-                SQL &= " WHERE (ID=" & visit_Id & ");"
-                Call db.executeSql(SQL)
-            End If
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18(MethodName)
             '
         End Sub
         '
@@ -12603,7 +12165,7 @@ ErrorTrap:
             '
             MethodName = "main_SaveVisitor"
             '
-            If visit_initialized Then
+            If visit.visit_initialized Then
                 If True Then
                     SQL = "UPDATE ccVisitors SET " _
                         & " Name = " & db.encodeSQLText(visitor_Name) _
@@ -12627,727 +12189,6 @@ ErrorTrap:
 ErrorTrap:
             Call handleLegacyError18(MethodName)
             '
-        End Sub
-        '
-        '========================================================================
-        ' Initilize the Current Page using just the WebClient
-        '   main_AllowVisitTracking - if true a cookie will be written and the visit tracked
-        '========================================================================
-        '
-        Public Sub visit_init(ByVal visitInit_allowVisitTracking As Boolean)
-            Try
-                Dim NeedToWriteVisitCookie As Boolean
-                Dim TrackGuests As Boolean
-                Dim TrackGuestsWithoutCookies As Boolean
-                Dim DefaultMemberName As String
-                Dim AllowOnNewVisitEvent As Boolean
-                Dim CS As Integer
-                'Dim CSNewVisit As Integer
-                'Dim CSNewVisitor As Integer
-                Dim visitor_changes As Boolean
-                Dim user_changes As Boolean
-                Dim visit_lastTimeFromCookie As Date
-                Dim SQL As String
-                Dim SlashPosition As Integer
-                Dim MemberLinkinEID As String
-                Dim MemberLinkLoginID As Integer
-                Dim MemberLinkRecognizeID As Integer
-                Dim CookieVisitNew As String
-                Dim CookieVisit As String
-                Dim CookieVisitor As String
-                Dim WorkingReferer As String
-                Dim MethodName As String
-                Dim Copy As String
-                Dim AuthUsername As String
-                Dim AuthPassword As String
-                Dim AuthDomain As String
-                Dim main_appNameCookiePrefix As String
-                '
-                main_appNameCookiePrefix = genericController.vbLCase(main_encodeCookieName(serverConfig.appConfig.name))
-
-                ' ----- Visit Defaults
-                '
-                visit_Id = 0
-                visit_pages = 0
-                visit_loginAttempts = 0
-                visit_lastTimeFromCookie = Date.MinValue
-                visit_stateOK = True
-                visit_isAuthenticated = False
-                visit_excludeFromAnalytics = False
-                visit_cookieSupport = False
-                '
-                ' ----- Visitor Defaults
-                '
-                'hint = "010"
-                'CSNewVisitor = -1
-                visitor_id = 0
-                visitor_new = False
-                visitor_changes = False
-                '
-                ' ----- Member Defaults
-                '
-                'hint = "020"
-                user.id = 0
-                user.name = "Guest"
-                user.userAdded = False
-                user.isNew = False
-                user_changes = False
-                user.styleFilename = ""
-                user.excludeFromAnalytics = False
-                '
-                ' ----- Decode Browser User-Agent string to main_VisitName, main_VisitIsBot, main_VisitIsBadBot, etc
-                '
-                ' moved to only run on first page (new visit) hit
-                '    Call main_decodeBrowserUserAgent(main_VisitBrowser)
-                '    '
-                '    ' ----- Determine if Visit Tracking is allowed
-                '    '
-                '
-                'Call AppendLog("main_InitVisit(), 2420")
-                '
-                Dim tokenDate As Date
-                CookieVisit = webServerIO.getRequestCookie(main_appNameCookiePrefix & main_cookieNameVisit)
-                MemberLinkinEID = docProperties.getText("eid")
-                MemberLinkLoginID = 0
-                MemberLinkRecognizeID = 0
-                If (MemberLinkinEID <> "") Then
-                    If siteProperties.getBoolean("AllowLinkLogin", True) Then
-                        '
-                        ' Link Login
-                        '
-                        Call security.decodeToken(MemberLinkinEID, MemberLinkLoginID, tokenDate)
-                        'MemberLinkLoginID = main_DecodeKeyNumber(MemberLinkinEID)
-                    ElseIf siteProperties.getBoolean("AllowLinkRecognize", True) Then
-                        '
-                        ' Link Recognize
-                        '
-                        Call security.decodeToken(MemberLinkinEID, MemberLinkRecognizeID, tokenDate)
-                        'MemberLinkRecognizeID = main_DecodeKeyNumber(MemberLinkinEID)
-                    Else
-                        '
-                        ' block link login
-                        '
-                        MemberLinkinEID = ""
-                    End If
-                End If
-                'hint = "200"
-                If (visitInit_allowVisitTracking) Or (CookieVisit <> "") Or (MemberLinkLoginID <> 0) Or (MemberLinkRecognizeID <> 0) Then
-                    '
-                    ' ----- try cookie main_VisitId
-                    '
-                    'hint = "210"
-                    If (CookieVisit <> "") Then
-                        Call security.decodeToken(CookieVisit, visit_Id, visit_lastTimeFromCookie)
-                        'main_VisitId = main_DecodeKeyNumber(CookieVisit)
-                        If visit_Id = 0 Then
-                            '
-                            ' ----- Bad Cookie, clear it so a new one will be written
-                            '
-                            CookieVisit = ""
-                        Else
-                            '
-                            ' ----- good cookie
-                            '
-                            'main_VisitLastTimeFromCookie = main_DecodeKeyTime(CookieVisit)
-                        End If
-                    End If
-                    '
-                    ' ----- Visit is good, read Visit/Visitor
-                    '
-                    'hint = "220"
-                    If (visit_Id <> 0) Then
-                        SQL = "SELECT" _
-                            & " ccVisits.ID AS VisitId" _
-                            & ",ccVisits.Name AS VisitName" _
-                            & ",ccVisits.VisitAuthenticated AS VisitAuthenticated" _
-                            & ",ccVisits.StartTime AS VisitStartTime" _
-                            & ",ccVisits.StartDateValue AS VisitStartDateValue" _
-                            & ",ccVisits.LastVisitTime AS VisitLastVisitTime" _
-                            & ",ccVisits.StopTime AS VisitStopTime" _
-                            & ",ccVisits.PageVisits AS VisitPageVisits" _
-                            & ",ccVisits.CookieSupport AS VisitCookieSupport" _
-                            & ",ccVisits.LoginAttempts AS VisitLoginAttempts" _
-                            & ",ccVisits.VisitorNew AS VisitVisitorNew" _
-                            & ",ccVisits.HTTP_REFERER AS VisitHTTP_REFERER" _
-                            & ",ccVisits.REMOTE_ADDR AS VisitREMOTE_ADDR" _
-                            & ",ccVisits.Browser AS VisitBrowser" _
-                            & ",ccVisits.MemberNew AS VisitMemberNew"
-                        SQL &= "" _
-                            & ",ccVisitors.ID AS VisitorID" _
-                            & ",ccVisitors.Name AS VisitorName" _
-                            & ",ccVisitors.MemberID AS VisitorMemberID" _
-                            & ",ccVisitors.OrderID AS VisitorOrderID"
-                        SQL &= ",ccVisitors.ForceBrowserMobile AS VisitorForceBrowserMobile"
-                        SQL &= ",ccVisits.bot AS VisitBot"
-                        SQL &= ",ccVisits.mobile AS VisitMobile"
-                        SQL &= "" _
-                            & ",m.ID AS MemberID" _
-                            & ",m.Name AS MemberName" _
-                            & ",m.admin AS MemberAdmin" _
-                            & ",m.developer AS MemberDeveloper" _
-                            & ",m.ContentControlID AS MemberContentControlID" _
-                            & ",m.AllowBulkEmail AS MemberAllowBulkEmail" _
-                            & ",m.AllowToolsPanel AS MemberAllowToolsPanel" _
-                            & ",m.AdminMenuModeID AS MemberAdminMenuModeID" _
-                            & ",m.AutoLogin AS MemberAutoLogin" _
-                            & ",m.username AS MemberUsername" _
-                            & ",m.password AS MemberPassword" _
-                            & ",m.LanguageID AS MemberLanguageID" _
-                            & ",ccLanguages.name AS MemberLanguage"
-                        SQL &= "" _
-                            & ",m.OrganizationID AS MemberOrganizationID" _
-                            & ",m.Active AS MemberActive" _
-                            & ",m.Visits AS MemberVisits" _
-                            & ",m.LastVisit AS MemberLastVisit" _
-                            & ",m.Company AS MemberCompany" _
-                            & ",m.Email AS MemberEmail"
-                        SQL &= ",m.StyleFilename as MemberStyleFilename"
-                        SQL &= ",m.ExcludeFromAnalytics as MemberExcludeFromAnalytics"
-                        SQL &= ",ccvisits.ExcludeFromAnalytics as VisitExcludeFromAnalytics"
-                        SQL &= "" _
-                            & " FROM ((ccVisits" _
-                                & " LEFT JOIN ccVisitors ON ccVisits.VisitorID = ccVisitors.ID)" _
-                                & " LEFT JOIN ccMembers as m ON ccVisits.MemberID = m.ID)" _
-                                & " LEFT JOIN ccLanguages ON m.LanguageID = ccLanguages.ID" _
-                            & " WHERE (((ccVisits.ID)=" & visit_Id & "))"
-                        '
-                        CS = db.cs_openSql(SQL)
-                        If Not db.cs_ok(CS) Then
-                            '
-                            ' Bad visit cookie, kill main_VisitId
-                            '
-                            visit_Id = 0
-                            visitor_id = 0
-                        Else
-                            '
-                            '--------------------------------------------------------------------------
-                            ' ----- Visit found, read visitor info first
-                            '--------------------------------------------------------------------------
-                            '
-                            'hint = "240"
-                            visitor_id = db.cs_getInteger(CS, "VisitorID")
-                            visitor_Name = db.cs_getText(CS, "VisitorName")
-                            visitor_memberID = (db.cs_getInteger(CS, "VisitorMemberID"))
-                            visitor_forceBrowserMobile = (db.cs_getInteger(CS, "VisitorForceBrowserMobile"))
-                            visitor_orderID = (db.cs_getInteger(CS, "VisitorOrderID"))
-                            '
-                            '--------------------------------------------------------------------------
-                            ' ----- test visit age
-                            '--------------------------------------------------------------------------
-                            '
-                            'hint = "250"
-                            visit_lastTime = db.cs_getDate(CS, "VisitLastVisitTime")
-                            If visit_lastTime.ToOADate + 0.041666 < app_startTime.ToOADate Then
-                                '--------------------------------------------------------------------------
-                                ' ----- kill visit (no activity for over 1 hour)
-                                ' changed time to 60 minutes from 30 minutes - multiple client request (Toll Brothers, etc)
-                                '--------------------------------------------------------------------------
-                                '
-                                'hint = "251"
-                                Call debug_testPoint("main_InitVisit Last visit was more than an hour old, kill the visit")
-                                NeedToWriteVisitCookie = True
-                                visit_Id = 0
-                                CookieVisit = ""
-                            Else
-                                '--------------------------------------------------------------------------
-                                ' -----  visit OK, capture visit and Member info
-                                '--------------------------------------------------------------------------
-                                '
-                                'hint = "252"
-                                visit_Id = (db.cs_getInteger(CS, "VisitId"))
-                                visit_name = (db.cs_getText(CS, "VisitName"))
-                                visit_cookieSupport = (db.cs_getBoolean(CS, "VisitCookieSupport"))
-                                visit_pages = (db.cs_getInteger(CS, "VisitPageVisits"))
-                                visit_isAuthenticated = (db.cs_getBoolean(CS, "VisitAuthenticated"))
-                                visit_startTime = (db.cs_getDate(CS, "VisitStartTime"))
-                                visit_startDateValue = (db.cs_getInteger(CS, "VisitStartDateValue"))
-                                visit_referer = (db.cs_getText(CS, "VisitHTTP_REFERER"))
-                                visit_loginAttempts = (db.cs_getInteger(CS, "VisitLoginAttempts"))
-                                visitor_new = (db.cs_getBoolean(CS, "VisitVisitorNew"))
-                                '
-                                webServerIO.requestRemoteIP = (db.cs_getText(CS, "VisitREMOTE_ADDR"))
-                                webServerIO.requestBrowser = (db.cs_getText(CS, "VisitBrowser"))
-                                visit_timeToLastHit = 0
-                                If visit_startTime > Date.MinValue Then
-                                    visit_timeToLastHit = CInt((app_startTime - visit_startTime).TotalSeconds)
-                                End If
-                                visit_excludeFromAnalytics = db.cs_getBoolean(CS, "VisitExcludeFromAnalytics")
-                                If ((Not visit_cookieSupport) And (CookieVisit <> "")) Then
-                                    visit_cookieSupport = True
-                                End If
-                                visit_browserIsMobile = db.cs_getBoolean(CS, "VisitMobile")
-                                visit_isBot = db.cs_getBoolean(CS, "VisitBot")
-                                '
-                                '--------------------------------------------------------------------------
-                                ' -----  Member info
-                                '   20170104 - set id in user object populates the record
-                                ' REFACTOR -- this is loading the user twice, when refactored remove these fields from the visit state and just set the user.id
-                                '--------------------------------------------------------------------------
-                                '
-                                Dim testActive As Boolean
-                                Dim testId As Integer
-                                testActive = db.cs_getBoolean(CS, "MemberActive")
-                                testId = db.cs_getInteger(CS, "MemberID")
-                                If ((Not testActive) Or (testId = 0)) Then
-                                    user.id = 0
-                                Else
-                                    user.id = testId
-                                    user.active = testActive
-                                    user.isNew = db.cs_getBoolean(CS, "VisitMemberNew")
-                                    user.name = (db.cs_getText(CS, "MemberName"))
-                                    user.isDeveloper = (db.cs_getBoolean(CS, "MemberDeveloper"))
-                                    user.isAdmin = (db.cs_getBoolean(CS, "MemberAdmin"))
-                                    user.contentControlID = (db.cs_getInteger(CS, "MemberContentControlID"))
-                                    user.allowBulkEmail = (db.cs_getBoolean(CS, "MemberAllowBulkEmail"))
-                                    user.allowToolsPanel = (db.cs_getBoolean(CS, "MemberAllowToolsPanel"))
-                                    user.adminMenuModeID = db.cs_getInteger(CS, "MemberAdminMenuModeID")
-                                    user.autoLogin = (db.cs_getBoolean(CS, "MemberAutoLogin"))
-                                    user.username = (db.cs_getText(CS, "MemberUsername"))
-                                    user.password = (db.cs_getText(CS, "MemberPassword"))
-                                    user.languageId = (db.cs_getInteger(CS, "MemberLanguageID"))
-                                    user.language = (db.cs_getText(CS, "MemberLanguage"))
-                                    user.organizationId = (db.cs_getInteger(CS, "MemberOrganizationID"))
-                                    user.styleFilename = db.cs_getText(CS, "MemberStyleFilename")
-                                    user.excludeFromAnalytics = (db.cs_getBoolean(CS, "MemberExcludeFromAnalytics"))
-                                    '
-                                    ' ----- consider removing
-                                    '
-                                    user.email = (db.cs_getText(CS, "MemberEmail"))
-                                    user.company = (db.cs_getText(CS, "MemberCompany"))
-                                    user.visits = (db.cs_getInteger(CS, "MemberVisits"))
-                                    user.lastVisit = (db.cs_getDate(CS, "MemberLastVisit"))
-                                End If
-                                '
-                                '--------------------------------------------------------------------------
-                                ' ----- set main_VisitStateOK if Dbase main_VisitLastTime matches main_VisitLastTimeFromCookie
-                                '--------------------------------------------------------------------------
-                                '
-                                'hint = "270"
-                                If ((visit_lastTimeFromCookie - visit_lastTime).TotalSeconds) > 2 Then
-                                    visit_stateOK = False
-                                    debug_testPoint("VisitState is false, main_VisitLastTime <> Database main_VisitLastTime, this page is out of order (back button), set main_VisitStateOK false")
-                                End If
-                            End If
-                        End If
-                        Call db.cs_Close(CS)
-                    End If
-                    '
-                    '--------------------------------------------------------------------------
-                    ' ----- new visit required
-                    '--------------------------------------------------------------------------
-                    '
-                    'Call AppendLog("main_InitVisit(), 2470")
-                    '
-                    'hint = "300"
-                    ' 1/15/2010
-                    If (visit_Id = 0) Then
-                        '
-                        ' ----- Decode Browser User-Agent string to main_VisitName, main_VisitIsBot, main_VisitIsBadBot, etc
-                        '
-                        Call web_init_decodeBrowserUserAgent(webServerIO.requestBrowser)
-                        '
-                        ' ----- create new visit record
-                        '
-                        'hint = "310"
-                        visit_Id = db.metaData_InsertContentRecordGetID("Visits", user.id)
-                        If (visit_Id < 1) Then
-                            visit_Id = 0
-                            handleExceptionAndRethrow(New Exception("Internal error, new visit record could not be selected."))
-                        End If
-                        If visit_name = "" Then
-                            visit_name = "User"
-                        End If
-                        visit_pages = 0
-                        visit_startTime = app_startTime
-                        visit_startDateValue = CInt(app_startTime.ToOADate)
-                        visit_lastTime = app_startTime
-                        '
-                        ' ----- main_Get visit referer
-                        '
-                        'hint = "320"
-                        If webServerIO.requestReferrer <> "" Then
-                            WorkingReferer = webServerIO.requestReferrer
-                            SlashPosition = genericController.vbInstr(1, WorkingReferer, "//")
-                            If (SlashPosition <> 0) And (Len(WorkingReferer) > (SlashPosition + 2)) Then
-                                WorkingReferer = Mid(WorkingReferer, SlashPosition + 2)
-                            End If
-                            SlashPosition = genericController.vbInstr(1, WorkingReferer, "/")
-                            If SlashPosition = 0 Then
-                                visit_refererPathPage = ""
-                                visit_refererHost = WorkingReferer
-                            Else
-                                visit_refererPathPage = Mid(WorkingReferer, SlashPosition)
-                                visit_refererHost = Mid(WorkingReferer, 1, SlashPosition - 1)
-                            End If
-                        End If
-                        '
-                        '--------------------------------------------------------------------------
-                        ' ----- create visitor from cookie
-                        '--------------------------------------------------------------------------
-                        '
-                        'hint = "330"
-                        CookieVisitor = genericController.encodeText(webServerIO.getRequestCookie(main_appNameCookiePrefix & main_cookieNameVisitor))
-                        '
-                        'Call AppendLog("main_InitVisit(), 2480")
-                        '
-                        If siteProperties.getBoolean("AllowAutoRecognize", True) Then
-                            '
-                            'Call AppendLog("main_InitVisit(), 2485")
-                            '
-                            'hint = "340"
-                            Call security.decodeToken(CookieVisitor, visitor_id, tokenDate)
-                            'main_VisitorID = main_DecodeKeyNumber(CookieVisitor)
-                            If visitor_id <> 0 Then
-                                '
-                                ' ----- cookie found, open visitor
-                                '
-                                'hint = "350"
-                                visit_cookieSupport = True
-                                If True Then
-                                    SQL = "SELECT ID,Name,MemberID,OrderID,ForceBrowserMobile from ccVisitors WHERE ID=" & visitor_id & ";"
-                                Else
-                                    SQL = "SELECT ID,Name,MemberID,OrderID,0 as ForceBrowserMobile from ccVisitors WHERE ID=" & visitor_id & ";"
-                                End If
-                                CS = db.cs_openSql(SQL)
-                                If Not db.cs_ok(CS) Then
-                                    '
-                                    ' ----- bad cookie, kill main_VisitorID
-                                    '
-                                    visitor_id = 0
-                                Else
-                                    '
-                                    ' ----- set visitor values
-                                    '
-                                    visitor_changes = False
-                                    visitor_id = (db.cs_getInteger(CS, "ID"))
-                                    visitor_Name = (db.cs_getText(CS, "Name"))
-                                    visitor_memberID = (db.cs_getInteger(CS, "MemberID"))
-                                    visitor_forceBrowserMobile = (db.cs_getInteger(CS, "ForceBrowserMobile"))
-                                    visitor_orderID = (db.cs_getInteger(CS, "OrderID"))
-                                End If
-                                Call db.cs_Close(CS)
-                            End If
-                        End If
-                        '
-                        '--------------------------------------------------------------------------
-                        ' ----- create new visitor for new visit
-                        '--------------------------------------------------------------------------
-                        '
-                        'Call AppendLog("main_InitVisit(), 2490")
-                        '
-                        'hint = "400"
-                        If visitor_id = 0 Then
-                            '
-                            ' Visitor Fields
-                            '
-                            visitor_id = db.metaData_InsertContentRecordGetID("Visitors", user.id)
-                            If (visitor_id < 1) Then
-                                Call handleLegacyError14(MethodName, "main_InitVisit, could not create new visitor")
-                                visitor_id = 0
-                            End If
-                            visitor_Name = "Visitor " & visitor_id
-                            visitor_memberID = 0
-                            visitor_orderID = 0
-                            visitor_changes = True
-                            visitor_forceBrowserMobile = 0
-                            '
-                            ' Visit Fields
-                            '
-                            visitor_new = True
-                        End If
-                        '
-                        '-----------------------------------------------------------------------------------
-                        ' ----- find  identity from the visitor
-                        '-----------------------------------------------------------------------------------
-                        '
-                        'Call AppendLog("main_InitVisit(), 2492")
-                        '
-                        'hint = "500"
-                        user.id = visitor_memberID
-                        If (visitor_memberID > 0) Then
-                            '
-                            ' ----- recognize by the main_VisitorMemberID
-                            '
-                            'hint = "510"
-                            If user.recognizeById(visitor_memberID) Then
-                                '
-                                ' ----- if successful, now test for autologin (authentication)
-                                '
-                                'hint = "520"
-
-                                If (siteProperties.getBoolean("AllowAutoLogin", False)) And (user.autoLogin) And visit_cookieSupport Then
-                                    '
-                                    ' ----- they allow it, now Check if they were logged in on their last visit
-                                    '
-                                    'hint = "530"
-                                    SQL = "select top 1 V.VisitAuthenticated from ccVisits V where (V.ID<>" & visit_Id & ")and(V.VisitorID=" & visitor_id & ") order by id desc"
-                                    CS = db.cs_openSql(SQL)
-                                    If db.cs_ok(CS) Then
-                                        If db.cs_getBoolean(CS, "VisitAuthenticated") Then
-                                            '
-                                            ' ----- yes, go ahead with autologin
-                                            '
-                                            If user.authenticateById(user.id) Then
-                                                Call log_LogActivity2("autologin", user.id, user.organizationId)
-                                                visitor_changes = True
-                                                user_changes = True
-                                            End If
-                                        End If
-                                    End If
-                                    Call db.cs_Close(CS)
-                                Else
-                                    '
-                                    ' Recognized, not auto login
-                                    '
-                                    'hint = "540"
-                                    Call log_LogActivity2("recognized", user.id, user.organizationId)
-                                End If
-                            End If
-                        End If
-                        '
-                        '--------------------------------------------------------------------------
-                        ' ----- new visit, update the persistant visitor cookie
-                        '--------------------------------------------------------------------------
-                        '
-                        'hint = "600"
-                        If visitInit_allowVisitTracking Then
-                            Call webServerIO.addResponseCookie(main_appNameCookiePrefix & main_cookieNameVisitor, security.encodeToken(visitor_id, visit_startTime), visit_startTime.AddYears(1), , requestAppRootPath, False)
-                        End If
-                        '
-                        '--------------------------------------------------------------------------
-                        ' ----- OnNewVisit Add-on call
-                        '--------------------------------------------------------------------------
-                        '
-                        AllowOnNewVisitEvent = True
-                    End If
-                    '
-                    '-----------------------------------------------------------------------------------
-                    ' ----- Attempt Link-in recognize or login
-                    ' ----- This is allowed even if main_AllowVisitTracking is off
-                    '-----------------------------------------------------------------------------------
-                    '
-                    'Call AppendLog("main_InitVisit(), 2494")
-                    '
-                    'hint = "700"
-                    If (MemberLinkLoginID <> 0) Then
-                        '
-                        ' Link Login
-                        '
-                        If user.authenticateById(MemberLinkLoginID) Then
-                            Call log_LogActivity2("link login with eid " & MemberLinkinEID, user.id, user.organizationId)
-                        End If
-                    ElseIf (MemberLinkRecognizeID <> 0) Then
-                        '
-                        ' Link Recognize
-                        '
-                        Call user.recognizeById(MemberLinkRecognizeID)
-                        Call log_LogActivity2("link recognize with eid " & MemberLinkinEID, user.id, user.organizationId)
-                    End If
-                    '
-                    '-----------------------------------------------------------------------------------
-                    ' ----- create guest identity if no identity
-                    '-----------------------------------------------------------------------------------
-                    '
-                    'Call AppendLog("main_InitVisit(), 2496")
-                    '
-                    'hint = "800"
-                    If (user.id < 1) Then
-                        '
-                        ' No user created
-                        '
-                        If (LCase(Left(visit_name, 5)) <> "visit") Then
-                            DefaultMemberName = visit_name
-                        Else
-                            DefaultMemberName = genericController.encodeText(GetContentFieldProperty("people", "name", "default"))
-                        End If
-                        If (False) Then
-                            '
-                            ' not upgraded, just create user like it did before
-                            '
-                            Call user.createUser()
-                        Else
-                            '
-                            ' upgraded, determine the kind of tracking - experimental build set to true
-                            '
-                            TrackGuests = siteProperties.getBoolean("track guests", False)
-                            If Not TrackGuests Then
-                                '
-                                ' do not track guests at all
-                                '
-                                Call user.createUserDefaults(DefaultMemberName)
-                            Else
-                                If visit_cookieSupport Then
-                                    '
-                                    ' cookies supported, not first hit and not spider
-                                    '
-                                    Call user.createUser()
-                                Else
-                                    '
-                                    ' upgraded, set it to the site property - experimental build set to true
-                                    '
-                                    TrackGuestsWithoutCookies = siteProperties.getBoolean("track guests without cookies")
-                                    If TrackGuestsWithoutCookies Then
-                                        '
-                                        ' compatibiltiy mode - create people for non-cookies too
-                                        '
-                                        Call user.createUser()
-                                    Else
-                                        '
-                                        ' set defaults for people record
-                                        '
-                                        Call user.createUserDefaults(DefaultMemberName)
-                                    End If
-                                End If
-                            End If
-                        End If
-                    End If
-                    '
-                    '--------------------------------------------------------------------------
-                    ' ----- establish language for the member, if they do not have one
-                    '--------------------------------------------------------------------------
-                    '
-                    'Call AppendLog("main_InitVisit(), 2498")
-                    '
-                    'hint = "900"
-                    If visit_pages = 0 Then
-                        '
-                        ' First page of this visit, verify the member language
-                        '
-                        If (user.languageId < 1) Or (user.language = "") Then
-                            '
-                            ' No member language, set member language from browser language
-                            '
-                            Call web_GetBrowserLanguage(user.languageId, user.language)
-                            If user.languageId > 0 Then
-                                '
-                                ' Browser Language worked
-                                '
-                                user_changes = True
-                            Else
-                                '
-                                ' Still no match, main_Get the default language
-                                '
-                                user.language = siteProperties.getText("Language", "English")
-                                If user.language <> "English" Then
-                                    '
-                                    ' Handle the non-English case first, so if there is a problem, fall back is English
-                                    '
-                                    CS = db.cs_open("Languages", "name=" & db.encodeSQLText(user.language))
-                                    If db.cs_ok(CS) Then
-                                        user.languageId = db.cs_getInteger(CS, "ID")
-                                        user_changes = True
-                                    End If
-                                    Call db.cs_Close(CS)
-                                    If user.languageId = 0 Then
-                                        '
-                                        ' non-English Language is not in Language Table, set default to english
-                                        '
-                                        user.language = "English"
-                                        Call siteProperties.setProperty("Language", user.language)
-                                    End If
-                                End If
-                                If user.language = "English" Then
-                                    CS = db.cs_open("Languages", "name=" & db.encodeSQLText(user.language))
-                                    If db.cs_ok(CS) Then
-                                        user.languageId = db.cs_getInteger(CS, "ID")
-                                        user_changes = True
-                                    End If
-                                    Call db.cs_Close(CS)
-                                    If user.languageId < 1 Then
-                                        '
-                                        ' English is not in Language table, add it, and set it in Member
-                                        '
-                                        CS = db.cs_insertRecord("Languages")
-                                        If db.cs_ok(CS) Then
-                                            user.languageId = db.cs_getInteger(CS, "ID")
-                                            user.language = "English"
-                                            Call db.cs_set(CS, "Name", user.language)
-                                            Call db.cs_set(CS, "HTTP_Accept_LANGUAGE", "en")
-                                            user_changes = True
-                                        End If
-                                        Call db.cs_Close(CS)
-                                    End If
-                                End If
-                            End If
-                        End If
-                    End If
-                    '
-                    '-----------------------------------------------------------------------------------
-                    ' ----- Save anything that changed
-                    '-----------------------------------------------------------------------------------
-                    '
-                    'Call AppendLog("main_InitVisit(), 2499")
-                    '
-                    ' can not count main_VisitCookieSupport yet, since a new visit will not show cookie support until the ajax hit
-                    'hint = "910"
-                    visit_excludeFromAnalytics = visit_excludeFromAnalytics Or visit_isBot Or user.excludeFromAnalytics Or user.isAdmin Or user.isDeveloper
-                    '
-                    ' Update Page count
-                    '
-                    If Not webServerIO_PageExcludeFromAnalytics Then
-                        visit_pages = visit_pages + 1
-                    End If
-                    '
-                    ' Update the Visit
-                    ' set main_visitInitialized true allows main_SaveVisit, main_SaveVisitor, etc to work
-                    '
-                    visit_initialized = True
-                    Call visit_save()
-                    '
-                    ' ----- Save visitor record
-                    '
-                    'hint = "940"
-                    If visitor_changes Then
-                        Call visitor_save()
-                    End If
-                    '
-                    ' ----- Save Member record
-                    '
-                    'hint = "950"
-                    If user_changes Then
-                        Call user.saveMemberBase()
-                    End If
-                    '
-                    ' ----- send visit cookie if supported or first page
-                    '       no, always send the cookie. There are too many exceptions to try being tricky here.
-                    '
-                    'hint = "960"
-                    CookieVisitNew = security.encodeToken(visit_Id, visit_lastTime)
-                    'CookieVisitNew = encodeToken(main_VisitId, main_VisitStartTime)
-                    If visitInit_allowVisitTracking And (CookieVisit <> CookieVisitNew) Then
-                        CookieVisit = CookieVisitNew
-                        NeedToWriteVisitCookie = True
-                    End If
-                End If
-                ' set visitinitialized - for the cases where the earlier set was bypassed, like now allowvisittracking
-                visit_initialized = True
-                'hint = "970"
-                If (AllowOnNewVisitEvent) And (True) Then
-                    '
-                    '---------------------------------------------------------------------------------
-                    ' ----- OnNewVisitEvent
-                    '---------------------------------------------------------------------------------
-                    '
-                    'hint = "980"
-                    '$$$$$ cache this
-                    ' $$$$$ make ptr list on load
-                    CS = db.cs_open(cnAddons, "(OnNewVisitEvent<>0)", "Name", , , , , "id")
-                    Do While db.cs_ok(CS)
-                        Call addon.execute_legacy5(db.cs_getInteger(CS, "ID"), "", "", CPUtilsBaseClass.addonContext.ContextOnNewVisit, "", 0, "", 0)
-                        db.cs_goNext(CS)
-                    Loop
-                    Call db.cs_Close(CS)
-                End If
-                '
-                '---------------------------------------------------------------------------------
-                ' ----- Write Visit Cookie
-                '---------------------------------------------------------------------------------
-                '
-                CookieVisit = security.encodeToken(visit_Id, app_startTime)
-                Call webServerIO.addResponseCookie(main_appNameCookiePrefix & main_cookieNameVisit, CookieVisit, , , requestAppRootPath, False)
-            Catch ex As Exception
-                handleExceptionAndRethrow(ex)
-            End Try
         End Sub
         '        '
         '        '========================================================================
@@ -13997,7 +12838,7 @@ ErrorTrap:
                         ' Cut Link if enabled
                         '
                         If iAllowCut Then
-                            WorkingLink = genericController.modifyLinkQuery(webServerIO_requestPage & "?" & web_RefreshQueryString, RequestNameCut, genericController.encodeText(ContentID) & "." & genericController.encodeText(RecordID), True)
+                            WorkingLink = genericController.modifyLinkQuery(webServerIO.webServerIO_requestPage & "?" & web_RefreshQueryString, RequestNameCut, genericController.encodeText(ContentID) & "." & genericController.encodeText(RecordID), True)
                             main_GetRecordEditLink2 = "" _
                                 & main_GetRecordEditLink2 _
                                 & "<a class=""ccRecordCutLink"" TabIndex=""-1"" href=""" & html.html_EncodeHTML(WorkingLink) & """><img src=""/ccLib/images/Contentcut.gif"" border=""0"" alt=""Cut this " & ContentCaption & " to clipboard"" title=""Cut this " & ContentCaption & " to clipboard"" align=""absmiddle""></a>"
@@ -14222,7 +13063,7 @@ ErrorTrap:
                                             '
                                             ' Can not paste as child of itself
                                             '
-                                            PasteLink = webServerIO_requestPage & "?" & web_RefreshQueryString
+                                            PasteLink = webServerIO.webServerIO_requestPage & "?" & web_RefreshQueryString
                                             PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePaste, "1", True)
                                             PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteParentContentID, CStr(iContentID), True)
                                             PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteParentRecordID, CStr(ParentID), True)
@@ -14587,24 +13428,6 @@ ErrorTrap:
             '
         End Function
         '
-        '
-        '
-        Public Sub webServerIO_addRefreshQueryString(ByVal Name As String, Optional ByVal Value As String = "")
-            Try
-                Dim temp() As String
-                '
-                If (InStr(1, Name, "=") > 0) Then
-                    temp = Split(Name, "=")
-                    _webServerIO_RefreshQueryString = genericController.ModifyQueryString(_webServerIO_RefreshQueryString, temp(0), temp(1), True)
-                Else
-                    _webServerIO_RefreshQueryString = genericController.ModifyQueryString(_webServerIO_RefreshQueryString, Name, Value, True)
-                End If
-            Catch ex As Exception
-                handleExceptionAndRethrow(ex)
-            End Try
-            '
-        End Sub
-        '
         '==================================================================================================
         ' ----- Remove this record from all watch lists
         '       Mark permanent if the content is being deleted. non-permanent otherwise
@@ -14800,7 +13623,7 @@ ErrorTrap:
                                 ' ----- Create Path Block record, if requested
                                 '
                                 CreatePathBlock = doc_getBoolean2("CreatePathBlock")
-                                CS = db.cs_open("Paths", "name=" & db.encodeSQLText(webServerIO_requestPath))
+                                CS = db.cs_open("Paths", "name=" & db.encodeSQLText(webServerIO.webServerIO_requestPath))
                                 PathID = 0
                                 If db.cs_ok(CS) Then
                                     PathID = db.cs_getInteger(CS, "id")
@@ -14812,7 +13635,7 @@ ErrorTrap:
                                     '
                                     CS = db.cs_insertRecord("Paths")
                                     If db.cs_ok(CS) Then
-                                        Call db.cs_set(CS, "name", webServerIO_requestPath)
+                                        Call db.cs_set(CS, "name", webServerIO.webServerIO_requestPath)
                                         Call db.cs_set(CS, "active", 1)
                                     End If
                                     Call db.cs_Close(CS)
@@ -15293,9 +14116,9 @@ ErrorTrap:
                 Call main_AddPagetitle(Title)
             End If
             If main_MetaContent_Title = "" Then
-                Call main_AddPagetitle("Admin-" & webServerIO_requestDomain)
+                Call main_AddPagetitle("Admin-" & webServerIO.webServerIO_requestDomain)
             End If
-            webServerIO_response_NoFollow = True
+            webServerIO.webServerIO_response_NoFollow = True
             '
             ' main_SetMetaContent - this is done by the 'content' contributer for the page
             '
@@ -15305,7 +14128,7 @@ ErrorTrap:
                 & main_DocTypeAdmin _
                 & vbCrLf & "<html>" _
                 & vbCrLf & "<head>" _
-                & webServerIO_GetHTMLInternalHead(True) _
+                & webServerIO.webServerIO_GetHTMLInternalHead(True) _
                 & vbCrLf & "</head>" _
                 & vbCrLf & "<body class=""ccBodyAdmin ccCon"">"
             '
@@ -15402,10 +14225,10 @@ ErrorTrap:
         '
         Public Property web_RefreshQueryString() As String
             Get
-                web_RefreshQueryString = _webServerIO_RefreshQueryString
+                web_RefreshQueryString = webServerIO._webServerIO_RefreshQueryString
             End Get
             Set(ByVal value As String)
-                _webServerIO_RefreshQueryString = value
+                webServerIO._webServerIO_RefreshQueryString = value
             End Set
         End Property
         '
@@ -16337,7 +15160,7 @@ ErrorTrap:
             CDef = metaData.getCdef(ContentName)
             Link = siteProperties.adminURL & "?af=" & AdminFormPublishing
             Copy = Msg_AuthoringSubmittedNotification
-            Copy = genericController.vbReplace(Copy, "<DOMAINNAME>", "<a href=""" & html.html_EncodeHTML(Link) & """>" & webServerIO_requestDomain & "</a>")
+            Copy = genericController.vbReplace(Copy, "<DOMAINNAME>", "<a href=""" & html.html_EncodeHTML(Link) & """>" & webServerIO.webServerIO_requestDomain & "</a>")
             Copy = genericController.vbReplace(Copy, "<RECORDNAME>", RecordName)
             Copy = genericController.vbReplace(Copy, "<CONTENTNAME>", ContentName)
             Copy = genericController.vbReplace(Copy, "<RECORDID>", RecordID.ToString)
@@ -17195,7 +16018,7 @@ ErrorTrap:
         Public Function html_GetUploadFormStart(Optional ByVal ActionQueryString As String = Nothing) As String
 
             If ActionQueryString Is Nothing Then
-                ActionQueryString = _webServerIO_RefreshQueryString
+                ActionQueryString = webServerIO._webServerIO_RefreshQueryString
             End If
             On Error GoTo ErrorTrap
             '
@@ -17203,7 +16026,7 @@ ErrorTrap:
             '
             iActionQueryString = genericController.ModifyQueryString(ActionQueryString, RequestNameRequestBinary, True, True)
             '
-            html_GetUploadFormStart = "<form action=""" & webServerIO_ServerFormActionURL & "?" & iActionQueryString & """ ENCTYPE=""MULTIPART/FORM-DATA"" METHOD=""POST""  style=""display: inline;"" >"
+            html_GetUploadFormStart = "<form action=""" & webServerIO.webServerIO_ServerFormActionURL & "?" & iActionQueryString & """ ENCTYPE=""MULTIPART/FORM-DATA"" METHOD=""POST""  style=""display: inline;"" >"
             '
             Exit Function
 ErrorTrap:
@@ -17222,7 +16045,7 @@ ErrorTrap:
         '   Browser Detection
         '========================================================================
         '
-        Private Sub web_init_decodeBrowserUserAgent(ByVal BrowserUserAgent As String)
+        Public Sub web_init_decodeBrowserUserAgent(ByVal BrowserUserAgent As String)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("decodeBrowserUserAgent")
             '
             Const DefaultMobileUserAgents = ""
@@ -17264,20 +16087,20 @@ ErrorTrap:
             If True Then
                 Select Case visitor_forceBrowserMobile
                     Case 1
-                        visit_browserIsMobile = True
+                        visit.visit_browserIsMobile = True
                     Case 2
-                        visit_browserIsMobile = False
+                        visit.visit_browserIsMobile = False
                     Case Else
                         If webServerIO.requestxWapProfile <> "" Then
                             '
                             ' If x_wap, set mobile true
                             '
-                            visit_browserIsMobile = True
+                            visit.visit_browserIsMobile = True
                         ElseIf genericController.vbInstr(1, webServerIO.requestHttpAccept, "wap", vbTextCompare) <> 0 Then
                             '
                             ' If main_HTTP_Accept, set mobile true
                             '
-                            visit_browserIsMobile = True
+                            visit.visit_browserIsMobile = True
                         Else
                             '
                             ' If useragent is in the list, set mobile true
@@ -17290,7 +16113,7 @@ ErrorTrap:
                                 If Cnt > 0 Then
                                     For Ptr = 0 To Cnt - 1
                                         If genericController.vbInstr(1, BrowserUserAgent, Subs(Ptr), vbTextCompare) <> 0 Then
-                                            visit_browserIsMobile = True
+                                            visit.visit_browserIsMobile = True
                                             Exit For
                                         End If
                                     Next
@@ -17299,7 +16122,7 @@ ErrorTrap:
                         End If
                 End Select
             Else
-                visit_browserIsMobile = False
+                visit.visit_browserIsMobile = False
             End If
             '
             '
@@ -17308,9 +16131,9 @@ ErrorTrap:
                 '
                 ' blank browser, Blank-Browser-Bot
                 '
-                visit_name = "Blank-Browser-Bot"
-                visit_isBot = True
-                visit_isBadBot = False
+                visit.visit_name = "Blank-Browser-Bot"
+                visit.visit_isBot = True
+                visit.visit_isBadBot = False
             Else
                 DetailsStart = genericController.vbInstr(1, BrowserUserAgent, "(")
                 '
@@ -17336,7 +16159,7 @@ ErrorTrap:
                     '
                     PositionStart = genericController.vbInstr(1, DetailTail, "netscape", vbTextCompare)
                     If PositionStart <> 0 Then
-                        visit_browserIsNS = True
+                        visit.visit_browserIsNS = True
                         PositionEnd = genericController.vbInstr(PositionStart, DetailTail, " ")
                         If PositionEnd = 0 Then
                             Agent = Mid(DetailTail, PositionStart)
@@ -17345,7 +16168,7 @@ ErrorTrap:
                         End If
                         AgentParts = Split(Agent, "/")
                         If UBound(AgentParts) > 0 Then
-                            visit_browserVersion = Trim(AgentParts(1))
+                            visit.visit_browserVersion = Trim(AgentParts(1))
                         End If
                     End If
                     '
@@ -17355,26 +16178,26 @@ ErrorTrap:
                         Detail = Trim(DetailSections(DetailPointer))
                         '
                         If (InStr(1, Detail, "msie", vbTextCompare) >= 0) Then
-                            visit_browserIsIE = True
+                            visit.visit_browserIsIE = True
                             DetailsVersionSection = Split(Trim(Detail), " ")
                             If UBound(DetailsVersionSection) > 0 Then
-                                visit_browserVersion = Trim(DetailsVersionSection(1))
+                                visit.visit_browserVersion = Trim(DetailsVersionSection(1))
                             End If
                         ElseIf genericController.vbInstr(1, Details, "netscape", vbTextCompare) <> 0 Then
                             '
-                            visit_browserIsNS = True
+                            visit.visit_browserIsNS = True
                         End If
                         '
                         If genericController.vbInstr(1, Detail, "win", vbTextCompare) <> 0 Then
-                            visit_browserIsWindows = True
+                            visit.visit_browserIsWindows = True
                         End If
                         '
                         If genericController.vbInstr(1, Detail, "mac", vbTextCompare) <> 0 Then
-                            visit_browserIsMac = True
+                            visit.visit_browserIsMac = True
                         End If
                         '
                         If genericController.vbInstr(1, Detail, "linux", vbTextCompare) <> 0 Then
-                            visit_browserIsLinux = True
+                            visit.visit_browserIsLinux = True
                         End If
                     Next
                 End If
@@ -17436,7 +16259,7 @@ ErrorTrap:
                                 If UBound(Args) > 0 Then
                                     If Trim(Args(1)) <> "" Then
                                         If genericController.vbInstr(1, BrowserUserAgent, Args(1), vbTextCompare) <> 0 Then
-                                            visit_name = Args(0)
+                                            visit.visit_name = Args(0)
                                             visitNameFound = True
                                             Exit For
                                         End If
@@ -17444,7 +16267,7 @@ ErrorTrap:
                                     If UBound(Args) > 1 Then
                                         If Trim(Args(2)) <> "" Then
                                             If genericController.vbInstr(1, webServerIO.requestRemoteIP, Args(2), vbTextCompare) <> 0 Then
-                                                visit_name = Args(0)
+                                                visit.visit_name = Args(0)
                                                 visitNameFound = True
                                                 Exit For
                                             End If
@@ -17455,11 +16278,11 @@ ErrorTrap:
                         Next
                         If visitNameFound Then
                             If UBound(Args) < 3 Then
-                                visit_isBot = True
-                                visit_isBadBot = False
+                                visit.visit_isBot = True
+                                visit.visit_isBadBot = False
                             Else
-                                visit_isBadBot = (LCase(Args(3)) = "b")
-                                visit_isBot = visit_isBadBot Or (LCase(Args(3)) = "r")
+                                visit.visit_isBadBot = (LCase(Args(3)) = "b")
+                                visit.visit_isBot = visit.visit_isBadBot Or (LCase(Args(3)) = "r")
                             End If
                         End If
                     End If
@@ -17529,7 +16352,7 @@ ErrorTrap:
             pageManager_GetSectionMenuNamed = main_GetEditWrapper("Section Menu", pageManager_GetSectionMenuNamed)
             '
             If pageManager_RedirectLink <> "" Then
-                Call webServerIO_Redirect2(pageManager_RedirectLink, pageManager_RedirectReason, pageManager_RedirectBecausePageNotFound)
+                Call webServerIO.webServerIO_Redirect2(pageManager_RedirectLink, pageManager_RedirectReason, pageManager_RedirectBecausePageNotFound)
             End If
             '
             Exit Function
@@ -17571,7 +16394,7 @@ ErrorTrap:
             End If
             Call db.cs_Close(CSPointer)
             '
-            main_GetContentWatchLinkByKey = genericController.EncodeAppRootPath(main_GetContentWatchLinkByKey, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
+            main_GetContentWatchLinkByKey = genericController.EncodeAppRootPath(main_GetContentWatchLinkByKey, webServerIO.webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
             '
             Exit Function
             '
@@ -17839,7 +16662,7 @@ ErrorTrap:
                                 Call siteProperties.setProperty("AllowWorkflowRendering", True)
                             End If
                         End If
-                        Call webServerIO_Redirect2(Link, "Redirecting because a new page has been added with the quick editor.", False)
+                        Call webServerIO.webServerIO_Redirect2(Link, "Redirecting because a new page has been added with the quick editor.", False)
                     End If
                     Call db.cs_Close(CSBlock)
                     '
@@ -17875,7 +16698,7 @@ ErrorTrap:
                                     Call siteProperties.setProperty("AllowWorkflowRendering", True)
                                 End If
                             End If
-                            Call webServerIO_Redirect2(Link, "Redirecting because a new page has been added with the quick editor.", False)
+                            Call webServerIO.webServerIO_Redirect2(Link, "Redirecting because a new page has been added with the quick editor.", False)
                         End If
                         Call db.cs_Close(CSBlock)
                     End If
@@ -17904,7 +16727,7 @@ ErrorTrap:
                         Link = pageManager_GetPageLink4(ParentID, "", True, False)
                         'Link = main_GetPageLink(ParentID)
                         Link = genericController.modifyLinkQuery(Link, "main_AdminWarningMsg", "The page has been deleted, and you have been redirected to the parent of the deleted page.", True)
-                        Call webServerIO_Redirect2(Link, "Redirecting to the parent page because the page was deleted with the quick editor.", pageManager_RedirectBecausePageNotFound)
+                        Call webServerIO.webServerIO_Redirect2(Link, "Redirecting to the parent page because the page was deleted with the quick editor.", pageManager_RedirectBecausePageNotFound)
                         Exit Sub
                     End If
                 End If
@@ -17984,7 +16807,7 @@ ErrorTrap:
                 '
                 ' ----- Read Bake Version
                 '
-                BakeName = "main_GetMenu-" & webServerIO_requestProtocol & "-" & webServerIO.requestDomain & "-" & PageName & "-" & ContentName & "-" & DefaultLink & "-" & RootPageRecordID & "-" & DepthLimit & "-" & MenuStyle & "-" & StyleSheetPrefix
+                BakeName = "main_GetMenu-" & webServerIO.webServerIO_requestProtocol & "-" & webServerIO.requestDomain & "-" & PageName & "-" & ContentName & "-" & DefaultLink & "-" & RootPageRecordID & "-" & DepthLimit & "-" & MenuStyle & "-" & StyleSheetPrefix
                 BakeName = genericController.vbReplace(BakeName, "/", "_")
                 BakeName = genericController.vbReplace(BakeName, ":", "_")
                 BakeName = genericController.vbReplace(BakeName, ".", "_")
@@ -18027,7 +16850,7 @@ ErrorTrap:
                         '
                         AllowInMenus = True
                         LinkWorking = DefaultLink
-                        LinkWorking = genericController.EncodeAppRootPath(LinkWorking, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
+                        LinkWorking = genericController.EncodeAppRootPath(LinkWorking, webServerIO.webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
                         LinkWorking = genericController.modifyLinkQuery(LinkWorking, "bid", "", False)
                         MenuNamePrefix = genericController.encodeText(genericController.GetRandomInteger) & "_"
                         MenuID = 0
@@ -18206,7 +17029,7 @@ ErrorTrap:
                 '
                 ' ----- Read Bake Version
                 '
-                BakeName = "main_GetMenu-" & webServerIO_requestProtocol & "-" & webServerIO.requestDomain & "-" & RootPageRecordID & "-" & DefaultLink & "-" & DepthLimit & "-" & MenuStyle & "-" & StyleSheetPrefix
+                BakeName = "main_GetMenu-" & webServerIO.webServerIO_requestProtocol & "-" & webServerIO.requestDomain & "-" & RootPageRecordID & "-" & DefaultLink & "-" & DepthLimit & "-" & MenuStyle & "-" & StyleSheetPrefix
                 BakeName = genericController.vbReplace(BakeName, "/", "_")
                 BakeName = genericController.vbReplace(BakeName, ":", "_")
                 BakeName = genericController.vbReplace(BakeName, ".", "_")
@@ -18237,7 +17060,7 @@ ErrorTrap:
                         AllowInMenus = True
                         LinkWorking = DefaultLink
                         LinkWorkingNoRedirect = LinkWorking
-                        LinkWorking = genericController.EncodeAppRootPath(LinkWorking, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
+                        LinkWorking = genericController.EncodeAppRootPath(LinkWorking, webServerIO.webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
                         LinkWorking = genericController.modifyLinkQuery(LinkWorking, "bid", "", False)
                         MenuNamePrefix = genericController.encodeText(genericController.GetRandomInteger) & "_"
                         ' ***** just want to know what would happen here
@@ -18681,7 +17504,7 @@ ErrorTrap:
         '           - uses pageManager_ChildPageListTracking to track what has been seen
         '=============================================================================
         '
-        Public Function main_GetChildPageList(ByVal RequestedListName As String, ByVal ContentName As String, ByVal parentPageID As Integer, ByVal allowChildListDisplay As Boolean, Optional ByVal ArchivePages As Boolean = False) As String
+        Public Function pageManager_GetChildPageList(ByVal RequestedListName As String, ByVal ContentName As String, ByVal parentPageID As Integer, ByVal allowChildListDisplay As Boolean, Optional ByVal ArchivePages As Boolean = False) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetChildPageList")
             '
             Dim ChildContent As String
@@ -18726,8 +17549,8 @@ ErrorTrap:
             End If
             '
             archiveLink = webServerIO.requestPathPage
-            archiveLink = genericController.ConvertLinkToShortLink(archiveLink, webServerIO.requestDomain, webServerIO_requestVirtualFilePath)
-            archiveLink = genericController.EncodeAppRootPath(archiveLink, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
+            archiveLink = genericController.ConvertLinkToShortLink(archiveLink, webServerIO.requestDomain, webServerIO.webServerIO_requestVirtualFilePath)
+            archiveLink = genericController.EncodeAppRootPath(archiveLink, webServerIO.webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
             '
             For childBranchPtr = 0 To main_RenderCache_ChildBranch_PCCPtrCnt - 1
                 PCCPtr = genericController.EncodeInteger(main_RenderCache_ChildBranch_PCCPtrs(childBranchPtr))
@@ -18880,18 +17703,18 @@ ErrorTrap:
             '
             ' ----- If there is a list, add the list start and list end
             '
-            main_GetChildPageList = ""
+            pageManager_GetChildPageList = ""
             If ActiveList <> "" Then
-                main_GetChildPageList = main_GetChildPageList & cr & "<ul id=""childPageList" & parentPageID & "_" & RequestedListName & """ class=""ccChildList"">" & genericController.kmaIndent(ActiveList) & cr & "</ul>"
+                pageManager_GetChildPageList = pageManager_GetChildPageList & cr & "<ul id=""childPageList" & parentPageID & "_" & RequestedListName & """ class=""ccChildList"">" & genericController.kmaIndent(ActiveList) & cr & "</ul>"
             End If
             If InactiveList <> "" Then
-                main_GetChildPageList = main_GetChildPageList & cr & "<ul id=""childPageList" & parentPageID & "_" & RequestedListName & """ class=""ccChildListInactive"">" & genericController.kmaIndent(InactiveList) & cr & "</ul>"
+                pageManager_GetChildPageList = pageManager_GetChildPageList & cr & "<ul id=""childPageList" & parentPageID & "_" & RequestedListName & """ class=""ccChildListInactive"">" & genericController.kmaIndent(InactiveList) & cr & "</ul>"
             End If
             '
             ' ----- if non-orphan list, authoring and none found, print none message
             '
             If (UcaseRequestedListName <> "") And (ChildListCount = 0) And main_RenderCache_CurrentPage_IsAuthoring Then
-                main_GetChildPageList = "[Child Page List with no pages]</p><p>" & main_GetChildPageList
+                pageManager_GetChildPageList = "[Child Page List with no pages]</p><p>" & pageManager_GetChildPageList
             End If
             '
             Exit Function
@@ -19226,43 +18049,8 @@ ErrorTrap:
         '
         '
         Public Function encodeAppRootPath(ByVal Link As String) As String
-            encodeAppRootPath = genericController.EncodeAppRootPath(genericController.encodeText(Link), webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
+            encodeAppRootPath = genericController.EncodeAppRootPath(genericController.encodeText(Link), webServerIO.webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
         End Function
-        '
-        '
-        '
-        Private Sub webServerIO_JavaStream_Add(ByVal NewString As String)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00375")
-            '
-            If main_JavaStreamCount >= main_JavaStreamSize Then
-                main_JavaStreamSize = main_JavaStreamSize + main_JavaStreamChunk
-                ReDim Preserve main_JavaStreamHolder(main_JavaStreamSize)
-            End If
-            main_JavaStreamHolder(main_JavaStreamCount) = NewString
-            main_JavaStreamCount = main_JavaStreamCount + 1
-            Exit Sub
-            '
-ErrorTrap:
-            Call handleLegacyError13("main_JavaStream_Add")
-        End Sub
-        '
-        '
-        '
-        Private ReadOnly Property webServerIO_JavaStream_Text() As String
-            Get
-                Dim MsgLabel As String
-                '
-                MsgLabel = "Msg" & genericController.encodeText(genericController.GetRandomInteger)
-                '
-                webServerIO_JavaStream_Text = Join(main_JavaStreamHolder, "")
-                webServerIO_JavaStream_Text = genericController.vbReplace(webServerIO_JavaStream_Text, "'", "'+""'""+'")
-                webServerIO_JavaStream_Text = genericController.vbReplace(webServerIO_JavaStream_Text, vbCrLf, "\n")
-                webServerIO_JavaStream_Text = genericController.vbReplace(webServerIO_JavaStream_Text, vbCr, "\n")
-                webServerIO_JavaStream_Text = genericController.vbReplace(webServerIO_JavaStream_Text, vbLf, "\n")
-                webServerIO_JavaStream_Text = "var " & MsgLabel & " = '" & webServerIO_JavaStream_Text & "'; document.write( " & MsgLabel & " ); " & vbCrLf
-
-            End Get
-        End Property
         '
         '
         '
@@ -19837,7 +18625,7 @@ ErrorTrap:
             End If
             ' ##### if the default is long, leave it long -- move this to just the content watch tree
             'main_GetPageDynamicLinkWithArgs = ConvertLinkToShortLink(main_GetPageDynamicLinkWithArgs, main_ServerHost, main_ServerVirtualPath)
-            main_GetPageDynamicLinkWithArgs = genericController.EncodeAppRootPath(main_GetPageDynamicLinkWithArgs, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
+            main_GetPageDynamicLinkWithArgs = genericController.EncodeAppRootPath(main_GetPageDynamicLinkWithArgs, webServerIO.webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
             '
             Exit Function
             '
@@ -20290,7 +19078,7 @@ ErrorTrap:
         '
         Public ReadOnly Property responseRedirect() As String
             Get
-                Return _docBufferRedirect
+                Return webServerIO.webServerIO_bufferRedirect
             End Get
         End Property
         '
@@ -20298,7 +19086,7 @@ ErrorTrap:
         '
         Public ReadOnly Property responseHeader() As String
             Get
-                Return _docBufferResponseHeader
+                Return webServerIO.webServerIO_bufferResponseHeader
             End Get
         End Property
         '
@@ -20306,7 +19094,7 @@ ErrorTrap:
         '
         Public ReadOnly Property responseCookies() As String
             Get
-                Return _docBufferCookies
+                Return webServerIO.webServerIO_bufferCookies
             End Get
         End Property
         '
@@ -20314,7 +19102,7 @@ ErrorTrap:
         '
         Public ReadOnly Property responseContentType() As String
             Get
-                Return _docBufferContentType
+                Return webServerIO.webServerIO_bufferContentType
             End Get
         End Property
         '
@@ -20322,7 +19110,7 @@ ErrorTrap:
         '
         Public ReadOnly Property responseStatus() As String
             Get
-                Return _docBufferResponseStatus
+                Return webServerIO.webServerIO_bufferResponseStatus
             End Get
         End Property
         '
@@ -20330,7 +19118,7 @@ ErrorTrap:
         '
         Public ReadOnly Property responseBuffer() As String
             Get
-                Return _docBuffer
+                Return webServerIO.webServerIO_buffer
             End Get
         End Property
 
@@ -20435,7 +19223,7 @@ ErrorTrap:
                 Dim PageNotFoundSource As String = ""
                 Dim IsPageNotFound As Boolean = False
                 '
-                If docOpen Then
+                If webServerIO.docOpen Then
                     main_AdminWarning = docProperties.getText("main_AdminWarningMsg")
                     main_AdminWarningPageID = docProperties.getInteger("main_AdminWarningPageID")
                     main_AdminWarningSectionID = docProperties.getInteger("main_AdminWarningSectionID")
@@ -20447,9 +19235,9 @@ ErrorTrap:
                     '--------------------------------------------------------------------------
                     '
                     Dim AllowCookieTest As Boolean
-                    AllowCookieTest = siteProperties.allowVisitTracking And (visit_pages = 1)
+                    AllowCookieTest = siteProperties.allowVisitTracking And (visit.visit_pages = 1)
                     If AllowCookieTest Then
-                        Call main_AddOnLoadJavascript2("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" & security.encodeToken(visit_Id, app_startTime) & "')};", "Cookie Test")
+                        Call main_AddOnLoadJavascript2("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" & security.encodeToken(visit.visit_Id, app_startTime) & "')};", "Cookie Test")
                     End If
                     '
                     '--------------------------------------------------------------------------
@@ -20458,8 +19246,8 @@ ErrorTrap:
                     '--------------------------------------------------------------------------
                     '
                     If docProperties.getInteger("ContensiveUserForm") = 1 Then
-                        Dim FromAddress As String = siteProperties.getText("EmailFromAddress", "info@" & webServerIO_requestDomain)
-                        Call main_SendFormEmail(siteProperties.emailAdmin, FromAddress, "Form Submitted on " & webServerIO_requestReferer)
+                        Dim FromAddress As String = siteProperties.getText("EmailFromAddress", "info@" & webServerIO.webServerIO_requestDomain)
+                        Call main_SendFormEmail(siteProperties.emailAdmin, FromAddress, "Form Submitted on " & webServerIO.webServerIO_requestReferer)
                         Dim cs As Integer = db.cs_insertRecord("User Form Response")
                         If db.cs_ok(cs) Then
                             Call db.cs_set(cs, "name", "Form " & webServerIO.requestReferrer)
@@ -20472,7 +19260,7 @@ ErrorTrap:
                                 End If
                             Next
                             Call db.cs_set(cs, "copy", Copy)
-                            Call db.cs_set(cs, "VisitId", visit_Id)
+                            Call db.cs_set(cs, "VisitId", visit.visit_Id)
                         End If
                         Call db.cs_Close(cs)
                     End If
@@ -20492,21 +19280,21 @@ ErrorTrap:
                     '       ri = redirect content recordid
                     '--------------------------------------------------------------------------
                     '
-                    webServerIO_RedirectContentID = (docProperties.getInteger("rc"))
-                    If (webServerIO_RedirectContentID <> 0) Then
-                        webServerIO_RedirectRecordID = (docProperties.getInteger("ri"))
-                        If (webServerIO_RedirectRecordID <> 0) Then
-                            Dim contentName As String = metaData.getContentNameByID(webServerIO_RedirectContentID)
+                    webServerIO.webServerIO_RedirectContentID = (docProperties.getInteger("rc"))
+                    If (webServerIO.webServerIO_RedirectContentID <> 0) Then
+                        webServerIO.webServerIO_RedirectRecordID = (docProperties.getInteger("ri"))
+                        If (webServerIO.webServerIO_RedirectRecordID <> 0) Then
+                            Dim contentName As String = metaData.getContentNameByID(webServerIO.webServerIO_RedirectContentID)
                             If contentName <> "" Then
-                                If main_RedirectByRecord_ReturnStatus(contentName, webServerIO_RedirectRecordID) Then
+                                If main_RedirectByRecord_ReturnStatus(contentName, webServerIO.webServerIO_RedirectRecordID) Then
                                     '
                                     'Call AppendLog("main_init(), 3210 - exit for rc/ri redirect ")
                                     '
-                                    docOpen = False '--- should be disposed by caller --- Call dispose
-                                    Return _docBuffer
+                                    webServerIO.docOpen = False '--- should be disposed by caller --- Call dispose
+                                    Return webServerIO.webServerIO_buffer
                                 Else
                                     main_AdminWarning = "<p>The site attempted to automatically jump to another page, but there was a problem with the page that included the link.<p>"
-                                    main_AdminWarningPageID = webServerIO_RedirectRecordID
+                                    main_AdminWarningPageID = webServerIO.webServerIO_RedirectRecordID
                                 End If
                             End If
                         End If
@@ -20558,14 +19346,14 @@ ErrorTrap:
                                 Dim CSPointer As Integer = db.cs_insertRecord("Library File Log")
                                 If db.cs_ok(CSPointer) Then
                                     Call db.cs_set(CSPointer, "FileID", downloadId)
-                                    Call db.cs_set(CSPointer, "VisitId", visit_Id)
+                                    Call db.cs_set(CSPointer, "VisitId", visit.visit_Id)
                                     Call db.cs_set(CSPointer, "MemberID", user.id)
                                 End If
                                 Call db.cs_Close(CSPointer)
                                 '
                                 ' ----- and go
                                 '
-                                Call webServerIO_Redirect2(webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, link), "Redirecting because the active download request variable is set to a valid Library Files record. Library File Log has been appended.", False)
+                                Call webServerIO.webServerIO_Redirect2(webServerIO.webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, link), "Redirecting because the active download request variable is set to a valid Library Files record. Library File Log has been appended.", False)
                             End If
                         End If
                     End If
@@ -20900,14 +19688,14 @@ ErrorTrap:
                                                 '
                                                 ' no favicon, 404 the call
                                                 '
-                                                Call web_setResponseStatus("404 Not Found")
-                                                Call webServerIO_setResponseContentType("image/gif")
-                                                docOpen = False '--- should be disposed by caller --- Call dispose
-                                                Return _docBuffer
+                                                Call webServerIO.web_setResponseStatus("404 Not Found")
+                                                Call webServerIO.webServerIO_setResponseContentType("image/gif")
+                                                webServerIO.docOpen = False '--- should be disposed by caller --- Call dispose
+                                                Return webServerIO.webServerIO_buffer
                                             Else
-                                                Call webServerIO_Redirect2(csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, Filename), "favicon request", False)
-                                                docOpen = False '--- should be disposed by caller --- Call dispose
-                                                Return _docBuffer
+                                                Call webServerIO.webServerIO_Redirect2(csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, Filename), "favicon request", False)
+                                                webServerIO.docOpen = False '--- should be disposed by caller --- Call dispose
+                                                Return webServerIO.webServerIO_buffer
                                             End If
                                         End If
                                         '
@@ -20929,10 +19717,10 @@ ErrorTrap:
                                                 Call appRootFiles.saveFile(Filename, Content)
                                             End If
                                             Content = Content & addonCache.localCache.robotsTxt
-                                            Call webServerIO_setResponseContentType("text/plain")
-                                            Call writeAltBuffer(Content)
-                                            docOpen = False '--- should be disposed by caller --- Call dispose
-                                            Return _docBuffer
+                                            Call webServerIO.webServerIO_setResponseContentType("text/plain")
+                                            Call webServerIO.writeAltBuffer(Content)
+                                            webServerIO.docOpen = False '--- should be disposed by caller --- Call dispose
+                                            Return webServerIO.webServerIO_buffer
                                         End If
                                         '
                                         ' No Link Forward, no Link Alias, no RemoteMethodFromPage, not Robots.txt
@@ -20964,7 +19752,7 @@ ErrorTrap:
                     ' ----- do anonymous access blocking
                     '
                     If Not user.isAuthenticated() Then
-                        If (webServerIO_requestPath <> "/") And genericController.vbInstr(1, siteProperties.adminURL, webServerIO_requestPath, vbTextCompare) <> 0 Then
+                        If (webServerIO.webServerIO_requestPath <> "/") And genericController.vbInstr(1, siteProperties.adminURL, webServerIO.webServerIO_requestPath, vbTextCompare) <> 0 Then
                             '
                             ' admin page is excluded from custom blocking
                             '
@@ -20979,9 +19767,9 @@ ErrorTrap:
                                     'Call AppendLog("main_init(), 3410 - exit for login block")
                                     '
                                     Call main_SetMetaContent(0, 0)
-                                    Call writeAltBuffer(user.getLoginPage(False) & html_GetEndOfBody(False, False, False, False))
-                                    docOpen = False '--- should be disposed by caller --- Call dispose
-                                    Return _docBuffer
+                                    Call webServerIO.writeAltBuffer(user.getLoginPage(False) & html_GetEndOfBody(False, False, False, False))
+                                    webServerIO.docOpen = False '--- should be disposed by caller --- Call dispose
+                                    Return webServerIO.webServerIO_buffer
                                 Case 2
                                     '
                                     ' block with custom content
@@ -21008,9 +19796,9 @@ ErrorTrap:
                                             & cr & "</body>" _
                                             & vbCrLf & "</html>"
                                     '& "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">"
-                                    Call writeAltBuffer(Copy)
-                                    docOpen = False '--- should be disposed by caller --- Call dispose
-                                    Return _docBuffer
+                                    Call webServerIO.writeAltBuffer(Copy)
+                                    webServerIO.docOpen = False '--- should be disposed by caller --- Call dispose
+                                    Return webServerIO.webServerIO_buffer
                             End Select
                         End If
                     End If
@@ -21024,7 +19812,7 @@ ErrorTrap:
                     Else
                         htmlBody = pageManager_GetHtmlBody()
                     End If
-                    If docOpen Then
+                    If webServerIO.docOpen Then
                         '
                         ' Build Body Tag
                         '
@@ -21100,24 +19888,24 @@ ErrorTrap:
                             '
                             ' Referer had no page, figure out what it should have been
                             '
-                            If webServerIO_requestPage <> "" Then
+                            If webServerIO.webServerIO_requestPage <> "" Then
                                 '
                                 ' If the referer had no page, and there is one here now, it must have been from an IIS redirect, use the current page as the default page
                                 '
-                                main_ServerReferrerURL = main_ServerReferrerURL & webServerIO_requestPage
+                                main_ServerReferrerURL = main_ServerReferrerURL & webServerIO.webServerIO_requestPage
                             Else
                                 main_ServerReferrerURL = main_ServerReferrerURL & siteProperties.serverPageDefault
                             End If
                         End If
                         Dim linkDst As String
                         'main_ServerPage = main_ServerPage
-                        If main_ServerReferrerURL <> webServerIO_ServerFormActionURL Then
+                        If main_ServerReferrerURL <> webServerIO.webServerIO_ServerFormActionURL Then
                             '
                             ' remove any methods from referrer
                             '
                             Dim Copy As String
-                            Copy = "Redirecting because a Contensive Form was detected, source URL [" & main_ServerReferrerURL & "] does not equal the current URL [" & webServerIO_ServerFormActionURL & "]. This may be from a Contensive Add-on that now needs to redirect back to the host page."
-                            linkDst = webServerIO_requestReferer
+                            Copy = "Redirecting because a Contensive Form was detected, source URL [" & main_ServerReferrerURL & "] does not equal the current URL [" & webServerIO.webServerIO_ServerFormActionURL & "]. This may be from a Contensive Add-on that now needs to redirect back to the host page."
+                            linkDst = webServerIO.webServerIO_requestReferer
                             If main_ServerReferrerQs <> "" Then
                                 linkDst = main_ServerReferrerURL
                                 main_ServerReferrerQs = genericController.ModifyQueryString(main_ServerReferrerQs, "method", "")
@@ -21125,8 +19913,8 @@ ErrorTrap:
                                     linkDst = linkDst & "?" & main_ServerReferrerQs
                                 End If
                             End If
-                            Call webServerIO_Redirect2(linkDst, Copy, False)
-                            docOpen = False '--- should be disposed by caller --- Call dispose
+                            Call webServerIO.webServerIO_Redirect2(linkDst, Copy, False)
+                            webServerIO.docOpen = False '--- should be disposed by caller --- Call dispose
                         End If
                     End If
                 End If
@@ -21142,7 +19930,7 @@ ErrorTrap:
                             ' new way -- if a (real) 404 page is received, just convert this hit to the page-not-found page, do not redirect to it
                             '
                             Call log_appendLogPageNotFound(webServerIO.requestLinkSource)
-                            Call web_setResponseStatus("404 Not Found")
+                            Call webServerIO.web_setResponseStatus("404 Not Found")
                             docProperties.setProperty("bid", main_GetPageNotFoundPageId())
                             'Call main_mergeInStream("bid=" & main_GetPageNotFoundPageId())
                             If user.isAuthenticatedAdmin() Then
@@ -21188,205 +19976,9 @@ ErrorTrap:
         ' main_Get the Head innerHTML for public pages
         '
         Public Function main_GetHTMLHead() As String
-            main_GetHTMLHead = webServerIO_GetHTMLInternalHead(False)
+            main_GetHTMLHead = webServerIO.webServerIO_GetHTMLInternalHead(False)
         End Function
         '
-        ' main_Get the Head innerHTML for any page
-        '
-        Public Function webServerIO_GetHTMLInternalHead(ByVal main_IsAdminSite As Boolean) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetHTMLInternalHead")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim Parts() As String
-            Dim FileList As String
-            Dim Files() As String
-            Dim Ptr As Integer
-            Dim Pos As Integer
-            Dim BaseHref As String
-            Dim StyleTag As String
-            Dim IDList As String
-            Dim Cnt As Integer
-            Dim StyleSheetLink As String
-            Dim SQL As String
-            Dim CS As Integer
-            Dim OtherHeadTags As String
-            Dim Copy As String
-            Dim VirtualFilename As String
-            Dim Ext As String
-            '
-            If Not main_MetaContent_Set Then
-                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<!-- main_GetHTMLInternalHead called out of order. It must follow a content call, such as main_GetHtmlBody, main_GetSectionPage, and main_GetContentPage -->"
-            End If
-            '
-            ' stylesheets first -- for performance
-            ' put stylesheets inline without processing
-            '
-            If siteProperties.getBoolean("Allow CSS Reset") Then
-                '
-                ' reset styles
-                '
-                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & webServerIO_requestDomain & "/ccLib/styles/ccreset.css"" >"
-            End If
-            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""/ccLib/Styles/" & defaultStyleFilename & """>"
-            If Not main_IsAdminSite Then
-                '
-                ' site styles
-                '
-                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, "templates/styles.css") & """ >"
-            End If
-            '
-            ' Template shared styles
-            '
-            ' !!!!! dont know why this was blocked. Running add-ons with shared styles need this in the admin site.
-            FileList = main_GetSharedStyleFileList(main_MetaContent_SharedStyleIDList, main_IsAdminSite)
-            main_MetaContent_SharedStyleIDList = ""
-            If FileList <> "" Then
-                Files = Split(FileList, vbCrLf)
-                For Ptr = 0 To UBound(Files)
-                    If Files(Ptr) <> "" Then
-                        Parts = Split(Files(Ptr) & "<<", "<")
-                        If Parts(1) <> "" Then
-                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & genericController.decodeHtml(Parts(1))
-                        End If
-                        webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, Parts(0)) & """ >"
-                        If Parts(2) <> "" Then
-                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & genericController.decodeHtml(Parts(2))
-                        End If
-                        'End If
-                    End If
-                Next
-            End If
-            '
-            ' Template exclusive styles
-            '
-            If main_MetaContent_TemplateStyleSheetTag <> "" Then
-                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & main_MetaContent_TemplateStyleSheetTag
-            End If
-            '
-            ' Page Styles
-            '
-            If main_MetaContent_StyleSheetTags <> "" Then
-                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & main_MetaContent_StyleSheetTags
-                main_MetaContent_StyleSheetTags = ""
-            End If
-            '
-            ' Member Styles
-            '
-            If user.styleFilename <> "" Then
-                Call main_AddStylesheetLink2(webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, user.styleFilename), "member style")
-                user.styleFilename = ""
-            End If
-            '
-            ' meta content
-            '
-            Copy = main_GetLastMetaTitle()
-            If Copy <> "" Then
-                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<title>" & Copy & "</title>"
-            End If
-            '
-            Copy = main_GetLastMetaKeywordList()
-            If Copy <> "" Then
-                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<meta name=""keywords"" content=""" & Copy & """ >"
-            End If
-            '
-            Copy = main_GetLastMetaDescription()
-            If Copy <> "" Then
-                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<meta name=""description"" content=""" & Copy & """ >"
-            End If
-            '
-            ' favicon
-            '
-            VirtualFilename = siteProperties.getText("faviconfilename")
-            If VirtualFilename <> "" Then
-                Pos = InStrRev(VirtualFilename, ".")
-                If Pos > 0 Then
-                    Ext = genericController.vbLCase(Mid(VirtualFilename, Pos))
-                    Select Case Ext
-                        Case ".ico"
-                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/vnd.microsoft.icon"" href=""" & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
-                        Case ".png"
-                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/png"" href=""" & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
-                        Case ".gif"
-                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/gif"" href=""" & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
-                        Case ".jpg"
-                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/jpg"" href=""" & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
-                    End Select
-                End If
-            End If
-            '
-            ' misc caching, etc
-            '
-            Dim encoding As String
-            encoding = html.html_EncodeHTML(siteProperties.getText("Site Character Encoding", "utf-8"))
-            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead _
-                & OtherHeadTags _
-                & cr & "<meta http-equiv=""content-type"" content=""text/html; charset=" & encoding & """ >" _
-                & cr & "<meta http-equiv=""content-language"" content=""en-us"" >" _
-                & cr & "<meta http-equiv=""cache-control"" content=""no-cache"" >" _
-                & cr & "<meta http-equiv=""expires"" content=""-1"" >" _
-                & cr & "<meta http-equiv=""pragma"" content=""no-cache"" >" _
-                & cr & "<meta name=""generator"" content=""Contensive"" >"
-            '& CR & "<meta http-equiv=""cache-control"" content=""no-store"" >"
-            '
-            ' no-follow
-            '
-            If webServerIO_response_NoFollow Then
-                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead _
-                    & cr & "<meta name=""robots"" content=""nofollow"" >" _
-                    & cr & "<meta name=""mssmarttagspreventparsing"" content=""true"" >"
-            End If
-            '
-            ' Base is needed for Link Alias case where a slash is in the URL (page named 1/2/3/4/5)
-            '
-            BaseHref = webServerIO_ServerFormActionURL
-            If main_IsAdminSite Then
-                '
-                ' no base in admin site
-                '
-            ElseIf BaseHref <> "" Then
-                If web_RefreshQueryString <> "" Then
-                    BaseHref = BaseHref & "?" & web_RefreshQueryString
-                End If
-                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<base href=""" & BaseHref & """ >"
-            End If
-            '
-            ' Head Javascript -- (should be) last for performance
-            '
-            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead _
-                & cr & "<script language=""JavaScript"" type=""text/javascript""  src=""" & webServerIO_requestProtocol & webServerIO_requestDomain & "/ccLib/ClientSide/Core.js""></script>" _
-                & ""
-            If main_HeadScriptCnt > 0 Then
-                For Ptr = 0 To main_HeadScriptCnt - 1
-                    With main_HeadScripts(Ptr)
-                        If (.addedByMessage <> "") And visitProperty.getBoolean("AllowDebugging") Then
-                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<!-- from " & .addedByMessage & " -->"
-                        End If
-                        If Not .IsLink Then
-                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<script Language=""JavaScript"" type=""text/javascript"">" & .Text & cr & "</script>"
-                        Else
-                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<script type=""text/javascript"" src=""" & .Text & """></script>"
-                        End If
-                    End With
-                Next
-                main_HeadScriptCnt = 0
-            End If
-            '
-            ' other head tags - always last
-            '
-            OtherHeadTags = main_GetLastOtherHeadTags()
-            If OtherHeadTags <> "" Then
-                If Left(OtherHeadTags, 2) <> vbCrLf Then
-                    OtherHeadTags = vbCrLf & OtherHeadTags
-                End If
-                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & genericController.vbReplace(OtherHeadTags, vbCrLf, cr)
-            End If
-            '
-            Exit Function
-            '
-ErrorTrap:
-            Call handleLegacyError18("main_GetHTMLInternalHead")
-        End Function
         '
         '=============================================================
         '
@@ -21587,10 +20179,10 @@ ErrorTrap:
         '
         Public Property main_MetaContentNoFollow() As Boolean
             Get
-                Return webServerIO_response_NoFollow
+                Return webServerIO.webServerIO_response_NoFollow
             End Get
             Set(ByVal value As Boolean)
-                webServerIO_response_NoFollow = value
+                webServerIO.webServerIO_response_NoFollow = value
             End Set
         End Property
         '
@@ -21783,7 +20375,7 @@ ErrorTrap:
                 main_GetLinkByContentRecordKey = DefaultLink
             End If
             '
-            main_GetLinkByContentRecordKey = genericController.EncodeAppRootPath(main_GetLinkByContentRecordKey, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
+            main_GetLinkByContentRecordKey = genericController.EncodeAppRootPath(main_GetLinkByContentRecordKey, webServerIO.webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
             '
             Exit Function
             '
@@ -22564,7 +21156,7 @@ ErrorTrap:
             Dim CompatibilitySpanAroundButton As Boolean
             '
             IsAuthoring = user.isEditing("Dynamic Menus")
-            DefaultTemplateLink = requestAppRootPath & webServerIO_requestPage
+            DefaultTemplateLink = requestAppRootPath & webServerIO.webServerIO_requestPage
             If False Then '.292" Then
                 CompatibilitySpanAroundButton = True
             Else
@@ -22630,7 +21222,7 @@ ErrorTrap:
                             If genericController.vbLCase(Right(StylesFilename, 4)) <> ".css" Then
                                 Call handleLegacyError15("Dynamic Menu [" & MenuName & "] StylesFilename is not a '.css' file, and will not display correct. Check that the field is setup as a CSSFile.", "main_GetDynamicMenu")
                             Else
-                                Call main_AddStylesheetLink2(webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, StylesFilename), "dynamic menu")
+                                Call main_AddStylesheetLink2(webServerIO.webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, StylesFilename), "dynamic menu")
                             End If
                         End If
                     End If
@@ -22868,7 +21460,7 @@ ErrorTrap:
             Dim StyleSN As Integer
             '
             If siteProperties.getBoolean("Allow CSS Reset") Then
-                pageManager_GetStyleTagPublic = pageManager_GetStyleTagPublic & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & webServerIO_requestDomain & "/ccLib/styles/ccreset.css"" >"
+                pageManager_GetStyleTagPublic = pageManager_GetStyleTagPublic & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO.webServerIO_requestProtocol & webServerIO.webServerIO_requestDomain & "/ccLib/styles/ccreset.css"" >"
             End If
             StyleSN = genericController.EncodeInteger(siteProperties.getText("StylesheetSerialNumber", "0"))
             If StyleSN < 0 Then
@@ -22900,7 +21492,7 @@ ErrorTrap:
                 '
                 ' cached stylesheet
                 '
-                pageManager_GetStyleTagPublic = pageManager_GetStyleTagPublic & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & webServerIO_requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, "templates/Public" & StyleSN & ".css") & """ >"
+                pageManager_GetStyleTagPublic = pageManager_GetStyleTagPublic & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO.webServerIO_requestProtocol & webServerIO.webServerIO_requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, "templates/Public" & StyleSN & ".css") & """ >"
             End If
         End Function
         '
@@ -22929,7 +21521,7 @@ ErrorTrap:
                     Call cdnFiles.saveFile(genericController.convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), csv_getStyleSheetProcessed)
                     Call cdnFiles.saveFile(genericController.convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css"), pageManager_GetStyleSheetDefault2)
                 End If
-                admin_GetStyleTagAdmin = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & webServerIO_requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, "templates/Admin" & StyleSN & ".css") & """ >"
+                admin_GetStyleTagAdmin = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO.webServerIO_requestProtocol & webServerIO.webServerIO_requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, "templates/Admin" & StyleSN & ".css") & """ >"
             End If
         End Function
         '
@@ -22938,8 +21530,8 @@ ErrorTrap:
         Private Function pageManager_GetLandingLink() As String
             If pageManager_LandingLink = "" Then
                 pageManager_LandingLink = siteProperties.getText("SectionLandingLink", requestAppRootPath & siteProperties.serverPageDefault)
-                pageManager_LandingLink = genericController.ConvertLinkToShortLink(pageManager_LandingLink, webServerIO.requestDomain, webServerIO_requestVirtualFilePath)
-                pageManager_LandingLink = genericController.EncodeAppRootPath(pageManager_LandingLink, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
+                pageManager_LandingLink = genericController.ConvertLinkToShortLink(pageManager_LandingLink, webServerIO.requestDomain, webServerIO.webServerIO_requestVirtualFilePath)
+                pageManager_LandingLink = genericController.EncodeAppRootPath(pageManager_LandingLink, webServerIO.webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
             End If
             pageManager_GetLandingLink = pageManager_LandingLink
         End Function
@@ -24311,7 +22903,7 @@ ErrorTrap:
             '
             If user.isAuthenticatedAdmin() Then
                 If PageNotFoundLink = "" Then
-                    PageNotFoundLink = webServerIO_ServerLink
+                    PageNotFoundLink = webServerIO.webServerIO_ServerLink
                 End If
                 '
                 ' Add the Link to the Admin Msg
@@ -24320,7 +22912,7 @@ ErrorTrap:
                 '
                 ' Add the Referrer to the Admin Msg
                 '
-                If webServerIO_requestReferer <> "" Then
+                If webServerIO.webServerIO_requestReferer <> "" Then
                     Pos = genericController.vbInstr(1, webServerIO.requestReferrer, "main_AdminWarningPageID=", vbTextCompare)
                     If Pos <> 0 Then
                         webServerIO.requestReferrer = Left(webServerIO.requestReferrer, Pos - 2)
@@ -25803,8 +24395,8 @@ ErrorTrap:
                         If Mid(Link, 1, 1) <> "/" Then
                             Link = "/" & Link
                         End If
-                        Link = genericController.ConvertLinkToShortLink(Link, webServerIO.requestDomain, webServerIO_requestVirtualFilePath)
-                        Link = genericController.EncodeAppRootPath(Link, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
+                        Link = genericController.ConvertLinkToShortLink(Link, webServerIO.requestDomain, webServerIO.webServerIO_requestVirtualFilePath)
+                        Link = genericController.EncodeAppRootPath(Link, webServerIO.webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
                         If templateSecure And (Not webServerIO.requestSecure) Then
                             '
                             ' Short Link, and IsSecure checked but current page is not secure
@@ -26404,7 +24996,7 @@ ErrorTrap:
         '       The Prefix and Suffix have had crlf removed, and comma replaced with &#44;
         '================================================================================================================
         '
-        Private Function main_GetSharedStyleFileList(SharedStyleIDList As String, main_IsAdminSite As Boolean) As String
+        Friend Function main_GetSharedStyleFileList(SharedStyleIDList As String, main_IsAdminSite As Boolean) As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetSharedStyleFileList")
             '
             Dim Prefix As String
@@ -26807,8 +25399,8 @@ ErrorTrap:
             '
             If Not main_PleaseWaitStarted Then
                 main_PleaseWaitStarted = True
-                Call writeAltBuffer(main_GetPleaseWaitStart)
-                Call webServerIO_FlushStream()
+                Call webServerIO.writeAltBuffer(main_GetPleaseWaitStart)
+                Call webServerIO.webServerIO_FlushStream()
             End If
             '
         End Sub
@@ -26824,8 +25416,8 @@ ErrorTrap:
         '
         Public Sub main_WritePleaseWaitEnd()
             If main_PleaseWaitStarted Then
-                Call writeAltBuffer(main_GetPleaseWaitEnd)
-                Call webServerIO_FlushStream()
+                Call webServerIO.writeAltBuffer(main_GetPleaseWaitEnd)
+                Call webServerIO.webServerIO_FlushStream()
             End If
         End Sub
         ''
@@ -26838,7 +25430,7 @@ ErrorTrap:
         '
         '
         Public Sub log_LogActivity2(Message As String, SubjectMemberID As Integer, SubjectOrganizationID As Integer)
-            Call log_logActivity(Message, user.id, SubjectMemberID, SubjectOrganizationID, webServerIO_ServerLink, visitor_id, visit_Id)
+            Call log_logActivity(Message, user.id, SubjectMemberID, SubjectOrganizationID, webServerIO.webServerIO_ServerLink, visitor_id, visit.visit_Id)
         End Sub
         '
         '=================================================================================================
@@ -26969,7 +25561,7 @@ ErrorTrap:
                 ' main_Get values out of the remote query record
                 '
                 If gv.status = GoogleVisualizationStatusEnum.OK Then
-                    CS = db.cs_open("Remote Queries", "((VisitId=" & visit_Id & ")and(remotekey=" & db.encodeSQLText(RemoteKey) & "))")
+                    CS = db.cs_open("Remote Queries", "((VisitId=" & visit.visit_Id & ")and(remotekey=" & db.encodeSQLText(RemoteKey) & "))")
                     If db.cs_ok(CS) Then
                         '
                         ' Use user definied query
@@ -27237,7 +25829,7 @@ ErrorTrap:
                 Call db.cs_set(CS, "maxRows", maxRows)
                 Call db.cs_set(CS, "dateexpires", db.encodeSQLDate(app_startTime.AddDays(1)))
                 Call db.cs_set(CS, "QueryTypeID", QueryTypeSQL)
-                Call db.cs_set(CS, "VisitId", visit_Id)
+                Call db.cs_set(CS, "VisitId", visit.visit_Id)
             End If
             Call db.cs_Close(CS)
             '
@@ -27337,9 +25929,9 @@ ErrorTrap:
         '
         '
         '
-        Private Sub log_appendLogPageNotFound(PageNotFoundLink As String)
+        Friend Sub log_appendLogPageNotFound(PageNotFoundLink As String)
             Try
-                Call logController.log_appendLog(Me, """" & FormatDateTime(app_startTime, vbGeneralDate) & """,""App=" & serverConfig.appConfig.name & """,""main_VisitId=" & visit_Id & """,""" & PageNotFoundLink & """,""Referrer=" & webServerIO.requestReferrer & """", "performance", "pagenotfound")
+                Call logController.log_appendLog(Me, """" & FormatDateTime(app_startTime, vbGeneralDate) & """,""App=" & serverConfig.appConfig.name & """,""main_VisitId=" & visit.visit_Id & """,""" & PageNotFoundLink & """,""Referrer=" & webServerIO.requestReferrer & """", "performance", "pagenotfound")
             Catch ex As Exception
                 handleExceptionAndRethrow(ex)
             End Try
@@ -27692,7 +26284,7 @@ ErrorTrap:
                             & "<p>An attempt to send login information for email address '" & Email & "' has been made.</p>" _
                             & "<p><a href=""?" & web_RefreshQueryString & """>Return to the Site.</a></p>" _
                             & "</div>"
-                        Call writeAltBuffer(Copy)
+                        Call webServerIO.writeAltBuffer(Copy)
                         executeRoute_hardCodedPage = True
                     Else
                         executeRoute_hardCodedPage = False
@@ -27701,7 +26293,7 @@ ErrorTrap:
                     '
                     ' ----- Page Content Printer main_version
                     '
-                    Call webServerIO_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPagePrinterVersion)
+                    Call webServerIO.webServerIO_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPagePrinterVersion)
                     pageManager_printVersion = True
                     autoPrintText = docProperties.getText("AutoPrint")
                     '
@@ -27727,7 +26319,7 @@ ErrorTrap:
                         End If
                         PageCopy = main_GetHtmlBody_GetSection_GetContent(PageID, rootPageId, ContentName, OrderByClause, False, False, False, 0, siteProperties.useContentWatchLink, allowPageWithoutSectionDisplay)
                         If pageManager_RedirectLink <> "" Then
-                            Call webServerIO_Redirect2(pageManager_RedirectLink, pageManager_RedirectReason, False)
+                            Call webServerIO.webServerIO_Redirect2(pageManager_RedirectLink, pageManager_RedirectReason, False)
                         End If
                         'PageCopy = main_GetContentPage(RootPageName, ContentName, OrderByClause, AllowChildPage, False, PageID)
                     End If
@@ -27738,7 +26330,7 @@ ErrorTrap:
                     BodyOpen = "<body class=""ccBodyPrint"">"
 
                     'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage")
-                    Call writeAltBuffer("" _
+                    Call webServerIO.writeAltBuffer("" _
                         & main_docType _
                         & vbCrLf & "<html>" _
                         & cr & "<head>" & main_GetHTMLHead() _
@@ -27768,14 +26360,14 @@ ErrorTrap:
                     '
                     ' main_Get FormIndex (the index to the InsertImage# function called on selection)
                     '
-                    Call webServerIO_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageResourceLibrary)
+                    Call webServerIO.webServerIO_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageResourceLibrary)
                     EditorObjectName = docProperties.getText("EditorObjectName")
                     LinkObjectName = docProperties.getText("LinkObjectName")
                     If EditorObjectName <> "" Then
                         '
                         ' Open a page compatible with a dialog
                         '
-                        Call webServerIO_addRefreshQueryString("EditorObjectName", EditorObjectName)
+                        Call webServerIO.webServerIO_addRefreshQueryString("EditorObjectName", EditorObjectName)
                         Call main_AddHeadScriptLink("/ccLib/ClientSide/dialogs.js", "Resource Library")
                         'Call AddHeadScript("<script type=""text/javascript"" src=""/ccLib/ClientSide/dialogs.js""></script>")
                         Call main_SetMetaContent(0, 0)
@@ -27800,7 +26392,7 @@ ErrorTrap:
                             & cr & "<script language=javascript type=""text/javascript"">fixDialog();</script>" _
                             & cr & "</body>" _
                             & "</html>"
-                        Call writeAltBuffer(Copy)
+                        Call webServerIO.writeAltBuffer(Copy)
                         executeRoute_hardCodedPage = True
                         'Call main_GetEndOfBody(False, False)
                         ''--- should be disposed by caller --- Call dispose
@@ -27813,7 +26405,7 @@ ErrorTrap:
                         '
                         ' Open a page compatible with a dialog
                         '
-                        Call webServerIO_addRefreshQueryString("LinkObjectName", LinkObjectName)
+                        Call webServerIO.webServerIO_addRefreshQueryString("LinkObjectName", LinkObjectName)
                         Call main_AddHeadScriptLink("/ccLib/ClientSide/dialogs.js", "Resource Library")
                         'Call AddHeadScript("<script type=""text/javascript"" src=""/ccLib/ClientSide/dialogs.js""></script>")
                         Call main_SetMetaContent(0, 0)
@@ -27834,7 +26426,7 @@ ErrorTrap:
                             & cr & "<script language=javascript type=text/javascript>fixDialog();</script>" _
                             & cr & "</body>" _
                             & vbCrLf & "</html>"
-                        Call writeAltBuffer(Copy)
+                        Call webServerIO.writeAltBuffer(Copy)
                         executeRoute_hardCodedPage = True
                     End If
                 Case HardCodedPageLoginDefault
@@ -27842,7 +26434,7 @@ ErrorTrap:
                     ' 9/4/2012 added to prevent lockout if login addon fails
                     web_RefreshQueryString = webServerIO.requestQueryString
                     'Call main_AddRefreshQueryString("method", "")
-                    Call writeAltBuffer(user.getLoginPage(True))
+                    Call webServerIO.writeAltBuffer(user.getLoginPage(True))
                     executeRoute_hardCodedPage = True
                 Case HardCodedPageLogin, HardCodedPageLogoutLogin
                     '
@@ -27857,7 +26449,7 @@ ErrorTrap:
                     End If
                     web_RefreshQueryString = webServerIO.requestQueryString
                     'Call main_AddRefreshQueryString("method", "")
-                    Call writeAltBuffer(user.getLoginPage(False))
+                    Call webServerIO.writeAltBuffer(user.getLoginPage(False))
                     'Call writeAltBuffer(main_GetLoginPage2(false) & main_GetEndOfBody(False, False, False))
                     executeRoute_hardCodedPage = True
                 Case HardCodedPageLogout
@@ -27870,13 +26462,13 @@ ErrorTrap:
                     '
                     ' 7/8/9 - Moved from intercept pages
                     '
-                    Call webServerIO_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageSiteExplorer)
+                    Call webServerIO.webServerIO_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageSiteExplorer)
                     LinkObjectName = docProperties.getText("LinkObjectName")
                     If LinkObjectName <> "" Then
                         '
                         ' Open a page compatible with a dialog
                         '
-                        Call webServerIO_addRefreshQueryString("LinkObjectName", LinkObjectName)
+                        Call webServerIO.webServerIO_addRefreshQueryString("LinkObjectName", LinkObjectName)
                         Call main_AddPagetitle("Site Explorer")
                         Call main_SetMetaContent(0, 0)
                         Copy = addon.execute_legacy5(0, "Site Explorer", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", 0)
@@ -27896,14 +26488,14 @@ ErrorTrap:
                             & cr & "</body>" _
                             & cr & "</html>"
                         'Set Obj = Nothing
-                        Call writeAltBuffer(Copy)
+                        Call webServerIO.writeAltBuffer(Copy)
                         executeRoute_hardCodedPage = True
                     End If
                 Case HardCodedPageStatus
                     '
                     ' Status call
                     '
-                    webServerIO_BlockClosePageCopyright = True
+                    webServerIO.webServerIO_BlockClosePageCopyright = True
                     '
                     ' test default data connection
                     '
@@ -27934,11 +26526,11 @@ ErrorTrap:
                     '
                     Call main_ClearStream()
                     If app_errorCount = 0 Then
-                        Call writeAltBuffer("Contensive OK")
+                        Call webServerIO.writeAltBuffer("Contensive OK")
                     Else
-                        Call writeAltBuffer("Contensive Error Count = " & app_errorCount)
+                        Call webServerIO.writeAltBuffer("Contensive Error Count = " & app_errorCount)
                     End If
-                    webServerIO_BlockClosePageCopyright = True
+                    webServerIO.webServerIO_BlockClosePageCopyright = True
                     html_BlockClosePageLink = True
                     'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2f")
                     Call html_GetEndOfBody(False, False, False, False)
@@ -27949,7 +26541,7 @@ ErrorTrap:
                     '
                     Name = docProperties.getText("name")
                     If Name <> "" Then
-                        webServerIO_BlockClosePageCopyright = True
+                        webServerIO.webServerIO_BlockClosePageCopyright = True
                         '
                         ' Determine bid (PageID) from referer querystring
                         '
@@ -27981,23 +26573,23 @@ ErrorTrap:
                         ' Write the page to the stream, with a javascript wrapper
                         '
                         MsgLabel = "Msg" & genericController.encodeText(genericController.GetRandomInteger)
-                        Call webServerIO_setResponseContentType("text/plain")
-                        Call writeAltBuffer("var " & MsgLabel & " = '" & Copy & "'; " & vbCrLf)
-                        Call writeAltBuffer("document.write( " & MsgLabel & " ); " & vbCrLf)
+                        Call webServerIO.webServerIO_setResponseContentType("text/plain")
+                        Call webServerIO.writeAltBuffer("var " & MsgLabel & " = '" & Copy & "'; " & vbCrLf)
+                        Call webServerIO.writeAltBuffer("document.write( " & MsgLabel & " ); " & vbCrLf)
                     End If
                     executeRoute_hardCodedPage = True
                 Case HardCodedPageGetJSLogin
                     '
                     ' ----- Create a Javascript login page
                     '
-                    webServerIO_BlockClosePageCopyright = True
+                    webServerIO.webServerIO_BlockClosePageCopyright = True
                     Copy = Copy & "<p align=""center""><CENTER>"
                     If Not user.isAuthenticated() Then
                         Copy = Copy & user.getLoginPanel()
                     ElseIf user.isAuthenticatedContentManager("Page Content") Then
                         'Copy = Copy & main_GetToolsPanel
                     Else
-                        Copy = Copy & "You are currently logged in as " & user.name & ". To logout, click <a HREF=""" & webServerIO_ServerFormActionURL & "?Method=logout"" rel=""nofollow"">Here</A>."
+                        Copy = Copy & "You are currently logged in as " & user.name & ". To logout, click <a HREF=""" & webServerIO.webServerIO_ServerFormActionURL & "?Method=logout"" rel=""nofollow"">Here</A>."
                     End If
                     'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2h")
                     Copy = Copy & html_GetEndOfBody(True, True, False, False)
@@ -28010,23 +26602,23 @@ ErrorTrap:
                     ' Write the page to the stream, with a javascript wrapper
                     '
                     MsgLabel = "Msg" & genericController.encodeText(genericController.GetRandomInteger)
-                    Call webServerIO_setResponseContentType("text/plain")
-                    Call writeAltBuffer("var " & MsgLabel & " = '" & Copy & "'; " & vbCrLf)
-                    Call writeAltBuffer("document.write( " & MsgLabel & " ); " & vbCrLf)
+                    Call webServerIO.webServerIO_setResponseContentType("text/plain")
+                    Call webServerIO.writeAltBuffer("var " & MsgLabel & " = '" & Copy & "'; " & vbCrLf)
+                    Call webServerIO.writeAltBuffer("document.write( " & MsgLabel & " ); " & vbCrLf)
                     executeRoute_hardCodedPage = True
                 Case HardCodedPageRedirect
                     '
                     ' ----- Redirect with RC and RI
                     '
-                    webServerIO_RedirectContentID = docProperties.getInteger("rc")
-                    webServerIO_RedirectRecordID = docProperties.getInteger("ri")
-                    If webServerIO_RedirectContentID <> 0 And webServerIO_RedirectRecordID <> 0 Then
-                        ContentName = metaData.getContentNameByID(webServerIO_RedirectContentID)
+                    webServerIO.webServerIO_RedirectContentID = docProperties.getInteger("rc")
+                    webServerIO.webServerIO_RedirectRecordID = docProperties.getInteger("ri")
+                    If webServerIO.webServerIO_RedirectContentID <> 0 And webServerIO.webServerIO_RedirectRecordID <> 0 Then
+                        ContentName = metaData.getContentNameByID(webServerIO.webServerIO_RedirectContentID)
                         If ContentName <> "" Then
-                            Call main_RedirectByRecord_ReturnStatus(ContentName, webServerIO_RedirectRecordID)
+                            Call main_RedirectByRecord_ReturnStatus(ContentName, webServerIO.webServerIO_RedirectRecordID)
                         End If
                     End If
-                    webServerIO_BlockClosePageCopyright = True
+                    webServerIO.webServerIO_BlockClosePageCopyright = True
                     html_BlockClosePageLink = True
                     return_allowPostInitExecuteAddon = False '--- should be disposed by caller --- Call dispose
                     executeRoute_hardCodedPage = True
@@ -28040,9 +26632,9 @@ ErrorTrap:
                         '
                         ' Administrator required
                         '
-                        Call writeAltBuffer("Error: You must be an administrator to use the ExportAscii method")
+                        Call webServerIO.writeAltBuffer("Error: You must be an administrator to use the ExportAscii method")
                     Else
-                        webServerIO_BlockClosePageCopyright = True
+                        webServerIO.webServerIO_BlockClosePageCopyright = True
                         ContentName = docProperties.getText("content")
                         PageSize = docProperties.getInteger("PageSize")
                         If PageSize = 0 Then
@@ -28053,13 +26645,13 @@ ErrorTrap:
                             PageNumber = 1
                         End If
                         If (ContentName = "") Then
-                            Call writeAltBuffer("Error: ExportAscii method requires ContentName")
+                            Call webServerIO.writeAltBuffer("Error: ExportAscii method requires ContentName")
                         Else
-                            Call writeAltBuffer(exportAscii_GetAsciiExport(ContentName, PageSize, PageNumber))
+                            Call webServerIO.writeAltBuffer(exportAscii_GetAsciiExport(ContentName, PageSize, PageNumber))
                         End If
                     End If
                     executeRoute_hardCodedPage = True
-                    webServerIO_BlockClosePageCopyright = True
+                    webServerIO.webServerIO_BlockClosePageCopyright = True
                     html_BlockClosePageLink = True
                     return_allowPostInitExecuteAddon = False '--- should be disposed by caller --- Call dispose
                     executeRoute_hardCodedPage = True
@@ -28111,12 +26703,12 @@ ErrorTrap:
                             Call handleLegacyError12("Init", "PayPal confirmation Order Process Notification email was not sent because EmailOrderNotifyAddress SiteProperty is not valid")
                         Else
                             Sender = siteProperties.getText("EmailOrderFromAddress")
-                            subject = webServerIO_requestDomain & " Online Order Pending, #" & ConfirmOrderID
-                            Message = "<p>An order confirmation has been recieved from PayPal for " & webServerIO_requestDomain & "</p>"
+                            subject = webServerIO.webServerIO_requestDomain & " Online Order Pending, #" & ConfirmOrderID
+                            Message = "<p>An order confirmation has been recieved from PayPal for " & webServerIO.webServerIO_requestDomain & "</p>"
                             Call main_SendEmail(Recipient, Sender, subject, Message, , False, True)
                         End If
                     End If
-                    webServerIO_BlockClosePageCopyright = True
+                    webServerIO.webServerIO_BlockClosePageCopyright = True
                     html_BlockClosePageLink = True
                     return_allowPostInitExecuteAddon = False '--- should be disposed by caller --- Call dispose
                     executeRoute_hardCodedPage = True
@@ -29095,7 +27687,7 @@ ErrorTrap:
                     '
                     ' protocol provided, do not fixup
                     '
-                    main_verifyTemplateLink = genericController.EncodeAppRootPath(main_verifyTemplateLink, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
+                    main_verifyTemplateLink = genericController.EncodeAppRootPath(main_verifyTemplateLink, webServerIO.webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
                 Else
                     '
                     ' no protocol, convert to short link
@@ -29106,8 +27698,8 @@ ErrorTrap:
                         '
                         main_verifyTemplateLink = "/" & main_verifyTemplateLink
                     End If
-                    main_verifyTemplateLink = genericController.ConvertLinkToShortLink(main_verifyTemplateLink, webServerIO.requestDomain, webServerIO_requestVirtualFilePath)
-                    main_verifyTemplateLink = genericController.EncodeAppRootPath(main_verifyTemplateLink, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
+                    main_verifyTemplateLink = genericController.ConvertLinkToShortLink(main_verifyTemplateLink, webServerIO.requestDomain, webServerIO.webServerIO_requestVirtualFilePath)
+                    main_verifyTemplateLink = genericController.EncodeAppRootPath(main_verifyTemplateLink, webServerIO.webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
                 End If
             End If
             '
@@ -29260,7 +27852,7 @@ ErrorTrap:
         '   replace invalid cookie characters with %hex
         '========================================================================
         '
-        Private Function main_encodeCookieName(ByVal Source As String) As String
+        Public Function main_encodeCookieName(ByVal Source As String) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("main_encodeCookieName")
             '
             Dim SourcePointer As Integer
@@ -29412,7 +28004,7 @@ ErrorTrap:
                         ' This field is default true, and non-authorable
                         ' It will be true in all cases, except a possible unforseen exception
                         '
-                        EmailBody = EmailBody & "<div style=""clear:both;padding:10px;"">" & csv_GetLinkedText("<a href=""" & html.html_EncodeHTML(webServerIO_requestProtocol & webServerIO.requestDomain & requestAppRootPath & siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
+                        EmailBody = EmailBody & "<div style=""clear:both;padding:10px;"">" & csv_GetLinkedText("<a href=""" & html.html_EncodeHTML(webServerIO.webServerIO_requestProtocol & webServerIO.requestDomain & requestAppRootPath & siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
                         EmailBody = genericController.vbReplace(EmailBody, "#member_email#", "UserEmailAddress")
                     End If
                     '
@@ -29613,7 +28205,7 @@ ErrorTrap:
             '
             ' Fix links for HTML send - must do it now before encodehtml so eid links will attach
             '
-            rootUrl = "http://" & webServerIO_requestDomain & requestAppRootPath
+            rootUrl = "http://" & webServerIO.webServerIO_requestDomain & requestAppRootPath
             iBodySource = genericController.ConvertLinksToAbsolute(iBodySource, rootUrl)
             '
             ' Build the list of groups
@@ -30322,7 +28914,7 @@ ErrorTrap:
                 main_RenderCache_CurrentPage_IsEditing = user.isEditing(main_RenderCache_CurrentPage_ContentName)
                 main_RenderCache_CurrentPage_IsQuickEditing = user.isQuickEditing(main_RenderCache_CurrentPage_ContentName)
                 main_RenderCache_CurrentPage_IsAuthoring = main_RenderCache_CurrentPage_IsEditing Or main_RenderCache_CurrentPage_IsQuickEditing
-                webServerIO_response_NoFollow = genericController.EncodeBoolean(cache_pageContent(PCC_AllowMetaContentNoFollow, main_RenderCache_CurrentPage_PCCPtr)) Or webServerIO_response_NoFollow
+                webServerIO.webServerIO_response_NoFollow = genericController.EncodeBoolean(cache_pageContent(PCC_AllowMetaContentNoFollow, main_RenderCache_CurrentPage_PCCPtr)) Or webServerIO.webServerIO_response_NoFollow
                 '
                 '        If main_oldCacheArray_CurrentPagePtr <> -1 Then
                 '            With main_oldCacheArray_CurrentPage(main_oldCacheArray_CurrentPagePtr)
@@ -30386,7 +28978,7 @@ ErrorTrap:
                 ParentID = genericController.EncodeInteger(cache_pageContent(PCC_ParentID, main_RenderCache_CurrentPage_PCCPtr))
                 'ParentID = main_oldCacheArray_CurrentPage(main_oldCacheArray_CurrentPagePtr).ParentID
                 If ArchivePage Then
-                    Call handleLegacyError12("main_LoadRenderCache_ParentBranch", "The Archive API is no longer supported. The current URL is [" & webServerIO_ServerLink & "]")
+                    Call handleLegacyError12("main_LoadRenderCache_ParentBranch", "The Archive API is no longer supported. The current URL is [" & webServerIO.webServerIO_ServerLink & "]")
 
                 Else
                     '
@@ -30802,7 +29394,7 @@ ErrorTrap:
                         & genericController.kmaIndent(PageContent) _
                         & cr & "</div>" _
                         & ""
-                ElseIf Not docOpen Then
+                ElseIf Not webServerIO.docOpen Then
                     '
                     ' exit if stream closed during main_GetSectionpage
                     '
@@ -30831,7 +29423,7 @@ ErrorTrap:
                     '
                     If Not pageManager_printVersion Then
                         LocalTemplateBody = html_executeContentCommands(Nothing, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, user.id, user.isAuthenticated, layoutError)
-                        returnHtmlBody = returnHtmlBody & html_encodeContent9(LocalTemplateBody, user.id, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", webServerIO_requestProtocol & webServerIO.requestDomain, False, siteProperties.defaultWrapperID, PageContent, CPUtilsBaseClass.addonContext.ContextTemplate)
+                        returnHtmlBody = returnHtmlBody & html_encodeContent9(LocalTemplateBody, user.id, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", webServerIO.webServerIO_requestProtocol & webServerIO.requestDomain, False, siteProperties.defaultWrapperID, PageContent, CPUtilsBaseClass.addonContext.ContextTemplate)
                         'returnHtmlBody = returnHtmlBody & EncodeContent8(LocalTemplateBody, memberID, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", main_ServerProtocol, False, app.SiteProperty_DefaultWrapperID, PageContent, ContextTemplate)
                     End If
                     '
@@ -31086,14 +29678,14 @@ ErrorTrap:
             '
             PageID = docProperties.getInteger("bid")
             If PageID <> 0 Then
-                Call webServerIO_addRefreshQueryString("bid", CStr(PageID))
+                Call webServerIO.webServerIO_addRefreshQueryString("bid", CStr(PageID))
             End If
             '
             ' Handle Section ID Request Variable
             '
             SectionID = docProperties.getInteger("sid")
             If SectionID <> 0 Then
-                Call webServerIO_addRefreshQueryString("sid", CStr(SectionID))
+                Call webServerIO.webServerIO_addRefreshQueryString("sid", CStr(SectionID))
             End If
             '
             '------------------------------------------------------------------------------------
@@ -31141,7 +29733,7 @@ ErrorTrap:
                     Call main_AddEndOfBodyJavascript2(genericController.encodeText(cache_siteSection(SSC_JSEndBody, Ptr)), "site section")
                     JSFilename = genericController.encodeText(cache_siteSection(SSC_JSFilename, Ptr))
                     If JSFilename <> "" Then
-                        JSFilename = webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
+                        JSFilename = webServerIO.webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
                         Call main_AddHeadScriptLink(JSFilename, "site section")
                     End If
                 End If
@@ -31177,7 +29769,7 @@ ErrorTrap:
                     Call main_AddEndOfBodyJavascript2(genericController.encodeText(cache_siteSection(SSC_JSEndBody, Ptr)), "site section")
                     JSFilename = genericController.encodeText(cache_siteSection(SSC_JSFilename, Ptr))
                     If JSFilename <> "" Then
-                        JSFilename = webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
+                        JSFilename = webServerIO.webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
                         Call main_AddHeadScriptLink(JSFilename, "site section")
                     End If
                 End If
@@ -31235,8 +29827,8 @@ ErrorTrap:
                     & vbCrLf & "</html>" _
                     & ""
                 'Call AppendLog("call main_getEndOfBody, from pageManager_getsection")
-                Call writeAltBuffer(Copy & html_GetEndOfBody(False, False, False, False))
-                Call handleLegacyError12("PagList_GetSection", "The page you requested could not be found and no landing page is configured for this domain [" & webServerIO_requestDomain & "].")
+                Call webServerIO.writeAltBuffer(Copy & html_GetEndOfBody(False, False, False, False))
+                Call handleLegacyError12("PagList_GetSection", "The page you requested could not be found and no landing page is configured for this domain [" & webServerIO.webServerIO_requestDomain & "].")
                 '--- should be disposed by caller --- Call dispose
                 Exit Function
             End If
@@ -31300,7 +29892,7 @@ ErrorTrap:
                         Call main_AddEndOfBodyJavascript2(db.cs_getText(CSSection, "JSEndBody"), "site section")
                         JSFilename = db.cs_getText(CSSection, "JSFilename")
                         If JSFilename <> "" Then
-                            JSFilename = webServerIO_requestPage & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
+                            JSFilename = webServerIO.webServerIO_requestPage & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
                             Call main_AddHeadScriptLink(JSFilename, "site section")
                         End If
                     End If
@@ -31450,7 +30042,7 @@ ErrorTrap:
                                 Else
                                     main_RenderedTemplateID = genericController.EncodeInteger(cache_pageTemplate(TC_ID, TCPtr))
                                     main_RenderedTemplateName = genericController.encodeText(cache_pageTemplate(TC_Name, TCPtr))
-                                    pageManager_TemplateReason = "This template [" & main_RenderedTemplateName & "] was used because it is selected as the default template for the current domain [" & webServerIO_requestDomain & "]."
+                                    pageManager_TemplateReason = "This template [" & main_RenderedTemplateName & "] was used because it is selected as the default template for the current domain [" & webServerIO.webServerIO_requestDomain & "]."
                                 End If
                             End If
                             If templateId = 0 Then
@@ -31477,7 +30069,7 @@ ErrorTrap:
                         ' Set the Template buffers
                         '
                         If TCPtr >= 0 Then
-                            If visit_browserIsMobile Then
+                            If visit.visit_browserIsMobile Then
                                 If siteProperties.getBoolean("AllowMobileTemplates") Then
                                     '
                                     ' set Mobile Template
@@ -31504,7 +30096,7 @@ ErrorTrap:
                             pageManager_TemplateBodyTag = genericController.encodeText(cache_pageTemplate(TC_BodyTag, TCPtr))
                             JSFilename = genericController.encodeText(cache_pageTemplate(TC_JSInHeadFilename, TCPtr))
                             If JSFilename <> "" Then
-                                JSFilename = webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
+                                JSFilename = webServerIO.webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
                                 Call main_AddHeadScriptLink(JSFilename, "template")
                             End If
                             '
@@ -31514,7 +30106,7 @@ ErrorTrap:
                                 If genericController.vbLCase(Right(StylesFilename, 4)) <> ".css" Then
                                     Call handleLegacyError15("Template [" & pageManager_TemplateName & "] StylesFilename is not a '.css' file, and will not display correct. Check that the field is setup as a CSSFile.", "main_GetHtmlBody_GetSection")
                                 Else
-                                    main_MetaContent_TemplateStyleSheetTag = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, StylesFilename) & """ >"
+                                    main_MetaContent_TemplateStyleSheetTag = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO.webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, StylesFilename) & """ >"
                                 End If
                             End If
                             '
@@ -31541,7 +30133,7 @@ ErrorTrap:
                             If (TCPtr >= 0) And (siteProperties.allowTemplateLinkVerification) Then
                                 PCCPtr = pageManager_cache_pageContent_getPtr(main_RenderedPageID, pagemanager_IsWorkflowRendering, user.isQuickEditing(""))
                                 '$$$$$ must check for PPtr<0
-                                SecureLink_CurrentURL = (Left(LCase(webServerIO_ServerLink), 8) = "https://")
+                                SecureLink_CurrentURL = (Left(LCase(webServerIO.webServerIO_ServerLink), 8) = "https://")
                                 SecureLink_Template_Required = genericController.EncodeBoolean(cache_pageTemplate(TC_IsSecure, TCPtr))
                                 SecureLink_Page_Required = genericController.EncodeBoolean(cache_pageContent(PCC_IsSecure, PCCPtr))
                                 SecureLink_Required = SecureLink_Template_Required Or SecureLink_Page_Required
@@ -31555,10 +30147,10 @@ ErrorTrap:
                                         ' redirect because protocol is wrong
                                         '
                                         If SecureLink_CurrentURL Then
-                                            pageManager_RedirectLink = genericController.vbReplace(webServerIO_ServerLink, "https://", "http://")
+                                            pageManager_RedirectLink = genericController.vbReplace(webServerIO.webServerIO_ServerLink, "https://", "http://")
                                             pageManager_RedirectReason = "Redirecting because neither the page or the template requires a secure link."
                                         Else
-                                            pageManager_RedirectLink = genericController.vbReplace(webServerIO_ServerLink, "http://", "https://")
+                                            pageManager_RedirectLink = genericController.vbReplace(webServerIO.webServerIO_ServerLink, "http://", "https://")
                                             If SecureLink_Page_Required Then
                                                 pageManager_RedirectReason = "Redirecting because this page [" & main_RenderedPageName & "] requires a secure link."
                                             Else
@@ -31570,7 +30162,7 @@ ErrorTrap:
                                     '
                                     ' ----- TemplateLink given
                                     '
-                                    CurrentLink = webServerIO_ServerLink
+                                    CurrentLink = webServerIO.webServerIO_ServerLink
                                     If genericController.vbInstr(1, templateLink, "://", vbTextCompare) <> 0 Then
                                         '
                                         ' ----- TemplateLink is full
@@ -31601,8 +30193,8 @@ ErrorTrap:
                                         '       test current short link vs template short link, and protocols
                                         '
                                         CurrentLink = genericController.vbReplace(CurrentLink, "https://", "http://", 1, 99, vbTextCompare)
-                                        CurrentLink = genericController.ConvertLinkToShortLink(CurrentLink, webServerIO.requestDomain, webServerIO_requestVirtualFilePath)
-                                        CurrentLink = genericController.EncodeAppRootPath(CurrentLink, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
+                                        CurrentLink = genericController.ConvertLinkToShortLink(CurrentLink, webServerIO.requestDomain, webServerIO.webServerIO_requestVirtualFilePath)
+                                        CurrentLink = genericController.EncodeAppRootPath(CurrentLink, webServerIO.webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
                                         LinkSplit = Split(CurrentLink, "?")
                                         CurrentLinkNoQuery = LinkSplit(0)
                                         If (SecureLink_CurrentURL <> SecureLink_Required) Or (UCase(templateLink) <> genericController.vbUCase(CurrentLinkNoQuery)) Then
@@ -31679,7 +30271,7 @@ ErrorTrap:
                                         Next
                                         linkDomain = content_GetRecordName("domains", setdomainId)
                                         If linkDomain <> "" Then
-                                            pageManager_RedirectLink = genericController.vbReplace(webServerIO_ServerLink, "://" & webServerIO.requestDomain, "://" & linkDomain, 1, 99, vbTextCompare)
+                                            pageManager_RedirectLink = genericController.vbReplace(webServerIO.webServerIO_ServerLink, "://" & webServerIO.requestDomain, "://" & linkDomain, 1, 99, vbTextCompare)
                                             pageManager_RedirectBecausePageNotFound = False
                                             pageManager_RedirectReason = "Redirecting because this template [" & main_RenderedTemplateName & "] requires a different domain [" & linkDomain & "]." & pageManager_TemplateReason
                                         End If
@@ -31740,7 +30332,7 @@ ErrorTrap:
             '------------------------------------------------------------------------------------
             '
             If pageManager_RedirectLink <> "" Then
-                Call webServerIO_Redirect2(pageManager_RedirectLink, pageManager_RedirectReason, pageManager_RedirectBecausePageNotFound)
+                Call webServerIO.webServerIO_Redirect2(pageManager_RedirectLink, pageManager_RedirectReason, pageManager_RedirectBecausePageNotFound)
             ElseIf AllowEditWrapper Then
                 returnHtml = main_GetEditWrapper("Page Content", returnHtml)
             End If
@@ -32258,7 +30850,7 @@ ErrorTrap:
                         '
                         ' Page Hit Notification
                         '
-                        If (Not visit_excludeFromAnalytics) And (contactMemberID <> 0) And (InStr(1, webServerIO.requestBrowser, "kmahttp", vbTextCompare) = 0) Then
+                        If (Not visit.visit_excludeFromAnalytics) And (contactMemberID <> 0) And (InStr(1, webServerIO.requestBrowser, "kmahttp", vbTextCompare) = 0) Then
                             AllowHitNotification = genericController.EncodeBoolean(cache_pageContent(PCC_AllowHitNotification, main_RenderCache_CurrentPage_PCCPtr))
                             'AllowHitNotification = app.csv_cs_getBoolean(CS, "AllowHitNotification")
                             If AllowHitNotification Then
@@ -32276,20 +30868,20 @@ ErrorTrap:
                                 Body = Body & "<p>This email was sent to you by the Contensive Server as a notification of the following content viewing details.</p>"
                                 Body = Body & genericController.StartTable(4, 1, 1)
                                 Body = Body & "<tr><td align=""right"" width=""150"" Class=""ccPanelHeader"">Description<br><img alt=""image"" src=""http://" & webServerIO.requestDomain & "/ccLib/images/spacer.gif"" width=""150"" height=""1""></td><td align=""left"" width=""100%"" Class=""ccPanelHeader"">Value</td></tr>"
-                                Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Domain", webServerIO_requestDomain, True)
-                                Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Link", webServerIO_ServerLink, False)
+                                Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Domain", webServerIO.webServerIO_requestDomain, True)
+                                Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Link", webServerIO.webServerIO_ServerLink, False)
                                 Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Page Name", PageName, True)
                                 Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Member Name", user.name, False)
                                 Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Member #", CStr(user.id), True)
-                                Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Start Time", CStr(visit_startTime), False)
-                                Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit #", CStr(visit_Id), True)
+                                Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Start Time", CStr(visit.visit_startTime), False)
+                                Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit #", CStr(visit.visit_Id), True)
                                 Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit IP", webServerIO.requestRemoteIP, False)
                                 Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Browser ", webServerIO.requestBrowser, True)
                                 Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visitor #", CStr(visitor_id), False)
-                                Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Authenticated", CStr(visit_isAuthenticated), True)
-                                Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Referrer", visit_referer, False)
+                                Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Authenticated", CStr(visit.visit_isAuthenticated), True)
+                                Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Referrer", visit.visit_referer, False)
                                 Body = Body & kmaEndTable
-                                Call email_sendMemberEmail3(contactMemberID, siteProperties.getText("EmailFromAddress", "info@" & webServerIO_requestDomain), "Page Hit Notification", Body, False, True, 0, "", False)
+                                Call email_sendMemberEmail3(contactMemberID, siteProperties.getText("EmailFromAddress", "info@" & webServerIO.webServerIO_requestDomain), "Page Hit Notification", Body, False, True, 0, "", False)
                             End If
                         End If
                         '
@@ -32379,7 +30971,7 @@ ErrorTrap:
                     '---------------------------------------------------------------------------------
                     '
                     If DateModified <> Date.MinValue Then
-                        Call web_addResponseHeader("LAST-MODIFIED", genericController.GetGMTFromDate(DateModified))
+                        Call webServerIO.web_addResponseHeader("LAST-MODIFIED", genericController.GetGMTFromDate(DateModified))
                         'Date: Sun, 07 Dec 2008 21:06:14 GMT
                     End If
                     '
@@ -32532,7 +31124,7 @@ ErrorTrap:
             Dim PageLink As String
             '
             'hint = "main_GetHtmlBody_GetSection_GetContentBox, enter"
-            If docOpen Then
+            If webServerIO.docOpen Then
                 '
                 ' ----- Load the content
                 '
@@ -33005,7 +31597,7 @@ ErrorTrap:
                 'hint = hint & ",030"
                 If (Not pageManager_printVersion) Then
                     IconRow = ""
-                    If (Not visit_isBot) And (AllowPrinterVersion Or AllowEmailPage) Then
+                    If (Not visit.visit_isBot) And (AllowPrinterVersion Or AllowEmailPage) Then
                         '
                         ' not a bot, and either print or email allowed
                         '
@@ -33025,14 +31617,14 @@ ErrorTrap:
                             '                    QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, HardCodedPagePrinterVersion, True)
                             Caption = siteProperties.getText("PagePrinterVersionCaption", "Printer Version")
                             Caption = genericController.vbReplace(Caption, " ", "&nbsp;")
-                            IconRow = IconRow & cr & "&nbsp;&nbsp;<a href=""" & html.html_EncodeHTML(webServerIO_requestPage & "?" & QueryString) & """ target=""_blank""><img alt=""image"" src=""/ccLib/images/IconSmallPrinter.gif"" width=""13"" height=""13"" border=""0"" align=""absmiddle""></a>&nbsp<a href=""" & html.html_EncodeHTML(webServerIO_requestPage & "?" & QueryString) & """ target=""_blank"" style=""text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;"">" & Caption & "</a>"
+                            IconRow = IconRow & cr & "&nbsp;&nbsp;<a href=""" & html.html_EncodeHTML(webServerIO.webServerIO_requestPage & "?" & QueryString) & """ target=""_blank""><img alt=""image"" src=""/ccLib/images/IconSmallPrinter.gif"" width=""13"" height=""13"" border=""0"" align=""absmiddle""></a>&nbsp<a href=""" & html.html_EncodeHTML(webServerIO.webServerIO_requestPage & "?" & QueryString) & """ target=""_blank"" style=""text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;"">" & Caption & "</a>"
                         End If
                         If AllowEmailPage Then
                             QueryString = web_RefreshQueryString
                             If QueryString <> "" Then
                                 QueryString = "?" & QueryString
                             End If
-                            EmailBody = webServerIO_requestProtocol & webServerIO.requestDomain & webServerIO.requestPathPage & QueryString
+                            EmailBody = webServerIO.webServerIO_requestProtocol & webServerIO.requestDomain & webServerIO.requestPathPage & QueryString
                             Caption = siteProperties.getText("PageAllowEmailCaption", "Email This Page")
                             Caption = genericController.vbReplace(Caption, " ", "&nbsp;")
                             IconRow = IconRow & cr & "&nbsp;&nbsp;<a HREF=""mailto:?SUBJECT=You might be interested in this&amp;BODY=" & EmailBody & """><img alt=""image"" src=""/ccLib/images/IconSmallEmail.gif"" width=""13"" height=""13"" border=""0"" align=""absmiddle""></a>&nbsp;<a HREF=""mailto:?SUBJECT=You might be interested in this&amp;BODY=" & EmailBody & """ style=""text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;"">" & Caption & "</a>"
@@ -33629,7 +32221,7 @@ ErrorTrap:
                         '   Verify Add-ons are run from Referrers on the Aggregate Access List
                         '--------------------------------------------------------------------------
                         '
-                        If webServerIO_ReadStreamJSForm Then
+                        If webServerIO.webServerIO_ReadStreamJSForm Then
                             If webServerIO.requestReferrer = "" Then
                                 '
                                 ' Allow it to be hand typed
@@ -33664,16 +32256,16 @@ ErrorTrap:
                                             End If
                                             Call db.cs_Close(cs)
                                             Call handleLegacyError12("Init", "Add-on call from [" & refHost & "] was blocked because this domain is not in the Aggregate Access Content. An inactive record was added. To allow this domain access, mark the record active.")
-                                            docOpen = False '--- should be disposed by caller --- Call dispose
-                                            Return _docBuffer
+                                            webServerIO.docOpen = False '--- should be disposed by caller --- Call dispose
+                                            Return webServerIO.webServerIO_buffer
                                         ElseIf Not db.cs_getBoolean(cs, "active") Then
                                             '
                                             ' inactive record, throw error
                                             '
                                             Call db.cs_Close(cs)
                                             Call handleLegacyError12("Init", "Add-on call from [" & refHost & "] was blocked because this domain is not active in the Aggregate Access Content. To allow this domain access, mark the record active.")
-                                            docOpen = False '--- should be disposed by caller --- Call dispose
-                                            Return _docBuffer
+                                            webServerIO.docOpen = False '--- should be disposed by caller --- Call dispose
+                                            Return webServerIO.webServerIO_buffer
                                         Else
                                             '
                                             ' Active record, allow hit
@@ -33727,9 +32319,9 @@ ErrorTrap:
                         '
                         ' deliver styles, javascript and other head tags as javascript appends
                         '
-                        webServerIO_BlockClosePageCopyright = True
+                        webServerIO.webServerIO_BlockClosePageCopyright = True
                         html_BlockClosePageLink = True
-                        If (webServerIO_OutStreamDevice = webServerIO_OutStreamJavaScript) Then
+                        If (webServerIO.webServerIO_OutStreamDevice = webServerIO.webServerIO_OutStreamJavaScript) Then
                             If genericController.vbInstr(1, returnResult, "<form ", vbTextCompare) <> 0 Then
                                 Dim FormSplit As String() = Split(returnResult, "<form ", , vbTextCompare)
                                 returnResult = FormSplit(0)
@@ -33743,7 +32335,7 @@ ErrorTrap:
                                 Next
                             End If
                             '
-                            Call writeAltBuffer(returnResult)
+                            Call webServerIO.writeAltBuffer(returnResult)
                             returnResult = ""
                         End If
                         '
@@ -33874,7 +32466,7 @@ ErrorTrap:
                                     Next
                                     returnResult = main_FormatRemoteQueryOutput(gd, RemoteFormatEnum.RemoteFormatJsonNameValue)
                                     returnResult = main_encodeHTML(returnResult)
-                                    Call writeAltBuffer(returnResult)
+                                    Call webServerIO.writeAltBuffer(returnResult)
                                 Case AjaxGetVisitProperty
                                     '
                                     ' 7/7/2009 - Moved from HardCodedPages - sets a visit property from the cj object
@@ -33901,12 +32493,12 @@ ErrorTrap:
                                     Next
                                     returnResult = main_FormatRemoteQueryOutput(gd, RemoteFormatEnum.RemoteFormatJsonNameValue)
                                     returnResult = main_encodeHTML(returnResult)
-                                    Call writeAltBuffer(returnResult)
+                                    Call webServerIO.writeAltBuffer(returnResult)
                                 Case AjaxData
                                     '
                                     ' 7/7/2009 - Moved from HardCodedPages - Run remote query from cj.remote object call, and return results html encoded in a <result></result> block
                                     ' 20050427 - not used
-                                    Call writeAltBuffer(init_ProcessAjaxData())
+                                    Call webServerIO.writeAltBuffer(init_ProcessAjaxData())
                                 Case AjaxPing
                                     '
                                     ' returns OK if the server is alive
@@ -33937,13 +32529,13 @@ ErrorTrap:
                             '
                             'Call AppendLog("main_init(), 2810 - exit for ajax hook")
                             '
-                            webServerIO_BlockClosePageCopyright = True
+                            webServerIO.webServerIO_BlockClosePageCopyright = True
                             html_BlockClosePageLink = True
                             'Call AppendLog("call main_getEndOfBody, from main_initf")
                             returnResult = returnResult & html_GetEndOfBody(False, False, True, False)
-                            Call writeAltBuffer(returnResult)
-                            docOpen = False '--- should be disposed by caller --- Call dispose
-                            Return _docBuffer
+                            Call webServerIO.writeAltBuffer(returnResult)
+                            webServerIO.docOpen = False '--- should be disposed by caller --- Call dispose
+                            Return webServerIO.webServerIO_buffer
                         End If
                     End If
                     '
@@ -33978,8 +32570,8 @@ ErrorTrap:
                                 Call db.cs_set(CSLog, "LogType", EmailLogTypeOpen)
                             End If
                             Call db.cs_Close(CSLog)
-                            RedirectLink = webServerIO_requestProtocol & webServerIO.requestDomain & "/ccLib/images/spacer.gif"
-                            Call webServerIO_Redirect2(RedirectLink, "Group Email Open hit, redirecting to a dummy image", False)
+                            RedirectLink = webServerIO.webServerIO_requestProtocol & webServerIO.requestDomain & "/ccLib/images/spacer.gif"
+                            Call webServerIO.webServerIO_Redirect2(RedirectLink, "Group Email Open hit, redirecting to a dummy image", False)
                         End If
                         '
                         emailDropId = docProperties.getInteger(RequestNameEmailClickFlag)
@@ -33994,7 +32586,7 @@ ErrorTrap:
                                 Call db.cs_set(CSLog, "Name", "Clicked " & CStr(app_startTime))
                                 Call db.cs_set(CSLog, "EmailDropID", emailDropId)
                                 Call db.cs_set(CSLog, "MemberID", EmailMemberID)
-                                Call db.cs_set(CSLog, "VisitId", visit_Id)
+                                Call db.cs_set(CSLog, "VisitId", visit.visit_Id)
                                 Call db.cs_set(CSLog, "LogType", EmailLogTypeClick)
                             End If
                             Call db.cs_Close(CSLog)
@@ -34025,12 +32617,12 @@ ErrorTrap:
                                     Call db.cs_set(CSLog, "Name", "Email Block Request " & CStr(app_startTime))
                                     Call db.cs_set(CSLog, "EmailDropID", emailDropId)
                                     Call db.cs_set(CSLog, "MemberID", EmailMemberID)
-                                    Call db.cs_set(CSLog, "VisitId", visit_Id)
+                                    Call db.cs_set(CSLog, "VisitId", visit.visit_Id)
                                     Call db.cs_set(CSLog, "LogType", EmailLogTypeBlockRequest)
                                 End If
                                 Call db.cs_Close(CSLog)
                             End If
-                            Call webServerIO_Redirect2(webServerIO_requestProtocol & webServerIO.requestDomain & "/ccLib/popup/EmailBlocked.htm", "Group Email Spam Block hit. Redirecting to EmailBlocked page.", False)
+                            Call webServerIO.webServerIO_Redirect2(webServerIO.webServerIO_requestProtocol & webServerIO.requestDomain & "/ccLib/popup/EmailBlocked.htm", "Group Email Spam Block hit. Redirecting to EmailBlocked page.", False)
                         End If
                     End If
                     '
@@ -34189,8 +32781,8 @@ ErrorTrap:
                         '
                         Dim ExitNow As Boolean = executeRoute_hardCodedPage(HardCodedPage)
                         If ExitNow Then
-                            docOpen = False '--- should be disposed by caller --- Call dispose
-                            Return _docBuffer
+                            webServerIO.docOpen = False '--- should be disposed by caller --- Call dispose
+                            Return webServerIO.webServerIO_buffer
                         End If
                     End If
                     '
@@ -34231,7 +32823,7 @@ ErrorTrap:
                         Dim defaultAddonId As Integer = siteProperties.getinteger("Default Route AddonId")
                         If defaultAddonId <> 0 Then
                             Dim addonStatusOk As Boolean = False
-                            returnResult = addon.execute(defaultAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", addonStatusOk, Nothing, "", Nothing, "", user.id, visit_isAuthenticated)
+                            returnResult = addon.execute(defaultAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", addonStatusOk, Nothing, "", Nothing, "", user.id, visit.visit_isAuthenticated)
                         End If
                         'returnResult = addonToBe_pageManager()
                     End If
@@ -34261,8 +32853,8 @@ ErrorTrap:
                 main_ClosePageCounter = 0
                 debug_allowDebugLog = True
                 app_startTime = DateTime.Now()
-                webServerIO_PageTestPointPrinting = True
-                webServerIO_AllowCookielessDetection = True
+                webServerIO.webServerIO_PageTestPointPrinting = True
+                webServerIO.webServerIO_AllowCookielessDetection = True
                 main_LoginIconFilename = ""
                 '
                 ' -- convert to lazy load
@@ -34562,7 +33154,7 @@ ErrorTrap:
         ''' <param name="MethodName"></param>
         ''' <param name="Cause"></param>
         ''' <remarks></remarks>
-        Private Sub handleLegacyError11(ByVal MethodName As String, ByVal Cause As String)
+        Friend Sub handleLegacyError11(ByVal MethodName As String, ByVal Cause As String)
             handleException(New Exception("Legacy error #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
             Throw New ApplicationException("handleLegacyError")
         End Sub
@@ -34574,7 +33166,7 @@ ErrorTrap:
         ''' <param name="MethodName"></param>
         ''' <param name="Cause"></param>
         ''' <remarks></remarks>
-        Private Sub handleLegacyError12(ByVal MethodName As String, ByVal Cause As String)
+        Friend Sub handleLegacyError12(ByVal MethodName As String, ByVal Cause As String)
             handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
             Throw New ApplicationException("handleLegacyError")
         End Sub
@@ -34585,7 +33177,7 @@ ErrorTrap:
         ''' </summary>
         ''' <param name="MethodName"></param>
         ''' <remarks></remarks>
-        Private Sub handleLegacyError13(ByVal MethodName As String)
+        Friend Sub handleLegacyError13(ByVal MethodName As String)
             handleException(New Exception("Legacy error, MethodName=[" & MethodName & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), "n/a", 2)
             Throw New ApplicationException("handleLegacyError")
         End Sub
@@ -34597,7 +33189,7 @@ ErrorTrap:
         ''' <param name="MethodName"></param>
         ''' <param name="Cause"></param>
         ''' <remarks></remarks>
-        Private Sub handleLegacyError14(ByVal MethodName As String, ByVal Cause As String)
+        Friend Sub handleLegacyError14(ByVal MethodName As String, ByVal Cause As String)
             handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
             Throw New ApplicationException("handleLegacyError")
         End Sub
@@ -34609,7 +33201,7 @@ ErrorTrap:
         ''' <param name="Cause"></param>
         ''' <param name="MethodName"></param>
         ''' <remarks></remarks>
-        Private Sub handleLegacyError15(ByVal Cause As String, ByVal MethodName As String)
+        Friend Sub handleLegacyError15(ByVal Cause As String, ByVal MethodName As String)
             handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
             Throw New ApplicationException("handleLegacyError")
         End Sub
@@ -34658,7 +33250,7 @@ ErrorTrap:
         ''' <param name="Err_Description"></param>
         ''' <param name="ResumeNext"></param>
         ''' <remarks></remarks>
-        Private Sub handleLegacyError19(ByVal MethodName As String, ByVal Cause As String, ByVal Err_Number As Integer, ByVal Err_Source As String, ByVal Err_Description As String, ByVal ResumeNext As Boolean)
+        Friend Sub handleLegacyError19(ByVal MethodName As String, ByVal Cause As String, ByVal Err_Number As Integer, ByVal Err_Source As String, ByVal Err_Description As String, ByVal ResumeNext As Boolean)
             handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err_Number & "," & Err_Source & "," & Err_Description & ""), Cause, 2)
             Throw New ApplicationException("handleLegacyError")
         End Sub
@@ -34700,7 +33292,7 @@ ErrorTrap:
         ''' <param name="ErrorObject"></param>
         ''' <param name="Cause"></param>
         ''' <remarks></remarks>
-        Private Sub handleLegacyError22(ByVal ErrorObject As ErrObject, ByVal Cause As String)
+        Friend Sub handleLegacyError22(ByVal ErrorObject As ErrObject, ByVal Cause As String)
             handleException(New Exception("Legacy error, cause=[" & Cause & "] #" & ErrorObject.Number & "," & ErrorObject.Source & "," & ErrorObject.Description & ""), Cause, 2)
             Throw New ApplicationException("handleLegacyError")
         End Sub
@@ -35138,7 +33730,7 @@ ErrorTrap:
                             '
                             ' If visit tracking, save the viewing record
                             '
-                            ViewingName = Left(visit_Id & "." & visit_pages, 10)
+                            ViewingName = Left(visit.visit_Id & "." & visit.visit_pages, 10)
                             PageID = main_RenderedPageID
                             FieldNames = "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,ContentControlID,pagetime,Active,CreateKey,RecordID"
                             FieldNames = FieldNames & ",ExcludeFromAnalytics"
@@ -35153,22 +33745,22 @@ ErrorTrap:
                                 & FieldNames _
                                 & ")VALUES(" _
                                 & " " & db.encodeSQLText(ViewingName) _
-                                & "," & db.encodeSQLNumber(visit_Id) _
+                                & "," & db.encodeSQLNumber(visit.visit_Id) _
                                 & "," & db.encodeSQLNumber(user.id) _
                                 & "," & db.encodeSQLText(webServerIO.requestDomain) _
-                                & "," & db.encodeSQLText(webServerIO_requestPath) _
-                                & "," & db.encodeSQLText(webServerIO_requestPage) _
+                                & "," & db.encodeSQLText(webServerIO.webServerIO_requestPath) _
+                                & "," & db.encodeSQLText(webServerIO.webServerIO_requestPage) _
                                 & "," & db.encodeSQLText(Left(webServerIO.requestQueryString, 255)) _
                                 & "," & db.encodeSQLText(Left(Form, 255)) _
                                 & "," & db.encodeSQLText(Left(webServerIO.requestReferrer, 255)) _
                                 & "," & db.encodeSQLDate(app_startTime) _
-                                & "," & db.encodeSQLBoolean(visit_stateOK) _
+                                & "," & db.encodeSQLBoolean(visit.visit_stateOK) _
                                 & "," & db.encodeSQLNumber(main_GetContentID("Viewings")) _
                                 & "," & db.encodeSQLNumber(GetTickCount - app_startTickCount) _
                                 & ",1" _
                                 & "," & db.encodeSQLNumber(CSMax) _
                                 & "," & db.encodeSQLNumber(PageID)
-                            SQL &= "," & db.encodeSQLBoolean(webServerIO_PageExcludeFromAnalytics)
+                            SQL &= "," & db.encodeSQLBoolean(webServerIO.webServerIO_PageExcludeFromAnalytics)
                             SQL &= "," & db.encodeSQLText(main_MetaContent_Title)
                             SQL &= ");"
                             Call db.executeSqlAsync(SQL)

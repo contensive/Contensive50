@@ -188,7 +188,7 @@ Namespace Contensive.Core
                                     End If
                                     .IsForm = False
                                     .IsFile = False
-                                    cpCore.webServerIO_ReadStreamJSForm = cpCore.webServerIO_ReadStreamJSForm Or (UCase(.Name) = genericController.vbUCase(RequestNameJSForm))
+                                    cpCore.webServerIO.webServerIO_ReadStreamJSForm = cpCore.webServerIO.webServerIO_ReadStreamJSForm Or (UCase(.Name) = genericController.vbUCase(RequestNameJSForm))
                                     cpCore.main_ReadStreamJSProcess = cpCore.main_ReadStreamJSProcess Or (UCase(.Name) = genericController.vbUCase(RequestNameJSProcess))
                                     cpCore.docProperties.setProperty(key, docProperty)
                                 End If

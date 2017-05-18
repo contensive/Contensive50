@@ -145,7 +145,7 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <returns></returns>
         Public Function isAuthenticated() As Boolean
-            Return cpCore.visit_isAuthenticated
+            Return cpCore.visit.visit_isAuthenticated
         End Function
         '
         '========================================================================
@@ -170,7 +170,7 @@ Namespace Contensive.Core
                     Dim localContentNameOrId As String
                     Dim cacheTestName As String
                     '
-                    If Not cpCore.visit_initialized Then
+                    If Not cpCore.visit.visit_initialized Then
                         Call cpCore.debug_testPoint("...visit not initialized")
                     Else
                         '
@@ -266,7 +266,7 @@ Namespace Contensive.Core
         Public Function isAuthenticatedAdmin() As Boolean
             Dim returnIs As Boolean = False
             Try
-                If (Not isAuthenticatedAdmin_cache_isLoaded) And cpCore.visit_initialized Then
+                If (Not isAuthenticatedAdmin_cache_isLoaded) And cpCore.visit.visit_initialized Then
                     isAuthenticatedAdmin_cache = isAuthenticated() And (isAdmin Or isDeveloper)
                     isAuthenticatedAdmin_cache_isLoaded = True
                 End If
@@ -286,7 +286,7 @@ Namespace Contensive.Core
         Public Function isAuthenticatedDeveloper() As Boolean
             Dim returnIs As Boolean = False
             Try
-                If (Not isAuthenticatedDeveloper_cache_isLoaded) And cpCore.visit_initialized Then
+                If (Not isAuthenticatedDeveloper_cache_isLoaded) And cpCore.visit.visit_initialized Then
                     isAuthenticatedDeveloper_cache = (isAuthenticated() And isDeveloper)
                     isAuthenticatedDeveloper_cache_isLoaded = True
                 End If
@@ -309,7 +309,7 @@ Namespace Contensive.Core
             Try
                 Dim SQL As String
                 '
-                If cpCore.visit_initialized Then
+                If cpCore.visit.visit_initialized Then
                     If (id > 0) Then
                         SQL = "UPDATE ccMembers SET " _
                         & " Name=" & cpCore.db.encodeSQLText(name) _
@@ -387,7 +387,7 @@ Namespace Contensive.Core
                         QS = genericController.ModifyQueryString(QS, "method", "")
                         QS = genericController.ModifyQueryString(QS, "RequestBinary", "")
                         '
-                        Call cpCore.webServerIO_Redirect2("?" & QS, "Login form success", False)
+                        Call cpCore.webServerIO.webServerIO_Redirect2("?" & QS, "Login form success", False)
                     End If
                 End If
                 If loginAddonID = 0 Then
@@ -620,7 +620,7 @@ Namespace Contensive.Core
                         '
                         styleFilename = cpCore.db.cs_getText(CS, "StyleFilename")
                         If styleFilename <> "" Then
-                            Call cpCore.main_AddStylesheetLink(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, styleFilename))
+                            Call cpCore.main_AddStylesheetLink(cpCore.webServerIO.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, styleFilename))
                         End If
                         excludeFromAnalytics = cpCore.db.cs_getBoolean(CS, "ExcludeFromAnalytics")
                         returnRecordId = recordId
@@ -697,7 +697,7 @@ Namespace Contensive.Core
         Public Function isAuthenticatedMember() As Boolean
             Dim returnREsult As Boolean = False
             Try
-                If (Not property_user_isMember_isLoaded) And (cpCore.visit_initialized) Then
+                If (Not property_user_isMember_isLoaded) And (cpCore.visit.visit_initialized) Then
                     property_user_isMember = isAuthenticated() And cpCore.IsWithinContent(contentControlID, cpCore.main_GetContentID("members"))
                     property_user_isMember_isLoaded = True
                 End If
@@ -732,11 +732,11 @@ Namespace Contensive.Core
                     loginForm_Password = cpCore.docProperties.getText("password")
                     loginForm_AutoLogin = cpCore.doc_getBoolean2("autologin")
                     '
-                    If (cpCore.visit_loginAttempts < main_maxVisitLoginAttempts) And (cpCore.visit_cookieSupport) Then
+                    If (cpCore.visit.visit_loginAttempts < main_maxVisitLoginAttempts) And cpCore.visit.visit_cookieSupport Then
                         LocalMemberID = authenticateGetId(loginForm_Username, loginForm_Password)
                         If LocalMemberID = 0 Then
-                            cpCore.visit_loginAttempts = cpCore.visit_loginAttempts + 1
-                            Call cpCore.visit_save()
+                            cpCore.visit.visit_loginAttempts = cpCore.visit.visit_loginAttempts + 1
+                            Call cpCore.visit.visit_save()
                         Else
                             returnREsult = authenticateById(LocalMemberID, loginForm_AutoLogin)
                             If returnREsult Then
@@ -860,15 +860,15 @@ Namespace Contensive.Core
                         End If
                         If cpCore.db.cs_ok(CS) Then
                             'hint = "160"
-                            FromAddress = cpCore.siteProperties.getText("EmailFromAddress", "info@" & cpCore.webServerIO_requestDomain)
-                            subject = "Password Request at " & cpCore.webServerIO_requestDomain
+                            FromAddress = cpCore.siteProperties.getText("EmailFromAddress", "info@" & cpCore.webServerIO.webServerIO_requestDomain)
+                            subject = "Password Request at " & cpCore.webServerIO.webServerIO_requestDomain
                             Message = ""
                             Do While cpCore.db.cs_ok(CS)
                                 'hint = "170"
                                 updateUser = False
                                 If Message = "" Then
                                     'hint = "180"
-                                    Message = "This email was sent in reply to a request at " & cpCore.webServerIO_requestDomain & " for the username and password associated with this email address. "
+                                    Message = "This email was sent in reply to a request at " & cpCore.webServerIO.webServerIO_requestDomain & " for the username and password associated with this email address. "
                                     Message = Message & "If this request was made by you, please return to the login screen and use the following:" & vbCrLf
                                     Message = Message & vbCrLf
                                 Else
@@ -1067,19 +1067,19 @@ Namespace Contensive.Core
                     '
                     ' Log them in
                     '
-                    cpCore.visit_isAuthenticated = True
-                    Call cpCore.visit_save()
+                    cpCore.visit.visit_isAuthenticated = True
+                    Call cpCore.visit.visit_save()
                     isAuthenticatedAdmin_cache_isLoaded = False
                     property_user_isMember_isLoaded = False
                     isAuthenticatedDeveloper_cache_isLoaded = False
                     '
                     ' Write Cookies in case Visit Tracking is off
                     '
-                    If cpCore.visit_startTime = Date.MinValue Then
-                        cpCore.visit_startTime = cpCore.app_startTime
+                    If cpCore.visit.visit_startTime = Date.MinValue Then
+                        cpCore.visit.visit_startTime = cpCore.app_startTime
                     End If
                     If Not cpCore.siteProperties.allowVisitTracking Then
-                        Call cpCore.visit_init(True)
+                        Call cpCore.visit.visit_init(True)
                     End If
                     '
                     ' Change autologin if included, selected, and allowed
@@ -1126,11 +1126,11 @@ Namespace Contensive.Core
                     & ""
                 CS = cpCore.db.cs_openSql(SQL)
                 If cpCore.db.cs_ok(CS) Then
-                    If cpCore.visit_Id = 0 Then
+                    If cpCore.visit.visit_Id = 0 Then
                         '
                         ' Visit was blocked during init, init the visit DateTime.Now
                         '
-                        Call cpCore.visit_init(True)
+                        Call cpCore.visit.visit_init(True)
                     End If
                     '
                     ' ----- Member was recognized
@@ -1158,7 +1158,7 @@ Namespace Contensive.Core
                     language = (cpCore.db.cs_getText(CS, "LanguageName"))
                     styleFilename = cpCore.db.cs_getText(CS, "StyleFilename")
                     If styleFilename <> "" Then
-                        Call cpCore.main_AddStylesheetLink(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, styleFilename))
+                        Call cpCore.main_AddStylesheetLink(cpCore.webServerIO.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, styleFilename))
                     End If
                     excludeFromAnalytics = cpCore.db.cs_getBoolean(CS, "ExcludeFromAnalytics")
                     '
@@ -1170,10 +1170,10 @@ Namespace Contensive.Core
                     End If
                     lastVisit = cpCore.app_startTime
                     'cpCore.main_VisitMemberID = id
-                    cpCore.visit_loginAttempts = 0
+                    cpCore.visit.visit_loginAttempts = 0
                     cpCore.visitor_memberID = id
-                    cpCore.visit_excludeFromAnalytics = cpCore.visit_excludeFromAnalytics Or cpCore.visit_isBot Or excludeFromAnalytics Or isAdmin Or isDeveloper
-                    Call cpCore.visit_save()
+                    cpCore.visit.visit_excludeFromAnalytics = cpCore.visit.visit_excludeFromAnalytics Or cpCore.visit.visit_isBot Or excludeFromAnalytics Or isAdmin Or isDeveloper
+                    Call cpCore.visit.visit_save()
                     Call cpCore.visitor_save()
                     Call saveMemberBase()
                     returnREsult = True
@@ -1196,7 +1196,7 @@ Namespace Contensive.Core
                 Dim CSMember As Integer
                 Dim CSlanguage As Integer
                 '
-                Call createUserDefaults(cpCore.visit_name)
+                Call createUserDefaults(cpCore.visit.visit_name)
                 '
                 id = 0
                 CSMember = cpCore.db.cs_insertRecord("people")
@@ -1233,8 +1233,8 @@ Namespace Contensive.Core
                     '
                     'cpCore.main_VisitMemberID = id
                     cpCore.visitor_memberID = id
-                    cpCore.visit_isAuthenticated = False
-                    Call cpCore.visit_save()
+                    cpCore.visit.visit_isAuthenticated = False
+                    Call cpCore.visit.visit_save()
                     Call cpCore.visitor_save()
                     '
                     isAuthenticatedAdmin_cache_isLoaded = False
@@ -1278,7 +1278,7 @@ Namespace Contensive.Core
                 contentControlID = 0
                 active = False
                 visits = 0
-                lastVisit = cpCore.visit_startTime
+                lastVisit = cpCore.visit.visit_startTime
                 company = ""
                 user_Title = ""
                 main_MemberAddress = ""
@@ -1325,7 +1325,7 @@ Namespace Contensive.Core
             Try
                 Dim SQL As String
                 '
-                If cpCore.visit_initialized Then
+                If cpCore.visit.visit_initialized Then
                     If (id > 0) Then
                         SQL = "UPDATE ccMembers SET " _
                         & " Name=" & cpCore.db.encodeSQLText(name) _
@@ -1471,7 +1471,7 @@ Namespace Contensive.Core
                 '
                 Call cpCore.main_SetMetaContent(0, 0)
                 Call cpCore.main_AddPagetitle2("Login", "loginPage")
-                head = cpCore.webServerIO_GetHTMLInternalHead(False)
+                head = cpCore.webServerIO.webServerIO_GetHTMLInternalHead(False)
                 If cpCore.pageManager_TemplateBodyTag <> "" Then
                     bodyTag = cpCore.pageManager_TemplateBodyTag
                 Else
@@ -1514,7 +1514,7 @@ Namespace Contensive.Core
                     '
                     ' ----- When page loads, set focus on login username
                     '
-                    Call cpCore.webServerIO_addRefreshQueryString("method", "")
+                    Call cpCore.webServerIO.webServerIO_addRefreshQueryString("method", "")
                     loginForm = ""
                     Call cpCore.main_AddOnLoadJavascript2("document.getElementById('LoginUsernameInput').focus()", "login")
                     '
@@ -1693,7 +1693,7 @@ Namespace Contensive.Core
                     ' ----- password blank, stop here
                     '
                     Call cpCore.error_AddUserError("A valid login requires a non-blank password.")
-                ElseIf (cpCore.visit_loginAttempts >= main_maxVisitLoginAttempts) Then
+                ElseIf (cpCore.visit.visit_loginAttempts >= main_maxVisitLoginAttempts) Then
                     '
                     ' ----- already tried 5 times
                     '

@@ -119,7 +119,8 @@ NOTES:
    add a call to the DynamicOptionList code to trigger the population of the child
    list. For example,
    
-   <select onChange="yourfunction(); dol.change(this)">
+   <select onChange="yourfunction(); dol
+(this)">
  
 */ 
 // Global objects to keep track of DynamicOptionList objects created on the page

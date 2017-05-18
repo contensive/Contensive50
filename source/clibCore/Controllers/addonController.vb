@@ -431,7 +431,7 @@ Namespace Contensive.Core.Controllers
                     OtherHeadTags = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_OtherHeadTags)
                     JSFilename = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_JSFilename)
                     If JSFilename <> "" Then
-                        JSFilename = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
+                        JSFilename = cpCore.webServerIO.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
                     End If
                 End If
                 If Not String.IsNullOrEmpty(ProgramID) Then
@@ -588,7 +588,7 @@ Namespace Contensive.Core.Controllers
                                 AddonName = "Addon #" & addonId
                             End If
                             If Context = CPUtilsBaseClass.addonContext.ContextAdmin Then
-                                returnVal = "The Add-on '" & AddonName & "' could not be found. It may have been deleted or marked inactive. If you are receiving this message after clicking an Add-on from the Navigator, their may be a problem with this Add-on. If you are receiving this message from the main admin page, your Dashboard Add-on may be set incorrectly. Use the Admin tab under Preferences to select the Dashboard, or <a href=""?" & RequestNameDashboardReset & "=" & cpCore.visit_Id & """>click here</a> to automatically reset the dashboard."
+                                returnVal = "The Add-on '" & AddonName & "' could not be found. It may have been deleted or marked inactive. If you are receiving this message after clicking an Add-on from the Navigator, their may be a problem with this Add-on. If you are receiving this message from the main admin page, your Dashboard Add-on may be set incorrectly. Use the Admin tab under Preferences to select the Dashboard, or <a href=""?" & RequestNameDashboardReset & "=" & cpCore.visit.visit_Id & """>click here</a> to automatically reset the dashboard."
                             Else
                                 returnVal = "The Add-on '" & AddonName & "' could not be found. It may have been deleted or marked inactive. Please use the Add-on Manager to replace it, or edit this page and remove it."
                             End If
@@ -843,7 +843,7 @@ Namespace Contensive.Core.Controllers
                                     '
                                     ' web-only
                                     '
-                                    Link = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & requestAppRootPath & cpCore.siteProperties.serverPageDefault
+                                    Link = cpCore.webServerIO.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & requestAppRootPath & cpCore.siteProperties.serverPageDefault
                                     If genericController.vbInstr(1, Link, "?") = 0 Then
                                         Link = Link & "?"
                                     Else
@@ -927,10 +927,10 @@ Namespace Contensive.Core.Controllers
                                         Call cpCore.main_AddEndOfBodyJavascript2(JSBodyEnd, AddedByName)
                                         Call cpCore.main_AddHeadScriptLink(JSFilename, AddedByName)
                                         If DefaultStylesFilename <> "" Then
-                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
+                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
                                         End If
                                         If CustomStylesFilename <> "" Then
-                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
+                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
                                         End If
                                     End If
                                 End If
@@ -946,8 +946,8 @@ Namespace Contensive.Core.Controllers
                                     ' Add-on setup for InFrame, running the call-back - this page must think it is just the remotemethod
                                     '
                                     If isMainOk Then
-                                        Call cpCore.webServerIO_addRefreshQueryString(RequestNameRemoteMethodAddon, AddonNameOrGuid_Local)
-                                        Call cpCore.webServerIO_addRefreshQueryString("optionstring", WorkingOptionString)
+                                        Call cpCore.webServerIO.webServerIO_addRefreshQueryString(RequestNameRemoteMethodAddon, AddonNameOrGuid_Local)
+                                        Call cpCore.webServerIO.webServerIO_addRefreshQueryString("optionstring", WorkingOptionString)
                                     End If
                                 ElseIf (AsAjax And (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) Then
                                     '
@@ -969,7 +969,7 @@ Namespace Contensive.Core.Controllers
                                             If NVPair <> "" Then
                                                 NVSplit = Split(NVPair, "=")
                                                 If UBound(NVSplit) > 0 Then
-                                                    Call cpCore.webServerIO_addRefreshQueryString(NVSplit(0), NVSplit(1))
+                                                    Call cpCore.webServerIO.webServerIO_addRefreshQueryString(NVSplit(0), NVSplit(1))
                                                 End If
                                             End If
                                         Next
@@ -1154,9 +1154,9 @@ Namespace Contensive.Core.Controllers
                                                 ' use request object to build link
                                                 '
                                                 If Mid(WorkingLink, 1, 1) = "/" Then
-                                                    WorkingLink = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & WorkingLink
+                                                    WorkingLink = cpCore.webServerIO.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & WorkingLink
                                                 Else
-                                                    WorkingLink = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.webServerIO_requestVirtualFilePath & WorkingLink
+                                                    WorkingLink = cpCore.webServerIO.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.webServerIO.webServerIO_requestVirtualFilePath & WorkingLink
                                                 End If
                                             Else
                                                 '
@@ -1214,7 +1214,7 @@ Namespace Contensive.Core.Controllers
                                         End If
                                     End If
                                     Link = modifyLinkQuery(Link, RequestNameJSForm, "1", True)
-                                    Link = EncodeAppRootPath(Link, cpCore.webServerIO_requestVirtualFilePath, requestAppRootPath, cpCore.webServerIO.requestDomain)
+                                    Link = EncodeAppRootPath(Link, cpCore.webServerIO.webServerIO_requestVirtualFilePath, requestAppRootPath, cpCore.webServerIO.requestDomain)
                                     ScriptCallbackContent = "<SCRIPT LANGUAGE=""JAVASCRIPT"" SRC=""" & Link & """></SCRIPT>"
                                 End If
                                 '
@@ -1237,10 +1237,10 @@ Namespace Contensive.Core.Controllers
                                         Call cpCore.main_AddEndOfBodyJavascript2(JSBodyEnd, AddedByName)
                                         Call cpCore.main_AddHeadScriptLink(JSFilename, AddedByName)
                                         If DefaultStylesFilename <> "" Then
-                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
+                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
                                         End If
                                         If CustomStylesFilename <> "" Then
-                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
+                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
                                         End If
                                     End If
                                 End If
@@ -4606,7 +4606,7 @@ ErrorTrap:
                 '
                 JSFilename = cpCore.db.cs_getText(CS, "jsfilename")
                 If JSFilename <> "" Then
-                    JSFilename = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
+                    JSFilename = cpCore.webServerIO.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
                     Call cpCore.main_AddHeadScriptLink(JSFilename, SourceComment)
                 End If
                 Copy = cpCore.db.cs_getText(CS, "stylesfilename")
@@ -4614,7 +4614,7 @@ ErrorTrap:
                     If genericController.vbInstr(1, Copy, "://") <> 0 Then
                     ElseIf Left(Copy, 1) = "/" Then
                     Else
-                        Copy = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, Copy)
+                        Copy = cpCore.webServerIO.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, Copy)
                     End If
                     Call cpCore.main_AddStylesheetLink2(Copy, SourceComment)
                 End If

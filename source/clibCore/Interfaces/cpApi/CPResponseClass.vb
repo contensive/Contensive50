@@ -57,7 +57,7 @@ Namespace Contensive.Core
             End Get
             Set(ByVal value As String)
                 If True Then
-                    Call cpCore.webServerIO_setResponseContentType(value)
+                    Call cpCore.webServerIO.webServerIO_setResponseContentType(value)
                 End If
             End Set
         End Property
@@ -100,13 +100,13 @@ Namespace Contensive.Core
 
         Public Overrides Sub AddHeader(ByVal HeaderName As String, ByVal HeaderValue As String) 'Inherits BaseClasses.CPResponseBaseClass.AddHeader
             If True Then
-                Call cpCore.web_addResponseHeader(HeaderName, HeaderValue)
+                Call cpCore.webServerIO.web_addResponseHeader(HeaderName, HeaderValue)
             End If
         End Sub
 
         Public Overrides Sub Flush() 'Inherits BaseClasses.CPResponseBaseClass.Flush
             If True Then
-                Call cpCore.webServerIO_FlushStream()
+                Call cpCore.webServerIO.webServerIO_FlushStream()
             End If
         End Sub
         Public Overrides Sub Redirect(ByVal Link As String) 'Inherits BaseClasses.CPResponseBaseClass.Redirect
@@ -117,13 +117,13 @@ Namespace Contensive.Core
 
         Public Overrides Sub SetBuffer(ByVal BufferOn As Boolean) 'Inherits BaseClasses.CPResponseBaseClass.SetBuffer
             If True Then
-                Call cpCore.webServerIO_SetStreamBuffer(BufferOn)
+                Call cpCore.webServerIO.webServerIO_SetStreamBuffer(BufferOn)
             End If
         End Sub
 
         Public Overrides Sub SetStatus(ByVal status As String) 'Inherits BaseClasses.CPResponseBaseClass.SetStatus
             If True Then
-                Call cpCore.web_setResponseStatus(status)
+                Call cpCore.webServerIO.web_setResponseStatus(status)
             End If
         End Sub
 
@@ -135,7 +135,7 @@ Namespace Contensive.Core
 
         Public Overrides Sub SetType(ByVal ContentType As String) 'Inherits BaseClasses.CPResponseBaseClass.SetType
             If True Then
-                Call cpCore.webServerIO_setResponseContentType(ContentType)
+                Call cpCore.webServerIO.webServerIO_setResponseContentType(ContentType)
             End If
         End Sub
 
@@ -147,7 +147,7 @@ Namespace Contensive.Core
 
         Public Overrides Sub Write(ByVal message As String)
             If True Then
-                Call cpCore.writeAltBuffer(message)
+                Call cpCore.webServerIO.writeAltBuffer(message)
             End If
         End Sub
         '
@@ -156,7 +156,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property isOpen() As Boolean
             Get
                 If True Then
-                    Return cpCore.docOpen
+                    Return cpCore.webServerIO.docOpen
                 Else
                     Return False
                 End If

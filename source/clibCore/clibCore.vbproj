@@ -407,12 +407,14 @@
     <Compile Include="Controllers\addonController.vb" />
     <Compile Include="Controllers\cacheController.vb" />
     <Compile Include="coreDocPropertiesClass.vb" />
+    <Compile Include="Models\Context\visitModel.vb" />
+    <Compile Include="Models\Context\_blankModel.vb" />
     <Compile Include="Models\Entity\domainLegacyModel.vb" />
     <Compile Include="coreEncodeBase64Class.vb" />
     <Compile Include="addon_pageManager\pageManagerController.vb" />
     <Compile Include="addon_tools\addon_toolConfigureEdit.vb" />
     <Compile Include="Models\Context\coreSitePropertiesClass.vb" />
-    <Compile Include="coreUserClass.vb" />
+    <Compile Include="Models\Context\coreUserClass.vb" />
     <Compile Include="Controllers\webServerIOController.vb" />
     <Compile Include="coreMetaDataClass.vb" />
     <Compile Include="coreCacheKeyPtrClass.vb" />

@@ -182,7 +182,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' -- default datasource
                     returnConnString = "" _
-                        & cpCore.dbEngine.getConnectionStringADONET() _
+                        & cpCore.dbServer.getConnectionStringADONET() _
                         & "Database=" & catalogName & ";"
                 Else
                     '

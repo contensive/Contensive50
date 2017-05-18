@@ -46,8 +46,8 @@ Namespace Contensive.Addons
                     & Now() _
                     & vbCrLf & "member.name:" & cpCore.user.name _
                     & vbCrLf & "member.id:" & cpCore.user.id _
-                    & vbCrLf & "visit.id:" & cpCore.visit_Id _
-                    & vbCrLf & "url:" & cpCore.webServerIO_ServerLink _
+                    & vbCrLf & "visit.id:" & cpCore.visit.visit_Id _
+                    & vbCrLf & "url:" & cpCore.webServerIO.webServerIO_ServerLink _
                     & vbCrLf & "url source:" & cpCore.webServerIO.requestLinkSource
                 SaveContent &= "" _
                         & vbCrLf & "----------" _
@@ -75,7 +75,7 @@ Namespace Contensive.Addons
                 Call cpCore.main_SetMetaContent(0, 0)
                 '
                 AdminContent = execute_getContent("")    ' REFACTOR - passing the inner container's content is deprecated. We now execute addons within the admin addon
-                If Not cpCore.docOpen Then
+                If Not cpCore.webServerIO.docOpen Then
                     '
                     ' stream closed, don't both
                     '
@@ -111,8 +111,8 @@ Namespace Contensive.Addons
                     & Now() _
                     & vbCrLf & "member.name:" & cpCore.user.name _
                     & vbCrLf & "member.id:" & cpCore.user.id _
-                    & vbCrLf & "visit.id:" & cpCore.visit_Id _
-                    & vbCrLf & "url:" & cpCore.webServerIO_ServerLink _
+                    & vbCrLf & "visit.id:" & cpCore.visit.visit_Id _
+                    & vbCrLf & "url:" & cpCore.webServerIO.webServerIO_ServerLink _
                     & vbCrLf & "url source:" & cpCore.webServerIO.requestLinkSource _
                     & vbCrLf & "----------" _
                     & vbCrLf & "response:" _
@@ -236,7 +236,7 @@ Namespace Contensive.Addons
             '-------------------------------------------------------------------------------
             '
 leak200:
-            If Not cpCore.docOpen Then
+            If Not cpCore.webServerIO.docOpen Then
                 '
                 ' ----- no stream anyway, do nothing
                 '
@@ -335,7 +335,7 @@ leak200:
                 If (AdminSourceForm = AdminFormEdit) Then
                     If (Not cpCore.error_IsUserError()) And cpCore.main_ReturnAfterEdit And ((AdminButton = ButtonOK) Or (AdminButton = ButtonCancel) Or (AdminButton = ButtonDelete) Or (AdminButton = ButtonPublish) Or (AdminButton = ButtonPublishApprove) Or (AdminButton = ButtonAbortEdit) Or (AdminButton = ButtonPublishSubmit)) Then
                         EditReferer = cpCore.docProperties.getText("EditReferer")
-                        CurrentLink = genericController.modifyLinkQuery(cpCore.webServerIO_ServerLink, "editreferer", "", False)
+                        CurrentLink = genericController.modifyLinkQuery(cpCore.webServerIO.webServerIO_ServerLink, "editreferer", "", False)
                         CurrentLink = genericController.vbLCase(CurrentLink)
                         '
                         ' check if this editreferer includes cid=thisone and id=thisone -- if so, go to index form for this cid
@@ -344,7 +344,7 @@ leak200:
                             '
                             ' return to the page it came from
                             '
-                            Call cpCore.webServerIO_Redirect2(EditReferer, "Admin Edit page returning to the EditReferer setting", False)
+                            Call cpCore.webServerIO.webServerIO_Redirect2(EditReferer, "Admin Edit page returning to the EditReferer setting", False)
                             Exit Function
                         Else
                             '
@@ -371,13 +371,13 @@ leak200:
                 ' build refresh string
                 '-------------------------------------------------------------------------------
                 '
-                If AdminContent.Id <> 0 Then Call cpCore.webServerIO_addRefreshQueryString("cid", genericController.encodeText(AdminContent.Id))
-                If editRecord.id <> 0 Then Call cpCore.webServerIO_addRefreshQueryString("id", genericController.encodeText(editRecord.id))
-                If TitleExtension <> "" Then Call cpCore.webServerIO_addRefreshQueryString(RequestNameTitleExtension, cpCore.main_EncodeRequestVariable(TitleExtension))
-                If RecordTop <> 0 Then Call cpCore.webServerIO_addRefreshQueryString("rt", genericController.encodeText(RecordTop))
-                If RecordsPerPage <> RecordsPerPageDefault Then Call cpCore.webServerIO_addRefreshQueryString("rs", genericController.encodeText(RecordsPerPage))
-                If AdminForm <> 0 Then Call cpCore.webServerIO_addRefreshQueryString(RequestNameAdminForm, genericController.encodeText(AdminForm))
-                If MenuDepth <> 0 Then Call cpCore.webServerIO_addRefreshQueryString(RequestNameAdminDepth, genericController.encodeText(MenuDepth))
+                If AdminContent.Id <> 0 Then Call cpCore.webServerIO.webServerIO_addRefreshQueryString("cid", genericController.encodeText(AdminContent.Id))
+                If editRecord.id <> 0 Then Call cpCore.webServerIO.webServerIO_addRefreshQueryString("id", genericController.encodeText(editRecord.id))
+                If TitleExtension <> "" Then Call cpCore.webServerIO.webServerIO_addRefreshQueryString(RequestNameTitleExtension, cpCore.main_EncodeRequestVariable(TitleExtension))
+                If RecordTop <> 0 Then Call cpCore.webServerIO.webServerIO_addRefreshQueryString("rt", genericController.encodeText(RecordTop))
+                If RecordsPerPage <> RecordsPerPageDefault Then Call cpCore.webServerIO.webServerIO_addRefreshQueryString("rs", genericController.encodeText(RecordsPerPage))
+                If AdminForm <> 0 Then Call cpCore.webServerIO.webServerIO_addRefreshQueryString(RequestNameAdminForm, genericController.encodeText(AdminForm))
+                If MenuDepth <> 0 Then Call cpCore.webServerIO.webServerIO_addRefreshQueryString(RequestNameAdminDepth, genericController.encodeText(MenuDepth))
                 '
                 ' normalize guid
                 '
@@ -418,13 +418,13 @@ leak200:
                     '
                     ' display Addon Help
                     '
-                    Call cpCore.webServerIO_addRefreshQueryString("helpaddonid", HelpAddonID.ToString)
+                    Call cpCore.webServerIO.webServerIO_addRefreshQueryString("helpaddonid", HelpAddonID.ToString)
                     ContentCell = GetAddonHelp(HelpAddonID, "")
                 ElseIf (HelpCollectionID <> 0) Then
                     '
                     ' display Collection Help
                     '
-                    Call cpCore.webServerIO_addRefreshQueryString("helpcollectionid", HelpCollectionID.ToString)
+                    Call cpCore.webServerIO.webServerIO_addRefreshQueryString("helpcollectionid", HelpCollectionID.ToString)
                     ContentCell = GetCollectionHelp(HelpCollectionID, "")
                 ElseIf (AdminForm <> 0) Then
                     '
@@ -473,7 +473,7 @@ leak200:
                         Case AdminFormDownloads
                             ContentCell = (GetForm_Downloads())
                         Case AdminformRSSControl
-                            Call cpCore.webServerIO_Redirect2("?cid=" & cpCore.main_GetContentID("RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.", False)
+                            Call cpCore.webServerIO.webServerIO_Redirect2("?cid=" & cpCore.main_GetContentID("RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.", False)
                         Case AdminFormImportWizard
                             ContentCell = cpCore.addon.execute_legacy4(ImportWizardGuid, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
                         Case AdminFormCustomReports
@@ -495,17 +495,17 @@ leak200:
                         '
                         ' Special case, call the routine that provides a backup
                         '
-                        Call cpCore.webServerIO_addRefreshQueryString("addonguid", AddonManagerGuid)
+                        Call cpCore.webServerIO.webServerIO_addRefreshQueryString("addonguid", AddonManagerGuid)
                         ContentCell = GetAddonManager()
                     Else
                         If addonId <> 0 Then
-                            Call cpCore.webServerIO_addRefreshQueryString("addonid", CStr(addonId))
+                            Call cpCore.webServerIO.webServerIO_addRefreshQueryString("addonid", CStr(addonId))
                             CS = cpCore.csOpen(cnAddons, addonId)
                             If Not cpCore.db.cs_ok(CS) Then
                                 Call cpCore.error_AddUserError("The Add-on you requested could not be found by its id " & addonId)
                             End If
                         ElseIf AddonGuid <> "" Then
-                            Call cpCore.webServerIO_addRefreshQueryString("addonguid", AddonGuid)
+                            Call cpCore.webServerIO.webServerIO_addRefreshQueryString("addonguid", AddonGuid)
                             '$$$$$ cache this
                             If True Then ' 3.4.060" Then
                                 CS = cpCore.db.cs_open(cnAddons, "ccguid=" & cpCore.db.encodeSQLText(AddonGuid))
@@ -516,7 +516,7 @@ leak200:
                                 Call cpCore.error_AddUserError("The Add-on you requested could not be found by its guid " & AddonGuid)
                             End If
                         ElseIf AddonName <> "" Then
-                            Call cpCore.webServerIO_addRefreshQueryString("addonname", AddonName)
+                            Call cpCore.webServerIO.webServerIO_addRefreshQueryString("addonname", AddonName)
                             CS = cpCore.db.cs_open(cnAddons, "name=" & cpCore.db.encodeSQLText(AddonName))
                             If Not cpCore.db.cs_ok(CS) Then
                                 Call cpCore.error_AddUserError("The Add-on you requested could not be found by its name " & AddonName)
@@ -526,7 +526,7 @@ leak200:
                             addonId = cpCore.db.cs_getInteger(CS, "ID")
                             AddonName = cpCore.db.cs_getText(CS, "name")
                             AddonHelpCopy = cpCore.db.cs_getText(CS, "help")
-                            Call cpCore.webServerIO_addRefreshQueryString(RequestNameRunAddon, addonId.ToString)
+                            Call cpCore.webServerIO.webServerIO_addRefreshQueryString(RequestNameRunAddon, addonId.ToString)
                         End If
                         Call cpCore.db.cs_Close(CS)
                         InstanceOptionString = cpCore.userProperty.getText("Addon [" & AddonName & "] Options", "")
@@ -714,8 +714,8 @@ ErrorTrap:
                     Exit For
                 Else
                     WherePair(1, WCount) = genericController.encodeText(cpCore.docProperties.getText("WR" & WCount))
-                    Call cpCore.webServerIO_addRefreshQueryString("wl" & WCount, cpCore.main_EncodeRequestVariable(WherePair(0, WCount)))
-                    Call cpCore.webServerIO_addRefreshQueryString("wr" & WCount, cpCore.main_EncodeRequestVariable(WherePair(1, WCount)))
+                    Call cpCore.webServerIO.webServerIO_addRefreshQueryString("wl" & WCount, cpCore.main_EncodeRequestVariable(WherePair(0, WCount)))
+                    Call cpCore.webServerIO.webServerIO_addRefreshQueryString("wr" & WCount, cpCore.main_EncodeRequestVariable(WherePair(1, WCount)))
                 End If
             Next
             '
@@ -726,7 +726,7 @@ ErrorTrap:
                 '
                 ' ***** really needs a server.URLDecode() function
                 '
-                Call cpCore.webServerIO_addRefreshQueryString("wc", WhereClauseContent)
+                Call cpCore.webServerIO.webServerIO_addRefreshQueryString("wc", WhereClauseContent)
                 'WhereClauseContent = genericController.vbReplace(WhereClauseContent, "%3D", "=")
                 'WhereClauseContent = genericController.vbReplace(WhereClauseContent, "%26", "&")
                 If WhereClauseContent <> "" Then
@@ -3894,7 +3894,7 @@ ErrorTrap:
                 '
                 EditReferer = cpCore.docProperties.getText(RequestNameEditReferer)
                 If EditReferer = "" Then
-                    EditReferer = cpCore.webServerIO_requestReferer
+                    EditReferer = cpCore.webServerIO.webServerIO_requestReferer
                     If EditReferer <> "" Then
                         '
                         ' special case - if you are coming from the advanced search, go back to the list page
@@ -3909,7 +3909,7 @@ ErrorTrap:
                         End If
                     End If
                 End If
-                Call cpCore.webServerIO_addRefreshQueryString(RequestNameEditReferer, EditReferer)
+                Call cpCore.webServerIO.webServerIO_addRefreshQueryString(RequestNameEditReferer, EditReferer)
                 '
                 ' Print common form elements
                 '
@@ -4694,7 +4694,7 @@ ErrorTrap:
                 '
                 '
                 '
-                Call cpCore.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "StaticPublishControl, Cancel Button Pressed", False)
+                Call cpCore.webServerIO.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "StaticPublishControl, Cancel Button Pressed", False)
             ElseIf Not cpCore.user.isAuthenticatedAdmin Then
                 '
                 '
@@ -4941,7 +4941,7 @@ ErrorTrap:
                 '
                 '
                 '
-                Call cpCore.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "Admin Publish, Cancel Button Pressed", False)
+                Call cpCore.webServerIO.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "Admin Publish, Cancel Button Pressed", False)
             ElseIf Not cpCore.user.isAuthenticatedAdmin Then
                 '
                 '
@@ -6691,8 +6691,8 @@ ErrorTrap:
                         HTMLFieldString = "" _
                             & "<SCRIPT type=text/javascript>" _
                             & vbCrLf & "var ccProto=(('https:'==document.location.protocol) ? 'https://' : 'http://');" _
-                            & vbCrLf & "document.write(unescape(""%3Cscript src='"" + ccProto + """ & cpCore.webServerIO_requestDomain & "/ccLib/ClientSide/Core.js' type='text/javascript'%3E%3C/script%3E""));" _
-                            & vbCrLf & "document.write(unescape(""%3Cscript src='"" + ccProto + """ & cpCore.webServerIO_requestDomain & "/" & genericController.EncodeURL(editRecord.nameLc) & "?requestjsform=1' type='text/javascript'%3E%3C/script%3E""));" _
+                            & vbCrLf & "document.write(unescape(""%3Cscript src='"" + ccProto + """ & cpCore.webServerIO.webServerIO_requestDomain & "/ccLib/ClientSide/Core.js' type='text/javascript'%3E%3C/script%3E""));" _
+                            & vbCrLf & "document.write(unescape(""%3Cscript src='"" + ccProto + """ & cpCore.webServerIO.webServerIO_requestDomain & "/" & genericController.EncodeURL(editRecord.nameLc) & "?requestjsform=1' type='text/javascript'%3E%3C/script%3E""));" _
                             & vbCrLf & "</SCRIPT>"
                         '<SCRIPT type=text/javascript>
                         'var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
@@ -7148,7 +7148,7 @@ ErrorTrap:
                 ' This is really messy -- there must be a better way
                 '
                 addonId = 0
-                If (cpCore.visit_Id = cpCore.docProperties.getInteger(RequestNameDashboardReset)) Then
+                If (cpCore.visit.visit_Id = cpCore.docProperties.getInteger(RequestNameDashboardReset)) Then
                     '$$$$$ cache this
                     CS = cpCore.db.cs_open(cnAddons, "ccguid=" & cpCore.db.encodeSQLText(DashboardAddonGuid))
                     If cpCore.db.cs_ok(CS) Then
@@ -7222,10 +7222,10 @@ ErrorTrap:
                     & vbCrLf & "<div style=""padding:20px;height:450px"">" _
                     & vbCrLf & "<div><a href=http://www.Contensive.com target=_blank><img style=""border:1px solid #000;"" src=""/ccLib/images/ContensiveAdminLogo.GIF"" border=0 ></A></div>" _
                     & vbCrLf & "<div><strong>Contensive/" & cpCore.codeVersion & "</strong></div>" _
-                    & vbCrLf & "<div style=""clear:both;height:18px;margin-top:10px""><div style=""float:left;width:200px;"">Domain Name</div><div style=""float:left;"">" & cpCore.webServerIO_requestDomain & "</div></div>" _
+                    & vbCrLf & "<div style=""clear:both;height:18px;margin-top:10px""><div style=""float:left;width:200px;"">Domain Name</div><div style=""float:left;"">" & cpCore.webServerIO.webServerIO_requestDomain & "</div></div>" _
                     & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;"">Login Member Name</div><div style=""float:left;"">" & cpCore.user.name & "</div></div>" _
                     & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;"">Quick Reports</div><div style=""float:left;""><a Href=""?" & RequestNameAdminForm & "=" & AdminFormQuickStats & """>Real-Time Activity</A></div></div>" _
-                    & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;""><a Href=""?" & RequestNameDashboardReset & "=" & cpCore.visit_Id & """>Run Dashboard</A></div></div>" _
+                    & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;""><a Href=""?" & RequestNameDashboardReset & "=" & cpCore.visit.visit_Id & """>Run Dashboard</A></div></div>" _
                     & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;""><a Href=""?addonguid=" & AddonManagerGuid & """>Add-on Manager</A></div></div>"
                     '
                     If cpCore.error_IsUserError Then
@@ -10191,7 +10191,7 @@ ErrorTrap:
                             End If
                             '
                             editRecord.id = 0
-                            Call cpCore.webServerIO_addRefreshQueryString("id", genericController.encodeText(editRecord.id))
+                            Call cpCore.webServerIO.webServerIO_addRefreshQueryString("id", genericController.encodeText(editRecord.id))
                         End If
                     Case Else
                         '
@@ -10243,7 +10243,7 @@ ErrorTrap:
                                 End With
                             Next
                             '
-                            Call cpCore.webServerIO_addRefreshQueryString("id", genericController.encodeText(editRecord.id))
+                            Call cpCore.webServerIO.webServerIO_addRefreshQueryString("id", genericController.encodeText(editRecord.id))
                         End If
                         'Call cpCore.main_AddUserError("The create duplicate action is not supported for this content.")
                 End Select
@@ -10581,7 +10581,7 @@ ErrorTrap:
                 '
                 '
                 '
-                Call cpCore.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "GetContentChildTool, Cancel Button Pressed", False)
+                Call cpCore.webServerIO.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "GetContentChildTool, Cancel Button Pressed", False)
             ElseIf Not cpCore.user.isAuthenticatedAdmin Then
                 '
                 '
@@ -10898,7 +10898,7 @@ ErrorTrap:
                 '
                 '
                 '
-                Call cpCore.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "HouseKeepingControl, Cancel Button Pressed", False)
+                Call cpCore.webServerIO.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "HouseKeepingControl, Cancel Button Pressed", False)
             ElseIf Not cpCore.user.isAuthenticatedAdmin Then
                 '
                 '
@@ -10933,7 +10933,7 @@ ErrorTrap:
                 End Select
                 '
                 If Button = ButtonOK Then
-                    Call cpCore.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "StaticPublishControl, OK Button Pressed", False)
+                    Call cpCore.webServerIO.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "StaticPublishControl, OK Button Pressed", False)
                 End If
                 '
                 ' ----- Status
@@ -11106,7 +11106,7 @@ ErrorTrap:
                 '
                 '
                 '
-                Call cpCore.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "StyleEditor, Cancel Button Pressed", False)
+                Call cpCore.webServerIO.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "StyleEditor, Cancel Button Pressed", False)
             ElseIf Not cpCore.user.isAuthenticatedAdmin Then
                 '
                 '
@@ -11464,7 +11464,7 @@ ErrorTrap:
             '
             Button = cpCore.docProperties.getText(RequestNameButton)
             If Button = ButtonCancel Then
-                Call cpCore.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "Downloads, Cancel Button Pressed", False)
+                Call cpCore.webServerIO.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "Downloads, Cancel Button Pressed", False)
             End If
             '
             If Not cpCore.user.isAuthenticatedAdmin() Then
@@ -12155,7 +12155,7 @@ ErrorTrap:
                 If Button <> "" Then
                     Select Case Button
                         Case ButtonCancel
-                            Call cpCore.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "CustomReports, Cancel Button Pressed", False)
+                            Call cpCore.webServerIO.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "CustomReports, Cancel Button Pressed", False)
                             'Call cpCore.main_Redirect2(encodeAppRootPath(cpCore.main_GetSiteProperty2("AdminURL"), cpCore.main_ServerVirtualPath, cpCore.app.RootPath, cpCore.main_ServerHost))
                         Case ButtonDelete
                             RowCnt = cpCore.docProperties.getInteger("RowCnt")
@@ -12542,14 +12542,14 @@ ErrorTrap:
                             '
                             ' Refresh Query String
                             '
-                            Call cpCore.webServerIO_addRefreshQueryString("tr", IndexConfig.RecordTop.ToString())
-                            Call cpCore.webServerIO_addRefreshQueryString("asf", AdminForm.ToString())
-                            Call cpCore.webServerIO_addRefreshQueryString("cid", adminContent.Id.ToString())
-                            Call cpCore.webServerIO_addRefreshQueryString(RequestNameTitleExtension, cpCore.main_EncodeRequestVariable(TitleExtension))
+                            Call cpCore.webServerIO.webServerIO_addRefreshQueryString("tr", IndexConfig.RecordTop.ToString())
+                            Call cpCore.webServerIO.webServerIO_addRefreshQueryString("asf", AdminForm.ToString())
+                            Call cpCore.webServerIO.webServerIO_addRefreshQueryString("cid", adminContent.Id.ToString())
+                            Call cpCore.webServerIO.webServerIO_addRefreshQueryString(RequestNameTitleExtension, cpCore.main_EncodeRequestVariable(TitleExtension))
                             If WherePairCount > 0 Then
                                 For WhereCount = 0 To WherePairCount - 1
-                                    Call cpCore.webServerIO_addRefreshQueryString("wl" & WhereCount, WherePair(0, WhereCount))
-                                    Call cpCore.webServerIO_addRefreshQueryString("wr" & WhereCount, WherePair(1, WhereCount))
+                                    Call cpCore.webServerIO.webServerIO_addRefreshQueryString("wl" & WhereCount, WherePair(0, WhereCount))
+                                    Call cpCore.webServerIO.webServerIO_addRefreshQueryString("wr" & WhereCount, WherePair(1, WhereCount))
                                 Next
                             End If
                             '
@@ -15038,7 +15038,7 @@ ErrorTrap:
                 '
                 ' Cancel out to the main page
                 '
-                Call cpCore.webServerIO_Redirect2("?", "CancelAll button pressed on Index Export", False)
+                Call cpCore.webServerIO.webServerIO_Redirect2("?", "CancelAll button pressed on Index Export", False)
             ElseIf Button <> ButtonCancel Then
                 '
                 ' get content access rights

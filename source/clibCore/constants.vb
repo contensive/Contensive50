@@ -1616,6 +1616,10 @@ Namespace Contensive.Core
         ' link forward cache
         '
         Public Const cache_linkForward_cacheName = "cache_linkForward"
+        '
+        Public Const main_cookieNameVisit = "visit"
+        Public Const main_cookieNameVisitor = "visitor"
+
     End Module
     '
 End Namespace

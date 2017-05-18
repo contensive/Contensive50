@@ -210,7 +210,7 @@ Namespace Contensive.Core
                 If False Then
                     Return DomainPrimary
                 Else
-                    Return cpCore.webServerIO_requestDomain
+                    Return cpCore.webServerIO.webServerIO_requestDomain
                 End If
             End Get
         End Property

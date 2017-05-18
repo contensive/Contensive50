@@ -286,7 +286,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub addRefreshQueryString(ByVal Name As String, ByVal Value As String)
             If True Then
-                Call cpCore.webServerIO_addRefreshQueryString(Name, Value)
+                Call cpCore.webServerIO.webServerIO_addRefreshQueryString(Name, Value)
             End If
         End Sub
         '

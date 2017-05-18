@@ -198,7 +198,7 @@
 //        /// <returns></returns>
 //        public bool isAuthenticated()
 //        {
-//            return cpCore.visit_isAuthenticated;
+//            return cpCore.visit.visit_isAuthenticated;
 //        }
 //        //
 //        //========================================================================
@@ -227,7 +227,7 @@
 //                    string localContentNameOrId = null;
 //                    string cacheTestName = null;
 //                    //
-//                    if (!cpCore.visit_initialized)
+//                    if (!cpCore.visit.visit_initialized)
 //                    {
 //                        cpCore.testPoint("...visit not initialized");
 //                    }
@@ -353,7 +353,7 @@
 //            bool returnIs = false;
 //            try
 //            {
-//                if ((!isAuthenticatedAdmin_cache_isLoaded) & cpCore.visit_initialized)
+//                if ((!isAuthenticatedAdmin_cache_isLoaded) & cpCore.visit.visit_initialized)
 //                {
 //                    isAuthenticatedAdmin_cache = isAuthenticated() & (isAdmin | isDeveloper);
 //                    isAuthenticatedAdmin_cache_isLoaded = true;
@@ -380,7 +380,7 @@
 //            bool returnIs = false;
 //            try
 //            {
-//                if ((!isAuthenticatedDeveloper_cache_isLoaded) & cpCore.visit_initialized)
+//                if ((!isAuthenticatedDeveloper_cache_isLoaded) & cpCore.visit.visit_initialized)
 //                {
 //                    isAuthenticatedDeveloper_cache = (isAuthenticated() & isDeveloper);
 //                    isAuthenticatedDeveloper_cache_isLoaded = true;
@@ -408,7 +408,7 @@
 //            {
 //                string SQL = null;
 //                //
-//                if (cpCore.visit_initialized)
+//                if (cpCore.visit.visit_initialized)
 //                {
 //                    if ((id > 0))
 //                    {
@@ -799,7 +799,7 @@
 //            bool returnREsult = false;
 //            try
 //            {
-//                if ((!property_user_isMember_isLoaded) & (cpCore.visit_initialized))
+//                if ((!property_user_isMember_isLoaded) & (cpCore.visit.visit_initialized))
 //                {
 //                    property_user_isMember = isAuthenticated() & cpCore.IsWithinContent(contentControlID, cpCore.main_GetContentID("members"));
 //                    property_user_isMember_isLoaded = true;
@@ -840,13 +840,13 @@
 //                    loginForm_Password = cpCore.docProperties.getText("password");
 //                    loginForm_AutoLogin = cpCore.main_GetStreamBoolean2("autologin");
 //                    //
-//                    if ((cpCore.visit_loginAttempts < main_maxVisitLoginAttempts) & (cpCore.visit_cookieSupport))
+//                    if ((cpCore.visit.visit_loginAttempts < main_maxVisitLoginAttempts) & (cpCore.visit.visit_cookieSupport))
 //                    {
 //                        LocalMemberID = authenticateGetId(loginForm_Username, loginForm_Password);
 //                        if (LocalMemberID == 0)
 //                        {
-//                            cpCore.visit_loginAttempts = cpCore.visit_loginAttempts + 1;
-//                            cpCore.visit_save();
+//                            cpCore.visit.visit_loginAttempts = cpCore.visit.visit_loginAttempts + 1;
+//                            cpCore.visit.visit_save();
 //                        }
 //                        else {
 //                            returnREsult = authenticateById(LocalMemberID, loginForm_AutoLogin);
@@ -1231,21 +1231,21 @@
 //                    //
 //                    // Log them in
 //                    //
-//                    cpCore.visit_isAuthenticated = true;
-//                    cpCore.visit_save();
+//                    cpCore.visit.visit_isAuthenticated = true;
+//                    cpCore.visit.visit_save();
 //                    isAuthenticatedAdmin_cache_isLoaded = false;
 //                    property_user_isMember_isLoaded = false;
 //                    isAuthenticatedDeveloper_cache_isLoaded = false;
 //                    //
 //                    // Write Cookies in case Visit Tracking is off
 //                    //
-//                    if (cpCore.visit_startTime == System.DateTime.MinValue)
+//                    if (cpCore.visit.visit_startTime == System.DateTime.MinValue)
 //                    {
-//                        cpCore.visit_startTime = cpCore.main_PageStartTime;
+//                        cpCore.visit.visit_startTime = cpCore.main_PageStartTime;
 //                    }
 //                    if (!cpCore.siteProperties.allowVisitTracking)
 //                    {
-//                        cpCore.visit_init(true);
+//                        cpCore.visit.visit_init(true);
 //                    }
 //                    //
 //                    // Change autologin if included, selected, and allowed
@@ -1290,12 +1290,12 @@
 //                CS = cpCore.db.cs_openSql(SQL);
 //                if (cpCore.db.cs_Ok(CS))
 //                {
-//                    if (cpCore.visit_Id == 0)
+//                    if (cpCore.visit.visit_Id == 0)
 //                    {
 //                        //
 //                        // Visit was blocked during init, init the visit DateTime.Now
 //                        //
-//                        cpCore.visit_init(true);
+//                        cpCore.visit.visit_init(true);
 //                    }
 //                    //
 //                    // ----- Member was recognized
@@ -1338,10 +1338,10 @@
 //                    }
 //                    lastVisit = cpCore.main_PageStartTime;
 //                    //cpCore.main_VisitMemberID = id
-//                    cpCore.visit_loginAttempts = 0;
+//                    cpCore.visit.visit_loginAttempts = 0;
 //                    cpCore.visitor_memberID = id;
-//                    cpCore.visit_excludeFromAnalytics = cpCore.visit_excludeFromAnalytics | cpCore.visit_isBot | excludeFromAnalytics | isAdmin | isDeveloper;
-//                    cpCore.visit_save();
+//                    cpCore.visit.visit_excludeFromAnalytics = cpCore.visit.visit_excludeFromAnalytics | cpCore.visit.visit_isBot | excludeFromAnalytics | isAdmin | isDeveloper;
+//                    cpCore.visit.visit_save();
 //                    cpCore.visitor_save();
 //                    saveMemberBase();
 //                    returnREsult = true;
@@ -1368,7 +1368,7 @@
 //                int CSMember = 0;
 //                int CSlanguage = 0;
 //                //
-//                createUserDefaults(cpCore.visit_name);
+//                createUserDefaults(cpCore.visit.visit_name);
 //                //
 //                id = 0;
 //                CSMember = cpCore.db.cs_insertRecord("people");
@@ -1408,8 +1408,8 @@
 //                    //
 //                    //cpCore.main_VisitMemberID = id
 //                    cpCore.visitor_memberID = id;
-//                    cpCore.visit_isAuthenticated = false;
-//                    cpCore.visit_save();
+//                    cpCore.visit.visit_isAuthenticated = false;
+//                    cpCore.visit.visit_save();
 //                    cpCore.visitor_save();
 //                    //
 //                    isAuthenticatedAdmin_cache_isLoaded = false;
@@ -1457,7 +1457,7 @@
 //                contentControlID = 0;
 //                active = false;
 //                visits = 0;
-//                lastVisit = cpCore.visit_startTime;
+//                lastVisit = cpCore.visit.visit_startTime;
 //                company = "";
 //                user_Title = "";
 //                main_MemberAddress = "";
@@ -1509,7 +1509,7 @@
 //            {
 //                string SQL = null;
 //                //
-//                if (cpCore.visit_initialized)
+//                if (cpCore.visit.visit_initialized)
 //                {
 //                    if ((id > 0))
 //                    {
@@ -1854,7 +1854,7 @@
 //                    //
 //                    cpCore.error_AddUserError("A valid login requires a non-blank password.");
 //                }
-//                else if ((cpCore.visit_loginAttempts >= main_maxVisitLoginAttempts))
+//                else if ((cpCore.visit.visit_loginAttempts >= main_maxVisitLoginAttempts))
 //                {
 //                    //
 //                    // ----- already tried 5 times
