@@ -233,7 +233,7 @@ Namespace Contensive.Core.Controllers
                         '
                         Copy = ""
                         Panel = Panel & "<td align=""right"" width=""100"" valign=""top""><p>Feedback</p></td>"
-                        Panel = Panel & "<td>" & cpcore.html_GetFormInputText2("NoteCopy", Copy, 4, 40, "TextArea", False) & "</td>"
+                        Panel = Panel & "<td>" & cpCore.htmldoc.html_GetFormInputText2("NoteCopy", Copy, 4, 40, "TextArea", False) & "</td>"
                         'Panel = Panel & "<td><textarea ID=""TextArea"" rows=""4"" cols=""40"" name=""NoteCopy"">" & Copy & "</textarea></td>"
                         Panel = Panel & "</tr><tr>"
                         '
@@ -474,7 +474,7 @@ Namespace Contensive.Core.Controllers
                         Call cpCore.db.cs_goNext(CS)
                     Loop
                     If result <> "" Then
-                        result = cpCore.html_GetContentCopy("Watch List Caption: " & ListName, ListName, cpCore.user.id, True, cpCore.user.isAuthenticated) & cr & "<ul class=""ccWatchList"">" & kmaIndent(result) & cr & "</ul>"
+                        result = cpCore.htmldoc.html_GetContentCopy("Watch List Caption: " & ListName, ListName, cpCore.user.id, True, cpCore.user.isAuthenticated) & cr & "<ul class=""ccWatchList"">" & kmaIndent(result) & cr & "</ul>"
                     End If
                 End If
                 Call cpCore.db.cs_Close(CS)

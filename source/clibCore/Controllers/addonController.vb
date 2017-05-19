@@ -450,7 +450,7 @@ Namespace Contensive.Core.Controllers
                     Ptr = cpCore.cache_addonStyleRules.getFirstPtr(addonIdKey)
                     Do While Ptr >= 0
                         styleId = genericController.EncodeInteger(cpCore.cache_addonStyleRules.getValue(Ptr))
-                        Call cpCore.main_AddSharedStyleID2(styleId, AddonName)
+                        Call cpCore.htmlDoc.main_AddSharedStyleID2(styleId, AddonName)
                         Ptr = cpCore.cache_addonStyleRules.getNextPtr()
                     Loop
                     '
@@ -592,7 +592,7 @@ Namespace Contensive.Core.Controllers
                             Else
                                 returnVal = "The Add-on '" & AddonName & "' could not be found. It may have been deleted or marked inactive. Please use the Add-on Manager to replace it, or edit this page and remove it."
                             End If
-                            returnVal = cpCore.html_GetAdminHintWrapper(returnVal)
+                            returnVal = cpCore.htmlDoc.html_GetAdminHintWrapper(returnVal)
                         End If
                         If (addonId > 0) Then
                             Throw New ApplicationException("The Add-on could not be found by id [" & addonId & "] or name/guid [" & AddonNameOrGuid & "]")
@@ -651,7 +651,7 @@ Namespace Contensive.Core.Controllers
                             '
                             ' This addon is running, can not reenter
                             '
-                            Call logController.log_appendLog(cpcore,"addon_execute, Addon [" & AddonName & "] was called by itself. This is not allowed. AddonID [" & addonId & "], AddonNameOrGuid [" & AddonNameOrGuid_Local & "]")
+                            Call logController.log_appendLog(cpCore, "addon_execute, Addon [" & AddonName & "] was called by itself. This is not allowed. AddonID [" & addonId & "], AddonNameOrGuid [" & AddonNameOrGuid_Local & "]")
                         Else
                             cpCore.addonsCurrentlyRunningIdList.Add(addonId)
                             'csv_addon_execute_AddonsCurrentlyRunningIdList = csv_addon_execute_AddonsCurrentlyRunningIdList & "," & addonId
@@ -915,22 +915,22 @@ Namespace Contensive.Core.Controllers
                                     ' Long Term Fix
                                     '   Convert js, style, and meta tag system to use .createElement during remote method processing
                                     '
-                                    Call cpCore.main_AddPagetitle2(PageTitle, AddedByName)
-                                    Call cpCore.main_addMetaDescription2(MetaDescription, AddedByName)
-                                    Call cpCore.main_addMetaKeywordList2(MetaKeywordList, AddedByName)
-                                    Call cpCore.main_AddHeadTag2(OtherHeadTags, AddedByName)
+                                    Call cpCore.htmlDoc.main_AddPagetitle2(PageTitle, AddedByName)
+                                    Call cpCore.htmlDoc.main_addMetaDescription2(MetaDescription, AddedByName)
+                                    Call cpCore.htmlDoc.main_addMetaKeywordList2(MetaKeywordList, AddedByName)
+                                    Call cpCore.htmlDoc.main_AddHeadTag2(OtherHeadTags, AddedByName)
                                     If Not blockJavascriptAndCss Then
                                         '
                                         ' add javascript and styles if it has not run already
                                         '
-                                        Call cpCore.main_AddOnLoadJavascript2(JSOnLoad, AddedByName)
-                                        Call cpCore.main_AddEndOfBodyJavascript2(JSBodyEnd, AddedByName)
-                                        Call cpCore.main_AddHeadScriptLink(JSFilename, AddedByName)
+                                        Call cpCore.htmlDoc.main_AddOnLoadJavascript2(JSOnLoad, AddedByName)
+                                        Call cpCore.htmlDoc.main_AddEndOfBodyJavascript2(JSBodyEnd, AddedByName)
+                                        Call cpCore.htmlDoc.main_AddHeadScriptLink(JSFilename, AddedByName)
                                         If DefaultStylesFilename <> "" Then
-                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
+                                            Call cpCore.htmlDoc.main_AddStylesheetLink2(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
                                         End If
                                         If CustomStylesFilename <> "" Then
-                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
+                                            Call cpCore.htmlDoc.main_AddStylesheetLink2(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
                                         End If
                                     End If
                                 End If
@@ -1108,7 +1108,7 @@ Namespace Contensive.Core.Controllers
                                                 If AddonName = "" And addonId <> 0 Then
                                                     AddonName = "Addon #" & addonId
                                                 End If
-                                                AssemblyContent = cpCore.html_GetAdminHintWrapper("<p>There was an error executing the assembly component of Add-on [" & AddonName & "], AddonOptionString [" & WorkingOptionString & "] with class name [" & DotNetClassFullName & "]. The details of this error follow.</p><p>" & errorMessageForAdmin & "</p>")
+                                                AssemblyContent = cpCore.htmlDoc.html_GetAdminHintWrapper("<p>There was an error executing the assembly component of Add-on [" & AddonName & "], AddonOptionString [" & WorkingOptionString & "] with class name [" & DotNetClassFullName & "]. The details of this error follow.</p><p>" & errorMessageForAdmin & "</p>")
                                             End If
                                         End If
                                     End If
@@ -1228,19 +1228,19 @@ Namespace Contensive.Core.Controllers
                                 'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") aa"
                                 '#End If
                                 If isMainOk Then
-                                    Call cpCore.main_AddPagetitle2(PageTitle, AddedByName)
-                                    Call cpCore.main_addMetaDescription2(MetaDescription, AddedByName)
-                                    Call cpCore.main_addMetaKeywordList2(MetaKeywordList, AddedByName)
-                                    Call cpCore.main_AddHeadTag2(OtherHeadTags, AddedByName)
+                                    Call cpCore.htmlDoc.main_AddPagetitle2(PageTitle, AddedByName)
+                                    Call cpCore.htmlDoc.main_addMetaDescription2(MetaDescription, AddedByName)
+                                    Call cpCore.htmlDoc.main_addMetaKeywordList2(MetaKeywordList, AddedByName)
+                                    Call cpCore.htmlDoc.main_AddHeadTag2(OtherHeadTags, AddedByName)
                                     If Not blockJavascriptAndCss Then
-                                        Call cpCore.main_AddOnLoadJavascript2(JSOnLoad, AddedByName)
-                                        Call cpCore.main_AddEndOfBodyJavascript2(JSBodyEnd, AddedByName)
-                                        Call cpCore.main_AddHeadScriptLink(JSFilename, AddedByName)
+                                        Call cpCore.htmlDoc.main_AddOnLoadJavascript2(JSOnLoad, AddedByName)
+                                        Call cpCore.htmlDoc.main_AddEndOfBodyJavascript2(JSBodyEnd, AddedByName)
+                                        Call cpCore.htmlDoc.main_AddHeadScriptLink(JSFilename, AddedByName)
                                         If DefaultStylesFilename <> "" Then
-                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
+                                            Call cpCore.htmlDoc.main_AddStylesheetLink2(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
                                         End If
                                         If CustomStylesFilename <> "" Then
-                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
+                                            Call cpCore.htmlDoc.main_AddStylesheetLink2(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
                                         End If
                                     End If
                                 End If
@@ -1274,7 +1274,7 @@ Namespace Contensive.Core.Controllers
                                     '
                                     returnVal = TextContent & HTMLContent
                                     If returnVal <> "" Then
-                                        returnVal = cpCore.html_executeContentCommands(Nothing, returnVal, CPUtilsBaseClass.addonContext.ContextAdmin, personalizationPeopleId, personalizationIsAuthenticated, layoutErrors)
+                                        returnVal = cpCore.htmlDoc.html_executeContentCommands(Nothing, returnVal, CPUtilsBaseClass.addonContext.ContextAdmin, personalizationPeopleId, personalizationIsAuthenticated, layoutErrors)
                                         's = csv_EncodeContent9(s, personalizationPeopleId, HostContentName, HostRecordID, 0, False, False, True, True, False, True, "", "", (Context = ContextEmail), WrapperID, ignore_TemplateCaseOnly_PageContent, Context, personalizationIsAuthenticated, nothing, False)
                                     End If
                                     '
@@ -1284,7 +1284,7 @@ Namespace Contensive.Core.Controllers
                                     '
                                     ' csv_EncodeContent everything
                                     '
-                                    returnVal = cpCore.html_encodeContent10(returnVal, personalizationPeopleId, HostContentName, HostRecordID, 0, False, False, True, True, False, True, "", "", (Context = CPUtilsBaseClass.addonContext.ContextEmail), WrapperID, ignore_TemplateCaseOnly_PageContent, Context, personalizationIsAuthenticated, Nothing, False)
+                                    returnVal = cpCore.htmlDoc.html_encodeContent10(returnVal, personalizationPeopleId, HostContentName, HostRecordID, 0, False, False, True, True, False, True, "", "", (Context = CPUtilsBaseClass.addonContext.ContextEmail), WrapperID, ignore_TemplateCaseOnly_PageContent, Context, personalizationIsAuthenticated, Nothing, False)
                                 End If
                                 ''
                                 '' +++++ 9/8/2011, 4.1.482
@@ -1416,10 +1416,10 @@ Namespace Contensive.Core.Controllers
                                                 HelpIcon = getHelpBubble(addonId, helpCopy, addonCollectionId, DialogList)
                                                 ToolBar = InstanceSettingsEditIcon & AddonEditIcon & AddonStylesEditIcon & SiteStylesEditIcon & HTMLViewerEditIcon & HelpIcon
                                                 ToolBar = genericController.vbReplace(ToolBar, "&nbsp;", "", 1, 99, vbTextCompare)
-                                                returnVal = cpCore.main_GetEditWrapper("<div class=""ccAddonEditTools"">" & ToolBar & "&nbsp;" & AddonName & DialogList & "</div>", returnVal)
+                                                returnVal = cpCore.htmlDoc.main_GetEditWrapper("<div class=""ccAddonEditTools"">" & ToolBar & "&nbsp;" & AddonName & DialogList & "</div>", returnVal)
                                                 's = GetEditWrapper("<div class=""ccAddonEditCaption"">" & AddonName & "</div><div class=""ccAddonEditTools"">" & ToolBar & "</div>", s)
                                             ElseIf cpCore.visitProperty.getBoolean("AllowEditing") Then
-                                                returnVal = cpCore.main_GetEditWrapper("<div class=""ccAddonEditCaption"">" & AddonName & "&nbsp;" & HelpIcon & "</div>", returnVal)
+                                                returnVal = cpCore.htmlDoc.main_GetEditWrapper("<div class=""ccAddonEditCaption"">" & AddonName & "&nbsp;" & HelpIcon & "</div>", returnVal)
                                             End If
                                         End If
                                     End If
@@ -1610,12 +1610,12 @@ Namespace Contensive.Core.Controllers
                                                                 Case "date"
                                                                     '
                                                                     If FieldValue <> "" Then
-                                                                        FieldValue =  genericController.EncodeDate(FieldValue).ToString
+                                                                        FieldValue = genericController.EncodeDate(FieldValue).ToString
                                                                     End If
                                                                     Call cpCore.siteProperties.setProperty(FieldName, FieldValue)
                                                                 Case "file", "imagefile"
                                                                     '
-                                                                    If cpCore.doc_getBoolean(FieldName & ".DeleteFlag") Then
+                                                                    If cpCore.docProperties.getBoolean(FieldName & ".DeleteFlag") Then
                                                                         Call cpCore.siteProperties.setProperty(FieldName, "")
                                                                     End If
                                                                     If FieldValue <> "" Then
@@ -1675,7 +1675,7 @@ Namespace Contensive.Core.Controllers
                                                                     '
                                                                     ' treat html as active content for now.
                                                                     '
-                                                                    FieldValue = cpCore.doc_getActiveContent(FieldName)
+                                                                    FieldValue = cpCore.docProperties.getRenderedActiveContent(FieldName)
                                                                 Else
                                                                     FieldValue = cpCore.docProperties.getText(FieldName)
                                                                 End If
@@ -1796,37 +1796,37 @@ Namespace Contensive.Core.Controllers
                                                                     Case "integer"
                                                                         '
                                                                         If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Copy = FieldValue & cpCore.htmlDoc.html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
-                                                                            Copy = cpCore.html_GetFormInputText2(FieldName, FieldValue)
+                                                                            Copy = cpCore.htmlDoc.html_GetFormInputText2(FieldName, FieldValue)
                                                                         End If
                                                                     Case "boolean"
                                                                         If FieldReadOnly Then
-                                                                            Copy = cpCore.html_GetFormInputCheckBox2(FieldName, genericController.EncodeBoolean(FieldValue))
+                                                                            Copy = cpCore.htmlDoc.html_GetFormInputCheckBox2(FieldName, genericController.EncodeBoolean(FieldValue))
                                                                             Copy = genericController.vbReplace(Copy, ">", " disabled>")
-                                                                            Copy = Copy & cpCore.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Copy = Copy & cpCore.htmlDoc.html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
-                                                                            Copy = cpCore.html_GetFormInputCheckBox2(FieldName, genericController.EncodeBoolean(FieldValue))
+                                                                            Copy = cpCore.htmlDoc.html_GetFormInputCheckBox2(FieldName, genericController.EncodeBoolean(FieldValue))
                                                                         End If
                                                                     Case "float"
                                                                         If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Copy = FieldValue & cpCore.htmlDoc.html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
-                                                                            Copy = cpCore.html_GetFormInputText2(FieldName, FieldValue)
+                                                                            Copy = cpCore.htmlDoc.html_GetFormInputText2(FieldName, FieldValue)
                                                                         End If
                                                                     Case "date"
                                                                         If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Copy = FieldValue & cpCore.htmlDoc.html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
-                                                                            Copy = cpCore.html_GetFormInputDate(FieldName, FieldValue)
+                                                                            Copy = cpCore.htmlDoc.html_GetFormInputDate(FieldName, FieldValue)
                                                                         End If
                                                                     Case "file", "imagefile"
                                                                         '
                                                                         If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Copy = FieldValue & cpCore.htmlDoc.html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
                                                                             If FieldValue = "" Then
-                                                                                Copy = cpCore.html_GetFormInputFile(FieldName)
+                                                                                Copy = cpCore.htmlDoc.html_GetFormInputFile(FieldName)
                                                                             Else
                                                                                 NonEncodedLink = cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, FieldValue)
                                                                                 EncodedLink = EncodeURL(NonEncodedLink)
@@ -1835,53 +1835,53 @@ Namespace Contensive.Core.Controllers
                                                                                 cpCore.privateFiles.splitPathFilename(FieldValue, FieldValuePath, FieldValuefilename)
                                                                                 Copy = "" _
                                                                                     & "<a href=""http://" & EncodedLink & """ target=""_blank"">[" & FieldValuefilename & "]</A>" _
-                                                                                    & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & cpCore.html_GetFormInputCheckBox2(FieldName & ".DeleteFlag", False) _
-                                                                                    & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & cpCore.html_GetFormInputFile(FieldName)
+                                                                                    & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & cpCore.htmlDoc.html_GetFormInputCheckBox2(FieldName & ".DeleteFlag", False) _
+                                                                                    & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & cpCore.htmlDoc.html_GetFormInputFile(FieldName)
                                                                             End If
                                                                         End If
                                                                         'Call s.Add("&nbsp;</span></nobr></td>")
                                                                     Case "currency"
                                                                         '
                                                                         If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Copy = FieldValue & cpCore.htmlDoc.html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
                                                                             If FieldValue <> "" Then
                                                                                 FieldValue = FormatCurrency(FieldValue)
                                                                             End If
-                                                                            Copy = cpCore.html_GetFormInputText2(FieldName, FieldValue)
+                                                                            Copy = cpCore.htmlDoc.html_GetFormInputText2(FieldName, FieldValue)
                                                                         End If
                                                                     Case "textfile"
                                                                         '
                                                                         If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Copy = FieldValue & cpCore.htmlDoc.html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
                                                                             FieldValue = cpCore.cdnFiles.readFile(FieldValue)
                                                                             If FieldHTML Then
-                                                                                Copy = cpCore.html_GetFormInputHTML(FieldName, FieldValue)
+                                                                                Copy = cpCore.htmlDoc.html_GetFormInputHTML(FieldName, FieldValue)
                                                                             Else
-                                                                                Copy = cpCore.html_GetFormInputTextExpandable(FieldName, FieldValue, 5)
+                                                                                Copy = cpCore.htmlDoc.html_GetFormInputTextExpandable(FieldName, FieldValue, 5)
                                                                             End If
                                                                         End If
                                                                     Case "cssfile"
                                                                         '
                                                                         If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Copy = FieldValue & cpCore.htmlDoc.html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
-                                                                            Copy = cpCore.html_GetFormInputTextExpandable(FieldName, FieldValue, 5)
+                                                                            Copy = cpCore.htmlDoc.html_GetFormInputTextExpandable(FieldName, FieldValue, 5)
                                                                         End If
                                                                     Case "xmlfile"
                                                                         '
                                                                         If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Copy = FieldValue & cpCore.htmlDoc.html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
-                                                                            Copy = cpCore.html_GetFormInputTextExpandable(FieldName, FieldValue, 5)
+                                                                            Copy = cpCore.htmlDoc.html_GetFormInputTextExpandable(FieldName, FieldValue, 5)
                                                                         End If
                                                                     Case "link"
                                                                         '
                                                                         If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Copy = FieldValue & cpCore.htmlDoc.html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
-                                                                            Copy = cpCore.html_GetFormInputText2(FieldName, FieldValue)
+                                                                            Copy = cpCore.htmlDoc.html_GetFormInputText2(FieldName, FieldValue)
                                                                         End If
                                                                     Case Else
                                                                         '
@@ -1889,13 +1889,13 @@ Namespace Contensive.Core.Controllers
                                                                         '
                                                                         If FieldReadOnly Then
                                                                             Dim tmp As String
-                                                                            tmp = cpCore.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            tmp = cpCore.htmlDoc.html_GetFormInputHidden(FieldName, FieldValue)
                                                                             Copy = FieldValue & tmp
                                                                         Else
                                                                             If FieldHTML Then
-                                                                                Copy = cpCore.html_GetFormInputHTML(FieldName, FieldValue)
+                                                                                Copy = cpCore.htmlDoc.html_GetFormInputHTML(FieldName, FieldValue)
                                                                             Else
-                                                                                Copy = cpCore.html_GetFormInputText2(FieldName, FieldValue)
+                                                                                Copy = cpCore.htmlDoc.html_GetFormInputText2(FieldName, FieldValue)
                                                                             End If
                                                                         End If
                                                                 End Select
@@ -1940,13 +1940,13 @@ Namespace Contensive.Core.Controllers
                                                                 '
                                                                 ' HTML
                                                                 '
-                                                                Copy = cpCore.html_GetFormInputHTML3(FieldName, FieldValue)
+                                                                Copy = cpCore.htmlDoc.html_GetFormInputHTML3(FieldName, FieldValue)
                                                                 'Copy = cpcore.main_GetFormInputActiveContent( FieldName, FieldValue)
                                                             Else
                                                                 '
                                                                 ' Text edit
                                                                 '
-                                                                Copy = cpCore.html_GetFormInputTextExpandable(FieldName, FieldValue)
+                                                                Copy = cpCore.htmlDoc.html_GetFormInputTextExpandable(FieldName, FieldValue)
                                                             End If
                                                             Call TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, False, False, ""))
                                                         End If
@@ -1968,7 +1968,7 @@ Namespace Contensive.Core.Controllers
                                                                 Copy = cpCore.cdnFiles.readFile(fieldfilename)
                                                             End If
                                                             If Not FieldReadOnly Then
-                                                                Copy = cpCore.html_GetFormInputTextExpandable(FieldName, Copy, 10)
+                                                                Copy = cpCore.htmlDoc.html_GetFormInputTextExpandable(FieldName, Copy, 10)
                                                             End If
                                                         End If
                                                         Call TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, False, False, ""))
@@ -2027,7 +2027,7 @@ Namespace Contensive.Core.Controllers
                                                             '
                                                             If rs.Rows.Count > 0 Then
                                                                 If rs.Rows.Count = 1 And rs.Columns.Count = 1 Then
-                                                                    Copy = cpCore.html_GetFormInputText2("result", genericController.encodeText(something(0, 0)), , , , , True)
+                                                                    Copy = cpCore.htmlDoc.html_GetFormInputText2("result", genericController.encodeText(something(0, 0)), , , , , True)
                                                                 Else
                                                                     For Each dr As DataRow In rs.Rows
                                                                         '
@@ -2266,7 +2266,7 @@ ErrorTrap:
                 '
 
                 selector = genericController.decodeNvaArgument(selector)
-                getFormContent_decodeSelector = cpCore.html_GetFormInputText2(SitePropertyName, selector, 1, 20)
+                getFormContent_decodeSelector = cpCore.htmlDoc.html_GetFormInputText2(SitePropertyName, selector, 1, 20)
             End If
 
             FastString = Nothing
@@ -2835,7 +2835,7 @@ ErrorTrap:
             '-----------------------------------------------------------------
             '
             'hint = hint & ",030"
-            logController.appendLogWithLegacyRow( cpcore,cpCore.serverConfig.appConfig.name, "start: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
+            logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "start: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
             '
             ' runAtServer = New runAtServerClass(Me)
             ' must nva encode because that is what the server-execute command expects
@@ -2852,7 +2852,7 @@ ErrorTrap:
             Call taskScheduler.addTaskToQueue(cpCore, taskQueueCommandEnumModule.runAddon, cmdDetail, False)
             'Call runAtServer.executeCmd("RunProcess", cmdQueryString)
             '
-            logController.appendLogWithLegacyRow( cpcore,cpCore.serverConfig.appConfig.name, "end: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
+            logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "end: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
             '
             Exit Function
 ErrorTrap:
@@ -2860,7 +2860,7 @@ ErrorTrap:
             ErrSource = Err.Source
             ErrDescription = Err.Description
             Call Err.Clear()
-            logController.appendLogWithLegacyRow( cpcore,cpCore.serverConfig.appConfig.name, "errortrap exit(" & (GetTickCount - ProcessStartTick) & " msec): execute now, addon [" & AddonIDGuidOrName & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
+            logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "errortrap exit(" & (GetTickCount - ProcessStartTick) & " msec): execute now, addon [" & AddonIDGuidOrName & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
             Call cpCore.handleLegacyError4(ErrNumber, ErrSource, ErrDescription, "unknownMethodNameLegacyCall" & ", hint=" & hint, True)
         End Function
         '
@@ -3128,7 +3128,7 @@ ErrorTrap:
                                         '
                                         OptionDefault = genericController.decodeNvaArgument(OptionDefault)
                                         FormInput = "" _
-                                            & cpCore.html_GetFormInputText2(OptionName, OptionDefault, 1, 20) _
+                                            & cpCore.htmlDoc.html_GetFormInputText2(OptionName, OptionDefault, 1, 20) _
                                             & "&nbsp;<a href=""#"" onClick=""OpenResourceLinkWindow( '" & OptionName & "' ) ;return false;""><img src=""/ccLib/images/ResourceLink1616.gif"" width=16 height=16 border=0 alt=""Link to a resource"" title=""Link to a resource""></a>"
                                         'EditorString = cpcore.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80)
                                     Case "checkbox"
@@ -3151,7 +3151,7 @@ ErrorTrap:
                                 '
 
                                 OptionSelector = genericController.decodeNvaArgument(OptionSelector)
-                                FormInput = cpCore.html_GetFormInputText2(OptionName, OptionSelector, 1, 20)
+                                FormInput = cpCore.htmlDoc.html_GetFormInputText2(OptionName, OptionSelector, 1, 20)
                             End If
                             CopyContent = CopyContent _
                                 & "<tr>" _
@@ -3162,11 +3162,11 @@ ErrorTrap:
                         CopyContent = "" _
                             & CopyContent _
                             & "</table>" _
-                            & cpCore.html_GetFormInputHidden("Type", FormTypeAddonSettingsEditor) _
-                            & cpCore.html_GetFormInputHidden("ContentName", ContentName) _
-                            & cpCore.html_GetFormInputHidden("RecordID", RecordID) _
-                            & cpCore.html_GetFormInputHidden("FieldName", FieldName) _
-                            & cpCore.html_GetFormInputHidden("ACInstanceID", ACInstanceID)
+                            & cpCore.htmlDoc.html_GetFormInputHidden("Type", FormTypeAddonSettingsEditor) _
+                            & cpCore.htmlDoc.html_GetFormInputHidden("ContentName", ContentName) _
+                            & cpCore.htmlDoc.html_GetFormInputHidden("RecordID", RecordID) _
+                            & cpCore.htmlDoc.html_GetFormInputHidden("FieldName", FieldName) _
+                            & cpCore.htmlDoc.html_GetFormInputHidden("ACInstanceID", ACInstanceID)
                     End If
                     '
                     BubbleJS = " onClick=""HelpBubbleOn( 'HelpBubble" & cpCore.htmlDoc.htmlDoc_HelpCodeCount & "',this);return false;"""
@@ -3175,10 +3175,10 @@ ErrorTrap:
                     'QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                     return_DialogList = return_DialogList _
                         & "<div class=""ccCon helpDialogCon"">" _
-                        & cpCore.html_GetUploadFormStart() _
+                        & cpCore.htmlDoc.html_GetUploadFormStart() _
                         & "<table border=0 cellpadding=0 cellspacing=0 class=""ccBubbleCon"" id=""HelpBubble" & cpCore.htmlDoc.htmlDoc_HelpCodeCount & """ style=""display:none;visibility:hidden;"">" _
                         & "<tr><td class=""ccHeaderCon"">" & CopyHeader & "</td></tr>" _
-                        & "<tr><td class=""ccButtonCon"">" & cpCore.html_GetFormButton("Update", "HelpBubbleButton") & "</td></tr>" _
+                        & "<tr><td class=""ccButtonCon"">" & cpCore.htmlDoc.html_GetFormButton("Update", "HelpBubbleButton") & "</td></tr>" _
                         & "<tr><td class=""ccContentCon"">" & CopyContent & "</td></tr>" _
                         & "</table>" _
                         & "</form>" _
@@ -3199,7 +3199,7 @@ ErrorTrap:
                     cpCore.htmlDoc.htmlDoc_HelpCodeCount = cpCore.htmlDoc.htmlDoc_HelpCodeCount + 1
                     '
                     If cpCore.htmlDoc.htmlDoc_HelpDialogCnt = 0 Then
-                        Call cpCore.main_AddOnLoadJavascript2("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
+                        Call cpCore.htmlDoc.main_AddOnLoadJavascript2("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
                     End If
                     cpCore.htmlDoc.htmlDoc_HelpDialogCnt = cpCore.htmlDoc.htmlDoc_HelpDialogCnt + 1
                 End If
@@ -3265,7 +3265,7 @@ ErrorTrap:
                         & "" _
                         & "<table border=0 cellpadding=5 cellspacing=0 width=""100%"">" _
                         & "<tr><td style=""width:400px;background-color:transparent;"" class=""ccContentCon ccAdminSmall"">These stylesheets will be added to all pages that include this add-on. The default stylesheet comes with the add-on, and can not be edited.</td></tr>" _
-                        & "<tr><td style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Custom Stylesheet</b>" & cpCore.html_GetFormInputTextExpandable2("CustomStyles", StyleSheet, 10, "400px") & "</td></tr>"
+                        & "<tr><td style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Custom Stylesheet</b>" & cpCore.htmlDoc.html_GetFormInputTextExpandable2("CustomStyles", StyleSheet, 10, "400px") & "</td></tr>"
                     'CopyContent = "" _
                     '    & cpcore.main_GetUploadFormStart() _
                     '    & "<table border=0 cellpadding=5 cellspacing=0 width=""100%"">" _
@@ -3274,14 +3274,14 @@ ErrorTrap:
                     If DefaultStylesheet = "" Then
                         CopyContent = CopyContent & "<tr><td style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Default Stylesheet</b><br>There are no default styles for this add-on.</td></tr>"
                     Else
-                        CopyContent = CopyContent & "<tr><td style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Default Stylesheet</b><br>" & cpCore.html_GetFormInputTextExpandable2("DefaultStyles", DefaultStylesheet, 10, "400px", , , True) & "</td></tr>"
+                        CopyContent = CopyContent & "<tr><td style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Default Stylesheet</b><br>" & cpCore.htmlDoc.html_GetFormInputTextExpandable2("DefaultStyles", DefaultStylesheet, 10, "400px", , , True) & "</td></tr>"
                     End If
                     CopyContent = "" _
                         & CopyContent _
                         & "</tr>" _
                         & "</table>" _
-                        & cpCore.html_GetFormInputHidden("Type", FormTypeAddonStyleEditor) _
-                        & cpCore.html_GetFormInputHidden("AddonID", addonId) _
+                        & cpCore.htmlDoc.html_GetFormInputHidden("Type", FormTypeAddonStyleEditor) _
+                        & cpCore.htmlDoc.html_GetFormInputHidden("AddonID", addonId) _
                         & ""
                     '
                     BubbleJS = " onClick=""HelpBubbleOn( 'HelpBubble" & cpCore.htmlDoc.htmlDoc_HelpCodeCount & "',this);return false;"""
@@ -3292,10 +3292,10 @@ ErrorTrap:
 
                     Dialog = Dialog _
                         & "<div class=""ccCon helpDialogCon"">" _
-                        & cpCore.html_GetUploadFormStart() _
+                        & cpCore.htmlDoc.html_GetUploadFormStart() _
                         & "<table border=0 cellpadding=0 cellspacing=0 class=""ccBubbleCon"" id=""HelpBubble" & cpCore.htmlDoc.htmlDoc_HelpCodeCount & """ style=""display:none;visibility:hidden;"">" _
                         & "<tr><td class=""ccHeaderCon"">" & CopyHeader & "</td></tr>" _
-                        & "<tr><td class=""ccButtonCon"">" & cpCore.html_GetFormButton("Update", "HelpBubbleButton") & "</td></tr>" _
+                        & "<tr><td class=""ccButtonCon"">" & cpCore.htmlDoc.html_GetFormButton("Update", "HelpBubbleButton") & "</td></tr>" _
                         & "<tr><td class=""ccContentCon"">" & CopyContent & "</td></tr>" _
                         & "</table>" _
                         & "</form>" _
@@ -3415,7 +3415,7 @@ ErrorTrap:
                     cpCore.htmlDoc.htmlDoc_HelpCodeCount = cpCore.htmlDoc.htmlDoc_HelpCodeCount + 1
                     '
                     If cpCore.htmlDoc.htmlDoc_HelpDialogCnt = 0 Then
-                        Call cpCore.main_AddOnLoadJavascript2("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
+                        Call cpCore.htmlDoc.main_AddOnLoadJavascript2("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
                     End If
                     cpCore.htmlDoc.htmlDoc_HelpDialogCnt = cpCore.htmlDoc.htmlDoc_HelpDialogCnt + 1
                     'SiteStylesBubbleCache = "x"
@@ -3483,7 +3483,7 @@ ErrorTrap:
                     CopyContent = "" _
                         & "<table border=0 cellpadding=5 cellspacing=0 width=""100%"">" _
                         & "<tr><td style=""width:400px;background-color:transparent;"" class=""ccAdminSmall"">This is the HTML produced by this add-on. Carrage returns and tabs have been added or modified to enhance readability.</td></tr>" _
-                        & "<tr><td style=""width:400px;background-color:transparent;"" class=""ccAdminSmall"">" & cpCore.html_GetFormInputTextExpandable2("DefaultStyles", "", 10, "400px", HTMLViewerBubbleID & "_dst", , False) & "</td></tr>" _
+                        & "<tr><td style=""width:400px;background-color:transparent;"" class=""ccAdminSmall"">" & cpCore.htmlDoc.html_GetFormInputTextExpandable2("DefaultStyles", "", 10, "400px", HTMLViewerBubbleID & "_dst", , False) & "</td></tr>" _
                         & "</tr>" _
                         & "</table>" _
                         & ""
@@ -3510,7 +3510,7 @@ ErrorTrap:
                     'SiteStylesBubbleCache = "x"
                     '
                     If cpCore.htmlDoc.htmlDoc_HelpDialogCnt = 0 Then
-                        Call cpCore.main_AddOnLoadJavascript2("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
+                        Call cpCore.htmlDoc.main_AddOnLoadJavascript2("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
                     End If
                     cpCore.htmlDoc.htmlDoc_HelpDialogCnt = cpCore.htmlDoc.htmlDoc_HelpDialogCnt + 1
                     getHTMLViewerBubble = "" _
@@ -3687,12 +3687,12 @@ ErrorTrap:
                                                                 Case "date"
                                                                     '
                                                                     If FieldValue <> "" Then
-                                                                        FieldValue =  genericController.EncodeDate(FieldValue).ToString
+                                                                        FieldValue = genericController.EncodeDate(FieldValue).ToString
                                                                     End If
                                                                     Call cpCore.siteProperties.setProperty(FieldName, FieldValue)
                                                                 Case "file", "imagefile"
                                                                     '
-                                                                    If cpCore.doc_getBoolean2(FieldName & ".DeleteFlag") Then
+                                                                    If cpCore.docProperties.getBoolean(FieldName & ".DeleteFlag") Then
                                                                         Call cpCore.siteProperties.setProperty(FieldName, "")
                                                                     End If
                                                                     If FieldValue <> "" Then
@@ -3752,7 +3752,7 @@ ErrorTrap:
                                                                     '
                                                                     ' treat html as active content for now.
                                                                     '
-                                                                    FieldValue = cpCore.doc_getActiveContent(FieldName)
+                                                                    FieldValue = cpCore.docProperties.getRenderedActiveContent(FieldName)
                                                                 Else
                                                                     FieldValue = cpCore.docProperties.getText(FieldName)
                                                                 End If
@@ -3877,37 +3877,37 @@ ErrorTrap:
                                                                     Case "integer"
                                                                         '
                                                                         If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Copy = FieldValue & cpCore.htmlDoc.html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
-                                                                            Copy = cpCore.html_GetFormInputText2(FieldName, FieldValue)
+                                                                            Copy = cpCore.htmlDoc.html_GetFormInputText2(FieldName, FieldValue)
                                                                         End If
                                                                     Case "boolean"
                                                                         If FieldReadOnly Then
-                                                                            Copy = cpCore.html_GetFormInputCheckBox2(FieldName, genericController.EncodeBoolean(FieldValue))
+                                                                            Copy = cpCore.htmlDoc.html_GetFormInputCheckBox2(FieldName, genericController.EncodeBoolean(FieldValue))
                                                                             Copy = genericController.vbReplace(Copy, ">", " disabled>")
-                                                                            Copy = Copy & cpCore.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Copy = Copy & cpCore.htmlDoc.html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
-                                                                            Copy = cpCore.html_GetFormInputCheckBox2(FieldName, genericController.EncodeBoolean(FieldValue))
+                                                                            Copy = cpCore.htmlDoc.html_GetFormInputCheckBox2(FieldName, genericController.EncodeBoolean(FieldValue))
                                                                         End If
                                                                     Case "float"
                                                                         If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Copy = FieldValue & cpCore.htmlDoc.html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
-                                                                            Copy = cpCore.html_GetFormInputText2(FieldName, FieldValue)
+                                                                            Copy = cpCore.htmlDoc.html_GetFormInputText2(FieldName, FieldValue)
                                                                         End If
                                                                     Case "date"
                                                                         If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Copy = FieldValue & cpCore.htmlDoc.html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
-                                                                            Copy = cpCore.html_GetFormInputDate(FieldName, FieldValue)
+                                                                            Copy = cpCore.htmlDoc.html_GetFormInputDate(FieldName, FieldValue)
                                                                         End If
                                                                     Case "file", "imagefile"
                                                                         '
                                                                         If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Copy = FieldValue & cpCore.htmlDoc.html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
                                                                             If FieldValue = "" Then
-                                                                                Copy = cpCore.html_GetFormInputFile(FieldName)
+                                                                                Copy = cpCore.htmlDoc.html_GetFormInputFile(FieldName)
                                                                             Else
                                                                                 NonEncodedLink = cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, FieldValue)
                                                                                 EncodedLink = EncodeURL(NonEncodedLink)
@@ -3916,65 +3916,65 @@ ErrorTrap:
                                                                                 cpCore.privateFiles.splitPathFilename(FieldValue, FieldValuePath, FieldValuefilename)
                                                                                 Copy = "" _
                                                                                     & "<a href=""http://" & EncodedLink & """ target=""_blank"">[" & FieldValuefilename & "]</A>" _
-                                                                                    & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & cpCore.html_GetFormInputCheckBox2(FieldName & ".DeleteFlag", False) _
-                                                                                    & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & cpCore.html_GetFormInputFile(FieldName)
+                                                                                    & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & cpCore.htmlDoc.html_GetFormInputCheckBox2(FieldName & ".DeleteFlag", False) _
+                                                                                    & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & cpCore.htmlDoc.html_GetFormInputFile(FieldName)
                                                                             End If
                                                                         End If
                                                                         'Call s.Add("&nbsp;</span></nobr></td>")
                                                                     Case "currency"
                                                                         '
                                                                         If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Copy = FieldValue & cpCore.htmlDoc.html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
                                                                             If FieldValue <> "" Then
                                                                                 FieldValue = FormatCurrency(FieldValue)
                                                                             End If
-                                                                            Copy = cpCore.html_GetFormInputText2(FieldName, FieldValue)
+                                                                            Copy = cpCore.htmlDoc.html_GetFormInputText2(FieldName, FieldValue)
                                                                         End If
                                                                     Case "textfile"
                                                                         '
                                                                         If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Copy = FieldValue & cpCore.htmlDoc.html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
                                                                             FieldValue = cpCore.cdnFiles.readFile(FieldValue)
                                                                             If FieldHTML Then
-                                                                                Copy = cpCore.html_GetFormInputHTML(FieldName, FieldValue)
+                                                                                Copy = cpCore.htmlDoc.html_GetFormInputHTML(FieldName, FieldValue)
                                                                             Else
-                                                                                Copy = cpCore.html_GetFormInputTextExpandable(FieldName, FieldValue, 5)
+                                                                                Copy = cpCore.htmlDoc.html_GetFormInputTextExpandable(FieldName, FieldValue, 5)
                                                                             End If
                                                                         End If
                                                                     Case "cssfile"
                                                                         '
                                                                         If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Copy = FieldValue & cpCore.htmlDoc.html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
-                                                                            Copy = cpCore.html_GetFormInputTextExpandable(FieldName, FieldValue, 5)
+                                                                            Copy = cpCore.htmlDoc.html_GetFormInputTextExpandable(FieldName, FieldValue, 5)
                                                                         End If
                                                                     Case "xmlfile"
                                                                         '
                                                                         If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Copy = FieldValue & cpCore.htmlDoc.html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
-                                                                            Copy = cpCore.html_GetFormInputTextExpandable(FieldName, FieldValue, 5)
+                                                                            Copy = cpCore.htmlDoc.html_GetFormInputTextExpandable(FieldName, FieldValue, 5)
                                                                         End If
                                                                     Case "link"
                                                                         '
                                                                         If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Copy = FieldValue & cpCore.htmlDoc.html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
-                                                                            Copy = cpCore.html_GetFormInputText2(FieldName, FieldValue)
+                                                                            Copy = cpCore.htmlDoc.html_GetFormInputText2(FieldName, FieldValue)
                                                                         End If
                                                                     Case Else
                                                                         '
                                                                         ' text
                                                                         '
                                                                         If FieldReadOnly Then
-                                                                            Copy = FieldValue & cpCore.html_GetFormInputHidden(FieldName, FieldValue)
+                                                                            Copy = FieldValue & cpCore.htmlDoc.html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
                                                                             If FieldHTML Then
-                                                                                Copy = cpCore.html_GetFormInputHTML(FieldName, FieldValue)
+                                                                                Copy = cpCore.htmlDoc.html_GetFormInputHTML(FieldName, FieldValue)
                                                                             Else
-                                                                                Copy = cpCore.html_GetFormInputText2(FieldName, FieldValue)
+                                                                                Copy = cpCore.htmlDoc.html_GetFormInputText2(FieldName, FieldValue)
                                                                             End If
                                                                         End If
                                                                 End Select
@@ -4019,13 +4019,13 @@ ErrorTrap:
                                                                 '
                                                                 ' HTML
                                                                 '
-                                                                Copy = cpCore.html_GetFormInputHTML3(FieldName, FieldValue)
+                                                                Copy = cpCore.htmlDoc.html_GetFormInputHTML3(FieldName, FieldValue)
                                                                 'Copy = cpcore.main_GetFormInputActiveContent( FieldName, FieldValue)
                                                             Else
                                                                 '
                                                                 ' Text edit
                                                                 '
-                                                                Copy = cpCore.html_GetFormInputTextExpandable(FieldName, FieldValue)
+                                                                Copy = cpCore.htmlDoc.html_GetFormInputTextExpandable(FieldName, FieldValue)
                                                             End If
                                                             Call TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, False, False, ""))
                                                         End If
@@ -4047,7 +4047,7 @@ ErrorTrap:
                                                                 Copy = cpCore.cdnFiles.readFile(fieldfilename)
                                                             End If
                                                             If Not FieldReadOnly Then
-                                                                Copy = cpCore.html_GetFormInputTextExpandable(FieldName, Copy, 10)
+                                                                Copy = cpCore.htmlDoc.html_GetFormInputTextExpandable(FieldName, Copy, 10)
                                                             End If
                                                         End If
                                                         Call TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, False, False, ""))
@@ -4110,7 +4110,7 @@ ErrorTrap:
                                                                 '
                                                                 ' Single result, display with no table
                                                                 '
-                                                                Copy = cpCore.html_GetFormInputText2("result", genericController.encodeText(dataArray(0, 0)), , , , , True)
+                                                                Copy = cpCore.htmlDoc.html_GetFormInputText2("result", genericController.encodeText(dataArray(0, 0)), , , , , True)
                                                             Else
                                                                 '
                                                                 ' Build headers
@@ -4334,7 +4334,7 @@ ErrorTrap:
                         '
                         ' Create Radio 
                         '
-                        'cpcore.main_addon_execute_GetFormContent_decodeSelector = "<div>" & genericController.vbReplace(cpcore.main_addon_execute_GetFormContent_decodeSelector, "><", "></div><div><") & "</div>"
+                        'cpCore.htmldoc.main_Addon_execute_GetFormContent_decodeSelector = "<div>" & genericController.vbReplace(cpCore.htmldoc.main_Addon_execute_GetFormContent_decodeSelector, "><", "></div><div><") & "</div>"
                     Case Else
                         '
                         ' Create select 
@@ -4347,7 +4347,7 @@ ErrorTrap:
                 '
 
                 selector = genericController.decodeNvaArgument(selector)
-                getFormContent_decodeSelector = cpCore.html_GetFormInputText2(SitePropertyName, selector, 1, 20)
+                getFormContent_decodeSelector = cpCore.htmlDoc.html_GetFormInputText2(SitePropertyName, selector, 1, 20)
             End If
 
             FastString = Nothing
@@ -4524,7 +4524,7 @@ ErrorTrap:
                 OptionString_ForObjectCall = OptionString_ForObjectCall & ConstructorName & "=" & ConstructorValue & "&"
                 'OptionString_ForObjectCall = OptionString_ForObjectCall & csv_DecodeAddonOptionArgument(ConstructorName) & "=" & csv_DecodeAddonOptionArgument(ConstructorValue) & vbCrLf
                 If IncludeSettingsBubbleOptions Then
-                    AddonOptionExpandedConstructor = AddonOptionExpandedConstructor & vbCrLf & cpCore.pageManager_GetAddonSelector(ConstructorName, ConstructorValue, ConstructorSelector)
+                    AddonOptionExpandedConstructor = AddonOptionExpandedConstructor & vbCrLf & cpCore.htmlDoc.pageManager_GetAddonSelector(ConstructorName, ConstructorValue, ConstructorSelector)
                 End If
             Next
             OptionString_ForObjectCall = OptionString_ForObjectCall & "InstanceID=" & InstanceID
@@ -4600,14 +4600,14 @@ ErrorTrap:
                 If WrapperSourceForComment <> "" Then
                     SourceComment = SourceComment & " for " & WrapperSourceForComment
                 End If
-                Call cpCore.main_AddOnLoadJavascript2(cpCore.db.cs_getText(CS, "javascriptonload"), SourceComment)
-                Call cpCore.main_AddEndOfBodyJavascript2(cpCore.db.cs_getText(CS, "javascriptbodyend"), SourceComment)
-                Call cpCore.main_AddHeadTag2(cpCore.db.cs_getText(CS, "OtherHeadTags"), SourceComment)
+                Call cpCore.htmlDoc.main_AddOnLoadJavascript2(cpCore.db.cs_getText(CS, "javascriptonload"), SourceComment)
+                Call cpCore.htmlDoc.main_AddEndOfBodyJavascript2(cpCore.db.cs_getText(CS, "javascriptbodyend"), SourceComment)
+                Call cpCore.htmlDoc.main_AddHeadTag2(cpCore.db.cs_getText(CS, "OtherHeadTags"), SourceComment)
                 '
                 JSFilename = cpCore.db.cs_getText(CS, "jsfilename")
                 If JSFilename <> "" Then
                     JSFilename = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
-                    Call cpCore.main_AddHeadScriptLink(JSFilename, SourceComment)
+                    Call cpCore.htmlDoc.main_AddHeadScriptLink(JSFilename, SourceComment)
                 End If
                 Copy = cpCore.db.cs_getText(CS, "stylesfilename")
                 If Copy <> "" Then
@@ -4616,7 +4616,7 @@ ErrorTrap:
                     Else
                         Copy = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, Copy)
                     End If
-                    Call cpCore.main_AddStylesheetLink2(Copy, SourceComment)
+                    Call cpCore.htmlDoc.main_AddStylesheetLink2(Copy, SourceComment)
                 End If
                 '
                 If Wrapper <> "" Then

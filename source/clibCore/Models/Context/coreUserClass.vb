@@ -435,7 +435,7 @@ Namespace Contensive.Core
                     '
                     returnResult = "" _
                     & returnResult _
-                    & cpCore.html_GetFormInputHidden("Type", FormTypeSendPassword) _
+                    & cpCore.htmldoc.html_GetFormInputHidden("Type", FormTypeSendPassword) _
                     & ""
                     For Each key As String In cpCore.docProperties.getKeyList
                         With cpCore.docProperties.getProperty(key)
@@ -443,7 +443,7 @@ Namespace Contensive.Core
                                 Select Case genericController.vbUCase(.Name)
                                     Case "S", "MA", "MB", "USERNAME", "PASSWORD", "EMAIL"
                                     Case Else
-                                        returnResult = returnResult & cpCore.html_GetFormInputHidden(.Name, .Value)
+                                        returnResult = returnResult & cpCore.htmldoc.html_GetFormInputHidden(.Name, .Value)
                                 End Select
                             End If
                         End With
@@ -453,7 +453,7 @@ Namespace Contensive.Core
                     QueryString = genericController.ModifyQueryString(QueryString, "S", "")
                     QueryString = genericController.ModifyQueryString(QueryString, "ccIPage", "")
                     returnResult = "" _
-                    & cpCore.html_GetFormStart(QueryString) _
+                    & cpCore.htmldoc.html_GetFormStart(QueryString) _
                     & kmaIndent(returnResult) _
                     & cr & "</form>" _
                     & ""
@@ -730,7 +730,7 @@ Namespace Contensive.Core
                     main_loginFormDefaultProcessed = True
                     loginForm_Username = cpCore.docProperties.getText("username")
                     loginForm_Password = cpCore.docProperties.getText("password")
-                    loginForm_AutoLogin = cpCore.doc_getBoolean2("autologin")
+                    loginForm_AutoLogin = cpCore.docproperties.getBoolean("autologin")
                     '
                     If (cpCore.visit.visit_loginAttempts < main_maxVisitLoginAttempts) And cpCore.visit.visit_cookieSupport Then
                         LocalMemberID = authenticateGetId(loginForm_Username, loginForm_Password)
@@ -1585,12 +1585,12 @@ Namespace Contensive.Core
                         & cr & "</table>" _
                         & ""
                     loginForm = loginForm _
-                        & cpCore.html_GetFormInputHidden("Type", FormTypeLogin) _
-                        & cpCore.html_GetFormInputHidden("email", loginForm_Email) _
+                        & cpCore.htmldoc.html_GetFormInputHidden("Type", FormTypeLogin) _
+                        & cpCore.htmldoc.html_GetFormInputHidden("email", loginForm_Email) _
                         & cpCore.main_GetPanelButtons(ButtonLogin, "Button") _
                         & ""
                     loginForm = "" _
-                        & cpCore.html_GetFormStart(QueryString) _
+                        & cpCore.htmldoc.html_GetFormStart(QueryString) _
                         & kmaIndent(loginForm) _
                         & cr & "</form>" _
                         & ""

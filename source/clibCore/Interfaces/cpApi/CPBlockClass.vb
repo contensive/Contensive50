@@ -167,7 +167,7 @@ Namespace Contensive.Core
                     If accum <> "" Then
                         headTags = Controllers.htmlDocController.getTagInnerHTML(accum, "head", False)
                         If headTags <> "" Then
-                            Call cpCore.html_addHeadTags(headTags)
+                            Call cpCore.htmldoc.html_addHeadTags(headTags)
                         End If
                         accum = Controllers.htmlDocController.getTagInnerHTML(accum, "body", False)
                     End If

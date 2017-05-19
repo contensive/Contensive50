@@ -48,7 +48,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Browser() As String 'Inherits BaseClasses.CPRequestBaseClass.Browser
             Get
                 If True Then
-                    Return cpCore.webServerIO.requestBrowser
+                    Return cpCore.webServer.requestBrowser
                 Else
                     Return ""
                 End If
@@ -107,7 +107,7 @@ Namespace Contensive.Core
 
         Public Overrides Function Cookie(ByVal CookieName As String) As String 'Inherits BaseClasses.CPRequestBaseClass.Cookie
             If True Then
-                Return cpCore.webServerIO.getRequestCookie(CookieName)
+                Return cpCore.webServer.getRequestCookie(CookieName)
             Else
                 Return ""
             End If
@@ -120,7 +120,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property CookieString() As String 'Inherits BaseClasses.CPRequestBaseClass.CookieString
             Get
                 Dim returnCookies As String = ""
-                For Each kvp As KeyValuePair(Of String, webServerIOController.cookieClass) In cpCore.webServerIO.requestCookies
+                For Each kvp As KeyValuePair(Of String, webServerController.cookieClass) In cpCore.webServer.requestCookies
                     returnCookies &= "&" & kvp.Key & "=" & kvp.Value.value
                 Next
                 If returnCookies.Length > 0 Then
@@ -133,7 +133,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Form() As String 'Inherits BaseClasses.CPRequestBaseClass.Form
             Get
                 If True Then
-                    Return cpCore.webServerIO.requestFormString
+                    Return cpCore.webServer.requestFormString
                 Else
                     Return ""
                 End If
@@ -143,7 +143,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property FormAction() As String 'Inherits BaseClasses.CPRequestBaseClass.FormAction
             Get
                 If True Then
-                    Return cpCore.webServerIO.webServerIO_ServerFormActionURL
+                    Return cpCore.webServer.webServerIO_ServerFormActionURL
                 Else
                     Return ""
                 End If
@@ -152,7 +152,7 @@ Namespace Contensive.Core
 
         Public Overrides Function GetBoolean(ByVal RequestName As String) As Boolean 'Inherits BaseClasses.CPRequestBaseClass.GetBoolean
             If True Then
-                Return cpCore.doc_getBoolean2(RequestName)
+                Return cpCore.docproperties.getBoolean(RequestName)
             Else
                 Return False
             End If
@@ -160,7 +160,7 @@ Namespace Contensive.Core
 
         Public Overrides Function GetDate(ByVal RequestName As String) As Date 'Inherits BaseClasses.CPRequestBaseClass.GetDate
             If True Then
-                Return cpCore.doc_getDate(RequestName)
+                Return cpCore.docproperties.getDate(RequestName)
             Else
                 Return New Date
             End If
@@ -168,7 +168,7 @@ Namespace Contensive.Core
 
         Public Overrides Function GetInteger(ByVal RequestName As String) As Integer 'Inherits BaseClasses.CPRequestBaseClass.GetInteger
             If True Then
-                Return cpCore.doc_getInteger(RequestName)
+                Return cpCore.docProperties.getInteger(RequestName)
             Else
                 Return 0
             End If
@@ -176,7 +176,7 @@ Namespace Contensive.Core
 
         Public Overrides Function GetNumber(ByVal RequestName As String) As Double 'Inherits BaseClasses.CPRequestBaseClass.GetNumber
             If True Then
-                Return cpCore.main_GetStreamNumber2(RequestName)
+                Return cpCore.docProperties.getNumber(RequestName)
             Else
                 Return 0
             End If
@@ -193,7 +193,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Host() As String 'Inherits BaseClasses.CPRequestBaseClass.Host
             Get
                 If True Then
-                    Return cpCore.webServerIO.requestDomain
+                    Return cpCore.webServer.requestDomain
                 Else
                     Return ""
                 End If
@@ -203,7 +203,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property HTTPAccept() As String 'Inherits BaseClasses.CPRequestBaseClass.HTTPAccept
             Get
                 If True Then
-                    Return cpCore.webServerIO.requestHttpAccept
+                    Return cpCore.webServer.requestHttpAccept
                 Else
                     Return ""
                 End If
@@ -213,7 +213,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property HTTPAcceptCharset() As String 'Inherits BaseClasses.CPRequestBaseClass.HTTPAcceptCharset
             Get
                 If True Then
-                    Return cpCore.webServerIO.requestHttpAcceptCharset
+                    Return cpCore.webServer.requestHttpAcceptCharset
                 Else
                     Return ""
                 End If
@@ -223,7 +223,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property HTTPProfile() As String 'Inherits BaseClasses.CPRequestBaseClass.HTTPProfile
             Get
                 If True Then
-                    Return cpCore.webServerIO.requestHttpProfile
+                    Return cpCore.webServer.requestHttpProfile
                 Else
                     Return ""
                 End If
@@ -233,7 +233,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property HTTPXWapProfile() As String 'Inherits BaseClasses.CPRequestBaseClass.HTTPXWapProfile
             Get
                 If True Then
-                    Return cpCore.webServerIO.requestxWapProfile
+                    Return cpCore.webServer.requestxWapProfile
                 Else
                     Return ""
                 End If
@@ -253,7 +253,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Link() As String 'Inherits BaseClasses.CPRequestBaseClass.Link
             Get
                 If True Then
-                    Return cpCore.webServerIO.webServerIO_ServerLink
+                    Return cpCore.webServer.webServerIO_ServerLink
                 Else
                     Return ""
                 End If
@@ -263,7 +263,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property LinkForwardSource() As String 'Inherits BaseClasses.CPRequestBaseClass.LinkForwardSource
             Get
                 If True Then
-                    Return cpCore.webServerIO.webServerIO_LinkForwardSource
+                    Return cpCore.webServer.webServerIO_LinkForwardSource
                 Else
                     Return ""
                 End If
@@ -273,7 +273,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property LinkSource() As String 'Inherits BaseClasses.CPRequestBaseClass.LinkSource
             Get
                 If True Then
-                    Return cpCore.webServerIO.requestLinkSource
+                    Return cpCore.webServer.requestLinkSource
                 Else
                     Return ""
                 End If
@@ -283,7 +283,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Page() As String 'Inherits BaseClasses.CPRequestBaseClass.Page
             Get
                 If True Then
-                    Return cpCore.webServerIO.webServerIO_requestPage
+                    Return cpCore.webServer.webServerIO_requestPage
                 Else
                     Return ""
                 End If
@@ -293,7 +293,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Path() As String 'Inherits BaseClasses.CPRequestBaseClass.Path
             Get
                 If True Then
-                    Return cpCore.webServerIO.webServerIO_requestPath
+                    Return cpCore.webServer.webServerIO_requestPath
                 Else
                     Return ""
                 End If
@@ -303,7 +303,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property PathPage() As String 'Inherits BaseClasses.CPRequestBaseClass.PathPage
             Get
                 If True Then
-                    Return cpCore.webServerIO.requestPathPage
+                    Return cpCore.webServer.requestPathPage
                 Else
                     Return ""
                 End If
@@ -313,7 +313,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Protocol() As String 'Inherits BaseClasses.CPRequestBaseClass.Protocol
             Get
                 If True Then
-                    Return cpCore.webServerIO.webServerIO_requestProtocol
+                    Return cpCore.webServer.webServerIO_requestProtocol
                 Else
                     Return ""
                 End If
@@ -323,7 +323,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property QueryString() As String 'Inherits BaseClasses.CPRequestBaseClass.QueryString
             Get
                 If True Then
-                    Return cpCore.webServerIO.requestQueryString
+                    Return cpCore.webServer.requestQueryString
                 Else
                     Return ""
                 End If
@@ -333,7 +333,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Referer() As String 'Inherits BaseClasses.CPRequestBaseClass.Referer
             Get
                 If True Then
-                    Return cpCore.webServerIO.webServerIO_requestReferer
+                    Return cpCore.webServer.webServerIO_requestReferer
                 Else
                     Return ""
                 End If
@@ -343,7 +343,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property RemoteIP() As String 'Inherits BaseClasses.CPRequestBaseClass.RemoteIP
             Get
                 If True Then
-                    Return cpCore.webServerIO.requestRemoteIP
+                    Return cpCore.webServer.requestRemoteIP
                 Else
                     Return ""
                 End If
@@ -353,7 +353,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Secure() As Boolean 'Inherits BaseClasses.CPRequestBaseClass.Secure
             Get
                 If True Then
-                    Return cpCore.webServerIO.requestSecure
+                    Return cpCore.webServer.requestSecure
                 Else
                     Return False
                 End If

@@ -18,7 +18,7 @@ Namespace Contensive.Core
         Public Shared Function OpenFormTable(cpCore As coreClass, ByVal ButtonList As String) As String
             Dim result As String = ""
             Try
-                result = cpCore.html_GetFormStart()
+                result = cpCore.htmldoc.html_GetFormStart()
                 If ButtonList <> "" Then
                     result = result & cpCore.main_GetPanelButtons(ButtonList, "Button")
                 End If

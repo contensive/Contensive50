@@ -179,7 +179,7 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         Public Function getFormInput(ByVal ContentName As String, ByVal FieldName As String, Optional ByVal HeightLines As Integer = 1, Optional ByVal WidthRows As Integer = 40, Optional ByVal HtmlId As String = "") As String
-            Return cpCore.html_GetFormInputCS(csPtr, ContentName, FieldName, HeightLines, WidthRows, HtmlId)
+            Return cpCore.htmldoc.html_GetFormInputCS(csPtr, ContentName, FieldName, HeightLines, WidthRows, HtmlId)
         End Function
         '
         '====================================================================================================

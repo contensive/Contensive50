@@ -97,6 +97,17 @@ Namespace Contensive.Core
         '
         '=============================================================================================
         '
+        Public Function getNumber(ByVal RequestName As String) As Double
+            Try
+                Return genericController.EncodeNumber(getProperty(RequestName).Value)
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+            Return 0
+        End Function
+        '
+        '=============================================================================================
+        '
         Public Function getInteger(ByVal RequestName As String) As Integer
             Try
                 Return genericController.EncodeInteger(getProperty(RequestName).Value)
@@ -115,6 +126,39 @@ Namespace Contensive.Core
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return String.Empty
+        End Function
+        '
+        '=============================================================================================
+        '
+        Public Function getRenderedActiveContent(ByVal RequestName As String) As String
+            Try
+                Return cpCore.htmlDoc.html_RenderActiveContent(genericController.encodeText(getProperty(RequestName).Value))
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+            Return String.Empty
+        End Function
+        '
+        '=============================================================================================
+        '
+        Public Function getBoolean(ByVal RequestName As String) As Boolean
+            Try
+                Return genericController.EncodeBoolean(getProperty(RequestName).Value)
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+            Return False
+        End Function
+        '
+        '=============================================================================================
+        '
+        Public Function getDate(ByVal RequestName As String) As Date
+            Try
+                Return genericController.EncodeDate(getProperty(RequestName).Value)
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+            Return Date.MinValue
         End Function
         '
         '====================================================================================================

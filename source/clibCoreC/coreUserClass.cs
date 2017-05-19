@@ -505,7 +505,7 @@
 //                    // write out all of the form input (except state) to hidden fields so they can be read after login
 //                    //
 //                    //
-//                    returnResult = "" + returnResult + cpCore.html_GetFormInputHidden("Type", FormTypeSendPassword) + "";
+//                    returnResult = "" + returnResult + cpCore.htmldoc.html_GetFormInputHidden("Type", FormTypeSendPassword) + "";
 //                    foreach (KeyValuePair<string, docPropertiesClass> kvp in cpCore.docProperties.docPropertiesDict)
 //                    {
 //                        var _with1 = kvp.Value;
@@ -521,7 +521,7 @@
 //                                case "EMAIL":
 //                                    break;
 //                                default:
-//                                    returnResult = returnResult + cpCore.html_GetFormInputHidden(_with1.Name, _with1.Value);
+//                                    returnResult = returnResult + cpCore.htmldoc.html_GetFormInputHidden(_with1.Name, _with1.Value);
 //                                    break;
 //                            }
 //                        }
@@ -530,7 +530,7 @@
 //                    QueryString = cpCore.web_RefreshQueryString;
 //                    QueryString = genericController.ModifyQueryString(QueryString, "S", "");
 //                    QueryString = genericController.ModifyQueryString(QueryString, "ccIPage", "");
-//                    returnResult = "" + cpCore.html_GetFormStart(QueryString) + kmaIndent(returnResult) + cr + "</form>" + "";
+//                    returnResult = "" + cpCore.htmldoc.html_GetFormStart(QueryString) + kmaIndent(returnResult) + cr + "</form>" + "";
 //                }
 //            }
 //            catch (Exception ex)
@@ -1754,8 +1754,8 @@
 //                    }
 //                    loginForm = loginForm + cr + "<tr>" + cr2 + "<td colspan=\"2\">&nbsp;</td>" + cr + "</tr>" + "";
 //                    loginForm = "" + cr + "<table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" width=\"100%\">" + kmaIndent(loginForm) + cr + "</table>" + "";
-//                    loginForm = loginForm + cpCore.html_GetFormInputHidden("Type", FormTypeLogin) + cpCore.html_GetFormInputHidden("email", loginForm_Email) + cpCore.main_GetPanelButtons(ButtonLogin, "Button") + "";
-//                    loginForm = "" + cpCore.html_GetFormStart(QueryString) + kmaIndent(loginForm) + cr + "</form>" + "";
+//                    loginForm = loginForm + cpCore.htmldoc.html_GetFormInputHidden("Type", FormTypeLogin) + cpCore.htmldoc.html_GetFormInputHidden("email", loginForm_Email) + cpCore.main_GetPanelButtons(ButtonLogin, "Button") + "";
+//                    loginForm = "" + cpCore.htmldoc.html_GetFormStart(QueryString) + kmaIndent(loginForm) + cr + "</form>" + "";
 
 //                    //-------
 

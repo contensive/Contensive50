@@ -47,7 +47,7 @@ Namespace Contensive.Core
         '
         '
         '
-        Public Overrides Property ContentType() As String 'Inherits BaseClasses.CPResponseBaseClass.ContentType
+        Public Overrides Property ContentType() As String
             Get
                 If True Then
                     Return cpCore.responseContentType
@@ -62,7 +62,7 @@ Namespace Contensive.Core
             End Set
         End Property
 
-        Public Overrides ReadOnly Property Cookies() As String 'Inherits BaseClasses.CPResponseBaseClass.Cookies
+        Public Overrides ReadOnly Property Cookies() As String
             Get
                 If True Then
                     Return cpCore.responseCookies
@@ -104,20 +104,20 @@ Namespace Contensive.Core
             End If
         End Sub
 
-        Public Overrides Sub Flush() 'Inherits BaseClasses.CPResponseBaseClass.Flush
+        Public Overrides Sub Flush()
             If True Then
                 Call cpCore.webServer.webServerIO_FlushStream()
             End If
         End Sub
-        Public Overrides Sub Redirect(ByVal Link As String) 'Inherits BaseClasses.CPResponseBaseClass.Redirect
+        Public Overrides Sub Redirect(ByVal Link As String)
             If True Then
                 Call cpCore.main_Redirect(Link)
             End If
         End Sub
 
-        Public Overrides Sub SetBuffer(ByVal BufferOn As Boolean) 'Inherits BaseClasses.CPResponseBaseClass.SetBuffer
+        Public Overrides Sub SetBuffer(ByVal BufferOn As Boolean)
             If True Then
-                Call cpCore.webServer.webServerIO_SetStreamBuffer(BufferOn)
+                Call cpCore.htmlDoc.enableOutputBuffer(BufferOn)
             End If
         End Sub
 
@@ -127,7 +127,7 @@ Namespace Contensive.Core
             End If
         End Sub
 
-        Public Overrides Sub SetTimeout(ByVal TimeoutSeconds As String) 'Inherits BaseClasses.CPResponseBaseClass.SetTimeout
+        Public Overrides Sub SetTimeout(ByVal TimeoutSeconds As String)
             If True Then
                 'Call cmc.main_SetStreamTimeout(TimeoutSeconds)
             End If

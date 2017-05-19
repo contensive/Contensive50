@@ -9,6 +9,7 @@ Imports Contensive.Core.Controllers.genericController
 Namespace Contensive.Core
     ''' <summary>
     ''' Code dedicated to processing iis input and output. lazy Constructed. (see coreHtmlClass for html processing)
+    ''' What belongs here is everything that would have to change if we converted to apache
     ''' </summary>
     Public Class webServerController
         '
@@ -459,7 +460,7 @@ Namespace Contensive.Core
                     '
                     webServerIO_InitCounter += 1
                     '
-                    Call webServerIO_SetStreamBuffer(True)
+                    Call cpCore.htmlDoc.enableOutputBuffer(True)
                     cpCore.docOpen = True
                     Call webServerIO_setResponseContentType("text/html")
                     '
@@ -1025,7 +1026,7 @@ Namespace Contensive.Core
                 '
                 MethodName = "main_addResponseCookie"
                 '
-                If cpCore.docOpen And cpCore.htmlDoc.docBufferEnabled Then
+                If cpCore.docOpen And cpCore.htmlDoc.outputBufferEnabled Then
                     If (isMissing(domain)) And cpCore.domains.domainDetails.allowCrossLogin And genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("Write Cookies to All Domains", True)) Then
                         '
                         ' no domain provided, new mode
@@ -1180,26 +1181,6 @@ Namespace Contensive.Core
         '
         '
         '
-        Public Sub webServerIO_SetStreamBuffer(BufferOn As Boolean)
-            Try
-                If cpCore.htmlDoc.docBufferEnabled Then
-                    '
-                    ' ----- once on, can not be turned off Response Object
-                    '
-                    cpCore.htmlDoc.docBufferEnabled = BufferOn
-                Else
-                    '
-                    ' ----- StreamBuffer off, allow on and off
-                    '
-                    cpCore.htmlDoc.docBufferEnabled = BufferOn
-                End If
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-        End Sub
-        '
-        '
-        '
         Public Sub web_setResponseStatus(status As String)
             webServerIO_bufferResponseStatus = status
         End Sub
@@ -1264,7 +1245,7 @@ ErrorTrap:
             '
             MethodName = "main_Redirect2(" & NonEncodedLink & "," & RedirectReason & "," & IsPageNotFound & ")"
             If cpCore.docOpen Then
-                redirectCycles = cpCore.doc_getInteger(rnRedirectCycleFlag)
+                redirectCycles = cpCore.docProperties.getInteger(rnRedirectCycleFlag)
                 '
                 ' convert link to a long link on this domain
                 '
@@ -1406,7 +1387,7 @@ ErrorTrap:
             Dim VirtualFilename As String
             Dim Ext As String
             '
-            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<!-- main_GetHTMLInternalHead called out of order. It must follow a content call, such as main_GetHtmlBody, main_GetSectionPage, and main_GetContentPage -->"
+            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<!-- main_GetHTMLInternalHead called out of order. It must follow a content call, such as pageManager_GetHtmlBody, main_GetSectionPage, and main_GetContentPage -->"
             '
             ' stylesheets first -- for performance
             ' put stylesheets inline without processing
@@ -1449,21 +1430,21 @@ ErrorTrap:
             '
             ' Template exclusive styles
             '
-            If cpCore.main_MetaContent_TemplateStyleSheetTag <> "" Then
-                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cpCore.main_MetaContent_TemplateStyleSheetTag
+            If cpCore.htmlDoc.main_MetaContent_TemplateStyleSheetTag <> "" Then
+                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cpCore.htmlDoc.main_MetaContent_TemplateStyleSheetTag
             End If
             '
             ' Page Styles
             '
-            If cpCore.main_MetaContent_StyleSheetTags <> "" Then
-                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cpCore.main_MetaContent_StyleSheetTags
-                cpCore.main_MetaContent_StyleSheetTags = ""
+            If cpCore.htmlDoc.main_MetaContent_StyleSheetTags <> "" Then
+                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cpCore.htmlDoc.main_MetaContent_StyleSheetTags
+                cpCore.htmlDoc.main_MetaContent_StyleSheetTags = ""
             End If
             '
             ' Member Styles
             '
             If cpCore.user.styleFilename <> "" Then
-                Call cpCore.main_AddStylesheetLink2(webServerIO_requestProtocol & requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, cpCore.user.styleFilename), "member style")
+                Call cpCore.htmlDoc.main_AddStylesheetLink2(webServerIO_requestProtocol & requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, cpCore.user.styleFilename), "member style")
                 cpCore.user.styleFilename = ""
             End If
             '

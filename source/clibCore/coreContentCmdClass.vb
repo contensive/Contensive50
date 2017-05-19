@@ -589,7 +589,7 @@ Namespace Contensive.Core
                                     End Select
                                 Next
                                 If ArgName <> "" Then
-                                    CmdAccumulator = cpCore.html_GetContentCopy(ArgName, "copy content", cpCore.user.id, True, cpCore.user.isAuthenticated)
+                                    CmdAccumulator = cpCore.htmldoc.html_GetContentCopy(ArgName, "copy content", cpCore.user.id, True, cpCore.user.isAuthenticated)
                                 End If
                             Case "opencopy"
                                 '
@@ -609,7 +609,7 @@ Namespace Contensive.Core
                                     End Select
                                 Next
                                 If ArgName <> "" Then
-                                    CmdAccumulator = cpCore.html_GetContentCopy(ArgName, "copy content", cpCore.user.id, True, cpCore.user.isAuthenticated)
+                                    CmdAccumulator = cpCore.htmldoc.html_GetContentCopy(ArgName, "copy content", cpCore.user.id, True, cpCore.user.isAuthenticated)
                                 End If
                             Case "openlayout"
                                 '
@@ -679,7 +679,7 @@ Namespace Contensive.Core
                                         importHead = Controllers.htmlDocController.getTagInnerHTML(CmdAccumulator, "head", False)
                                         If importHead <> "" Then
                                             ' try this, but it may not be implemented yet
-                                            Call cpCore.html_addHeadTags(importHead)
+                                            Call cpCore.htmldoc.html_addHeadTags(importHead)
                                         End If
                                         CmdAccumulator = Controllers.htmlDocController.getTagInnerHTML(CmdAccumulator, "body", False)
                                     End If

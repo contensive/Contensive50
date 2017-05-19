@@ -188,25 +188,25 @@ Namespace Contensive.Core
                 GetForm = Adminui.GetFormBodyAdminOnly()
                 GetForm = Adminui.GetBody("Admin Tools", ButtonCancelAll, "", False, False, "<div>Administration Tools</div>", "", 0, GetForm)
             Else
-                ToolsAction = cpCore.doc_getInteger("dta")
+                ToolsAction = cpCore.docProperties.getInteger("dta")
                 Button = cpCore.docProperties.getText("Button")
-                AdminFormTool = cpCore.doc_getInteger(RequestNameAdminForm)
+                AdminFormTool = cpCore.docProperties.getInteger(RequestNameAdminForm)
                 ToolsTable = cpCore.docProperties.getText("dtt")
                 ToolsContentName = cpCore.docProperties.getText("ContentName")
                 ToolsQuery = cpCore.docProperties.getText("dtq")
                 ToolsDataSource = cpCore.docProperties.getText("dtds")
-                MenuEntryID = cpCore.doc_getInteger("dtei")
-                MenuHeaderID = cpCore.doc_getInteger("dthi")
-                MenuDirection = cpCore.doc_getInteger("dtmd")
-                DefaultReadOnly = cpCore.doc_getBoolean("dtdreadonly")
-                DefaultActive = cpCore.doc_getBoolean("dtdactive")
-                DefaultPassword = cpCore.doc_getBoolean("dtdpassword")
-                DefaulttextBuffered = cpCore.doc_getBoolean("dtdtextbuffered")
-                DefaultRequired = cpCore.doc_getBoolean("dtdrequired")
-                DefaultAdminOnly = cpCore.doc_getBoolean("dtdadmin")
-                DefaultDeveloperOnly = cpCore.doc_getBoolean("dtddev")
-                defaultAddMenu = cpCore.doc_getBoolean("dtdam")
-                DefaultCreateBlankRecord = cpCore.doc_getBoolean("dtblank")
+                MenuEntryID = cpCore.docProperties.getInteger("dtei")
+                MenuHeaderID = cpCore.docProperties.getInteger("dthi")
+                MenuDirection = cpCore.docProperties.getInteger("dtmd")
+                DefaultReadOnly = cpCore.docProperties.getBoolean("dtdreadonly")
+                DefaultActive = cpCore.docProperties.getBoolean("dtdactive")
+                DefaultPassword = cpCore.docProperties.getBoolean("dtdpassword")
+                DefaulttextBuffered = cpCore.docProperties.getBoolean("dtdtextbuffered")
+                DefaultRequired = cpCore.docProperties.getBoolean("dtdrequired")
+                DefaultAdminOnly = cpCore.docProperties.getBoolean("dtdadmin")
+                DefaultDeveloperOnly = cpCore.docProperties.getBoolean("dtddev")
+                defaultAddMenu = cpCore.docProperties.getBoolean("dtdam")
+                DefaultCreateBlankRecord = cpCore.docProperties.getBoolean("dtblank")
                 '
                 Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("dta", ToolsAction.ToString())
                 'Call cpCore.main_AddRefreshQueryString("Button=" & Button)
@@ -549,23 +549,23 @@ ErrorTrap:
                 '
                 ' Read in arguments if available
                 '
-                Timeout = cpCore.doc_getInteger("Timeout")
+                Timeout = cpCore.docProperties.getInteger("Timeout")
                 If Timeout = 0 Then
                     Timeout = 30
                 End If
                 '
-                PageSize = cpCore.doc_getInteger("PageSize")
+                PageSize = cpCore.docProperties.getInteger("PageSize")
                 If PageSize = 0 Then
                     PageSize = 10
                 End If
                 '
-                PageNumber = cpCore.doc_getInteger("PageNumber")
+                PageNumber = cpCore.docProperties.getInteger("PageNumber")
                 If PageNumber = 0 Then
                     PageNumber = 1
                 End If
                 '
                 If (cpCore.docProperties.getText("button")) = ButtonRun Then
-                    DataSourceID = cpCore.doc_getInteger("DataSourceID")
+                    DataSourceID = cpCore.docProperties.getInteger("DataSourceID")
                     DataSourceName = ""
                     If DataSourceID <> 0 Then
                         DataSourceName = cpCore.db.getDataSourceNameByID(DataSourceID)
@@ -674,7 +674,7 @@ ErrorTrap:
                 'Call Stream.Add(SpanClassAdminNormal & cpCore.main_GetFormStart(""))
                 '
                 Dim SQLRows As Integer
-                SQLRows = cpCore.doc_getInteger("SQLRows")
+                SQLRows = cpCore.docProperties.getInteger("SQLRows")
                 If SQLRows = 0 Then
                     SQLRows = cpCore.properties_user_getInteger("ManualQueryInputRows", 5)
                 Else
@@ -705,17 +705,17 @@ ErrorTrap:
                 If IsNull(PageSize) Then
                     PageSize = 100
                 End If
-                Call Stream.Add("<br>Page Size:<br>" & cpCore.html_GetFormInputText("PageSize", PageSize.ToString()))
+                Call Stream.Add("<br>Page Size:<br>" & cpCore.htmlDoc.html_GetFormInputText("PageSize", PageSize.ToString()))
                 '
                 If IsNull(PageNumber) Then
                     PageNumber = 1
                 End If
-                Call Stream.Add("<br>Page Number:<br>" & cpCore.html_GetFormInputText("PageNumber", PageNumber.ToString()))
+                Call Stream.Add("<br>Page Number:<br>" & cpCore.htmlDoc.html_GetFormInputText("PageNumber", PageNumber.ToString()))
                 '
                 If IsNull(Timeout) Then
                     Timeout = 30
                 End If
-                Call Stream.Add("<br>Timeout (sec):<br>" & cpCore.html_GetFormInputText("Timeout", Timeout.ToString()))
+                Call Stream.Add("<br>Timeout (sec):<br>" & cpCore.htmlDoc.html_GetFormInputText("Timeout", Timeout.ToString()))
                 '
                 'Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolManualQuery))
                 'Stream.Add( cpCore.main_GetFormEnd & "</SPAN>")
@@ -760,7 +760,7 @@ ErrorTrap:
                 '
                 ' Process input
                 '
-                DataSourceID = cpCore.doc_getInteger("DataSourceID")
+                DataSourceID = cpCore.docProperties.getInteger("DataSourceID")
                 DataSourceName = cpCore.db.getDataSourceNameByID(DataSourceID)
                 ContentName = cpCore.docProperties.getText("ContentName")
                 TableName = cpCore.docProperties.getText("TableName")
@@ -795,7 +795,7 @@ ErrorTrap:
                             Call cpCore.db.cs_Close(CS)
                         End If
                     End If
-                    Call cpCore.main_CreateAdminMenu("Site Content", ContentName, ContentName, "", "")
+                    Call cpCore.admin_VerifyAdminMenu("Site Content", ContentName, ContentName, "", "")
                     ContentID = cpCore.main_GetContentID(ContentName)
                     Call Stream.Add("<P>Content Definition was created. An admin menu entry for this definition has been added under 'Site Content', and will be visible on the next page view. Use the [<a href=""?af=105&ContentID=" & ContentID & """>Edit Content Definition Fields</a>] tool to review and edit this definition's fields.</P>")
                 Else
@@ -808,10 +808,10 @@ ErrorTrap:
             Call Stream.Add(cpCore.htmlDoc.main_GetFormInputSelect("DataSourceID", DataSourceID, "Data Sources", "", "Default"))
             Call Stream.Add("<br><br>")
             Call Stream.Add("Content Name<br>")
-            Call Stream.Add(cpCore.html_GetFormInputText2("ContentName", ContentName, 1, 40))
+            Call Stream.Add(cpCore.htmlDoc.html_GetFormInputText2("ContentName", ContentName, 1, 40))
             Call Stream.Add("<br><br>")
             Call Stream.Add("Table Name<br>")
-            Call Stream.Add(cpCore.html_GetFormInputText2("TableName", TableName, 1, 40))
+            Call Stream.Add(cpCore.htmlDoc.html_GetFormInputText2("TableName", TableName, 1, 40))
             Call Stream.Add("<br><br>")
             'Call Stream.Add(cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolCreateContentDefinition))
             Call Stream.Add("</SPAN>")
@@ -920,14 +920,14 @@ ErrorTrap:
             '   Load Request
             '--------------------------------------------------------------------------------
             '
-            ToolsAction = cpCore.doc_getInteger("dta")
-            TargetFieldID = cpCore.doc_getInteger("fi")
-            ContentID = cpCore.doc_getInteger(RequestNameToolContentID)
+            ToolsAction = cpCore.docProperties.getInteger("dta")
+            TargetFieldID = cpCore.docProperties.getInteger("fi")
+            ContentID = cpCore.docProperties.getInteger(RequestNameToolContentID)
             'ColumnPointer = cpCore.main_GetStreamInteger("dtcn")
             FieldNameToAdd = genericController.vbUCase(cpCore.docProperties.getText(RequestNameAddField))
-            FieldIDToAdd = cpCore.doc_getInteger(RequestNameAddFieldID)
+            FieldIDToAdd = cpCore.docProperties.getInteger(RequestNameAddFieldID)
             ButtonList = ButtonCancel & "," & ButtonSelect
-            ReloadCDef = cpCore.doc_getBoolean("ReloadCDef")
+            ReloadCDef = cpCore.docProperties.getBoolean("ReloadCDef")
             '
             '--------------------------------------------------------------------------------
             ' Process actions
@@ -1468,7 +1468,7 @@ ErrorTrap:
             Call Stream.Add(cpCore.main_GetPanel(FormPanel))
             '
             Call cpCore.siteProperties.setProperty("AllowContentAutoLoad", AllowContentAutoLoad)
-            Stream.Add(cpCore.html_GetFormInputHidden("ReloadCDef", ReloadCDef))
+            Stream.Add(cpCore.htmlDoc.html_GetFormInputHidden("ReloadCDef", ReloadCDef))
 
             GetForm_ConfigureListing = genericLegacyView.OpenFormTable(cpCore, ButtonList) & Stream.Text & genericLegacyView.CloseFormTable(cpCore, ButtonList)
             '
@@ -1547,7 +1547,7 @@ ErrorTrap:
             Call Stream.Add(GetTitle("Content Diagnostic", "This tool finds Content and Table problems. To run successfully, the Site Property 'TrapErrors' must be set to true."))
             Call Stream.Add(SpanClassAdminNormal & "<br>")
             '
-            iDiagActionCount = cpCore.doc_getInteger("DiagActionCount")
+            iDiagActionCount = cpCore.docProperties.getInteger("DiagActionCount")
             Button = cpCore.docProperties.getText("Button")
             If (iDiagActionCount <> 0) And ((Button = ButtonFix) Or (Button = ButtonFixAndRun)) Then
                 '
@@ -1639,7 +1639,7 @@ ErrorTrap:
                     '
                     Call Stream.Add("Site Property 'TrapErrors' is currently set false. This property must be true to run Content Diagnostics successfully.<br>")
                 Else
-                    Call cpCore.webServer.webServerIO_SetStreamBuffer(False)
+                    Call cpCore.htmlDoc.enableOutputBuffer(False)
                     '
                     ' ----- check Content Sources for duplicates
                     '
@@ -1896,7 +1896,7 @@ ErrorTrap:
                     '
                     ' ----- Done with diagnostics
                     '
-                    Stream.Add(cpCore.html_GetFormInputHidden("DiagActionCount", DiagActionCount))
+                    Stream.Add(cpCore.htmlDoc.html_GetFormInputHidden("DiagActionCount", DiagActionCount))
                 End If
             End If
             '
@@ -2070,10 +2070,10 @@ ErrorTrap:
                 '
                 ' Process input
                 '
-                ParentContentID = cpCore.doc_getInteger("ParentContentID")
+                ParentContentID = cpCore.docProperties.getInteger("ParentContentID")
                 ParentContentName = Local_GetContentNameByID(ParentContentID)
                 ChildContentName = cpCore.docProperties.getText("ChildContentName")
-                AddAdminMenuEntry = cpCore.doc_getBoolean("AddAdminMenuEntry")
+                AddAdminMenuEntry = cpCore.docProperties.getBoolean("AddAdminMenuEntry")
                 '
                 Call Stream.Add(SpanClassAdminSmall)
                 If (ParentContentName = "") Or (ChildContentName = "") Then
@@ -2101,9 +2101,9 @@ ErrorTrap:
                         End If
                         Call cpCore.db.cs_Close(CS)
                         If MenuName <> "" Then
-                            Call cpCore.main_CreateAdminMenu(MenuName, ChildContentName, ChildContentName, "", ChildContentName, AdminOnly, DeveloperOnly, False)
+                            Call cpCore.admin_VerifyAdminMenu(MenuName, ChildContentName, ChildContentName, "", ChildContentName, AdminOnly, DeveloperOnly, False)
                         Else
-                            Call cpCore.main_CreateAdminMenu("Site Content", ChildContentName, ChildContentName, "", "")
+                            Call cpCore.admin_VerifyAdminMenu("Site Content", ChildContentName, ChildContentName, "", "")
                         End If
                     End If
                     Stream.Add("<br>Finished</P>")
@@ -2117,11 +2117,11 @@ ErrorTrap:
             Call Stream.Add("<br><br>")
             '
             Call Stream.Add("Child Content Name<br>")
-            Stream.Add(cpCore.html_GetFormInputText2("ChildContentName", ChildContentName, 1, 40))
+            Stream.Add(cpCore.htmlDoc.html_GetFormInputText2("ChildContentName", ChildContentName, 1, 40))
             Call Stream.Add("<br><br>")
             '
             Call Stream.Add("Add Admin Menu Entry under Parent's Menu Entry<br>")
-            Stream.Add(cpCore.html_GetFormInputCheckBox2("AddAdminMenuEntry", AddAdminMenuEntry))
+            Stream.Add(cpCore.htmlDoc.html_GetFormInputCheckBox2("AddAdminMenuEntry", AddAdminMenuEntry))
             Call Stream.Add("<br><br>")
             '
             ''Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolCreateChildContent)
@@ -2260,7 +2260,7 @@ ErrorTrap:
                     If Caption <> "" Then
                         Panel = Panel & "<tr>"
                         Panel = Panel & "<td width=""30"" align=""right"">"
-                        Panel = Panel & cpCore.html_GetFormInputRadioBox("DiagAction" & DiagActionCount, DiagActions(ActionPointer).Command, "")
+                        Panel = Panel & cpCore.htmlDoc.html_GetFormInputRadioBox("DiagAction" & DiagActionCount, DiagActions(ActionPointer).Command, "")
                         Panel = Panel & "</td>"
                         Panel = Panel & "<td width=""100%"">" & SpanClassAdminNormal & Caption & "</SPAN></td>"
                         Panel = Panel & "</tr>"
@@ -2646,7 +2646,7 @@ ErrorTrap:
                 ' Read in arguments
                 '
                 TableName = cpCore.docProperties.getText("TableName")
-                DataSourceID = cpCore.doc_getInteger("DataSourceID")
+                DataSourceID = cpCore.docProperties.getInteger("DataSourceID")
                 DataSourceName = cpCore.db.getDataSourceNameByID(DataSourceID)
                 '
                 ' Run the SQL
@@ -2871,7 +2871,7 @@ ErrorTrap:
             '
             Call Stream.Add("<br>")
             Call Stream.Add("Table Name<br>")
-            Stream.Add(cpCore.html_GetFormInputText("Tablename", TableName))
+            Stream.Add(cpCore.htmlDoc.html_GetFormInputText("Tablename", TableName))
             '
             Call Stream.Add("<br><br>")
             Call Stream.Add("Data Source<br>")
@@ -3248,7 +3248,7 @@ ErrorTrap:
                                 ' put the menu into the current menu format
                                 '
                                 formFieldId = .id
-                                Call streamRow.Add(cpCore.html_GetFormInputHidden("dtfaID." & RecordCount, formFieldId))
+                                Call streamRow.Add(cpCore.htmlDoc.html_GetFormInputHidden("dtfaID." & RecordCount, formFieldId))
                                 streamRow.Add("<tr>")
                                 '
                                 ' edit button
@@ -3271,7 +3271,7 @@ ErrorTrap:
                                     '
                                     ' inherited property
                                     '
-                                    streamRow.Add("<td class=""ccPanelInput"" align=""center"">" & cpCore.html_GetFormInputCheckBox2("dtfaInherited." & RecordCount, .inherited) & "</td>")
+                                    streamRow.Add("<td class=""ccPanelInput"" align=""center"">" & cpCore.htmlDoc.html_GetFormInputCheckBox2("dtfaInherited." & RecordCount, .inherited) & "</td>")
                                 Else
                                     '
                                     ' CDef has a parent, but the field is non-inherited, test for a matching Parent Field
@@ -3288,7 +3288,7 @@ ErrorTrap:
                                         streamRow.Add("<td class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "False**</span></td>")
                                         NeedFootNote2 = True
                                     Else
-                                        streamRow.Add("<td class=""ccPanelInput"" align=""center"">" & cpCore.html_GetFormInputCheckBox2("dtfaInherited." & RecordCount, .inherited) & "</td>")
+                                        streamRow.Add("<td class=""ccPanelInput"" align=""center"">" & cpCore.htmlDoc.html_GetFormInputCheckBox2("dtfaInherited." & RecordCount, .inherited) & "</td>")
                                     End If
                                 End If
                                 '
@@ -3302,7 +3302,7 @@ ErrorTrap:
                                 ElseIf FieldLocked Then
                                     Call streamRow.Add(SpanClassAdminSmall & .nameLc & "&nbsp;</SPAN><input type=hidden name=dtfaName." & RecordCount & " value=""" & .nameLc & """>")
                                 Else
-                                    Call streamRow.Add(cpCore.html_GetFormInputText2("dtfaName." & RecordCount, .nameLc, 1, 10))
+                                    Call streamRow.Add(cpCore.htmlDoc.html_GetFormInputText2("dtfaName." & RecordCount, .nameLc, 1, 10))
                                 End If
                                 streamRow.Add("</nobr></td>")
                                 '
@@ -3312,7 +3312,7 @@ ErrorTrap:
                                 If .inherited Then
                                     Call streamRow.Add(SpanClassAdminSmall & .caption & "</SPAN>")
                                 Else
-                                    Call streamRow.Add(cpCore.html_GetFormInputText2("dtfaCaption." & RecordCount, .caption, 1, 10))
+                                    Call streamRow.Add(cpCore.htmlDoc.html_GetFormInputText2("dtfaCaption." & RecordCount, .caption, 1, 10))
                                 End If
                                 streamRow.Add("</nobr></td>")
                                 '
@@ -3322,7 +3322,7 @@ ErrorTrap:
                                 If .inherited Then
                                     Call streamRow.Add(SpanClassAdminSmall & .editTabName & "</SPAN>")
                                 Else
-                                    Call streamRow.Add(cpCore.html_GetFormInputText2("dtfaEditTab." & RecordCount, .editTabName, 1, 10))
+                                    Call streamRow.Add(cpCore.htmlDoc.html_GetFormInputText2("dtfaEditTab." & RecordCount, .editTabName, 1, 10))
                                 End If
                                 streamRow.Add("</nobr></td>")
                                 '
@@ -3332,7 +3332,7 @@ ErrorTrap:
                                 If .inherited Then
                                     Call streamRow.Add(SpanClassAdminSmall & genericController.encodeText(.defaultValue) & "</SPAN>")
                                 Else
-                                    Call streamRow.Add(cpCore.html_GetFormInputText2("dtfaDefaultValue." & RecordCount, genericController.encodeText(.defaultValue), 1, 10))
+                                    Call streamRow.Add(cpCore.htmlDoc.html_GetFormInputText2("dtfaDefaultValue." & RecordCount, genericController.encodeText(.defaultValue), 1, 10))
                                 End If
                                 streamRow.Add("</nobr></td>")
                                 '
@@ -3349,7 +3349,7 @@ ErrorTrap:
                                     End If
                                     Call cpCore.db.cs_Close(CSPointer)
                                 ElseIf FieldLocked Then
-                                    Call streamRow.Add(cpCore.content_GetRecordName("content field types", .fieldTypeId) & cpCore.html_GetFormInputHidden("dtfaType." & RecordCount, .fieldTypeId))
+                                    Call streamRow.Add(cpCore.content_GetRecordName("content field types", .fieldTypeId) & cpCore.htmlDoc.html_GetFormInputHidden("dtfaType." & RecordCount, .fieldTypeId))
                                 Else
                                     TypeSelect = TypeSelectTemplate
                                     TypeSelect = genericController.vbReplace(TypeSelect, "menuname", "dtfaType." & RecordCount, 1, 99, vbTextCompare)
@@ -3364,7 +3364,7 @@ ErrorTrap:
                                 If .inherited Then
                                     Call streamRow.Add(SpanClassAdminSmall & .editSortPriority & "</SPAN>")
                                 Else
-                                    Call streamRow.Add(cpCore.html_GetFormInputText2("dtfaEditSortPriority." & RecordCount, .editSortPriority.ToString(), 1, 10))
+                                    Call streamRow.Add(cpCore.htmlDoc.html_GetFormInputText2("dtfaEditSortPriority." & RecordCount, .editSortPriority.ToString(), 1, 10))
                                 End If
                                 streamRow.Add("</nobr></td>")
                                 '
@@ -3429,7 +3429,7 @@ ErrorTrap:
                             End If
                         Next
                         Call Stream.Add(StreamValidRows.Text())
-                        Call Stream.Add(cpCore.html_GetFormInputHidden("dtfaRecordCount", RecordCount))
+                        Call Stream.Add(cpCore.htmlDoc.html_GetFormInputHidden("dtfaRecordCount", RecordCount))
                     End If
                     Stream.Add("</table>")
                     'Stream.Add( cpCore.main_GetPanelButtons(ButtonList, "Button"))
@@ -3448,7 +3448,7 @@ ErrorTrap:
                     '
                     ' Save the content selection
                     '
-                    Call Stream.Add(cpCore.html_GetFormInputHidden(RequestNameToolContentID, ContentID))
+                    Call Stream.Add(cpCore.htmlDoc.html_GetFormInputHidden(RequestNameToolContentID, ContentID))
                 Else
                     '
                     ' content tables that have edit forms to Configure
@@ -3460,7 +3460,7 @@ ErrorTrap:
                     Call Stream.Add(cpCore.main_GetPanel(FormPanel))
                 End If
                 '
-                Call Stream.Add(cpCore.html_GetFormInputHidden("ReloadCDef", ReloadCDef))
+                Call Stream.Add(cpCore.htmlDoc.html_GetFormInputHidden("ReloadCDef", ReloadCDef))
                 result = genericLegacyView.OpenFormTable(cpCore, ButtonList) & Stream.Text & genericLegacyView.CloseFormTable(cpCore, ButtonList)
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex)
@@ -3475,7 +3475,7 @@ ErrorTrap:
             If Inherited Then
                 GetForm_ConfigureEdit_CheckBox = GetForm_ConfigureEdit_CheckBox & SpanClassAdminSmall & Value & "</SPAN>"
             Else
-                GetForm_ConfigureEdit_CheckBox = GetForm_ConfigureEdit_CheckBox & cpCore.html_GetFormInputCheckBox(Label, Value)
+                GetForm_ConfigureEdit_CheckBox = GetForm_ConfigureEdit_CheckBox & cpCore.htmlDoc.html_GetFormInputCheckBox(Label, Value)
             End If
             GetForm_ConfigureEdit_CheckBox = GetForm_ConfigureEdit_CheckBox & "</nobr></td>"
         End Function
@@ -3514,7 +3514,7 @@ ErrorTrap:
             ' Process Input
             '
             Button = cpCore.docProperties.getText("Button")
-            TableID = cpCore.doc_getInteger("TableID")
+            TableID = cpCore.docProperties.getInteger("TableID")
             '
             ' Get Tablename and DataSource
             '
@@ -3525,14 +3525,14 @@ ErrorTrap:
             End If
             Call cpCore.db.cs_Close(CS)
             '
-            If (TableID <> 0) And (TableID = cpCore.doc_getInteger("previoustableid")) And (Button <> "") Then
+            If (TableID <> 0) And (TableID = cpCore.docProperties.getInteger("previoustableid")) And (Button <> "") Then
                 '
                 ' Drop Indexes
                 '
-                Count = cpCore.doc_getInteger("DropCount")
+                Count = cpCore.docProperties.getInteger("DropCount")
                 If Count > 0 Then
                     For Pointer = 0 To Count - 1
-                        If cpCore.doc_getBoolean("DropIndex." & Pointer) Then
+                        If cpCore.docProperties.getBoolean("DropIndex." & Pointer) Then
                             IndexName = cpCore.docProperties.getText("DropIndexName." & Pointer)
                             GetForm_DbIndex = GetForm_DbIndex & "<br>Dropping index [" & IndexName & "] from table [" & TableName & "]"
                             Call cpCore.db.deleteSqlIndex("Default", TableName, IndexName)
@@ -3542,10 +3542,10 @@ ErrorTrap:
                 '
                 ' Add Indexes
                 '
-                Count = cpCore.doc_getInteger("AddCount")
+                Count = cpCore.docProperties.getInteger("AddCount")
                 If Count > 0 Then
                     For Pointer = 0 To Count - 1
-                        If cpCore.doc_getBoolean("AddIndex." & Pointer) Then
+                        If cpCore.docProperties.getBoolean("AddIndex." & Pointer) Then
                             'IndexName = cpCore.main_GetStreamText2("AddIndexFieldName." & Pointer)
                             FieldName = cpCore.docProperties.getText("AddIndexFieldName." & Pointer)
                             IndexName = TableName & FieldName
@@ -3556,7 +3556,7 @@ ErrorTrap:
                 End If
             End If
             '
-            GetForm_DbIndex = GetForm_DbIndex & cpCore.html_GetFormStart
+            GetForm_DbIndex = GetForm_DbIndex & cpCore.htmlDoc.html_GetFormStart
             TableColSpan = 3
             GetForm_DbIndex = GetForm_DbIndex & StartTable(2, 0, 0)
             '
@@ -3568,7 +3568,7 @@ ErrorTrap:
                 '
                 ' Add/Drop Indexes form
                 '
-                GetForm_DbIndex = GetForm_DbIndex & cpCore.html_GetFormInputHidden("PreviousTableID", TableID)
+                GetForm_DbIndex = GetForm_DbIndex & cpCore.htmlDoc.html_GetFormInputHidden("PreviousTableID", TableID)
                 '
                 ' Drop Indexes
                 '
@@ -3590,8 +3590,8 @@ ErrorTrap:
                         IndexName = genericController.encodeText(Rows(5, RowPointer))
                         If IndexName <> "" Then
                             GetForm_DbIndex = GetForm_DbIndex & StartTableRow()
-                            Copy = cpCore.html_GetFormInputCheckBox2("DropIndex." & RowPointer, False) _
-                                    & cpCore.html_GetFormInputHidden("DropIndexName." & RowPointer, IndexName) _
+                            Copy = cpCore.htmlDoc.html_GetFormInputCheckBox2("DropIndex." & RowPointer, False) _
+                                    & cpCore.htmlDoc.html_GetFormInputHidden("DropIndexName." & RowPointer, IndexName) _
                                     & genericController.encodeText(IndexName)
                             GetForm_DbIndex = GetForm_DbIndex & GetTableCell(Copy, , , TableRowEven)
                             GetForm_DbIndex = GetForm_DbIndex & GetTableCell(genericController.encodeText(Rows(17, RowPointer)), , , TableRowEven)
@@ -3600,7 +3600,7 @@ ErrorTrap:
                             TableRowEven = Not TableRowEven
                         End If
                     Next
-                    GetForm_DbIndex = GetForm_DbIndex & cpCore.html_GetFormInputHidden("DropCount", RowMax + 1)
+                    GetForm_DbIndex = GetForm_DbIndex & cpCore.htmlDoc.html_GetFormInputHidden("DropCount", RowMax + 1)
                 End If
                 '
                 ' Add Indexes
@@ -3621,8 +3621,8 @@ ErrorTrap:
                     RowMax = UBound(Rows, 2)
                     For RowPointer = 0 To RowMax
                         GetForm_DbIndex = GetForm_DbIndex & StartTableRow()
-                        Copy = cpCore.html_GetFormInputCheckBox2("AddIndex." & RowPointer, False) _
-                                & cpCore.html_GetFormInputHidden("AddIndexFieldName." & RowPointer, Rows(3, RowPointer)) _
+                        Copy = cpCore.htmlDoc.html_GetFormInputCheckBox2("AddIndex." & RowPointer, False) _
+                                & cpCore.htmlDoc.html_GetFormInputHidden("AddIndexFieldName." & RowPointer, Rows(3, RowPointer)) _
                                 & genericController.encodeText(Rows(3, RowPointer))
                         GetForm_DbIndex = GetForm_DbIndex & GetTableCell(Copy, , , TableRowEven)
                         GetForm_DbIndex = GetForm_DbIndex & GetTableCell("&nbsp;", , , TableRowEven)
@@ -3630,7 +3630,7 @@ ErrorTrap:
                         GetForm_DbIndex = GetForm_DbIndex & kmaEndTableRow
                         TableRowEven = Not TableRowEven
                     Next
-                    GetForm_DbIndex = GetForm_DbIndex & cpCore.html_GetFormInputHidden("AddCount", RowMax + 1)
+                    GetForm_DbIndex = GetForm_DbIndex & cpCore.htmlDoc.html_GetFormInputHidden("AddCount", RowMax + 1)
                 End If
                 '
                 ' Spacers
@@ -4046,7 +4046,7 @@ ErrorTrap:
         'Function genericLegacyView.OpenFormTable(cpcore,ByVal ButtonList As String) As String
         '    Dim result As String = ""
         '    Try
-        '        OpenFormTable = cpCore.html_GetFormStart()
+        '        OpenFormTable = cpCore.htmldoc.html_GetFormStart()
         '        If ButtonList <> "" Then
         '            OpenFormTable = OpenFormTable & cpCore.main_GetPanelButtons(ButtonList, "Button")
         '        End If
@@ -4097,10 +4097,10 @@ ErrorTrap:
             Dim AllowImageImport As Boolean
             Dim AllowStyleImport As Boolean
             '
-            AllowBodyHTML = cpCore.doc_getBoolean("AllowBodyHTML")
-            AllowScriptLink = cpCore.doc_getBoolean("AllowScriptLink")
-            AllowImageImport = cpCore.doc_getBoolean("AllowImageImport")
-            AllowStyleImport = cpCore.doc_getBoolean("AllowStyleImport")
+            AllowBodyHTML = cpCore.docProperties.getBoolean("AllowBodyHTML")
+            AllowScriptLink = cpCore.docProperties.getBoolean("AllowScriptLink")
+            AllowImageImport = cpCore.docProperties.getBoolean("AllowImageImport")
+            AllowStyleImport = cpCore.docProperties.getBoolean("AllowStyleImport")
             '
             Stream.Add(GetTitle("Load Templates", "This tool creates template records from the HTML files in the root folder of the site."))
             '
@@ -4122,10 +4122,10 @@ ErrorTrap:
             Call Stream.Add(SpanClassAdminNormal)
             Call Stream.Add("<br>")
             'Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolLoadTemplates)
-            Stream.Add("<br>" & cpCore.html_GetFormInputCheckBox2("AllowBodyHTML", AllowBodyHTML) & " Update/Import Soft Templates from the Body of .HTM and .HTML files")
-            Stream.Add("<br>" & cpCore.html_GetFormInputCheckBox2("AllowScriptLink", AllowScriptLink) & " Update/Import Hard Templates with links to .ASP and .ASPX scripts")
-            Stream.Add("<br>" & cpCore.html_GetFormInputCheckBox2("AllowImageImport", AllowImageImport) & " Update/Import image links (.GIF,.JPG,.PDF ) into the resource library")
-            Stream.Add("<br>" & cpCore.html_GetFormInputCheckBox2("AllowStyleImport", AllowStyleImport) & " Import style sheets (.CSS) to Dynamic Styles")
+            Stream.Add("<br>" & cpCore.htmlDoc.html_GetFormInputCheckBox2("AllowBodyHTML", AllowBodyHTML) & " Update/Import Soft Templates from the Body of .HTM and .HTML files")
+            Stream.Add("<br>" & cpCore.htmlDoc.html_GetFormInputCheckBox2("AllowScriptLink", AllowScriptLink) & " Update/Import Hard Templates with links to .ASP and .ASPX scripts")
+            Stream.Add("<br>" & cpCore.htmlDoc.html_GetFormInputCheckBox2("AllowImageImport", AllowImageImport) & " Update/Import image links (.GIF,.JPG,.PDF ) into the resource library")
+            Stream.Add("<br>" & cpCore.htmlDoc.html_GetFormInputCheckBox2("AllowStyleImport", AllowStyleImport) & " Import style sheets (.CSS) to Dynamic Styles")
             Call Stream.Add("</SPAN>")
             '
             ButtonList = ButtonCancel & "," & ButtonImportTemplates
@@ -4524,10 +4524,10 @@ ErrorTrap:
             '
             IsDeveloper = cpCore.user.isAuthenticatedDeveloper()
             If Button = ButtonFindAndReplace Then
-                RowCnt = cpCore.doc_getInteger("CDefRowCnt")
+                RowCnt = cpCore.docProperties.getInteger("CDefRowCnt")
                 If RowCnt > 0 Then
                     For RowPtr = 0 To RowCnt - 1
-                        If cpCore.doc_getBoolean("Cdef" & RowPtr) Then
+                        If cpCore.docProperties.getBoolean("Cdef" & RowPtr) Then
                             lcName = genericController.vbLCase(cpCore.docProperties.getText("CDefName" & RowPtr))
                             If IsDeveloper Or (lcName = "page content") Or (lcName = "copy content") Or (lcName = "page templates") Then
                                 CDefList = CDefList & "," & lcName
@@ -4564,13 +4564,13 @@ ErrorTrap:
             '
             ' Display form
             '
-            FindRows = cpCore.doc_getInteger("SQLRows")
+            FindRows = cpCore.docProperties.getInteger("SQLRows")
             If FindRows = 0 Then
                 FindRows = cpCore.properties_user_getInteger("FindAndReplaceFindRows", 1)
             Else
                 Call cpCore.userProperty.setProperty("FindAndReplaceFindRows", CStr(FindRows))
             End If
-            ReplaceRows = cpCore.doc_getInteger("ReplaceRows")
+            ReplaceRows = cpCore.docProperties.getInteger("ReplaceRows")
             If ReplaceRows = 0 Then
                 ReplaceRows = cpCore.properties_user_getInteger("FindAndReplaceReplaceRows", 1)
             Else
@@ -4594,16 +4594,16 @@ ErrorTrap:
                 If IsDeveloper Or (lcName = "page content") Or (lcName = "copy content") Or (lcName = "page templates") Then
                     RecordID = cpCore.db.cs_getInteger(CS, "ID")
                     If genericController.vbInstr(1, "," & CDefList & ",", "," & RecordName & ",") <> 0 Then
-                        TopHalf = TopHalf & "<div>" & cpCore.html_GetFormInputCheckBox2("Cdef" & RowPtr, True) & cpCore.html_GetFormInputHidden("CDefName" & RowPtr, RecordName) & "&nbsp;" & cpCore.db.cs_getText(CS, "Name") & "</div>"
+                        TopHalf = TopHalf & "<div>" & cpCore.htmlDoc.html_GetFormInputCheckBox2("Cdef" & RowPtr, True) & cpCore.htmlDoc.html_GetFormInputHidden("CDefName" & RowPtr, RecordName) & "&nbsp;" & cpCore.db.cs_getText(CS, "Name") & "</div>"
                     Else
-                        BottomHalf = BottomHalf & "<div>" & cpCore.html_GetFormInputCheckBox2("Cdef" & RowPtr, False) & cpCore.html_GetFormInputHidden("CDefName" & RowPtr, RecordName) & "&nbsp;" & cpCore.db.cs_getText(CS, "Name") & "</div>"
+                        BottomHalf = BottomHalf & "<div>" & cpCore.htmlDoc.html_GetFormInputCheckBox2("Cdef" & RowPtr, False) & cpCore.htmlDoc.html_GetFormInputHidden("CDefName" & RowPtr, RecordName) & "&nbsp;" & cpCore.db.cs_getText(CS, "Name") & "</div>"
                     End If
                 End If
                 Call cpCore.db.cs_goNext(CS)
                 RowPtr = RowPtr + 1
             Loop
             Call cpCore.db.cs_Close(CS)
-            Stream.Add(TopHalf & BottomHalf & cpCore.html_GetFormInputHidden("CDefRowCnt", RowPtr))
+            Stream.Add(TopHalf & BottomHalf & cpCore.htmlDoc.html_GetFormInputHidden("CDefRowCnt", RowPtr))
             '
             GetForm_FindAndReplace = genericLegacyView.OpenFormTable(cpCore, ButtonCancel & "," & ButtonFindAndReplace) & Stream.Text & genericLegacyView.CloseFormTable(cpCore, ButtonCancel & "," & ButtonFindAndReplace)
             Exit Function
@@ -4687,7 +4687,7 @@ ErrorTrap:
             '
             'If Button = ButtonCreateGUID Then
             'GUIDGenerator = New guidClass
-            Call s.Add(cpCore.html_GetFormInputText2("GUID", Guid.NewGuid().ToString, 1, 80))
+            Call s.Add(cpCore.htmlDoc.html_GetFormInputText2("GUID", Guid.NewGuid().ToString, 1, 80))
             'Call s.Add("<span style=""border:inset; padding:4px; background-color:white;"">" & Guid.NewGuid.ToString() & "</span>")
             'End If
             '
