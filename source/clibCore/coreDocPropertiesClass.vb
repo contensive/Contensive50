@@ -142,10 +142,10 @@ Namespace Contensive.Core
             Try
                 If Not String.IsNullOrEmpty(sourceKey) Then
                     returnResult = sourceKey.ToLower()
-                    If cpCore.webServerIO.requestSpaceAsUnderscore Then
+                    If cpCore.webServer.requestSpaceAsUnderscore Then
                         returnResult = genericController.vbReplace(returnResult, " ", "_")
                     End If
-                    If cpCore.webServerIO.requestDotAsUnderscore Then
+                    If cpCore.webServer.requestDotAsUnderscore Then
                         returnResult = genericController.vbReplace(returnResult, ".", "_")
                     End If
                 End If
@@ -188,8 +188,7 @@ Namespace Contensive.Core
                                     End If
                                     .IsForm = False
                                     .IsFile = False
-                                    cpCore.webServerIO.webServerIO_ReadStreamJSForm = cpCore.webServerIO.webServerIO_ReadStreamJSForm Or (UCase(.Name) = genericController.vbUCase(RequestNameJSForm))
-                                    cpCore.main_ReadStreamJSProcess = cpCore.main_ReadStreamJSProcess Or (UCase(.Name) = genericController.vbUCase(RequestNameJSProcess))
+                                    cpCore.webServer.webServerIO_ReadStreamJSForm = cpCore.webServer.webServerIO_ReadStreamJSForm Or (UCase(.Name) = genericController.vbUCase(RequestNameJSForm))
                                     cpCore.docProperties.setProperty(key, docProperty)
                                 End If
                             End If

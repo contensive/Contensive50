@@ -73,10 +73,10 @@ Namespace Contensive.Core
         '
         Public Property pathPage() As String
             Get
-                Return cp.core.webServerIO.requestPathPage
+                Return cp.core.webServer.requestPathPage
             End Get
             Set(ByVal value As String)
-                cp.core.webServerIO.requestPathPage = value
+                cp.core.webServer.requestPathPage = value
             End Set
         End Property
         '
@@ -84,10 +84,10 @@ Namespace Contensive.Core
         '
         Public Property referrer() As String
             Get
-                Return cp.core.webServerIO.requestReferrer
+                Return cp.core.webServer.requestReferrer
             End Get
             Set(ByVal value As String)
-                cp.core.webServerIO.requestReferrer = value
+                cp.core.webServer.requestReferrer = value
             End Set
         End Property
         '
@@ -95,10 +95,10 @@ Namespace Contensive.Core
         '
         Public Property domain() As String
             Get
-                Return cp.core.webServerIO.requestDomain
+                Return cp.core.webServer.requestDomain
             End Get
             Set(ByVal value As String)
-                cp.core.webServerIO.requestDomain = value
+                cp.core.webServer.requestDomain = value
             End Set
         End Property
         '
@@ -106,10 +106,10 @@ Namespace Contensive.Core
         '
         Public Property queryString() As String
             Get
-                Return cp.core.webServerIO.requestQueryString
+                Return cp.core.webServer.requestQueryString
             End Get
             Set(ByVal value As String)
-                cp.core.webServerIO.requestQueryString = value
+                cp.core.webServer.requestQueryString = value
             End Set
         End Property
         '
@@ -117,10 +117,10 @@ Namespace Contensive.Core
         '
         Public Property isSecure() As Boolean
             Get
-                Return cp.core.webServerIO.requestSecure
+                Return cp.core.webServer.requestSecure
             End Get
             Set(ByVal value As Boolean)
-                cp.core.webServerIO.requestSecure = value
+                cp.core.webServer.requestSecure = value
             End Set
         End Property
         '
@@ -128,10 +128,10 @@ Namespace Contensive.Core
         '
         Public Property remoteIp() As String
             Get
-                Return cp.core.webServerIO.requestRemoteIP
+                Return cp.core.webServer.requestRemoteIP
             End Get
             Set(ByVal value As String)
-                cp.core.webServerIO.requestRemoteIP = value
+                cp.core.webServer.requestRemoteIP = value
             End Set
         End Property
         '
@@ -139,10 +139,10 @@ Namespace Contensive.Core
         '
         Public Property browserUserAgent() As String
             Get
-                Return cp.core.webServerIO.requestBrowser
+                Return cp.core.webServer.requestBrowser
             End Get
             Set(ByVal value As String)
-                cp.core.webServerIO.requestBrowser = value
+                cp.core.webServer.requestBrowser = value
             End Set
         End Property
         '
@@ -150,10 +150,10 @@ Namespace Contensive.Core
         '
         Public Property acceptLanguage() As String
             Get
-                Return cp.core.webServerIO.RequestLanguage
+                Return cp.core.webServer.RequestLanguage
             End Get
             Set(ByVal value As String)
-                cp.core.webServerIO.RequestLanguage = value
+                cp.core.webServer.RequestLanguage = value
             End Set
         End Property
         '
@@ -161,10 +161,10 @@ Namespace Contensive.Core
         '
         Public Property accept() As String
             Get
-                Return cp.core.webServerIO.requestHttpAccept
+                Return cp.core.webServer.requestHttpAccept
             End Get
             Set(ByVal value As String)
-                cp.core.webServerIO.requestHttpAccept = value
+                cp.core.webServer.requestHttpAccept = value
             End Set
         End Property
         '
@@ -172,10 +172,10 @@ Namespace Contensive.Core
         '
         Public Property acceptCharSet() As String
             Get
-                Return cp.core.webServerIO.requestHttpAcceptCharset
+                Return cp.core.webServer.requestHttpAcceptCharset
             End Get
             Set(ByVal value As String)
-                cp.core.webServerIO.requestHttpAcceptCharset = value
+                cp.core.webServer.requestHttpAcceptCharset = value
             End Set
         End Property
         '
@@ -183,10 +183,10 @@ Namespace Contensive.Core
         '
         Public Property profileUrl() As String
             Get
-                Return cp.core.webServerIO.requestHttpProfile
+                Return cp.core.webServer.requestHttpProfile
             End Get
             Set(ByVal value As String)
-                cp.core.webServerIO.requestHttpProfile = value
+                cp.core.webServer.requestHttpProfile = value
             End Set
         End Property
         '
@@ -194,10 +194,10 @@ Namespace Contensive.Core
         '
         Public Property xWapProfile() As String
             Get
-                Return cp.core.webServerIO.requestxWapProfile
+                Return cp.core.webServer.requestxWapProfile
             End Get
             Set(ByVal value As String)
-                cp.core.webServerIO.requestxWapProfile = value
+                cp.core.webServer.requestxWapProfile = value
             End Set
         End Property
         '
@@ -205,10 +205,10 @@ Namespace Contensive.Core
         '
         Public Property isBinaryRequest() As Boolean
             Get
-                Return cp.core.webServerIO.requestFormUseBinaryHeader
+                Return cp.core.webServer.requestFormUseBinaryHeader
             End Get
             Set(ByVal value As Boolean)
-                cp.core.webServerIO.requestFormUseBinaryHeader = value
+                cp.core.webServer.requestFormUseBinaryHeader = value
             End Set
         End Property
         '
@@ -216,10 +216,10 @@ Namespace Contensive.Core
         '
         Public Property binaryRequest() As Object
             Get
-                Return cp.core.webServerIO.requestFormBinaryHeader
+                Return cp.core.webServer.requestFormBinaryHeader
             End Get
             Set(ByVal value As Object)
-                cp.core.webServerIO.requestFormBinaryHeader = value
+                cp.core.webServer.requestFormBinaryHeader = value
             End Set
         End Property
         '
@@ -231,7 +231,7 @@ Namespace Contensive.Core
         Public Property cookies() As String
             Get
                 Dim cookieString As String = ""
-                For Each kvp As KeyValuePair(Of String, webServerIOController.cookieClass) In cp.core.webServerIO.requestCookies
+                For Each kvp As KeyValuePair(Of String, webServerController.cookieClass) In cp.core.webServer.requestCookies
                     cookieString &= "&" & kvp.Key & "=" & kvp.Value.value
                 Next
                 If cookieString.Length > 0 Then
@@ -246,7 +246,7 @@ Namespace Contensive.Core
                     ampSplit = Split(value, "&")
                     ampSplitCount = UBound(ampSplit) + 1
                     For ampSplitPointer = 0 To ampSplitCount - 1
-                        Dim newCookie As New webServerIOController.cookieClass
+                        Dim newCookie As New webServerController.cookieClass
                         Dim cookieName As String
                         With newCookie
                             Dim NameValue As String = ampSplit(ampSplitPointer)
@@ -258,10 +258,10 @@ Namespace Contensive.Core
                                 .value = DecodeResponseVariable(CStr(ValuePair(1)))
                             End If
                         End With
-                        If cp.core.webServerIO.requestCookies.ContainsKey(cookieName) Then
-                            cp.core.webServerIO.requestCookies.Remove(cookieName)
+                        If cp.core.webServer.requestCookies.ContainsKey(cookieName) Then
+                            cp.core.webServer.requestCookies.Remove(cookieName)
                         End If
-                        cp.core.webServerIO.requestCookies.Add(cookieName, newCookie)
+                        cp.core.webServer.requestCookies.Add(cookieName, newCookie)
                     Next
                 End If
             End Set
@@ -271,10 +271,10 @@ Namespace Contensive.Core
         '
         Public Property form() As String
             Get
-                Return cp.core.webServerIO.requestFormString
+                Return cp.core.webServer.requestFormString
             End Get
             Set(ByVal value As String)
-                cp.core.webServerIO.requestFormString = value
+                cp.core.webServer.requestFormString = value
             End Set
         End Property
         '==========================================================================================
@@ -286,10 +286,10 @@ Namespace Contensive.Core
         ''' <remarks></remarks>
         Public Property formFiles() As String
             Get
-                Return cp.core.webServerIO.requesFilesString
+                Return cp.core.webServer.requesFilesString
             End Get
             Set(ByVal value As String)
-                cp.core.webServerIO.requesFilesString = value
+                cp.core.webServer.requesFilesString = value
             End Set
         End Property
         '
@@ -297,10 +297,10 @@ Namespace Contensive.Core
         '
         Public Property requestNameSpaceAsUnderscore() As Boolean
             Get
-                Return cp.core.webServerIO.requestSpaceAsUnderscore
+                Return cp.core.webServer.requestSpaceAsUnderscore
             End Get
             Set(ByVal value As Boolean)
-                cp.core.webServerIO.requestSpaceAsUnderscore = value
+                cp.core.webServer.requestSpaceAsUnderscore = value
             End Set
         End Property
         '
@@ -308,10 +308,10 @@ Namespace Contensive.Core
         '
         Public Property requestNameDotAsUnderscore() As Boolean
             Get
-                Return cp.core.webServerIO.requestDotAsUnderscore
+                Return cp.core.webServer.requestDotAsUnderscore
             End Get
             Set(ByVal value As Boolean)
-                cp.core.webServerIO.requestDotAsUnderscore = value
+                cp.core.webServer.requestDotAsUnderscore = value
             End Set
         End Property
 

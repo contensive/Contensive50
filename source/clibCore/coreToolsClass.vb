@@ -208,7 +208,7 @@ Namespace Contensive.Core
                 defaultAddMenu = cpCore.doc_getBoolean("dtdam")
                 DefaultCreateBlankRecord = cpCore.doc_getBoolean("dtblank")
                 '
-                Call cpCore.webServerIO.webServerIO_addRefreshQueryString("dta", ToolsAction.ToString())
+                Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("dta", ToolsAction.ToString())
                 'Call cpCore.main_AddRefreshQueryString("Button=" & Button)
                 'Call cpCore.main_AddRefreshQueryString("af=" & AdminFormTool)
                 '
@@ -345,7 +345,7 @@ ErrorTrap:
             Dim Stream As New coreFastStringClass
             Dim ButtonList As String = ""
             '
-            Stream.Add(SpanClassAdminNormal & "<strong><A href=""" & cpCore.webServerIO.webServerIO_requestPage & "?af=" & AdminFormToolRoot & """>Tools</A></strong></SPAN>")
+            Stream.Add(SpanClassAdminNormal & "<strong><A href=""" & cpCore.webServer.webServerIO_requestPage & "?af=" & AdminFormToolRoot & """>Tools</A></strong></SPAN>")
             Stream.Add(SpanClassAdminNormal & ":Create Content Fields from Table</SPAN>")
             '
             '   print out the submit form
@@ -467,7 +467,7 @@ ErrorTrap:
             '
             GetForm_RootRow = ""
             GetForm_RootRow = GetForm_RootRow & "<tr><td colspan=""2"">"
-            GetForm_RootRow = GetForm_RootRow & SpanClassAdminNormal & "<P class=""ccAdminNormal""><A href=""" & cpCore.webServerIO.webServerIO_requestPage & "?af=" & AdminFormToolId.ToString() & """><B>" & Caption & "</b></SPAN></A></p>"
+            GetForm_RootRow = GetForm_RootRow & SpanClassAdminNormal & "<P class=""ccAdminNormal""><A href=""" & cpCore.webServer.webServerIO_requestPage & "?af=" & AdminFormToolId.ToString() & """><B>" & Caption & "</b></SPAN></A></p>"
             GetForm_RootRow = GetForm_RootRow & "</td></tr>"
             If Description <> "" Then
                 GetForm_RootRow = GetForm_RootRow & "<tr><td width=""30""><img src=""/ccLib/images/spacer.gif"" height=""1"" width=""30""></td>"
@@ -490,7 +490,7 @@ ErrorTrap:
             Try
                 result = "" _
                     & "<p>" & SpanClassAdminNormal _
-                    & "<a href=""" & cpCore.webServerIO.webServerIO_requestPage & "?af=" & AdminFormToolRoot & """><b>Tools</b></a>&nbsp;&gt;&nbsp;" & Title _
+                    & "<a href=""" & cpCore.webServer.webServerIO_requestPage & "?af=" & AdminFormToolRoot & """><b>Tools</b></a>&nbsp;&gt;&nbsp;" & Title _
                     & "</p>" _
                     & "<p>" & SpanClassAdminNormal & Description & "</p>"
             Catch ex As Exception
@@ -655,7 +655,7 @@ ErrorTrap:
                                 ElseIf CellData = "" Then
                                     Stream.Add(ColumnStart & "[empty]" & ColumnEnd)
                                 Else
-                                    Stream.Add(ColumnStart & cpCore.html.html_EncodeHTML(genericController.encodeText(CellData)) & ColumnEnd)
+                                    Stream.Add(ColumnStart & cpCore.htmlDoc.html_EncodeHTML(genericController.encodeText(CellData)) & ColumnEnd)
                                 End If
                             Next
                             Stream.Add(RowEnd)
@@ -682,7 +682,7 @@ ErrorTrap:
                 End If
                 Call Stream.Add("<TEXTAREA NAME=""SQL"" ROWS=""" & SQLRows & """ ID=""SQL"" STYLE=""width: 800px;"">" & SQL & "</TEXTAREA>")
                 Call Stream.Add("&nbsp;<INPUT TYPE=""Text"" TabIndex=-1 NAME=""SQLRows"" SIZE=""3"" VALUE=""" & SQLRows & """ ID=""""  onchange=""SQL.rows=SQLRows.value; return true""> Rows")
-                Call Stream.Add("<br><br>Data Source<br>" & cpCore.main_GetFormInputSelect("DataSourceID", DataSourceID, "Data Sources", "", "Default"))
+                Call Stream.Add("<br><br>Data Source<br>" & cpCore.htmlDoc.main_GetFormInputSelect("DataSourceID", DataSourceID, "Data Sources", "", "Default"))
                 '
                 SelectFieldWidthLimit = cpCore.siteProperties.getinteger("SelectFieldWidthLimit", 200)
                 If SQLArchive <> "" Then
@@ -805,7 +805,7 @@ ErrorTrap:
             End If
             Call Stream.Add(SpanClassAdminNormal)
             Call Stream.Add("Data Source<br>")
-            Call Stream.Add(cpCore.main_GetFormInputSelect("DataSourceID", DataSourceID, "Data Sources", "", "Default"))
+            Call Stream.Add(cpCore.htmlDoc.main_GetFormInputSelect("DataSourceID", DataSourceID, "Data Sources", "", "Default"))
             Call Stream.Add("<br><br>")
             Call Stream.Add("Content Name<br>")
             Call Stream.Add(cpCore.html_GetFormInputText2("ContentName", ContentName, 1, 40))
@@ -1346,7 +1346,7 @@ ErrorTrap:
                                     Caption = Caption & "*"
                                     InheritedFieldCount = InheritedFieldCount + 1
                                 End If
-                                AStart = "<A href=""" & cpCore.webServerIO.webServerIO_requestPage & "?" & RequestNameToolContentID & "=" & ContentID & "&af=" & AdminFormToolConfigureListing & "&fi=" & fieldId & "&dtcn=" & ColumnCount
+                                AStart = "<A href=""" & cpCore.webServer.webServerIO_requestPage & "?" & RequestNameToolContentID & "=" & ContentID & "&af=" & AdminFormToolConfigureListing & "&fi=" & fieldId & "&dtcn=" & ColumnCount
                                 Call Stream.Add("<td width=""" & ColumnWidth & "%"" valign=""top"" align=""left"">" & SpanClassAdminNormal & Caption & "<br>")
                                 Call Stream.Add("<IMG src=""/ccLib/images/black.GIF"" width=""100%"" height=""1"">")
                                 Call Stream.Add(AStart & "&dta=" & ToolsActionRemoveField & """><IMG src=""/ccLib/images/LibButtonDeleteUp.gif"" width=""50"" height=""15"" border=""0""></A><br>")
@@ -1450,7 +1450,7 @@ ErrorTrap:
                                     '
                                     ' can be used as column header
                                     '
-                                    Stream.Add("<A href=""" & cpCore.webServerIO.webServerIO_requestPage & "?" & RequestNameToolContentID & "=" & ContentID & "&af=" & AdminFormToolConfigureListing & "&fi=" & .id & "&dta=" & ToolsActionAddField & "&" & RequestNameAddFieldID & "=" & .id & """><IMG src=""/ccLib/images/LibButtonAddUp.gif"" width=""50"" height=""15"" border=""0""></A> " & .caption & "<br>")
+                                    Stream.Add("<A href=""" & cpCore.webServer.webServerIO_requestPage & "?" & RequestNameToolContentID & "=" & ContentID & "&af=" & AdminFormToolConfigureListing & "&fi=" & .id & "&dta=" & ToolsActionAddField & "&" & RequestNameAddFieldID & "=" & .id & """><IMG src=""/ccLib/images/LibButtonAddUp.gif"" width=""50"" height=""15"" border=""0""></A> " & .caption & "<br>")
                                 End If
                             End If
                         End With
@@ -1464,7 +1464,7 @@ ErrorTrap:
             '
             FormPanel = FormPanel & SpanClassAdminNormal & "Select a Content Definition to Configure its Listing Page<br>"
             'FormPanel = FormPanel & cpCore.main_GetFormInputHidden("af", AdminFormToolConfigureListing)
-            FormPanel = FormPanel & cpCore.main_GetFormInputSelect("ContentID", ContentID, "Content")
+            FormPanel = FormPanel & cpCore.htmlDoc.main_GetFormInputSelect("ContentID", ContentID, "Content")
             Call Stream.Add(cpCore.main_GetPanel(FormPanel))
             '
             Call cpCore.siteProperties.setProperty("AllowContentAutoLoad", AllowContentAutoLoad)
@@ -1639,7 +1639,7 @@ ErrorTrap:
                     '
                     Call Stream.Add("Site Property 'TrapErrors' is currently set false. This property must be true to run Content Diagnostics successfully.<br>")
                 Else
-                    Call cpCore.webServerIO.webServerIO_SetStreamBuffer(False)
+                    Call cpCore.webServer.webServerIO_SetStreamBuffer(False)
                     '
                     ' ----- check Content Sources for duplicates
                     '
@@ -2113,7 +2113,7 @@ ErrorTrap:
             Call Stream.Add(SpanClassAdminNormal)
             '
             Call Stream.Add("Parent Content Name<br>")
-            Stream.Add(cpCore.main_GetFormInputSelect("ParentContentID", ParentContentID, "Content", ""))
+            Stream.Add(cpCore.htmlDoc.main_GetFormInputSelect("ParentContentID", ParentContentID, "Content", ""))
             Call Stream.Add("<br><br>")
             '
             Call Stream.Add("Child Content Name<br>")
@@ -2875,7 +2875,7 @@ ErrorTrap:
             '
             Call Stream.Add("<br><br>")
             Call Stream.Add("Data Source<br>")
-            Stream.Add(cpCore.main_GetFormInputSelect("DataSourceID", DataSourceID, "Data Sources", "", "Default"))
+            Stream.Add(cpCore.htmlDoc.main_GetFormInputSelect("DataSourceID", DataSourceID, "Data Sources", "", "Default"))
             '
             ''Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolSchema)
             Call Stream.Add("</SPAN>")
@@ -3118,7 +3118,7 @@ ErrorTrap:
                         '
                         ' ----- Exit back to menu
                         '
-                        Call cpCore.main_Redirect(cpCore.webServerIO.webServerIO_requestProtocol & cpCore.webServerIO.webServerIO_requestDomain & cpCore.webServerIO.webServerIO_requestPath & cpCore.webServerIO.webServerIO_requestPage & "?af=" & AdminFormTools)
+                        Call cpCore.main_Redirect(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.webServerIO_requestDomain & cpCore.webServer.webServerIO_requestPath & cpCore.webServer.webServerIO_requestPage & "?af=" & AdminFormTools)
                     End If
                 End If
                 '
@@ -3126,7 +3126,7 @@ ErrorTrap:
                 '   Print Output
                 '--------------------------------------------------------------------------------
                 '
-                Stream.Add(SpanClassAdminNormal & "<strong><a href=""" & cpCore.webServerIO.webServerIO_requestPage & "?af=" & AdminFormToolRoot & """>Tools</a></strong>&nbsp;»&nbsp;Manage Admin Edit Fields</span>")
+                Stream.Add(SpanClassAdminNormal & "<strong><a href=""" & cpCore.webServer.webServerIO_requestPage & "?af=" & AdminFormToolRoot & """>Tools</a></strong>&nbsp;»&nbsp;Manage Admin Edit Fields</span>")
                 Stream.Add("<div>")
                 Stream.Add("<div style=""width:45%;float:left;padding:10px;"">" _
                     & "Use this tool to add or modify content definition fields. Contensive uses a caching system for content definitions that is not automatically reloaded. Change you make will not take effect until the next time the system is reloaded. When you create a new field, the database field is created automatically when you have saved both a name and a field type. If you change the field type, you may have to manually change the database field." _
@@ -3209,7 +3209,7 @@ ErrorTrap:
                         '
                         ' Build a select template for Type
                         '
-                        TypeSelectTemplate = cpCore.main_GetFormInputSelect("menuname", -1, "Content Field Types", "", "unknown")
+                        TypeSelectTemplate = cpCore.htmlDoc.main_GetFormInputSelect("menuname", -1, "Content Field Types", "", "unknown")
                         '
                         ' Index the sort order
                         '
@@ -3455,7 +3455,7 @@ ErrorTrap:
                     '
                     FormPanel = FormPanel & SpanClassAdminNormal & "Select a Content Definition to Configure its edit form<br>"
                     FormPanel = FormPanel & "<br>"
-                    FormPanel = FormPanel & cpCore.main_GetFormInputSelect(RequestNameToolContentID, ContentID, "Content")
+                    FormPanel = FormPanel & cpCore.htmlDoc.main_GetFormInputSelect(RequestNameToolContentID, ContentID, "Content")
                     FormPanel = FormPanel & "</SPAN>"
                     Call Stream.Add(cpCore.main_GetPanel(FormPanel))
                 End If
@@ -3563,7 +3563,7 @@ ErrorTrap:
             ' Select Table Form
             '
             GetForm_DbIndex = GetForm_DbIndex & GetTableRow("<br><br><B>Select table to index</b>", TableColSpan, False)
-            GetForm_DbIndex = GetForm_DbIndex & GetTableRow(cpCore.main_GetFormInputSelect("TableID", TableID, "Tables", , "Select a SQL table to start"), TableColSpan, False)
+            GetForm_DbIndex = GetForm_DbIndex & GetTableRow(cpCore.htmlDoc.main_GetFormInputSelect("TableID", TableID, "Tables", , "Select a SQL table to start"), TableColSpan, False)
             If TableID <> 0 Then
                 '
                 ' Add/Drop Indexes form
@@ -3824,8 +3824,8 @@ ErrorTrap:
                 ' Return the content of the file
                 '
 
-                Call cpCore.webServerIO.webServerIO_setResponseContentType("text/text")
-                Call cpCore.webServerIO.writeAltBuffer(cpCore.appRootFiles.readFile(cpCore.docProperties.getText("SourceFile")))
+                Call cpCore.webServer.webServerIO_setResponseContentType("text/text")
+                Call cpCore.htmlDoc.writeAltBuffer(cpCore.appRootFiles.readFile(cpCore.docProperties.getText("SourceFile")))
                 Call cpCore.doc_close()
                 'GetForm_LogFiles_Details = cpCore.app.publicFiles.ReadFile(cpCore.main_GetStreamText2("SourceFile"))
             Else
@@ -3836,7 +3836,7 @@ ErrorTrap:
                 If CurrentPath <> ParentPath Then
                     FileSize = ""
                     FileDate = ""
-                    GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetForm_LogFiles_Details_GetRow("<A href=""" & cpCore.webServerIO.webServerIO_requestPage & "?SetPath=" & ParentPath & """>" & FolderOpenImage & "</A>", "<A href=""" & cpCore.webServerIO.webServerIO_requestPage & "?SetPath=" & ParentPath & """>" & ParentPath & "</A>", FileSize, FileDate, RowEven)
+                    GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetForm_LogFiles_Details_GetRow("<A href=""" & cpCore.webServer.webServerIO_requestPage & "?SetPath=" & ParentPath & """>" & FolderOpenImage & "</A>", "<A href=""" & cpCore.webServer.webServerIO_requestPage & "?SetPath=" & ParentPath & """>" & ParentPath & "</A>", FileSize, FileDate, RowEven)
                 End If
                 '
                 ' Sub-Folders
@@ -3853,7 +3853,7 @@ ErrorTrap:
                             FolderName = LineSplit(0)
                             FileSize = LineSplit(1)
                             FileDate = LineSplit(2)
-                            GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetForm_LogFiles_Details_GetRow("<A href=""" & cpCore.webServerIO.webServerIO_requestPage & "?SetPath=" & CurrentPath & "\" & FolderName & """>" & FolderClosedImage & "</A>", "<A href=""" & cpCore.webServerIO.webServerIO_requestPage & "?SetPath=" & CurrentPath & "\" & FolderName & """>" & FolderName & "</A>", FileSize, FileDate, RowEven)
+                            GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetForm_LogFiles_Details_GetRow("<A href=""" & cpCore.webServer.webServerIO_requestPage & "?SetPath=" & CurrentPath & "\" & FolderName & """>" & FolderClosedImage & "</A>", "<A href=""" & cpCore.webServer.webServerIO_requestPage & "?SetPath=" & CurrentPath & "\" & FolderName & """>" & FolderName & "</A>", FileSize, FileDate, RowEven)
                         End If
                     Next
                 End If
@@ -3880,7 +3880,7 @@ ErrorTrap:
                             QueryString = genericController.ModifyQueryString(QueryString, RequestNameAdminForm, CStr(AdminFormTool), True)
                             QueryString = genericController.ModifyQueryString(QueryString, "at", AdminFormToolLogFileView, True)
                             QueryString = genericController.ModifyQueryString(QueryString, "SourceFile", FileURL, True)
-                            CellCopy = "<A href=""" & cpCore.webServerIO.webServerIO_requestPath & "?" & QueryString & """ target=""_blank"">" & Filename & "</A>"
+                            CellCopy = "<A href=""" & cpCore.webServer.webServerIO_requestPath & "?" & QueryString & """ target=""_blank"">" & Filename & "</A>"
                             GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetForm_LogFiles_Details_GetRow(SpacerImage, CellCopy, FileSize, FileDate, RowEven)
                         End If
                     Next
@@ -3989,7 +3989,7 @@ ErrorTrap:
                 '
                 ' Restart
                 '
-                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " & cpCore.user.name & " (" & cpCore.user.id & ") restarted using the Restart tool", False, True, cpCore.webServerIO.webServerIO_ServerLink, "", "")
+                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " & cpCore.user.name & " (" & cpCore.user.id & ") restarted using the Restart tool", False, True, cpCore.webServer.webServerIO_ServerLink, "", "")
                 'runAtServer = New runAtServerClass(cpCore)
                 Call cpCore.main_Redirect("/ccLib/Popup/WaitForIISReset.htm")
                 Call Threading.Thread.Sleep(2000)
@@ -4637,7 +4637,7 @@ ErrorTrap:
                 '
                 '
                 '
-                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " & cpCore.user.name & " (" & cpCore.user.id & ") executed an IISReset using the IISReset tool", False, True, cpCore.webServerIO.webServerIO_ServerLink, "", "")
+                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " & cpCore.user.name & " (" & cpCore.user.id & ") executed an IISReset using the IISReset tool", False, True, cpCore.webServer.webServerIO_ServerLink, "", "")
                 'runAtServer = New runAtServerClass(cpCore)
                 Call cpCore.main_Redirect("/ccLib/Popup/WaitForIISReset.htm")
                 Call Threading.Thread.Sleep(2000)

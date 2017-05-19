@@ -426,7 +426,7 @@
     <Compile Include="Controllers\dbController.vb" />
     <Compile Include="coreClusterClass.vb" />
     <Compile Include="coreContentCmdClass.vb" />
-    <Compile Include="Controllers\htmlToolsController.vb" />
+    <Compile Include="Controllers\htmlDocController.vb" />
     <Compile Include="corePropertyCacheClass.vb" />
     <Compile Include="coreTaskRunnerServiceClass.vb" />
     <Compile Include="coreTaskSchedulerServiceClass.vb" />
@@ -478,7 +478,8 @@
     <Compile Include="Controllers\appBuilderController.vb" />
     <Compile Include="Models\Entity\serverConfigModel.vb" />
     <Compile Include="Models\Entity\dataSourceModel.vb" />
-    <Compile Include="Models\Entity\_blankCachedModel.vb" />
+    <Compile Include="Models\Entity\visitorModel.vb" />
+    <Compile Include="Models\Entity\_xblankCachedModel.vb" />
     <Compile Include="Models\Entity\addonModel.vb" />
     <Compile Include="Models\Entity\groupModel.vb" />
     <Compile Include="Models\Entity\_blankModel.vb" />

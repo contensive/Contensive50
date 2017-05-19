@@ -24,6 +24,17 @@ Namespace Contensive.Core.Models.Context
             MyBase.New()
             Me.cpCore = cpCore
         End Sub
+        '====================================================================================================
+        '
+        Public ReadOnly Property LoginIconFilename() As String
+            Get
+                If (_LoginIconFilename Is Nothing) Then
+                    _LoginIconFilename = getText("LoginIconFilename", "/ccLib/images/ccLibLogin.GIF")
+                End If
+                Return _LoginIconFilename
+            End Get
+        End Property
+        Private _LoginIconFilename As String = Nothing
         '
         '====================================================================================================
         '
@@ -326,7 +337,7 @@ Namespace Contensive.Core.Models.Context
         Public ReadOnly Property emailAdmin() As String
             Get
                 If Not _EmailAdmin_LocalLoaded Then
-                    _EmailAdmin_Local = getText("main_EmailAdmin", "webmaster@" & cpCore.webServerIO.webServerIO_requestDomain)
+                    _EmailAdmin_Local = getText("main_EmailAdmin", "webmaster@" & cpCore.webServer.webServerIO_requestDomain)
                     _EmailAdmin_LocalLoaded = True
                 End If
                 Return _EmailAdmin_Local

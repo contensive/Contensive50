@@ -10,7 +10,7 @@ Namespace Contensive.Core
     ''' <summary>
     ''' Code dedicated to processing iis input and output. lazy Constructed. (see coreHtmlClass for html processing)
     ''' </summary>
-    Public Class webServerIOController
+    Public Class webServerController
         '
         Dim cpCore As coreClass
         '
@@ -46,20 +46,14 @@ Namespace Contensive.Core
         Public requestDotAsUnderscore As Boolean = False    ' (php converts spaces and dots to underscores)
         Public requestLinkSource As String = ""
         '
-        Public webServerIO_bufferEnabled As Boolean = True          ' when true (default), stream is buffered until page is done
-        Public webServerIO_buffer As String = ""                   ' if any method calls writeAltBuffer, string concatinates here. If this is not empty at exit, it is used instead of returned string
-        Public webServerIO_bufferRedirect As String = ""
-        Public webServerIO_bufferContentType As String = ""
-        Public webServerIO_bufferCookies As String = ""
-        Public webServerIO_bufferResponseHeader As String = ""
-        Public webServerIO_bufferResponseStatus As String = ""
-        '
         Public webServerIO_LinkForwardSource As String = ""          ' main_ServerPathPage -- set during init
         Public webServerIO_LinkForwardError As String = ""           ' always 404
         Public webServerIO_ReadStreamJSForm As Boolean = False                  ' When true, the request comes from a browser handling a JSPage script line
         Public webServerIO_PageExcludeFromAnalytics As Boolean = False    ' For this page - true for remote methods and ajax
         Public webServerIO_BlockClosePageCopyright As Boolean = False ' if true, block the copyright message
         Public webServerIO_PageTestPointPrinting As Boolean = False    ' if true, send main_TestPoint messages to the stream
+        '
+        ' refactor - this method stears the stream between controllers, put it in cpcore
         Public webServerIO_OutStreamDevice As Integer = 0
         Public webServerIO_MemberAction As Integer = 0              ' action to be performed during init
         Public webServerIO_AdminMessage As String = ""          ' For more information message
@@ -74,18 +68,16 @@ Namespace Contensive.Core
         Public webServerIO_requestPath As String = ""                 ' The path part of the current URI
         Public webServerIO_requestPage As String = ""                 ' The page part of the current URI
         Public webServerIO_requestSecureURLRoot As String = ""        ' The URL to the root of the secure area for this site
+        '
         Public webServerIO_response_NoFollow As Boolean = False   ' when set, Meta no follow is added
+        Public webServerIO_bufferRedirect As String = ""
+        Public webServerIO_bufferContentType As String = ""
+        Public webServerIO_bufferCookies As String = ""
+        Public webServerIO_bufferResponseHeader As String = ""
+        Public webServerIO_bufferResponseStatus As String = ""
         '------------------------------------------------------------------------
         '
-        Public _webServerIO_RefreshQueryString As String = ""      ' the querystring required to return to the current state (perform a refresh)
-        Public webServerIO_AllowCookielessDetection As Boolean = False
-        Public Const webServerIO_OutStreamJavaScript = 1
-        '
-        Public webServerIO_RedirectContentID As Integer = 0
-        Public webServerIO_RedirectRecordID As Integer = 0
-        '
-        Public docOpen As Boolean = False                                   ' when false, routines should not add to the output and immediately exit
-        '
+        '   QueryString, Form and cookie Processing variables
         Public Class cookieClass
             Public name As String
             Public value As String
@@ -468,7 +460,7 @@ Namespace Contensive.Core
                     webServerIO_InitCounter += 1
                     '
                     Call webServerIO_SetStreamBuffer(True)
-                    docOpen = True
+                    cpCore.docOpen = True
                     Call webServerIO_setResponseContentType("text/html")
                     '
                     '--------------------------------------------------------------------------
@@ -508,7 +500,7 @@ Namespace Contensive.Core
                         ' Add JSProcessForm to form
                         '
                         webServerIO_BlockClosePageCopyright = True
-                        webServerIO_OutStreamDevice = webServerIO_OutStreamJavaScript ' refactor - these should just be setContentType as a string so developers can set whatever
+                        webServerIO_OutStreamDevice = htmlDocController.htmlDoc_OutStreamJavaScript ' refactor - these should just be setContentType as a string so developers can set whatever
                         Call webServerIO_setResponseContentType("application/javascript") ' refactor -- this should be setContentType
                         '
                         ' Add the cpcore.main_ServerReferrer QS to the cpcore.doc.main_InStreamArray()
@@ -586,8 +578,8 @@ Namespace Contensive.Core
                         'CookieDetectVisitId = cpCore.main_DecodeKeyNumber(CookieDetectKey)
                         If CookieDetectVisitId <> 0 Then
                             Call cpCore.db.executeSql("update ccvisits set CookieSupport=1 where id=" & CookieDetectVisitId)
-                            docOpen = False '--- should be disposed by caller --- Call dispose
-                            Return docOpen
+                            cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
+                            Return cpCore.docOpen
                         End If
                     End If
                     '
@@ -606,25 +598,8 @@ Namespace Contensive.Core
                     cpCore.domains.domainDetails.forwardUrl = ""
                     webServerIO_requestDomain = requestDomain
                     '
-                    ' set cpcore.main_ServerDomainPrmary to the first valid defaultDomain entry
-                    '
-                    If cpCore.serverConfig.appConfig.domainList.Count > 0 Then
-                        cpCore.domains_ServerDomainPrimary = cpCore.serverConfig.appConfig.domainList(0)
-                    Else
-                        cpCore.domains_ServerDomainPrimary = ""
-                    End If
-                    '
                     ' REFACTOR -- move to cpcore.domains class 
                     cpCore.domains.domainDetailsList = cpCore.cache.getObject(Of Dictionary(Of String, Models.Entity.domainLegacyModel.domainDetailsClass))("domainContentList")
-
-                    'domainDetailsListText = genericController.encodeText(cpCore.cache.getObject(Of String)("domainContentList"))
-                    'If Not String.IsNullOrEmpty(domainDetailsListText) Then
-                    '    Try
-                    '        cpCore.domains.domainDetailsList = cpCore.json.Deserialize(Of Dictionary(Of String, Models.Entity.domainLegacyModel.domainDetailsClass))(domainDetailsListText)
-                    '    Catch ex As Exception
-                    '        cpCore.domains.domainDetailsList = Nothing
-                    '    End Try
-                    'End If
                     If (cpCore.domains.domainDetailsList Is Nothing) Then
                         '
                         '  no cache found, build domainContentList from database
@@ -732,7 +707,7 @@ Namespace Contensive.Core
                                 cpCore.domains.domainDetails.forwardUrl = "http://" & cpCore.domains.domainDetails.forwardUrl
                             End If
                             Call webServerIO_Redirect2(cpCore.domains.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domains.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this URL", False)
-                            Return docOpen
+                            Return cpCore.docOpen
                         ElseIf (cpCore.domains.domainDetails.typeId = 3) And (cpCore.domains.domainDetails.forwardDomainId <> 0) And (cpCore.domains.domainDetails.forwardDomainId <> cpCore.domains.domainDetails.id) Then
                             '
                             ' forward to a replacement domain
@@ -747,7 +722,7 @@ Namespace Contensive.Core
                                     cpCore.domains.domainDetails.forwardUrl = Mid(requestLinkSource, 1, pos - 1) & forwardDomain & Mid(requestLinkSource, pos + Len(requestDomain))
                                     'main_domainForwardUrl = genericController.vbReplace(main_ServerLinkSource, cpcore.main_ServerHost, forwardDomain)
                                     Call webServerIO_Redirect2(cpCore.domains.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domains.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this replacement domain", False)
-                                    Return docOpen
+                                    Return cpCore.docOpen
                                 End If
                                 '                                cpcore.main_domainForwardUrl = "http://"
                                 '                                If cpcore.main_ServerPageSecure Then
@@ -840,8 +815,8 @@ Namespace Contensive.Core
                     '            Link = cpcore.web_requestProtocol & cpcore.main_ServerDomain & appRootPath & cpcore.web_requestAppPath & cpcore.web_requestPage & "?" & web.requestQueryString
                     '        End If
                     '        Call cpcore.web_Redirect2(Link, "Redirecting because this site is configured to only run in the path [" & appRootPath & "]. See the IIS Virtual Folder property of the Contensive Application Manager.", False)
-                    '        cpcore. docopen = False '--- should be disposed by caller --- Call dispose
-                    '        Return cpcore. docopen
+                    '        cpcore. cpcore.docOpen = False '--- should be disposed by caller --- Call dispose
+                    '        Return cpcore. cpcore.docOpen
                     '    End If
                     'End If
                     '
@@ -849,11 +824,11 @@ Namespace Contensive.Core
                     '
                     Id = cpCore.docProperties.getInteger("bid")
                     If Id <> 0 Then
-                        Call webServerIO_addRefreshQueryString("bid", Id.ToString)
+                        Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("bid", Id.ToString)
                     End If
                     Id = cpCore.docProperties.getInteger("sid")
                     If Id <> 0 Then
-                        Call webServerIO_addRefreshQueryString("sid", Id.ToString)
+                        Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("sid", Id.ToString)
                     End If
                     '
                     ' ----- Create Server Link property
@@ -910,8 +885,8 @@ Namespace Contensive.Core
                         Else
                             Call webServerIO_Redirect2(webServerIO_requestProtocol & webServerIO_requestDomain & webServerIO_requestPath & webServerIO_requestPage, Copy, False)
                         End If
-                        docOpen = False '--- should be disposed by caller --- Call dispose
-                        Return docOpen
+                        cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
+                        Return cpCore.docOpen
                     End If
                     '
                     ' -- this is to prevent an html page from coming out of the virtual path. (there should not be a link to it.)
@@ -956,8 +931,8 @@ Namespace Contensive.Core
                         'Call AppendLog("main_init(), 2510 - exit for redirect")
                         '
                         Call webServerIO_Redirect2(RedirectLink, RedirectReason, IsPageNotFound)
-                        docOpen = False '--- should be disposed by caller --- Call dispose
-                        Return docOpen
+                        cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
+                        Return cpCore.docOpen
                     End If
                     '
                     '--------------------------------------------------------------------------
@@ -983,7 +958,7 @@ Namespace Contensive.Core
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
-            Return docOpen
+            Return cpCore.docOpen
         End Function
         '
         '========================================================================
@@ -1021,7 +996,7 @@ Namespace Contensive.Core
             If requestCookies.ContainsKey(cookieKey) Then
                 '
             Else
-                Dim newCookie As New webServerIOController.cookieClass
+                Dim newCookie As New webServerController.cookieClass
                 newCookie.name = cookieKey
                 newCookie.value = cookieValue
                 requestCookies.Add(cookieKey, newCookie)
@@ -1050,7 +1025,7 @@ Namespace Contensive.Core
                 '
                 MethodName = "main_addResponseCookie"
                 '
-                If docOpen And webServerIO_bufferEnabled Then
+                If cpCore.docOpen And cpCore.htmlDoc.docBufferEnabled Then
                     If (isMissing(domain)) And cpCore.domains.domainDetails.allowCrossLogin And genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("Write Cookies to All Domains", True)) Then
                         '
                         ' no domain provided, new mode
@@ -1137,8 +1112,8 @@ Namespace Contensive.Core
                                         C = genericController.vbReplace(C, "/", "%2F")
                                         Link = Link & "&e=" & C
                                     End If
-                                    Link = cpCore.html.html_EncodeHTML(Link)
-                                    cpCore.main_ClosePageHTML = cpCore.main_ClosePageHTML & vbCrLf & vbTab & "<iframe style=""display:none;"" width=""0"" height=""0"" src=""" & Link & """></iframe>"
+                                    Link = cpCore.htmlDoc.html_EncodeHTML(Link)
+                                    cpCore.htmlDoc.htmlForEndOfBody = cpCore.htmlDoc.htmlForEndOfBody & vbCrLf & vbTab & "<iframe style=""display:none;"" width=""0"" height=""0"" src=""" & Link & """></iframe>"
                                 End If
                             End If
                         Next
@@ -1205,36 +1180,18 @@ Namespace Contensive.Core
         '
         '
         '
-        Public Sub webServerIO_addRefreshQueryString(ByVal Name As String, Optional ByVal Value As String = "")
-            Try
-                Dim temp() As String
-                '
-                If (InStr(1, Name, "=") > 0) Then
-                    temp = Split(Name, "=")
-                    _webServerIO_RefreshQueryString = genericController.ModifyQueryString(_webServerIO_RefreshQueryString, temp(0), temp(1), True)
-                Else
-                    _webServerIO_RefreshQueryString = genericController.ModifyQueryString(_webServerIO_RefreshQueryString, Name, Value, True)
-                End If
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-            '
-        End Sub
-        '
-        '
-        '
         Public Sub webServerIO_SetStreamBuffer(BufferOn As Boolean)
             Try
-                If webServerIO_bufferEnabled Then
+                If cpCore.htmlDoc.docBufferEnabled Then
                     '
                     ' ----- once on, can not be turned off Response Object
                     '
-                    webServerIO_bufferEnabled = BufferOn
+                    cpCore.htmlDoc.docBufferEnabled = BufferOn
                 Else
                     '
                     ' ----- StreamBuffer off, allow on and off
                     '
-                    webServerIO_bufferEnabled = BufferOn
+                    cpCore.htmlDoc.docBufferEnabled = BufferOn
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -1258,7 +1215,7 @@ Namespace Contensive.Core
         Public Sub web_addResponseHeader(HeaderName As Object, HeaderValue As Object)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SetStreamHeader")
             '
-            If docOpen Then
+            If cpCore.docOpen Then
                 If webServerIO_bufferResponseHeader <> "" Then
                     webServerIO_bufferResponseHeader = webServerIO_bufferResponseHeader & vbCrLf
                 End If
@@ -1306,7 +1263,7 @@ ErrorTrap:
             Dim redirectCycles As Integer
             '
             MethodName = "main_Redirect2(" & NonEncodedLink & "," & RedirectReason & "," & IsPageNotFound & ")"
-            If docOpen Then
+            If cpCore.docOpen Then
                 redirectCycles = cpCore.doc_getInteger(rnRedirectCycleFlag)
                 '
                 ' convert link to a long link on this domain
@@ -1381,7 +1338,7 @@ ErrorTrap:
 
                         EncodedLink = NonEncodedLink
                         'EncodedLink = encodeURL(NonEncodedLink)
-                        writeAltBuffer("<div style=""padding:20px;border:1px dashed black;background-color:white;color:black;"">" & RedirectReason & "<p>Click to continue the redirect to <a href=" & EncodedLink & ">" & cpCore.html.html_EncodeHTML(NonEncodedLink) & "</a>...</p></div>")
+                        cpCore.htmlDoc.writeAltBuffer("<div style=""padding:20px;border:1px dashed black;background-color:white;color:black;"">" & RedirectReason & "<p>Click to continue the redirect to <a href=" & EncodedLink & ">" & cpCore.htmlDoc.html_EncodeHTML(NonEncodedLink) & "</a>...</p></div>")
                     Else
                         '
                         ' Redirect now
@@ -1416,41 +1373,6 @@ ErrorTrap:
 ErrorTrap:
             Call cpCore.handleLegacyError13(MethodName)
         End Sub
-
-        '
-        '
-        Private Sub webServerIO_JavaStream_Add(ByVal NewString As String)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00375")
-            '
-            If cpCore.main_JavaStreamCount >= cpCore.main_JavaStreamSize Then
-                cpCore.main_JavaStreamSize = cpCore.main_JavaStreamSize + cpCore.main_JavaStreamChunk
-                ReDim Preserve cpCore.main_JavaStreamHolder(cpCore.main_JavaStreamSize)
-            End If
-            cpCore.main_JavaStreamHolder(cpCore.main_JavaStreamCount) = NewString
-            cpCore.main_JavaStreamCount = cpCore.main_JavaStreamCount + 1
-            Exit Sub
-            '
-ErrorTrap:
-            Call cpCore.handleLegacyError13("main_JavaStream_Add")
-        End Sub
-        '
-        '
-        '
-        Public ReadOnly Property webServerIO_JavaStream_Text() As String
-            Get
-                Dim MsgLabel As String
-                '
-                MsgLabel = "Msg" & genericController.encodeText(genericController.GetRandomInteger)
-                '
-                webServerIO_JavaStream_Text = Join(cpCore.main_JavaStreamHolder, "")
-                webServerIO_JavaStream_Text = genericController.vbReplace(webServerIO_JavaStream_Text, "'", "'+""'""+'")
-                webServerIO_JavaStream_Text = genericController.vbReplace(webServerIO_JavaStream_Text, vbCrLf, "\n")
-                webServerIO_JavaStream_Text = genericController.vbReplace(webServerIO_JavaStream_Text, vbCr, "\n")
-                webServerIO_JavaStream_Text = genericController.vbReplace(webServerIO_JavaStream_Text, vbLf, "\n")
-                webServerIO_JavaStream_Text = "var " & MsgLabel & " = '" & webServerIO_JavaStream_Text & "'; document.write( " & MsgLabel & " ); " & vbCrLf
-
-            End Get
-        End Property
         '
         '
         Public Sub webServerIO_FlushStream()
@@ -1484,9 +1406,7 @@ ErrorTrap:
             Dim VirtualFilename As String
             Dim Ext As String
             '
-            If Not cpCore.main_MetaContent_Set Then
-                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<!-- main_GetHTMLInternalHead called out of order. It must follow a content call, such as main_GetHtmlBody, main_GetSectionPage, and main_GetContentPage -->"
-            End If
+            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<!-- main_GetHTMLInternalHead called out of order. It must follow a content call, such as main_GetHtmlBody, main_GetSectionPage, and main_GetContentPage -->"
             '
             ' stylesheets first -- for performance
             ' put stylesheets inline without processing
@@ -1508,8 +1428,8 @@ ErrorTrap:
             ' Template shared styles
             '
             ' !!!!! dont know why this was blocked. Running add-ons with shared styles need this in the admin site.
-            FileList = cpCore.main_GetSharedStyleFileList(cpCore.main_MetaContent_SharedStyleIDList, main_IsAdminSite)
-            cpCore.main_MetaContent_SharedStyleIDList = ""
+            FileList = cpCore.main_GetSharedStyleFileList(cpCore.htmlDoc.main_MetaContent_SharedStyleIDList, main_IsAdminSite)
+            cpCore.htmlDoc.main_MetaContent_SharedStyleIDList = ""
             If FileList <> "" Then
                 Files = Split(FileList, vbCrLf)
                 For Ptr = 0 To UBound(Files)
@@ -1587,7 +1507,7 @@ ErrorTrap:
             ' misc caching, etc
             '
             Dim encoding As String
-            encoding = cpCore.html.html_EncodeHTML(cpCore.siteProperties.getText("Site Character Encoding", "utf-8"))
+            encoding = cpCore.htmlDoc.html_EncodeHTML(cpCore.siteProperties.getText("Site Character Encoding", "utf-8"))
             webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead _
                 & OtherHeadTags _
                 & cr & "<meta http-equiv=""content-type"" content=""text/html; charset=" & encoding & """ >" _
@@ -1656,32 +1576,5 @@ ErrorTrap:
 ErrorTrap:
             Call cpCore.handleLegacyError18("main_GetHTMLInternalHead")
         End Function
-        '
-        '========================================================================
-        '   Write to the HTML stream
-        '========================================================================
-        ' refactor -- if this conversion goes correctly, all writeStream will mvoe to teh executeRoute which returns the string 
-        Public Sub writeAltBuffer(ByVal Message As Object)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("WriteStream")
-            '
-            If docOpen Then
-                Select Case webServerIO_OutStreamDevice
-                    Case webServerIO_OutStreamJavaScript
-                        Call webServerIO_JavaStream_Add(genericController.encodeText(Message))
-                    Case Else
-
-                        If (iisContext IsNot Nothing) Then
-                            cpCore.main_IsStreamWritten = True
-                            Call iisContext.Response.Write(genericController.encodeText(Message))
-                        Else
-                            webServerIO_buffer = webServerIO_buffer & genericController.encodeText(Message)
-                        End If
-                End Select
-            End If
-            '
-            Exit Sub
-ErrorTrap:
-            Call cpCore.handleLegacyError18("writeAltBuffer")
-        End Sub
     End Class
 End Namespace

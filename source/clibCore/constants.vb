@@ -1619,7 +1619,6 @@ Namespace Contensive.Core
         '
         Public Const main_cookieNameVisit = "visit"
         Public Const main_cookieNameVisitor = "visitor"
-
+        Public Const html_quickEdit_fpo = "<quickeditor>"
     End Module
-    '
 End Namespace

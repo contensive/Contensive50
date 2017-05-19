@@ -14,10 +14,6 @@ Namespace Contensive.Core.Controllers
         Inherits Contensive.BaseClasses.AddonBaseClass
         '
         '====================================================================================================
-        ' unless state is being saved in this class, consider it static
-        '====================================================================================================
-        '
-        '====================================================================================================
         ''' <summary>
         ''' future pageManager addon interface
         ''' </summary>
@@ -85,12 +81,12 @@ Namespace Contensive.Core.Controllers
                             If SeeAlsoLink <> "" Then
                                 result = result & cr & "<li class=""ccListItem"">"
                                 If genericController.vbInstr(1, SeeAlsoLink, "://") = 0 Then
-                                    SeeAlsoLink = cpcore.webServerIO.webServerIO_requestProtocol & SeeAlsoLink
+                                    SeeAlsoLink = cpcore.webServer.webServerIO_requestProtocol & SeeAlsoLink
                                 End If
                                 If IsEditingLocal Then
                                     result = result & cpcore.main_GetRecordEditLink2("See Also", (cpcore.db.cs_getInteger(CS, "ID")), False, "", cpcore.user.isEditing("See Also"))
                                 End If
-                                result = result & "<a href=""" & cpcore.html.html_EncodeHTML(SeeAlsoLink) & """ target=""_blank"">" & (cpcore.db.cs_getText(CS, "Name")) & "</A>"
+                                result = result & "<a href=""" & cpcore.htmlDoc.html_EncodeHTML(SeeAlsoLink) & """ target=""_blank"">" & (cpcore.db.cs_getText(CS, "Name")) & "</A>"
                                 Copy = (cpcore.db.cs_getText(CS, "Brief"))
                                 If Copy <> "" Then
                                     result = result & "<br >" & AddSpan(Copy, "ccListCopy")
@@ -213,7 +209,7 @@ Namespace Contensive.Core.Controllers
                         '
                         ' ----- print the feedback submit form
                         '
-                        Panel = "<form Action=""" & cpcore.webServerIO.webServerIO_ServerFormActionURL & "?" & cpcore.web_RefreshQueryString & """ Method=""post"">"
+                        Panel = "<form Action=""" & cpcore.webServer.webServerIO_ServerFormActionURL & "?" & cpcore.web_RefreshQueryString & """ Method=""post"">"
                         Panel = Panel & "<table border=""0"" cellpadding=""4"" cellspacing=""0"" width=""100%"">"
                         Panel = Panel & "<tr>"
                         Panel = Panel & "<td colspan=""2""><p>Your feedback is welcome</p></td>"
@@ -223,14 +219,14 @@ Namespace Contensive.Core.Controllers
                         '
                         Copy = cpcore.user.name
                         Panel = Panel & "<td align=""right"" width=""100""><p>Your Name</p></td>"
-                        Panel = Panel & "<td align=""left""><input type=""text"" name=""NoteFromName"" value=""" & cpcore.html.html_EncodeHTML(Copy) & """></span></td>"
+                        Panel = Panel & "<td align=""left""><input type=""text"" name=""NoteFromName"" value=""" & cpcore.htmlDoc.html_EncodeHTML(Copy) & """></span></td>"
                         Panel = Panel & "</tr><tr>"
                         '
                         ' ----- From Email address
                         '
                         Copy = cpcore.user.email
                         Panel = Panel & "<td align=""right"" width=""100""><p>Your Email</p></td>"
-                        Panel = Panel & "<td align=""left""><input type=""text"" name=""NoteFromEmail"" value=""" & cpcore.html.html_EncodeHTML(Copy) & """></span></td>"
+                        Panel = Panel & "<td align=""left""><input type=""text"" name=""NoteFromEmail"" value=""" & cpcore.htmlDoc.html_EncodeHTML(Copy) & """></span></td>"
                         Panel = Panel & "</tr><tr>"
                         '
                         ' ----- Message
@@ -372,7 +368,7 @@ Namespace Contensive.Core.Controllers
                         If (LinkLabel <> "") Then
                             result = result & cr & "<li class=""ccListItem"">"
                             If (Link <> "") Then
-                                result = result & cpcore.csv_GetLinkedText("<a href=""" & cpcore.html.html_EncodeHTML(cpcore.webServerIO.webServerIO_requestPage & "?rc=" & ContentID & "&ri=" & RecordID) & """>", LinkLabel)
+                                result = result & cpcore.csv_GetLinkedText("<a href=""" & cpcore.htmlDoc.html_EncodeHTML(cpcore.webServer.webServerIO_requestPage & "?rc=" & ContentID & "&ri=" & RecordID) & """>", LinkLabel)
                             Else
                                 result = result & LinkLabel
                             End If
@@ -469,7 +465,7 @@ Namespace Contensive.Core.Controllers
                         If (LinkLabel <> "") Then
                             result = result & cr & "<li id=""main_ContentWatch" & RecordID & """ class=""ccListItem"">"
                             If (Link <> "") Then
-                                result = result & "<a href=""http://" & cpCore.webServerIO.webServerIO_requestDomain & requestAppRootPath & cpCore.webServerIO.webServerIO_requestPage & "?rc=" & ContentID & "&ri=" & RecordID & """>" & LinkLabel & "</a>"
+                                result = result & "<a href=""http://" & cpCore.webServer.webServerIO_requestDomain & requestAppRootPath & cpCore.webServer.webServerIO_requestPage & "?rc=" & ContentID & "&ri=" & RecordID & """>" & LinkLabel & "</a>"
                             Else
                                 result = result & LinkLabel
                             End If

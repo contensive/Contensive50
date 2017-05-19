@@ -46,10 +46,8 @@ Namespace Contensive.Core.Models.Context
         ''' <summary>
         ''' new
         ''' </summary>
-        ''' <param name="cpCore"></param>
-        Public Sub New(cpCore As coreClass)
-            MyBase.New()
-            Me.cpCore = cpCore
+        Public Sub New()
+            '
         End Sub
         '
         '
@@ -106,8 +104,8 @@ Namespace Contensive.Core.Models.Context
                 '
                 'hint = "010"
                 'CSNewVisitor = -1
-                cpCore.visitor_id = 0
-                cpCore.visitor_new = False
+                cpCore.visitor.id = 0
+                cpCore.visitor.newVisitor = False
                 visitor_changes = False
                 '
                 ' ----- Member Defaults
@@ -132,7 +130,7 @@ Namespace Contensive.Core.Models.Context
                 'Call AppendLog("main_InitVisit(), 2420")
                 '
                 Dim tokenDate As Date
-                CookieVisit = cpCore.webServerIO.getRequestCookie(main_appNameCookiePrefix & constants.main_cookieNameVisit)
+                CookieVisit = cpCore.webServer.getRequestCookie(main_appNameCookiePrefix & constants.main_cookieNameVisit)
                 MemberLinkinEID = cpCore.docProperties.getText("eid")
                 MemberLinkLoginID = 0
                 MemberLinkRecognizeID = 0
@@ -143,7 +141,7 @@ Namespace Contensive.Core.Models.Context
                         '
                         Call cpCore.security.decodeToken(MemberLinkinEID, MemberLinkLoginID, tokenDate)
                         'MemberLinkLoginID = main_DecodeKeyNumber(MemberLinkinEID)
-                    ElseIf cpcore.siteProperties.getBoolean("AllowLinkRecognize", True) Then
+                    ElseIf cpCore.siteProperties.getBoolean("AllowLinkRecognize", True) Then
                         '
                         ' Link Recognize
                         '
@@ -243,7 +241,7 @@ Namespace Contensive.Core.Models.Context
                             ' Bad visit cookie, kill main_VisitId
                             '
                             visit_Id = 0
-                            cpCore.visitor_id = 0
+                            cpCore.visitor.id = 0
                         Else
                             '
                             '--------------------------------------------------------------------------
@@ -251,11 +249,11 @@ Namespace Contensive.Core.Models.Context
                             '--------------------------------------------------------------------------
                             '
                             'hint = "240"
-                            cpCore.visitor_id = cpCore.db.cs_getInteger(CS, "VisitorID")
-                            cpCore.visitor_Name = cpCore.db.cs_getText(CS, "VisitorName")
-                            cpCore.visitor_memberID = (cpCore.db.cs_getInteger(CS, "VisitorMemberID"))
-                            cpCore.visitor_forceBrowserMobile = (cpCore.db.cs_getInteger(CS, "VisitorForceBrowserMobile"))
-                            cpCore.visitor_orderID = (cpCore.db.cs_getInteger(CS, "VisitorOrderID"))
+                            cpCore.visitor.id = cpCore.db.cs_getInteger(CS, "VisitorID")
+                            cpCore.visitor.name = cpCore.db.cs_getText(CS, "VisitorName")
+                            cpCore.visitor.memberID = (cpCore.db.cs_getInteger(CS, "VisitorMemberID"))
+                            cpCore.visitor.forceBrowserMobile = (cpCore.db.cs_getInteger(CS, "VisitorForceBrowserMobile"))
+                            cpCore.visitor.orderID = (cpCore.db.cs_getInteger(CS, "VisitorOrderID"))
                             '
                             '--------------------------------------------------------------------------
                             ' ----- test visit age
@@ -289,10 +287,10 @@ Namespace Contensive.Core.Models.Context
                                 visit_startDateValue = (cpCore.db.cs_getInteger(CS, "VisitStartDateValue"))
                                 visit_referer = (cpCore.db.cs_getText(CS, "VisitHTTP_REFERER"))
                                 visit_loginAttempts = (cpCore.db.cs_getInteger(CS, "VisitLoginAttempts"))
-                                cpCore.visitor_new = (cpCore.db.cs_getBoolean(CS, "VisitVisitorNew"))
+                                cpCore.visitor.newVisitor = (cpCore.db.cs_getBoolean(CS, "VisitVisitorNew"))
                                 '
-                                cpCore.webServerIO.requestRemoteIP = (cpCore.db.cs_getText(CS, "VisitREMOTE_ADDR"))
-                                cpCore.webServerIO.requestBrowser = (cpCore.db.cs_getText(CS, "VisitBrowser"))
+                                cpCore.webServer.requestRemoteIP = (cpCore.db.cs_getText(CS, "VisitREMOTE_ADDR"))
+                                cpCore.webServer.requestBrowser = (cpCore.db.cs_getText(CS, "VisitBrowser"))
                                 visit_timeToLastHit = 0
                                 If visit_startTime > Date.MinValue Then
                                     visit_timeToLastHit = CInt((cpCore.app_startTime - visit_startTime).TotalSeconds)
@@ -370,7 +368,7 @@ Namespace Contensive.Core.Models.Context
                         '
                         ' ----- Decode Browser User-Agent string to main_VisitName, main_VisitIsBot, main_VisitIsBadBot, etc
                         '
-                        Call cpCore.web_init_decodeBrowserUserAgent(cpCore.webServerIO.requestBrowser)
+                        Call cpCore.web_init_decodeBrowserUserAgent(cpCore.webServer.requestBrowser)
                         '
                         ' ----- create new visit record
                         '
@@ -391,8 +389,8 @@ Namespace Contensive.Core.Models.Context
                         ' ----- main_Get visit referer
                         '
                         'hint = "320"
-                        If cpCore.webServerIO.requestReferrer <> "" Then
-                            WorkingReferer = cpCore.webServerIO.requestReferrer
+                        If cpCore.webServer.requestReferrer <> "" Then
+                            WorkingReferer = cpCore.webServer.requestReferrer
                             SlashPosition = genericController.vbInstr(1, WorkingReferer, "//")
                             If (SlashPosition <> 0) And (Len(WorkingReferer) > (SlashPosition + 2)) Then
                                 WorkingReferer = Mid(WorkingReferer, SlashPosition + 2)
@@ -412,44 +410,44 @@ Namespace Contensive.Core.Models.Context
                         '--------------------------------------------------------------------------
                         '
                         'hint = "330"
-                        CookieVisitor = genericController.encodeText(cpCore.webServerIO.getRequestCookie(main_appNameCookiePrefix & main_cookieNameVisitor))
+                        CookieVisitor = genericController.encodeText(cpCore.webServer.getRequestCookie(main_appNameCookiePrefix & main_cookieNameVisitor))
                         '
                         'Call AppendLog("main_InitVisit(), 2480")
                         '
-                        If cpcore.siteProperties.getBoolean("AllowAutoRecognize", True) Then
+                        If cpCore.siteProperties.getBoolean("AllowAutoRecognize", True) Then
                             '
                             'Call AppendLog("main_InitVisit(), 2485")
                             '
                             'hint = "340"
-                            Call cpCore.security.decodeToken(CookieVisitor, cpCore.visitor_id, tokenDate)
+                            Call cpCore.security.decodeToken(CookieVisitor, cpCore.visitor.id, tokenDate)
                             'main_VisitorID = main_DecodeKeyNumber(CookieVisitor)
-                            If cpCore.visitor_id <> 0 Then
+                            If cpCore.visitor.id <> 0 Then
                                 '
                                 ' ----- cookie found, open visitor
                                 '
                                 'hint = "350"
                                 visit_cookieSupport = True
                                 If True Then
-                                    SQL = "SELECT ID,Name,MemberID,OrderID,ForceBrowserMobile from ccVisitors WHERE ID=" & cpCore.visitor_id & ";"
+                                    SQL = "SELECT ID,Name,MemberID,OrderID,ForceBrowserMobile from ccVisitors WHERE ID=" & cpCore.visitor.id & ";"
                                 Else
-                                    SQL = "SELECT ID,Name,MemberID,OrderID,0 as ForceBrowserMobile from ccVisitors WHERE ID=" & cpCore.visitor_id & ";"
+                                    SQL = "SELECT ID,Name,MemberID,OrderID,0 as ForceBrowserMobile from ccVisitors WHERE ID=" & cpCore.visitor.id & ";"
                                 End If
                                 CS = cpCore.db.cs_openSql(SQL)
                                 If Not cpCore.db.cs_ok(CS) Then
                                     '
                                     ' ----- bad cookie, kill main_VisitorID
                                     '
-                                    cpCore.visitor_id = 0
+                                    cpCore.visitor.id = 0
                                 Else
                                     '
                                     ' ----- set visitor values
                                     '
                                     visitor_changes = False
-                                    cpCore.visitor_id = (cpCore.db.cs_getInteger(CS, "ID"))
-                                    cpCore.visitor_Name = (cpCore.db.cs_getText(CS, "Name"))
-                                    cpCore.visitor_memberID = (cpCore.db.cs_getInteger(CS, "MemberID"))
-                                    cpCore.visitor_forceBrowserMobile = (cpCore.db.cs_getInteger(CS, "ForceBrowserMobile"))
-                                    cpCore.visitor_orderID = (cpCore.db.cs_getInteger(CS, "OrderID"))
+                                    cpCore.visitor.id = (cpCore.db.cs_getInteger(CS, "ID"))
+                                    cpCore.visitor.name = (cpCore.db.cs_getText(CS, "Name"))
+                                    cpCore.visitor.memberID = (cpCore.db.cs_getInteger(CS, "MemberID"))
+                                    cpCore.visitor.forceBrowserMobile = (cpCore.db.cs_getInteger(CS, "ForceBrowserMobile"))
+                                    cpCore.visitor.orderID = (cpCore.db.cs_getInteger(CS, "OrderID"))
                                 End If
                                 Call cpCore.db.cs_Close(CS)
                             End If
@@ -462,24 +460,24 @@ Namespace Contensive.Core.Models.Context
                         'Call AppendLog("main_InitVisit(), 2490")
                         '
                         'hint = "400"
-                        If cpCore.visitor_id = 0 Then
+                        If cpCore.visitor.id = 0 Then
                             '
                             ' Visitor Fields
                             '
-                            cpCore.visitor_id = cpCore.db.metaData_InsertContentRecordGetID("Visitors", cpCore.user.id)
-                            If (cpCore.visitor_id < 1) Then
+                            cpCore.visitor.id = cpCore.db.metaData_InsertContentRecordGetID("Visitors", cpCore.user.id)
+                            If (cpCore.visitor.id < 1) Then
                                 Call cpCore.handleLegacyError14(MethodName, "main_InitVisit, could not create new visitor")
-                                cpCore.visitor_id = 0
+                                cpCore.visitor.id = 0
                             End If
-                            cpCore.visitor_Name = "Visitor " & cpCore.visitor_id
-                            cpCore.visitor_memberID = 0
-                            cpCore.visitor_orderID = 0
+                            cpCore.visitor.name = "Visitor " & cpCore.visitor.id
+                            cpCore.visitor.memberID = 0
+                            cpCore.visitor.orderID = 0
                             visitor_changes = True
-                            cpCore.visitor_forceBrowserMobile = 0
+                            cpCore.visitor.forceBrowserMobile = 0
                             '
                             ' Visit Fields
                             '
-                            cpCore.visitor_new = True
+                            cpCore.visitor.newVisitor = True
                         End If
                         '
                         '-----------------------------------------------------------------------------------
@@ -489,13 +487,13 @@ Namespace Contensive.Core.Models.Context
                         'Call AppendLog("main_InitVisit(), 2492")
                         '
                         'hint = "500"
-                        cpCore.user.id = cpCore.visitor_memberID
-                        If (cpCore.visitor_memberID > 0) Then
+                        cpCore.user.id = cpCore.visitor.memberID
+                        If (cpCore.visitor.memberID > 0) Then
                             '
                             ' ----- recognize by the main_VisitorMemberID
                             '
                             'hint = "510"
-                            If cpCore.user.recognizeById(cpCore.visitor_memberID) Then
+                            If cpCore.user.recognizeById(cpCore.visitor.memberID) Then
                                 '
                                 ' ----- if successful, now test for autologin (authentication)
                                 '
@@ -506,7 +504,7 @@ Namespace Contensive.Core.Models.Context
                                     ' ----- they allow it, now Check if they were logged in on their last visit
                                     '
                                     'hint = "530"
-                                    SQL = "select top 1 V.VisitAuthenticated from ccVisits V where (V.ID<>" & visit_Id & ")and(V.VisitorID=" & cpCore.visitor_id & ") order by id desc"
+                                    SQL = "select top 1 V.VisitAuthenticated from ccVisits V where (V.ID<>" & visit_Id & ")and(V.VisitorID=" & cpCore.visitor.id & ") order by id desc"
                                     CS = cpCore.db.cs_openSql(SQL)
                                     If cpCore.db.cs_ok(CS) Then
                                         If cpCore.db.cs_getBoolean(CS, "VisitAuthenticated") Then
@@ -537,7 +535,7 @@ Namespace Contensive.Core.Models.Context
                         '
                         'hint = "600"
                         If visitInit_allowVisitTracking Then
-                            Call cpCore.webServerIO.addResponseCookie(main_appNameCookiePrefix & main_cookieNameVisitor, cpCore.security.encodeToken(cpCore.visitor_id, visit_startTime), visit_startTime.AddYears(1), , requestAppRootPath, False)
+                            Call cpCore.webServer.addResponseCookie(main_appNameCookiePrefix & main_cookieNameVisitor, cpCore.security.encodeToken(cpCore.visitor.id, visit_startTime), visit_startTime.AddYears(1), , requestAppRootPath, False)
                         End If
                         '
                         '--------------------------------------------------------------------------
@@ -710,7 +708,7 @@ Namespace Contensive.Core.Models.Context
                     '
                     ' Update Page count
                     '
-                    If Not cpCore.webServerIO.webServerIO_PageExcludeFromAnalytics Then
+                    If Not cpCore.webServer.webServerIO_PageExcludeFromAnalytics Then
                         visit_pages = visit_pages + 1
                     End If
                     '
@@ -724,7 +722,7 @@ Namespace Contensive.Core.Models.Context
                     '
                     'hint = "940"
                     If visitor_changes Then
-                        Call cpCore.visitor_save()
+                        Call cpCore.visitor.save(cpCore)
                     End If
                     '
                     ' ----- Save Member record
@@ -770,7 +768,7 @@ Namespace Contensive.Core.Models.Context
                 '---------------------------------------------------------------------------------
                 '
                 CookieVisit = cpCore.security.encodeToken(visit_Id, cpCore.app_startTime)
-                Call cpCore.webServerIO.addResponseCookie(main_appNameCookiePrefix & constants.main_cookieNameVisit, CookieVisit, , , requestAppRootPath, False)
+                Call cpCore.webServer.addResponseCookie(main_appNameCookiePrefix & constants.main_cookieNameVisit, CookieVisit, , , requestAppRootPath, False)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -826,16 +824,16 @@ Namespace Contensive.Core.Models.Context
                     ' First page of the visit, save everything
                     '
                     SQL &= "" _
-                        & ",VisitorID=" & cpCore.visitor_id _
+                        & ",VisitorID=" & cpCore.visitor.id _
                         & ",Name=" & cpCore.db.encodeSQLText(visit_name) _
-                        & ",VisitorNew=" & cpCore.db.encodeSQLBoolean(cpCore.visitor_new) _
+                        & ",VisitorNew=" & cpCore.db.encodeSQLBoolean(cpCore.visitor.newVisitor) _
                         & ",StartTime=" & cpCore.db.encodeSQLDate(visit_startTime) _
                         & ",StartDateValue=" & visit_startDateValue _
                         & ",DateAdded=" & cpCore.db.encodeSQLDate(visit_startTime) _
-                        & ",Remote_Addr=" & cpCore.db.encodeSQLText(cpCore.webServerIO.requestRemoteIP) _
-                        & ",Browser=" & cpCore.db.encodeSQLText(Left(cpCore.webServerIO.requestBrowser, 255)) _
-                        & ",HTTP_Via=" & cpCore.db.encodeSQLText(Left(cpCore.webServerIO.requestHTTPVia, 255)) _
-                        & ",HTTP_From=" & cpCore.db.encodeSQLText(Left(cpCore.webServerIO.requestHTTPFrom, 255)) _
+                        & ",Remote_Addr=" & cpCore.db.encodeSQLText(cpCore.webServer.requestRemoteIP) _
+                        & ",Browser=" & cpCore.db.encodeSQLText(Left(cpCore.webServer.requestBrowser, 255)) _
+                        & ",HTTP_Via=" & cpCore.db.encodeSQLText(Left(cpCore.webServer.requestHTTPVia, 255)) _
+                        & ",HTTP_From=" & cpCore.db.encodeSQLText(Left(cpCore.webServer.requestHTTPFrom, 255)) _
                         & ",HTTP_REFERER=" & cpCore.db.encodeSQLText(Left(visit_refererHost, 255)) _
                         & ",RefererPathPage=" & cpCore.db.encodeSQLText(Left(visit_refererPathPage, 255)) _
                         & ""

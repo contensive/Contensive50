@@ -431,7 +431,7 @@ Namespace Contensive.Core.Controllers
                     OtherHeadTags = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_OtherHeadTags)
                     JSFilename = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_JSFilename)
                     If JSFilename <> "" Then
-                        JSFilename = cpCore.webServerIO.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
+                        JSFilename = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
                     End If
                 End If
                 If Not String.IsNullOrEmpty(ProgramID) Then
@@ -843,7 +843,7 @@ Namespace Contensive.Core.Controllers
                                     '
                                     ' web-only
                                     '
-                                    Link = cpCore.webServerIO.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & requestAppRootPath & cpCore.siteProperties.serverPageDefault
+                                    Link = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & requestAppRootPath & cpCore.siteProperties.serverPageDefault
                                     If genericController.vbInstr(1, Link, "?") = 0 Then
                                         Link = Link & "?"
                                     Else
@@ -879,8 +879,8 @@ Namespace Contensive.Core.Controllers
                                         & "&HostContentName=" & EncodeRequestVariable(HostContentName) _
                                         & "&HostRecordID=" & HostRecordID _
                                         & "&HostRQS=" & EncodeRequestVariable(cpCore.web_RefreshQueryString) _
-                                        & "&HostQS=" & EncodeRequestVariable(cpCore.webServerIO.requestQueryString) _
-                                        & "&HostForm=" & EncodeRequestVariable(cpCore.webServerIO.requestFormString) _
+                                        & "&HostQS=" & EncodeRequestVariable(cpCore.webServer.requestQueryString) _
+                                        & "&HostForm=" & EncodeRequestVariable(cpCore.webServer.requestFormString) _
                                         & "&optionstring=" & EncodeRequestVariable(WorkingOptionString) _
                                         & ""
                                     If IsInline Then
@@ -927,10 +927,10 @@ Namespace Contensive.Core.Controllers
                                         Call cpCore.main_AddEndOfBodyJavascript2(JSBodyEnd, AddedByName)
                                         Call cpCore.main_AddHeadScriptLink(JSFilename, AddedByName)
                                         If DefaultStylesFilename <> "" Then
-                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
+                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
                                         End If
                                         If CustomStylesFilename <> "" Then
-                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
+                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
                                         End If
                                     End If
                                 End If
@@ -946,8 +946,8 @@ Namespace Contensive.Core.Controllers
                                     ' Add-on setup for InFrame, running the call-back - this page must think it is just the remotemethod
                                     '
                                     If isMainOk Then
-                                        Call cpCore.webServerIO.webServerIO_addRefreshQueryString(RequestNameRemoteMethodAddon, AddonNameOrGuid_Local)
-                                        Call cpCore.webServerIO.webServerIO_addRefreshQueryString("optionstring", WorkingOptionString)
+                                        Call cpCore.htmlDoc.webServerIO_addRefreshQueryString(RequestNameRemoteMethodAddon, AddonNameOrGuid_Local)
+                                        Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("optionstring", WorkingOptionString)
                                     End If
                                 ElseIf (AsAjax And (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) Then
                                     '
@@ -969,7 +969,7 @@ Namespace Contensive.Core.Controllers
                                             If NVPair <> "" Then
                                                 NVSplit = Split(NVPair, "=")
                                                 If UBound(NVSplit) > 0 Then
-                                                    Call cpCore.webServerIO.webServerIO_addRefreshQueryString(NVSplit(0), NVSplit(1))
+                                                    Call cpCore.htmlDoc.webServerIO_addRefreshQueryString(NVSplit(0), NVSplit(1))
                                                 End If
                                             End If
                                         Next
@@ -1138,7 +1138,7 @@ Namespace Contensive.Core.Controllers
                                 '-----------------------------------------------------------------------------------------------------
                                 '
                                 If (True) And (inlineScript <> "") Then
-                                    inlineScriptContent = "<!-- inlineScript(" & cpCore.csv_ConnectionID & ")[" & cpCore.html.html_EncodeHTML(inlineScript) & "] -->"
+                                    inlineScriptContent = "<!-- inlineScript(" & cpCore.csv_ConnectionID & ")[" & cpCore.htmlDoc.html_EncodeHTML(inlineScript) & "] -->"
                                 End If
                                 '
                                 '-----------------------------------------------------------------------------------------------------
@@ -1154,9 +1154,9 @@ Namespace Contensive.Core.Controllers
                                                 ' use request object to build link
                                                 '
                                                 If Mid(WorkingLink, 1, 1) = "/" Then
-                                                    WorkingLink = cpCore.webServerIO.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & WorkingLink
+                                                    WorkingLink = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & WorkingLink
                                                 Else
-                                                    WorkingLink = cpCore.webServerIO.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.webServerIO.webServerIO_requestVirtualFilePath & WorkingLink
+                                                    WorkingLink = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.webServer.webServerIO_requestVirtualFilePath & WorkingLink
                                                 End If
                                             Else
                                                 '
@@ -1214,7 +1214,7 @@ Namespace Contensive.Core.Controllers
                                         End If
                                     End If
                                     Link = modifyLinkQuery(Link, RequestNameJSForm, "1", True)
-                                    Link = EncodeAppRootPath(Link, cpCore.webServerIO.webServerIO_requestVirtualFilePath, requestAppRootPath, cpCore.webServerIO.requestDomain)
+                                    Link = EncodeAppRootPath(Link, cpCore.webServer.webServerIO_requestVirtualFilePath, requestAppRootPath, cpCore.webServer.requestDomain)
                                     ScriptCallbackContent = "<SCRIPT LANGUAGE=""JAVASCRIPT"" SRC=""" & Link & """></SCRIPT>"
                                 End If
                                 '
@@ -1237,10 +1237,10 @@ Namespace Contensive.Core.Controllers
                                         Call cpCore.main_AddEndOfBodyJavascript2(JSBodyEnd, AddedByName)
                                         Call cpCore.main_AddHeadScriptLink(JSFilename, AddedByName)
                                         If DefaultStylesFilename <> "" Then
-                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
+                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
                                         End If
                                         If CustomStylesFilename <> "" Then
-                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
+                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
                                         End If
                                     End If
                                 End If
@@ -1412,7 +1412,7 @@ Namespace Contensive.Core.Controllers
                                                 AddonEditIcon = "<a href=""" & cpCore.siteProperties.adminURL & "?cid=" & cpCore.metaData.getContentId(cnAddons) & "&id=" & addonId & "&af=4&aa=2&ad=1"" tabindex=""-1"">" & AddonEditIcon & "</a>"
                                                 InstanceSettingsEditIcon = getInstanceBubble(AddonName, AddonOptionExpandedConstructor, HostContentName, HostRecordID, HostFieldName, ACInstanceID, Context, DialogList)
                                                 AddonStylesEditIcon = getAddonStylesBubble(addonId, DialogList)
-                                                HTMLViewerEditIcon = getHTMLViewerBubble(addonId, "editWrapper" & cpCore.pageManager_EditWrapperCnt, DialogList)
+                                                HTMLViewerEditIcon = getHTMLViewerBubble(addonId, "editWrapper" & cpCore.htmlDoc.html_EditWrapperCnt, DialogList)
                                                 HelpIcon = getHelpBubble(addonId, helpCopy, addonCollectionId, DialogList)
                                                 ToolBar = InstanceSettingsEditIcon & AddonEditIcon & AddonStylesEditIcon & SiteStylesEditIcon & HTMLViewerEditIcon & HelpIcon
                                                 ToolBar = genericController.vbReplace(ToolBar, "&nbsp;", "", 1, 99, vbTextCompare)
@@ -1828,7 +1828,7 @@ Namespace Contensive.Core.Controllers
                                                                             If FieldValue = "" Then
                                                                                 Copy = cpCore.html_GetFormInputFile(FieldName)
                                                                             Else
-                                                                                NonEncodedLink = cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, FieldValue)
+                                                                                NonEncodedLink = cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, FieldValue)
                                                                                 EncodedLink = EncodeURL(NonEncodedLink)
                                                                                 Dim FieldValuefilename As String = ""
                                                                                 Dim FieldValuePath As String = ""
@@ -2074,7 +2074,7 @@ Namespace Contensive.Core.Controllers
                                                                                 ElseIf genericController.encodeText(CellData) = "" Then
                                                                                     Copy = Copy & (ColumnStart & "[empty]" & ColumnEnd)
                                                                                 Else
-                                                                                    Copy = Copy & (ColumnStart & cpCore.html.html_EncodeHTML(genericController.encodeText(CellData)) & ColumnEnd)
+                                                                                    Copy = Copy & (ColumnStart & cpCore.htmlDoc.html_EncodeHTML(genericController.encodeText(CellData)) & ColumnEnd)
                                                                                 End If
                                                                             Next
                                                                             Copy = Copy & (RowEnd)
@@ -2982,7 +2982,7 @@ ErrorTrap:
                         & "<table border=0 cellpadding=0 cellspacing=0 width=""100%"">" _
                         & "<tr>" _
                         & "<td align=left class=""bbLeft"">Options for this instance of " & AddonName & "</td>" _
-                        & "<td align=right class=""bbRight""><a href=""#"" onClick=""HelpBubbleOff('HelpBubble" & cpCore.pageManager_HelpCodeCount & "');return false;""><img alt=""close"" src=""/ccLib/images/ClosexRev1313.gif"" width=13 height=13 border=0></a></td>" _
+                        & "<td align=right class=""bbRight""><a href=""#"" onClick=""HelpBubbleOff('HelpBubble" & cpCore.htmlDoc.htmlDoc_HelpCodeCount & "');return false;""><img alt=""close"" src=""/ccLib/images/ClosexRev1313.gif"" width=13 height=13 border=0></a></td>" _
                         & "</tr>" _
                         & "</table>" _
                         & "</div>"
@@ -3169,14 +3169,14 @@ ErrorTrap:
                             & cpCore.html_GetFormInputHidden("ACInstanceID", ACInstanceID)
                     End If
                     '
-                    BubbleJS = " onClick=""HelpBubbleOn( 'HelpBubble" & cpCore.pageManager_HelpCodeCount & "',this);return false;"""
+                    BubbleJS = " onClick=""HelpBubbleOn( 'HelpBubble" & cpCore.htmlDoc.htmlDoc_HelpCodeCount & "',this);return false;"""
                     QueryString = cpCore.web_RefreshQueryString
                     QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
                     'QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                     return_DialogList = return_DialogList _
                         & "<div class=""ccCon helpDialogCon"">" _
                         & cpCore.html_GetUploadFormStart() _
-                        & "<table border=0 cellpadding=0 cellspacing=0 class=""ccBubbleCon"" id=""HelpBubble" & cpCore.pageManager_HelpCodeCount & """ style=""display:none;visibility:hidden;"">" _
+                        & "<table border=0 cellpadding=0 cellspacing=0 class=""ccBubbleCon"" id=""HelpBubble" & cpCore.htmlDoc.htmlDoc_HelpCodeCount & """ style=""display:none;visibility:hidden;"">" _
                         & "<tr><td class=""ccHeaderCon"">" & CopyHeader & "</td></tr>" _
                         & "<tr><td class=""ccButtonCon"">" & cpCore.html_GetFormButton("Update", "HelpBubbleButton") & "</td></tr>" _
                         & "<tr><td class=""ccContentCon"">" & CopyContent & "</td></tr>" _
@@ -3189,19 +3189,19 @@ ErrorTrap:
                         & "</a>" _
                         & "" _
                         & ""
-                    If cpCore.pageManager_HelpCodeCount >= cpCore.pageManager_HelpCodeSize Then
-                        cpCore.pageManager_HelpCodeSize = cpCore.pageManager_HelpCodeSize + 10
-                        ReDim Preserve cpCore.pageManager_HelpCodes(cpCore.pageManager_HelpCodeSize)
-                        ReDim Preserve cpCore.pageManager_HelpCaptions(cpCore.pageManager_HelpCodeSize)
+                    If cpCore.htmlDoc.htmlDoc_HelpCodeCount >= cpCore.htmlDoc.htmlDoc_HelpCodeSize Then
+                        cpCore.htmlDoc.htmlDoc_HelpCodeSize = cpCore.htmlDoc.htmlDoc_HelpCodeSize + 10
+                        ReDim Preserve cpCore.htmlDoc.htmlDoc_HelpCodes(cpCore.htmlDoc.htmlDoc_HelpCodeSize)
+                        ReDim Preserve cpCore.htmlDoc.htmlDoc_HelpCaptions(cpCore.htmlDoc.htmlDoc_HelpCodeSize)
                     End If
-                    cpCore.pageManager_HelpCodes(cpCore.pageManager_HelpCodeCount) = LocalCode
-                    cpCore.pageManager_HelpCaptions(cpCore.pageManager_HelpCodeCount) = AddonName
-                    cpCore.pageManager_HelpCodeCount = cpCore.pageManager_HelpCodeCount + 1
+                    cpCore.htmlDoc.htmlDoc_HelpCodes(cpCore.htmlDoc.htmlDoc_HelpCodeCount) = LocalCode
+                    cpCore.htmlDoc.htmlDoc_HelpCaptions(cpCore.htmlDoc.htmlDoc_HelpCodeCount) = AddonName
+                    cpCore.htmlDoc.htmlDoc_HelpCodeCount = cpCore.htmlDoc.htmlDoc_HelpCodeCount + 1
                     '
-                    If cpCore.pageManager_HelpDialogCnt = 0 Then
+                    If cpCore.htmlDoc.htmlDoc_HelpDialogCnt = 0 Then
                         Call cpCore.main_AddOnLoadJavascript2("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
                     End If
-                    cpCore.pageManager_HelpDialogCnt = cpCore.pageManager_HelpDialogCnt + 1
+                    cpCore.htmlDoc.htmlDoc_HelpDialogCnt = cpCore.htmlDoc.htmlDoc_HelpDialogCnt + 1
                 End If
             End If
             '
@@ -3257,7 +3257,7 @@ ErrorTrap:
                         & "<table border=0 cellpadding=0 cellspacing=0 width=""100%"">" _
                         & "<tr>" _
                         & "<td align=left class=""bbLeft"">Stylesheet for " & AddonName & "</td>" _
-                        & "<td align=right class=""bbRight""><a href=""#"" onClick=""HelpBubbleOff('HelpBubble" & cpCore.pageManager_HelpCodeCount & "');return false;""><img alt=""close"" src=""/ccLib/images/ClosexRev1313.gif"" width=13 height=13 border=0></a></td>" _
+                        & "<td align=right class=""bbRight""><a href=""#"" onClick=""HelpBubbleOff('HelpBubble" & cpCore.htmlDoc.htmlDoc_HelpCodeCount & "');return false;""><img alt=""close"" src=""/ccLib/images/ClosexRev1313.gif"" width=13 height=13 border=0></a></td>" _
                         & "</tr>" _
                         & "</table>" _
                         & "</div>"
@@ -3284,7 +3284,7 @@ ErrorTrap:
                         & cpCore.html_GetFormInputHidden("AddonID", addonId) _
                         & ""
                     '
-                    BubbleJS = " onClick=""HelpBubbleOn( 'HelpBubble" & cpCore.pageManager_HelpCodeCount & "',this);return false;"""
+                    BubbleJS = " onClick=""HelpBubbleOn( 'HelpBubble" & cpCore.htmlDoc.htmlDoc_HelpCodeCount & "',this);return false;"""
                     QueryString = cpCore.web_RefreshQueryString
                     QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
                     'QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
@@ -3293,7 +3293,7 @@ ErrorTrap:
                     Dialog = Dialog _
                         & "<div class=""ccCon helpDialogCon"">" _
                         & cpCore.html_GetUploadFormStart() _
-                        & "<table border=0 cellpadding=0 cellspacing=0 class=""ccBubbleCon"" id=""HelpBubble" & cpCore.pageManager_HelpCodeCount & """ style=""display:none;visibility:hidden;"">" _
+                        & "<table border=0 cellpadding=0 cellspacing=0 class=""ccBubbleCon"" id=""HelpBubble" & cpCore.htmlDoc.htmlDoc_HelpCodeCount & """ style=""display:none;visibility:hidden;"">" _
                         & "<tr><td class=""ccHeaderCon"">" & CopyHeader & "</td></tr>" _
                         & "<tr><td class=""ccButtonCon"">" & cpCore.html_GetFormButton("Update", "HelpBubbleButton") & "</td></tr>" _
                         & "<tr><td class=""ccContentCon"">" & CopyContent & "</td></tr>" _
@@ -3305,14 +3305,14 @@ ErrorTrap:
                         & "&nbsp;<a href=""#"" tabindex=-1 target=""_blank""" & BubbleJS & ">" _
                         & GetIconSprite("", 0, "/ccLib/images/toolstyles.png", 22, 22, "Edit " & AddonName & " Stylesheets", "Edit " & AddonName & " Stylesheets", "", True, "") _
                         & "</a>"
-                    If cpCore.pageManager_HelpCodeCount >= cpCore.pageManager_HelpCodeSize Then
-                        cpCore.pageManager_HelpCodeSize = cpCore.pageManager_HelpCodeSize + 10
-                        ReDim Preserve cpCore.pageManager_HelpCodes(cpCore.pageManager_HelpCodeSize)
-                        ReDim Preserve cpCore.pageManager_HelpCaptions(cpCore.pageManager_HelpCodeSize)
+                    If cpCore.htmlDoc.htmlDoc_HelpCodeCount >= cpCore.htmlDoc.htmlDoc_HelpCodeSize Then
+                        cpCore.htmlDoc.htmlDoc_HelpCodeSize = cpCore.htmlDoc.htmlDoc_HelpCodeSize + 10
+                        ReDim Preserve cpCore.htmlDoc.htmlDoc_HelpCodes(cpCore.htmlDoc.htmlDoc_HelpCodeSize)
+                        ReDim Preserve cpCore.htmlDoc.htmlDoc_HelpCaptions(cpCore.htmlDoc.htmlDoc_HelpCodeSize)
                     End If
-                    cpCore.pageManager_HelpCodes(cpCore.pageManager_HelpCodeCount) = LocalCode
-                    cpCore.pageManager_HelpCaptions(cpCore.pageManager_HelpCodeCount) = AddonName
-                    cpCore.pageManager_HelpCodeCount = cpCore.pageManager_HelpCodeCount + 1
+                    cpCore.htmlDoc.htmlDoc_HelpCodes(cpCore.htmlDoc.htmlDoc_HelpCodeCount) = LocalCode
+                    cpCore.htmlDoc.htmlDoc_HelpCaptions(cpCore.htmlDoc.htmlDoc_HelpCodeCount) = AddonName
+                    cpCore.htmlDoc.htmlDoc_HelpCodeCount = cpCore.htmlDoc.htmlDoc_HelpCodeCount + 1
                 End If
             End If
             '
@@ -3360,7 +3360,7 @@ ErrorTrap:
             If cpCore.user.isAuthenticated() Then
                 If cpCore.user.isEditingAnything() Then
                     StyleSN = genericController.EncodeInteger(cpCore.siteProperties.getText("StylesheetSerialNumber", "0"))
-                    cpCore.pageManager_HelpViewerButtonID = "HelpBubble" & cpCore.pageManager_HelpCodeCount
+                    cpCore.htmlDoc.html_HelpViewerButtonID = "HelpBubble" & cpCore.htmlDoc.htmlDoc_HelpCodeCount
                     InnerCopy = helpCopy
                     If InnerCopy = "" Then
                         InnerCopy = "<p style=""text-align:center"">No help is available for this add-on.</p>"
@@ -3382,7 +3382,7 @@ ErrorTrap:
                         & "<table border=0 cellpadding=0 cellspacing=0 width=""100%"">" _
                         & "<tr>" _
                         & "<td align=left class=""bbLeft"">Help Viewer</td>" _
-                        & "<td align=right class=""bbRight""><a href=""#"" onClick=""HelpBubbleOff('HelpBubble" & cpCore.pageManager_HelpCodeCount & "');return false;""><img alt=""close"" src=""/ccLib/images/ClosexRev1313.gif"" width=13 height=13 border=0></a></td>" _
+                        & "<td align=right class=""bbRight""><a href=""#"" onClick=""HelpBubbleOff('HelpBubble" & cpCore.htmlDoc.htmlDoc_HelpCodeCount & "');return false;""><img alt=""close"" src=""/ccLib/images/ClosexRev1313.gif"" width=13 height=13 border=0></a></td>" _
                         & "</tr>" _
                         & "</table>" _
                         & "</div>"
@@ -3399,25 +3399,25 @@ ErrorTrap:
                     'QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                     return_DialogList = return_DialogList _
                         & "<div class=""ccCon helpDialogCon"">" _
-                        & "<table border=0 cellpadding=0 cellspacing=0 class=""ccBubbleCon"" id=""HelpBubble" & cpCore.pageManager_HelpCodeCount & """ style=""display:none;visibility:hidden;"">" _
+                        & "<table border=0 cellpadding=0 cellspacing=0 class=""ccBubbleCon"" id=""HelpBubble" & cpCore.htmlDoc.htmlDoc_HelpCodeCount & """ style=""display:none;visibility:hidden;"">" _
                         & "<tr><td class=""ccHeaderCon"">" & CopyHeader & "</td></tr>" _
                         & "<tr><td class=""ccContentCon"">" & CopyContent & "</td></tr>" _
                         & "</table>" _
                         & "</div>"
-                    BubbleJS = " onClick=""HelpBubbleOn( 'HelpBubble" & cpCore.pageManager_HelpCodeCount & "',this);return false;"""
-                    If cpCore.pageManager_HelpCodeCount >= cpCore.pageManager_HelpCodeSize Then
-                        cpCore.pageManager_HelpCodeSize = cpCore.pageManager_HelpCodeSize + 10
-                        ReDim Preserve cpCore.pageManager_HelpCodes(cpCore.pageManager_HelpCodeSize)
-                        ReDim Preserve cpCore.pageManager_HelpCaptions(cpCore.pageManager_HelpCodeSize)
+                    BubbleJS = " onClick=""HelpBubbleOn( 'HelpBubble" & cpCore.htmlDoc.htmlDoc_HelpCodeCount & "',this);return false;"""
+                    If cpCore.htmlDoc.htmlDoc_HelpCodeCount >= cpCore.htmlDoc.htmlDoc_HelpCodeSize Then
+                        cpCore.htmlDoc.htmlDoc_HelpCodeSize = cpCore.htmlDoc.htmlDoc_HelpCodeSize + 10
+                        ReDim Preserve cpCore.htmlDoc.htmlDoc_HelpCodes(cpCore.htmlDoc.htmlDoc_HelpCodeSize)
+                        ReDim Preserve cpCore.htmlDoc.htmlDoc_HelpCaptions(cpCore.htmlDoc.htmlDoc_HelpCodeSize)
                     End If
-                    cpCore.pageManager_HelpCodes(cpCore.pageManager_HelpCodeCount) = LocalCode
-                    cpCore.pageManager_HelpCaptions(cpCore.pageManager_HelpCodeCount) = AddonName
-                    cpCore.pageManager_HelpCodeCount = cpCore.pageManager_HelpCodeCount + 1
+                    cpCore.htmlDoc.htmlDoc_HelpCodes(cpCore.htmlDoc.htmlDoc_HelpCodeCount) = LocalCode
+                    cpCore.htmlDoc.htmlDoc_HelpCaptions(cpCore.htmlDoc.htmlDoc_HelpCodeCount) = AddonName
+                    cpCore.htmlDoc.htmlDoc_HelpCodeCount = cpCore.htmlDoc.htmlDoc_HelpCodeCount + 1
                     '
-                    If cpCore.pageManager_HelpDialogCnt = 0 Then
+                    If cpCore.htmlDoc.htmlDoc_HelpDialogCnt = 0 Then
                         Call cpCore.main_AddOnLoadJavascript2("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
                     End If
-                    cpCore.pageManager_HelpDialogCnt = cpCore.pageManager_HelpDialogCnt + 1
+                    cpCore.htmlDoc.htmlDoc_HelpDialogCnt = cpCore.htmlDoc.htmlDoc_HelpDialogCnt + 1
                     'SiteStylesBubbleCache = "x"
                     'End If
                     getHelpBubble = "" _
@@ -3469,7 +3469,7 @@ ErrorTrap:
             If cpCore.user.isAuthenticated() Then
                 If cpCore.user.isEditingAnything() Then
                     StyleSN = genericController.EncodeInteger(cpCore.siteProperties.getText("StylesheetSerialNumber", "0"))
-                    HTMLViewerBubbleID = "HelpBubble" & cpCore.pageManager_HelpCodeCount
+                    HTMLViewerBubbleID = "HelpBubble" & cpCore.htmlDoc.htmlDoc_HelpCodeCount
                     '
                     CopyHeader = CopyHeader _
                         & "<div class=""ccHeaderCon"">" _
@@ -3499,20 +3499,20 @@ ErrorTrap:
                         & "</table>" _
                         & "</div>"
                     BubbleJS = " onClick=""var d=document.getElementById('" & HTMLViewerBubbleID & "_dst');if(d){var s=document.getElementById('" & HTMLSourceID & "');if(s){d.value=s.innerHTML;HelpBubbleOn( '" & HTMLViewerBubbleID & "',this)}};return false;"" "
-                    If cpCore.pageManager_HelpCodeCount >= cpCore.pageManager_HelpCodeSize Then
-                        cpCore.pageManager_HelpCodeSize = cpCore.pageManager_HelpCodeSize + 10
-                        ReDim Preserve cpCore.pageManager_HelpCodes(cpCore.pageManager_HelpCodeSize)
-                        ReDim Preserve cpCore.pageManager_HelpCaptions(cpCore.pageManager_HelpCodeSize)
+                    If cpCore.htmlDoc.htmlDoc_HelpCodeCount >= cpCore.htmlDoc.htmlDoc_HelpCodeSize Then
+                        cpCore.htmlDoc.htmlDoc_HelpCodeSize = cpCore.htmlDoc.htmlDoc_HelpCodeSize + 10
+                        ReDim Preserve cpCore.htmlDoc.htmlDoc_HelpCodes(cpCore.htmlDoc.htmlDoc_HelpCodeSize)
+                        ReDim Preserve cpCore.htmlDoc.htmlDoc_HelpCaptions(cpCore.htmlDoc.htmlDoc_HelpCodeSize)
                     End If
-                    cpCore.pageManager_HelpCodes(cpCore.pageManager_HelpCodeCount) = LocalCode
-                    cpCore.pageManager_HelpCaptions(cpCore.pageManager_HelpCodeCount) = AddonName
-                    cpCore.pageManager_HelpCodeCount = cpCore.pageManager_HelpCodeCount + 1
+                    cpCore.htmlDoc.htmlDoc_HelpCodes(cpCore.htmlDoc.htmlDoc_HelpCodeCount) = LocalCode
+                    cpCore.htmlDoc.htmlDoc_HelpCaptions(cpCore.htmlDoc.htmlDoc_HelpCodeCount) = AddonName
+                    cpCore.htmlDoc.htmlDoc_HelpCodeCount = cpCore.htmlDoc.htmlDoc_HelpCodeCount + 1
                     'SiteStylesBubbleCache = "x"
                     '
-                    If cpCore.pageManager_HelpDialogCnt = 0 Then
+                    If cpCore.htmlDoc.htmlDoc_HelpDialogCnt = 0 Then
                         Call cpCore.main_AddOnLoadJavascript2("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
                     End If
-                    cpCore.pageManager_HelpDialogCnt = cpCore.pageManager_HelpDialogCnt + 1
+                    cpCore.htmlDoc.htmlDoc_HelpDialogCnt = cpCore.htmlDoc.htmlDoc_HelpDialogCnt + 1
                     getHTMLViewerBubble = "" _
                         & "&nbsp;<a href=""#"" tabindex=-1 target=""_blank""" & BubbleJS & " >" _
                         & GetIconSprite("", 0, "/ccLib/images/toolhtml.png", 22, 22, "View the source HTML produced by this Add-on", "View the source HTML produced by this Add-on", "", True, "") _
@@ -3909,7 +3909,7 @@ ErrorTrap:
                                                                             If FieldValue = "" Then
                                                                                 Copy = cpCore.html_GetFormInputFile(FieldName)
                                                                             Else
-                                                                                NonEncodedLink = cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, FieldValue)
+                                                                                NonEncodedLink = cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, FieldValue)
                                                                                 EncodedLink = EncodeURL(NonEncodedLink)
                                                                                 Dim FieldValuefilename As String = ""
                                                                                 Dim FieldValuePath As String = ""
@@ -4157,7 +4157,7 @@ ErrorTrap:
                                                                         ElseIf genericController.encodeText(CellData) = "" Then
                                                                             Copy = Copy & (ColumnStart & "[empty]" & ColumnEnd)
                                                                         Else
-                                                                            Copy = Copy & (ColumnStart & cpCore.html.html_EncodeHTML(genericController.encodeText(CellData)) & ColumnEnd)
+                                                                            Copy = Copy & (ColumnStart & cpCore.htmlDoc.html_EncodeHTML(genericController.encodeText(CellData)) & ColumnEnd)
                                                                         End If
                                                                     Next
                                                                     Copy = Copy & (RowEnd)
@@ -4606,7 +4606,7 @@ ErrorTrap:
                 '
                 JSFilename = cpCore.db.cs_getText(CS, "jsfilename")
                 If JSFilename <> "" Then
-                    JSFilename = cpCore.webServerIO.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
+                    JSFilename = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
                     Call cpCore.main_AddHeadScriptLink(JSFilename, SourceComment)
                 End If
                 Copy = cpCore.db.cs_getText(CS, "stylesfilename")
@@ -4614,7 +4614,7 @@ ErrorTrap:
                     If genericController.vbInstr(1, Copy, "://") <> 0 Then
                     ElseIf Left(Copy, 1) = "/" Then
                     Else
-                        Copy = cpCore.webServerIO.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, Copy)
+                        Copy = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, Copy)
                     End If
                     Call cpCore.main_AddStylesheetLink2(Copy, SourceComment)
                 End If

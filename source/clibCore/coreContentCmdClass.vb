@@ -301,7 +301,7 @@ Namespace Contensive.Core
                 ' accumulator gets the result of each cmd, then is passed to the next command to filter
                 '
                 Dim CmdAccumulator As String
-                Dim htmlTools As Controllers.htmlToolsController
+                Dim htmlDoc As Controllers.htmlDocController
                 Dim importHead As String
                 Dim ArgName As String
                 Dim ArgInstanceId As String
@@ -325,7 +325,7 @@ Namespace Contensive.Core
                 Dim trimming As Boolean
                 Dim addonStatusOK As Boolean
                 '
-                htmlTools = New Controllers.htmlToolsController(cpCore)
+                htmlDoc = New Controllers.htmlDocController(cpCore)
                 '
                 cmdSrc = Trim(cmdSrc)
                 whiteChrs = vbCr & vbLf & vbTab & " "
@@ -676,12 +676,12 @@ Namespace Contensive.Core
                                 If ArgName <> "" Then
                                     CmdAccumulator = cpCore.appRootFiles.readFile(ArgName)
                                     If CmdAccumulator <> "" Then
-                                        importHead = Controllers.htmlToolsController.getTagInnerHTML(CmdAccumulator, "head", False)
+                                        importHead = Controllers.htmlDocController.getTagInnerHTML(CmdAccumulator, "head", False)
                                         If importHead <> "" Then
                                             ' try this, but it may not be implemented yet
                                             Call cpCore.html_addHeadTags(importHead)
                                         End If
-                                        CmdAccumulator = Controllers.htmlToolsController.getTagInnerHTML(CmdAccumulator, "body", False)
+                                        CmdAccumulator = Controllers.htmlDocController.getTagInnerHTML(CmdAccumulator, "body", False)
                                     End If
                                 End If
                             Case "user"

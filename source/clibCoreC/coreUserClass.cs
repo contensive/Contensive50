@@ -254,7 +254,7 @@
 //                        else {
 //                            if (isAuthenticated())
 //                            {
-//                                if (!cpCore.pageManager_printVersion)
+//                                if (!cpCore.htmldoc.pageManager_printVersion)
 //                                {
 //                                    if ((cpCore.visitProperty.getBoolean("AllowEditing") | cpCore.visitProperty.getBoolean("AllowAdvancedEditor")))
 //                                    {
@@ -298,7 +298,7 @@
 //            bool returnResult = false;
 //            try
 //            {
-//                if ((!cpCore.pageManager_printVersion))
+//                if ((!cpCore.htmldoc.pageManager_printVersion))
 //                {
 //                    if (isAuthenticatedContentManager(genericController.encodeText(ContentName)))
 //                    {
@@ -325,7 +325,7 @@
 //            bool returnResult = false;
 //            try
 //            {
-//                if ((!cpCore.pageManager_printVersion))
+//                if ((!cpCore.htmldoc.pageManager_printVersion))
 //                {
 //                    if (isAuthenticatedContentManager(genericController.encodeText(ContentName)))
 //                    {
@@ -1339,10 +1339,10 @@
 //                    lastVisit = cpCore.main_PageStartTime;
 //                    //cpCore.main_VisitMemberID = id
 //                    cpCore.visit.visit_loginAttempts = 0;
-//                    cpCore.visitor_memberID = id;
+//                    cpCore.visitor.memberID = id;
 //                    cpCore.visit.visit_excludeFromAnalytics = cpCore.visit.visit_excludeFromAnalytics | cpCore.visit.visit_isBot | excludeFromAnalytics | isAdmin | isDeveloper;
 //                    cpCore.visit.visit_save();
-//                    cpCore.visitor_save();
+//                    cpCore.visitor.save();
 //                    saveMemberBase();
 //                    returnREsult = true;
 //                }
@@ -1407,10 +1407,10 @@
 //                    cpCore.db.cs_Close(ref CSMember);
 //                    //
 //                    //cpCore.main_VisitMemberID = id
-//                    cpCore.visitor_memberID = id;
+//                    cpCore.visitor.memberID = id;
 //                    cpCore.visit.visit_isAuthenticated = false;
 //                    cpCore.visit.visit_save();
-//                    cpCore.visitor_save();
+//                    cpCore.visitor.save();
 //                    //
 //                    isAuthenticatedAdmin_cache_isLoaded = false;
 //                    property_user_isMember_isLoaded = false;

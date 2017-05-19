@@ -183,21 +183,9 @@ Namespace Contensive.Core
         '
         Public Overrides ReadOnly Property DomainPrimary() As String 'Inherits BaseClasses.CPSiteBaseClass.DomainPrimary
             Get
-                Dim DomainList As String
-                Dim Domains() As String
-                '
                 DomainPrimary = ""
-                'CP.File.AppendVirtual("cpDebug.log", "test 1")
-                If False Then
-                    'CP.File.AppendVirtual("cpDebug.log", "test 2")
-                    DomainList = cpCore.app_domainList
-                    If DomainList <> "" Then
-                        Domains = DomainList.Split(",")
-                        DomainPrimary = Domains(0)
-                    End If
-                Else
-                    'CP.File.AppendVirtual("cpDebug.log", "test 3")
-                    DomainPrimary = cpCore.domains_ServerDomainPrimary
+                If cpCore.serverConfig.appConfig.domainList.Count > 0 Then
+                    DomainPrimary = cpCore.serverConfig.appConfig.domainList(0)
                 End If
                 Return DomainPrimary
             End Get
@@ -210,7 +198,7 @@ Namespace Contensive.Core
                 If False Then
                     Return DomainPrimary
                 Else
-                    Return cpCore.webServerIO.webServerIO_requestDomain
+                    Return cpCore.webServer.webServerIO_requestDomain
                 End If
             End Get
         End Property

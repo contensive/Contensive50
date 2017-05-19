@@ -23,7 +23,7 @@ Namespace Contensive.Core
         Private cpCore As Contensive.Core.coreClass
         Private cp As CPClass
         Private accum As String
-        Private htmlTools As Controllers.htmlToolsController
+        Private htmlDoc As Controllers.htmlDocController
         Protected disposed As Boolean = False
         '
         ' Constructor - Initialize the Main and Csv objects
@@ -35,7 +35,7 @@ Namespace Contensive.Core
                 cp = cpParent
                 cpCore = cp.core
                 Try
-                    htmlTools = New Controllers.htmlToolsController(cpCore)
+                    htmlDoc = New Controllers.htmlDocController(cpCore)
                 Catch ex As Exception
                     cp.core.handleExceptionAndRethrow(ex, "Error creating object Controllers.htmlToolsController during cp.block constructor.")
                 End Try
@@ -52,7 +52,7 @@ Namespace Contensive.Core
                     '
                     ' dispose managed objects, dereference local object pointers 
                     '
-                    htmlTools = Nothing
+                    htmlDoc = Nothing
                     cp = Nothing
                     cpCore = Nothing
                 End If
@@ -134,7 +134,7 @@ Namespace Contensive.Core
             Try
                 Dim a As String = accum
                 If findSelector <> "" Then
-                    s = htmlTools.getInnerHTML(cpCore, a, findSelector)
+                    s = htmlDoc.getInnerHTML(cpCore, a, findSelector)
                 End If
             Catch ex As Exception
                 cp.core.handleExceptionAndRethrow(ex, "Unexpected Error in block.GetInner")
@@ -149,7 +149,7 @@ Namespace Contensive.Core
             Try
                 Dim a As String = accum
                 If findSelector <> "" Then
-                    s = htmlTools.getOuterHTML(cpCore, a, findSelector)
+                    s = htmlDoc.getOuterHTML(cpCore, a, findSelector)
                 End If
             Catch ex As Exception
                 cp.core.handleExceptionAndRethrow(ex, "Unexpected Error in block.GetOuter")
@@ -165,11 +165,11 @@ Namespace Contensive.Core
                 If wwwFileName <> "" Then
                     accum = cp.wwwFiles.read(wwwFileName)
                     If accum <> "" Then
-                        headTags = Controllers.htmlToolsController.getTagInnerHTML(accum, "head", False)
+                        headTags = Controllers.htmlDocController.getTagInnerHTML(accum, "head", False)
                         If headTags <> "" Then
                             Call cpCore.html_addHeadTags(headTags)
                         End If
-                        accum = Controllers.htmlToolsController.getTagInnerHTML(accum, "body", False)
+                        accum = Controllers.htmlDocController.getTagInnerHTML(accum, "body", False)
                     End If
                 End If
             Catch ex As Exception
@@ -240,7 +240,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub SetInner(ByVal findSelector As String, ByVal htmlString As String)
             Try
-                accum = htmlTools.insertInnerHTML(cpCore, accum, findSelector, htmlString)
+                accum = htmlDoc.insertInnerHTML(cpCore, accum, findSelector, htmlString)
             Catch ex As Exception
                 cp.core.handleExceptionAndRethrow(ex, "Unexpected Error in block.SetInner")
             End Try
@@ -250,7 +250,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub SetOuter(ByVal findSelector As String, ByVal htmlString As String)
             Try
-                accum = htmlTools.insertOuterHTML(cpCore, accum, findSelector, htmlString)
+                accum = htmlDoc.insertOuterHTML(cpCore, accum, findSelector, htmlString)
             Catch ex As Exception
                 cp.core.handleExceptionAndRethrow(ex, "Unexpected Error in block.SetOuter")
             End Try

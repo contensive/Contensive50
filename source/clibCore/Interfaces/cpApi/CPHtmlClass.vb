@@ -207,7 +207,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function SelectContent(ByVal HtmlName As String, ByVal HtmlValue As String, ByVal ContentName As String, Optional ByVal SQLCriteria As String = "", Optional ByVal NoneCaption As String = "", Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Inherits BaseClasses.CPHtmlBaseClass.SelectContent
             If True Then
-                SelectContent = cpCore.main_GetFormInputSelect(HtmlName, genericController.EncodeInteger(HtmlValue), ContentName, SQLCriteria, NoneCaption)
+                SelectContent = cpCore.htmlDoc.main_GetFormInputSelect(HtmlName, genericController.EncodeInteger(HtmlValue), ContentName, SQLCriteria, NoneCaption)
                 If HtmlClass <> "" Then
                     SelectContent = SelectContent.Replace("<select ", "<select class=""" & HtmlClass & """ ")
                 End If
@@ -222,7 +222,7 @@ Namespace Contensive.Core
 
         Public Overrides Function SelectList(ByVal HtmlName As String, ByVal HtmlValue As String, ByVal OptionList As String, Optional ByVal NoneCaption As String = "", Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Inherits BaseClasses.CPHtmlBaseClass.SelectList
             If True Then
-                SelectList = cpCore.main_GetFormInputSelectList(HtmlName, HtmlValue, OptionList, NoneCaption, HtmlId)
+                SelectList = cpCore.htmlDoc.main_GetFormInputSelectList(HtmlName, HtmlValue, OptionList, NoneCaption, HtmlId)
                 If HtmlClass <> "" Then
                     SelectList = SelectList.Replace("<select ", "<select class=""" & HtmlClass & """ ")
                 End If
@@ -345,7 +345,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function SelectUser(ByVal HtmlName As String, ByVal HtmlValue As Integer, ByVal GroupId As Integer, Optional ByVal NoneCaption As String = "", Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Inherits BaseClasses.CPHtmlBaseClass.SelectUser
             If True Then
-                Return cpCore.html_GetFormInputMemberSelect(HtmlName, HtmlValue, GroupId, NoneCaption, HtmlId)
+                Return cpCore.htmldoc.html_GetFormInputMemberSelect(HtmlName, HtmlValue, GroupId, NoneCaption, HtmlId)
             Else
                 Return ""
             End If

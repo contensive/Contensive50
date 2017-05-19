@@ -21,7 +21,7 @@ Namespace Contensive.Core.Models.Entity
     '   invalidateFIELDNAMEcache() - method to invalide the model cache. One per cache
     '
     '	1) set the primary content name in const cnPrimaryContent. avoid constants Like cnAddons used outside model
-    '	2) find-And-replace "_blankModel" with the name for this model
+    '	2) find-And-replace "visitorModel" with the name for this model
     '	3) when adding model fields, add in three places: the Public Property, the saveObject(), the loadObject()
     '	4) when adding create() methods to support other fields/combinations of fields, 
     '       - add a secondary cache For that new create method argument in loadObjec()
@@ -57,16 +57,21 @@ Namespace Contensive.Core.Models.Entity
     '       - when building the model, if another model is added, that model returns its cachenames in the cacheNameList to be added as dependentObjects
     '
     '
-    Public Class _blankModel
+    Public Class visitorModel
         '
         '-- const
-        Public Const primaryContentName As String = "" '<------ set content name
-        Private Const primaryContentTableName As String = "" '<------ set to tablename for the primary content (used for cache names)
+        Public Const primaryContentName As String = "visitors" '<------ set content name
+        Private Const primaryContentTableName As String = "ccvisitors" '<------ set to tablename for the primary content (used for cache names)
         '
         ' -- instance properties
         Public id As Integer
         Public name As String
         Public guid As String
+        '
+        Public memberID As Integer = 0              ' the last member account this visitor used (memberid=0 means untracked guest)
+        Public orderID As Integer = 0               ' the current shopping cart (non-complete order)
+        Public newVisitor As Boolean = False               ' stored in visit record - Is this the first visit for this visitor
+        Public forceBrowserMobile As Integer = 0           ' 0 = not set -- use Browser detect each time, 1 = Force Mobile, 2 = Force not Mobile
         '
         ' -- publics not exposed to the UI (test/internal data)
         <JsonIgnore> Public createKey As Integer
@@ -86,12 +91,12 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="cp"></param>
         ''' <param name="recordId">The id of the record to be read into the new object</param>
         ''' <param name="cacheNameList">Any cachenames effected by this record will be added to this list. If the method consumer creates a cache object, add these cachenames to its dependent cachename list.</param>
-        Public Shared Function create(cpCore As coreClass, recordId As Integer, ByRef cacheNameList As List(Of String)) As _blankModel
-            Dim result As _blankModel = Nothing
+        Public Shared Function create(cpCore As coreClass, recordId As Integer, ByRef cacheNameList As List(Of String)) As visitorModel
+            Dim result As visitorModel = Nothing
             Try
                 If recordId > 0 Then
-                    Dim cacheName As String = GetType(_blankModel).FullName & getCacheName("id", recordId.ToString())
-                    result = cpCore.cache.getObject(Of _blankModel)(cacheName)
+                    Dim cacheName As String = GetType(visitorModel).FullName & getCacheName("id", recordId.ToString())
+                    result = cpCore.cache.getObject(Of visitorModel)(cacheName)
                     If (result Is Nothing) Then
                         result = loadObject(cpCore, "id=" & recordId.ToString(), cacheNameList)
                     End If
@@ -109,12 +114,12 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <param name="recordGuid"></param>
-        Public Shared Function create(cpCore As coreClass, recordGuid As String, ByRef cacheNameList As List(Of String)) As _blankModel
-            Dim result As _blankModel = Nothing
+        Public Shared Function create(cpCore As coreClass, recordGuid As String, ByRef cacheNameList As List(Of String)) As visitorModel
+            Dim result As visitorModel = Nothing
             Try
                 If Not String.IsNullOrEmpty(recordGuid) Then
-                    Dim cacheName As String = GetType(_blankModel).FullName & getCacheName("ccguid", recordGuid)
-                    result = cpCore.cache.getObject(Of _blankModel)(cacheName)
+                    Dim cacheName As String = GetType(visitorModel).FullName & getCacheName("ccguid", recordGuid)
+                    result = cpCore.cache.getObject(Of visitorModel)(cacheName)
                     If (result Is Nothing) Then
                         result = loadObject(cpCore, "ccGuid=" & cpCore.db.encodeSQLText(recordGuid), cacheNameList)
                     End If
@@ -132,12 +137,12 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <param name="sqlCriteria"></param>
-        Private Shared Function loadObject(cpCore As coreClass, sqlCriteria As String, ByRef cacheNameList As List(Of String)) As _blankModel
-            Dim result As _blankModel = Nothing
+        Private Shared Function loadObject(cpCore As coreClass, sqlCriteria As String, ByRef cacheNameList As List(Of String)) As visitorModel
+            Dim result As visitorModel = Nothing
             Try
                 Dim cs As New csController(cpCore)
                 If cs.open(primaryContentName, sqlCriteria) Then
-                    result = New _blankModel
+                    result = New visitorModel
                     With result
                         '
                         ' -- populate result model
@@ -248,15 +253,15 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="cp"></param>
         ''' <param name="someCriteria"></param>
         ''' <returns></returns>
-        Public Shared Function getObjectList(cpCore As coreClass, someCriteria As Integer) As List(Of _blankModel)
-            Dim result As New List(Of _blankModel)
+        Public Shared Function getObjectList(cpCore As coreClass, someCriteria As Integer) As List(Of visitorModel)
+            Dim result As New List(Of visitorModel)
             Try
                 Dim cs As New csController(cpCore)
                 Dim ignoreCacheNames As New List(Of String)
                 If (cs.open(primaryContentName, "(someCriteria=" & someCriteria & ")", "name", True, "id")) Then
-                    Dim instance As _blankModel
+                    Dim instance As visitorModel
                     Do
-                        instance = _blankModel.create(cpCore, cs.getInteger("id"), ignoreCacheNames)
+                        instance = visitorModel.create(cpCore, cs.getInteger("id"), ignoreCacheNames)
                         If (instance IsNot Nothing) Then
                             result.Add(instance)
                         End If
@@ -305,7 +310,50 @@ Namespace Contensive.Core.Models.Entity
         ''' <returns></returns>
         Private Shared Function getCacheName(fieldName As String, fieldValue As String) As String
             Return (primaryContentTableName & "." & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
-            'Return (GetType(_blankModel).FullName & "." & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
+            'Return (GetType(visitorModel).FullName & "." & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
         End Function
+        '
+        ' LEGACY CODE =============================================================================
+        '   Save Visitor
+        '
+        '   Saves changes to the visitor record back to the database. Should be called
+        '   before exit of anypage if anything here changes
+        '=============================================================================
+        '
+        Public Sub save(cpcore As coreClass)
+            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SaveVisitor")
+            '
+            'If Not (true) Then Exit Sub
+            '
+            Dim SQL As String
+            Dim MethodName As String
+            '
+            MethodName = "main_SaveVisitor"
+            '
+            If cpcore.visit.visit_initialized Then
+                If True Then
+                    SQL = "UPDATE ccVisitors SET " _
+                        & " Name = " & cpcore.db.encodeSQLText(name) _
+                        & ",MemberID = " & cpcore.db.encodeSQLNumber(memberID) _
+                        & ",OrderID = " & cpcore.db.encodeSQLNumber(orderID) _
+                        & ",ForceBrowserMobile = " & cpcore.db.encodeSQLNumber(forceBrowserMobile) _
+                        & " WHERE ID=" & id & ";"
+                Else
+                    SQL = "UPDATE ccVisitors SET " _
+                        & " Name = " & cpcore.db.encodeSQLText(name) _
+                        & ",MemberID = " & cpcore.db.encodeSQLNumber(memberID) _
+                        & ",OrderID = " & cpcore.db.encodeSQLNumber(orderID) _
+                        & " WHERE ID=" & id & ";"
+                End If
+                Call cpcore.db.executeSql(SQL)
+            End If
+            Exit Sub
+            '
+            ' ----- Error Trap
+            '
+ErrorTrap:
+            Call cpcore.handleLegacyError18(MethodName)
+            '
+        End Sub
     End Class
 End Namespace

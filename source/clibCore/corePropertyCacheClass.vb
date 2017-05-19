@@ -81,7 +81,7 @@ Namespace Contensive.Core
                 Case PropertyTypeVisit
                     setProperty(propertyName, PropertyValue, cpCore.visit.visit_Id)
                 Case PropertyTypeVisitor
-                    setProperty(propertyName, PropertyValue, cpCore.visitor_id)
+                    setProperty(propertyName, PropertyValue, cpCore.visitor.id)
                 Case PropertyTypeMember
                     setProperty(propertyName, PropertyValue, cpCore.user.id)
             End Select
@@ -175,7 +175,7 @@ ErrorTrap:
                 Case PropertyTypeVisit
                     Return getDate(propertyName, defaultValue, cpCore.visit.visit_Id)
                 Case PropertyTypeVisitor
-                    Return getDate(propertyName, defaultValue, cpCore.visitor_id)
+                    Return getDate(propertyName, defaultValue, cpCore.visitor.id)
                 Case PropertyTypeMember
                     Return getDate(propertyName, defaultValue, cpCore.user.id)
             End Select
@@ -219,7 +219,7 @@ ErrorTrap:
                 Case PropertyTypeVisit
                     Return getNumber(propertyName, defaultValue, cpCore.visit.visit_Id)
                 Case PropertyTypeVisitor
-                    Return getNumber(propertyName, defaultValue, cpCore.visitor_id)
+                    Return getNumber(propertyName, defaultValue, cpCore.visitor.id)
                 Case PropertyTypeMember
                     Return getNumber(propertyName, defaultValue, cpCore.user.id)
             End Select
@@ -263,7 +263,7 @@ ErrorTrap:
                 Case PropertyTypeVisit
                     Return getBoolean(propertyName, defaultValue, cpCore.visit.visit_Id)
                 Case PropertyTypeVisitor
-                    Return getBoolean(propertyName, defaultValue, cpCore.visitor_id)
+                    Return getBoolean(propertyName, defaultValue, cpCore.visitor.id)
                 Case PropertyTypeMember
                     Return getBoolean(propertyName, defaultValue, cpCore.user.id)
             End Select
@@ -307,7 +307,7 @@ ErrorTrap:
                 Case PropertyTypeVisit
                     Return getInteger(propertyName, defaultValue, cpCore.visit.visit_Id)
                 Case PropertyTypeVisitor
-                    Return getInteger(propertyName, defaultValue, cpCore.visitor_id)
+                    Return getInteger(propertyName, defaultValue, cpCore.visitor.id)
                 Case PropertyTypeMember
                     Return getInteger(propertyName, defaultValue, cpCore.user.id)
             End Select
@@ -351,7 +351,7 @@ ErrorTrap:
                 Case PropertyTypeVisit
                     Return getText(propertyName, defaultValue, cpCore.visit.visit_Id)
                 Case PropertyTypeVisitor
-                    Return getText(propertyName, defaultValue, cpCore.visitor_id)
+                    Return getText(propertyName, defaultValue, cpCore.visitor.id)
                 Case PropertyTypeMember
                     Return getText(propertyName, defaultValue, cpCore.user.id)
             End Select

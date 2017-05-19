@@ -121,7 +121,7 @@ Namespace Contensive.Core
             Dim returnValue As String = ""
             '
             If (Source <> "") Then
-                returnValue = CP.core.html.html_EncodeHTML(Source)
+                returnValue = CP.core.htmlDoc.html_EncodeHTML(Source)
             End If
             Return returnValue
         End Function

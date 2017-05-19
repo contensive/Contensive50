@@ -286,7 +286,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub addRefreshQueryString(ByVal Name As String, ByVal Value As String)
             If True Then
-                Call cpCore.webServerIO.webServerIO_addRefreshQueryString(Name, Value)
+                Call cpCore.htmlDoc.webServerIO_addRefreshQueryString(Name, Value)
             End If
         End Sub
         '
@@ -310,7 +310,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub addBodyEnd(ByVal NewCode As String)
             If True Then
-                cpCore.main_ClosePageHTML = cpCore.main_ClosePageHTML & NewCode
+                cpCore.htmlDoc.htmlForEndOfBody = cpCore.htmlDoc.htmlForEndOfBody & NewCode
             End If
         End Sub
         '
@@ -319,14 +319,14 @@ Namespace Contensive.Core
         Public Overrides Property body() As String
             Get
                 If True Then
-                    body = cpCore.pageManager_FilterInput
+                    body = cpCore.htmlDoc.html_DocBodyFilter
                 Else
                     Return ""
                 End If
             End Get
             Set(ByVal value As String)
                 If True Then
-                    cpCore.pageManager_FilterInput = value
+                    cpCore.htmlDoc.html_DocBodyFilter = value
                 End If
             End Set
         End Property

@@ -120,12 +120,12 @@ Namespace Contensive.Core
                             '
                             ' This tab is linked to a page
                             '
-                            TabLink = cpCore.html.html_EncodeHTML(Tabs(TabPtr).Link)
+                            TabLink = cpCore.htmlDoc.html_EncodeHTML(Tabs(TabPtr).Link)
                         Else
                             '
                             ' This tab has a visible body
                             '
-                            TabLink = cpCore.html.html_EncodeHTML(Tabs(TabPtr).Link)
+                            TabLink = cpCore.htmlDoc.html_EncodeHTML(Tabs(TabPtr).Link)
                             If Not FirstLiveBodyShown Then
                                 FirstLiveBodyShown = True
                                 TabBody = TabBody & "<div style=""visibility: visible; position: absolute; left: 0px;"" class=""" & Tabs(TabPtr).StylePrefix & "Body"" id=""" & TabID & """></div>"

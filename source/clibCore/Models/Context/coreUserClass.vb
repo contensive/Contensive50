@@ -189,7 +189,7 @@ Namespace Contensive.Core
                             Call cpCore.debug_testPoint("...is in main_IsNotEditingContentList")
                         Else
                             If isAuthenticated() Then
-                                If Not cpCore.pageManager_printVersion Then
+                                If Not cpCore.htmlDoc.pageManager_printVersion Then
                                     If (cpCore.visitProperty.getBoolean("AllowEditing") Or cpCore.visitProperty.getBoolean("AllowAdvancedEditor")) Then
                                         If localContentNameOrId <> "" Then
                                             If genericController.vbIsNumeric(localContentNameOrId) Then
@@ -223,7 +223,7 @@ Namespace Contensive.Core
         Public Function isQuickEditing(ByVal ContentName As String) As Boolean
             Dim returnResult As Boolean = False
             Try
-                If (Not cpCore.pageManager_printVersion) Then
+                If (Not cpCore.htmlDoc.pageManager_printVersion) Then
                     If isAuthenticatedContentManager(genericController.encodeText(ContentName)) Then
                         returnResult = cpCore.visitProperty.getBoolean("AllowQuickEditor")
                     End If
@@ -244,7 +244,7 @@ Namespace Contensive.Core
         Public Function isAdvancedEditing(ByVal ContentName As String) As Boolean
             Dim returnResult As Boolean = False
             Try
-                If (Not cpCore.pageManager_printVersion) Then
+                If (Not cpCore.htmlDoc.pageManager_printVersion) Then
                     If isAuthenticatedContentManager(genericController.encodeText(ContentName)) Then
                         returnResult = cpCore.visitProperty.getBoolean("AllowAdvancedEditor")
                     End If
@@ -387,7 +387,7 @@ Namespace Contensive.Core
                         QS = genericController.ModifyQueryString(QS, "method", "")
                         QS = genericController.ModifyQueryString(QS, "RequestBinary", "")
                         '
-                        Call cpCore.webServerIO.webServerIO_Redirect2("?" & QS, "Login form success", False)
+                        Call cpCore.webServer.webServerIO_Redirect2("?" & QS, "Login form success", False)
                     End If
                 End If
                 If loginAddonID = 0 Then
@@ -417,7 +417,7 @@ Namespace Contensive.Core
                     & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"">" _
                     & cr2 & "<tr>" _
                     & cr3 & "<td style=""text-align:right;vertical-align:middle;width:30%;padding:4px"" align=""right"" width=""30%"">" & SpanClassAdminNormal & "Email</span></td>" _
-                    & cr3 & "<td style=""text-align:left;vertical-align:middle;width:70%;padding:4px"" align=""left""  width=""70%""><input NAME=""" & "email"" VALUE=""" & cpCore.html.html_EncodeHTML(loginForm_Email) & """ SIZE=""20"" MAXLENGTH=""50""></td>" _
+                    & cr3 & "<td style=""text-align:left;vertical-align:middle;width:70%;padding:4px"" align=""left""  width=""70%""><input NAME=""" & "email"" VALUE=""" & cpCore.htmlDoc.html_EncodeHTML(loginForm_Email) & """ SIZE=""20"" MAXLENGTH=""50""></td>" _
                     & cr2 & "</tr>" _
                     & cr2 & "<tr>" _
                     & cr3 & "<td colspan=""2"">&nbsp;</td>" _
@@ -620,7 +620,7 @@ Namespace Contensive.Core
                         '
                         styleFilename = cpCore.db.cs_getText(CS, "StyleFilename")
                         If styleFilename <> "" Then
-                            Call cpCore.main_AddStylesheetLink(cpCore.webServerIO.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, styleFilename))
+                            Call cpCore.main_AddStylesheetLink(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, styleFilename))
                         End If
                         excludeFromAnalytics = cpCore.db.cs_getBoolean(CS, "ExcludeFromAnalytics")
                         returnRecordId = recordId
@@ -860,15 +860,15 @@ Namespace Contensive.Core
                         End If
                         If cpCore.db.cs_ok(CS) Then
                             'hint = "160"
-                            FromAddress = cpCore.siteProperties.getText("EmailFromAddress", "info@" & cpCore.webServerIO.webServerIO_requestDomain)
-                            subject = "Password Request at " & cpCore.webServerIO.webServerIO_requestDomain
+                            FromAddress = cpCore.siteProperties.getText("EmailFromAddress", "info@" & cpCore.webServer.webServerIO_requestDomain)
+                            subject = "Password Request at " & cpCore.webServer.webServerIO_requestDomain
                             Message = ""
                             Do While cpCore.db.cs_ok(CS)
                                 'hint = "170"
                                 updateUser = False
                                 If Message = "" Then
                                     'hint = "180"
-                                    Message = "This email was sent in reply to a request at " & cpCore.webServerIO.webServerIO_requestDomain & " for the username and password associated with this email address. "
+                                    Message = "This email was sent in reply to a request at " & cpCore.webServer.webServerIO_requestDomain & " for the username and password associated with this email address. "
                                     Message = Message & "If this request was made by you, please return to the login screen and use the following:" & vbCrLf
                                     Message = Message & vbCrLf
                                 Else
@@ -1158,7 +1158,7 @@ Namespace Contensive.Core
                     language = (cpCore.db.cs_getText(CS, "LanguageName"))
                     styleFilename = cpCore.db.cs_getText(CS, "StyleFilename")
                     If styleFilename <> "" Then
-                        Call cpCore.main_AddStylesheetLink(cpCore.webServerIO.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, styleFilename))
+                        Call cpCore.main_AddStylesheetLink(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, styleFilename))
                     End If
                     excludeFromAnalytics = cpCore.db.cs_getBoolean(CS, "ExcludeFromAnalytics")
                     '
@@ -1171,10 +1171,10 @@ Namespace Contensive.Core
                     lastVisit = cpCore.app_startTime
                     'cpCore.main_VisitMemberID = id
                     cpCore.visit.visit_loginAttempts = 0
-                    cpCore.visitor_memberID = id
+                    cpCore.visitor.memberID = id
                     cpCore.visit.visit_excludeFromAnalytics = cpCore.visit.visit_excludeFromAnalytics Or cpCore.visit.visit_isBot Or excludeFromAnalytics Or isAdmin Or isDeveloper
                     Call cpCore.visit.visit_save()
-                    Call cpCore.visitor_save()
+                    Call cpCore.visitor.save(cpCore)
                     Call saveMemberBase()
                     returnREsult = True
                 End If
@@ -1232,10 +1232,10 @@ Namespace Contensive.Core
                     Call cpCore.db.cs_Close(CSMember)
                     '
                     'cpCore.main_VisitMemberID = id
-                    cpCore.visitor_memberID = id
+                    cpCore.visitor.memberID = id
                     cpCore.visit.visit_isAuthenticated = False
                     Call cpCore.visit.visit_save()
-                    Call cpCore.visitor_save()
+                    Call cpCore.visitor.save(cpCore)
                     '
                     isAuthenticatedAdmin_cache_isLoaded = False
                     property_user_isMember_isLoaded = False
@@ -1471,14 +1471,14 @@ Namespace Contensive.Core
                 '
                 Call cpCore.main_SetMetaContent(0, 0)
                 Call cpCore.main_AddPagetitle2("Login", "loginPage")
-                head = cpCore.webServerIO.webServerIO_GetHTMLInternalHead(False)
+                head = cpCore.webServer.webServerIO_GetHTMLInternalHead(False)
                 If cpCore.pageManager_TemplateBodyTag <> "" Then
                     bodyTag = cpCore.pageManager_TemplateBodyTag
                 Else
                     bodyTag = TemplateDefaultBodyTag
                 End If
                 'Call AppendLog("call main_getEndOfBody, from main_getLoginPage2 ")
-                returnREsult = cpCore.main_assembleHtmlDoc(cpCore.main_docType, head, bodyTag, Body & cpCore.html_GetEndOfBody(False, False, False, False))
+                returnREsult = cpCore.main_assembleHtmlDoc(cpCore.main_docType, head, bodyTag, Body & cpCore.htmlDoc.html_GetEndOfBody(False, False, False, False))
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -1514,7 +1514,7 @@ Namespace Contensive.Core
                     '
                     ' ----- When page loads, set focus on login username
                     '
-                    Call cpCore.webServerIO.webServerIO_addRefreshQueryString("method", "")
+                    Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("method", "")
                     loginForm = ""
                     Call cpCore.main_AddOnLoadJavascript2("document.getElementById('LoginUsernameInput').focus()", "login")
                     '
@@ -1526,7 +1526,7 @@ Namespace Contensive.Core
                         usernameMsg = "<b>To login, enter your username and password.</b></p>"
                     End If
                     '
-                    QueryString = cpCore.webServerIO.requestQueryString
+                    QueryString = cpCore.webServer.requestQueryString
                     QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
                     QueryString = genericController.ModifyQueryString(QueryString, "requestbinary", "", False)
                     '
@@ -1541,7 +1541,7 @@ Namespace Contensive.Core
                     loginForm = loginForm _
                     & cr & "<tr>" _
                     & cr2 & "<td style=""text-align:right;vertical-align:middle;width:30%;padding:4px"" align=""right"" width=""30%"">" & SpanClassAdminNormal & Caption & "&nbsp;</span></td>" _
-                    & cr2 & "<td style=""text-align:left;vertical-align:middle;width:70%;padding:4px"" align=""left""  width=""70%""><input ID=""LoginUsernameInput"" NAME=""" & "username"" VALUE=""" & cpCore.html.html_EncodeHTML(loginForm_Username) & """ SIZE=""20"" MAXLENGTH=""50"" ></td>" _
+                    & cr2 & "<td style=""text-align:left;vertical-align:middle;width:70%;padding:4px"" align=""left""  width=""70%""><input ID=""LoginUsernameInput"" NAME=""" & "username"" VALUE=""" & cpCore.htmlDoc.html_EncodeHTML(loginForm_Username) & """ SIZE=""20"" MAXLENGTH=""50"" ></td>" _
                     & cr & "</tr>"
                     '
                     ' ----- Password

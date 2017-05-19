@@ -135,7 +135,7 @@ Namespace Contensive.Core
                     '
                     ' ----- redirect back to the root
                     '
-                    Call cpCore.webServerIO.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "Addon Manager, Cancel Button Pressed", False)
+                    Call cpCore.webServer.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "Addon Manager, Cancel Button Pressed", False)
                 Else
                     If Not cpCore.user.isAuthenticatedAdmin Then
                         '
@@ -551,7 +551,7 @@ Namespace Contensive.Core
                         ' --------------------------------------------------------------------------------
                         '
                         If (InstalledCollectionIDList.Count > 0) And (Not cpCore.error_IsUserError) Then
-                            Call cpCore.webServerIO.webServerIO_Redirect2(cpCore.siteProperties.adminURL & "?helpcollectionid=" & InstalledCollectionIDList(0).ToString(), "Redirecting to help page after collection installation", False)
+                            Call cpCore.webServer.webServerIO_Redirect2(cpCore.siteProperties.adminURL & "?helpcollectionid=" & InstalledCollectionIDList(0).ToString(), "Redirecting to help page after collection installation", False)
                         End If
                         '
                         ' --------------------------------------------------------------------------------
@@ -956,7 +956,7 @@ ErrorTrap:
         '
         '
         Private Sub HandleClassAppendLog(ByVal MethodName As String, ByVal Context As String)
-            logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, Context, "dll", "AddonManClass", MethodName, 0, "", "", False, True, cpCore.webServerIO.webServerIO_ServerLink, "", "")
+            logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, Context, "dll", "AddonManClass", MethodName, 0, "", "", False, True, cpCore.webServer.webServerIO_ServerLink, "", "")
 
         End Sub
         '
@@ -966,7 +966,7 @@ ErrorTrap:
         '
         Private Sub HandleClassTrapError(ByVal MethodName As String, Optional ByVal Context As String = "context unknown")
             '
-            cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, Context, "dll", "AddonManClass", MethodName, Err.Number, Err.Source, Err.Description, True, False, cpCore.webServerIO.webServerIO_ServerLink)
+            cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, Context, "dll", "AddonManClass", MethodName, Err.Number, Err.Source, Err.Description, True, False, cpCore.webServer.webServerIO_ServerLink)
             '
         End Sub
         '

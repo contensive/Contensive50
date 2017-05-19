@@ -936,7 +936,7 @@ ErrorTrap:
                     If PagePointer <> 1 Then
                         WorkingQS = cpCore.web_RefreshQueryString
                         WorkingQS = genericController.ModifyQueryString(WorkingQS, "GotoPage", "1", True)
-                        GetReport2 = GetReport2 & "<a href=""" & cpCore.webServerIO.webServerIO_requestPage & "?" & WorkingQS & """>1</A>...&nbsp;"
+                        GetReport2 = GetReport2 & "<a href=""" & cpCore.webServer.webServerIO_requestPage & "?" & WorkingQS & """>1</A>...&nbsp;"
                     End If
                     WorkingQS = cpCore.web_RefreshQueryString
                     WorkingQS = genericController.ModifyQueryString(WorkingQS, RequestNamePageSize, CStr(ReportPageSize), True)
@@ -945,18 +945,18 @@ ErrorTrap:
                             GetReport2 = GetReport2 & PagePointer & "&nbsp;"
                         Else
                             WorkingQS = genericController.ModifyQueryString(WorkingQS, RequestNamePageNumber, CStr(PagePointer), True)
-                            GetReport2 = GetReport2 & "<a href=""" & cpCore.webServerIO.webServerIO_requestPage & "?" & WorkingQS & """>" & PagePointer & "</A>&nbsp;"
+                            GetReport2 = GetReport2 & "<a href=""" & cpCore.webServer.webServerIO_requestPage & "?" & WorkingQS & """>" & PagePointer & "</A>&nbsp;"
                         End If
                         PagePointer = PagePointer + 1
                         LinkCount = LinkCount + 1
                     Loop
                     If PagePointer < PageCount Then
                         WorkingQS = genericController.ModifyQueryString(WorkingQS, RequestNamePageNumber, CStr(PageCount), True)
-                        GetReport2 = GetReport2 & "...<a href=""" & cpCore.webServerIO.webServerIO_requestPage & "?" & WorkingQS & """>" & PageCount & "</A>&nbsp;"
+                        GetReport2 = GetReport2 & "...<a href=""" & cpCore.webServer.webServerIO_requestPage & "?" & WorkingQS & """>" & PageCount & "</A>&nbsp;"
                     End If
                     If ReportPageNumber < PageCount Then
                         WorkingQS = genericController.ModifyQueryString(WorkingQS, RequestNamePageNumber, CStr(ReportPageNumber + 1), True)
-                        GetReport2 = GetReport2 & "...<a href=""" & cpCore.webServerIO.webServerIO_requestPage & "?" & WorkingQS & """>next</A>&nbsp;"
+                        GetReport2 = GetReport2 & "...<a href=""" & cpCore.webServer.webServerIO_requestPage & "?" & WorkingQS & """>next</A>&nbsp;"
                     End If
                     GetReport2 = GetReport2 & "<br>&nbsp;"
                 End If

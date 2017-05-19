@@ -57,7 +57,7 @@ Namespace Contensive.Core
             End Get
             Set(ByVal value As String)
                 If True Then
-                    Call cpCore.webServerIO.webServerIO_setResponseContentType(value)
+                    Call cpCore.webServer.webServerIO_setResponseContentType(value)
                 End If
             End Set
         End Property
@@ -100,13 +100,13 @@ Namespace Contensive.Core
 
         Public Overrides Sub AddHeader(ByVal HeaderName As String, ByVal HeaderValue As String) 'Inherits BaseClasses.CPResponseBaseClass.AddHeader
             If True Then
-                Call cpCore.webServerIO.web_addResponseHeader(HeaderName, HeaderValue)
+                Call cpCore.webServer.web_addResponseHeader(HeaderName, HeaderValue)
             End If
         End Sub
 
         Public Overrides Sub Flush() 'Inherits BaseClasses.CPResponseBaseClass.Flush
             If True Then
-                Call cpCore.webServerIO.webServerIO_FlushStream()
+                Call cpCore.webServer.webServerIO_FlushStream()
             End If
         End Sub
         Public Overrides Sub Redirect(ByVal Link As String) 'Inherits BaseClasses.CPResponseBaseClass.Redirect
@@ -117,13 +117,13 @@ Namespace Contensive.Core
 
         Public Overrides Sub SetBuffer(ByVal BufferOn As Boolean) 'Inherits BaseClasses.CPResponseBaseClass.SetBuffer
             If True Then
-                Call cpCore.webServerIO.webServerIO_SetStreamBuffer(BufferOn)
+                Call cpCore.webServer.webServerIO_SetStreamBuffer(BufferOn)
             End If
         End Sub
 
         Public Overrides Sub SetStatus(ByVal status As String) 'Inherits BaseClasses.CPResponseBaseClass.SetStatus
             If True Then
-                Call cpCore.webServerIO.web_setResponseStatus(status)
+                Call cpCore.webServer.web_setResponseStatus(status)
             End If
         End Sub
 
@@ -135,19 +135,19 @@ Namespace Contensive.Core
 
         Public Overrides Sub SetType(ByVal ContentType As String) 'Inherits BaseClasses.CPResponseBaseClass.SetType
             If True Then
-                Call cpCore.webServerIO.webServerIO_setResponseContentType(ContentType)
+                Call cpCore.webServer.webServerIO_setResponseContentType(ContentType)
             End If
         End Sub
 
         Public Overrides Sub SetCookie(ByVal CookieName As String, ByVal CookieValue As String, Optional ByVal DateExpires As Date = #12:00:00 AM#, Optional ByVal Domain As String = "", Optional ByVal Path As String = "", Optional ByVal Secure As Boolean = False) 'Inherits BaseClasses.CPResponseBaseClass.SetCookie
             If True Then
-                Call cpCore.webServerIO.addResponseCookie(CookieName, CookieValue, DateExpires, Domain, Path, Secure)
+                Call cpCore.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, Domain, Path, Secure)
             End If
         End Sub
 
         Public Overrides Sub Write(ByVal message As String)
             If True Then
-                Call cpCore.webServerIO.writeAltBuffer(message)
+                Call cpCore.htmlDoc.writeAltBuffer(message)
             End If
         End Sub
         '
@@ -156,7 +156,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property isOpen() As Boolean
             Get
                 If True Then
-                    Return cpCore.webServerIO.docOpen
+                    Return cpCore.docOpen
                 Else
                     Return False
                 End If
