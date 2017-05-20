@@ -921,26 +921,26 @@ ErrorTrap:
                 '
                 ' ----- add window.print if this is the Printerversion
                 '
-                If cpCore.pageManager_printVersion Then
+                If pageManager_printVersion Then
                     autoPrintText = cpCore.docProperties.getText("AutoPrint")
                     If autoPrintText = "" Then
                         autoPrintText = cpCore.siteProperties.getText("AllowAutoPrintDialog", "1")
                     End If
                     If genericController.EncodeBoolean(autoPrintText) Then
-                        Call cpCore.main_AddOnLoadJavascript2("window.print(); window.close()", "Print Page")
+                        Call main_AddOnLoadJavascript2("window.print(); window.close()", "Print Page")
                     End If
                 End If
                 '
                 ' -- print what is needed
                 '
-                If (Not BlockNonContentExtras) And (Not cpCore.pageManager_printVersion) Then
+                If (Not BlockNonContentExtras) And (Not pageManager_printVersion) Then
                     If cpCore.user.isAuthenticatedContentManager() And cpCore.user.allowToolsPanel Then
                         If AllowTools Then
                             s = s & cpCore.main_GetToolsPanel()
                         End If
                     Else
                         If AllowLogin Then
-                            s = s & cpCore.main_GetLoginLink()
+                            s = s & main_GetLoginLink()
                         End If
                     End If
                 End If
@@ -948,7 +948,7 @@ ErrorTrap:
                 ' ----- output the menu system
                 '
                 If Not (cpCore.menuFlyout Is Nothing) Then
-                    s = s & cpCore.menu_GetClose()
+                    s = s & menu_GetClose()
                 End If
                 '
                 ' ----- Popup USER errors
@@ -988,8 +988,8 @@ ErrorTrap:
                 ' ----- Include any other close page
                 '
                 If Not BlockNonContentExtras Then
-                    If cpCore.htmlForEndOfBody <> "" Then
-                        s = s & cpCore.htmlForEndOfBody
+                    If htmlForEndOfBody <> "" Then
+                        s = s & htmlForEndOfBody
                     End If
                     If cpCore.main_testPointMessage <> "" Then
                         s = s & "<div class=""ccTestPointMessageCon"">" & cpCore.main_testPointMessage & "</div>"
@@ -1418,7 +1418,7 @@ ErrorTrap:
                                         Copy = Left(Copy, cpCore.siteProperties.selectFieldWidthLimit) & "...+"
                                     End If
                                 End If
-                                Call FastString.Add(">" & cpCore.html_EncodeHTML(Copy) & "</option>")
+                                Call FastString.Add(">" & html_EncodeHTML(Copy) & "</option>")
                             Next
                             If Not SelectedFound And (CurrentValue <> 0) Then
                                 Call cpCore.db.cs_Close(CSPointer)
@@ -1453,7 +1453,7 @@ ErrorTrap:
                                             Copy = Left(Copy, cpCore.siteProperties.selectFieldWidthLimit) & "...+"
                                         End If
                                     End If
-                                    Call FastString.Add(">" & cpCore.html_EncodeHTML(Copy) & "</option>")
+                                    Call FastString.Add(">" & html_EncodeHTML(Copy) & "</option>")
                                 End If
                             End If
                         End If
@@ -1910,12 +1910,12 @@ ErrorTrap:
                 main_GetLoginLink = main_GetLoginLink & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"">"
                 main_GetLoginLink = main_GetLoginLink & "<tr><td align=""right"">"
                 If cpCore.user.isAuthenticatedContentManager() Then
-                    main_GetLoginLink = main_GetLoginLink & "<a href=""" & cpCore.html_EncodeHTML(cpCore.siteProperties.adminURL) & """ target=""_blank"">"
+                    main_GetLoginLink = main_GetLoginLink & "<a href=""" & html_EncodeHTML(cpCore.siteProperties.adminURL) & """ target=""_blank"">"
                 Else
                     Link = cpCore.webServer.webServerIO_requestPage & "?" & cpCore.web_RefreshQueryString
                     Link = genericController.modifyLinkQuery(Link, RequestNameHardCodedPage, HardCodedPageLogin, True)
                     'Link = genericController.modifyLinkQuery(Link, RequestNameInterceptpage, LegacyInterceptPageSNLogin, True)
-                    main_GetLoginLink = main_GetLoginLink & "<a href=""" & cpCore.html_EncodeHTML(Link) & """ >"
+                    main_GetLoginLink = main_GetLoginLink & "<a href=""" & html_EncodeHTML(Link) & """ >"
                 End If
                 IconFilename = cpCore.siteProperties.LoginIconFilename
                 If genericController.vbLCase(Mid(IconFilename, 1, 7)) <> "/ccLib/" Then
@@ -2150,7 +2150,7 @@ ErrorTrap:
             '
             iActionQueryString = genericController.ModifyQueryString(ActionQueryString, RequestNameRequestBinary, True, True)
             '
-            html_GetUploadFormStart = "<form action=""" & webServer.webServerIO_ServerFormActionURL & "?" & iActionQueryString & """ ENCTYPE=""MULTIPART/FORM-DATA"" METHOD=""POST""  style=""display: inline;"" >"
+            html_GetUploadFormStart = "<form action=""" & cpCore.webServer.webServerIO_ServerFormActionURL & "?" & iActionQueryString & """ ENCTYPE=""MULTIPART/FORM-DATA"" METHOD=""POST""  style=""display: inline;"" >"
             '
             Exit Function
 ErrorTrap:
@@ -2190,7 +2190,7 @@ ErrorTrap:
             MethodName = "main_GetFormStart3"
             '
             If ActionQueryString Is Nothing Then
-                ActionQS = web_RefreshQueryString
+                ActionQS = cpCore.web_RefreshQueryString
             Else
                 ActionQS = ActionQueryString
             End If
@@ -2199,7 +2199,7 @@ ErrorTrap:
                 iMethod = "post"
             End If
             RefreshHiddens = ""
-            Action = webServer.webServerIO_ServerFormActionURL
+            Action = cpCore.webServer.webServerIO_ServerFormActionURL
             '
             If (ActionQS <> "") Then
                 If (iMethod <> "main_Get") Then
@@ -2299,7 +2299,7 @@ ErrorTrap:
                 Else
                     html_GetFormInputText2 = "<textarea NAME=""" & htmlName & """ ROWS=""" & iHeight.ToString & """ COLS=""" & iWidth.ToString & """" & TagID & TagDisabled & ">" & iDefaultValue & "</TEXTAREA>"
                 End If
-                main_FormInputTextCnt = main_FormInputTextCnt + 1
+                cpCore.main_FormInputTextCnt = cpCore.main_FormInputTextCnt + 1
             End If
             '
             Exit Function
@@ -2339,7 +2339,7 @@ ErrorTrap:
             Value_Local = html_EncodeHTML(Value)
             IDRoot = Id
             If IDRoot = "" Then
-                IDRoot = "TextArea" & main_FormInputTextCnt
+                IDRoot = "TextArea" & cpCore.main_FormInputTextCnt
             End If
             '
             StyleWidth_Local = styleWidth
@@ -2381,7 +2381,7 @@ ErrorTrap:
                 & genericController.kmaIndent(EditorClosed) _
                 & genericController.kmaIndent(EditorOpened) _
                 & "</div>"
-            main_FormInputTextCnt = main_FormInputTextCnt + 1
+            cpCore.main_FormInputTextCnt = cpCore.main_FormInputTextCnt + 1
             Exit Function
             '
             ' ----- Error Trap
@@ -2427,10 +2427,10 @@ ErrorTrap:
                 iWidth = 20
             End If
             '
-            CalendarObjName = "Cal" & main_InputDateCnt
-            AnchorName = "ACal" & main_InputDateCnt
+            CalendarObjName = "Cal" & cpCore.main_InputDateCnt
+            AnchorName = "ACal" & cpCore.main_InputDateCnt
 
-            If main_InputDateCnt = 0 Then
+            If cpCore.main_InputDateCnt = 0 Then
                 HeadJS = "" _
                     & vbCrLf & "<SCRIPT LANGUAGE=""JavaScript"" SRC=""/ccLib/mktree/CalendarPopup.js""></SCRIPT>" _
                     & vbCrLf & "<SCRIPT LANGUAGE=""JavaScript"">" _
@@ -2459,7 +2459,7 @@ ErrorTrap:
                 & vbCrLf & "<a HREF=""#"" Onclick = ""cal.select(document.getElementById('" & iTagName & "'),'" & AnchorName & "','MM/dd/yyyy','" & DateString & "'); return false;"" NAME=""" & AnchorName & """ ID=""" & AnchorName & """><img title=""Select a date"" alt=""Select a date"" src=""/ccLib/images/table.jpg"" width=12 height=10 border=0></A>" _
                 & vbCrLf & ""
 
-            main_InputDateCnt = main_InputDateCnt + 1
+            cpCore.main_InputDateCnt = cpCore.main_InputDateCnt + 1
             Exit Function
             '
             ' ----- Error Trap
@@ -2611,7 +2611,7 @@ ErrorTrap:
             '
             ' ----- Gather all the SecondaryContent that associates to the PrimaryContent
             '
-            SecondaryCDef = metaData.getCdef(SecondaryContentName)
+            SecondaryCDef = cpCore.metaData.getCdef(SecondaryContentName)
             SecondaryTablename = SecondaryCDef.ContentTableName
             SecondaryContentID = SecondaryCDef.Id
             SecondaryCDef.childIdList.Add(SecondaryContentID)
@@ -2711,7 +2711,7 @@ ErrorTrap:
                 Stream = ""
                 If True Then
                     fieldFound = False
-                    Contentdefinition = metaData.getCdef(ContentName)
+                    Contentdefinition = cpCore.metaData.getCdef(ContentName)
                     For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In Contentdefinition.fields
                         Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
                         With field
@@ -2766,7 +2766,7 @@ ErrorTrap:
                                 Case FieldTypeIdFileHTMLPrivate
                                     FieldValueText = genericController.encodeText(FieldValueVariant)
                                     If FieldValueText <> "" Then
-                                        FieldValueText = privateFiles.readFile(FieldValueText)
+                                        FieldValueText = cpCore.privateFiles.readFile(FieldValueText)
                                     End If
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
@@ -2780,7 +2780,7 @@ ErrorTrap:
                                 Case FieldTypeIdFileTextPrivate
                                     FieldValueText = genericController.encodeText(FieldValueVariant)
                                     If FieldValueText <> "" Then
-                                        FieldValueText = privateFiles.readFile(FieldValueText)
+                                        FieldValueText = cpCore.privateFiles.readFile(FieldValueText)
                                     End If
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
@@ -2844,14 +2844,14 @@ ErrorTrap:
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
                                     Else
-                                        returnResult = "<img src=""" & cpCore.csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, FieldValueText) & """><BR >change: " & html_GetFormInputFile(FieldName, genericController.encodeText(FieldValueVariant))
+                                        returnResult = "<img src=""" & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, FieldValueText) & """><BR >change: " & html_GetFormInputFile(FieldName, genericController.encodeText(FieldValueVariant))
                                     End If
                                 '
                                 '
                                 '
                                 Case FieldTypeIdLookup
                                     FieldValueInteger = genericController.EncodeInteger(FieldValueVariant)
-                                    FieldLookupContentName = metaData.getContentNameByID(FieldLookupContentID)
+                                    FieldLookupContentName = cpCore.metaData.getContentNameByID(FieldLookupContentID)
                                     If FieldLookupContentName <> "" Then
                                         '
                                         ' Lookup into Content
@@ -2859,7 +2859,7 @@ ErrorTrap:
                                         If FieldReadOnly Then
                                             CSPointer = cpCore.csOpenRecord(FieldLookupContentName, FieldValueInteger)
                                             If cpCore.db.cs_ok(CSLookup) Then
-                                                returnResult = main_cs_getEncodedField(CSLookup, "name")
+                                                returnResult = cpCore.main_cs_getEncodedField(CSLookup, "name")
                                             End If
                                             Call cpCore.db.cs_Close(CSLookup)
                                         Else
@@ -3099,7 +3099,7 @@ ErrorTrap:
         '========================================================================================================
         '
         Public Sub html_addHeadTags(headTags As String)
-            web_EncodeContent_HeadTags = web_EncodeContent_HeadTags & vbCrLf & vbTab & headTags
+            cpCore.web_EncodeContent_HeadTags = cpCore.web_EncodeContent_HeadTags & vbCrLf & vbTab & headTags
         End Sub
         '
         '=========================================================================================
@@ -3204,8 +3204,8 @@ ErrorTrap:
 
                         Dim FieldValuefilename As String = ""
                         Dim FieldValuePath As String = ""
-                        privateFiles.splitPathFilename(HtmlValue, FieldValuePath, FieldValuefilename)
-                        html_GetFormInputField = html_GetFormInputField & "<a href=""http://" & genericController.EncodeURL(webServer.requestDomain & cpCore.csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & FieldValuefilename & "]</A>"
+                        cpCore.privateFiles.splitPathFilename(HtmlValue, FieldValuePath, FieldValuefilename)
+                        html_GetFormInputField = html_GetFormInputField & "<a href=""http://" & genericController.EncodeURL(cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & FieldValuefilename & "]</A>"
                         html_GetFormInputField = html_GetFormInputField & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & html_GetFormInputCheckBox2(InputName & ".Delete", False)
                         html_GetFormInputField = html_GetFormInputField & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & html_GetFormInputFile2(InputName, HtmlId, HtmlClass)
                     End If
@@ -3229,8 +3229,8 @@ ErrorTrap:
                     Else
                         Dim FieldValuefilename As String = ""
                         Dim FieldValuePath As String = ""
-                        privateFiles.splitPathFilename(HtmlValue, FieldValuePath, FieldValuefilename)
-                        html_GetFormInputField = html_GetFormInputField & "<a href=""http://" & genericController.EncodeURL(webServer.requestDomain & cpCore.csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & FieldValuefilename & "]</A>"
+                        cpCore.privateFiles.splitPathFilename(HtmlValue, FieldValuePath, FieldValuefilename)
+                        html_GetFormInputField = html_GetFormInputField & "<a href=""http://" & genericController.EncodeURL(cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & FieldValuefilename & "]</A>"
                         html_GetFormInputField = html_GetFormInputField & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & html_GetFormInputCheckBox2(InputName & ".Delete", False)
                         html_GetFormInputField = html_GetFormInputField & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & html_GetFormInputFile2(InputName, HtmlId, HtmlClass)
                     End If
@@ -3265,7 +3265,7 @@ ErrorTrap:
                     '
                     '
                     '
-                    CDef = metaData.getCdef(ContentName)
+                    CDef = cpCore.metaData.getCdef(ContentName)
                     LookupContentName = ""
                     With CDef
                         For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In CDef.fields
@@ -3273,7 +3273,7 @@ ErrorTrap:
                             With field
                                 If genericController.vbUCase(.nameLc) = genericController.vbUCase(FieldName) Then
                                     If .lookupContentID <> 0 Then
-                                        LookupContentName = genericController.encodeText(metaData.getContentNameByID(.lookupContentID))
+                                        LookupContentName = genericController.encodeText(cpCore.metaData.getContentNameByID(.lookupContentID))
                                     End If
                                     If LookupContentName <> "" Then
                                         html_GetFormInputField = main_GetFormInputSelect2(InputName, genericController.EncodeInteger(HtmlValue), LookupContentName, "", "Select One", HtmlId, IgnoreBoolean, HtmlClass)
@@ -3292,11 +3292,11 @@ ErrorTrap:
                     '
                     '
                     '
-                    CDef = metaData.getCdef(ContentName)
+                    CDef = cpCore.metaData.getCdef(ContentName)
                     With CDef.fields(FieldName.ToLower())
-                        MTMContent0 = metaData.getContentNameByID(.contentId)
-                        MTMContent1 = metaData.getContentNameByID(.manyToManyContentID)
-                        MTMRuleContent = metaData.getContentNameByID(.manyToManyRuleContentID)
+                        MTMContent0 = cpCore.metaData.getContentNameByID(.contentId)
+                        MTMContent1 = cpCore.metaData.getContentNameByID(.manyToManyContentID)
+                        MTMRuleContent = cpCore.metaData.getContentNameByID(.manyToManyRuleContentID)
                         MTMRuleField0 = .ManyToManyRulePrimaryField
                         MTMRuleField1 = .ManyToManyRuleSecondaryField
                     End With
@@ -3488,7 +3488,7 @@ ErrorTrap:
                 ' AC StartBlockText
                 '
                 IconIDControlString = "AC," & ACTypeAggregateFunction & ",0,Block Text,"
-                IconImg = genericController.GetAddonIconImg(siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", cpCore.serverConfig.appConfig.cdnFilesNetprefix, "Text Block Start", "Block text to all except selected groups starting at this point", "", 0)
+                IconImg = genericController.GetAddonIconImg(cpCore.siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", cpCore.serverConfig.appConfig.cdnFilesNetprefix, "Text Block Start", "Block text to all except selected groups starting at this point", "", 0)
                 IconImg = genericController.EncodeJavascript(IconImg)
                 Items(ItemsCnt) = "['Block Text','" & IconImg & "']"
                 Call Index.setPtr("Block Text", ItemsCnt)
@@ -3497,7 +3497,7 @@ ErrorTrap:
                 ' AC EndBlockText
                 '
                 IconIDControlString = "AC," & ACTypeAggregateFunction & ",0,Block Text End,"
-                IconImg = genericController.GetAddonIconImg(siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", cpCore.serverConfig.appConfig.cdnFilesNetprefix, "Text Block End", "End of text block", "", 0)
+                IconImg = genericController.GetAddonIconImg(cpCore.siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", cpCore.serverConfig.appConfig.cdnFilesNetprefix, "Text Block End", "End of text block", "", 0)
                 IconImg = genericController.EncodeJavascript(IconImg)
                 Items(ItemsCnt) = "['Block Text End','" & IconImg & "']"
                 Call Index.setPtr("Block Text", ItemsCnt)
@@ -3514,7 +3514,7 @@ ErrorTrap:
                     FieldList = cpCore.GetContentProperty("people", "SelectFieldList")
                     FieldList = genericController.vbReplace(FieldList, ",", "|")
                     IconIDControlString = "AC,PERSONALIZATION,0,Personalization,field=[" & FieldList & "]"
-                    IconImg = genericController.GetAddonIconImg(siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", cpCore.serverConfig.appConfig.cdnFilesNetprefix, "Any Personalization Field", "Renders as any Personalization Field", "", 0)
+                    IconImg = genericController.GetAddonIconImg(cpCore.siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", cpCore.serverConfig.appConfig.cdnFilesNetprefix, "Any Personalization Field", "Renders as any Personalization Field", "", 0)
                     IconImg = genericController.EncodeJavascript(IconImg)
                     Items(ItemsCnt) = "['Personalization','" & IconImg & "']"
                     Call Index.setPtr("Personalization", ItemsCnt)
@@ -3529,7 +3529,7 @@ ErrorTrap:
                         '   Need a more consistant solution later
                         '
                         IconIDControlString = "AC," & ACTypeTemplateContent & ",0,Template Content,"
-                        IconImg = genericController.GetAddonIconImg(siteProperties.adminURL, 52, 64, 0, False, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", cpCore.serverConfig.appConfig.cdnFilesNetprefix, "Content Box", "Renders as the content for a template", "", 0)
+                        IconImg = genericController.GetAddonIconImg(cpCore.siteProperties.adminURL, 52, 64, 0, False, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", cpCore.serverConfig.appConfig.cdnFilesNetprefix, "Content Box", "Renders as the content for a template", "", 0)
                         IconImg = genericController.EncodeJavascript(IconImg)
                         Items(ItemsCnt) = "['Content Box','" & IconImg & "']"
                         'Items(ItemsCnt) = "['Template Content','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Content"" id=""AC," & ACTypeTemplateContent & ",0,Template Content,"" src=""/ccLib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>']"
@@ -3537,7 +3537,7 @@ ErrorTrap:
                         ItemsCnt = ItemsCnt + 1
                         '
                         IconIDControlString = "AC," & ACTypeTemplateText & ",0,Template Text,Name=Default"
-                        IconImg = genericController.GetAddonIconImg(siteProperties.adminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", cpCore.serverConfig.appConfig.cdnFilesNetprefix, "Template Text", "Renders as a template text block", "", 0)
+                        IconImg = genericController.GetAddonIconImg(cpCore.siteProperties.adminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", cpCore.serverConfig.appConfig.cdnFilesNetprefix, "Template Text", "Renders as a template text block", "", 0)
                         IconImg = genericController.EncodeJavascript(IconImg)
                         Items(ItemsCnt) = "['Template Text','" & IconImg & "']"
                         'Items(ItemsCnt) = "['Template Text','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Text"" id=""AC," & ACTypeTemplateText & ",0,Template Text,Name=Default"" src=""/ccLib/images/ACTemplateTextIcon.gif"" WIDTH=52 HEIGHT=52>']"
@@ -3557,7 +3557,7 @@ ErrorTrap:
                             If FieldName <> "" Then
                                 FieldCaption = "Watch List [" & FieldName & "]"
                                 IconIDControlString = "AC,WATCHLIST,0," & FieldName & ",ListName=" & FieldName & "&SortField=[DateAdded|Link|LinkLabel|Clicks|WhatsNewDateExpires]&SortDirection=Z-A[A-Z|Z-A]"
-                                IconImg = genericController.GetAddonIconImg(siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", cpCore.serverConfig.appConfig.cdnFilesNetprefix, FieldCaption, "Rendered as the " & FieldCaption, "", 0)
+                                IconImg = genericController.GetAddonIconImg(cpCore.siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", cpCore.serverConfig.appConfig.cdnFilesNetprefix, FieldCaption, "Rendered as the " & FieldCaption, "", 0)
                                 IconImg = genericController.EncodeJavascript(IconImg)
                                 FieldCaption = genericController.EncodeJavascript(FieldCaption)
                                 Items(ItemsCnt) = "['" & FieldCaption & "','" & IconImg & "']"
@@ -3643,7 +3643,7 @@ ErrorTrap:
                                         DefaultAddonOption_String = ""
                                     Else
                                         ArgumentList = Trim(cpCore.db.cs_get(CSAddons, "ArgumentList"))
-                                        DefaultAddonOption_String = main_GetDefaultAddonOption_String(ArgumentList, AddonGuid, IsInline)
+                                        DefaultAddonOption_String = cpCore.main_GetDefaultAddonOption_String(ArgumentList, AddonGuid, IsInline)
                                         DefaultAddonOption_String = main_encodeHTML(DefaultAddonOption_String)
                                     End If
                                     '
@@ -3653,7 +3653,7 @@ ErrorTrap:
                                     '
                                     LastAddonName = AddonName
                                     IconIDControlString = "AC,AGGREGATEFUNCTION,0," & AddonName & "," & DefaultAddonOption_String & "," & AddonGuid
-                                    IconImg = genericController.GetAddonIconImg(siteProperties.adminURL, IconWidth, IconHeight, IconSprites, IsInline, IconIDControlString, IconFilename, cpCore.serverConfig.appConfig.cdnFilesNetprefix, AddonName, "Rendered as the Add-on [" & AddonName & "]", "", 0)
+                                    IconImg = genericController.GetAddonIconImg(cpCore.siteProperties.adminURL, IconWidth, IconHeight, IconSprites, IsInline, IconIDControlString, IconFilename, cpCore.serverConfig.appConfig.cdnFilesNetprefix, AddonName, "Rendered as the Add-on [" & AddonName & "]", "", 0)
                                     Items(ItemsCnt) = "['" & genericController.EncodeJavascript(AddonName) & "','" & genericController.EncodeJavascript(IconImg) & "']"
                                     Call Index.setPtr(AddonName, ItemsCnt)
                                     ItemsCnt = ItemsCnt + 1
@@ -3723,7 +3723,7 @@ ErrorTrap:
             Dim returnValue As String = ""
             Try
                 Dim LoopPtr As Integer
-                Dim contentCmd As New coreContentCmdClass(Me)
+                Dim contentCmd As New coreContentCmdClass(cpCore)
                 '
                 returnValue = Source
                 LoopPtr = 0
@@ -3998,7 +3998,7 @@ ErrorTrap:
                     '
                     ' ----- Load the Active Elements
                     '
-                    KmaHTML = New coreHtmlParseClass(Me)
+                    KmaHTML = New coreHtmlParseClass(cpCore)
                     Call KmaHTML.Load(workingContent)
                     '
                     ' ----- Execute and output elements
@@ -4212,7 +4212,7 @@ ErrorTrap:
                                                     'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a line of text with contact information for this record's primary contact"" id=""AC," & ACType & """ src=""/ccLib/images/ACContact.GIF"">"
                                                 ElseIf EncodeCachableTags Then
                                                     If moreInfoPeopleId <> 0 Then
-                                                        Copy = Controllers.pageManagerController.pageManager_getMoreInfoHtml(Me, moreInfoPeopleId)
+                                                        Copy = Controllers.pageManagerController.pageManager_getMoreInfoHtml(cpCore, moreInfoPeopleId)
                                                     End If
                                                 End If
                                             Case ACTypeFeedback
@@ -4857,7 +4857,7 @@ ErrorTrap:
             Dim NewImageFilename As String
             '
             Dim MethodName As String
-            Dim DHTML As New coreHtmlParseClass(Me)
+            Dim DHTML As New coreHtmlParseClass(cpCore)
             Dim ElementPointer As Integer
             Dim ElementCount As Integer
             Dim AttributeCount As Integer
@@ -5453,7 +5453,7 @@ ErrorTrap:
                                                                                                     '
                                                                                                     ' image load failed, use raw filename
                                                                                                     '
-                                                                                                    cpCore.handleLegacyError3(serverConfig.appConfig.name, "Error while loading image to resize, [" & RecordVirtualFilename & "]", "dll", "cpCoreClass", "DecodeAciveContent", Err.Number, Err.Source, Err.Description, False, True, "")
+                                                                                                    cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "Error while loading image to resize, [" & RecordVirtualFilename & "]", "dll", "cpCoreClass", "DecodeAciveContent", Err.Number, Err.Source, Err.Description, False, True, "")
                                                                                                     Err.Clear()
                                                                                                     NewImageFilename = ImageFilename
                                                                                                 Else
@@ -5682,7 +5682,7 @@ ErrorTrap:
         '
         Public Function main_ConvertHTML2Text(ByVal Source As String) As String
             Try
-                Dim Decoder As New coreHtmlToTextClass(Me)
+                Dim Decoder As New coreHtmlToTextClass(cpCore)
                 Return Decoder.convert(Source)
             Catch ex As Exception
                 Call cpCore.handleLegacyError18("main_ConvertHTML2Text")
@@ -6204,7 +6204,7 @@ ErrorTrap:
                             '
                             ' ListField
                             '
-                            CID = metaData.getContentId(ContentName)
+                            CID = cpCore.metaData.getContentId(ContentName)
                             If CID > 0 Then
                                 CS = cpCore.db.cs_open("Content Fields", "Contentid=" & CID, "name", , , , , "ID,Name")
                             End If
@@ -6295,7 +6295,7 @@ ErrorTrap:
                 Dim addonOption_String As String
                 Dim FieldTypeDefaultEditorAddonId As Integer
                 '
-                FieldTypeDefaultEditorAddonIdList = getFieldTypeDefaultEditorAddonIdList()
+                FieldTypeDefaultEditorAddonIdList = cpCore.getFieldTypeDefaultEditorAddonIdList()
                 FieldTypeDefaultEditorAddonIds = Split(FieldTypeDefaultEditorAddonIdList, ",")
                 FieldTypeDefaultEditorAddonId = genericController.EncodeInteger(FieldTypeDefaultEditorAddonIds(FieldTypeIdHTML))
 
@@ -6336,7 +6336,7 @@ ErrorTrap:
         ' ----- Process the reply from the Tools Panel form
         '========================================================================
         '
-        Private Sub pageManager_ProcessFormToolsPanel()
+        Public Sub pageManager_ProcessFormToolsPanel()
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("ProcessFormToolsPanel")
             '
             'If Not (true) Then Exit Sub
@@ -6383,29 +6383,29 @@ ErrorTrap:
                             '
                             ' ----- AllowAdminLinks
                             '
-                            Call visitProperty.setProperty("AllowEditing", genericController.encodeText(cpCore.docProperties.getBoolean("AllowEditing")))
+                            Call cpCore.visitProperty.setProperty("AllowEditing", genericController.encodeText(cpCore.docProperties.getBoolean("AllowEditing")))
                             '
                             ' ----- Quick Editor
                             '
-                            Call visitProperty.setProperty("AllowQuickEditor", genericController.encodeText(cpCore.docProperties.getBoolean("AllowQuickEditor")))
+                            Call cpCore.visitProperty.setProperty("AllowQuickEditor", genericController.encodeText(cpCore.docProperties.getBoolean("AllowQuickEditor")))
                             '
                             ' ----- Advanced Editor
                             '
-                            Call visitProperty.setProperty("AllowAdvancedEditor", genericController.encodeText(cpCore.docProperties.getBoolean("AllowAdvancedEditor")))
+                            Call cpCore.visitProperty.setProperty("AllowAdvancedEditor", genericController.encodeText(cpCore.docProperties.getBoolean("AllowAdvancedEditor")))
                             '
                             ' ----- Allow Workflow authoring Render Mode - Visit Property
                             '
-                            Call visitProperty.setProperty("AllowWorkflowRendering", genericController.encodeText(cpCore.docProperties.getBoolean("AllowWorkflowRendering")))
+                            Call cpCore.visitProperty.setProperty("AllowWorkflowRendering", genericController.encodeText(cpCore.docProperties.getBoolean("AllowWorkflowRendering")))
                             '
                             ' ----- developer Only parts
                             '
-                            Call visitProperty.setProperty("AllowDebugging", genericController.encodeText(cpCore.docProperties.getBoolean("AllowDebugging")))
+                            Call cpCore.visitProperty.setProperty("AllowDebugging", genericController.encodeText(cpCore.docProperties.getBoolean("AllowDebugging")))
                             If cpCore.user.isAuthenticatedDeveloper() Then
                                 '
                                 ' ----- Create Path Block record, if requested
                                 '
                                 CreatePathBlock = cpCore.docProperties.getBoolean("CreatePathBlock")
-                                CS = cpCore.db.cs_open("Paths", "name=" & cpCore.db.encodeSQLText(webServer.webServerIO_requestPath))
+                                CS = cpCore.db.cs_open("Paths", "name=" & cpCore.db.encodeSQLText(cpCore.webServer.webServerIO_requestPath))
                                 PathID = 0
                                 If cpCore.db.cs_ok(CS) Then
                                     PathID = cpCore.db.cs_getInteger(CS, "id")
@@ -6417,7 +6417,7 @@ ErrorTrap:
                                     '
                                     CS = cpCore.db.cs_insertRecord("Paths")
                                     If cpCore.db.cs_ok(CS) Then
-                                        Call cpCore.db.cs_set(CS, "name", webServer.webServerIO_requestPath)
+                                        Call cpCore.db.cs_set(CS, "name", cpCore.webServer.webServerIO_requestPath)
                                         Call cpCore.db.cs_set(CS, "active", 1)
                                     End If
                                     Call cpCore.db.cs_Close(CS)
@@ -6445,7 +6445,7 @@ ErrorTrap:
         ' -----
         '========================================================================
         '
-        Private Sub pageManager_ProcessAddonSettingsEditor()
+        Public Sub pageManager_ProcessAddonSettingsEditor()
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("ProcessAddonSettingsEditor")
             '
             'If Not (true) Then Exit Sub
@@ -6644,7 +6644,7 @@ ErrorTrap:
                     If addonOption_String <> "" Then
                         addonOption_String = Mid(addonOption_String, 2)
                     End If
-                    Call userProperty.setProperty("Addon [" & AddonName & "] Options", addonOption_String)
+                    Call cpCore.userProperty.setProperty("Addon [" & AddonName & "] Options", addonOption_String)
                     needToClearCache = True
                 End If
             ElseIf ContentName = "" Or RecordID = 0 Then
@@ -6833,7 +6833,7 @@ ErrorTrap:
         ' ----- Process the little edit form in the help bubble
         '========================================================================
         '
-        Private Sub main_ProcessHelpBubbleEditor()
+        Public Sub main_ProcessHelpBubbleEditor()
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("ProcessHelpBubbleEditor")
             '
             'If Not (true) Then Exit Sub
@@ -6863,7 +6863,7 @@ ErrorTrap:
                             SQL = "update ccfields set caption=" & cpCore.db.encodeSQLText(HelpCaption) & ",HelpMessage=" & cpCore.db.encodeSQLText(HelpMessage) & " where id=" & RecordID
                             Call cpCore.db.executeSql(SQL)
                             cpCore.cache.invalidateAll()
-                            metaData.clear()
+                            cpCore.metaData.clear()
                         End If
                     End If
             End Select
@@ -7087,17 +7087,17 @@ ErrorTrap:
                 '
                 IsContentCategoriesSupported = IncludeContentFolderDivs
                 If IsContentCategoriesSupported Then
-                    IsContentCategoriesSupported = main_IsContentFieldSupported(SecondaryContentName, "ContentCategoryID")
+                    IsContentCategoriesSupported = cpCore.main_IsContentFieldSupported(SecondaryContentName, "ContentCategoryID")
                 End If
                 '
                 ' IsRuleCopySupported - if true, the rule records include an allow button, and copy
                 '   This is for a checkbox like [ ] Other [enter other copy here]
                 '
-                IsRuleCopySupported = main_IsContentFieldSupported(RulesContentName, "RuleCopy")
+                IsRuleCopySupported = cpCore.main_IsContentFieldSupported(RulesContentName, "RuleCopy")
                 If IsRuleCopySupported Then
-                    IsRuleCopySupported = IsRuleCopySupported And main_IsContentFieldSupported(SecondaryContentName, "AllowRuleCopy")
+                    IsRuleCopySupported = IsRuleCopySupported And cpCore.main_IsContentFieldSupported(SecondaryContentName, "AllowRuleCopy")
                     If IsRuleCopySupported Then
-                        IsRuleCopySupported = IsRuleCopySupported And main_IsContentFieldSupported(SecondaryContentName, "RuleCopyCaption")
+                        IsRuleCopySupported = IsRuleCopySupported And cpCore.main_IsContentFieldSupported(SecondaryContentName, "RuleCopyCaption")
                     End If
                 End If
                 If CaptionFieldName = "" Then
@@ -7111,8 +7111,8 @@ ErrorTrap:
                     '
                     ' ----- Gather all the SecondaryContent that associates to the PrimaryContent
                     '
-                    PrimaryContentID = main_GetContentID(PrimaryContentName)
-                    SecondaryCDef = metaData.getCdef(SecondaryContentName)
+                    PrimaryContentID = cpCore.main_GetContentID(PrimaryContentName)
+                    SecondaryCDef = cpCore.metaData.getCdef(SecondaryContentName)
                     SecondaryTablename = SecondaryCDef.ContentTableName
                     SecondaryContentID = SecondaryCDef.Id
                     ContentIDList.Add(SecondaryContentID)
@@ -7127,7 +7127,7 @@ ErrorTrap:
                     main_MemberShipSize = 0
                     returnHtml = ""
                     If (SecondaryTablename <> "") And (rulesTablename <> "") Then
-                        OldFolderVar = "OldFolder" & main_CheckListCnt
+                        OldFolderVar = "OldFolder" & cpCore.main_CheckListCnt
                         main_HeadScriptCode &= "var " & OldFolderVar & ";"
                         If PrimaryRecordID = 0 Then
                             '
@@ -7325,7 +7325,7 @@ ErrorTrap:
                                                     End If
                                                 Next
                                             End If
-                                            returnHtml &= main_GetYesNo(Found) & "&nbsp;-&nbsp;"
+                                            returnHtml &= cpCore.main_GetYesNo(Found) & "&nbsp;-&nbsp;"
                                         Else
                                             Found = False
                                             If main_MemberShipCount <> 0 Then
@@ -7372,7 +7372,7 @@ ErrorTrap:
                         Call main_AddHeadScriptCode(main_HeadScriptCode, "CheckList Categories")
                     End If
                     'End If
-                    main_CheckListCnt = main_CheckListCnt + 1
+                    cpCore.main_CheckListCnt = cpCore.main_CheckListCnt + 1
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -7412,12 +7412,12 @@ ErrorTrap:
             Dim JSSwitchAll As String
             Dim IsContentCategoriesSupported As Boolean
             '
-            IsContentCategoriesSupported = main_IsContentFieldSupported(SecondaryContentName, "ContentCategoryID")
+            IsContentCategoriesSupported = cpCore.main_IsContentFieldSupported(SecondaryContentName, "ContentCategoryID")
             If Not IsContentCategoriesSupported Then
                 main_GetFormInputCheckListCategories = main_GetFormInputCheckListCategories_Content(TagName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectCriteria, CaptionFieldName, readOnlyField, False, "")
             Else
                 IsAuthoringMode = True
-                LinkBase = web_RefreshQueryString
+                LinkBase = cpCore.web_RefreshQueryString
                 BakeName = "ContentFolderNav"
                 If Not IsAuthoringMode Then
                     '          main_GetFormInputCheckListCategories = cache.cache_readBake(BakeName)
@@ -7427,7 +7427,7 @@ ErrorTrap:
 
                 If main_GetFormInputCheckListCategories = "" Then
                     EmptyDivID = TagName & ".empty"
-                    SQL = GetSQLSelect("", "ccContentCategories", "ID,ContentCategoryID,Name", , "Name")
+                    SQL = cpCore.GetSQLSelect("", "ccContentCategories", "ID,ContentCategoryID,Name", , "Name")
                     CS = cpCore.db.cs_openSql(SQL)
                     Do While cpCore.db.cs_ok(CS)
                         Caption = cpCore.db.cs_getText(CS, "name")
@@ -7439,7 +7439,7 @@ ErrorTrap:
                             FirstCaption = Caption
                         End If
                         JSCaption = genericController.EncodeJavascript(Caption)
-                        JSSwitch = "switchContentFolderDiv( '" & TagName & ".ContentCategoryID" & Id & "',OldFolder" & main_CheckListCnt & ",'" & TagName & ".ContentCaption','" & JSCaption & "','" & EmptyDivID & "'); OldFolder" & main_CheckListCnt & "='" & TagName & ".ContentCategoryID" & Id & "';return false;"
+                        JSSwitch = "switchContentFolderDiv( '" & TagName & ".ContentCategoryID" & Id & "',OldFolder" & cpCore.main_CheckListCnt & ",'" & TagName & ".ContentCaption','" & JSCaption & "','" & EmptyDivID & "'); OldFolder" & cpCore.main_CheckListCnt & "='" & TagName & ".ContentCategoryID" & Id & "';return false;"
                         If JSSwitchFirst = "" Then
                             JSSwitchFirst = JSSwitch
                         End If
@@ -7455,7 +7455,7 @@ ErrorTrap:
                     ' Add the top 'All' node
                     '
                     JSCaption = "All"
-                    JSSwitchAll = "switchContentFolderDiv( '" & TagName & ".All',  OldFolder" & main_CheckListCnt & ",'" & TagName & ".ContentCaption','" & JSCaption & "','" & EmptyDivID & "'); OldFolder" & main_CheckListCnt & "='" & TagName & ".All';"
+                    JSSwitchAll = "switchContentFolderDiv( '" & TagName & ".All',  OldFolder" & cpCore.main_CheckListCnt & ",'" & TagName & ".ContentCaption','" & JSCaption & "','" & EmptyDivID & "'); OldFolder" & cpCore.main_CheckListCnt & "='" & TagName & ".All';"
                     If genericController.vbInstr(1, LeftPane, "<LI", vbTextCompare) = 0 Then
                         AllNode = "<div class=""caption""><a href=""#"" onClick=""" & JSSwitchAll & ";return false;"">Show all</a></div>"
                         LeftPane = cr & AllNode & LeftPane
@@ -7467,7 +7467,7 @@ ErrorTrap:
                     ' + Add Category
                     '
                     If cpCore.user.isAuthenticatedContentManager("Content Categories") Then
-                        LeftPane = LeftPane & cr & "<div class=""caption""><a href=""" & cpCore.siteProperties.adminURL & "?editreferer=" & genericController.EncodeRequestVariable("?" & web_RefreshQueryString) & "&cid=" & main_GetContentID("Content Categories") & "&af=4&aa=2"">+&nbsp;Add&nbsp;Category</a></div>"
+                        LeftPane = LeftPane & cr & "<div class=""caption""><a href=""" & cpCore.siteProperties.adminURL & "?editreferer=" & genericController.EncodeRequestVariable("?" & cpCore.web_RefreshQueryString) & "&cid=" & cpCore.main_GetContentID("Content Categories") & "&af=4&aa=2"">+&nbsp;Add&nbsp;Category</a></div>"
                     End If
                     '
                     LeftPane = cr & "<div class=""ccCategoryListCon"">" & genericController.kmaIndent(LeftPane) & cr & "</div>"
@@ -7523,16 +7523,16 @@ ErrorTrap:
             '
             Dim s As String
             '
-            s = main_OnLoadJavascript
+            s = cpCore.main_OnLoadJavascript
             If NewCode <> "" And genericController.vbInstr(1, s, NewCode, vbTextCompare) = 0 Then
                 If s <> "" Then
                     s = s & ";"
                 End If
-                If (addedByMessage <> "") And visitProperty.getBoolean("AllowDebugging") Then
+                If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
                     s = s & " /* from " & addedByMessage & " */ "
                 End If
                 s = s & NewCode
-                main_OnLoadJavascript = s
+                cpCore.main_OnLoadJavascript = s
             End If
             '
             Exit Sub
@@ -7558,13 +7558,13 @@ ErrorTrap:
             Dim s As String
             '
             s = ""
-            If NewCode <> "" And genericController.vbInstr(1, main_endOfBodyJavascript, NewCode, vbTextCompare) = 0 Then
+            If NewCode <> "" And genericController.vbInstr(1, cpCore.main_endOfBodyJavascript, NewCode, vbTextCompare) = 0 Then
                 's = s & vbCrLf
-                If (addedByMessage <> "") And visitProperty.getBoolean("AllowDebugging") Then
+                If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
                     s = s & "/* from " & addedByMessage & "*/"
                 End If
                 s = s & NewCode
-                main_endOfBodyJavascript = main_endOfBodyJavascript & vbCrLf & s
+                cpCore.main_endOfBodyJavascript = cpCore.main_endOfBodyJavascript & vbCrLf & s
             End If
             '
             Exit Sub
@@ -7615,11 +7615,11 @@ ErrorTrap:
                 NewCode = genericController.vbReplace(NewCode, vbCrLf & vbCrLf, vbCrLf)
                 NewCode = genericController.vbReplace(NewCode, vbCrLf & vbCrLf, vbCrLf)
                 NewCode = genericController.vbReplace(NewCode, vbCrLf, cr2)
-                ReDim Preserve main_HeadScripts(main_HeadScriptCnt)
-                main_HeadScripts(main_HeadScriptCnt).IsLink = False
-                main_HeadScripts(main_HeadScriptCnt).Text = NewCode
-                main_HeadScripts(main_HeadScriptCnt).addedByMessage = genericController.vbLCase(addedByMessage)
-                main_HeadScriptCnt = main_HeadScriptCnt + 1
+                ReDim Preserve cpCore.main_HeadScripts(cpCore.main_HeadScriptCnt)
+                cpCore.main_HeadScripts(cpCore.main_HeadScriptCnt).IsLink = False
+                cpCore.main_HeadScripts(cpCore.main_HeadScriptCnt).Text = NewCode
+                cpCore.main_HeadScripts(cpCore.main_HeadScriptCnt).addedByMessage = genericController.vbLCase(addedByMessage)
+                cpCore.main_HeadScriptCnt = cpCore.main_HeadScriptCnt + 1
             End If
             '    If NewCode <> "" And genericController.vbInstr(1, main_HeadScriptCode, NewCode, vbTextCompare) = 0 Then
             '        s = NewCode
@@ -7658,11 +7658,11 @@ ErrorTrap:
             Dim s As String
             '
             If Filename <> "" Then
-                ReDim Preserve main_HeadScripts(main_HeadScriptCnt)
-                main_HeadScripts(main_HeadScriptCnt).IsLink = True
-                main_HeadScripts(main_HeadScriptCnt).Text = Filename
-                main_HeadScripts(main_HeadScriptCnt).addedByMessage = addedByMessage
-                main_HeadScriptCnt = main_HeadScriptCnt + 1
+                ReDim Preserve cpCore.main_HeadScripts(cpCore.main_HeadScriptCnt)
+                cpCore.main_HeadScripts(cpCore.main_HeadScriptCnt).IsLink = True
+                cpCore.main_HeadScripts(cpCore.main_HeadScriptCnt).Text = Filename
+                cpCore.main_HeadScripts(cpCore.main_HeadScriptCnt).addedByMessage = addedByMessage
+                cpCore.main_HeadScriptCnt = cpCore.main_HeadScriptCnt + 1
             End If
             '    If Filename <> "" And genericController.vbInstr(1, s, Filename, vbTextCompare) = 0 Then
             '
@@ -7688,7 +7688,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap
             '
             If PageTitle <> "" And genericController.vbInstr(1, main_MetaContent_Title, PageTitle, vbTextCompare) = 0 Then
-                If (addedByMessage <> "") And visitProperty.getBoolean("AllowDebugging") Then
+                If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
                     Call main_AddHeadTag2("<!-- title from " & addedByMessage & " -->", "")
                 End If
                 If main_MetaContent_Title <> "" Then
@@ -7717,7 +7717,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap
             '
             If MetaDescription <> "" And genericController.vbInstr(1, main_MetaContent_Description, MetaDescription, vbTextCompare) = 0 Then
-                If (addedByMessage <> "") And visitProperty.getBoolean("AllowDebugging") Then
+                If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
                     Call main_AddHeadTag2("<!-- meta description from " & addedByMessage & " -->", "")
                 End If
                 If main_MetaContent_Description <> "" Then
@@ -7746,10 +7746,10 @@ ErrorTrap:
             '
             If StyleSheetLink <> "" Then
                 main_MetaContent_StyleSheetTags = main_MetaContent_StyleSheetTags & cr
-                If (addedByMessage <> "") And visitProperty.getBoolean("AllowDebugging") Then
+                If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
                     main_MetaContent_StyleSheetTags = main_MetaContent_StyleSheetTags & "<!-- from " & addedByMessage & " -->"
                 End If
-                If visitProperty.getBoolean("AllowAdvancedEditor") Then
+                If cpCore.visitProperty.getBoolean("AllowAdvancedEditor") Then
                     If genericController.vbInstr(1, StyleSheetLink, "&") <> 0 Then
                         main_MetaContent_StyleSheetTags = main_MetaContent_StyleSheetTags & "<link rel=""stylesheet"" type=""text/css"" href=""" & StyleSheetLink & """>"
                     Else
@@ -7779,7 +7779,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap
             '
             If genericController.vbInstr(1, main_MetaContent_SharedStyleIDList & ",", "," & styleId & ",") = 0 Then
-                If (addedByMessage <> "") And visitProperty.getBoolean("AllowDebugging") Then
+                If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
                     Call main_AddHeadTag2("<!-- shared style " & styleId & " from " & addedByMessage & " -->", "")
                 End If
                 main_MetaContent_SharedStyleIDList = main_MetaContent_SharedStyleIDList & "," & styleId
@@ -7804,7 +7804,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap
             '
             If MetaKeywordList <> "" And genericController.vbInstr(1, main_MetaContent_KeyWordList, MetaKeywordList, vbTextCompare) = 0 Then
-                If (addedByMessage <> "") And visitProperty.getBoolean("AllowDebugging") Then
+                If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
                     Call main_AddHeadTag2("<!-- meta keyword list from " & addedByMessage & " -->", "")
                 End If
                 If main_MetaContent_KeyWordList <> "" Then
@@ -7835,7 +7835,7 @@ ErrorTrap:
                 If main_MetaContent_OtherHeadTags <> "" Then
                     main_MetaContent_OtherHeadTags = main_MetaContent_OtherHeadTags & vbCrLf
                 End If
-                If (addedByMessage <> "") And visitProperty.getBoolean("AllowDebugging") Then
+                If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
                     main_MetaContent_OtherHeadTags = main_MetaContent_OtherHeadTags & "<!-- from " & addedByMessage & " -->" & vbCrLf
                 End If
                 main_MetaContent_OtherHeadTags = main_MetaContent_OtherHeadTags & HeadTag
@@ -8019,7 +8019,7 @@ ErrorTrap:
                 '
                 'hint = hint & ",040"
                 If PlainText Then
-                    converthtmlToText = New coreHtmlToTextClass(Me)
+                    converthtmlToText = New coreHtmlToTextClass(cpCore)
                     returnValue = converthtmlToText.convert(returnValue)
                     converthtmlToText = Nothing
                 End If
@@ -8086,7 +8086,7 @@ ErrorTrap:
                                             '
                                             'hint = hint & ",320"
                                             ListName = cpCore.csv_GetAddonOption("name", addonOptionString)
-                                            returnValue = returnValue & pageManager_GetChildPageList(ListName, ContextContentName, ContextRecordID, True)
+                                            returnValue = returnValue & cpCore.pageManager_GetChildPageList(ListName, ContextContentName, ContextRecordID, True)
                                         Case ACTypeTemplateText
                                             '
                                             ' Text Box = copied here from gethtmlbody
@@ -8104,7 +8104,7 @@ ErrorTrap:
                                             ' Dynamic Menu
                                             '
                                             'hint = hint & ",320"
-                                            returnValue = returnValue & pageManager_GetDynamicMenu(addonOptionString, cpCore.siteProperties.useContentWatchLink)
+                                            returnValue = returnValue & cpCore.pageManager_GetDynamicMenu(addonOptionString, cpCore.siteProperties.useContentWatchLink)
                                         Case ACTypeWatchList
                                             '
                                             ' Watch List
@@ -8113,7 +8113,7 @@ ErrorTrap:
                                             ListName = cpCore.csv_GetAddonOption("LISTNAME", addonOptionString)
                                             SortField = cpCore.csv_GetAddonOption("SORTFIELD", addonOptionString)
                                             SortReverse = genericController.EncodeBoolean(cpCore.csv_GetAddonOption("SORTDIRECTION", addonOptionString))
-                                            returnValue = returnValue & Controllers.pageManagerController.main_GetWatchList(Me, ListName, SortField, SortReverse)
+                                            returnValue = returnValue & Controllers.pageManagerController.main_GetWatchList(cpCore, ListName, SortField, SortReverse)
                                         Case Else
                                             '
                                             ' Unrecognized command - put all the syntax back in
@@ -8151,7 +8151,7 @@ ErrorTrap:
                         LineStart = genericController.vbInstr(1, returnValue, StartFlag)
                         LineEnd = genericController.vbInstr(LineStart, returnValue, EndFlag)
                         If LineEnd = 0 Then
-                            logController.log_appendLog(Me, "csv_EncodeContent9, Addon could not be inserted into content because the HTML comment holding the position is not formated correctly")
+                            logController.log_appendLog(cpCore, "csv_EncodeContent9, Addon could not be inserted into content because the HTML comment holding the position is not formated correctly")
                             Exit Do
                         Else
                             AddonName = ""
@@ -8252,12 +8252,12 @@ ErrorTrap:
                     '
                     'hint = hint & ",600, Handle webclient features"
                     If genericController.vbInstr(1, returnValue, FeedbackFormNotSupportedComment, vbTextCompare) <> 0 Then
-                        returnValue = genericController.vbReplace(returnValue, FeedbackFormNotSupportedComment, Controllers.pageManagerController.main_GetFeedbackForm(Me, ContextContentName, ContextRecordID, ContextContactPeopleID), 1, 99, vbTextCompare)
+                        returnValue = genericController.vbReplace(returnValue, FeedbackFormNotSupportedComment, Controllers.pageManagerController.main_GetFeedbackForm(cpCore, ContextContentName, ContextRecordID, ContextContactPeopleID), 1, 99, vbTextCompare)
                     End If
                     '
                     ' if call from webpage, push addon js and css out to cpCoreClass
                     '
-                    Copy = web_GetEncodeContent_HeadTags()
+                    Copy = cpCore.web_GetEncodeContent_HeadTags()
                     If Copy <> "" Then
                         '
                         ' headtags generated from csv_EncodeContent
@@ -8280,7 +8280,7 @@ ErrorTrap:
                         If genericController.vbInstr(1, Copy, "://") <> 0 Then
                         ElseIf Left(Copy, 1) = "/" Then
                         Else
-                            Copy = webServer.webServerIO_requestProtocol & webServer.requestDomain & cpCore.csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, Copy)
+                            Copy = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, Copy)
                         End If
                         Call main_AddHeadScriptLink(Copy, "embedded content")
                         Copy = cpCore.csv_GetEncodeContent_JSFilename()
@@ -8297,7 +8297,7 @@ ErrorTrap:
                         If genericController.vbInstr(1, Copy, "://") <> 0 Then
                         ElseIf Left(Copy, 1) = "/" Then
                         Else
-                            Copy = webServer.webServerIO_requestProtocol & webServer.requestDomain & cpCore.csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, Copy)
+                            Copy = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, Copy)
                         End If
                         Call main_AddStylesheetLink2(Copy, "")
                         Copy = cpCore.csv_GetEncodeContent_StyleFilenames()

@@ -235,7 +235,7 @@ Namespace Contensive.Core
         ''' <param name="NewCode"></param>
         Public Overrides Sub addHeadJavascript(ByVal NewCode As String)
             If True Then
-                Call cpCore.main_AddHeadJavascript(NewCode)
+                Call cpCore.htmlDoc.main_AddHeadJavascript(NewCode)
             End If
         End Sub
         '
@@ -246,7 +246,7 @@ Namespace Contensive.Core
         ''' <param name="HeadTag"></param>
         Public Overrides Sub addHeadTag(ByVal HeadTag As String)
             If True Then
-                Call cpCore.main_AddHeadTag(HeadTag)
+                Call cpCore.htmlDoc.main_AddHeadTag(HeadTag)
             End If
         End Sub
         '
@@ -254,7 +254,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub addMetaDescription(ByVal MetaDescription As String)
             If True Then
-                Call cpCore.main_addMetaDescription(MetaDescription)
+                Call cpCore.htmlDoc.main_addMetaDescription(MetaDescription)
             End If
         End Sub
         '
@@ -262,7 +262,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub addMetaKeywordList(ByVal MetaKeywordList As String)
             If True Then
-                Call cpCore.main_addMetaKeywordList(MetaKeywordList)
+                Call cpCore.htmlDoc.main_addMetaKeywordList(MetaKeywordList)
             End If
         End Sub
         '
@@ -270,7 +270,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub addOnLoadJavascript(ByVal NewCode As String)
             If True Then
-                Call cpCore.main_AddOnLoadJavascript(NewCode)
+                Call cpCore.htmlDoc.main_AddOnLoadJavascript(NewCode)
             End If
         End Sub
         '
@@ -278,7 +278,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub addTitle(ByVal PageTitle As String)
             If True Then
-                Call cpCore.main_AddPagetitle(PageTitle)
+                Call cpCore.htmlDoc.main_AddPagetitle(PageTitle)
             End If
         End Sub
         '
@@ -302,7 +302,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub addHeadStyleLink(ByVal StyleSheetLink As String)
             If True Then
-                Call cpCore.main_AddStylesheetLink(StyleSheetLink)
+                Call cpCore.htmlDoc.main_AddStylesheetLink(StyleSheetLink)
             End If
         End Sub
         '

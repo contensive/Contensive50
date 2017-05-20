@@ -138,24 +138,24 @@ Namespace Contensive.Core
         Public main_RenderedTemplateName As String = ""           ' The current template's name
         Public main_RenderedNavigationStructure As String = ""    ' Public string describing the current page
         '
-        Private main_RenderedParentID As Integer = 0               '
+        Public main_RenderedParentID As Integer = 0               '
         '
-        Private main_RenderCache_Loaded As Boolean = False                               ' true after main_loadRenderCache
+        Public main_RenderCache_Loaded As Boolean = False                               ' true after main_loadRenderCache
         '
-        Private main_RenderCache_CurrentPage_PCCPtr As Integer = 0
-        Private main_RenderCache_CurrentPage_ContentId As Integer = 0                        '
-        Private main_RenderCache_CurrentPage_ContentName As String = ""                   ' set during LoadContent_CurrentPage
-        Private main_RenderCache_CurrentPage_IsRenderingMode As Boolean = False             ' true if tools panel rendering is on
-        Private main_RenderCache_CurrentPage_IsQuickEditing As Boolean = False              ' true if tools panel is on, and user can author current page
-        Private main_RenderCache_CurrentPage_IsEditing As Boolean = False                   ' true if tools panel is on
-        Private main_RenderCache_CurrentPage_IsAuthoring As Boolean = False                ' true if either editing or quickediting
-        Private main_RenderCache_CurrentPage_IsRootPage As Boolean = False                  ' true after LoadContent if the current page is the root page
+        Public main_RenderCache_CurrentPage_PCCPtr As Integer = 0
+        Public main_RenderCache_CurrentPage_ContentId As Integer = 0                        '
+        Public main_RenderCache_CurrentPage_ContentName As String = ""                   ' set during LoadContent_CurrentPage
+        Public main_RenderCache_CurrentPage_IsRenderingMode As Boolean = False             ' true if tools panel rendering is on
+        Public main_RenderCache_CurrentPage_IsQuickEditing As Boolean = False              ' true if tools panel is on, and user can author current page
+        Public main_RenderCache_CurrentPage_IsEditing As Boolean = False                   ' true if tools panel is on
+        Public main_RenderCache_CurrentPage_IsAuthoring As Boolean = False                ' true if either editing or quickediting
+        Public main_RenderCache_CurrentPage_IsRootPage As Boolean = False                  ' true after LoadContent if the current page is the root page
         '
-        Private main_RenderCache_ParentBranch_PCCPtrCnt As Integer = 0
-        Private main_RenderCache_ParentBranch_PCCPtrs As Integer()
+        Public main_RenderCache_ParentBranch_PCCPtrCnt As Integer = 0
+        Public main_RenderCache_ParentBranch_PCCPtrs As Integer()
         '
-        Private main_RenderCache_ChildBranch_PCCPtrCnt As Integer = 0
-        Private main_RenderCache_ChildBranch_PCCPtrs As Integer()
+        Public main_RenderCache_ChildBranch_PCCPtrCnt As Integer = 0
+        Public main_RenderCache_ChildBranch_PCCPtrs As Integer()
         '
 
 
@@ -205,7 +205,7 @@ Namespace Contensive.Core
         '
         '
         '
-        Private main_CheckListCnt As Integer = 0                    ' cnt of the main_GetFormInputCheckList calls - used for javascript
+        Public main_CheckListCnt As Integer = 0                    ' cnt of the main_GetFormInputCheckList calls - used for javascript
         '
         ' ----------------------------------------------------------------------------------------
         '   values collected from add-ons as the page progresses
@@ -229,15 +229,15 @@ Namespace Contensive.Core
         '
         ' Page Bake Header
         '
-        Private Const main_BakeHeadDelimiter = "#####MultilineFlag#####"
+        Public Const main_BakeHeadDelimiter = "#####MultilineFlag#####"
         '
         ' Count of how many main_GetFormInputDate calendars have been placed
         '
-        Private main_InputDateCnt As Integer = 0
+        Public main_InputDateCnt As Integer = 0
         '
-        Private main_AdminWarning As String = ""                                      ' Message - when set displays in an admin hint box in the page
-        Private main_AdminWarningPageID As Integer = 0                                  ' PageID that goes with the warning
-        Private main_AdminWarningSectionID As Integer = 0                               ' PageID that goes with the warning
+        Public main_AdminWarning As String = ""                                      ' Message - when set displays in an admin hint box in the page
+        Public main_AdminWarningPageID As Integer = 0                                  ' PageID that goes with the warning
+        Public main_AdminWarningSectionID As Integer = 0                               ' PageID that goes with the warning
         '
         ' Cache the input selects (admin uses the same ones over and over)
         '
@@ -3169,19 +3169,19 @@ ErrorTrap:
                         '
                         ' encode subject
                         '
-                        subjectEncoded = html_executeContentCommands(Nothing, subjectEncoded, CPUtilsBaseClass.addonContext.ContextEmail, ToMemberID, True, layoutError)
-                        subjectEncoded = html_encodeContent10(subjectEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
+                        subjectEncoded = htmlDoc.html_executeContentCommands(Nothing, subjectEncoded, CPUtilsBaseClass.addonContext.ContextEmail, ToMemberID, True, layoutError)
+                        subjectEncoded = htmlDoc.html_encodeContent10(subjectEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
                         '
                         ' encode Body
                         '
-                        bodyEncoded = html_executeContentCommands(Nothing, bodyEncoded, CPUtilsBaseClass.addonContext.ContextEmail, ToMemberID, True, layoutError)
-                        bodyEncoded = html_encodeContent10(bodyEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
+                        bodyEncoded = htmlDoc.html_executeContentCommands(Nothing, bodyEncoded, CPUtilsBaseClass.addonContext.ContextEmail, ToMemberID, True, layoutError)
+                        bodyEncoded = htmlDoc.html_encodeContent10(bodyEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
                         '
                         ' encode template
                         '
                         If (templateEncoded <> "") Then
-                            templateEncoded = html_executeContentCommands(Nothing, templateEncoded, CPUtilsBaseClass.addonContext.ContextEmail, ToMemberID, True, layoutError)
-                            templateEncoded = html_encodeContent10(templateEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
+                            templateEncoded = htmlDoc.html_executeContentCommands(Nothing, templateEncoded, CPUtilsBaseClass.addonContext.ContextEmail, ToMemberID, True, layoutError)
+                            templateEncoded = htmlDoc.html_encodeContent10(templateEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
                             '
                             If (InStr(1, templateEncoded, fpoContentBox) <> 0) Then
                                 bodyEncoded = genericController.vbReplace(templateEncoded, fpoContentBox, bodyEncoded)
@@ -3996,7 +3996,7 @@ ErrorTrap:
                     '
                     ' ----- handle content special cases (prevent redirect to deleted records)
                     '
-                    NonEncodedLink = main_DecodeUrl(EncodedLink)
+                    NonEncodedLink = htmlDoc.main_DecodeUrl(EncodedLink)
                     Select Case genericController.vbUCase(iContentName)
                         Case "CONTENT WATCH"
                             '
@@ -4584,8 +4584,8 @@ ErrorTrap:
                     BubbleCopy = "Use the Tools Panel to enable features such as editing and debugging tools. It also includes links to the admin site, the support site and the My Profile page."
                     main_GetToolsPanel = main_GetToolsPanel & main_GetPanelHeader("Contensive Tools Panel" & helpLink)
                     '
-                    ToolsPanel.Add(html_GetFormStart(WorkingQueryString))
-                    ToolsPanel.Add(html_GetFormInputHidden("Type", FormTypeToolsPanel))
+                    ToolsPanel.Add(htmlDoc.html_GetFormStart(WorkingQueryString))
+                    ToolsPanel.Add(htmlDoc.html_GetFormInputHidden("Type", FormTypeToolsPanel))
                     '
                     If True Then
                         '
@@ -4781,7 +4781,7 @@ ErrorTrap:
                         & genericController.kmaIndent(Copy) _
                         & cr & "</table>"
                     ToolsPanel.Add(main_GetPanelInput(Copy))
-                    ToolsPanel.Add(html_GetFormEnd)
+                    ToolsPanel.Add(htmlDoc.html_GetFormEnd)
                     main_GetToolsPanel = main_GetToolsPanel & main_GetPanel(ToolsPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5)
                     '
                     main_GetToolsPanel = main_GetToolsPanel & main_GetPanel(LinkPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5)
@@ -7016,7 +7016,7 @@ ErrorTrap:
                             & " class=""ccRecordEditLink"" " _
                             & " TabIndex=-1" _
                             & " href=""" & htmlDoc.html_EncodeHTML(siteProperties.adminURL & "?cid=" & ContentID & "&id=" & iRecordID & "&af=4&aa=2&ad=1") & """"
-                        If Not main_ReturnAfterEdit Then
+                        If Not htmlDoc.main_ReturnAfterEdit Then
                             main_GetRecordEditLink2 = main_GetRecordEditLink2 & " target=""_blank"""
                         End If
                         main_GetRecordEditLink2 = main_GetRecordEditLink2 _
@@ -7203,13 +7203,13 @@ ErrorTrap:
                     If Not useFlyout Then
                         Link = siteProperties.adminURL & "?cid=" & iContentID & "&af=4&aa=2&ad=1"
                         If PresetNameValueList <> "" Then
-                            Link = Link & "&wc=" & main_EncodeRequestVariable(PresetNameValueList)
+                            Link = Link & "&wc=" & htmlDoc.main_EncodeRequestVariable(PresetNameValueList)
                         End If
                         main_GetRecordAddLink2 = main_GetRecordAddLink2 _
                             & "<a" _
                             & " TabIndex=-1" _
                             & " href=""" & htmlDoc.html_EncodeHTML(Link) & """"
-                        If Not main_ReturnAfterEdit Then
+                        If Not htmlDoc.main_ReturnAfterEdit Then
                             main_GetRecordAddLink2 = main_GetRecordAddLink2 & " target=""_blank"""
                         End If
                         main_GetRecordAddLink2 = main_GetRecordAddLink2 _
@@ -7302,7 +7302,7 @@ ErrorTrap:
                             main_GetRecordAddLink2 = genericController.vbReplace(main_GetRecordAddLink2, "IconContentAdd.gif"" ", "IconContentAdd.gif"" align=""absmiddle"" ")
                         End If
                     End If
-                    If main_ReturnAfterEdit Then
+                    If htmlDoc.main_ReturnAfterEdit Then
                         main_GetRecordAddLink2 = genericController.vbReplace(main_GetRecordAddLink2, "target=", "xtarget=", 1, 99, vbTextCompare)
                     End If
                     'End If
@@ -7512,7 +7512,7 @@ ErrorTrap:
                             If PresetNameValueList <> "" Then
                                 Dim NameValueList As String
                                 NameValueList = PresetNameValueList
-                                Link = Link & "&wc=" & main_EncodeRequestVariable(PresetNameValueList)
+                                Link = Link & "&wc=" & htmlDoc.main_EncodeRequestVariable(PresetNameValueList)
                             End If
                         End If
                         Call htmlDoc.menu_AddEntry(MenuName & ":" & ContentName, ParentMenuName, , , Link, ButtonCaption, "", "", True)
@@ -7610,7 +7610,7 @@ ErrorTrap:
                 '
                 ' Just do a text box with a blank
                 '
-                main_GetFormCSInput = htmlDoc.htmldoc.html_GetFormInputText2(genericController.encodeText(FieldName), "")
+                main_GetFormCSInput = htmlDoc.html_GetFormInputText2(genericController.encodeText(FieldName), "")
             End If
             Exit Function
             '
@@ -7701,10 +7701,10 @@ ErrorTrap:
             'If Not (true) Then Exit Function
             '
             If Title <> "" Then
-                Call main_AddPagetitle(Title)
+                Call htmlDoc.main_AddPagetitle(Title)
             End If
             If htmlDoc.main_MetaContent_Title = "" Then
-                Call main_AddPagetitle("Admin-" & webServer.webServerIO_requestDomain)
+                Call htmlDoc.main_AddPagetitle("Admin-" & webServer.webServerIO_requestDomain)
             End If
             webServer.webServerIO_response_NoFollow = True
             '
@@ -9140,7 +9140,7 @@ ErrorTrap:
                 RecordID = db.cs_getInteger(CSPointer, "id")
                 ContentName = metaData.getContentNameByID(db.cs_getInteger(CSPointer, "contentcontrolId"))
             End If
-            main_cs_getEncodedField = html_encodeContent10(db.cs_get(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName)), user.id, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, user.isAuthenticated, Nothing, user.isEditingAnything)
+            main_cs_getEncodedField = htmlDoc.html_encodeContent10(db.cs_get(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName)), user.id, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, user.isAuthenticated, Nothing, user.isEditingAnything)
             Exit Function
             '
             ' ----- Error Trap
@@ -9797,7 +9797,7 @@ ErrorTrap:
             '
             DefaultTemplateLink = siteProperties.getText("SectionLandingLink", requestAppRootPath & siteProperties.serverPageDefault)
             pageManager_GetSectionMenuNamed = pageManager_GetSectionMenu(DepthLimit, MenuStyle, StyleSheetPrefixLocal, DefaultTemplateLink, MenuID, MenuNameLocal, siteProperties.useContentWatchLink)
-            pageManager_GetSectionMenuNamed = main_GetEditWrapper("Section Menu", pageManager_GetSectionMenuNamed)
+            pageManager_GetSectionMenuNamed = htmlDoc.main_GetEditWrapper("Section Menu", pageManager_GetSectionMenuNamed)
             '
             If pageManager_RedirectLink <> "" Then
                 Call webServer.webServerIO_Redirect2(pageManager_RedirectLink, pageManager_RedirectReason, pageManager_RedirectBecausePageNotFound)
@@ -10060,7 +10060,7 @@ ErrorTrap:
                         If db.cs_ok(CSBlock) Then
                             FieldName = "copyFilename"
                             Copy = docProperties.getText(FieldName)
-                            Copy = html_DecodeContent(Copy)
+                            Copy = htmlDoc.html_DecodeContent(Copy)
                             If Copy <> db.cs_get(CSBlock, "copyFilename") Then
                                 Call db.cs_set(CSBlock, "copyFilename", Copy)
                                 SaveButNoChanges = False
@@ -11451,8 +11451,8 @@ ErrorTrap:
             End If
             Call db.cs_Close(CSSections)
             '
-            pageManager_GetSectionMenu = html_executeContentCommands(Nothing, pageManager_GetSectionMenu, CPUtilsBaseClass.addonContext.ContextPage, user.id, user.isAuthenticated, layoutError)
-            pageManager_GetSectionMenu = html_encodeContent10(pageManager_GetSectionMenu, user.id, "", 0, 0, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, user.isAuthenticated, Nothing, user.isEditingAnything)
+            pageManager_GetSectionMenu = htmlDoc.html_executeContentCommands(Nothing, pageManager_GetSectionMenu, CPUtilsBaseClass.addonContext.ContextPage, user.id, user.isAuthenticated, layoutError)
+            pageManager_GetSectionMenu = htmlDoc.html_encodeContent10(pageManager_GetSectionMenu, user.id, "", 0, 0, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, user.isAuthenticated, Nothing, user.isEditingAnything)
             'pageManager_GetSectionMenu = main_EncodeContent5(pageManager_GetSectionMenu, memberID, "", 0, 0, False, False, True, True, False, True, "", "", False, 0)
             '
             Exit Function
@@ -12407,9 +12407,9 @@ ErrorTrap:
                 CS = db.cs_open("Meta Content", Criteria, , , , ,, FieldList)
                 If db.cs_ok(CS) Then
                     MetaContentID = db.cs_getInteger(CS, "ID")
-                    Call main_AddPagetitle2(htmlDoc.html_EncodeHTML(db.cs_getText(CS, "Name")), "page content")
-                    Call main_addMetaDescription2(htmlDoc.html_EncodeHTML(db.cs_getText(CS, "MetaDescription")), "page content")
-                    Call main_AddHeadTag2(db.cs_getText(CS, "OtherHeadTags"), "page content")
+                    Call htmlDoc.main_AddPagetitle2(htmlDoc.html_EncodeHTML(db.cs_getText(CS, "Name")), "page content")
+                    Call htmlDoc.main_addMetaDescription2(htmlDoc.html_EncodeHTML(db.cs_getText(CS, "MetaDescription")), "page content")
+                    Call htmlDoc.main_AddHeadTag2(db.cs_getText(CS, "OtherHeadTags"), "page content")
                     If True Then
                         KeywordList = genericController.vbReplace(db.cs_getText(CS, "MetaKeywordList"), vbCrLf, ",")
                     End If
@@ -12436,7 +12436,7 @@ ErrorTrap:
                     End If
                     'KeyWordList = Mid(KeyWordList, 2)
                     KeywordList = htmlDoc.html_EncodeHTML(KeywordList)
-                    Call main_addMetaKeywordList2(KeywordList, "page content")
+                    Call htmlDoc.main_addMetaKeywordList2(KeywordList, "page content")
                 End If
                 Call db.cs_Close(CS)
                 'htmldoc.main_MetaContent_KeyWordList = encodeHTML(KeyWordList)
@@ -12684,7 +12684,7 @@ ErrorTrap:
                     Dim AllowCookieTest As Boolean
                     AllowCookieTest = siteProperties.allowVisitTracking And (visit.visit_pages = 1)
                     If AllowCookieTest Then
-                        Call main_AddOnLoadJavascript2("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" & security.encodeToken(visit.visit_Id, app_startTime) & "')};", "Cookie Test")
+                        Call htmlDoc.main_AddOnLoadJavascript2("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" & security.encodeToken(visit.visit_Id, app_startTime) & "')};", "Cookie Test")
                     End If
                     '
                     '--------------------------------------------------------------------------
@@ -13225,8 +13225,8 @@ ErrorTrap:
                                     'Call AppendLog("main_init(), 3420 - exit for custom content block")
                                     '
                                     Call main_SetMetaContent(0, 0)
-                                    Call main_AddOnLoadJavascript2("document.body.style.overflow='scroll'", "Anonymous User Block")
-                                    Dim Copy As String = cr & html_GetContentCopy("AnonymousUserResponseCopy", "<p style=""width:250px;margin:100px auto auto auto;"">The site is currently not available for anonymous access.</p>", user.id, True, user.isAuthenticated)
+                                    Call htmlDoc.main_AddOnLoadJavascript2("document.body.style.overflow='scroll'", "Anonymous User Block")
+                                    Dim Copy As String = cr & htmlDoc.html_GetContentCopy("AnonymousUserResponseCopy", "<p style=""width:250px;margin:100px auto auto auto;"">The site is currently not available for anonymous access.</p>", user.id, True, user.isAuthenticated)
                                     ' -- already encoded
                                     'Copy = EncodeContentForWeb(Copy, "copy content", 0, "", 0)
                                     Copy = "" _
@@ -14275,7 +14275,7 @@ ErrorTrap:
                             If db.cs_ok(CSPeople) Then
                                 Body = f.RepeatCell
                                 Body = genericController.vbReplace(Body, "{{CAPTION}}", CaptionSpan & Caption & "</span>", 1, 99, vbTextCompare)
-                                Body = genericController.vbReplace(Body, "{{FIELD}}", html_GetFormInputCS(CSPeople, "People", .PeopleField), 1, 99, vbTextCompare)
+                                Body = genericController.vbReplace(Body, "{{FIELD}}", htmlDoc.html_GetFormInputCS(CSPeople, "People", .PeopleField), 1, 99, vbTextCompare)
                                 RepeatBody = RepeatBody & Body
                                 HasRequiredFields = HasRequiredFields Or .REquired
                             End If
@@ -14642,7 +14642,7 @@ ErrorTrap:
                             If genericController.vbLCase(Right(StylesFilename, 4)) <> ".css" Then
                                 Call handleLegacyError15("Dynamic Menu [" & MenuName & "] StylesFilename is not a '.css' file, and will not display correct. Check that the field is setup as a CSSFile.", "main_GetDynamicMenu")
                             Else
-                                Call main_AddStylesheetLink2(webServer.webServerIO_requestProtocol & webServer.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, StylesFilename), "dynamic menu")
+                                Call htmlDoc.main_AddStylesheetLink2(webServer.webServerIO_requestProtocol & webServer.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, StylesFilename), "dynamic menu")
                             End If
                         End If
                     End If
@@ -14859,7 +14859,7 @@ ErrorTrap:
         '===========================================================================================================
         '
         Public Function pageManager_GetStyleSheetDefault() As String
-            pageManager_GetStyleSheetDefault = pageManager_GetStyleSheetDefault2()
+            pageManager_GetStyleSheetDefault = htmlDoc.pageManager_GetStyleSheetDefault2()
         End Function
         '        '
         '        '
@@ -14895,7 +14895,7 @@ ErrorTrap:
                 '
                 'Dim kmafs As New fileSystemClass
                 Call cdnFiles.saveFile(genericController.convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), csv_getStyleSheetProcessed)
-                Call cdnFiles.saveFile(genericController.convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css"), pageManager_GetStyleSheetDefault2)
+                Call cdnFiles.saveFile(genericController.convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css"), htmlDoc.pageManager_GetStyleSheetDefault2)
 
             End If
             If (StyleSN = 0) Then
@@ -14939,7 +14939,7 @@ ErrorTrap:
                     '
                     'Dim kmafs As New fileSystemClass
                     Call cdnFiles.saveFile(genericController.convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), csv_getStyleSheetProcessed)
-                    Call cdnFiles.saveFile(genericController.convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css"), pageManager_GetStyleSheetDefault2)
+                    Call cdnFiles.saveFile(genericController.convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css"), htmlDoc.pageManager_GetStyleSheetDefault2)
                 End If
                 admin_GetStyleTagAdmin = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServer.webServerIO_requestProtocol & webServer.webServerIO_requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, "templates/Admin" & StyleSN & ".css") & """ >"
             End If
@@ -15497,7 +15497,7 @@ ErrorTrap:
             Dim Copy As String
             '
             Copy = htmlDoc.html_EncodeHTML(StyleCopy)
-            main_GetFormInputStyles = html_GetFormInputTextExpandable2(TagName, StyleCopy, 10, , HtmlId, , , HtmlClass)
+            main_GetFormInputStyles = htmlDoc.html_GetFormInputTextExpandable2(TagName, StyleCopy, 10, , HtmlId, , , HtmlClass)
             'FieldRows = main_GetMemberProperty("StyleEditorRowHeight", 10)
             'FieldOptionRow = "<input TYPE=""Text"" TabIndex=-1 NAME=""" & TagName & "Rows"" SIZE=""3"" VALUE=""" & FieldRows & """ ID=""""  onchange=""" & TagName & ".rows=" & TagName & "Rows.value; return true""> Rows"
             'main_GetFormInputStyles = "<textarea NAME=""" & TagName & """ ROWS=""" & FieldRows & """ ID=""" & TagName & """ STYLE=""width: 600px;"">" & Copy & "</TEXTAREA>" & FieldOptionRow
@@ -15703,7 +15703,7 @@ ErrorTrap:
                             ' if menulinkoverride is encoded, decode it
                             '
                             If genericController.vbInstr(1, cache_pageContent(PCC_Link, Ptr), "%") <> 0 Then
-                                cache_pageContent(PCC_Link, Ptr) = main_DecodeUrl(cache_pageContent(PCC_Link, Ptr))
+                                cache_pageContent(PCC_Link, Ptr) = htmlDoc.main_DecodeUrl(cache_pageContent(PCC_Link, Ptr))
                             End If
                         Next
                         IDList = IDList2.Text
@@ -15958,7 +15958,7 @@ ErrorTrap:
                     End If
                     '
                     If genericController.vbInstr(1, cache_pageContent(PCC_Link, RowPtr), "%") <> 0 Then
-                        cache_pageContent(PCC_Link, RowPtr) = main_DecodeUrl(cache_pageContent(PCC_Link, RowPtr))
+                        cache_pageContent(PCC_Link, RowPtr) = htmlDoc.main_DecodeUrl(cache_pageContent(PCC_Link, RowPtr))
                     End If
                     '
                     ParentID = genericController.EncodeInteger(cache_pageContent(PCC_ParentID, RowPtr))
@@ -17428,8 +17428,8 @@ ErrorTrap:
                     styleId = db.cs_getInteger(CS, "ID")
                     If styleId <> LastStyleID Then
                         Filename = db.cs_get(CS, "StyleFilename")
-                        Prefix = genericController.vbReplace(main_encodeHTML(db.cs_get(CS, "Prefix")), ",", "&#44;")
-                        Suffix = genericController.vbReplace(main_encodeHTML(db.cs_get(CS, "Suffix")), ",", "&#44;")
+                        Prefix = genericController.vbReplace(htmlDoc.main_encodeHTML(db.cs_get(CS, "Prefix")), ",", "&#44;")
+                        Suffix = genericController.vbReplace(htmlDoc.main_encodeHTML(db.cs_get(CS, "Suffix")), ",", "&#44;")
                         If (Not main_IsAdminSite) And db.cs_getBoolean(CS, "alwaysinclude") Then
                             MapList = MapList & vbCrLf & "0" & vbTab & Filename & "<" & Prefix & "<" & Suffix
                         Else
@@ -17437,8 +17437,8 @@ ErrorTrap:
                         End If
                     End If
                     IncludedStyleFilename = db.cs_getText(CS, "iStylefilename")
-                    Prefix = main_encodeHTML(db.cs_get(CS, "iPrefix"))
-                    Suffix = main_encodeHTML(db.cs_get(CS, "iSuffix"))
+                    Prefix = htmlDoc.main_encodeHTML(db.cs_get(CS, "iPrefix"))
+                    Suffix = htmlDoc.main_encodeHTML(db.cs_get(CS, "iSuffix"))
                     If IncludedStyleFilename <> "" Then
                         MapList = MapList & "," & IncludedStyleFilename & "<" & Prefix & "<" & Suffix
                     End If
@@ -18555,7 +18555,7 @@ ErrorTrap:
                     End If
                     '
                     If genericController.EncodeBoolean(autoPrintText) Then
-                        Call main_AddOnLoadJavascript2("window.print(); window.close()", "Print Page")
+                        Call htmlDoc.main_AddOnLoadJavascript2("window.print(); window.close()", "Print Page")
                     End If
                     BodyOpen = "<body class=""ccBodyPrint"">"
 
@@ -18598,10 +18598,10 @@ ErrorTrap:
                         ' Open a page compatible with a dialog
                         '
                         Call htmlDoc.webServerIO_addRefreshQueryString("EditorObjectName", EditorObjectName)
-                        Call main_AddHeadScriptLink("/ccLib/ClientSide/dialogs.js", "Resource Library")
+                        Call htmlDoc.main_AddHeadScriptLink("/ccLib/ClientSide/dialogs.js", "Resource Library")
                         'Call AddHeadScript("<script type=""text/javascript"" src=""/ccLib/ClientSide/dialogs.js""></script>")
                         Call main_SetMetaContent(0, 0)
-                        Call main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Resource Library")
+                        Call htmlDoc.main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Resource Library")
                         Copy = main_GetResourceLibrary2("", True, EditorObjectName, LinkObjectName, True)
                         'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2b")
                         Copy = "" _
@@ -18636,10 +18636,10 @@ ErrorTrap:
                         ' Open a page compatible with a dialog
                         '
                         Call htmlDoc.webServerIO_addRefreshQueryString("LinkObjectName", LinkObjectName)
-                        Call main_AddHeadScriptLink("/ccLib/ClientSide/dialogs.js", "Resource Library")
+                        Call htmlDoc.main_AddHeadScriptLink("/ccLib/ClientSide/dialogs.js", "Resource Library")
                         'Call AddHeadScript("<script type=""text/javascript"" src=""/ccLib/ClientSide/dialogs.js""></script>")
                         Call main_SetMetaContent(0, 0)
-                        Call main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Resource Library")
+                        Call htmlDoc.main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Resource Library")
                         Copy = main_GetResourceLibrary2("", True, EditorObjectName, LinkObjectName, True)
                         'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2c")
                         Copy = "" _
@@ -18699,10 +18699,10 @@ ErrorTrap:
                         ' Open a page compatible with a dialog
                         '
                         Call htmlDoc.webServerIO_addRefreshQueryString("LinkObjectName", LinkObjectName)
-                        Call main_AddPagetitle("Site Explorer")
+                        Call htmlDoc.main_AddPagetitle("Site Explorer")
                         Call main_SetMetaContent(0, 0)
                         Copy = addon.execute_legacy5(0, "Site Explorer", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", 0)
-                        Call main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Site Explorer")
+                        Call htmlDoc.main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Site Explorer")
                         'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2d")
                         Copy = "" _
                             & main_docType _
@@ -19009,7 +19009,7 @@ ErrorTrap:
             End If
             Stream = Stream & main_GetPanelHeader("Contensive Active Content Editor")
             Stream = Stream & main_GetPanel(EditorPanel)
-            Stream = html_GetFormStart() & Stream & html_GetFormEnd()
+            Stream = htmlDoc.html_GetFormStart() & Stream & htmlDoc.html_GetFormEnd()
             main_GetActiveEditor = Stream
             '
             ' ----- Error Trap
@@ -19058,7 +19058,7 @@ ErrorTrap:
                     '
                     ' ----- convert editor active edit icons
                     '
-                    ContentCopy = html_DecodeContent(ContentCopy)
+                    ContentCopy = htmlDoc.html_DecodeContent(ContentCopy)
                     '
                     ' ----- save the content
                     '
@@ -19184,7 +19184,7 @@ ErrorTrap:
                         '
                         ' rejoin
                         '
-                        NameValuePair = pageManager_GetAddonSelector(OptionName, OptionValue, OptionSelector)
+                        NameValuePair = htmlDoc.pageManager_GetAddonSelector(OptionName, OptionValue, OptionSelector)
                         NameValuePair = genericController.EncodeJavascript(NameValuePair)
                         main_GetDefaultAddonOption_String = main_GetDefaultAddonOption_String & "&" & NameValuePair
                         If genericController.vbInstr(1, NameValuePair, "=") = 0 Then
@@ -21055,8 +21055,8 @@ ErrorTrap:
                     ' ----- Encode Template
                     '
                     If Not htmlDoc.pageManager_printVersion Then
-                        LocalTemplateBody = html_executeContentCommands(Nothing, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, user.id, user.isAuthenticated, layoutError)
-                        returnHtmlBody = returnHtmlBody & html_encodeContent9(LocalTemplateBody, user.id, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", webServer.webServerIO_requestProtocol & webServer.requestDomain, False, siteProperties.defaultWrapperID, PageContent, CPUtilsBaseClass.addonContext.ContextTemplate)
+                        LocalTemplateBody = htmlDoc.html_executeContentCommands(Nothing, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, user.id, user.isAuthenticated, layoutError)
+                        returnHtmlBody = returnHtmlBody & htmlDoc.html_encodeContent9(LocalTemplateBody, user.id, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", webServer.webServerIO_requestProtocol & webServer.requestDomain, False, siteProperties.defaultWrapperID, PageContent, CPUtilsBaseClass.addonContext.ContextTemplate)
                         'returnHtmlBody = returnHtmlBody & EncodeContent8(LocalTemplateBody, memberID, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", main_ServerProtocol, False, app.SiteProperty_DefaultWrapperID, PageContent, ContextTemplate)
                     End If
                     '
@@ -21079,7 +21079,7 @@ ErrorTrap:
                         ' Add template editing
                         '
                         If visitProperty.getBoolean("AllowAdvancedEditor") And user.isEditing("Page Templates") Then
-                            returnHtmlBody = main_GetEditWrapper("Page Template [" & LocalTemplateName & "]", main_GetRecordEditLink2("Page Templates", LocalTemplateID, False, LocalTemplateName, user.isEditing("Page Templates")) & returnHtmlBody)
+                            returnHtmlBody = htmlDoc.main_GetEditWrapper("Page Template [" & LocalTemplateName & "]", main_GetRecordEditLink2("Page Templates", LocalTemplateID, False, LocalTemplateName, user.isEditing("Page Templates")) & returnHtmlBody)
                         End If
                     End If
                     '
@@ -21361,13 +21361,13 @@ ErrorTrap:
                     SectionTemplateID = genericController.EncodeInteger(cache_siteSection(SSC_TemplateID, Ptr))
                     SectionContentID = genericController.EncodeInteger(cache_siteSection(SSC_ContentID, Ptr))
                     SectionBlock = genericController.EncodeBoolean(cache_siteSection(SSC_BlockSection, Ptr))
-                    Call main_AddOnLoadJavascript2(genericController.encodeText(cache_siteSection(SSC_JSOnLoad, Ptr)), "site section")
-                    Call main_AddHeadScriptCode(genericController.encodeText(cache_siteSection(SSC_JSHead, Ptr)), "site section")
-                    Call main_AddEndOfBodyJavascript2(genericController.encodeText(cache_siteSection(SSC_JSEndBody, Ptr)), "site section")
+                    Call htmlDoc.main_AddOnLoadJavascript2(genericController.encodeText(cache_siteSection(SSC_JSOnLoad, Ptr)), "site section")
+                    Call htmlDoc.main_AddHeadScriptCode(genericController.encodeText(cache_siteSection(SSC_JSHead, Ptr)), "site section")
+                    Call htmlDoc.main_AddEndOfBodyJavascript2(genericController.encodeText(cache_siteSection(SSC_JSEndBody, Ptr)), "site section")
                     JSFilename = genericController.encodeText(cache_siteSection(SSC_JSFilename, Ptr))
                     If JSFilename <> "" Then
                         JSFilename = webServer.webServerIO_requestProtocol & webServer.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
-                        Call main_AddHeadScriptLink(JSFilename, "site section")
+                        Call htmlDoc.main_AddHeadScriptLink(JSFilename, "site section")
                     End If
                 End If
             ElseIf (SectionID <> 0) Then
@@ -21397,13 +21397,13 @@ ErrorTrap:
                     SectionTemplateID = genericController.EncodeInteger(cache_siteSection(SSC_TemplateID, Ptr))
                     SectionContentID = genericController.EncodeInteger(cache_siteSection(SSC_ContentID, Ptr))
                     SectionBlock = genericController.EncodeBoolean(cache_siteSection(SSC_BlockSection, Ptr))
-                    Call main_AddOnLoadJavascript2(genericController.encodeText(cache_siteSection(SSC_JSOnLoad, Ptr)), "site section")
-                    Call main_AddHeadScriptCode(genericController.encodeText(cache_siteSection(SSC_JSHead, Ptr)), "site section")
-                    Call main_AddEndOfBodyJavascript2(genericController.encodeText(cache_siteSection(SSC_JSEndBody, Ptr)), "site section")
+                    Call htmlDoc.main_AddOnLoadJavascript2(genericController.encodeText(cache_siteSection(SSC_JSOnLoad, Ptr)), "site section")
+                    Call htmlDoc.main_AddHeadScriptCode(genericController.encodeText(cache_siteSection(SSC_JSHead, Ptr)), "site section")
+                    Call htmlDoc.main_AddEndOfBodyJavascript2(genericController.encodeText(cache_siteSection(SSC_JSEndBody, Ptr)), "site section")
                     JSFilename = genericController.encodeText(cache_siteSection(SSC_JSFilename, Ptr))
                     If JSFilename <> "" Then
                         JSFilename = webServer.webServerIO_requestProtocol & webServer.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
-                        Call main_AddHeadScriptLink(JSFilename, "site section")
+                        Call htmlDoc.main_AddHeadScriptLink(JSFilename, "site section")
                     End If
                 End If
                 '
@@ -21520,13 +21520,13 @@ ErrorTrap:
                         SectionTemplateID = db.cs_getInteger(CSSection, "TemplateID")
                         SectionContentID = db.cs_getInteger(CSSection, "ContentID")
                         SectionBlock = db.cs_getBoolean(CSSection, "BlockSection")
-                        Call main_AddOnLoadJavascript2(db.cs_getText(CSSection, "JSOnLoad"), "site section")
-                        Call main_AddHeadScriptCode(db.cs_getText(CSSection, "JSHead"), "site section")
-                        Call main_AddEndOfBodyJavascript2(db.cs_getText(CSSection, "JSEndBody"), "site section")
+                        Call htmlDoc.main_AddOnLoadJavascript2(db.cs_getText(CSSection, "JSOnLoad"), "site section")
+                        Call htmlDoc.main_AddHeadScriptCode(db.cs_getText(CSSection, "JSHead"), "site section")
+                        Call htmlDoc.main_AddEndOfBodyJavascript2(db.cs_getText(CSSection, "JSEndBody"), "site section")
                         JSFilename = db.cs_getText(CSSection, "JSFilename")
                         If JSFilename <> "" Then
                             JSFilename = webServer.webServerIO_requestPage & webServer.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
-                            Call main_AddHeadScriptLink(JSFilename, "site section")
+                            Call htmlDoc.main_AddHeadScriptLink(JSFilename, "site section")
                         End If
                     End If
                     Call db.cs_Close(CSSection)
@@ -21722,15 +21722,15 @@ ErrorTrap:
                             End If
                             pageManager_TemplateLink = genericController.encodeText(cache_pageTemplate(TC_Link, TCPtr))
                             pageManager_TemplateName = genericController.encodeText(cache_pageTemplate(TC_Name, TCPtr))
-                            Call main_AddOnLoadJavascript2(genericController.encodeText(cache_pageTemplate(TC_JSOnLoad, TCPtr)), "template")
-                            Call main_AddHeadScriptCode(genericController.encodeText(cache_pageTemplate(TC_JSInHeadLegacy, TCPtr)), "template")
-                            Call main_AddEndOfBodyJavascript2(genericController.encodeText(cache_pageTemplate(TC_JSEndBody, TCPtr)), "template")
-                            Call main_AddHeadTag2(genericController.encodeText(cache_pageTemplate(TC_OtherHeadTags, TCPtr)), "template")
+                            Call htmlDoc.main_AddOnLoadJavascript2(genericController.encodeText(cache_pageTemplate(TC_JSOnLoad, TCPtr)), "template")
+                            Call htmlDoc.main_AddHeadScriptCode(genericController.encodeText(cache_pageTemplate(TC_JSInHeadLegacy, TCPtr)), "template")
+                            Call htmlDoc.main_AddEndOfBodyJavascript2(genericController.encodeText(cache_pageTemplate(TC_JSEndBody, TCPtr)), "template")
+                            Call htmlDoc.main_AddHeadTag2(genericController.encodeText(cache_pageTemplate(TC_OtherHeadTags, TCPtr)), "template")
                             pageManager_TemplateBodyTag = genericController.encodeText(cache_pageTemplate(TC_BodyTag, TCPtr))
                             JSFilename = genericController.encodeText(cache_pageTemplate(TC_JSInHeadFilename, TCPtr))
                             If JSFilename <> "" Then
                                 JSFilename = webServer.webServerIO_requestProtocol & webServer.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
-                                Call main_AddHeadScriptLink(JSFilename, "template")
+                                Call htmlDoc.main_AddHeadScriptLink(JSFilename, "template")
                             End If
                             '
                             ' Add exclusive styles
@@ -21752,7 +21752,7 @@ ErrorTrap:
                                 For Ptr = 0 To UBound(ListSplit)
                                     styleId = genericController.EncodeInteger(ListSplit(Ptr))
                                     If styleId <> 0 Then
-                                        Call main_AddSharedStyleID2(genericController.EncodeInteger(ListSplit(Ptr)), "template")
+                                        Call htmlDoc.main_AddSharedStyleID2(genericController.EncodeInteger(ListSplit(Ptr)), "template")
                                     End If
                                 Next
                             End If
@@ -21927,8 +21927,8 @@ ErrorTrap:
                             FieldRows = 50
                             Call userProperty.setProperty("Page Content.copyFilename.PixelHeight", 50)
                         End If
-                        styleList = main_GetStyleSheet2(csv_contentTypeEnum.contentTypeWeb, templateId, 0)
-                        addonListJSON = main_GetEditorAddonListJSON(csv_contentTypeEnum.contentTypeWeb)
+                        styleList = htmlDoc.main_GetStyleSheet2(csv_contentTypeEnum.contentTypeWeb, templateId, 0)
+                        addonListJSON = htmlDoc.main_GetEditorAddonListJSON(csv_contentTypeEnum.contentTypeWeb)
                         Editor = htmlDoc.html_GetFormInputHTML3("copyFilename", htmlDoc.html_quickEdit_copy, CStr(FieldRows), "100%", False, True, addonListJSON, styleList, styleOptionList)
                         returnHtml = genericController.vbReplace(returnHtml, html_quickEdit_fpo, Editor)
                     End If
@@ -21967,7 +21967,7 @@ ErrorTrap:
             If pageManager_RedirectLink <> "" Then
                 Call webServer.webServerIO_Redirect2(pageManager_RedirectLink, pageManager_RedirectReason, pageManager_RedirectBecausePageNotFound)
             ElseIf AllowEditWrapper Then
-                returnHtml = main_GetEditWrapper("Page Content", returnHtml)
+                returnHtml = htmlDoc.main_GetEditWrapper("Page Content", returnHtml)
             End If
             '
             pageManager_GetHtmlBody_GetSection = returnHtml
@@ -22125,7 +22125,7 @@ ErrorTrap:
                 '
                 ' PageRecordID and RootPageID are good
                 '
-                Call main_AddHeadTag2("<meta name=""contentId"" content=""" & PageRecordID & """ >", "page content")
+                Call htmlDoc.main_AddHeadTag2("<meta name=""contentId"" content=""" & PageRecordID & """ >", "page content")
                 '
                 'main_oldCacheArray_CurrentPagePtr = -1
                 If RootPageContentName = "" Then
@@ -22407,8 +22407,8 @@ ErrorTrap:
                     '
                     ' Encode the copy
                     '
-                    returnHtml = html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, user.id, user.isAuthenticated, layoutError)
-                    returnHtml = html_encodeContent9(returnHtml, user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+                    returnHtml = htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, user.id, user.isAuthenticated, layoutError)
+                    returnHtml = htmlDoc.html_encodeContent9(returnHtml, user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
                     'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, 0, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
                     RQS = web_RefreshQueryString
                     If RQS <> "" Then
@@ -22453,14 +22453,14 @@ ErrorTrap:
                             '
                             ' Link authoring, workflow rendering -> do encoding, but no tracking
                             '
-                            returnHtml = html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, user.id, user.isAuthenticated, layoutError)
-                            returnHtml = html_encodeContent9(returnHtml, user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+                            returnHtml = htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, user.id, user.isAuthenticated, layoutError)
+                            returnHtml = htmlDoc.html_encodeContent9(returnHtml, user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
                         ElseIf htmlDoc.pageManager_printVersion Then
                             '
                             ' Printer Version -> personalize and count viewings, no tracking
                             '
-                            returnHtml = html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, user.id, user.isAuthenticated, layoutError)
-                            returnHtml = html_encodeContent9(returnHtml, user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+                            returnHtml = htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, user.id, user.isAuthenticated, layoutError)
+                            returnHtml = htmlDoc.html_encodeContent9(returnHtml, user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
                             'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
                             Call db.executeSql("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & main_RenderedPageID)
                             'Call app.csv_SetCS(CS, "Viewings", app.csv_cs_getInteger(CS, "Viewings") + 1)
@@ -22472,8 +22472,8 @@ ErrorTrap:
                             ' this should be done before the contentbox is added
                             ' so a stray blocktext does not truncate the html
                             '!!!!!!!!!!!!!!!!!!!!!!!!!
-                            returnHtml = html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, user.id, user.isAuthenticated, layoutError)
-                            returnHtml = html_encodeContent9(returnHtml, user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+                            returnHtml = htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, user.id, user.isAuthenticated, layoutError)
+                            returnHtml = htmlDoc.html_encodeContent9(returnHtml, user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
                             'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
                             'Call main_TrackContent(main_RenderCache_CurrentPage_ContentName, main_RenderedPageID)
                             'Call main_TrackContentSet(CS)
@@ -22612,12 +22612,12 @@ ErrorTrap:
                     ' ----- Store page javascript
                     '---------------------------------------------------------------------------------
                     '
-                    Call main_AddOnLoadJavascript2(JSOnLoad, "page content")
-                    Call main_AddHeadScriptCode(JSHead, "page content")
+                    Call htmlDoc.main_AddOnLoadJavascript2(JSOnLoad, "page content")
+                    Call htmlDoc.main_AddHeadScriptCode(JSHead, "page content")
                     If JSFilename <> "" Then
-                        Call main_AddHeadScriptLink(csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, JSFilename), "page content")
+                        Call htmlDoc.main_AddHeadScriptLink(csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, JSFilename), "page content")
                     End If
-                    Call main_AddEndOfBodyJavascript2(JSEndBody, "page content")
+                    Call htmlDoc.main_AddEndOfBodyJavascript2(JSEndBody, "page content")
                     '
                     '---------------------------------------------------------------------------------
                     ' Set the Meta Content flag
@@ -22673,8 +22673,8 @@ ErrorTrap:
                 '
                 ' add contentid and sectionid
                 '
-                Call main_AddHeadTag2("<meta name=""contentId"" content=""" & main_RenderedPageID & """ >", "page content")
-                Call main_AddHeadTag2("<meta name=""sectionId"" content=""" & main_RenderedSectionID & """ >", "page content")
+                Call htmlDoc.main_AddHeadTag2("<meta name=""contentId"" content=""" & main_RenderedPageID & """ >", "page content")
+                Call htmlDoc.main_AddHeadTag2("<meta name=""sectionId"" content=""" & main_RenderedSectionID & """ >", "page content")
             End If
             '
             ' Display Admin Warnings with Edits for record errors
@@ -22901,7 +22901,7 @@ ErrorTrap:
                     ElseIf iIsEditing Then
                         PageName = genericController.encodeText(cache_pageContent(PCC_Name, main_RenderCache_CurrentPage_PCCPtr))
                         EditLink = main_GetRecordEditLink2(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage), PageName, user.isEditing(ContentName))
-                        returnHtml = returnHtml & main_GetEditWrapper("", main_GetRecordEditLink(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage)) & LiveBody)
+                        returnHtml = returnHtml & htmlDoc.main_GetEditWrapper("", main_GetRecordEditLink(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage)) & LiveBody)
                     Else
                         returnHtml = returnHtml & LiveBody
                     End If
@@ -23291,7 +23291,7 @@ ErrorTrap:
                     If headline <> "" Then
                         'hint = hint & ",043"
                         ' an html field can be added to an html stream. a non-html field should be html encoded before being added.
-                        headline = main_encodeHTML(headline)
+                        headline = htmlDoc.main_encodeHTML(headline)
                         If siteProperties.getBoolean("PageHeadlineUseccHeadline") Then
                             Cell = Cell & cr & "<p>" & AddSpan(headline, "ccHeadline") & "</p>"
                         Else
@@ -23495,7 +23495,7 @@ ErrorTrap:
             Dim PCCPtr As Integer
             Dim ChildListInstanceOptions As String
             '
-            Call main_AddStylesheetLink2("/ccLib/styles/ccQuickEdit.css", "Quick Editor")
+            Call htmlDoc.main_AddStylesheetLink2("/ccLib/styles/ccQuickEdit.css", "Quick Editor")
             '
             ' ----- First Active Record - Output Quick Editor form
             '
@@ -23579,11 +23579,11 @@ ErrorTrap:
             s = s _
             & cr & "<tr>" _
             & cr2 & "<td class=""qeRow qeLeft"" style=""padding-top:10px;"">Name</td>" _
-            & cr2 & "<td class=""qeRow qeRight"">" & htmlDoc.htmldoc.html_GetFormInputText2("name", genericController.encodeText(cache_pageContent(PCC_Name, main_RenderCache_CurrentPage_PCCPtr)), 1, , , , readOnlyField) & "</td>" _
+            & cr2 & "<td class=""qeRow qeRight"">" & htmlDoc.html_GetFormInputText2("name", genericController.encodeText(cache_pageContent(PCC_Name, main_RenderCache_CurrentPage_PCCPtr)), 1, , , , readOnlyField) & "</td>" _
             & cr & "</tr>" _
             & cr & "<tr>" _
             & cr2 & "<td class=""qeRow qeLeft"" style=""padding-top:10px;"">Headline</td>" _
-            & cr2 & "<td class=""qeRow qeRight"">" & htmlDoc.htmldoc.html_GetFormInputText2("headline", genericController.encodeText(cache_pageContent(PCC_Headline, main_RenderCache_CurrentPage_PCCPtr)), 1, , , , readOnlyField) & "</td>" _
+            & cr2 & "<td class=""qeRow qeRight"">" & htmlDoc.html_GetFormInputText2("headline", genericController.encodeText(cache_pageContent(PCC_Headline, main_RenderCache_CurrentPage_PCCPtr)), 1, , , , readOnlyField) & "</td>" _
             & cr & "</tr>" _
             & ""
             If readOnlyField Then
@@ -23701,7 +23701,7 @@ ErrorTrap:
                 FieldRows = 50
                 Call userProperty.setProperty(ContentName & ".copyFilename.PixelHeight", 50)
             End If
-            addonListJSON = main_GetEditorAddonListJSON(csv_contentTypeEnum.contentTypeWeb)
+            addonListJSON = htmlDoc.main_GetEditorAddonListJSON(csv_contentTypeEnum.contentTypeWeb)
             '
             ' At this point we do now know the the template so we can not main_Get the stylelist.
             ' Put in main_fpo_QuickEditing to be replaced after template known
@@ -24036,7 +24036,7 @@ ErrorTrap:
                                             Dim addonId As Integer = genericController.EncodeInteger(rsDr("addonid"))
                                             If (addonId <> 0) And (addonId <> addonDefaultEditorId) Then
                                                 returnResult = returnResult _
-                                                    & vbCrLf & vbTab & "<div class=""radioCon"">" & html_GetFormInputRadioBox(radioGroupName, genericController.encodeText(addonId), CStr(currentEditorAddonId)) & "&nbsp;Use " & genericController.encodeText(rsDr("addonName")) & "</div>" _
+                                                    & vbCrLf & vbTab & "<div class=""radioCon"">" & htmlDoc.html_GetFormInputRadioBox(radioGroupName, genericController.encodeText(addonId), CStr(currentEditorAddonId)) & "&nbsp;Use " & genericController.encodeText(rsDr("addonName")) & "</div>" _
                                                     & ""
                                             End If
 
@@ -24056,7 +24056,7 @@ ErrorTrap:
                                     returnResult = "" _
                                         & vbCrLf & vbTab & "<h1>Editor Preference</h1>" _
                                         & vbCrLf & vbTab & "<p>Select the editor you will use for this field. Select default if you want to use the current system default.</p>" _
-                                        & vbCrLf & vbTab & "<div class=""radioCon"">" & html_GetFormInputRadioBox("setEditorPreference" & fieldId, "0", "0") & "&nbsp;Use Default Editor" & addonDefaultEditorName & "</div>" _
+                                        & vbCrLf & vbTab & "<div class=""radioCon"">" & htmlDoc.html_GetFormInputRadioBox("setEditorPreference" & fieldId, "0", "0") & "&nbsp;Use Default Editor" & addonDefaultEditorName & "</div>" _
                                         & vbCrLf & vbTab & returnResult _
                                         & vbCrLf & vbTab & "<div class=""buttonCon"">" _
                                         & vbCrLf & vbTab & "<button type=""button"" onclick=""" & OnClick & """>Select</button>" _
@@ -24098,7 +24098,7 @@ ErrorTrap:
                                         Call visitProperty.setProperty(PropertyName, PropertyValue)
                                     Next
                                     returnResult = main_FormatRemoteQueryOutput(gd, RemoteFormatEnum.RemoteFormatJsonNameValue)
-                                    returnResult = main_encodeHTML(returnResult)
+                                    returnResult = htmlDoc.main_encodeHTML(returnResult)
                                     Call htmlDoc.writeAltBuffer(returnResult)
                                 Case AjaxGetVisitProperty
                                     '
@@ -24125,7 +24125,7 @@ ErrorTrap:
                                         gd.row(0).Cell(Ptr).v = visitProperty.getText(PropertyName, PropertyValue)
                                     Next
                                     returnResult = main_FormatRemoteQueryOutput(gd, RemoteFormatEnum.RemoteFormatJsonNameValue)
-                                    returnResult = main_encodeHTML(returnResult)
+                                    returnResult = htmlDoc.main_encodeHTML(returnResult)
                                     Call htmlDoc.writeAltBuffer(returnResult)
                                 Case AjaxData
                                     '
@@ -24338,12 +24338,12 @@ ErrorTrap:
                                     '
                                     '
                                     '
-                                    Call pageManager_ProcessAddonSettingsEditor()
+                                    Call htmlDoc.pageManager_ProcessAddonSettingsEditor()
                                 Case FormTypeHelpBubbleEditor
                                     '
                                     '
                                     '
-                                    Call main_ProcessHelpBubbleEditor()
+                                    Call htmlDoc.main_ProcessHelpBubbleEditor()
                                 Case FormTypeJoin
                                     '
                                     '
@@ -24386,7 +24386,7 @@ ErrorTrap:
                                     '
                                     ' ----- Administrator Tools Panel
                                     '
-                                    Call pageManager_ProcessFormToolsPanel()
+                                    Call htmlDoc.pageManager_ProcessFormToolsPanel()
                                 Case FormTypePageAuthoring
                                     '
                                     ' ----- Page Authoring Tools Panel
@@ -24522,7 +24522,7 @@ ErrorTrap:
                 If Not exceptionList Is Nothing Then
                     If exceptionList.Count > 0 Then
                         For Each exMsg As String In exceptionList
-                            returnHtmlList &= cr2 & "<li class=""ccExceptionListRow"">" & cr3 & html_convertText2HTML(exMsg) & cr2 & "</li>"
+                            returnHtmlList &= cr2 & "<li class=""ccExceptionListRow"">" & cr3 & htmlDoc.html_convertText2HTML(exMsg) & cr2 & "</li>"
                         Next
                         returnHtmlList = cr & "<ul class=""ccExceptionList"">" & returnHtmlList & cr & "</ul>"
                     End If

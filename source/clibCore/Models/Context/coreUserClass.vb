@@ -620,7 +620,7 @@ Namespace Contensive.Core
                         '
                         styleFilename = cpCore.db.cs_getText(CS, "StyleFilename")
                         If styleFilename <> "" Then
-                            Call cpCore.main_AddStylesheetLink(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, styleFilename))
+                            Call cpCore.htmlDoc.main_AddStylesheetLink(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, styleFilename))
                         End If
                         excludeFromAnalytics = cpCore.db.cs_getBoolean(CS, "ExcludeFromAnalytics")
                         returnRecordId = recordId
@@ -1158,7 +1158,7 @@ Namespace Contensive.Core
                     language = (cpCore.db.cs_getText(CS, "LanguageName"))
                     styleFilename = cpCore.db.cs_getText(CS, "StyleFilename")
                     If styleFilename <> "" Then
-                        Call cpCore.main_AddStylesheetLink(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, styleFilename))
+                        Call cpCore.htmlDoc.main_AddStylesheetLink(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, styleFilename))
                     End If
                     excludeFromAnalytics = cpCore.db.cs_getBoolean(CS, "ExcludeFromAnalytics")
                     '
@@ -1470,7 +1470,7 @@ Namespace Contensive.Core
                     & "</div>"
                 '
                 Call cpCore.main_SetMetaContent(0, 0)
-                Call cpCore.main_AddPagetitle2("Login", "loginPage")
+                Call cpCore.htmlDoc.main_AddPagetitle2("Login", "loginPage")
                 head = cpCore.webServer.webServerIO_GetHTMLInternalHead(False)
                 If cpCore.pageManager_TemplateBodyTag <> "" Then
                     bodyTag = cpCore.pageManager_TemplateBodyTag
@@ -1516,7 +1516,7 @@ Namespace Contensive.Core
                     '
                     Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("method", "")
                     loginForm = ""
-                    Call cpCore.main_AddOnLoadJavascript2("document.getElementById('LoginUsernameInput').focus()", "login")
+                    Call cpCore.htmlDoc.main_AddOnLoadJavascript2("document.getElementById('LoginUsernameInput').focus()", "login")
                     '
                     ' ----- Error Messages
                     '

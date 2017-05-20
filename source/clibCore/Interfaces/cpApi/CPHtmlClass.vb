@@ -113,7 +113,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function CheckList(ByVal HtmlName As String, ByVal PrimaryContentName As String, ByVal PrimaryRecordId As Integer, ByVal SecondaryContentName As String, ByVal RulesContentName As String, ByVal RulesPrimaryFieldname As String, ByVal RulesSecondaryFieldName As String, Optional ByVal SecondaryContentSelectSQLCriteria As String = "", Optional ByVal CaptionFieldName As String = "", Optional ByVal IsReadOnly As Boolean = False, Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Inherits BaseClasses.CPHtmlBaseClass.CheckList
             If True Then
-                Return cpCore.main_GetFormInputCheckList(HtmlName, PrimaryContentName, PrimaryRecordId, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectSQLCriteria, CaptionFieldName, IsReadOnly)
+                Return cpCore.htmlDoc.main_GetFormInputCheckList(HtmlName, PrimaryContentName, PrimaryRecordId, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectSQLCriteria, CaptionFieldName, IsReadOnly)
             Else
                 Return ""
             End If

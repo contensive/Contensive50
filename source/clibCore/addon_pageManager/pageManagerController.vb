@@ -185,7 +185,7 @@ Namespace Contensive.Core.Controllers
                         If (Copy = "") Then
                             NoteCopy = NoteCopy & "[no comments entered]" & BR
                         Else
-                            NoteCopy = NoteCopy & cpcore.main_EncodeCRLF(Copy) & BR
+                            NoteCopy = NoteCopy & cpcore.htmlDoc.main_EncodeCRLF(Copy) & BR
                         End If
                         '
                         NoteCopy = NoteCopy & BR
@@ -480,7 +480,7 @@ Namespace Contensive.Core.Controllers
                 Call cpCore.db.cs_Close(CS)
                 '
                 If cpCore.visitProperty.getBoolean("AllowAdvancedEditor") Then
-                    result = cpCore.main_GetEditWrapper("Watch List [" & ListName & "]", result)
+                    result = cpCore.htmlDoc.main_GetEditWrapper("Watch List [" & ListName & "]", result)
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex)
