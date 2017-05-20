@@ -403,7 +403,7 @@
     <Compile Include="Controllers\dbEngineController.vb" />
     <Compile Include="Controllers\genericController.vb" />
     <Compile Include="Controllers\iisController.vb" />
-    <Compile Include="addonLegacyModel.vb" />
+    <Compile Include="Models\addonLegacyModel.vb" />
     <Compile Include="Controllers\addonController.vb" />
     <Compile Include="Controllers\cacheController.vb" />
     <Compile Include="coreDocPropertiesClass.vb" />
@@ -479,6 +479,9 @@
     <Compile Include="Models\Entity\serverConfigModel.vb" />
     <Compile Include="Models\Entity\dataSourceModel.vb" />
     <Compile Include="Models\Entity\visitorModel.vb" />
+    <Compile Include="Models\Entity\pageContentModel.vb" />
+    <Compile Include="Models\Entity\siteSectionModel.vb" />
+    <Compile Include="Models\Entity\pageTemplateModel.vb" />
     <Compile Include="Models\Entity\_xblankCachedModel.vb" />
     <Compile Include="Models\Entity\addonModel.vb" />
     <Compile Include="Models\Entity\groupModel.vb" />
@@ -576,6 +579,9 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Models\dataModelFields.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>

@@ -154,7 +154,7 @@ Namespace Contensive.Core
 
         Public Overrides Sub IISReset()
             If True Then
-                Call CP.core.main_IISReset()
+                Call CP.core.webServer.reset()
             End If
         End Sub
         '

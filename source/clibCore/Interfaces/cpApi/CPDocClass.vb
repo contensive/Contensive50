@@ -63,17 +63,17 @@ Namespace Contensive.Core
         ''' Returns the pageManager content
         ''' </summary>
         ''' <returns></returns>
-        <Obsolete("Page Content comes from the pageManager addon.", True)> Public Overrides Property content() As String
+        <Obsolete("Page Content comes from the pageManager cpcore.addon.", True)> Public Overrides Property content() As String
             Get
                 If True Then
-                    Return cpCore.pageManager_PageContent
+                    Return cpCore.pageManager.pageManager_PageContent
                 Else
                     Return ""
                 End If
             End Get
             Set(ByVal value As String)
                 If True Then
-                    cpCore.pageManager_PageContent = value
+                    cpCore.pageManager.pageManager_PageContent = value
                 End If
             End Set
         End Property
@@ -86,7 +86,7 @@ Namespace Contensive.Core
         <Obsolete("Use addon navigation.", True)> Public Overrides ReadOnly Property navigationStructure() As String
             Get
                 If True Then
-                    Return cpCore.main_RenderedNavigationStructure
+                    Return cpCore.pageManager.main_RenderedNavigationStructure
                 Else
                     Return ""
                 End If
@@ -121,7 +121,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property pageId() As Integer
             Get
                 If True Then
-                    Return cpCore.main_RenderedPageID
+                    Return cpCore.pageManager.main_RenderedPageID
                 Else
                     Return 0
                 End If
@@ -137,7 +137,7 @@ Namespace Contensive.Core
             Get
                 Dim s As String
                 If True Then
-                    s = cpCore.main_RenderedPageName
+                    s = cpCore.pageManager.main_RenderedPageName
                     If (s Is Nothing) Then
                         s = ""
                     End If
@@ -176,7 +176,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property sectionId() As Integer
             Get
                 If True Then
-                    Return cpCore.main_RenderedSectionID
+                    Return cpCore.pageManager.main_RenderedSectionID
                 Else
                     Return 0
                 End If
@@ -206,7 +206,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property templateId() As Integer
             Get
                 If True Then
-                    Return cpCore.main_RenderedTemplateID
+                    Return cpCore.pageManager.main_RenderedTemplateID
                 Else
                     Return 0
                 End If
@@ -336,7 +336,7 @@ Namespace Contensive.Core
         '
         Public Overrides ReadOnly Property siteStylesheet() As String
             Get
-                Return cpCore.pageManager_GetStyleSheet2()
+                Return cpCore.pageManager.pageManager_GetStyleSheet2()
             End Get
         End Property
         '

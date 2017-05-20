@@ -8,18 +8,12 @@ Imports Contensive.Core.coreCommonModule
 Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
 
-'
-' findReplace as integer to as integer
-' just the document -- replace out 
-' if 'Imports Interop.adodb, replace in ObjectStateEnum.adState...
-' findreplace encode to encode
-' findreplace ''DoEvents to '''DoEvents
-' runProcess becomes runProcess
-' Sleep becomes Threading.Thread.Sleep(
-' as object to as object
-
 Namespace Contensive.Core.Controllers
     Public Class htmlDocController
+        '
+        ' -- properties and methods to create an html doc
+        ' -- used in admin and pageManager
+        ' -- if an entity is only needed in admin or pagemanger, it goes there. if shared it goes here.
         '
         Private cpCore As coreClass
         '
@@ -78,6 +72,53 @@ Namespace Contensive.Core.Controllers
         Public main_MetaContent_StyleSheetTags As String = ""
         Public main_MetaContent_TemplateStyleSheetTag As String = ""
         Public main_MetaContent_SharedStyleIDList As String = ""
+        '
+        Public main_TabObject As coreMenuTabClass
+        Public html_ComboTabObject As coreMenuComboTabClass
+        Public main_LiveTabObject As coreMenuLiveTabClass
+        '
+        Public main_AdminWarning As String = ""                                      ' Message - when set displays in an admin hint box in the page
+        Public main_AdminWarningPageID As Integer = 0                                  ' PageID that goes with the warning
+        Public main_AdminWarningSectionID As Integer = 0                               ' PageID that goes with the warning
+        '
+        Public main_CheckListCnt As Integer = 0                    ' cnt of the main_GetFormInputCheckList calls - used for javascript
+        '
+        Public main_page_IncludedAddonIDList As String = ""
+        '
+        Public main_OnLoadJavascript As String = ""
+        Public main_endOfBodyJavascript As String = ""           ' javascript that goes at the end of the close page
+        Public main_endOfBodyString As String = ""
+        '
+        ' block of js code that goes into a script tag
+        '
+        Public Structure main_HeadScriptType
+            Dim IsLink As Boolean
+            Dim Text As String
+            Dim addedByMessage As String
+        End Structure
+        Public main_HeadScriptCnt As Integer = 0
+        Public main_HeadScripts() As main_HeadScriptType
+        '
+        ' Page Bake Header
+        '
+        Public Const main_BakeHeadDelimiter = "#####MultilineFlag#####"
+        '
+        ' Count of how many main_GetFormInputDate calendars have been placed
+        '
+        Public main_InputDateCnt As Integer = 0
+        '
+        ' Cache the input selects (admin uses the same ones over and over)
+        '
+        Public Structure main_InputSelectCacheType
+            Dim SelectRaw As String
+            Dim ContentName As String
+            Dim Criteria As String
+            Dim CurrentValue As String
+        End Structure
+        Public main_InputSelectCacheCnt As Integer = 0
+        Public main_InputSelectCache() As main_InputSelectCacheType
+        '
+        Public main_FormInputTextCnt As Integer = 0
         '
         '====================================================================================================
         ''' <summary>
@@ -1002,9 +1043,9 @@ ErrorTrap:
                 '
                 ' Add Script Code to Head
                 '
-                If cpCore.main_HeadScriptCnt > 0 Then
-                    For Ptr = 0 To cpCore.main_HeadScriptCnt - 1
-                        With cpCore.main_HeadScripts(Ptr)
+                If cpCore.htmlDoc.main_HeadScriptCnt > 0 Then
+                    For Ptr = 0 To cpCore.htmlDoc.main_HeadScriptCnt - 1
+                        With cpCore.htmlDoc.main_HeadScripts(Ptr)
                             If .addedByMessage <> "" Then
                                 JS = JS & vbCrLf & "/* from " & .addedByMessage & " */ "
                             End If
@@ -1022,13 +1063,13 @@ ErrorTrap:
                             End If
                         End With
                     Next
-                    cpCore.main_HeadScriptCnt = 0
+                    cpCore.htmlDoc.main_HeadScriptCnt = 0
                 End If
                 '
                 ' ----- Add onload javascript
                 '
-                If (cpCore.main_OnLoadJavascript <> "") Then
-                    JS = JS & vbCrLf & vbTab & "cj.addLoadEvent(function(){" & cpCore.main_OnLoadJavascript & "});"
+                If (main_OnLoadJavascript <> "") Then
+                    JS = JS & vbCrLf & vbTab & "cj.addLoadEvent(function(){" & main_OnLoadJavascript & "});"
                 End If
                 '
                 ' ----- Add any left over style links
@@ -1091,9 +1132,9 @@ ErrorTrap:
                 '
                 ' ----- Add end of body javascript
                 '
-                If (cpCore.main_endOfBodyJavascript <> "") Then
-                    JS = JS & vbCrLf & cpCore.main_endOfBodyJavascript
-                    cpCore.main_endOfBodyJavascript = ""
+                If (main_endOfBodyJavascript <> "") Then
+                    JS = JS & vbCrLf & main_endOfBodyJavascript
+                    main_endOfBodyJavascript = ""
                 End If
                 '
                 ' ----- If javascript stream, output it all now
@@ -1129,8 +1170,8 @@ ErrorTrap:
                 '
                 ' end-of-body string -- include it without csv because it may have error strings
                 '
-                If (Not BlockNonContentExtras) And (cpCore.main_endOfBodyString <> "") Then
-                    s = s & cpCore.main_endOfBodyString
+                If (Not BlockNonContentExtras) And (main_endOfBodyString <> "") Then
+                    s = s & main_endOfBodyString
                 End If
             Catch ex As Exception
                 Call cpCore.handleExceptionAndRethrow(ex)
@@ -1209,9 +1250,9 @@ ErrorTrap:
             return_IsEmptyList = True
             '
             CurrentValueText = CStr(CurrentValue)
-            If cpCore.main_InputSelectCacheCnt > 0 Then
-                For CachePtr = 0 To cpCore.main_InputSelectCacheCnt - 1
-                    With cpCore.main_InputSelectCache(CachePtr)
+            If cpCore.htmlDoc.main_InputSelectCacheCnt > 0 Then
+                For CachePtr = 0 To cpCore.htmlDoc.main_InputSelectCacheCnt - 1
+                    With cpCore.htmlDoc.main_InputSelectCache(CachePtr)
                         If (.ContentName = ContentName) And (.Criteria = LcaseCriteria) And (.CurrentValue = CurrentValueText) Then
                             SelectRaw = .SelectRaw
                             return_IsEmptyList = False
@@ -1466,14 +1507,14 @@ ErrorTrap:
                 ' Save the SelectRaw
                 '
                 If Not return_IsEmptyList Then
-                    CachePtr = cpCore.main_InputSelectCacheCnt
-                    cpCore.main_InputSelectCacheCnt = cpCore.main_InputSelectCacheCnt + 1
-                    ReDim Preserve cpCore.main_InputSelectCache(Ptr)
-                    ReDim Preserve cpCore.main_InputSelectCache(CachePtr)
-                    cpCore.main_InputSelectCache(CachePtr).ContentName = ContentName
-                    cpCore.main_InputSelectCache(CachePtr).Criteria = LcaseCriteria
-                    cpCore.main_InputSelectCache(CachePtr).CurrentValue = CurrentValue.ToString
-                    cpCore.main_InputSelectCache(CachePtr).SelectRaw = SelectRaw
+                    CachePtr = cpCore.htmlDoc.main_InputSelectCacheCnt
+                    cpCore.htmlDoc.main_InputSelectCacheCnt = cpCore.htmlDoc.main_InputSelectCacheCnt + 1
+                    ReDim Preserve cpCore.htmlDoc.main_InputSelectCache(Ptr)
+                    ReDim Preserve cpCore.htmlDoc.main_InputSelectCache(CachePtr)
+                    cpCore.htmlDoc.main_InputSelectCache(CachePtr).ContentName = ContentName
+                    cpCore.htmlDoc.main_InputSelectCache(CachePtr).Criteria = LcaseCriteria
+                    cpCore.htmlDoc.main_InputSelectCache(CachePtr).CurrentValue = CurrentValue.ToString
+                    cpCore.htmlDoc.main_InputSelectCache(CachePtr).SelectRaw = SelectRaw
                 End If
             End If
             '
@@ -1564,9 +1605,9 @@ ErrorTrap:
             iNoneCaption = genericController.encodeEmptyText(NoneCaption, "Select One")
             'iCriteria = genericController.vbLCase(encodeMissingText(Criteria, ""))
             '
-            If cpCore.main_InputSelectCacheCnt > 0 Then
-                For CachePtr = 0 To cpCore.main_InputSelectCacheCnt - 1
-                    With cpCore.main_InputSelectCache(CachePtr)
+            If cpCore.htmlDoc.main_InputSelectCacheCnt > 0 Then
+                For CachePtr = 0 To cpCore.htmlDoc.main_InputSelectCacheCnt - 1
+                    With cpCore.htmlDoc.main_InputSelectCache(CachePtr)
                         If (.ContentName = "Group:" & GroupID) And (.Criteria = iCriteria) And (genericController.EncodeInteger(.CurrentValue) = iCurrentValue) Then
                             SelectRaw = .SelectRaw
                             Exit For
@@ -1800,14 +1841,14 @@ ErrorTrap:
                 '
                 ' Save the SelectRaw
                 '
-                CachePtr = cpCore.main_InputSelectCacheCnt
-                cpCore.main_InputSelectCacheCnt = cpCore.main_InputSelectCacheCnt + 1
-                ReDim Preserve cpCore.main_InputSelectCache(Ptr)
-                ReDim Preserve cpCore.main_InputSelectCache(CachePtr)
-                cpCore.main_InputSelectCache(CachePtr).ContentName = "Group:" & GroupID
-                cpCore.main_InputSelectCache(CachePtr).Criteria = iCriteria
-                cpCore.main_InputSelectCache(CachePtr).CurrentValue = iCurrentValue.ToString
-                cpCore.main_InputSelectCache(CachePtr).SelectRaw = SelectRaw
+                CachePtr = cpCore.htmlDoc.main_InputSelectCacheCnt
+                cpCore.htmlDoc.main_InputSelectCacheCnt = cpCore.htmlDoc.main_InputSelectCacheCnt + 1
+                ReDim Preserve cpCore.htmlDoc.main_InputSelectCache(Ptr)
+                ReDim Preserve cpCore.htmlDoc.main_InputSelectCache(CachePtr)
+                cpCore.htmlDoc.main_InputSelectCache(CachePtr).ContentName = "Group:" & GroupID
+                cpCore.htmlDoc.main_InputSelectCache(CachePtr).Criteria = iCriteria
+                cpCore.htmlDoc.main_InputSelectCache(CachePtr).CurrentValue = iCurrentValue.ToString
+                cpCore.htmlDoc.main_InputSelectCache(CachePtr).SelectRaw = SelectRaw
             End If
             '
             SelectRaw = genericController.vbReplace(SelectRaw, MenuNameFPO, iMenuName)
@@ -2299,7 +2340,7 @@ ErrorTrap:
                 Else
                     html_GetFormInputText2 = "<textarea NAME=""" & htmlName & """ ROWS=""" & iHeight.ToString & """ COLS=""" & iWidth.ToString & """" & TagID & TagDisabled & ">" & iDefaultValue & "</TEXTAREA>"
                 End If
-                cpCore.main_FormInputTextCnt = cpCore.main_FormInputTextCnt + 1
+                main_FormInputTextCnt = main_FormInputTextCnt + 1
             End If
             '
             Exit Function
@@ -2339,7 +2380,7 @@ ErrorTrap:
             Value_Local = html_EncodeHTML(Value)
             IDRoot = Id
             If IDRoot = "" Then
-                IDRoot = "TextArea" & cpCore.main_FormInputTextCnt
+                IDRoot = "TextArea" & main_FormInputTextCnt
             End If
             '
             StyleWidth_Local = styleWidth
@@ -2381,7 +2422,7 @@ ErrorTrap:
                 & genericController.kmaIndent(EditorClosed) _
                 & genericController.kmaIndent(EditorOpened) _
                 & "</div>"
-            cpCore.main_FormInputTextCnt = cpCore.main_FormInputTextCnt + 1
+            main_FormInputTextCnt = main_FormInputTextCnt + 1
             Exit Function
             '
             ' ----- Error Trap
@@ -2427,10 +2468,10 @@ ErrorTrap:
                 iWidth = 20
             End If
             '
-            CalendarObjName = "Cal" & cpCore.main_InputDateCnt
-            AnchorName = "ACal" & cpCore.main_InputDateCnt
+            CalendarObjName = "Cal" & cpCore.htmlDoc.main_InputDateCnt
+            AnchorName = "ACal" & cpCore.htmlDoc.main_InputDateCnt
 
-            If cpCore.main_InputDateCnt = 0 Then
+            If cpCore.htmlDoc.main_InputDateCnt = 0 Then
                 HeadJS = "" _
                     & vbCrLf & "<SCRIPT LANGUAGE=""JavaScript"" SRC=""/ccLib/mktree/CalendarPopup.js""></SCRIPT>" _
                     & vbCrLf & "<SCRIPT LANGUAGE=""JavaScript"">" _
@@ -2459,7 +2500,7 @@ ErrorTrap:
                 & vbCrLf & "<a HREF=""#"" Onclick = ""cal.select(document.getElementById('" & iTagName & "'),'" & AnchorName & "','MM/dd/yyyy','" & DateString & "'); return false;"" NAME=""" & AnchorName & """ ID=""" & AnchorName & """><img title=""Select a date"" alt=""Select a date"" src=""/ccLib/images/table.jpg"" width=12 height=10 border=0></A>" _
                 & vbCrLf & ""
 
-            cpCore.main_InputDateCnt = cpCore.main_InputDateCnt + 1
+            cpCore.htmlDoc.main_InputDateCnt = cpCore.htmlDoc.main_InputDateCnt + 1
             Exit Function
             '
             ' ----- Error Trap
@@ -4212,7 +4253,7 @@ ErrorTrap:
                                                     'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a line of text with contact information for this record's primary contact"" id=""AC," & ACType & """ src=""/ccLib/images/ACContact.GIF"">"
                                                 ElseIf EncodeCachableTags Then
                                                     If moreInfoPeopleId <> 0 Then
-                                                        Copy = Controllers.pageManagerController.pageManager_getMoreInfoHtml(cpCore, moreInfoPeopleId)
+                                                        Copy = cpCore.pageManager.pageManager_getMoreInfoHtml(cpCore, moreInfoPeopleId)
                                                     End If
                                                 End If
                                             Case ACTypeFeedback
@@ -6801,19 +6842,19 @@ ErrorTrap:
                 '
                 ' Clear Caches
                 '
-                Call cpCore.pageManager_cache_pageContent_clear()
-                Call cpCore.pageManager_cache_pageTemplate_clear()
-                Call cpCore.pageManager_cache_siteSection_clear()
+                Call cpCore.pageManager.pageManager_cache_pageContent_clear()
+                Call cpCore.pageManager.pageManager_cache_pageTemplate_clear()
+                Call cpCore.pageManager.pageManager_cache_siteSection_clear()
                 Call cpCore.cache.invalidateObjectList("")
                 If ContentName <> "" Then
                     Call cpCore.cache.invalidateObjectList(ContentName)
                     TableName = cpCore.GetContentTablename(ContentName)
                     If genericController.vbLCase(TableName) = "cctemplates" Then
-                        Call cpCore.cache.setObject(cpCore.pageManager_cache_pageTemplate_cacheName, EmptyVariant)
-                        Call cpCore.pageManager_cache_pageTemplate_load()
+                        Call cpCore.cache.setObject(cpCore.pageManager.pageManager_cache_pageTemplate_cacheName, EmptyVariant)
+                        Call cpCore.pageManager.pageManager_cache_pageTemplate_load()
                     End If
                     If genericController.vbLCase(TableName) = "ccpagecontent" Then
-                        Call cpCore.pageManager_cache_pageContent_updateRow(RecordID, cpCore.pagemanager_IsWorkflowRendering, cpCore.main_RenderCache_CurrentPage_IsQuickEditing)
+                        Call cpCore.pageManager.pageManager_cache_pageContent_updateRow(RecordID, cpCore.pageManager.pagemanager_IsWorkflowRendering, cpCore.pageManager.main_RenderCache_CurrentPage_IsQuickEditing)
                     End If
                 End If
             End If
@@ -7127,7 +7168,7 @@ ErrorTrap:
                     main_MemberShipSize = 0
                     returnHtml = ""
                     If (SecondaryTablename <> "") And (rulesTablename <> "") Then
-                        OldFolderVar = "OldFolder" & cpCore.main_CheckListCnt
+                        OldFolderVar = "OldFolder" & main_CheckListCnt
                         main_HeadScriptCode &= "var " & OldFolderVar & ";"
                         If PrimaryRecordID = 0 Then
                             '
@@ -7372,7 +7413,7 @@ ErrorTrap:
                         Call main_AddHeadScriptCode(main_HeadScriptCode, "CheckList Categories")
                     End If
                     'End If
-                    cpCore.main_CheckListCnt = cpCore.main_CheckListCnt + 1
+                    main_CheckListCnt = main_CheckListCnt + 1
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -7439,7 +7480,7 @@ ErrorTrap:
                             FirstCaption = Caption
                         End If
                         JSCaption = genericController.EncodeJavascript(Caption)
-                        JSSwitch = "switchContentFolderDiv( '" & TagName & ".ContentCategoryID" & Id & "',OldFolder" & cpCore.main_CheckListCnt & ",'" & TagName & ".ContentCaption','" & JSCaption & "','" & EmptyDivID & "'); OldFolder" & cpCore.main_CheckListCnt & "='" & TagName & ".ContentCategoryID" & Id & "';return false;"
+                        JSSwitch = "switchContentFolderDiv( '" & TagName & ".ContentCategoryID" & Id & "',OldFolder" & main_CheckListCnt & ",'" & TagName & ".ContentCaption','" & JSCaption & "','" & EmptyDivID & "'); OldFolder" & main_CheckListCnt & "='" & TagName & ".ContentCategoryID" & Id & "';return false;"
                         If JSSwitchFirst = "" Then
                             JSSwitchFirst = JSSwitch
                         End If
@@ -7455,7 +7496,7 @@ ErrorTrap:
                     ' Add the top 'All' node
                     '
                     JSCaption = "All"
-                    JSSwitchAll = "switchContentFolderDiv( '" & TagName & ".All',  OldFolder" & cpCore.main_CheckListCnt & ",'" & TagName & ".ContentCaption','" & JSCaption & "','" & EmptyDivID & "'); OldFolder" & cpCore.main_CheckListCnt & "='" & TagName & ".All';"
+                    JSSwitchAll = "switchContentFolderDiv( '" & TagName & ".All',  OldFolder" & main_CheckListCnt & ",'" & TagName & ".ContentCaption','" & JSCaption & "','" & EmptyDivID & "'); OldFolder" & main_CheckListCnt & "='" & TagName & ".All';"
                     If genericController.vbInstr(1, LeftPane, "<LI", vbTextCompare) = 0 Then
                         AllNode = "<div class=""caption""><a href=""#"" onClick=""" & JSSwitchAll & ";return false;"">Show all</a></div>"
                         LeftPane = cr & AllNode & LeftPane
@@ -7523,7 +7564,7 @@ ErrorTrap:
             '
             Dim s As String
             '
-            s = cpCore.main_OnLoadJavascript
+            s = main_OnLoadJavascript
             If NewCode <> "" And genericController.vbInstr(1, s, NewCode, vbTextCompare) = 0 Then
                 If s <> "" Then
                     s = s & ";"
@@ -7532,7 +7573,7 @@ ErrorTrap:
                     s = s & " /* from " & addedByMessage & " */ "
                 End If
                 s = s & NewCode
-                cpCore.main_OnLoadJavascript = s
+                main_OnLoadJavascript = s
             End If
             '
             Exit Sub
@@ -7558,13 +7599,13 @@ ErrorTrap:
             Dim s As String
             '
             s = ""
-            If NewCode <> "" And genericController.vbInstr(1, cpCore.main_endOfBodyJavascript, NewCode, vbTextCompare) = 0 Then
+            If NewCode <> "" And genericController.vbInstr(1, main_endOfBodyJavascript, NewCode, vbTextCompare) = 0 Then
                 's = s & vbCrLf
                 If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
                     s = s & "/* from " & addedByMessage & "*/"
                 End If
                 s = s & NewCode
-                cpCore.main_endOfBodyJavascript = cpCore.main_endOfBodyJavascript & vbCrLf & s
+                main_endOfBodyJavascript = main_endOfBodyJavascript & vbCrLf & s
             End If
             '
             Exit Sub
@@ -7615,11 +7656,11 @@ ErrorTrap:
                 NewCode = genericController.vbReplace(NewCode, vbCrLf & vbCrLf, vbCrLf)
                 NewCode = genericController.vbReplace(NewCode, vbCrLf & vbCrLf, vbCrLf)
                 NewCode = genericController.vbReplace(NewCode, vbCrLf, cr2)
-                ReDim Preserve cpCore.main_HeadScripts(cpCore.main_HeadScriptCnt)
-                cpCore.main_HeadScripts(cpCore.main_HeadScriptCnt).IsLink = False
-                cpCore.main_HeadScripts(cpCore.main_HeadScriptCnt).Text = NewCode
-                cpCore.main_HeadScripts(cpCore.main_HeadScriptCnt).addedByMessage = genericController.vbLCase(addedByMessage)
-                cpCore.main_HeadScriptCnt = cpCore.main_HeadScriptCnt + 1
+                ReDim Preserve cpCore.htmlDoc.main_HeadScripts(cpCore.htmlDoc.main_HeadScriptCnt)
+                cpCore.htmlDoc.main_HeadScripts(cpCore.htmlDoc.main_HeadScriptCnt).IsLink = False
+                cpCore.htmlDoc.main_HeadScripts(cpCore.htmlDoc.main_HeadScriptCnt).Text = NewCode
+                cpCore.htmlDoc.main_HeadScripts(cpCore.htmlDoc.main_HeadScriptCnt).addedByMessage = genericController.vbLCase(addedByMessage)
+                cpCore.htmlDoc.main_HeadScriptCnt = cpCore.htmlDoc.main_HeadScriptCnt + 1
             End If
             '    If NewCode <> "" And genericController.vbInstr(1, main_HeadScriptCode, NewCode, vbTextCompare) = 0 Then
             '        s = NewCode
@@ -7658,11 +7699,11 @@ ErrorTrap:
             Dim s As String
             '
             If Filename <> "" Then
-                ReDim Preserve cpCore.main_HeadScripts(cpCore.main_HeadScriptCnt)
-                cpCore.main_HeadScripts(cpCore.main_HeadScriptCnt).IsLink = True
-                cpCore.main_HeadScripts(cpCore.main_HeadScriptCnt).Text = Filename
-                cpCore.main_HeadScripts(cpCore.main_HeadScriptCnt).addedByMessage = addedByMessage
-                cpCore.main_HeadScriptCnt = cpCore.main_HeadScriptCnt + 1
+                ReDim Preserve cpCore.htmlDoc.main_HeadScripts(cpCore.htmlDoc.main_HeadScriptCnt)
+                cpCore.htmlDoc.main_HeadScripts(cpCore.htmlDoc.main_HeadScriptCnt).IsLink = True
+                cpCore.htmlDoc.main_HeadScripts(cpCore.htmlDoc.main_HeadScriptCnt).Text = Filename
+                cpCore.htmlDoc.main_HeadScripts(cpCore.htmlDoc.main_HeadScriptCnt).addedByMessage = addedByMessage
+                cpCore.htmlDoc.main_HeadScriptCnt = cpCore.htmlDoc.main_HeadScriptCnt + 1
             End If
             '    If Filename <> "" And genericController.vbInstr(1, s, Filename, vbTextCompare) = 0 Then
             '
@@ -8086,7 +8127,7 @@ ErrorTrap:
                                             '
                                             'hint = hint & ",320"
                                             ListName = cpCore.csv_GetAddonOption("name", addonOptionString)
-                                            returnValue = returnValue & cpCore.pageManager_GetChildPageList(ListName, ContextContentName, ContextRecordID, True)
+                                            returnValue = returnValue & cpCore.pageManager.pageManager_GetChildPageList(ListName, ContextContentName, ContextRecordID, True)
                                         Case ACTypeTemplateText
                                             '
                                             ' Text Box = copied here from gethtmlbody
@@ -8104,7 +8145,7 @@ ErrorTrap:
                                             ' Dynamic Menu
                                             '
                                             'hint = hint & ",320"
-                                            returnValue = returnValue & cpCore.pageManager_GetDynamicMenu(addonOptionString, cpCore.siteProperties.useContentWatchLink)
+                                            returnValue = returnValue & cpCore.pageManager.pageManager_GetDynamicMenu(addonOptionString, cpCore.siteProperties.useContentWatchLink)
                                         Case ACTypeWatchList
                                             '
                                             ' Watch List
@@ -8113,7 +8154,7 @@ ErrorTrap:
                                             ListName = cpCore.csv_GetAddonOption("LISTNAME", addonOptionString)
                                             SortField = cpCore.csv_GetAddonOption("SORTFIELD", addonOptionString)
                                             SortReverse = genericController.EncodeBoolean(cpCore.csv_GetAddonOption("SORTDIRECTION", addonOptionString))
-                                            returnValue = returnValue & Controllers.pageManagerController.main_GetWatchList(cpCore, ListName, SortField, SortReverse)
+                                            returnValue = returnValue & cpCore.pageManager.main_GetWatchList(cpCore, ListName, SortField, SortReverse)
                                         Case Else
                                             '
                                             ' Unrecognized command - put all the syntax back in
@@ -8252,7 +8293,7 @@ ErrorTrap:
                     '
                     'hint = hint & ",600, Handle webclient features"
                     If genericController.vbInstr(1, returnValue, FeedbackFormNotSupportedComment, vbTextCompare) <> 0 Then
-                        returnValue = genericController.vbReplace(returnValue, FeedbackFormNotSupportedComment, Controllers.pageManagerController.main_GetFeedbackForm(cpCore, ContextContentName, ContextRecordID, ContextContactPeopleID), 1, 99, vbTextCompare)
+                        returnValue = genericController.vbReplace(returnValue, FeedbackFormNotSupportedComment, cpCore.pageManager.main_GetFeedbackForm(cpCore, ContextContentName, ContextRecordID, ContextContactPeopleID), 1, 99, vbTextCompare)
                     End If
                     '
                     ' if call from webpage, push addon js and css out to cpCoreClass
@@ -8948,6 +8989,106 @@ ErrorTrap:
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return returnCopy
+        End Function
+        '
+        '
+        '
+        Public Sub main_AddTabEntry(ByVal Caption As String, ByVal Link As String, ByVal IsHit As Boolean, Optional ByVal StylePrefix As String = "", Optional ByVal LiveBody As String = "")
+            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("AddTabEntry")
+            '
+            ' should use the ccNav object, no the ccCommon module for this code
+            '
+            Call cpCore.menuTab.AddEntry(genericController.encodeText(Caption), genericController.encodeText(Link), genericController.EncodeBoolean(IsHit), genericController.encodeText(StylePrefix))
+
+            'Call ccAddTabEntry(genericController.encodeText(Caption), genericController.encodeText(Link), genericController.EncodeBoolean(IsHit), genericController.encodeText(StylePrefix), genericController.encodeText(LiveBody))
+            '
+            Exit Sub
+ErrorTrap:
+            Call cpCore.handleLegacyError18("main_AddTabEntry")
+        End Sub
+        '        '
+        '        '
+        '        '
+        '        Public Function main_GetTabs() As String
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetTabs")
+        '            '
+        '            ' should use the ccNav object, no the ccCommon module for this code
+        '            '
+        '            '
+        '            main_GetTabs = menuTab.GetTabs()
+        '            '    main_GetTabs = ccGetTabs()
+        '            '
+        '            Exit Function
+        'ErrorTrap:
+        '            Call cpcore.handleLegacyError18("main_GetTabs")
+        '        End Function
+        '
+        '
+        '
+        Public Sub main_AddLiveTabEntry(ByVal Caption As String, ByVal LiveBody As String, Optional ByVal StylePrefix As String = "")
+            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("AddLiveTabEntry")
+            '
+            ' should use the ccNav object, no the ccCommon module for this code
+            '
+            If (main_LiveTabObject Is Nothing) Then
+                main_LiveTabObject = New coreMenuLiveTabClass
+            End If
+            Call main_LiveTabObject.AddEntry(genericController.encodeText(Caption), genericController.encodeText(LiveBody), genericController.encodeText(StylePrefix))
+            '
+            Exit Sub
+ErrorTrap:
+            Call cpCore.handleLegacyError18("main_AddLiveTabEntry")
+        End Sub
+        '
+        '
+        '
+        Public Function main_GetLiveTabs() As String
+            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetLiveTabs")
+            '
+            ' should use the ccNav object, no the ccCommon module for this code
+            '
+            If (main_LiveTabObject Is Nothing) Then
+                main_LiveTabObject = New coreMenuLiveTabClass
+            End If
+            main_GetLiveTabs = main_LiveTabObject.GetTabs()
+            '
+            Exit Function
+ErrorTrap:
+            Call cpCore.handleLegacyError18("main_GetLiveTabs")
+        End Function
+        '
+        '
+        '
+        Public Sub menu_AddComboTabEntry(Caption As String, Link As String, AjaxLink As String, LiveBody As String, IsHit As Boolean, ContainerClass As String)
+            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("AddComboTabEntry")
+            '
+            ' should use the ccNav object, no the ccCommon module for this code
+            '
+            If (html_ComboTabObject Is Nothing) Then
+                html_ComboTabObject = New coreMenuComboTabClass
+            End If
+            Call html_ComboTabObject.AddEntry(Caption, Link, AjaxLink, LiveBody, IsHit, ContainerClass)
+            '
+            Exit Sub
+ErrorTrap:
+            Call cpCore.handleLegacyError18("main_AddComboTabEntry")
+        End Sub
+        '
+        '
+        '
+        Public Function menu_GetComboTabs() As String
+            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetComboTabs")
+            '
+            ' should use the ccNav object, no the ccCommon module for this code
+            '
+            If (html_ComboTabObject Is Nothing) Then
+                html_ComboTabObject = New coreMenuComboTabClass
+            End If
+            menu_GetComboTabs = html_ComboTabObject.GetTabs()
+            '
+            Exit Function
+ErrorTrap:
+            Call cpCore.handleLegacyError18("main_GetComboTabs")
         End Function
     End Class
 End Namespace

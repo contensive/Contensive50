@@ -1472,8 +1472,8 @@ Namespace Contensive.Core
                 Call cpCore.main_SetMetaContent(0, 0)
                 Call cpCore.htmlDoc.main_AddPagetitle2("Login", "loginPage")
                 head = cpCore.webServer.webServerIO_GetHTMLInternalHead(False)
-                If cpCore.pageManager_TemplateBodyTag <> "" Then
-                    bodyTag = cpCore.pageManager_TemplateBodyTag
+                If cpCore.pageManager.pageManager_TemplateBodyTag <> "" Then
+                    bodyTag = cpCore.pageManager.pageManager_TemplateBodyTag
                 Else
                     bodyTag = TemplateDefaultBodyTag
                 End If

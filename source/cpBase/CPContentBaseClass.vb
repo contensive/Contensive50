@@ -93,7 +93,7 @@ Namespace Contensive.BaseClasses
         ''' Returns the primary link alias for the record id and querystringsuffix. If no link alias exists, it defaultvalue is returned.
         ''' </summary>
         ''' <param name="PageID"></param>
-        ''' <param name="QueryStringSuffix">In the case where an add-on is on the page, there may be many unique documents possible from the one pageid. Each possible variation is determined by values in the querystring added by the addon. These name=value pairs in Querystring format are used to identify additional link aliases.</param>
+        ''' <param name="QueryStringSuffix">In the case where an add-on is on the page, there may be many unique documents possible from the one pageid. Each possible variation is determined by values in the querystring added by the cpcore.addon. These name=value pairs in Querystring format are used to identify additional link aliases.</param>
         ''' <param name="DefaultLink">If no link alias is found, this value is returned.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>

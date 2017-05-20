@@ -245,7 +245,7 @@ Namespace Contensive.Core
             If False Then
                 Return Link
             Else
-                Return cpCore.encodeAppRootPath(Link)
+                Return genericController.EncodeAppRootPath(genericController.encodeText(Link), cpCore.webServer.webServerIO_requestVirtualFilePath, requestAppRootPath, cpCore.webServer.requestDomain)
             End If
         End Function
 

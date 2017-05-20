@@ -117,7 +117,7 @@ Namespace Contensive.BaseClasses
         ''' <remarks></remarks>
         Public MustOverride ReadOnly Property Content() As CPContentBaseClass 'Implements BaseClasses.CPBaseClass.Content
         ''' <summary>
-        ''' The addon class handles access to an add-on's features. Use the Utils object to run an addon. An instance of the Addon class is passed to the executing addon in the MyAddon object so it can access any features needed. See the CPAddonBaseClass for more details.
+        ''' The addon class handles access to an add-on's features. Use the Utils object to run an cpcore.addon. An instance of the Addon class is passed to the executing addon in the MyAddon object so it can access any features needed. See the CPAddonBaseClass for more details.
         ''' </summary>
         ''' <value></value>
         ''' <returns></returns>

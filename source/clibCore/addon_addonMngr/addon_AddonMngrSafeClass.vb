@@ -754,8 +754,8 @@ Namespace Contensive.Core
                                         & ""
                                         BodyHTML = Adminui.GetEditPanel(True, "Add-on Collection Library", "Select an Add-on to install from the Contensive Add-on Library. Please select only one at a time. Click OK to install the selected Add-on. The site may need to be stopped during the installation, but will be available again in approximately one minute.", BodyHTML)
                                     BodyHTML = BodyHTML & cpCore.htmlDoc.html_GetFormInputHidden("AOCnt", RowPtr)
-                                    Call cpCore.main_AddLiveTabEntry("<nobr>Collection&nbsp;Library</nobr>", BodyHTML, "ccAdminTab")
-                                    End If
+                                    Call cpCore.htmlDoc.main_AddLiveTabEntry("<nobr>Collection&nbsp;Library</nobr>", BodyHTML, "ccAdminTab")
+                                End If
                                     '
                                     ' --------------------------------------------------------------------------------
                                     ' Current Collections Tab
@@ -824,13 +824,13 @@ Namespace Contensive.Core
                                     BodyHTML = "<div style=""width:100%"">" & Adminui.GetReport2(RowPtr, ColCaption, ColAlign, ColWidth, Cells, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) & "</div>"
                                     BodyHTML = Adminui.GetEditPanel(True, "Add-on Collections", "Use this form to review and delete current add-on collections.", BodyHTML)
                                 BodyHTML = BodyHTML & cpCore.htmlDoc.html_GetFormInputHidden("accnt", RowPtr)
-                                Call cpCore.main_AddLiveTabEntry("Installed&nbsp;Collections", BodyHTML, "ccAdminTab")
-                                    '
-                                    ' --------------------------------------------------------------------------------
-                                    ' Get the Upload Add-ons tab
-                                    ' --------------------------------------------------------------------------------
-                                    '
-                                    Body = New coreFastStringClass
+                                Call cpCore.htmlDoc.main_AddLiveTabEntry("Installed&nbsp;Collections", BodyHTML, "ccAdminTab")
+                                '
+                                ' --------------------------------------------------------------------------------
+                                ' Get the Upload Add-ons tab
+                                ' --------------------------------------------------------------------------------
+                                '
+                                Body = New coreFastStringClass
                                     If Not DbUpToDate Then
                                         Call Body.Add("<p>Add-on upload is disabled because your site database needs to be updated.</p>")
                                     Else
@@ -850,15 +850,15 @@ Namespace Contensive.Core
                                     Call Body.Add(Adminui.GetEditRow(FormInput, "&nbsp;", "", True, False, ""))
                                         Call Body.Add(Adminui.EditTableClose)
                                     End If
-                                    Call cpCore.main_AddLiveTabEntry("Add&nbsp;Manually", Adminui.GetEditPanel(True, "Install or Update an Add-on Collection.", "Use this form to upload a new or updated Add-on Collection to your site. A collection file can be a single xml configuration file, a single zip file containing the configuration file and other resource files, or a configuration with other resource files uploaded separately. Use the 'Add more files' link to add as many files as you need. When you hit OK, the Collection will be checked, and only submitted if all files are uploaded.", Body.Text), "ccAdminTab")
-                                    '
-                                    ' --------------------------------------------------------------------------------
-                                    ' Build Page from tabs
-                                    ' --------------------------------------------------------------------------------
-                                    '
-                                    Content.Add(cpCore.main_GetLiveTabs())
-                                    '
-                                    ButtonList = ButtonCancel & "," & ButtonOK
+                                Call cpCore.htmlDoc.main_AddLiveTabEntry("Add&nbsp;Manually", Adminui.GetEditPanel(True, "Install or Update an Add-on Collection.", "Use this form to upload a new or updated Add-on Collection to your site. A collection file can be a single xml configuration file, a single zip file containing the configuration file and other resource files, or a configuration with other resource files uploaded separately. Use the 'Add more files' link to add as many files as you need. When you hit OK, the Collection will be checked, and only submitted if all files are uploaded.", Body.Text), "ccAdminTab")
+                                '
+                                ' --------------------------------------------------------------------------------
+                                ' Build Page from tabs
+                                ' --------------------------------------------------------------------------------
+                                '
+                                Content.Add(cpCore.htmlDoc.main_GetLiveTabs())
+                                '
+                                ButtonList = ButtonCancel & "," & ButtonOK
                                 Content.Add(cpCore.htmlDoc.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormLegacyAddonManager))
                             End If
                             End If

@@ -122,7 +122,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetPageLink(ByVal PageID As Integer, Optional ByVal QueryStringSuffix As String = "", Optional ByVal AllowLinkAlias As Boolean = True) As String
-            Return cpCore.main_GetPageLink3(PageID, QueryStringSuffix, AllowLinkAlias)
+            Return cpCore.pageManager.main_GetPageLink3(PageID, QueryStringSuffix, AllowLinkAlias)
         End Function
         '
         '====================================================================================================
@@ -146,7 +146,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetTemplateLink(ByVal TemplateID As Integer) As String
-            Return cpCore.main_GetTemplateLink(TemplateID)
+            Return cpCore.pageManager.main_GetTemplateLink(TemplateID)
         End Function
         '
         '====================================================================================================

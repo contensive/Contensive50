@@ -147,7 +147,7 @@ Namespace Contensive.Core.Controllers
         '           or id of a wrapper record
         '
         '   Context
-        '       These values represent the situation around the call for execute addon. This determines the
+        '       These values represent the situation around the call for execute cpcore.addon. This determines the
         '       type of data returned, and other actions taken. For instance, a ContextPage is used when the add-on
         '       results will be put on a page for output. In this case, javascript in the add-on will be put into
         '       the current document head.
@@ -1449,7 +1449,7 @@ Namespace Contensive.Core.Controllers
                                 End If
                             End If
                             '
-                            ' this completes the execute of this addon. remove it from the 'running' list
+                            ' this completes the execute of this cpcore.addon. remove it from the 'running' list
                             '
                             cpCore.addonsCurrentlyRunningIdList.Remove(addonId)
                             'csv_addon_execute_AddonsCurrentlyRunningIdList = genericController.vbReplace(csv_addon_execute_AddonsCurrentlyRunningIdList & ",", "," & addonId & ",", ",")
@@ -2090,7 +2090,7 @@ Namespace Contensive.Core.Controllers
                                             Next
                                             Copy = Adminui.GetEditPanel(True, TabHeading, TabDescription, Adminui.EditTableOpen & TabCell.Text & Adminui.EditTableClose)
                                             If Copy <> "" Then
-                                                Call cpCore.main_AddLiveTabEntry(Replace(TabName, " ", "&nbsp;"), Copy, "ccAdminTab")
+                                                Call cpCore.htmlDoc.main_AddLiveTabEntry(Replace(TabName, " ", "&nbsp;"), Copy, "ccAdminTab")
                                             End If
                                             'Content.Add( GetForm_Edit_AddTab(TabName, Copy, True))
                                             TabCell = Nothing
@@ -2110,7 +2110,7 @@ Namespace Contensive.Core.Controllers
                             '
                             '
                             If TabCnt > 0 Then
-                                Content.Add(cpCore.main_GetLiveTabs())
+                                Content.Add(cpCore.htmlDoc.main_GetLiveTabs())
                             End If
                         End If
                     End If
@@ -2940,7 +2940,7 @@ ErrorTrap:
         '=============================================================================================================
         '
         Public Function execute_legacy2(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal Option_String As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal IsIncludeAddon As Boolean, ByVal DefaultWrapperID As Integer, ByVal ignore_TemplateCaseOnly_PageContent As String, ByRef return_StatusOK As Boolean, ByVal nothingObject As Object, Optional ByVal AddonInUseIdList As String = "") As String
-            execute_legacy2 = execute(addonId, AddonNameOrGuid, Option_String, Context, HostContentName, HostRecordID, HostFieldName, ACInstanceID, IsIncludeAddon, DefaultWrapperID, ignore_TemplateCaseOnly_PageContent, return_StatusOK, nothingObject, AddonInUseIdList, Nothing, cpCore.main_page_IncludedAddonIDList, cpCore.user.id, cpCore.user.isAuthenticated)
+            execute_legacy2 = execute(addonId, AddonNameOrGuid, Option_String, Context, HostContentName, HostRecordID, HostFieldName, ACInstanceID, IsIncludeAddon, DefaultWrapperID, ignore_TemplateCaseOnly_PageContent, return_StatusOK, nothingObject, AddonInUseIdList, Nothing, cpCore.htmlDoc.main_page_IncludedAddonIDList, cpCore.user.id, cpCore.user.isAuthenticated)
         End Function
         '
         '===============================================================================================================================================
@@ -4170,7 +4170,7 @@ ErrorTrap:
                                             Next
                                             Copy = Adminui.GetEditPanel(True, TabHeading, TabDescription, Adminui.EditTableOpen & TabCell.Text & Adminui.EditTableClose)
                                             If Copy <> "" Then
-                                                Call cpCore.main_AddLiveTabEntry(Replace(TabName, " ", "&nbsp;"), Copy, "ccAdminTab")
+                                                Call cpCore.htmlDoc.main_AddLiveTabEntry(Replace(TabName, " ", "&nbsp;"), Copy, "ccAdminTab")
                                             End If
                                             'Content.Add( cpcore.main_GetForm_Edit_AddTab(TabName, Copy, True))
                                             TabCell = Nothing
@@ -4190,7 +4190,7 @@ ErrorTrap:
                             '
                             '
                             If TabCnt > 0 Then
-                                Content.Add(cpCore.main_GetLiveTabs())
+                                Content.Add(cpCore.htmlDoc.main_GetLiveTabs())
                             End If
                         End If
                     End If

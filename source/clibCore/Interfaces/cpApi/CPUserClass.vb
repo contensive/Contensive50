@@ -273,7 +273,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property IsWorkflowRendering() As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsWorkflowRendering
             Get
                 If True Then
-                    Return cpCore.pagemanager_IsWorkflowRendering
+                    Return cpCore.pageManager.pagemanager_IsWorkflowRendering
                 Else
                     Return False
                 End If

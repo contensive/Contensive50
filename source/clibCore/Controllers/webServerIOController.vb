@@ -1526,9 +1526,9 @@ ErrorTrap:
             webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead _
                 & cr & "<script language=""JavaScript"" type=""text/javascript""  src=""" & webServerIO_requestProtocol & webServerIO_requestDomain & "/ccLib/ClientSide/Core.js""></script>" _
                 & ""
-            If cpCore.main_HeadScriptCnt > 0 Then
-                For Ptr = 0 To cpCore.main_HeadScriptCnt - 1
-                    With cpCore.main_HeadScripts(Ptr)
+            If cpCore.htmlDoc.main_HeadScriptCnt > 0 Then
+                For Ptr = 0 To cpCore.htmlDoc.main_HeadScriptCnt - 1
+                    With cpCore.htmlDoc.main_HeadScripts(Ptr)
                         If (.addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
                             webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<!-- from " & .addedByMessage & " -->"
                         End If
@@ -1539,7 +1539,7 @@ ErrorTrap:
                         End If
                     End With
                 Next
-                cpCore.main_HeadScriptCnt = 0
+                cpCore.htmlDoc.main_HeadScriptCnt = 0
             End If
             '
             ' other head tags - always last

@@ -9,67 +9,43 @@ Imports Contensive.BaseClasses
 Imports Newtonsoft.Json
 
 Namespace Contensive.Core.Models.Entity
-    '
-    '====================================================================================================
-    ' entity model pattern
-    '   factory pattern load because if a record is not found, must rturn nothing
-    '   new() - empty constructor to allow deserialization
-    '   saveObject() - saves instance properties (nonstatic method)
-    '   create() - loads instance properties and returns a model 
-    '   delete() - deletes the record that matches the argument
-    '   getObjectList() - a pattern for creating model lists.
-    '   invalidateFIELDNAMEcache() - method to invalide the model cache. One per cache
-    '
-    '	1) set the primary content name in const cnPrimaryContent. avoid constants Like cnAddons used outside model
-    '	2) find-And-replace "_blankModel" with the name for this model
-    '	3) when adding model fields, add in three places: the Public Property, the saveObject(), the loadObject()
-    '	4) when adding create() methods to support other fields/combinations of fields, 
-    '       - add a secondary cache For that new create method argument in loadObjec()
-    '       - add it to the injected cachename list in loadObject()
-    '       - add an invalidate
-    '
-    ' Model Caching
-    '   caching applies to model objects only, not lists of models (for now)
-    '       - this is because of the challenge of invalidating the list object when individual records are added or deleted
-    '
-    '   a model should have 1 primary cache object which stores the data and can have other secondary cacheObjects which do not hold data
-    '    the cacheName of the 'primary' cacheObject for models and db records (cacheNamePrefix + ".id." + #id)
-    '    'secondary' cacheName is (cacheNamePrefix + . + fieldName + . + #)
-    '
-    '   cacheobjects can be used to hold data (primary cacheobjects), or to hold only metadata (secondary cacheobjects)
-    '       - primary cacheobjects are like 'personModel.id.99' that holds the model for id=99
-    '           - it is primary because the .primaryobject is null
-    '           - invalidationData. This cacheobject is invalid after this datetime
-    '           - dependentobjectlist() - this object is invalid if any of those objects are invalid
-    '       - secondary cachobjects are like 'person.ccguid.12345678'. It does not hold data, just a reference to the primary cacheobject
-    '
-    '   cacheNames spaces are replaced with underscores, so "addon collections" should be addon_collections
-    '
-    '   cacheNames that match content names are treated as caches of "any" record in the content, so invalidating "people" can be used to invalidate
-    '       any non-specific cache in the people table, by including "people" as a dependant cachename. the "people" cachename should not clear
-    '       specific people caches, like people.id.99, but can be used to clear lists of records like "staff_list_group"
-    '       - this can be used as a fallback strategy to cache record lists: a remote method list can be cached with a dependancy on "add-ons".
-    '       - models should always clear this content name cache entry on all cache clears
-    '
-    '   when a model is created, the code first attempts to read the model's cacheobject. if it fails, it builds it and saves the cache object and tags
-    '       - when building the model, is writes object to the primary cacheobject, and writes all the secondaries to be used
-    '       - when building the model, if a database record is opened, a dependantObject Tag is created for the tablename+'id'+id
-    '       - when building the model, if another model is added, that model returns its cachenames in the cacheNameList to be added as dependentObjects
-    '
-    '
-    Public Class _blankModel
+    Public Class pageTemplateModel
         '
         '-- const
-        Public Const primaryContentName As String = "" '<------ set content name
-        Private Const primaryContentTableName As String = "" '<------ set to tablename for the primary content (used for cache names)
+        Public Const primaryContentName As String = "page templates"
+        Private Const primaryContentTableName As String = "ccpagetemplates"
         '
         ' -- instance properties
-        Public id As Integer
-        Public name As String
-        Public ccguid As String
+        Public ID As Integer
+        Public Active As Boolean
+        Public BodyHTML As String
+        Public BodyTag As String
+        Public ccGuid As String
+        Public ContentCategoryID As Integer
+        Public ContentControlID As Integer
+        Public CreatedBy As Integer
+        Public CreateKey As Integer
+        Public DateAdded As Date
+        Public EditArchive As Boolean
+        Public EditBlank As Boolean
+        Public EditSourceID As Integer
+        Public IsSecure As Boolean
+        Public JSEndBody As String
+        Public JSFilename As String
+        Public JSHead As String
+        Public JSOnLoad As String
+        Public Link As String
+        Public MobileBodyHTML As String
+        Public ModifiedBy As Integer
+        Public ModifiedDate As Date
+        Public Name As String
+        Public OtherHeadTags As String
+        Public SortOrder As String
+        Public Source As String
+        Public StylesFilename As String
         '
         ' -- publics not exposed to the UI (test/internal data)
-        <JsonIgnore> Public createKey As Integer
+        '<JsonIgnore> Public createKey As Integer
         '
         '====================================================================================================
         ''' <summary>
@@ -86,12 +62,12 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="cp"></param>
         ''' <param name="recordId">The id of the record to be read into the new object</param>
         ''' <param name="cacheNameList">Any cachenames effected by this record will be added to this list. If the method consumer creates a cache object, add these cachenames to its dependent cachename list.</param>
-        Public Shared Function create(cpCore As coreClass, recordId As Integer, ByRef cacheNameList As List(Of String)) As _blankModel
-            Dim result As _blankModel = Nothing
+        Public Shared Function create(cpCore As coreClass, recordId As Integer, ByRef cacheNameList As List(Of String)) As pageTemplateModel
+            Dim result As pageTemplateModel = Nothing
             Try
                 If recordId > 0 Then
-                    Dim cacheName As String = GetType(_blankModel).FullName & getCacheName("id", recordId.ToString())
-                    result = cpCore.cache.getObject(Of _blankModel)(cacheName)
+                    Dim cacheName As String = GetType(pageTemplateModel).FullName & getCacheName("id", recordId.ToString())
+                    result = cpCore.cache.getObject(Of pageTemplateModel)(cacheName)
                     If (result Is Nothing) Then
                         result = loadObject(cpCore, "id=" & recordId.ToString(), cacheNameList)
                     End If
@@ -109,12 +85,12 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <param name="recordGuid"></param>
-        Public Shared Function create(cpCore As coreClass, recordGuid As String, ByRef cacheNameList As List(Of String)) As _blankModel
-            Dim result As _blankModel = Nothing
+        Public Shared Function create(cpCore As coreClass, recordGuid As String, ByRef cacheNameList As List(Of String)) As pageTemplateModel
+            Dim result As pageTemplateModel = Nothing
             Try
                 If Not String.IsNullOrEmpty(recordGuid) Then
-                    Dim cacheName As String = GetType(_blankModel).FullName & getCacheName("ccguid", recordGuid)
-                    result = cpCore.cache.getObject(Of _blankModel)(cacheName)
+                    Dim cacheName As String = GetType(pageTemplateModel).FullName & getCacheName("ccguid", recordGuid)
+                    result = cpCore.cache.getObject(Of pageTemplateModel)(cacheName)
                     If (result Is Nothing) Then
                         result = loadObject(cpCore, "ccGuid=" & cpCore.db.encodeSQLText(recordGuid), cacheNameList)
                     End If
@@ -132,19 +108,42 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <param name="sqlCriteria"></param>
-        Private Shared Function loadObject(cpCore As coreClass, sqlCriteria As String, ByRef cacheNameList As List(Of String)) As _blankModel
-            Dim result As _blankModel = Nothing
+        Private Shared Function loadObject(cpCore As coreClass, sqlCriteria As String, ByRef cacheNameList As List(Of String)) As pageTemplateModel
+            Dim result As pageTemplateModel = Nothing
             Try
                 Dim cs As New csController(cpCore)
                 If cs.open(primaryContentName, sqlCriteria) Then
-                    result = New _blankModel
+                    result = New pageTemplateModel
                     With result
                         '
                         ' -- populate result model
-                        .id = cs.getInteger("id")
-                        .name = cs.getText("name")
-                        .ccguid = cs.getText("ccGuid")
-                        .createKey = cs.getInteger("createKey")
+                        .ID = cs.getInteger("ID")
+                        .Active = cs.getBoolean("Active")
+                        .BodyHTML = cs.getText("BodyHTML")
+                        .BodyTag = cs.getText("BodyTag")
+                        .ccGuid = cs.getText("ccGuid")
+                        .ContentCategoryID = cs.getInteger("ContentCategoryID")
+                        .ContentControlID = cs.getInteger("ContentControlID")
+                        .CreatedBy = cs.getInteger("CreatedBy")
+                        .CreateKey = cs.getInteger("CreateKey")
+                        .DateAdded = cs.getDate("DateAdded")
+                        .EditArchive = cs.getBoolean("EditArchive")
+                        .EditBlank = cs.getBoolean("EditBlank")
+                        .EditSourceID = cs.getInteger("EditSourceID")
+                        .IsSecure = cs.getBoolean("IsSecure")
+                        .JSEndBody = cs.getText("JSEndBody")
+                        .JSFilename = cs.getText("JSFilename")
+                        .JSHead = cs.getText("JSHead")
+                        .JSOnLoad = cs.getText("JSOnLoad")
+                        .Link = cs.getText("Link")
+                        .MobileBodyHTML = cs.getText("MobileBodyHTML")
+                        .ModifiedBy = cs.getInteger("ModifiedBy")
+                        .ModifiedDate = cs.getDate("ModifiedDate")
+                        .Name = cs.getText("Name")
+                        .OtherHeadTags = cs.getText("OtherHeadTags")
+                        .SortOrder = cs.getText("SortOrder")
+                        .Source = cs.getText("Source")
+                        .StylesFilename = cs.getText("StylesFilename")
                     End With
                     If (result IsNot Nothing) Then
                         '
@@ -154,7 +153,7 @@ Namespace Contensive.Core.Models.Entity
                         cacheNameList.Add(cacheName0)
                         cpCore.cache.setObject(cacheName0, result)
                         '
-                        Dim cacheName1 As String = getCacheName("ccguid", result.ccguid)
+                        Dim cacheName1 As String = getCacheName("ccguid", result.ccGuid)
                         cacheNameList.Add(cacheName1)
                         cpCore.cache.setObject(cacheName1, Nothing, cacheName1)
                     End If
@@ -191,15 +190,38 @@ Namespace Contensive.Core.Models.Entity
                 End If
                 If cs.ok() Then
                     id = cs.getInteger("id")
-                    Call cs.SetField("name", name)
-                    Call cs.SetField("ccGuid", ccguid)
-                    Call cs.SetField("createKey", createKey.ToString())
+                    cs.SetField("Active", Active.ToString())
+                    cs.SetField("BodyHTML", BodyHTML)
+                    cs.SetField("BodyTag", BodyTag)
+                    cs.SetField("ccGuid", ccGuid)
+                    cs.SetField("ContentCategoryID", ContentCategoryID.ToString())
+                    cs.SetField("ContentControlID", ContentControlID.ToString())
+                    cs.SetField("CreatedBy", CreatedBy.ToString())
+                    cs.SetField("CreateKey", CreateKey.ToString())
+                    cs.SetField("DateAdded", DateAdded.ToString())
+                    cs.SetField("EditArchive", EditArchive.ToString())
+                    cs.SetField("EditBlank", EditBlank.ToString())
+                    cs.SetField("EditSourceID", EditSourceID.ToString())
+                    cs.SetField("IsSecure", IsSecure.ToString())
+                    cs.SetField("JSEndBody", JSEndBody)
+                    cs.SetField("JSFilename", JSFilename)
+                    cs.SetField("JSHead", JSHead)
+                    cs.SetField("JSOnLoad", JSOnLoad)
+                    cs.SetField("Link", Link)
+                    cs.SetField("MobileBodyHTML", MobileBodyHTML)
+                    cs.SetField("ModifiedBy", ModifiedBy.ToString())
+                    cs.SetField("ModifiedDate", ModifiedDate.ToString())
+                    cs.SetField("Name", Name)
+                    cs.SetField("OtherHeadTags", OtherHeadTags)
+                    cs.SetField("SortOrder", SortOrder)
+                    cs.SetField("Source", Source)
+                    cs.SetField("StylesFilename", StylesFilename)
                 End If
                 Call cs.Close()
                 '
                 ' -- invalidate objects
                 cpCore.cache.invalidateObject(getCacheName("id", id.ToString))
-                cpCore.cache.invalidateObject(getCacheName("ccguid", ccguid))
+                cpCore.cache.invalidateObject(getCacheName("ccguid", ccGuid))
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
                 Throw
@@ -248,15 +270,15 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="cp"></param>
         ''' <param name="someCriteria"></param>
         ''' <returns></returns>
-        Public Shared Function getObjectList(cpCore As coreClass, someCriteria As Integer) As List(Of _blankModel)
-            Dim result As New List(Of _blankModel)
+        Public Shared Function getObjectList(cpCore As coreClass, someCriteria As Integer) As List(Of pageTemplateModel)
+            Dim result As New List(Of pageTemplateModel)
             Try
                 Dim cs As New csController(cpCore)
                 Dim ignoreCacheNames As New List(Of String)
                 If (cs.open(primaryContentName, "(someCriteria=" & someCriteria & ")", "name", True, "id")) Then
-                    Dim instance As _blankModel
+                    Dim instance As pageTemplateModel
                     Do
-                        instance = _blankModel.create(cpCore, cs.getInteger("id"), ignoreCacheNames)
+                        instance = pageTemplateModel.create(cpCore, cs.getInteger("id"), ignoreCacheNames)
                         If (instance IsNot Nothing) Then
                             result.Add(instance)
                         End If
@@ -288,9 +310,9 @@ Namespace Contensive.Core.Models.Entity
         ''' invalidate a secondary key (ccGuid field).
         ''' </summary>
         ''' <param name="cpCore"></param>
-        ''' <param name="guid"></param>
-        Public Shared Sub invalidateGuidCache(cpCore As coreClass, guid As String)
-            cpCore.cache.invalidateObject(getCacheName("ccguid", guid))
+        ''' <param name="ccguid"></param>
+        Public Shared Sub invalidateGuidCache(cpCore As coreClass, ccguid As String)
+            cpCore.cache.invalidateObject(getCacheName("ccguid", ccguid))
             '
             ' -- always clear the cache with the content name
             cpCore.cache.invalidateObject(primaryContentName)
@@ -305,7 +327,7 @@ Namespace Contensive.Core.Models.Entity
         ''' <returns></returns>
         Private Shared Function getCacheName(fieldName As String, fieldValue As String) As String
             Return (primaryContentTableName & "." & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
-            'Return (GetType(_blankModel).FullName & "." & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
+            'Return (GetType(pageTemplateModel).FullName & "." & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
         End Function
     End Class
 End Namespace

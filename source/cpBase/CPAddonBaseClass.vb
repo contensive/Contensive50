@@ -3,7 +3,7 @@
 '
 Namespace Contensive.BaseClasses
     ''' <summary>
-    ''' CP.Addon - The Addon class represents the instance of an add-on. To use this class, use its constructor and open an addon. 
+    ''' CP.Addon - The Addon class represents the instance of an add-on. To use this class, use its constructor and open an cpcore.addon. 
     ''' Use these properties to retrieve it's configuration
     ''' </summary>
     ''' <remarks></remarks>
@@ -45,7 +45,7 @@ Namespace Contensive.BaseClasses
         ''' <remarks></remarks>
         Public MustOverride ReadOnly Property ccGuid() As String 'Implements BaseClasses.CPAddonBaseClass.ccGuid
         ''' <summary>
-        ''' The ID local to this site of the collection which installed this addon.
+        ''' The ID local to this site of the collection which installed this cpcore.addon.
         ''' </summary>
         ''' <value></value>
         ''' <returns></returns>
@@ -220,7 +220,7 @@ Namespace Contensive.BaseClasses
         ''' <remarks></remarks>
         Public MustOverride ReadOnly Property MetaKeywordList() As String 'Implements BaseClasses.CPAddonBaseClass.MetaKeywordList
         ''' <summary>
-        ''' The name of the addon.
+        ''' The name of the cpcore.addon.
         ''' </summary>
         ''' <value></value>
         ''' <returns></returns>

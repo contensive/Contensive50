@@ -805,7 +805,7 @@ Namespace Contensive.Core
                                     ' If another xml files shows up, and process OK it will cover this error
                                     '
                                     'hint = hint & ",330"
-                                    return_ErrorMessage = "<p>There was a problem with the Collection File for this addon.</p>"
+                                    return_ErrorMessage = "<p>There was a problem with the Collection File for this cpcore.addon.</p>"
                                     Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, error reading collection [" & collectionPathFilename & "]")
                                     'StatusOK = False
                                     loadOk = False

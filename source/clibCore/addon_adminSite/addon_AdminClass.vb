@@ -88,7 +88,7 @@ Namespace Contensive.Addons
                     returnHtml = "" _
                     & PageOpen _
                     & AdminContent _
-                    & cpCore.pagemanager_GetPageEnd() _
+                    & cpCore.pageManager.pagemanager_GetPageEnd() _
                     & ""
                 Else
                     '
@@ -101,7 +101,7 @@ Namespace Contensive.Addons
                     & PageOpen _
                     & AdminContent _
                     & cpCore.htmlDoc.html_GetEndOfBody(True, True, False, True) _
-                    & cpCore.pagemanager_GetPageEnd() _
+                    & cpCore.pageManager.pagemanager_GetPageEnd() _
                     & ""
                 End If
                 '
@@ -981,7 +981,7 @@ ErrorTrap:
                             '
                             ' Mark the record reviewed without making any changes
                             '
-                            Call cpCore.pageManager_MarkRecordReviewed(adminContent.Name, editRecord.id)
+                            Call cpCore.pageManager.pageManager_MarkRecordReviewed(adminContent.Name, editRecord.id)
                         Case AdminActionWorkflowPublishSelected
                             '
                             ' Publish everything selected
@@ -1048,7 +1048,7 @@ ErrorTrap:
                                     'no - if WF, on process on publish
                                     'Call ProcessSpecialCaseAfterSave(false,AdminContent.Name, EditRecord.ID, EditRecord.Name, EditRecord.ParentID, UseContentWatchLink)
                                     Call cpCore.workflow.main_SubmitEdit(adminContent.Name, editRecord.id)
-                                    Call cpCore.pageManager_SendPublishSubmitNotice(adminContent.Name, editRecord.id, editRecord.nameLc)
+                                    Call cpCore.pageManager.pageManager_SendPublishSubmitNotice(adminContent.Name, editRecord.id, editRecord.nameLc)
                                 Else
                                     AdminForm = AdminSourceForm
                                 End If
@@ -1103,7 +1103,7 @@ ErrorTrap:
                                         'ContentName = EditRecord.ContentName
                                         'ContentName = cpCore.metaData.getContentNameByID(cpCore.app.cs_getInteger(CSEditRecord, "ContentControlID"))
                                         If cpCore.main_IsContentFieldSupported(adminContent.Name, "parentid") Then
-                                            Call cpCore.pageManager_DeleteChildRecords(adminContent.Name, editRecord.id, False)
+                                            Call cpCore.pageManager.pageManager_DeleteChildRecords(adminContent.Name, editRecord.id, False)
                                         End If
                                     End If
                                     Call cpCore.DeleteCSRecord(CSEditRecord)
@@ -1361,7 +1361,7 @@ ErrorTrap:
                                             ' Page Content special cases
                                             '
                                             If genericController.vbLCase(adminContent.ContentTableName) = "ccpagecontent" Then
-                                                Call cpCore.pageManager_cache_pageContent_removeRow(RecordID, False, False)
+                                                Call cpCore.pageManager.pageManager_cache_pageContent_removeRow(RecordID, False, False)
                                                 If RecordID = (cpCore.siteProperties.getinteger("PageNotFoundPageID", 0)) Then
                                                     Call cpCore.siteProperties.getText("PageNotFoundPageID", "0")
                                                 End If
@@ -1723,11 +1723,11 @@ ErrorTrap:
                 '
                 ' ----- Set the local global copy of Edit Record Locks
                 '
-                Call cpCore.pageManager_GetAuthoringStatus(adminContent.Name, editRecord.id, editRecord.SubmitLock, editRecord.ApproveLock, editRecord.SubmittedName, editRecord.ApprovedName, editRecord.IsInserted, editRecord.IsDeleted, editRecord.IsModified, editRecord.LockModifiedName, editRecord.LockModifiedDate, editRecord.SubmittedDate, editRecord.ApprovedDate)
+                Call cpCore.pageManager.pageManager_GetAuthoringStatus(adminContent.Name, editRecord.id, editRecord.SubmitLock, editRecord.ApproveLock, editRecord.SubmittedName, editRecord.ApprovedName, editRecord.IsInserted, editRecord.IsDeleted, editRecord.IsModified, editRecord.LockModifiedName, editRecord.LockModifiedDate, editRecord.SubmittedDate, editRecord.ApprovedDate)
                 '
                 ' ----- Set flags used to determine the Authoring State
                 '
-                Call cpCore.pageManager_GetAuthoringPermissions(adminContent.Name, editRecord.id, editRecord.AllowInsert, editRecord.AllowCancel, editRecord.AllowSave, editRecord.AllowDelete, editRecord.AllowPublish, editRecord.AllowAbort, editRecord.AllowSubmit, editRecord.AllowApprove, editRecord.Read_Only)
+                Call cpCore.pageManager.pageManager_GetAuthoringPermissions(adminContent.Name, editRecord.id, editRecord.AllowInsert, editRecord.AllowCancel, editRecord.AllowSave, editRecord.AllowDelete, editRecord.AllowPublish, editRecord.AllowAbort, editRecord.AllowSubmit, editRecord.AllowApprove, editRecord.Read_Only)
                 '
                 ' ----- Set Edit Lock
                 '
@@ -3866,10 +3866,10 @@ ErrorTrap:
                 '
                 AdminContentWorkflowAuthoring = AdminContentWorkflowAuthoring
                 'IsWorkflowMode = cpCore.app.SiteProperty_AllowWorkflowAuthoring And AdminContent.AllowWorkflowAuthoring
-                If cpCore.pageManager_cache_pageContent_rows = 0 Then
-                    Call cpCore.pageManager_cache_pageContent_load(AdminContentWorkflowAuthoring, False)
+                If cpCore.pageManager.pageManager_cache_pageContent_rows = 0 Then
+                    Call cpCore.pageManager.pageManager_cache_pageContent_load(AdminContentWorkflowAuthoring, False)
                 End If
-                'Ptr = cpCore.pageManager_cache_pageContent_getPtr(0, AdminContentWorkflowAuthoring, False)
+                'Ptr = cpCore.pageManager.pageManager_cache_pageContent_getPtr(0, AdminContentWorkflowAuthoring, False)
                 '
                 ' Test if this editors has access to this record
                 '
@@ -3972,7 +3972,7 @@ ErrorTrap:
                     '
                     ' ----- special case, Is this page a LandingPageParent (Parent of the landing page), or is this section the landing page section
                     '
-                    PCC = cpCore.pageManager_cache_pageContent_get(False, False)
+                    PCC = cpCore.pageManager.pageManager_cache_pageContent_get(False, False)
                     If Not IsNothing(PCC) Then
                         TestPageID = LandingPageID
                         Do While LoopPtr < 20 And (TestPageID <> 0)
@@ -3981,7 +3981,7 @@ ErrorTrap:
                             If IsLandingPageParent Or IsLandingSection Then
                                 Exit Do
                             End If
-                            PCCPtr = cpCore.pageManager_cache_pageContent_getPtr(TestPageID, False, False)
+                            PCCPtr = cpCore.pageManager.pageManager_cache_pageContent_getPtr(TestPageID, False, False)
                             If PCCPtr >= 0 Then
                                 TestPageID = genericController.EncodeInteger(PCC(PCC_ParentID, PCCPtr))
                             End If
@@ -4009,7 +4009,7 @@ ErrorTrap:
                 If IsTemplateTable Then
                     TemplateIDForStyles = editRecord.id
                 ElseIf IsPageContentTable Then
-                    Call cpCore.pageManager_GetPageArgs(editRecord.id, AdminContentWorkflowAuthoring, False, IgnoreInteger, TemplateIDForStyles, IgnoreInteger, IgnoreString, IgnoreBoolean, IgnoreInteger, IgnoreBoolean, "")
+                    Call cpCore.pageManager.pageManager_GetPageArgs(editRecord.id, AdminContentWorkflowAuthoring, False, IgnoreInteger, TemplateIDForStyles, IgnoreInteger, IgnoreString, IgnoreBoolean, IgnoreInteger, IgnoreBoolean, "")
                 End If
                 '
                 ' ----- create page headers
@@ -4251,7 +4251,7 @@ ErrorTrap:
                             Call Stream.Add(GetForm_Edit_AddTab("Reports", GetForm_Edit_MemberReports(adminContent, editRecord), allowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                             If allowAdminTabs Then
-                                Call Stream.Add(cpCore.menu_GetComboTabs())
+                                Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
                             End If
                             Call Stream.Add(EditSectionButtonBar)
                         End If
@@ -4275,7 +4275,7 @@ ErrorTrap:
                             'Call Stream.Add(GetForm_Edit_AddTab("Calendar", GetForm_Edit_CalendarEvents, AllowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                             If allowAdminTabs Then
-                                Call Stream.Add(cpCore.menu_GetComboTabs())
+                                Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
                                 'Call Stream.Add("<div class=""ccPanelBackground"">" & cpCore.main_GetComboTabs() & "</div>")
                             End If
                             Call Stream.Add(EditSectionButtonBar)
@@ -4337,7 +4337,7 @@ ErrorTrap:
                             Call Stream.Add(GetForm_Edit_AddTab("Bounce&nbsp;Control", GetForm_Edit_EmailBounceStatus(), allowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                             If allowAdminTabs Then
-                                Call Stream.Add(cpCore.menu_GetComboTabs())
+                                Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
                                 'Call Stream.Add("<div Class=""ccPanelBackground"">" & cpCore.main_GetComboTabs() & "</div>")
                             End If
                             Call Stream.Add(EditSectionButtonBar)
@@ -4390,7 +4390,7 @@ ErrorTrap:
                             Call Stream.Add(GetForm_Edit_AddTab("Bounce&nbsp;Control", GetForm_Edit_EmailBounceStatus(), allowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                             If allowAdminTabs Then
-                                Call Stream.Add(cpCore.menu_GetComboTabs())
+                                Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
                                 'Call Stream.Add("<div Class=""ccPanelBackground"">" & cpCore.main_GetComboTabs() & "</div>")
                             End If
                             Call Stream.Add(EditSectionButtonBar)
@@ -4441,7 +4441,7 @@ ErrorTrap:
                             Call Stream.Add(GetForm_Edit_AddTab("Bounce&nbsp;Control", GetForm_Edit_EmailBounceStatus(), allowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                             If allowAdminTabs Then
-                                Call Stream.Add(cpCore.menu_GetComboTabs())
+                                Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
                                 'Call Stream.Add("<div Class=""ccPanelBackground"">" & cpCore.main_GetComboTabs() & "</div>")
                             End If
                             Call Stream.Add(EditSectionButtonBar)
@@ -4464,7 +4464,7 @@ ErrorTrap:
                             Call Stream.Add(GetForm_Edit_AddTab("Authoring Permissions", GetForm_Edit_GroupRules(adminContent, editRecord), allowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                             If allowAdminTabs Then
-                                Call Stream.Add(cpCore.menu_GetComboTabs())
+                                Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
                                 'Call Stream.Add("<div class=""ccPanelBackground"">" & cpCore.main_GetComboTabs() & "</div>")
                             End If
                             Call Stream.Add(EditSectionButtonBar)
@@ -4488,7 +4488,7 @@ ErrorTrap:
                         'Call Stream.Add(GetForm_Edit_AddTab("Calendar", GetForm_Edit_CalendarEvents, AllowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                         If allowAdminTabs Then
-                            Call Stream.Add(cpCore.menu_GetComboTabs())
+                            Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
                         End If
                         Call Stream.Add(EditSectionButtonBar)
                     Case "CCSECTIONS"
@@ -4504,7 +4504,7 @@ ErrorTrap:
                         Call Stream.Add(GetForm_Edit_AddTab("Section Blocking", GetForm_Edit_SectionBlockRules(adminContent, editRecord), allowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                         If allowAdminTabs Then
-                            Call Stream.Add(cpCore.menu_GetComboTabs())
+                            Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
                             'Call Stream.Add("<div class=""ccPanelBackground"">" & cpCore.main_GetComboTabs() & "</div>")
                         End If
                         Call Stream.Add(EditSectionButtonBar)
@@ -4520,7 +4520,7 @@ ErrorTrap:
                         Call Stream.Add(GetForm_Edit_AddTab("Select Sections", GetForm_Edit_DynamicMenuSectionRules(adminContent, editRecord), allowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                         If allowAdminTabs Then
-                            Call Stream.Add(cpCore.menu_GetComboTabs())
+                            Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
                             'Call Stream.Add("<div class=""ccPanelBackground"">" & cpCore.main_GetComboTabs() & "</div>")
                         End If
                         Call Stream.Add(EditSectionButtonBar)
@@ -4536,7 +4536,7 @@ ErrorTrap:
                         Call Stream.Add(GetForm_Edit_AddTab("Authoring Access", GetForm_Edit_LibraryFolderRules(adminContent, editRecord), allowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                         If allowAdminTabs Then
-                            Call Stream.Add(cpCore.menu_GetComboTabs())
+                            Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
                         End If
                         Call Stream.Add(EditSectionButtonBar)
                     Case genericController.vbUCase("ccGroups")
@@ -4556,7 +4556,7 @@ ErrorTrap:
                         'Call Stream.Add(GetForm_Edit_AddTab("Calendar", GetForm_Edit_CalendarEvents, AllowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                         If allowAdminTabs Then
-                            Call Stream.Add(cpCore.menu_GetComboTabs())
+                            Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
                         End If
                         Call Stream.Add(EditSectionButtonBar)
                     '
@@ -4593,7 +4593,7 @@ ErrorTrap:
                         Call Stream.Add(GetForm_Edit_AddTab("Reports", GetForm_Edit_LayoutReports(adminContent, editRecord), allowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                         If allowAdminTabs Then
-                            Call Stream.Add(cpCore.menu_GetComboTabs())
+                            Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
                         End If
                         Call Stream.Add(EditSectionButtonBar)
                     Case Else
@@ -4609,7 +4609,7 @@ ErrorTrap:
                         Call Stream.Add(GetForm_Edit_AddTab("Content Watch", GetForm_Edit_ContentTracking(adminContent, editRecord), allowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                         If allowAdminTabs Then
-                            Call Stream.Add(cpCore.menu_GetComboTabs())
+                            Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
                         End If
                         Call Stream.Add(EditSectionButtonBar)
                 End Select
@@ -4993,7 +4993,7 @@ ErrorTrap:
                         ContentID = cpCore.db.cs_getInteger(CS, "contentID")
                         ContentName = cpCore.db.cs_getText(CS, "contentname")
                         RecordID = cpCore.db.cs_getInteger(CS, "recordid")
-                        Link = cpCore.pageManager_GetPageLink4(RecordID, "", True, False)
+                        Link = cpCore.pageManager.pageManager_GetPageLink4(RecordID, "", True, False)
                         'Link = cpCore.main_GetPageLink3(RecordID, "", True)
                         'If Link = "" Then
                         '    Link = cpCore.db.cs_getText(CS, "Link")
@@ -5014,7 +5014,7 @@ ErrorTrap:
                                 'Call HandleInternalError("GetForm_Publish", "Admin Workflow Publish selected an authoring control record [" & ContentID & "." & RecordID & "] for a content definition [" & ContentName & "] that does not AllowWorkflowAuthoring.")
                             Else
 
-                                Call cpCore.pageManager_GetAuthoringStatus(ContentName, RecordID, IsSubmitted, IsApproved, SubmitName, ApprovedName, IsInserted, IsDeleted, IsModified, ModifiedName, ModifiedDate, SubmittedDate, ApprovedDate)
+                                Call cpCore.pageManager.pageManager_GetAuthoringStatus(ContentName, RecordID, IsSubmitted, IsApproved, SubmitName, ApprovedName, IsInserted, IsDeleted, IsModified, ModifiedName, ModifiedDate, SubmittedDate, ApprovedDate)
                                 If RowColor = "class=""ccPanelRowOdd""" Then
                                     RowColor = "class=""ccPanelRowEven"""
                                 Else
@@ -6660,7 +6660,7 @@ ErrorTrap:
                 '
                 If (UCase(adminContent.ContentTableName) = "CCPAGECONTENT") Or (UCase(adminContent.ContentTableName) = "ITEMS") Then
                     FieldHelp = "This is the URL where this record was last displayed on the site. It may be blank if the record has not been displayed yet."
-                    Copy = cpCore.main_GetContentWatchLinkByKey(editRecord.contentControlId & "." & editRecord.id, , False)
+                    Copy = cpCore.pageManager.main_GetContentWatchLinkByKey(editRecord.contentControlId & "." & editRecord.id, , False)
                     If Copy = "" Then
                         HTMLFieldString = "unknown"
                     Else
@@ -7571,7 +7571,7 @@ ErrorTrap:
                 '
                 ' Table of old Link Aliases
                 '
-                Link = cpCore.main_GetPageDynamicLink(editRecord.id, False)
+                Link = cpCore.pageManager.main_GetPageDynamicLink(editRecord.id, False)
                 CS = cpCore.db.cs_open("Link Aliases", "pageid=" & editRecord.id, "ID Desc", , , , , "name")
                 Do While cpCore.db.cs_ok(CS)
                     LinkList = LinkList & "<div style=""margin-left:4px;margin-bottom:4px;"">" & cpCore.htmlDoc.html_EncodeHTML(cpCore.db.cs_getText(CS, "name")) & "</div>"
@@ -11712,7 +11712,7 @@ ErrorTrap:
                 '        '
                 '        Call cpCore.htmldoc.main_AddLiveTabEntry("Current&nbsp;Downloads", Tab0.Text, "ccAdminTab")
                 '        Call cpCore.htmldoc.main_AddLiveTabEntry("Request&nbsp;New&nbsp;Download", Tab1.Text, "ccAdminTab")
-                '        Content = cpCore.main_GetLiveTabs()
+                '        Content = cpCore.htmldoc.main_GetLiveTabs()
                 Content = Tab0.Text
                 '
                 ButtonListLeft = ButtonCancel & "," & ButtonRefresh & "," & ButtonDelete
@@ -11748,7 +11748,7 @@ ErrorTrap:
                 If Not AllowAdminTabs Then
                     GetForm_Edit_AddTab = Content
                 Else
-                    Call cpCore.menu_AddComboTabEntry(Replace(Caption, " ", "&nbsp;"), "", "", Content, False, "ccAdminTab")
+                    Call cpCore.htmlDoc.menu_AddComboTabEntry(Replace(Caption, " ", "&nbsp;"), "", "", Content, False, "ccAdminTab")
                     'Call cpCore.htmldoc.main_AddLiveTabEntry(Replace(Caption, " ", "&nbsp;"), Content, "ccAdminTab")
                 End If
             End If
@@ -11775,12 +11775,12 @@ ErrorTrap:
                 '
                 ' Ajax Tab
                 '
-                Call cpCore.menu_AddComboTabEntry(Replace(Caption, " ", "&nbsp;"), "", AjaxLink, "", False, "ccAdminTab")
+                Call cpCore.htmlDoc.menu_AddComboTabEntry(Replace(Caption, " ", "&nbsp;"), "", AjaxLink, "", False, "ccAdminTab")
             Else
                 '
                 ' Live Tab
                 '
-                Call cpCore.menu_AddComboTabEntry(Replace(Caption, " ", "&nbsp;"), "", "", Content, False, "ccAdminTab")
+                Call cpCore.htmlDoc.menu_AddComboTabEntry(Replace(Caption, " ", "&nbsp;"), "", "", Content, False, "ccAdminTab")
             End If
             '
             Exit Function
@@ -12315,9 +12315,9 @@ ErrorTrap:
                 '
                 ' Build and add tabs
                 '
-                Call cpCore.main_AddLiveTabEntry("Custom&nbsp;Reports", Tab0.Text, "ccAdminTab")
-                Call cpCore.main_AddLiveTabEntry("Request&nbsp;New&nbsp;Report", Tab1.Text, "ccAdminTab")
-                Content = cpCore.main_GetLiveTabs()
+                Call cpCore.htmlDoc.main_AddLiveTabEntry("Custom&nbsp;Reports", Tab0.Text, "ccAdminTab")
+                Call cpCore.htmlDoc.main_AddLiveTabEntry("Request&nbsp;New&nbsp;Report", Tab1.Text, "ccAdminTab")
+                Content = cpCore.htmlDoc.main_GetLiveTabs()
                 '
             End If
             '
@@ -12354,8 +12354,10 @@ ErrorTrap:
                 Dim Copy As String = ""
                 Dim RightCopy As String
                 Dim TitleRows As Integer
-                Dim LandingPageID As Integer
-                Dim IsPageContent As Boolean
+                ' refactor -- is was using pagemanager code, and it only detected if the page is the current domain's 
+                'Dim LandingPageID As Integer
+                'Dim IsPageContent As Boolean
+                'Dim IsLandingPage As Boolean
                 Dim PageCount As Integer
                 Dim AllowAdd As Boolean
                 Dim AllowDelete As Boolean
@@ -12387,7 +12389,6 @@ ErrorTrap:
                 Dim SortTitle As String
                 Dim HeaderDescription As String = ""
                 Dim AllowFilterNav As Boolean
-                Dim IsLandingPage As Boolean
                 Dim ColumnPointer As Integer
                 Dim WhereCount As Integer
                 Dim sqlWhere As String = ""
@@ -12902,14 +12903,14 @@ ErrorTrap:
                                 '
                                 ' --- Print out the records
                                 '
-                                IsPageContent = (LCase(adminContent.ContentTableName) = "ccpagecontent")
-                                If IsPageContent Then
-                                    LandingPageID = cpCore.main_GetLandingPageID
-                                End If
+                                'IsPageContent = (LCase(adminContent.ContentTableName) = "ccpagecontent")
+                                'If IsPageContent Then
+                                '    LandingPageID = cpCore.main_GetLandingPageID
+                                'End If
                                 Do While ((cpCore.db.cs_ok(CS)) And (RecordPointer < RecordLast))
                                     RecordID = cpCore.db.cs_getInteger(CS, "ID")
                                     RecordName = cpCore.db.cs_getText(CS, "name")
-                                    IsLandingPage = IsPageContent And (RecordID = LandingPageID)
+                                    'IsLandingPage = IsPageContent And (RecordID = LandingPageID)
                                     If RowColor = "class=""ccAdminListRowOdd""" Then
                                         RowColor = "class=""ccAdminListRowEven"""
                                     Else
@@ -12923,7 +12924,8 @@ ErrorTrap:
                                     '
                                     ' --- Delete Checkbox Columns
                                     '
-                                    If AllowDelete And Not IsLandingPage Then
+                                    If AllowDelete Then
+                                        'If AllowDelete And Not IsLandingPage Then
                                         'If AdminContent.AllowDelete And Not IsLandingPage Then
                                         DataTable_DataRows &= "<td align=center " & RowColor & "><input TYPE=CheckBox NAME=row" & RecordPointer & " VALUE=1 ID=""DelCheck""><input type=hidden name=rowid" & RecordPointer & " VALUE=" & RecordID & "></span></td>"
                                     Else
