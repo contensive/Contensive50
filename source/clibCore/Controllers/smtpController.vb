@@ -4,11 +4,10 @@ Option Strict On
 
 Imports System.Net.Mail
 Imports System.Net.Mime
-Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
 '
-Namespace Contensive.Core
-    Public Class coreSmtpHandlerClass
+Namespace Contensive.Core.Controllers
+    Public Class smtpController
         '
         Public ErrorNumber As Integer
         Public ErrorSource As String

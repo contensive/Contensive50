@@ -22,7 +22,7 @@
 //        //
 //        //====================================================================================================
 //        /// <summary>
-//        /// id for the user. When this property is set, all public user. properteries are updated for this selected id
+//        /// id for the authcontext.user. When this property is set, all public authcontext.user. properteries are updated for this selected id
 //        /// </summary>
 //        /// <returns></returns>
 //        public int id
@@ -159,7 +159,7 @@
 //        public bool main_loginFormDefaultProcessed = false;
 //        //
 //        //------------------------------------------------------------------------
-//        // ----- local cache to speed up user.main_IsContentManager
+//        // ----- local cache to speed up authcontext.user.main_IsContentManager
 //        //------------------------------------------------------------------------
 //        //
 //        // If ContentId in this list, they are not a content manager
@@ -198,7 +198,7 @@
 //        /// <returns></returns>
 //        public bool isAuthenticated()
 //        {
-//            return cpCore.visit.visit_isAuthenticated;
+//            return cpCore.visit.visit.visitAuthenticated;
 //        }
 //        //
 //        //========================================================================
@@ -840,12 +840,12 @@
 //                    loginForm_Password = cpCore.docProperties.getText("password");
 //                    loginForm_AutoLogin = cpCore.main_GetStreamBoolean2("autologin");
 //                    //
-//                    if ((cpCore.visit.visit_loginAttempts < main_maxVisitLoginAttempts) & (cpCore.visit.visit_cookieSupport))
+//                    if ((cpCore.visit.visit.loginAttempts < main_maxVisitLoginAttempts) & (cpCore.visit.visit.cookieSupport))
 //                    {
 //                        LocalMemberID = authenticateGetId(loginForm_Username, loginForm_Password);
 //                        if (LocalMemberID == 0)
 //                        {
-//                            cpCore.visit.visit_loginAttempts = cpCore.visit.visit_loginAttempts + 1;
+//                            cpCore.visit.visit.loginAttempts = cpCore.visit.visit.loginAttempts + 1;
 //                            cpCore.visit.visit_save();
 //                        }
 //                        else {
@@ -1164,7 +1164,7 @@
 //                    //
 //                    // Specific Content called out
 //                    //
-//                    cpCore.user.getContentAccessRights(ContentName, ref returnIsContentManager, ref notImplemented_allowAdd,ref  notImplemented_allowDelete);
+//                    cpcore.authContext.user.getContentAccessRights(ContentName, ref returnIsContentManager, ref notImplemented_allowAdd,ref  notImplemented_allowDelete);
 //                }
 //            }
 //            catch (Exception ex)
@@ -1231,7 +1231,7 @@
 //                    //
 //                    // Log them in
 //                    //
-//                    cpCore.visit.visit_isAuthenticated = true;
+//                    cpCore.visit.visit.visitAuthenticated = true;
 //                    cpCore.visit.visit_save();
 //                    isAuthenticatedAdmin_cache_isLoaded = false;
 //                    property_user_isMember_isLoaded = false;
@@ -1239,9 +1239,9 @@
 //                    //
 //                    // Write Cookies in case Visit Tracking is off
 //                    //
-//                    if (cpCore.visit.visit_startTime == System.DateTime.MinValue)
+//                    if (cpCore.visit.visit.startTime == System.DateTime.MinValue)
 //                    {
-//                        cpCore.visit.visit_startTime = cpCore.main_PageStartTime;
+//                        cpCore.visit.visit.startTime = cpCore.main_PageStartTime;
 //                    }
 //                    if (!cpCore.siteProperties.allowVisitTracking)
 //                    {
@@ -1290,7 +1290,7 @@
 //                CS = cpCore.db.cs_openSql(SQL);
 //                if (cpCore.db.cs_Ok(CS))
 //                {
-//                    if (cpCore.visit.visit_Id == 0)
+//                    if (cpCore.visit.visit.Id == 0)
 //                    {
 //                        //
 //                        // Visit was blocked during init, init the visit DateTime.Now
@@ -1338,9 +1338,9 @@
 //                    }
 //                    lastVisit = cpCore.main_PageStartTime;
 //                    //cpCore.main_VisitMemberID = id
-//                    cpCore.visit.visit_loginAttempts = 0;
+//                    cpCore.visit.visit.loginAttempts = 0;
 //                    cpCore.visitor.memberID = id;
-//                    cpCore.visit.visit_excludeFromAnalytics = cpCore.visit.visit_excludeFromAnalytics | cpCore.visit.visit_isBot | excludeFromAnalytics | isAdmin | isDeveloper;
+//                    cpCore.visit.visit.excludeFromAnalytics = cpCore.visit.visit.excludeFromAnalytics | cpCore.visit.visit_isBot | excludeFromAnalytics | isAdmin | isDeveloper;
 //                    cpCore.visit.visit_save();
 //                    cpCore.visitor.save();
 //                    saveMemberBase();
@@ -1368,7 +1368,7 @@
 //                int CSMember = 0;
 //                int CSlanguage = 0;
 //                //
-//                createUserDefaults(cpCore.visit.visit_name);
+//                createUserDefaults(cpCore.visit.visit.name);
 //                //
 //                id = 0;
 //                CSMember = cpCore.db.cs_insertRecord("people");
@@ -1408,7 +1408,7 @@
 //                    //
 //                    //cpCore.main_VisitMemberID = id
 //                    cpCore.visitor.memberID = id;
-//                    cpCore.visit.visit_isAuthenticated = false;
+//                    cpCore.visit.visit.visitAuthenticated = false;
 //                    cpCore.visit.visit_save();
 //                    cpCore.visitor.save();
 //                    //
@@ -1457,7 +1457,7 @@
 //                contentControlID = 0;
 //                active = false;
 //                visits = 0;
-//                lastVisit = cpCore.visit.visit_startTime;
+//                lastVisit = cpCore.visit.visit.startTime;
 //                company = "";
 //                user_Title = "";
 //                main_MemberAddress = "";
@@ -1585,7 +1585,7 @@
 //                    else {
 //                        if (!cpCore.error_IsUserError())
 //                        {
-//                            CS = cpCore.db.csOpen("people", "ID=" + cpCore.db.encodeSQLNumber(cpCore.user.id));
+//                            CS = cpCore.db.csOpen("people", "ID=" + cpCore.db.encodeSQLNumber(cpcore.authContext.user.id));
 //                            if (!cpCore.db.cs_Ok(CS))
 //                            {
 //                                cpCore.handleExceptionAndRethrow(new Exception("Could not open the current members account to set the username and password."));
@@ -1607,7 +1607,7 @@
 //                                cpCore.db.cs_set(CS, "Name", FullName);
 //                                cpCore.db.cs_set(CS, "username", loginForm_Username);
 //                                cpCore.db.cs_set(CS, "password", loginForm_Password);
-//                                cpCore.user.authenticateById(cpCore.user.id);
+//                                cpcore.authContext.user.authenticateById(cpcore.authContext.user.id);
 //                            }
 //                            cpCore.db.cs_Close(ref CS);
 //                        }
@@ -1854,7 +1854,7 @@
 //                    //
 //                    cpCore.error_AddUserError("A valid login requires a non-blank password.");
 //                }
-//                else if ((cpCore.visit.visit_loginAttempts >= main_maxVisitLoginAttempts))
+//                else if ((cpCore.visit.visit.loginAttempts >= main_maxVisitLoginAttempts))
 //                {
 //                    //
 //                    // ----- already tried 5 times
@@ -2039,7 +2039,7 @@
 //                    else if (string.IsNullOrEmpty(ContentName))
 //                    {
 //                        //
-//                        // no content given, do not handle the general case -- use user.main_IsContentManager2()
+//                        // no content given, do not handle the general case -- use authcontext.user.main_IsContentManager2()
 //                        //
 //                    }
 //                    else if (isAuthenticatedDeveloper())

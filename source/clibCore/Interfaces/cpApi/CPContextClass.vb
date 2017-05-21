@@ -214,11 +214,11 @@ Namespace Contensive.Core
         '
         '
         '
-        Public Property binaryRequest() As Object
+        Public Property binaryRequest() As Byte()
             Get
                 Return cp.core.webServer.requestFormBinaryHeader
             End Get
-            Set(ByVal value As Object)
+            Set(ByVal value As Byte())
                 cp.core.webServer.requestFormBinaryHeader = value
             End Set
         End Property

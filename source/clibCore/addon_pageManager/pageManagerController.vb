@@ -184,7 +184,7 @@ Namespace Contensive.Core.Controllers
                         '
                         ' ----- Set authoring only for valid ContentName
                         '
-                        IsEditingLocal = c.user.isEditing(iContentName)
+                        IsEditingLocal = c.authContext.user.isEditing(iContentName)
                     Else
                         '
                         ' ----- if iContentName was bad, maybe they put table in, no authoring
@@ -202,7 +202,7 @@ Namespace Contensive.Core.Controllers
                                     SeeAlsoLink = c.webServer.webServerIO_requestProtocol & SeeAlsoLink
                                 End If
                                 If IsEditingLocal Then
-                                    result = result & c.main_GetRecordEditLink2("See Also", (cpcore.db.cs_getInteger(CS, "ID")), False, "", c.user.isEditing("See Also"))
+                                    result = result & c.main_GetRecordEditLink2("See Also", (cpcore.db.cs_getInteger(CS, "ID")), False, "", c.authContext.user.isEditing("See Also"))
                                 End If
                                 result = result & "<a href=""" & c.htmlDoc.html_EncodeHTML(SeeAlsoLink) & """ target=""_blank"">" & (cpcore.db.cs_getText(CS, "Name")) & "</A>"
                                 Copy = (cpcore.db.cs_getText(CS, "Brief"))
@@ -313,12 +313,12 @@ Namespace Contensive.Core.Controllers
                         Copy = "[the content of this page is not available]" & BR
                         If c.db.cs_ok(CS) Then
                             Copy = (cpcore.db.cs_get(CS, "copyFilename"))
-                            'Copy = main_EncodeContent5(Copy, c.user.userid, iContentName, iRecordID, 0, False, False, True, True, False, True, "", "", False, 0)
+                            'Copy = main_EncodeContent5(Copy, c.authcontext.user.userid, iContentName, iRecordID, 0, False, False, True, True, False, True, "", "", False, 0)
                         End If
                         NoteCopy = NoteCopy & Copy & BR
                         Call c.db.cs_Close(CS)
                         '
-                        Call c.email_sendMemberEmail3(iToMemberID, NoteFromEmail, "Feedback Form Submitted", NoteCopy, False, True, 0, "", False)
+                        Call c.email.sendPerson(iToMemberID, NoteFromEmail, "Feedback Form Submitted", NoteCopy, False, True, 0, "", False)
                         '
                         ' ----- Note sent, say thanks
                         '
@@ -335,14 +335,14 @@ Namespace Contensive.Core.Controllers
                         '
                         ' ----- From Name
                         '
-                        Copy = c.user.name
+                        Copy = c.authContext.user.name
                         Panel = Panel & "<td align=""right"" width=""100""><p>Your Name</p></td>"
                         Panel = Panel & "<td align=""left""><input type=""text"" name=""NoteFromName"" value=""" & c.htmlDoc.html_EncodeHTML(Copy) & """></span></td>"
                         Panel = Panel & "</tr><tr>"
                         '
                         ' ----- From Email address
                         '
-                        Copy = c.user.email
+                        Copy = c.authContext.user.email
                         Panel = Panel & "<td align=""right"" width=""100""><p>Your Email</p></td>"
                         Panel = Panel & "<td align=""left""><input type=""text"" name=""NoteFromEmail"" value=""" & c.htmlDoc.html_EncodeHTML(Copy) & """></span></td>"
                         Panel = Panel & "</tr><tr>"
@@ -592,7 +592,7 @@ Namespace Contensive.Core.Controllers
                         Call c.db.cs_goNext(CS)
                     Loop
                     If result <> "" Then
-                        result = c.htmlDoc.html_GetContentCopy("Watch List Caption: " & ListName, ListName, c.user.id, True, c.user.isAuthenticated) & cr & "<ul class=""ccWatchList"">" & kmaIndent(result) & cr & "</ul>"
+                        result = c.htmlDoc.html_GetContentCopy("Watch List Caption: " & ListName, ListName, c.authContext.user.id, True, c.authContext.user.isAuthenticated) & cr & "<ul class=""ccWatchList"">" & kmaIndent(result) & cr & "</ul>"
                     End If
                 End If
                 Call c.db.cs_Close(CS)
@@ -719,8 +719,8 @@ Namespace Contensive.Core.Controllers
                     ' ----- Encode Template
                     '
                     If Not c.htmlDoc.pageManager_printVersion Then
-                        LocalTemplateBody = c.htmlDoc.html_executeContentCommands(Nothing, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, c.user.id, c.user.isAuthenticated, layoutError)
-                        returnHtmlBody = returnHtmlBody & c.htmlDoc.html_encodeContent9(LocalTemplateBody, c.user.id, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", c.webServer.webServerIO_requestProtocol & c.webServer.requestDomain, False, c.siteProperties.defaultWrapperID, PageContent, CPUtilsBaseClass.addonContext.ContextTemplate)
+                        LocalTemplateBody = c.htmlDoc.html_executeContentCommands(Nothing, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, c.authContext.user.id, c.authContext.user.isAuthenticated, layoutError)
+                        returnHtmlBody = returnHtmlBody & c.htmlDoc.html_encodeContent9(LocalTemplateBody, c.authContext.user.id, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", c.webServer.webServerIO_requestProtocol & c.webServer.requestDomain, False, c.siteProperties.defaultWrapperID, PageContent, CPUtilsBaseClass.addonContext.ContextTemplate)
                         'returnHtmlBody = returnHtmlBody & EncodeContent8(LocalTemplateBody, memberID, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", main_ServerProtocol, False, app.SiteProperty_DefaultWrapperID, PageContent, ContextTemplate)
                     End If
                     '
@@ -734,7 +734,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' ----- Add tools Panel
                     '
-                    If Not c.user.isAuthenticated() Then
+                    If Not c.authContext.user.isAuthenticated() Then
                         '
                         ' not logged in
                         '
@@ -742,8 +742,8 @@ Namespace Contensive.Core.Controllers
                         '
                         ' Add template editing
                         '
-                        If c.visitProperty.getBoolean("AllowAdvancedEditor") And c.user.isEditing("Page Templates") Then
-                            returnHtmlBody = c.htmlDoc.main_GetEditWrapper("Page Template [" & LocalTemplateName & "]", c.main_GetRecordEditLink2("Page Templates", LocalTemplateID, False, LocalTemplateName, c.user.isEditing("Page Templates")) & returnHtmlBody)
+                        If c.visitProperty.getBoolean("AllowAdvancedEditor") And c.authContext.user.isEditing("Page Templates") Then
+                            returnHtmlBody = c.htmlDoc.main_GetEditWrapper("Page Template [" & LocalTemplateName & "]", c.main_GetRecordEditLink2("Page Templates", LocalTemplateID, False, LocalTemplateName, c.authContext.user.isEditing("Page Templates")) & returnHtmlBody)
                         End If
                     End If
                     '
@@ -1254,7 +1254,7 @@ Namespace Contensive.Core.Controllers
                     '
                     return_blockSiteWithLogin = True
                     Call c.main_SetMetaContent(0, 0)
-                    returnHtml = c.user.getLoginPanel()
+                    returnHtml = c.htmlDoc.getLoginPanel()
                 Else
                     '
                     ' main_Get the content
@@ -1366,7 +1366,7 @@ Namespace Contensive.Core.Controllers
                         ' Set the Template buffers
                         '
                         If TCPtr >= 0 Then
-                            If c.visit.visit_browserIsMobile Then
+                            If c.authContext.visit_browserIsMobile Then
                                 If c.siteProperties.getBoolean("AllowMobileTemplates") Then
                                     '
                                     ' set Mobile Template
@@ -1428,7 +1428,7 @@ Namespace Contensive.Core.Controllers
                         '
                         If pageManager_RedirectLink = "" Then
                             If (TCPtr >= 0) And (c.siteProperties.allowTemplateLinkVerification) Then
-                                PCCPtr = pageManager_cache_pageContent_getPtr(main_RenderedPageID, pagemanager_IsWorkflowRendering, c.user.isQuickEditing(""))
+                                PCCPtr = pageManager_cache_pageContent_getPtr(main_RenderedPageID, pagemanager_IsWorkflowRendering, c.authContext.user.isQuickEditing(""))
                                 '$$$$$ must check for PPtr<0
                                 SecureLink_CurrentURL = (Left(LCase(c.webServer.webServerIO_ServerLink), 8) = "https://")
                                 SecureLink_Template_Required = genericController.EncodeBoolean(cache_pageTemplate(TC_IsSecure, TCPtr))
@@ -1604,17 +1604,17 @@ Namespace Contensive.Core.Controllers
             '------------------------------------------------------------------------------------
             '
             'hint = "8"
-            If c.user.isAuthenticatedAdmin() And c.htmlDoc.main_AdminWarning <> "" Then
+            If c.authContext.user.isAuthenticatedAdmin() And c.htmlDoc.main_AdminWarning <> "" Then
                 '
                 ' Display Admin Warnings with Edits for record errors
                 '
                 If c.htmlDoc.main_AdminWarningPageID <> 0 Then
-                    c.htmlDoc.main_AdminWarning = c.htmlDoc.main_AdminWarning & "</p>" & c.main_GetRecordEditLink2("Page Content", c.htmlDoc.main_AdminWarningPageID, True, "Page " & c.htmlDoc.main_AdminWarningPageID, c.user.isAuthenticatedAdmin()) & "&nbsp;Edit the page<p>"
+                    c.htmlDoc.main_AdminWarning = c.htmlDoc.main_AdminWarning & "</p>" & c.main_GetRecordEditLink2("Page Content", c.htmlDoc.main_AdminWarningPageID, True, "Page " & c.htmlDoc.main_AdminWarningPageID, c.authContext.user.isAuthenticatedAdmin()) & "&nbsp;Edit the page<p>"
                     c.htmlDoc.main_AdminWarningPageID = 0
                 End If
                 '
                 If c.htmlDoc.main_AdminWarningSectionID <> 0 Then
-                    c.htmlDoc.main_AdminWarning = c.htmlDoc.main_AdminWarning & "</p>" & c.main_GetRecordEditLink2("Site Sections", c.htmlDoc.main_AdminWarningSectionID, True, "Section " & c.htmlDoc.main_AdminWarningSectionID, c.user.isAuthenticatedAdmin()) & "&nbsp;Edit the section<p>"
+                    c.htmlDoc.main_AdminWarning = c.htmlDoc.main_AdminWarning & "</p>" & c.main_GetRecordEditLink2("Site Sections", c.htmlDoc.main_AdminWarningSectionID, True, "Section " & c.htmlDoc.main_AdminWarningSectionID, c.authContext.user.isAuthenticatedAdmin()) & "&nbsp;Edit the section<p>"
                     c.htmlDoc.main_AdminWarningSectionID = 0
                 End If
                 returnHtml = "" _
@@ -1657,7 +1657,7 @@ ErrorTrap:
                 rootPageId = PageID
             Else
                 If pageManager_cache_pageContent_rows = 0 Then
-                    Call pageManager_cache_pageContent_load(pagemanager_IsWorkflowRendering, c.user.isQuickEditing(""))
+                    Call pageManager_cache_pageContent_load(pagemanager_IsWorkflowRendering, c.authContext.user.isQuickEditing(""))
                 End If
                 Ptr = pageManager_cache_pageContent_idIndex.getPtr(CStr(PageID))
                 If Ptr >= 0 Then
@@ -1869,11 +1869,11 @@ ErrorTrap:
                 '---------------------------------------------------------------------------------
                 '
                 If (BlockedRecordIDList <> "") Then
-                    If c.user.isAuthenticatedAdmin() Then
+                    If c.authContext.user.isAuthenticatedAdmin() Then
                         '
                         ' Administrators are never blocked
                         '
-                    ElseIf (Not c.user.isAuthenticated()) Then
+                    ElseIf (Not c.authContext.user.isAuthenticated()) Then
                         '
                         ' non-authenticated are always blocked
                         '
@@ -1886,7 +1886,7 @@ ErrorTrap:
                             & " FROM (ccPageContentBlockRules" _
                             & " LEFT JOIN ccgroups ON ccPageContentBlockRules.GroupID = ccgroups.ID)" _
                             & " LEFT JOIN ccMemberRules ON ccgroups.ID = ccMemberRules.GroupID" _
-                            & " WHERE (((ccMemberRules.MemberID)=" & c.db.encodeSQLNumber(c.user.id) & ")" _
+                            & " WHERE (((ccMemberRules.MemberID)=" & c.db.encodeSQLNumber(c.authContext.user.id) & ")" _
                             & " AND ((ccPageContentBlockRules.RecordID) In (" & BlockedRecordIDList & "))" _
                             & " AND ((ccPageContentBlockRules.Active)<>0)" _
                             & " AND ((ccgroups.Active)<>0)" _
@@ -1915,7 +1915,7 @@ ErrorTrap:
                                 & " AND ((ManagementGroups.Active)<>0)" _
                                 & " AND ((ManagementMemberRules.Active)<>0)" _
                                 & " AND ((ManagementMemberRules.DateExpires) Is Null Or (ManagementMemberRules.DateExpires)>" & c.db.encodeSQLDate(c.app_startTime) & ")" _
-                                & " AND ((ManagementMemberRules.MemberID)=" & c.user.id & " ));"
+                                & " AND ((ManagementMemberRules.MemberID)=" & c.authContext.user.id & " ));"
                             CS = c.db.cs_openSql(SQL)
                             Do While c.db.cs_ok(CS)
                                 BlockedRecordIDList = genericController.vbReplace(BlockedRecordIDList, "," & c.db.cs_getText(CS, "RecordID"), "")
@@ -1963,33 +1963,33 @@ ErrorTrap:
                             '
                             ' ----- Login page
                             '
-                            If Not c.user.isAuthenticated() Then
-                                If Not c.user.isRecognized() Then
+                            If Not c.authContext.user.isAuthenticated() Then
+                                If Not c.authContext.user.isRecognized() Then
                                     '
                                     ' not recognized
                                     '
                                     BlockCopy = "" _
                                         & "<p>This content has limited access. If you have an account, please login using this form.</p>" _
                                         & ""
-                                    BlockForm = c.user.getLoginForm()
+                                    BlockForm = c.htmlDoc.getLoginForm()
                                 Else
                                     '
                                     ' recognized, not authenticated
                                     '
                                     BlockCopy = "" _
-                                        & "<p>This content has limited access. You were recognized as ""<b>" & c.user.name & "</b>"", but you need to login to continue. To login to this account or another, please use this form.</p>" _
+                                        & "<p>This content has limited access. You were recognized as ""<b>" & c.authContext.user.name & "</b>"", but you need to login to continue. To login to this account or another, please use this form.</p>" _
                                         & ""
-                                    BlockForm = c.user.getLoginForm()
+                                    BlockForm = c.htmlDoc.getLoginForm()
                                 End If
                             Else
                                 '
                                 ' authenticated
                                 '
                                 BlockCopy = "" _
-                                    & "<p>You are currently logged in as ""<b>" & c.user.name & "</b>"". If this is not you, please <a href=""?" & c.web_RefreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
+                                    & "<p>You are currently logged in as ""<b>" & c.authContext.user.name & "</b>"". If this is not you, please <a href=""?" & c.web_RefreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
                                     & "<p>This account does not have access to this content. If you want to login with a different account, please use this form.</p>" _
                                     & ""
-                                BlockForm = c.user.getLoginForm()
+                                BlockForm = c.htmlDoc.getLoginForm()
                             End If
                             returnHtml = "" _
                                 & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td align=center>" _
@@ -2006,7 +2006,7 @@ ErrorTrap:
                                 '
                                 ' login subform form
                                 '
-                                BlockForm = c.user.getLoginForm()
+                                BlockForm = c.htmlDoc.getLoginForm()
                                 BlockCopy = "" _
                                     & "<p>This content has limited access. If you have an account, please login using this form.</p>" _
                                     & "<p>If you do not have an account, <a href=?" & c.web_RefreshQueryString & "&subform=0>click here to register</a>.</p>" _
@@ -2015,13 +2015,13 @@ ErrorTrap:
                                 '
                                 ' Register Form
                                 '
-                                If Not c.user.isAuthenticated() And c.user.isRecognized() Then
+                                If Not c.authContext.user.isAuthenticated() And c.authContext.user.isRecognized() Then
                                     '
                                     ' Can not take the chance, if you go to a registration page, and you are recognized but not auth -- logout first
                                     '
-                                    Call c.user.logout()
+                                    Call c.authContext.user.logout()
                                 End If
-                                If Not c.user.isAuthenticated() Then
+                                If Not c.authContext.user.isAuthenticated() Then
                                     '
                                     ' Not Authenticated
                                     '
@@ -2031,7 +2031,7 @@ ErrorTrap:
                                         & ""
                                 Else
                                     BlockCopy = "" _
-                                        & "<p>You are currently logged in as ""<b>" & c.user.name & "</b>"". If this is not you, please <a href=""?" & c.web_RefreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
+                                        & "<p>You are currently logged in as ""<b>" & c.authContext.user.name & "</b>"". If this is not you, please <a href=""?" & c.web_RefreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
                                         & "<p>This account does not have access to this content. To view this content, please complete this form.</p>" _
                                         & ""
                                 End If
@@ -2071,8 +2071,8 @@ ErrorTrap:
                     '
                     ' Encode the copy
                     '
-                    returnHtml = c.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, c.user.id, c.user.isAuthenticated, layoutError)
-                    returnHtml = c.htmlDoc.html_encodeContent9(returnHtml, c.user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & c.webServer.requestDomain, False, c.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+                    returnHtml = c.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, c.authContext.user.id, c.authContext.user.isAuthenticated, layoutError)
+                    returnHtml = c.htmlDoc.html_encodeContent9(returnHtml, c.authContext.user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & c.webServer.requestDomain, False, c.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
                     'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, 0, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
                     RQS = c.web_RefreshQueryString
                     If RQS <> "" Then
@@ -2113,18 +2113,18 @@ ErrorTrap:
                         contactMemberID = genericController.EncodeInteger(cache_pageContent(PCC_ContactMemberID, main_RenderCache_CurrentPage_PCCPtr))
                         pageViewings = genericController.EncodeInteger(cache_pageContent(PCC_Viewings, main_RenderCache_CurrentPage_PCCPtr))
                         'contactMemberID = app.csv_cs_getInteger(CS, "ContactMemberID")
-                        If c.user.isEditing(main_RenderCache_CurrentPage_ContentName) Or c.visitProperty.getBoolean("AllowWorkflowRendering") Then
+                        If c.authContext.user.isEditing(main_RenderCache_CurrentPage_ContentName) Or c.visitProperty.getBoolean("AllowWorkflowRendering") Then
                             '
                             ' Link authoring, workflow rendering -> do encoding, but no tracking
                             '
-                            returnHtml = c.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, c.user.id, c.user.isAuthenticated, layoutError)
-                            returnHtml = c.htmlDoc.html_encodeContent9(returnHtml, c.user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & c.webServer.requestDomain, False, c.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+                            returnHtml = c.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, c.authContext.user.id, c.authContext.user.isAuthenticated, layoutError)
+                            returnHtml = c.htmlDoc.html_encodeContent9(returnHtml, c.authContext.user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & c.webServer.requestDomain, False, c.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
                         ElseIf c.htmlDoc.pageManager_printVersion Then
                             '
                             ' Printer Version -> personalize and count viewings, no tracking
                             '
-                            returnHtml = c.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, c.user.id, c.user.isAuthenticated, layoutError)
-                            returnHtml = c.htmlDoc.html_encodeContent9(returnHtml, c.user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & c.webServer.requestDomain, False, c.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+                            returnHtml = c.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, c.authContext.user.id, c.authContext.user.isAuthenticated, layoutError)
+                            returnHtml = c.htmlDoc.html_encodeContent9(returnHtml, c.authContext.user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & c.webServer.requestDomain, False, c.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
                             'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
                             Call c.db.executeSql("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & main_RenderedPageID)
                             'Call app.csv_SetCS(CS, "Viewings", app.csv_cs_getInteger(CS, "Viewings") + 1)
@@ -2136,8 +2136,8 @@ ErrorTrap:
                             ' this should be done before the contentbox is added
                             ' so a stray blocktext does not truncate the html
                             '!!!!!!!!!!!!!!!!!!!!!!!!!
-                            returnHtml = c.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, c.user.id, c.user.isAuthenticated, layoutError)
-                            returnHtml = c.htmlDoc.html_encodeContent9(returnHtml, c.user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & c.webServer.requestDomain, False, c.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+                            returnHtml = c.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, c.authContext.user.id, c.authContext.user.isAuthenticated, layoutError)
+                            returnHtml = c.htmlDoc.html_encodeContent9(returnHtml, c.authContext.user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & c.webServer.requestDomain, False, c.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
                             'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
                             'Call main_TrackContent(main_RenderCache_CurrentPage_ContentName, main_RenderedPageID)
                             'Call main_TrackContentSet(CS)
@@ -2147,7 +2147,7 @@ ErrorTrap:
                         '
                         ' Page Hit Notification
                         '
-                        If (Not c.visit.visit_excludeFromAnalytics) And (contactMemberID <> 0) And (InStr(1, c.webServer.requestBrowser, "kmahttp", vbTextCompare) = 0) Then
+                        If (Not c.authContext.visit.excludeFromAnalytics) And (contactMemberID <> 0) And (InStr(1, c.webServer.requestBrowser, "kmahttp", vbTextCompare) = 0) Then
                             AllowHitNotification = genericController.EncodeBoolean(cache_pageContent(PCC_AllowHitNotification, main_RenderCache_CurrentPage_PCCPtr))
                             'AllowHitNotification = app.csv_cs_getBoolean(CS, "AllowHitNotification")
                             If AllowHitNotification Then
@@ -2168,17 +2168,17 @@ ErrorTrap:
                                 Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Domain", c.webServer.webServerIO_requestDomain, True)
                                 Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Link", c.webServer.webServerIO_ServerLink, False)
                                 Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Page Name", PageName, True)
-                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Member Name", c.user.name, False)
-                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Member #", CStr(c.user.id), True)
-                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Start Time", CStr(c.visit.visit_startTime), False)
-                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit #", CStr(c.visit.visit_Id), True)
+                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Member Name", c.authContext.user.name, False)
+                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Member #", CStr(c.authContext.user.id), True)
+                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Start Time", CStr(c.authContext.visit.startTime), False)
+                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit #", CStr(c.authContext.visit.Id), True)
                                 Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit IP", c.webServer.requestRemoteIP, False)
                                 Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Browser ", c.webServer.requestBrowser, True)
-                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visitor #", CStr(c.visitor.id), False)
-                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Authenticated", CStr(c.visit.visit_isAuthenticated), True)
-                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Referrer", c.visit.visit_referer, False)
+                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visitor #", CStr(c.authContext.visitor.id), False)
+                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Authenticated", CStr(c.authContext.visit.visitAuthenticated), True)
+                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Referrer", c.authContext.visit.http_referer, False)
                                 Body = Body & kmaEndTable
-                                Call c.email_sendMemberEmail3(contactMemberID, c.siteProperties.getText("EmailFromAddress", "info@" & c.webServer.webServerIO_requestDomain), "Page Hit Notification", Body, False, True, 0, "", False)
+                                Call c.email.sendPerson(contactMemberID, c.siteProperties.getText("EmailFromAddress", "info@" & c.webServer.webServerIO_requestDomain), "Page Hit Notification", Body, False, True, 0, "", False)
                             End If
                         End If
                         '
@@ -2205,7 +2205,7 @@ ErrorTrap:
                                 ' Always
                                 '
                                 If SystemEMailID <> 0 Then
-                                    Call c.main_SendSystemEmail(c.content_GetRecordName("System Email", SystemEMailID), "", c.user.id)
+                                    Call c.email.sendSystem_Legacy(c.content_GetRecordName("System Email", SystemEMailID), "", c.authContext.user.id)
                                 End If
                                 If main_AddGroupID <> 0 Then
                                     Call c.group_AddGroupMember(c.group_GetGroupName(main_AddGroupID))
@@ -2218,9 +2218,9 @@ ErrorTrap:
                                 ' If in Condition Group
                                 '
                                 If ConditionGroupID <> 0 Then
-                                    If c.user.IsMemberOfGroup2(c.group_GetGroupName(ConditionGroupID)) Then
+                                    If c.authContext.user.IsMemberOfGroup2(c.group_GetGroupName(ConditionGroupID)) Then
                                         If SystemEMailID <> 0 Then
-                                            Call c.main_SendSystemEmail(c.content_GetRecordName("System Email", SystemEMailID), "", c.user.id)
+                                            Call c.email.sendSystem_Legacy(c.content_GetRecordName("System Email", SystemEMailID), "", c.authContext.user.id)
                                         End If
                                         If main_AddGroupID <> 0 Then
                                             Call c.group_AddGroupMember(c.group_GetGroupName(main_AddGroupID))
@@ -2235,7 +2235,7 @@ ErrorTrap:
                                 ' If not in Condition Group
                                 '
                                 If ConditionGroupID <> 0 Then
-                                    If Not c.user.IsMemberOfGroup2(c.group_GetGroupName(ConditionGroupID)) Then
+                                    If Not c.authContext.user.IsMemberOfGroup2(c.group_GetGroupName(ConditionGroupID)) Then
                                         If main_AddGroupID <> 0 Then
                                             Call c.group_AddGroupMember(c.group_GetGroupName(main_AddGroupID))
                                         End If
@@ -2243,7 +2243,7 @@ ErrorTrap:
                                             Call c.group_DeleteGroupMember(c.group_GetGroupName(RemoveGroupID))
                                         End If
                                         If SystemEMailID <> 0 Then
-                                            Call c.main_SendSystemEmail(c.content_GetRecordName("System Email", SystemEMailID), "", c.user.id)
+                                            Call c.email.sendSystem_Legacy(c.content_GetRecordName("System Email", SystemEMailID), "", c.authContext.user.id)
                                         End If
                                     End If
                                 End If
@@ -2346,12 +2346,12 @@ ErrorTrap:
             If c.htmlDoc.main_AdminWarning <> "" Then
                 '
                 If c.htmlDoc.main_AdminWarningPageID <> 0 Then
-                    c.htmlDoc.main_AdminWarning = c.htmlDoc.main_AdminWarning & "</p>" & c.main_GetRecordEditLink2("Page Content", c.htmlDoc.main_AdminWarningPageID, True, "Page " & c.htmlDoc.main_AdminWarningPageID, c.user.isAuthenticatedAdmin()) & "&nbsp;Edit the page<p>"
+                    c.htmlDoc.main_AdminWarning = c.htmlDoc.main_AdminWarning & "</p>" & c.main_GetRecordEditLink2("Page Content", c.htmlDoc.main_AdminWarningPageID, True, "Page " & c.htmlDoc.main_AdminWarningPageID, c.authContext.user.isAuthenticatedAdmin()) & "&nbsp;Edit the page<p>"
                     c.htmlDoc.main_AdminWarningPageID = 0
                 End If
                 '
                 If c.htmlDoc.main_AdminWarningSectionID <> 0 Then
-                    c.htmlDoc.main_AdminWarning = c.htmlDoc.main_AdminWarning & "</p>" & c.main_GetRecordEditLink2("Site Sections", c.htmlDoc.main_AdminWarningSectionID, True, "Section " & c.htmlDoc.main_AdminWarningSectionID, c.user.isAuthenticatedAdmin()) & "&nbsp;Edit the section<p>"
+                    c.htmlDoc.main_AdminWarning = c.htmlDoc.main_AdminWarning & "</p>" & c.main_GetRecordEditLink2("Site Sections", c.htmlDoc.main_AdminWarningSectionID, True, "Section " & c.htmlDoc.main_AdminWarningSectionID, c.authContext.user.isAuthenticatedAdmin()) & "&nbsp;Edit the section<p>"
                     c.htmlDoc.main_AdminWarningSectionID = 0
                 End If
 
@@ -2373,7 +2373,7 @@ ErrorTrap:
             ErrString = genericController.GetErrString(Err)
             Call c.handleLegacyError19("pageManager_GetHtmlBody_GetSection_GetContent", "Trap", Err_Number, Err_Source, Err_Description, True)
             Err.Clear()
-            If c.user.isAuthenticatedAdmin() Then
+            If c.authContext.user.isAuthenticatedAdmin() Then
                 '
                 ' Put up an admin hint
                 '
@@ -2488,7 +2488,7 @@ ErrorTrap:
                             '????? test this
                             'hint = hint & ",110"
                             currentPageContentName = c.metaData.getContentNameByID(genericController.EncodeInteger(cache_pageContent(PCC_ContentControlID, main_RenderCache_CurrentPage_PCCPtr)))
-                            If c.user.isAuthenticatedContentManager(currentPageContentName) Then
+                            If c.authContext.user.isAuthenticatedContentManager(currentPageContentName) Then
                                 '
                                 ' allow page without section because this is a content manager -- but give them a message
                                 '
@@ -2555,16 +2555,16 @@ ErrorTrap:
                     ' $$$$$ remove main_oldCacheRS_cs, use pccPtr
                     'hint = hint & ",200"
                     '????? test - this was a routine placed in-line
-                    iIsEditing = c.user.isEditing(main_RenderCache_CurrentPage_ContentName)
+                    iIsEditing = c.authContext.user.isEditing(main_RenderCache_CurrentPage_ContentName)
                     '
                     ' ----- Render the Body
                     '
                     LiveBody = pageManager_GetHtmlBody_GetSection_GetContentBox_Live_Body(main_RenderCache_CurrentPage_ContentName, main_RenderCache_CurrentPage_ContentId, OrderByClause, AllowChildPageList, False, rootPageId, AllowReturnLink, RootPageContentName, ArchivePages)
-                    If c.user.isAdvancedEditing("") Then
+                    If c.authContext.user.isAdvancedEditing("") Then
                         returnHtml = returnHtml & c.main_GetRecordEditLink(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage)) & LiveBody
                     ElseIf iIsEditing Then
                         PageName = genericController.encodeText(cache_pageContent(PCC_Name, main_RenderCache_CurrentPage_PCCPtr))
-                        EditLink = c.main_GetRecordEditLink2(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage), PageName, c.user.isEditing(ContentName))
+                        EditLink = c.main_GetRecordEditLink2(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage), PageName, c.authContext.user.isEditing(ContentName))
                         returnHtml = returnHtml & c.htmlDoc.main_GetEditWrapper("", c.main_GetRecordEditLink(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage)) & LiveBody)
                     Else
                         returnHtml = returnHtml & LiveBody
@@ -2894,7 +2894,7 @@ ErrorTrap:
                 'hint = hint & ",030"
                 If (Not c.htmlDoc.pageManager_printVersion) Then
                     IconRow = ""
-                    If (Not c.visit.visit_isBot) And (AllowPrinterVersion Or AllowEmailPage) Then
+                    If (Not c.authContext.visit_isBot) And (AllowPrinterVersion Or AllowEmailPage) Then
                         '
                         ' not a bot, and either print or email allowed
                         '
@@ -2975,7 +2975,7 @@ ErrorTrap:
                         '
                         ' Page copy is empty if  Links Enabled put in a blank line to separate edit from add tag
                         '
-                        If c.user.isEditing(main_RenderCache_CurrentPage_ContentName) Then
+                        If c.authContext.user.isEditing(main_RenderCache_CurrentPage_ContentName) Then
                             Body = cr & "<p><!-- Empty Content Placeholder --></p>"
                         End If
                     Else
@@ -2992,7 +2992,7 @@ ErrorTrap:
                     ' ----- Child pages
                     '
                     'hint = hint & ",046"
-                    If allowChildListComposite Or c.user.isEditingAnything() Then
+                    If allowChildListComposite Or c.authContext.user.isEditingAnything() Then
                         'hint = hint & ",047"
                         If Not allowChildListComposite Then
                             Cell = Cell & c.htmlDoc.html_GetAdminHintWrapper("Automatic Child List display is disabled for this page. It is displayed here because you are in editing mode. To enable automatic child list display, see the features tab for this page.")
@@ -3041,7 +3041,7 @@ ErrorTrap:
                 'hint = hint & ",060"
                 If (LastModified <> Date.MinValue) And allowLastModifiedFooter Then
                     s = s & cr & "<p>This page was last modified " & FormatDateTime(LastModified)
-                    If c.user.isAuthenticatedAdmin() Then
+                    If c.authContext.user.isAuthenticatedAdmin() Then
                         If ModifiedBy = 0 Then
                             s = s & " (admin only: modified by unknown)"
                         Else
@@ -3061,7 +3061,7 @@ ErrorTrap:
                 If True Then
                     If (DateReviewed <> Date.MinValue) And allowReviewedFooter Then
                         s = s & cr & "<p>This page was last reviewed " & FormatDateTime(DateReviewed, vbLongDate)
-                        If c.user.isAuthenticatedAdmin() Then
+                        If c.authContext.user.isAuthenticatedAdmin() Then
                             If ReviewedBy = 0 Then
                                 s = s & " (by unknown)"
                             Else
@@ -3546,9 +3546,9 @@ ErrorTrap:
             RecordID = (c.docProperties.getInteger("ID"))
             ContentName = c.docProperties.getText("ContentName")
             Button = c.docProperties.getText("Button")
-            iIsAdmin = c.user.isAuthenticatedAdmin()
+            iIsAdmin = c.authContext.user.isAuthenticatedAdmin()
             '
-            If (Button <> "") And (RecordID <> 0) And (ContentName <> "") And (c.user.isAuthenticatedContentManager(ContentName)) Then
+            If (Button <> "") And (RecordID <> 0) And (ContentName <> "") And (c.authContext.user.isAuthenticatedContentManager(ContentName)) Then
                 main_WorkflowSupport = c.siteProperties.allowWorkflowAuthoring And c.workflow.isWorkflowAuthoringCompatible(ContentName)
                 Call pageManager_GetAuthoringStatus(ContentName, RecordID, IsSubmitted, IsApproved, SubmittedMemberName, ApprovedMemberName, IsInserted, IsDeleted, IsModified, ModifiedMemberName, ModifiedDate, SubmittedDate, ApprovedDate)
                 IsEditLocked = c.workflow.GetEditLockStatus(ContentName, RecordID)
@@ -3638,8 +3638,8 @@ ErrorTrap:
                     If c.db.cs_ok(CSBlock) Then
                         Call c.db.cs_set(CSBlock, "active", True)
                         Call c.db.cs_set(CSBlock, "ParentID", RecordID)
-                        Call c.db.cs_set(CSBlock, "contactmemberid", c.user.id)
-                        Call c.db.cs_set(CSBlock, "name", "New Page added " & c.app_startTime & " by " & c.user.name)
+                        Call c.db.cs_set(CSBlock, "contactmemberid", c.authContext.user.id)
+                        Call c.db.cs_set(CSBlock, "name", "New Page added " & c.app_startTime & " by " & c.authContext.user.name)
                         Call c.db.cs_set(CSBlock, "copyFilename", "")
                         RecordID = c.db.cs_getInteger(CSBlock, "ID")
                         Call c.db.cs_save2(CSBlock)
@@ -3674,8 +3674,8 @@ ErrorTrap:
                         If c.db.cs_ok(CSBlock) Then
                             Call c.db.cs_set(CSBlock, "active", True)
                             Call c.db.cs_set(CSBlock, "ParentID", ParentID)
-                            Call c.db.cs_set(CSBlock, "contactmemberid", c.user.id)
-                            Call c.db.cs_set(CSBlock, "name", "New Page added " & c.app_startTime & " by " & c.user.name)
+                            Call c.db.cs_set(CSBlock, "contactmemberid", c.authContext.user.id)
+                            Call c.db.cs_set(CSBlock, "name", "New Page added " & c.app_startTime & " by " & c.authContext.user.name)
                             Call c.db.cs_set(CSBlock, "copyFilename", "")
                             RecordID = c.db.cs_getInteger(CSBlock, "ID")
                             Call c.db.cs_save2(CSBlock)
@@ -3723,7 +3723,7 @@ ErrorTrap:
                 End If
                 '
                 If (Button = ButtonAbortEdit) Then
-                    Call c.workflow.abortEdit2(ContentName, RecordID, c.user.id)
+                    Call c.workflow.abortEdit2(ContentName, RecordID, c.authContext.user.id)
                 End If
                 If (Button = ButtonPublishSubmit) Then
                     Call c.workflow.main_SubmitEdit(ContentName, RecordID)
@@ -4559,7 +4559,7 @@ ErrorTrap:
                 End If
                 pageParentListName = genericController.encodeText(cache_pageContent(PCC_ParentListName, PCCPtr))
                 pageEditLink = ""
-                If c.user.isEditing(ContentName) Then
+                If c.authContext.user.isEditing(ContentName) Then
                     pageEditLink = c.main_GetRecordEditLink2(ContentName, PageID, True, PageName, True)
                 End If
                 pageAllowInChildLists = genericController.EncodeBoolean(cache_pageContent(PCC_AllowInChildLists, PCCPtr))
@@ -4766,7 +4766,7 @@ ErrorTrap:
             PageContentCID = c.main_GetContentID("Page Content")
             If (True) Then
                 SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,BlockSection,RootPageID"
-                ShowHiddenMenu = c.user.isEditingAnything()
+                ShowHiddenMenu = c.authContext.user.isEditingAnything()
                 'ShowHiddenMenu = main_IsEditing("Site Sections")
                 If IsAllSectionsMenuMode Then
                     '
@@ -4802,7 +4802,7 @@ ErrorTrap:
                 ' Multiple Menus with ccDynamicMenuSectionRules
                 '
                 SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,BlockSection,0 as RootPageID"
-                ShowHiddenMenu = c.user.isEditingAnything()
+                ShowHiddenMenu = c.authContext.user.isEditingAnything()
                 'ShowHiddenMenu = main_IsEditing("Site Sections")
                 If IsAllSectionsMenuMode Then
                     '
@@ -4836,7 +4836,7 @@ ErrorTrap:
                 '
                 SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,BlockSection,0 as RootPageID"
                 Criteria = ""
-                ShowHiddenMenu = c.user.isEditingAnything()
+                ShowHiddenMenu = c.authContext.user.isEditingAnything()
                 'ShowHiddenMenu = main_IsEditing("Site Sections")
                 CSSections = c.db.cs_open("Site Sections", Criteria, , , , ,, SelectFieldList)
             ElseIf c.IsSQLTableField("Default", "ccSections", "MenuImageOverFilename") Then
@@ -4845,7 +4845,7 @@ ErrorTrap:
                 '
                 SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,0 as BlockSection,0 as RootPageID"
                 Criteria = ""
-                ShowHiddenMenu = c.user.isEditingAnything()
+                ShowHiddenMenu = c.authContext.user.isEditingAnything()
                 'ShowHiddenMenu = main_IsEditing("Site Sections")
                 CSSections = c.db.cs_open("Site Sections", Criteria, , , , ,, SelectFieldList)
             ElseIf c.IsSQLTableField("Default", "ccSections", "HideMenu") Then
@@ -4854,7 +4854,7 @@ ErrorTrap:
                 '
                 SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,'' as MenuImageOverFilename,HideMenu,0 as BlockSection,0 as RootPageID"
                 Criteria = ""
-                ShowHiddenMenu = c.user.isEditingAnything()
+                ShowHiddenMenu = c.authContext.user.isEditingAnything()
                 'ShowHiddenMenu = main_IsEditing("Site Sections")
                 CSSections = c.db.cs_open("Site Sections", Criteria, , , , ,, SelectFieldList)
             Else
@@ -4968,7 +4968,7 @@ ErrorTrap:
                         If Link = "" Then
                             Link = DefaultTemplateLink
                         End If
-                        AuthoringTag = c.main_GetRecordEditLink2("Site Sections", SectionID, False, SectionName, c.user.isEditing("Site Sections"))
+                        AuthoringTag = c.main_GetRecordEditLink2("Site Sections", SectionID, False, SectionName, c.authContext.user.isEditing("Site Sections"))
                         Link = genericController.modifyLinkQuery(Link, "sid", CStr(SectionID), True)
                         '
                         ' main_Get Menu, remove crlf, and parse the line with crlf
@@ -4993,8 +4993,8 @@ ErrorTrap:
             End If
             Call c.db.cs_Close(CSSections)
             '
-            pageManager_GetSectionMenu = c.htmlDoc.html_executeContentCommands(Nothing, pageManager_GetSectionMenu, CPUtilsBaseClass.addonContext.ContextPage, c.user.id, c.user.isAuthenticated, layoutError)
-            pageManager_GetSectionMenu = c.htmlDoc.html_encodeContent10(pageManager_GetSectionMenu, c.user.id, "", 0, 0, False, False, True, True, False, True, "", "http://" & c.webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, c.user.isAuthenticated, Nothing, c.user.isEditingAnything)
+            pageManager_GetSectionMenu = c.htmlDoc.html_executeContentCommands(Nothing, pageManager_GetSectionMenu, CPUtilsBaseClass.addonContext.ContextPage, c.authContext.user.id, c.authContext.user.isAuthenticated, layoutError)
+            pageManager_GetSectionMenu = c.htmlDoc.html_encodeContent10(pageManager_GetSectionMenu, c.authContext.user.id, "", 0, 0, False, False, True, True, False, True, "", "http://" & c.webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, c.authContext.user.isAuthenticated, Nothing, c.authContext.user.isEditingAnything)
             'pageManager_GetSectionMenu = main_EncodeContent5(pageManager_GetSectionMenu, memberID, "", 0, 0, False, False, True, True, False, True, "", "", False, 0)
             '
             Exit Function
@@ -5013,9 +5013,9 @@ ErrorTrap:
             Dim CS As Integer
             Dim SQL As String
             '
-            If c.user.isAuthenticatedAdmin() Then
+            If c.authContext.user.isAuthenticatedAdmin() Then
                 pageManager_BypassContentBlock = True
-            ElseIf c.user.isAuthenticatedContentManager(c.metaData.getContentNameByID(ContentID)) Then
+            ElseIf c.authContext.user.isAuthenticatedContentManager(c.metaData.getContentNameByID(ContentID)) Then
                 pageManager_BypassContentBlock = True
             Else
                 SQL = "SELECT ccMemberRules.MemberID" _
@@ -5025,7 +5025,7 @@ ErrorTrap:
                     & " AND ((ccgroups.Active)<>0)" _
                     & " AND ((ccMemberRules.Active)<>0)" _
                     & " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" & c.db.encodeSQLDate(c.app_startTime) & ")" _
-                    & " AND ((ccMemberRules.MemberID)=" & c.user.id & "));"
+                    & " AND ((ccMemberRules.MemberID)=" & c.authContext.user.id & "));"
                 CS = c.db.cs_openSql(SQL)
                 pageManager_BypassContentBlock = c.db.cs_ok(CS)
                 Call c.db.cs_Close(CS)
@@ -5171,7 +5171,7 @@ ErrorTrap:
                         '
                         ContentName = c.metaData.getContentNameByID(ContentControlID)
                         If ContentName <> "" Then
-                            If (Not main_RenderCache_CurrentPage_IsQuickEditing) And c.user.isQuickEditing(ContentName) Then
+                            If (Not main_RenderCache_CurrentPage_IsQuickEditing) And c.authContext.user.isQuickEditing(ContentName) Then
                                 main_RenderCache_CurrentPage_IsQuickEditing = True
                                 reloadPage = True
                             End If
@@ -5255,8 +5255,8 @@ ErrorTrap:
                 main_RenderCache_CurrentPage_IsRootPage = (main_RenderedPageID = rootPageId) And (main_RenderedParentID = 0)
                 main_RenderCache_CurrentPage_ContentId = genericController.EncodeInteger(cache_pageContent(PCC_ContentControlID, main_RenderCache_CurrentPage_PCCPtr))
                 main_RenderCache_CurrentPage_ContentName = c.metaData.getContentNameByID(main_RenderCache_CurrentPage_ContentId)
-                main_RenderCache_CurrentPage_IsEditing = c.user.isEditing(main_RenderCache_CurrentPage_ContentName)
-                main_RenderCache_CurrentPage_IsQuickEditing = c.user.isQuickEditing(main_RenderCache_CurrentPage_ContentName)
+                main_RenderCache_CurrentPage_IsEditing = c.authContext.user.isEditing(main_RenderCache_CurrentPage_ContentName)
+                main_RenderCache_CurrentPage_IsQuickEditing = c.authContext.user.isQuickEditing(main_RenderCache_CurrentPage_ContentName)
                 main_RenderCache_CurrentPage_IsAuthoring = main_RenderCache_CurrentPage_IsEditing Or main_RenderCache_CurrentPage_IsQuickEditing
                 c.webServer.webServerIO_response_NoFollow = genericController.EncodeBoolean(cache_pageContent(PCC_AllowMetaContentNoFollow, main_RenderCache_CurrentPage_PCCPtr)) Or c.webServer.webServerIO_response_NoFollow
                 '
@@ -5499,7 +5499,7 @@ ErrorTrap:
                         ParentContentID = genericController.EncodeInteger(cache_pageContent(PCC_ContentControlID, parentPCCPtr))
                         ParentContentName = c.metaData.getContentNameByID(ParentContentID)
                         If ParentContentName <> "" Then
-                            IsParentEditing = c.user.isEditing(ParentContentName)
+                            IsParentEditing = c.authContext.user.isEditing(ParentContentName)
                         End If
                     End If
                 End If
@@ -6976,9 +6976,9 @@ ErrorTrap:
                     '--------------------------------------------------------------------------
                     '
                     Dim AllowCookieTest As Boolean
-                    AllowCookieTest = c.siteProperties.allowVisitTracking And (c.visit.visit_pages = 1)
+                    AllowCookieTest = c.siteProperties.allowVisitTracking And (c.authContext.visit.pagevisits = 1)
                     If AllowCookieTest Then
-                        Call c.htmlDoc.main_AddOnLoadJavascript2("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" & c.security.encodeToken(c.visit.visit_Id, c.app_startTime) & "')};", "Cookie Test")
+                        Call c.htmlDoc.main_AddOnLoadJavascript2("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" & c.security.encodeToken(c.authContext.visit.Id, c.app_startTime) & "')};", "Cookie Test")
                     End If
                     '
                     '--------------------------------------------------------------------------
@@ -6988,7 +6988,7 @@ ErrorTrap:
                     '
                     If c.docProperties.getInteger("ContensiveUserForm") = 1 Then
                         Dim FromAddress As String = c.siteProperties.getText("EmailFromAddress", "info@" & c.webServer.webServerIO_requestDomain)
-                        Call c.main_SendFormEmail(c.siteProperties.emailAdmin, FromAddress, "Form Submitted on " & c.webServer.webServerIO_requestReferer)
+                        Call c.email.sendForm(c.siteProperties.emailAdmin, FromAddress, "Form Submitted on " & c.webServer.webServerIO_requestReferer)
                         Dim cs As Integer = c.db.cs_insertRecord("User Form Response")
                         If c.db.cs_ok(cs) Then
                             Call c.db.cs_set(cs, "name", "Form " & c.webServer.requestReferrer)
@@ -7001,7 +7001,7 @@ ErrorTrap:
                                 End If
                             Next
                             Call c.db.cs_set(cs, "copy", Copy)
-                            Call c.db.cs_set(cs, "VisitId", c.visit.visit_Id)
+                            Call c.db.cs_set(cs, "VisitId", c.authContext.visit.Id)
                         End If
                         Call c.db.cs_Close(cs)
                     End If
@@ -7087,8 +7087,8 @@ ErrorTrap:
                                 Dim CSPointer As Integer = c.db.cs_insertRecord("Library File Log")
                                 If c.db.cs_ok(CSPointer) Then
                                     Call c.db.cs_set(CSPointer, "FileID", downloadId)
-                                    Call c.db.cs_set(CSPointer, "VisitId", c.visit.visit_Id)
-                                    Call c.db.cs_set(CSPointer, "MemberID", c.user.id)
+                                    Call c.db.cs_set(CSPointer, "VisitId", c.authContext.visit.Id)
+                                    Call c.db.cs_set(CSPointer, "MemberID", c.authContext.user.id)
                                 End If
                                 Call c.db.cs_Close(CSPointer)
                                 '
@@ -7128,7 +7128,7 @@ ErrorTrap:
                         ElseIf (ClipBoard = "") Then
                             ' state not working...
                         Else
-                            If Not c.user.isAuthenticatedContentManager(ClipParentContentName) Then
+                            If Not c.authContext.user.isAuthenticatedContentManager(ClipParentContentName) Then
                                 Call c.error_AddUserError("The paste operation failed because you are not a content manager of the Clip Parent")
                             Else
                                 '
@@ -7492,7 +7492,7 @@ ErrorTrap:
                     '
                     ' ----- do anonymous access blocking
                     '
-                    If Not c.user.isAuthenticated() Then
+                    If Not c.authContext.user.isAuthenticated() Then
                         If (c.webServer.webServerIO_requestPath <> "/") And genericController.vbInstr(1, c.siteProperties.adminURL, c.webServer.webServerIO_requestPath, vbTextCompare) <> 0 Then
                             '
                             ' admin page is excluded from custom blocking
@@ -7508,7 +7508,7 @@ ErrorTrap:
                                     'Call AppendLog("main_init(), 3410 - exit for login block")
                                     '
                                     Call c.main_SetMetaContent(0, 0)
-                                    Call c.htmlDoc.writeAltBuffer(c.user.getLoginPage(False) & c.htmlDoc.html_GetEndOfBody(False, False, False, False))
+                                    Call c.htmlDoc.writeAltBuffer(c.htmlDoc.getLoginPage(False) & c.htmlDoc.html_GetEndOfBody(False, False, False, False))
                                     c.docOpen = False '--- should be disposed by caller --- Call dispose
                                     Return c.htmlDoc.docBuffer
                                 Case 2
@@ -7520,7 +7520,7 @@ ErrorTrap:
                                     '
                                     Call c.main_SetMetaContent(0, 0)
                                     Call c.htmlDoc.main_AddOnLoadJavascript2("document.body.style.overflow='scroll'", "Anonymous User Block")
-                                    Dim Copy As String = cr & c.htmlDoc.html_GetContentCopy("AnonymousUserResponseCopy", "<p style=""width:250px;margin:100px auto auto auto;"">The site is currently not available for anonymous access.</p>", c.user.id, True, c.user.isAuthenticated)
+                                    Dim Copy As String = cr & c.htmlDoc.html_GetContentCopy("AnonymousUserResponseCopy", "<p style=""width:250px;margin:100px auto auto auto;"">The site is currently not available for anonymous access.</p>", c.authContext.user.id, True, c.authContext.user.isAuthenticated)
                                     ' -- already encoded
                                     'Copy = EncodeContentForWeb(Copy, "copy content", 0, "", 0)
                                     Copy = "" _
@@ -7549,7 +7549,7 @@ ErrorTrap:
                     '
                     bodyAddonId = genericController.EncodeInteger(c.siteProperties.getText("Html Body AddonId", "0"))
                     If bodyAddonId <> 0 Then
-                        htmlBody = c.addon.execute(bodyAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", bodyAddonStatusOK, Nothing, "", Nothing, "", c.user.id, c.user.isAuthenticated)
+                        htmlBody = c.addon.execute(bodyAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", bodyAddonStatusOK, Nothing, "", Nothing, "", c.authContext.user.id, c.authContext.user.isAuthenticated)
                     Else
                         htmlBody = pageManager_GetHtmlBody()
                     End If
@@ -7674,7 +7674,7 @@ ErrorTrap:
                             Call c.webServer.web_setResponseStatus("404 Not Found")
                             c.docProperties.setProperty("bid", main_GetPageNotFoundPageId())
                             'Call main_mergeInStream("bid=" & main_GetPageNotFoundPageId())
-                            If c.user.isAuthenticatedAdmin() Then
+                            If c.authContext.user.isAuthenticatedAdmin() Then
                                 c.htmlDoc.main_AdminWarning = PageNotFoundReason
                                 c.htmlDoc.main_AdminWarningPageID = 0
                                 c.htmlDoc.main_AdminWarningSectionID = 0
@@ -7749,7 +7749,7 @@ ErrorTrap:
                     IDs = Split(pageManager_DeleteChildRecords, ",")
                     IDCnt = UBound(IDs) + 1
                     SingleEntry = (IDCnt = 1)
-                    QuickEditing = c.user.isQuickEditing("page content")
+                    QuickEditing = c.authContext.user.isQuickEditing("page content")
                     For Ptr = 0 To IDCnt - 1
                         Call c.DeleteContentRecord("page content", genericController.EncodeInteger(IDs(Ptr)))
                         Call pageManager_cache_pageContent_removeRow(genericController.EncodeInteger(IDs(Ptr)), pagemanager_IsWorkflowRendering, QuickEditing)
@@ -7853,7 +7853,7 @@ ErrorTrap:
                 If (CDef.AllowAdd) And (Not IsInserted) Then
                     AllowInsert = True
                 End If
-            ElseIf c.user.isAuthenticatedAdmin() Then
+            ElseIf c.authContext.user.isAuthenticatedAdmin() Then
                 '
                 ' Workflow, Admin
                 '
@@ -8019,9 +8019,9 @@ ErrorTrap:
             Copy = genericController.vbReplace(Copy, "<CONTENTNAME>", ContentName)
             Copy = genericController.vbReplace(Copy, "<RECORDID>", RecordID.ToString)
             Copy = genericController.vbReplace(Copy, "<SUBMITTEDDATE>", c.app_startTime.ToString)
-            Copy = genericController.vbReplace(Copy, "<SUBMITTEDNAME>", c.user.name)
+            Copy = genericController.vbReplace(Copy, "<SUBMITTEDNAME>", c.authContext.user.name)
             '
-            Call c.main_SendGroupEmail(c.siteProperties.getText("WorkflowEditorGroup", "Content Editors"), FromAddress, "Authoring Submitted Notification", Copy, False, True)
+            Call c.email.sendGroup(c.siteProperties.getText("WorkflowEditorGroup", "Content Editors"), FromAddress, "Authoring Submitted Notification", Copy, False, True)
             '
             Exit Sub
             '
@@ -8250,7 +8250,7 @@ ErrorTrap:
                                 CaptionSpan = "<span>"
                             End If
                             If Not c.db.cs_ok(CSPeople) Then
-                                CSPeople = c.csOpen("people", c.user.id)
+                                CSPeople = c.csOpen("people", c.authContext.user.id)
                             End If
                             Caption = .Caption
                             If .REquired Or genericController.EncodeBoolean(c.GetContentFieldProperty("People", .PeopleField, "Required")) Then
@@ -8267,7 +8267,7 @@ ErrorTrap:
                             '
                             ' Group main_MemberShip
                             '
-                            GroupValue = c.user.IsMemberOfGroup2(.GroupName)
+                            GroupValue = c.authContext.user.IsMemberOfGroup2(.GroupName)
                             Body = f.RepeatCell
                             Body = genericController.vbReplace(Body, "{{CAPTION}}", c.htmlDoc.html_GetFormInputCheckBox2("Group" & .GroupName, GroupValue), 1, 99, vbTextCompare)
                             Body = genericController.vbReplace(Body, "{{FIELD}}", .Caption)
@@ -8342,11 +8342,11 @@ ErrorTrap:
                 ' Load the instructions
                 '
                 f = pageManager_LoadFormPageInstructions(FormInstructions, Formhtml)
-                If f.AuthenticateOnFormProcess And Not c.user.isAuthenticated() And c.user.isRecognized() Then
+                If f.AuthenticateOnFormProcess And Not c.authContext.user.isAuthenticated() And c.authContext.user.isRecognized() Then
                     '
                     ' If this form will authenticate when done, and their is a current, non-authenticated account -- logout first
                     '
-                    Call c.user.logout()
+                    Call c.authContext.user.logout()
                 End If
                 CSPeople = -1
                 Success = True
@@ -8374,7 +8374,7 @@ ErrorTrap:
                                     c.error_AddUserError("The field [" & c.htmlDoc.html_EncodeHTML(.Caption) & "] is required.")
                                 Else
                                     If Not c.db.cs_ok(CSPeople) Then
-                                        CSPeople = c.csOpen("people", c.user.id)
+                                        CSPeople = c.csOpen("people", c.authContext.user.id)
                                     End If
                                     If c.db.cs_ok(CSPeople) Then
                                         Select Case genericController.vbUCase(.PeopleField)
@@ -8406,7 +8406,7 @@ ErrorTrap:
                                 ' Group main_MemberShip
                                 '
                                 IsInGroup = c.docProperties.getBoolean("Group" & .GroupName)
-                                WasInGroup = c.user.IsMemberOfGroup2(.GroupName)
+                                WasInGroup = c.authContext.user.IsMemberOfGroup2(.GroupName)
                                 If WasInGroup And Not IsInGroup Then
                                     c.group_DeleteGroupMember(.GroupName)
                                 ElseIf IsInGroup And Not WasInGroup Then
@@ -8432,7 +8432,7 @@ ErrorTrap:
                     ' Authenticate
                     '
                     If f.AuthenticateOnFormProcess Then
-                        Call c.user.authenticateById(c.user.id)
+                        Call c.authContext.user.authenticateById(c.authContext.user.id)
                     End If
                     '
                     ' Join Group requested by page that created form
@@ -8697,7 +8697,7 @@ ErrorTrap:
             Dim templateId As Integer
             Dim templateDomain As String
             '
-            Call pageManager_GetPageArgs(PageID, pagemanager_IsWorkflowRendering, c.user.isQuickEditing(""), ContentControlID, templateId, ParentID, MenuLinkOverRide, IsRootPage, SectionID, PageIsSecure, "")
+            Call pageManager_GetPageArgs(PageID, pagemanager_IsWorkflowRendering, c.authContext.user.isQuickEditing(""), ContentControlID, templateId, ParentID, MenuLinkOverRide, IsRootPage, SectionID, PageIsSecure, "")
             '
             ' main_Get defaultpathpage
             '
@@ -9074,7 +9074,7 @@ ErrorTrap:
             Dim IsOldMenu As Boolean
             Dim CompatibilitySpanAroundButton As Boolean
             '
-            IsAuthoring = c.user.isEditing("Dynamic Menus")
+            IsAuthoring = c.authContext.user.isEditing("Dynamic Menus")
             DefaultTemplateLink = requestAppRootPath & c.webServer.webServerIO_requestPage
             If False Then '.292" Then
                 CompatibilitySpanAroundButton = True
@@ -9222,7 +9222,7 @@ ErrorTrap:
                 End If
             End If
             pageManager_GetDynamicMenu = PreButton & genericController.vbReplace(pageManager_GetDynamicMenu, vbCrLf, PostButton & MenuDelimiter & PreButton) & PostButton
-            If c.user.isAdvancedEditing("") Then
+            If c.authContext.user.isAdvancedEditing("") Then
                 pageManager_GetDynamicMenu = "<div style=""border-bottom:1px dashed #404040; padding:5px;margin-bottom:5px;"">Dynamic Menu [" & MenuName & "]" & EditLink & "</div><div>" & pageManager_GetDynamicMenu & "</div>"
             End If
             '
@@ -9345,7 +9345,7 @@ ErrorTrap:
         Public Function pagemanager_IsWorkflowRendering() As Boolean
             Dim returnIs As Boolean = False
             Try
-                If c.user.isAuthenticatedContentManager() Then
+                If c.authContext.user.isAuthenticatedContentManager() Then
                     pagemanager_IsWorkflowRendering = c.visitProperty.getBoolean("AllowWorkflowRendering")
                 End If
             Catch ex As Exception
@@ -9371,7 +9371,7 @@ ErrorTrap:
                 '
                 SQL = "update " & TableName & " set DateReviewed=" & c.db.encodeSQLDate(c.app_startTime)
                 If c.main_IsContentFieldSupported(ContentName, "ReviewedBy") Then
-                    SQL &= ",ReviewedBy=" & c.user.id
+                    SQL &= ",ReviewedBy=" & c.authContext.user.id
                 End If
                 '
                 ' Mark the live record
@@ -9510,7 +9510,7 @@ ErrorTrap:
             '
             ' Add the Admin Message to the link
             '
-            If c.user.isAuthenticatedAdmin() Then
+            If c.authContext.user.isAuthenticatedAdmin() Then
                 If PageNotFoundLink = "" Then
                     PageNotFoundLink = c.webServer.webServerIO_ServerLink
                 End If
@@ -9778,7 +9778,7 @@ ErrorTrap:
             Dim PCCPtr As Integer
             Dim PageIsSecure As Boolean
             '
-            Call pageManager_GetPageArgs(PageID, pagemanager_IsWorkflowRendering, c.user.isQuickEditing(""), CCID, templateId, ParentID, MenuLinkOverRide, IsRootPage, SectionID, PageIsSecure, "")
+            Call pageManager_GetPageArgs(PageID, pagemanager_IsWorkflowRendering, c.authContext.user.isQuickEditing(""), CCID, templateId, ParentID, MenuLinkOverRide, IsRootPage, SectionID, PageIsSecure, "")
             '    PCCPtr = pageManager_cache_pageContent_getPtr(PageID, main_IsWorkflowRendering, main_IsQuickEditing(""))
             '    If PCCPtr >= 0 Then
             '        PageFound = True

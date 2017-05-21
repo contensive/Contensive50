@@ -51,7 +51,7 @@ Namespace Contensive.Core
             '
             On Error GoTo ErrorTrap
             '
-            Dim SMTPHandler As coreSmtpHandlerClass
+            Dim SMTPHandler As smtpController
             'Dim AppService As appServicesClass
             'Dim KernelService As KernelServicesClass
             Dim EmailHandlerFolder As String
@@ -74,7 +74,7 @@ Namespace Contensive.Core
                 ' ----- check for email in the send queue
                 '
                 EmailHandlerFolder = "EmailOut\"
-                SMTPHandler = New coreSmtpHandlerClass(cpCore)
+                SMTPHandler = New smtpController(cpCore)
                 Call SMTPHandler.SendEmailQueue(EmailHandlerFolder)
                 SMTPHandler = Nothing
             End If
@@ -218,7 +218,7 @@ ErrorTrap:
                     'exclusiveStyles = cpCore.asv.csv_cs_getText(CSEmail, "exclusiveStyles")
                     EmailFrom = cpCore.db.cs_getText(CSEmail, "FromAddress")
                     EmailSubject = cpCore.db.cs_getText(CSEmail, "Subject")
-                    emailStyles = cpCore.email_getEmailStyles(emailID)
+                    emailStyles = cpCore.email.getStyles(emailID)
                     '
                     ' Mark this email sent and go to the next
                     '
@@ -338,7 +338,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            cpCore.handleLegacyError3(cpCore.serverconfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_GroupEmail", Err.Number, Err.Source, Err.Description, True, True, "")
+            cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_GroupEmail", Err.Number, Err.Source, Err.Description, True, True, "")
             Err.Clear()
         End Sub
         '
@@ -462,7 +462,7 @@ ErrorTrap:
                         EmailAddLinkEID = cpCore.db.cs_getBoolean(CSEmail, "AddLinkEID")
                         EmailSubject = cpCore.db.cs_get(CSEmail, "Subject")
                         EmailCopy = cpCore.db.cs_get(CSEmail, "CopyFilename")
-                        emailStyles = cpCore.email_getEmailStyles(emailID)
+                        emailStyles = cpCore.email.getStyles(emailID)
                         EmailStatus = SendEmailRecord(EmailMemberID, emailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, EmailSubject, EmailCopy, cpCore.db.cs_getBoolean(CSEmail, "AllowSpamFooter"), EmailAddLinkEID, emailStyles)
                         'EmailStatus = SendEmailRecord( EmailMemberID, EmailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, EmailSubject, EmailCopy, cpCore.csv_cs_getBoolean(CSEmail, "AllowSpamFooter"), EmailAddLinkEID, EmailInlineStyles)
                         Call SendConfirmationEmail(ConfirmationMemberID, EmailDropID, EmailTemplate, EmailAddLinkEID, "", EmailSubject, EmailCopy, emailStyles, FromAddress, EmailStatus & "<BR>")
@@ -526,7 +526,7 @@ ErrorTrap:
                         EmailAddLinkEID = cpCore.db.cs_getBoolean(CSEmail, "AddLinkEID")
                         EmailSubject = cpCore.db.cs_get(CSEmail, "Subject")
                         EmailCopy = cpCore.db.cs_get(CSEmail, "CopyFilename")
-                        emailStyles = cpCore.email_getEmailStyles(emailID)
+                        emailStyles = cpCore.email.getStyles(emailID)
                         EmailStatus = SendEmailRecord(EmailMemberID, emailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, cpCore.db.cs_get(CSEmail, "Subject"), cpCore.db.cs_get(CSEmail, "CopyFilename"), cpCore.db.cs_getBoolean(CSEmail, "AllowSpamFooter"), cpCore.db.cs_getBoolean(CSEmail, "AddLinkEID"), emailStyles)
                         'EmailStatus = SendEmailRecord( EmailMemberID, EmailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, cpCore.csv_cs_get(CSEmail, "Subject"), cpCore.csv_cs_get(CSEmail, "CopyFilename"), cpCore.csv_cs_getBoolean(CSEmail, "AllowSpamFooter"), cpCore.csv_cs_getBoolean(CSEmail, "AddLinkEID"), EmailInlineStyles)
                         Call SendConfirmationEmail(ConfirmationMemberID, EmailDropID, EmailTemplate, EmailAddLinkEID, "", EmailSubject, EmailCopy, emailStyles, FromAddress, EmailStatus & "<BR>")
@@ -580,7 +580,7 @@ ErrorTrap:
                             EmailAddLinkEID = cpCore.db.cs_getBoolean(CSEmail, "AddLinkEID")
                             EmailSubject = cpCore.db.cs_get(CSEmail, "Subject")
                             EmailCopy = cpCore.db.cs_get(CSEmail, "CopyFilename")
-                            emailStyles = cpCore.email_getEmailStyles(emailID)
+                            emailStyles = cpCore.email.getStyles(emailID)
                             EmailStatus = SendEmailRecord(EmailMemberID, emailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, cpCore.db.cs_get(CSEmail, "Subject"), cpCore.db.cs_get(CSEmail, "CopyFilename"), cpCore.db.cs_getBoolean(CSEmail, "AllowSpamFooter"), cpCore.db.cs_getBoolean(CSEmail, "AddLinkEID"), emailStyles)
                             'EmailStatus = SendEmailRecord( EmailMemberID, EmailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, cpCore.csv_cs_get(CSEmail, "Subject"), cpCore.csv_cs_get(CSEmail, "CopyFilename"), cpCore.csv_cs_getBoolean(CSEmail, "AllowSpamFooter"), cpCore.csv_cs_getBoolean(CSEmail, "AddLinkEID"), EmailInlineStyles)
                             Call SendConfirmationEmail(ConfirmationMemberID, EmailDropID, EmailTemplate, EmailAddLinkEID, "", EmailSubject, EmailCopy, emailStyles, FromAddress, EmailStatus & "<BR>")
@@ -594,7 +594,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            cpCore.handleLegacyError3(cpCore.serverconfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_ConditionalEmail", Err.Number, Err.Source, Err.Description, True, True, "")
+            cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_ConditionalEmail", Err.Number, Err.Source, Err.Description, True, True, "")
             Err.Clear()
         End Sub
         '
@@ -763,7 +763,7 @@ ErrorTrap:
                         '
                         ' Send
                         '
-                        EmailStatus = cpCore.email_send3(ToAddress, FromAddress, EmailSubjectEncoded, EmailBodyEncoded, BounceAddress, ReplyToAddress, "", True, True, 0)
+                        EmailStatus = cpCore.email.send(ToAddress, FromAddress, EmailSubjectEncoded, EmailBodyEncoded, BounceAddress, ReplyToAddress, "", True, True, 0)
                         If EmailStatus = "" Then
                             EmailStatus = "ok"
                         End If
@@ -781,7 +781,7 @@ ErrorTrap:
                 End If
                 'Call cpCore.app.closeCS(CSLog)
             Catch ex As Exception
-                cpCore.handleLegacyError3(cpCore.serverconfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "SendEmailRecord", Err.Number, Err.Source, Err.Description, True, True, "")
+                cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "SendEmailRecord", Err.Number, Err.Source, Err.Description, True, True, "")
                 Err.Clear()
             Finally
                 Call cpCore.db.cs_Close(CSPeople)
@@ -820,7 +820,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            cpCore.handleLegacyError3(cpCore.serverconfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "GetEmailTemplate", Err.Number, Err.Source, Err.Description, True, True, "")
+            cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "GetEmailTemplate", Err.Number, Err.Source, Err.Description, True, True, "")
             Err.Clear()
         End Function
         '
@@ -852,12 +852,12 @@ ErrorTrap:
                 If cpCore.db.cs_ok(CSPeople) Then
                     ClickFlagQuery = RequestNameEmailClickFlag & "=" & EmailDropID & "&" & RequestNameEmailMemberID & "=" & ConfirmationMemberID
                     '
-                    EmailSubject = cpCore.htmldoc.html_executeContentCommands(Nothing, EmailSubject, CPUtilsClass.addonContext.ContextEmail, ConfirmationMemberID, True, errorMessage)
-                    EmailSubject = cpCore.htmldoc.html_encodeContent10(EmailSubject, ConfirmationMemberID, "", 0, 0, True, False, False, False, False, True, "", "http://" & GetPrimaryDomainName(), True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
+                    EmailSubject = cpCore.htmlDoc.html_executeContentCommands(Nothing, EmailSubject, CPUtilsClass.addonContext.ContextEmail, ConfirmationMemberID, True, errorMessage)
+                    EmailSubject = cpCore.htmlDoc.html_encodeContent10(EmailSubject, ConfirmationMemberID, "", 0, 0, True, False, False, False, False, True, "", "http://" & GetPrimaryDomainName(), True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                     'EmailSubject = cpCore.csv_EncodeContent8(Nothing, EmailSubject, ConfirmationMemberID, "", 0, 0, True, False, False, False, False, True, "", "http://" & GetPrimaryDomainName(), True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
                     '
-                    EmailBody = cpCore.htmldoc.html_executeContentCommands(Nothing, EmailBody, CPUtilsClass.addonContext.ContextEmail, ConfirmationMemberID, True, errorMessage)
-                    EmailBody = cpCore.htmldoc.html_encodeContent10(EmailCopy, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & GetPrimaryDomainName(), True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
+                    EmailBody = cpCore.htmlDoc.html_executeContentCommands(Nothing, EmailBody, CPUtilsClass.addonContext.ContextEmail, ConfirmationMemberID, True, errorMessage)
+                    EmailBody = cpCore.htmlDoc.html_encodeContent10(EmailCopy, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & GetPrimaryDomainName(), True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                     'EmailBody = cpCore.csv_EncodeContent8(Nothing, EmailCopy, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & GetPrimaryDomainName(), True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
                     '
                     ' Encode the template
@@ -869,8 +869,8 @@ ErrorTrap:
                         EmailBody = "<div style=""padding:10px"">" & EmailBody & "</div>"
                     Else
                         WorkingTemplate = EmailTemplate
-                        WorkingTemplate = cpCore.htmldoc.html_executeContentCommands(Nothing, WorkingTemplate, CPUtilsClass.addonContext.ContextEmail, ConfirmationMemberID, True, errorMessage)
-                        WorkingTemplate = cpCore.htmldoc.html_encodeContent10(WorkingTemplate, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & GetPrimaryDomainName(), True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
+                        WorkingTemplate = cpCore.htmlDoc.html_executeContentCommands(Nothing, WorkingTemplate, CPUtilsClass.addonContext.ContextEmail, ConfirmationMemberID, True, errorMessage)
+                        WorkingTemplate = cpCore.htmlDoc.html_encodeContent10(WorkingTemplate, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & GetPrimaryDomainName(), True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                         'WorkingTemplate = cpCore.csv_encodecontent8(Nothing, EmailTemplate, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, False, "http://" & GetPrimaryDomainName(), True, "", 0, ContentPlaceHolder, True, CPUtilsClass.addonContext.contextemail)
                         If genericController.vbInstr(1, WorkingTemplate, fpoContentBox) <> 0 Then
                             EmailBody = genericController.vbReplace(WorkingTemplate, fpoContentBox, EmailBody)
@@ -904,7 +904,7 @@ ErrorTrap:
                     & "--- end of list ---" & BR _
                     & "</div></BODY></HTML>"
                     ConfirmBody = ConvertLinksToAbsolute(ConfirmBody, PrimaryLink & "/")
-                    Call cpCore.email_send3(cpCore.db.cs_getText(CSPeople, "Email"), EmailFrom, "Email confirmation from " & GetPrimaryDomainName(), ConfirmBody, "", "", "", True, True, 0)
+                    Call cpCore.email.send(cpCore.db.cs_getText(CSPeople, "Email"), EmailFrom, "Email confirmation from " & GetPrimaryDomainName(), ConfirmBody, "", "", "", True, True, 0)
                 End If
                 Call cpCore.db.cs_Close(CSPeople)
             Catch ex As Exception

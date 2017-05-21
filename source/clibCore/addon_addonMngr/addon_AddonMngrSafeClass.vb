@@ -137,7 +137,7 @@ Namespace Contensive.Core
                     '
                     Call cpCore.webServer.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "Addon Manager, Cancel Button Pressed", False)
                 Else
-                    If Not cpCore.user.isAuthenticatedAdmin Then
+                    If Not cpcore.authContext.user.isAuthenticatedAdmin Then
                         '
                         ' ----- Put up error message
                         '
@@ -457,7 +457,7 @@ Namespace Contensive.Core
                             ' Reinstall core collection
                             '---------------------------------------------------------------------------------------------
                             '
-                            If cpCore.user.isAuthenticatedDeveloper() And cpCore.docProperties.getBoolean("InstallCore") Then
+                            If cpcore.authContext.user.isAuthenticatedDeveloper() And cpCore.docProperties.getBoolean("InstallCore") Then
                                 UpgradeOK = addonInstall.installCollectionFromRemoteRepo("{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}", ErrorMessage, "", False)
                             End If
                             '
@@ -794,7 +794,7 @@ Namespace Contensive.Core
                                         ' before system attribute
                                         '
                                         CS = cpCore.db.cs_open("Add-on Collections", , "Name")
-                                    ElseIf Not cpCore.user.isAuthenticatedDeveloper Then
+                                    ElseIf Not cpcore.authContext.user.isAuthenticatedDeveloper Then
                                         '
                                         ' non-developers
                                         '
@@ -835,7 +835,7 @@ Namespace Contensive.Core
                                         Call Body.Add("<p>Add-on upload is disabled because your site database needs to be updated.</p>")
                                     Else
                                         Call Body.Add(Adminui.EditTableOpen)
-                                        If cpCore.user.isAuthenticatedDeveloper Then
+                                        If cpcore.authContext.user.isAuthenticatedDeveloper Then
                                         Call Body.Add(Adminui.GetEditRow(cpCore.htmlDoc.html_GetFormInputCheckBox2("InstallCore"), "Reinstall Core Collection", "", False, False, ""))
                                     End If
                                     Call Body.Add(Adminui.GetEditRow(cpCore.htmlDoc.html_GetFormInputFile("MetaFile"), "Add-on Collection File(s)", "", True, False, ""))

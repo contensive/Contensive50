@@ -49,7 +49,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property fromAddressDefault() As String
             Get
                 If True Then
-                    Return cpCore.user.isAuthenticatedMember
+                    Return cpCore.authContext.user.isAuthenticatedMember
                 Else
                     Return False
                 End If
@@ -67,7 +67,7 @@ Namespace Contensive.Core
         ''' <param name="BodyIsHTML"></param>
         Public Overrides Sub Send(ByVal ToAddress As String, ByVal FromAddress As String, ByVal Subject As String, ByVal Body As String, Optional ByVal SendImmediately As Boolean = True, Optional ByVal BodyIsHTML As Boolean = True)
             Try
-                Call cpCore.email_send3(ToAddress, FromAddress, Subject, Body, "", "", "", SendImmediately, BodyIsHTML, 0)
+                Call cpCore.email.send(ToAddress, FromAddress, Subject, Body, "", "", "", SendImmediately, BodyIsHTML, 0)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -81,7 +81,7 @@ Namespace Contensive.Core
         ''' <param name="Subject"></param>
         Public Overrides Sub SendForm(ByVal ToAddress As String, ByVal FromAddress As String, ByVal Subject As String)
             Try
-                Call cpCore.main_SendFormEmail(ToAddress, FromAddress, Subject)
+                Call cpCore.email.sendForm(ToAddress, FromAddress, Subject)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -98,7 +98,7 @@ Namespace Contensive.Core
         ''' <param name="BodyIsHTML"></param>
         Public Overrides Sub SendGroup(ByVal GroupList As String, ByVal FromAddress As String, ByVal Subject As String, ByVal Body As String, Optional ByVal SendImmediately As Boolean = True, Optional ByVal BodyIsHTML As Boolean = True)
             Try
-                Call cpCore.main_SendGroupEmail(GroupList, FromAddress, Subject, Body, SendImmediately, BodyIsHTML)
+                Call cpCore.email.sendGroup(GroupList, FromAddress, Subject, Body, SendImmediately, BodyIsHTML)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -106,19 +106,19 @@ Namespace Contensive.Core
 
         Public Overrides Sub SendPassword(ByVal UserEmailAddress As String) 'Inherits BaseClasses.CPEmailBaseClass.SendPassword
             If True Then
-                Call cpCore.user.sendPassword(UserEmailAddress)
+                Call cpCore.email.sendPassword(UserEmailAddress)
             End If
         End Sub
 
         Public Overrides Sub SendSystem(ByVal EmailName As String, Optional ByVal AdditionalCopy As String = "", Optional ByVal AdditionalUserID As Integer = 0)
-            Call cpCore.csv_SendSystemEmail(EmailName, AdditionalCopy, AdditionalUserID)
+            Call cpCore.email.sendSystem(EmailName, AdditionalCopy, AdditionalUserID)
         End Sub
 
         Public Overrides Sub SendUser(ByVal toUserId As String, ByVal FromAddress As String, ByVal Subject As String, ByVal Body As String, Optional ByVal SendImmediately As Boolean = True, Optional ByVal BodyIsHTML As Boolean = True) 'Inherits BaseClasses.CPEmailBaseClass.SendUser
             Dim userId As Integer = 0
             If genericController.vbIsNumeric(toUserId) Then
                 userId = CInt(toUserId)
-                Call cpCore.email_sendMemberEmail3(userId, FromAddress, Subject, Body, SendImmediately, BodyIsHTML, 0, "", False)
+                Call cpCore.email.sendPerson(userId, FromAddress, Subject, Body, SendImmediately, BodyIsHTML, 0, "", False)
             End If
         End Sub
         Private Sub appendDebugLog(ByVal copy As String)

@@ -11,13 +11,13 @@ Namespace Contensive.Core
     ''' <summary>
     ''' classSummary
     ''' </summary>
-    Public Class coreUserClass
+    Public Class authContextUserModel
         '
         Private cpCore As coreClass
         '
         '====================================================================================================
         ''' <summary>
-        ''' id for the user. When this property is set, all public user. properteries are updated for this selected id
+        ''' id for the authcontext.user. When this property is set, all public authcontext.user. properteries are updated for this selected id
         ''' </summary>
         ''' <returns></returns>
         Public Property id As Integer
@@ -103,17 +103,12 @@ Namespace Contensive.Core
         '
         '----------------------------------------------------------------------------------------------------
         '
-        Public loginForm_Username As String = ""       ' Values entered with the login form
-        Public loginForm_Password As String = ""       '   =
-        Public loginForm_Email As String = ""          '   =
-        Public loginForm_AutoLogin As Boolean = False    '   =
-        '
         '
         Public Const main_maxVisitLoginAttempts As Integer = 20
         Public main_loginFormDefaultProcessed As Boolean = False       ' prevent main_ProcessLoginFormDefault from running twice (multiple user messages, popups, etc.)
         '
         '------------------------------------------------------------------------
-        ' ----- local cache to speed up user.main_IsContentManager
+        ' ----- local cache to speed up authcontext.user.main_IsContentManager
         '------------------------------------------------------------------------
         '
         Private contentAccessRights_NotList As String = ""                  ' If ContentId in this list, they are not a content manager
@@ -145,7 +140,7 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <returns></returns>
         Public Function isAuthenticated() As Boolean
-            Return cpCore.visit.visit_isAuthenticated
+            Return cpCore.authContext.visit.VisitAuthenticated
         End Function
         '
         '========================================================================
@@ -170,7 +165,7 @@ Namespace Contensive.Core
                     Dim localContentNameOrId As String
                     Dim cacheTestName As String
                     '
-                    If Not cpCore.visit.visit_initialized Then
+                    If Not cpCore.authContext.visit_initialized Then
                         Call cpCore.debug_testPoint("...visit not initialized")
                     Else
                         '
@@ -266,7 +261,7 @@ Namespace Contensive.Core
         Public Function isAuthenticatedAdmin() As Boolean
             Dim returnIs As Boolean = False
             Try
-                If (Not isAuthenticatedAdmin_cache_isLoaded) And cpCore.visit.visit_initialized Then
+                If (Not isAuthenticatedAdmin_cache_isLoaded) And cpCore.authContext.visit_initialized Then
                     isAuthenticatedAdmin_cache = isAuthenticated() And (isAdmin Or isDeveloper)
                     isAuthenticatedAdmin_cache_isLoaded = True
                 End If
@@ -286,7 +281,7 @@ Namespace Contensive.Core
         Public Function isAuthenticatedDeveloper() As Boolean
             Dim returnIs As Boolean = False
             Try
-                If (Not isAuthenticatedDeveloper_cache_isLoaded) And cpCore.visit.visit_initialized Then
+                If (Not isAuthenticatedDeveloper_cache_isLoaded) And cpCore.authContext.visit_initialized Then
                     isAuthenticatedDeveloper_cache = (isAuthenticated() And isDeveloper)
                     isAuthenticatedDeveloper_cache_isLoaded = True
                 End If
@@ -309,7 +304,7 @@ Namespace Contensive.Core
             Try
                 Dim SQL As String
                 '
-                If cpCore.visit.visit_initialized Then
+                If cpCore.authContext.visit_initialized Then
                     If (id > 0) Then
                         SQL = "UPDATE ccMembers SET " _
                         & " Name=" & cpCore.db.encodeSQLText(name) _
@@ -357,112 +352,6 @@ Namespace Contensive.Core
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
-        '
-        '=============================================================================
-        ''' <summary>
-        ''' 
-        ''' </summary>
-        ''' <returns></returns>
-        Public Function getLoginForm() As String
-            Dim returnHtml As String = ""
-            Try
-                '
-                Dim loginAddonID As Integer
-                Dim isAddonOk As Boolean
-                Dim QS As String
-                '
-                loginAddonID = cpCore.siteProperties.getinteger("Login Page AddonID")
-                If loginAddonID <> 0 Then
-                    '
-                    ' Custom Login
-                    '
-                    returnHtml = cpCore.addon.execute_legacy2(loginAddonID, "", "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", isAddonOk, Nothing)
-                    If Not isAddonOk Then
-                        loginAddonID = 0
-                    ElseIf (returnHtml = "") And (isAddonOk) Then
-                        '
-                        ' login successful, redirect back to this page (without a method)
-                        '
-                        QS = cpCore.web_RefreshQueryString
-                        QS = genericController.ModifyQueryString(QS, "method", "")
-                        QS = genericController.ModifyQueryString(QS, "RequestBinary", "")
-                        '
-                        Call cpCore.webServer.webServerIO_Redirect2("?" & QS, "Login form success", False)
-                    End If
-                End If
-                If loginAddonID = 0 Then
-                    '
-                    ' ----- When page loads, set focus on login username
-                    '
-                    returnHtml = getLoginForm_Default()
-                End If
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-            Return returnHtml
-        End Function
-        '
-        '=============================================================================
-        ''' <summary>
-        ''' a simple email password form
-        ''' </summary>
-        ''' <returns></returns>
-        Public Function getSendPasswordForm() As String
-            Dim returnResult As String = ""
-            Try
-                Dim QueryString As String
-                '
-                If cpCore.siteProperties.getBoolean("allowPasswordEmail", True) Then
-                    returnResult = "" _
-                    & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"">" _
-                    & cr2 & "<tr>" _
-                    & cr3 & "<td style=""text-align:right;vertical-align:middle;width:30%;padding:4px"" align=""right"" width=""30%"">" & SpanClassAdminNormal & "Email</span></td>" _
-                    & cr3 & "<td style=""text-align:left;vertical-align:middle;width:70%;padding:4px"" align=""left""  width=""70%""><input NAME=""" & "email"" VALUE=""" & cpCore.htmlDoc.html_EncodeHTML(loginForm_Email) & """ SIZE=""20"" MAXLENGTH=""50""></td>" _
-                    & cr2 & "</tr>" _
-                    & cr2 & "<tr>" _
-                    & cr3 & "<td colspan=""2"">&nbsp;</td>" _
-                    & cr2 & "</tr>" _
-                    & cr2 & "<tr>" _
-                    & cr3 & "<td colspan=""2"">" _
-                    & kmaIndent(kmaIndent(cpCore.main_GetPanelButtons(ButtonSendPassword, "Button"))) _
-                    & cr3 & "</td>" _
-                    & cr2 & "</tr>" _
-                    & cr & "</table>" _
-                    & ""
-                    '
-                    ' write out all of the form input (except state) to hidden fields so they can be read after login
-                    '
-                    '
-                    returnResult = "" _
-                    & returnResult _
-                    & cpCore.htmldoc.html_GetFormInputHidden("Type", FormTypeSendPassword) _
-                    & ""
-                    For Each key As String In cpCore.docProperties.getKeyList
-                        With cpCore.docProperties.getProperty(key)
-                            If .IsForm Then
-                                Select Case genericController.vbUCase(.Name)
-                                    Case "S", "MA", "MB", "USERNAME", "PASSWORD", "EMAIL"
-                                    Case Else
-                                        returnResult = returnResult & cpCore.htmldoc.html_GetFormInputHidden(.Name, .Value)
-                                End Select
-                            End If
-                        End With
-                    Next
-                    '
-                    QueryString = cpCore.web_RefreshQueryString
-                    QueryString = genericController.ModifyQueryString(QueryString, "S", "")
-                    QueryString = genericController.ModifyQueryString(QueryString, "ccIPage", "")
-                    returnResult = "" _
-                    & cpCore.htmldoc.html_GetFormStart(QueryString) _
-                    & kmaIndent(returnResult) _
-                    & cr & "</form>" _
-                    & ""
-                End If
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-            Return returnResult
-        End Function
         '
         '===============================================================================================================================
         '   Is Group Member of a GroupIDList
@@ -697,7 +586,7 @@ Namespace Contensive.Core
         Public Function isAuthenticatedMember() As Boolean
             Dim returnREsult As Boolean = False
             Try
-                If (Not property_user_isMember_isLoaded) And (cpCore.visit.visit_initialized) Then
+                If (Not property_user_isMember_isLoaded) And (cpCore.authContext.visit_initialized) Then
                     property_user_isMember = isAuthenticated() And cpCore.IsWithinContent(contentControlID, cpCore.main_GetContentID("members"))
                     property_user_isMember_isLoaded = True
                 End If
@@ -709,257 +598,8 @@ Namespace Contensive.Core
         End Function
         Private property_user_isMember As Boolean = False
         Private property_user_isMember_isLoaded As Boolean = False
-        '
-        '========================================================================
-        ' ----- Process the login form
-        '========================================================================
-        '
-        Public Function processFormLoginDefault() As Boolean
-            Dim returnREsult As Boolean = False
-            Try
-                Dim LocalMemberID As Integer
-                returnREsult = False
-                '
-                If Not main_loginFormDefaultProcessed Then
-                    '
-                    ' Processing can happen
-                    '   1) early in init() -- legacy
-                    '   2) as well as at the front of main_GetLoginForm - to support addon Login forms
-                    ' This flag prevents the default form from processing twice
-                    '
-                    main_loginFormDefaultProcessed = True
-                    loginForm_Username = cpCore.docProperties.getText("username")
-                    loginForm_Password = cpCore.docProperties.getText("password")
-                    loginForm_AutoLogin = cpCore.docproperties.getBoolean("autologin")
-                    '
-                    If (cpCore.visit.visit_loginAttempts < main_maxVisitLoginAttempts) And cpCore.visit.visit_cookieSupport Then
-                        LocalMemberID = authenticateGetId(loginForm_Username, loginForm_Password)
-                        If LocalMemberID = 0 Then
-                            cpCore.visit.visit_loginAttempts = cpCore.visit.visit_loginAttempts + 1
-                            Call cpCore.visit.visit_save()
-                        Else
-                            returnREsult = authenticateById(LocalMemberID, loginForm_AutoLogin)
-                            If returnREsult Then
-                                Call cpCore.log_LogActivity2("successful username/password login", id, organizationId)
-                            Else
-                                Call cpCore.log_LogActivity2("bad username/password login", id, organizationId)
-                            End If
-                        End If
-                    End If
-                End If
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-            Return returnREsult
-        End Function
-        '
-        '========================================================================
-        ' ----- Process the send password form
-        '========================================================================
-        '
-        Public Sub processFormSendPassword()
-            Try
-                loginForm_Email = cpCore.docProperties.getText("email")
-                Call sendPassword(loginForm_Email)
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-        End Sub
-        '
-        '=============================================================================
-        ' Send the Member his username and password
-        '=============================================================================
-        '
-        Public Function sendPassword(ByVal Email As Object) As Boolean
-            Dim returnREsult As Boolean = False
-            Try
-                Dim sqlCriteria As String
-                Dim Message As String = ""
-                Dim CS As Integer
-                Dim workingEmail As String
-                Dim FromAddress As String = ""
-                Dim subject As String = ""
-                Dim allowEmailLogin As Boolean
-                Dim Password As String
-                Dim Username As String
-                Dim updateUser As Boolean
-                Dim atPtr As Integer
-                Dim Index As Integer
-                Dim EMailName As String
-                Dim usernameOK As Boolean
-                Dim recordCnt As Integer
-                Dim Ptr As Integer
-                '
-                Const passwordChrs As String = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345678999999"
-                Const passwordChrsLength As Integer = 62
-                '
-                workingEmail = genericController.encodeText(Email)
-                '
-                returnREsult = False
-                If workingEmail = "" Then
-                    'hint = "110"
-                    cpCore.error_AddUserError("Please enter your email address before requesting your username and password.")
-                Else
-                    'hint = "120"
-                    atPtr = genericController.vbInstr(1, workingEmail, "@")
-                    If atPtr < 2 Then
-                        '
-                        ' email not valid
-                        '
-                        'hint = "130"
-                        cpCore.error_AddUserError("Please enter a valid email address before requesting your username and password.")
-                    Else
-                        'hint = "140"
-                        EMailName = vbMid(workingEmail, 1, atPtr - 1)
-                        '
-                        Call cpCore.log_LogActivity2("password request for email " & workingEmail, id, organizationId)
-                        '
-                        allowEmailLogin = cpCore.siteProperties.getBoolean("allowEmailLogin", False)
-                        recordCnt = 0
-                        sqlCriteria = "(email=" & cpCore.db.encodeSQLText(workingEmail) & ")"
-                        If True Then
-                            sqlCriteria = sqlCriteria & "and((dateExpires is null)or(dateExpires>" & cpCore.db.encodeSQLDate(DateTime.Now) & "))"
-                        End If
-                        CS = cpCore.db.cs_open("People", sqlCriteria, "ID", SelectFieldList:="username,password", PageSize:=1)
-                        If Not cpCore.db.cs_ok(CS) Then
-                            '
-                            ' valid login account for this email not found
-                            '
-                            If (LCase(vbMid(workingEmail, atPtr + 1)) = "contensive.com") Then
-                                '
-                                ' look for expired account to renew
-                                '
-                                Call cpCore.db.cs_Close(CS)
-                                CS = cpCore.db.cs_open("People", "((email=" & cpCore.db.encodeSQLText(workingEmail) & "))", "ID", PageSize:=1)
-                                If cpCore.db.cs_ok(CS) Then
-                                    '
-                                    ' renew this old record
-                                    '
-                                    'hint = "150"
-                                    Call cpCore.db.cs_setField(CS, "developer", "1")
-                                    Call cpCore.db.cs_setField(CS, "admin", "1")
-                                    Call cpCore.db.cs_setField(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString())
-                                Else
-                                    '
-                                    ' inject support record
-                                    '
-                                    'hint = "150"
-                                    Call cpCore.db.cs_Close(CS)
-                                    CS = cpCore.db.cs_insertRecord("people")
-                                    Call cpCore.db.cs_setField(CS, "name", "Contensive Support")
-                                    Call cpCore.db.cs_setField(CS, "email", workingEmail)
-                                    Call cpCore.db.cs_setField(CS, "developer", "1")
-                                    Call cpCore.db.cs_setField(CS, "admin", "1")
-                                    Call cpCore.db.cs_setField(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString())
-                                End If
-                                Call cpCore.db.cs_save2(CS)
-                            Else
-                                'hint = "155"
-                                cpCore.error_AddUserError("No current user was found matching this email address. Please try again. ")
-                            End If
-                        End If
-                        If cpCore.db.cs_ok(CS) Then
-                            'hint = "160"
-                            FromAddress = cpCore.siteProperties.getText("EmailFromAddress", "info@" & cpCore.webServer.webServerIO_requestDomain)
-                            subject = "Password Request at " & cpCore.webServer.webServerIO_requestDomain
-                            Message = ""
-                            Do While cpCore.db.cs_ok(CS)
-                                'hint = "170"
-                                updateUser = False
-                                If Message = "" Then
-                                    'hint = "180"
-                                    Message = "This email was sent in reply to a request at " & cpCore.webServer.webServerIO_requestDomain & " for the username and password associated with this email address. "
-                                    Message = Message & "If this request was made by you, please return to the login screen and use the following:" & vbCrLf
-                                    Message = Message & vbCrLf
-                                Else
-                                    'hint = "190"
-                                    Message = Message & vbCrLf
-                                    Message = Message & "Additional user accounts with the same email address: " & vbCrLf
-                                End If
-                                '
-                                ' username
-                                '
-                                'hint = "200"
-                                Username = cpCore.db.cs_getText(CS, "Username")
-                                usernameOK = True
-                                If Not allowEmailLogin Then
-                                    'hint = "210"
-                                    If Username <> Username.Trim() Then
-                                        'hint = "220"
-                                        Username = Username.Trim()
-                                        updateUser = True
-                                    End If
-                                    If Username = "" Then
-                                        'hint = "230"
-                                        'username = emailName & Int(Rnd() * 9999)
-                                        usernameOK = False
-                                        Ptr = 0
-                                        Do While Not usernameOK And (Ptr < 100)
-                                            'hint = "240"
-                                            Username = EMailName & Int(Rnd() * 9999)
-                                            usernameOK = Not cpCore.main_IsLoginOK(Username, "test")
-                                            Ptr = Ptr + 1
-                                        Loop
-                                        'hint = "250"
-                                        If usernameOK Then
-                                            updateUser = True
-                                        End If
-                                    End If
-                                    'hint = "260"
-                                    Message = Message & " username: " & Username & vbCrLf
-                                End If
-                                'hint = "270"
-                                If usernameOK Then
-                                    '
-                                    ' password
-                                    '
-                                    'hint = "280"
-                                    Password = cpCore.db.cs_getText(CS, "Password")
-                                    If Password.Trim() <> Password Then
-                                        'hint = "290"
-                                        Password = Password.Trim()
-                                        updateUser = True
-                                    End If
-                                    'hint = "300"
-                                    If Password = "" Then
-                                        'hint = "310"
-                                        For Ptr = 0 To 8
-                                            'hint = "320"
-                                            Index = CInt(Rnd() * passwordChrsLength)
-                                            Password = Password & vbMid(passwordChrs, Index, 1)
-                                        Next
-                                        'hint = "330"
-                                        updateUser = True
-                                    End If
-                                    'hint = "340"
-                                    Message = Message & " password: " & Password & vbCrLf
-                                    returnREsult = True
-                                    If updateUser Then
-                                        'hint = "350"
-                                        Call cpCore.db.cs_set(CS, "username", Username)
-                                        Call cpCore.db.cs_set(CS, "password", Password)
-                                    End If
-                                    recordCnt = recordCnt + 1
-                                End If
-                                cpCore.db.cs_goNext(CS)
-                            Loop
-                        End If
-                    End If
-                End If
-                'hint = "360"
-                If returnREsult Then
-                    Call cpCore.main_SendEmail(workingEmail, FromAddress, subject, Message, 0, True, False)
-                    '    main_ClosePageHTML = main_ClosePageHTML & main_GetPopupMessage(app.publicFiles.ReadFile("ccLib\Popup\PasswordSent.htm"), 300, 300, "no")
-                End If
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-            Return returnREsult
-        End Function
 
-        Public Sub New(cpCore As coreClass)
-            MyBase.New()
-            Me.cpCore = cpCore
+        Public Sub New()
         End Sub
         '
         '========================================================================
@@ -1012,7 +652,7 @@ Namespace Contensive.Core
                     '
                     ' Specific Content called out
                     '
-                    Call cpCore.user.getContentAccessRights(ContentName, returnIsContentManager, notImplemented_allowAdd, notImplemented_allowDelete)
+                    Call cpCore.authContext.user.getContentAccessRights(ContentName, returnIsContentManager, notImplemented_allowAdd, notImplemented_allowDelete)
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -1067,19 +707,19 @@ Namespace Contensive.Core
                     '
                     ' Log them in
                     '
-                    cpCore.visit.visit_isAuthenticated = True
-                    Call cpCore.visit.visit_save()
+                    cpCore.authContext.visit.VisitAuthenticated = True
+                    Call cpCore.authContext.saveObject(cpCore)
                     isAuthenticatedAdmin_cache_isLoaded = False
                     property_user_isMember_isLoaded = False
                     isAuthenticatedDeveloper_cache_isLoaded = False
                     '
                     ' Write Cookies in case Visit Tracking is off
                     '
-                    If cpCore.visit.visit_startTime = Date.MinValue Then
-                        cpCore.visit.visit_startTime = cpCore.app_startTime
+                    If cpCore.authContext.visit.StartTime = Date.MinValue Then
+                        cpCore.authContext.visit.StartTime = cpCore.app_startTime
                     End If
                     If Not cpCore.siteProperties.allowVisitTracking Then
-                        Call cpCore.visit.visit_init(True)
+                        cpCore.authContext = Models.Context.authContextModel.create(cpCore, True)
                     End If
                     '
                     ' Change autologin if included, selected, and allowed
@@ -1126,11 +766,11 @@ Namespace Contensive.Core
                     & ""
                 CS = cpCore.db.cs_openSql(SQL)
                 If cpCore.db.cs_ok(CS) Then
-                    If cpCore.visit.visit_Id = 0 Then
+                    If cpCore.authContext.visit.ID = 0 Then
                         '
                         ' Visit was blocked during init, init the visit DateTime.Now
                         '
-                        Call cpCore.visit.visit_init(True)
+                        cpCore.authContext = Models.Context.authContextModel.create(cpCore, cpCore.siteProperties.allowVisitTracking)
                     End If
                     '
                     ' ----- Member was recognized
@@ -1170,11 +810,11 @@ Namespace Contensive.Core
                     End If
                     lastVisit = cpCore.app_startTime
                     'cpCore.main_VisitMemberID = id
-                    cpCore.visit.visit_loginAttempts = 0
-                    cpCore.visitor.memberID = id
-                    cpCore.visit.visit_excludeFromAnalytics = cpCore.visit.visit_excludeFromAnalytics Or cpCore.visit.visit_isBot Or excludeFromAnalytics Or isAdmin Or isDeveloper
-                    Call cpCore.visit.visit_save()
-                    Call cpCore.visitor.save(cpCore)
+                    cpCore.authContext.visit.LoginAttempts = 0
+                    cpCore.authContext.visitor.memberID = id
+                    cpCore.authContext.visit.ExcludeFromAnalytics = cpCore.authContext.visit.ExcludeFromAnalytics Or cpCore.authContext.visit_isBot Or excludeFromAnalytics Or isAdmin Or isDeveloper
+                    Call cpCore.authContext.saveObject(cpCore)
+                    Call cpCore.authContext.visitor.saveObject(cpCore)
                     Call saveMemberBase()
                     returnREsult = True
                 End If
@@ -1196,7 +836,7 @@ Namespace Contensive.Core
                 Dim CSMember As Integer
                 Dim CSlanguage As Integer
                 '
-                Call createUserDefaults(cpCore.visit.visit_name)
+                Call createUserDefaults(cpCore.authContext.visit.Name)
                 '
                 id = 0
                 CSMember = cpCore.db.cs_insertRecord("people")
@@ -1232,10 +872,10 @@ Namespace Contensive.Core
                     Call cpCore.db.cs_Close(CSMember)
                     '
                     'cpCore.main_VisitMemberID = id
-                    cpCore.visitor.memberID = id
-                    cpCore.visit.visit_isAuthenticated = False
-                    Call cpCore.visit.visit_save()
-                    Call cpCore.visitor.save(cpCore)
+                    cpCore.authContext.visitor.memberID = id
+                    cpCore.authContext.visit.VisitAuthenticated = False
+                    Call cpCore.authContext.saveObject(cpCore)
+                    Call cpCore.authContext.visitor.saveObject(cpCore)
                     '
                     isAuthenticatedAdmin_cache_isLoaded = False
                     property_user_isMember_isLoaded = False
@@ -1268,17 +908,13 @@ Namespace Contensive.Core
                 allowToolsPanel = False
                 autoLogin = False
                 adminMenuModeID = 0
-                loginForm_Username = ""
-                loginForm_Password = ""
-                loginForm_Email = ""
-                loginForm_AutoLogin = False
                 userAdded = False
                 username = ""
                 password = ""
                 contentControlID = 0
                 active = False
                 visits = 0
-                lastVisit = cpCore.visit.visit_startTime
+                lastVisit = cpCore.authContext.visit.StartTime
                 company = ""
                 user_Title = ""
                 main_MemberAddress = ""
@@ -1325,7 +961,7 @@ Namespace Contensive.Core
             Try
                 Dim SQL As String
                 '
-                If cpCore.visit.visit_initialized Then
+                If cpCore.authContext.visit_initialized Then
                     If (id > 0) Then
                         SQL = "UPDATE ccMembers SET " _
                         & " Name=" & cpCore.db.encodeSQLText(name) _
@@ -1375,283 +1011,6 @@ Namespace Contensive.Core
             End Try
         End Sub
         '
-        '========================================================================
-        ' ----- Process the send password form
-        '========================================================================
-        '
-        Public Sub processFormJoin()
-            Try
-                Dim ErrorMessage As String = ""
-                Dim CS As Integer
-                Dim FirstName As String
-                Dim LastName As String
-                Dim FullName As String
-                Dim Email As String
-                Dim errorCode As Integer = 0
-                '
-                loginForm_Username = cpCore.docProperties.getText("username")
-                loginForm_Password = cpCore.docProperties.getText("password")
-                '
-                If Not genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("AllowMemberJoin", False)) Then
-                    cpCore.error_AddUserError("This site does not accept public main_MemberShip.")
-                Else
-                    If Not isNewLoginOK(loginForm_Username, loginForm_Password, ErrorMessage, errorCode) Then
-                        Call cpCore.error_AddUserError(ErrorMessage)
-                    Else
-                        If Not cpCore.error_IsUserError() Then
-                            CS = cpCore.db.cs_open("people", "ID=" & cpCore.db.encodeSQLNumber(cpCore.user.id))
-                            If Not cpCore.db.cs_ok(CS) Then
-                                cpCore.handleExceptionAndRethrow(New Exception("Could not open the current members account to set the username and password."))
-                            Else
-                                If (cpCore.db.cs_getText(CS, "username") <> "") Or (cpCore.db.cs_getText(CS, "password") <> "") Or (cpCore.db.cs_getBoolean(CS, "admin")) Or (cpCore.db.cs_getBoolean(CS, "developer")) Then
-                                    '
-                                    ' if the current account can be logged into, you can not join 'into' it
-                                    '
-                                    Call logout()
-                                End If
-                                FirstName = cpCore.docProperties.getText("firstname")
-                                LastName = cpCore.docProperties.getText("firstname")
-                                FullName = FirstName & " " & LastName
-                                Email = cpCore.docProperties.getText("email")
-                                Call cpCore.db.cs_set(CS, "FirstName", FirstName)
-                                Call cpCore.db.cs_set(CS, "LastName", LastName)
-                                Call cpCore.db.cs_set(CS, "Name", FullName)
-                                Call cpCore.db.cs_set(CS, "username", loginForm_Username)
-                                Call cpCore.db.cs_set(CS, "password", loginForm_Password)
-                                Call cpCore.user.authenticateById(cpCore.user.id)
-                            End If
-                            Call cpCore.db.cs_Close(CS)
-                        End If
-                    End If
-                End If
-                Call cpCore.cache.invalidateObjectList("People")
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-        End Sub
-        '
-        '========================================================================
-        '   Print the login form in an intercept page
-        '========================================================================
-        '
-        Public Function getLoginPage(forceDefaultLogin As Boolean) As String
-            Dim returnREsult As String = ""
-            Try
-                Dim Body As String
-                Dim head As String
-                Dim bodyTag As String
-                '
-                ' ----- Default Login
-                '
-                If forceDefaultLogin Then
-                    Body = getLoginForm_Default()
-                Else
-                    Body = getLoginForm()
-                End If
-                Body = "" _
-                    & cr & "<p class=""ccAdminNormal"">You are attempting to enter an access controlled area. Continue only if you have authority to enter this area. Information about your visit will be recorded for security purposes.</p>" _
-                    & Body _
-                    & ""
-                '
-                Body = "" _
-                    & cpCore.main_GetPanel(Body, "ccPanel", "ccPanelHilite", "ccPanelShadow", "400", 15) _
-                    & cr & "<p>&nbsp;</p>" _
-                    & cr & "<p>&nbsp;</p>" _
-                    & cr & "<p style=""text-align:center""><a href=""http://www.Contensive.com"" target=""_blank""><img src=""/ccLib/images/ccLibLogin.GIF"" width=""80"" height=""33"" border=""0"" alt=""Contensive Content Control"" ></A></p>" _
-                    & cr & "<p style=""text-align:center"" class=""ccAdminSmall"">The content on this web site is managed and delivered by the Contensive Site Management Server. If you do not have member access, please use your back button to return to the public area.</p>" _
-                    & ""
-                '
-                ' --- create an outer table to hold the form
-                '
-                Body = "" _
-                    & cr & "<div class=""ccCon"" style=""width:400px;margin:100px auto 0 auto;"">" _
-                    & kmaIndent(cpCore.main_GetPanelHeader("Login")) _
-                    & kmaIndent(Body) _
-                    & "</div>"
-                '
-                Call cpCore.main_SetMetaContent(0, 0)
-                Call cpCore.htmlDoc.main_AddPagetitle2("Login", "loginPage")
-                head = cpCore.webServer.webServerIO_GetHTMLInternalHead(False)
-                If cpCore.pageManager.pageManager_TemplateBodyTag <> "" Then
-                    bodyTag = cpCore.pageManager.pageManager_TemplateBodyTag
-                Else
-                    bodyTag = TemplateDefaultBodyTag
-                End If
-                'Call AppendLog("call main_getEndOfBody, from main_getLoginPage2 ")
-                returnREsult = cpCore.main_assembleHtmlDoc(cpCore.main_docType, head, bodyTag, Body & cpCore.htmlDoc.html_GetEndOfBody(False, False, False, False))
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-            Return returnREsult
-        End Function
-        '
-        '========================================================================
-        '   default login form
-        '========================================================================
-        '
-        Public Function getLoginForm_Default() As String
-            Dim returnHtml As String = ""
-            Try
-                Dim Panel As String
-                Dim usernameMsg As String
-                Dim QueryString As String
-                Dim loginForm As String
-                Dim Caption As String
-                Dim formType As String
-                Dim needLoginForm As Boolean
-                '
-                ' ----- process the previous form, if login OK, return blank (signal for page refresh)
-                '
-                needLoginForm = True
-                formType = cpCore.docProperties.getText("type")
-                If formType = FormTypeLogin Then
-                    If processFormLoginDefault() Then
-                        returnHtml = ""
-                        needLoginForm = False
-                    End If
-                End If
-                If needLoginForm Then
-                    '
-                    ' ----- When page loads, set focus on login username
-                    '
-                    Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("method", "")
-                    loginForm = ""
-                    Call cpCore.htmlDoc.main_AddOnLoadJavascript2("document.getElementById('LoginUsernameInput').focus()", "login")
-                    '
-                    ' ----- Error Messages
-                    '
-                    If genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("allowEmailLogin", False)) Then
-                        usernameMsg = "<b>To login, enter your username or email address with your password.</b></p>"
-                    Else
-                        usernameMsg = "<b>To login, enter your username and password.</b></p>"
-                    End If
-                    '
-                    QueryString = cpCore.webServer.requestQueryString
-                    QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
-                    QueryString = genericController.ModifyQueryString(QueryString, "requestbinary", "", False)
-                    '
-                    ' ----- Username
-                    '
-                    If genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("allowEmailLogin", False)) Then
-                        Caption = "Username&nbsp;or&nbsp;Email"
-                    Else
-                        Caption = "Username"
-                    End If
-                    '
-                    loginForm = loginForm _
-                    & cr & "<tr>" _
-                    & cr2 & "<td style=""text-align:right;vertical-align:middle;width:30%;padding:4px"" align=""right"" width=""30%"">" & SpanClassAdminNormal & Caption & "&nbsp;</span></td>" _
-                    & cr2 & "<td style=""text-align:left;vertical-align:middle;width:70%;padding:4px"" align=""left""  width=""70%""><input ID=""LoginUsernameInput"" NAME=""" & "username"" VALUE=""" & cpCore.htmlDoc.html_EncodeHTML(loginForm_Username) & """ SIZE=""20"" MAXLENGTH=""50"" ></td>" _
-                    & cr & "</tr>"
-                    '
-                    ' ----- Password
-                    '
-                    If genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("allowNoPasswordLogin", False)) Then
-                        Caption = "Password&nbsp;(optional)"
-                    Else
-                        Caption = "Password"
-                    End If
-                    loginForm = loginForm _
-                    & cr & "<tr>" _
-                    & cr2 & "<td style=""text-align:right;vertical-align:middle;width:30%;padding:4px"" align=""right"">" & SpanClassAdminNormal & Caption & "&nbsp;</span></td>" _
-                    & cr2 & "<td style=""text-align:left;vertical-align:middle;width:70%;padding:4px"" align=""left"" ><input NAME=""" & "password"" VALUE="""" SIZE=""20"" MAXLENGTH=""50"" type=""password""></td>" _
-                    & cr & "</tr>" _
-                    & ""
-                    '
-                    ' ----- autologin support
-                    '
-                    If genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("AllowAutoLogin", False)) Then
-                        loginForm = loginForm _
-                        & cr & "<tr>" _
-                        & cr2 & "<td align=""right"">&nbsp;</td>" _
-                        & cr2 & "<td align=""left"" >" _
-                        & cr3 & "<table border=""0"" cellpadding=""5"" cellspacing=""0"" width=""100%"">" _
-                        & cr4 & "<tr>" _
-                        & cr5 & "<td valign=""top"" width=""20""><input type=""checkbox"" name=""" & "autologin"" value=""ON"" checked></td>" _
-                        & cr5 & "<td valign=""top"" width=""100%"">" & SpanClassAdminNormal & "Login automatically from this computer</span></td>" _
-                        & cr4 & "</tr>" _
-                        & cr3 & "</table>" _
-                        & cr2 & "</td>" _
-                        & cr & "</tr>"
-                    End If
-                    loginForm = loginForm _
-                        & cr & "<tr>" _
-                        & cr2 & "<td colspan=""2"">&nbsp;</td>" _
-                        & cr & "</tr>" _
-                        & ""
-                    loginForm = "" _
-                        & cr & "<table border=""0"" cellpadding=""5"" cellspacing=""0"" width=""100%"">" _
-                        & kmaIndent(loginForm) _
-                        & cr & "</table>" _
-                        & ""
-                    loginForm = loginForm _
-                        & cpCore.htmldoc.html_GetFormInputHidden("Type", FormTypeLogin) _
-                        & cpCore.htmldoc.html_GetFormInputHidden("email", loginForm_Email) _
-                        & cpCore.main_GetPanelButtons(ButtonLogin, "Button") _
-                        & ""
-                    loginForm = "" _
-                        & cpCore.htmldoc.html_GetFormStart(QueryString) _
-                        & kmaIndent(loginForm) _
-                        & cr & "</form>" _
-                        & ""
-
-                    '-------
-
-                    Panel = "" _
-                        & cpCore.error_GetUserError() _
-                        & cr & "<p class=""ccAdminNormal"">" & usernameMsg _
-                        & loginForm _
-                        & ""
-                    '
-                    ' ----- Password Form
-                    '
-                    If genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("allowPasswordEmail", True)) Then
-                        Panel = "" _
-                            & Panel _
-                            & cr & "<p class=""ccAdminNormal""><b>Forget your password?</b></p>" _
-                            & cr & "<p class=""ccAdminNormal"">If you are a member of the system and can not remember your password, enter your email address below and we will email your matching username and password.</p>" _
-                            & getSendPasswordForm() _
-                            & ""
-                    End If
-                    '
-                    returnHtml = "" _
-                        & cr & "<div class=""ccLoginFormCon"">" _
-                        & kmaIndent(Panel) _
-                        & cr & "</div>" _
-                        & ""
-                End If
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-            Return returnHtml
-        End Function
-        '
-        '========================================================================
-        '   same as main_GetLoginForm
-        '========================================================================
-        '
-        Public Function getLoginPanel() As String
-            Return getLoginForm()
-        End Function
-        ''
-        ''========================================================================
-        ''   Member Check
-        ''       Check for visit authentication.
-        ''       If the visit is not authenticated (logged in with username/password),
-        ''       block the page with the login form (not a loginpage so there is no <html><body>
-        ''========================================================================
-        ''
-        'Public Sub user_CheckMember()
-        '    Try
-        '        If Not isAuthenticated() Then
-        '            Call cpCore.writeAltBuffer(user_GetLoginPage2(False))
-        '            Call cpCore.main_CloseStream()
-        '        End If
-        '    Catch ex As Exception
-        '        cpCore.handleExceptionAndRethrow(ex)
-        '    End Try
-        'End Sub
-        '
         '===================================================================================================
         '   Returns the ID of a member given their Username and Password
         '
@@ -1693,7 +1052,7 @@ Namespace Contensive.Core
                     ' ----- password blank, stop here
                     '
                     Call cpCore.error_AddUserError("A valid login requires a non-blank password.")
-                ElseIf (cpCore.visit.visit_loginAttempts >= main_maxVisitLoginAttempts) Then
+                ElseIf (cpCore.authContext.visit.LoginAttempts >= main_maxVisitLoginAttempts) Then
                     '
                     ' ----- already tried 5 times
                     '
@@ -1851,7 +1210,7 @@ Namespace Contensive.Core
                         '
                     ElseIf String.IsNullOrEmpty(ContentName) Then
                         '
-                        ' no content given, do not handle the general case -- use user.main_IsContentManager2()
+                        ' no content given, do not handle the general case -- use authcontext.user.main_IsContentManager2()
                         '
                     ElseIf isAuthenticatedDeveloper() Then
                         '

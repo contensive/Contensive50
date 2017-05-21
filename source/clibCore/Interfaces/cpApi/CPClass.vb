@@ -170,7 +170,7 @@ Namespace Contensive.Core
                     'If Response.isOpen Then
                     '    result = core.addon.addon_execute_legacy4(addonId.ToString(), core.getLegacyOptionStringFromVar(), addonContext, Nothing)
                     'End If
-                    result = core.addon.execute(addonId, "", "", addonContext, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", core.user.id, core.visit.visit_isAuthenticated)
+                    result = core.addon.execute(addonId, "", "", addonContext, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", core.authContext.user.id, core.authContext.visit.visitAuthenticated)
                 End If
                 '
             Catch ex As Exception

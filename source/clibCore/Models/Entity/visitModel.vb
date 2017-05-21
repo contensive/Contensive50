@@ -9,72 +9,55 @@ Imports Contensive.BaseClasses
 Imports Newtonsoft.Json
 
 Namespace Contensive.Core.Models.Entity
-    '
-    '====================================================================================================
-    ' entity model pattern
-    '   factory pattern load because if a record is not found, must rturn nothing
-    '   new() - empty constructor to allow deserialization
-    '   saveObject() - saves instance properties (nonstatic method)
-    '   create() - loads instance properties and returns a model 
-    '   delete() - deletes the record that matches the argument
-    '   getObjectList() - a pattern for creating model lists.
-    '   invalidateFIELDNAMEcache() - method to invalide the model cache. One per cache
-    '
-    '	1) set the primary content name in const cnPrimaryContent. avoid constants Like cnAddons used outside model
-    '	2) find-And-replace "visitorModel" with the name for this model
-    '	3) when adding model fields, add in three places: the Public Property, the saveObject(), the loadObject()
-    '	4) when adding create() methods to support other fields/combinations of fields, 
-    '       - add a secondary cache For that new create method argument in loadObjec()
-    '       - add it to the injected cachename list in loadObject()
-    '       - add an invalidate
-    '
-    ' Model Caching
-    '   caching applies to model objects only, not lists of models (for now)
-    '       - this is because of the challenge of invalidating the list object when individual records are added or deleted
-    '
-    '   a model should have 1 primary cache object which stores the data and can have other secondary cacheObjects which do not hold data
-    '    the cacheName of the 'primary' cacheObject for models and db records (cacheNamePrefix + ".id." + #id)
-    '    'secondary' cacheName is (cacheNamePrefix + . + fieldName + . + #)
-    '
-    '   cacheobjects can be used to hold data (primary cacheobjects), or to hold only metadata (secondary cacheobjects)
-    '       - primary cacheobjects are like 'personModel.id.99' that holds the model for id=99
-    '           - it is primary because the .primaryobject is null
-    '           - invalidationData. This cacheobject is invalid after this datetime
-    '           - dependentobjectlist() - this object is invalid if any of those objects are invalid
-    '       - secondary cachobjects are like 'person.ccguid.12345678'. It does not hold data, just a reference to the primary cacheobject
-    '
-    '   cacheNames spaces are replaced with underscores, so "addon collections" should be addon_collections
-    '
-    '   cacheNames that match content names are treated as caches of "any" record in the content, so invalidating "people" can be used to invalidate
-    '       any non-specific cache in the people table, by including "people" as a dependant cachename. the "people" cachename should not clear
-    '       specific people caches, like people.id.99, but can be used to clear lists of records like "staff_list_group"
-    '       - this can be used as a fallback strategy to cache record lists: a remote method list can be cached with a dependancy on "add-ons".
-    '       - models should always clear this content name cache entry on all cache clears
-    '
-    '   when a model is created, the code first attempts to read the model's cacheobject. if it fails, it builds it and saves the cache object and tags
-    '       - when building the model, is writes object to the primary cacheobject, and writes all the secondaries to be used
-    '       - when building the model, if a database record is opened, a dependantObject Tag is created for the tablename+'id'+id
-    '       - when building the model, if another model is added, that model returns its cachenames in the cacheNameList to be added as dependentObjects
-    '
-    '
-    Public Class visitorModel
+    Public Class visitModel
         '
         '-- const
-        Public Const primaryContentName As String = "visitors" '<------ set content name
-        Private Const primaryContentTableName As String = "ccvisitors" '<------ set to tablename for the primary content (used for cache names)
+        Public Const primaryContentName As String = "visits"
+        Private Const primaryContentTableName As String = "ccvisits"
         '
         ' -- instance properties
-        Public id As Integer
-        Public name As String
-        Public guid As String
-        '
-        Public memberID As Integer = 0              ' the last member account this visitor used (memberid=0 means untracked guest)
-        Public orderID As Integer = 0               ' the current shopping cart (non-complete order)
-        Public newVisitor As Boolean = False               ' stored in visit record - Is this the first visit for this visitor
-        Public forceBrowserMobile As Integer = 0           ' 0 = not set -- use Browser detect each time, 1 = Force Mobile, 2 = Force not Mobile
+        Public ID As Integer
+        Public Active As Boolean
+        Public Bot As Boolean
+        Public Browser As String
+        Public ccGuid As String
+        Public ContentCategoryID As Integer
+        Public ContentControlID As Integer
+        Public CookieSupport As Boolean
+        Public CreatedBy As Integer
+        Public CreateKey As Integer
+        Public DateAdded As Date
+        Public EditArchive As Boolean
+        Public EditBlank As Boolean
+        Public EditSourceID As Integer
+        Public ExcludeFromAnalytics As Boolean
+        Public HTTP_FROM As String
+        Public HTTP_REFERER As String
+        Public HTTP_VIA As String
+        Public LastVisitTime As Date
+        Public LoginAttempts As Integer
+        Public MemberID As Integer
+        Public MemberNew As Boolean
+        Public Mobile As Boolean
+        Public ModifiedBy As Integer
+        Public ModifiedDate As Date
+        Public Name As String
+        Public PageVisits As Integer
+        Public RefererPathPage As String
+        Public REMOTE_ADDR As String
+        Public RemoteName As String
+        Public SortOrder As String
+        Public StartDateValue As Integer
+        Public StartTime As Date
+        Public StopTime As Date
+        Public TimeToLastHit As Integer
+        Public VerboseReporting As Boolean
+        Public VisitAuthenticated As Boolean
+        Public VisitorID As Integer
+        Public VisitorNew As Boolean
         '
         ' -- publics not exposed to the UI (test/internal data)
-        <JsonIgnore> Public createKey As Integer
+        '<JsonIgnore> Public createKey As Integer
         '
         '====================================================================================================
         ''' <summary>
@@ -91,12 +74,12 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="cp"></param>
         ''' <param name="recordId">The id of the record to be read into the new object</param>
         ''' <param name="cacheNameList">Any cachenames effected by this record will be added to this list. If the method consumer creates a cache object, add these cachenames to its dependent cachename list.</param>
-        Public Shared Function create(cpCore As coreClass, recordId As Integer, ByRef cacheNameList As List(Of String)) As visitorModel
-            Dim result As visitorModel = Nothing
+        Public Shared Function create(cpCore As coreClass, recordId As Integer, ByRef cacheNameList As List(Of String)) As visitModel
+            Dim result As visitModel = Nothing
             Try
                 If recordId > 0 Then
-                    Dim cacheName As String = GetType(visitorModel).FullName & getCacheName("id", recordId.ToString())
-                    result = cpCore.cache.getObject(Of visitorModel)(cacheName)
+                    Dim cacheName As String = GetType(visitModel).FullName & getCacheName("id", recordId.ToString())
+                    result = cpCore.cache.getObject(Of visitModel)(cacheName)
                     If (result Is Nothing) Then
                         result = loadObject(cpCore, "id=" & recordId.ToString(), cacheNameList)
                     End If
@@ -114,12 +97,12 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <param name="recordGuid"></param>
-        Public Shared Function create(cpCore As coreClass, recordGuid As String, ByRef cacheNameList As List(Of String)) As visitorModel
-            Dim result As visitorModel = Nothing
+        Public Shared Function create(cpCore As coreClass, recordGuid As String, ByRef cacheNameList As List(Of String)) As visitModel
+            Dim result As visitModel = Nothing
             Try
                 If Not String.IsNullOrEmpty(recordGuid) Then
-                    Dim cacheName As String = GetType(visitorModel).FullName & getCacheName("ccguid", recordGuid)
-                    result = cpCore.cache.getObject(Of visitorModel)(cacheName)
+                    Dim cacheName As String = GetType(visitModel).FullName & getCacheName("ccguid", recordGuid)
+                    result = cpCore.cache.getObject(Of visitModel)(cacheName)
                     If (result Is Nothing) Then
                         result = loadObject(cpCore, "ccGuid=" & cpCore.db.encodeSQLText(recordGuid), cacheNameList)
                     End If
@@ -137,19 +120,54 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <param name="sqlCriteria"></param>
-        Private Shared Function loadObject(cpCore As coreClass, sqlCriteria As String, ByRef cacheNameList As List(Of String)) As visitorModel
-            Dim result As visitorModel = Nothing
+        Private Shared Function loadObject(cpCore As coreClass, sqlCriteria As String, ByRef cacheNameList As List(Of String)) As visitModel
+            Dim result As visitModel = Nothing
             Try
                 Dim cs As New csController(cpCore)
                 If cs.open(primaryContentName, sqlCriteria) Then
-                    result = New visitorModel
+                    result = New visitModel
                     With result
                         '
                         ' -- populate result model
-                        .id = cs.getInteger("id")
-                        .name = cs.getText("name")
-                        .guid = cs.getText("ccGuid")
-                        .createKey = cs.getInteger("createKey")
+                        .ID = cs.getInteger("ID")
+                        .Active = cs.getBoolean("Active")
+                        .Bot = cs.getBoolean("Bot")
+                        .Browser = cs.getText("Browser")
+                        .ccGuid = cs.getText("ccGuid")
+                        .ContentCategoryID = cs.getInteger("ContentCategoryID")
+                        .ContentControlID = cs.getInteger("ContentControlID")
+                        .CookieSupport = cs.getBoolean("CookieSupport")
+                        .CreatedBy = cs.getInteger("CreatedBy")
+                        .CreateKey = cs.getInteger("CreateKey")
+                        .DateAdded = cs.getDate("DateAdded")
+                        .EditArchive = cs.getBoolean("EditArchive")
+                        .EditBlank = cs.getBoolean("EditBlank")
+                        .EditSourceID = cs.getInteger("EditSourceID")
+                        .ExcludeFromAnalytics = cs.getBoolean("ExcludeFromAnalytics")
+                        .HTTP_FROM = cs.getText("HTTP_FROM")
+                        .HTTP_REFERER = cs.getText("HTTP_REFERER")
+                        .HTTP_VIA = cs.getText("HTTP_VIA")
+                        .LastVisitTime = cs.getDate("LastVisitTime")
+                        .LoginAttempts = cs.getInteger("LoginAttempts")
+                        .MemberID = cs.getInteger("MemberID")
+                        .MemberNew = cs.getBoolean("MemberNew")
+                        .Mobile = cs.getBoolean("Mobile")
+                        .ModifiedBy = cs.getInteger("ModifiedBy")
+                        .ModifiedDate = cs.getDate("ModifiedDate")
+                        .Name = cs.getText("Name")
+                        .PageVisits = cs.getInteger("PageVisits")
+                        .RefererPathPage = cs.getText("RefererPathPage")
+                        .REMOTE_ADDR = cs.getText("REMOTE_ADDR")
+                        .RemoteName = cs.getText("RemoteName")
+                        .SortOrder = cs.getText("SortOrder")
+                        .StartDateValue = cs.getInteger("StartDateValue")
+                        .StartTime = cs.getDate("StartTime")
+                        .StopTime = cs.getDate("StopTime")
+                        .TimeToLastHit = cs.getInteger("TimeToLastHit")
+                        .VerboseReporting = cs.getBoolean("VerboseReporting")
+                        .VisitAuthenticated = cs.getBoolean("VisitAuthenticated")
+                        .VisitorID = cs.getInteger("VisitorID")
+                        .VisitorNew = cs.getBoolean("VisitorNew")
                     End With
                     If (result IsNot Nothing) Then
                         '
@@ -159,7 +177,7 @@ Namespace Contensive.Core.Models.Entity
                         cacheNameList.Add(cacheName0)
                         cpCore.cache.setObject(cacheName0, result)
                         '
-                        Dim cacheName1 As String = getCacheName("ccguid", result.guid)
+                        Dim cacheName1 As String = getCacheName("ccguid", result.ccguid)
                         cacheNameList.Add(cacheName1)
                         cpCore.cache.setObject(cacheName1, Nothing, cacheName1)
                     End If
@@ -196,15 +214,50 @@ Namespace Contensive.Core.Models.Entity
                 End If
                 If cs.ok() Then
                     id = cs.getInteger("id")
-                    Call cs.SetField("name", name)
-                    Call cs.SetField("ccGuid", guid)
-                    Call cs.SetField("createKey", createKey.ToString())
+                    cs.SetField("Active", Active.ToString())
+                    cs.SetField("Bot", Bot.ToString())
+                    cs.SetField("Browser", Browser)
+                    cs.SetField("ccGuid", ccGuid)
+                    cs.SetField("ContentCategoryID", ContentCategoryID.ToString())
+                    cs.SetField("ContentControlID", ContentControlID.ToString())
+                    cs.SetField("CookieSupport", CookieSupport.ToString())
+                    cs.SetField("CreatedBy", CreatedBy.ToString())
+                    cs.SetField("CreateKey", CreateKey.ToString())
+                    cs.SetField("DateAdded", DateAdded.ToString())
+                    cs.SetField("EditArchive", EditArchive.ToString())
+                    cs.SetField("EditBlank", EditBlank.ToString())
+                    cs.SetField("EditSourceID", EditSourceID.ToString())
+                    cs.SetField("ExcludeFromAnalytics", ExcludeFromAnalytics.ToString())
+                    cs.SetField("HTTP_FROM", HTTP_FROM)
+                    cs.SetField("HTTP_REFERER", HTTP_REFERER)
+                    cs.SetField("HTTP_VIA", HTTP_VIA)
+                    cs.SetField("LastVisitTime", LastVisitTime.ToString())
+                    cs.SetField("LoginAttempts", LoginAttempts.ToString())
+                    cs.SetField("MemberID", MemberID.ToString())
+                    cs.SetField("MemberNew", MemberNew.ToString())
+                    cs.SetField("Mobile", Mobile.ToString())
+                    cs.SetField("ModifiedBy", ModifiedBy.ToString())
+                    cs.SetField("ModifiedDate", ModifiedDate.ToString())
+                    cs.SetField("Name", Name)
+                    cs.SetField("PageVisits", PageVisits.ToString())
+                    cs.SetField("RefererPathPage", RefererPathPage)
+                    cs.SetField("REMOTE_ADDR", REMOTE_ADDR)
+                    cs.SetField("RemoteName", RemoteName)
+                    cs.SetField("SortOrder", SortOrder)
+                    cs.SetField("StartDateValue", StartDateValue.ToString())
+                    cs.SetField("StartTime", StartTime.ToString())
+                    cs.SetField("StopTime", StopTime.ToString())
+                    cs.SetField("TimeToLastHit", TimeToLastHit.ToString())
+                    cs.SetField("VerboseReporting", VerboseReporting.ToString())
+                    cs.SetField("VisitAuthenticated", VisitAuthenticated.ToString())
+                    cs.SetField("VisitorID", VisitorID.ToString())
+                    cs.SetField("VisitorNew", VisitorNew.ToString())
                 End If
                 Call cs.Close()
                 '
                 ' -- invalidate objects
                 cpCore.cache.invalidateObject(getCacheName("id", id.ToString))
-                cpCore.cache.invalidateObject(getCacheName("ccguid", guid))
+                cpCore.cache.invalidateObject(getCacheName("ccguid", ccguid))
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
                 Throw
@@ -253,15 +306,15 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="cp"></param>
         ''' <param name="someCriteria"></param>
         ''' <returns></returns>
-        Public Shared Function getObjectList(cpCore As coreClass, someCriteria As Integer) As List(Of visitorModel)
-            Dim result As New List(Of visitorModel)
+        Public Shared Function getObjectList(cpCore As coreClass, someCriteria As Integer) As List(Of visitModel)
+            Dim result As New List(Of visitModel)
             Try
                 Dim cs As New csController(cpCore)
                 Dim ignoreCacheNames As New List(Of String)
                 If (cs.open(primaryContentName, "(someCriteria=" & someCriteria & ")", "name", True, "id")) Then
-                    Dim instance As visitorModel
+                    Dim instance As visitModel
                     Do
-                        instance = visitorModel.create(cpCore, cs.getInteger("id"), ignoreCacheNames)
+                        instance = visitModel.create(cpCore, cs.getInteger("id"), ignoreCacheNames)
                         If (instance IsNot Nothing) Then
                             result.Add(instance)
                         End If
@@ -310,50 +363,7 @@ Namespace Contensive.Core.Models.Entity
         ''' <returns></returns>
         Private Shared Function getCacheName(fieldName As String, fieldValue As String) As String
             Return (primaryContentTableName & "." & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
-            'Return (GetType(visitorModel).FullName & "." & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
+            'Return (GetType(visitModel).FullName & "." & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
         End Function
-        '        '
-        '        ' LEGACY CODE =============================================================================
-        '        '   Save Visitor
-        '        '
-        '        '   Saves changes to the visitor record back to the database. Should be called
-        '        '   before exit of anypage if anything here changes
-        '        '=============================================================================
-        '        '
-        '        Public Sub saveObject(cpcore As coreClass)
-        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SaveVisitor")
-        '            '
-        '            'If Not (true) Then Exit Sub
-        '            '
-        '            Dim SQL As String
-        '            Dim MethodName As String
-        '            '
-        '            MethodName = "main_SaveVisitor"
-        '            '
-        '            If cpcore.visit.visit_initialized Then
-        '                If True Then
-        '                    SQL = "UPDATE ccVisitors SET " _
-        '                        & " Name = " & cpcore.db.encodeSQLText(name) _
-        '                        & ",MemberID = " & cpcore.db.encodeSQLNumber(memberID) _
-        '                        & ",OrderID = " & cpcore.db.encodeSQLNumber(orderID) _
-        '                        & ",ForceBrowserMobile = " & cpcore.db.encodeSQLNumber(forceBrowserMobile) _
-        '                        & " WHERE ID=" & id & ";"
-        '                Else
-        '                    SQL = "UPDATE ccVisitors SET " _
-        '                        & " Name = " & cpcore.db.encodeSQLText(name) _
-        '                        & ",MemberID = " & cpcore.db.encodeSQLNumber(memberID) _
-        '                        & ",OrderID = " & cpcore.db.encodeSQLNumber(orderID) _
-        '                        & " WHERE ID=" & id & ";"
-        '                End If
-        '                Call cpcore.db.executeSql(SQL)
-        '            End If
-        '            Exit Sub
-        '            '
-        '            ' ----- Error Trap
-        '            '
-        'ErrorTrap:
-        '            Call cpcore.handleLegacyError18(MethodName)
-        '            '
-        '        End Sub
     End Class
 End Namespace

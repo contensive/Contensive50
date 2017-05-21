@@ -1693,7 +1693,7 @@ Namespace Contensive.Core.Controllers
         Public Function cs_openSql(ByVal SQL As String, Optional ByVal DataSourceName As String = "", Optional ByVal PageSize As Integer = 9999, Optional ByVal PageNumber As Integer = 1) As Integer
             Dim returnCs As Integer = -1
             Try
-                returnCs = cs_init(cpCore.user.id)
+                returnCs = cs_init(cpcore.authContext.user.id)
                 With contentSetStore(returnCs)
                     .Updateable = False
                     .ContentName = ""
@@ -2594,7 +2594,7 @@ Namespace Contensive.Core.Controllers
                         Throw New ApplicationException("content [" & ContentName & "] could Not be found.")
                     Else
                         If MemberID = -1 Then
-                            MemberID = cpCore.user.id
+                            MemberID = cpcore.authContext.user.id
                         End If
                         With CDef
                             WorkflowAuthoringMode = .AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring
@@ -4921,7 +4921,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' --- no records were found, add a blank if we can
                     '
-                    dt = cpCore.db.insertTableRecordGetDataTable(DataSourceName, TableName, cpCore.user.id)
+                    dt = cpCore.db.insertTableRecordGetDataTable(DataSourceName, TableName, cpcore.authContext.user.id)
                     If dt.Rows.Count > 0 Then
                         RecordID = genericController.EncodeInteger(dt.Rows(0).Item("ID"))
                         Call cpCore.db.executeSql("Update " & TableName & " Set active=0 where id=" & RecordID & ";", DataSourceName)

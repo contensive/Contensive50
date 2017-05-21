@@ -344,8 +344,8 @@ Namespace Contensive.Core.Controllers
                     '
                     ' just in case - during transition from cpCoreClass to csv, in case a call is missing.
                     '
-                    personalizationPeopleId = cpCore.user.id
-                    personalizationIsAuthenticated = cpCore.user.isAuthenticated()
+                    personalizationPeopleId = cpcore.authContext.user.id
+                    personalizationIsAuthenticated = cpcore.authContext.user.isAuthenticated()
                 End If
                 '
                 ' ----- Set WorkingOptionString to what came in from the tag of the object
@@ -526,7 +526,7 @@ Namespace Contensive.Core.Controllers
                             GroupIDList = cpCore.csv_GetAddonOption("AllowGroups", WorkingOptionString)
                             GroupIDList = Trim(GroupIDList)
                             ' not webonly anymore
-                            If Not cpCore.user.isMemberOfGroupIdList(personalizationPeopleId, personalizationIsAuthenticated, GroupIDList) Then
+                            If Not cpcore.authContext.user.isMemberOfGroupIdList(personalizationPeopleId, personalizationIsAuthenticated, GroupIDList) Then
                                 HTMLContent = BlockTextStartMarker
                             End If
                             'If isMainOk Then
@@ -580,7 +580,7 @@ Namespace Contensive.Core.Controllers
                             '
                             ' Block all output even on error
                             '
-                        ElseIf cpCore.user.isAuthenticatedAdmin() Or cpCore.user.isAuthenticatedContentManager("Page Content") Then
+                        ElseIf cpcore.authContext.user.isAuthenticatedAdmin() Or cpcore.authContext.user.isAuthenticatedContentManager("Page Content") Then
                             '
                             ' Provide hint to administrators
                             '
@@ -588,7 +588,7 @@ Namespace Contensive.Core.Controllers
                                 AddonName = "Addon #" & addonId
                             End If
                             If Context = CPUtilsBaseClass.addonContext.ContextAdmin Then
-                                returnVal = "The Add-on '" & AddonName & "' could not be found. It may have been deleted or marked inactive. If you are receiving this message after clicking an Add-on from the Navigator, their may be a problem with this Add-on. If you are receiving this message from the main admin page, your Dashboard Add-on may be set incorrectly. Use the Admin tab under Preferences to select the Dashboard, or <a href=""?" & RequestNameDashboardReset & "=" & cpCore.visit.visit_Id & """>click here</a> to automatically reset the dashboard."
+                                returnVal = "The Add-on '" & AddonName & "' could not be found. It may have been deleted or marked inactive. If you are receiving this message after clicking an Add-on from the Navigator, their may be a problem with this Add-on. If you are receiving this message from the main admin page, your Dashboard Add-on may be set incorrectly. Use the Admin tab under Preferences to select the Dashboard, or <a href=""?" & RequestNameDashboardReset & "=" & cpCore.authContext.visit.Id & """>click here</a> to automatically reset the dashboard."
                             Else
                                 returnVal = "The Add-on '" & AddonName & "' could not be found. It may have been deleted or marked inactive. Please use the Add-on Manager to replace it, or edit this page and remove it."
                             End If
@@ -633,7 +633,7 @@ Namespace Contensive.Core.Controllers
                             If IncludeEditWrapper Then
                                 IncludeEditWrapper = IncludeEditWrapper _
                                     And (cpCore.visitProperty.getBoolean("AllowAdvancedEditor") _
-                                    And ((Context = CPUtilsBaseClass.addonContext.ContextAdmin) Or cpCore.user.isEditing(HostContentName)))
+                                    And ((Context = CPUtilsBaseClass.addonContext.ContextAdmin) Or cpcore.authContext.user.isEditing(HostContentName)))
                                 'IncludeEditWrapper = IncludeEditWrapper _
                                 '    And ( _
                                 '        ( _
@@ -1101,7 +1101,7 @@ Namespace Contensive.Core.Controllers
                                                 '
                                                 ' Block all output even on error
                                                 '
-                                            ElseIf cpCore.user.isAuthenticatedAdmin() Then
+                                            ElseIf cpcore.authContext.user.isAuthenticatedAdmin() Then
                                                 '
                                                 ' Provide hint to administrators
                                                 '
@@ -1322,7 +1322,7 @@ Namespace Contensive.Core.Controllers
                                     '        '
                                     '        ' Block all output even on error
                                     '        '
-                                    '    ElseIf  cpcore.user.user_isAdmin() Then
+                                    '    ElseIf  cpcore.authContext.user.user_isAdmin() Then
                                     '        '
                                     '        ' Provide hint to administrators
                                     '        '
@@ -1546,7 +1546,7 @@ Namespace Contensive.Core.Controllers
                 '
                 return_ExitAddonBlankWithResponse = True
                 Exit Function
-            ElseIf Not cpCore.user.isAuthenticatedAdmin() Then
+            ElseIf Not cpcore.authContext.user.isAuthenticatedAdmin() Then
                 '
                 ' Not Admin Error
                 '
@@ -1683,7 +1683,7 @@ Namespace Contensive.Core.Controllers
                                                                 CS = cpCore.db.cs_open("Copy Content", "name=" & cpCore.db.encodeSQLText(FieldName), "ID")
                                                                 If Not cpCore.db.cs_ok(CS) Then
                                                                     Call cpCore.db.cs_Close(CS)
-                                                                    CS = cpCore.db.cs_insertRecord("Copy Content", cpCore.user.id)
+                                                                    CS = cpCore.db.cs_insertRecord("Copy Content", cpcore.authContext.user.id)
                                                                 End If
                                                                 If cpCore.db.cs_ok(CS) Then
                                                                     Call cpCore.db.cs_set(CS, "name", FieldName)
@@ -1919,7 +1919,7 @@ Namespace Contensive.Core.Controllers
                                                             CS = cpCore.db.cs_open("Copy Content", "Name=" & cpCore.db.encodeSQLText(FieldName), "ID", , , , , "id,name,Copy")
                                                             If Not cpCore.db.cs_ok(CS) Then
                                                                 Call cpCore.db.cs_Close(CS)
-                                                                CS = cpCore.db.cs_insertRecord("Copy Content", cpCore.user.id)
+                                                                CS = cpCore.db.cs_insertRecord("Copy Content", cpcore.authContext.user.id)
                                                                 If cpCore.db.cs_ok(CS) Then
                                                                     RecordID = cpCore.db.cs_getInteger(CS, "ID")
                                                                     Call cpCore.db.cs_set(CS, "name", FieldName)
@@ -2940,7 +2940,7 @@ ErrorTrap:
         '=============================================================================================================
         '
         Public Function execute_legacy2(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal Option_String As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal IsIncludeAddon As Boolean, ByVal DefaultWrapperID As Integer, ByVal ignore_TemplateCaseOnly_PageContent As String, ByRef return_StatusOK As Boolean, ByVal nothingObject As Object, Optional ByVal AddonInUseIdList As String = "") As String
-            execute_legacy2 = execute(addonId, AddonNameOrGuid, Option_String, Context, HostContentName, HostRecordID, HostFieldName, ACInstanceID, IsIncludeAddon, DefaultWrapperID, ignore_TemplateCaseOnly_PageContent, return_StatusOK, nothingObject, AddonInUseIdList, Nothing, cpCore.htmlDoc.main_page_IncludedAddonIDList, cpCore.user.id, cpCore.user.isAuthenticated)
+            execute_legacy2 = execute(addonId, AddonNameOrGuid, Option_String, Context, HostContentName, HostRecordID, HostFieldName, ACInstanceID, IsIncludeAddon, DefaultWrapperID, ignore_TemplateCaseOnly_PageContent, return_StatusOK, nothingObject, AddonInUseIdList, Nothing, cpCore.htmlDoc.main_page_IncludedAddonIDList, cpcore.authContext.user.id, cpcore.authContext.user.isAuthenticated)
         End Function
         '
         '===============================================================================================================================================
@@ -2975,8 +2975,8 @@ ErrorTrap:
             Dim Ptr As Integer
             Dim Pos As Integer
             '
-            If cpCore.user.isAuthenticated() And ((ACInstanceID = "-2") Or (ACInstanceID = "-1") Or (ACInstanceID = "0") Or (RecordID <> 0)) Then
-                If cpCore.user.isEditingAnything() Then
+            If cpcore.authContext.user.isAuthenticated() And ((ACInstanceID = "-2") Or (ACInstanceID = "-1") Or (ACInstanceID = "0") Or (RecordID <> 0)) Then
+                If cpcore.authContext.user.isEditingAnything() Then
                     CopyHeader = CopyHeader _
                         & "<div class=""ccHeaderCon"">" _
                         & "<table border=0 cellpadding=0 cellspacing=0 width=""100%"">" _
@@ -3242,8 +3242,8 @@ ErrorTrap:
             Dim CS As Integer
             Dim AddonName As String
             '
-            If cpCore.user.isAuthenticated() And True Then
-                If cpCore.user.isEditingAnything() Then
+            If cpcore.authContext.user.isAuthenticated() And True Then
+                If cpcore.authContext.user.isEditingAnything() Then
                     CS = cpCore.csOpen(cnAddons, addonId)
                     If cpCore.db.cs_ok(CS) Then
                         AddonName = cpCore.db.cs_getText(CS, "name")
@@ -3357,8 +3357,8 @@ ErrorTrap:
             Dim InnerCopy As String
             Dim CollectionCopy As String
             '
-            If cpCore.user.isAuthenticated() Then
-                If cpCore.user.isEditingAnything() Then
+            If cpcore.authContext.user.isAuthenticated() Then
+                If cpcore.authContext.user.isEditingAnything() Then
                     StyleSN = genericController.EncodeInteger(cpCore.siteProperties.getText("StylesheetSerialNumber", "0"))
                     cpCore.htmlDoc.html_HelpViewerButtonID = "HelpBubble" & cpCore.htmlDoc.htmlDoc_HelpCodeCount
                     InnerCopy = helpCopy
@@ -3466,8 +3466,8 @@ ErrorTrap:
             Dim StyleSN As Integer
             Dim HTMLViewerBubbleID As String
             '
-            If cpCore.user.isAuthenticated() Then
-                If cpCore.user.isEditingAnything() Then
+            If cpcore.authContext.user.isAuthenticated() Then
+                If cpcore.authContext.user.isEditingAnything() Then
                     StyleSN = genericController.EncodeInteger(cpCore.siteProperties.getText("StylesheetSerialNumber", "0"))
                     HTMLViewerBubbleID = "HelpBubble" & cpCore.htmlDoc.htmlDoc_HelpCodeCount
                     '
@@ -3607,7 +3607,7 @@ ErrorTrap:
                 '
                 return_ExitRequest = True
                 Exit Function
-            ElseIf Not cpCore.user.isAuthenticatedAdmin() Then
+            ElseIf Not cpcore.authContext.user.isAuthenticatedAdmin() Then
                 '
                 ' Not Admin Error
                 '

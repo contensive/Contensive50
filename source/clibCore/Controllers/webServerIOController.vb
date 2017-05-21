@@ -919,7 +919,7 @@ Namespace Contensive.Core
                     'Call AppendLog("main_init(), 2400")
                     '
                     ''hint = "Initializing Visit"
-                    Call cpCore.visit.visit_init(cpCore.siteProperties.allowVisitTracking)
+                    cpCore.authContext = Models.Context.authContextModel.create(cpCore, cpCore.siteProperties.allowVisitTracking)
                     '
                     '--------------------------------------------------------------------------
                     ' ----- Process Early redirects, like PageNotFound
@@ -1443,9 +1443,9 @@ ErrorTrap:
             '
             ' Member Styles
             '
-            If cpCore.user.styleFilename <> "" Then
-                Call cpCore.htmlDoc.main_AddStylesheetLink2(webServerIO_requestProtocol & requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, cpCore.user.styleFilename), "member style")
-                cpCore.user.styleFilename = ""
+            If cpCore.authContext.user.styleFilename <> "" Then
+                Call cpCore.htmlDoc.main_AddStylesheetLink2(webServerIO_requestProtocol & requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, cpCore.authContext.user.styleFilename), "member style")
+                cpCore.authContext.user.styleFilename = ""
             End If
             '
             ' meta content

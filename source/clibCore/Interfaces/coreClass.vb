@@ -40,8 +40,8 @@ Namespace Contensive.Core
         ' -- state, authentication, authorization
         ' -- these are set id=0 at construction, then initialize if authentication used
         '
-        Public visit As New visitModel
-        Public visitor As New visitorModel
+        Public authContext As authContextModel
+        'Public visitor As New visitorModel
         '
         ' -- Debugging
         '
@@ -97,10 +97,6 @@ Namespace Contensive.Core
         End Class
         Public cache_addonIncludeRules As addonIncludeRulesClass
         '
-        'Private cache_addonIncludeRules.item As String(,)
-        'Private cache_addonIncludeRules.itemCnt As Integer = 0
-        'Private cache_addonIncludeRules.addonIdIndex As keyPtrIndexClass
-        '
         ' ----- libraryFiles
         '
         Public cache_libraryFiles As String(,)
@@ -111,31 +107,6 @@ Namespace Contensive.Core
         '
         Public cache_linkForward As String = ""
         '
-        '========================================================================================================================
-        '
-        ''========================================================================================================================
-        '' should have been addonTypeEnum
-        ''
-        'Public Enum CPUtilsBaseClass.addonContext
-        '    ' these should have been addonContextPage, etc.
-        '    ContextPage = 1
-        '    ContextAdmin = 2
-        '    ContextTemplate = 3
-        '    contextEmail = 4
-        '    ContextRemoteMethod = 5
-        '    ContextOnNewVisit = 6
-        '    ContextOnPageEnd = 7
-        '    ContextOnPageStart = 8
-        '    ContextEditor = 9
-        '    ContextHelpUser = 10
-        '    ContextHelpAdmin = 11
-        '    ContextHelpDeveloper = 12
-        '    ContextOnContentChange = 13
-        '    ContextFilter = 14
-        '    ContextSimple = 15
-        '    ContextOnBodyStart = 16
-        '    ContextOnBodyEnd = 17
-        'End Enum
         '
         ' should have been userTypeEnum
         ' only for main_GetFormInputWysiwig - to be deprecated anyway
@@ -478,12 +449,6 @@ Namespace Contensive.Core
         Private DefaultValueArray() As String
         Private DefaultValueArrayCnt As Integer
         '
-        ' Email Block List - these are people who have asked to not have email sent to them from this site
-        '   Loaded ondemand by csv_GetEmailBlockList
-        '
-        Private email_BlockList_Local As String = ""
-        Private email_BlockList_LocalLoaded As Boolean
-        '
         ' Attributes collected while composing content -
         '   These need to be added to the page or email after the content is complete.
         '   pages - after each encode content call, get these and add them into the page
@@ -507,6 +472,23 @@ Namespace Contensive.Core
         ' storage moved here from main - if addon move to csv is successful, this will stay
         '
         Public pageManager_PageAddonCnt As Integer = 0
+        '
+        '===================================================================================================
+        ''' <summary>
+        ''' pageManager - too many page link tie-ins to make it a real addon. Code internal to handle models, then call it with an addon
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public ReadOnly Property email As emailController
+            Get
+                If (_email Is Nothing) Then
+                    _email = New emailController(Me)
+                End If
+                Return _email
+            End Get
+        End Property
+        Private _email As emailController
         '
         '===================================================================================================
         ''' <summary>
@@ -867,23 +849,6 @@ Namespace Contensive.Core
             End Get
         End Property
         Private _domains As Models.Entity.domainLegacyModel = Nothing
-        '
-        '===================================================================================================
-        ''' <summary>
-        ''' siteProperties object
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public ReadOnly Property user() As coreUserClass
-            Get
-                If (_user Is Nothing) Then
-                    _user = New coreUserClass(Me)
-                End If
-                Return _user
-            End Get
-        End Property
-        Private _user As coreUserClass = Nothing
         '
         '===================================================================================================
         ''' <summary>
@@ -1500,138 +1465,6 @@ ErrorTrap:
 ErrorTrap:
             Call handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_DeleteContentTracking", True)
         End Sub
-        '
-        'Public Function sendEmail(ByVal ToAddress As String, ByVal FromAddress As String, ByVal SubjectMessage As String, ByVal BodyMessage As String, Optional ByVal ResultLogFilename As String = "", Optional ByVal Immediate As Boolean = False, Optional ByVal HTML As Boolean = True) As String
-        '    sendEmail = sendEmail3(ToAddress, FromAddress, SubjectMessage, BodyMessage, "", "", ResultLogFilename, Immediate, HTML, 0)
-        'End Function
-        ''
-        ''========================================================================
-        ''   Sends an email
-        ''    Returns blank if all OK
-        ''   Returns a string with the error if there was a problem
-        ''========================================================================
-        ''
-        'Public Function sendEmail2(ByVal ToAddress As String, ByVal FromAddress As String, ByVal SubjectMessage As String, ByVal BodyMessage As String, ByVal BounceAddress As String, ByVal ReplyToAddress As String, Optional ByVal ResultLogFilename As String = "", Optional ByVal Immediate As Boolean = False, Optional ByVal HTML As Boolean = False, Optional emailIdForLog As Integer = 0) As String
-        '    sendEmail2 = sendEmail3(ToAddress, FromAddress, SubjectMessage, BodyMessage, BounceAddress, ReplyToAddress, ResultLogFilename, Immediate, HTML, 0)
-        'End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Send Email
-        ''' </summary>
-        ''' <param name="ToAddress"></param>
-        ''' <param name="FromAddress"></param>
-        ''' <param name="SubjectMessage"></param>
-        ''' <param name="BodyMessage"></param>
-        ''' <param name="BounceAddress"></param>
-        ''' <param name="ReplyToAddress"></param>
-        ''' <param name="ResultLogFilename"></param>
-        ''' <param name="isImmediate"></param>
-        ''' <param name="isHTML"></param>
-        ''' <param name="emailIdOrZeroForLog"></param>
-        ''' <returns>OK if send is successful, otherwise returns the principle issue as a user error.</returns>
-        Public Function email_send3(ByVal ToAddress As String, ByVal FromAddress As String, ByVal SubjectMessage As String, ByVal BodyMessage As String, ByVal BounceAddress As String, ByVal ReplyToAddress As String, ByVal ResultLogFilename As String, ByVal isImmediate As Boolean, ByVal isHTML As Boolean, ByVal emailIdOrZeroForLog As Integer) As String
-            Dim returnStatus As String = ""
-            Try
-                '
-                Dim htmlBody As String
-                Dim rootUrl As String
-                Dim EmailHandler As New coreSmtpHandlerClass(Me)
-                Dim iResultLogPathPage As String
-                Dim WarningMsg As String = ""
-                Dim CSLog As Integer
-                '
-                If ToAddress = "" Then
-                    ' block
-                ElseIf (InStr(1, ToAddress, "@") = 0) Or (InStr(1, ToAddress, ".") = 0) Then
-                    ' block
-                ElseIf FromAddress = "" Then
-                    ' block
-                ElseIf (InStr(1, FromAddress, "@") = 0) Or (InStr(1, FromAddress, ".") = 0) Then
-                    ' block
-                ElseIf 0 <> genericController.vbInstr(1, getEmailBlockList_InternalOnly, vbCrLf & ToAddress & vbCrLf, vbTextCompare) Then
-                    '
-                    ' They are in the block list
-                    '
-                    returnStatus = "Recipient has blocked this email"
-                Else
-                    '
-                    iResultLogPathPage = ResultLogFilename
-                    '
-                    ' Test for from-address / to-address matches
-                    '
-                    If genericController.vbLCase(FromAddress) = genericController.vbLCase(ToAddress) Then
-                        FromAddress = siteProperties.getText("EmailFromAddress", "")
-                        If FromAddress = "" Then
-                            '
-                            '
-                            '
-                            FromAddress = ToAddress
-                            WarningMsg = "The from-address matches the to-address. This email was sent, but may be blocked by spam filtering."
-                        ElseIf genericController.vbLCase(FromAddress) = genericController.vbLCase(ToAddress) Then
-                            '
-                            '
-                            '
-                            WarningMsg = "The from-address matches the to-address. This email was sent, but may be blocked by spam filtering."
-                        Else
-                            '
-                            '
-                            '
-                            WarningMsg = "The from-address matches the to-address. The from-address was changed to " & FromAddress & " to prevent it from being blocked by spam filtering."
-                        End If
-                    End If
-                    '
-                    If isHTML Then
-                        '
-                        ' Fix links for HTML send
-                        '
-                        rootUrl = "http://" & serverConfig.appConfig.domainList(0) & "/"
-                        BodyMessage = genericController.ConvertLinksToAbsolute(BodyMessage, rootUrl)
-                        '
-                        ' compose body
-                        '
-                        htmlBody = "" _
-                            & "<html>" _
-                            & "<head>" _
-                            & "<Title>" & SubjectMessage & "</Title>" _
-                            & "<Base href=""" & rootUrl & """ >" _
-                            & "</head>" _
-                            & "<body class=""ccBodyEmail"">" _
-                            & "<Base href=""" & rootUrl & """ >" _
-                            & BodyMessage _
-                            & "</body>" _
-                            & "</html>"
-                        returnStatus = EmailHandler.sendEmail5(ToAddress, FromAddress, SubjectMessage, BodyMessage, BounceAddress, ReplyToAddress, iResultLogPathPage, siteProperties.getText("SMTPServer", "SMTP.YourServer.Com"), isImmediate, isHTML, "")
-                    Else
-                        returnStatus = EmailHandler.sendEmail5(ToAddress, FromAddress, SubjectMessage, BodyMessage, BounceAddress, ReplyToAddress, iResultLogPathPage, siteProperties.getText("SMTPServer", "SMTP.YourServer.Com"), isImmediate, isHTML, "")
-                    End If
-                    If (returnStatus = "") Then
-                        returnStatus = WarningMsg
-                    End If
-                    '
-                    ' ----- Log the send
-                    '
-                    If True Then
-                        CSLog = db.cs_insertRecord("Email Log", 0)
-                        If db.cs_ok(CSLog) Then
-                            Call db.cs_set(CSLog, "Name", "System Email Send " & CStr(Now()))
-                            Call db.cs_set(CSLog, "LogType", EmailLogTypeImmediateSend)
-                            Call db.cs_set(CSLog, "SendStatus", returnStatus)
-                            Call db.cs_set(CSLog, "toaddress", ToAddress)
-                            Call db.cs_set(CSLog, "fromaddress", FromAddress)
-                            Call db.cs_set(CSLog, "Subject", SubjectMessage)
-                            If emailIdOrZeroForLog <> 0 Then
-                                Call db.cs_set(CSLog, "emailid", emailIdOrZeroForLog)
-                            End If
-                        End If
-                        Call db.cs_Close(CSLog)
-                    End If
-                End If
-            Catch ex As Exception
-                handleExceptionAndRethrow(ex)
-            End Try
-            Return returnStatus
-        End Function
         '        '
         '        '========================================================================
         '        '   Returns an application link correctly filtered for the Siteproperty Domain
@@ -2178,45 +2011,6 @@ ErrorTrap:
         '
         '
         '
-        Private Function getEmailBlockList_InternalOnly() As String
-            '
-            Dim Filename As String
-            '
-            If Not email_BlockList_LocalLoaded Then
-                Filename = "Config\SMTPBlockList.txt"
-                email_BlockList_Local = privateFiles.readFile(Filename)
-                email_BlockList_LocalLoaded = True
-            End If
-            getEmailBlockList_InternalOnly = email_BlockList_Local
-            '
-        End Function
-
-        '
-        '
-        '
-        Public Sub email_addToEmailBlockList_InternalOnly(ByVal EmailAddress As String)
-            If EmailAddress = "" Then
-                '
-                ' bad email address
-                '
-            ElseIf (InStr(1, EmailAddress, "@") = 0) Or (InStr(1, EmailAddress, ".") = 0) Then
-                '
-                ' bad email address
-                '
-            ElseIf genericController.vbInstr(1, getEmailBlockList_InternalOnly(), vbCrLf & EmailAddress & vbTab, vbTextCompare) <> 0 Then
-                '
-                ' They are already in the list
-                '
-            Else
-                '
-                ' add them to the list
-                '
-                email_BlockList_Local = getEmailBlockList_InternalOnly() & vbCrLf & EmailAddress & vbTab & Now()
-                Call privateFiles.saveFile("Config\SMTPBlockList.txt", email_BlockList_Local)
-                email_BlockList_LocalLoaded = False
-            End If
-        End Sub
-        '
         '=====================================================================================================
         '   Insert into the ActivityLog
         '=====================================================================================================
@@ -2455,25 +2249,6 @@ ErrorTrap:
                 handleExceptionAndRethrow(ex)
             End Try
         End Sub
-        '
-        '
-        '
-        Public Function email_getEmailStyles(ByVal EmailID As Integer) As String
-            On Error GoTo ErrorTrap 'Const Tn = "getEmailStyles": 'Dim th as integer: th = profileLogMethodEnter(Tn)
-            '
-            email_getEmailStyles = htmlDoc.html_getStyleSheet2(csv_contentTypeEnum.contentTypeEmail, 0, genericController.EncodeInteger(EmailID))
-            If email_getEmailStyles <> "" Then
-                email_getEmailStyles = "" _
-                    & vbCrLf & StyleSheetStart _
-                    & vbCrLf & email_getEmailStyles _
-                    & vbCrLf & StyleSheetEnd
-            End If
-            '
-            '
-            Exit Function
-ErrorTrap:
-            handleExceptionAndRethrow(New Exception("Unexpected exception"))
-        End Function
         ''
         ''====================================================================================================
         '''' <summary>
@@ -2897,366 +2672,6 @@ ErrorTrap:
 ErrorTrap:
             Call handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_addLinkAlias", True)
         End Sub
-        '  
-        '========================================================================
-        ''' <summary>
-        ''' Send email to a memberId, returns ok if send is successful, otherwise returns the principle issue as a user error.
-        ''' </summary>
-        ''' <param name="ToMemberID"></param>
-        ''' <param name="FromAddress"></param>
-        ''' <param name="subject"></param>
-        ''' <param name="Body"></param>
-        ''' <param name="Immediate"></param>
-        ''' <param name="HTML"></param>
-        ''' <param name="emailIdOrZeroForLog"></param>
-        ''' <param name="template"></param>
-        ''' <param name="EmailAllowLinkEID"></param>
-        ''' <returns> returns ok if send is successful, otherwise returns the principle issue as a user error</returns>
-        Public Function email_sendMemberEmail3(ByVal ToMemberID As Integer, ByVal FromAddress As String, ByVal subject As String, ByVal Body As String, ByVal Immediate As Boolean, ByVal HTML As Boolean, ByVal emailIdOrZeroForLog As Integer, ByVal template As String, ByVal EmailAllowLinkEID As Boolean) As String
-            Dim returnStatus As String = ""
-            Try
-                Dim CS As Integer
-                Dim ToAddress As String
-                'Dim MethodName As String
-                Dim rootUrl As String
-                Dim layoutError As String = ""
-                Dim subjectEncoded As String
-                Dim bodyEncoded As String
-                Dim templateEncoded As String
-                '
-                subjectEncoded = subject
-                bodyEncoded = Body
-                templateEncoded = template
-                '
-                CS = db.cs_openContentRecord("People", ToMemberID, , , , "email")
-                If db.cs_ok(CS) Then
-                    ToAddress = Trim(db.cs_getText(CS, "email"))
-                    If ToAddress = "" Then
-                        returnStatus = "The email was not sent because the to-address was blank."
-                    ElseIf (InStr(1, ToAddress, "@") = 0) Or (InStr(1, ToAddress, ".") = 0) Then
-                        returnStatus = "The email was not sent because the to-address [" & ToAddress & "] was not valid."
-                    ElseIf FromAddress = "" Then
-                        returnStatus = "The email was not sent because the from-address was blank."
-                    ElseIf (InStr(1, FromAddress, "@") = 0) Or (InStr(1, FromAddress, ".") = 0) Then
-                        returnStatus = "The email was not sent because the from-address [" & FromAddress & "] was not valid."
-                    Else
-                        '
-                        ' encode subject
-                        '
-                        subjectEncoded = htmlDoc.html_executeContentCommands(Nothing, subjectEncoded, CPUtilsBaseClass.addonContext.ContextEmail, ToMemberID, True, layoutError)
-                        subjectEncoded = htmlDoc.html_encodeContent10(subjectEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
-                        '
-                        ' encode Body
-                        '
-                        bodyEncoded = htmlDoc.html_executeContentCommands(Nothing, bodyEncoded, CPUtilsBaseClass.addonContext.ContextEmail, ToMemberID, True, layoutError)
-                        bodyEncoded = htmlDoc.html_encodeContent10(bodyEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
-                        '
-                        ' encode template
-                        '
-                        If (templateEncoded <> "") Then
-                            templateEncoded = htmlDoc.html_executeContentCommands(Nothing, templateEncoded, CPUtilsBaseClass.addonContext.ContextEmail, ToMemberID, True, layoutError)
-                            templateEncoded = htmlDoc.html_encodeContent10(templateEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
-                            '
-                            If (InStr(1, templateEncoded, fpoContentBox) <> 0) Then
-                                bodyEncoded = genericController.vbReplace(templateEncoded, fpoContentBox, bodyEncoded)
-                            Else
-                                bodyEncoded = templateEncoded & bodyEncoded
-                            End If
-                        End If
-                        bodyEncoded = genericController.vbReplace(bodyEncoded, "#member_id#", ToMemberID.ToString)
-                        bodyEncoded = genericController.vbReplace(bodyEncoded, "#member_email#", ToAddress)
-                        '
-                        returnStatus = email_send3(ToAddress, FromAddress, subjectEncoded, bodyEncoded, "", "", "", Immediate, HTML, emailIdOrZeroForLog)
-                    End If
-                End If
-                Call db.cs_Close(CS)
-            Catch ex As Exception
-                handleExceptionAndRethrow(ex)
-            End Try
-            Return returnStatus
-        End Function
-        '
-        '========================================================================
-        ' Set the email sql for all members marked to receive the email
-        '   Used to send the email and as body on the email test
-        '========================================================================
-        '
-        Public Function email_getGroupEmailSQL(ByVal ToAll As Boolean, ByVal EmailID As Integer) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("getGroupEmailSQL")
-            '
-            ' converted array to dictionary - Dim FieldPointer As Integer
-            '
-            email_getGroupEmailSQL = ""
-            If ToAll Then
-                email_getGroupEmailSQL = "SELECT ccMembers.ID AS ID, ccMembers.Name AS Name, ccMembers.Email AS Email" _
-                    & " FROM ccMembers" _
-                    & " WHERE ((ccMembers.Email Is Not Null) AND (ccMembers.Active<>0) AND (ccMembers.AllowBulkEmail<>0))" _
-                    & " ORDER BY ccMembers.Email,ccMembers.ID"
-            Else
-                email_getGroupEmailSQL = "SELECT " _
-                    & " u.ID AS ID" _
-                    & " ,u.Name AS Name" _
-                    & " ,u.Email AS Email " _
-                    & " " _
-                    & " from " _
-                    & " (((ccMembers u" _
-                    & " left join ccMemberRules mr on mr.memberid=u.id)" _
-                    & " left join ccGroups g on g.id=mr.groupid)" _
-                    & " left join ccEmailGroups r on r.groupid=g.id)" _
-                    & " " _
-                    & " where " _
-                    & " (r.EmailID=1) " _
-                    & " and(r.Active<>0) " _
-                    & " and(g.Active<>0) " _
-                    & " and(g.AllowBulkEmail<>0) " _
-                    & " and(mr.Active<>0) " _
-                    & " and(u.Active<>0) " _
-                    & " and(u.AllowBulkEmail<>0)" _
-                    & " AND((mr.DateExpires is null)OR(mr.DateExpires>'20161205 22:40:58:184')) " _
-                    & " " _
-                    & " group by " _
-                    & " u.ID, u.Name, u.Email " _
-                    & " " _
-                    & " having ((u.Email Is Not Null) and(u.Email<>'')) " _
-                    & " " _
-                    & " order by u.Email,u.ID" _
-                    & " "
-                'csv_getGroupEmailSQL = "SELECT ccMembers.ID AS ID, ccMembers.Name AS Name, ccMembers.Email AS Email" _
-                '    & " FROM (ccEmailGroups LEFT JOIN ccGroups ON ccEmailGroups.GroupID = ccGroups.ID) LEFT JOIN (ccMemberRules LEFT JOIN ccMembers ON ccMemberRules.MemberID = ccMembers.ID) ON ccGroups.ID = ccMemberRules.GroupID" _
-                '    & " WHERE (((ccEmailGroups.EmailID)=" & EncodeSQLNumber(EmailID) & ") AND (ccEmailGroups.Active<>0) AND (ccGroups.Active<>0) AND (ccGroups.AllowBulkEmail<>0) AND (ccMemberRules.Active<>0) AND (ccMembers.Active<>0) AND ((ccMembers.AllowBulkEmail)<>0))AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & EncodeSQLDate(Now()) & "))" _
-                '    & " GROUP BY ccMembers.ID, ccMembers.Name, ccMembers.Email" _
-                '    & " HAVING (((ccMembers.Email) Is Not Null) and ((ccMembers.Email)<>" & EncodeSQLText("") & "))" _
-                '    & " ORDER BY ccMembers.Email,ccMembers.ID"
-            End If
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError7("csv_getGroupEmailSQL", "Unexpected Trap")
-        End Function
-        '
-        ' ----- Need to test this and make it public
-        '
-        '   This is what the admin site should call for both test and group email
-        '   Making it public lets developers send email that administrators can control
-        '
-        Public Function csv_SendSystemEmail(ByVal EMailName As String, ByVal AdditionalCopy As String, ByVal AdditionalMemberIDOrZero As Integer) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SendSystemEmail")
-            '
-            Dim returnString As String
-            Dim isAdmin As Boolean
-            Dim iAdditionalMemberID As Integer
-            Dim layoutError As String
-            Dim emailstyles As String
-            Dim EmailRecordID As Integer
-            Dim CSPeople As Integer
-            Dim CSEmail As Integer
-            Dim CSLog As Integer
-            Dim EmailToAddress As String
-            Dim EmailToName As String
-            Dim SQL As String
-            Dim EmailFrom As String
-            Dim EmailSubjectSource As String
-            Dim EmailBodySource As String
-            Dim ConfirmBody As String
-            Dim EmailAllowLinkEID As Boolean
-            Dim EmailToConfirmationMemberID As Integer
-            Dim EmailStatusMessage As String
-            Dim EMailToMemberID As Integer
-            Dim EmailSubject As String
-            Dim ClickFlagQuery As String
-            Dim EmailBody As String
-            Dim EmailStatus As String
-            Dim BounceAddress As String
-            Dim SelectList As String
-            Dim EMailTemplateID As Integer
-            Dim EmailTemplate As String
-            Dim EmailTemplateSource As String
-            Dim CS As Integer
-            Dim isValid As Boolean
-            '
-            returnString = ""
-            iAdditionalMemberID = AdditionalMemberIDOrZero
-            '
-            If True Then
-                SelectList = "ID,TestMemberID,FromAddress,Subject,copyfilename,AddLinkEID,AllowSpamFooter,EmailTemplateID"
-            Else
-                SelectList = "ID,TestMemberID,FromAddress,Subject,copyfilename,AddLinkEID,AllowSpamFooter,0 as EmailTemplateID"
-            End If
-            CSEmail = db.cs_open("System Email", "name=" & db.encodeSQLText(EMailName), "ID", , , , , SelectList)
-            If Not db.cs_ok(CSEmail) Then
-                '
-                ' ----- Email was not found
-                '
-                Call db.cs_Close(CSEmail)
-                CSEmail = db.cs_insertRecord("System Email")
-                Call db.cs_set(CSEmail, "name", EMailName)
-                Call db.cs_set(CSEmail, "Subject", EMailName)
-                Call db.cs_set(CSEmail, "FromAddress", siteProperties.getText("EmailAdmin", "webmaster@" & serverConfig.appConfig.domainList(0)))
-                'Call app.csv_SetCS(CSEmail, "caption", EmailName)
-                Call db.cs_Close(CSEmail)
-                Call Err.Raise(ignoreInteger, "dll", "No system email was found with the name [" & EMailName & "]. A new email blank was created but not sent.")
-            Else
-                '
-                ' --- collect values needed for send
-                '
-                EmailRecordID = db.cs_getInteger(CSEmail, "ID")
-                EmailToConfirmationMemberID = db.cs_getInteger(CSEmail, "testmemberid")
-                EmailFrom = db.cs_getText(CSEmail, "FromAddress")
-                EmailSubjectSource = db.cs_getText(CSEmail, "Subject")
-                EmailBodySource = db.cs_get(CSEmail, "copyfilename") & AdditionalCopy
-                EmailAllowLinkEID = db.cs_getBoolean(CSEmail, "AddLinkEID")
-                BounceAddress = siteProperties.getText("EmailBounceAddress", "")
-                If BounceAddress = "" Then
-                    BounceAddress = EmailFrom
-                End If
-                EMailTemplateID = db.cs_getInteger(CSEmail, "EmailTemplateID")
-                '
-                ' Get the Email Template
-                '
-                If EMailTemplateID <> 0 Then
-                    CS = db.cs_openContentRecord("Email Templates", EMailTemplateID)
-                    If db.cs_ok(CS) Then
-                        EmailTemplateSource = db.cs_get(CS, "BodyHTML")
-                    End If
-                    Call db.cs_Close(CS)
-                End If
-                If EmailTemplateSource = "" Then
-                    EmailTemplateSource = "<div style=""padding:10px""><ac type=content></div>"
-                End If
-                '
-                ' add styles to the template
-                '
-                emailstyles = email_getEmailStyles(EmailRecordID)
-                EmailTemplateSource = emailstyles & EmailTemplateSource
-                '
-                ' Spam Footer
-                '
-                If db.cs_getBoolean(CSEmail, "AllowSpamFooter") Then
-                    '
-                    ' This field is default true, and non-authorable
-                    ' It will be true in all cases, except a possible unforseen exception
-                    '
-                    EmailTemplateSource = EmailTemplateSource & "<div style=""clear: both;padding:10px;"">" & csv_GetLinkedText("<a href=""" & htmlDoc.html_EncodeHTML("http://" & serverConfig.appConfig.domainList(0) & "/" & siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
-                End If
-                '
-                ' --- Send message to the additional member
-                '
-                If iAdditionalMemberID <> 0 Then
-                    EmailStatusMessage = EmailStatusMessage & BR & "Primary Recipient:" & BR
-                    CSPeople = db.cs_openContentRecord("People", iAdditionalMemberID, , , , "ID,Name,Email")
-                    If db.cs_ok(CSPeople) Then
-                        EMailToMemberID = db.cs_getInteger(CSPeople, "ID")
-                        EmailToName = db.cs_getText(CSPeople, "name")
-                        EmailToAddress = db.cs_getText(CSPeople, "email")
-                        If EmailToAddress = "" Then
-                            EmailStatusMessage = EmailStatusMessage & "&nbsp;&nbsp;Error: Not Sent to " & EmailToName & " (people #" & EMailToMemberID & ") because their email address was blank." & BR
-                        Else
-                            EmailStatus = email_sendMemberEmail3(iAdditionalMemberID, EmailFrom, EmailSubjectSource, EmailBodySource, False, True, EmailRecordID, EmailTemplateSource, EmailAllowLinkEID)
-                            If EmailStatus = "" Then
-                                EmailStatus = "ok"
-                            End If
-                            EmailStatusMessage = EmailStatusMessage & "&nbsp;&nbsp;Sent to " & EmailToName & " at " & EmailToAddress & ", Status = " & EmailStatus & BR
-                        End If
-                    End If
-                    Call db.cs_Close(CSPeople)
-                End If
-                '
-                ' --- Send message to everyone selected
-                '
-                EmailStatusMessage = EmailStatusMessage & BR & "Recipients in selected System Email groups:" & BR
-                SQL = email_getGroupEmailSQL(False, EmailRecordID)
-                CSPeople = db.cs_openCsSql_rev("default", SQL)
-                Do While db.cs_ok(CSPeople)
-                    EMailToMemberID = db.cs_getInteger(CSPeople, "ID")
-                    EmailToName = db.cs_getText(CSPeople, "name")
-                    EmailToAddress = db.cs_getText(CSPeople, "email")
-                    If EmailToAddress = "" Then
-                        EmailStatusMessage = EmailStatusMessage & "&nbsp;&nbsp;Not Sent to " & EmailToName & ", people #" & EMailToMemberID & " because their email address was blank." & BR
-                    Else
-                        EmailStatus = email_sendMemberEmail3(EMailToMemberID, EmailFrom, EmailSubjectSource, EmailBodySource, False, True, EmailRecordID, EmailTemplateSource, EmailAllowLinkEID)
-                        If EmailStatus = "" Then
-                            EmailStatus = "ok"
-                        End If
-                        EmailStatusMessage = EmailStatusMessage & "&nbsp;&nbsp;Sent to " & EmailToName & " at " & EmailToAddress & ", Status = " & EmailStatus & BR
-                        Call db.cs_goNext(CSPeople)
-                    End If
-                Loop
-                Call db.cs_Close(CSPeople)
-                '
-                ' --- Send the completion message to the administrator
-                '
-                If EmailToConfirmationMemberID = 0 Then
-                    ' AddUserError ("No confirmation email was sent because no confirmation member was selected")
-                Else
-                    '
-                    ' get the confirmation info
-                    '
-                    isValid = False
-                    CSPeople = db.cs_openContentRecord("people", EmailToConfirmationMemberID)
-                    If db.cs_ok(CSPeople) Then
-                        isValid = db.cs_getBoolean(CSPeople, "active")
-                        EMailToMemberID = db.cs_getInteger(CSPeople, "ID")
-                        EmailToName = db.cs_getText(CSPeople, "name")
-                        EmailToAddress = db.cs_getText(CSPeople, "email")
-                        isAdmin = db.cs_getBoolean(CSPeople, "admin")
-                    End If
-                    Call db.cs_Close(CSPeople)
-                    '
-                    If Not isValid Then
-                        'returnString = "Administrator: The confirmation email was not sent because the confirmation email person is not selected or inactive, " & EmailStatus
-                    Else
-                        '
-                        ' Encode the body
-                        '
-                        EmailBody = EmailBodySource & ""
-                        '
-                        ' Encode the template
-                        '
-                        EmailTemplate = EmailTemplateSource
-                        '
-                        EmailSubject = EmailSubjectSource
-                        '
-                        ConfirmBody = ConfirmBody & "<div style=""padding:10px;"">" & BR
-                        ConfirmBody = ConfirmBody & "The follow System Email was sent." & BR
-                        ConfirmBody = ConfirmBody & "" & BR
-                        ConfirmBody = ConfirmBody & "If this email includes personalization, each email sent was personalized to it's recipient. This confirmation has been personalized to you." & BR
-                        ConfirmBody = ConfirmBody & "" & BR
-                        ConfirmBody = ConfirmBody & "Subject: " & EmailSubject & BR
-                        ConfirmBody = ConfirmBody & "From: " & EmailFrom & BR
-                        ConfirmBody = ConfirmBody & "Bounces return to: " & BounceAddress & BR
-                        ConfirmBody = ConfirmBody & "Body:" & BR
-                        ConfirmBody = ConfirmBody & "<div style=""clear:all"">----------------------------------------------------------------------</div>" & BR
-                        ConfirmBody = ConfirmBody & EmailBody & BR
-                        ConfirmBody = ConfirmBody & "<div style=""clear:all"">----------------------------------------------------------------------</div>" & BR
-                        ConfirmBody = ConfirmBody & "--- recipient list ---" & BR
-                        ConfirmBody = ConfirmBody & EmailStatusMessage & BR
-                        ConfirmBody = ConfirmBody & "--- end of list ---" & BR
-                        ConfirmBody = ConfirmBody & "</div>"
-                        '
-                        EmailStatus = email_sendMemberEmail3(EmailToConfirmationMemberID, EmailFrom, "System Email confirmation from " & serverConfig.appConfig.domainList(0), ConfirmBody, False, True, EmailRecordID, "", False)
-                        If isAdmin And (EmailStatus <> "") Then
-                            returnString = "Administrator: There was a problem sending the confirmation email, " & EmailStatus
-                        End If
-                    End If
-                End If
-                '
-                ' ----- Done
-                '
-                Call db.cs_Close(CSPeople)
-            End If
-            Call db.cs_Close(CSEmail)
-            '
-            csv_SendSystemEmail = returnString
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError7("csv_SendSystemEmail", "Unexpected Trap")
-        End Function
         '
         '
         '
@@ -3400,17 +2815,17 @@ ErrorTrap:
                     ' Sest to blank
                     '
                     AllowChange = True
-                ElseIf genericController.vbUCase(Newusername) <> genericController.vbUCase(user.username) Then
+                ElseIf genericController.vbUCase(Newusername) <> genericController.vbUCase(authContext.user.username) Then
                     '
                     ' ----- username changed, check if change is allowed
                     '
-                    If Not user.isNewLoginOK(Newusername, NewPassword, ErrorMessage, ErrorCode) Then
+                    If Not authContext.user.isNewLoginOK(Newusername, NewPassword, ErrorMessage, ErrorCode) Then
                         error_AddUserError(ErrorMessage)
                         AllowChange = False
                     End If
                 End If
                 If AllowChange Then
-                    CSMember = db.cs_open("people", "id=" & db.encodeSQLNumber(user.id))
+                    CSMember = db.cs_open("people", "id=" & db.encodeSQLNumber(authContext.user.id))
                     If Not db.cs_ok(CSMember) Then
                         Call error_AddUserError("There was a problem locating your account record. No changes were saved.")
                         ' if user error, it goes back to the hardcodedpage
@@ -3430,7 +2845,7 @@ ErrorTrap:
                                     FieldName = field.nameLc
                                     FieldValue = docProperties.getText(FieldName)
                                     If FieldValue <> "" Then
-                                        CSTest = db.cs_open(ContentName, "(" & FieldName & "=" & db.encodeSQLText(FieldValue) & ")and(ID<>" & user.id & ")")
+                                        CSTest = db.cs_open(ContentName, "(" & FieldName & "=" & db.encodeSQLText(FieldValue) & ")and(ID<>" & authContext.user.id & ")")
                                         If db.cs_ok(CSTest) Then
                                             Call error_AddUserError("The field '" & FieldName & "' must be unique, and another account has already used '" & FieldValue & "'")
                                         End If
@@ -3498,7 +2913,7 @@ ErrorTrap:
                             If siteProperties.getBoolean("AllowAutoLogin", False) Then
                                 Call main_ProcessFormMyProfile_UpdateFieldBoolean(CSMember, "AutoLogin")
                             End If
-                            If user.isAuthenticatedContentManager() Then
+                            If authContext.user.isAuthenticatedContentManager() Then
                                 Call main_ProcessFormMyProfile_UpdateFieldBoolean(CSMember, "AllowToolsPanel")
                             End If
                             '
@@ -3508,7 +2923,7 @@ ErrorTrap:
                             '
                             ' --- Update Group Records
                             '
-                            Call main_ProcessCheckList("MemberRules", "Members", genericController.encodeText(user.id), "Groups", "Member Rules", "MemberID", "GroupID")
+                            Call main_ProcessCheckList("MemberRules", "Members", genericController.encodeText(authContext.user.id), "Groups", "Member Rules", "MemberID", "GroupID")
                             '
                             '
                             '
@@ -3547,7 +2962,7 @@ ErrorTrap:
             '
             FieldValue = docProperties.getText(FieldName)
             If db.cs_getText(CSMember, FieldName) <> FieldValue Then
-                Call log_LogActivity2("profile changed " & FieldName, user.id, user.organizationId)
+                Call log_LogActivity2("profile changed " & FieldName, authContext.user.id, authContext.user.organizationId)
                 Call db.cs_set(CSMember, FieldName, FieldValue)
             End If
             Exit Sub
@@ -3569,7 +2984,7 @@ ErrorTrap:
             '
             FieldValue = docProperties.getBoolean(FieldName)
             If db.cs_getBoolean(CSMember, FieldName) <> FieldValue Then
-                Call log_LogActivity2("profile changed " & FieldName, user.id, user.organizationId)
+                Call log_LogActivity2("profile changed " & FieldName, authContext.user.id, authContext.user.organizationId)
                 Call db.cs_set(CSMember, FieldName, FieldValue)
             End If
             Exit Sub
@@ -3697,7 +3112,7 @@ ErrorTrap:
                 iMessage = genericController.vbReplace(iMessage, vbCrLf, " ")
                 iMessage = genericController.vbReplace(iMessage, vbCr, " ")
                 iMessage = genericController.vbReplace(iMessage, vbLf, " ")
-                iMessage = FormatDateTime(Now, vbShortTime) & vbTab & Format((ElapsedTime), "00.000") & vbTab & visit.visit_Id & vbTab & iMessage
+                iMessage = FormatDateTime(Now, vbShortTime) & vbTab & Format((ElapsedTime), "00.000") & vbTab & authContext.visit.ID & vbTab & iMessage
                 '
                 logController.log_appendLog(Me, iMessage, "", "testPoints_" & serverConfig.appConfig.name)
             End If
@@ -4320,7 +3735,7 @@ ErrorTrap:
             '
             MethodName = "main_GetToolsPanel"
             '
-            If user.allowToolsPanel Then
+            If authContext.user.allowToolsPanel Then
                 ShowLegacyToolsPanel = siteProperties.getBoolean("AllowLegacyToolsPanel", True)
                 '
                 ' --- Link Panel - used for both Legacy Tools Panel, and without it
@@ -4334,7 +3749,7 @@ ErrorTrap:
                 LinkPanel.Add("<a class=""ccAdminLink"" href=""" & htmlDoc.html_EncodeHTML("http://" & webServer.webServerIO_requestDomain) & """>Public Home</A> | ")
                 LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & htmlDoc.html_EncodeHTML(siteProperties.adminURL & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
                 If siteProperties.getBoolean("AllowMobileTemplates", False) Then
-                    If visit.visit_browserIsMobile Then
+                    If authContext.visit_browserIsMobile Then
                         QS = web_RefreshQueryString
                         QS = genericController.ModifyQueryString(QS, "method", "forcenonmobile")
                         LinkPanel.Add("<a class=""ccAdminLink"" href=""?" & QS & """>Non-Mobile Version</A> | ")
@@ -4440,7 +3855,7 @@ ErrorTrap:
                         '
                         ' Create Path Block Row
                         '
-                        If user.isAuthenticatedDeveloper() Then
+                        If authContext.user.isAuthenticatedDeveloper() Then
                             TagID = "CreatePathBlock"
                             If siteProperties.allowPathBlocking Then
                                 '
@@ -4483,10 +3898,10 @@ ErrorTrap:
                     '
                     ' ----- Create the Login Panel
                     '
-                    If Trim(user.name) = "" Then
-                        Copy = "You are logged in as member #" & user.id & "."
+                    If Trim(authContext.user.name) = "" Then
+                        Copy = "You are logged in as member #" & authContext.user.id & "."
                     Else
-                        Copy = "You are logged in as " & user.name & "."
+                        Copy = "You are logged in as " & authContext.user.name & "."
                     End If
                     LoginPanel = LoginPanel & "" _
                         & cr & "<div class=""ccAdminSmall"">" _
@@ -4523,7 +3938,7 @@ ErrorTrap:
                     ' Autologin checkbox
                     '
                     If siteProperties.getBoolean("AllowAutoLogin", False) Then
-                        If visit.visit_cookieSupport Then
+                        If authContext.visit.CookieSupport Then
                             TagID = "autologin"
                             LoginPanel = LoginPanel & "" _
                                 & cr & "<div class=""ccAdminSmall"">" _
@@ -4640,10 +4055,10 @@ ErrorTrap:
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Visit Pages", genericController.encodeText(main_VisitPages))
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Visitor ID", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("visitors") & "&af=4&id=" & main_VisitorID & """>" & main_VisitorID & "</a>")
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Visitor New", genericController.encodeText(main_VisitorNew))
-                    'DebugPanel = DebugPanel & main_DebugPanelRow("Member ID", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("people") & "&af=4&id=" & user.userId & """>" & user.userId & "</a>")
-                    'DebugPanel = DebugPanel & main_DebugPanelRow("Member Name", html.html_EncodeHTML(user.userName))
-                    'DebugPanel = DebugPanel & main_DebugPanelRow("Member New", genericController.encodeText(user.userIsNew))
-                    'DebugPanel = DebugPanel & main_DebugPanelRow("Member Language", user.userLanguage)
+                    'DebugPanel = DebugPanel & main_DebugPanelRow("Member ID", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("people") & "&af=4&id=" & authcontext.user.userId & """>" & authcontext.user.userId & "</a>")
+                    'DebugPanel = DebugPanel & main_DebugPanelRow("Member Name", html.html_EncodeHTML(authContext.user.userName))
+                    'DebugPanel = DebugPanel & main_DebugPanelRow("Member New", genericController.encodeText(authContext.user.userIsNew))
+                    'DebugPanel = DebugPanel & main_DebugPanelRow("Member Language", authcontext.user.userLanguage)
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Page", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("page content") & "&af=4&id=" & main_RenderedPageID & """>" & main_RenderedPageID & ", " & main_RenderedPageName & "</a>")
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Section", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("site sections") & "&af=4&id=" & main_RenderedSectionID & """>" & main_RenderedSectionID & ", " & main_RenderedSectionName & "</a>")
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Template", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("page templates") & "&af=4&id=" & main_RenderedTemplateID & """>" & main_RenderedTemplateID & ", " & main_RenderedTemplateName & "</a>")
@@ -4653,10 +4068,10 @@ ErrorTrap:
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Krnl ProcessID", genericController.encodeText(csv_HostServiceProcessID))
                     DebugPanel = DebugPanel & main_DebugPanelRow("Render Time &gt;= ", Format((GetTickCount - app_startTickCount) / 1000, "0.000") & " sec")
                     If True Then
-                        VisitHrs = CInt(visit.visit_timeToLastHit / 3600)
-                        VisitMin = CInt(visit.visit_timeToLastHit / 60) - (60 * VisitHrs)
-                        VisitSec = visit.visit_timeToLastHit Mod 60
-                        DebugPanel = DebugPanel & main_DebugPanelRow("Visit Length", CStr(visit.visit_timeToLastHit) & " sec, (" & VisitHrs & " hrs " & VisitMin & " mins " & VisitSec & " secs)")
+                        VisitHrs = CInt(authContext.visit.TimeToLastHit / 3600)
+                        VisitMin = CInt(authContext.visit.TimeToLastHit / 60) - (60 * VisitHrs)
+                        VisitSec = authContext.visit.TimeToLastHit Mod 60
+                        DebugPanel = DebugPanel & main_DebugPanelRow("Visit Length", CStr(authContext.visit.TimeToLastHit) & " sec, (" & VisitHrs & " hrs " & VisitMin & " mins " & VisitSec & " secs)")
                         'DebugPanel = DebugPanel & main_DebugPanelRow("Visit Length", CStr(main_VisitTimeToLastHit) & " sec, (" & Int(main_VisitTimeToLastHit / 60) & " min " & (main_VisitTimeToLastHit Mod 60) & " sec)")
                     End If
                     DebugPanel = DebugPanel & main_DebugPanelRow("Addon Profile", "<hr><ul class=""ccPanel"">" & "<li>tbd</li>" & cr & "</ul>")
@@ -4801,7 +4216,7 @@ ErrorTrap:
         '            '
         '            MethodName = "main_GetJoinForm"
         '            '
-        '            CSPeople = app.csOpen("people", "ID=" & user.userid)
+        '            CSPeople = app.csOpen("people", "ID=" & authcontext.user.userid)
         '            If Not app.csOk(CSPeople) Then
         '                '
         '                ' ----- could not open people, can not continue
@@ -4809,7 +4224,7 @@ ErrorTrap:
         '                Call handleLegacyError14(MethodName, "main_GetJoinForm, could not open the guest identity")
         '            Else
         '                If True Then
-        '                    If user.user_isRecognized() And Not user.user_isAuthenticated() Then
+        '                    If authcontext.user.user_isRecognized() And Not authcontext.user.user_isAuthenticated() Then
         '                        '
         '                        ' ----- Recognized but Not authenticated
         '                        '
@@ -4899,7 +4314,7 @@ ErrorTrap:
         '            '
         '            MethodName = "main_GetMyProfileForm"
         '            '
-        '            If Not user.user_isAuthenticated() Then
+        '            If Not authcontext.user.user_isAuthenticated() Then
         '                Call error_AddUserError("You can not edit your MyAccount page until you have logged in.")
         '            Else
         '                CSMember = main_OpenContent("People", "ID=" & app.EncodeSQLNumber(iPeopleID))
@@ -4976,7 +4391,7 @@ ErrorTrap:
         '                    If genericController.EncodeBoolean(app.siteProperty_getBoolean("AllowAutoLogin", False)) Then
         '                        s.Add(main_GetMyProfileForm_RowCS(CSMember, "People", "autologin", "This site allows automatic login. If this box is check, you will enable this function for your member account.", RowCount) & vbCrLf)
         '                    End If
-        '                    If user.main_IsContentManager() Then
+        '                    If authcontext.user.main_IsContentManager() Then
         '                        s.Add(main_GetMyProfileForm_RowCS(CSMember, "People", "allowtoolspanel", "If checked, a tools panel appears at the bottom of every active page with acceStream to key administrative functions.", RowCount) & vbCrLf)
         '                    End If
         '                    s.Add(TableClose)
@@ -5005,7 +4420,7 @@ ErrorTrap:
         '                    '
         '                    s = New coreFastStringClass
         '                    s.Add(TableOpen)
-        '                    s.Add(main_GetMyProfileForm_Row("Member Number", genericController.encodeText(user.userid)) & vbCrLf)
+        '                    s.Add(main_GetMyProfileForm_Row("Member Number", genericController.encodeText(authContext.user.userid)) & vbCrLf)
         '                    s.Add(main_GetMyProfileForm_Row("Visitor Number", genericController.encodeText(main_VisitorID)) & vbCrLf)
         '                    s.Add(main_GetMyProfileForm_Row("Visit Number", genericController.encodeText(main_VisitId)) & vbCrLf)
         '                    CSLastVisit = app.csOpen("Visits", "MemberID=" & iPeopleID, "ID DESC")
@@ -5074,7 +4489,7 @@ ErrorTrap:
         '            '
         '            MethodName = "main_Get_old_MyProfileForm"
         '            '
-        '            If Not user.user_isAuthenticated() Then
+        '            If Not authcontext.user.user_isAuthenticated() Then
         '                Call error_AddUserError("You can not edit your MyAccount page until you have logged in.")
         '            Else
         '                CSMember = main_OpenContent("People", "ID=" & db.EncodeSQLNumber(iPeopleID))
@@ -5154,7 +4569,7 @@ ErrorTrap:
         '                    If siteProperties.getBoolean("AllowAutoLogin", False) Then
         '                        Stream.Add(main_GetMyProfileForm_RowCS(CSMember, "People", "autologin", "This site allows automatic login. If this box is check, you will enable this function for your member account.", RowCount) & vbCrLf)
         '                    End If
-        '                    If user.main_IsContentManager() Then
+        '                    If authcontext.user.main_IsContentManager() Then
         '                        Stream.Add(main_GetMyProfileForm_RowCS(CSMember, "People", "allowtoolspanel", "If checked, a tools panel appears at the bottom of every active page with acceStream to key administrative functions.", RowCount) & vbCrLf)
         '                    End If
         '                    '
@@ -5176,7 +4591,7 @@ ErrorTrap:
         '                    ' ----- Records
         '                    '
         '                    Stream.Add("<tr><td colspan=""2"">" & SpanClassAdminNormal & "<b>Statistics</b></span><br ><img src=""/ccLib/images/black.gif"" width=""100%"" height=""1"" ></td></tr>" & vbCrLf)
-        '                    Stream.Add(main_GetMyProfileForm_Row("Member Number", genericController.encodeText(user.userId)) & vbCrLf)
+        '                    Stream.Add(main_GetMyProfileForm_Row("Member Number", genericController.encodeText(authContext.user.userId)) & vbCrLf)
         '                    Stream.Add(main_GetMyProfileForm_Row("Visitor Number", genericController.encodeText(main_VisitorID)) & vbCrLf)
         '                    Stream.Add(main_GetMyProfileForm_Row("Visit Number", genericController.encodeText(main_VisitId)) & vbCrLf)
         '                    CSLastVisit = db.csOpen("Visits", "MemberID=" & iPeopleID, "ID DESC")
@@ -5318,7 +4733,7 @@ ErrorTrap:
         '            '
         '            SQL = "SELECT ccTopics.Name as Name, Sum( ccTopicHabits.Score ) as Score" _
         '                & " FROM ccTopics LEFT JOIN ccTopicHabits ON ccTopics.ID = ccTopicHabits.TopicID" _
-        '                & " WHERE (((ccTopics.Active)<>0) AND ((ccTopicHabits.MemberID)=" & user.userId & ")) OR (((ccTopics.Active)<>0) AND ((ccTopicHabits.MemberID) Is Null))" _
+        '                & " WHERE (((ccTopics.Active)<>0) AND ((ccTopicHabits.MemberID)=" & authcontext.user.userId & ")) OR (((ccTopics.Active)<>0) AND ((ccTopicHabits.MemberID) Is Null))" _
         '                & " Group By ccTopics.name" _
         '                & " Order by ccTopics.Name"
         '            CS = db.csOpenSql(SQL)
@@ -5367,11 +4782,11 @@ ErrorTrap:
         '            '
         '            MethodName = "main_GetMyProfileForm_Groups"
         '            '
-        '            If Not user.user_isAdmin() Then
+        '            If Not authcontext.user.user_isAdmin() Then
         '                PublicJoinCriteria = "ccgroups.PublicJoin<>0"
         '            End If
         '            '
-        '            GroupList = main_GetFormInputCheckList("MemberRules", "People", user.userId, "Groups", "Member Rules", "MemberID", "GroupID", PublicJoinCriteria, "Caption")
+        '            GroupList = main_GetFormInputCheckList("MemberRules", "People", authcontext.user.userId, "Groups", "Member Rules", "MemberID", "GroupID", PublicJoinCriteria, "Caption")
         '            If GroupList = "" Then
         '                GroupList = "<div>There are no public groups</div>"
         '            End If
@@ -5907,7 +5322,7 @@ ErrorTrap:
                     ContentControlID = (db.cs_getInteger(iCSPointer, "contentcontrolid"))
                     ContentName = metaData.getContentNameByID(ContentControlID)
                     If ContentName <> "" Then
-                        cs_cs_getRecordEditLink = main_GetRecordEditLink2(ContentName, RecordID, genericController.EncodeBoolean(AllowCut), RecordName, user.isEditing(ContentName))
+                        cs_cs_getRecordEditLink = main_GetRecordEditLink2(ContentName, RecordID, genericController.EncodeBoolean(AllowCut), RecordName, authContext.user.isEditing(ContentName))
                     End If
                 End If
             End If
@@ -5989,7 +5404,7 @@ ErrorTrap:
                     '
                     ' ----- People and member content export
                     '
-                    If Not user.isAuthenticatedAdmin() Then
+                    If Not authContext.user.isAuthenticatedAdmin() Then
                         Call sb.Append("Warning: You must be a site administrator to export this information.")
                     Else
                         CSPointer = db.cs_open(iContentName, , "ID", False, , , ,, PageSize, PageNumber)
@@ -6047,7 +5462,7 @@ ErrorTrap:
                     '
                     ' ----- All other content
                     '
-                    If Not user.isAuthenticatedContentManager(iContentName) Then
+                    If Not authContext.user.isAuthenticatedContentManager(iContentName) Then
                         Call sb.Append("Error: You must be a content manager to export this data.")
                     Else
                         CSPointer = db.cs_open(iContentName, , "ID", False, , , ,, PageSize, PageNumber)
@@ -6570,7 +5985,7 @@ ErrorTrap:
                     handleExceptionAndRethrow(New Exception("Invalid ContentName [" & iContentName & "] or RecordID [" & genericController.encodeText(RecordID) & "]"))
                 End If
             Else
-                Call db.deleteContentRecord(iContentName, iRecordID, user.id)
+                Call db.deleteContentRecord(iContentName, iRecordID, authContext.user.id)
             End If
             Call main_ProcessSpecialCaseAfterSave(True, iContentName, iRecordID, "", 0, False)
             Exit Sub
@@ -6612,7 +6027,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function metaData_InsertContentRecordGetID(ByVal ContentName As String) As Integer
-            metaData_InsertContentRecordGetID = db.metaData_InsertContentRecordGetID(genericController.encodeText(ContentName), user.id)
+            metaData_InsertContentRecordGetID = db.metaData_InsertContentRecordGetID(genericController.encodeText(ContentName), authContext.user.id)
         End Function
         '
         '=============================================================================
@@ -6623,7 +6038,7 @@ ErrorTrap:
         '=============================================================================
         '
         Public Sub metaData_CreateContentChild(ByVal ChildContentName As String, ByVal ParentContentName As String)
-            Call metaData.CreateContentChild(genericController.encodeText(ChildContentName), genericController.encodeText(ParentContentName), user.id)
+            Call metaData.CreateContentChild(genericController.encodeText(ChildContentName), genericController.encodeText(ParentContentName), authContext.user.id)
         End Sub
         '
         ' ----- alternate name
@@ -6723,7 +6138,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function main_GetRecordEditLink(ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal AllowCut As Boolean = False) As String
-            main_GetRecordEditLink = main_GetRecordEditLink2(ContentName, RecordID, genericController.EncodeBoolean(AllowCut), "", user.isEditing(genericController.encodeText(ContentName)))
+            main_GetRecordEditLink = main_GetRecordEditLink2(ContentName, RecordID, genericController.EncodeBoolean(AllowCut), "", authContext.user.isEditing(genericController.encodeText(ContentName)))
         End Function
         '
         '========================================================================
@@ -6909,7 +6324,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function main_GetRecordAddLink(ByVal ContentName As String, ByVal PresetNameValueList As String, Optional ByVal AllowPaste As Boolean = False) As String
-            main_GetRecordAddLink = main_GetRecordAddLink2(genericController.encodeText(ContentName), genericController.encodeText(PresetNameValueList), AllowPaste, user.isEditing(genericController.encodeText(ContentName)))
+            main_GetRecordAddLink = main_GetRecordAddLink2(genericController.encodeText(ContentName), genericController.encodeText(PresetNameValueList), AllowPaste, authContext.user.isEditing(genericController.encodeText(ContentName)))
         End Function
         '
         '========================================================================
@@ -7149,7 +6564,7 @@ ErrorTrap:
                     ' ----- Select the Content Record for the Menu Entry selected
                     '
                     ContentRecordFound = False
-                    If user.isAuthenticatedAdmin() Then
+                    If authContext.user.isAuthenticatedAdmin() Then
                         '
                         ' ----- admin member, they have access, main_Get ContentID and set markers true
                         '
@@ -7190,7 +6605,7 @@ ErrorTrap:
                             & " AND((ccMemberRules.DateExpires is Null)or(ccMemberRules.DateExpires>" & db.encodeSQLDate(app_startTime) & "))" _
                             & " AND(ccgroups.active<>0)" _
                             & " AND(ccMembers.active<>0)" _
-                            & " AND(ccMembers.ID=" & user.id & ")" _
+                            & " AND(ccMembers.ID=" & authContext.user.id & ")" _
                             & " );"
                         CS = db.cs_openSql(SQL)
                         If db.cs_ok(CS) Then
@@ -7296,7 +6711,7 @@ ErrorTrap:
             ContentName = metaData.getContentNameByID(ContentID)
             If ContentName <> "" Then
                 If Not genericController.IsNull(RecordIDVariant) Then
-                    main_GetRecordEditLinkByContent = main_GetRecordEditLink2(ContentName, genericController.EncodeInteger(RecordIDVariant), False, "", user.isEditing(ContentName))
+                    main_GetRecordEditLinkByContent = main_GetRecordEditLink2(ContentName, genericController.EncodeInteger(RecordIDVariant), False, "", authContext.user.isEditing(ContentName))
                 Else
                     main_GetRecordEditLinkByContent = main_GetRecordAddLink(ContentName, Criteria)
                 End If
@@ -7464,7 +6879,7 @@ ErrorTrap:
             Dim returnProperty As String = DefaultValue
             Try
                 If TargetMemberID = SystemMemberID Then
-                    returnProperty = userProperty.getText(PropertyName, DefaultValue, user.id)
+                    returnProperty = userProperty.getText(PropertyName, DefaultValue, authContext.user.id)
                 Else
                     returnProperty = userProperty.getText(PropertyName, DefaultValue, TargetMemberID)
                 End If
@@ -7485,7 +6900,7 @@ ErrorTrap:
         'Public Sub userProperty_SetProperty(ByVal PropertyName As String, ByVal Value As String, Optional ByVal TargetMemberID As Integer = SystemMemberID)
         '    Try
         '        If TargetMemberID = SystemMemberID Then
-        '            Call userProperty.setProperty(PropertyName, Value, user.userId)
+        '            Call userProperty.setProperty(PropertyName, Value, authcontext.user.userId)
         '        Else
         '            Call userProperty.setProperty(PropertyName, Value, TargetMemberID)
         '        End If
@@ -7948,7 +7363,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            csOpenRecord = db.cs_open(ContentName, "(ID=" & db.encodeSQLNumber(RecordID) & ")", , False, user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
+            csOpenRecord = db.cs_open(ContentName, "(ID=" & db.encodeSQLNumber(RecordID) & ")", , False, authContext.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
             '
             Exit Function
             '
@@ -7973,7 +7388,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            csOpen = db.cs_open(genericController.encodeText(ContentName), "(ID=" & db.encodeSQLNumber(RecordID) & ")", , False, user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
+            csOpen = db.cs_open(genericController.encodeText(ContentName), "(ID=" & db.encodeSQLNumber(RecordID) & ")", , False, authContext.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
             '
             Exit Function
             '
@@ -8189,7 +7604,7 @@ ErrorTrap:
                     '
                     ' Approved
                     '
-                    If user.isAuthenticatedAdmin() Then
+                    If authContext.user.isAuthenticatedAdmin() Then
                         Copy = genericController.vbReplace(Msg_AuthoringApprovedAdmin, "<EDITNAME>", ApprovedBy)
                         main_GetAuthoringStatusMessage &= Delimiter & Copy
                         Delimiter = "<BR >"
@@ -8202,7 +7617,7 @@ ErrorTrap:
                     '
                     ' Submitted
                     '
-                    If user.isAuthenticatedAdmin() Then
+                    If authContext.user.isAuthenticatedAdmin() Then
                         Copy = genericController.vbReplace(Msg_AuthoringSubmittedAdmin, "<EDITNAME>", SubmittedBy)
                         main_GetAuthoringStatusMessage &= Delimiter & Copy
                         Delimiter = "<BR >"
@@ -8227,7 +7642,7 @@ ErrorTrap:
                     '
                     ' modified, submitted or approved
                     '
-                    If user.isAuthenticatedAdmin() Then
+                    If authContext.user.isAuthenticatedAdmin() Then
                         If RecordEditLocked Then
                             Copy = genericController.vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
                             Copy = genericController.vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
@@ -8288,7 +7703,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            main_IsLoginOK = (user.authenticateGetId(Username, Password) <> 0)
+            main_IsLoginOK = (authContext.user.authenticateGetId(Username, Password) <> 0)
             If Not main_IsLoginOK Then
                 ErrorMessage = error_GetUserError()
             End If
@@ -8299,20 +7714,6 @@ ErrorTrap:
 ErrorTrap:
             Call handleLegacyError18("main_IsLoginOK")
             '
-        End Function
-        '
-        '   2.1 compatibility
-        '
-        Public Function main_GetFormSendPassword() As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00278")
-            '
-            'If Not (true) Then Exit Function
-            '
-            main_GetFormSendPassword = user.getSendPasswordForm()
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("main_GetFormSendPassword")
         End Function
         '
         '
@@ -8555,7 +7956,7 @@ ErrorTrap:
                 RecordID = db.cs_getInteger(CSPointer, "id")
                 ContentName = metaData.getContentNameByID(db.cs_getInteger(CSPointer, "contentcontrolId"))
             End If
-            main_cs_getEncodedField = htmlDoc.html_encodeContent10(db.cs_get(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName)), user.id, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, user.isAuthenticated, Nothing, user.isEditingAnything)
+            main_cs_getEncodedField = htmlDoc.html_encodeContent10(db.cs_get(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName)), authContext.user.id, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, authContext.user.isAuthenticated, Nothing, authContext.user.isEditingAnything)
             Exit Function
             '
             ' ----- Error Trap
@@ -8641,7 +8042,7 @@ ErrorTrap:
         '            '
         '            'If Not (true) Then Exit Sub
         '            '
-        '            Call db.workflow.workflow_AbortEdit(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), user.userid)
+        '            Call db.workflow.workflow_AbortEdit(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), authcontext.user.userid)
         '            '
         '            Exit Sub
         '            '
@@ -8694,7 +8095,7 @@ ErrorTrap:
         ''
         'Public ReadOnly Property visitProperty.getboolean("AllowHelpIcon")() As Boolean
         '    Get
-        '        If user.isAuthenticated() Then
+        '        If authcontext.user.isAuthenticated() Then
         '            If Not property_visit_allowHelpIcon_isLoaded Then
         '                property_visit_allowHelpIcon_Local = genericController.EncodeBoolean(visitProperty.getBoolean("AllowHelpIcon")
         '                property_visit_allowHelpIcon_isLoaded = True
@@ -8719,7 +8120,7 @@ ErrorTrap:
         ''
         'Public ReadOnly Property visitProperty_AllowQuickEditor() As Boolean
         '    Get
-        '        If user.isAuthenticated() Then
+        '        If authcontext.user.isAuthenticated() Then
         '            If Not property_visit_allowQuickEditor_isLoaded Then
         '                property_visit_allowQuickEditor = genericController.EncodeBoolean(
         '                property_visit_allowQuickEditor_isLoaded = True
@@ -8735,7 +8136,7 @@ ErrorTrap:
         ''
         'Public ReadOnly Property visitProperty_AllowAdvancedEditor() As Boolean
         '    Get
-        '        If user.isAuthenticated() Then
+        '        If authcontext.user.isAuthenticated() Then
         '            If Not property_visit_allowAdvancedEditor_isLoaded Then
         '                property_visit_allowAdvancedEditor = visitProperty.getBoolean("AllowAdvancedEditor")
         '                property_visit_allowAdvancedEditor_isLoaded = True
@@ -8760,7 +8161,7 @@ ErrorTrap:
         ''
         'Public ReadOnly Property visitProperty_AllowWorkflowRendering() As Boolean
         '    Get
-        '        If user.isAuthenticated() Then
+        '        If authcontext.user.isAuthenticated() Then
         '            If Not property_visit_allowWorkflowRendering_isLoaded Then
         '                property_visit_allowWorkflowRendering = genericController.EncodeBoolean(
         '                property_visit_allowWorkflowRendering_isLoaded = True
@@ -8776,7 +8177,7 @@ ErrorTrap:
         'Public ReadOnly Property visitProperty.getBoolean("AllowDebugging")() As Boolean
         '    Get
         '        visitProperty.getBoolean("AllowDebugging") = False
-        '        If user.isAuthenticated() Then
+        '        If authcontext.user.isAuthenticated() Then
         '            If Not property_visit_allowDebugging_isLoaded Then
         '                property_visit_allowDebugging_Local = genericController.EncodeBoolean(
         '                property_visit_allowDebugging_isLoaded = True
@@ -8948,22 +8349,22 @@ ErrorTrap:
             Dim Subs() As String
             '
             If True Then
-                Select Case visitor.forceBrowserMobile
+                Select Case authContext.visitor.forceBrowserMobile
                     Case 1
-                        visit.visit_browserIsMobile = True
+                        authContext.visit_browserIsMobile = True
                     Case 2
-                        visit.visit_browserIsMobile = False
+                        authContext.visit_browserIsMobile = False
                     Case Else
                         If webServer.requestxWapProfile <> "" Then
                             '
                             ' If x_wap, set mobile true
                             '
-                            visit.visit_browserIsMobile = True
+                            authContext.visit_browserIsMobile = True
                         ElseIf genericController.vbInstr(1, webServer.requestHttpAccept, "wap", vbTextCompare) <> 0 Then
                             '
                             ' If main_HTTP_Accept, set mobile true
                             '
-                            visit.visit_browserIsMobile = True
+                            authContext.visit_browserIsMobile = True
                         Else
                             '
                             ' If useragent is in the list, set mobile true
@@ -8976,7 +8377,7 @@ ErrorTrap:
                                 If Cnt > 0 Then
                                     For Ptr = 0 To Cnt - 1
                                         If genericController.vbInstr(1, BrowserUserAgent, Subs(Ptr), vbTextCompare) <> 0 Then
-                                            visit.visit_browserIsMobile = True
+                                            authContext.visit_browserIsMobile = True
                                             Exit For
                                         End If
                                     Next
@@ -8985,7 +8386,7 @@ ErrorTrap:
                         End If
                 End Select
             Else
-                visit.visit_browserIsMobile = False
+                authContext.visit_browserIsMobile = False
             End If
             '
             '
@@ -8994,9 +8395,9 @@ ErrorTrap:
                 '
                 ' blank browser, Blank-Browser-Bot
                 '
-                visit.visit_name = "Blank-Browser-Bot"
-                visit.visit_isBot = True
-                visit.visit_isBadBot = False
+                authContext.visit.Name = "Blank-Browser-Bot"
+                authContext.visit_isBot = True
+                authContext.visit_isBadBot = False
             Else
                 DetailsStart = genericController.vbInstr(1, BrowserUserAgent, "(")
                 '
@@ -9022,7 +8423,7 @@ ErrorTrap:
                     '
                     PositionStart = genericController.vbInstr(1, DetailTail, "netscape", vbTextCompare)
                     If PositionStart <> 0 Then
-                        visit.visit_browserIsNS = True
+                        authContext.visit_browserIsNS = True
                         PositionEnd = genericController.vbInstr(PositionStart, DetailTail, " ")
                         If PositionEnd = 0 Then
                             Agent = Mid(DetailTail, PositionStart)
@@ -9031,7 +8432,7 @@ ErrorTrap:
                         End If
                         AgentParts = Split(Agent, "/")
                         If UBound(AgentParts) > 0 Then
-                            visit.visit_browserVersion = Trim(AgentParts(1))
+                            authContext.visit_browserVersion = Trim(AgentParts(1))
                         End If
                     End If
                     '
@@ -9041,26 +8442,26 @@ ErrorTrap:
                         Detail = Trim(DetailSections(DetailPointer))
                         '
                         If (InStr(1, Detail, "msie", vbTextCompare) >= 0) Then
-                            visit.visit_browserIsIE = True
+                            authContext.visit_browserIsIE = True
                             DetailsVersionSection = Split(Trim(Detail), " ")
                             If UBound(DetailsVersionSection) > 0 Then
-                                visit.visit_browserVersion = Trim(DetailsVersionSection(1))
+                                authContext.visit_browserVersion = Trim(DetailsVersionSection(1))
                             End If
                         ElseIf genericController.vbInstr(1, Details, "netscape", vbTextCompare) <> 0 Then
                             '
-                            visit.visit_browserIsNS = True
+                            authContext.visit_browserIsNS = True
                         End If
                         '
                         If genericController.vbInstr(1, Detail, "win", vbTextCompare) <> 0 Then
-                            visit.visit_browserIsWindows = True
+                            authContext.visit_browserIsWindows = True
                         End If
                         '
                         If genericController.vbInstr(1, Detail, "mac", vbTextCompare) <> 0 Then
-                            visit.visit_browserIsMac = True
+                            authContext.visit_browserIsMac = True
                         End If
                         '
                         If genericController.vbInstr(1, Detail, "linux", vbTextCompare) <> 0 Then
-                            visit.visit_browserIsLinux = True
+                            authContext.visit_browserIsLinux = True
                         End If
                     Next
                 End If
@@ -9122,7 +8523,7 @@ ErrorTrap:
                                 If UBound(Args) > 0 Then
                                     If Trim(Args(1)) <> "" Then
                                         If genericController.vbInstr(1, BrowserUserAgent, Args(1), vbTextCompare) <> 0 Then
-                                            visit.visit_name = Args(0)
+                                            authContext.visit.Name = Args(0)
                                             visitNameFound = True
                                             Exit For
                                         End If
@@ -9130,7 +8531,7 @@ ErrorTrap:
                                     If UBound(Args) > 1 Then
                                         If Trim(Args(2)) <> "" Then
                                             If genericController.vbInstr(1, webServer.requestRemoteIP, Args(2), vbTextCompare) <> 0 Then
-                                                visit.visit_name = Args(0)
+                                                authContext.visit.Name = Args(0)
                                                 visitNameFound = True
                                                 Exit For
                                             End If
@@ -9141,11 +8542,11 @@ ErrorTrap:
                         Next
                         If visitNameFound Then
                             If UBound(Args) < 3 Then
-                                visit.visit_isBot = True
-                                visit.visit_isBadBot = False
+                                authContext.visit_isBot = True
+                                authContext.visit_isBadBot = False
                             Else
-                                visit.visit_isBadBot = (LCase(Args(3)) = "b")
-                                visit.visit_isBot = visit.visit_isBadBot Or (LCase(Args(3)) = "r")
+                                authContext.visit_isBadBot = (LCase(Args(3)) = "b")
+                                authContext.visit_isBot = authContext.visit_isBadBot Or (LCase(Args(3)) = "r")
                             End If
                         End If
                     End If
@@ -9793,12 +9194,12 @@ ErrorTrap:
             main_isSectionBlocked = False
             If AllowSectionBlocking Then
                 main_isSectionBlocked = True
-                If user.isAuthenticatedAdmin() Then
+                If authContext.user.isAuthenticatedAdmin() Then
                     '
                     ' Admin always main_Gets in
                     '
                     main_isSectionBlocked = False
-                ElseIf Not user.isAuthenticated() Then
+                ElseIf Not authContext.user.isAuthenticated() Then
                     '
                     ' not authenticated never main_Gets in
                     '
@@ -9807,7 +9208,7 @@ ErrorTrap:
                     ' check if this member is in one of the SectionRule groups
                     '
                     SQLWhere = "" _
-                        & " M.MemberID=" & user.id _
+                        & " M.MemberID=" & authContext.user.id _
                         & " and R.SectionID=" & SectionID _
                         & " and M.GroupID=R.GroupID" _
                         & " and R.Active<>0" _
@@ -9849,7 +9250,7 @@ ErrorTrap:
         Public Sub main_RequestTask(ByVal Command As String, ByVal SQL As String, ByVal ExportName As String, ByVal Filename As String)
             On Error GoTo ErrorTrap 'Const Tn = "RequestTask" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
-            Call tasks_RequestTask(genericController.encodeText(Command), genericController.encodeText(SQL), genericController.encodeText(ExportName), genericController.encodeText(Filename), genericController.EncodeInteger(user.id))
+            Call tasks_RequestTask(genericController.encodeText(Command), genericController.encodeText(SQL), genericController.encodeText(ExportName), genericController.encodeText(Filename), genericController.EncodeInteger(authContext.user.id))
             '
             Exit Sub
 ErrorTrap:
@@ -11021,7 +10422,7 @@ ErrorTrap:
                             If pageContentName = "" Then
                                 pageContentName = "Page Content"
                             End If
-                            Call db.cs_set(CS, "RootPageID", main_CreatePageGetID(PageName, "Page Content", user.id, ""))
+                            Call db.cs_set(CS, "RootPageID", main_CreatePageGetID(PageName, "Page Content", authContext.user.id, ""))
                             Call pageManager.pageManager_cache_pageContent_clear()
                         End If
                     End If
@@ -11639,7 +11040,7 @@ ErrorTrap:
         '
         '
         Public Sub log_LogActivity2(Message As String, SubjectMemberID As Integer, SubjectOrganizationID As Integer)
-            Call log_logActivity(Message, user.id, SubjectMemberID, SubjectOrganizationID, webServer.webServerIO_ServerLink, visitor.id, visit.visit_Id)
+            Call log_logActivity(Message, authContext.user.id, SubjectMemberID, SubjectOrganizationID, webServer.webServerIO_ServerLink, authContext.visitor.id, authContext.visit.ID)
         End Sub
         '
         '=================================================================================================
@@ -11770,7 +11171,7 @@ ErrorTrap:
                 ' main_Get values out of the remote query record
                 '
                 If gv.status = GoogleVisualizationStatusEnum.OK Then
-                    CS = db.cs_open("Remote Queries", "((VisitId=" & visit.visit_Id & ")and(remotekey=" & db.encodeSQLText(RemoteKey) & "))")
+                    CS = db.cs_open("Remote Queries", "((VisitId=" & authContext.visit.ID & ")and(remotekey=" & db.encodeSQLText(RemoteKey) & "))")
                     If db.cs_ok(CS) Then
                         '
                         ' Use user definied query
@@ -11794,7 +11195,7 @@ ErrorTrap:
                                 '
                                 ' developers editing field help
                                 '
-                                If Not user.isDeveloper Then
+                                If Not authContext.user.isDeveloper Then
                                     gv.status = GoogleVisualizationStatusEnum.ErrorStatus
                                     If IsArray(gv.errors) Then
                                         Ptr = 0
@@ -12038,7 +11439,7 @@ ErrorTrap:
                 Call db.cs_set(CS, "maxRows", maxRows)
                 Call db.cs_set(CS, "dateexpires", db.encodeSQLDate(app_startTime.AddDays(1)))
                 Call db.cs_set(CS, "QueryTypeID", QueryTypeSQL)
-                Call db.cs_set(CS, "VisitId", visit.visit_Id)
+                Call db.cs_set(CS, "VisitId", authContext.visit.ID)
             End If
             Call db.cs_Close(CS)
             '
@@ -12140,7 +11541,7 @@ ErrorTrap:
         '
         Friend Sub log_appendLogPageNotFound(PageNotFoundLink As String)
             Try
-                Call logController.log_appendLog(Me, """" & FormatDateTime(app_startTime, vbGeneralDate) & """,""App=" & serverConfig.appConfig.name & """,""main_VisitId=" & visit.visit_Id & """,""" & PageNotFoundLink & """,""Referrer=" & webServer.requestReferrer & """", "performance", "pagenotfound")
+                Call logController.log_appendLog(Me, """" & FormatDateTime(app_startTime, vbGeneralDate) & """,""App=" & serverConfig.appConfig.name & """,""main_VisitId=" & authContext.visit.ID & """,""" & PageNotFoundLink & """,""Referrer=" & webServer.requestReferrer & """", "performance", "pagenotfound")
             Catch ex As Exception
                 handleExceptionAndRethrow(ex)
             End Try
@@ -12319,7 +11720,7 @@ ErrorTrap:
             Dim Sender As String
             Dim subject As String
             Dim Message As String
-            Dim Email As String
+            Dim Emailtext As String
             '
             Dim LinkObjectName As String
             Dim EditorObjectName As String
@@ -12335,12 +11736,12 @@ ErrorTrap:
                     '
                     ' send password to the email address in the querystring
                     '
-                    Email = docProperties.getText("email")
-                    If Email <> "" Then
-                        Call user.sendPassword(Email)
+                    Emailtext = docProperties.getText("email")
+                    If Emailtext <> "" Then
+                        Call email.sendPassword(Emailtext)
                         Copy = "" _
                             & "<div style=""width:300px;margin:100px auto 0 auto;"">" _
-                            & "<p>An attempt to send login information for email address '" & Email & "' has been made.</p>" _
+                            & "<p>An attempt to send login information for email address '" & Emailtext & "' has been made.</p>" _
                             & "<p><a href=""?" & web_RefreshQueryString & """>Return to the Site.</a></p>" _
                             & "</div>"
                         Call htmlDoc.writeAltBuffer(Copy)
@@ -12374,7 +11775,7 @@ ErrorTrap:
                         '
                         allowPageWithoutSectionDisplay = siteProperties.getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default)
                         If Not allowPageWithoutSectionDisplay Then
-                            allowPageWithoutSectionDisplay = user.isAuthenticatedContentManager(ContentName)
+                            allowPageWithoutSectionDisplay = authContext.user.isAuthenticatedContentManager(ContentName)
                         End If
                         PageCopy = pageManager.pageManager_GetHtmlBody_GetSection_GetContent(PageID, rootPageId, ContentName, OrderByClause, False, False, False, 0, siteProperties.useContentWatchLink, allowPageWithoutSectionDisplay)
                         If pageManager.pageManager_RedirectLink <> "" Then
@@ -12493,7 +11894,7 @@ ErrorTrap:
                     ' 9/4/2012 added to prevent lockout if login addon fails
                     web_RefreshQueryString = webServer.requestQueryString
                     'Call main_AddRefreshQueryString("method", "")
-                    Call htmlDoc.writeAltBuffer(user.getLoginPage(True))
+                    Call htmlDoc.writeAltBuffer(htmlDoc.getLoginPage(True))
                     executeRoute_hardCodedPage = True
                 Case HardCodedPageLogin, HardCodedPageLogoutLogin
                     '
@@ -12504,18 +11905,18 @@ ErrorTrap:
                     ' Because you want the form created to save the refresh values
                     '
                     If genericController.vbUCase(HardCodedPage) = "LOGOUTLOGIN" Then
-                        Call user.logout()
+                        Call authContext.user.logout()
                     End If
                     web_RefreshQueryString = webServer.requestQueryString
                     'Call main_AddRefreshQueryString("method", "")
-                    Call htmlDoc.writeAltBuffer(user.getLoginPage(False))
+                    Call htmlDoc.writeAltBuffer(htmlDoc.getLoginPage(False))
                     'Call writeAltBuffer(main_GetLoginPage2(false) & main_GetEndOfBody(False, False, False))
                     executeRoute_hardCodedPage = True
                 Case HardCodedPageLogout
                     '
                     ' ----- logout the current member
                     '
-                    Call user.logout()
+                    Call authContext.user.logout()
                     executeRoute_hardCodedPage = False
                 Case HardCodedPageSiteExplorer
                     '
@@ -12620,7 +12021,7 @@ ErrorTrap:
                         rootPageId = main_GetRecordID("Page Content", Name)
                         allowPageWithoutSectionDisplay = siteProperties.getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default)
                         If Not allowPageWithoutSectionDisplay Then
-                            allowPageWithoutSectionDisplay = user.isAuthenticatedContentManager(ContentName)
+                            allowPageWithoutSectionDisplay = authContext.user.isAuthenticatedContentManager(ContentName)
                         End If
                         Copy = pageManager.pageManager_GetHtmlBody_GetSection_GetContent(PageID, rootPageId, "Page Content", "", True, True, False, 0, siteProperties.useContentWatchLink, allowPageWithoutSectionDisplay)
                         'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2g")
@@ -12643,12 +12044,12 @@ ErrorTrap:
                     '
                     webServer.webServerIO_BlockClosePageCopyright = True
                     Copy = Copy & "<p align=""center""><CENTER>"
-                    If Not user.isAuthenticated() Then
-                        Copy = Copy & user.getLoginPanel()
-                    ElseIf user.isAuthenticatedContentManager("Page Content") Then
+                    If Not authContext.user.isAuthenticated() Then
+                        Copy = Copy & htmlDoc.getLoginPanel()
+                    ElseIf authContext.user.isAuthenticatedContentManager("Page Content") Then
                         'Copy = Copy & main_GetToolsPanel
                     Else
-                        Copy = Copy & "You are currently logged in as " & user.name & ". To logout, click <a HREF=""" & webServer.webServerIO_ServerFormActionURL & "?Method=logout"" rel=""nofollow"">Here</A>."
+                        Copy = Copy & "You are currently logged in as " & authContext.user.name & ". To logout, click <a HREF=""" & webServer.webServerIO_ServerFormActionURL & "?Method=logout"" rel=""nofollow"">Here</A>."
                     End If
                     'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2h")
                     Copy = Copy & htmlDoc.html_GetEndOfBody(True, True, False, False)
@@ -12687,7 +12088,7 @@ ErrorTrap:
                     '   Should be a remote method in commerce
                     '----------------------------------------------------
                     '
-                    If Not user.isAuthenticatedAdmin() Then
+                    If Not authContext.user.isAuthenticatedAdmin() Then
                         '
                         ' Administrator required
                         '
@@ -12764,7 +12165,7 @@ ErrorTrap:
                             Sender = siteProperties.getText("EmailOrderFromAddress")
                             subject = webServer.webServerIO_requestDomain & " Online Order Pending, #" & ConfirmOrderID
                             Message = "<p>An order confirmation has been recieved from PayPal for " & webServer.webServerIO_requestDomain & "</p>"
-                            Call main_SendEmail(Recipient, Sender, subject, Message, , False, True)
+                            Call email.send_Legacy(Recipient, Sender, subject, Message, , False, True)
                         End If
                     End If
                     webServer.webServerIO_BlockClosePageCopyright = True
@@ -13314,385 +12715,6 @@ ErrorTrap:
         'Public Function main_SendMemberEmail_Fast(ByVal ToMemberID As Integer, ByVal From As String, ByVal subject As String, ByVal Body As String, ByVal Immediate As Boolean, ByVal HTML As Boolean) As String
         '    main_SendMemberEmail_Fast = csv_SendMemberEmail3(ToMemberID, From, subject, Body, Immediate, HTML, 0, "", False)
         'End Function
-        '
-        '========================================================================
-        ''' <summary>
-        ''' Send Email to address
-        ''' </summary>
-        ''' <param name="ToAddress"></param>
-        ''' <param name="FromAddress"></param>
-        ''' <param name="SubjectMessage"></param>
-        ''' <param name="BodyMessage"></param>
-        ''' <param name="optionalEmailIdForLog"></param>
-        ''' <param name="Immediate"></param>
-        ''' <param name="HTML"></param>
-        ''' <returns>Returns OK if successful, otherwise returns user status</returns>
-        Public Function main_SendEmail(ByVal ToAddress As String, ByVal FromAddress As String, ByVal SubjectMessage As String, ByVal BodyMessage As String, Optional ByVal optionalEmailIdForLog As Integer = 0, Optional ByVal Immediate As Boolean = True, Optional ByVal HTML As Boolean = False) As String
-            Dim returnStatus As String = ""
-            Try
-                returnStatus = email_send3(genericController.encodeText(ToAddress), genericController.encodeText(FromAddress), genericController.encodeText(SubjectMessage), genericController.encodeText(BodyMessage), "", "", "", Immediate, genericController.EncodeBoolean(HTML), genericController.EncodeInteger(optionalEmailIdForLog))
-            Catch ex As Exception
-                handleExceptionAndRethrow(ex)
-            End Try
-            Return returnStatus
-        End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' send the confirmation email as a test
-        ''' </summary>
-        ''' <param name="EmailID"></param>
-        ''' <param name="ConfirmationMemberID"></param>
-        Public Sub email_sendEmailConfirmationTest(ByVal EmailID As Integer, ByVal ConfirmationMemberID As Integer)
-            Try
-                Dim ConfirmFooter As String
-                Dim TotalCnt As Integer
-                Dim BlankCnt As Integer
-                Dim DupCnt As Integer
-                Dim DupList As String
-                Dim BadCnt As Integer
-                Dim BadList As String
-
-                Dim EmailLen As Integer
-                Dim Pos As Integer
-
-                Dim LastEmail As String
-                Dim Email As String
-                Dim LastDupEmail As String
-                Dim EmailLine As String
-                Dim TotalList As String
-                Dim EMailName As String
-                Dim EmailMemberID As Integer
-                Dim Posat As Integer
-                Dim PosDot As Integer
-                Dim CS As Integer
-                Dim EmailSubject As String
-                Dim EmailBody As String
-                Dim EmailTemplate As String
-                Dim EMailTemplateID As Integer
-                Dim CSTemplate As Integer
-                Dim SpamFooter As String
-                Dim CSPeople As Integer
-                Dim SQL As String
-                Dim EmailStatus As String
-                Dim emailstyles As String
-                Dim layoutError As String
-                '
-                CS = csOpen("email", EmailID)
-                If Not db.cs_ok(CS) Then
-                    Call error_AddUserError("There was a problem sending the email confirmation. The email record could not be found.")
-                Else
-                    EmailSubject = db.cs_get(CS, "Subject")
-                    EmailBody = db.cs_get(CS, "copyFilename")
-                    '
-                    ' merge in template
-                    '
-                    EmailTemplate = ""
-                    EMailTemplateID = db.cs_getInteger(CS, "EmailTemplateID")
-                    If EMailTemplateID <> 0 Then
-                        CSTemplate = csOpen("Email Templates", EMailTemplateID, , , "BodyHTML")
-                        If db.cs_ok(CSTemplate) Then
-                            EmailTemplate = db.cs_get(CSTemplate, "BodyHTML")
-                        End If
-                        Call db.cs_Close(CSTemplate)
-                    End If
-                    '
-                    ' styles
-                    '
-                    emailstyles = email_getEmailStyles(EmailID)
-                    EmailBody = emailstyles & EmailBody
-                    '
-                    ' spam footer
-                    '
-                    If db.cs_getBoolean(CS, "AllowSpamFooter") Then
-                        '
-                        ' This field is default true, and non-authorable
-                        ' It will be true in all cases, except a possible unforseen exception
-                        '
-                        EmailBody = EmailBody & "<div style=""clear:both;padding:10px;"">" & csv_GetLinkedText("<a href=""" & htmlDoc.html_EncodeHTML(webServer.webServerIO_requestProtocol & webServer.requestDomain & requestAppRootPath & siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
-                        EmailBody = genericController.vbReplace(EmailBody, "#member_email#", "UserEmailAddress")
-                    End If
-                    '
-                    ' Confirm footer
-                    '
-                    SQL = main_GetGroupEmailSQL(False, EmailID)
-                    'SQL = main_GetGroupEmailSQL(db.cs_getBoolean(CS, "ToAll"), EmailID)
-                    CSPeople = db.cs_openSql(SQL)
-                    If Not db.cs_ok(CSPeople) Then
-                        error_AddUserError("There are no valid recipients of this email, other than the confirmation address. Either no groups or topics were selected, or those selections contain no people with both a valid email addresses and 'Allow Group Email' enabled.")
-                    Else
-                        'TotalList = TotalList & "--- all recipients ---" & BR
-                        LastEmail = "empty"
-                        Do While db.cs_ok(CSPeople)
-                            Email = db.cs_get(CSPeople, "email")
-                            EMailName = db.cs_get(CSPeople, "name")
-                            EmailMemberID = db.cs_getInteger(CSPeople, "ID")
-                            If EMailName = "" Then
-                                EMailName = "no name (member id " & EmailMemberID & ")"
-                            End If
-                            EmailLine = Email & " for " & EMailName
-                            If Email = "" Then
-                                BlankCnt = BlankCnt + 1
-                            Else
-                                If Email = LastEmail Then
-                                    DupCnt = DupCnt + 1
-                                    If Email <> LastDupEmail Then
-                                        DupList = DupList & "<div class=i>" & Email & "</div>" & BR
-                                        LastDupEmail = Email
-                                    End If
-                                End If
-                            End If
-                            EmailLen = Len(Email)
-                            Posat = genericController.vbInstr(1, Email, "@")
-                            PosDot = InStrRev(Email, ".")
-                            If EmailLen < 6 Then
-                                BadCnt = BadCnt + 1
-                                BadList = BadList & EmailLine & BR
-                            ElseIf (Posat < 2) Or (Posat > (EmailLen - 4)) Then
-                                BadCnt = BadCnt + 1
-                                BadList = BadList & EmailLine & BR
-                            ElseIf (PosDot < 4) Or (PosDot > (EmailLen - 2)) Then
-                                BadCnt = BadCnt + 1
-                                BadList = BadList & EmailLine & BR
-                            End If
-                            TotalList = TotalList & EmailLine & BR
-                            LastEmail = Email
-                            TotalCnt = TotalCnt + 1
-                            Call db.cs_goNext(CSPeople)
-                        Loop
-                        'TotalList = TotalList & "--- end all recipients ---" & BR
-                    End If
-                    Call db.cs_Close(CSPeople)
-                    '
-                    If DupCnt = 1 Then
-                        Call error_AddUserError("There is 1 duplicate email address. See the test email for details.")
-                        ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">WARNING: There is 1 duplicate email address. Only one email will be sent to each address. If the email includes personalization, or if you are using link authentication to automatically log in the user, you may want to correct duplicates to be sure the email is created correctly.<div style=""margin:20px;"">" & DupList & "</div></div>"
-                    ElseIf DupCnt > 1 Then
-                        Call error_AddUserError("There are " & DupCnt & " duplicate email addresses. See the test email for details")
-                        ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">WARNING: There are " & DupCnt & " duplicate email addresses. Only one email will be sent to each address. If the email includes personalization, or if you are using link authentication to automatically log in the user, you may want to correct duplicates to be sure the email is created correctly.<div style=""margin:20px;"">" & DupList & "</div></div>"
-                    End If
-                    '
-                    If BadCnt = 1 Then
-                        Call error_AddUserError("There is 1 invalid email address. See the test email for details.")
-                        ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">WARNING: There is 1 invalid email address<div style=""margin:20px;"">" & BadList & "</div></div>"
-                    ElseIf BadCnt > 1 Then
-                        Call error_AddUserError("There are " & BadCnt & " invalid email addresses. See the test email for details")
-                        ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">WARNING: There are " & BadCnt & " invalid email addresses<div style=""margin:20px;"">" & BadList & "</div></div>"
-                    End If
-                    '
-                    If BlankCnt = 1 Then
-                        Call error_AddUserError("There is 1 blank email address. See the test email for details")
-                        ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">WARNING: There is 1 blank email address.</div>"
-                    ElseIf BlankCnt > 1 Then
-                        Call error_AddUserError("There are " & DupCnt & " blank email addresses. See the test email for details.")
-                        ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">WARNING: There are " & BlankCnt & " blank email addresses.</div>"
-                    End If
-                    '
-                    If TotalCnt = 0 Then
-                        ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">WARNING: There are no recipients for this email.</div>"
-                    ElseIf TotalCnt = 1 Then
-                        ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">There is 1 recipient<div style=""margin:20px;"">" & TotalList & "</div></div>"
-                    Else
-                        ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">There are " & TotalCnt & " recipients<div style=""margin:20px;"">" & TotalList & "</div></div>"
-                    End If
-                    '
-                    If ConfirmationMemberID = 0 Then
-                        error_AddUserError("No confirmation email was send because a Confirmation member is not selected")
-                    Else
-                        EmailBody = EmailBody & "<div style=""clear:both;padding:10px;margin:10px;border:1px dashed #888;"">Administrator<br><br>" & ConfirmFooter & "</div>"
-                        EmailStatus = email_sendMemberEmail3(ConfirmationMemberID, db.cs_getText(CS, "FromAddress"), EmailSubject, EmailBody, True, True, EmailID, EmailTemplate, False)
-                        If EmailStatus <> "ok" Then
-                            error_AddUserError(EmailStatus)
-                        End If
-                    End If
-                End If
-                Call db.cs_Close(CS)
-            Catch ex As Exception
-                handleExceptionAndRethrow(ex)
-            End Try
-        End Sub
-        '
-        '========================================================================
-        ' main_SendFormEmail
-        '   sends an email with the contents of a form
-        '========================================================================
-        '
-        Public Sub main_SendFormEmail(ByVal SendTo As String, ByVal SendFrom As String, ByVal SendSubject As String)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SendFormEmail")
-            '
-            'If Not (true) Then Exit Sub
-            '
-            Dim Message As String
-            Dim subject As String
-            Dim Result As String
-            Dim RequestFormElementVariant As Object
-            Dim MethodName As String
-            Dim iSendTo As String
-            Dim iSendFrom As String
-            Dim iSendSubject As String
-            Dim Pointer As Integer
-            '
-            iSendTo = genericController.encodeText(SendTo)
-            iSendFrom = genericController.encodeText(SendFrom)
-            iSendSubject = genericController.encodeText(SendSubject)
-            '
-            MethodName = "main_SendFormEmail"
-            '
-            If ((InStr(iSendTo, "@") = 0)) Then
-                iSendTo = siteProperties.getText("TrapEmail")
-                iSendSubject = "EmailForm with bad Sendto address"
-                Message = "Subject: " & iSendSubject
-                Message = Message & vbCrLf
-            End If
-            Message = Message & "The form was submitted " & app_startTime & vbCrLf
-            Message = Message & vbCrLf
-            Message = Message & "All text fields are included, completed or not." & vbCrLf
-            Message = Message & "Only those checkboxes that are checked are included." & vbCrLf
-            Message = Message & "Entries are not in the order they appeared on the form." & vbCrLf
-            Message = Message & vbCrLf
-            For Each key As String In docProperties.getKeyList
-                With docProperties.getProperty(key)
-                    If .IsForm Then
-                        If genericController.vbUCase(.Value) = "ON" Then
-                            Message = Message & .Name & ": Yes" & vbCrLf & vbCrLf
-                        Else
-                            Message = Message & .Name & ": " & .Value & vbCrLf & vbCrLf
-                        End If
-                    End If
-                End With
-            Next
-            '
-            Call main_SendEmail(iSendTo, iSendFrom, iSendSubject, Message, , False, False)
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18(MethodName)
-            '
-        End Sub
-        '
-        '
-        '
-        Public Sub main_SendGroupEmail(ByVal GroupList As String, ByVal FromAddress As String, ByVal subject As String, ByVal Body As String, ByVal Immediate As Boolean, ByVal HTML As Boolean)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00271")
-            '
-            'If Not (true) Then Exit Sub
-            '
-            Dim rootUrl As String
-            Dim MethodName As String
-            Dim Groups() As String
-            Dim GroupCount As Integer
-            Dim GroupPointer As Integer
-            Dim iiGroupList As String
-            Dim ParsePosition As Integer
-            Dim iGroupList As String
-            Dim iFromAddress As String
-            Dim iSubjectSource As String
-            Dim iSubject As String
-            Dim iBodySource As String
-            Dim iBody As String
-            Dim iImmediate As Boolean
-            Dim iHTML As Boolean
-            Dim SQL As String
-            Dim CSPointer As Integer
-            Dim ToMemberID As Integer
-            '
-            MethodName = "main_SendGroupEmail"
-            '
-            iGroupList = genericController.encodeText(GroupList)
-            iFromAddress = genericController.encodeText(FromAddress)
-            iSubjectSource = genericController.encodeText(subject)
-            iBodySource = genericController.encodeText(Body)
-            iImmediate = genericController.EncodeBoolean(Immediate)
-            iHTML = genericController.EncodeBoolean(HTML)
-            '
-            ' Fix links for HTML send - must do it now before encodehtml so eid links will attach
-            '
-            rootUrl = "http://" & webServer.webServerIO_requestDomain & requestAppRootPath
-            iBodySource = genericController.ConvertLinksToAbsolute(iBodySource, rootUrl)
-            '
-            ' Build the list of groups
-            '
-            If iGroupList <> "" Then
-                iiGroupList = iGroupList
-                Do While iiGroupList <> ""
-                    ReDim Preserve Groups(GroupCount)
-                    ParsePosition = genericController.vbInstr(1, iiGroupList, ",")
-                    If ParsePosition = 0 Then
-                        Groups(GroupCount) = iiGroupList
-                        iiGroupList = ""
-                    Else
-                        Groups(GroupCount) = Mid(iiGroupList, 1, ParsePosition - 1)
-                        iiGroupList = Mid(iiGroupList, ParsePosition + 1)
-                    End If
-                    GroupCount = GroupCount + 1
-                Loop
-            End If
-            If GroupCount > 0 Then
-                '
-                ' Build the SQL statement
-                '
-                SQL = "SELECT DISTINCT ccMembers.ID" _
-                    & " FROM (ccMembers LEFT JOIN ccMemberRules ON ccMembers.ID = ccMemberRules.MemberID) LEFT JOIN ccgroups ON ccMemberRules.GroupID = ccgroups.ID" _
-                    & " WHERE (((ccMembers.Active)<>0) AND ((ccMembers.AllowBulkEmail)<>0) AND ((ccMemberRules.Active)<>0) AND ((ccgroups.Active)<>0) AND ((ccgroups.AllowBulkEmail)<>0)AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & db.encodeSQLDate(app_startTime) & ")) AND ("
-                For GroupPointer = 0 To GroupCount - 1
-                    If GroupPointer = 0 Then
-                        SQL &= "(ccgroups.Name=" & db.encodeSQLText(Groups(GroupPointer)) & ")"
-                    Else
-                        SQL &= "OR(ccgroups.Name=" & db.encodeSQLText(Groups(GroupPointer)) & ")"
-                    End If
-                Next
-                SQL &= "));"
-                CSPointer = db.cs_openSql(SQL)
-                Do While db.cs_ok(CSPointer)
-                    ToMemberID = genericController.EncodeInteger(db.cs_getInteger(CSPointer, "ID"))
-                    iSubject = iSubjectSource
-                    iBody = iBodySource
-                    '
-
-
-                    ' send
-                    '
-                    Call email_sendMemberEmail3(ToMemberID, iFromAddress, iSubject, iBody, iImmediate, iHTML, 0, "", False)
-                    Call db.cs_goNext(CSPointer)
-                Loop
-            End If
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18(MethodName)
-            '
-        End Sub
-        '
-        ' ----- Need to test this and make it public
-        '
-        '   This is what the admin site should call for both test and group email
-        '   Making it public lets developers send email that administrators can control
-        '
-        Public Sub main_SendSystemEmail(ByVal EMailName As String, Optional ByVal AdditionalCopy As String = "", Optional ByVal AdditionalMemberID As Integer = 0)
-            Dim EmailStatus As String
-            '
-            EmailStatus = csv_SendSystemEmail(genericController.encodeText(EMailName), genericController.encodeText(AdditionalCopy), genericController.EncodeInteger(AdditionalMemberID))
-            If user.isAuthenticatedAdmin() And (EmailStatus <> "") Then
-                error_AddUserError("Administrator: There was a problem sending the confirmation email, " & EmailStatus)
-            End If
-            Exit Sub
-        End Sub
-        '
-        '========================================================================
-        ' Set the email sql for all members marked to receive the email
-        '   Used to send the email and as body on the email test
-        '========================================================================
-        '
-        Public Function main_GetGroupEmailSQL(ByVal ignore_ToAll As Boolean, ByVal EmailID As Integer) As String
-            main_GetGroupEmailSQL = email_getGroupEmailSQL(False, EmailID)
-            Exit Function
-        End Function
 
         '
         '========================================================================
@@ -14268,7 +13290,7 @@ ErrorTrap:
                             '
                             ' REFACTOR -- must know if this is json or html remote before call because it is an argument -- assume this is a json for now -- must deal with it somehow
                             '
-                            returnResult = addon.execute(0, addonRoute, Option_String, CPUtilsBaseClass.addonContext.ContextRemoteMethodJson, HostContentName, hostRecordId, "", "0", False, 0, "", AddonStatusOK, Nothing, "", Nothing, "", user.id, user.isAuthenticated)
+                            returnResult = addon.execute(0, addonRoute, Option_String, CPUtilsBaseClass.addonContext.ContextRemoteMethodJson, HostContentName, hostRecordId, "", "0", False, 0, "", AddonStatusOK, Nothing, "", Nothing, "", authContext.user.id, authContext.user.isAuthenticated)
                         End If
                         '
                         ' deliver styles, javascript and other head tags as javascript appends
@@ -14540,7 +13562,7 @@ ErrorTrap:
                                 Call db.cs_set(CSLog, "Name", "Clicked " & CStr(app_startTime))
                                 Call db.cs_set(CSLog, "EmailDropID", emailDropId)
                                 Call db.cs_set(CSLog, "MemberID", EmailMemberID)
-                                Call db.cs_set(CSLog, "VisitId", visit.visit_Id)
+                                Call db.cs_set(CSLog, "VisitId", authContext.visit.ID)
                                 Call db.cs_set(CSLog, "LogType", EmailLogTypeClick)
                             End If
                             Call db.cs_Close(CSLog)
@@ -14549,7 +13571,7 @@ ErrorTrap:
                             '
                             ' ----- Email spam footer was clicked, clear the AllowBulkEmail field
                             '
-                            Call email_addToEmailBlockList_InternalOnly(EmailSpamBlock)
+                            Call email.addToBlockList(EmailSpamBlock)
                             '
                             CSLog = db.cs_open("people", "email=" & db.encodeSQLText(EmailSpamBlock), , , , , , "AllowBulkEmail")
                             Do While db.cs_ok(CSLog)
@@ -14571,7 +13593,7 @@ ErrorTrap:
                                     Call db.cs_set(CSLog, "Name", "Email Block Request " & CStr(app_startTime))
                                     Call db.cs_set(CSLog, "EmailDropID", emailDropId)
                                     Call db.cs_set(CSLog, "MemberID", EmailMemberID)
-                                    Call db.cs_set(CSLog, "VisitId", visit.visit_Id)
+                                    Call db.cs_set(CSLog, "VisitId", authContext.visit.ID)
                                     Call db.cs_set(CSLog, "LogType", EmailLogTypeBlockRequest)
                                 End If
                                 Call db.cs_Close(CSLog)
@@ -14598,7 +13620,7 @@ ErrorTrap:
                             Call main_SetMetaContent(0, 0)
                             Select Case formType
                                 Case FormTypeSiteStyleEditor
-                                    If user.isAuthenticated() And user.isAuthenticatedAdmin() Then
+                                    If authContext.user.isAuthenticated() And authContext.user.isAuthenticatedAdmin() Then
                                         '
                                         ' Save the site sites
                                         '
@@ -14627,7 +13649,7 @@ ErrorTrap:
                                     '
                                     ' save custom styles
                                     '
-                                    If user.isAuthenticated() And user.isAuthenticatedAdmin() Then
+                                    If authContext.user.isAuthenticated() And authContext.user.isAuthenticatedAdmin() Then
                                         Dim addonId As Integer
                                         Dim contentName As String = ""
                                         Dim tableName As String
@@ -14650,7 +13672,7 @@ ErrorTrap:
                                             Call cache.invalidateObjectList(contentName)
                                             tableName = GetContentTablename(contentName)
                                             If genericController.vbLCase(tableName) = "cctemplates" Then
-                                                Call cache.setObject(pageManager.pageManager_cache_pageTemplate_cacheName, nothingObject)
+                                                Call cache.setObject(pageManagerController.pageManager_cache_pageTemplate_cacheName, nothingObject)
                                                 Call pageManager.pageManager_cache_pageTemplate_load()
                                             End If
                                         End If
@@ -14669,40 +13691,17 @@ ErrorTrap:
                                     '
                                     '
                                     '
-                                    Call user.processFormJoin()
+                                    Call htmlDoc.processFormJoin()
                                 Case FormTypeSendPassword
                                     '
                                     '
                                     '
-                                    Call user.processFormSendPassword()
+                                    Call htmlDoc.processFormSendPassword()
                                 Case FormTypeLogin, "l09H58a195"
                                     '
                                     '
                                     '
-                                    Call user.processFormLoginDefault()
-                            'Case FormTypeMyProfile
-                            '    '
-                            '    '
-                            '    '
-                            '    Call main_ProcessFormMyProfile()
-                            '    If main_iUserError <> "" Then
-                            '        '
-                            '        ' Problem with the form, go back to the page
-                            '        '
-                            '        HardCodedPage = "myprofile"
-                            '        'LegacyInterceptPageSN = LegacyInterceptPageSNMyProfile
-                            '    Else
-                            '        '
-                            '        ' No user error, close the page
-                            '        '
-                            '        '
-                            '        'Call AppendLog("main_init(), 3010 - exit for myprofile popup window")
-                            '        '
-                            '        Call writeAltBuffer("<script Language=""JavaScript"" type=""text/javascript""> window.close(); </Script>")
-                            '        Call writeAltBuffer(main_GetPageEnd)
-                            '        responseOpen = False '--- should be disposed by caller --- Call dispose
-                            '        Return docBuffer
-                            '    End If
+                                    Call htmlDoc.processFormLoginDefault()
                                 Case FormTypeToolsPanel
                                     '
                                     ' ----- Administrator Tools Panel
@@ -14758,7 +13757,7 @@ ErrorTrap:
                         '
                         ' REFACTOR -- when admin code is broken cleanly into an addon, run it through execute
                         '
-                        'returnResult = executeAddon(0, adminSiteAddonGuid, "", CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "", False, 0, "", returnStatusOK, Nothing, "", Nothing, "", user.userid, visit_isAuthenticated)
+                        'returnResult = executeAddon(0, adminSiteAddonGuid, "", CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "", False, 0, "", returnStatusOK, Nothing, "", Nothing, "", authcontext.user.userid, visit.visitAuthenticated)
                         '
                         ' until then, run it as an internal class
                         '
@@ -14777,7 +13776,7 @@ ErrorTrap:
                         Dim defaultAddonId As Integer = siteProperties.getinteger("Default Route AddonId")
                         If defaultAddonId <> 0 Then
                             Dim addonStatusOk As Boolean = False
-                            returnResult = addon.execute(defaultAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", addonStatusOk, Nothing, "", Nothing, "", user.id, visit.visit_isAuthenticated)
+                            returnResult = addon.execute(defaultAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", addonStatusOk, Nothing, "", Nothing, "", authContext.user.id, authContext.visit.VisitAuthenticated)
                         End If
                         'returnResult = addonToBe_pageManager()
                     End If
@@ -15364,7 +14363,7 @@ ErrorTrap:
                         handleExceptionAndRethrow(New ApplicationException("Could not find or create the group with id [" & groupId & "]"))
                     Else
                         If userid = 0 Then
-                            userid = user.id
+                            userid = authContext.user.id
                         End If
                         Using cs As New csController(Me)
                             cs.open("Member Rules", "(MemberID=" & userid.ToString & ")and(GroupID=" & groupId.ToString & ")", , False)
@@ -15411,7 +14410,7 @@ ErrorTrap:
                         handleExceptionAndRethrow(New ApplicationException("Could not find or create the group [" & groupNameOrGuid & "]"))
                     Else
                         If userid = 0 Then
-                            userid = user.id
+                            userid = authContext.user.id
                         End If
                         Using cs As New csController(Me)
                             cs.open("Member Rules", "(MemberID=" & userid.ToString & ")and(GroupID=" & GroupID.ToString & ")", , False)
@@ -15631,7 +14630,7 @@ ErrorTrap:
                             '
                             ' If visit tracking, save the viewing record
                             '
-                            ViewingName = Left(visit.visit_Id & "." & visit.visit_pages, 10)
+                            ViewingName = Left(authContext.visit.ID & "." & authContext.visit.PageVisits, 10)
                             PageID = pageManager.main_RenderedPageID
                             FieldNames = "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,ContentControlID,pagetime,Active,CreateKey,RecordID"
                             FieldNames = FieldNames & ",ExcludeFromAnalytics"
@@ -15640,8 +14639,8 @@ ErrorTrap:
                                 & FieldNames _
                                 & ")VALUES(" _
                                 & " " & db.encodeSQLText(ViewingName) _
-                                & "," & db.encodeSQLNumber(visit.visit_Id) _
-                                & "," & db.encodeSQLNumber(user.id) _
+                                & "," & db.encodeSQLNumber(authContext.visit.ID) _
+                                & "," & db.encodeSQLNumber(authContext.user.id) _
                                 & "," & db.encodeSQLText(webServer.requestDomain) _
                                 & "," & db.encodeSQLText(webServer.webServerIO_requestPath) _
                                 & "," & db.encodeSQLText(webServer.webServerIO_requestPage) _
@@ -15649,7 +14648,7 @@ ErrorTrap:
                                 & "," & db.encodeSQLText(Left(Form, 255)) _
                                 & "," & db.encodeSQLText(Left(webServer.requestReferrer, 255)) _
                                 & "," & db.encodeSQLDate(app_startTime) _
-                                & "," & db.encodeSQLBoolean(visit.visit_stateOK) _
+                                & "," & db.encodeSQLBoolean(authContext.visit_stateOK) _
                                 & "," & db.encodeSQLNumber(main_GetContentID("Viewings")) _
                                 & "," & db.encodeSQLNumber(GetTickCount - app_startTickCount) _
                                 & ",1" _
@@ -15706,12 +14705,12 @@ ErrorTrap:
                         'Call _json.Dispose()
                         _json = Nothing
                     End If
-                    '
-                    If Not (_user Is Nothing) Then
-                        ' no dispose
-                        'Call _user.Dispose()
-                        _user = Nothing
-                    End If
+                    ''
+                    'If Not (_user Is Nothing) Then
+                    '    ' no dispose
+                    '    'Call _user.Dispose()
+                    '    _user = Nothing
+                    'End If
                     '
                     If Not (_domains Is Nothing) Then
                         ' no dispose

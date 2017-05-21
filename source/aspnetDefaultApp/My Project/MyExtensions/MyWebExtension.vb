@@ -20,7 +20,7 @@ Namespace My
             End Get
         End Property
         ''' <summary>
-        ''' Returns information for the current Web user.
+        ''' Returns information for the current Web authcontext.user.
         ''' </summary>
         <Global.System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")> _
         Friend ReadOnly Property User() As Global.Microsoft.VisualBasic.ApplicationServices.WebUser

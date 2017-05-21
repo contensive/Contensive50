@@ -181,7 +181,7 @@ Namespace Contensive.Core
             '
             ' ----- Check permissions
             '
-            If Not cpCore.user.isAuthenticatedAdmin Then
+            If Not cpcore.authContext.user.isAuthenticatedAdmin Then
                 '
                 ' You must be admin to use this feature
                 '
@@ -542,7 +542,7 @@ ErrorTrap:
                 '
                 SQLFilename = cpCore.userProperty.getText("SQLArchive")
                 If SQLFilename = "" Then
-                    SQLFilename = "SQLArchive" & Format(cpCore.user.id, "000000000") & ".txt"
+                    SQLFilename = "SQLArchive" & Format(cpcore.authContext.user.id, "000000000") & ".txt"
                     Call cpCore.userProperty.setProperty("SQLArchive", SQLFilename)
                 End If
                 SQLArchive = cpCore.cdnFiles.readFile(SQLFilename)
@@ -3064,10 +3064,10 @@ ErrorTrap:
                                                     & ",EditTab=" & cpCore.db.encodeSQLText(cp.Doc.GetText("dtfaEditTab." & RecordPointer)) _
                                                     & ",Scramble=" & cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaScramble." & RecordPointer)) _
                                                     & ""
-                                                    If cpCore.user.isAuthenticatedAdmin Then
+                                                    If cpcore.authContext.user.isAuthenticatedAdmin Then
                                                         SQL &= ",adminonly=" & cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAdminOnly." & RecordPointer))
                                                     End If
-                                                    If cpCore.user.isAuthenticatedDeveloper Then
+                                                    If cpcore.authContext.user.isAuthenticatedDeveloper Then
                                                         SQL &= ",DeveloperOnly=" & cpCore.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaDeveloperOnly." & RecordPointer))
                                                     End If
                                                     SQL &= " where ID=" & formFieldId
@@ -3406,13 +3406,13 @@ ErrorTrap:
                                 '
                                 ' Admin Only
                                 '
-                                If cpCore.user.isAuthenticatedAdmin Then
+                                If cpcore.authContext.user.isAuthenticatedAdmin Then
                                     streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaAdminOnly." & RecordCount, genericController.encodeText(.adminOnly), .inherited))
                                 End If
                                 '
                                 ' Developer Only
                                 '
-                                If cpCore.user.isAuthenticatedDeveloper Then
+                                If cpcore.authContext.user.isAuthenticatedDeveloper Then
                                     streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaDeveloperOnly." & RecordCount, genericController.encodeText(.developerOnly), .inherited))
                                 End If
                                 '
@@ -3977,7 +3977,7 @@ ErrorTrap:
             ButtonList = ButtonCancel & "," & ButtonRestartContensiveApplication
             Stream.Add(GetTitle("Load Content Definitions", "This tool stops and restarts the Contensive Application controlling this website. If you restart, the site will be unavailable for up to a minute while the site is stopped and restarted. If the site does not restart, you will need to contact a site administrator to have the Contensive Server restarted."))
             '
-            If Not cpCore.user.isAuthenticatedAdmin Then
+            If Not cpcore.authContext.user.isAuthenticatedAdmin Then
                 '
                 GetForm_Restart = "<P>You must be an administrator to use this tool.</P>"
                 '
@@ -3989,7 +3989,7 @@ ErrorTrap:
                 '
                 ' Restart
                 '
-                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " & cpCore.user.name & " (" & cpCore.user.id & ") restarted using the Restart tool", False, True, cpCore.webServer.webServerIO_ServerLink, "", "")
+                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " & cpcore.authContext.user.name & " (" & cpcore.authContext.user.id & ") restarted using the Restart tool", False, True, cpCore.webServer.webServerIO_ServerLink, "", "")
                 'runAtServer = New runAtServerClass(cpCore)
                 Call cpCore.main_Redirect("/ccLib/Popup/WaitForIISReset.htm")
                 Call Threading.Thread.Sleep(2000)
@@ -4439,7 +4439,7 @@ ErrorTrap:
             'InstanceOptionString = cpCore.main_GetMemberProperty("Addon [File Manager] Options", "")
             Content = cpCore.addon.execute_legacy1(0, "{B966103C-DBF4-4655-856A-3D204DEF6B21}", InstanceOptionString, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "-2", -1)
             'If Content = "" Then
-            '    IsContentManager = cpCore.user.main_IsContentManager()
+            '    IsContentManager = cpcore.authContext.user.main_IsContentManager()
             '    Content = FileView.GetContentFileView2( "", IsContentManager, IsContentManager, True, False, True, False)
             'End If
             Description = "Manage files and folders within the virtual content file area."
@@ -4476,7 +4476,7 @@ ErrorTrap:
             'InstanceOptionString = cpCore.main_GetMemberProperty("Addon [File Manager] Options", "")
             Content = cpCore.addon.execute_legacy1(0, "{B966103C-DBF4-4655-856A-3D204DEF6B21}", InstanceOptionString, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "-2", -1)
             'If Content = "" Then
-            '    IsContentManager = cpCore.user.main_IsContentManager()
+            '    IsContentManager = cpcore.authContext.user.main_IsContentManager()
             '    Content = FileView.GetContentFileView2( "", IsContentManager, IsContentManager, True, False, True, False)
             'End If
             Description = "Manage files and folders within the Website's file area."
@@ -4522,7 +4522,7 @@ ErrorTrap:
             '
             Button = cpCore.docProperties.getText("button")
             '
-            IsDeveloper = cpCore.user.isAuthenticatedDeveloper()
+            IsDeveloper = cpcore.authContext.user.isAuthenticatedDeveloper()
             If Button = ButtonFindAndReplace Then
                 RowCnt = cpCore.docProperties.getInteger("CDefRowCnt")
                 If RowCnt > 0 Then
@@ -4637,7 +4637,7 @@ ErrorTrap:
                 '
                 '
                 '
-                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " & cpCore.user.name & " (" & cpCore.user.id & ") executed an IISReset using the IISReset tool", False, True, cpCore.webServer.webServerIO_ServerLink, "", "")
+                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " & cpcore.authContext.user.name & " (" & cpcore.authContext.user.id & ") executed an IISReset using the IISReset tool", False, True, cpCore.webServer.webServerIO_ServerLink, "", "")
                 'runAtServer = New runAtServerClass(cpCore)
                 Call cpCore.main_Redirect("/ccLib/Popup/WaitForIISReset.htm")
                 Call Threading.Thread.Sleep(2000)

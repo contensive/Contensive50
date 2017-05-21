@@ -398,6 +398,7 @@
     <Compile Include="addon_housekeeping\houseKeepClass.vb" />
     <Compile Include="constants.vb" />
     <Compile Include="Controllers\logController.vb" />
+    <Compile Include="Controllers\emailController.vb" />
     <Compile Include="Controllers\_blankStaticController.vb" />
     <Compile Include="Controllers\csController.vb" />
     <Compile Include="Controllers\dbEngineController.vb" />
@@ -407,14 +408,14 @@
     <Compile Include="Controllers\addonController.vb" />
     <Compile Include="Controllers\cacheController.vb" />
     <Compile Include="coreDocPropertiesClass.vb" />
-    <Compile Include="Models\Context\visitModel.vb" />
+    <Compile Include="Models\Context\authContextModel.vb" />
     <Compile Include="Models\Context\_blankModel.vb" />
     <Compile Include="Models\Entity\domainLegacyModel.vb" />
     <Compile Include="coreEncodeBase64Class.vb" />
     <Compile Include="addon_pageManager\pageManagerController.vb" />
     <Compile Include="addon_tools\addon_toolConfigureEdit.vb" />
     <Compile Include="Models\Context\coreSitePropertiesClass.vb" />
-    <Compile Include="Models\Context\coreUserClass.vb" />
+    <Compile Include="Models\Context\authContextUserModel.vb" />
     <Compile Include="Controllers\webServerIOController.vb" />
     <Compile Include="coreMetaDataClass.vb" />
     <Compile Include="coreCacheKeyPtrClass.vb" />
@@ -482,6 +483,7 @@
     <Compile Include="Models\Entity\pageContentModel.vb" />
     <Compile Include="Models\Entity\siteSectionModel.vb" />
     <Compile Include="Models\Entity\pageTemplateModel.vb" />
+    <Compile Include="Models\Entity\visitModel.vb" />
     <Compile Include="Models\Entity\_xblankCachedModel.vb" />
     <Compile Include="Models\Entity\addonModel.vb" />
     <Compile Include="Models\Entity\groupModel.vb" />
@@ -501,7 +503,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="coreSmtpHandlerClass.vb" />
+    <Compile Include="Controllers\smtpController.vb" />
     <Compile Include="coreToolsClass.vb" />
     <Compile Include="coreUploadClass.vb" />
     <Compile Include="coreXmlToolsClass.vb" />

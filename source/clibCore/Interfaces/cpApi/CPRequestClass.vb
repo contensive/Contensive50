@@ -58,7 +58,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property BrowserIsIE() As Boolean 'Inherits BaseClasses.CPRequestBaseClass.BrowserIsIE
             Get
                 If True Then
-                    Return cpCore.visit.visit_browserIsIE
+                    Return cpCore.authContext.visit_browserIsIE
                 Else
                     Return False
                 End If
@@ -68,7 +68,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property BrowserIsMac() As Boolean 'Inherits BaseClasses.CPRequestBaseClass.BrowserIsMac
             Get
                 If True Then
-                    Return cpCore.visit.visit_browserIsMac
+                    Return cpCore.authContext.visit_browserIsMac
                 Else
                     Return False
                 End If
@@ -78,7 +78,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property BrowserIsMobile() As Boolean 'Inherits BaseClasses.CPRequestBaseClass.BrowserIsMobile
             Get
                 If True Then
-                    Return cpCore.visit.visit_browserIsMobile
+                    Return cpCore.authContext.visit_browserIsMobile
                 Else
                     Return False
                 End If
@@ -88,7 +88,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property BrowserIsWindows() As Boolean 'Inherits BaseClasses.CPRequestBaseClass.BrowserIsWindows
             Get
                 If True Then
-                    Return cpCore.visit.visit_browserIsWindows
+                    Return cpCore.authContext.visit_browserIsWindows
                 Else
                     Return False
                 End If
@@ -98,7 +98,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property BrowserVersion() As String 'Inherits BaseClasses.CPRequestBaseClass.BrowserVersion
             Get
                 If True Then
-                    Return cpCore.visit.visit_browserVersion
+                    Return cpCore.authContext.visit_browserVersion
                 Else
                     Return ""
                 End If
@@ -243,7 +243,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Language() As String 'Inherits BaseClasses.CPRequestBaseClass.Language
             Get
                 If True Then
-                    Return cpCore.user.language
+                    Return cpcore.authContext.user.language
                 Else
                     Return ""
                 End If
