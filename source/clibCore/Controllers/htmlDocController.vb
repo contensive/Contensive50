@@ -975,7 +975,7 @@ ErrorTrap:
                 ' -- print what is needed
                 '
                 If (Not BlockNonContentExtras) And (Not pageManager_printVersion) Then
-                    If cpCore.authContext.isAuthenticatedContentManager(cpCore) And cpCore.authContext.authContextUser.allowToolsPanel Then
+                    If cpCore.authContext.isAuthenticatedContentManager(cpCore) And cpCore.authContext.user.AllowToolsPanel Then
                         If AllowTools Then
                             s = s & cpCore.main_GetToolsPanel()
                         End If
@@ -1111,11 +1111,11 @@ ErrorTrap:
                 '
                 ' ----- Add Member Stylesheet if left over
                 '
-                If cpCore.authContext.authContextUser.styleFilename <> "" Then
-                    Copy = cpCore.cdnFiles.readFile(cpCore.authContext.authContextUser.styleFilename)
+                If cpCore.authContext.user.StyleFilename <> "" Then
+                    Copy = cpCore.cdnFiles.readFile(cpCore.authContext.user.StyleFilename)
                     headTags = headTags & cr & "<style type=""text/css"">" & Copy & "</style>"
                     'JS = JS & vbCrLf & vbTab & "cjAddHeadTag('<style type=""text/css"">" & Copy & "</style>');"
-                    cpCore.authContext.authContextUser.styleFilename = ""
+                    cpCore.authContext.user.StyleFilename = ""
                 End If
                 '
                 ' ----- Add any left over head tags
@@ -6401,7 +6401,7 @@ ErrorTrap:
             '
             ' ----- Read in and save the Member profile values from the tools panel
             '
-            If (cpCore.authContext.authContextUser.id > 0) Then
+            If (cpCore.authContext.user.ID > 0) Then
                 If Not cpCore.error_IsUserError() Then
                     Button = cpCore.docProperties.getText("mb")
                     Select Case Button
@@ -7042,7 +7042,7 @@ ErrorTrap:
         Public Function html_encodeContentForWeb(Source As String, ContextContentName As String, ContextRecordID As Integer, Ignore_BasePath As String, WrapperID As Integer) As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("EncodeContentForWeb")
             '
-            html_encodeContentForWeb = html_encodeContent9(Source, cpCore.authContext.authContextUser.id, ContextContentName, ContextRecordID, 0, False, False, True, True, False, True, "", "", False, WrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+            html_encodeContentForWeb = html_encodeContent9(Source, cpCore.authContext.user.ID, ContextContentName, ContextRecordID, 0, False, False, True, True, False, True, "", "", False, WrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
             '
             Exit Function
 ErrorTrap:
@@ -8026,7 +8026,7 @@ ErrorTrap:
             Dim iPersonalizationPeopleId As Integer
             iPersonalizationPeopleId = personalizationPeopleId
             If iPersonalizationPeopleId = 0 Then
-                iPersonalizationPeopleId = cpCore.authContext.authContextUser.id
+                iPersonalizationPeopleId = cpCore.authContext.user.ID
             End If
             '
             returnValue = Source
@@ -9126,9 +9126,9 @@ ErrorTrap:
                         Else
                             returnREsult = cpCore.authContext.authenticateById(cpCore, LocalMemberID, loginForm_AutoLogin)
                             If returnREsult Then
-                                Call cpCore.log_LogActivity2("successful username/password login", cpCore.authContext.authContextUser.id, cpCore.authContext.authContextUser.organizationId)
+                                Call cpCore.log_LogActivity2("successful username/password login", cpCore.authContext.user.ID, cpCore.authContext.user.OrganizationID)
                             Else
-                                Call cpCore.log_LogActivity2("bad username/password login", cpCore.authContext.authContextUser.id, cpCore.authContext.authContextUser.organizationId)
+                                Call cpCore.log_LogActivity2("bad username/password login", cpCore.authContext.user.ID, cpCore.authContext.user.OrganizationID)
                             End If
                         End If
                     End If
@@ -9180,7 +9180,7 @@ ErrorTrap:
                         Call cpCore.error_AddUserError(ErrorMessage)
                     Else
                         If Not cpCore.error_IsUserError() Then
-                            CS = cpCore.db.cs_open("people", "ID=" & cpCore.db.encodeSQLNumber(cpCore.authContext.authContextUser.id))
+                            CS = cpCore.db.cs_open("people", "ID=" & cpCore.db.encodeSQLNumber(cpCore.authContext.user.ID))
                             If Not cpCore.db.cs_ok(CS) Then
                                 cpCore.handleExceptionAndRethrow(New Exception("Could not open the current members account to set the username and password."))
                             Else
@@ -9199,7 +9199,7 @@ ErrorTrap:
                                 Call cpCore.db.cs_set(CS, "Name", FullName)
                                 Call cpCore.db.cs_set(CS, "username", loginForm_Username)
                                 Call cpCore.db.cs_set(CS, "password", loginForm_Password)
-                                Call cpCore.authContext.authenticateById(cpCore, cpCore.authContext.authContextUser.id)
+                                Call cpCore.authContext.authenticateById(cpCore, cpCore.authContext.user.ID)
                             End If
                             Call cpCore.db.cs_Close(CS)
                         End If
@@ -9367,7 +9367,7 @@ ErrorTrap:
                         & ""
                     loginForm = loginForm _
                         & cpCore.htmlDoc.html_GetFormInputHidden("Type", FormTypeLogin) _
-                        & cpCore.htmlDoc.html_GetFormInputHidden("email", cpCore.authContext.authContextUser.email) _
+                        & cpCore.htmlDoc.html_GetFormInputHidden("email", cpCore.authContext.user.Email) _
                         & cpCore.main_GetPanelButtons(ButtonLogin, "Button") _
                         & ""
                     loginForm = "" _
@@ -9474,7 +9474,7 @@ ErrorTrap:
                     & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"">" _
                     & cr2 & "<tr>" _
                     & cr3 & "<td style=""text-align:right;vertical-align:middle;width:30%;padding:4px"" align=""right"" width=""30%"">" & SpanClassAdminNormal & "Email</span></td>" _
-                    & cr3 & "<td style=""text-align:left;vertical-align:middle;width:70%;padding:4px"" align=""left""  width=""70%""><input NAME=""" & "email"" VALUE=""" & cpCore.htmlDoc.html_EncodeHTML(cpCore.authContext.authContextUser.email) & """ SIZE=""20"" MAXLENGTH=""50""></td>" _
+                    & cr3 & "<td style=""text-align:left;vertical-align:middle;width:70%;padding:4px"" align=""left""  width=""70%""><input NAME=""" & "email"" VALUE=""" & cpCore.htmlDoc.html_EncodeHTML(cpCore.authContext.user.Email) & """ SIZE=""20"" MAXLENGTH=""50""></td>" _
                     & cr2 & "</tr>" _
                     & cr2 & "<tr>" _
                     & cr3 & "<td colspan=""2"">&nbsp;</td>" _

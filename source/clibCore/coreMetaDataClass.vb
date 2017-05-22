@@ -2255,7 +2255,7 @@ ErrorTrap:
                 & " Left Join ccGroupRules on ccMemberRules.GroupID=ccGroupRules.GroupID)" _
                 & " Left Join ccContent on ccGroupRules.ContentID=ccContent.ID)" _
                 & " WHERE" _
-                    & " (ccMemberRules.MemberID=" & cpcore.authContext.authContextUser.id & ")" _
+                    & " (ccMemberRules.MemberID=" & cpcore.authContext.user.id & ")" _
                     & " AND(ccGroupRules.Active<>0)" _
                     & " AND(ccContent.Active<>0)" _
                     & " AND(ccMemberRules.Active<>0)"

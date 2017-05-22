@@ -976,7 +976,6 @@ Namespace Contensive.Core
             authContext = New authContextModel
             authContext.visit = New Models.Entity.visitModel
             authContext.visitor = New Models.Entity.visitorModel
-            authContext.authContextUser = New authContextUserModel()
             authContext.user = New Models.Entity.personModel
             '
             serverConfig = Models.Entity.serverConfigModel.getObject(Me)
@@ -999,7 +998,6 @@ Namespace Contensive.Core
             authContext = New authContextModel
             authContext.visit = New Models.Entity.visitModel
             authContext.visitor = New Models.Entity.visitorModel
-            authContext.authContextUser = New authContextUserModel()
             authContext.user = New Models.Entity.personModel
             '
             Me.serverConfig = serverConfig
@@ -1023,7 +1021,6 @@ Namespace Contensive.Core
             authContext = New authContextModel
             authContext.visit = New Models.Entity.visitModel
             authContext.visitor = New Models.Entity.visitorModel
-            authContext.authContextUser = New authContextUserModel()
             authContext.user = New Models.Entity.personModel
             '
             Me.serverConfig = serverConfig
@@ -1047,7 +1044,6 @@ Namespace Contensive.Core
             authContext = New authContextModel
             authContext.visit = New Models.Entity.visitModel
             authContext.visitor = New Models.Entity.visitorModel
-            authContext.authContextUser = New authContextUserModel()
             authContext.user = New Models.Entity.personModel
             '
             serverConfig = Models.Entity.serverConfigModel.getObject(Me, applicationName)
@@ -1071,7 +1067,6 @@ Namespace Contensive.Core
             authContext = New authContextModel
             authContext.visit = New Models.Entity.visitModel
             authContext.visitor = New Models.Entity.visitorModel
-            authContext.authContextUser = New authContextUserModel()
             authContext.user = New Models.Entity.personModel
             '
             serverConfig = Models.Entity.serverConfigModel.getObject(Me, applicationName)
@@ -2855,7 +2850,7 @@ ErrorTrap:
                     ' Sest to blank
                     '
                     AllowChange = True
-                ElseIf genericController.vbUCase(Newusername) <> genericController.vbUCase(authContext.authContextUser.username) Then
+                ElseIf genericController.vbUCase(Newusername) <> genericController.vbUCase(authContext.user.username) Then
                     '
                     ' ----- username changed, check if change is allowed
                     '
@@ -2865,7 +2860,7 @@ ErrorTrap:
                     End If
                 End If
                 If AllowChange Then
-                    CSMember = db.cs_open("people", "id=" & db.encodeSQLNumber(authContext.authContextUser.id))
+                    CSMember = db.cs_open("people", "id=" & db.encodeSQLNumber(authContext.user.ID))
                     If Not db.cs_ok(CSMember) Then
                         Call error_AddUserError("There was a problem locating your account record. No changes were saved.")
                         ' if user error, it goes back to the hardcodedpage
@@ -2885,7 +2880,7 @@ ErrorTrap:
                                     FieldName = field.nameLc
                                     FieldValue = docProperties.getText(FieldName)
                                     If FieldValue <> "" Then
-                                        CSTest = db.cs_open(ContentName, "(" & FieldName & "=" & db.encodeSQLText(FieldValue) & ")and(ID<>" & authContext.authContextUser.id & ")")
+                                        CSTest = db.cs_open(ContentName, "(" & FieldName & "=" & db.encodeSQLText(FieldValue) & ")and(ID<>" & authContext.user.ID & ")")
                                         If db.cs_ok(CSTest) Then
                                             Call error_AddUserError("The field '" & FieldName & "' must be unique, and another account has already used '" & FieldValue & "'")
                                         End If
@@ -2963,7 +2958,7 @@ ErrorTrap:
                             '
                             ' --- Update Group Records
                             '
-                            Call main_ProcessCheckList("MemberRules", "Members", genericController.encodeText(authContext.authContextUser.id), "Groups", "Member Rules", "MemberID", "GroupID")
+                            Call main_ProcessCheckList("MemberRules", "Members", genericController.encodeText(authContext.user.ID), "Groups", "Member Rules", "MemberID", "GroupID")
                             '
                             '
                             '
@@ -3002,7 +2997,7 @@ ErrorTrap:
             '
             FieldValue = docProperties.getText(FieldName)
             If db.cs_getText(CSMember, FieldName) <> FieldValue Then
-                Call log_LogActivity2("profile changed " & FieldName, authContext.authContextUser.id, authContext.authContextUser.organizationId)
+                Call log_LogActivity2("profile changed " & FieldName, authContext.user.ID, authContext.user.OrganizationID)
                 Call db.cs_set(CSMember, FieldName, FieldValue)
             End If
             Exit Sub
@@ -3024,7 +3019,7 @@ ErrorTrap:
             '
             FieldValue = docProperties.getBoolean(FieldName)
             If db.cs_getBoolean(CSMember, FieldName) <> FieldValue Then
-                Call log_LogActivity2("profile changed " & FieldName, authContext.authContextUser.id, authContext.authContextUser.organizationId)
+                Call log_LogActivity2("profile changed " & FieldName, authContext.user.ID, authContext.user.OrganizationID)
                 Call db.cs_set(CSMember, FieldName, FieldValue)
             End If
             Exit Sub
@@ -3775,7 +3770,7 @@ ErrorTrap:
             '
             MethodName = "main_GetToolsPanel"
             '
-            If authContext.authContextUser.allowToolsPanel Then
+            If authContext.user.AllowToolsPanel Then
                 ShowLegacyToolsPanel = siteProperties.getBoolean("AllowLegacyToolsPanel", True)
                 '
                 ' --- Link Panel - used for both Legacy Tools Panel, and without it
@@ -3938,10 +3933,10 @@ ErrorTrap:
                     '
                     ' ----- Create the Login Panel
                     '
-                    If Trim(authContext.authContextUser.name) = "" Then
-                        Copy = "You are logged in as member #" & authContext.authContextUser.id & "."
+                    If Trim(authContext.user.Name) = "" Then
+                        Copy = "You are logged in as member #" & authContext.user.ID & "."
                     Else
-                        Copy = "You are logged in as " & authContext.authContextUser.name & "."
+                        Copy = "You are logged in as " & authContext.user.Name & "."
                     End If
                     LoginPanel = LoginPanel & "" _
                         & cr & "<div class=""ccAdminSmall"">" _
@@ -6025,7 +6020,7 @@ ErrorTrap:
                     handleExceptionAndRethrow(New Exception("Invalid ContentName [" & iContentName & "] or RecordID [" & genericController.encodeText(RecordID) & "]"))
                 End If
             Else
-                Call db.deleteContentRecord(iContentName, iRecordID, authContext.authContextUser.id)
+                Call db.deleteContentRecord(iContentName, iRecordID, authContext.user.ID)
             End If
             Call main_ProcessSpecialCaseAfterSave(True, iContentName, iRecordID, "", 0, False)
             Exit Sub
@@ -6067,7 +6062,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function metaData_InsertContentRecordGetID(ByVal ContentName As String) As Integer
-            metaData_InsertContentRecordGetID = db.metaData_InsertContentRecordGetID(genericController.encodeText(ContentName), authContext.authContextUser.id)
+            metaData_InsertContentRecordGetID = db.metaData_InsertContentRecordGetID(genericController.encodeText(ContentName), authContext.user.ID)
         End Function
         '
         '=============================================================================
@@ -6078,7 +6073,7 @@ ErrorTrap:
         '=============================================================================
         '
         Public Sub metaData_CreateContentChild(ByVal ChildContentName As String, ByVal ParentContentName As String)
-            Call metaData.CreateContentChild(genericController.encodeText(ChildContentName), genericController.encodeText(ParentContentName), authContext.authContextUser.id)
+            Call metaData.CreateContentChild(genericController.encodeText(ChildContentName), genericController.encodeText(ParentContentName), authContext.user.ID)
         End Sub
         '
         ' ----- alternate name
@@ -6645,7 +6640,7 @@ ErrorTrap:
                             & " AND((ccMemberRules.DateExpires is Null)or(ccMemberRules.DateExpires>" & db.encodeSQLDate(app_startTime) & "))" _
                             & " AND(ccgroups.active<>0)" _
                             & " AND(ccMembers.active<>0)" _
-                            & " AND(ccMembers.ID=" & authContext.authContextUser.id & ")" _
+                            & " AND(ccMembers.ID=" & authContext.user.ID & ")" _
                             & " );"
                         CS = db.cs_openSql(SQL)
                         If db.cs_ok(CS) Then
@@ -6919,7 +6914,7 @@ ErrorTrap:
             Dim returnProperty As String = DefaultValue
             Try
                 If TargetMemberID = SystemMemberID Then
-                    returnProperty = userProperty.getText(PropertyName, DefaultValue, authContext.authContextUser.id)
+                    returnProperty = userProperty.getText(PropertyName, DefaultValue, authContext.user.ID)
                 Else
                     returnProperty = userProperty.getText(PropertyName, DefaultValue, TargetMemberID)
                 End If
@@ -7403,7 +7398,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            csOpenRecord = db.cs_open(ContentName, "(ID=" & db.encodeSQLNumber(RecordID) & ")", , False, authContext.authContextUser.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
+            csOpenRecord = db.cs_open(ContentName, "(ID=" & db.encodeSQLNumber(RecordID) & ")", , False, authContext.user.ID, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
             '
             Exit Function
             '
@@ -7428,7 +7423,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            csOpen = db.cs_open(genericController.encodeText(ContentName), "(ID=" & db.encodeSQLNumber(RecordID) & ")", , False, authContext.authContextUser.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
+            csOpen = db.cs_open(genericController.encodeText(ContentName), "(ID=" & db.encodeSQLNumber(RecordID) & ")", , False, authContext.user.ID, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
             '
             Exit Function
             '
@@ -7996,7 +7991,7 @@ ErrorTrap:
                 RecordID = db.cs_getInteger(CSPointer, "id")
                 ContentName = metaData.getContentNameByID(db.cs_getInteger(CSPointer, "contentcontrolId"))
             End If
-            main_cs_getEncodedField = htmlDoc.html_encodeContent10(db.cs_get(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName)), authContext.authContextUser.id, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, authContext.isAuthenticated, Nothing, authContext.isEditingAnything(Me))
+            main_cs_getEncodedField = htmlDoc.html_encodeContent10(db.cs_get(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName)), authContext.user.ID, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, authContext.isAuthenticated, Nothing, authContext.isEditingAnything(Me))
             Exit Function
             '
             ' ----- Error Trap
@@ -8992,7 +8987,7 @@ ErrorTrap:
                     ' check if this member is in one of the SectionRule groups
                     '
                     SQLWhere = "" _
-                        & " M.MemberID=" & authContext.authContextUser.id _
+                        & " M.MemberID=" & authContext.user.ID _
                         & " and R.SectionID=" & SectionID _
                         & " and M.GroupID=R.GroupID" _
                         & " and R.Active<>0" _
@@ -9034,7 +9029,7 @@ ErrorTrap:
         Public Sub main_RequestTask(ByVal Command As String, ByVal SQL As String, ByVal ExportName As String, ByVal Filename As String)
             On Error GoTo ErrorTrap 'Const Tn = "RequestTask" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
-            Call tasks_RequestTask(genericController.encodeText(Command), genericController.encodeText(SQL), genericController.encodeText(ExportName), genericController.encodeText(Filename), genericController.EncodeInteger(authContext.authContextUser.id))
+            Call tasks_RequestTask(genericController.encodeText(Command), genericController.encodeText(SQL), genericController.encodeText(ExportName), genericController.encodeText(Filename), genericController.EncodeInteger(authContext.user.ID))
             '
             Exit Sub
 ErrorTrap:
@@ -10206,7 +10201,7 @@ ErrorTrap:
                             If pageContentName = "" Then
                                 pageContentName = "Page Content"
                             End If
-                            Call db.cs_set(CS, "RootPageID", main_CreatePageGetID(PageName, "Page Content", authContext.authContextUser.id, ""))
+                            Call db.cs_set(CS, "RootPageID", main_CreatePageGetID(PageName, "Page Content", authContext.user.ID, ""))
                             Call pageManager.pageManager_cache_pageContent_clear()
                         End If
                     End If
@@ -10824,7 +10819,7 @@ ErrorTrap:
         '
         '
         Public Sub log_LogActivity2(Message As String, SubjectMemberID As Integer, SubjectOrganizationID As Integer)
-            Call log_logActivity(Message, authContext.authContextUser.id, SubjectMemberID, SubjectOrganizationID, webServer.webServerIO_ServerLink, authContext.visitor.id, authContext.visit.ID)
+            Call log_logActivity(Message, authContext.user.ID, SubjectMemberID, SubjectOrganizationID, webServer.webServerIO_ServerLink, authContext.visitor.id, authContext.visit.ID)
         End Sub
         '
         '=================================================================================================
@@ -10979,7 +10974,7 @@ ErrorTrap:
                                 '
                                 ' developers editing field help
                                 '
-                                If Not authContext.authContextUser.isDeveloper Then
+                                If Not authContext.user.Developer Then
                                     gv.status = GoogleVisualizationStatusEnum.ErrorStatus
                                     If IsArray(gv.errors) Then
                                         Ptr = 0
@@ -11833,7 +11828,7 @@ ErrorTrap:
                     ElseIf authContext.isAuthenticatedContentManager(Me, "Page Content") Then
                         'Copy = Copy & main_GetToolsPanel
                     Else
-                        Copy = Copy & "You are currently logged in as " & authContext.authContextUser.name & ". To logout, click <a HREF=""" & webServer.webServerIO_ServerFormActionURL & "?Method=logout"" rel=""nofollow"">Here</A>."
+                        Copy = Copy & "You are currently logged in as " & authContext.user.Name & ". To logout, click <a HREF=""" & webServer.webServerIO_ServerFormActionURL & "?Method=logout"" rel=""nofollow"">Here</A>."
                     End If
                     'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2h")
                     Copy = Copy & htmlDoc.html_GetEndOfBody(True, True, False, False)
@@ -13074,7 +13069,7 @@ ErrorTrap:
                             '
                             ' REFACTOR -- must know if this is json or html remote before call because it is an argument -- assume this is a json for now -- must deal with it somehow
                             '
-                            returnResult = addon.execute(0, addonRoute, Option_String, CPUtilsBaseClass.addonContext.ContextRemoteMethodJson, HostContentName, hostRecordId, "", "0", False, 0, "", AddonStatusOK, Nothing, "", Nothing, "", authContext.authContextUser.id, authContext.isAuthenticated)
+                            returnResult = addon.execute(0, addonRoute, Option_String, CPUtilsBaseClass.addonContext.ContextRemoteMethodJson, HostContentName, hostRecordId, "", "0", False, 0, "", AddonStatusOK, Nothing, "", Nothing, "", authContext.user.ID, authContext.isAuthenticated)
                         End If
                         '
                         ' deliver styles, javascript and other head tags as javascript appends
@@ -13560,7 +13555,7 @@ ErrorTrap:
                         Dim defaultAddonId As Integer = siteProperties.getinteger("Default Route AddonId")
                         If defaultAddonId <> 0 Then
                             Dim addonStatusOk As Boolean = False
-                            returnResult = addon.execute(defaultAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", addonStatusOk, Nothing, "", Nothing, "", authContext.authContextUser.id, authContext.visit.VisitAuthenticated)
+                            returnResult = addon.execute(defaultAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", addonStatusOk, Nothing, "", Nothing, "", authContext.user.ID, authContext.visit.VisitAuthenticated)
                         End If
                         'returnResult = addonToBe_pageManager()
                     End If
@@ -14157,7 +14152,7 @@ ErrorTrap:
                         handleExceptionAndRethrow(New ApplicationException("Could not find or create the group with id [" & groupId & "]"))
                     Else
                         If userid = 0 Then
-                            userid = authContext.authContextUser.id
+                            userid = authContext.user.ID
                         End If
                         Using cs As New csController(Me)
                             cs.open("Member Rules", "(MemberID=" & userid.ToString & ")and(GroupID=" & groupId.ToString & ")", , False)
@@ -14204,7 +14199,7 @@ ErrorTrap:
                         handleExceptionAndRethrow(New ApplicationException("Could not find or create the group [" & groupNameOrGuid & "]"))
                     Else
                         If userid = 0 Then
-                            userid = authContext.authContextUser.id
+                            userid = authContext.user.ID
                         End If
                         Using cs As New csController(Me)
                             cs.open("Member Rules", "(MemberID=" & userid.ToString & ")and(GroupID=" & GroupID.ToString & ")", , False)
@@ -14434,7 +14429,7 @@ ErrorTrap:
                                 & ")VALUES(" _
                                 & " " & db.encodeSQLText(ViewingName) _
                                 & "," & db.encodeSQLNumber(authContext.visit.ID) _
-                                & "," & db.encodeSQLNumber(authContext.authContextUser.id) _
+                                & "," & db.encodeSQLNumber(authContext.user.ID) _
                                 & "," & db.encodeSQLText(webServer.requestDomain) _
                                 & "," & db.encodeSQLText(webServer.webServerIO_requestPath) _
                                 & "," & db.encodeSQLText(webServer.webServerIO_requestPage) _

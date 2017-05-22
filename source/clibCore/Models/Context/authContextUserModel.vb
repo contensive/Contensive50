@@ -84,7 +84,6 @@ Namespace Contensive.Core.Models.Context
         Public shipZip As String = ""           '
         Public shipCountry As String = ""         '
         Public shipPhone As String = ""        '
-        Public Const main_maxVisitLoginAttempts As Integer = 20
         Public main_loginFormDefaultProcessed As Boolean = False       ' prevent main_ProcessLoginFormDefault from running twice (multiple user messages, popups, etc.)
         Public createdByVisit As Boolean
 
@@ -216,7 +215,7 @@ Namespace Contensive.Core.Models.Context
         '       If successful, main_VisitMemberID and main_VisitorMemberID must be set to MemberID
         '========================================================================
         '
-        Public Shared Function createDefault(cpcore As coreClass, defaultName As String) As authContextUserModel
+        Public Shared Function add(cpcore As coreClass, defaultName As String) As authContextUserModel
             Dim resultUser As authContextUserModel = createUserDefaults(cpcore, defaultName)
             Try
                 'Dim CSMember As Integer

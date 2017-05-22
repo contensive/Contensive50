@@ -1621,5 +1621,8 @@ Namespace Contensive.Core
         Public Const main_cookieNameVisit = "visit"
         Public Const main_cookieNameVisitor = "visitor"
         Public Const html_quickEdit_fpo = "<quickeditor>"
+        '
+        '
+        Public Const maxVisitLoginAttempts As Integer = 20
     End Module
 End Namespace

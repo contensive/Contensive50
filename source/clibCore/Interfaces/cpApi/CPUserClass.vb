@@ -59,7 +59,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Email() As String 'Inherits BaseClasses.CPUserBaseClass.Email
             Get
                 If True Then
-                    Return cpcore.authContext.authContextUser.email
+                    Return cpcore.authContext.user.email
                 Else
                     Return ""
                 End If
@@ -83,7 +83,7 @@ Namespace Contensive.Core
                 Dim localId As Integer = 0
                 '
                 If True Then
-                    localId = cpcore.authContext.authContextUser.id
+                    localId = cpcore.authContext.user.id
                     If (localId = 0) Then
                         localId = cpCore.db.metaData_InsertContentRecordGetID("people", 0)
                         Call cpCore.authContext.recognizeById(cpCore, localId)
@@ -95,7 +95,7 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         '
-        Public Overrides ReadOnly Property IsAdmin() As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsAdmin
+        Public Overrides ReadOnly Property IsAdmin() As Boolean 'Inherits BaseClasses.CPUserBaseClass.admin
             Get
                 If True Then
                     Return cpCore.authContext.isAuthenticatedAdmin(cpCore)
@@ -285,7 +285,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Language() As String 'Inherits BaseClasses.CPUserBaseClass.Language
             Get
                 If True Then
-                    Return cpcore.authContext.authContextUser.language
+                    Return cpcore.authContext.user.language
                 Else
                     Return ""
                 End If
@@ -297,7 +297,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property LanguageID() As Integer 'Inherits BaseClasses.CPUserBaseClass.LanguageId
             Get
                 If True Then
-                    Return cpcore.authContext.authContextUser.languageId
+                    Return cpcore.authContext.user.languageId
                 Else
                     Return 0
                 End If
@@ -354,7 +354,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Name() As String 'Inherits BaseClasses.CPUserBaseClass.Name
             Get
                 If True Then
-                    Return cpcore.authContext.authContextUser.name
+                    Return cpcore.authContext.user.name
                 Else
                     Return ""
                 End If
@@ -365,7 +365,7 @@ Namespace Contensive.Core
         '
         Public Overrides ReadOnly Property IsNew() As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsNew
             Get
-                Return cpCore.authContext.authContextUser.isNew
+                Return cpCore.authContext.visit.MemberNew
             End Get
         End Property
         '
@@ -382,7 +382,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property OrganizationID() As Integer 'Inherits BaseClasses.CPUserBaseClass.OrganizationId
             Get
                 If True Then
-                    Return cpcore.authContext.authContextUser.organizationId
+                    Return cpcore.authContext.user.organizationId
                 Else
                     Return 0
                 End If
@@ -393,7 +393,7 @@ Namespace Contensive.Core
         '
         Public Overrides ReadOnly Property Password() As String 'Inherits BaseClasses.CPUserBaseClass.Password
             Get
-                Return cpcore.authContext.authContextUser.password
+                Return cpcore.authContext.user.password
             End Get
         End Property
         '
@@ -407,7 +407,7 @@ Namespace Contensive.Core
         '
         Public Overrides ReadOnly Property Username() As String 'Inherits BaseClasses.CPUserBaseClass.Username
             Get
-                Return cpcore.authContext.authContextUser.username
+                Return cpcore.authContext.user.username
             End Get
         End Property
         '

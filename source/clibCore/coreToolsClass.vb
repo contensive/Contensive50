@@ -542,7 +542,7 @@ ErrorTrap:
                 '
                 SQLFilename = cpCore.userProperty.getText("SQLArchive")
                 If SQLFilename = "" Then
-                    SQLFilename = "SQLArchive" & Format(cpcore.authContext.authContextUser.id, "000000000") & ".txt"
+                    SQLFilename = "SQLArchive" & Format(cpcore.authContext.user.id, "000000000") & ".txt"
                     Call cpCore.userProperty.setProperty("SQLArchive", SQLFilename)
                 End If
                 SQLArchive = cpCore.cdnFiles.readFile(SQLFilename)
@@ -3989,7 +3989,7 @@ ErrorTrap:
                 '
                 ' Restart
                 '
-                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " & cpcore.authContext.authContextUser.name & " (" & cpcore.authContext.authContextUser.id & ") restarted using the Restart tool", False, True, cpCore.webServer.webServerIO_ServerLink, "", "")
+                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " & cpcore.authContext.user.name & " (" & cpcore.authContext.user.id & ") restarted using the Restart tool", False, True, cpCore.webServer.webServerIO_ServerLink, "", "")
                 'runAtServer = New runAtServerClass(cpCore)
                 Call cpCore.main_Redirect("/ccLib/Popup/WaitForIISReset.htm")
                 Call Threading.Thread.Sleep(2000)
@@ -4637,7 +4637,7 @@ ErrorTrap:
                 '
                 '
                 '
-                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " & cpcore.authContext.authContextUser.name & " (" & cpcore.authContext.authContextUser.id & ") executed an IISReset using the IISReset tool", False, True, cpCore.webServer.webServerIO_ServerLink, "", "")
+                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " & cpcore.authContext.user.name & " (" & cpcore.authContext.user.id & ") executed an IISReset using the IISReset tool", False, True, cpCore.webServer.webServerIO_ServerLink, "", "")
                 'runAtServer = New runAtServerClass(cpCore)
                 Call cpCore.main_Redirect("/ccLib/Popup/WaitForIISReset.htm")
                 Call Threading.Thread.Sleep(2000)

@@ -344,7 +344,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' just in case - during transition from cpCoreClass to csv, in case a call is missing.
                     '
-                    personalizationPeopleId = cpcore.authContext.authContextUser.id
+                    personalizationPeopleId = cpCore.authContext.user.ID
                     personalizationIsAuthenticated = cpCore.authContext.isAuthenticated()
                 End If
                 '
@@ -1683,7 +1683,7 @@ Namespace Contensive.Core.Controllers
                                                                 CS = cpCore.db.cs_open("Copy Content", "name=" & cpCore.db.encodeSQLText(FieldName), "ID")
                                                                 If Not cpCore.db.cs_ok(CS) Then
                                                                     Call cpCore.db.cs_Close(CS)
-                                                                    CS = cpCore.db.cs_insertRecord("Copy Content", cpcore.authContext.authContextUser.id)
+                                                                    CS = cpCore.db.cs_insertRecord("Copy Content", cpCore.authContext.user.ID)
                                                                 End If
                                                                 If cpCore.db.cs_ok(CS) Then
                                                                     Call cpCore.db.cs_set(CS, "name", FieldName)
@@ -1919,7 +1919,7 @@ Namespace Contensive.Core.Controllers
                                                             CS = cpCore.db.cs_open("Copy Content", "Name=" & cpCore.db.encodeSQLText(FieldName), "ID", , , , , "id,name,Copy")
                                                             If Not cpCore.db.cs_ok(CS) Then
                                                                 Call cpCore.db.cs_Close(CS)
-                                                                CS = cpCore.db.cs_insertRecord("Copy Content", cpcore.authContext.authContextUser.id)
+                                                                CS = cpCore.db.cs_insertRecord("Copy Content", cpCore.authContext.user.ID)
                                                                 If cpCore.db.cs_ok(CS) Then
                                                                     RecordID = cpCore.db.cs_getInteger(CS, "ID")
                                                                     Call cpCore.db.cs_set(CS, "name", FieldName)
@@ -2940,7 +2940,7 @@ ErrorTrap:
         '=============================================================================================================
         '
         Public Function execute_legacy2(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal Option_String As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal IsIncludeAddon As Boolean, ByVal DefaultWrapperID As Integer, ByVal ignore_TemplateCaseOnly_PageContent As String, ByRef return_StatusOK As Boolean, ByVal nothingObject As Object, Optional ByVal AddonInUseIdList As String = "") As String
-            execute_legacy2 = execute(addonId, AddonNameOrGuid, Option_String, Context, HostContentName, HostRecordID, HostFieldName, ACInstanceID, IsIncludeAddon, DefaultWrapperID, ignore_TemplateCaseOnly_PageContent, return_StatusOK, nothingObject, AddonInUseIdList, Nothing, cpCore.htmlDoc.main_page_IncludedAddonIDList, cpCore.authContext.authContextUser.id, cpCore.authContext.isAuthenticated)
+            execute_legacy2 = execute(addonId, AddonNameOrGuid, Option_String, Context, HostContentName, HostRecordID, HostFieldName, ACInstanceID, IsIncludeAddon, DefaultWrapperID, ignore_TemplateCaseOnly_PageContent, return_StatusOK, nothingObject, AddonInUseIdList, Nothing, cpCore.htmlDoc.main_page_IncludedAddonIDList, cpCore.authContext.user.ID, cpCore.authContext.isAuthenticated)
         End Function
         '
         '===============================================================================================================================================

@@ -979,7 +979,7 @@ ErrorTrap:
                         'hint = "140"
                         EMailName = vbMid(workingEmail, 1, atPtr - 1)
                         '
-                        Call cpcore.log_LogActivity2("password request for email " & workingEmail, cpcore.authContext.authContextUser.id, cpcore.authContext.authContextUser.organizationId)
+                        Call cpcore.log_LogActivity2("password request for email " & workingEmail, cpcore.authContext.user.ID, cpcore.authContext.user.OrganizationID)
                         '
                         allowEmailLogin = cpcore.siteProperties.getBoolean("allowEmailLogin", False)
                         recordCnt = 0

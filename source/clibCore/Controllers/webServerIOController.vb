@@ -1387,9 +1387,9 @@ ErrorTrap:
             '
             ' Member Styles
             '
-            If cpCore.authContext.authContextUser.styleFilename <> "" Then
-                Call cpCore.htmlDoc.main_AddStylesheetLink2(webServerIO_requestProtocol & requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, cpCore.authContext.authContextUser.styleFilename), "member style")
-                cpCore.authContext.authContextUser.styleFilename = ""
+            If cpCore.authContext.user.StyleFilename <> "" Then
+                Call cpCore.htmlDoc.main_AddStylesheetLink2(webServerIO_requestProtocol & requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, cpCore.authContext.user.StyleFilename), "member style")
+                cpCore.authContext.user.StyleFilename = ""
             End If
             '
             ' meta content

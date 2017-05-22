@@ -24,7 +24,7 @@ Namespace Contensive.Core.Models.Context
         Public user As Models.Entity.personModel
         '
         ' -- legacy user object -- will be refactored out, constructor creates default non-authenticated instance
-        Public authContextUser As authContextUserModel
+        'Public authContextUser As authContextUserModel
         '
         ' -- is this user authenticated in this visit
         Public ReadOnly Property isAuthenticated As Boolean
@@ -51,6 +51,9 @@ Namespace Contensive.Core.Models.Context
         Private contentAccessRights_AllowAddList As String = ""             ' If in _List, test this for allowAdd
         Private contentAccessRights_AllowDeleteList As String = ""          ' If in _List, test this for allowDelete
         '
+        Public main_IsEditingContentList As String = ""
+        Public main_IsNotEditingContentList As String = ""
+        '
         '====================================================================================================
         ''' <summary>
         ''' constructor, no arguments, created default authentication model for use without user, and before user is available
@@ -59,7 +62,7 @@ Namespace Contensive.Core.Models.Context
             visit = New Models.Entity.visitModel()
             visitor = New Models.Entity.visitorModel()
             user = New Models.Entity.personModel()
-            authContextUser = New authContextUserModel()
+            'authContextUser = New authContextUserModel()
         End Sub
         '
         '========================================================================
@@ -92,7 +95,7 @@ Namespace Contensive.Core.Models.Context
                 resultAuthContext = New authContextModel
                 resultAuthContext.visit = New Models.Entity.visitModel
                 resultAuthContext.visitor = New Models.Entity.visitorModel
-                resultAuthContext.authContextUser = New authContextUserModel()
+                'resultauthContext.user = New authContextUserModel()
                 resultAuthContext.user = New Models.Entity.personModel
                 '
                 visit_lastTimeFromCookie = Date.MinValue
@@ -109,12 +112,11 @@ Namespace Contensive.Core.Models.Context
                 resultAuthContext.visitor.newVisitor = False
                 '
                 user_changes = False
-                resultAuthContext.authContextUser.id = 0
-                resultAuthContext.authContextUser.name = "Guest"
-                resultAuthContext.authContextUser.userAdded = False
-                resultAuthContext.authContextUser.isNew = False
-                resultAuthContext.authContextUser.styleFilename = ""
-                resultAuthContext.authContextUser.excludeFromAnalytics = False
+                resultAuthContext.user.ID = 0
+                resultAuthContext.user.Name = "Guest"
+                resultAuthContext.visit.MemberNew = False
+                resultAuthContext.user.StyleFilename = ""
+                resultAuthContext.user.ExcludeFromAnalytics = False
                 '
                 CookieVisit = cpCore.webServer.getRequestCookie(main_appNameCookiePrefix & constants.main_cookieNameVisit)
                 MemberLinkinEID = cpCore.docProperties.getText("eid")
@@ -297,33 +299,33 @@ Namespace Contensive.Core.Models.Context
                                 testActive = cpCore.db.cs_getBoolean(CS, "MemberActive")
                                 testId = cpCore.db.cs_getInteger(CS, "MemberID")
                                 If ((Not testActive) Or (testId = 0)) Then
-                                    resultAuthContext.authContextUser.id = 0
+                                    resultAuthContext.user.ID = 0
                                 Else
-                                    resultAuthContext.authContextUser.id = testId
-                                    resultAuthContext.authContextUser.active = testActive
-                                    resultAuthContext.authContextUser.isNew = cpCore.db.cs_getBoolean(CS, "VisitMemberNew")
-                                    resultAuthContext.authContextUser.name = (cpCore.db.cs_getText(CS, "MemberName"))
-                                    resultAuthContext.authContextUser.isDeveloper = (cpCore.db.cs_getBoolean(CS, "MemberDeveloper"))
-                                    resultAuthContext.authContextUser.isAdmin = (cpCore.db.cs_getBoolean(CS, "MemberAdmin"))
-                                    resultAuthContext.authContextUser.contentControlID = (cpCore.db.cs_getInteger(CS, "MemberContentControlID"))
-                                    resultAuthContext.authContextUser.allowBulkEmail = (cpCore.db.cs_getBoolean(CS, "MemberAllowBulkEmail"))
-                                    resultAuthContext.authContextUser.allowToolsPanel = (cpCore.db.cs_getBoolean(CS, "MemberAllowToolsPanel"))
-                                    resultAuthContext.authContextUser.adminMenuModeID = cpCore.db.cs_getInteger(CS, "MemberAdminMenuModeID")
-                                    resultAuthContext.authContextUser.autoLogin = (cpCore.db.cs_getBoolean(CS, "MemberAutoLogin"))
-                                    resultAuthContext.authContextUser.username = (cpCore.db.cs_getText(CS, "MemberUsername"))
-                                    resultAuthContext.authContextUser.password = (cpCore.db.cs_getText(CS, "MemberPassword"))
-                                    resultAuthContext.authContextUser.languageId = (cpCore.db.cs_getInteger(CS, "MemberLanguageID"))
-                                    resultAuthContext.authContextUser.language = (cpCore.db.cs_getText(CS, "MemberLanguage"))
-                                    resultAuthContext.authContextUser.organizationId = (cpCore.db.cs_getInteger(CS, "MemberOrganizationID"))
-                                    resultAuthContext.authContextUser.styleFilename = cpCore.db.cs_getText(CS, "MemberStyleFilename")
-                                    resultAuthContext.authContextUser.excludeFromAnalytics = (cpCore.db.cs_getBoolean(CS, "MemberExcludeFromAnalytics"))
+                                    resultAuthContext.user.ID = testId
+                                    resultAuthContext.user.Active = testActive
+                                    resultAuthContext.visit.MemberNew = cpCore.db.cs_getBoolean(CS, "VisitMemberNew")
+                                    resultAuthContext.user.Name = (cpCore.db.cs_getText(CS, "MemberName"))
+                                    resultAuthContext.user.Developer = (cpCore.db.cs_getBoolean(CS, "MemberDeveloper"))
+                                    resultAuthContext.user.Admin = (cpCore.db.cs_getBoolean(CS, "MemberAdmin"))
+                                    resultAuthContext.user.ContentControlID = (cpCore.db.cs_getInteger(CS, "MemberContentControlID"))
+                                    resultAuthContext.user.AllowBulkEmail = (cpCore.db.cs_getBoolean(CS, "MemberAllowBulkEmail"))
+                                    resultAuthContext.user.AllowToolsPanel = (cpCore.db.cs_getBoolean(CS, "MemberAllowToolsPanel"))
+                                    resultAuthContext.user.AdminMenuModeID = cpCore.db.cs_getInteger(CS, "MemberAdminMenuModeID")
+                                    resultAuthContext.user.AutoLogin = (cpCore.db.cs_getBoolean(CS, "MemberAutoLogin"))
+                                    resultAuthContext.user.Username = (cpCore.db.cs_getText(CS, "MemberUsername"))
+                                    resultAuthContext.user.Password = (cpCore.db.cs_getText(CS, "MemberPassword"))
+                                    resultAuthContext.user.LanguageID = (cpCore.db.cs_getInteger(CS, "MemberLanguageID"))
+                                    'resultAuthContext.user.language = (cpCore.db.cs_getText(CS, "MemberLanguage"))
+                                    resultAuthContext.user.OrganizationID = (cpCore.db.cs_getInteger(CS, "MemberOrganizationID"))
+                                    resultAuthContext.user.StyleFilename = cpCore.db.cs_getText(CS, "MemberStyleFilename")
+                                    resultAuthContext.user.ExcludeFromAnalytics = (cpCore.db.cs_getBoolean(CS, "MemberExcludeFromAnalytics"))
                                     '
                                     ' ----- consider removing
                                     '
-                                    resultAuthContext.authContextUser.email = (cpCore.db.cs_getText(CS, "MemberEmail"))
-                                    resultAuthContext.authContextUser.company = (cpCore.db.cs_getText(CS, "MemberCompany"))
-                                    resultAuthContext.authContextUser.visits = (cpCore.db.cs_getInteger(CS, "MemberVisits"))
-                                    resultAuthContext.authContextUser.lastVisit = (cpCore.db.cs_getDate(CS, "MemberLastVisit"))
+                                    resultAuthContext.user.Email = (cpCore.db.cs_getText(CS, "MemberEmail"))
+                                    resultAuthContext.user.Company = (cpCore.db.cs_getText(CS, "MemberCompany"))
+                                    resultAuthContext.user.Visits = (cpCore.db.cs_getInteger(CS, "MemberVisits"))
+                                    resultAuthContext.user.LastVisit = (cpCore.db.cs_getDate(CS, "MemberLastVisit"))
                                 End If
                                 '
                                 '--------------------------------------------------------------------------
@@ -357,7 +359,7 @@ Namespace Contensive.Core.Models.Context
                         ' ----- create new visit record
                         '
                         'hint = "310"
-                        resultAuthContext.visit.ID = cpCore.db.metaData_InsertContentRecordGetID("Visits", resultAuthContext.authContextUser.id)
+                        resultAuthContext.visit.ID = cpCore.db.metaData_InsertContentRecordGetID("Visits", resultAuthContext.user.ID)
                         If (resultAuthContext.visit.ID < 1) Then
                             resultAuthContext.visit.ID = 0
                             cpCore.handleExceptionAndRethrow(New Exception("Internal error, new visit record could not be selected."))
@@ -448,7 +450,7 @@ Namespace Contensive.Core.Models.Context
                             '
                             ' Visitor Fields
                             '
-                            resultAuthContext.visitor.id = cpCore.db.metaData_InsertContentRecordGetID("Visitors", resultAuthContext.authContextUser.id)
+                            resultAuthContext.visitor.id = cpCore.db.metaData_InsertContentRecordGetID("Visitors", resultAuthContext.user.ID)
                             If (resultAuthContext.visitor.id < 1) Then
                                 Call cpCore.handleLegacyError14(MethodName, "main_InitVisit, could not create new visitor")
                                 resultAuthContext.visitor.id = 0
@@ -471,7 +473,7 @@ Namespace Contensive.Core.Models.Context
                         'Call AppendLog("main_InitVisit(), 2492")
                         '
                         'hint = "500"
-                        resultAuthContext.authContextUser.id = resultAuthContext.visitor.memberID
+                        resultAuthContext.user.ID = resultAuthContext.visitor.memberID
                         If (resultAuthContext.visitor.memberID > 0) Then
                             '
                             ' ----- recognize by the main_VisitorMemberID
@@ -483,7 +485,7 @@ Namespace Contensive.Core.Models.Context
                                 '
                                 'hint = "520"
 
-                                If (cpCore.siteProperties.getBoolean("AllowAutoLogin", False)) And (resultAuthContext.authContextUser.autoLogin) And resultAuthContext.visit.CookieSupport Then
+                                If (cpCore.siteProperties.getBoolean("AllowAutoLogin", False)) And (resultAuthContext.user.AutoLogin) And resultAuthContext.visit.CookieSupport Then
                                     '
                                     ' ----- they allow it, now Check if they were logged in on their last visit
                                     '
@@ -495,8 +497,8 @@ Namespace Contensive.Core.Models.Context
                                             '
                                             ' ----- yes, go ahead with autologin
                                             '
-                                            If resultAuthContext.authenticateById(cpCore, resultAuthContext.authContextUser.id) Then
-                                                Call cpCore.log_LogActivity2("autologin", resultAuthContext.authContextUser.id, resultAuthContext.authContextUser.organizationId)
+                                            If resultAuthContext.authenticateById(cpCore, resultAuthContext.user.ID) Then
+                                                Call cpCore.log_LogActivity2("autologin", resultAuthContext.user.ID, resultAuthContext.user.OrganizationID)
                                                 visitor_changes = True
                                                 user_changes = True
                                             End If
@@ -508,7 +510,7 @@ Namespace Contensive.Core.Models.Context
                                     ' Recognized, not auto login
                                     '
                                     'hint = "540"
-                                    Call cpCore.log_LogActivity2("recognized", resultAuthContext.authContextUser.id, resultAuthContext.authContextUser.organizationId)
+                                    Call cpCore.log_LogActivity2("recognized", resultAuthContext.user.ID, resultAuthContext.user.OrganizationID)
                                 End If
                             End If
                         End If
@@ -542,14 +544,14 @@ Namespace Contensive.Core.Models.Context
                         ' Link Login
                         '
                         If resultAuthContext.authenticateById(cpCore, MemberLinkLoginID) Then
-                            Call cpCore.log_LogActivity2("link login with eid " & MemberLinkinEID, resultAuthContext.authContextUser.id, resultAuthContext.authContextUser.organizationId)
+                            Call cpCore.log_LogActivity2("link login with eid " & MemberLinkinEID, resultAuthContext.user.ID, resultAuthContext.user.OrganizationID)
                         End If
                     ElseIf (MemberLinkRecognizeID <> 0) Then
                         '
                         ' Link Recognize
                         '
                         Call resultAuthContext.recognizeById(cpCore, MemberLinkRecognizeID)
-                        Call cpCore.log_LogActivity2("link recognize with eid " & MemberLinkinEID, resultAuthContext.authContextUser.id, resultAuthContext.authContextUser.organizationId)
+                        Call cpCore.log_LogActivity2("link recognize with eid " & MemberLinkinEID, resultAuthContext.user.ID, resultAuthContext.user.OrganizationID)
                     End If
                     '
                     '-----------------------------------------------------------------------------------
@@ -559,7 +561,7 @@ Namespace Contensive.Core.Models.Context
                     'Call AppendLog("main_InitVisit(), 2496")
                     '
                     'hint = "800"
-                    If (resultAuthContext.authContextUser.id < 1) Then
+                    If (resultAuthContext.user.ID < 1) Then
                         '
                         ' No user created
                         '
@@ -568,12 +570,17 @@ Namespace Contensive.Core.Models.Context
                         Else
                             DefaultMemberName = genericController.encodeText(cpCore.GetContentFieldProperty("people", "name", "default"))
                         End If
-                        If (False) Then
+                        '
+                        ' upgraded, determine the kind of tracking - experimental build set to true
+                        '
+                        TrackGuests = cpCore.siteProperties.getBoolean("track guests", False)
+                        If Not TrackGuests Then
                             '
-                            ' not upgraded, just create user like it did before
+                            ' do not track guests at all
                             '
-                            resultAuthContext.authContextUser = authContextUserModel.createDefault(cpCore, resultAuthContext.visit.Name)
-                            resultAuthContext.visitor.memberID = resultAuthContext.authContextUser.id
+                            resultAuthContext.user = Models.Entity.personModel.add(cpCore, New List(Of String))
+                            'resultauthContext.user = authContextUserModel.add(cpCore, resultAuthContext.visit.Name)
+                            resultAuthContext.visitor.memberID = resultAuthContext.user.ID
                             resultAuthContext.visitor.saveObject(cpCore)
                             '
                             resultAuthContext.visit.VisitAuthenticated = False
@@ -583,16 +590,13 @@ Namespace Contensive.Core.Models.Context
                             resultAuthContext.property_user_isMember_isLoaded = False
                             resultAuthContext.isAuthenticatedDeveloper_cache_isLoaded = False
                         Else
-                            '
-                            ' upgraded, determine the kind of tracking - experimental build set to true
-                            '
-                            TrackGuests = cpCore.siteProperties.getBoolean("track guests", False)
-                            If Not TrackGuests Then
+                            If resultAuthContext.visit.CookieSupport Then
                                 '
-                                ' do not track guests at all
+                                ' cookies supported, not first hit and not spider
                                 '
-                                resultAuthContext.authContextUser = authContextUserModel.createDefault(cpCore, resultAuthContext.visit.Name)
-                                resultAuthContext.visitor.memberID = resultAuthContext.authContextUser.id
+                                resultAuthContext.user = Models.Entity.personModel.add(cpCore, New List(Of String))
+                                'resultauthContext.user = authContextUserModel.add(cpCore, resultAuthContext.visit.Name)
+                                resultAuthContext.visitor.memberID = resultAuthContext.user.ID
                                 resultAuthContext.visitor.saveObject(cpCore)
                                 '
                                 resultAuthContext.visit.VisitAuthenticated = False
@@ -602,42 +606,30 @@ Namespace Contensive.Core.Models.Context
                                 resultAuthContext.property_user_isMember_isLoaded = False
                                 resultAuthContext.isAuthenticatedDeveloper_cache_isLoaded = False
                             Else
-                                If resultAuthContext.visit.CookieSupport Then
+                                '
+                                ' upgraded, set it to the site property - experimental build set to true
+                                '
+                                TrackGuestsWithoutCookies = cpCore.siteProperties.getBoolean("track guests without cookies")
+                                If TrackGuestsWithoutCookies Then
                                     '
-                                    ' cookies supported, not first hit and not spider
+                                    ' compatibiltiy mode - create people for non-cookies too
                                     '
-                                    resultAuthContext.authContextUser = authContextUserModel.createDefault(cpCore, resultAuthContext.visit.Name)
-                                    resultAuthContext.visitor.memberID = resultAuthContext.authContextUser.id
-                                    resultAuthContext.visitor.saveObject(cpCore)
-                                    '
-                                    resultAuthContext.visit.VisitAuthenticated = False
-                                    resultAuthContext.visit.saveObject(cpCore)
-                                    '
+                                    resultAuthContext.user = Models.Entity.personModel.add(cpCore, New List(Of String))
+                                    resultAuthContext.user.Name = resultAuthContext.visit.Name
+                                    resultAuthContext.user.saveObject(cpCore)
                                     resultAuthContext.isAuthenticatedAdmin_cache_isLoaded = False
                                     resultAuthContext.property_user_isMember_isLoaded = False
                                     resultAuthContext.isAuthenticatedDeveloper_cache_isLoaded = False
                                 Else
                                     '
-                                    ' upgraded, set it to the site property - experimental build set to true
+                                    ' set defaults for people record
                                     '
-                                    TrackGuestsWithoutCookies = cpCore.siteProperties.getBoolean("track guests without cookies")
-                                    If TrackGuestsWithoutCookies Then
-                                        '
-                                        ' compatibiltiy mode - create people for non-cookies too
-                                        '
-                                        Call resultAuthContext.authContextUser.createDefault(cpCore, resultAuthContext.visit.Name)
-                                        resultAuthContext.isAuthenticatedAdmin_cache_isLoaded = False
-                                        resultAuthContext.property_user_isMember_isLoaded = False
-                                        resultAuthContext.isAuthenticatedDeveloper_cache_isLoaded = False
-                                    Else
-                                        '
-                                        ' set defaults for people record
-                                        '
-                                        Call resultAuthContext.authContextUser.createUserDefaults(cpCore, DefaultMemberName)
-                                        resultAuthContext.isAuthenticatedAdmin_cache_isLoaded = False
-                                        resultAuthContext.property_user_isMember_isLoaded = False
-                                        resultAuthContext.isAuthenticatedDeveloper_cache_isLoaded = False
-                                    End If
+                                    resultAuthContext.user = Models.Entity.personModel.add(cpCore, New List(Of String))
+                                    resultAuthContext.user.Name = DefaultMemberName
+                                    resultAuthContext.user.saveObject(cpCore)
+                                    resultAuthContext.isAuthenticatedAdmin_cache_isLoaded = False
+                                    resultAuthContext.property_user_isMember_isLoaded = False
+                                    resultAuthContext.isAuthenticatedDeveloper_cache_isLoaded = False
                                 End If
                             End If
                         End If
@@ -654,12 +646,12 @@ Namespace Contensive.Core.Models.Context
                         '
                         ' First page of this visit, verify the member language
                         '
-                        If (resultAuthContext.authContextUser.languageId < 1) Or (resultAuthContext.authContextUser.language = "") Then
+                        If (resultAuthContext.user.LanguageID < 1) Then ' Or (resultAuthContext.user.language = "") Then
                             '
                             ' No member language, set member language from browser language
                             '
-                            Call cpCore.web_GetBrowserLanguage(resultAuthContext.authContextUser.languageId, resultAuthContext.authContextUser.language)
-                            If resultAuthContext.authContextUser.languageId > 0 Then
+                            Call cpCore.web_GetBrowserLanguage(resultAuthContext.user.LanguageID, resultAuthContext.user.language)
+                            If resultAuthContext.user.LanguageID > 0 Then
                                 '
                                 ' Browser Language worked
                                 '
@@ -668,41 +660,41 @@ Namespace Contensive.Core.Models.Context
                                 '
                                 ' Still no match, main_Get the default language
                                 '
-                                resultAuthContext.authContextUser.language = cpCore.siteProperties.getText("Language", "English")
-                                If resultAuthContext.authContextUser.language <> "English" Then
+                                resultAuthContext.user.language = cpCore.siteProperties.getText("Language", "English")
+                                If resultAuthContext.user.language <> "English" Then
                                     '
                                     ' Handle the non-English case first, so if there is a problem, fall back is English
                                     '
-                                    CS = cpCore.db.cs_open("Languages", "name=" & cpCore.db.encodeSQLText(resultAuthContext.authContextUser.language))
+                                    CS = cpCore.db.cs_open("Languages", "name=" & cpCore.db.encodeSQLText(resultAuthContext.user.language))
                                     If cpCore.db.cs_ok(CS) Then
-                                        resultAuthContext.authContextUser.languageId = cpCore.db.cs_getInteger(CS, "ID")
+                                        resultAuthContext.user.LanguageID = cpCore.db.cs_getInteger(CS, "ID")
                                         user_changes = True
                                     End If
                                     Call cpCore.db.cs_Close(CS)
-                                    If resultAuthContext.authContextUser.languageId = 0 Then
+                                    If resultAuthContext.user.LanguageID = 0 Then
                                         '
                                         ' non-English Language is not in Language Table, set default to english
                                         '
-                                        resultAuthContext.authContextUser.language = "English"
-                                        Call cpCore.siteProperties.setProperty("Language", resultAuthContext.authContextUser.language)
+                                        resultAuthContext.user.language = "English"
+                                        Call cpCore.siteProperties.setProperty("Language", resultAuthContext.user.language)
                                     End If
                                 End If
-                                If resultAuthContext.authContextUser.language = "English" Then
-                                    CS = cpCore.db.cs_open("Languages", "name=" & cpCore.db.encodeSQLText(resultAuthContext.authContextUser.language))
+                                If resultAuthContext.user.language = "English" Then
+                                    CS = cpCore.db.cs_open("Languages", "name=" & cpCore.db.encodeSQLText(resultAuthContext.user.language))
                                     If cpCore.db.cs_ok(CS) Then
-                                        resultAuthContext.authContextUser.languageId = cpCore.db.cs_getInteger(CS, "ID")
+                                        resultAuthContext.user.LanguageID = cpCore.db.cs_getInteger(CS, "ID")
                                         user_changes = True
                                     End If
                                     Call cpCore.db.cs_Close(CS)
-                                    If resultAuthContext.authContextUser.languageId < 1 Then
+                                    If resultAuthContext.user.LanguageID < 1 Then
                                         '
                                         ' English is not in Language table, add it, and set it in Member
                                         '
                                         CS = cpCore.db.cs_insertRecord("Languages")
                                         If cpCore.db.cs_ok(CS) Then
-                                            resultAuthContext.authContextUser.languageId = cpCore.db.cs_getInteger(CS, "ID")
-                                            resultAuthContext.authContextUser.language = "English"
-                                            Call cpCore.db.cs_set(CS, "Name", resultAuthContext.authContextUser.language)
+                                            resultAuthContext.user.LanguageID = cpCore.db.cs_getInteger(CS, "ID")
+                                            resultAuthContext.user.language = "English"
+                                            Call cpCore.db.cs_set(CS, "Name", resultAuthContext.user.language)
                                             Call cpCore.db.cs_set(CS, "HTTP_Accept_LANGUAGE", "en")
                                             user_changes = True
                                         End If
@@ -721,7 +713,7 @@ Namespace Contensive.Core.Models.Context
                     '
                     ' can not count main_VisitCookieSupport yet, since a new visit will not show cookie support until the ajax hit
                     'hint = "910"
-                    resultAuthContext.visit.ExcludeFromAnalytics = resultAuthContext.visit.ExcludeFromAnalytics Or resultAuthContext.visit_isBot Or resultAuthContext.authContextUser.excludeFromAnalytics Or resultAuthContext.authContextUser.isAdmin Or resultAuthContext.authContextUser.isDeveloper
+                    resultAuthContext.visit.ExcludeFromAnalytics = resultAuthContext.visit.ExcludeFromAnalytics Or resultAuthContext.visit_isBot Or resultAuthContext.user.ExcludeFromAnalytics Or resultAuthContext.user.Admin Or resultAuthContext.user.Developer
                     '
                     ' Update Page count
                     '
@@ -746,7 +738,7 @@ Namespace Contensive.Core.Models.Context
                     '
                     'hint = "950"
                     If user_changes Then
-                        Call resultAuthContext.authContextUser.saveObject(cpCore)
+                        Call resultAuthContext.user.saveObject(cpCore)
                     End If
                     '
                     ' ----- send visit cookie if supported or first page
@@ -830,8 +822,8 @@ Namespace Contensive.Core.Models.Context
                     & ",CookieSupport=" & cpCore.db.encodeSQLBoolean(visit.CookieSupport) _
                     & ",LoginAttempts=" & visit.LoginAttempts _
                     & ",VisitAuthenticated=" & cpCore.db.encodeSQLBoolean(visit.VisitAuthenticated) _
-                    & ",MemberID=" & authContextUser.id _
-                    & ",MemberNew=" & cpCore.db.encodeSQLBoolean(authContextUser.isNew) _
+                    & ",MemberID=" & user.ID _
+                    & ",MemberNew=" & cpCore.db.encodeSQLBoolean(visit.MemberNew) _
                     & ",TimeToLastHit=" & cpCore.db.encodeSQLNumber(visit.TimeToLastHit) _
                     & ",ExcludeFromAnalytics=" & cpCore.db.encodeSQLBoolean(visit.ExcludeFromAnalytics) _
                     & ",Mobile=" & cpCore.db.encodeSQLBoolean(visit_browserIsMobile) _
@@ -1186,11 +1178,11 @@ ErrorTrap:
                             '
                             ' Is a CM for any content def
                             '
-                            If (Not _isAuthenticatedContentManagerAnything_loaded) Or (_isAuthenticatedContentManagerAnything_userId <> authContextUser.id) Then
+                            If (Not _isAuthenticatedContentManagerAnything_loaded) Or (_isAuthenticatedContentManagerAnything_userId <> user.ID) Then
                                 SQL = "SELECT ccGroupRules.ContentID" _
                                     & " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID" _
                                     & " WHERE (" _
-                                        & "(ccMemberRules.MemberID=" & cpCore.db.encodeSQLNumber(authContextUser.id) & ")" _
+                                        & "(ccMemberRules.MemberID=" & cpCore.db.encodeSQLNumber(user.ID) & ")" _
                                         & " AND(ccMemberRules.active<>0)" _
                                         & " AND(ccGroupRules.active<>0)" _
                                         & " AND(ccGroupRules.ContentID Is not Null)" _
@@ -1200,7 +1192,7 @@ ErrorTrap:
                                 _isAuthenticatedContentManagerAnything = cpCore.db.cs_ok(CS)
                                 cpCore.db.cs_Close(CS)
                                 '
-                                _isAuthenticatedContentManagerAnything_userId = authContextUser.id
+                                _isAuthenticatedContentManagerAnything_userId = user.ID
                                 _isAuthenticatedContentManagerAnything_loaded = True
                             End If
                             returnIsContentManager = _isAuthenticatedContentManagerAnything
@@ -1228,16 +1220,16 @@ ErrorTrap:
         '
         Public Sub logout(cpCore As coreClass)
             Try
-                Call cpCore.log_LogActivity2("logout", authContextUser.id, authContextUser.organizationId)
+                Call cpCore.log_LogActivity2("logout", user.ID, user.OrganizationID)
                 '
                 ' Clear MemberID for this page
                 '
-                authContextUser = authContextUserModel.createDefault(cpCore, visit.Name)
+                user = Models.Entity.personModel.add(cpCore, New List(Of String))
                 '
                 visit.VisitAuthenticated = False
                 visit.saveObject(cpCore)
                 '
-                visitor.memberID = authContextUser.id
+                visitor.memberID = user.ID
                 visitor.saveObject(cpCore)
                 '
                 isAuthenticatedAdmin_cache_isLoaded = False
@@ -1289,7 +1281,7 @@ ErrorTrap:
                     ' ----- password blank, stop here
                     '
                     Call cpCore.error_AddUserError("A valid login requires a non-blank password.")
-                ElseIf (visit.LoginAttempts >= authContextUsermodel.main_maxVisitLoginAttempts) Then
+                ElseIf (visit.LoginAttempts >= constants.maxVisitLoginAttempts) Then
                     '
                     ' ----- already tried 5 times
                     '
@@ -1526,7 +1518,7 @@ ErrorTrap:
                     SQL = "SELECT ccGroupRules.ContentID,allowAdd,allowDelete" _
                     & " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID" _
                     & " WHERE (" _
-                        & " (ccMemberRules.MemberID=" & cpCore.db.encodeSQLNumber(authContextUser.id) & ")" _
+                        & " (ccMemberRules.MemberID=" & cpCore.db.encodeSQLNumber(user.ID) & ")" _
                         & " AND(ccMemberRules.active<>0)" _
                         & " AND(ccGroupRules.active<>0)" _
                         & " AND(ccGroupRules.ContentID=" & ContentID & ")" _
@@ -1592,11 +1584,11 @@ ErrorTrap:
                 If LocalMemberID <> 0 Then
                     returnREsult = authenticateById(cpCore, LocalMemberID, AllowAutoLogin)
                     If returnREsult Then
-                        Call cpCore.log_LogActivity2("successful password login", authContextUser.id, authContextUser.organizationId)
+                        Call cpCore.log_LogActivity2("successful password login", user.ID, user.OrganizationID)
                         isAuthenticatedAdmin_cache_isLoaded = False
                         property_user_isMember_isLoaded = False
                     Else
-                        Call cpCore.log_LogActivity2("unsuccessful login (loginField:" & loginFieldValue & "/password:" & password & ")", authContextUser.id, authContextUser.organizationId)
+                        Call cpCore.log_LogActivity2("unsuccessful login (loginField:" & loginFieldValue & "/password:" & password & ")", user.ID, user.OrganizationID)
                     End If
                 End If
             Catch ex As Exception
@@ -1637,7 +1629,7 @@ ErrorTrap:
                     '
                     ' Change autologin if included, selected, and allowed
                     '
-                    If AllowAutoLogin Xor authContextUser.autoLogin Then
+                    If AllowAutoLogin Xor user.AutoLogin Then
                         If cpCore.siteProperties.getBoolean("AllowAutoLogin") Then
                             CS = cpCore.csOpenRecord("people", irecordID)
                             If cpCore.db.cs_ok(CS) Then
@@ -1689,46 +1681,46 @@ ErrorTrap:
                     ' ----- Member was recognized
                     '   REFACTOR -- when the id is set, the user object is populated, so the rest of this can be removed (verify these are all set in the load
                     '
-                    authContextUser.id = (cpCore.db.cs_getInteger(CS, "ID"))
-                    authContextUser.name = (cpCore.db.cs_getText(CS, "Name"))
-                    authContextUser.username = (cpCore.db.cs_getText(CS, "username"))
-                    authContextUser.email = (cpCore.db.cs_getText(CS, "Email"))
-                    authContextUser.password = (cpCore.db.cs_getText(CS, "Password"))
-                    authContextUser.organizationId = (cpCore.db.cs_getInteger(CS, "OrganizationID"))
-                    authContextUser.languageId = (cpCore.db.cs_getInteger(CS, "LanguageID"))
-                    authContextUser.active = (cpCore.db.cs_getBoolean(CS, "Active"))
-                    authContextUser.company = (cpCore.db.cs_getText(CS, "Company"))
-                    authContextUser.visits = (cpCore.db.cs_getInteger(CS, "Visits"))
-                    authContextUser.lastVisit = (cpCore.db.cs_getDate(CS, "LastVisit"))
-                    authContextUser.allowBulkEmail = (cpCore.db.cs_getBoolean(CS, "AllowBulkEmail"))
-                    authContextUser.allowToolsPanel = (cpCore.db.cs_getBoolean(CS, "AllowToolsPanel"))
-                    authContextUser.adminMenuModeID = (cpCore.db.cs_getInteger(CS, "AdminMenuModeID"))
-                    authContextUser.autoLogin = (cpCore.db.cs_getBoolean(CS, "AutoLogin"))
-                    authContextUser.isDeveloper = (cpCore.db.cs_getBoolean(CS, "Developer"))
-                    authContextUser.isAdmin = (cpCore.db.cs_getBoolean(CS, "Admin"))
-                    authContextUser.contentControlID = (cpCore.db.cs_getInteger(CS, "ContentControlID"))
-                    authContextUser.languageId = (cpCore.db.cs_getInteger(CS, "LanguageID"))
-                    authContextUser.language = (cpCore.db.cs_getText(CS, "LanguageName"))
-                    authContextUser.styleFilename = cpCore.db.cs_getText(CS, "StyleFilename")
-                    If authContextUser.styleFilename <> "" Then
-                        Call cpCore.htmlDoc.main_AddStylesheetLink(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, authContextUser.styleFilename))
+                    user.ID = (cpCore.db.cs_getInteger(CS, "ID"))
+                    user.Name = (cpCore.db.cs_getText(CS, "Name"))
+                    user.Username = (cpCore.db.cs_getText(CS, "username"))
+                    user.Email = (cpCore.db.cs_getText(CS, "Email"))
+                    user.Password = (cpCore.db.cs_getText(CS, "Password"))
+                    user.OrganizationID = (cpCore.db.cs_getInteger(CS, "OrganizationID"))
+                    user.LanguageID = (cpCore.db.cs_getInteger(CS, "LanguageID"))
+                    user.Active = (cpCore.db.cs_getBoolean(CS, "Active"))
+                    user.Company = (cpCore.db.cs_getText(CS, "Company"))
+                    user.Visits = (cpCore.db.cs_getInteger(CS, "Visits"))
+                    user.LastVisit = (cpCore.db.cs_getDate(CS, "LastVisit"))
+                    user.AllowBulkEmail = (cpCore.db.cs_getBoolean(CS, "AllowBulkEmail"))
+                    user.AllowToolsPanel = (cpCore.db.cs_getBoolean(CS, "AllowToolsPanel"))
+                    user.AdminMenuModeID = (cpCore.db.cs_getInteger(CS, "AdminMenuModeID"))
+                    user.AutoLogin = (cpCore.db.cs_getBoolean(CS, "AutoLogin"))
+                    user.Developer = (cpCore.db.cs_getBoolean(CS, "Developer"))
+                    user.Admin = (cpCore.db.cs_getBoolean(CS, "Admin"))
+                    user.ContentControlID = (cpCore.db.cs_getInteger(CS, "ContentControlID"))
+                    user.LanguageID = (cpCore.db.cs_getInteger(CS, "LanguageID"))
+                    user.language = (cpCore.db.cs_getText(CS, "LanguageName"))
+                    user.StyleFilename = cpCore.db.cs_getText(CS, "StyleFilename")
+                    If user.StyleFilename <> "" Then
+                        Call cpCore.htmlDoc.main_AddStylesheetLink(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, user.StyleFilename))
                     End If
-                    authContextUser.excludeFromAnalytics = cpCore.db.cs_getBoolean(CS, "ExcludeFromAnalytics")
+                    user.ExcludeFromAnalytics = cpCore.db.cs_getBoolean(CS, "ExcludeFromAnalytics")
                     '
-                    authContextUser.visits = authContextUser.visits + 1
-                    If authContextUser.visits = 1 Then
-                        authContextUser.isNew = True
+                    user.Visits = user.Visits + 1
+                    If user.Visits = 1 Then
+                        visit.MemberNew = True
                     Else
-                        authContextUser.isNew = False
+                        visit.MemberNew = False
                     End If
-                    authContextUser.lastVisit = cpCore.app_startTime
+                    user.LastVisit = cpCore.app_startTime
                     'cpCore.main_VisitMemberID = id
                     visit.LoginAttempts = 0
-                    visitor.memberID = authContextUser.id
-                    visit.ExcludeFromAnalytics = visit.ExcludeFromAnalytics Or visit_isBot Or authContextUser.excludeFromAnalytics Or authContextUser.isAdmin Or authContextUser.isDeveloper
+                    visitor.memberID = user.ID
+                    visit.ExcludeFromAnalytics = visit.ExcludeFromAnalytics Or visit_isBot Or user.ExcludeFromAnalytics Or user.Admin Or user.Developer
                     Call saveObject(cpCore)
                     Call visitor.saveObject(cpCore)
-                    Call authContextUser.saveObject(cpCore)
+                    Call user.saveObject(cpCore)
                     returnREsult = True
                 End If
                 Call cpCore.db.cs_Close(CS)
@@ -1748,7 +1740,7 @@ ErrorTrap:
                 Dim iMemberID As Integer
                 iMemberID = genericController.EncodeInteger(checkMemberID)
                 If iMemberID = 0 Then
-                    iMemberID = authContextUser.id
+                    iMemberID = user.ID
                 End If
                 returnREsult = isMemberOfGroupList(cpCore, "," & cpCore.group_GetGroupID(genericController.encodeText(GroupName)), iMemberID, True)
             Catch ex As Exception
@@ -1767,7 +1759,7 @@ ErrorTrap:
                 Dim iMemberID As Integer
                 iMemberID = checkMemberID
                 If iMemberID = 0 Then
-                    iMemberID = authContextUser.id
+                    iMemberID = user.ID
                 End If
                 returnREsult = isMemberOfGroupList(cpCore, "," & cpCore.group_GetGroupID(genericController.encodeText(GroupName)), iMemberID, adminReturnsTrue)
             Catch ex As Exception
@@ -1785,7 +1777,7 @@ ErrorTrap:
             Dim returnREsult As Boolean = False
             Try
                 If checkMemberID = 0 Then
-                    checkMemberID = authContextUser.id
+                    checkMemberID = user.ID
                 End If
                 returnREsult = isMemberOfGroupIdList(cpCore, checkMemberID, isAuthenticated(), GroupIDList, adminReturnsTrue)
             Catch ex As Exception
@@ -1803,7 +1795,7 @@ ErrorTrap:
             Dim returnREsult As Boolean = False
             Try
                 If (Not property_user_isMember_isLoaded) And (visit_initialized) Then
-                    property_user_isMember = isAuthenticated() And cpCore.IsWithinContent(authContextUser.contentControlID, cpCore.main_GetContentID("members"))
+                    property_user_isMember = isAuthenticated() And cpCore.IsWithinContent(user.ContentControlID, cpCore.main_GetContentID("members"))
                     property_user_isMember_isLoaded = True
                 End If
                 returnREsult = property_user_isMember
@@ -1934,7 +1926,7 @@ ErrorTrap:
         ''' </summary>
         ''' <returns></returns>
         Public Function isRecognized(cpCore As coreClass) As Boolean
-            Return Not authContextUser.isNew
+            Return Not visit.MemberNew
         End Function
         ''
         ''========================================================================
@@ -1980,10 +1972,10 @@ ErrorTrap:
                             cacheTestName = "iseditingall"
                         End If
                         cacheTestName = genericController.vbLCase(cacheTestName)
-                        If genericController.IsInDelimitedString(authContextUser.main_IsEditingContentList, cacheTestName, ",") Then
+                        If genericController.IsInDelimitedString(main_IsEditingContentList, cacheTestName, ",") Then
                             Call cpCore.debug_testPoint("...is in main_IsEditingContentList")
                             returnResult = True
-                        ElseIf genericController.IsInDelimitedString(authContextUser.main_IsNotEditingContentList, cacheTestName, ",") Then
+                        ElseIf genericController.IsInDelimitedString(main_IsNotEditingContentList, cacheTestName, ",") Then
                             Call cpCore.debug_testPoint("...is in main_IsNotEditingContentList")
                         Else
                             If isAuthenticated() Then
@@ -1999,9 +1991,9 @@ ErrorTrap:
                                 End If
                             End If
                             If returnResult Then
-                                authContextUser.main_IsEditingContentList = authContextUser.main_IsEditingContentList & "," & cacheTestName
+                                main_IsEditingContentList = main_IsEditingContentList & "," & cacheTestName
                             Else
-                                authContextUser.main_IsNotEditingContentList = authContextUser.main_IsNotEditingContentList & "," & cacheTestName
+                                main_IsNotEditingContentList = main_IsNotEditingContentList & "," & cacheTestName
                             End If
                         End If
                     End If

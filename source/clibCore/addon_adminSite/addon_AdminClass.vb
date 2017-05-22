@@ -44,8 +44,8 @@ Namespace Contensive.Addons
                 '
                 SaveContent = "" _
                     & Now() _
-                    & vbCrLf & "member.name:" & cpCore.authContext.authContextUser.name _
-                    & vbCrLf & "member.id:" & cpCore.authContext.authContextUser.id _
+                    & vbCrLf & "member.name:" & cpCore.authContext.user.Name _
+                    & vbCrLf & "member.id:" & cpCore.authContext.user.ID _
                     & vbCrLf & "visit.id:" & cpCore.authContext.visit.ID _
                     & vbCrLf & "url:" & cpCore.webServer.webServerIO_ServerLink _
                     & vbCrLf & "url source:" & cpCore.webServer.requestLinkSource
@@ -109,8 +109,8 @@ Namespace Contensive.Addons
                 '
                 SaveContent &= "" _
                     & Now() _
-                    & vbCrLf & "member.name:" & cpCore.authContext.authContextUser.name _
-                    & vbCrLf & "member.id:" & cpCore.authContext.authContextUser.id _
+                    & vbCrLf & "member.name:" & cpCore.authContext.user.Name _
+                    & vbCrLf & "member.id:" & cpCore.authContext.user.ID _
                     & vbCrLf & "visit.id:" & cpCore.authContext.visit.ID _
                     & vbCrLf & "url:" & cpCore.webServer.webServerIO_ServerLink _
                     & vbCrLf & "url source:" & cpCore.webServer.requestLinkSource _
@@ -754,14 +754,14 @@ ErrorTrap:
             '
             AdminMenuModeID = cpCore.docProperties.getInteger("mm")
             If AdminMenuModeID = 0 Then
-                AdminMenuModeID = cpCore.authContext.authContextUser.adminMenuModeID
+                AdminMenuModeID = cpCore.authContext.user.AdminMenuModeID
             End If
             If AdminMenuModeID = 0 Then
                 AdminMenuModeID = AdminMenuModeLeft
             End If
-            If cpCore.authContext.authContextUser.adminMenuModeID <> AdminMenuModeID Then
-                cpCore.authContext.authContextUser.adminMenuModeID = AdminMenuModeID
-                Call cpCore.authContext.authContextUser.saveObject(cpCore)
+            If cpCore.authContext.user.AdminMenuModeID <> AdminMenuModeID Then
+                cpCore.authContext.user.AdminMenuModeID = AdminMenuModeID
+                Call cpCore.authContext.user.saveObject(cpCore)
             End If
             '    '
             '    ' ----- FieldName
@@ -1076,7 +1076,7 @@ ErrorTrap:
                             '
                             ' --- copy live record over edit record
                             '
-                            Call cpCore.workflow.abortEdit2(adminContent.Name, editRecord.id, cpCore.authContext.authContextUser.id)
+                            Call cpCore.workflow.abortEdit2(adminContent.Name, editRecord.id, cpCore.authContext.user.ID)
                             Call cpCore.main_ProcessSpecialCaseAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                             If MenuDepth > 0 Then
                                 '
@@ -1895,11 +1895,11 @@ ErrorTrap:
                             '    .readonlyfield = True
                             '    .Required = False
                             Case "MODIFIEDBY"
-                                editrecord.fieldsLc(field.nameLc).value = cpCore.authContext.authContextUser.id
+                                editrecord.fieldsLc(field.nameLc).value = cpCore.authContext.user.ID
                                 '    .readonlyfield = True
                                 '    .Required = False
                             Case "CREATEDBY"
-                                editrecord.fieldsLc(field.nameLc).value = cpCore.authContext.authContextUser.id
+                                editrecord.fieldsLc(field.nameLc).value = cpCore.authContext.user.ID
                                 '    .readonlyfield = True
                                 '    .Required = False
                                 'Case "DATEADDED"
@@ -3666,7 +3666,7 @@ ErrorTrap:
                             Filename = cpCore.db.cs_get(CS, .nameLc)
                             If Filename <> "" Then
                                 Copy = cpCore.cdnFiles.readFile(Filename)
-                                Copy = cpCore.htmlDoc.html_encodeContent10(Copy, cpCore.authContext.authContextUser.id, "", 0, 0, True, False, False, False, True, False, "", "", IsEmailContent, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, cpCore.authContext.isAuthenticated, Nothing, cpCore.authContext.isEditingAnything(cpCore))
+                                Copy = cpCore.htmlDoc.html_encodeContent10(Copy, cpCore.authContext.user.ID, "", 0, 0, True, False, False, False, True, False, "", "", IsEmailContent, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, cpCore.authContext.isAuthenticated, Nothing, cpCore.authContext.isEditingAnything(cpCore))
                                 Stream.Add(Copy)
                             End If
                         Case FieldTypeIdRedirect, FieldTypeIdManyToMany
@@ -4308,7 +4308,7 @@ ErrorTrap:
                             EmailSubmitted = False
                             If editRecord.id <> 0 Then
                                 If editRecord.fieldsLc.ContainsKey("testmemberid") Then
-                                    editRecord.fieldsLc.Item("testmemberid").value = cpCore.authContext.authContextUser.id
+                                    editRecord.fieldsLc.Item("testmemberid").value = cpCore.authContext.user.ID
                                 End If
                             End If
                             EditSectionButtonBar = ""
@@ -4348,7 +4348,7 @@ ErrorTrap:
                             EmailSubmitted = False
                             If editRecord.id <> 0 Then
                                 If editRecord.fieldsLc.ContainsKey("testmemberid") Then
-                                    editRecord.fieldsLc.Item("testmemberid").value = cpCore.authContext.authContextUser.id
+                                    editRecord.fieldsLc.Item("testmemberid").value = cpCore.authContext.user.ID
                                 End If
                                 If editRecord.fieldsLc.ContainsKey("submitted") Then
                                     EmailSubmitted = genericController.EncodeBoolean(editRecord.fieldsLc.Item("submitted").value)
@@ -4402,7 +4402,7 @@ ErrorTrap:
                             EmailSent = False
                             If editRecord.id <> 0 Then
                                 If editRecord.fieldsLc.ContainsKey("testmemberid") Then
-                                    editRecord.fieldsLc.Item("testmemberid").value = cpCore.authContext.authContextUser.id
+                                    editRecord.fieldsLc.Item("testmemberid").value = cpCore.authContext.user.ID
                                 End If
                                 If editRecord.fieldsLc.ContainsKey("submitted") Then
                                     EmailSubmitted = genericController.EncodeBoolean(editRecord.fieldsLc.Item("submitted").value)
@@ -7222,7 +7222,7 @@ ErrorTrap:
                     & vbCrLf & "<div><a href=http://www.Contensive.com target=_blank><img style=""border:1px solid #000;"" src=""/ccLib/images/ContensiveAdminLogo.GIF"" border=0 ></A></div>" _
                     & vbCrLf & "<div><strong>Contensive/" & cpCore.codeVersion & "</strong></div>" _
                     & vbCrLf & "<div style=""clear:both;height:18px;margin-top:10px""><div style=""float:left;width:200px;"">Domain Name</div><div style=""float:left;"">" & cpCore.webServer.webServerIO_requestDomain & "</div></div>" _
-                    & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;"">Login Member Name</div><div style=""float:left;"">" & cpCore.authContext.authContextUser.name & "</div></div>" _
+                    & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;"">Login Member Name</div><div style=""float:left;"">" & cpCore.authContext.user.Name & "</div></div>" _
                     & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;"">Quick Reports</div><div style=""float:left;""><a Href=""?" & RequestNameAdminForm & "=" & AdminFormQuickStats & """>Real-Time Activity</A></div></div>" _
                     & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;""><a Href=""?" & RequestNameDashboardReset & "=" & cpCore.authContext.visit.ID & """>Run Dashboard</A></div></div>" _
                     & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;""><a Href=""?addonguid=" & AddonManagerGuid & """>Add-on Manager</A></div></div>"
@@ -9881,8 +9881,8 @@ ErrorTrap:
                             '
                             ' field has some kind of restriction
                             '
-                            If Not cpCore.authContext.authContextUser.isDeveloper Then
-                                If Not cpCore.authContext.authContextUser.isAdmin Then
+                            If Not cpCore.authContext.user.Developer Then
+                                If Not cpCore.authContext.user.Admin Then
                                     '
                                     ' you are not admin
                                     '
@@ -10301,7 +10301,7 @@ ErrorTrap:
                 '
                 ' ----- Get the baked version
                 '
-                BakeName = "AdminMenu" & Format(cpCore.authContext.authContextUser.id, "00000000")
+                BakeName = "AdminMenu" & Format(cpCore.authContext.user.ID, "00000000")
                 GetMenuTopMode = genericController.encodeText(cpCore.cache.getObject(Of String)(BakeName))
                 MenuDelimiterPosition = genericController.vbInstr(1, GetMenuTopMode, MenuDelimiter, vbTextCompare)
                 If MenuDelimiterPosition > 1 Then
@@ -12617,7 +12617,7 @@ ErrorTrap:
                                 End If
                                 SubTitlePart = ""
                                 If .LastEditedByMe Then
-                                    SubTitlePart = SubTitlePart & " by " & cpCore.authContext.authContextUser.name
+                                    SubTitlePart = SubTitlePart & " by " & cpCore.authContext.user.Name
                                 End If
                                 If .LastEditedPast30Days Then
                                     SubTitlePart = SubTitlePart & " in the past 30 days"
@@ -15075,7 +15075,7 @@ ErrorTrap:
                         End If
                     End If
                     If ExportName = "" Then
-                        ExportName = adminContent.Name & " export for " & cpCore.authContext.authContextUser.name
+                        ExportName = adminContent.Name & " export for " & cpCore.authContext.user.Name
                     End If
                     '
                     ' Get the SQL parts
@@ -17194,7 +17194,7 @@ ErrorTrap:
                 ' Where Clause: edited by me
                 '
                 If IndexConfig.LastEditedByMe Then
-                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ModifiedBy=" & cpCore.authContext.authContextUser.id & ")"
+                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ModifiedBy=" & cpCore.authContext.user.ID & ")"
                 End If
                 '
                 ' Where Clause: edited today

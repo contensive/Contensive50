@@ -15,6 +15,8 @@ Namespace Contensive.Core.Models.Entity
         Public Const primaryContentName As String = "" '<------ set content name
         Private Const primaryContentTableName As String = "" '<------ set to tablename for the primary content (used for cache names)
         '
+        'Public isNew As Boolean
+        '
         ' -- instance properties
         Public ID As Integer
         Public Active As Boolean
@@ -89,6 +91,8 @@ Namespace Contensive.Core.Models.Entity
         Public Visits As Integer
         Public Zip As String
         '
+        Public language As String ' REFACTOR - remove if this is not used
+        '
         '====================================================================================================
         ''' <summary>
         ''' Create an empty object. needed for deserialization
@@ -96,6 +100,25 @@ Namespace Contensive.Core.Models.Entity
         Public Sub New()
             '
         End Sub
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' add a new recod to the db and open it. Starting a new model with this method will use the default
+        ''' values in Contensive metadata (active, contentcontrolid, etc)
+        ''' </summary>
+        ''' <param name="cpCore"></param>
+        ''' <param name="cacheNameList"></param>
+        ''' <returns></returns>
+        Public Shared Function add(cpCore As coreClass, ByRef cacheNameList As List(Of String)) As personModel
+            Dim result As personModel = Nothing
+            Try
+                result = create(cpCore, cpCore.db.metaData_InsertContentRecordGetID(primaryContentName, cpCore.authContext.user.ID), cacheNameList)
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+                Throw
+            End Try
+            Return result
+        End Function
         '
         '====================================================================================================
         ''' <summary>

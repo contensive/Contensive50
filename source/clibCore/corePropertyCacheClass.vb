@@ -83,7 +83,7 @@ Namespace Contensive.Core
                 Case PropertyTypeVisitor
                     setProperty(propertyName, PropertyValue, cpCore.authContext.visitor.id)
                 Case PropertyTypeMember
-                    setProperty(propertyName, PropertyValue, cpCore.authContext.authContextUser.id)
+                    setProperty(propertyName, PropertyValue, cpCore.authContext.user.id)
             End Select
         End Sub
         '
@@ -177,7 +177,7 @@ ErrorTrap:
                 Case PropertyTypeVisitor
                     Return getDate(propertyName, defaultValue, cpCore.authContext.visitor.id)
                 Case PropertyTypeMember
-                    Return getDate(propertyName, defaultValue, cpCore.authContext.authContextUser.id)
+                    Return getDate(propertyName, defaultValue, cpCore.authContext.user.id)
             End Select
             Return Date.MinValue
         End Function
@@ -221,7 +221,7 @@ ErrorTrap:
                 Case PropertyTypeVisitor
                     Return getNumber(propertyName, defaultValue, cpCore.authContext.visitor.id)
                 Case PropertyTypeMember
-                    Return getNumber(propertyName, defaultValue, cpCore.authContext.authContextUser.id)
+                    Return getNumber(propertyName, defaultValue, cpCore.authContext.user.id)
             End Select
             Return 0
         End Function
@@ -265,7 +265,7 @@ ErrorTrap:
                 Case PropertyTypeVisitor
                     Return getBoolean(propertyName, defaultValue, cpCore.authContext.visitor.id)
                 Case PropertyTypeMember
-                    Return getBoolean(propertyName, defaultValue, cpCore.authContext.authContextUser.id)
+                    Return getBoolean(propertyName, defaultValue, cpCore.authContext.user.id)
             End Select
             Return False
         End Function
@@ -309,7 +309,7 @@ ErrorTrap:
                 Case PropertyTypeVisitor
                     Return getInteger(propertyName, defaultValue, cpCore.authContext.visitor.id)
                 Case PropertyTypeMember
-                    Return getInteger(propertyName, defaultValue, cpCore.authContext.authContextUser.id)
+                    Return getInteger(propertyName, defaultValue, cpCore.authContext.user.id)
             End Select
             Return 0
         End Function
@@ -353,7 +353,7 @@ ErrorTrap:
                 Case PropertyTypeVisitor
                     Return getText(propertyName, defaultValue, cpCore.authContext.visitor.id)
                 Case PropertyTypeMember
-                    Return getText(propertyName, defaultValue, cpCore.authContext.authContextUser.id)
+                    Return getText(propertyName, defaultValue, cpCore.authContext.user.id)
             End Select
             Return ""
         End Function

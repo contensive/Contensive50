@@ -154,7 +154,7 @@
 //        public bool loginForm_AutoLogin = false;
 //        //
 //        //
-//        public const int main_maxVisitLoginAttempts = 20;
+//        public const int maxVisitLoginAttempts = 20;
 //        // prevent main_ProcessLoginFormDefault from running twice (multiple user messages, popups, etc.)
 //        public bool main_loginFormDefaultProcessed = false;
 //        //
@@ -840,7 +840,7 @@
 //                    loginForm_Password = cpCore.docProperties.getText("password");
 //                    loginForm_AutoLogin = cpCore.main_GetStreamBoolean2("autologin");
 //                    //
-//                    if ((cpCore.visit.visit.loginAttempts < main_maxVisitLoginAttempts) & (cpCore.visit.visit.cookieSupport))
+//                    if ((cpCore.visit.visit.loginAttempts < maxVisitLoginAttempts) & (cpCore.visit.visit.cookieSupport))
 //                    {
 //                        LocalMemberID = authenticateGetId(loginForm_Username, loginForm_Password);
 //                        if (LocalMemberID == 0)
@@ -1854,7 +1854,7 @@
 //                    //
 //                    cpCore.error_AddUserError("A valid login requires a non-blank password.");
 //                }
-//                else if ((cpCore.visit.visit.loginAttempts >= main_maxVisitLoginAttempts))
+//                else if ((cpCore.visit.visit.loginAttempts >= maxVisitLoginAttempts))
 //                {
 //                    //
 //                    // ----- already tried 5 times

@@ -81,6 +81,25 @@ Namespace Contensive.Core.Models.Entity
         '
         '====================================================================================================
         ''' <summary>
+        ''' add a new recod to the db and open it. Starting a new model with this method will use the default
+        ''' values in Contensive metadata (active, contentcontrolid, etc)
+        ''' </summary>
+        ''' <param name="cpCore"></param>
+        ''' <param name="cacheNameList"></param>
+        ''' <returns></returns>
+        Public Shared Function add(cpCore As coreClass, ByRef cacheNameList As List(Of String)) As _blankModel
+            Dim result As _blankModel = Nothing
+            Try
+                result = create(cpCore, cpCore.db.metaData_InsertContentRecordGetID(primaryContentName, cpCore.authContext.user.ID), cacheNameList)
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+                Throw
+            End Try
+            Return result
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
         ''' return a new model with the data selected. All cacheNames related to the object will be added to the cacheNameList.
         ''' </summary>
         ''' <param name="cp"></param>
