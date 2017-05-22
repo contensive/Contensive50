@@ -857,11 +857,11 @@ Namespace Contensive.Core
                                     '
                                     CSNewLock = cpCore.db.cs_insertRecord("Authoring Controls", MemberID)
                                     If cpCore.db.cs_ok(CSNewLock) Then
-                                        Call cpCore.db.cs_setField(CSNewLock, "RecordID", RecordID)
-                                        Call cpCore.db.cs_setField(CSNewLock, "DateExpires", (Now.AddDays(EditLockTimeoutDays)))
-                                        Call cpCore.db.cs_setField(CSNewLock, "ControlType", AuthoringControlsEditing)
-                                        Call cpCore.db.cs_setField(CSNewLock, "ContentRecordKey", genericController.encodeText(ContentID & "." & RecordID))
-                                        Call cpCore.db.cs_setField(CSNewLock, "ContentID", ContentID)
+                                        Call cpCore.db.cs_set(CSNewLock, "RecordID", RecordID)
+                                        Call cpCore.db.cs_set(CSNewLock, "DateExpires", (Now.AddDays(EditLockTimeoutDays)))
+                                        Call cpCore.db.cs_set(CSNewLock, "ControlType", AuthoringControlsEditing)
+                                        Call cpCore.db.cs_set(CSNewLock, "ContentRecordKey", genericController.encodeText(ContentID & "." & RecordID))
+                                        Call cpCore.db.cs_set(CSNewLock, "ContentID", ContentID)
                                     End If
                                     Call cpCore.db.cs_Close(CSNewLock)
                                 Else
@@ -869,7 +869,7 @@ Namespace Contensive.Core
                                         '
                                         ' Record Locked by Member, update DateExpire
                                         '
-                                        Call cpCore.db.cs_setField(CSCurrentLock, "DateExpires", (Now.AddDays(EditLockTimeoutDays)))
+                                        Call cpCore.db.cs_set(CSCurrentLock, "DateExpires", (Now.AddDays(EditLockTimeoutDays)))
                                     End If
                                 End If
                                 Call cpCore.db.cs_Close(CSCurrentLock)
@@ -884,10 +884,10 @@ Namespace Contensive.Core
                                     '
                                     CSNewLock = cpCore.db.cs_insertRecord("Authoring Controls", MemberID)
                                     If cpCore.db.cs_ok(CSNewLock) Then
-                                        Call cpCore.db.cs_setField(CSNewLock, "RecordID", RecordID)
-                                        Call cpCore.db.cs_setField(CSNewLock, "ControlType", AuthoringControl)
-                                        Call cpCore.db.cs_setField(CSNewLock, "ContentRecordKey", genericController.encodeText(ContentID & "." & RecordID))
-                                        Call cpCore.db.cs_setField(CSNewLock, "ContentID", ContentID)
+                                        Call cpCore.db.cs_set(CSNewLock, "RecordID", RecordID)
+                                        Call cpCore.db.cs_set(CSNewLock, "ControlType", AuthoringControl)
+                                        Call cpCore.db.cs_set(CSNewLock, "ContentRecordKey", genericController.encodeText(ContentID & "." & RecordID))
+                                        Call cpCore.db.cs_set(CSNewLock, "ContentID", ContentID)
                                     End If
                                     Call cpCore.db.cs_Close(CSNewLock)
                                 Else

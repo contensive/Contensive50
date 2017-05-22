@@ -6488,35 +6488,35 @@ Namespace Contensive.Core
                         End If
                         Call cpCore.db.cs_set(CSEntry, "name", EntryName)
                         If ParentID = 0 Then
-                            Call cpCore.db.cs_set(CSEntry, "ParentID", Nothing)
+                            Call cpCore.db.cs_set(CSEntry, "ParentID", 0)
                         Else
                             Call cpCore.db.cs_set(CSEntry, "ParentID", ParentID)
                         End If
                         If (ContentID = -1) Then
-                            Call cpCore.db.cs_setField(CSEntry, "ContentID", Nothing)
+                            Call cpCore.db.cs_set(CSEntry, "ContentID", 0)
                         Else
-                            Call cpCore.db.cs_setField(CSEntry, "ContentID", ContentID)
+                            Call cpCore.db.cs_set(CSEntry, "ContentID", ContentID)
                         End If
-                        Call cpCore.db.cs_setField(CSEntry, "LinkPage", LinkPage)
-                        Call cpCore.db.cs_setField(CSEntry, "SortOrder", SortOrder)
-                        Call cpCore.db.cs_setField(CSEntry, "AdminOnly", AdminOnly)
-                        Call cpCore.db.cs_setField(CSEntry, "DeveloperOnly", DeveloperOnly)
-                        Call cpCore.db.cs_setField(CSEntry, "NewWindow", NewWindow)
-                        Call cpCore.db.cs_setField(CSEntry, "Active", Active)
+                        Call cpCore.db.cs_set(CSEntry, "LinkPage", LinkPage)
+                        Call cpCore.db.cs_set(CSEntry, "SortOrder", SortOrder)
+                        Call cpCore.db.cs_set(CSEntry, "AdminOnly", AdminOnly)
+                        Call cpCore.db.cs_set(CSEntry, "DeveloperOnly", DeveloperOnly)
+                        Call cpCore.db.cs_set(CSEntry, "NewWindow", NewWindow)
+                        Call cpCore.db.cs_set(CSEntry, "Active", Active)
                         If SupportAddonID Then
-                            Call cpCore.db.cs_setField(CSEntry, "AddonID", addonId)
+                            Call cpCore.db.cs_set(CSEntry, "AddonID", addonId)
                         End If
                         If SupportGuid Then
-                            Call cpCore.db.cs_setField(CSEntry, GuidFieldName, ccGuid)
+                            Call cpCore.db.cs_set(CSEntry, GuidFieldName, ccGuid)
                         End If
                         If SupportNavIcon Then
-                            Call cpCore.db.cs_setField(CSEntry, "NavIconTitle", NavIconTitle)
+                            Call cpCore.db.cs_set(CSEntry, "NavIconTitle", NavIconTitle)
                             Dim NavIconID As Integer
                             NavIconID = GetListIndex(NavIconType, NavIconTypeList)
-                            Call cpCore.db.cs_setField(CSEntry, "NavIconType", NavIconID)
+                            Call cpCore.db.cs_set(CSEntry, "NavIconType", NavIconID)
                         End If
                         If SupportInstalledByCollectionID Then
-                            Call cpCore.db.cs_setField(CSEntry, "InstalledByCollectionID", InstalledByCollectionID)
+                            Call cpCore.db.cs_set(CSEntry, "InstalledByCollectionID", InstalledByCollectionID)
                         End If
                         '
                         ' merge any duplicate guid matches
@@ -6578,13 +6578,13 @@ Namespace Contensive.Core
                     cpCore.db.cs_Close(CSEntry)
                     CSEntry = cpCore.db.cs_insertRecord(ContentName, SystemMemberID)
                     If cpCore.db.cs_ok(CSEntry) Then
-                        Call cpCore.db.cs_setField(CSEntry, "name", Name)
+                        Call cpCore.db.cs_set(CSEntry, "name", Name)
                     End If
                 End If
                 If cpCore.db.cs_ok(CSEntry) Then
-                    Call cpCore.db.cs_setField(CSEntry, "Link", Link)
-                    Call cpCore.db.cs_setField(CSEntry, "ArgumentList", ArgumentList)
-                    Call cpCore.db.cs_setField(CSEntry, "SortOrder", SortOrder)
+                    Call cpCore.db.cs_set(CSEntry, "Link", Link)
+                    Call cpCore.db.cs_set(CSEntry, "ArgumentList", ArgumentList)
+                    Call cpCore.db.cs_set(CSEntry, "SortOrder", SortOrder)
                 End If
                 Call cpCore.db.cs_Close(CSEntry)
             Catch ex As Exception
@@ -6622,7 +6622,7 @@ Namespace Contensive.Core
                     cpCore.db.cs_Close(CSEntry)
                     CSEntry = cpCore.db.cs_insertRecord(ContentName, SystemMemberID)
                     If cpCore.db.cs_ok(CSEntry) Then
-                        Call cpCore.db.cs_setField(CSEntry, "name", Name)
+                        Call cpCore.db.cs_set(CSEntry, "name", Name)
                     End If
                 End If
                 If cpCore.db.cs_ok(CSEntry) Then
@@ -6660,13 +6660,13 @@ Namespace Contensive.Core
                     cpCore.db.cs_Close(CSEntry)
                     CSEntry = cpCore.db.cs_insertRecord(ContentName, SystemMemberID)
                     If cpCore.db.cs_ok(CSEntry) Then
-                        Call cpCore.db.cs_setField(CSEntry, "name", Name)
+                        Call cpCore.db.cs_set(CSEntry, "name", Name)
                     End If
                 End If
                 If cpCore.db.cs_ok(CSEntry) Then
-                    Call cpCore.db.cs_setField(CSEntry, "ObjectProgramID", ObjectProgramID)
-                    Call cpCore.db.cs_setField(CSEntry, "ArgumentList", ArgumentList)
-                    Call cpCore.db.cs_setField(CSEntry, "SortOrder", SortOrder)
+                    Call cpCore.db.cs_set(CSEntry, "ObjectProgramID", ObjectProgramID)
+                    Call cpCore.db.cs_set(CSEntry, "ArgumentList", ArgumentList)
+                    Call cpCore.db.cs_set(CSEntry, "SortOrder", SortOrder)
                 End If
                 Call cpCore.db.cs_Close(CSEntry)
             Catch ex As Exception

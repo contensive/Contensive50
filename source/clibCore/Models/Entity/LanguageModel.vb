@@ -9,11 +9,11 @@ Imports Contensive.BaseClasses
 Imports Newtonsoft.Json
 
 Namespace Contensive.Core.Models.Entity
-    Public Class visitorModel
+    Public Class LanguageModel
         '
         '-- const
-        Public Const primaryContentName As String = "visitors" '<------ set content name
-        Private Const primaryContentTableName As String = "ccvisitors" '<------ set to tablename for the primary content (used for cache names)
+        Public Const primaryContentName As String = "languages"
+        Private Const primaryContentTableName As String = "cclanguages"
         '
         ' -- instance properties
         Public ID As Integer
@@ -27,24 +27,11 @@ Namespace Contensive.Core.Models.Entity
         Public EditArchive As Boolean
         Public EditBlank As Boolean
         Public EditSourceID As Integer
-        Public ForceBrowserMobile As Integer
-        Public MemberID As Integer
+        Public HTTP_Accept_Language As String
         Public ModifiedBy As Integer
         Public ModifiedDate As Date
         Public Name As String
-        Public OrderID As Integer
         Public SortOrder As String
-        'Public id As Integer
-        'Public name As String
-        'Public guid As String
-        ''
-        'Public memberID As Integer = 0              ' the last member account this visitor used (memberid=0 means untracked guest)
-        'Public orderID As Integer = 0               ' the current shopping cart (non-complete order)
-        'Public newVisitor As Boolean = False               ' stored in visit record - Is this the first visit for this visitor
-        'Public forceBrowserMobile As Integer = 0           ' 0 = not set -- use Browser detect each time, 1 = Force Mobile, 2 = Force not Mobile
-        ''
-        '' -- publics not exposed to the UI (test/internal data)
-        '<JsonIgnore> Public createKey As Integer
         '
         '====================================================================================================
         ''' <summary>
@@ -62,8 +49,8 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="cpCore"></param>
         ''' <param name="cacheNameList"></param>
         ''' <returns></returns>
-        Public Shared Function add(cpCore As coreClass, ByRef cacheNameList As List(Of String)) As visitorModel
-            Dim result As visitorModel = Nothing
+        Public Shared Function add(cpCore As coreClass, ByRef cacheNameList As List(Of String)) As LanguageModel
+            Dim result As LanguageModel = Nothing
             Try
                 result = create(cpCore, cpCore.db.metaData_InsertContentRecordGetID(primaryContentName, cpCore.authContext.user.ID), cacheNameList)
             Catch ex As Exception
@@ -80,12 +67,12 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="cp"></param>
         ''' <param name="recordId">The id of the record to be read into the new object</param>
         ''' <param name="cacheNameList">Any cachenames effected by this record will be added to this list. If the method consumer creates a cache object, add these cachenames to its dependent cachename list.</param>
-        Public Shared Function create(cpCore As coreClass, recordId As Integer, ByRef cacheNameList As List(Of String)) As visitorModel
-            Dim result As visitorModel = Nothing
+        Public Shared Function create(cpCore As coreClass, recordId As Integer, ByRef cacheNameList As List(Of String)) As LanguageModel
+            Dim result As LanguageModel = Nothing
             Try
                 If recordId > 0 Then
-                    Dim cacheName As String = GetType(visitorModel).FullName & getCacheName("id", recordId.ToString())
-                    result = cpCore.cache.getObject(Of visitorModel)(cacheName)
+                    Dim cacheName As String = GetType(LanguageModel).FullName & getCacheName("id", recordId.ToString())
+                    result = cpCore.cache.getObject(Of LanguageModel)(cacheName)
                     If (result Is Nothing) Then
                         result = loadObject(cpCore, "id=" & recordId.ToString(), cacheNameList)
                     End If
@@ -103,12 +90,12 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <param name="recordGuid"></param>
-        Public Shared Function create(cpCore As coreClass, recordGuid As String, ByRef cacheNameList As List(Of String)) As visitorModel
-            Dim result As visitorModel = Nothing
+        Public Shared Function create(cpCore As coreClass, recordGuid As String, ByRef cacheNameList As List(Of String)) As LanguageModel
+            Dim result As LanguageModel = Nothing
             Try
                 If Not String.IsNullOrEmpty(recordGuid) Then
-                    Dim cacheName As String = GetType(visitorModel).FullName & getCacheName("ccguid", recordGuid)
-                    result = cpCore.cache.getObject(Of visitorModel)(cacheName)
+                    Dim cacheName As String = GetType(LanguageModel).FullName & getCacheName("ccguid", recordGuid)
+                    result = cpCore.cache.getObject(Of LanguageModel)(cacheName)
                     If (result Is Nothing) Then
                         result = loadObject(cpCore, "ccGuid=" & cpCore.db.encodeSQLText(recordGuid), cacheNameList)
                     End If
@@ -126,12 +113,12 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <param name="sqlCriteria"></param>
-        Private Shared Function loadObject(cpCore As coreClass, sqlCriteria As String, ByRef cacheNameList As List(Of String)) As visitorModel
-            Dim result As visitorModel = Nothing
+        Private Shared Function loadObject(cpCore As coreClass, sqlCriteria As String, ByRef cacheNameList As List(Of String)) As LanguageModel
+            Dim result As LanguageModel = Nothing
             Try
                 Dim cs As New csController(cpCore)
                 If cs.open(primaryContentName, sqlCriteria) Then
-                    result = New visitorModel
+                    result = New LanguageModel
                     With result
                         '
                         ' -- populate result model
@@ -146,12 +133,10 @@ Namespace Contensive.Core.Models.Entity
                         .EditArchive = cs.getBoolean("EditArchive")
                         .EditBlank = cs.getBoolean("EditBlank")
                         .EditSourceID = cs.getInteger("EditSourceID")
-                        .ForceBrowserMobile = cs.getInteger("ForceBrowserMobile")
-                        .MemberID = cs.getInteger("MemberID")
+                        .HTTP_Accept_Language = cs.getText("HTTP_Accept_Language")
                         .ModifiedBy = cs.getInteger("ModifiedBy")
                         .ModifiedDate = cs.getDate("ModifiedDate")
                         .Name = cs.getText("Name")
-                        .OrderID = cs.getInteger("OrderID")
                         .SortOrder = cs.getText("SortOrder")
                     End With
                     If (result IsNot Nothing) Then
@@ -162,7 +147,7 @@ Namespace Contensive.Core.Models.Entity
                         cacheNameList.Add(cacheName0)
                         cpCore.cache.setObject(cacheName0, result)
                         '
-                        Dim cacheName1 As String = getCacheName("ccguid", result.ccGuid)
+                        Dim cacheName1 As String = getCacheName("ccguid", result.ccguid)
                         cacheNameList.Add(cacheName1)
                         cpCore.cache.setObject(cacheName1, Nothing, cacheName1)
                     End If
@@ -198,9 +183,6 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
                 If cs.ok() Then
-                    If (String.IsNullOrEmpty(name)) Then
-                        name = "Visitor " & id.ToString()
-                    End If
                     id = cs.getInteger("id")
                     cs.setField("Active", Active.ToString())
                     cs.setField("ccGuid", ccGuid)
@@ -212,19 +194,17 @@ Namespace Contensive.Core.Models.Entity
                     cs.setField("EditArchive", EditArchive.ToString())
                     cs.setField("EditBlank", EditBlank.ToString())
                     cs.setField("EditSourceID", EditSourceID.ToString())
-                    cs.setField("ForceBrowserMobile", ForceBrowserMobile.ToString())
-                    cs.setField("MemberID", MemberID.ToString())
+                    cs.setField("HTTP_Accept_Language", HTTP_Accept_Language)
                     cs.setField("ModifiedBy", ModifiedBy.ToString())
                     cs.setField("ModifiedDate", ModifiedDate.ToString())
                     cs.setField("Name", Name)
-                    cs.setField("OrderID", OrderID.ToString())
                     cs.setField("SortOrder", SortOrder)
                 End If
                 Call cs.Close()
                 '
                 ' -- invalidate objects
                 cpCore.cache.invalidateObject(getCacheName("id", id.ToString))
-                cpCore.cache.invalidateObject(getCacheName("ccguid", ccGuid))
+                cpCore.cache.invalidateObject(getCacheName("ccguid", ccguid))
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
                 Throw
@@ -273,15 +253,15 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="cp"></param>
         ''' <param name="someCriteria"></param>
         ''' <returns></returns>
-        Public Shared Function getObjectList(cpCore As coreClass, someCriteria As Integer) As List(Of visitorModel)
-            Dim result As New List(Of visitorModel)
+        Public Shared Function getObjectList(cpCore As coreClass, someCriteria As Integer) As List(Of LanguageModel)
+            Dim result As New List(Of LanguageModel)
             Try
                 Dim cs As New csController(cpCore)
                 Dim ignoreCacheNames As New List(Of String)
                 If (cs.open(primaryContentName, "(someCriteria=" & someCriteria & ")", "name", True, "id")) Then
-                    Dim instance As visitorModel
+                    Dim instance As LanguageModel
                     Do
-                        instance = visitorModel.create(cpCore, cs.getInteger("id"), ignoreCacheNames)
+                        instance = LanguageModel.create(cpCore, cs.getInteger("id"), ignoreCacheNames)
                         If (instance IsNot Nothing) Then
                             result.Add(instance)
                         End If
@@ -330,50 +310,7 @@ Namespace Contensive.Core.Models.Entity
         ''' <returns></returns>
         Private Shared Function getCacheName(fieldName As String, fieldValue As String) As String
             Return (primaryContentTableName & "." & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
-            'Return (GetType(visitorModel).FullName & "." & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
+            'Return (GetType(LanguageModel).FullName & "." & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
         End Function
-        '        '
-        '        ' LEGACY CODE =============================================================================
-        '        '   Save Visitor
-        '        '
-        '        '   Saves changes to the visitor record back to the database. Should be called
-        '        '   before exit of anypage if anything here changes
-        '        '=============================================================================
-        '        '
-        '        Public Sub saveObject(cpcore As coreClass)
-        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SaveVisitor")
-        '            '
-        '            'If Not (true) Then Exit Sub
-        '            '
-        '            Dim SQL As String
-        '            Dim MethodName As String
-        '            '
-        '            MethodName = "main_SaveVisitor"
-        '            '
-        '            If cpcore.visit.visit_initialized Then
-        '                If True Then
-        '                    SQL = "UPDATE ccVisitors SET " _
-        '                        & " Name = " & cpcore.db.encodeSQLText(name) _
-        '                        & ",MemberID = " & cpcore.db.encodeSQLNumber(memberID) _
-        '                        & ",OrderID = " & cpcore.db.encodeSQLNumber(orderID) _
-        '                        & ",ForceBrowserMobile = " & cpcore.db.encodeSQLNumber(forceBrowserMobile) _
-        '                        & " WHERE ID=" & id & ";"
-        '                Else
-        '                    SQL = "UPDATE ccVisitors SET " _
-        '                        & " Name = " & cpcore.db.encodeSQLText(name) _
-        '                        & ",MemberID = " & cpcore.db.encodeSQLNumber(memberID) _
-        '                        & ",OrderID = " & cpcore.db.encodeSQLNumber(orderID) _
-        '                        & " WHERE ID=" & id & ";"
-        '                End If
-        '                Call cpcore.db.executeSql(SQL)
-        '            End If
-        '            Exit Sub
-        '            '
-        '            ' ----- Error Trap
-        '            '
-        'ErrorTrap:
-        '            Call cpcore.handleLegacyError18(MethodName)
-        '            '
-        '        End Sub
     End Class
 End Namespace

@@ -3183,7 +3183,7 @@ ErrorTrap:
             Dim SQL As String
             ' converted array to dictionary - Dim FieldPointer As Integer
             Dim Filename As String
-            Dim FieldValueVariant As Object
+            Dim fieldValueObject As Object
             Dim FieldValueText As String
             Dim DataSourceName As String
             Dim MethodName As String
@@ -3215,7 +3215,7 @@ ErrorTrap:
                 ' If There is an error, block the save
                 '
                 AdminAction = AdminActionNop
-            ElseIf Not cpCore.authContext.isAuthenticatedContentManager(cpcore, adminContent.Name) Then
+            ElseIf Not cpCore.authContext.isAuthenticatedContentManager(cpCore, adminContent.Name) Then
                 '
                 ' save blocked by BlockCurrentRecord
                 '
@@ -3264,8 +3264,8 @@ ErrorTrap:
                         Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
                         With field
                             Dim editRecordField As editRecordFieldClass = editRecord.fieldsLc(.nameLc)
-                            FieldValueVariant = editRecordField.value
-                            FieldValueText = genericController.encodeText(FieldValueVariant)
+                            fieldValueObject = editRecordField.value
+                            FieldValueText = genericController.encodeText(fieldValueObject)
                             FieldChanged = False
                             FieldName = .nameLc
                             UcaseFieldName = genericController.vbUCase(FieldName)
@@ -3275,58 +3275,55 @@ ErrorTrap:
                             Select Case UcaseFieldName
                                 Case "NAME"
                                     '
-                                    editRecord.nameLc = genericController.encodeText(FieldValueVariant)
+                                    editRecord.nameLc = genericController.encodeText(fieldValueObject)
                                 Case "CCGUID"
-                                    If cpCore.db.cs_getText(CSEditRecord, FieldName) <> genericController.encodeText(FieldValueVariant) Then
+                                    Dim saveValue As String = genericController.encodeText(fieldValueObject)
+                                    If cpCore.db.cs_getText(CSEditRecord, FieldName) <> saveValue Then
                                         FieldChanged = True
                                         RecordChanged = True
-                                        Call cpCore.db.cs_set(CSEditRecord, FieldName, FieldValueVariant)
+                                        Call cpCore.db.cs_set(CSEditRecord, FieldName, saveValue)
                                     End If
                                         'RecordChanged = True
                                         'Call cpCore.app.SetCS(CSEditRecord, FieldName, FieldValueVariant)
                                 Case "CONTENTCATEGORYID"
-                                    If cpCore.db.cs_getInteger(CSEditRecord, FieldName) <> genericController.EncodeInteger(FieldValueVariant) Then
+                                    Dim saveValue As Integer = genericController.EncodeInteger(fieldValueObject)
+                                    If cpCore.db.cs_getInteger(CSEditRecord, FieldName) <> saveValue Then
                                         FieldChanged = True
                                         RecordChanged = True
-                                        Call cpCore.db.cs_set(CSEditRecord, FieldName, FieldValueVariant)
+                                        Call cpCore.db.cs_set(CSEditRecord, FieldName, saveValue)
                                     End If
-                                        'RecordChanged = True
-                                        'Call cpCore.app.SetCS(CSEditRecord, FieldName, FieldValueVariant)
                                 Case "CONTENTCONTROLID"
                                     '
                                     ' run this after the save, so it will be blocked if the save fails
                                     ' block the change from this save
                                     ' Update the content control ID here, for all the children, and all the edit and archive records of both
                                     '
-                                    If editRecord.contentControlId <> genericController.EncodeInteger(FieldValueVariant) Then
-                                        SaveCCIDValue = genericController.EncodeInteger(FieldValueVariant)
+                                    Dim saveValue As Integer = genericController.EncodeInteger(fieldValueObject)
+                                    If editRecord.contentControlId <> saveValue Then
+                                        SaveCCIDValue = saveValue
                                         RecordChanged = True
                                     End If
-                                        '
-                                        ' I really do not understand this one - it must have been a copy from somewhere else, or a mistake
-                                        'FieldValueVariant = cpCore.main_memberID
                                 Case "ACTIVE"
-                                    If (Not genericController.EncodeBoolean(FieldValueVariant)) Then
+                                    Dim saveValue As Boolean = genericController.EncodeBoolean(fieldValueObject)
+                                    If (Not saveValue) Then
                                         '
                                         ' ----- record is being saved inactive, delete contentwatch and contentwatchlistrules
                                         '
                                         ContentWatchListIDCount = 0
                                         ContentWatchLink = ""
-                                        '##### no - this should be done at the SaveCSRecord to cover Workflow cases
-                                        'Call cpCore.main_DeleteContentTracking(AdminContent.Name, EditRecord.ID, False)
                                     End If
                                         '
                                 Case "DATEEXPIRES"
                                     '
                                     ' ----- make sure content watch expires before content expires
                                     '
-                                    If (Not genericController.IsNull(FieldValueVariant)) Then
-                                        If IsDate(FieldValueVariant) Then
-                                            Dim fieldValueDate As Date = CDate(FieldValueVariant)
+                                    If (Not genericController.IsNull(fieldValueObject)) Then
+                                        If IsDate(fieldValueObject) Then
+                                            Dim saveValue As Date = genericController.EncodeDate(fieldValueObject)
                                             If ContentWatchExpires <= Date.MinValue Then
-                                                ContentWatchExpires = fieldValueDate
-                                            ElseIf ContentWatchExpires > fieldValueDate Then
-                                                ContentWatchExpires = fieldValueDate
+                                                ContentWatchExpires = saveValue
+                                            ElseIf ContentWatchExpires > saveValue Then
+                                                ContentWatchExpires = saveValue
                                             End If
                                         End If
                                     End If
@@ -3335,13 +3332,13 @@ ErrorTrap:
                                     '
                                     ' ----- make sure content watch expires before content archives
                                     '
-                                    If (Not genericController.IsNull(FieldValueVariant)) Then
-                                        If IsDate(FieldValueVariant) Then
-                                            Dim fieldValueDate As Date = CDate(FieldValueVariant)
+                                    If (Not genericController.IsNull(fieldValueObject)) Then
+                                        If IsDate(fieldValueObject) Then
+                                            Dim saveValue As Date = genericController.EncodeDate(fieldValueObject)
                                             If (ContentWatchExpires) <= Date.MinValue Then
-                                                ContentWatchExpires = fieldValueDate
-                                            ElseIf ContentWatchExpires > fieldValueDate Then
-                                                ContentWatchExpires = fieldValueDate
+                                                ContentWatchExpires = saveValue
+                                            ElseIf ContentWatchExpires > saveValue Then
+                                                ContentWatchExpires = saveValue
                                             End If
                                         End If
                                     End If
@@ -3365,9 +3362,9 @@ ErrorTrap:
                                         If cpCore.docProperties.getBoolean(FieldName & ".DeleteFlag") Then
                                             RecordChanged = True
                                             FieldChanged = True
-                                            Call cpCore.db.cs_setField(CSEditRecord, FieldName, DBNull.Value)
+                                            Call cpCore.db.cs_set(CSEditRecord, FieldName, "")
                                         End If
-                                        FieldValueText = genericController.encodeText(FieldValueVariant)
+                                        FieldValueText = genericController.encodeText(fieldValueObject)
                                         If FieldValueText <> "" Then
                                             Filename = FieldValueText
                                             Dim pathFilename As String = cpCore.db.cs_getFilename(CSEditRecord, FieldName, Filename, adminContent.Name)
@@ -3375,7 +3372,7 @@ ErrorTrap:
                                             Path = genericController.vbReplace(Path, "\", "/")
                                             Path = genericController.vbReplace(Path, "/" & Filename, "")
                                             cpCore.cdnFiles.saveUpload(FieldName, Path, Filename)
-                                            Call cpCore.db.cs_setField(CSEditRecord, FieldName, Path & Filename)
+                                            Call cpCore.db.cs_set(CSEditRecord, FieldName, Path & Filename)
                                             'Call cpCore.web_processFormInputFile(FieldName, cpCore.cdnFiles, Path)
                                             RecordChanged = True
                                             FieldChanged = True
@@ -3384,50 +3381,51 @@ ErrorTrap:
                                         '
                                         ' boolean
                                         '
-                                        If cpCore.db.cs_getBoolean(CSEditRecord, FieldName) <> genericController.EncodeBoolean(FieldValueVariant) Then
+                                        Dim saveValue As Boolean = genericController.EncodeBoolean(fieldValueObject)
+                                        If cpCore.db.cs_getBoolean(CSEditRecord, FieldName) <> saveValue Then
                                             RecordChanged = True
                                             FieldChanged = True
-                                            Call cpCore.db.cs_set(CSEditRecord, FieldName, FieldValueVariant)
+                                            Call cpCore.db.cs_set(CSEditRecord, FieldName, saveValue)
                                         End If
                                     Case FieldTypeIdCurrency, FieldTypeIdFloat
                                         '
                                         ' Floating pointer numbers
                                         '
-                                        testStr = cpCore.db.cs_getText(CSEditRecord, FieldName)
-                                        If testStr <> genericController.encodeText(FieldValueVariant) Then
-                                            'If cpCore.main_cs_getNumber(CSEditRecord, FieldName) <> encodeNumber(FieldValueVariant) Then
+                                        Dim saveValue As Double = genericController.EncodeNumber(fieldValueObject)
+                                        If cpCore.db.cs_getNumber(CSEditRecord, FieldName) <> saveValue Then
                                             RecordChanged = True
                                             FieldChanged = True
-                                            Call cpCore.db.cs_set(CSEditRecord, FieldName, FieldValueVariant)
+                                            Call cpCore.db.cs_set(CSEditRecord, FieldName, saveValue)
                                         End If
                                     Case FieldTypeIdDate
                                         '
                                         ' Date
                                         '
-                                        If cpCore.db.cs_getDate(CSEditRecord, FieldName) <> genericController.EncodeDate(FieldValueVariant) Then
+                                        Dim saveValue As Date = genericController.EncodeDate(fieldValueObject)
+                                        If cpCore.db.cs_getDate(CSEditRecord, FieldName) <> saveValue Then
                                             FieldChanged = True
                                             RecordChanged = True
-                                            Call cpCore.db.cs_set(CSEditRecord, FieldName, FieldValueVariant)
+                                            Call cpCore.db.cs_set(CSEditRecord, FieldName, saveValue)
                                         End If
                                     Case FieldTypeIdInteger, FieldTypeIdLookup
                                         '
                                         ' Integers
                                         '
-                                        testStr = cpCore.db.cs_getText(CSEditRecord, FieldName)
-                                        If testStr <> genericController.encodeText(FieldValueVariant) Then
-                                            'If cpCore.app.cs_getInteger(CSEditRecord, FieldName) <> genericController.EncodeInteger(FieldValueVariant) Then
+                                        Dim saveValue As Integer = genericController.EncodeInteger(fieldValueObject)
+                                        If saveValue <> cpCore.db.cs_getInteger(CSEditRecord, FieldName) Then
                                             FieldChanged = True
                                             RecordChanged = True
-                                            Call cpCore.db.cs_set(CSEditRecord, FieldName, FieldValueVariant)
+                                            Call cpCore.db.cs_set(CSEditRecord, FieldName, saveValue)
                                         End If
                                     Case FieldTypeIdLongText, FieldTypeIdText, FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
                                         '
                                         ' Text
                                         '
-                                        If cpCore.db.cs_get(CSEditRecord, FieldName) <> genericController.encodeText(FieldValueVariant) Then
+                                        Dim saveValue As String = genericController.encodeText(fieldValueObject)
+                                        If cpCore.db.cs_get(CSEditRecord, FieldName) <> saveValue Then
                                             FieldChanged = True
                                             RecordChanged = True
-                                            Call cpCore.db.cs_set(CSEditRecord, FieldName, genericController.encodeText(FieldValueVariant))
+                                            Call cpCore.db.cs_set(CSEditRecord, FieldName, saveValue)
                                         End If
                                     Case FieldTypeIdManyToMany
                                         '
@@ -3444,16 +3442,17 @@ ErrorTrap:
                                         ' Unknown other types
                                         '
 
+                                        Dim saveValue As String = genericController.encodeText(fieldValueObject)
                                         FieldChanged = True
                                         RecordChanged = True
-                                        Call cpCore.db.cs_set(CSEditRecord, UcaseFieldName, FieldValueVariant)
+                                        Call cpCore.db.cs_set(CSEditRecord, UcaseFieldName, saveValue)
                                         'sql &=  "," & .Name & "=" & cpCore.app.EncodeSQL(FieldValueVariant, .FieldType)
                                 End Select
                             End If
                             '
                             ' ----- put any changes back in array for the next page to display
                             '
-                            editRecordField.value = FieldValueVariant
+                            editRecordField.value = fieldValueObject
                         End With
                         '
                         ' Log Activity for changes to people and organizattions

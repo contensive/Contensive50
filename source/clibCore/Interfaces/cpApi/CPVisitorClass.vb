@@ -121,7 +121,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property IsNew() As Boolean 'Inherits BaseClasses.CPVisitorBaseClass.IsNew
             Get
                 If True Then
-                    Return cpCore.authContext.visitor.newVisitor
+                    Return cpCore.authContext.visit.VisitorNew
                 Else
                     Return False
                 End If

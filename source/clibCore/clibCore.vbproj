@@ -485,6 +485,7 @@
     <Compile Include="Models\Entity\pageTemplateModel.vb" />
     <Compile Include="Models\Entity\visitModel.vb" />
     <Compile Include="Models\Entity\personModel.vb" />
+    <Compile Include="Models\Entity\LanguageModel.vb" />
     <Compile Include="Models\Entity\_xblankCachedModel.vb" />
     <Compile Include="Models\Entity\addonModel.vb" />
     <Compile Include="Models\Entity\groupModel.vb" />

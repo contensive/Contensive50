@@ -341,12 +341,19 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         '
-        Public Sub setField(ByVal FieldName As String, ByVal FieldValue As Object)
+        Public Sub setField(ByVal FieldName As String, ByVal FieldValue As Date)
             Call cpCore.db.cs_set(csPtr, FieldName, FieldValue)
         End Sub
-        '
-        '====================================================================================================
-        Public Sub SetField(ByVal FieldName As String, ByVal FieldValue As String)
+        Public Sub setField(ByVal FieldName As String, ByVal FieldValue As Boolean)
+            Call cpCore.db.cs_set(csPtr, FieldName, FieldValue)
+        End Sub
+        Public Sub setField(ByVal FieldName As String, ByVal FieldValue As String)
+            Call cpCore.db.cs_set(csPtr, FieldName, FieldValue)
+        End Sub
+        Public Sub setField(ByVal FieldName As String, ByVal FieldValue As Double)
+            Call cpCore.db.cs_set(csPtr, FieldName, FieldValue)
+        End Sub
+        Public Sub setField(ByVal FieldName As String, ByVal FieldValue As Integer)
             Call cpCore.db.cs_set(csPtr, FieldName, FieldValue)
         End Sub
         '

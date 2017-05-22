@@ -139,11 +139,11 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <param name="sqlCriteria"></param>
-        Private Shared Function loadObject(cpCore As coreClass, sqlCriteria As String, ByRef cacheNameList As List(Of String)) As visitModel
+        Private Shared Function loadObject(cpCore As coreClass, sqlCriteria As String, ByRef cacheNameList As List(Of String), Optional sortOrder As String = "id") As visitModel
             Dim result As visitModel = Nothing
             Try
                 Dim cs As New csController(cpCore)
-                If cs.open(primaryContentName, sqlCriteria) Then
+                If cs.open(primaryContentName, sqlCriteria, sortOrder) Then
                     result = New visitModel
                     With result
                         '
@@ -192,11 +192,11 @@ Namespace Contensive.Core.Models.Entity
                         '
                         ' -- set primary and secondary caches
                         ' -- add all cachenames to the injected cachenamelist
-                        Dim cacheName0 As String = getCacheName("id", result.id.ToString())
+                        Dim cacheName0 As String = getCacheName("id", result.ID.ToString())
                         cacheNameList.Add(cacheName0)
                         cpCore.cache.setObject(cacheName0, result)
                         '
-                        Dim cacheName1 As String = getCacheName("ccguid", result.ccguid)
+                        Dim cacheName1 As String = getCacheName("ccguid", result.ccGuid)
                         cacheNameList.Add(cacheName1)
                         cpCore.cache.setObject(cacheName1, Nothing, cacheName1)
                     End If
@@ -233,7 +233,10 @@ Namespace Contensive.Core.Models.Entity
                 End If
                 If cs.ok() Then
                     id = cs.getInteger("id")
-                    cs.SetField("Active", Active.ToString())
+                    If (String.IsNullOrEmpty(Name)) Then
+                        Name = "Visit " & ID.ToString()
+                    End If
+                    cs.setField("Active", Active.ToString())
                     cs.SetField("Bot", Bot.ToString())
                     cs.SetField("Browser", Browser)
                     cs.SetField("ccGuid", ccGuid)
@@ -383,6 +386,19 @@ Namespace Contensive.Core.Models.Entity
         Private Shared Function getCacheName(fieldName As String, fieldValue As String) As String
             Return (primaryContentTableName & "." & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
             'Return (GetType(visitModel).FullName & "." & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' return a visit object for the visitor's last visit before the provided id
+        ''' </summary>
+        ''' <param name="cpCore"></param>
+        ''' <param name="visitId"></param>
+        ''' <param name="visitorId"></param>
+        ''' <returns></returns>
+        Public Shared Function getLastVisitByVisitor(cpCore As coreClass, visitId As Integer, visitorId As Integer) As visitModel
+            Dim result As visitModel = loadObject(cpCore, "(id<>" & visitId & ")and(VisitorID=" & visitorId & ")", New List(Of String), "id desc")
+            Return result
         End Function
     End Class
 End Namespace

@@ -72,14 +72,10 @@ Namespace Contensive.Core.Models.Context
             Try
                 Dim NeedToWriteVisitCookie As Boolean
                 Dim TrackGuests As Boolean
-                Dim TrackGuestsWithoutCookies As Boolean
                 Dim DefaultMemberName As String
                 Dim AllowOnNewVisitEvent As Boolean
                 Dim CS As Integer
-                Dim visitor_changes As Boolean
-                Dim user_changes As Boolean
                 Dim visit_lastTimeFromCookie As Date
-                Dim SQL As String
                 Dim SlashPosition As Integer
                 Dim MemberLinkinEID As String
                 Dim MemberLinkLoginID As Integer
@@ -88,14 +84,15 @@ Namespace Contensive.Core.Models.Context
                 Dim CookieVisit As String
                 Dim CookieVisitor As String
                 Dim WorkingReferer As String
-                Dim MethodName As String
                 Dim tokenDate As Date
                 Dim main_appNameCookiePrefix As String = genericController.vbLCase(cpCore.main_encodeCookieName(cpCore.serverConfig.appConfig.name))
+                Dim visit_changes As Boolean = False
+                Dim visitor_changes As Boolean = False
+                Dim user_changes As Boolean = False
                 '
                 resultAuthContext = New authContextModel
                 resultAuthContext.visit = New Models.Entity.visitModel
                 resultAuthContext.visitor = New Models.Entity.visitorModel
-                'resultauthContext.user = New authContextUserModel()
                 resultAuthContext.user = New Models.Entity.personModel
                 '
                 visit_lastTimeFromCookie = Date.MinValue
@@ -106,17 +103,18 @@ Namespace Contensive.Core.Models.Context
                 resultAuthContext.visit.VisitAuthenticated = False
                 resultAuthContext.visit.ExcludeFromAnalytics = False
                 resultAuthContext.visit.CookieSupport = False
+                resultAuthContext.visit.VisitorNew = False
+                resultAuthContext.visit.MemberNew = False
+                visit_changes = False
                 '
+                resultAuthContext.visitor.ID = 0
                 visitor_changes = False
-                resultAuthContext.visitor.id = 0
-                resultAuthContext.visitor.newVisitor = False
                 '
-                user_changes = False
                 resultAuthContext.user.ID = 0
                 resultAuthContext.user.Name = "Guest"
-                resultAuthContext.visit.MemberNew = False
                 resultAuthContext.user.StyleFilename = ""
                 resultAuthContext.user.ExcludeFromAnalytics = False
+                user_changes = False
                 '
                 CookieVisit = cpCore.webServer.getRequestCookie(main_appNameCookiePrefix & constants.main_cookieNameVisit)
                 MemberLinkinEID = cpCore.docProperties.getText("eid")
@@ -146,224 +144,68 @@ Namespace Contensive.Core.Models.Context
                     ' ----- try cookie main_VisitId
                     '
                     'hint = "210"
+                    Dim cookieVisitId As Integer = 0
                     If (CookieVisit <> "") Then
-                        Call cpCore.security.decodeToken(CookieVisit, resultAuthContext.visit.ID, visit_lastTimeFromCookie)
-                        'main_VisitId = main_DecodeKeyNumber(CookieVisit)
-                        If resultAuthContext.visit.ID = 0 Then
+                        Call cpCore.security.decodeToken(CookieVisit, cookieVisitId, visit_lastTimeFromCookie)
+                        If cookieVisitId = 0 Then
                             '
                             ' ----- Bad Cookie, clear it so a new one will be written
-                            '
                             CookieVisit = ""
                         Else
                             '
                             ' ----- good cookie
-                            '
-                            'main_VisitLastTimeFromCookie = main_DecodeKeyTime(CookieVisit)
                         End If
                     End If
                     '
                     ' ----- Visit is good, read Visit/Visitor
                     '
                     'hint = "220"
-                    If (resultAuthContext.visit.ID <> 0) Then
-                        SQL = "SELECT" _
-                            & " ccVisits.ID AS VisitId" _
-                            & ",ccVisits.Name AS VisitName" _
-                            & ",ccVisits.VisitAuthenticated AS VisitAuthenticated" _
-                            & ",ccVisits.StartTime AS VisitStartTime" _
-                            & ",ccVisits.StartDateValue AS VisitStartDateValue" _
-                            & ",ccVisits.LastVisitTime AS VisitLastVisitTime" _
-                            & ",ccVisits.StopTime AS VisitStopTime" _
-                            & ",ccVisits.PageVisits AS VisitPageVisits" _
-                            & ",ccVisits.CookieSupport AS VisitCookieSupport" _
-                            & ",ccVisits.LoginAttempts AS VisitLoginAttempts" _
-                            & ",ccVisits.VisitorNew AS VisitVisitorNew" _
-                            & ",ccVisits.HTTP_REFERER AS VisitHTTP_REFERER" _
-                            & ",ccVisits.REMOTE_ADDR AS VisitREMOTE_ADDR" _
-                            & ",ccVisits.Browser AS VisitBrowser" _
-                            & ",ccVisits.MemberNew AS VisitMemberNew"
-                        SQL &= "" _
-                            & ",ccVisitors.ID AS VisitorID" _
-                            & ",ccVisitors.Name AS VisitorName" _
-                            & ",ccVisitors.MemberID AS VisitorMemberID" _
-                            & ",ccVisitors.OrderID AS VisitorOrderID"
-                        SQL &= ",ccVisitors.ForceBrowserMobile AS VisitorForceBrowserMobile"
-                        SQL &= ",ccVisits.bot AS VisitBot"
-                        SQL &= ",ccVisits.mobile AS VisitMobile"
-                        SQL &= "" _
-                            & ",m.ID AS MemberID" _
-                            & ",m.Name AS MemberName" _
-                            & ",m.admin AS MemberAdmin" _
-                            & ",m.developer AS MemberDeveloper" _
-                            & ",m.ContentControlID AS MemberContentControlID" _
-                            & ",m.AllowBulkEmail AS MemberAllowBulkEmail" _
-                            & ",m.AllowToolsPanel AS MemberAllowToolsPanel" _
-                            & ",m.AdminMenuModeID AS MemberAdminMenuModeID" _
-                            & ",m.AutoLogin AS MemberAutoLogin" _
-                            & ",m.username AS MemberUsername" _
-                            & ",m.password AS MemberPassword" _
-                            & ",m.LanguageID AS MemberLanguageID" _
-                            & ",ccLanguages.name AS MemberLanguage"
-                        SQL &= "" _
-                            & ",m.OrganizationID AS MemberOrganizationID" _
-                            & ",m.Active AS MemberActive" _
-                            & ",m.Visits AS MemberVisits" _
-                            & ",m.LastVisit AS MemberLastVisit" _
-                            & ",m.Company AS MemberCompany" _
-                            & ",m.Email AS MemberEmail"
-                        SQL &= ",m.StyleFilename as MemberStyleFilename"
-                        SQL &= ",m.ExcludeFromAnalytics as MemberExcludeFromAnalytics"
-                        SQL &= ",ccvisits.ExcludeFromAnalytics as VisitExcludeFromAnalytics"
-                        SQL &= "" _
-                            & " FROM ((ccVisits" _
-                                & " LEFT JOIN ccVisitors ON ccVisits.VisitorID = ccVisitors.ID)" _
-                                & " LEFT JOIN ccMembers as m ON ccVisits.MemberID = m.ID)" _
-                                & " LEFT JOIN ccLanguages ON m.LanguageID = ccLanguages.ID" _
-                            & " WHERE (((ccVisits.ID)=" & resultAuthContext.visit.ID & "))"
-                        '
-                        CS = cpCore.db.cs_openSql(SQL)
-                        If Not cpCore.db.cs_ok(CS) Then
-                            '
-                            ' Bad visit cookie, kill main_VisitId
-                            '
-                            resultAuthContext.visit.ID = 0
-                            resultAuthContext.visitor.id = 0
-                        Else
-                            '
-                            '--------------------------------------------------------------------------
-                            ' ----- Visit found, read visitor info first
-                            '--------------------------------------------------------------------------
-                            '
-                            'hint = "240"
-                            resultAuthContext.visitor.id = cpCore.db.cs_getInteger(CS, "VisitorID")
-                            resultAuthContext.visitor.name = cpCore.db.cs_getText(CS, "VisitorName")
-                            resultAuthContext.visitor.memberID = (cpCore.db.cs_getInteger(CS, "VisitorMemberID"))
-                            resultAuthContext.visitor.forceBrowserMobile = (cpCore.db.cs_getInteger(CS, "VisitorForceBrowserMobile"))
-                            resultAuthContext.visitor.orderID = (cpCore.db.cs_getInteger(CS, "VisitorOrderID"))
-                            '
-                            '--------------------------------------------------------------------------
-                            ' ----- test visit age
-                            '--------------------------------------------------------------------------
-                            '
-                            'hint = "250"
-                            resultAuthContext.visit.LastVisitTime = cpCore.db.cs_getDate(CS, "VisitLastVisitTime")
-                            If resultAuthContext.visit.LastVisitTime.ToOADate + 0.041666 < cpCore.app_startTime.ToOADate Then
-                                '--------------------------------------------------------------------------
-                                ' ----- kill visit (no activity for over 1 hour)
-                                ' changed time to 60 minutes from 30 minutes - multiple client request (Toll Brothers, etc)
-                                '--------------------------------------------------------------------------
+                    If (cookieVisitId <> 0) Then
+                        With resultAuthContext
+                            .visit = Models.Entity.visitModel.create(cpCore, cookieVisitId, New List(Of String))
+                            If (.visit Is Nothing) Then
                                 '
-                                'hint = "251"
-                                Call cpCore.debug_testPoint("main_InitVisit Last visit was more than an hour old, kill the visit")
-                                NeedToWriteVisitCookie = True
-                                resultAuthContext.visit.ID = 0
-                                CookieVisit = ""
+                                ' -- visit record is missing, create a new visit
+                                .visit = Models.Entity.visitModel.add(cpCore, New List(Of String))
+                            ElseIf .visit.LastVisitTime.ToOADate + 0.041666 < cpCore.app_startTime.ToOADate Then
+                                '
+                                ' -- visit has expired, create new visit
+                                .visit = Models.Entity.visitModel.add(cpCore, New List(Of String))
                             Else
-                                '--------------------------------------------------------------------------
-                                ' -----  visit OK, capture visit and Member info
-                                '--------------------------------------------------------------------------
-                                '
-                                'hint = "252"
-                                resultAuthContext.visit.ID = (cpCore.db.cs_getInteger(CS, "VisitId"))
-                                resultAuthContext.visit.Name = (cpCore.db.cs_getText(CS, "VisitName"))
-                                resultAuthContext.visit.CookieSupport = (cpCore.db.cs_getBoolean(CS, "VisitCookieSupport"))
-                                resultAuthContext.visit.PageVisits = (cpCore.db.cs_getInteger(CS, "VisitPageVisits"))
-                                resultAuthContext.visit.VisitAuthenticated = (cpCore.db.cs_getBoolean(CS, "VisitAuthenticated"))
-                                resultAuthContext.visit.StartTime = (cpCore.db.cs_getDate(CS, "VisitStartTime"))
-                                resultAuthContext.visit.StartDateValue = (cpCore.db.cs_getInteger(CS, "VisitStartDateValue"))
-                                resultAuthContext.visit.HTTP_REFERER = (cpCore.db.cs_getText(CS, "VisitHTTP_REFERER"))
-                                resultAuthContext.visit.LoginAttempts = (cpCore.db.cs_getInteger(CS, "VisitLoginAttempts"))
-                                resultAuthContext.visitor.newVisitor = (cpCore.db.cs_getBoolean(CS, "VisitVisitorNew"))
-                                '
-                                cpCore.webServer.requestRemoteIP = (cpCore.db.cs_getText(CS, "VisitREMOTE_ADDR"))
-                                cpCore.webServer.requestBrowser = (cpCore.db.cs_getText(CS, "VisitBrowser"))
-                                resultAuthContext.visit.TimeToLastHit = 0
-                                If resultAuthContext.visit.StartTime > Date.MinValue Then
-                                    resultAuthContext.visit.TimeToLastHit = CInt((cpCore.app_startTime - resultAuthContext.visit.StartTime).TotalSeconds)
+
+                                cpCore.webServer.requestRemoteIP = .visit.REMOTE_ADDR
+                                cpCore.webServer.requestBrowser = .visit.Browser
+                                .visit.TimeToLastHit = 0
+                                If .visit.StartTime > Date.MinValue Then
+                                    .visit.TimeToLastHit = CInt((cpCore.app_startTime - .visit.StartTime).TotalSeconds)
                                 End If
-                                resultAuthContext.visit.ExcludeFromAnalytics = cpCore.db.cs_getBoolean(CS, "VisitExcludeFromAnalytics")
-                                If ((Not resultAuthContext.visit.CookieSupport) And (CookieVisit <> "")) Then
-                                    resultAuthContext.visit.CookieSupport = True
+                                .visit.ExcludeFromAnalytics = .visit.ExcludeFromAnalytics
+                                .visit.CookieSupport = True
+                                .visit_browserIsMobile = .visit.Mobile
+                                .visit_isBot = .visit.Bot
+                                '
+                                If (.visit.VisitorID > 0) Then
+                                    .visitor = Models.Entity.visitorModel.create(cpCore, .visit.VisitorID, New List(Of String))
                                 End If
-                                resultAuthContext.visit_browserIsMobile = cpCore.db.cs_getBoolean(CS, "VisitMobile")
-                                resultAuthContext.visit_isBot = cpCore.db.cs_getBoolean(CS, "VisitBot")
-                                '
-                                '--------------------------------------------------------------------------
-                                ' -----  Member info
-                                '   20170104 - set id in user object populates the record
-                                ' REFACTOR -- this is loading the user twice, when refactored remove these fields from the visit state and just set the authcontext.user.id
-                                '--------------------------------------------------------------------------
-                                '
-                                Dim testActive As Boolean
-                                Dim testId As Integer
-                                testActive = cpCore.db.cs_getBoolean(CS, "MemberActive")
-                                testId = cpCore.db.cs_getInteger(CS, "MemberID")
-                                If ((Not testActive) Or (testId = 0)) Then
-                                    resultAuthContext.user.ID = 0
-                                Else
-                                    resultAuthContext.user.ID = testId
-                                    resultAuthContext.user.Active = testActive
-                                    resultAuthContext.visit.MemberNew = cpCore.db.cs_getBoolean(CS, "VisitMemberNew")
-                                    resultAuthContext.user.Name = (cpCore.db.cs_getText(CS, "MemberName"))
-                                    resultAuthContext.user.Developer = (cpCore.db.cs_getBoolean(CS, "MemberDeveloper"))
-                                    resultAuthContext.user.Admin = (cpCore.db.cs_getBoolean(CS, "MemberAdmin"))
-                                    resultAuthContext.user.ContentControlID = (cpCore.db.cs_getInteger(CS, "MemberContentControlID"))
-                                    resultAuthContext.user.AllowBulkEmail = (cpCore.db.cs_getBoolean(CS, "MemberAllowBulkEmail"))
-                                    resultAuthContext.user.AllowToolsPanel = (cpCore.db.cs_getBoolean(CS, "MemberAllowToolsPanel"))
-                                    resultAuthContext.user.AdminMenuModeID = cpCore.db.cs_getInteger(CS, "MemberAdminMenuModeID")
-                                    resultAuthContext.user.AutoLogin = (cpCore.db.cs_getBoolean(CS, "MemberAutoLogin"))
-                                    resultAuthContext.user.Username = (cpCore.db.cs_getText(CS, "MemberUsername"))
-                                    resultAuthContext.user.Password = (cpCore.db.cs_getText(CS, "MemberPassword"))
-                                    resultAuthContext.user.LanguageID = (cpCore.db.cs_getInteger(CS, "MemberLanguageID"))
-                                    'resultAuthContext.user.language = (cpCore.db.cs_getText(CS, "MemberLanguage"))
-                                    resultAuthContext.user.OrganizationID = (cpCore.db.cs_getInteger(CS, "MemberOrganizationID"))
-                                    resultAuthContext.user.StyleFilename = cpCore.db.cs_getText(CS, "MemberStyleFilename")
-                                    resultAuthContext.user.ExcludeFromAnalytics = (cpCore.db.cs_getBoolean(CS, "MemberExcludeFromAnalytics"))
-                                    '
-                                    ' ----- consider removing
-                                    '
-                                    resultAuthContext.user.Email = (cpCore.db.cs_getText(CS, "MemberEmail"))
-                                    resultAuthContext.user.Company = (cpCore.db.cs_getText(CS, "MemberCompany"))
-                                    resultAuthContext.user.Visits = (cpCore.db.cs_getInteger(CS, "MemberVisits"))
-                                    resultAuthContext.user.LastVisit = (cpCore.db.cs_getDate(CS, "MemberLastVisit"))
+                                If (.visit.MemberID > 0) Then
+                                    .user = Models.Entity.personModel.create(cpCore, resultAuthContext.visit.MemberID, New List(Of String))
                                 End If
-                                '
-                                '--------------------------------------------------------------------------
-                                ' ----- set main_VisitStateOK if Dbase main_VisitLastTime matches main_VisitLastTimeFromCookie
-                                '--------------------------------------------------------------------------
-                                '
-                                'hint = "270"
-                                If ((visit_lastTimeFromCookie - resultAuthContext.visit.LastVisitTime).TotalSeconds) > 2 Then
-                                    resultAuthContext.visit_stateOK = False
-                                    cpCore.debug_testPoint("VisitState is false, main_VisitLastTime <> Database main_VisitLastTime, this page is out of order (back button), set main_VisitStateOK false")
+
+                                If ((visit_lastTimeFromCookie - .visit.LastVisitTime).TotalSeconds) > 2 Then
+                                    .visit_stateOK = False
                                 End If
                             End If
-                        End If
-                        Call cpCore.db.cs_Close(CS)
+                        End With
                     End If
-                    '
-                    '--------------------------------------------------------------------------
-                    ' ----- new visit required
-                    '--------------------------------------------------------------------------
-                    '
-                    'Call AppendLog("main_InitVisit(), 2470")
-                    '
-                    'hint = "300"
-                    ' 1/15/2010
                     If (resultAuthContext.visit.ID = 0) Then
                         '
-                        ' ----- Decode Browser User-Agent string to main_VisitName, main_VisitIsBot, main_VisitIsBadBot, etc
+                        ' -- new visit required
+                        ' -- Decode Browser User-Agent string to main_VisitName, main_VisitIsBot, main_VisitIsBadBot, etc
                         '
                         Call web_init_decodeBrowserUserAgent(cpCore, resultAuthContext, cpCore.webServer.requestBrowser)
                         '
-                        ' ----- create new visit record
-                        '
-                        'hint = "310"
-                        resultAuthContext.visit.ID = cpCore.db.metaData_InsertContentRecordGetID("Visits", resultAuthContext.user.ID)
-                        If (resultAuthContext.visit.ID < 1) Then
-                            resultAuthContext.visit.ID = 0
-                            cpCore.handleExceptionAndRethrow(New Exception("Internal error, new visit record could not be selected."))
-                        End If
+                        ' -- create new visit record
+                        resultAuthContext.visit = Models.Entity.visitModel.add(cpCore, New List(Of String))
                         If resultAuthContext.visit.Name = "" Then
                             resultAuthContext.visit.Name = "User"
                         End If
@@ -372,10 +214,8 @@ Namespace Contensive.Core.Models.Context
                         resultAuthContext.visit.StartDateValue = CInt(cpCore.app_startTime.ToOADate)
                         resultAuthContext.visit.LastVisitTime = cpCore.app_startTime
                         '
-                        ' ----- main_Get visit referer
-                        '
-                        'hint = "320"
-                        If cpCore.webServer.requestReferrer <> "" Then
+                        ' -- setup referrer
+                        If (Not String.IsNullOrEmpty(cpCore.webServer.requestReferrer)) Then
                             WorkingReferer = cpCore.webServer.requestReferrer
                             SlashPosition = genericController.vbInstr(1, WorkingReferer, "//")
                             If (SlashPosition <> 0) And (Len(WorkingReferer) > (SlashPosition + 2)) Then
@@ -391,112 +231,53 @@ Namespace Contensive.Core.Models.Context
                             End If
                         End If
                         '
-                        '--------------------------------------------------------------------------
-                        ' ----- create visitor from cookie
-                        '--------------------------------------------------------------------------
-                        '
-                        'hint = "330"
+                        ' -- create visitor from cookie
                         CookieVisitor = genericController.encodeText(cpCore.webServer.getRequestCookie(main_appNameCookiePrefix & main_cookieNameVisitor))
-                        '
-                        'Call AppendLog("main_InitVisit(), 2480")
-                        '
                         If cpCore.siteProperties.getBoolean("AllowAutoRecognize", True) Then
                             '
-                            'Call AppendLog("main_InitVisit(), 2485")
-                            '
-                            'hint = "340"
-                            Call cpCore.security.decodeToken(CookieVisitor, resultAuthContext.visitor.id, tokenDate)
-                            'main_VisitorID = main_DecodeKeyNumber(CookieVisitor)
-                            If resultAuthContext.visitor.id <> 0 Then
+                            ' -- auto recognize, setup user based on visitor
+                            Dim cookieVisitorId As Integer = 0
+                            Call cpCore.security.decodeToken(CookieVisitor, cookieVisitorId, tokenDate)
+                            If cookieVisitorId <> 0 Then
                                 '
-                                ' ----- cookie found, open visitor
-                                '
-                                'hint = "350"
-                                resultAuthContext.visit.CookieSupport = True
-                                If True Then
-                                    SQL = "SELECT ID,Name,MemberID,OrderID,ForceBrowserMobile from ccVisitors WHERE ID=" & resultAuthContext.visitor.id & ";"
-                                Else
-                                    SQL = "SELECT ID,Name,MemberID,OrderID,0 as ForceBrowserMobile from ccVisitors WHERE ID=" & resultAuthContext.visitor.id & ";"
+                                ' -- visitor cookie good
+                                resultAuthContext.visitor = Models.Entity.visitorModel.create(cpCore, cookieVisitorId, New List(Of String))
+                                If (resultAuthContext.visitor Is Nothing) Then
+                                    '
+                                    ' -- visitor not found, set to blank model
+                                    resultAuthContext.visitor = New Models.Entity.visitorModel
                                 End If
-                                CS = cpCore.db.cs_openSql(SQL)
-                                If Not cpCore.db.cs_ok(CS) Then
-                                    '
-                                    ' ----- bad cookie, kill main_VisitorID
-                                    '
-                                    resultAuthContext.visitor.id = 0
-                                Else
-                                    '
-                                    ' ----- set visitor values
-                                    '
-                                    visitor_changes = False
-                                    resultAuthContext.visitor.id = (cpCore.db.cs_getInteger(CS, "ID"))
-                                    resultAuthContext.visitor.name = (cpCore.db.cs_getText(CS, "Name"))
-                                    resultAuthContext.visitor.memberID = (cpCore.db.cs_getInteger(CS, "MemberID"))
-                                    resultAuthContext.visitor.forceBrowserMobile = (cpCore.db.cs_getInteger(CS, "ForceBrowserMobile"))
-                                    resultAuthContext.visitor.orderID = (cpCore.db.cs_getInteger(CS, "OrderID"))
-                                End If
-                                Call cpCore.db.cs_Close(CS)
                             End If
                         End If
                         '
-                        '--------------------------------------------------------------------------
-                        ' ----- create new visitor for new visit
-                        '--------------------------------------------------------------------------
-                        '
-                        'Call AppendLog("main_InitVisit(), 2490")
-                        '
-                        'hint = "400"
+                        ' -- create new visitor for new visit
                         If resultAuthContext.visitor.id = 0 Then
                             '
                             ' Visitor Fields
-                            '
-                            resultAuthContext.visitor.id = cpCore.db.metaData_InsertContentRecordGetID("Visitors", resultAuthContext.user.ID)
-                            If (resultAuthContext.visitor.id < 1) Then
-                                Call cpCore.handleLegacyError14(MethodName, "main_InitVisit, could not create new visitor")
-                                resultAuthContext.visitor.id = 0
-                            End If
+                            resultAuthContext.visitor = Models.Entity.visitorModel.add(cpCore, New List(Of String))
                             resultAuthContext.visitor.name = "Visitor " & resultAuthContext.visitor.id
                             resultAuthContext.visitor.memberID = 0
                             resultAuthContext.visitor.orderID = 0
-                            visitor_changes = True
                             resultAuthContext.visitor.forceBrowserMobile = 0
+                            visitor_changes = True
                             '
-                            ' Visit Fields
-                            '
-                            resultAuthContext.visitor.newVisitor = True
+                            resultAuthContext.visit.VisitorNew = True
+                            visit_changes = True
                         End If
                         '
-                        '-----------------------------------------------------------------------------------
-                        ' ----- find  identity from the visitor
-                        '-----------------------------------------------------------------------------------
-                        '
-                        'Call AppendLog("main_InitVisit(), 2492")
-                        '
-                        'hint = "500"
-                        resultAuthContext.user.ID = resultAuthContext.visitor.memberID
+                        ' -- find  identity from the visitor
                         If (resultAuthContext.visitor.memberID > 0) Then
                             '
-                            ' ----- recognize by the main_VisitorMemberID
-                            '
-                            'hint = "510"
+                            ' -- recognize by the main_VisitorMemberID
                             If resultAuthContext.recognizeById(cpCore, resultAuthContext.visitor.memberID) Then
                                 '
-                                ' ----- if successful, now test for autologin (authentication)
-                                '
-                                'hint = "520"
-
-                                If (cpCore.siteProperties.getBoolean("AllowAutoLogin", False)) And (resultAuthContext.user.AutoLogin) And resultAuthContext.visit.CookieSupport Then
+                                ' -- if successful, now test for autologin (authentication)
+                                If (cpCore.siteProperties.AllowAutoLogin And resultAuthContext.user.AutoLogin And resultAuthContext.visit.CookieSupport) Then
                                     '
-                                    ' ----- they allow it, now Check if they were logged in on their last visit
-                                    '
-                                    'hint = "530"
-                                    SQL = "select top 1 V.VisitAuthenticated from ccVisits V where (V.ID<>" & resultAuthContext.visit.ID & ")and(V.VisitorID=" & resultAuthContext.visitor.id & ") order by id desc"
-                                    CS = cpCore.db.cs_openSql(SQL)
-                                    If cpCore.db.cs_ok(CS) Then
-                                        If cpCore.db.cs_getBoolean(CS, "VisitAuthenticated") Then
-                                            '
-                                            ' ----- yes, go ahead with autologin
-                                            '
+                                    ' -- they allow it, now Check if they were logged in on their last visit
+                                    Dim lastVisit As Models.Entity.visitModel = Models.Entity.visitModel.getLastVisitByVisitor(cpCore, resultAuthContext.visit.ID, resultAuthContext.visitor.id)
+                                    If (lastVisit IsNot Nothing) Then
+                                        If (lastVisit.VisitAuthenticated And (lastVisit.MemberID = resultAuthContext.visit.ID)) Then
                                             If resultAuthContext.authenticateById(cpCore, resultAuthContext.user.ID) Then
                                                 Call cpCore.log_LogActivity2("autologin", resultAuthContext.user.ID, resultAuthContext.user.OrganizationID)
                                                 visitor_changes = True
@@ -504,82 +285,51 @@ Namespace Contensive.Core.Models.Context
                                             End If
                                         End If
                                     End If
-                                    Call cpCore.db.cs_Close(CS)
                                 Else
                                     '
-                                    ' Recognized, not auto login
-                                    '
-                                    'hint = "540"
+                                    ' -- Recognized, not auto login
                                     Call cpCore.log_LogActivity2("recognized", resultAuthContext.user.ID, resultAuthContext.user.OrganizationID)
                                 End If
                             End If
                         End If
                         '
-                        '--------------------------------------------------------------------------
-                        ' ----- new visit, update the persistant visitor cookie
-                        '--------------------------------------------------------------------------
-                        '
-                        'hint = "600"
+                        ' -- new visit, update the persistant visitor cookie
                         If visitInit_allowVisitTracking Then
                             Call cpCore.webServer.addResponseCookie(main_appNameCookiePrefix & main_cookieNameVisitor, cpCore.security.encodeToken(resultAuthContext.visitor.id, resultAuthContext.visit.StartTime), resultAuthContext.visit.StartTime.AddYears(1), , requestAppRootPath, False)
                         End If
                         '
-                        '--------------------------------------------------------------------------
-                        ' ----- OnNewVisit Add-on call
-                        '--------------------------------------------------------------------------
-                        '
+                        ' -- OnNewVisit Add-on call
                         AllowOnNewVisitEvent = True
                     End If
                     '
-                    '-----------------------------------------------------------------------------------
-                    ' ----- Attempt Link-in recognize or login
-                    ' ----- This is allowed even if main_AllowVisitTracking is off
-                    '-----------------------------------------------------------------------------------
-                    '
-                    'Call AppendLog("main_InitVisit(), 2494")
-                    '
-                    'hint = "700"
+                    ' -- Attempt Link-in recognize or login
                     If (MemberLinkLoginID <> 0) Then
                         '
-                        ' Link Login
-                        '
+                        ' -- Link Login
                         If resultAuthContext.authenticateById(cpCore, MemberLinkLoginID) Then
                             Call cpCore.log_LogActivity2("link login with eid " & MemberLinkinEID, resultAuthContext.user.ID, resultAuthContext.user.OrganizationID)
                         End If
                     ElseIf (MemberLinkRecognizeID <> 0) Then
                         '
-                        ' Link Recognize
-                        '
+                        ' -- Link Recognize
                         Call resultAuthContext.recognizeById(cpCore, MemberLinkRecognizeID)
                         Call cpCore.log_LogActivity2("link recognize with eid " & MemberLinkinEID, resultAuthContext.user.ID, resultAuthContext.user.OrganizationID)
                     End If
                     '
-                    '-----------------------------------------------------------------------------------
-                    ' ----- create guest identity if no identity
-                    '-----------------------------------------------------------------------------------
-                    '
-                    'Call AppendLog("main_InitVisit(), 2496")
-                    '
-                    'hint = "800"
+                    ' -- create guest identity if no identity
                     If (resultAuthContext.user.ID < 1) Then
                         '
-                        ' No user created
-                        '
+                        ' -- No user created
                         If (LCase(Left(resultAuthContext.visit.Name, 5)) <> "visit") Then
                             DefaultMemberName = resultAuthContext.visit.Name
                         Else
                             DefaultMemberName = genericController.encodeText(cpCore.GetContentFieldProperty("people", "name", "default"))
                         End If
-                        '
-                        ' upgraded, determine the kind of tracking - experimental build set to true
-                        '
                         TrackGuests = cpCore.siteProperties.getBoolean("track guests", False)
                         If Not TrackGuests Then
                             '
-                            ' do not track guests at all
-                            '
+                            ' -- do not track guests at all
                             resultAuthContext.user = Models.Entity.personModel.add(cpCore, New List(Of String))
-                            'resultauthContext.user = authContextUserModel.add(cpCore, resultAuthContext.visit.Name)
                             resultAuthContext.visitor.memberID = resultAuthContext.user.ID
                             resultAuthContext.visitor.saveObject(cpCore)
                             '
@@ -592,10 +342,8 @@ Namespace Contensive.Core.Models.Context
                         Else
                             If resultAuthContext.visit.CookieSupport Then
                                 '
-                                ' cookies supported, not first hit and not spider
-                                '
+                                ' -- cookies supported, not first hit and not spider
                                 resultAuthContext.user = Models.Entity.personModel.add(cpCore, New List(Of String))
-                                'resultauthContext.user = authContextUserModel.add(cpCore, resultAuthContext.visit.Name)
                                 resultAuthContext.visitor.memberID = resultAuthContext.user.ID
                                 resultAuthContext.visitor.saveObject(cpCore)
                                 '
@@ -606,13 +354,9 @@ Namespace Contensive.Core.Models.Context
                                 resultAuthContext.property_user_isMember_isLoaded = False
                                 resultAuthContext.isAuthenticatedDeveloper_cache_isLoaded = False
                             Else
-                                '
-                                ' upgraded, set it to the site property - experimental build set to true
-                                '
-                                TrackGuestsWithoutCookies = cpCore.siteProperties.getBoolean("track guests without cookies")
-                                If TrackGuestsWithoutCookies Then
+                                If cpCore.siteProperties.trackGuestsWithoutCookies Then
                                     '
-                                    ' compatibiltiy mode - create people for non-cookies too
+                                    ' -- create people for non-cookies too
                                     '
                                     resultAuthContext.user = Models.Entity.personModel.add(cpCore, New List(Of String))
                                     resultAuthContext.user.Name = resultAuthContext.visit.Name
@@ -622,11 +366,10 @@ Namespace Contensive.Core.Models.Context
                                     resultAuthContext.isAuthenticatedDeveloper_cache_isLoaded = False
                                 Else
                                     '
-                                    ' set defaults for people record
+                                    ' set defaults for people object, but no record
                                     '
-                                    resultAuthContext.user = Models.Entity.personModel.add(cpCore, New List(Of String))
+                                    resultAuthContext.user = New Models.Entity.personModel
                                     resultAuthContext.user.Name = DefaultMemberName
-                                    resultAuthContext.user.saveObject(cpCore)
                                     resultAuthContext.isAuthenticatedAdmin_cache_isLoaded = False
                                     resultAuthContext.property_user_isMember_isLoaded = False
                                     resultAuthContext.isAuthenticatedDeveloper_cache_isLoaded = False
@@ -635,21 +378,13 @@ Namespace Contensive.Core.Models.Context
                         End If
                     End If
                     '
-                    '--------------------------------------------------------------------------
-                    ' ----- establish language for the member, if they do not have one
-                    '--------------------------------------------------------------------------
-                    '
-                    'Call AppendLog("main_InitVisit(), 2498")
-                    '
-                    'hint = "900"
+                    ' -- establish language for the member, if they do not have one
                     If resultAuthContext.visit.PageVisits = 0 Then
                         '
-                        ' First page of this visit, verify the member language
-                        '
-                        If (resultAuthContext.user.LanguageID < 1) Then ' Or (resultAuthContext.user.language = "") Then
+                        ' -- First page of this visit, verify the member language
+                        If (resultAuthContext.user.LanguageID < 1) Then
                             '
-                            ' No member language, set member language from browser language
-                            '
+                            ' -- No member language, set member language from browser language
                             Call cpCore.web_GetBrowserLanguage(resultAuthContext.user.LanguageID, resultAuthContext.user.language)
                             If resultAuthContext.user.LanguageID > 0 Then
                                 '
@@ -665,117 +400,61 @@ Namespace Contensive.Core.Models.Context
                                     '
                                     ' Handle the non-English case first, so if there is a problem, fall back is English
                                     '
-                                    CS = cpCore.db.cs_open("Languages", "name=" & cpCore.db.encodeSQLText(resultAuthContext.user.language))
-                                    If cpCore.db.cs_ok(CS) Then
-                                        resultAuthContext.user.LanguageID = cpCore.db.cs_getInteger(CS, "ID")
-                                        user_changes = True
-                                    End If
-                                    Call cpCore.db.cs_Close(CS)
+                                    resultAuthContext.user.LanguageID = cpCore.db.getRecordID("languages", resultAuthContext.user.language)
                                     If resultAuthContext.user.LanguageID = 0 Then
                                         '
-                                        ' non-English Language is not in Language Table, set default to english
-                                        '
+                                        ' -- non-English Language is not in Language Table, set default to english
                                         resultAuthContext.user.language = "English"
                                         Call cpCore.siteProperties.setProperty("Language", resultAuthContext.user.language)
                                     End If
                                 End If
                                 If resultAuthContext.user.language = "English" Then
-                                    CS = cpCore.db.cs_open("Languages", "name=" & cpCore.db.encodeSQLText(resultAuthContext.user.language))
-                                    If cpCore.db.cs_ok(CS) Then
-                                        resultAuthContext.user.LanguageID = cpCore.db.cs_getInteger(CS, "ID")
-                                        user_changes = True
-                                    End If
-                                    Call cpCore.db.cs_Close(CS)
+                                    resultAuthContext.user.LanguageID = cpCore.db.getRecordID("languages", resultAuthContext.user.language)
                                     If resultAuthContext.user.LanguageID < 1 Then
                                         '
-                                        ' English is not in Language table, add it, and set it in Member
-                                        '
-                                        CS = cpCore.db.cs_insertRecord("Languages")
-                                        If cpCore.db.cs_ok(CS) Then
-                                            resultAuthContext.user.LanguageID = cpCore.db.cs_getInteger(CS, "ID")
-                                            resultAuthContext.user.language = "English"
-                                            Call cpCore.db.cs_set(CS, "Name", resultAuthContext.user.language)
-                                            Call cpCore.db.cs_set(CS, "HTTP_Accept_LANGUAGE", "en")
+                                        ' -- English is not in Language table, add it, and set it in Member
+                                        Dim language As Models.Entity.LanguageModel = Models.Entity.LanguageModel.add(cpCore, New List(Of String))
+                                        If (language IsNot Nothing) Then
+                                            language.Name = "English"
+                                            language.HTTP_Accept_Language = "en"
+                                            language.saveObject(cpCore)
+                                            resultAuthContext.user.LanguageID = language.ID
+                                            resultAuthContext.user.language = language.Name
                                             user_changes = True
                                         End If
-                                        Call cpCore.db.cs_Close(CS)
                                     End If
                                 End If
                             End If
                         End If
                     End If
                     '
-                    '-----------------------------------------------------------------------------------
-                    ' ----- Save anything that changed
-                    '-----------------------------------------------------------------------------------
-                    '
-                    'Call AppendLog("main_InitVisit(), 2499")
-                    '
-                    ' can not count main_VisitCookieSupport yet, since a new visit will not show cookie support until the ajax hit
-                    'hint = "910"
+                    ' -- Save anything that changed
                     resultAuthContext.visit.ExcludeFromAnalytics = resultAuthContext.visit.ExcludeFromAnalytics Or resultAuthContext.visit_isBot Or resultAuthContext.user.ExcludeFromAnalytics Or resultAuthContext.user.Admin Or resultAuthContext.user.Developer
-                    '
-                    ' Update Page count
-                    '
                     If Not cpCore.webServer.webServerIO_PageExcludeFromAnalytics Then
-                        resultAuthContext.visit.PageVisits = resultAuthContext.visit.PageVisits + 1
+                        resultAuthContext.visit.PageVisits += 1
                     End If
-                    '
-                    ' Update the Visit
-                    ' set main_visitInitialized true allows main_SaveVisit, main_SaveVisitor, etc to work
-                    '
                     resultAuthContext.visit_initialized = True
-                    resultAuthContext.saveObject(cpCore)
-                    '
-                    ' ----- Save visitor record
-                    '
-                    'hint = "940"
+                    resultAuthContext.visit.saveObject(cpCore)
                     If visitor_changes Then
                         Call resultAuthContext.visitor.saveObject(cpCore)
                     End If
-                    '
-                    ' ----- Save Member record
-                    '
-                    'hint = "950"
                     If user_changes Then
                         Call resultAuthContext.user.saveObject(cpCore)
                     End If
-                    '
-                    ' ----- send visit cookie if supported or first page
-                    '       no, always send the cookie. There are too many exceptions to try being tricky here.
-                    '
-                    'hint = "960"
                     CookieVisitNew = cpCore.security.encodeToken(resultAuthContext.visit.ID, resultAuthContext.visit.LastVisitTime)
-                    'CookieVisitNew = encodeToken(main_VisitId, main_VisitStartTime)
                     If visitInit_allowVisitTracking And (CookieVisit <> CookieVisitNew) Then
                         CookieVisit = CookieVisitNew
                         NeedToWriteVisitCookie = True
                     End If
                 End If
-                ' set visitinitialized - for the cases where the earlier set was bypassed, like now allowvisittracking
                 resultAuthContext.visit_initialized = True
-                'hint = "970"
                 If (AllowOnNewVisitEvent) And (True) Then
-                    '
-                    '---------------------------------------------------------------------------------
-                    ' ----- OnNewVisitEvent
-                    '---------------------------------------------------------------------------------
-                    '
-                    'hint = "980"
-                    '$$$$$ cache this
-                    ' $$$$$ make ptr list on load
-                    CS = cpCore.db.cs_open(cnAddons, "(OnNewVisitEvent<>0)", "Name", , , , , "id")
-                    Do While cpCore.db.cs_ok(CS)
-                        Call cpCore.addon.execute_legacy5(cpCore.db.cs_getInteger(CS, "ID"), "", "", CPUtilsBaseClass.addonContext.ContextOnNewVisit, "", 0, "", 0)
-                        cpCore.db.cs_goNext(CS)
-                    Loop
-                    Call cpCore.db.cs_Close(CS)
+                    For Each addon As Models.Entity.addonModel In Models.Entity.addonModel.getAddonList_OnNewVisitEvent(cpCore)
+                        Call cpCore.addon.execute_legacy5(addon.id, "", "", CPUtilsBaseClass.addonContext.ContextOnNewVisit, "", 0, "", 0)
+                    Next
                 End If
                 '
-                '---------------------------------------------------------------------------------
-                ' ----- Write Visit Cookie
-                '---------------------------------------------------------------------------------
-                '
+                ' -- Write Visit Cookie
                 CookieVisit = cpCore.security.encodeToken(resultAuthContext.visit.ID, cpCore.app_startTime)
                 Call cpCore.webServer.addResponseCookie(main_appNameCookiePrefix & constants.main_cookieNameVisit, CookieVisit, , , requestAppRootPath, False)
             Catch ex As Exception
@@ -783,82 +462,6 @@ Namespace Contensive.Core.Models.Context
             End Try
             Return resultAuthContext
         End Function
-
-
-        '
-        '=============================================================================
-        ' Save Visit
-        '   If main_VisitId = 0, create new visit entry and set main_VisitId
-        '=============================================================================
-        '
-        Public Sub saveObject(cpCore As coreClass)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SaveVisit")
-            '
-            'If Not (true) Then Exit Sub
-            '
-            Dim SQL As String
-            Dim MethodName As String
-            ' 'dim buildversion As String
-            '
-            MethodName = "main_SaveVisit"
-            '
-            If visit_initialized Then
-                '
-                ' initialized means the main_InitVisit has completed, so all the other visit values are real
-                '
-                'BuildVersion = app.dataBuildVersion
-                '
-                ' ----- set the default Visit Name if nothing else
-                '
-                If visit.Name = "" Then
-                    visit.Name = "Visit" & visit.ID
-                End If
-                '
-                ' ----- save existing visit
-                '
-                SQL = "UPDATE ccVisits SET " _
-                    & " LastVisitTime=" & cpCore.db.encodeSQLDate(cpCore.app_startTime) _
-                    & ",PageVisits=" & (visit.PageVisits) _
-                    & ",CookieSupport=" & cpCore.db.encodeSQLBoolean(visit.CookieSupport) _
-                    & ",LoginAttempts=" & visit.LoginAttempts _
-                    & ",VisitAuthenticated=" & cpCore.db.encodeSQLBoolean(visit.VisitAuthenticated) _
-                    & ",MemberID=" & user.ID _
-                    & ",MemberNew=" & cpCore.db.encodeSQLBoolean(visit.MemberNew) _
-                    & ",TimeToLastHit=" & cpCore.db.encodeSQLNumber(visit.TimeToLastHit) _
-                    & ",ExcludeFromAnalytics=" & cpCore.db.encodeSQLBoolean(visit.ExcludeFromAnalytics) _
-                    & ",Mobile=" & cpCore.db.encodeSQLBoolean(visit_browserIsMobile) _
-                    & ",Bot=" & cpCore.db.encodeSQLBoolean(visit_isBot Or visit_isBadBot) _
-                    & ""
-                If visit.PageVisits <= 1 Then
-                    '
-                    ' First page of the visit, save everything
-                    '
-                    SQL &= "" _
-                        & ",VisitorID=" & visitor.id _
-                        & ",Name=" & cpCore.db.encodeSQLText(visit.Name) _
-                        & ",VisitorNew=" & cpCore.db.encodeSQLBoolean(visitor.newVisitor) _
-                        & ",StartTime=" & cpCore.db.encodeSQLDate(visit.StartTime) _
-                        & ",StartDateValue=" & visit.StartDateValue _
-                        & ",DateAdded=" & cpCore.db.encodeSQLDate(visit.StartTime) _
-                        & ",Remote_Addr=" & cpCore.db.encodeSQLText(cpCore.webServer.requestRemoteIP) _
-                        & ",Browser=" & cpCore.db.encodeSQLText(Left(cpCore.webServer.requestBrowser, 255)) _
-                        & ",HTTP_Via=" & cpCore.db.encodeSQLText(Left(cpCore.webServer.requestHTTPVia, 255)) _
-                        & ",HTTP_From=" & cpCore.db.encodeSQLText(Left(cpCore.webServer.requestHTTPFrom, 255)) _
-                        & ",HTTP_REFERER=" & cpCore.db.encodeSQLText(Left(visit.HTTP_REFERER, 255)) _
-                        & ",RefererPathPage=" & cpCore.db.encodeSQLText(Left(visit.RefererPathPage, 255)) _
-                        & ""
-                End If
-                SQL &= " WHERE (ID=" & visit.ID & ");"
-                Call cpCore.db.executeSql(SQL)
-            End If
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call cpCore.handleLegacyError18(MethodName)
-            '
-        End Sub
         '
         '========================================================================
         '   Browser Detection
@@ -1281,7 +884,7 @@ ErrorTrap:
                     ' ----- password blank, stop here
                     '
                     Call cpCore.error_AddUserError("A valid login requires a non-blank password.")
-                ElseIf (visit.LoginAttempts >= constants.maxVisitLoginAttempts) Then
+                ElseIf (visit.LoginAttempts >= cpCore.siteProperties.maxVisitLoginAttempts) Then
                     '
                     ' ----- already tried 5 times
                     '
@@ -1613,7 +1216,7 @@ ErrorTrap:
                     ' Log them in
                     '
                     visit.VisitAuthenticated = True
-                    Call saveObject(cpCore)
+                    visit.saveObject(cpCore)
                     isAuthenticatedAdmin_cache_isLoaded = False
                     property_user_isMember_isLoaded = False
                     isAuthenticatedDeveloper_cache_isLoaded = False
@@ -1718,7 +1321,7 @@ ErrorTrap:
                     visit.LoginAttempts = 0
                     visitor.memberID = user.ID
                     visit.ExcludeFromAnalytics = visit.ExcludeFromAnalytics Or visit_isBot Or user.ExcludeFromAnalytics Or user.Admin Or user.Developer
-                    Call saveObject(cpCore)
+                    Call visit.saveObject(cpCore)
                     Call visitor.saveObject(cpCore)
                     Call user.saveObject(cpCore)
                     returnREsult = True

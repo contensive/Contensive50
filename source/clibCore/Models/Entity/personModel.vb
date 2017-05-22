@@ -12,8 +12,8 @@ Namespace Contensive.Core.Models.Entity
     Public Class personModel
         '
         '-- const
-        Public Const primaryContentName As String = "" '<------ set content name
-        Private Const primaryContentTableName As String = "" '<------ set to tablename for the primary content (used for cache names)
+        Public Const primaryContentName As String = "people" '<------ set content name
+        Private Const primaryContentTableName As String = "ccmembers" '<------ set to tablename for the primary content (used for cache names)
         '
         'Public isNew As Boolean
         '

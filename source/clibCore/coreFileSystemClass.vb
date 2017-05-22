@@ -58,11 +58,15 @@ Namespace Contensive.Core
         ''' <param name="rootLocalPath"></param>
         ''' <param name="remoteFileEndpoint">If not isLocal, this endpoint is used for file sync</param>
         Public Sub New(cpCore As coreClass, isLocal As Boolean, fileSyncMode As fileSyncModeEnum, rootLocalPath As String, Optional remoteFileEndpoint As String = "")
-            Me.cpCore = cpCore
-            Me.isLocal = isLocal
-            Me.clusterFileEndpoint = remoteFileEndpoint
-            Me.fileSyncMode = fileSyncMode
-            Me.rootLocalPath = normalizePath(rootLocalPath)
+            If (String.IsNullOrEmpty(rootLocalPath)) Then
+                cpCore.handleExceptionAndRethrow(New ArgumentException("Blank file system root path not permitted."))
+            Else
+                Me.cpCore = cpCore
+                Me.isLocal = isLocal
+                Me.clusterFileEndpoint = remoteFileEndpoint
+                Me.fileSyncMode = fileSyncMode
+                Me.rootLocalPath = normalizePath(rootLocalPath)
+            End If
         End Sub
         '
         '==============================================================================================================

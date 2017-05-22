@@ -9118,11 +9118,11 @@ ErrorTrap:
                     loginForm_Password = cpCore.docProperties.getText("password")
                     loginForm_AutoLogin = cpCore.docProperties.getBoolean("autologin")
                     '
-                    If (cpCore.authContext.visit.LoginAttempts < cpCore.siteProperties.getinteger("maxVisitLoginAttempts")) And cpCore.authContext.visit.CookieSupport Then
+                    If (cpCore.authContext.visit.LoginAttempts < cpCore.siteProperties.maxVisitLoginAttempts) And cpCore.authContext.visit.CookieSupport Then
                         LocalMemberID = cpCore.authContext.authenticateGetId(cpCore, loginForm_Username, loginForm_Password)
                         If LocalMemberID = 0 Then
                             cpCore.authContext.visit.LoginAttempts = cpCore.authContext.visit.LoginAttempts + 1
-                            Call cpCore.authContext.saveObject(cpCore)
+                            cpCore.authContext.visit.saveObject(cpCore)
                         Else
                             returnREsult = cpCore.authContext.authenticateById(cpCore, LocalMemberID, loginForm_AutoLogin)
                             If returnREsult Then

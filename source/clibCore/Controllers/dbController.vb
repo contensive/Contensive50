@@ -2217,7 +2217,7 @@ Namespace Contensive.Core.Controllers
                                 fieldTypeId = .CDef.fields(FieldName.ToLower()).fieldTypeId
                             End If
                             returnFilename = genericController.csv_GetVirtualFilenameByTable(TableName, FieldName, RecordID, OriginalFilename, fieldTypeId)
-                            Call cs_setField(CSPointer, fieldNameUpper, returnFilename)
+                            Call cs_set(CSPointer, fieldNameUpper, returnFilename)
                         End With
                     End If
                 End If
@@ -2297,7 +2297,7 @@ Namespace Contensive.Core.Controllers
                                 ' Filename changed, mark record changed
                                 '
                                 Call cpCore.privateFiles.saveFile(Filename, Copy)
-                                Call cs_setField(CSPointer, FieldName, Filename)
+                                Call cs_set(CSPointer, FieldName, Filename)
                             Else
                                 OldCopy = cpCore.cdnFiles.readFile(Filename)
                                 If OldCopy <> Copy Then
@@ -2305,7 +2305,7 @@ Namespace Contensive.Core.Controllers
                                     ' copy changed, mark record changed
                                     '
                                     Call cpCore.privateFiles.saveFile(Filename, Copy)
-                                    Call cs_setField(CSPointer, FieldName, Filename)
+                                    Call cs_set(CSPointer, FieldName, Filename)
                                 End If
                             End If
                         End If
@@ -2343,92 +2343,93 @@ Namespace Contensive.Core.Controllers
             End Try
             Return returnResult
         End Function
-        '
-        '========================================================================
-        ''' <summary>
-        ''' set the value of a field within a csv_ContentSet
-        ''' </summary>
-        ''' <param name="CSPointer"></param>
-        ''' <param name="FieldName"></param>
-        ''' <param name="FieldValue"></param>
-        Public Sub cs_setField(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal FieldValue As Object)
-            Try
-                Dim FieldNameLocal As String
-                Dim FieldNameLocalUcase As String
-                Dim SetNeeded As Boolean
-                Dim field As coreMetaDataClass.CDefFieldClass
-                '
-                If Not cs_ok(CSPointer) Then
-                    Throw New ArgumentException("dataset must be valid")
-                Else
-                    With contentSetStore(CSPointer)
-                        If Not .Updateable Then
-                            Throw New ApplicationException("Attempting To update an unupdateable Content Set")
-                        Else
-                            FieldNameLocal = Trim(FieldName)
-                            FieldNameLocalUcase = genericController.vbUCase(FieldNameLocal)
-                            With .CDef
-                                If String.IsNullOrEmpty(.Name) Then
-                                    Throw New ApplicationException("Dataset must specify the content to update and cannot be created from a query.")
-                                ElseIf Not .fields.ContainsKey(FieldName.ToLower()) Then
-                                    Throw New ApplicationException("setField failed because field [" & FieldName.ToLower & "] was Not found In content [" & .Name & "]")
-                                Else
-                                    field = .fields(FieldName.ToLower)
-                                    Select Case field.fieldTypeId
-                                        Case FieldTypeIdAutoIdIncrement, FieldTypeIdRedirect, FieldTypeIdManyToMany
-                                        '
-                                        ' Never set
-                                        '
-                                        Case FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdFileHTMLPrivate
-                                            '
-                                            ' Always set
-                                            ' TextFile, assume this call is only made if a change was made to the copy.
-                                            ' Use the csv_SetCSTextFile to manage the modified name and date correctly.
-                                            ' csv_SetCSTextFile uses this method to set the row changed, so leave this here.
-                                            '
-                                            SetNeeded = True
-                                        Case FieldTypeIdBoolean
-                                            '
-                                            ' Boolean - sepcial case, block on typed GetAlways set
-                                            If genericController.EncodeBoolean(FieldValue) <> cs_getBoolean(CSPointer, FieldName) Then
-                                                SetNeeded = True
-                                            End If
-                                        Case Else
-                                            '
-                                            ' Set if text of value changes
-                                            '
-                                            If genericController.encodeText(FieldValue) <> cs_getText(CSPointer, FieldName) Then
-                                                SetNeeded = True
-                                            End If
-                                    End Select
-                                End If
-                            End With
-                            If Not SetNeeded Then
-                                SetNeeded = SetNeeded
-                            Else
-                                If contentSetStore(CSPointer).WorkflowAuthoringMode Then
-                                    '
-                                    ' Do phantom ID replacement
-                                    '
-                                    If FieldNameLocalUcase = "ID" Then
-                                        FieldNameLocal = "EditSourceID"
-                                        FieldNameLocalUcase = genericController.vbUCase(FieldNameLocal)
-                                    End If
-                                End If
-                                If .writeCache.ContainsKey(FieldName.ToLower) Then
-                                    .writeCache.Item(FieldName.ToLower) = genericController.encodeText(FieldValue)
-                                Else
-                                    .writeCache.Add(FieldName.ToLower, genericController.encodeText(FieldValue))
-                                End If
-                                .LastUsed = DateTime.Now
-                            End If
-                        End If
-                    End With
-                End If
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-        End Sub
+        ''
+        ''========================================================================
+        '''' <summary>
+        '''' set the value of a field within a csv_ContentSet
+        '''' </summary>
+        '''' <param name="CSPointer"></param>
+        '''' <param name="FieldName"></param>
+        '''' <param name="FieldValue"></param>
+        'Public Sub cs_setFieldx(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal FieldValue As Object)
+        '    Try
+        '        cs_set(CSPointer, FieldName, FieldValue)
+        '        'Dim FieldNameLocal As String
+        '        'Dim FieldNameLocalUcase As String
+        '        'Dim SetNeeded As Boolean
+        '        'Dim field As coreMetaDataClass.CDefFieldClass
+        '        ''
+        '        'If Not cs_ok(CSPointer) Then
+        '        '    Throw New ArgumentException("dataset must be valid")
+        '        'Else
+        '        '    With contentSetStore(CSPointer)
+        '        '        If Not .Updateable Then
+        '        '            Throw New ApplicationException("Attempting To update an unupdateable Content Set")
+        '        '        Else
+        '        '            FieldNameLocal = Trim(FieldName)
+        '        '            FieldNameLocalUcase = genericController.vbUCase(FieldNameLocal)
+        '        '            With .CDef
+        '        '                If String.IsNullOrEmpty(.Name) Then
+        '        '                    Throw New ApplicationException("Dataset must specify the content to update and cannot be created from a query.")
+        '        '                ElseIf Not .fields.ContainsKey(FieldName.ToLower()) Then
+        '        '                    Throw New ApplicationException("setField failed because field [" & FieldName.ToLower & "] was Not found In content [" & .Name & "]")
+        '        '                Else
+        '        '                    field = .fields(FieldName.ToLower)
+        '        '                    Select Case field.fieldTypeId
+        '        '                        Case FieldTypeIdAutoIdIncrement, FieldTypeIdRedirect, FieldTypeIdManyToMany
+        '        '                        '
+        '        '                        ' Never set
+        '        '                        '
+        '        '                        Case FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdFileHTMLPrivate
+        '        '                            '
+        '        '                            ' Always set
+        '        '                            ' TextFile, assume this call is only made if a change was made to the copy.
+        '        '                            ' Use the csv_SetCSTextFile to manage the modified name and date correctly.
+        '        '                            ' csv_SetCSTextFile uses this method to set the row changed, so leave this here.
+        '        '                            '
+        '        '                            SetNeeded = True
+        '        '                        Case FieldTypeIdBoolean
+        '        '                            '
+        '        '                            ' Boolean - sepcial case, block on typed GetAlways set
+        '        '                            If genericController.EncodeBoolean(FieldValue) <> cs_getBoolean(CSPointer, FieldName) Then
+        '        '                                SetNeeded = True
+        '        '                            End If
+        '        '                        Case Else
+        '        '                            '
+        '        '                            ' Set if text of value changes
+        '        '                            '
+        '        '                            If genericController.encodeText(FieldValue) <> cs_getText(CSPointer, FieldName) Then
+        '        '                                SetNeeded = True
+        '        '                            End If
+        '        '                    End Select
+        '        '                End If
+        '        '            End With
+        '        '            If Not SetNeeded Then
+        '        '                SetNeeded = SetNeeded
+        '        '            Else
+        '        '                If contentSetStore(CSPointer).WorkflowAuthoringMode Then
+        '        '                    '
+        '        '                    ' Do phantom ID replacement
+        '        '                    '
+        '        '                    If FieldNameLocalUcase = "ID" Then
+        '        '                        FieldNameLocal = "EditSourceID"
+        '        '                        FieldNameLocalUcase = genericController.vbUCase(FieldNameLocal)
+        '        '                    End If
+        '        '                End If
+        '        '                If .writeCache.ContainsKey(FieldName.ToLower) Then
+        '        '                    .writeCache.Item(FieldName.ToLower) = genericController.encodeText(FieldValue)
+        '        '                Else
+        '        '                    .writeCache.Add(FieldName.ToLower, genericController.encodeText(FieldValue))
+        '        '                End If
+        '        '                .LastUsed = DateTime.Now
+        '        '            End If
+        '        '        End If
+        '        '    End With
+        '        'End If
+        '    Catch ex As Exception
+        '        cpCore.handleExceptionAndRethrow(ex)
+        '    End Try
+        'End Sub
         '
         '========================================================================
         ''' <summary>
@@ -2820,7 +2821,7 @@ Namespace Contensive.Core.Controllers
                                         If (SourceFilename <> "") Then
                                             DestFilename = cs_getFilename(CSDestination, FieldName, "")
                                             'DestFilename = csv_GetVirtualFilename(DestContentName, FieldName, DestRecordID)
-                                            Call cs_setField(CSDestination, FieldName, DestFilename)
+                                            Call cs_set(CSDestination, FieldName, DestFilename)
                                             Call cpCore.cdnFiles.copyFile(SourceFilename, DestFilename)
                                         End If
                                     Case FieldTypeIdFileTextPrivate, FieldTypeIdFileHTMLPrivate
@@ -2832,14 +2833,14 @@ Namespace Contensive.Core.Controllers
                                         If (SourceFilename <> "") Then
                                             DestFilename = cs_getFilename(CSDestination, FieldName, "")
                                             'DestFilename = csv_GetVirtualFilename(DestContentName, FieldName, DestRecordID)
-                                            Call cs_setField(CSDestination, FieldName, DestFilename)
+                                            Call cs_set(CSDestination, FieldName, DestFilename)
                                             Call cpCore.privateFiles.copyFile(SourceFilename, DestFilename)
                                         End If
                                     Case Else
                                         '
                                         ' ----- value
                                         '
-                                        Call cs_setField(CSDestination, FieldName, cs_getField(CSSource, FieldName))
+                                        Call cs_set(CSDestination, FieldName, cs_getField(CSSource, FieldName))
                                 End Select
                         End Select
                         FieldName = cs_getNextFieldName(CSSource)
@@ -3079,12 +3080,10 @@ Namespace Contensive.Core.Controllers
         ''' <param name="FieldName"></param>
         ''' <param name="FieldValue"></param>
         '
-        Public Sub cs_set(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal FieldValue As Object)
+        Public Sub cs_set(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal FieldValue As String)
             Try
                 Dim BlankTest As String
-                Dim FieldValueText As String
                 Dim FieldNameLc As String
-                Dim FieldValueVariantLocal As Object
                 Dim SetNeeded As Boolean
                 Dim fileNameNoExt As String
                 Dim ContentName As String
@@ -3102,7 +3101,9 @@ Namespace Contensive.Core.Controllers
                         Else
                             ContentName = .ContentName
                             FieldNameLc = Trim(FieldName).ToLower
-                            FieldValueVariantLocal = FieldValue
+                            If (FieldValue Is Nothing) Then
+                                FieldValue = String.Empty
+                            End If
                             With .CDef
                                 If .Name <> "" Then
                                     Dim field As coreMetaDataClass.CDefFieldClass
@@ -3122,7 +3123,7 @@ Namespace Contensive.Core.Controllers
                                                 ' csv_cs_get returns the filename
                                                 ' csv_SetCS saves the filename
                                                 '
-                                                FieldValueVariantLocal = FieldValueVariantLocal
+                                                'FieldValueVariantLocal = FieldValueVariantLocal
                                                 SetNeeded = True
                                             Case FieldTypeIdFileTextPrivate, FieldTypeIdFileHTMLPrivate
                                                 '
@@ -3137,8 +3138,8 @@ Namespace Contensive.Core.Controllers
                                                 ' csv_SetCSTextFile uses this method to set the row changed, so leave this here.
                                                 '
                                                 fileNameNoExt = cs_getText(CSPointer, FieldNameLc)
-                                                FieldValueText = genericController.encodeText(FieldValueVariantLocal)
-                                                If FieldValueText = "" Then
+                                                'FieldValue = genericController.encodeText(FieldValueVariantLocal)
+                                                If FieldValue = "" Then
                                                     If fileNameNoExt <> "" Then
                                                         Call cpCore.privateFiles.deleteFile(fileNameNoExt)
                                                         'Call publicFiles.DeleteFile(fileNameNoExt)
@@ -3148,10 +3149,10 @@ Namespace Contensive.Core.Controllers
                                                     If fileNameNoExt = "" Then
                                                         fileNameNoExt = cs_getFilename(CSPointer, FieldName, "", ContentName)
                                                     End If
-                                                    Call cpCore.privateFiles.saveFile(fileNameNoExt, FieldValueText)
-                                                    'Call publicFiles.SaveFile(fileNameNoExt, FieldValueText)
+                                                    Call cpCore.privateFiles.saveFile(fileNameNoExt, FieldValue)
+                                                    'Call publicFiles.SaveFile(fileNameNoExt, FieldValue)
                                                 End If
-                                                FieldValueVariantLocal = fileNameNoExt
+                                                FieldValue = fileNameNoExt
                                                 SetNeeded = True
                                             Case FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript
                                                 '
@@ -3164,8 +3165,7 @@ Namespace Contensive.Core.Controllers
                                                 Dim Pos As Integer
                                                 pathFilenameOriginal = cs_getText(CSPointer, FieldNameLc)
                                                 PathFilename = pathFilenameOriginal
-                                                FieldValueText = genericController.encodeText(FieldValueVariantLocal)
-                                                BlankTest = FieldValueText
+                                                BlankTest = FieldValue
                                                 BlankTest = genericController.vbReplace(BlankTest, " ", "")
                                                 BlankTest = genericController.vbReplace(BlankTest, vbCr, "")
                                                 BlankTest = genericController.vbReplace(BlankTest, vbLf, "")
@@ -3219,38 +3219,43 @@ Namespace Contensive.Core.Controllers
                                                         pathFilenameOriginal = genericController.convertCdnUrlToCdnPathFilename(pathFilenameOriginal)
                                                         Call cpCore.cdnFiles.deleteFile(pathFilenameOriginal)
                                                     End If
-                                                    Call cpCore.cdnFiles.saveFile(PathFilename, FieldValueText)
+                                                    Call cpCore.cdnFiles.saveFile(PathFilename, FieldValue)
                                                 End If
-                                                FieldValueVariantLocal = PathFilename
+                                                FieldValue = PathFilename
                                                 SetNeeded = True
                                             Case FieldTypeIdBoolean
                                                 '
                                                 ' Boolean - sepcial case, block on typed GetAlways set
-                                                FieldValueVariantLocal = genericController.EncodeBoolean(FieldValueVariantLocal)
-                                                If genericController.EncodeBoolean(FieldValueVariantLocal) <> cs_getBoolean(CSPointer, FieldNameLc) Then
+                                                If genericController.EncodeBoolean(FieldValue) <> cs_getBoolean(CSPointer, FieldNameLc) Then
                                                     SetNeeded = True
                                                 End If
                                             Case FieldTypeIdText
                                                 '
                                                 ' Set if text of value changes
                                                 '
-                                                FieldValueVariantLocal = Left(genericController.encodeText(FieldValueVariantLocal), 255)
-                                                If genericController.encodeText(FieldValueVariantLocal) <> cs_getText(CSPointer, FieldNameLc) Then
-                                                    SetNeeded = True
+                                                If (FieldValue.Length > 255) Then
+                                                    cpCore.handleExceptionAndContinue(New ApplicationException("Text length too long saving field [" & FieldName & "], length [" & FieldValue.Length & "], but max for Text field is 255. Save will be attempted"))
+                                                Else
+                                                    If genericController.encodeText(FieldValue) <> cs_getText(CSPointer, FieldNameLc) Then
+                                                        SetNeeded = True
+                                                    End If
                                                 End If
                                             Case FieldTypeIdLongText, FieldTypeIdHTML
                                                 '
                                                 ' Set if text of value changes
                                                 '
-                                                FieldValueVariantLocal = Left(genericController.encodeText(FieldValueVariantLocal), 65535)
-                                                If genericController.encodeText(FieldValueVariantLocal) <> cs_getText(CSPointer, FieldNameLc) Then
-                                                    SetNeeded = True
+                                                If (FieldValue.Length > 65535) Then
+                                                    cpCore.handleExceptionAndContinue(New ApplicationException("Text length too long saving field [" & FieldName & "], length [" & FieldValue.Length & "], but max for LongText and Html is 65535. Save will be attempted"))
+                                                Else
+                                                    If genericController.encodeText(FieldValue) <> cs_getText(CSPointer, FieldNameLc) Then
+                                                        SetNeeded = True
+                                                    End If
                                                 End If
                                             Case Else
                                                 '
                                                 ' Set if text of value changes
                                                 '
-                                                If genericController.encodeText(FieldValueVariantLocal) <> cs_getText(CSPointer, FieldNameLc) Then
+                                                If genericController.encodeText(FieldValue) <> cs_getText(CSPointer, FieldNameLc) Then
                                                     SetNeeded = True
                                                 End If
                                         End Select
@@ -3272,9 +3277,9 @@ Namespace Contensive.Core.Controllers
                                 ' ----- set the new value into the row buffer
                                 '
                                 If .writeCache.ContainsKey(FieldNameLc) Then
-                                    .writeCache.Item(FieldNameLc) = FieldValueVariantLocal.ToString()
+                                    .writeCache.Item(FieldNameLc) = FieldValue.ToString()
                                 Else
-                                    .writeCache.Add(FieldNameLc, FieldValueVariantLocal.ToString())
+                                    .writeCache.Add(FieldNameLc, FieldValue.ToString())
                                 End If
                                 .LastUsed = DateTime.Now
                             End If
@@ -3284,6 +3289,18 @@ Namespace Contensive.Core.Controllers
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
+        End Sub
+        Public Sub cs_set(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal FieldValue As Date)
+            cs_set(CSPointer, FieldName, FieldValue.ToString())
+        End Sub
+        Public Sub cs_set(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal FieldValue As Boolean)
+            cs_set(CSPointer, FieldName, FieldValue.ToString())
+        End Sub
+        Public Sub cs_set(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal FieldValue As Integer)
+            cs_set(CSPointer, FieldName, FieldValue.ToString())
+        End Sub
+        Public Sub cs_set(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal FieldValue As Double)
+            cs_set(CSPointer, FieldName, FieldValue.ToString())
         End Sub
         '
         '========================================================================

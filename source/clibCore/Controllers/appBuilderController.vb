@@ -1719,17 +1719,17 @@ Namespace Contensive.Core.Controllers
                     '
                     Call cpcore.db.cs_Close(CS)
                     CS = cpcore.db.cs_insertRecord(ContentName, SystemMemberID)
-                    Call cpcore.db.cs_setField(CS, "NAME", Name)
-                    Call cpcore.db.cs_setField(CS, "ACTIVE", True)
-                    Call cpcore.db.cs_setField(CS, "Abbreviation", Abbreviation)
-                    Call cpcore.db.cs_setField(CS, "CountryID", CountryID)
-                    Call cpcore.db.cs_setField(CS, "FIPSState", FIPSState)
+                    Call cpcore.db.cs_set(CS, "NAME", Name)
+                    Call cpcore.db.cs_set(CS, "ACTIVE", True)
+                    Call cpcore.db.cs_set(CS, "Abbreviation", Abbreviation)
+                    Call cpcore.db.cs_set(CS, "CountryID", CountryID)
+                    Call cpcore.db.cs_set(CS, "FIPSState", FIPSState)
                 Else
                     '
                     ' verify only fields needed for contensive
                     '
-                    Call cpcore.db.cs_setField(CS, "CountryID", CountryID)
-                    Call cpcore.db.cs_setField(CS, "Abbreviation", Abbreviation)
+                    Call cpcore.db.cs_set(CS, "CountryID", CountryID)
+                    Call cpcore.db.cs_set(CS, "Abbreviation", Abbreviation)
                 End If
                 Call cpcore.db.cs_Close(CS)
             Catch ex As Exception
@@ -1822,12 +1822,12 @@ Namespace Contensive.Core.Controllers
                     Call cpCore.db.cs_Close(CS)
                     CS = cpCore.db.cs_insertRecord("Countries", SystemMemberID)
                     If cpCore.db.cs_ok(CS) Then
-                        Call cpCore.db.cs_setField(CS, "ACTIVE", True)
+                        Call cpCore.db.cs_set(CS, "ACTIVE", True)
                     End If
                 End If
                 If cpCore.db.cs_ok(CS) Then
-                    Call cpCore.db.cs_setField(CS, "NAME", Name)
-                    Call cpCore.db.cs_setField(CS, "Abbreviation", Abbreviation)
+                    Call cpCore.db.cs_set(CS, "NAME", Name)
+                    Call cpCore.db.cs_set(CS, "Abbreviation", Abbreviation)
                     If genericController.vbLCase(Name) = "united states" Then
                         Call cpCore.db.cs_set(CS, "DomesticShipping", "1")
                     End If
@@ -2300,28 +2300,28 @@ Namespace Contensive.Core.Controllers
                     cpCore.db.cs_Close(CSEntry)
                     CSEntry = cpCore.db.cs_insertRecord(MenuContentName, SystemMemberID)
                     If cpCore.db.cs_ok(CSEntry) Then
-                        Call cpCore.db.cs_setField(CSEntry, "name", EntryName)
+                        Call cpCore.db.cs_set(CSEntry, "name", EntryName)
                     End If
                 End If
                 If cpCore.db.cs_ok(CSEntry) Then
                     If ParentID = 0 Then
-                        Call cpCore.db.cs_setField(CSEntry, "ParentID", Nothing)
+                        Call cpCore.db.cs_set(CSEntry, "ParentID", 0)
                     Else
-                        Call cpCore.db.cs_setField(CSEntry, "ParentID", ParentID)
+                        Call cpCore.db.cs_set(CSEntry, "ParentID", ParentID)
                     End If
                     If (ContentID = -1) Then
-                        Call cpCore.db.cs_setField(CSEntry, "ContentID", Nothing)
+                        Call cpCore.db.cs_set(CSEntry, "ContentID", 0)
                     Else
-                        Call cpCore.db.cs_setField(CSEntry, "ContentID", ContentID)
+                        Call cpCore.db.cs_set(CSEntry, "ContentID", ContentID)
                     End If
-                    Call cpCore.db.cs_setField(CSEntry, "LinkPage", LinkPage)
-                    Call cpCore.db.cs_setField(CSEntry, "SortOrder", SortOrder)
-                    Call cpCore.db.cs_setField(CSEntry, "AdminOnly", AdminOnly)
-                    Call cpCore.db.cs_setField(CSEntry, "DeveloperOnly", DeveloperOnly)
-                    Call cpCore.db.cs_setField(CSEntry, "NewWindow", NewWindow)
-                    Call cpCore.db.cs_setField(CSEntry, "Active", Active)
+                    Call cpCore.db.cs_set(CSEntry, "LinkPage", LinkPage)
+                    Call cpCore.db.cs_set(CSEntry, "SortOrder", SortOrder)
+                    Call cpCore.db.cs_set(CSEntry, "AdminOnly", AdminOnly)
+                    Call cpCore.db.cs_set(CSEntry, "DeveloperOnly", DeveloperOnly)
+                    Call cpCore.db.cs_set(CSEntry, "NewWindow", NewWindow)
+                    Call cpCore.db.cs_set(CSEntry, "Active", Active)
                     If SupportAddonID Then
-                        Call cpCore.db.cs_setField(CSEntry, "AddonID", addonId)
+                        Call cpCore.db.cs_set(CSEntry, "AddonID", addonId)
                     End If
                 End If
                 Call cpCore.db.cs_Close(CSEntry)

@@ -409,6 +409,40 @@ Namespace Contensive.Core.Models.Entity
         Public Shared Function getRecordName(cpcore As coreClass, recordId As Integer) As String
             Return cpcore.content_GetRecordName(cnAddons, recordId)
         End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' for internal use -- return a list of addons based on a sql criteria. To create a new list, create a shared method in the addonmodel so field names are not distributed without being typed
+        ''' </summary>
+        ''' <param name="cpcore"></param>
+        ''' <param name="sqlCriteria"></param>
+        ''' <returns></returns>
+        Private Shared Function getAddonList_SqlCriteria(cpcore As coreClass, sqlCriteria As String) As List(Of addonModel)
+            Dim resultList As New List(Of addonModel)
+            Try
+                Dim cs As New csController(cpcore)
+                If cs.open(cnAddons) Then
+                    Do
+                        resultList.Add(addonModel.getObject(cpcore, cs.getInteger("id"), New List(Of String)))
+                        cs.goNext()
+                    Loop While cs.ok
+                End If
+                cs.Close()
+            Catch ex As Exception
+                cpcore.handleExceptionAndRethrow(ex)
+            End Try
+            Return resultList
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' return a list of addons to run onNewVisit
+        ''' </summary>
+        ''' <param name="cpcore"></param>
+        ''' <returns></returns>
+        Public Shared Function getAddonList_OnNewVisitEvent(cpcore As coreClass) As List(Of addonModel)
+            Return getAddonList_SqlCriteria(cpcore, "(OnNewVisitEvent<>0)")
+        End Function
     End Class
 End Namespace
 

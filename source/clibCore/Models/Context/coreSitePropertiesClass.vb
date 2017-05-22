@@ -24,6 +24,42 @@ Namespace Contensive.Core.Models.Context
             MyBase.New()
             Me.cpCore = cpCore
         End Sub
+        '
+        '====================================================================================================
+        '
+        Friend ReadOnly Property trackGuestsWithoutCookies() As Boolean
+            Get
+                If _trackGuestsWithoutCookies Is Nothing Then
+                    _trackGuestsWithoutCookies = getBoolean("track guests without cookies", False)
+                End If
+                Return CBool(_trackGuestsWithoutCookies)
+            End Get
+        End Property
+        Private _trackGuestsWithoutCookies As Boolean?
+        '
+        '====================================================================================================
+        '
+        Friend ReadOnly Property AllowAutoLogin() As Boolean
+            Get
+                If _AllowAutoLogin Is Nothing Then
+                    _AllowAutoLogin = getBoolean("allowAutoLogin", False)
+                End If
+                Return CBool(_AllowAutoLogin)
+            End Get
+        End Property
+        Private _AllowAutoLogin As Boolean?
+        '
+        '====================================================================================================
+        '
+        Friend ReadOnly Property maxVisitLoginAttempts() As Integer
+            Get
+                If _maxVisitLoginAttempts Is Nothing Then
+                    _maxVisitLoginAttempts = getinteger("maxVisitLoginAttempts", 20)
+                End If
+                Return CInt(_maxVisitLoginAttempts)
+            End Get
+        End Property
+        Private _maxVisitLoginAttempts As Integer?
         '====================================================================================================
         '
         Public ReadOnly Property LoginIconFilename() As String

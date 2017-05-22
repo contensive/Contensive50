@@ -1065,9 +1065,6 @@ Namespace Contensive.Core
             '
             ' -- create default auth objects for non-user methods, or until auth is available
             authContext = New authContextModel
-            authContext.visit = New Models.Entity.visitModel
-            authContext.visitor = New Models.Entity.visitorModel
-            authContext.user = New Models.Entity.personModel
             '
             serverConfig = Models.Entity.serverConfigModel.getObject(Me, applicationName)
             serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
@@ -5014,7 +5011,7 @@ ErrorTrap:
                         If iDateExpires <> Date.MinValue Then
                             Call db.cs_set(CS, "DateExpires", iDateExpires)
                         Else
-                            Call db.cs_set(CS, "DateExpires", Nothing)
+                            Call db.cs_set(CS, "DateExpires", "")
                         End If
                     End If
                     Call db.cs_Close(CS)
@@ -9450,7 +9447,7 @@ ErrorTrap:
                         Filename = docProperties.getText(LocalRequestName)
                         If Filename <> "" Then
                             Path = db.cs_getFilename(CSPointer, FieldName, Filename)
-                            Call db.cs_setField(CSPointer, FieldName, Path)
+                            Call db.cs_set(CSPointer, FieldName, Path)
                             Path = genericController.vbReplace(Path, "\", "/")
                             Path = genericController.vbReplace(Path, "/" & Filename, "")
                             Call appRootFiles.saveUpload(LocalRequestName, Path, Filename)
@@ -14170,7 +14167,7 @@ ErrorTrap:
                                 If dateExpires <> #12:00:00 AM# Then
                                     Call cs.SetField("DateExpires", dateExpires.ToString)
                                 Else
-                                    Call cs.SetField("DateExpires", Nothing)
+                                    Call cs.setField("DateExpires", "")
                                 End If
                             End If
                             Call cs.Close()
@@ -14216,7 +14213,7 @@ ErrorTrap:
                                 If dateExpires <> #12:00:00 AM# Then
                                     Call cs.SetField("DateExpires", dateExpires.ToString)
                                 Else
-                                    Call cs.SetField("DateExpires", Nothing)
+                                    Call cs.setField("DateExpires", "")
                                 End If
                             End If
                             Call cs.Close()

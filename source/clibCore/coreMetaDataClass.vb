@@ -2518,21 +2518,21 @@ ErrorTrap:
                                             Case "ID"
                                             ' do nothing
                                             Case "NAME"
-                                                Call cpCore.db.cs_setField(CSNew, FieldName, ChildContentName)
+                                                Call cpCore.db.cs_set(CSNew, FieldName, ChildContentName)
                                             Case "PARENTID"
-                                                Call cpCore.db.cs_setField(CSNew, FieldName, cpCore.db.cs_getText(CSContent, "ID"))
+                                                Call cpCore.db.cs_set(CSNew, FieldName, cpCore.db.cs_getText(CSContent, "ID"))
                                             Case "CREATEDBY", "MODIFIEDBY"
-                                                Call cpCore.db.cs_setField(CSNew, FieldName, MemberID)
+                                                Call cpCore.db.cs_set(CSNew, FieldName, MemberID)
                                             Case "DATEADDED", "MODIFIEDDATE"
-                                                Call cpCore.db.cs_setField(CSNew, FieldName, DateNow)
+                                                Call cpCore.db.cs_set(CSNew, FieldName, DateNow)
                                             Case "CCGUID"
 
                                                 '
                                                 ' new, non-blank guid so if this cdef is exported, it will be updateable
                                                 '
-                                                Call cpCore.db.cs_setField(CSNew, FieldName, Guid.NewGuid.ToString())
+                                                Call cpCore.db.cs_set(CSNew, FieldName, Guid.NewGuid.ToString())
                                             Case Else
-                                                Call cpCore.db.cs_setField(CSNew, FieldName, cpCore.db.cs_getText(CSContent, FieldName))
+                                                Call cpCore.db.cs_set(CSNew, FieldName, cpCore.db.cs_getText(CSContent, FieldName))
                                         End Select
                                     Next
                                 End If

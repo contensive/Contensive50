@@ -1003,9 +1003,9 @@ ErrorTrap:
                                     ' renew this old record
                                     '
                                     'hint = "150"
-                                    Call cpcore.db.cs_setField(CS, "developer", "1")
-                                    Call cpcore.db.cs_setField(CS, "admin", "1")
-                                    Call cpcore.db.cs_setField(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString())
+                                    Call cpcore.db.cs_set(CS, "developer", "1")
+                                    Call cpcore.db.cs_set(CS, "admin", "1")
+                                    Call cpcore.db.cs_set(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString())
                                 Else
                                     '
                                     ' inject support record
@@ -1013,11 +1013,11 @@ ErrorTrap:
                                     'hint = "150"
                                     Call cpcore.db.cs_Close(CS)
                                     CS = cpcore.db.cs_insertRecord("people")
-                                    Call cpcore.db.cs_setField(CS, "name", "Contensive Support")
-                                    Call cpcore.db.cs_setField(CS, "email", workingEmail)
-                                    Call cpcore.db.cs_setField(CS, "developer", "1")
-                                    Call cpcore.db.cs_setField(CS, "admin", "1")
-                                    Call cpcore.db.cs_setField(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString())
+                                    Call cpcore.db.cs_set(CS, "name", "Contensive Support")
+                                    Call cpcore.db.cs_set(CS, "email", workingEmail)
+                                    Call cpcore.db.cs_set(CS, "developer", "1")
+                                    Call cpcore.db.cs_set(CS, "admin", "1")
+                                    Call cpcore.db.cs_set(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString())
                                 End If
                                 Call cpcore.db.cs_save2(CS)
                             Else
