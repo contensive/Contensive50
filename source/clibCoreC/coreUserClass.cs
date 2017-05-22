@@ -348,7 +348,7 @@
 //        //       Member has admin or developer status
 //        //========================================================================
 //        //
-//        public bool isAuthenticatedAdmin()
+//        public bool isAuthenticatedAdmin(cpcore)
 //        {
 //            bool returnIs = false;
 //            try
@@ -1138,7 +1138,7 @@
 //                {
 //                    if (isAuthenticated())
 //                    {
-//                        if (isAuthenticatedAdmin())
+//                        if (isAuthenticatedAdmin(cpcore))
 //                        {
 //                            returnIsContentManager = true;
 //                        }
@@ -2051,7 +2051,7 @@
 //                        returnAllowAdd = true;
 //                        returnAllowDelete = true;
 //                    }
-//                    else if (isAuthenticatedAdmin())
+//                    else if (isAuthenticatedAdmin(cpcore))
 //                    {
 //                        //
 //                        // admin is content manager if the CDef is not developer only

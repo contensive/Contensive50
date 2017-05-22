@@ -52,13 +52,13 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetCopy(ByVal CopyName As String, Optional ByVal DefaultContent As String = "") As String
-            GetCopy = cpCore.htmldoc.html_GetContentCopy(CopyName, DefaultContent, cpcore.authContext.user.id, True, cpcore.authContext.user.isAuthenticated)
+            GetCopy = cpCore.htmldoc.html_GetContentCopy(CopyName, DefaultContent, cpcore.authContext.authContextUser.id, True, cpcore.authContext.isAuthenticated)
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Function GetCopy(ByVal CopyName As String, ByVal DefaultContent As String, ByVal personalizationPeopleId As Integer) As String
-            GetCopy = cpCore.htmldoc.html_GetContentCopy(CopyName, DefaultContent, personalizationPeopleId, True, cpcore.authContext.user.isAuthenticated)
+            GetCopy = cpCore.htmldoc.html_GetContentCopy(CopyName, DefaultContent, personalizationPeopleId, True, cpcore.authContext.isAuthenticated)
         End Function
         '
         '====================================================================================================

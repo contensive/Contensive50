@@ -975,7 +975,7 @@ ErrorTrap:
                 ' -- print what is needed
                 '
                 If (Not BlockNonContentExtras) And (Not pageManager_printVersion) Then
-                    If cpCore.authContext.user.isAuthenticatedContentManager() And cpCore.authContext.user.allowToolsPanel Then
+                    If cpCore.authContext.isAuthenticatedContentManager(cpCore) And cpCore.authContext.authContextUser.allowToolsPanel Then
                         If AllowTools Then
                             s = s & cpCore.main_GetToolsPanel()
                         End If
@@ -1011,7 +1011,7 @@ ErrorTrap:
                 '
                 ' ----- popup error if this is a developer
                 '
-                If (Not BlockNonContentExtras) And cpCore.authContext.user.isAuthenticatedDeveloper() Then
+                If (Not BlockNonContentExtras) And cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
                     AllowPopupTraps = cpCore.siteProperties.getBoolean("AllowPopupTraps", True)
                     If AllowPopupTraps Then
                         If cpCore.html_PageErrorWithoutCsv Then
@@ -1111,11 +1111,11 @@ ErrorTrap:
                 '
                 ' ----- Add Member Stylesheet if left over
                 '
-                If cpCore.authContext.user.styleFilename <> "" Then
-                    Copy = cpCore.cdnFiles.readFile(cpCore.authContext.user.styleFilename)
+                If cpCore.authContext.authContextUser.styleFilename <> "" Then
+                    Copy = cpCore.cdnFiles.readFile(cpCore.authContext.authContextUser.styleFilename)
                     headTags = headTags & cr & "<style type=""text/css"">" & Copy & "</style>"
                     'JS = JS & vbCrLf & vbTab & "cjAddHeadTag('<style type=""text/css"">" & Copy & "</style>');"
-                    cpCore.authContext.user.styleFilename = ""
+                    cpCore.authContext.authContextUser.styleFilename = ""
                 End If
                 '
                 ' ----- Add any left over head tags
@@ -1950,7 +1950,7 @@ ErrorTrap:
             If cpCore.siteProperties.getBoolean("AllowLoginIcon", True) Then
                 main_GetLoginLink = main_GetLoginLink & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"">"
                 main_GetLoginLink = main_GetLoginLink & "<tr><td align=""right"">"
-                If cpCore.authContext.user.isAuthenticatedContentManager() Then
+                If cpCore.authContext.isAuthenticatedContentManager(cpCore) Then
                     main_GetLoginLink = main_GetLoginLink & "<a href=""" & html_EncodeHTML(cpCore.siteProperties.adminURL) & """ target=""_blank"">"
                 Else
                     Link = cpCore.webServer.webServerIO_requestPage & "?" & cpCore.web_RefreshQueryString
@@ -2137,7 +2137,7 @@ ErrorTrap:
             'If Not (true) Then Exit Function
             '
             html_GetAdminHintWrapper = ""
-            If cpCore.authContext.user.isEditing("") Or cpCore.authContext.user.isAuthenticatedAdmin() Then
+            If cpCore.authContext.isEditing(cpCore, "") Or cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                 html_GetAdminHintWrapper = html_GetAdminHintWrapper & html_GetLegacySiteStyles()
                 html_GetAdminHintWrapper = html_GetAdminHintWrapper _
                     & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccHintWrapper"">" _
@@ -2672,7 +2672,7 @@ ErrorTrap:
             If cpCore.db.cs_ok(CS) Then
                 SectionName = ""
                 GroupCount = 0
-                CanSeeHiddenFields = cpCore.authContext.user.isAuthenticatedDeveloper()
+                CanSeeHiddenFields = cpCore.authContext.isAuthenticatedDeveloper(cpCore)
                 Do While cpCore.db.cs_ok(CS)
                     GroupName = cpCore.db.cs_getText(CS, "GroupName")
                     If (Mid(GroupName, 1, 1) <> "_") Or CanSeeHiddenFields Then
@@ -3745,7 +3745,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function html_EncodeActiveContent4(ByVal Source As String, ByVal PeopleID As Integer, ByVal ContextContentName As String, ByVal ContextRecordID As Integer, ByVal ContextContactPeopleID As Integer, ByVal AddLinkEID As Boolean, ByVal EncodeCachableTags As Boolean, ByVal EncodeImages As Boolean, ByVal EncodeEditIcons As Boolean, ByVal EncodeNonCachableTags As Boolean, ByVal AddAnchorQuery As String, ByVal ProtocolHostString As String, ByVal IsEmailContent As Boolean, ByVal AdminURL As String) As String
-            html_EncodeActiveContent4 = html_EncodeActiveContent_Internal(Source, PeopleID, ContextContentName, ContextRecordID, ContextContactPeopleID, AddLinkEID, EncodeCachableTags, EncodeImages, EncodeEditIcons, EncodeNonCachableTags, AddAnchorQuery, ProtocolHostString, IsEmailContent, AdminURL, cpCore.authContext.user.isAuthenticated)
+            html_EncodeActiveContent4 = html_EncodeActiveContent_Internal(Source, PeopleID, ContextContentName, ContextRecordID, ContextContactPeopleID, AddLinkEID, EncodeCachableTags, EncodeImages, EncodeEditIcons, EncodeNonCachableTags, AddAnchorQuery, ProtocolHostString, IsEmailContent, AdminURL, cpCore.authContext.isAuthenticated)
         End Function
         '
         '========================================================================
@@ -3753,7 +3753,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function html_EncodeActiveContent5(ByVal Source As String, ByVal PeopleID As Integer, ByVal ContextContentName As String, ByVal ContextRecordID As Integer, ByVal ContextContactPeopleID As Integer, ByVal AddLinkEID As Boolean, ByVal EncodeCachableTags As Boolean, ByVal EncodeImages As Boolean, ByVal EncodeEditIcons As Boolean, ByVal EncodeNonCachableTags As Boolean, ByVal AddAnchorQuery As String, ByVal ProtocolHostString As String, ByVal IsEmailContent As Boolean, ByVal AdminURL As String, ByVal personalizationIsAuthenticated As Boolean, ByVal Context As CPUtilsBaseClass.addonContext) As String
-            html_EncodeActiveContent5 = html_EncodeActiveContent_Internal(Source, PeopleID, ContextContentName, ContextRecordID, ContextContactPeopleID, AddLinkEID, EncodeCachableTags, EncodeImages, EncodeEditIcons, EncodeNonCachableTags, AddAnchorQuery, ProtocolHostString, IsEmailContent, AdminURL, cpCore.authContext.user.isAuthenticated, Context)
+            html_EncodeActiveContent5 = html_EncodeActiveContent_Internal(Source, PeopleID, ContextContentName, ContextRecordID, ContextContactPeopleID, AddLinkEID, EncodeCachableTags, EncodeImages, EncodeEditIcons, EncodeNonCachableTags, AddAnchorQuery, ProtocolHostString, IsEmailContent, AdminURL, cpCore.authContext.isAuthenticated, Context)
         End Function
         '
         '========================================================================
@@ -4369,7 +4369,7 @@ ErrorTrap:
                                                                 '
                                                                 Copy = ""
                                                                 GroupIDList = cpCore.csv_GetAddonOptionStringValue("AllowGroups", addonOptionString)
-                                                                If (Not cpCore.authContext.user.isMemberOfGroupIdList(personalizationPeopleId, True, GroupIDList, True)) Then
+                                                                If (Not cpCore.authContext.isMemberOfGroupIdList(cpCore, personalizationPeopleId, True, GroupIDList, True)) Then
                                                                     '
                                                                     ' Block content if not allowed
                                                                     '
@@ -6401,7 +6401,7 @@ ErrorTrap:
             '
             ' ----- Read in and save the Member profile values from the tools panel
             '
-            If (cpCore.authContext.user.id > 0) Then
+            If (cpCore.authContext.authContextUser.id > 0) Then
                 If Not cpCore.error_IsUserError() Then
                     Button = cpCore.docProperties.getText("mb")
                     Select Case Button
@@ -6409,7 +6409,7 @@ ErrorTrap:
                             '
                             ' Logout - This can only come from the Horizonal Tool Bar
                             '
-                            Call cpCore.authContext.user.logout()
+                            Call cpCore.authContext.logout(cpCore)
                         Case ButtonLogin
                             '
                             ' Login - This can only come from the Horizonal Tool Bar
@@ -6443,7 +6443,7 @@ ErrorTrap:
                             ' ----- developer Only parts
                             '
                             Call cpCore.visitProperty.setProperty("AllowDebugging", genericController.encodeText(cpCore.docProperties.getBoolean("AllowDebugging")))
-                            If cpCore.authContext.user.isAuthenticatedDeveloper() Then
+                            If cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
                                 '
                                 ' ----- Create Path Block record, if requested
                                 '
@@ -6931,7 +6931,7 @@ ErrorTrap:
             '
             Dim returnValue As String
             '
-            returnValue = html_encodeContent10(Source, personalizationPeopleId, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, IsEmailContent, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, cpCore.authContext.user.isAuthenticated, Nothing, cpCore.authContext.user.isEditingAnything)
+            returnValue = html_encodeContent10(Source, personalizationPeopleId, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, IsEmailContent, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, cpCore.authContext.isAuthenticated, Nothing, cpCore.authContext.isEditingAnything(cpCore))
             '
             html_encodeContent9 = returnValue
             '
@@ -7042,7 +7042,7 @@ ErrorTrap:
         Public Function html_encodeContentForWeb(Source As String, ContextContentName As String, ContextRecordID As Integer, Ignore_BasePath As String, WrapperID As Integer) As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("EncodeContentForWeb")
             '
-            html_encodeContentForWeb = html_encodeContent9(Source, cpCore.authContext.user.id, ContextContentName, ContextRecordID, 0, False, False, True, True, False, True, "", "", False, WrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+            html_encodeContentForWeb = html_encodeContent9(Source, cpCore.authContext.authContextUser.id, ContextContentName, ContextRecordID, 0, False, False, True, True, False, True, "", "", False, WrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
             '
             Exit Function
 ErrorTrap:
@@ -7294,7 +7294,7 @@ ErrorTrap:
                                 CheckBoxCnt = 0
                                 DivCheckBoxCnt = 0
                                 DivCnt = 0
-                                CanSeeHiddenFields = cpCore.authContext.user.isAuthenticatedDeveloper()
+                                CanSeeHiddenFields = cpCore.authContext.isAuthenticatedDeveloper(cpCore)
                                 DivName = TagName & ".All"
                                 Do While cpCore.db.cs_ok(CS)
                                     OptionName = cpCore.db.cs_getText(CS, "OptionName")
@@ -7509,7 +7509,7 @@ ErrorTrap:
                     '
                     ' + Add Category
                     '
-                    If cpCore.authContext.user.isAuthenticatedContentManager("Content Categories") Then
+                    If cpCore.authContext.isAuthenticatedContentManager(cpCore, "Content Categories") Then
                         LeftPane = LeftPane & cr & "<div class=""caption""><a href=""" & cpCore.siteProperties.adminURL & "?editreferer=" & genericController.EncodeRequestVariable("?" & cpCore.web_RefreshQueryString) & "&cid=" & cpCore.main_GetContentID("Content Categories") & "&af=4&aa=2"">+&nbsp;Add&nbsp;Category</a></div>"
                     End If
                     '
@@ -7918,7 +7918,7 @@ ErrorTrap:
             '
             Dim IsAuthoring As Boolean
             '
-            IsAuthoring = cpCore.authContext.user.isEditingAnything()
+            IsAuthoring = cpCore.authContext.isEditingAnything(cpCore)
             If Not IsAuthoring Then
                 main_GetEditWrapper = Content
             Else
@@ -8026,7 +8026,7 @@ ErrorTrap:
             Dim iPersonalizationPeopleId As Integer
             iPersonalizationPeopleId = personalizationPeopleId
             If iPersonalizationPeopleId = 0 Then
-                iPersonalizationPeopleId = cpCore.authContext.user.id
+                iPersonalizationPeopleId = cpCore.authContext.authContextUser.id
             End If
             '
             returnValue = Source
@@ -8978,7 +8978,7 @@ ErrorTrap:
                     returnCopy = html_encodeContent10(returnCopy, personalizationPeopleId, "copy content", RecordID, contactPeopleId, False, False, True, True, False, True, "", "", False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, False, Nothing, False)
                     '
                     If True Then
-                        If cpCore.authContext.user.isEditingAnything() Then
+                        If cpCore.authContext.isEditingAnything(cpCore) Then
                             returnCopy = cpCore.cs_cs_getRecordEditLink(CS, False) & returnCopy
                             If AllowEditWrapper Then
                                 returnCopy = main_GetEditWrapper("copy content", returnCopy)
@@ -9118,17 +9118,17 @@ ErrorTrap:
                     loginForm_Password = cpCore.docProperties.getText("password")
                     loginForm_AutoLogin = cpCore.docProperties.getBoolean("autologin")
                     '
-                    If (cpCore.authContext.visit.loginAttempts < cpCore.siteProperties.getinteger("maxVisitLoginAttempts")) And cpCore.authContext.visit.cookieSupport Then
-                        LocalMemberID = cpCore.authContext.user.authenticateGetId(loginForm_Username, loginForm_Password)
+                    If (cpCore.authContext.visit.LoginAttempts < cpCore.siteProperties.getinteger("maxVisitLoginAttempts")) And cpCore.authContext.visit.CookieSupport Then
+                        LocalMemberID = cpCore.authContext.authenticateGetId(cpCore, loginForm_Username, loginForm_Password)
                         If LocalMemberID = 0 Then
-                            cpCore.authContext.visit.loginAttempts = cpCore.authContext.visit.loginAttempts + 1
+                            cpCore.authContext.visit.LoginAttempts = cpCore.authContext.visit.LoginAttempts + 1
                             Call cpCore.authContext.saveObject(cpCore)
                         Else
-                            returnREsult = cpCore.authContext.user.authenticateById(LocalMemberID, loginForm_AutoLogin)
+                            returnREsult = cpCore.authContext.authenticateById(cpCore, LocalMemberID, loginForm_AutoLogin)
                             If returnREsult Then
-                                Call cpCore.log_LogActivity2("successful username/password login", cpCore.authContext.user.id, cpCore.authContext.user.organizationId)
+                                Call cpCore.log_LogActivity2("successful username/password login", cpCore.authContext.authContextUser.id, cpCore.authContext.authContextUser.organizationId)
                             Else
-                                Call cpCore.log_LogActivity2("bad username/password login", cpCore.authContext.user.id, cpCore.authContext.user.organizationId)
+                                Call cpCore.log_LogActivity2("bad username/password login", cpCore.authContext.authContextUser.id, cpCore.authContext.authContextUser.organizationId)
                             End If
                         End If
                     End If
@@ -9176,11 +9176,11 @@ ErrorTrap:
                 If Not genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("AllowMemberJoin", False)) Then
                     cpCore.error_AddUserError("This site does not accept public main_MemberShip.")
                 Else
-                    If Not cpCore.authContext.user.isNewLoginOK(loginForm_Username, loginForm_Password, ErrorMessage, errorCode) Then
+                    If Not cpCore.authContext.isNewLoginOK(cpCore, loginForm_Username, loginForm_Password, ErrorMessage, errorCode) Then
                         Call cpCore.error_AddUserError(ErrorMessage)
                     Else
                         If Not cpCore.error_IsUserError() Then
-                            CS = cpCore.db.cs_open("people", "ID=" & cpCore.db.encodeSQLNumber(cpCore.authContext.user.id))
+                            CS = cpCore.db.cs_open("people", "ID=" & cpCore.db.encodeSQLNumber(cpCore.authContext.authContextUser.id))
                             If Not cpCore.db.cs_ok(CS) Then
                                 cpCore.handleExceptionAndRethrow(New Exception("Could not open the current members account to set the username and password."))
                             Else
@@ -9188,7 +9188,7 @@ ErrorTrap:
                                     '
                                     ' if the current account can be logged into, you can not join 'into' it
                                     '
-                                    Call cpCore.authContext.user.logout()
+                                    Call cpCore.authContext.logout(cpCore)
                                 End If
                                 FirstName = cpCore.docProperties.getText("firstname")
                                 LastName = cpCore.docProperties.getText("firstname")
@@ -9199,7 +9199,7 @@ ErrorTrap:
                                 Call cpCore.db.cs_set(CS, "Name", FullName)
                                 Call cpCore.db.cs_set(CS, "username", loginForm_Username)
                                 Call cpCore.db.cs_set(CS, "password", loginForm_Password)
-                                Call cpCore.authContext.user.authenticateById(cpCore.authContext.user.id)
+                                Call cpCore.authContext.authenticateById(cpCore, cpCore.authContext.authContextUser.id)
                             End If
                             Call cpCore.db.cs_Close(CS)
                         End If
@@ -9367,7 +9367,7 @@ ErrorTrap:
                         & ""
                     loginForm = loginForm _
                         & cpCore.htmlDoc.html_GetFormInputHidden("Type", FormTypeLogin) _
-                        & cpCore.htmlDoc.html_GetFormInputHidden("email", cpCore.authContext.user.email) _
+                        & cpCore.htmlDoc.html_GetFormInputHidden("email", cpCore.authContext.authContextUser.email) _
                         & cpCore.main_GetPanelButtons(ButtonLogin, "Button") _
                         & ""
                     loginForm = "" _
@@ -9474,7 +9474,7 @@ ErrorTrap:
                     & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"">" _
                     & cr2 & "<tr>" _
                     & cr3 & "<td style=""text-align:right;vertical-align:middle;width:30%;padding:4px"" align=""right"" width=""30%"">" & SpanClassAdminNormal & "Email</span></td>" _
-                    & cr3 & "<td style=""text-align:left;vertical-align:middle;width:70%;padding:4px"" align=""left""  width=""70%""><input NAME=""" & "email"" VALUE=""" & cpCore.htmlDoc.html_EncodeHTML(cpCore.authContext.user.email) & """ SIZE=""20"" MAXLENGTH=""50""></td>" _
+                    & cr3 & "<td style=""text-align:left;vertical-align:middle;width:70%;padding:4px"" align=""left""  width=""70%""><input NAME=""" & "email"" VALUE=""" & cpCore.htmlDoc.html_EncodeHTML(cpCore.authContext.authContextUser.email) & """ SIZE=""20"" MAXLENGTH=""50""></td>" _
                     & cr2 & "</tr>" _
                     & cr2 & "<tr>" _
                     & cr3 & "<td colspan=""2"">&nbsp;</td>" _

@@ -30,7 +30,7 @@ Namespace Contensive.Core
             cp = cpParent
             cpCore = cp.core
             CSPointer = -1
-            OpeningMemberID = cpcore.authContext.user.id
+            OpeningMemberID = cpcore.authContext.authContextUser.id
         End Sub
         '
         ' dispose

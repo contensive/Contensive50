@@ -52,7 +52,6 @@ Namespace Contensive.Core
         Public webServerIO_ReadStreamJSForm As Boolean = False                  ' When true, the request comes from a browser handling a JSPage script line
         Public webServerIO_PageExcludeFromAnalytics As Boolean = False    ' For this page - true for remote methods and ajax
         Public webServerIO_BlockClosePageCopyright As Boolean = False ' if true, block the copyright message
-        Public webServerIO_PageTestPointPrinting As Boolean = False    ' if true, send main_TestPoint messages to the stream
         '
         ' refactor - this method stears the stream between controllers, put it in cpcore
         Public webServerIO_OutStreamDevice As Integer = 0
@@ -909,17 +908,17 @@ Namespace Contensive.Core
                     If webServerIO_ServerFormActionURL = "" Then
                         webServerIO_ServerFormActionURL = webServerIO_requestProtocol & requestDomain & webServerIO_requestPath & webServerIO_requestPage
                     End If
-                    '
-                    '--------------------------------------------------------------------------
-                    ' ----- Initialize Visit
-                    '   AjaxFast does NOT support visit tracking
-                    '   Ajax and RemoteMethods DO support visit tracking so they can handle authentication based permissions
-                    '--------------------------------------------------------------------------
-                    '
-                    'Call AppendLog("main_init(), 2400")
-                    '
-                    ''hint = "Initializing Visit"
-                    cpCore.authContext = Models.Context.authContextModel.create(cpCore, cpCore.siteProperties.allowVisitTracking)
+                    ''
+                    ''--------------------------------------------------------------------------
+                    '' ----- Initialize Visit
+                    ''   AjaxFast does NOT support visit tracking
+                    ''   Ajax and RemoteMethods DO support visit tracking so they can handle authentication based permissions
+                    ''--------------------------------------------------------------------------
+                    ''
+                    ''Call AppendLog("main_init(), 2400")
+                    ''
+                    '''hint = "Initializing Visit"
+                    'cpCore.authContext = Models.Context.authContextModel.create(cpCore, cpCore.siteProperties.allowVisitTracking)
                     '
                     '--------------------------------------------------------------------------
                     ' ----- Process Early redirects, like PageNotFound
@@ -935,20 +934,7 @@ Namespace Contensive.Core
                         cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
                         Return cpCore.docOpen
                     End If
-                    '
-                    '--------------------------------------------------------------------------
-                    '   Setup Debugging
-                    '       must be on good domainname (for cookie), after authentication, after visit detect and after cpcore.main_ProcessFormToolsPanel
-                    '--------------------------------------------------------------------------
-                    '
-                    ''hint = "Checking Debugging Hook (was Verbose Reporting)"
-                    '
-                    ' debug printed defaults on, so if not on, set it off and clear what was collected
-                    '
-                    If Not cpCore.visitProperty.getBoolean("AllowDebugging") Then
-                        webServerIO_PageTestPointPrinting = False
-                        cpCore.main_testPointMessage = ""
-                    End If
+
                 End If
                 '
                 '--------------------------------------------------------------------------------
@@ -1215,144 +1201,102 @@ ErrorTrap:
         End Sub
         '
         '===========================================================================================
-        ' ----- Redirect
-        '
-        '   Link is where you are going
-        '   The Link argument should NOT be encoded. (it should still include spaces)
-        '   Link may be '/index.asp', or 'index.asp' or 'http://www.docmc.main_com/index.asp'
-        '       ShortLink is '/index.asp'
-        '       FullLink is 'http://www.docmc.main_com/index.asp'
-        '===========================================================================================
-        '
+        ''' <summary>
+        ''' redirect
+        ''' </summary>
+        ''' <param name="NonEncodedLink"></param>
+        ''' <param name="RedirectReason"></param>
+        ''' <param name="IsPageNotFound"></param>
         Public Sub webServerIO_Redirect2(ByVal NonEncodedLink As String, ByVal RedirectReason As String, ByVal IsPageNotFound As Boolean)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Redirect2")
-            '
-            Const rnRedirectCycleFlag = "cycleFlag"
-            '
-            Dim MethodName As String
-            Dim Protocol As String
-            Dim ProtocolEnd As String
-            Dim EncodedLink As String
-            'Dim kmafs As fileSystemClass
-            Dim Copy As String
-            '
-            Dim RedirectLink As String
-            Dim PageNotFoundSource As String
-            Dim ShortLink As String
-            Dim ServerShortLink As String
-            Dim FullLink As String
-            Dim redirectCycles As Integer
-            '
-            MethodName = "main_Redirect2(" & NonEncodedLink & "," & RedirectReason & "," & IsPageNotFound & ")"
-            If cpCore.docOpen Then
-                redirectCycles = cpCore.docProperties.getInteger(rnRedirectCycleFlag)
+            Try
+                Const rnRedirectCycleFlag = "cycleFlag"
+                Dim EncodedLink As String
+                Dim Copy As String
+                Dim ShortLink As String
+                Dim FullLink As String
+                Dim redirectCycles As Integer
                 '
-                ' convert link to a long link on this domain
-                '
-                If genericController.vbLCase(Mid(NonEncodedLink, 1, 4)) = "http" Then
-                    FullLink = NonEncodedLink
-                Else
-                    ShortLink = NonEncodedLink
-                    ShortLink = genericController.ConvertLinkToShortLink(ShortLink, requestDomain, webServerIO_requestVirtualFilePath)
-                    ShortLink = genericController.EncodeAppRootPath(ShortLink, webServerIO_requestVirtualFilePath, requestAppRootPath, requestDomain)
-                    FullLink = webServerIO_requestProtocol & requestDomain & ShortLink
-                End If
-                If (NonEncodedLink = "") Then
+                If cpCore.docOpen Then
+                    redirectCycles = cpCore.docProperties.getInteger(rnRedirectCycleFlag)
                     '
-                    ' Link is not valid
+                    ' convert link to a long link on this domain
                     '
-                    Call Err.Raise(ignoreInteger, "dll", "Redirect was called with a blank Link. Redirect Reason [" & RedirectReason & "]")
-                    Exit Sub
-                    '
-                    ' changed to main_ServerLinksource because if a redirect is caused by a link forward, and the host page for the iis 404 is
-                    ' the same as the destination of the link forward, this throws an error and does not forward. the only case where main_ServerLinksource is different
-                    ' then main_ServerLink is the linkfforward/linkalias case.
-                    '
-                ElseIf (requestFormString = "") And (requestLinkSource = FullLink) Then
-                    '
-                    ' Loop redirect error, throw trap and block redirect to prevent loop
-                    '
-                    Call Err.Raise(ignoreInteger, "dll", "Redirect was called to the same URL, main_ServerLink is [" & webServerIO_ServerLink & "], main_ServerLinkSource is [" & requestLinkSource & "]. This redirect is only allowed if either the form or querystring has change to prevent cyclic redirects. Redirect Reason [" & RedirectReason & "]")
-                    Exit Sub
-                ElseIf IsPageNotFound Then
-                    '
-                    ' Do a PageNotFound then redirect
-                    '
-                    Call cpCore.log_appendLogPageNotFound(requestLinkSource)
-                    If ShortLink <> "" Then
-                        Call cpCore.db.executeSql("Update ccContentWatch set link=null where link=" & cpCore.db.encodeSQLText(ShortLink))
-                    End If
-                    '
-                    If webServerIO_PageTestPointPrinting Then
-                        '
-                        ' Verbose - do not redirect, just print the link
-                        '
-                        EncodedLink = NonEncodedLink
-                        'EncodedLink = encodeURL(NonEncodedLink)
-                        'writeAltBuffer("<div style=""padding:20px;border:1px dashed black;background-color:white;color:black;"">" & RedirectReason & "<p>Click to continue the redirect to <a href=" & EncodedLink & ">" & EncodeHTML(NonEncodedLink) & "</a>...</p></div>")
+                    If genericController.vbLCase(Mid(NonEncodedLink, 1, 4)) = "http" Then
+                        FullLink = NonEncodedLink
                     Else
-                        '
-                        Call web_setResponseStatus("404 Not Found")
-                        'Call writeAltBuffer("" _
-                        '    & "<html>" _
-                        '    & "<head>" _
-                        '    & "<meta http-equiv=""Refresh"" content=""0; url=" & NonEncodedLink & """>" _
-                        '    & "</head>" _
-                        '    & "<body>" _
-                        '    & "The page you requested could not be found. If you are not automatically forwarded, please click <a href=""" & NonEncodedLink & """>here</a>." _
-                        '    & "</body>" _
-                        '    & "</html>" _
-                        '    & "")
+                        ShortLink = NonEncodedLink
+                        ShortLink = genericController.ConvertLinkToShortLink(ShortLink, requestDomain, webServerIO_requestVirtualFilePath)
+                        ShortLink = genericController.EncodeAppRootPath(ShortLink, webServerIO_requestVirtualFilePath, requestAppRootPath, requestDomain)
+                        FullLink = webServerIO_requestProtocol & requestDomain & ShortLink
                     End If
-                Else
-
-                    '
-                    ' Go ahead and redirect
-                    '
-                    Copy = """" & FormatDateTime(cpCore.app_startTime, vbGeneralDate) & """,""" & requestDomain & """,""" & requestLinkSource & """,""" & NonEncodedLink & """,""" & RedirectReason & """"
-                    logController.log_appendLog(cpCore, Copy, "performance", "redirects")
-                    '
-                    If webServerIO_PageTestPointPrinting Then
+                    If (NonEncodedLink = "") Then
                         '
-                        ' Verbose - do not redirect, just print the link
+                        ' Link is not valid
                         '
-
-                        EncodedLink = NonEncodedLink
-                        'EncodedLink = encodeURL(NonEncodedLink)
-                        cpCore.htmlDoc.writeAltBuffer("<div style=""padding:20px;border:1px dashed black;background-color:white;color:black;"">" & RedirectReason & "<p>Click to continue the redirect to <a href=" & EncodedLink & ">" & cpCore.htmlDoc.html_EncodeHTML(NonEncodedLink) & "</a>...</p></div>")
-                    Else
+                        Call Err.Raise(ignoreInteger, "dll", "Redirect was called with a blank Link. Redirect Reason [" & RedirectReason & "]")
+                        Exit Sub
                         '
-                        ' Redirect now
+                        ' changed to main_ServerLinksource because if a redirect is caused by a link forward, and the host page for the iis 404 is
+                        ' the same as the destination of the link forward, this throws an error and does not forward. the only case where main_ServerLinksource is different
+                        ' then main_ServerLink is the linkfforward/linkalias case.
                         '
-                        Call cpCore.main_ClearStream()
-                        EncodedLink = genericController.EncodeURL(NonEncodedLink)
-
-                        If (Not iisContext Is Nothing) Then
-                            '
-                            ' redirect and release application. HOWEVER -- the thread will continue so use responseOpen=false to abort as much activity as possible
-                            '
-                            iisContext.Response.Redirect(NonEncodedLink, False)
-                            iisContext.ApplicationInstance.CompleteRequest()
-                        Else
-                            webServerIO_bufferRedirect = NonEncodedLink
+                    ElseIf (requestFormString = "") And (requestLinkSource = FullLink) Then
+                        '
+                        ' Loop redirect error, throw trap and block redirect to prevent loop
+                        '
+                        Call Err.Raise(ignoreInteger, "dll", "Redirect was called to the same URL, main_ServerLink is [" & webServerIO_ServerLink & "], main_ServerLinkSource is [" & requestLinkSource & "]. This redirect is only allowed if either the form or querystring has change to prevent cyclic redirects. Redirect Reason [" & RedirectReason & "]")
+                        Exit Sub
+                    ElseIf IsPageNotFound Then
+                        '
+                        ' Do a PageNotFound then redirect
+                        '
+                        Call cpCore.log_appendLogPageNotFound(requestLinkSource)
+                        If ShortLink <> "" Then
+                            Call cpCore.db.executeSql("Update ccContentWatch set link=null where link=" & cpCore.db.encodeSQLText(ShortLink))
                         End If
-                        'responseBufferRedirect = NonEncodedLink
+                        '
+                        If cpCore.testPointPrinting Then
+                            '
+                            ' -- Verbose - do not redirect, just print the link
+                            EncodedLink = NonEncodedLink
+                        Else
+                            Call web_setResponseStatus("404 Not Found")
+                        End If
+                    Else
+
+                        '
+                        ' Go ahead and redirect
+                        '
+                        Copy = """" & FormatDateTime(cpCore.app_startTime, vbGeneralDate) & """,""" & requestDomain & """,""" & requestLinkSource & """,""" & NonEncodedLink & """,""" & RedirectReason & """"
+                        logController.log_appendLog(cpCore, Copy, "performance", "redirects")
+                        '
+                        If cpCore.testPointPrinting Then
+                            '
+                            ' -- Verbose - do not redirect, just print the link
+                            EncodedLink = NonEncodedLink
+                            cpCore.htmlDoc.writeAltBuffer("<div style=""padding:20px;border:1px dashed black;background-color:white;color:black;"">" & RedirectReason & "<p>Click to continue the redirect to <a href=" & EncodedLink & ">" & cpCore.htmlDoc.html_EncodeHTML(NonEncodedLink) & "</a>...</p></div>")
+                        Else
+                            '
+                            ' -- Redirect now
+                            Call cpCore.main_ClearStream()
+                            EncodedLink = genericController.EncodeURL(NonEncodedLink)
+                            If (Not iisContext Is Nothing) Then
+                                '
+                                ' -- redirect and release application. HOWEVER -- the thread will continue so use responseOpen=false to abort as much activity as possible
+                                iisContext.Response.Redirect(NonEncodedLink, False)
+                                iisContext.ApplicationInstance.CompleteRequest()
+                            Else
+                                webServerIO_bufferRedirect = NonEncodedLink
+                            End If
+                        End If
                     End If
+                    '
+                    ' -- close the output stream
+                    Call cpCore.doc_close()
                 End If
-                '
-                ' ----- close the output stream
-                '
-                Call cpCore.doc_close()
-            End If
-            '
-            ' Edit
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call cpCore.handleLegacyError13(MethodName)
+            Catch ex As Exception
+                cpCore.handleExceptionAndContinue(ex)
+            End Try
         End Sub
         '
         '
@@ -1443,9 +1387,9 @@ ErrorTrap:
             '
             ' Member Styles
             '
-            If cpCore.authContext.user.styleFilename <> "" Then
-                Call cpCore.htmlDoc.main_AddStylesheetLink2(webServerIO_requestProtocol & requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, cpCore.authContext.user.styleFilename), "member style")
-                cpCore.authContext.user.styleFilename = ""
+            If cpCore.authContext.authContextUser.styleFilename <> "" Then
+                Call cpCore.htmlDoc.main_AddStylesheetLink2(webServerIO_requestProtocol & requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, cpCore.authContext.authContextUser.styleFilename), "member style")
+                cpCore.authContext.authContextUser.styleFilename = ""
             End If
             '
             ' meta content

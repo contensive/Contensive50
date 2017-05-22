@@ -912,7 +912,7 @@ ErrorTrap:
             Dim EmailStatus As String
             '
             EmailStatus = sendSystem(genericController.encodeText(EMailName), genericController.encodeText(AdditionalCopy), genericController.EncodeInteger(AdditionalMemberID))
-            If cpcore.authContext.user.isAuthenticatedAdmin() And (EmailStatus <> "") Then
+            If cpcore.authContext.isAuthenticatedAdmin(cpcore) And (EmailStatus <> "") Then
                 cpcore.error_AddUserError("Administrator: There was a problem sending the confirmation email, " & EmailStatus)
             End If
             Exit Sub
@@ -979,7 +979,7 @@ ErrorTrap:
                         'hint = "140"
                         EMailName = vbMid(workingEmail, 1, atPtr - 1)
                         '
-                        Call cpcore.log_LogActivity2("password request for email " & workingEmail, cpcore.authContext.user.id, cpcore.authContext.user.organizationId)
+                        Call cpcore.log_LogActivity2("password request for email " & workingEmail, cpcore.authContext.authContextUser.id, cpcore.authContext.authContextUser.organizationId)
                         '
                         allowEmailLogin = cpcore.siteProperties.getBoolean("allowEmailLogin", False)
                         recordCnt = 0

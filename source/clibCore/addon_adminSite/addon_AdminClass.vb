@@ -44,9 +44,9 @@ Namespace Contensive.Addons
                 '
                 SaveContent = "" _
                     & Now() _
-                    & vbCrLf & "member.name:" & cpCore.authContext.user.name _
-                    & vbCrLf & "member.id:" & cpCore.authContext.user.id _
-                    & vbCrLf & "visit.id:" & cpCore.authContext.visit.Id _
+                    & vbCrLf & "member.name:" & cpCore.authContext.authContextUser.name _
+                    & vbCrLf & "member.id:" & cpCore.authContext.authContextUser.id _
+                    & vbCrLf & "visit.id:" & cpCore.authContext.visit.ID _
                     & vbCrLf & "url:" & cpCore.webServer.webServerIO_ServerLink _
                     & vbCrLf & "url source:" & cpCore.webServer.requestLinkSource
                 SaveContent &= "" _
@@ -109,9 +109,9 @@ Namespace Contensive.Addons
                 '
                 SaveContent &= "" _
                     & Now() _
-                    & vbCrLf & "member.name:" & cpCore.authContext.user.name _
-                    & vbCrLf & "member.id:" & cpCore.authContext.user.id _
-                    & vbCrLf & "visit.id:" & cpCore.authContext.visit.Id _
+                    & vbCrLf & "member.name:" & cpCore.authContext.authContextUser.name _
+                    & vbCrLf & "member.id:" & cpCore.authContext.authContextUser.id _
+                    & vbCrLf & "visit.id:" & cpCore.authContext.visit.ID _
                     & vbCrLf & "url:" & cpCore.webServer.webServerIO_ServerLink _
                     & vbCrLf & "url source:" & cpCore.webServer.requestLinkSource _
                     & vbCrLf & "----------" _
@@ -240,12 +240,12 @@ leak200:
                 '
                 ' ----- no stream anyway, do nothing
                 '
-            ElseIf Not cpCore.authContext.user.isAuthenticated Then
+            ElseIf Not cpCore.authContext.isAuthenticated Then
                 '
                 ' --- must be authenticated to continue
                 '
                 Stream.Add(cpCore.htmlDoc.getLoginPage(False))
-            ElseIf Not cpCore.authContext.user.isAuthenticatedContentManager Then
+            ElseIf Not cpCore.authContext.isAuthenticatedContentManager(cpcore) Then
                 '
                 ' --- member must have proper access to continue
                 '
@@ -669,7 +669,7 @@ ErrorTrap:
             UserAllowContentEdit = True
             UserAllowContentAdd = True
             UserAllowContentDelete = True
-            If Not cpCore.authContext.user.isAuthenticatedAdmin() Then
+            If Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                 If (adminContent.Id > 0) Then
                     UserAllowContentEdit = userHasContentAccess(adminContent.Id)
                 End If
@@ -754,14 +754,14 @@ ErrorTrap:
             '
             AdminMenuModeID = cpCore.docProperties.getInteger("mm")
             If AdminMenuModeID = 0 Then
-                AdminMenuModeID = cpCore.authContext.user.adminMenuModeID
+                AdminMenuModeID = cpCore.authContext.authContextUser.adminMenuModeID
             End If
             If AdminMenuModeID = 0 Then
                 AdminMenuModeID = AdminMenuModeLeft
             End If
-            If cpCore.authContext.user.adminMenuModeID <> AdminMenuModeID Then
-                cpCore.authContext.user.adminMenuModeID = AdminMenuModeID
-                Call cpCore.authContext.user.saveMember()
+            If cpCore.authContext.authContextUser.adminMenuModeID <> AdminMenuModeID Then
+                cpCore.authContext.authContextUser.adminMenuModeID = AdminMenuModeID
+                Call cpCore.authContext.authContextUser.saveObject(cpCore)
             End If
             '    '
             '    ' ----- FieldName
@@ -1076,7 +1076,7 @@ ErrorTrap:
                             '
                             ' --- copy live record over edit record
                             '
-                            Call cpCore.workflow.abortEdit2(adminContent.Name, editRecord.id, cpCore.authContext.user.id)
+                            Call cpCore.workflow.abortEdit2(adminContent.Name, editRecord.id, cpCore.authContext.authContextUser.id)
                             Call cpCore.main_ProcessSpecialCaseAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                             If MenuDepth > 0 Then
                                 '
@@ -1748,7 +1748,7 @@ ErrorTrap:
                 ' ----- Set Read Only: if non-developer tries to edit a developer record
                 '
                 If genericController.vbUCase(adminContent.ContentTableName) = genericController.vbUCase("ccMembers") Then
-                    If Not cpCore.authContext.user.isAuthenticatedDeveloper Then
+                    If Not cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
                         If editRecord.fieldsLc.ContainsKey("developer") Then
                             If genericController.EncodeBoolean(editRecord.fieldsLc.Item("developer").value) Then
                                 editRecord.Read_Only = True
@@ -1895,11 +1895,11 @@ ErrorTrap:
                             '    .readonlyfield = True
                             '    .Required = False
                             Case "MODIFIEDBY"
-                                editrecord.fieldsLc(field.nameLc).value = cpCore.authContext.user.id
+                                editrecord.fieldsLc(field.nameLc).value = cpCore.authContext.authContextUser.id
                                 '    .readonlyfield = True
                                 '    .Required = False
                             Case "CREATEDBY"
-                                editrecord.fieldsLc(field.nameLc).value = cpCore.authContext.user.id
+                                editrecord.fieldsLc(field.nameLc).value = cpCore.authContext.authContextUser.id
                                 '    .readonlyfield = True
                                 '    .Required = False
                                 'Case "DATEADDED"
@@ -2525,12 +2525,12 @@ ErrorTrap:
                                 ' (many to many is handled during save)
                                 '
                                 ResponseFieldValueIsOKToSave = False
-                            ElseIf (.adminOnly) And (Not cpCore.authContext.user.isAuthenticatedAdmin) Then
+                            ElseIf (.adminOnly) And (Not cpCore.authContext.isAuthenticatedAdmin(cpcore)) Then
                                 '
                                 ' non-admin and admin only field, leave current value
                                 '
                                 ResponseFieldValueIsOKToSave = False
-                            ElseIf (.developerOnly) And (Not cpCore.authContext.user.isAuthenticatedDeveloper) Then
+                            ElseIf (.developerOnly) And (Not cpCore.authContext.isAuthenticatedDeveloper(cpcore)) Then
                                 '
                                 ' non-developer and developer only field, leave current value
                                 '
@@ -3215,7 +3215,7 @@ ErrorTrap:
                 ' If There is an error, block the save
                 '
                 AdminAction = AdminActionNop
-            ElseIf Not cpCore.authContext.user.isAuthenticatedContentManager(adminContent.Name) Then
+            ElseIf Not cpCore.authContext.isAuthenticatedContentManager(cpcore, adminContent.Name) Then
                 '
                 ' save blocked by BlockCurrentRecord
                 '
@@ -3582,7 +3582,7 @@ ErrorTrap:
                 '
                 ContentName = cpCore.metaData.getContentNameByID(ContentID)
                 If ContentName <> "" Then
-                    returnHas = cpCore.authContext.user.isAuthenticatedContentManager(ContentName)
+                    returnHas = cpCore.authContext.isAuthenticatedContentManager(cpCore, ContentName)
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -3666,7 +3666,7 @@ ErrorTrap:
                             Filename = cpCore.db.cs_get(CS, .nameLc)
                             If Filename <> "" Then
                                 Copy = cpCore.cdnFiles.readFile(Filename)
-                                Copy = cpCore.htmlDoc.html_encodeContent10(Copy, cpCore.authContext.user.id, "", 0, 0, True, False, False, False, True, False, "", "", IsEmailContent, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, cpCore.authContext.user.isAuthenticated, Nothing, cpCore.authContext.user.isEditingAnything)
+                                Copy = cpCore.htmlDoc.html_encodeContent10(Copy, cpCore.authContext.authContextUser.id, "", 0, 0, True, False, False, False, True, False, "", "", IsEmailContent, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, cpCore.authContext.isAuthenticated, Nothing, cpCore.authContext.isEditingAnything(cpCore))
                                 Stream.Add(Copy)
                             End If
                         Case FieldTypeIdRedirect, FieldTypeIdManyToMany
@@ -4139,7 +4139,7 @@ ErrorTrap:
                 '
                 ' ----- determine access details
                 '
-                Call cpCore.authContext.user.getContentAccessRights(adminContent.Name, allowCMEdit, allowCMAdd, allowCMDelete)
+                Call cpCore.authContext.getContentAccessRights(cpCore, adminContent.Name, allowCMEdit, allowCMAdd, allowCMDelete)
                 AllowAdd = adminContent.AllowAdd And allowCMAdd
                 AllowDelete = adminContent.AllowDelete And allowCMDelete And (editRecord.id <> 0)
                 allowSave = allowCMEdit
@@ -4231,7 +4231,7 @@ ErrorTrap:
                 '
                 Select Case genericController.vbUCase(adminContent.ContentTableName)
                     Case genericController.vbUCase("ccMembers")
-                        If Not (cpCore.authContext.user.isAuthenticatedAdmin) Then
+                        If Not (cpCore.authContext.isAuthenticatedAdmin(cpcore)) Then
                             '
                             ' Must be admin
                             '
@@ -4257,7 +4257,7 @@ ErrorTrap:
                         End If
                     '
                     Case "CCPATHS"
-                        If Not (cpCore.authContext.user.isAuthenticatedAdmin) Then
+                        If Not (cpCore.authContext.isAuthenticatedAdmin(cpcore)) Then
                             '
                             ' Must be admin
                             '
@@ -4293,7 +4293,7 @@ ErrorTrap:
                                 LastSendTestDate = genericController.EncodeDate(editRecord.fieldsLc("lastsendtestdate").value)
                             End If
                         End If
-                        If Not (cpCore.authContext.user.isAuthenticatedAdmin) Then
+                        If Not (cpCore.authContext.isAuthenticatedAdmin(cpcore)) Then
                             '
                             ' Must be admin
                             '
@@ -4308,7 +4308,7 @@ ErrorTrap:
                             EmailSubmitted = False
                             If editRecord.id <> 0 Then
                                 If editRecord.fieldsLc.ContainsKey("testmemberid") Then
-                                    editRecord.fieldsLc.Item("testmemberid").value = cpCore.authContext.user.id
+                                    editRecord.fieldsLc.Item("testmemberid").value = cpCore.authContext.authContextUser.id
                                 End If
                             End If
                             EditSectionButtonBar = ""
@@ -4317,7 +4317,7 @@ ErrorTrap:
                             Else
                                 EditSectionButtonBar = EditSectionButtonBar & cpCore.htmlDoc.html_GetFormButton(ButtonCancel, , , "Return processSubmit(this)")
                             End If
-                            If (AllowDelete) And (cpCore.authContext.user.isAuthenticatedDeveloper) Then
+                            If (AllowDelete) And (cpCore.authContext.isAuthenticatedDeveloper(cpCore)) Then
                                 EditSectionButtonBar = EditSectionButtonBar & cpCore.htmlDoc.html_GetFormButton(ButtonDeleteEmail, , , "If(!DeleteCheck())Return False;")
                             End If
                             If (Not EmailSubmitted) And (Not EmailSent) Then
@@ -4332,8 +4332,8 @@ ErrorTrap:
                             Call Stream.Add(EditSectionButtonBar)
                             Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                             Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
-                            Call Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Groups", GetForm_Edit_EmailRules(adminContent, editRecord, editRecord.Read_Only And (Not cpCore.authContext.user.isAuthenticatedDeveloper)), allowAdminTabs))
-                            Call Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Topics", GetForm_Edit_EmailTopics(adminContent, editRecord, editRecord.Read_Only And (Not cpCore.authContext.user.isAuthenticatedDeveloper)), allowAdminTabs))
+                            Call Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Groups", GetForm_Edit_EmailRules(adminContent, editRecord, editRecord.Read_Only And (Not cpCore.authContext.isAuthenticatedDeveloper(cpCore))), allowAdminTabs))
+                            Call Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Topics", GetForm_Edit_EmailTopics(adminContent, editRecord, editRecord.Read_Only And (Not cpCore.authContext.isAuthenticatedDeveloper(cpCore))), allowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Bounce&nbsp;Control", GetForm_Edit_EmailBounceStatus(), allowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                             If allowAdminTabs Then
@@ -4348,7 +4348,7 @@ ErrorTrap:
                             EmailSubmitted = False
                             If editRecord.id <> 0 Then
                                 If editRecord.fieldsLc.ContainsKey("testmemberid") Then
-                                    editRecord.fieldsLc.Item("testmemberid").value = cpCore.authContext.user.id
+                                    editRecord.fieldsLc.Item("testmemberid").value = cpCore.authContext.authContextUser.id
                                 End If
                                 If editRecord.fieldsLc.ContainsKey("submitted") Then
                                     EmailSubmitted = genericController.EncodeBoolean(editRecord.fieldsLc.Item("submitted").value)
@@ -4402,7 +4402,7 @@ ErrorTrap:
                             EmailSent = False
                             If editRecord.id <> 0 Then
                                 If editRecord.fieldsLc.ContainsKey("testmemberid") Then
-                                    editRecord.fieldsLc.Item("testmemberid").value = cpCore.authContext.user.id
+                                    editRecord.fieldsLc.Item("testmemberid").value = cpCore.authContext.authContextUser.id
                                 End If
                                 If editRecord.fieldsLc.ContainsKey("submitted") Then
                                     EmailSubmitted = genericController.EncodeBoolean(editRecord.fieldsLc.Item("submitted").value)
@@ -4447,7 +4447,7 @@ ErrorTrap:
                             Call Stream.Add(EditSectionButtonBar)
                         End If
                     Case "CCCONTENT"
-                        If Not (cpCore.authContext.user.isAuthenticatedAdmin) Then
+                        If Not (cpCore.authContext.isAuthenticatedAdmin(cpcore)) Then
                             '
                             ' Must be admin
                             '
@@ -4694,7 +4694,7 @@ ErrorTrap:
                 '
                 '
                 Call cpCore.webServer.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "StaticPublishControl, Cancel Button Pressed", False)
-            ElseIf Not cpCore.authContext.user.isAuthenticatedAdmin Then
+            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 '
                 '
@@ -4941,7 +4941,7 @@ ErrorTrap:
                 '
                 '
                 Call cpCore.webServer.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "Admin Publish, Cancel Button Pressed", False)
-            ElseIf Not cpCore.authContext.user.isAuthenticatedAdmin Then
+            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpcore) Then
                 '
                 '
                 '
@@ -6247,7 +6247,7 @@ ErrorTrap:
                             ' field help
                             '------------------------------------------------------------------------------------------------------------
                             '
-                            If cpCore.authContext.user.isAuthenticatedAdmin Then
+                            If cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                                 '
                                 ' Admin view
                                 '
@@ -6630,7 +6630,7 @@ ErrorTrap:
                     '
                     Copy = "If selected, this page will be displayed when a user comes to your website with just your domain name and no other page is requested. This is called your default Landing Page. Only one page on the site can be the default Landing Page. If you want a unique Landing Page for a specific domain name, add it in the 'Domains' content and the default will not be used for that docpCore.main_"
                     Checked = ((editRecord.id <> 0) And (editRecord.id = (cpCore.siteProperties.getinteger("LandingPageID", 0))))
-                    If cpCore.authContext.user.isAuthenticatedAdmin Then
+                    If cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                         HTMLFieldString = cpCore.htmlDoc.html_GetFormInputCheckBox2("LandingPageID", Checked)
                     Else
                         HTMLFieldString = "<b>" & genericController.GetYesNo(Checked) & "</b>" & cpCore.htmlDoc.html_GetFormInputHidden("LandingPageID", Checked)
@@ -6642,7 +6642,7 @@ ErrorTrap:
                     '
                     Copy = "If selected, this content will be displayed when a page can not be found. Only one page on the site can be marked."
                     Checked = ((editRecord.id <> 0) And (editRecord.id = (cpCore.siteProperties.getinteger("PageNotFoundPageID", 0))))
-                    If cpCore.authContext.user.isAuthenticatedAdmin Then
+                    If cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                         HTMLFieldString = cpCore.htmlDoc.html_GetFormInputCheckBox2("PageNotFound", Checked)
                     Else
                         HTMLFieldString = "<b>" & genericController.GetYesNo(Checked) & "</b>" & cpCore.htmlDoc.html_GetFormInputHidden("PageNotFound", Checked)
@@ -6723,7 +6723,7 @@ ErrorTrap:
                         '
                         ' field is read-only except for developers
                         '
-                        If cpCore.authContext.user.isAuthenticatedDeveloper() Then
+                        If cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
                             HTMLFieldString = cpCore.htmlDoc.html_GetFormInputText2("ccguid", HTMLFieldString, , , , , False) & ""
                         Else
                             HTMLFieldString = cpCore.htmlDoc.html_GetFormInputText2("ccguid", HTMLFieldString, , , , , True) & cpCore.htmlDoc.html_GetFormInputHidden("ccguid", HTMLFieldString)
@@ -6787,7 +6787,7 @@ ErrorTrap:
                         '
                         '
                         '
-                        If Not cpCore.authContext.user.isAuthenticatedAdmin Then
+                        If Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                             HTMLFieldString = HTMLFieldString & cpCore.htmlDoc.html_GetFormInputHidden("ContentControlID", FieldValueInteger)
                         Else
                             RecordContentName = editRecord.contentControlId_Name
@@ -6827,7 +6827,7 @@ ErrorTrap:
                                 End If
 
                             End If
-                            If cpCore.authContext.user.isAuthenticatedAdmin() And (LimitContentSelectToThisID = 0) Then
+                            If cpCore.authContext.isAuthenticatedAdmin(cpCore) And (LimitContentSelectToThisID = 0) Then
                                 '
                                 ' administrator, and either ( no parentid or does not support it), let them select any content compatible with the table
                                 '
@@ -6844,7 +6844,7 @@ ErrorTrap:
                                 Do While cpCore.db.cs_ok(CSPointer)
                                     ChildCID = cpCore.db.cs_getInteger(CSPointer, "ID")
                                     If (cpCore.IsWithinContent(ChildCID, LimitContentSelectToThisID)) Then
-                                        If (cpCore.authContext.user.isAuthenticatedAdmin) Or (cpCore.authContext.user.isAuthenticatedContentManager(cpCore.metaData.getContentNameByID(ChildCID))) Then
+                                        If (cpCore.authContext.isAuthenticatedAdmin(cpCore)) Or (cpCore.authContext.isAuthenticatedContentManager(cpCore, cpCore.metaData.getContentNameByID(ChildCID))) Then
                                             CIDList = CIDList & "," & ChildCID
                                         End If
                                     End If
@@ -7147,7 +7147,7 @@ ErrorTrap:
                 ' This is really messy -- there must be a better way
                 '
                 addonId = 0
-                If (cpCore.authContext.visit.Id = cpCore.docProperties.getInteger(RequestNameDashboardReset)) Then
+                If (cpCore.authContext.visit.ID = cpCore.docProperties.getInteger(RequestNameDashboardReset)) Then
                     '$$$$$ cache this
                     CS = cpCore.db.cs_open(cnAddons, "ccguid=" & cpCore.db.encodeSQLText(DashboardAddonGuid))
                     If cpCore.db.cs_ok(CS) Then
@@ -7222,9 +7222,9 @@ ErrorTrap:
                     & vbCrLf & "<div><a href=http://www.Contensive.com target=_blank><img style=""border:1px solid #000;"" src=""/ccLib/images/ContensiveAdminLogo.GIF"" border=0 ></A></div>" _
                     & vbCrLf & "<div><strong>Contensive/" & cpCore.codeVersion & "</strong></div>" _
                     & vbCrLf & "<div style=""clear:both;height:18px;margin-top:10px""><div style=""float:left;width:200px;"">Domain Name</div><div style=""float:left;"">" & cpCore.webServer.webServerIO_requestDomain & "</div></div>" _
-                    & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;"">Login Member Name</div><div style=""float:left;"">" & cpCore.authContext.user.name & "</div></div>" _
+                    & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;"">Login Member Name</div><div style=""float:left;"">" & cpCore.authContext.authContextUser.name & "</div></div>" _
                     & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;"">Quick Reports</div><div style=""float:left;""><a Href=""?" & RequestNameAdminForm & "=" & AdminFormQuickStats & """>Real-Time Activity</A></div></div>" _
-                    & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;""><a Href=""?" & RequestNameDashboardReset & "=" & cpCore.authContext.visit.Id & """>Run Dashboard</A></div></div>" _
+                    & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;""><a Href=""?" & RequestNameDashboardReset & "=" & cpCore.authContext.visit.ID & """>Run Dashboard</A></div></div>" _
                     & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;""><a Href=""?addonguid=" & AddonManagerGuid & """>Add-on Manager</A></div></div>"
                     '
                     If cpCore.error_IsUserError Then
@@ -7993,7 +7993,7 @@ ErrorTrap:
                 f.Add(Adminui.EditTableOpen)
                 SectionName = ""
                 GroupCount = 0
-                CanSeeHiddenGroups = cpCore.authContext.user.isAuthenticatedDeveloper
+                CanSeeHiddenGroups = cpCore.authContext.isAuthenticatedDeveloper(cpCore)
                 Do While cpCore.db.cs_ok(CS)
                     GroupName = cpCore.db.cs_get(CS, "GroupName")
                     If (Mid(GroupName, 1, 1) <> "_") Or CanSeeHiddenGroups Then
@@ -8581,7 +8581,7 @@ ErrorTrap:
             Dim FastString As coreFastStringClass
             Dim Adminui As New coreAdminUIClass(cpCore)
             '
-            If cpCore.authContext.user.isAuthenticatedAdmin Then
+            If cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 ' ----- Open the panel
                 '
@@ -9315,11 +9315,11 @@ ErrorTrap:
                 Criteria = Criteria & "AND" & cpCore.content_getContentControlCriteria(MenuContentName)
             End If
             iParentCriteria = genericController.encodeEmptyText(ParentCriteria, "")
-            If cpCore.authContext.user.isAuthenticatedDeveloper Then
+            If cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
                 '
                 ' ----- Developer
                 '
-            ElseIf cpCore.authContext.user.isAuthenticatedAdmin Then
+            ElseIf cpCore.authContext.isAuthenticatedAdmin(cpcore) Then
                 '
                 ' ----- Administrator
                 '
@@ -9881,8 +9881,8 @@ ErrorTrap:
                             '
                             ' field has some kind of restriction
                             '
-                            If Not cpCore.authContext.user.isDeveloper Then
-                                If Not cpCore.authContext.user.isAdmin Then
+                            If Not cpCore.authContext.authContextUser.isDeveloper Then
+                                If Not cpCore.authContext.authContextUser.isAdmin Then
                                     '
                                     ' you are not admin
                                     '
@@ -10301,7 +10301,7 @@ ErrorTrap:
                 '
                 ' ----- Get the baked version
                 '
-                BakeName = "AdminMenu" & Format(cpCore.authContext.user.id, "00000000")
+                BakeName = "AdminMenu" & Format(cpCore.authContext.authContextUser.id, "00000000")
                 GetMenuTopMode = genericController.encodeText(cpCore.cache.getObject(Of String)(BakeName))
                 MenuDelimiterPosition = genericController.vbInstr(1, GetMenuTopMode, MenuDelimiter, vbTextCompare)
                 If MenuDelimiterPosition > 1 Then
@@ -10318,7 +10318,7 @@ ErrorTrap:
                         '
                         ' There are menu items to bake
                         '
-                        IsAdminLocal = cpCore.authContext.user.isAuthenticatedAdmin
+                        IsAdminLocal = cpCore.authContext.isAuthenticatedAdmin(cpCore)
                         If Not IsAdminLocal Then
                             '
                             ' content managers, need the ContentManagementList
@@ -10581,7 +10581,7 @@ ErrorTrap:
                 '
                 '
                 Call cpCore.webServer.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "GetContentChildTool, Cancel Button Pressed", False)
-            ElseIf Not cpCore.authContext.user.isAuthenticatedAdmin Then
+            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpcore) Then
                 '
                 '
                 '
@@ -10898,7 +10898,7 @@ ErrorTrap:
                 '
                 '
                 Call cpCore.webServer.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "HouseKeepingControl, Cancel Button Pressed", False)
-            ElseIf Not cpCore.authContext.user.isAuthenticatedAdmin Then
+            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpcore) Then
                 '
                 '
                 '
@@ -11106,7 +11106,7 @@ ErrorTrap:
                 '
                 '
                 Call cpCore.webServer.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "StyleEditor, Cancel Button Pressed", False)
-            ElseIf Not cpCore.authContext.user.isAuthenticatedAdmin Then
+            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpcore) Then
                 '
                 '
                 '
@@ -11466,7 +11466,7 @@ ErrorTrap:
                 Call cpCore.webServer.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "Downloads, Cancel Button Pressed", False)
             End If
             '
-            If Not cpCore.authContext.user.isAuthenticatedAdmin() Then
+            If Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 ' Must be a developer
                 '
@@ -12142,7 +12142,7 @@ ErrorTrap:
                 SQLFieldName = "SQLQuery"
             End If
             '
-            If Not cpCore.authContext.user.isAuthenticatedAdmin() Then
+            If Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 ' Must be a developer
                 '
@@ -12461,7 +12461,7 @@ ErrorTrap:
                         "This content [" & adminContent.Name & "] cannot be accessed because it has no fields. Please contact your application developer for more assistance." _
                         , "Content [" & adminContent.Name & "] has no field records."
                         ))
-                ElseIf (adminContent.DeveloperOnly And (Not cpCore.authContext.user.isAuthenticatedDeveloper)) Then
+                ElseIf (adminContent.DeveloperOnly And (Not cpCore.authContext.isAuthenticatedDeveloper(cpcore))) Then
                     '
                     ' Developer Content and not developer
                     '
@@ -12473,7 +12473,7 @@ ErrorTrap:
                     '
                     ' get access rights
                     '
-                    Call cpCore.authContext.user.getContentAccessRights(adminContent.Name, allowCMEdit, allowCMAdd, allowCMDelete)
+                    Call cpCore.authContext.getContentAccessRights(cpCore, adminContent.Name, allowCMEdit, allowCMAdd, allowCMDelete)
                     '
                     ' detemine which subform to disaply
                     '
@@ -12617,7 +12617,7 @@ ErrorTrap:
                                 End If
                                 SubTitlePart = ""
                                 If .LastEditedByMe Then
-                                    SubTitlePart = SubTitlePart & " by " & cpCore.authContext.user.name
+                                    SubTitlePart = SubTitlePart & " by " & cpCore.authContext.authContextUser.name
                                 End If
                                 If .LastEditedPast30Days Then
                                     SubTitlePart = SubTitlePart & " in the past 30 days"
@@ -15044,7 +15044,7 @@ ErrorTrap:
                 '
                 ' get content access rights
                 '
-                Call cpCore.authContext.user.getContentAccessRights(adminContent.Name, allowContentEdit, allowContentAdd, allowContentDelete)
+                Call cpCore.authContext.getContentAccessRights(cpCore, adminContent.Name, allowContentEdit, allowContentAdd, allowContentDelete)
                 If Not allowContentEdit Then
                     'If Not cpcore.authContext.user.main_IsContentManager2(AdminContent.Name) Then
                     '
@@ -15075,7 +15075,7 @@ ErrorTrap:
                         End If
                     End If
                     If ExportName = "" Then
-                        ExportName = adminContent.Name & " export for " & cpCore.authContext.user.name
+                        ExportName = adminContent.Name & " export for " & cpCore.authContext.authContextUser.name
                     End If
                     '
                     ' Get the SQL parts
@@ -15168,7 +15168,7 @@ ErrorTrap:
                                 & cr2 & "<td class=""exportTblCaption"">Record Limit</td>" _
                                 & cr2 & "<td class=""exportTblInput"">" & cpCore.htmlDoc.html_GetFormInputText2("RecordLimit", RecordLimitText) & "</td>" _
                                 & cr & "</tr>"
-                            If cpCore.authContext.user.isAuthenticatedDeveloper Then
+                            If cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
                                 Content = Content _
                                     & cr & "<tr>" _
                                     & cr2 & "<td class=""exportTblCaption"">Results SQL</td>" _
@@ -15192,7 +15192,7 @@ ErrorTrap:
                                 & cpCore.htmlDoc.html_GetFormInputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) _
                                 & ""
                             ButtonList = ButtonCancel & "," & ButtonRequestDownload
-                            If cpCore.authContext.user.isAuthenticatedDeveloper Then
+                            If cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
                                 ButtonList = ButtonList & "," & ButtonRefresh
                             End If
                         End If
@@ -15940,7 +15940,7 @@ ErrorTrap:
                 '
                 ' From here down will return a form
                 '
-                If Not cpCore.authContext.user.isAuthenticatedAdmin Then
+                If Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                     '
                     ' Does not have permission
                     '
@@ -16099,7 +16099,7 @@ ErrorTrap:
                 ' Cancel just exits with no content
                 '
                 Exit Function
-            ElseIf Not cpCore.authContext.user.isAuthenticatedAdmin Then
+            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpcore) Then
                 '
                 ' Not Admin Error
                 '
@@ -16566,7 +16566,7 @@ ErrorTrap:
                     ' Cancel just exits with no content
                     '
                     Exit Function
-                ElseIf Not cpCore.authContext.user.isAuthenticatedAdmin Then
+                ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpcore) Then
                     '
                     ' Not Admin Error
                     '
@@ -16649,7 +16649,7 @@ ErrorTrap:
                 ' Cancel just exits with no content
                 '
                 Exit Function
-            ElseIf Not cpCore.authContext.user.isAuthenticatedAdmin Then
+            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpcore) Then
                 '
                 ' Not Admin Error
                 '
@@ -17194,7 +17194,7 @@ ErrorTrap:
                 ' Where Clause: edited by me
                 '
                 If IndexConfig.LastEditedByMe Then
-                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ModifiedBy=" & cpCore.authContext.user.id & ")"
+                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ModifiedBy=" & cpCore.authContext.authContextUser.id & ")"
                 End If
                 '
                 ' Where Clause: edited today
