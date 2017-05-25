@@ -475,6 +475,23 @@ Namespace Contensive.Core
         '
         '===================================================================================================
         ''' <summary>
+        ''' addonCache object
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public ReadOnly Property dataSources() As Dictionary(Of String, Models.Entity.dataSourceModel)
+            Get
+                If (_dataSources Is Nothing) Then
+                    _dataSources = Models.Entity.dataSourceModel.getNameDict(Me)
+                End If
+                Return _dataSources
+            End Get
+        End Property
+        Private _dataSources As Dictionary(Of String, Models.Entity.dataSourceModel) = Nothing
+        '
+        '===================================================================================================
+        ''' <summary>
         ''' pageManager - too many page link tie-ins to make it a real addon. Code internal to handle models, then call it with an addon
         ''' </summary>
         ''' <value></value>
@@ -687,14 +704,18 @@ Namespace Contensive.Core
         Public ReadOnly Property appRootFiles() As coreFileSystemClass
             Get
                 If (_appRootFiles Is Nothing) Then
-                    If serverConfig.isLocalFileSystem Then
-                        '
-                        ' local server -- everything is ephemeral
-                        _appRootFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.appRootFilesPath))
-                    Else
-                        '
-                        ' cluster mode - each filesystem is configured accordingly
-                        _appRootFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.activeSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.appRootFilesPath))
+                    If (serverConfig.appConfig IsNot Nothing) Then
+                        If (serverConfig.appConfig.enabled) Then
+                            If serverConfig.isLocalFileSystem Then
+                                '
+                                ' local server -- everything is ephemeral
+                                _appRootFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.appRootFilesPath))
+                            Else
+                                '
+                                ' cluster mode - each filesystem is configured accordingly
+                                _appRootFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.activeSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.appRootFilesPath))
+                            End If
+                        End If
                     End If
                 End If
                 Return _appRootFiles
@@ -737,14 +758,18 @@ Namespace Contensive.Core
         Public ReadOnly Property privateFiles() As coreFileSystemClass
             Get
                 If (_privateFiles Is Nothing) Then
-                    If serverConfig.isLocalFileSystem Then
-                        '
-                        ' local server -- everything is ephemeral
-                        _privateFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.privateFilesPath))
-                    Else
-                        '
-                        ' cluster mode - each filesystem is configured accordingly
-                        _privateFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.privateFilesPath))
+                    If (serverConfig.appConfig IsNot Nothing) Then
+                        If (serverConfig.appConfig.enabled) Then
+                            If serverConfig.isLocalFileSystem Then
+                                '
+                                ' local server -- everything is ephemeral
+                                _privateFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.privateFilesPath))
+                            Else
+                                '
+                                ' cluster mode - each filesystem is configured accordingly
+                                _privateFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.privateFilesPath))
+                            End If
+                        End If
                     End If
                 End If
                 Return _privateFiles
@@ -801,14 +826,18 @@ Namespace Contensive.Core
         Public ReadOnly Property cdnFiles() As coreFileSystemClass
             Get
                 If (_cdnFiles Is Nothing) Then
-                    If serverConfig.isLocalFileSystem Then
-                        '
-                        ' local server -- everything is ephemeral
-                        _cdnFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.cdnFilesPath))
-                    Else
-                        '
-                        ' cluster mode - each filesystem is configured accordingly
-                        _cdnFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.cdnFilesPath))
+                    If (serverConfig.appConfig IsNot Nothing) Then
+                        If (serverConfig.appConfig.enabled) Then
+                            If serverConfig.isLocalFileSystem Then
+                                '
+                                ' local server -- everything is ephemeral
+                                _cdnFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.cdnFilesPath))
+                            Else
+                                '
+                                ' cluster mode - each filesystem is configured accordingly
+                                _cdnFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.cdnFilesPath))
+                            End If
+                        End If
                     End If
                 End If
                 Return _cdnFiles
@@ -974,9 +1003,6 @@ Namespace Contensive.Core
             '
             ' -- create default auth objects for non-user methods, or until auth is available
             authContext = New authContextModel
-            authContext.visit = New Models.Entity.visitModel
-            authContext.visitor = New Models.Entity.visitorModel
-            authContext.user = New Models.Entity.personModel
             '
             serverConfig = Models.Entity.serverConfigModel.getObject(Me)
             Me.serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
@@ -996,9 +1022,6 @@ Namespace Contensive.Core
             '
             ' -- create default auth objects for non-user methods, or until auth is available
             authContext = New authContextModel
-            authContext.visit = New Models.Entity.visitModel
-            authContext.visitor = New Models.Entity.visitorModel
-            authContext.user = New Models.Entity.personModel
             '
             Me.serverConfig = serverConfig
             Me.serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
@@ -1019,13 +1042,10 @@ Namespace Contensive.Core
             '
             ' -- create default auth objects for non-user methods, or until auth is available
             authContext = New authContextModel
-            authContext.visit = New Models.Entity.visitModel
-            authContext.visitor = New Models.Entity.visitorModel
-            authContext.user = New Models.Entity.personModel
             '
             Me.serverConfig = serverConfig
-            Me.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady
             Me.serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
+            Me.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady
             webServer.initWebContext(httpContext)
             constructorInitialize()
         End Sub
@@ -1042,14 +1062,13 @@ Namespace Contensive.Core
             '
             ' -- create default auth objects for non-user methods, or until auth is available
             authContext = New authContextModel
-            authContext.visit = New Models.Entity.visitModel
-            authContext.visitor = New Models.Entity.visitorModel
-            authContext.user = New Models.Entity.personModel
             '
             serverConfig = Models.Entity.serverConfigModel.getObject(Me, applicationName)
             serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
-            webServer.iisContext = Nothing
-            constructorInitialize()
+            If (serverConfig.appConfig IsNot Nothing) Then
+                webServer.iisContext = Nothing
+                constructorInitialize()
+            End If
         End Sub
         '====================================================================================================
         ''' <summary>
@@ -1068,8 +1087,10 @@ Namespace Contensive.Core
             '
             serverConfig = Models.Entity.serverConfigModel.getObject(Me, applicationName)
             serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
-            Call webServer.initWebContext(httpContext)
-            constructorInitialize()
+            If (serverConfig.appConfig IsNot Nothing) Then
+                Call webServer.initWebContext(httpContext)
+                constructorInitialize()
+            End If
         End Sub
         ''
         '' ----- Get a DataSource ID from its Name
@@ -2847,7 +2868,7 @@ ErrorTrap:
                     ' Sest to blank
                     '
                     AllowChange = True
-                ElseIf genericController.vbUCase(Newusername) <> genericController.vbUCase(authContext.user.username) Then
+                ElseIf genericController.vbUCase(Newusername) <> genericController.vbUCase(authContext.user.Username) Then
                     '
                     ' ----- username changed, check if change is allowed
                     '
@@ -3781,7 +3802,7 @@ ErrorTrap:
                 LinkPanel.Add("<a class=""ccAdminLink"" href=""" & htmlDoc.html_EncodeHTML("http://" & webServer.webServerIO_requestDomain) & """>Public Home</A> | ")
                 LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & htmlDoc.html_EncodeHTML(siteProperties.adminURL & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
                 If siteProperties.getBoolean("AllowMobileTemplates", False) Then
-                    If authContext.visit_browserIsMobile Then
+                    If authContext.visit.Mobile Then
                         QS = web_RefreshQueryString
                         QS = genericController.ModifyQueryString(QS, "method", "forcenonmobile")
                         LinkPanel.Add("<a class=""ccAdminLink"" href=""?" & QS & """>Non-Mobile Version</A> | ")
@@ -10816,7 +10837,7 @@ ErrorTrap:
         '
         '
         Public Sub log_LogActivity2(Message As String, SubjectMemberID As Integer, SubjectOrganizationID As Integer)
-            Call log_logActivity(Message, authContext.user.ID, SubjectMemberID, SubjectOrganizationID, webServer.webServerIO_ServerLink, authContext.visitor.id, authContext.visit.ID)
+            Call log_logActivity(Message, authContext.user.ID, SubjectMemberID, SubjectOrganizationID, webServer.webServerIO_ServerLink, authContext.visitor.ID, authContext.visit.ID)
         End Sub
         '
         '=================================================================================================
@@ -10831,74 +10852,36 @@ ErrorTrap:
         Private Function init_ProcessAjaxData() As String
             Dim result As String = ""
             Try
-                Dim SetNameValue() As String
                 Dim SetPairs() As String
                 Dim Pos As Integer
                 Dim FieldValue As String
                 Dim SetPairString As String
-                Dim RecordID As Integer
-                Dim HelpMessage As String
                 Dim ArgCnt As Integer
-                Dim RowDelim As String
-                Dim ColDelim As String
                 Dim s As New coreFastStringClass
-                Dim Rows As String
-                Dim Cols As String
-                'Dim CDef As CDefType
-                Dim FieldList As String
-                Dim SelectFields() As String
-                Dim SrcPtr As Integer
                 Dim FieldName As String
-                Dim FieldCaption As String
-                Dim LCaseFieldName As String
-                Dim ColumnName() As String
-                Dim ColumnCaption() As String
-                Dim ColumnType() As String
-                '
-                Dim fieldType As String
-                Dim test As String
                 Dim Copy As String
                 Dim PageSize As Integer
-                Dim FieldCount As Integer
-                Dim RowMax As Integer
-                Dim ColMax As Integer
-                'Dim RecordField As Field
-                Dim RowStart As String
-                Dim RowEnd As String
-                Dim ColumnStart As String
-                Dim ColumnEnd As String
-                Dim RowPtr As Integer
-                Dim ColPtr As Integer
-                Dim CellData As Object
-                Dim Cnt As Integer
-                'dim dt as datatable
-                Dim ErrorNumber As Integer
-                Dim ErrorDescription As String
-                Dim Cells As Object
                 Dim ArgArray() As String
                 Dim RemoteKey As String
                 Dim EncodedArgs As String
                 Dim Args As String
                 Dim PageNumber As Integer
                 Dim CS As Integer
-                Dim DataSource As String
                 Dim SQLQuery As String
                 Dim maxRows As Integer
                 Dim ArgName() As String
                 Dim ArgValue() As String
-                Dim ArgPairs() As String
                 Dim Ptr As Integer
                 Dim QueryType As Integer
-                Dim ContentName As String
+                Dim ContentName As String = ""
                 Dim Criteria As String
-                Dim SortFieldList As String
-                Dim AllowInactiveRecords As String
+                Dim SortFieldList As String = ""
                 Dim AllowInactiveRecords2 As Boolean
-
-                Dim SelectFieldList As String
+                Dim SelectFieldList As String = ""
                 Dim gd As New GoogleDataType
                 Dim gv As New GoogleVisualizationType
                 Dim RemoteFormat As RemoteFormatEnum
+                'Dim DataSource As Models.Entity.dataSourceModel
                 '
                 gv.status = GoogleVisualizationStatusEnum.OK
                 gd.IsEmpty = True
@@ -10953,7 +10936,7 @@ ErrorTrap:
                         ' Use user definied query
                         '
                         SQLQuery = db.cs_getText(CS, "sqlquery")
-                        DataSource = db.getDataSourceNameByID(db.cs_getInteger(CS, "datasourceid"))
+                        'DataSource = Models.Entity.dataSourceModel.create(Me, db.cs_getInteger(CS, "datasourceid"), New List(Of String))
                         maxRows = db.cs_getInteger(CS, "maxrows")
                         QueryType = db.cs_getInteger(CS, "QueryTypeID")
                         ContentName = db.cs_get(CS, "ContentID")
@@ -12882,287 +12865,290 @@ ErrorTrap:
         Public Function executeRoute(Optional route As String = "") As String
             Dim returnResult As String = ""
             Try
-                Dim pairs() As String
-                Dim pairName As String
-                Dim pairValue As String
-                Dim addonRoute As String = ""
-                Dim routeTest As String
-                Dim workingRoute As String
-                Dim adminRoute As String = serverConfig.appConfig.adminRoute.ToLower
-                Dim AjaxFunction As String = docProperties.getText(RequestNameAjaxFunction)
-                Dim AjaxFastFunction As String = docProperties.getText(RequestNameAjaxFastFunction)
-                Dim RemoteMethodFromQueryString As String = docProperties.getText(RequestNameRemoteMethodAddon)
-                '
-                'debugLog("executeRoute, enter")
-                '
-                ' determine route from either url or querystring 
-                '
-                If (Not String.IsNullOrEmpty(route)) Then
+                If (serverConfig.appConfig IsNot Nothing) Then
                     '
-                    ' route privided as argument
+                    ' -- if app is not configured, cannot execute route
+                    Dim pairs() As String
+                    Dim pairName As String
+                    Dim pairValue As String
+                    Dim addonRoute As String = ""
+                    Dim routeTest As String
+                    Dim workingRoute As String
+                    Dim adminRoute As String = serverConfig.appConfig.adminRoute.ToLower
+                    Dim AjaxFunction As String = docProperties.getText(RequestNameAjaxFunction)
+                    Dim AjaxFastFunction As String = docProperties.getText(RequestNameAjaxFastFunction)
+                    Dim RemoteMethodFromQueryString As String = docProperties.getText(RequestNameRemoteMethodAddon)
                     '
-                    workingRoute = route
-                ElseIf (Not String.IsNullOrEmpty(RemoteMethodFromQueryString)) Then
+                    'debugLog("executeRoute, enter")
                     '
-                    ' route comes from a remoteMethod=route querystring argument
+                    ' determine route from either url or querystring 
                     '
-                    workingRoute = "/" & RemoteMethodFromQueryString.ToLower()
-                Else
-                    '
-                    ' routine comes from the url
-                    '
-                    workingRoute = webServer.requestPathPage.ToLower
-                End If
-                '
-                ' normalize route to /path/page or /path
-                '
-                workingRoute = genericController.normalizeRoute(workingRoute)
-                '
-                ' call with no addon route returns admin site
-                '
-                If False Then
-                    ''
-                    ''--------------------------------------------------------------------------
-                    '' route is admin
-                    ''--------------------------------------------------------------------------
-                    ''
-
-                    ''If the Then admin route Is taken -- the login panel processing Is bypassed. those methods need To be a different kind Of route, Or it should be an addon
-                    ''runAtServerClass in the admin addon.
-
-                    'Dim admin As New adminClass(Me)
-                    'returnResult = admin.addonToBe_admin()
-                Else
-                    '
-                    '------------------------------------------------------------------------------------------
-                    '   remote method
-                    '       for hardcoded_addons (simple ajax functions) and addons with asajax and inframe
-                    '       Eventually replace the hard-coded ajax hood with this process
-                    '       so cj. methods can be consolidated into the cj.ajax.addon (can callback) calls
-                    '------------------------------------------------------------------------------------------
-                    '
-                    ' if route is a remote method, use it
-                    '
-                    routeTest = workingRoute
-                    Dim addonPtr As Integer = addonCache.getPtr(routeTest)
-                    If addonPtr >= 0 Then
-                        If addonCache.localCache.addonList(addonPtr.ToString).addonCache_remoteMethod Then
-                            addonRoute = routeTest
-                        End If
+                    If (Not String.IsNullOrEmpty(route)) Then
+                        '
+                        ' route privided as argument
+                        '
+                        workingRoute = route
+                    ElseIf (Not String.IsNullOrEmpty(RemoteMethodFromQueryString)) Then
+                        '
+                        ' route comes from a remoteMethod=route querystring argument
+                        '
+                        workingRoute = "/" & RemoteMethodFromQueryString.ToLower()
                     Else
-                        If (InStr(routeTest, "/", CompareMethod.Text) = 1) Then
-                            routeTest = routeTest.Substring(1)
-                            addonPtr = addonCache.getPtr(routeTest)
-                            If addonPtr >= 0 Then
-                                If addonCache.localCache.addonList(addonPtr.ToString).addonCache_remoteMethod Then
-                                    addonRoute = routeTest
-                                End If
+                        '
+                        ' routine comes from the url
+                        '
+                        workingRoute = webServer.requestPathPage.ToLower
+                    End If
+                    '
+                    ' normalize route to /path/page or /path
+                    '
+                    workingRoute = genericController.normalizeRoute(workingRoute)
+                    '
+                    ' call with no addon route returns admin site
+                    '
+                    If False Then
+                        ''
+                        ''--------------------------------------------------------------------------
+                        '' route is admin
+                        ''--------------------------------------------------------------------------
+                        ''
+
+                        ''If the Then admin route Is taken -- the login panel processing Is bypassed. those methods need To be a different kind Of route, Or it should be an addon
+                        ''runAtServerClass in the admin addon.
+
+                        'Dim admin As New adminClass(Me)
+                        'returnResult = admin.addonToBe_admin()
+                    Else
+                        '
+                        '------------------------------------------------------------------------------------------
+                        '   remote method
+                        '       for hardcoded_addons (simple ajax functions) and addons with asajax and inframe
+                        '       Eventually replace the hard-coded ajax hood with this process
+                        '       so cj. methods can be consolidated into the cj.ajax.addon (can callback) calls
+                        '------------------------------------------------------------------------------------------
+                        '
+                        ' if route is a remote method, use it
+                        '
+                        routeTest = workingRoute
+                        Dim addonPtr As Integer = addonCache.getPtr(routeTest)
+                        If addonPtr >= 0 Then
+                            If addonCache.localCache.addonList(addonPtr.ToString).addonCache_remoteMethod Then
+                                addonRoute = routeTest
                             End If
-                        End If
-                    End If
-                    If addonRoute = "" Then
-                        '
-                        ' if remote method is not in route, get nameGuid from querystring
-                        '
-                        addonRoute = docProperties.getText(RequestNameRemoteMethodAddon)
-                    End If
-                    If addonRoute <> "" Then
-                        '
-                        ' -- this section was added here. it came from an earlier processing section of initApp() but appears to apply only to remote method processing
-                        '--------------------------------------------------------------------------
-                        '   Verify Add-ons are run from Referrers on the Aggregate Access List
-                        '--------------------------------------------------------------------------
-                        '
-                        If webServer.webServerIO_ReadStreamJSForm Then
-                            If webServer.requestReferrer = "" Then
-                                '
-                                ' Allow it to be hand typed
-                                '
-                            Else
-                                '
-                                ' Test source site
-                                '
-                                Dim refProtocol As String = ""
-                                Dim refHost As String = ""
-                                Dim refPath As String = ""
-                                Dim refPage As String = ""
-                                Dim refQueryString As String = ""
-                                Dim cs As Integer
-                                Call genericController.SeparateURL(webServer.requestReferrer, refProtocol, refHost, refPath, refPage, refQueryString)
-                                If genericController.vbUCase(refHost) <> genericController.vbUCase(webServer.requestDomain) Then
-                                    '
-                                    ' Not from this site
-                                    '
-                                    If siteProperties.getBoolean("AllowAggregateAccessBlocking") Then
-                                        cs = db.cs_open("Aggregate Access", "Link=" & EncodeSQLText(refHost), , False, , , , "active")
-                                        If Not db.cs_ok(cs) Then
-                                            '
-                                            ' no record, add an inactive record and throw error
-                                            '
-                                            Call db.cs_Close(cs)
-                                            cs = db.cs_insertRecord("Aggregate Access")
-                                            If db.cs_ok(cs) Then
-                                                Call db.cs_set(cs, "Name", refHost)
-                                                Call db.cs_set(cs, "Link", refHost)
-                                                Call db.cs_set(cs, "active", False)
-                                            End If
-                                            Call db.cs_Close(cs)
-                                            Call handleLegacyError12("Init", "Add-on call from [" & refHost & "] was blocked because this domain is not in the Aggregate Access Content. An inactive record was added. To allow this domain access, mark the record active.")
-                                            docOpen = False '--- should be disposed by caller --- Call dispose
-                                            Return htmlDoc.docBuffer
-                                        ElseIf Not db.cs_getBoolean(cs, "active") Then
-                                            '
-                                            ' inactive record, throw error
-                                            '
-                                            Call db.cs_Close(cs)
-                                            Call handleLegacyError12("Init", "Add-on call from [" & refHost & "] was blocked because this domain is not active in the Aggregate Access Content. To allow this domain access, mark the record active.")
-                                            docOpen = False '--- should be disposed by caller --- Call dispose
-                                            Return htmlDoc.docBuffer
-                                        Else
-                                            '
-                                            ' Active record, allow hit
-                                            '
-                                            Call db.cs_Close(cs)
-                                        End If
+                        Else
+                            If (InStr(routeTest, "/", CompareMethod.Text) = 1) Then
+                                routeTest = routeTest.Substring(1)
+                                addonPtr = addonCache.getPtr(routeTest)
+                                If addonPtr >= 0 Then
+                                    If addonCache.localCache.addonList(addonPtr.ToString).addonCache_remoteMethod Then
+                                        addonRoute = routeTest
                                     End If
                                 End If
                             End If
                         End If
-                        '
-                        'Call AppendLog("main_init(), 2710 - exit for remote method")
-                        '
-                        If True Then
-                            Dim Option_String As String = ""
-                            Dim pos As Integer
-                            Dim HostContentName As String
-                            Dim hostRecordId As Integer
-                            If docProperties.containsKey("Option_String") Then
-                                Option_String = docProperties.getText("Option_String")
-                            Else
-                                '
-                                ' convert Querystring encoding to (internal) NVA
-                                '
-                                If webServer.requestQueryString <> "" Then
-                                    pairs = Split(webServer.requestQueryString, "&")
-                                    For addonPtr = 0 To UBound(pairs)
-                                        pairName = pairs(addonPtr)
-                                        pairValue = ""
-                                        pos = genericController.vbInstr(1, pairName, "=")
-                                        If pos > 0 Then
-                                            pairValue = genericController.DecodeResponseVariable(Mid(pairName, pos + 1))
-                                            pairName = genericController.DecodeResponseVariable(Mid(pairName, 1, pos - 1))
+                        If addonRoute = "" Then
+                            '
+                            ' if remote method is not in route, get nameGuid from querystring
+                            '
+                            addonRoute = docProperties.getText(RequestNameRemoteMethodAddon)
+                        End If
+                        If addonRoute <> "" Then
+                            '
+                            ' -- this section was added here. it came from an earlier processing section of initApp() but appears to apply only to remote method processing
+                            '--------------------------------------------------------------------------
+                            '   Verify Add-ons are run from Referrers on the Aggregate Access List
+                            '--------------------------------------------------------------------------
+                            '
+                            If webServer.webServerIO_ReadStreamJSForm Then
+                                If webServer.requestReferrer = "" Then
+                                    '
+                                    ' Allow it to be hand typed
+                                    '
+                                Else
+                                    '
+                                    ' Test source site
+                                    '
+                                    Dim refProtocol As String = ""
+                                    Dim refHost As String = ""
+                                    Dim refPath As String = ""
+                                    Dim refPage As String = ""
+                                    Dim refQueryString As String = ""
+                                    Dim cs As Integer
+                                    Call genericController.SeparateURL(webServer.requestReferrer, refProtocol, refHost, refPath, refPage, refQueryString)
+                                    If genericController.vbUCase(refHost) <> genericController.vbUCase(webServer.requestDomain) Then
+                                        '
+                                        ' Not from this site
+                                        '
+                                        If siteProperties.getBoolean("AllowAggregateAccessBlocking") Then
+                                            cs = db.cs_open("Aggregate Access", "Link=" & EncodeSQLText(refHost), , False, , , , "active")
+                                            If Not db.cs_ok(cs) Then
+                                                '
+                                                ' no record, add an inactive record and throw error
+                                                '
+                                                Call db.cs_Close(cs)
+                                                cs = db.cs_insertRecord("Aggregate Access")
+                                                If db.cs_ok(cs) Then
+                                                    Call db.cs_set(cs, "Name", refHost)
+                                                    Call db.cs_set(cs, "Link", refHost)
+                                                    Call db.cs_set(cs, "active", False)
+                                                End If
+                                                Call db.cs_Close(cs)
+                                                Call handleLegacyError12("Init", "Add-on call from [" & refHost & "] was blocked because this domain is not in the Aggregate Access Content. An inactive record was added. To allow this domain access, mark the record active.")
+                                                docOpen = False '--- should be disposed by caller --- Call dispose
+                                                Return htmlDoc.docBuffer
+                                            ElseIf Not db.cs_getBoolean(cs, "active") Then
+                                                '
+                                                ' inactive record, throw error
+                                                '
+                                                Call db.cs_Close(cs)
+                                                Call handleLegacyError12("Init", "Add-on call from [" & refHost & "] was blocked because this domain is not active in the Aggregate Access Content. To allow this domain access, mark the record active.")
+                                                docOpen = False '--- should be disposed by caller --- Call dispose
+                                                Return htmlDoc.docBuffer
+                                            Else
+                                                '
+                                                ' Active record, allow hit
+                                                '
+                                                Call db.cs_Close(cs)
+                                            End If
                                         End If
-                                        Option_String = Option_String & "&" & genericController.encodeNvaArgument(pairName) & "=" & genericController.encodeNvaArgument(pairValue)
-                                    Next
-                                    Option_String = Mid(Option_String, 2)
+                                    End If
                                 End If
                             End If
-                            HostContentName = docProperties.getText("hostcontentname")
-                            hostRecordId = docProperties.getInteger("HostRecordID")
                             '
-                            ' remote methods are add-ons
+                            'Call AppendLog("main_init(), 2710 - exit for remote method")
                             '
-                            Dim AddonStatusOK As Boolean = True
-                            '
-                            ' REFACTOR -- must know if this is json or html remote before call because it is an argument -- assume this is a json for now -- must deal with it somehow
-                            '
-                            returnResult = addon.execute(0, addonRoute, Option_String, CPUtilsBaseClass.addonContext.ContextRemoteMethodJson, HostContentName, hostRecordId, "", "0", False, 0, "", AddonStatusOK, Nothing, "", Nothing, "", authContext.user.ID, authContext.isAuthenticated)
-                        End If
-                        '
-                        ' deliver styles, javascript and other head tags as javascript appends
-                        '
-                        webServer.webServerIO_BlockClosePageCopyright = True
-                        html_BlockClosePageLink = True
-                        If (webServer.webServerIO_OutStreamDevice = htmlDocController.htmlDoc_OutStreamJavaScript) Then
-                            If genericController.vbInstr(1, returnResult, "<form ", vbTextCompare) <> 0 Then
-                                Dim FormSplit As String() = Split(returnResult, "<form ", , vbTextCompare)
-                                returnResult = FormSplit(0)
-                                For addonPtr = 1 To UBound(FormSplit)
-                                    Dim FormEndPos As Integer = genericController.vbInstr(1, FormSplit(addonPtr), ">")
-                                    Dim FormInner As String = Mid(FormSplit(addonPtr), 1, FormEndPos)
-                                    Dim FormSuffix As String = Mid(FormSplit(addonPtr), FormEndPos + 1)
-                                    FormInner = genericController.vbReplace(FormInner, "method=""post""", "method=""main_Get""", 1, 99, vbTextCompare)
-                                    FormInner = genericController.vbReplace(FormInner, "method=post", "method=""main_Get""", 1, 99, vbTextCompare)
-                                    returnResult = returnResult & "<form " & FormInner & FormSuffix
-                                Next
+                            If True Then
+                                Dim Option_String As String = ""
+                                Dim pos As Integer
+                                Dim HostContentName As String
+                                Dim hostRecordId As Integer
+                                If docProperties.containsKey("Option_String") Then
+                                    Option_String = docProperties.getText("Option_String")
+                                Else
+                                    '
+                                    ' convert Querystring encoding to (internal) NVA
+                                    '
+                                    If webServer.requestQueryString <> "" Then
+                                        pairs = Split(webServer.requestQueryString, "&")
+                                        For addonPtr = 0 To UBound(pairs)
+                                            pairName = pairs(addonPtr)
+                                            pairValue = ""
+                                            pos = genericController.vbInstr(1, pairName, "=")
+                                            If pos > 0 Then
+                                                pairValue = genericController.DecodeResponseVariable(Mid(pairName, pos + 1))
+                                                pairName = genericController.DecodeResponseVariable(Mid(pairName, 1, pos - 1))
+                                            End If
+                                            Option_String = Option_String & "&" & genericController.encodeNvaArgument(pairName) & "=" & genericController.encodeNvaArgument(pairValue)
+                                        Next
+                                        Option_String = Mid(Option_String, 2)
+                                    End If
+                                End If
+                                HostContentName = docProperties.getText("hostcontentname")
+                                hostRecordId = docProperties.getInteger("HostRecordID")
+                                '
+                                ' remote methods are add-ons
+                                '
+                                Dim AddonStatusOK As Boolean = True
+                                '
+                                ' REFACTOR -- must know if this is json or html remote before call because it is an argument -- assume this is a json for now -- must deal with it somehow
+                                '
+                                returnResult = addon.execute(0, addonRoute, Option_String, CPUtilsBaseClass.addonContext.ContextRemoteMethodJson, HostContentName, hostRecordId, "", "0", False, 0, "", AddonStatusOK, Nothing, "", Nothing, "", authContext.user.ID, authContext.isAuthenticated)
                             End If
                             '
-                            Call htmlDoc.writeAltBuffer(returnResult)
-                            returnResult = ""
+                            ' deliver styles, javascript and other head tags as javascript appends
+                            '
+                            webServer.webServerIO_BlockClosePageCopyright = True
+                            html_BlockClosePageLink = True
+                            If (webServer.webServerIO_OutStreamDevice = htmlDocController.htmlDoc_OutStreamJavaScript) Then
+                                If genericController.vbInstr(1, returnResult, "<form ", vbTextCompare) <> 0 Then
+                                    Dim FormSplit As String() = Split(returnResult, "<form ", , vbTextCompare)
+                                    returnResult = FormSplit(0)
+                                    For addonPtr = 1 To UBound(FormSplit)
+                                        Dim FormEndPos As Integer = genericController.vbInstr(1, FormSplit(addonPtr), ">")
+                                        Dim FormInner As String = Mid(FormSplit(addonPtr), 1, FormEndPos)
+                                        Dim FormSuffix As String = Mid(FormSplit(addonPtr), FormEndPos + 1)
+                                        FormInner = genericController.vbReplace(FormInner, "method=""post""", "method=""main_Get""", 1, 99, vbTextCompare)
+                                        FormInner = genericController.vbReplace(FormInner, "method=post", "method=""main_Get""", 1, 99, vbTextCompare)
+                                        returnResult = returnResult & "<form " & FormInner & FormSuffix
+                                    Next
+                                End If
+                                '
+                                Call htmlDoc.writeAltBuffer(returnResult)
+                                returnResult = ""
+                            End If
+                            '
+                            ' 20161227 - executeRoute came from old init(), which used the altBuffer to mock a return. Back that out and return the result directly.
+                            '
+                            Return returnResult
+                            'Call AppendLog("call main_getEndOfBody, from main_inite")
+                            'returnResult = returnResult & main_GetEndOfBody(False, False, True, False)
+                            'Call writeAltBuffer(returnResult)
+                            'docOpen = False '--- should be disposed by caller --- Call dispose
+                            'Return _docBuffer
                         End If
-                        '
-                        ' 20161227 - executeRoute came from old init(), which used the altBuffer to mock a return. Back that out and return the result directly.
-                        '
-                        Return returnResult
-                        'Call AppendLog("call main_getEndOfBody, from main_inite")
-                        'returnResult = returnResult & main_GetEndOfBody(False, False, True, False)
-                        'Call writeAltBuffer(returnResult)
-                        'docOpen = False '--- should be disposed by caller --- Call dispose
-                        'Return _docBuffer
-                    End If
-                    If True Then
-                        '
-                        '------------------------------------------------------------------------------------------
-                        '   These should all be converted to system add-ons
-                        '
-                        '   AJAX late functions (slower then the early functions, but they include visit state, etc.
-                        '------------------------------------------------------------------------------------------
-                        '
-                        If AjaxFunction <> "" Then
-                            returnResult = ""
-                            Select Case AjaxFunction
-                                Case ajaxGetFieldEditorPreferenceForm
-                                    '
-                                    ' When editing in admin site, if a field has multiple editors (addons as editors), you main_Get an icon
-                                    '   to click to select the editor. When clicked, a fancybox opens to display a form. The onStart of
-                                    '   he fancybox calls this ajax call and puts the return in the div that is displayed. Return a list
-                                    '   of addon editors compatible with the field type.
-                                    '
-                                    Dim addonDefaultEditorName As String = ""
-                                    Dim addonDefaultEditorId As Integer = 0
-                                    Dim fieldId As Integer = docProperties.getInteger("fieldid")
-                                    '
-                                    ' main_Get name of default editor
-                                    '
-                                    Dim Sql As String = "select top 1" _
+                        If True Then
+                            '
+                            '------------------------------------------------------------------------------------------
+                            '   These should all be converted to system add-ons
+                            '
+                            '   AJAX late functions (slower then the early functions, but they include visit state, etc.
+                            '------------------------------------------------------------------------------------------
+                            '
+                            If AjaxFunction <> "" Then
+                                returnResult = ""
+                                Select Case AjaxFunction
+                                    Case ajaxGetFieldEditorPreferenceForm
+                                        '
+                                        ' When editing in admin site, if a field has multiple editors (addons as editors), you main_Get an icon
+                                        '   to click to select the editor. When clicked, a fancybox opens to display a form. The onStart of
+                                        '   he fancybox calls this ajax call and puts the return in the div that is displayed. Return a list
+                                        '   of addon editors compatible with the field type.
+                                        '
+                                        Dim addonDefaultEditorName As String = ""
+                                        Dim addonDefaultEditorId As Integer = 0
+                                        Dim fieldId As Integer = docProperties.getInteger("fieldid")
+                                        '
+                                        ' main_Get name of default editor
+                                        '
+                                        Dim Sql As String = "select top 1" _
                                         & " a.name,a.id" _
                                         & " from ccfields f left join ccAggregateFunctions a on a.id=f.editorAddonId" _
                                         & " where" _
                                         & " f.ID = " & fieldId _
                                         & ""
-                                    Dim dt As DataTable
-                                    dt = db.executeSql(Sql)
-                                    If dt.Rows.Count > 0 Then
-                                        For Each rsDr As DataRow In dt.Rows
-                                            addonDefaultEditorName = "&nbsp;(" & genericController.encodeText(rsDr("name")) & ")"
-                                            addonDefaultEditorId = genericController.EncodeInteger(rsDr("id"))
-                                        Next
-                                    End If
-                                    '
-                                    Dim radioGroupName As String = "setEditorPreference" & fieldId
-                                    Dim currentEditorAddonId As Integer = docProperties.getInteger("currentEditorAddonId")
-                                    Dim submitFormId As Integer = docProperties.getInteger("submitFormId")
-                                    Sql = "select f.name,c.name,r.addonid,a.name as addonName" _
+                                        Dim dt As DataTable
+                                        dt = db.executeSql(Sql)
+                                        If dt.Rows.Count > 0 Then
+                                            For Each rsDr As DataRow In dt.Rows
+                                                addonDefaultEditorName = "&nbsp;(" & genericController.encodeText(rsDr("name")) & ")"
+                                                addonDefaultEditorId = genericController.EncodeInteger(rsDr("id"))
+                                            Next
+                                        End If
+                                        '
+                                        Dim radioGroupName As String = "setEditorPreference" & fieldId
+                                        Dim currentEditorAddonId As Integer = docProperties.getInteger("currentEditorAddonId")
+                                        Dim submitFormId As Integer = docProperties.getInteger("submitFormId")
+                                        Sql = "select f.name,c.name,r.addonid,a.name as addonName" _
                                         & " from (((cccontent c" _
                                         & " left join ccfields f on f.contentid=c.id)" _
                                         & " left join ccAddonContentFieldTypeRules r on r.contentFieldTypeID=f.type)" _
                                         & " left join ccAggregateFunctions a on a.id=r.AddonId)" _
                                         & " where f.id=" & fieldId
 
-                                    dt = db.executeSql(Sql)
-                                    If dt.Rows.Count > 0 Then
-                                        For Each rsDr As DataRow In dt.Rows
-                                            Dim addonId As Integer = genericController.EncodeInteger(rsDr("addonid"))
-                                            If (addonId <> 0) And (addonId <> addonDefaultEditorId) Then
-                                                returnResult = returnResult _
+                                        dt = db.executeSql(Sql)
+                                        If dt.Rows.Count > 0 Then
+                                            For Each rsDr As DataRow In dt.Rows
+                                                Dim addonId As Integer = genericController.EncodeInteger(rsDr("addonid"))
+                                                If (addonId <> 0) And (addonId <> addonDefaultEditorId) Then
+                                                    returnResult = returnResult _
                                                     & vbCrLf & vbTab & "<div class=""radioCon"">" & htmlDoc.html_GetFormInputRadioBox(radioGroupName, genericController.encodeText(addonId), CStr(currentEditorAddonId)) & "&nbsp;Use " & genericController.encodeText(rsDr("addonName")) & "</div>" _
                                                     & ""
-                                            End If
+                                                End If
 
-                                        Next
-                                    End If
+                                            Next
+                                        End If
 
-                                    Dim OnClick As String = "" _
+                                        Dim OnClick As String = "" _
                                         & "var a=document.getElementsByName('" & radioGroupName & "');" _
                                         & "for(i=0;i<a.length;i++) {" _
                                         & "if(a[i].checked){var v=a[i].value}" _
@@ -13172,7 +13158,7 @@ ErrorTrap:
                                         & "document.getElementById('adminEditForm').submit();" _
                                         & ""
 
-                                    returnResult = "" _
+                                        returnResult = "" _
                                         & vbCrLf & vbTab & "<h1>Editor Preference</h1>" _
                                         & vbCrLf & vbTab & "<p>Select the editor you will use for this field. Select default if you want to use the current system default.</p>" _
                                         & vbCrLf & vbTab & "<div class=""radioCon"">" & htmlDoc.html_GetFormInputRadioBox("setEditorPreference" & fieldId, "0", "0") & "&nbsp;Use Default Editor" & addonDefaultEditorName & "</div>" _
@@ -13181,389 +13167,384 @@ ErrorTrap:
                                         & vbCrLf & vbTab & "<button type=""button"" onclick=""" & OnClick & """>Select</button>" _
                                         & vbCrLf & vbTab & "</div>" _
                                         & ""
-                                Case AjaxGetDefaultAddonOptionString
-                                    '
-                                    ' return the addons defult AddonOption_String
-                                    ' used in wysiwyg editor - addons in select list have no defaultOption_String
-                                    ' because created it is expensive (lookuplists, etc). This is only called
-                                    ' when the addon is double-clicked in the editor after being dropped
-                                    '
-                                    Dim AddonGuid As String = docProperties.getText("guid")
-                                    '$$$$$ cache this
-                                    Dim CS As Integer = db.cs_open(cnAddons, "ccguid=" & db.encodeSQLText(AddonGuid))
-                                    Dim addonArgumentList As String = ""
-                                    Dim addonIsInline As Boolean = False
-                                    If db.cs_ok(CS) Then
-                                        addonArgumentList = db.cs_getText(CS, "argumentlist")
-                                        addonIsInline = db.cs_getBoolean(CS, "IsInline")
-                                        returnResult = main_GetDefaultAddonOption_String(addonArgumentList, AddonGuid, addonIsInline)
-                                    End If
-                                    Call db.cs_Close(CS)
-                                Case AjaxSetVisitProperty
-                                    '
-                                    ' 7/7/2009 - Moved from HardCodedPages - sets a visit property from the cj object
-                                    '
-                                    Dim ArgList As String = docProperties.getText("args")
-                                    Dim Args As String() = Split(ArgList, "&")
-                                    Dim gd As GoogleDataType = New GoogleDataType
-                                    gd.IsEmpty = True
-                                    For Ptr = 0 To UBound(Args)
-                                        Dim ArgNameValue As String() = Split(Args(Ptr), "=")
-                                        Dim PropertyName As String = ArgNameValue(0)
-                                        Dim PropertyValue As String = ""
-                                        If UBound(ArgNameValue) > 0 Then
-                                            PropertyValue = ArgNameValue(1)
+                                    Case AjaxGetDefaultAddonOptionString
+                                        '
+                                        ' return the addons defult AddonOption_String
+                                        ' used in wysiwyg editor - addons in select list have no defaultOption_String
+                                        ' because created it is expensive (lookuplists, etc). This is only called
+                                        ' when the addon is double-clicked in the editor after being dropped
+                                        '
+                                        Dim AddonGuid As String = docProperties.getText("guid")
+                                        '$$$$$ cache this
+                                        Dim CS As Integer = db.cs_open(cnAddons, "ccguid=" & db.encodeSQLText(AddonGuid))
+                                        Dim addonArgumentList As String = ""
+                                        Dim addonIsInline As Boolean = False
+                                        If db.cs_ok(CS) Then
+                                            addonArgumentList = db.cs_getText(CS, "argumentlist")
+                                            addonIsInline = db.cs_getBoolean(CS, "IsInline")
+                                            returnResult = main_GetDefaultAddonOption_String(addonArgumentList, AddonGuid, addonIsInline)
                                         End If
-                                        Call visitProperty.setProperty(PropertyName, PropertyValue)
-                                    Next
-                                    returnResult = main_FormatRemoteQueryOutput(gd, RemoteFormatEnum.RemoteFormatJsonNameValue)
-                                    returnResult = htmlDoc.main_encodeHTML(returnResult)
-                                    Call htmlDoc.writeAltBuffer(returnResult)
-                                Case AjaxGetVisitProperty
-                                    '
-                                    ' 7/7/2009 - Moved from HardCodedPages - sets a visit property from the cj object
-                                    '
-                                    Dim ArgList As String = docProperties.getText("args")
-                                    Dim Args As String() = Split(ArgList, "&")
-                                    Dim gd As GoogleDataType = New GoogleDataType
-                                    gd.IsEmpty = False
-                                    ReDim gd.row(0)
+                                        Call db.cs_Close(CS)
+                                    Case AjaxSetVisitProperty
+                                        '
+                                        ' 7/7/2009 - Moved from HardCodedPages - sets a visit property from the cj object
+                                        '
+                                        Dim ArgList As String = docProperties.getText("args")
+                                        Dim Args As String() = Split(ArgList, "&")
+                                        Dim gd As GoogleDataType = New GoogleDataType
+                                        gd.IsEmpty = True
+                                        For Ptr = 0 To UBound(Args)
+                                            Dim ArgNameValue As String() = Split(Args(Ptr), "=")
+                                            Dim PropertyName As String = ArgNameValue(0)
+                                            Dim PropertyValue As String = ""
+                                            If UBound(ArgNameValue) > 0 Then
+                                                PropertyValue = ArgNameValue(1)
+                                            End If
+                                            Call visitProperty.setProperty(PropertyName, PropertyValue)
+                                        Next
+                                        returnResult = main_FormatRemoteQueryOutput(gd, RemoteFormatEnum.RemoteFormatJsonNameValue)
+                                        returnResult = htmlDoc.main_encodeHTML(returnResult)
+                                        Call htmlDoc.writeAltBuffer(returnResult)
+                                    Case AjaxGetVisitProperty
+                                        '
+                                        ' 7/7/2009 - Moved from HardCodedPages - sets a visit property from the cj object
+                                        '
+                                        Dim ArgList As String = docProperties.getText("args")
+                                        Dim Args As String() = Split(ArgList, "&")
+                                        Dim gd As GoogleDataType = New GoogleDataType
+                                        gd.IsEmpty = False
+                                        ReDim gd.row(0)
 
-                                    For Ptr = 0 To UBound(Args)
-                                        ReDim Preserve gd.col(Ptr)
-                                        ReDim Preserve gd.row(0).Cell(Ptr)
-                                        Dim ArgNameValue As String() = Split(Args(Ptr), "=")
-                                        Dim PropertyName As String = ArgNameValue(0)
-                                        gd.col(Ptr).Id = PropertyName
-                                        gd.col(Ptr).Label = PropertyName
-                                        gd.col(Ptr).Type = "string"
-                                        Dim PropertyValue As String = ""
-                                        If UBound(ArgNameValue) > 0 Then
-                                            PropertyValue = ArgNameValue(1)
+                                        For Ptr = 0 To UBound(Args)
+                                            ReDim Preserve gd.col(Ptr)
+                                            ReDim Preserve gd.row(0).Cell(Ptr)
+                                            Dim ArgNameValue As String() = Split(Args(Ptr), "=")
+                                            Dim PropertyName As String = ArgNameValue(0)
+                                            gd.col(Ptr).Id = PropertyName
+                                            gd.col(Ptr).Label = PropertyName
+                                            gd.col(Ptr).Type = "string"
+                                            Dim PropertyValue As String = ""
+                                            If UBound(ArgNameValue) > 0 Then
+                                                PropertyValue = ArgNameValue(1)
+                                            End If
+                                            gd.row(0).Cell(Ptr).v = visitProperty.getText(PropertyName, PropertyValue)
+                                        Next
+                                        returnResult = main_FormatRemoteQueryOutput(gd, RemoteFormatEnum.RemoteFormatJsonNameValue)
+                                        returnResult = htmlDoc.main_encodeHTML(returnResult)
+                                        Call htmlDoc.writeAltBuffer(returnResult)
+                                    Case AjaxData
+                                        '
+                                        ' 7/7/2009 - Moved from HardCodedPages - Run remote query from cj.remote object call, and return results html encoded in a <result></result> block
+                                        ' 20050427 - not used
+                                        Call htmlDoc.writeAltBuffer(init_ProcessAjaxData())
+                                    Case AjaxPing
+                                        '
+                                        ' returns OK if the server is alive
+                                        '
+                                        returnResult = "ok"
+                                    Case AjaxOpenIndexFilter
+                                        Call visitProperty.setProperty("IndexFilterOpen", "1")
+                                    Case AjaxOpenIndexFilterGetContent
+                                        '
+                                        ' should be converted to adminClass remoteMethod
+                                        '
+                                        Call visitProperty.setProperty("IndexFilterOpen", "1")
+                                        Dim adminSite As New Contensive.Addons.addon_AdminSiteClass(cp_forAddonExecutionOnly)
+                                        Dim ContentID As Integer = docProperties.getInteger("cid")
+                                        If ContentID = 0 Then
+                                            returnResult = "No filter is available"
+                                        Else
+                                            Dim cdef As coreMetaDataClass.CDefClass = metaData.getCdef(ContentID)
+                                            returnResult = adminSite.GetForm_IndexFilterContent(cdef)
                                         End If
-                                        gd.row(0).Cell(Ptr).v = visitProperty.getText(PropertyName, PropertyValue)
-                                    Next
-                                    returnResult = main_FormatRemoteQueryOutput(gd, RemoteFormatEnum.RemoteFormatJsonNameValue)
-                                    returnResult = htmlDoc.main_encodeHTML(returnResult)
-                                    Call htmlDoc.writeAltBuffer(returnResult)
-                                Case AjaxData
-                                    '
-                                    ' 7/7/2009 - Moved from HardCodedPages - Run remote query from cj.remote object call, and return results html encoded in a <result></result> block
-                                    ' 20050427 - not used
-                                    Call htmlDoc.writeAltBuffer(init_ProcessAjaxData())
-                                Case AjaxPing
-                                    '
-                                    ' returns OK if the server is alive
-                                    '
-                                    returnResult = "ok"
-                                Case AjaxOpenIndexFilter
-                                    Call visitProperty.setProperty("IndexFilterOpen", "1")
-                                Case AjaxOpenIndexFilterGetContent
-                                    '
-                                    ' should be converted to adminClass remoteMethod
-                                    '
-                                    Call visitProperty.setProperty("IndexFilterOpen", "1")
-                                    Dim adminSite As New Contensive.Addons.addon_AdminSiteClass(cp_forAddonExecutionOnly)
-                                    Dim ContentID As Integer = docProperties.getInteger("cid")
-                                    If ContentID = 0 Then
-                                        returnResult = "No filter is available"
-                                    Else
-                                        Dim cdef As coreMetaDataClass.CDefClass = metaData.getCdef(ContentID)
-                                        returnResult = adminSite.GetForm_IndexFilterContent(cdef)
-                                    End If
-                                    adminSite = Nothing
-                                Case AjaxCloseIndexFilter
-                                    Call visitProperty.setProperty("IndexFilterOpen", "0")
-                                Case AjaxOpenAdminNav
-                                    Call visitProperty.setProperty("AdminNavOpen", "1")
-                                Case Else
-                            End Select
-                            '
-                            'Call AppendLog("main_init(), 2810 - exit for ajax hook")
-                            '
-                            webServer.webServerIO_BlockClosePageCopyright = True
-                            html_BlockClosePageLink = True
-                            'Call AppendLog("call main_getEndOfBody, from main_initf")
-                            returnResult = returnResult & htmlDoc.html_GetEndOfBody(False, False, True, False)
-                            Call htmlDoc.writeAltBuffer(returnResult)
-                            docOpen = False '--- should be disposed by caller --- Call dispose
-                            Return htmlDoc.docBuffer
-                        End If
-                    End If
-                    '
-                    '--------------------------------------------------------------------------
-                    '   Process Email Open and Click Intercepts
-                    '   works with DropID -> spacer.gif, or DropCssID -> styles.css
-                    '--------------------------------------------------------------------------
-                    '
-                    If True Then
-                        Dim recordid As Integer
-                        Dim emailDropId As Integer
-                        Dim RedirectLink As String
-                        Dim EmailMemberID As Integer
-                        Dim CSLog As Integer
-                        Dim EmailSpamBlock As String
-                        recordid = 0
-                        emailDropId = docProperties.getInteger(RequestNameEmailOpenFlag)
-                        If emailDropId <> 0 Then
-                            recordid = emailDropId
-                        End If
-                        '    End If
-                        If (recordid <> 0) Then
-                            '
-                            ' ----- Email open detected. Log it and redirect to a 1x1 spacer
-                            '
-                            EmailMemberID = docProperties.getInteger(RequestNameEmailMemberID)
-                            CSLog = db.cs_insertRecord("Email Log")
-                            If db.cs_ok(CSLog) Then
-                                Call db.cs_set(CSLog, "Name", "Opened " & CStr(app_startTime))
-                                Call db.cs_set(CSLog, "EmailDropID", recordid)
-                                Call db.cs_set(CSLog, "MemberID", EmailMemberID)
-                                Call db.cs_set(CSLog, "LogType", EmailLogTypeOpen)
+                                        adminSite = Nothing
+                                    Case AjaxCloseIndexFilter
+                                        Call visitProperty.setProperty("IndexFilterOpen", "0")
+                                    Case AjaxOpenAdminNav
+                                        Call visitProperty.setProperty("AdminNavOpen", "1")
+                                    Case Else
+                                End Select
+                                '
+                                'Call AppendLog("main_init(), 2810 - exit for ajax hook")
+                                '
+                                webServer.webServerIO_BlockClosePageCopyright = True
+                                html_BlockClosePageLink = True
+                                'Call AppendLog("call main_getEndOfBody, from main_initf")
+                                returnResult = returnResult & htmlDoc.html_GetEndOfBody(False, False, True, False)
+                                Call htmlDoc.writeAltBuffer(returnResult)
+                                docOpen = False '--- should be disposed by caller --- Call dispose
+                                Return htmlDoc.docBuffer
                             End If
-                            Call db.cs_Close(CSLog)
-                            RedirectLink = webServer.webServerIO_requestProtocol & webServer.requestDomain & "/ccLib/images/spacer.gif"
-                            Call webServer.webServerIO_Redirect2(RedirectLink, "Group Email Open hit, redirecting to a dummy image", False)
                         End If
                         '
-                        emailDropId = docProperties.getInteger(RequestNameEmailClickFlag)
-                        EmailSpamBlock = docProperties.getText(RequestNameEmailSpamFlag)
-                        If (emailDropId <> 0) And (EmailSpamBlock = "") Then
-                            '
-                            ' ----- Email click detected. Log it.
-                            '
-                            EmailMemberID = docProperties.getInteger(RequestNameEmailMemberID)
-                            CSLog = db.cs_insertRecord("Email Log")
-                            If db.cs_ok(CSLog) Then
-                                Call db.cs_set(CSLog, "Name", "Clicked " & CStr(app_startTime))
-                                Call db.cs_set(CSLog, "EmailDropID", emailDropId)
-                                Call db.cs_set(CSLog, "MemberID", EmailMemberID)
-                                Call db.cs_set(CSLog, "VisitId", authContext.visit.ID)
-                                Call db.cs_set(CSLog, "LogType", EmailLogTypeClick)
-                            End If
-                            Call db.cs_Close(CSLog)
-                        End If
-                        If EmailSpamBlock <> "" Then
-                            '
-                            ' ----- Email spam footer was clicked, clear the AllowBulkEmail field
-                            '
-                            Call email.addToBlockList(EmailSpamBlock)
-                            '
-                            CSLog = db.cs_open("people", "email=" & db.encodeSQLText(EmailSpamBlock), , , , , , "AllowBulkEmail")
-                            Do While db.cs_ok(CSLog)
-                                Call db.cs_set(CSLog, "AllowBulkEmail", False)
-                                Call db.cs_goNext(CSLog)
-                            Loop
-                            Call db.cs_Close(CSLog)
-                            '
-                            ' ----- Make a log entry to track the result of this email drop
-                            '
-                            emailDropId = docProperties.getInteger(RequestNameEmailBlockRequestDropID)
+                        '--------------------------------------------------------------------------
+                        '   Process Email Open and Click Intercepts
+                        '   works with DropID -> spacer.gif, or DropCssID -> styles.css
+                        '--------------------------------------------------------------------------
+                        '
+                        If True Then
+                            Dim recordid As Integer
+                            Dim emailDropId As Integer
+                            Dim RedirectLink As String
+                            Dim EmailMemberID As Integer
+                            Dim CSLog As Integer
+                            Dim EmailSpamBlock As String
+                            recordid = 0
+                            emailDropId = docProperties.getInteger(RequestNameEmailOpenFlag)
                             If emailDropId <> 0 Then
+                                recordid = emailDropId
+                            End If
+                            '    End If
+                            If (recordid <> 0) Then
+                                '
+                                ' ----- Email open detected. Log it and redirect to a 1x1 spacer
+                                '
+                                EmailMemberID = docProperties.getInteger(RequestNameEmailMemberID)
+                                CSLog = db.cs_insertRecord("Email Log")
+                                If db.cs_ok(CSLog) Then
+                                    Call db.cs_set(CSLog, "Name", "Opened " & CStr(app_startTime))
+                                    Call db.cs_set(CSLog, "EmailDropID", recordid)
+                                    Call db.cs_set(CSLog, "MemberID", EmailMemberID)
+                                    Call db.cs_set(CSLog, "LogType", EmailLogTypeOpen)
+                                End If
+                                Call db.cs_Close(CSLog)
+                                RedirectLink = webServer.webServerIO_requestProtocol & webServer.requestDomain & "/ccLib/images/spacer.gif"
+                                Call webServer.webServerIO_Redirect2(RedirectLink, "Group Email Open hit, redirecting to a dummy image", False)
+                            End If
+                            '
+                            emailDropId = docProperties.getInteger(RequestNameEmailClickFlag)
+                            EmailSpamBlock = docProperties.getText(RequestNameEmailSpamFlag)
+                            If (emailDropId <> 0) And (EmailSpamBlock = "") Then
                                 '
                                 ' ----- Email click detected. Log it.
                                 '
                                 EmailMemberID = docProperties.getInteger(RequestNameEmailMemberID)
                                 CSLog = db.cs_insertRecord("Email Log")
                                 If db.cs_ok(CSLog) Then
-                                    Call db.cs_set(CSLog, "Name", "Email Block Request " & CStr(app_startTime))
+                                    Call db.cs_set(CSLog, "Name", "Clicked " & CStr(app_startTime))
                                     Call db.cs_set(CSLog, "EmailDropID", emailDropId)
                                     Call db.cs_set(CSLog, "MemberID", EmailMemberID)
                                     Call db.cs_set(CSLog, "VisitId", authContext.visit.ID)
-                                    Call db.cs_set(CSLog, "LogType", EmailLogTypeBlockRequest)
+                                    Call db.cs_set(CSLog, "LogType", EmailLogTypeClick)
                                 End If
                                 Call db.cs_Close(CSLog)
                             End If
-                            Call webServer.webServerIO_Redirect2(webServer.webServerIO_requestProtocol & webServer.requestDomain & "/ccLib/popup/EmailBlocked.htm", "Group Email Spam Block hit. Redirecting to EmailBlocked page.", False)
-                        End If
-                    End If
-                    '
-                    '--------------------------------------------------------------------------
-                    '   Process Intercept Pages
-                    '       must be before main_Get Intercept Pages
-                    '       must be before path block, so a login will main_Get you through
-                    '       must be before verbose check, so a change is reflected on this page
-                    '--------------------------------------------------------------------------
-                    '
-                    If True Then
-                        Dim formType As String
-                        Dim StyleSN As Integer
-                        formType = docProperties.getText("type")
-                        If (formType <> "") Then
-                            '
-                            ' set the meta content flag to show it is not needed for the head tag
-                            '
-                            Call main_SetMetaContent(0, 0)
-                            Select Case formType
-                                Case FormTypeSiteStyleEditor
-                                    If authContext.isAuthenticated() And authContext.isAuthenticatedAdmin(Me) Then
-                                        '
-                                        ' Save the site sites
-                                        '
-                                        Call appRootFiles.saveFile(DynamicStylesFilename, docProperties.getText("SiteStyles"))
-                                        If docProperties.getBoolean(RequestNameInlineStyles) Then
-                                            '
-                                            ' Inline Styles
-                                            '
-                                            Call siteProperties.setProperty("StylesheetSerialNumber", "0")
-                                        Else
-                                            '
-                                            ' Linked Styles
-                                            ' Bump the Style Serial Number so next fetch is not cached
-                                            '
-                                            StyleSN = siteProperties.getinteger("StylesheetSerialNumber", 0)
-                                            StyleSN = StyleSN + 1
-                                            Call siteProperties.setProperty("StylesheetSerialNumber", genericController.encodeText(StyleSN))
-                                            '
-                                            ' Save new public stylesheet
-                                            '
-                                            Call appRootFiles.saveFile("templates\Public" & StyleSN & ".css", pageManager.pageManager_GetStyleSheet)
-                                            Call appRootFiles.saveFile("templates\Admin" & StyleSN & ".css", pageManager.pageManager_GetStyleSheetDefault)
-                                        End If
+                            If EmailSpamBlock <> "" Then
+                                '
+                                ' ----- Email spam footer was clicked, clear the AllowBulkEmail field
+                                '
+                                Call email.addToBlockList(EmailSpamBlock)
+                                '
+                                CSLog = db.cs_open("people", "email=" & db.encodeSQLText(EmailSpamBlock), , , , , , "AllowBulkEmail")
+                                Do While db.cs_ok(CSLog)
+                                    Call db.cs_set(CSLog, "AllowBulkEmail", False)
+                                    Call db.cs_goNext(CSLog)
+                                Loop
+                                Call db.cs_Close(CSLog)
+                                '
+                                ' ----- Make a log entry to track the result of this email drop
+                                '
+                                emailDropId = docProperties.getInteger(RequestNameEmailBlockRequestDropID)
+                                If emailDropId <> 0 Then
+                                    '
+                                    ' ----- Email click detected. Log it.
+                                    '
+                                    EmailMemberID = docProperties.getInteger(RequestNameEmailMemberID)
+                                    CSLog = db.cs_insertRecord("Email Log")
+                                    If db.cs_ok(CSLog) Then
+                                        Call db.cs_set(CSLog, "Name", "Email Block Request " & CStr(app_startTime))
+                                        Call db.cs_set(CSLog, "EmailDropID", emailDropId)
+                                        Call db.cs_set(CSLog, "MemberID", EmailMemberID)
+                                        Call db.cs_set(CSLog, "VisitId", authContext.visit.ID)
+                                        Call db.cs_set(CSLog, "LogType", EmailLogTypeBlockRequest)
                                     End If
-                                Case FormTypeAddonStyleEditor
-                                    '
-                                    ' save custom styles
-                                    '
-                                    If authContext.isAuthenticated() And authContext.isAuthenticatedAdmin(Me) Then
-                                        Dim addonId As Integer
-                                        Dim contentName As String = ""
-                                        Dim tableName As String
-                                        Dim nothingObject As Object = Nothing
-                                        Dim cs As Integer
-                                        addonId = docProperties.getInteger("AddonID")
-                                        cs = csOpen(cnAddons, addonId)
-                                        If db.cs_ok(cs) Then
-                                            Call db.cs_set(cs, "CustomStylesFilename", docProperties.getText("CustomStyles"))
-                                        End If
-                                        Call db.cs_Close(cs)
-                                        '
-                                        ' Clear Caches
-                                        '
-                                        Call pageManager.pageManager_cache_pageContent_clear()
-                                        Call pageManager.pageManager_cache_pageTemplate_clear()
-                                        Call pageManager.pageManager_cache_siteSection_clear()
-                                        Call cache.invalidateObjectList("")
-                                        If contentName <> "" Then
-                                            Call cache.invalidateObjectList(contentName)
-                                            tableName = GetContentTablename(contentName)
-                                            If genericController.vbLCase(tableName) = "cctemplates" Then
-                                                Call cache.setObject(pageManagerController.pageManager_cache_pageTemplate_cacheName, nothingObject)
-                                                Call pageManager.pageManager_cache_pageTemplate_load()
+                                    Call db.cs_Close(CSLog)
+                                End If
+                                Call webServer.webServerIO_Redirect2(webServer.webServerIO_requestProtocol & webServer.requestDomain & "/ccLib/popup/EmailBlocked.htm", "Group Email Spam Block hit. Redirecting to EmailBlocked page.", False)
+                            End If
+                        End If
+                        '
+                        '--------------------------------------------------------------------------
+                        '   Process Intercept Pages
+                        '       must be before main_Get Intercept Pages
+                        '       must be before path block, so a login will main_Get you through
+                        '       must be before verbose check, so a change is reflected on this page
+                        '--------------------------------------------------------------------------
+                        '
+                        If True Then
+                            Dim formType As String
+                            Dim StyleSN As Integer
+                            formType = docProperties.getText("type")
+                            If (formType <> "") Then
+                                '
+                                ' set the meta content flag to show it is not needed for the head tag
+                                '
+                                Call main_SetMetaContent(0, 0)
+                                Select Case formType
+                                    Case FormTypeSiteStyleEditor
+                                        If authContext.isAuthenticated() And authContext.isAuthenticatedAdmin(Me) Then
+                                            '
+                                            ' Save the site sites
+                                            '
+                                            Call appRootFiles.saveFile(DynamicStylesFilename, docProperties.getText("SiteStyles"))
+                                            If docProperties.getBoolean(RequestNameInlineStyles) Then
+                                                '
+                                                ' Inline Styles
+                                                '
+                                                Call siteProperties.setProperty("StylesheetSerialNumber", "0")
+                                            Else
+                                                '
+                                                ' Linked Styles
+                                                ' Bump the Style Serial Number so next fetch is not cached
+                                                '
+                                                StyleSN = siteProperties.getinteger("StylesheetSerialNumber", 0)
+                                                StyleSN = StyleSN + 1
+                                                Call siteProperties.setProperty("StylesheetSerialNumber", genericController.encodeText(StyleSN))
+                                                '
+                                                ' Save new public stylesheet
+                                                '
+                                                Call appRootFiles.saveFile("templates\Public" & StyleSN & ".css", pageManager.pageManager_GetStyleSheet)
+                                                Call appRootFiles.saveFile("templates\Admin" & StyleSN & ".css", pageManager.pageManager_GetStyleSheetDefault)
                                             End If
                                         End If
-                                    End If
-                                Case FormTypeAddonSettingsEditor
-                                    '
-                                    '
-                                    '
-                                    Call htmlDoc.pageManager_ProcessAddonSettingsEditor()
-                                Case FormTypeHelpBubbleEditor
-                                    '
-                                    '
-                                    '
-                                    Call htmlDoc.main_ProcessHelpBubbleEditor()
-                                Case FormTypeJoin
-                                    '
-                                    '
-                                    '
-                                    Call htmlDoc.processFormJoin()
-                                Case FormTypeSendPassword
-                                    '
-                                    '
-                                    '
-                                    Call htmlDoc.processFormSendPassword()
-                                Case FormTypeLogin, "l09H58a195"
-                                    '
-                                    '
-                                    '
-                                    Call htmlDoc.processFormLoginDefault()
-                                Case FormTypeToolsPanel
-                                    '
-                                    ' ----- Administrator Tools Panel
-                                    '
-                                    Call htmlDoc.pageManager_ProcessFormToolsPanel()
-                                Case FormTypePageAuthoring
-                                    '
-                                    ' ----- Page Authoring Tools Panel
-                                    '
-                                    Call pageManager.pageManager_ProcessFormQuickEditing()
-                                Case FormTypeActiveEditor
-                                    '
-                                    ' ----- Active Editor
-                                    '
-                                    Call main_ProcessActiveEditor()
-                            End Select
+                                    Case FormTypeAddonStyleEditor
+                                        '
+                                        ' save custom styles
+                                        '
+                                        If authContext.isAuthenticated() And authContext.isAuthenticatedAdmin(Me) Then
+                                            Dim addonId As Integer
+                                            Dim contentName As String = ""
+                                            Dim tableName As String
+                                            Dim nothingObject As Object = Nothing
+                                            Dim cs As Integer
+                                            addonId = docProperties.getInteger("AddonID")
+                                            cs = csOpen(cnAddons, addonId)
+                                            If db.cs_ok(cs) Then
+                                                Call db.cs_set(cs, "CustomStylesFilename", docProperties.getText("CustomStyles"))
+                                            End If
+                                            Call db.cs_Close(cs)
+                                            '
+                                            ' Clear Caches
+                                            '
+                                            Call pageManager.pageManager_cache_pageContent_clear()
+                                            Call pageManager.pageManager_cache_pageTemplate_clear()
+                                            Call pageManager.pageManager_cache_siteSection_clear()
+                                            Call cache.invalidateObjectList("")
+                                            If contentName <> "" Then
+                                                Call cache.invalidateObjectList(contentName)
+                                                tableName = GetContentTablename(contentName)
+                                                If genericController.vbLCase(tableName) = "cctemplates" Then
+                                                    Call cache.setObject(pageManagerController.pageManager_cache_pageTemplate_cacheName, nothingObject)
+                                                    Call pageManager.pageManager_cache_pageTemplate_load()
+                                                End If
+                                            End If
+                                        End If
+                                    Case FormTypeAddonSettingsEditor
+                                        '
+                                        '
+                                        '
+                                        Call htmlDoc.pageManager_ProcessAddonSettingsEditor()
+                                    Case FormTypeHelpBubbleEditor
+                                        '
+                                        '
+                                        '
+                                        Call htmlDoc.main_ProcessHelpBubbleEditor()
+                                    Case FormTypeJoin
+                                        '
+                                        '
+                                        '
+                                        Call htmlDoc.processFormJoin()
+                                    Case FormTypeSendPassword
+                                        '
+                                        '
+                                        '
+                                        Call htmlDoc.processFormSendPassword()
+                                    Case FormTypeLogin, "l09H58a195"
+                                        '
+                                        '
+                                        '
+                                        Call htmlDoc.processFormLoginDefault()
+                                    Case FormTypeToolsPanel
+                                        '
+                                        ' ----- Administrator Tools Panel
+                                        '
+                                        Call htmlDoc.pageManager_ProcessFormToolsPanel()
+                                    Case FormTypePageAuthoring
+                                        '
+                                        ' ----- Page Authoring Tools Panel
+                                        '
+                                        Call pageManager.pageManager_ProcessFormQuickEditing()
+                                    Case FormTypeActiveEditor
+                                        '
+                                        ' ----- Active Editor
+                                        '
+                                        Call main_ProcessActiveEditor()
+                                End Select
+                            End If
                         End If
-                    End If
-                    '
-                    '--------------------------------------------------------------------------
-                    ' Process HardCoded Methods
-                    ' must go after form processing bc some of these pages have forms that are processed
-                    '--------------------------------------------------------------------------
-                    '
-                    Dim HardCodedPage As String
-                    HardCodedPage = docProperties.getText(RequestNameHardCodedPage)
-                    If (HardCodedPage <> "") Then
                         '
-                        'Call AppendLog("main_init(), 3110 - exit for hardcodedpage hook")
+                        '--------------------------------------------------------------------------
+                        ' Process HardCoded Methods
+                        ' must go after form processing bc some of these pages have forms that are processed
+                        '--------------------------------------------------------------------------
                         '
-                        Dim ExitNow As Boolean = executeRoute_hardCodedPage(HardCodedPage)
-                        If ExitNow Then
-                            docOpen = False '--- should be disposed by caller --- Call dispose
-                            Return htmlDoc.docBuffer
+                        Dim HardCodedPage As String
+                        HardCodedPage = docProperties.getText(RequestNameHardCodedPage)
+                        If (HardCodedPage <> "") Then
+                            '
+                            'Call AppendLog("main_init(), 3110 - exit for hardcodedpage hook")
+                            '
+                            Dim ExitNow As Boolean = executeRoute_hardCodedPage(HardCodedPage)
+                            If ExitNow Then
+                                docOpen = False '--- should be disposed by caller --- Call dispose
+                                Return htmlDoc.docBuffer
+                            End If
                         End If
-                    End If
-                    '
-                    '--------------------------------------------------------------------------
-                    ' normalize adminRoute and test for hit
-                    '--------------------------------------------------------------------------
-                    '
-                    If (workingRoute = genericController.normalizeRoute(adminRoute)) Then
-                        '
-                        'debugLog("executeRoute, route is admin")
                         '
                         '--------------------------------------------------------------------------
-                        ' route is admin
-                        '   If the Then admin route Is taken -- the login panel processing Is bypassed. those methods need To be a different kind Of route, Or it should be an addon
-                        '   runAtServerClass in the admin addon.
+                        ' normalize adminRoute and test for hit
                         '--------------------------------------------------------------------------
                         '
-                        Dim returnStatusOK As Boolean = False
-                        '
-                        ' REFACTOR -- when admin code is broken cleanly into an addon, run it through execute
-                        '
-                        'returnResult = executeAddon(0, adminSiteAddonGuid, "", CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "", False, 0, "", returnStatusOK, Nothing, "", Nothing, "", authcontext.user.userid, visit.visitAuthenticated)
-                        '
-                        ' until then, run it as an internal class
-                        '
-                        Dim admin As New Contensive.Addons.addon_AdminSiteClass()
-                        returnResult = admin.execute(cp_forAddonExecutionOnly).ToString()
-                    Else
-                        '--------------------------------------------------------------------------
-                        ' default routing addon takes what is left
-                        '
-                        ' Here was read a site property set to the default addon. Might be performanceCloud-type web application. Might be page-manager
-                        '
-                        '--------------------------------------------------------------------------
-                        '
-                        'debugLog("executeRoute, route is Default Route AddonId")
-                        '
-                        Dim defaultAddonId As Integer = siteProperties.getinteger("Default Route AddonId")
-                        If defaultAddonId <> 0 Then
-                            Dim addonStatusOk As Boolean = False
-                            returnResult = addon.execute(defaultAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", addonStatusOk, Nothing, "", Nothing, "", authContext.user.ID, authContext.visit.VisitAuthenticated)
+                        If (workingRoute = genericController.normalizeRoute(adminRoute)) Then
+                            '
+                            'debugLog("executeRoute, route is admin")
+                            '
+                            '--------------------------------------------------------------------------
+                            ' route is admin
+                            '   If the Then admin route Is taken -- the login panel processing Is bypassed. those methods need To be a different kind Of route, Or it should be an addon
+                            '   runAtServerClass in the admin addon.
+                            '--------------------------------------------------------------------------
+                            '
+                            Dim returnStatusOK As Boolean = False
+                            '
+                            ' REFACTOR -- when admin code is broken cleanly into an addon, run it through execute
+                            '
+                            'returnResult = executeAddon(0, adminSiteAddonGuid, "", CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "", False, 0, "", returnStatusOK, Nothing, "", Nothing, "", authcontext.user.userid, visit.visitAuthenticated)
+                            '
+                            ' until then, run it as an internal class
+                            '
+                            Dim admin As New Contensive.Addons.addon_AdminSiteClass()
+                            returnResult = admin.execute(cp_forAddonExecutionOnly).ToString()
+                        Else
+                            '--------------------------------------------------------------------------
+                            ' default routing addon takes what is left
+                            '
+                            ' Here was read a site property set to the default addon. Might be performanceCloud-type web application. Might be page-manager
+                            '
+                            '--------------------------------------------------------------------------
+                            '
+                            'debugLog("executeRoute, route is Default Route AddonId")
+                            '
+                            Dim defaultAddonId As Integer = siteProperties.getinteger("Default Route AddonId")
+                            If defaultAddonId <> 0 Then
+                                Dim addonStatusOk As Boolean = False
+                                returnResult = addon.execute(defaultAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", addonStatusOk, Nothing, "", Nothing, "", authContext.user.ID, authContext.visit.VisitAuthenticated)
+                            End If
+                            'returnResult = addonToBe_pageManager()
                         End If
-                        'returnResult = addonToBe_pageManager()
                     End If
                 End If
-                '
-                'debugLog("executeRoute, exit")
-                '
             Catch ex As Exception
-                '
-                'debugLog("executeRoute, exception")
-                '
                 handleExceptionLegacyRow2(ex, "cpCoreClass", System.Reflection.MethodInfo.GetCurrentMethod.Name, "Unexpected Exception")
             End Try
             Return returnResult

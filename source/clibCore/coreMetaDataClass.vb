@@ -2,6 +2,9 @@
 Option Explicit On
 Option Strict On
 
+Imports Contensive.Core.Models
+Imports Contensive.Core.Models.Entity
+Imports Contensive.Core.Models.Context
 Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
 
@@ -2735,7 +2738,7 @@ ErrorTrap:
         '       called from upgrade and DeveloperTools
         '========================================================================
         '
-        Public Function metaData_CreateContent4(ByVal Active As Boolean, ByVal DataSourceName As String, ByVal TableName As String, ByVal contentName As String, Optional ByVal AdminOnly As Boolean = False, Optional ByVal DeveloperOnly As Boolean = False, Optional ByVal AllowAdd As Boolean = True, Optional ByVal AllowDelete As Boolean = True, Optional ByVal ParentName As String = "", Optional ByVal DefaultSortMethod As String = "", Optional ByVal DropDownFieldList As String = "", Optional ByVal AllowWorkflowAuthoring As Boolean = False, Optional ByVal AllowCalendarEvents As Boolean = False, Optional ByVal AllowContentTracking As Boolean = False, Optional ByVal AllowTopicRules As Boolean = False, Optional ByVal AllowContentChildTool As Boolean = False, Optional ByVal AllowMetaContent As Boolean = False, Optional ByVal IconLink As String = "", Optional ByVal IconWidth As Integer = 0, Optional ByVal IconHeight As Integer = 0, Optional ByVal IconSprites As Integer = 0, Optional ByVal ccGuid As String = "", Optional ByVal IsBaseContent As Boolean = False, Optional ByVal installedByCollectionGuid As String = "", Optional clearMetaCache As Boolean = False) As Integer
+        Public Function metaData_CreateContent4(ByVal Active As Boolean, datasource As datasourceModel, ByVal TableName As String, ByVal contentName As String, Optional ByVal AdminOnly As Boolean = False, Optional ByVal DeveloperOnly As Boolean = False, Optional ByVal AllowAdd As Boolean = True, Optional ByVal AllowDelete As Boolean = True, Optional ByVal ParentName As String = "", Optional ByVal DefaultSortMethod As String = "", Optional ByVal DropDownFieldList As String = "", Optional ByVal AllowWorkflowAuthoring As Boolean = False, Optional ByVal AllowCalendarEvents As Boolean = False, Optional ByVal AllowContentTracking As Boolean = False, Optional ByVal AllowTopicRules As Boolean = False, Optional ByVal AllowContentChildTool As Boolean = False, Optional ByVal AllowMetaContent As Boolean = False, Optional ByVal IconLink As String = "", Optional ByVal IconWidth As Integer = 0, Optional ByVal IconHeight As Integer = 0, Optional ByVal IconSprites As Integer = 0, Optional ByVal ccGuid As String = "", Optional ByVal IsBaseContent As Boolean = False, Optional ByVal installedByCollectionGuid As String = "", Optional clearMetaCache As Boolean = False) As Integer
             Dim returnContentId As Integer = 0
             Try
                 '
@@ -2747,7 +2750,7 @@ ErrorTrap:
                 Dim parentId As Integer
                 Dim dt As DataTable
                 Dim TableID As Integer
-                Dim DataSourceID As Integer
+                'Dim DataSourceID As Integer
                 Dim iDefaultSortMethod As String
                 Dim DefaultSortMethodID As Integer
                 Dim CDefFound As Boolean
@@ -2766,7 +2769,7 @@ ErrorTrap:
                         '
                         ' Create the SQL table
                         '
-                        Call cpCore.db.createSQLTable(DataSourceName, TableName)
+                        Call cpCore.db.createSQLTable(datasource.Name, TableName)
                         '
                         ' Check for a Content Definition
                         '
@@ -2843,22 +2846,22 @@ ErrorTrap:
                                 '
                                 ' ----- no table definition found, create one
                                 '
-                                If genericController.vbUCase(DataSourceName) = "DEFAULT" Then
-                                    DataSourceID = -1
-                                ElseIf DataSourceName = "" Then
-                                    DataSourceID = -1
-                                Else
-                                    DataSourceID = cpCore.db.getDataSourceId(DataSourceName)
-                                    If DataSourceID = -1 Then
-                                        Call cpCore.handleExceptionAndRethrow(New ApplicationException("Could not find DataSource [" & DataSourceName & "] for table [" & TableName & "]"))
-                                    End If
-                                End If
+                                'If genericController.vbUCase(DataSourceName) = "DEFAULT" Then
+                                '    DataSourceID = -1
+                                'ElseIf DataSourceName = "" Then
+                                '    DataSourceID = -1
+                                'Else
+                                '    DataSourceID = cpCore.db.getDataSourceId(DataSourceName)
+                                '    If DataSourceID = -1 Then
+                                '        Call cpCore.handleExceptionAndRethrow(New ApplicationException("Could not find DataSource [" & DataSourceName & "] for table [" & TableName & "]"))
+                                '    End If
+                                'End If
                                 TableID = cpCore.db.insertTableRecordGetId("Default", "ccTables", SystemMemberID)
                                 '
                                 sqlList = New sqlFieldListClass
                                 sqlList.add("name", cpCore.db.encodeSQLText(TableName))
                                 sqlList.add("active", SQLTrue)
-                                sqlList.add("DATASOURCEID", cpCore.db.encodeSQLNumber(DataSourceID))
+                                sqlList.add("DATASOURCEID", cpCore.db.encodeSQLNumber(datasource.ID))
                                 sqlList.add("CONTENTCONTROLID", cpCore.db.encodeSQLNumber(cpCore.db.getContentId("Tables")))
                                 '
                                 Call cpCore.db.updateTableRecord("Default", "ccTables", "ID=" & TableID, sqlList)

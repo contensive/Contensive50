@@ -9,7 +9,23 @@ Namespace Contensive.Core.Controllers
     '
     '====================================================================================================
     ''' <summary>
-    ''' Interface to cache systems
+    ''' Interface to cache systems. Cache objects are saved to dotnet cache, remotecache, filecache. 
+    ''' 
+    ''' When a record is saved in admin, an invalidation call is made for tableName+1d.
+    ''' 
+    ''' If code edits a db record, you should call invalidation for tablename+id
+    ''' 
+    ''' one-to-many lists: if the list is cached, it has to include tags for all its included members
+    ''' 
+    ''' many-to-many lists: should have a model for the rule table, and lists should come from methods there. the delete method must invalidate the rule model cache
+    ''' 
+    ''' A cacheobject has:
+    '''   cacheName - if the object is a model of a database record, and there is only one model for that db record, use tableName+id as the cacheName. If it contains other data,
+    '''     use the modelName+id as the cacheName, and include all records in the dependentObjectList.
+    '''   primaryObjectKey -- a secondary cacheObject does not hold data, just a pointer to a primary object. For example, if you use both id and guid to reference objects,
+    '''     save the data in the primary cacheObject (tableName+id) and save a secondary cacheObject (tablename+guid). Sve both when you update the cacheObject. requesting either
+    '''     or invalidating either will effect the primary cache
+    '''   dependentObjectList -- if a cacheobject contains data from multiple sources, each source should be included in the dependencyList. This includes both cached models and Db records.
     ''' </summary>
     Public Class cacheController
         Implements IDisposable
@@ -29,6 +45,19 @@ Namespace Contensive.Core.Controllers
         ' ----- private instance storage
         '
         Private remoteCacheDisabled As Boolean
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' cache data wrapper to include tags and save datetime
+        ''' </summary>
+        <Serializable()>
+        Public Class cacheObjectClass
+            Public primaryObjectKey As String                       ' if populated, all other properties are ignored and the primary tag b
+            Public dependantObjectList As New List(Of String)       ' this object is invalidated if any of these objects are invalidated
+            Public saveDate As Date                                 ' the date this object was last saved.
+            Public invalidationDate As Date                         ' the future date when this object self-invalidates
+            Public data As Object                                   ' the data storage
+        End Class
         '
         '====================================================================================================
         ''' <summary>
@@ -54,19 +83,6 @@ Namespace Contensive.Core.Controllers
             End Get
         End Property
         Private _globalInvalidationDate As Date?
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' cache data wrapper to include tags and save datetime
-        ''' </summary>
-        <Serializable()>
-        Public Class cacheObjectClass
-            Public primaryObjectKey As String                       ' if populated, all other properties are ignored and the primary tag b
-            Public dependantObjectList As New List(Of String)       ' this object is invalidated if any of these objects are invalidated
-            Public saveDate As Date                                 ' the date this object was last saved.
-            Public invalidationDate As Date                         ' the future date when this object self-invalidates
-            Public data As Object                                   ' the data storage
-        End Class
         '
         '====================================================================================================
         ''' <summary>
@@ -476,6 +492,30 @@ Namespace Contensive.Core.Controllers
                         .saveDate = DateTime.Now(),
                         .invalidationDate = Now.AddDays(invalidationDaysDefault),
                         .dependantObjectList = dependantObjectList
+                    }
+                    setCacheObject(cacheName, cacheObject)
+                End If
+            Catch ex As Exception
+                cpCore.handleExceptionAndContinue(ex)
+            End Try
+        End Sub
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' save a secondary cache entry. Contains no data, just a reference to the primary cache where the data is stored
+        ''' </summary>
+        ''' <param name="CP"></param>
+        ''' <param name="cacheName"></param>
+        ''' <param name="data"></param>
+        ''' <param name="dependantObject"></param>
+        ''' <remarks></remarks>
+        Public Sub setSecondaryObject(cacheName As String, primaryCacheName As String)
+            Try
+                If allowCache Then
+                    Dim cacheObject As New cacheObjectClass With {
+                        .saveDate = DateTime.Now(),
+                        .invalidationDate = Now.AddDays(invalidationDaysDefault),
+                        .primaryObjectKey = primaryCacheName
                     }
                     setCacheObject(cacheName, cacheObject)
                 End If

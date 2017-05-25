@@ -14,8 +14,7 @@ Namespace Contensive.Core.Models.Entity
         '-- const
         Public Const primaryContentName As String = "people" '<------ set content name
         Private Const primaryContentTableName As String = "ccmembers" '<------ set to tablename for the primary content (used for cache names)
-        '
-        'Public isNew As Boolean
+        Private Const primaryContentDataSource As String = "default" '<----- set to datasource if not default
         '
         ' -- instance properties
         Public ID As Integer
@@ -112,7 +111,7 @@ Namespace Contensive.Core.Models.Entity
         Public Shared Function add(cpCore As coreClass, ByRef cacheNameList As List(Of String)) As personModel
             Dim result As personModel = Nothing
             Try
-                result = create(cpCore, cpCore.db.metaData_InsertContentRecordGetID(primaryContentName, cpCore.authContext.user.ID), cacheNameList)
+                result = create(cpCore, cpCore.db.metaData_InsertContentRecordGetID(primaryContentName, 0), cacheNameList)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
                 Throw

@@ -165,48 +165,17 @@ Namespace Contensive.Core.Models.Entity
                     If (Not returnModel.apps.ContainsKey(appName.ToLower())) Then
                         '
                         ' -- application now configured
-                        returnModel.appConfig = New appConfigModel()
-                        returnModel.appConfig.appStatus = applicationStatusEnum.ApplicationStatusAppConfigNotFound
+                        returnModel.appConfig = Nothing
                         Throw New Exception("application [" & appName & "] was not found in this server group.")
                     Else
                         returnModel.appConfig = returnModel.apps(appName.ToLower())
+                        returnModel.appConfig.appStatus = applicationStatusEnum.ApplicationStatusReady
                     End If
-                    'If genericController.vbInstr(1, returnModel.appConfig.domainList(0), ",") > 1 Then
-                    '    '
-                    '    ' if first entry in domain list is comma delimited, save only the first entry
-                    '    '
-                    '    returnModel.appConfig.domainList(0) = Mid(returnModel.appConfig.domainList(0), 1, genericController.vbInstr(1, returnModel.appConfig.domainList(0), ",") - 1)
-                    'End If
-                    returnModel.appConfig.appStatus = applicationStatusEnum.ApplicationStatusReady
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex, "exception in serverConfigModel.getObject")
             End Try
             Return returnModel
-        End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' called only from getObject. Load the model from the Db without cache. If there are any properties or objects that cannot be used from cache, do not include them here either, load in getObject()
-        ''' </summary>
-        ''' <param name="recordId"></param>
-        Private Shared Function getObjectNoCache(cpcore As coreClass, recordId As Integer) As Models.Entity.blankCachedModel
-            Dim returnNewModel As New blankCachedModel()
-            Try
-                Dim cs As New csController(cpcore)
-                returnNewModel.id = 0
-                If recordId <> 0 Then
-                    cs.open(cnBlank, "(ID=" & recordId & ")")
-                    If cs.ok() Then
-                        returnNewModel.id = recordId
-                        returnNewModel.name = cs.getText("Name")
-                    End If
-                    Call cs.Close()
-                End If
-            Catch ex As Exception
-                cpcore.handleExceptionAndRethrow(ex)
-            End Try
-            Return returnNewModel
         End Function
         '
         '====================================================================================================

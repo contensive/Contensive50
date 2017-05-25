@@ -2249,10 +2249,11 @@ ErrorTrap:
                 '
                 ' fixup the string so it can be reduced by each field found, leaving and empty string if all correct
                 '
-                DataSourceName = cpCore.db.getDataSourceNameByID(adminContent.dataSourceId)
+                Dim datasource As Models.Entity.dataSourceModel = Models.Entity.dataSourceModel.create(cpCore, adminContent.dataSourceId, New List(Of String))
+                'DataSourceName = cpCore.db.getDataSourceNameByID(adminContent.dataSourceId)
                 For Each keyValuePair In adminContent.fields
                     Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
-                    Call LoadEditResponseByPointer(adminContent, editRecord, field, DataSourceName, FormFieldListToBeLoaded, FormEmptyFieldList)
+                    Call LoadEditResponseByPointer(adminContent, editRecord, field, datasource.Name, FormFieldListToBeLoaded, FormEmptyFieldList)
                 Next
                 '
                 ' If there are any form fields that were no loaded, flag the error now
@@ -3185,7 +3186,6 @@ ErrorTrap:
             Dim Filename As String
             Dim fieldValueObject As Object
             Dim FieldValueText As String
-            Dim DataSourceName As String
             Dim MethodName As String
             Dim NewRecord As Boolean
             Dim RecordChanged As Boolean
@@ -3204,10 +3204,10 @@ ErrorTrap:
             Dim SQLUnique As String
             'Dim RSUnique as datatable
             Dim SaveCCIDValue As Integer
+            'Dim DataSource As Models.Entity.dataSourceModel = Models.Entity.dataSourceModel.create(cpCore, adminContent.dataSourceId, New List(Of String))
             '
             MethodName = "SaveEditRecord"
             '
-            DataSourceName = cpCore.db.getDataSourceNameByID(adminContent.dataSourceId)
             SaveCCIDValue = 0
             ActivityLogOrganizationID = -1
             If cpCore.error_IsUserError Then
@@ -12409,8 +12409,8 @@ ErrorTrap:
                 Dim ButtonFace As String
                 Dim ButtonHref As String
                 Dim URI As String
-                Dim DataSourceName As String
-                Dim DataSourceType As Integer
+                'Dim DataSourceName As String
+                'Dim DataSourceType As Integer
                 Dim FieldName As String
                 Dim FieldUsedInColumns As New Dictionary(Of String, Boolean)                 ' used to prevent select SQL from being sorted by a field that does not appear
                 Dim ColumnWidthTotal As Integer
@@ -12469,6 +12469,7 @@ ErrorTrap:
                         , "Content [" & adminContent.Name & "] has no field records."
                         ))
                 Else
+                    Dim datasource As Models.Entity.dataSourceModel = Models.Entity.dataSourceModel.create(cpCore, adminContent.dataSourceId, New List(Of String))
                     '
                     ' get access rights
                     '
@@ -12496,13 +12497,13 @@ ErrorTrap:
                         '
                         ' values needed for both SetINdexSQL and after
                         '
-                        DataSourceName = cpCore.db.getDataSourceNameByID(adminContent.dataSourceId)
-                        DataSourceType = cpCore.db.getDataSourceType(DataSourceName)
+                        'DataSourceName = cpCore.db.getDataSourceNameByID(adminContent.dataSourceId)
+                        'DataSourceType = cpCore.db.getDataSourceType(DataSourceName)
                         IndexConfig = LoadIndexConfig(adminContent)
                         '
                         ' Get the SQL parts
                         '
-                        Call SetIndexSQL(adminContent, editRecord, AllowAccessToContent, sqlFieldList, sqlFrom, sqlWhere, sqlOrderBy, IsLimitedToSubContent, ContentAccessLimitMessage, FieldUsedInColumns, IsLookupFieldValid, IndexConfig, DataSourceName, DataSourceType, IndexConfig.RecordTop, IndexConfig.RecordsPerPage)
+                        Call SetIndexSQL(adminContent, editRecord, AllowAccessToContent, sqlFieldList, sqlFrom, sqlWhere, sqlOrderBy, IsLimitedToSubContent, ContentAccessLimitMessage, FieldUsedInColumns, IsLookupFieldValid, IndexConfig, datasource.Name, datasource.type, IndexConfig.RecordTop, IndexConfig.RecordsPerPage)
                         If (Not allowCMEdit) Or (Not AllowAccessToContent) Then
                             '
                             ' two conditions should be the same -- but not time to check - This user does not have access to this content
@@ -12516,7 +12517,7 @@ ErrorTrap:
                             If sqlWhere <> "" Then
                                 SQL &= " where " & sqlWhere
                             End If
-                            CS = cpCore.db.cs_openCsSql_rev(DataSourceName, SQL)
+                            CS = cpCore.db.cs_openCsSql_rev(datasource.Name, SQL)
                             If cpCore.db.cs_ok(CS) Then
                                 recordCnt = cpCore.db.cs_getInteger(CS, "cnt")
                             End If
@@ -12525,7 +12526,7 @@ ErrorTrap:
                             ' Assumble the SQL
                             '
                             SQL = "select"
-                            If DataSourceType <> DataSourceTypeODBCMySQL Then
+                            If datasource.type <> DataSourceTypeODBCMySQL Then
                                 SQL &= " Top " & (IndexConfig.RecordTop + IndexConfig.RecordsPerPage)
                             End If
                             SQL &= " " & sqlFieldList & " From " & sqlFrom
@@ -12535,7 +12536,7 @@ ErrorTrap:
                             If sqlOrderBy <> "" Then
                                 SQL &= " Order By" & sqlOrderBy
                             End If
-                            If DataSourceType = DataSourceTypeODBCMySQL Then
+                            If datasource.type = DataSourceTypeODBCMySQL Then
                                 SQL &= " Limit " & (IndexConfig.RecordTop + IndexConfig.RecordsPerPage)
                             End If
                             '
@@ -12599,8 +12600,6 @@ ErrorTrap:
                             End If
                             ButtonBar = Adminui.GetButtonBarForIndex(LeftButtons, RightButtons, IndexConfig.PageNumber, IndexConfig.RecordsPerPage, PageCount)
                             'ButtonBar = AdminUI.GetButtonBar(LeftButtons, RightButtons)
-
-
                             '
                             ' ----- TitleBar
                             '
@@ -12893,8 +12892,8 @@ ErrorTrap:
                             '
                             '   select and print Records
                             '
-                            DataSourceName = cpCore.db.getDataSourceNameByID(adminContent.dataSourceId)
-                            CS = cpCore.db.cs_openSql(SQL, DataSourceName, IndexConfig.RecordsPerPage, IndexConfig.PageNumber)
+                            'DataSourceName = cpCore.db.getDataSourceNameByID(adminContent.dataSourceId)
+                            CS = cpCore.db.cs_openSql(SQL, datasource.Name, IndexConfig.RecordsPerPage, IndexConfig.PageNumber)
                             If cpCore.db.cs_ok(CS) Then
                                 RowColor = ""
                                 RecordPointer = IndexConfig.RecordTop
@@ -15010,8 +15009,8 @@ ErrorTrap:
             Dim Button As String
             Dim RecordLimit As Integer
             Dim recordCnt As Integer
-            Dim DataSourceName As String
-            Dim DataSourceType As Integer
+            'Dim DataSourceName As String
+            'Dim DataSourceType As Integer
             Dim sqlFieldList As String = ""
             Dim SQLFrom As String = ""
             Dim SQLWhere As String = ""
@@ -15030,6 +15029,7 @@ ErrorTrap:
             Dim allowContentEdit As Boolean
             Dim allowContentAdd As Boolean
             Dim allowContentDelete As Boolean
+            Dim datasource As Models.Entity.dataSourceModel = Models.Entity.dataSourceModel.create(cpCore, adminContent.dataSourceId, New List(Of String))
             '
             ' ----- Process Input
             '
@@ -15079,12 +15079,12 @@ ErrorTrap:
                     '
                     ' Get the SQL parts
                     '
-                    DataSourceName = cpCore.db.getDataSourceNameByID(adminContent.dataSourceId)
-                    DataSourceType = cpCore.db.getDataSourceType(DataSourceName)
+                    'DataSourceName = cpCore.db.getDataSourceNameByID(adminContent.dataSourceId)
+                    'DataSourceType = cpCore.db.getDataSourceType(DataSourceName)
                     IndexConfig = LoadIndexConfig(adminContent)
                     RecordTop = IndexConfig.RecordTop
                     RecordsPerPage = IndexConfig.RecordsPerPage
-                    Call SetIndexSQL(adminContent, editRecord, AllowContentAccess, sqlFieldList, SQLFrom, SQLWhere, SQLOrderBy, IsLimitedToSubContent, ContentAccessLimitMessage, FieldUsedInColumns, IsLookupFieldValid, IndexConfig, DataSourceName, DataSourceType, RecordTop, RecordsPerPage)
+                    Call SetIndexSQL(adminContent, editRecord, AllowContentAccess, sqlFieldList, SQLFrom, SQLWhere, SQLOrderBy, IsLimitedToSubContent, ContentAccessLimitMessage, FieldUsedInColumns, IsLookupFieldValid, IndexConfig, datasource.Name, datasource.type, RecordTop, RecordsPerPage)
                     If Not AllowContentAccess Then
                         '
                         ' This should be caught with check earlier, but since I added this, and I never make mistakes, I will leave this in case there is a mistake in the earlier code
@@ -15095,7 +15095,7 @@ ErrorTrap:
                         ' Get the total record count
                         '
                         SQL = "select count(" & adminContent.ContentTableName & ".ID) as cnt from " & SQLFrom & " where " & SQLWhere
-                        CS = cpCore.db.cs_openCsSql_rev(DataSourceName, SQL)
+                        CS = cpCore.db.cs_openCsSql_rev(datasource.Name, SQL)
                         If cpCore.db.cs_ok(CS) Then
                             recordCnt = cpCore.db.cs_getInteger(CS, "cnt")
                         End If
@@ -15104,14 +15104,14 @@ ErrorTrap:
                         ' Build the SQL
                         '
                         SQL = "select"
-                        If IsRecordLimitSet And (DataSourceType <> DataSourceTypeODBCMySQL) Then
+                        If IsRecordLimitSet And (datasource.type <> DataSourceTypeODBCMySQL) Then
                             SQL &= " Top " & RecordLimit
                         End If
                         SQL &= " " & adminContent.ContentTableName & ".* From " & SQLFrom & " WHERE " & SQLWhere
                         If SQLOrderBy <> "" Then
                             SQL &= " Order By" & SQLOrderBy
                         End If
-                        If IsRecordLimitSet And (DataSourceType = DataSourceTypeODBCMySQL) Then
+                        If IsRecordLimitSet And (datasource.type = DataSourceTypeODBCMySQL) Then
                             SQL &= " Limit " & RecordLimit
                         End If
                         '

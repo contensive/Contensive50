@@ -1366,7 +1366,7 @@ Namespace Contensive.Core.Controllers
                         ' Set the Template buffers
                         '
                         If TCPtr >= 0 Then
-                            If c.authContext.visit_browserIsMobile Then
+                            If c.authContext.visit.Mobile Then
                                 If c.siteProperties.getBoolean("AllowMobileTemplates") Then
                                     '
                                     ' set Mobile Template
@@ -2894,7 +2894,7 @@ ErrorTrap:
                 'hint = hint & ",030"
                 If (Not c.htmlDoc.pageManager_printVersion) Then
                     IconRow = ""
-                    If (Not c.authContext.visit_isBot) And (AllowPrinterVersion Or AllowEmailPage) Then
+                    If (Not c.authContext.visit.Bot) And (AllowPrinterVersion Or AllowEmailPage) Then
                         '
                         ' not a bot, and either print or email allowed
                         '
@@ -8432,7 +8432,7 @@ ErrorTrap:
                     ' Authenticate
                     '
                     If f.AuthenticateOnFormProcess Then
-                        Call c.authContext.authenticateById(c, c.authContext.user.ID)
+                        Call c.authContext.authenticateById(c, c.authContext.user.ID, c.authContext)
                     End If
                     '
                     ' Join Group requested by page that created form

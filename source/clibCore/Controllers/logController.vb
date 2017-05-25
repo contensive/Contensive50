@@ -53,8 +53,21 @@ Namespace Contensive.Core.Controllers
                 Dim FileSuffix As String
                 Dim threadId As Integer = System.Threading.Thread.CurrentThread.ManagedThreadId
                 Dim threadName As String = Format(threadId, "00000000")
+                Dim fileSystem As coreFileSystemClass = Nothing
                 '
                 Try
+                    If (cpCore.serverConfig IsNot Nothing) Then
+                        If (cpCore.serverConfig.appConfig IsNot Nothing) Then
+                            '
+                            ' -- use app log space
+                            fileSystem = cpCore.privateFiles
+                        End If
+                    End If
+                    If (fileSystem Is Nothing) Then
+                        '
+                        ' -- no app or no server, use program data files
+                        fileSystem = cpCore.programDataFiles
+                    End If
                     DayNumber = Day(Now)
                     MonthNumber = Month(Now)
                     FilenameNoExt = log_getDateString(Now)
@@ -63,11 +76,14 @@ Namespace Contensive.Core.Controllers
                         logPath = logPath & "\"
                     End If
                     logPath = "logs\" & logPath
+                    '
+                    ' check for serverconfig, then for appConfig, else use programdata folder
+                    '
                     ' logPathRoot = privatefiles.rootLocalPath
-                    If Not cpCore.privateFiles.pathExists(logPath) Then
-                        Call cpCore.privateFiles.createPath(logPath)
+                    If Not fileSystem.pathExists(logPath) Then
+                        Call fileSystem.createPath(logPath)
                     Else
-                        Dim logFiles As IO.FileInfo() = cpCore.privateFiles.getFileList(logPath)
+                        Dim logFiles As IO.FileInfo() = fileSystem.getFileList(logPath)
                         For Each fileInfo As IO.FileInfo In logFiles
                             If fileInfo.Name.ToLower = FilenameNoExt.ToLower & ".log" Then
                                 FileSize = CInt(fileInfo.Length)
@@ -86,7 +102,7 @@ Namespace Contensive.Core.Controllers
                             SaveOK = True
                             Try
                                 Dim absContent As String = LogFileCopyPrep(FormatDateTime(Now(), vbGeneralDate)) & vbTab & threadName & vbTab & LogLine & vbCrLf
-                                cpCore.privateFiles.appendFile(PathFilenameNoExt & FileSuffix & ".log", absContent)
+                                fileSystem.appendFile(PathFilenameNoExt & FileSuffix & ".log", absContent)
                             Catch ex As IO.IOException
                                 '
                                 ' permission denied - happens when more then one process are writing at once, go to the next suffix

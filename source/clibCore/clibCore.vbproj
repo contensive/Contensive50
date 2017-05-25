@@ -415,7 +415,6 @@
     <Compile Include="addon_pageManager\pageManagerController.vb" />
     <Compile Include="addon_tools\addon_toolConfigureEdit.vb" />
     <Compile Include="Models\Context\coreSitePropertiesClass.vb" />
-    <Compile Include="Models\Context\authContextUserModel.vb" />
     <Compile Include="Controllers\webServerIOController.vb" />
     <Compile Include="coreMetaDataClass.vb" />
     <Compile Include="coreCacheKeyPtrClass.vb" />
@@ -478,7 +477,7 @@
     <Compile Include="coreMenuTreeClass.vb" />
     <Compile Include="Controllers\appBuilderController.vb" />
     <Compile Include="Models\Entity\serverConfigModel.vb" />
-    <Compile Include="Models\Entity\dataSourceModel.vb" />
+    <Compile Include="Models\Entity\xdataSourceModel.vb" />
     <Compile Include="Models\Entity\visitorModel.vb" />
     <Compile Include="Models\Entity\pageContentModel.vb" />
     <Compile Include="Models\Entity\siteSectionModel.vb" />
@@ -486,9 +485,9 @@
     <Compile Include="Models\Entity\visitModel.vb" />
     <Compile Include="Models\Entity\personModel.vb" />
     <Compile Include="Models\Entity\LanguageModel.vb" />
-    <Compile Include="Models\Entity\_xblankCachedModel.vb" />
     <Compile Include="Models\Entity\addonModel.vb" />
     <Compile Include="Models\Entity\groupModel.vb" />
+    <Compile Include="Models\Entity\dataSourceModel.vb" />
     <Compile Include="Models\Entity\_blankModel.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

@@ -5005,7 +5005,7 @@ Namespace Contensive.Core
                 Dim FieldCount As Integer
                 Dim FieldSize As Integer
                 Dim ContentName As String
-                Dim DataSourceName As String
+                'Dim DataSourceName As String
                 Dim SQL As String
                 Dim ContentIsBaseContent As Boolean
                 '
@@ -5020,11 +5020,7 @@ Namespace Contensive.Core
                         ContentName = .Name
                         ContentIsBaseContent = False
                         FieldHelpCID = cpCore.db.getContentId("Field Help")
-                        '
-                        DataSourceName = .ContentDataSourceName
-                        If DataSourceName = "" Then
-                            DataSourceName = "Default"
-                        End If
+                        Dim datasource As Contensive.Core.Models.Entity.dataSourceModel = Models.Entity.dataSourceModel.create(cpCore, .ContentDataSourceName, New List(Of String))
                         '
                         ' get contentid and protect content with IsBaseContent true
                         '
@@ -5057,7 +5053,7 @@ Namespace Contensive.Core
                             ' ----- update definition (use SingleRecord as an update flag)
                             '
                             Call cpCore.metaData.metaData_CreateContent4(True _
-                                    , .ContentDataSourceName _
+                                    , datasource _
                                     , .ContentTableName _
                                     , ContentName _
                                     , .AdminOnly _

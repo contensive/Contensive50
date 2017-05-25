@@ -78,7 +78,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property BrowserIsMobile() As Boolean 'Inherits BaseClasses.CPRequestBaseClass.BrowserIsMobile
             Get
                 If True Then
-                    Return cpCore.authContext.visit_browserIsMobile
+                    Return cpCore.authContext.visit.Mobile
                 Else
                     Return False
                 End If

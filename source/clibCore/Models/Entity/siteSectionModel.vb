@@ -14,6 +14,7 @@ Namespace Contensive.Core.Models.Entity
         '-- const
         Public Const primaryContentName As String = "site sections"
         Private Const primaryContentTableName As String = "ccsitesections"
+        Private Const primaryContentDataSource As String = "default" '<----- set to datasource if not default
         '
         ' -- instance properties
         Public ID As Integer
@@ -359,6 +360,25 @@ Namespace Contensive.Core.Models.Entity
         Private Shared Function getCacheName(fieldName As String, fieldValue As String) As String
             Return (primaryContentTableName & "." & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
             'Return (GetType(siteSectionModel).FullName & "." & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' add a new recod to the db and open it. Starting a new model with this method will use the default
+        ''' values in Contensive metadata (active, contentcontrolid, etc)
+        ''' </summary>
+        ''' <param name="cpCore"></param>
+        ''' <param name="cacheNameList"></param>
+        ''' <returns></returns>
+        Public Shared Function add(cpCore As coreClass, ByRef cacheNameList As List(Of String)) As siteSectionModel
+            Dim result As siteSectionModel = Nothing
+            Try
+                result = create(cpCore, cpCore.db.metaData_InsertContentRecordGetID(primaryContentName, 0), cacheNameList)
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+                Throw
+            End Try
+            Return result
         End Function
     End Class
 End Namespace

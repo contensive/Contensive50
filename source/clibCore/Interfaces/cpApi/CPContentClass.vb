@@ -322,9 +322,9 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         '
-        Public Overrides Function AddContent(ContentName As String, sqlTableName As String, dataSource As String) As Integer
+        Public Overrides Function AddContent(ContentName As String, sqlTableName As String, dataSourceName As String) As Integer
             Return cpCore.metaData.metaData_CreateContent4(True _
-                , dataSource _
+                , Models.Entity.dataSourceModel.create(cpCore, dataSourceName, New List(Of String)) _
                 , sqlTableName _
                 , ContentName _
                 , False _

@@ -18,7 +18,12 @@ Namespace Contensive.Core.Models.Entity
     '
     Public Class addonModel
         '
-        ' -- public properties
+        '-- const
+        Public Const primaryContentName As String = "add-ons" '<------ set content name
+        Private Const primaryContentTableName As String = "ccaggregatefunctions" '<------ set to tablename for the primary content (used for cache names)
+        Private Const primaryContentDataSource As String = "default" '<----- set to datasource if not default
+        '
+        ' -- instance properties
         '
         Public id As Integer = 0
         Public name As String = String.Empty
@@ -114,7 +119,7 @@ Namespace Contensive.Core.Models.Entity
             Dim returnModel As addonModel = Nothing
             Try
                 Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer
-                Dim recordCacheName As String = cnAddons & "CachedModelRecordId" & recordId
+                Dim recordCacheName As String = primaryContentName & "CachedModelRecordId" & recordId
                 Dim recordCache As String = cpcore.cache.getString(recordCacheName)
                 Dim loadDbModel As Boolean = True
                 If Not String.IsNullOrEmpty(recordCache) Then
@@ -151,7 +156,7 @@ Namespace Contensive.Core.Models.Entity
                 Dim cs As New csController(cpcore)
                 returnNewModel.id = 0
                 If recordId <> 0 Then
-                    cs.open(cnAddons, "(ID=" & recordId & ")")
+                    cs.open(primaryContentName, "(ID=" & recordId & ")")
                     If cs.ok() Then
                         With returnNewModel
                             .id = recordId
@@ -246,13 +251,13 @@ Namespace Contensive.Core.Models.Entity
             Try
                 Dim cs As New csController(cpcore)
                 If (id > 0) Then
-                    If Not cs.open(cnAddons, "id=" & id) Then
+                    If Not cs.open(primaryContentName, "id=" & id) Then
                         id = 0
                         cs.Close()
                         Throw New ApplicationException("Unable to open record [" & id & "]")
                     End If
                 Else
-                    If Not cs.Insert(cnAddons) Then
+                    If Not cs.Insert(primaryContentName) Then
                         cs.Close()
                         id = 0
                         Throw New ApplicationException("Unable to insert record")
@@ -260,9 +265,9 @@ Namespace Contensive.Core.Models.Entity
                 End If
                 If cs.ok() Then
                     id = cs.getInteger("id")
-                    cs.SetField("Name", name)
+                    cs.setField("Name", name)
                     cs.setField("active", active)
-                    cs.SetField("sortorder", sortorder)
+                    cs.setField("sortorder", sortorder)
                     cs.setField("dateadded", dateadded)
                     cs.setField("createdby", createdby)
                     cs.setField("modifieddate", modifieddate)
@@ -273,64 +278,64 @@ Namespace Contensive.Core.Models.Entity
                     cs.setField("EditArchive", EditArchive)
                     cs.setField("EditBlank", EditBlank)
                     cs.setField("ContentCategoryID", ContentCategoryID)
-                    cs.SetField("ccGuid", ccGuid)
+                    cs.setField("ccGuid", ccGuid)
                     cs.setField("onpagestartevent", onpagestartevent)
                     cs.setField("blockdefaultstyles", blockdefaultstyles)
                     cs.setField("iconheight", iconheight)
                     cs.setField("iconwidth", iconwidth)
-                    cs.SetField("customstylesfilename", customstylesfilename)
+                    cs.setField("customstylesfilename", customstylesfilename)
                     cs.setField("iconsprites", iconsprites)
-                    cs.SetField("javascriptbodyend", javascriptbodyend)
+                    cs.setField("javascriptbodyend", javascriptbodyend)
                     cs.setField("onnewvisitevent", onnewvisitevent)
                     cs.setField("remotemethod", remotemethod)
-                    cs.SetField("copytext", copytext)
-                    cs.SetField("sharedstyles", sharedstyles)
-                    cs.SetField("stylesfilename", stylesfilename)
-                    cs.SetField("otherheadtags", otherheadtags)
-                    cs.SetField("metakeywordlist", metakeywordlist)
+                    cs.setField("copytext", copytext)
+                    cs.setField("sharedstyles", sharedstyles)
+                    cs.setField("stylesfilename", stylesfilename)
+                    cs.setField("otherheadtags", otherheadtags)
+                    cs.setField("metakeywordlist", metakeywordlist)
                     cs.setField("onpageendevent", onpageendevent)
-                    cs.SetField("pagetitle", pagetitle)
-                    cs.SetField("iconfilename", iconfilename)
-                    cs.SetField("javascriptonload", javascriptonload)
+                    cs.setField("pagetitle", pagetitle)
+                    cs.setField("iconfilename", iconfilename)
+                    cs.setField("javascriptonload", javascriptonload)
                     cs.setField("admin", admin)
                     cs.setField("content", content)
                     cs.setField("template", template)
                     cs.setField("email", email)
-                    cs.SetField("helplink", helplink)
+                    cs.setField("helplink", helplink)
                     cs.setField("navtypeid", navtypeid)
-                    cs.SetField("help", help)
-                    cs.SetField("metadescription", metadescription)
-                    cs.SetField("scriptingcode", scriptingcode)
-                    cs.SetField("scriptingtimeout", scriptingtimeout)
-                    cs.SetField("inlinescript", inlinescript)
+                    cs.setField("help", help)
+                    cs.setField("metadescription", metadescription)
+                    cs.setField("scriptingcode", scriptingcode)
+                    cs.setField("scriptingtimeout", scriptingtimeout)
+                    cs.setField("inlinescript", inlinescript)
                     cs.setField("collectionid", collectionid)
                     cs.setField("onbodystart", onbodystart)
-                    cs.SetField("fieldtypeeditor", fieldtypeeditor)
+                    cs.setField("fieldtypeeditor", fieldtypeeditor)
                     cs.setField("isinline", isinline)
-                    cs.SetField("dotnetclass", dotnetclass)
-                    cs.SetField("copy", copy)
-                    cs.SetField("argumentlist", argumentlist)
-                    cs.SetField("link", link)
+                    cs.setField("dotnetclass", dotnetclass)
+                    cs.setField("copy", copy)
+                    cs.setField("argumentlist", argumentlist)
+                    cs.setField("link", link)
                     cs.setField("onbodyend", onbodyend)
-                    cs.SetField("objectprogramid", objectprogramid)
-                    cs.SetField("jsfilename", jsfilename)
-                    cs.SetField("robotstxt", robotstxt)
-                    cs.SetField("includedaddons", includedaddons)
-                    cs.SetField("formxml", formxml)
+                    cs.setField("objectprogramid", objectprogramid)
+                    cs.setField("jsfilename", jsfilename)
+                    cs.setField("robotstxt", robotstxt)
+                    cs.setField("includedaddons", includedaddons)
+                    cs.setField("formxml", formxml)
                     cs.setField("inframe", inframe)
                     cs.setField("filter", filter)
                     cs.setField("scriptinglanguageid", scriptinglanguageid)
-                    cs.SetField("remoteassetlink", remoteassetlink)
+                    cs.setField("remoteassetlink", remoteassetlink)
                     cs.setField("blockedittools", blockedittools)
                     cs.setField("asajax", asajax)
-                    cs.SetField("processserverkey", processserverkey)
+                    cs.setField("processserverkey", processserverkey)
                     cs.setField("processinterval", processinterval)
                     cs.setField("processrunonce", processrunonce)
                     cs.setField("processnextrun", processnextrun)
-                    cs.SetField("processcontenttriggers", processcontenttriggers)
-                    cs.SetField("scriptingentrypoint", scriptingentrypoint)
-                    cs.SetField("scriptingmodules", scriptingmodules)
-                    cs.SetField("events", events)
+                    cs.setField("processcontenttriggers", processcontenttriggers)
+                    cs.setField("scriptingentrypoint", scriptingentrypoint)
+                    cs.setField("scriptingmodules", scriptingmodules)
+                    cs.setField("events", events)
                 End If
                 Call cs.Close()
             Catch ex As Exception
@@ -350,7 +355,7 @@ Namespace Contensive.Core.Models.Entity
             Dim result As List(Of addonModel) = Nothing
             Try
                 Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer
-                Dim recordCacheName As String = cnAddons & "CachedRemoteMethods"
+                Dim recordCacheName As String = primaryContentName & "CachedRemoteMethods"
                 Dim recordCache As String = cpcore.cache.getString(recordCacheName)
                 Dim loadDbModel As Boolean = True
                 If Not String.IsNullOrEmpty(recordCache) Then
@@ -386,7 +391,7 @@ Namespace Contensive.Core.Models.Entity
             Dim result As New List(Of addonModel)
             Try
                 Dim cs As New csController(cpcore)
-                If (cs.open(cnAddons, "(remoteMethod=1)", "name", True, "id")) Then
+                If (cs.open(primaryContentName, "(remoteMethod=1)", "name", True, "id")) Then
                     Do
                         result.Add(getObject(cpcore, cs.getInteger("id"), New List(Of String)))
                         cs.goNext()
@@ -407,7 +412,7 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="recordId"></param>record
         ''' <returns></returns>
         Public Shared Function getRecordName(cpcore As coreClass, recordId As Integer) As String
-            Return cpcore.content_GetRecordName(cnAddons, recordId)
+            Return cpcore.content_GetRecordName(primaryContentName, recordId)
         End Function
         '
         '====================================================================================================
@@ -421,7 +426,7 @@ Namespace Contensive.Core.Models.Entity
             Dim resultList As New List(Of addonModel)
             Try
                 Dim cs As New csController(cpcore)
-                If cs.open(cnAddons) Then
+                If cs.open(primaryContentName, sqlCriteria) Then
                     Do
                         resultList.Add(addonModel.getObject(cpcore, cs.getInteger("id"), New List(Of String)))
                         cs.goNext()

@@ -14,6 +14,7 @@ Namespace Contensive.Core.Models.Entity
         '-- const
         Public Const primaryContentName As String = "languages"
         Private Const primaryContentTableName As String = "cclanguages"
+        Private Const primaryContentDataSource As String = "default" '<----- set to datasource if not default
         '
         ' -- instance properties
         Public ID As Integer
@@ -52,7 +53,7 @@ Namespace Contensive.Core.Models.Entity
         Public Shared Function add(cpCore As coreClass, ByRef cacheNameList As List(Of String)) As LanguageModel
             Dim result As LanguageModel = Nothing
             Try
-                result = create(cpCore, cpCore.db.metaData_InsertContentRecordGetID(primaryContentName, cpCore.authContext.user.ID), cacheNameList)
+                result = create(cpCore, cpCore.db.metaData_InsertContentRecordGetID(primaryContentName, 0), cacheNameList)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
                 Throw

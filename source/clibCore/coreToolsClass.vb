@@ -2,6 +2,8 @@
 Option Explicit On
 Option Strict On
 
+Imports Contensive.Core.Models.Entity
+Imports Contensive.Core.Models.Context
 Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
 '
@@ -506,8 +508,8 @@ ErrorTrap:
         Private Function GetForm_ManualQuery() As String
             Dim returnHtml As String = ""
             Try
-                Dim DataSourceName As String
-                Dim DataSourceID As Integer
+                'Dim DataSourceName As String
+                'Dim DataSourceID As Integer
                 Dim SQL As String = ""
                 Dim dt As DataTable = Nothing
                 Dim FieldCount As Integer
@@ -533,6 +535,7 @@ ErrorTrap:
                 Dim SQLName As String
                 Dim Stream As New coreFastStringClass
                 Dim ButtonList As String
+                Dim datasource As dataSourceModel = dataSourceModel.create(cpCore, cpCore.docProperties.getInteger("dataSourceid"), New List(Of String))
                 '
                 ButtonList = ButtonCancel & "," & ButtonRun
                 '
@@ -564,19 +567,12 @@ ErrorTrap:
                     PageNumber = 1
                 End If
                 '
+                SQL = cpCore.docProperties.getText("SQL")
+                If SQL = "" Then
+                    SQL = cpCore.docProperties.getText("SQLList")
+                End If
+                '
                 If (cpCore.docProperties.getText("button")) = ButtonRun Then
-                    DataSourceID = cpCore.docProperties.getInteger("DataSourceID")
-                    DataSourceName = ""
-                    If DataSourceID <> 0 Then
-                        DataSourceName = cpCore.db.getDataSourceNameByID(DataSourceID)
-                    End If
-                    If DataSourceName = "" Then
-                        DataSourceName = "default"
-                    End If
-                    SQL = cpCore.docProperties.getText("SQL")
-                    If SQL = "" Then
-                        SQL = cpCore.docProperties.getText("SQLList")
-                    End If
                     '
                     ' Add this SQL to the members SQL list
                     '
@@ -594,9 +590,9 @@ ErrorTrap:
                     ' Run the SQL
                     '
                     Call Stream.Add("<P>" & SpanClassAdminSmall)
-                    Stream.Add(Now() & " Executing sql [" & SQL & "] on DataSource [" & DataSourceName & "]")
+                    Stream.Add(Now() & " Executing sql [" & SQL & "] on DataSource [" & datasource.Name & "]")
                     Try
-                        dt = cpCore.db.executeSql(SQL, DataSourceName, PageSize * (PageNumber - 1), PageSize)
+                        dt = cpCore.db.executeSql(SQL, datasource.Name, PageSize * (PageNumber - 1), PageSize)
                     Catch ex As Exception
                         '
                         ' ----- error
@@ -682,7 +678,7 @@ ErrorTrap:
                 End If
                 Call Stream.Add("<TEXTAREA NAME=""SQL"" ROWS=""" & SQLRows & """ ID=""SQL"" STYLE=""width: 800px;"">" & SQL & "</TEXTAREA>")
                 Call Stream.Add("&nbsp;<INPUT TYPE=""Text"" TabIndex=-1 NAME=""SQLRows"" SIZE=""3"" VALUE=""" & SQLRows & """ ID=""""  onchange=""SQL.rows=SQLRows.value; return true""> Rows")
-                Call Stream.Add("<br><br>Data Source<br>" & cpCore.htmlDoc.main_GetFormInputSelect("DataSourceID", DataSourceID, "Data Sources", "", "Default"))
+                Call Stream.Add("<br><br>Data Source<br>" & cpCore.htmlDoc.main_GetFormInputSelect("DataSourceID", DataSource.ID, "Data Sources", "", "Default"))
                 '
                 SelectFieldWidthLimit = cpCore.siteProperties.getinteger("SelectFieldWidthLimit", 200)
                 If SQLArchive <> "" Then
@@ -736,8 +732,6 @@ ErrorTrap:
             '
             Dim CS As Integer
             Dim ContentID As Integer
-            Dim DataSourceID As Integer
-            Dim DataSourceName As String
             Dim TableName As String = ""
             Dim ContentName As String = ""
             Dim Stream As New coreFastStringClass
@@ -747,6 +741,7 @@ ErrorTrap:
             Dim Caption As String
             Dim NavID As Integer
             Dim ParentNavID As Integer
+            Dim datasource As dataSourceModel = dataSourceModel.create(cpCore, cpCore.docProperties.getInteger("DataSourceID"), New List(Of String))
             '
             ButtonList = ButtonCancel & "," & ButtonRun
             Caption = "Create Content Definition"
@@ -760,16 +755,14 @@ ErrorTrap:
                 '
                 ' Process input
                 '
-                DataSourceID = cpCore.docProperties.getInteger("DataSourceID")
-                DataSourceName = cpCore.db.getDataSourceNameByID(DataSourceID)
                 ContentName = cpCore.docProperties.getText("ContentName")
                 TableName = cpCore.docProperties.getText("TableName")
                 '
                 Call Stream.Add(SpanClassAdminSmall)
-                Stream.Add("<P>Creating content [" & ContentName & "] on table [" & TableName & "] on Datasource [" & DataSourceName & "].</P>")
-                If (ContentName <> "") And (TableName <> "") And (DataSourceName <> "") Then
-                    Call cpCore.db.createSQLTable(DataSourceName, TableName)
-                    Call cpCore.db.createContentFromSQLTable(DataSourceName, TableName, ContentName)
+                Stream.Add("<P>Creating content [" & ContentName & "] on table [" & TableName & "] on Datasource [" & datasource.Name & "].</P>")
+                If (ContentName <> "") And (TableName <> "") And (datasource.Name <> "") Then
+                    Call cpCore.db.createSQLTable(datasource.Name, TableName)
+                    Call cpCore.db.createContentFromSQLTable(datasource, TableName, ContentName)
                     cpCore.cache.invalidateAll()
                     cpCore.metaData.clear()
                     ContentID = cpCore.main_GetContentID(ContentName)
@@ -805,7 +798,7 @@ ErrorTrap:
             End If
             Call Stream.Add(SpanClassAdminNormal)
             Call Stream.Add("Data Source<br>")
-            Call Stream.Add(cpCore.htmlDoc.main_GetFormInputSelect("DataSourceID", DataSourceID, "Data Sources", "", "Default"))
+            Call Stream.Add(cpCore.htmlDoc.main_GetFormInputSelect("DataSourceID", datasource.ID, "Data Sources", "", "Default"))
             Call Stream.Add("<br><br>")
             Call Stream.Add("Content Name<br>")
             Call Stream.Add(cpCore.htmlDoc.html_GetFormInputText2("ContentName", ContentName, 1, 40))
@@ -2596,8 +2589,6 @@ ErrorTrap:
         Private Function GetForm_DbSchema() As String
             On Error GoTo ErrorTrap
             '
-            Dim DataSourceName As String
-            Dim DataSourceID As Integer
             Dim SQL As String
             Dim ErrorNumber As Integer
             Dim ErrorDescription As String = ""
@@ -2628,6 +2619,7 @@ ErrorTrap:
             Dim Stream As New coreFastStringClass
             Dim ButtonList As String
             Dim RSSchema As DataTable
+            Dim datasource As dataSourceModel = dataSourceModel.create(cpCore, cpCore.docProperties.getInteger("DataSourceID"), New List(Of String))
             '
             ButtonList = ButtonCancel & "," & ButtonRun
             '
@@ -2646,15 +2638,13 @@ ErrorTrap:
                 ' Read in arguments
                 '
                 TableName = cpCore.docProperties.getText("TableName")
-                DataSourceID = cpCore.docProperties.getInteger("DataSourceID")
-                DataSourceName = cpCore.db.getDataSourceNameByID(DataSourceID)
                 '
                 ' Run the SQL
                 '
                 'ConnectionString = cpCore.db.getmain_GetConnectionString(DataSourceName)
                 '
                 Call Stream.Add(SpanClassAdminSmall & "<br><br>")
-                Stream.Add(Now() & " Opening Table Schema on DataSource [" & DataSourceName & "]<br>")
+                Stream.Add(Now() & " Opening Table Schema on DataSource [" & datasource.Name & "]<br>")
                 On Error Resume Next
                 '
                 RSSchema = cpCore.db.getTableSchemaData(TableName)
@@ -2875,7 +2865,7 @@ ErrorTrap:
             '
             Call Stream.Add("<br><br>")
             Call Stream.Add("Data Source<br>")
-            Stream.Add(cpCore.htmlDoc.main_GetFormInputSelect("DataSourceID", DataSourceID, "Data Sources", "", "Default"))
+            Stream.Add(cpCore.htmlDoc.main_GetFormInputSelect("DataSourceID", DataSource.ID, "Data Sources", "", "Default"))
             '
             ''Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolSchema)
             Call Stream.Add("</SPAN>")

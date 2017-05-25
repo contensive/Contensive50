@@ -178,7 +178,8 @@ Namespace Contensive.Core.Controllers
         ''' <param name="properties">properties are nameValue pairs consumable by the addon during execution. These properties are added to cpcore.docproperties and made available. Originally this argument was for the nameValues modified in the page instance where the addon was placed.</param>
         ''' <param name="context">member of CPUtilsBaseClass.addonContext</param>
         ''' <returns></returns>
-        Public Function execute(ByVal addonId As Integer, properties As Dictionary(Of String, String), context As CPUtilsBaseClass.addonContext) As Object
+        Public Function execute(ByVal addonId As Integer, properties As Dictionary(Of String, String), context As CPUtilsBaseClass.addonContext) As String
+            Dim result As String = String.Empty
             Try
                 Dim optionString As String = ""
                 Dim return_StatusOk As Boolean
@@ -190,10 +191,11 @@ Namespace Contensive.Core.Controllers
                 If Not String.IsNullOrEmpty(optionString) Then
                     optionString = optionString.Substring(1)
                 End If
-                Return execute(addonId, "", optionString, context, "", 0, "", "", False, 0, "", return_StatusOk, Nothing, "", Nothing, "", 0, False)
+                result = execute(addonId, "", optionString, context, "", 0, "", "", False, 0, "", return_StatusOk, Nothing, "", Nothing, "", 0, False)
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex)
             End Try
+            Return result
         End Function
         '
         '====================================================================================================
@@ -365,20 +367,21 @@ Namespace Contensive.Core.Controllers
                 Else
                     Dim addonCacheKey As String = addonCachePtr.ToString
                     FoundAddon = True
-                    ProgramID = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ObjectProgramID)
-                    AddonName = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_name)
-                    addonId = genericController.EncodeInteger(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_Id)
-                    addonCollectionId = genericController.EncodeInteger(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_collectionid)
-                    AddonGuid = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ccguid)
+                    Dim addonCache As Models.Entity.addonLegacyModel.addonClass = cpCore.addonCache.localCache.addonList(addonCacheKey)
+                    ProgramID = addonCache.addonCache_ObjectProgramID
+                    AddonName = genericController.encodeText(addonCache.addonCache_name)
+                    addonId = genericController.EncodeInteger(addonCache.addonCache_Id)
+                    addonCollectionId = genericController.EncodeInteger(addonCache.addonCache_collectionid)
+                    AddonGuid = genericController.encodeText(addonCache.addonCache_ccguid)
                     If AddonGuid <> "" Then
                         AddonNameOrGuid_Local = AddonGuid
                     Else
                         AddonNameOrGuid_Local = AddonName
                     End If
-                    HTMLContent = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_Copy)
-                    Link = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_Link)
-                    DotNetClassFullName = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_DotNetClass)
-                    AddonOptionConstructor = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ArgumentList)
+                    HTMLContent = genericController.encodeText(addonCache.addonCache_Copy)
+                    Link = genericController.encodeText(addonCache.addonCache_Link)
+                    DotNetClassFullName = genericController.encodeText(addonCache.addonCache_DotNetClass)
+                    AddonOptionConstructor = genericController.encodeText(addonCache.addonCache_ArgumentList)
                     AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
                     AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbLf, vbCr)
                     AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
@@ -386,27 +389,27 @@ Namespace Contensive.Core.Controllers
                     AddonBlockEditTools = False
                     TextContent = ""
                     FormXML = ""
-                    TextContent = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_CopyText)
-                    IsInline = genericController.EncodeBoolean(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_IsInline)
+                    TextContent = genericController.encodeText(addonCache.addonCache_CopyText)
+                    IsInline = genericController.EncodeBoolean(addonCache.addonCache_IsInline)
                     '
                     ' Support BlockDefaultStyles and CustomStylesFilename
                     '
-                    If Not cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_BlockDefaultStyles Then
+                    If Not addonCache.addonCache_BlockDefaultStyles Then
                         '
                         ' Add default styles
                         '
-                        DefaultStylesFilename = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_StylesFilename)
+                        DefaultStylesFilename = genericController.encodeText(addonCache.addonCache_StylesFilename)
                     End If
                     '
                     ' Add custom styles
                     '
-                    CustomStylesFilename = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_CustomStylesFilename)
-                    FormXML = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_formxml)
-                    RemoteAssetLink = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_RemoteAssetLink)
-                    AsAjax = genericController.EncodeBoolean(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_AsAjax)
-                    InFrame = genericController.EncodeBoolean(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_InFrame)
-                    ScriptingEntryPoint = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ScriptingEntryPoint)
-                    scriptinglanguageid = genericController.EncodeInteger(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ScriptingLanguageID)
+                    CustomStylesFilename = genericController.encodeText(addonCache.addonCache_CustomStylesFilename)
+                    FormXML = genericController.encodeText(addonCache.addonCache_formxml)
+                    RemoteAssetLink = genericController.encodeText(addonCache.addonCache_RemoteAssetLink)
+                    AsAjax = genericController.EncodeBoolean(addonCache.addonCache_AsAjax)
+                    InFrame = genericController.EncodeBoolean(addonCache.addonCache_InFrame)
+                    ScriptingEntryPoint = genericController.encodeText(addonCache.addonCache_ScriptingEntryPoint)
+                    scriptinglanguageid = genericController.EncodeInteger(addonCache.addonCache_ScriptingLanguageID)
                     '
                     ' Get Language
                     '
@@ -417,19 +420,19 @@ Namespace Contensive.Core.Controllers
                     If ScriptingLanguage = "" Then
                         ScriptingLanguage = "VBScript"
                     End If
-                    ScriptingCode = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ScriptingCode)
-                    AddonBlockEditTools = genericController.EncodeBoolean(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_BlockEditTools)
-                    ScriptingTimeout = genericController.EncodeInteger(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ScriptingTimeout)
-                    inlineScript = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_inlineScript)
-                    helpCopy = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_help)
-                    helpLink = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_helpLink)
-                    JSOnLoad = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_JavaScriptOnLoad)
-                    JSBodyEnd = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_JavaScriptBodyEnd)
-                    PageTitle = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_PageTitle)
-                    MetaDescription = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_MetaDescription)
-                    MetaKeywordList = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_MetaKeywordList)
-                    OtherHeadTags = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_OtherHeadTags)
-                    JSFilename = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_JSFilename)
+                    ScriptingCode = genericController.encodeText(addonCache.addonCache_ScriptingCode)
+                    AddonBlockEditTools = genericController.EncodeBoolean(addonCache.addonCache_BlockEditTools)
+                    ScriptingTimeout = genericController.EncodeInteger(addonCache.addonCache_ScriptingTimeout)
+                    inlineScript = genericController.encodeText(addonCache.addonCache_inlineScript)
+                    helpCopy = genericController.encodeText(addonCache.addonCache_help)
+                    helpLink = genericController.encodeText(addonCache.addonCache_helpLink)
+                    JSOnLoad = genericController.encodeText(addonCache.addonCache_JavaScriptOnLoad)
+                    JSBodyEnd = genericController.encodeText(addonCache.addonCache_JavaScriptBodyEnd)
+                    PageTitle = genericController.encodeText(addonCache.addonCache_PageTitle)
+                    MetaDescription = genericController.encodeText(addonCache.addonCache_MetaDescription)
+                    MetaKeywordList = genericController.encodeText(addonCache.addonCache_MetaKeywordList)
+                    OtherHeadTags = genericController.encodeText(addonCache.addonCache_OtherHeadTags)
+                    JSFilename = genericController.encodeText(addonCache.addonCache_JSFilename)
                     If JSFilename <> "" Then
                         JSFilename = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
                     End If

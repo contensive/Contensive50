@@ -6,6 +6,7 @@ Imports System
 Imports System.Collections.Generic
 Imports System.Text
 Imports Contensive.BaseClasses
+Imports Contensive.Core.Controllers
 Imports Newtonsoft.Json
 
 Namespace Contensive.Core.Models.Entity
@@ -14,6 +15,7 @@ Namespace Contensive.Core.Models.Entity
         '-- const
         Public Const primaryContentName As String = "visitors" '<------ set content name
         Private Const primaryContentTableName As String = "ccvisitors" '<------ set to tablename for the primary content (used for cache names)
+        Private Const primaryContentDataSource As String = "default" '<----- set to datasource if not default
         '
         ' -- instance properties
         Public ID As Integer
@@ -65,7 +67,7 @@ Namespace Contensive.Core.Models.Entity
         Public Shared Function add(cpCore As coreClass, ByRef cacheNameList As List(Of String)) As visitorModel
             Dim result As visitorModel = Nothing
             Try
-                result = create(cpCore, cpCore.db.metaData_InsertContentRecordGetID(primaryContentName, cpCore.authContext.user.ID), cacheNameList)
+                result = create(cpCore, cpCore.db.metaData_InsertContentRecordGetID(primaryContentName, 0), cacheNameList)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
                 Throw
@@ -126,7 +128,7 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <param name="sqlCriteria"></param>
-        Private Shared Function loadObject(cpCore As coreClass, sqlCriteria As String, ByRef cacheNameList As List(Of String)) As visitorModel
+        Private Shared Function loadObject(cpCore As coreClass, sqlCriteria As String, ByRef callersCacheNameList As List(Of String)) As visitorModel
             Dim result As visitorModel = Nothing
             Try
                 Dim cs As New csController(cpCore)
@@ -158,12 +160,12 @@ Namespace Contensive.Core.Models.Entity
                         '
                         ' -- set primary and secondary caches
                         ' -- add all cachenames to the injected cachenamelist
-                        Dim cacheName0 As String = getCacheName("id", result.id.ToString())
-                        cacheNameList.Add(cacheName0)
+                        Dim cacheName0 As String = getCacheName("id", result.ID.ToString())
+                        callersCacheNameList.Add(cacheName0)
                         cpCore.cache.setObject(cacheName0, result)
                         '
                         Dim cacheName1 As String = getCacheName("ccguid", result.ccGuid)
-                        cacheNameList.Add(cacheName1)
+                        callersCacheNameList.Add(cacheName1)
                         cpCore.cache.setObject(cacheName1, Nothing, cacheName1)
                     End If
                 End If
@@ -184,24 +186,25 @@ Namespace Contensive.Core.Models.Entity
         Public Function saveObject(cpCore As coreClass) As Integer
             Try
                 Dim cs As New csController(cpCore)
-                If (id > 0) Then
-                    If Not cs.open(primaryContentName, "id=" & id) Then
-                        id = 0
+                If (ID > 0) Then
+                    If Not cs.open(primaryContentName, "id=" & ID) Then
+                        Dim message As String = "Unable to open record in content [" & primaryContentName & "], with id [" & ID & "]"
                         cs.Close()
-                        Throw New ApplicationException("Unable to open record in content [" & primaryContentName & "], with id [" & id & "]")
+                        ID = 0
+                        Throw New ApplicationException(message)
                     End If
                 Else
                     If Not cs.Insert(primaryContentName) Then
                         cs.Close()
-                        id = 0
+                        ID = 0
                         Throw New ApplicationException("Unable to insert record in content [" & primaryContentName & "]")
                     End If
                 End If
                 If cs.ok() Then
-                    If (String.IsNullOrEmpty(name)) Then
-                        name = "Visitor " & id.ToString()
+                    ID = cs.getInteger("id")
+                    If (String.IsNullOrEmpty(Name)) Then
+                        Name = "Visitor " & ID.ToString()
                     End If
-                    id = cs.getInteger("id")
                     cs.setField("Active", Active.ToString())
                     cs.setField("ccGuid", ccGuid)
                     cs.setField("ContentCategoryID", ContentCategoryID.ToString())
@@ -223,13 +226,13 @@ Namespace Contensive.Core.Models.Entity
                 Call cs.Close()
                 '
                 ' -- invalidate objects
-                cpCore.cache.invalidateObject(getCacheName("id", id.ToString))
+                cpCore.cache.invalidateObject(getCacheName("id", ID.ToString))
                 cpCore.cache.invalidateObject(getCacheName("ccguid", ccGuid))
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
                 Throw
             End Try
-            Return id
+            Return ID
         End Function
         '
         '====================================================================================================
@@ -331,6 +334,43 @@ Namespace Contensive.Core.Models.Entity
         Private Shared Function getCacheName(fieldName As String, fieldValue As String) As String
             Return (primaryContentTableName & "." & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
             'Return (GetType(visitorModel).FullName & "." & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
+        End Function
+        '
+        '====================================================================================================
+        '
+        Public Shared Function getDefault(cpcore As coreClass) As visitorModel
+            Dim instance As New visitorModel
+            Try
+                Dim CDef As coreMetaDataClass.CDefClass = cpcore.metaData.getCdef(primaryContentName)
+                If (CDef Is Nothing) Then
+                    Throw New ApplicationException("content [" & primaryContentName & "] could Not be found.")
+                ElseIf (CDef.Id <= 0) Then
+                    Throw New ApplicationException("content [" & primaryContentName & "] could Not be found.")
+                Else
+                    With CDef
+                        instance.Active = genericController.EncodeBoolean(.fields("Active").defaultValue)
+                        instance.ccGuid = genericController.encodeText(.fields("ccGuid").defaultValue)
+                        instance.ContentCategoryID = CDef.Id
+                        instance.ContentControlID = genericController.EncodeInteger(.fields("ContentControlID").defaultValue)
+                        instance.CreatedBy = genericController.EncodeInteger(.fields("CreatedBy").defaultValue)
+                        instance.CreateKey = genericController.EncodeInteger(.fields("CreateKey").defaultValue)
+                        instance.DateAdded = genericController.EncodeDate(.fields("DateAdded").defaultValue)
+                        instance.EditArchive = genericController.EncodeBoolean(.fields("EditArchive").defaultValue)
+                        instance.EditBlank = genericController.EncodeBoolean(.fields("EditBlank").defaultValue)
+                        instance.EditSourceID = genericController.EncodeInteger(.fields("EditSourceID").defaultValue)
+                        instance.ForceBrowserMobile = genericController.EncodeInteger(.fields("ForceBrowserMobile").defaultValue)
+                        instance.MemberID = genericController.EncodeInteger(.fields("MemberID").defaultValue)
+                        instance.ModifiedBy = genericController.EncodeInteger(.fields("ModifiedBy").defaultValue)
+                        instance.ModifiedDate = genericController.EncodeDate(.fields("ModifiedDate").defaultValue)
+                        instance.Name = genericController.encodeText(.fields("Name").defaultValue)
+                        instance.OrderID = genericController.EncodeInteger(.fields("OrderID").defaultValue)
+                        instance.SortOrder = genericController.encodeText(.fields("SortOrder").defaultValue)
+                    End With
+                End If
+            Catch ex As Exception
+                cpcore.handleExceptionAndContinue(ex)
+            End Try
+            Return instance
         End Function
         '        '
         '        ' LEGACY CODE =============================================================================

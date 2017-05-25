@@ -4,6 +4,12 @@ Option Strict On
 
 Imports System.Data.SqlClient
 Imports System.Text.RegularExpressions
+Imports Contensive
+Imports Contensive.BaseClasses
+Imports Contensive.Core
+Imports Contensive.Core.Models
+Imports Contensive.Core.Models.Entity
+Imports Contensive.Core.Models.Context
 
 Namespace Contensive.Core.Controllers
     Public Class dbController
@@ -110,42 +116,25 @@ Namespace Contensive.Core.Controllers
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
-        '
-        '===================================================================================================
-        ''' <summary>
-        ''' addonCache object
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public ReadOnly Property dataSources() As Dictionary(Of String, Models.Entity.dataSourceModel)
-            Get
-                If (_dataSources Is Nothing) Then
-                    _dataSources = Models.Entity.dataSourceModel.getDictionary(cpCore)
-                End If
-                Return _dataSources
-            End Get
-        End Property
-        Private _dataSources As Dictionary(Of String, Models.Entity.dataSourceModel) = Nothing
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' get the database id for a given datasource name. If not found, -1 is returned
-        ''' </summary>
-        ''' <param name="DataSourceName"></param>
-        ''' <returns></returns>
-        Public Function getDataSourceId(ByVal DataSourceName As String) As Integer
-            Dim returnDataSourceId As Integer = -1
-            Try
-                Dim normalizedDataSourceName As String = Models.Entity.dataSourceModel.normalizeDataSourceName(DataSourceName)
-                If (dataSources.ContainsKey(normalizedDataSourceName)) Then
-                    returnDataSourceId = dataSources(normalizedDataSourceName).id
-                End If
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-            Return returnDataSourceId
-        End Function
+        ''
+        ''====================================================================================================
+        '''' <summary>
+        '''' get the database id for a given datasource name. If not found, -1 is returned
+        '''' </summary>
+        '''' <param name="DataSourceName"></param>
+        '''' <returns></returns>
+        'Public Function getDataSourceId(ByVal DataSourceName As String) As Integer
+        '    Dim returnDataSourceId As Integer = -1
+        '    Try
+        '        Dim normalizedDataSourceName As String = Models.Entity.dataSourceModel.normalizeDataSourceName(DataSourceName)
+        '        If (dataSources.ContainsKey(normalizedDataSourceName)) Then
+        '            returnDataSourceId = dataSources(normalizedDataSourceName).id
+        '        End If
+        '    Catch ex As Exception
+        '        cpCore.handleExceptionAndRethrow(ex)
+        '    End Try
+        '    Return returnDataSourceId
+        'End Function
         ''
         ''====================================================================================================
         '''' <summary>
@@ -187,14 +176,14 @@ Namespace Contensive.Core.Controllers
                 Else
                     '
                     ' -- custom datasource from Db in primary datasource
-                    If (Not dataSources.ContainsKey(normalizedDataSourceName)) Then
+                    If (Not cpCore.dataSources.ContainsKey(normalizedDataSourceName)) Then
                         '
                         ' -- not found, this is a hard error
                         Throw New ApplicationException("Datasource [" & normalizedDataSourceName & "] was not found.")
                     Else
                         '
                         ' -- found in local cache
-                        With dataSources(normalizedDataSourceName)
+                        With cpCore.dataSources(normalizedDataSourceName)
                             returnConnString = "" _
                                 & "server=" & .endPoint & ";" _
                                 & "User Id=" & .username & ";" _
@@ -249,14 +238,14 @@ Namespace Contensive.Core.Controllers
                 Else
                     '
                     ' -- custom datasource from Db in primary datasource
-                    If (Not dataSources.ContainsKey(normalizedDataSourceName)) Then
+                    If (Not cpCore.dataSources.ContainsKey(normalizedDataSourceName)) Then
                         '
                         ' -- not found, this is a hard error
                         Throw New ApplicationException("Datasource [" & normalizedDataSourceName & "] was not found.")
                     Else
                         '
                         ' -- found in local cache
-                        With dataSources(normalizedDataSourceName)
+                        With cpCore.dataSources(normalizedDataSourceName)
                             returnConnString &= "" _
                                 & "Provider=sqloledb;" _
                                 & "Data Source=" & .endPoint & ";" _
@@ -392,10 +381,11 @@ Namespace Contensive.Core.Controllers
                     End Using
                 End Using
                 dbVerified = True
-            End If
-            Dim tickCountDuration As Integer = GetTickCount - tickCountStart
-            If (tickCountDuration > sqlSlowThreshholdMsec) Then
-                saveSlowQueryLog(tickCountDuration, sql)
+                Dim tickCountDuration As Integer = GetTickCount - tickCountStart
+                saveTransactionLog("duration [" & tickCountDuration & "], sql [" & sql & "]")
+                If (tickCountDuration > sqlSlowThreshholdMsec) Then
+                    saveSlowQueryLog(tickCountDuration, sql)
+                End If
             End If
             Return returnData
         End Function
@@ -2248,7 +2238,7 @@ Namespace Contensive.Core.Controllers
         '    genericController.EncodeDate( csv_cs_getField )
         '
         Public Function cs_getDate(ByVal CSPointer As Integer, ByVal FieldName As String) As Date
-            cs_getDate =  genericController.EncodeDate(cs_getField(CSPointer, FieldName))
+            cs_getDate = genericController.EncodeDate(cs_getField(CSPointer, FieldName))
         End Function
         '
         '   genericController.EncodeBoolean( csv_cs_getField )
@@ -2653,7 +2643,7 @@ Namespace Contensive.Core.Controllers
                                                         Case FieldTypeIdInteger, FieldTypeIdMemberSelect
                                                             sqlList.add(FieldName, encodeSQLNumber(genericController.EncodeInteger(.defaultValue)))
                                                         Case FieldTypeIdDate
-                                                            sqlList.add(FieldName, encodeSQLDate( genericController.EncodeDate(.defaultValue)))
+                                                            sqlList.add(FieldName, encodeSQLDate(genericController.EncodeDate(.defaultValue)))
                                                         Case FieldTypeIdLookup
                                                             '
                                                             ' refactor --
@@ -3475,7 +3465,7 @@ Namespace Contensive.Core.Controllers
                                 ' capture and block it - it is hardcoded in sql
                                 '
                                 AuthorableFieldUpdate = True
-                                sqlModifiedDate =  genericController.EncodeDate(writeCacheValueVariant)
+                                sqlModifiedDate = genericController.EncodeDate(writeCacheValueVariant)
                             Else
                                 '
                                 ' let these field be added to the sql
@@ -3506,7 +3496,7 @@ Namespace Contensive.Core.Controllers
                                             Case FieldTypeIdBoolean
                                                 SQLSetPair = FieldName & "=" & encodeSQLBoolean(genericController.EncodeBoolean(writeCacheValueVariant))
                                             Case FieldTypeIdDate
-                                                SQLSetPair = FieldName & "=" & encodeSQLDate( genericController.EncodeDate(writeCacheValueVariant))
+                                                SQLSetPair = FieldName & "=" & encodeSQLDate(genericController.EncodeDate(writeCacheValueVariant))
                                             Case FieldTypeIdText
                                                 Copy = Left(genericController.encodeText(writeCacheValueVariant), 255)
                                                 If .Scramble Then
@@ -3796,7 +3786,7 @@ Namespace Contensive.Core.Controllers
                     Case FieldTypeIdAutoIdIncrement, FieldTypeIdInteger, FieldTypeIdLookup, FieldTypeIdMemberSelect
                         returnResult = encodeSQLNumber(genericController.EncodeInteger(expression))
                     Case FieldTypeIdDate
-                        returnResult = encodeSQLDate( genericController.EncodeDate(expression))
+                        returnResult = encodeSQLDate(genericController.EncodeDate(expression))
                     Case FieldTypeIdLongText, FieldTypeIdHTML
                         returnResult = encodeSQLText(genericController.encodeText(expression))
                     Case FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdRedirect, FieldTypeIdManyToMany, FieldTypeIdText, FieldTypeIdFileTextPrivate, FieldTypeIdFileJavascript, FieldTypeIdFileXML, FieldTypeIdFileCSS, FieldTypeIdFileHTMLPrivate
@@ -3848,7 +3838,7 @@ Namespace Contensive.Core.Controllers
                 If IsDBNull(expression) Then
                     returnResult = "null"
                 Else
-                    Dim expressionDate As Date =  genericController.EncodeDate(expression)
+                    Dim expressionDate As Date = genericController.EncodeDate(expression)
                     If (expressionDate = Date.MinValue) Then
                         returnResult = "null"
                     Else
@@ -4861,44 +4851,44 @@ Namespace Contensive.Core.Controllers
             End Try
             Return returnContentId
         End Function
-        '
-        '========================================================================
-        ''' <summary>
-        ''' get dataSource Name from dataSource Id. Return "default" for Id=0. Name is as it appears in the name field of the dataSources table. To use a key in the dataSource cache, normaize with normalizeDataSourceKey()
-        ''' </summary>
-        ''' <param name="DataSourceID"></param>
-        ''' <returns></returns>
-        Public Function getDataSourceNameByID(DataSourceID As Integer) As String
-            Dim returndataSourceName As String = "default"
-            Try
-                If (DataSourceID > 0) Then
-                    For Each kvp As KeyValuePair(Of String, Models.Entity.dataSourceModel) In dataSources
-                        If (kvp.Value.id = DataSourceID) Then
-                            returndataSourceName = kvp.Value.name
-                        End If
-                    Next
-                    If String.IsNullOrEmpty(returndataSourceName) Then
-                        Using dt As DataTable = executeSql("select name,connString from ccDataSources where id=" & DataSourceID)
-                            If dt.Rows.Count > 0 Then
-                                Dim dataSource As New Models.Entity.dataSourceModel
-                                With dataSource
-                                    .id = genericController.EncodeInteger(dt(0).Item("id"))
-                                    .connStringOLEDB = genericController.encodeText(dt(0).Item("connString"))
-                                    .name = Models.Entity.dataSourceModel.normalizeDataSourceName(genericController.encodeText(dt(0).Item("name")))
-                                    returndataSourceName = .name
-                                End With
-                            End If
-                        End Using
-                    End If
-                    If String.IsNullOrEmpty(returndataSourceName) Then
-                        Throw New ApplicationException("Datasource ID [" & DataSourceID & "] was not found, the default datasource will be used")
-                    End If
-                End If
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-            Return returndataSourceName
-        End Function
+        ''
+        ''========================================================================
+        '''' <summary>
+        '''' get dataSource Name from dataSource Id. Return "default" for Id=0. Name is as it appears in the name field of the dataSources table. To use a key in the dataSource cache, normaize with normalizeDataSourceKey()
+        '''' </summary>
+        '''' <param name="DataSourceID"></param>
+        '''' <returns></returns>
+        'Public Function getDataSourceNameByID(DataSourceID As Integer) As String
+        '    Dim returndataSourceName As String = "default"
+        '    Try
+        '        If (DataSourceID > 0) Then
+        '            For Each kvp As KeyValuePair(Of String, Models.Entity.dataSourceModel) In dataSources
+        '                If (kvp.Value.id = DataSourceID) Then
+        '                    returndataSourceName = kvp.Value.name
+        '                End If
+        '            Next
+        '            If String.IsNullOrEmpty(returndataSourceName) Then
+        '                Using dt As DataTable = executeSql("select name,connString from ccDataSources where id=" & DataSourceID)
+        '                    If dt.Rows.Count > 0 Then
+        '                        Dim dataSource As New Models.Entity.dataSourceModel
+        '                        With dataSource
+        '                            .id = genericController.EncodeInteger(dt(0).Item("id"))
+        '                            .ConnString = genericController.encodeText(dt(0).Item("connString"))
+        '                            .name = Models.Entity.dataSourceModel.normalizeDataSourceName(genericController.encodeText(dt(0).Item("name")))
+        '                            returndataSourceName = .name
+        '                        End With
+        '                    End If
+        '                End Using
+        '            End If
+        '            If String.IsNullOrEmpty(returndataSourceName) Then
+        '                Throw New ApplicationException("Datasource ID [" & DataSourceID & "] was not found, the default datasource will be used")
+        '            End If
+        '        End If
+        '    Catch ex As Exception
+        '        cpCore.handleExceptionAndRethrow(ex)
+        '    End Try
+        '    Return returndataSourceName
+        'End Function
         '
         '=============================================================================
         ''' <summary>
@@ -4908,7 +4898,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="TableName"></param>
         ''' <param name="ContentName"></param>
         '
-        Public Sub createContentFromSQLTable(ByVal DataSourceName As String, ByVal TableName As String, ByVal ContentName As String)
+        Public Sub createContentFromSQLTable(ByVal DataSource As datasourcemodel, ByVal TableName As String, ByVal ContentName As String)
             Try
                 Dim SQL As String
                 Dim dtFields As DataTable
@@ -4932,16 +4922,16 @@ Namespace Contensive.Core.Controllers
                 ' ----- Read in a record from the table to get fields
                 '----------------------------------------------------------------
                 '
-                Dim dt As DataTable = cpCore.db.openTable(DataSourceName, TableName, "", "", , 1)
+                Dim dt As DataTable = cpCore.db.openTable(DataSource.Name, TableName, "", "", , 1)
                 If dt.Rows.Count = 0 Then
                     dt.Dispose()
                     '
                     ' --- no records were found, add a blank if we can
                     '
-                    dt = cpCore.db.insertTableRecordGetDataTable(DataSourceName, TableName, cpCore.authContext.user.ID)
+                    dt = cpCore.db.insertTableRecordGetDataTable(DataSource.Name, TableName, cpCore.authContext.user.ID)
                     If dt.Rows.Count > 0 Then
                         RecordID = genericController.EncodeInteger(dt.Rows(0).Item("ID"))
-                        Call cpCore.db.executeSql("Update " & TableName & " Set active=0 where id=" & RecordID & ";", DataSourceName)
+                        Call cpCore.db.executeSql("Update " & TableName & " Set active=0 where id=" & RecordID & ";", DataSource.Name)
                     End If
                 End If
                 If dt.Rows.Count = 0 Then
@@ -4958,7 +4948,7 @@ Namespace Contensive.Core.Controllers
                         ' ----- Content definition not found, create it
                         '
                         ContentIsNew = True
-                        Call cpCore.metaData.metaData_CreateContent4(True, DataSourceName, TableName, ContentName)
+                        Call cpCore.metaData.metaData_CreateContent4(True, DataSource, TableName, ContentName)
                         'ContentID = csv_GetContentID(ContentName)
                         SQL = "Select ID from ccContent where name=" & cpCore.db.encodeSQLText(ContentName)
                         dt = cpCore.db.executeSql(SQL)
@@ -5014,7 +5004,7 @@ Namespace Contensive.Core.Controllers
                 ' Fill ContentControlID fields with new ContentID
                 '
                 SQL = "Update " & TableName & " Set ContentControlID=" & ContentID & " where (ContentControlID Is null);"
-                Call cpCore.db.executeSql(SQL, DataSourceName)
+                Call cpCore.db.executeSql(SQL, DataSource.Name)
                 '
                 ' ----- Load CDef
                 '       Load only if the previous state of autoload was true

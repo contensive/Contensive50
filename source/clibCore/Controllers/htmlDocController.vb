@@ -9124,7 +9124,7 @@ ErrorTrap:
                             cpCore.authContext.visit.LoginAttempts = cpCore.authContext.visit.LoginAttempts + 1
                             cpCore.authContext.visit.saveObject(cpCore)
                         Else
-                            returnREsult = cpCore.authContext.authenticateById(cpCore, LocalMemberID, loginForm_AutoLogin)
+                            returnREsult = cpCore.authContext.authenticateById(cpCore, LocalMemberID, cpCore.authContext)
                             If returnREsult Then
                                 Call cpCore.log_LogActivity2("successful username/password login", cpCore.authContext.user.ID, cpCore.authContext.user.OrganizationID)
                             Else
@@ -9199,7 +9199,7 @@ ErrorTrap:
                                 Call cpCore.db.cs_set(CS, "Name", FullName)
                                 Call cpCore.db.cs_set(CS, "username", loginForm_Username)
                                 Call cpCore.db.cs_set(CS, "password", loginForm_Password)
-                                Call cpCore.authContext.authenticateById(cpCore, cpCore.authContext.user.ID)
+                                Call cpCore.authContext.authenticateById(cpCore, cpCore.authContext.user.ID, cpCore.authContext)
                             End If
                             Call cpCore.db.cs_Close(CS)
                         End If
