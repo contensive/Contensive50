@@ -10,7 +10,6 @@ Imports System.IO
 
 Public Class configurationClass
     Public Shared Function getServerConfig() As Contensive.Core.Models.Entity.serverConfigModel
-        Logger.LogInfo("getServerConfig")
         Dim serverConfig As Contensive.Core.Models.Entity.serverConfigModel = Nothing
         Try
             serverConfig = New Contensive.Core.Models.Entity.serverConfigModel
@@ -42,13 +41,12 @@ Public Class configurationClass
             serverConfig.programFilesPath = ""
             serverConfig.username = ConfigurationManager.AppSettings("ContensiveServerGroupUsername")
         Catch ex As Exception
-            Logger.LogInfo(ex)
+            Logger.appendProgramDataLog(ex.ToString)
         End Try
         Return serverConfig
     End Function
     '
     Public Shared Sub RegisterRoutes(cp As Contensive.Core.CPClass, ByVal routes As RouteCollection)
-        Logger.LogInfo("RegisterRoutes")
         Try
             Dim cs As Contensive.BaseClasses.CPCSBaseClass = cp.CSNew
             '
@@ -63,7 +61,7 @@ Public Class configurationClass
                     If (adminRoute.Substring(0, 1) = "/"c) Then
                         adminRoute = adminRoute.Substring(1)
                     End If
-                    cp.Utils.AppendLog("RegisterRoutes, admin route, serverConfig.appConfig.adminRoute [" & adminRoute & "]")
+                    appendLog(cp, "RegisterRoutes, admin route, serverConfig.appConfig.adminRoute [" & adminRoute & "]")
                     routes.MapPageRoute("Admin Route", adminRoute, physicalFile)
                 Catch ex As Exception
                     cp.Site.ErrorReport(ex, "Exception while adding admin route")
@@ -71,14 +69,14 @@ Public Class configurationClass
             End If
             '
             Dim remoteMethods As List(Of Contensive.Core.Models.Entity.addonModel) = Contensive.Core.Models.Entity.addonModel.getRemoteMethods(cp.core)
-            cp.Utils.AppendLog("RegisterRoutes, remoteMethods.Count=" & remoteMethods.Count.ToString())
+            appendLog(cp, "RegisterRoutes, remoteMethods.Count=" & remoteMethods.Count.ToString())
             For Each remoteMethod As Contensive.Core.Models.Entity.addonModel In remoteMethods
                 '
                 ' -- register each remote method
                 Try
                     Dim routeName As String = remoteMethod.name
                     Dim routeUrl As String = remoteMethod.name
-                    cp.Utils.AppendLog("RegisterRoutes, remoteMethods, routeName=[" & routeName & "], routeUrl =[" & routeUrl & "], physicalFile=[" & physicalFile & "]")
+                    appendLog(cp, "RegisterRoutes, remoteMethods, routeName=[" & routeName & "], routeUrl =[" & routeUrl & "], physicalFile=[" & physicalFile & "]")
                     routes.MapPageRoute(routeName, routeUrl, physicalFile)
                 Catch ex As Exception
                     cp.Site.ErrorReport(ex, "Exception while adding remote method routes")
@@ -90,7 +88,7 @@ Public Class configurationClass
                 Do
                     Dim routeName As String = cs.GetText("name")
                     Dim routeUrl As String = routeName
-                    cp.Utils.AppendLog("RegisterRoutes, link aliases, routeName=[" & routeName & "], routeUrl =[" & routeUrl & "], physicalFile=[" & physicalFile & "]")
+                    appendLog(cp, "RegisterRoutes, link aliases, routeName=[" & routeName & "], routeUrl =[" & routeUrl & "], physicalFile=[" & physicalFile & "]")
                     routes.MapPageRoute(routeName, routeUrl, physicalFile)
                     cs.GoNext()
                 Loop While cs.OK()
@@ -102,14 +100,14 @@ Public Class configurationClass
                 Do
                     Dim routeName As String = cs.GetText("name")
                     Dim routeUrl As String = cs.GetText("SourceLink")
-                    cp.Utils.AppendLog("RegisterRoutes, link aliases, routeName=[" & routeName & "], routeUrl =[" & routeUrl & "], physicalFile=[" & physicalFile & "]")
+                    appendLog(cp, "RegisterRoutes, link aliases, routeName=[" & routeName & "], routeUrl =[" & routeUrl & "], physicalFile=[" & physicalFile & "]")
                     routes.MapPageRoute(routeName, routeUrl, physicalFile)
                     cs.GoNext()
                 Loop While cs.OK()
             End If
             cs.Close()
         Catch ex As Exception
-            Logger.LogInfo(ex)
+            Logger.appendProgramDataLog(ex.ToString())
         End Try
     End Sub
     '
@@ -117,9 +115,13 @@ Public Class configurationClass
         Return Equals(source.ToLower(), "true") Or Equals(source.ToLower(), "yes") Or Equals(source.ToLower(), "on") Or (IsNumeric(source) And (source <> "0"))
     End Function
     '
-
+    Public Shared Sub appendLog(cp As Contensive.BaseClasses.CPBaseClass, message As String)
+        cp.Utils.AppendLog("aspnet\", message)
+        'cp.Utils.AppendLog("aspnet\" & Now.Year.ToString & Now.Month.ToString().PadLeft(2, "0"c) & Now.Day.ToString().PadLeft(2, "0"c) & ".log", message)
+        Trace.WriteLine(message)
+    End Sub
+    '
     ' 
-
     ' This class is responsible for tracing application errors during runtime. It writes information to log file describing cause of error, file name & line number etc 
     '
 

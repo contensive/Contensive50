@@ -243,6 +243,9 @@ Namespace Contensive.Core.Models.Entity
                 End If
                 If cs.ok() Then
                     id = cs.getInteger("id")
+                    If (String.IsNullOrEmpty(ccguid)) Then
+                        ccguid = Controllers.genericController.getGUID()
+                    End If
                     Call cs.setField("name", name)
                     Call cs.setField("ccGuid", ccguid)
                     Call cs.setField("createKey", createKey.ToString())

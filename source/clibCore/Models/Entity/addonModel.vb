@@ -265,6 +265,9 @@ Namespace Contensive.Core.Models.Entity
                 End If
                 If cs.ok() Then
                     id = cs.getInteger("id")
+                    If (String.IsNullOrEmpty(ccGuid)) Then
+                        ccGuid = Controllers.genericController.getGUID()
+                    End If
                     cs.setField("Name", name)
                     cs.setField("active", active)
                     cs.setField("sortorder", sortorder)

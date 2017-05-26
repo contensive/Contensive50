@@ -503,11 +503,10 @@ Namespace Contensive.Core.Models.Context
                     If dt.Rows.Count > 0 Then
                         ContentID = genericController.EncodeInteger(dt.Rows(0).Item("ID"))
                     End If
-                    'ContentID = csv_GetContentID("Site Properties")
                     SQL = "INSERT INTO ccSetup (ACTIVE,CONTENTCONTROLID,NAME,FIELDVALUE,ModifiedDate,DateAdded)VALUES(" & SQLTrue & "," & cpCore.db.encodeSQLNumber(ContentID) & "," & cpCore.db.encodeSQLText(UCase(propertyName)) & "," & cpCore.db.encodeSQLText(Value) & "," & SQLNow & "," & SQLNow & ");"
                     Call cpCore.db.executeSql(SQL)
                 End If
-                Call cpCore.cache.setObject(cacheName, Value, "site properties")
+                Call cpCore.cache.setObject(cacheName, Value)
 
             Catch ex As Exception
                 Call cpCore.handleExceptionAndRethrow(ex)
@@ -547,26 +546,23 @@ Namespace Contensive.Core.Models.Context
         ''' <param name="memberId"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function getText_noCache(ByVal PropertyName As String, ByVal DefaultValue As String, ByRef return_propertyFound As Boolean) As String
+        Public Function getTextFromDb(ByVal PropertyName As String, ByVal DefaultValue As String, ByRef return_propertyFound As Boolean) As String
             Dim returnString As String = ""
             Try
-                Dim SQL As String
-                Dim dt As DataTable
-
-                SQL = "select FieldValue from ccSetup where name=" & cpCore.db.encodeSQLText(PropertyName) & " order by id"
-                dt = cpCore.db.executeSql(SQL)
-                If dt.Rows.Count > 0 Then
-                    returnString = genericController.encodeText(dt.Rows(0).Item("FieldValue"))
-                    return_propertyFound = True
-                ElseIf (DefaultValue <> "") Then
-                    ' do not set - set may have to save, and save needs contentId, which now loads ondemand, which checks cache, which does a getSiteProperty.
-                    Call setProperty(PropertyName, DefaultValue)
-                    returnString = DefaultValue
-                    return_propertyFound = True
-                Else
-                    returnString = ""
-                    return_propertyFound = False
-                End If
+                Using dt As DataTable = cpCore.db.executeSql("select FieldValue from ccSetup where name=" & cpCore.db.encodeSQLText(PropertyName) & " order by id")
+                    If dt.Rows.Count > 0 Then
+                        returnString = genericController.encodeText(dt.Rows(0).Item("FieldValue"))
+                        return_propertyFound = True
+                    ElseIf (DefaultValue <> "") Then
+                        ' do not set - set may have to save, and save needs contentId, which now loads ondemand, which checks cache, which does a getSiteProperty.
+                        Call setProperty(PropertyName, DefaultValue)
+                        returnString = DefaultValue
+                        return_propertyFound = True
+                    Else
+                        returnString = ""
+                        return_propertyFound = False
+                    End If
+                End Using
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -582,7 +578,7 @@ Namespace Contensive.Core.Models.Context
         ''' <param name="memberId"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function getText(ByVal PropertyName As String, Optional ByVal DefaultValue As String = "") As String
+        Public Function getText(ByVal PropertyName As String, ByVal DefaultValue As String) As String
             Dim returnString As String = ""
             Try
                 '
@@ -590,12 +586,12 @@ Namespace Contensive.Core.Models.Context
                 '   a setproperty udpates the local dictionary, the cache and the db
                 '
                 Dim cacheName As String = "siteProperty-" & PropertyName
-                Dim propertyFound As Boolean = False
                 returnString = cpCore.cache.getObject(Of String)(cacheName)
                 If String.IsNullOrEmpty(returnString) Then
-                    returnString = getText_noCache(PropertyName, DefaultValue, propertyFound)
+                    Dim propertyFound As Boolean = False
+                    returnString = getTextFromDb(PropertyName, DefaultValue, propertyFound)
                     If (propertyFound) And (returnString <> "") Then
-                        Call cpCore.cache.setObject(cacheName, returnString, "Site Properties")
+                        Call cpCore.cache.setObject(cacheName, returnString)
                     End If
                 End If
             Catch ex As Exception
@@ -611,7 +607,7 @@ Namespace Contensive.Core.Models.Context
         ''' <param name="PropertyName"></param>
         ''' <returns></returns>
         Public Function getText(ByVal PropertyName As String) As String
-            Return getText(PropertyName, "")
+            Return getText(PropertyName, Nothing)
         End Function
         '
         '========================================================================
@@ -653,7 +649,7 @@ Namespace Contensive.Core.Models.Context
                 'Return True
                 Dim propertyFound As Boolean = False
                 If Not siteProperty_AllowCache_LocalLoaded Then
-                    siteProperty_AllowCache_Local = genericController.EncodeBoolean(getText_noCache("AllowBake", "0", propertyFound))
+                    siteProperty_AllowCache_Local = genericController.EncodeBoolean(getTextFromDb("AllowBake", "0", propertyFound))
                     siteProperty_AllowCache_LocalLoaded = True
                 End If
                 allowCache_notCached = siteProperty_AllowCache_Local

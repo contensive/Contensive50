@@ -306,13 +306,15 @@ Namespace Contensive.Core.Controllers
                         appendCacheLog("getCacheObject, config.enableCache and siteproperty.allowCache")
                         Dim encodedCacheName As String = encodeCacheName(cpCore.serverConfig.appConfig.name, cacheName)
                         If cpCore.serverConfig.isLocalCache Or remoteCacheDisabled Then
-                            appendCacheLog("getCacheObject, local cache")
+                            appendCacheLog("getCacheObject, local cache, attempt memory cache")
                             '
                             ' implement a simple local cache using the filesystem/dotnet
                             '
                             returnObj = getCacheObjectDotNet(cacheName)
-                            If (returnObj) Is Nothing Then
-                                appendCacheLog("getCacheObject, memory cache miss")
+                            If (returnObj IsNot Nothing) Then
+                                appendCacheLog("getCacheObject, memory cache hit")
+                            Else
+                                appendCacheLog("getCacheObject, memory cache miss, attempt file cache")
                                 Dim serializedDataObject As String = Nothing
                                 Using mutex As New System.Threading.Mutex(False, encodedCacheName)
                                     mutex.WaitOne()

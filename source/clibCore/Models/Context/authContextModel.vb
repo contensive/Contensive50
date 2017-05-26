@@ -59,9 +59,9 @@ Namespace Contensive.Core.Models.Context
         ''' constructor, no arguments, created default authentication model for use without user, and before user is available
         ''' </summary>
         Public Sub New()
-            'visit = New Models.Entity.visitModel()
-            'visitor = New Models.Entity.visitorModel()
-            'user = New Models.Entity.personModel()
+            visit = New Models.Entity.visitModel()
+            visitor = New Models.Entity.visitorModel()
+            user = New Models.Entity.personModel()
             'authContextUser = New authContextUserModel()
         End Sub
         '
@@ -90,9 +90,9 @@ Namespace Contensive.Core.Models.Context
                 Dim user_changes As Boolean = False
                 '
                 resultAuthContext = New authContextModel
-                resultAuthContext.visit = New Models.Entity.visitModel
-                resultAuthContext.visitor = New Models.Entity.visitorModel
-                resultAuthContext.user = New Models.Entity.personModel
+                'resultAuthContext.visit = New Models.Entity.visitModel
+                'resultAuthContext.visitor = New Models.Entity.visitorModel
+                'resultAuthContext.user = New Models.Entity.personModel
                 '
                 visitCookieTimestamp = Date.MinValue
                 'resultAuthContext.visit.ID = 0

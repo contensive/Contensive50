@@ -86,7 +86,7 @@ Namespace Contensive.Core
                     localId = cpcore.authContext.user.id
                     If (localId = 0) Then
                         localId = cpCore.db.metaData_InsertContentRecordGetID("people", 0)
-                        Call cpCore.authContext.recognizeById(cpCore, localId)
+                        Call cpCore.authContext.recognizeById(cpCore, localId, cpCore.authContext)
                     End If
                 End If
                 Return localId
@@ -318,19 +318,23 @@ Namespace Contensive.Core
         '
         <Obsolete("Use LoginById(integer) instead", False)>
         Public Overrides Function LoginByID(ByVal RecordID As String, Optional ByVal SetAutoLogin As Boolean = False) As Boolean
-            Return cpCore.authContext.authenticateById(cpCore, EncodeInteger(RecordID), SetAutoLogin)
+            Return cpCore.authContext.authenticateById(cpCore, EncodeInteger(RecordID), cpCore.authContext)
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Function LoginByID(ByVal RecordID As Integer) As Boolean
-            Return cpCore.authContext.authenticateById(cpCore, RecordID, False)
+            Return cpCore.authContext.authenticateById(cpCore, RecordID, cpCore.authContext)
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Function LoginByID(ByVal RecordID As Integer, ByVal SetAutoLogin As Boolean) As Boolean
-            Return cpCore.authContext.authenticateById(cpCore, RecordID, SetAutoLogin)
+            Return cpCore.authContext.authenticateById(cpCore, RecordID, cpCore.authContext)
+            If Not cpCore.authContext.user.AutoLogin Then
+                cpCore.authContext.user.AutoLogin = True
+                cpCore.authContext.user.saveObject(cpCore)
+            End If
         End Function
         '
         '====================================================================================================
@@ -400,7 +404,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function Recognize(ByVal UserID As Integer) As Boolean 'Inherits BaseClasses.CPUserBaseClass.Recognize
-            Return cpCore.authContext.recognizeById(cpCore, UserID)
+            Return cpCore.authContext.recognizeById(cpCore, UserID, cpCore.authContext)
         End Function
         '
         '====================================================================================================

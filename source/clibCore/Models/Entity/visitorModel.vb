@@ -155,6 +155,7 @@ Namespace Contensive.Core.Models.Entity
                         .Name = cs.getText("Name")
                         .OrderID = cs.getInteger("OrderID")
                         .SortOrder = cs.getText("SortOrder")
+                        If (String.IsNullOrEmpty(.ccGuid)) Then .ccGuid = Controllers.genericController.getGUID()
                     End With
                     If (result IsNot Nothing) Then
                         '
@@ -166,7 +167,7 @@ Namespace Contensive.Core.Models.Entity
                         '
                         Dim cacheName1 As String = getCacheName("ccguid", result.ccGuid)
                         callersCacheNameList.Add(cacheName1)
-                        cpCore.cache.setObject(cacheName1, Nothing, cacheName1)
+                        cpCore.cache.setObject(cacheName1, Nothing, cacheName0)
                     End If
                 End If
                 Call cs.Close()
@@ -202,6 +203,9 @@ Namespace Contensive.Core.Models.Entity
                 End If
                 If cs.ok() Then
                     ID = cs.getInteger("id")
+                    If (String.IsNullOrEmpty(ccGuid)) Then
+                        ccGuid = Controllers.genericController.getGUID()
+                    End If
                     If (String.IsNullOrEmpty(Name)) Then
                         Name = "Visitor " & ID.ToString()
                     End If
@@ -308,7 +312,7 @@ Namespace Contensive.Core.Models.Entity
             cpCore.cache.invalidateObject(getCacheName("id", recordId.ToString))
             '
             ' -- always clear the cache with the content name
-            cpCore.cache.invalidateObject(primaryContentName)
+            '?? cpCore.cache.invalidateObject(primaryContentName)
         End Sub
         '
         '====================================================================================================
@@ -321,7 +325,7 @@ Namespace Contensive.Core.Models.Entity
             cpCore.cache.invalidateObject(getCacheName("ccguid", guid))
             '
             ' -- always clear the cache with the content name
-            cpCore.cache.invalidateObject(primaryContentName)
+            '?? cpCore.cache.invalidateObject(primaryContentName)
         End Sub
         '
         '====================================================================================================

@@ -253,7 +253,7 @@ Namespace Contensive.Core.Models.Entity
                         .Username = cs.getText("Username")
                         .Visits = cs.getInteger("Visits")
                         .Zip = cs.getText("Zip")
-                    End With
+                        If (String.IsNullOrEmpty(.ccGuid)) Then .ccGuid = Controllers.genericController.getGUID() End With
                     If (result IsNot Nothing) Then
                         '
                         ' -- set primary and secondary caches
@@ -264,7 +264,7 @@ Namespace Contensive.Core.Models.Entity
                         '
                         Dim cacheName1 As String = getCacheName("ccguid", result.ccguid)
                         cacheNameList.Add(cacheName1)
-                        cpCore.cache.setObject(cacheName1, Nothing, cacheName1)
+                        cpCore.cache.setObject(cacheName1, Nothing, cacheName0)
                     End If
                 End If
                 Call cs.Close()
@@ -299,7 +299,10 @@ Namespace Contensive.Core.Models.Entity
                 End If
                 If cs.ok() Then
                     id = cs.getInteger("id")
-                    cs.SetField("Active", Active.ToString())
+                    If (String.IsNullOrEmpty(ccGuid)) Then
+                        ccGuid = Controllers.genericController.getGUID()
+                    End If
+                    cs.setField("Active", Active.ToString())
                     cs.SetField("Address", Address)
                     cs.SetField("Address2", Address2)
                     cs.SetField("Admin", Admin.ToString())
@@ -456,7 +459,7 @@ Namespace Contensive.Core.Models.Entity
             cpCore.cache.invalidateObject(getCacheName("id", recordId.ToString))
             '
             ' -- always clear the cache with the content name
-            cpCore.cache.invalidateObject(primaryContentName)
+            '?? cpCore.cache.invalidateObject(primaryContentName)
         End Sub
         '
         '====================================================================================================
@@ -469,7 +472,7 @@ Namespace Contensive.Core.Models.Entity
             cpCore.cache.invalidateObject(getCacheName("ccguid", guid))
             '
             ' -- always clear the cache with the content name
-            cpCore.cache.invalidateObject(primaryContentName)
+            '?? cpCore.cache.invalidateObject(primaryContentName)
         End Sub
         '
         '====================================================================================================

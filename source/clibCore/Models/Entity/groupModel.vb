@@ -214,6 +214,9 @@ Namespace Contensive.Core.Models.Entity
                 End If
                 If cs.ok() Then
                     id = cs.getInteger("id")
+                    If (String.IsNullOrEmpty(ccGuid)) Then
+                        ccGuid = Controllers.genericController.getGUID()
+                    End If
                     cs.setField("Active", Active.ToString())
                     cs.setField("AllowBulkEmail", AllowBulkEmail.ToString())
                     cs.setField("Caption", Caption)

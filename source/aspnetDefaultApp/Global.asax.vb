@@ -20,7 +20,7 @@ Public Class Global_asax
         Try
             Trace.WriteLine(getAppDescription("Application_Start"))
             Using cp As New Contensive.Core.CPClass(ConfigurationManager.AppSettings("ContensiveAppName"))
-                cp.Utils.AppendLog("Application_Start")
+                DefaultSite.configurationClass.appendLog(cp, getAppDescription("Application_Start"))
                 If (cp.appOk) Then
                     DefaultSite.configurationClass.RegisterRoutes(cp, RouteTable.Routes)
                 End If
@@ -64,14 +64,11 @@ Public Class Global_asax
     Private Function getAppDescription(eventName As String) As String
         Dim builder As New StringBuilder
         '
-        builder.AppendFormat("-------------------------------------------{0}", Environment.NewLine)
-        builder.AppendFormat("Event: {0}{1}", eventName, Environment.NewLine)
-        builder.AppendFormat("Guid: {0}{1}", AppId, Environment.NewLine)
-        builder.AppendFormat("Thread Id: {0}{1}",
-              System.Threading.Thread.CurrentThread.ManagedThreadId, Environment.NewLine)
-        builder.AppendFormat("Appdomain: {0}{1}",
-              AppDomain.CurrentDomain.FriendlyName, Environment.NewLine)
-        builder.Append(IIf(System.Threading.Thread.CurrentThread.IsThreadPoolThread, "Pool Thread", "No Thread").ToString() & Environment.NewLine)
+        builder.AppendFormat("Event: {0}", eventName)
+        builder.AppendFormat(", Guid: {0}", AppId)
+        builder.AppendFormat(", Thread Id: {0}", System.Threading.Thread.CurrentThread.ManagedThreadId)
+        builder.AppendFormat(", Appdomain: {0}", AppDomain.CurrentDomain.FriendlyName)
+        builder.Append(IIf(System.Threading.Thread.CurrentThread.IsThreadPoolThread, ", Pool Thread", ", No Thread").ToString())
         Return builder.ToString()
     End Function
 
