@@ -13,7 +13,7 @@ Namespace Contensive.Core.Controllers
     ''' 
     ''' When a record is saved in admin, an invalidation call is made for tableName+1d.
     ''' 
-    ''' If code edits a db record, you should call invalidation for tablename+id
+    ''' If code edits a db record, you should call invalidation for tablename+id+#
     ''' 
     ''' one-to-many lists: if the list is cached, it has to include tags for all its included members
     ''' 
@@ -26,6 +26,12 @@ Namespace Contensive.Core.Controllers
     '''     save the data in the primary cacheObject (tableName+id) and save a secondary cacheObject (tablename+guid). Sve both when you update the cacheObject. requesting either
     '''     or invalidating either will effect the primary cache
     '''   dependentObjectList -- if a cacheobject contains data from multiple sources, each source should be included in the dependencyList. This includes both cached models and Db records.
+    '''   
+    ''' Special cache entries
+    '''     dbTablename - cachename = the name of the table
+    '''         - when any record is saved to the table, this dbTablename cache is updated
+    '''         - objects like addonList depend on it, and are flushed if ANY record in that table is updated
+    '''         
     ''' </summary>
     Public Class cacheController
         Implements IDisposable
@@ -44,14 +50,15 @@ Namespace Contensive.Core.Controllers
         '
         ' ----- private instance storage
         '
-        Private remoteCacheDisabled As Boolean
+        Private remoteCacheInitialized As Boolean
+        'Private remoteCacheDisabled As Boolean
         '
         '====================================================================================================
         ''' <summary>
         ''' cache data wrapper to include tags and save datetime
         ''' </summary>
         <Serializable()>
-        Public Class cacheObjectClass
+        Public Class cacheWrapperClass
             Public primaryObjectKey As String                       ' if populated, all other properties are ignored and the primary tag b
             Public dependantObjectList As New List(Of String)       ' this object is invalidated if any of these objects are invalidated
             Public saveDate As Date                                 ' the date this object was last saved.
@@ -70,13 +77,13 @@ Namespace Contensive.Core.Controllers
             Get
                 '
                 If (_globalInvalidationDate Is Nothing) Then
-                    Dim dataObject As cacheObjectClass = getCacheObject("globalInvalidationDate")
+                    Dim dataObject As cacheWrapperClass = getCacheWrapper("globalInvalidationDate")
                     If (dataObject IsNot Nothing) Then
                         _globalInvalidationDate = dataObject.saveDate
                     End If
                     If (_globalInvalidationDate Is Nothing) Then
                         _globalInvalidationDate = Now()
-                        setCacheObject("globalInvalidationDate", New cacheObjectClass With {.saveDate = CDate(_globalInvalidationDate)})
+                        setCacheWrapper("globalInvalidationDate", New cacheWrapperClass With {.saveDate = CDate(_globalInvalidationDate)})
                     End If
                 End If
                 Return CDate(_globalInvalidationDate)
@@ -94,23 +101,24 @@ Namespace Contensive.Core.Controllers
                 Me.cpCore = cpCore
                 '
                 _globalInvalidationDate = Nothing
-                remoteCacheDisabled = True
-                Dim cacheEndpoint As String = cpCore.serverConfig.awsElastiCacheConfigurationEndpoint
-                If Not String.IsNullOrEmpty(cacheEndpoint) Then
-                    Dim cacheEndpointSplit As String() = cacheEndpoint.Split(":"c)
-                    Dim cacheEndpointPort As Integer = 11211
-                    If cacheEndpointSplit.Count > 1 Then
-                        cacheEndpointPort = genericController.EncodeInteger(cacheEndpointSplit(1))
+                remoteCacheInitialized = False
+                If (cpCore.serverConfig.enableRemoteCache) Then
+                    Dim cacheEndpoint As String = cpCore.serverConfig.awsElastiCacheConfigurationEndpoint
+                    If Not String.IsNullOrEmpty(cacheEndpoint) Then
+                        Dim cacheEndpointSplit As String() = cacheEndpoint.Split(":"c)
+                        Dim cacheEndpointPort As Integer = 11211
+                        If cacheEndpointSplit.Count > 1 Then
+                            cacheEndpointPort = genericController.EncodeInteger(cacheEndpointSplit(1))
+                        End If
+                        Dim cacheConfig As Amazon.ElastiCacheCluster.ElastiCacheClusterConfig = New Amazon.ElastiCacheCluster.ElastiCacheClusterConfig(cacheEndpointSplit(0), cacheEndpointPort)
+                        cacheConfig.Protocol = Enyim.Caching.Memcached.MemcachedProtocol.Binary
+                        cacheClient = New Enyim.Caching.MemcachedClient(cacheConfig)
+                        If (cacheClient IsNot Nothing) Then remoteCacheInitialized = True
                     End If
-                    Dim cacheConfig As Amazon.ElastiCacheCluster.ElastiCacheClusterConfig = New Amazon.ElastiCacheCluster.ElastiCacheClusterConfig(cacheEndpointSplit(0), cacheEndpointPort)
-                    cacheConfig.Protocol = Enyim.Caching.Memcached.MemcachedProtocol.Binary
-                    cacheClient = New Enyim.Caching.MemcachedClient(cacheConfig)
-                    remoteCacheDisabled = False
                 End If
             Catch ex As Exception
                 '
-                ' client does not throw its own errors, so try to differentiate by message
-                '
+                ' -- client does not throw its own errors, so try to differentiate by message
                 cpCore.handleExceptionAndRethrow(New ApplicationException("Exception initializing remote cache, will continue with cache disabled.", ex))
             End Try
         End Sub
@@ -123,27 +131,32 @@ Namespace Contensive.Core.Controllers
         ''' <param name="data">Either a string, a date, or a serializable object</param>
         ''' <param name="invalidationDate"></param>
         ''' <remarks></remarks>
-        Private Sub setCacheObject(ByVal cacheName As String, ByVal data As cacheObjectClass)
+        Private Sub setCacheWrapper(ByVal cacheName As String, ByVal data As cacheWrapperClass)
             Try
                 If (String.IsNullOrEmpty(cacheName)) Then
                     Throw New ArgumentException("cacheName cannot be blank")
                 Else
-                    If (cpCore.serverConfig.appConfig.enableCache) And (cpCore.siteProperties.allowCache_notCached) Then
-                        Dim encodedCacheName As String = encodeCacheName(cpCore.serverConfig.appConfig.name, cacheName)
-                        If cpCore.serverConfig.isLocalCache Or remoteCacheDisabled Then
+                    Dim cacheWrapperName As String = encodeCacheWrapperName(cpCore.serverConfig.appConfig.name, cacheName)
+                    If (cpCore.serverConfig.enableLocalMemoryCache) Then
+                        If (remoteCacheInitialized) Then
                             '
-                            ' -- implement a simple local cache using the filesystem+dotnet
-                            setCacheObjectDotNet(cacheName, data)
+                            ' -- save remote cache
+                            Call cacheClient.Store(Enyim.Caching.Memcached.StoreMode.Set, cacheWrapperName, data, data.invalidationDate)
+                        End If
+                        If cpCore.serverConfig.enableLocalMemoryCache Then
+                            '
+                            ' -- save local memory cache
+                            setCacheWrapper_MemoryCache(cacheWrapperName, data)
+                        End If
+                        If cpCore.serverConfig.enableLocalFileCache Then
+                            '
+                            ' -- save local memory cache
                             Dim serializedData As String = Newtonsoft.Json.JsonConvert.SerializeObject(data)
-                            Using mutex As New System.Threading.Mutex(False, encodedCacheName)
+                            Using mutex As New System.Threading.Mutex(False, cacheWrapperName)
                                 mutex.WaitOne()
-                                cpCore.privateFiles.saveFile("appCache\" & genericController.encodeFilename(encodedCacheName & ".txt"), serializedData)
+                                cpCore.privateFiles.saveFile("appCache\" & genericController.encodeFilename(cacheWrapperName & ".txt"), serializedData)
                                 mutex.ReleaseMutex()
                             End Using
-                        Else
-                            '
-                            ' -- use remote cache
-                            Call cacheClient.Store(Enyim.Caching.Memcached.StoreMode.Set, encodedCacheName, data, data.invalidationDate)
                         End If
                     End If
                 End If
@@ -154,31 +167,31 @@ Namespace Contensive.Core.Controllers
         '
         '====================================================================================================
         ''' <summary>
-        ''' dotnet set cache object
+        ''' save cacheWrapper to memory cache
         ''' </summary>
         ''' <param name="cacheName"></param>
         ''' <param name="data"></param>
-        Public Sub setCacheObjectDotNet(ByVal cacheName As String, ByVal data As cacheObjectClass)
+        Public Sub setCacheWrapper_MemoryCache(ByVal cacheName As String, ByVal data As cacheWrapperClass)
             Dim cache As ObjectCache = MemoryCache.Default
             Dim policy As New CacheItemPolicy()
             policy.AbsoluteExpiration = Now.AddMinutes(100)
             cache.Set(cacheName, data, policy)
         End Sub
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' dotnet get cache object
-        ''' </summary>
-        ''' <typeparam name="T"></typeparam>
-        ''' <param name="cacheItemName"></param>
-        ''' <param name="cachetimeinminutes"></param>
-        ''' <param name="objectSettingFunction"></param>
-        ''' <returns></returns>
-        Public Function getCacheObjectDotNet(ByVal cacheName As String) As cacheObjectClass
-            Dim cache As ObjectCache = MemoryCache.Default
-            Dim cachedObject As cacheObjectClass = DirectCast(cache(cacheName), cacheObjectClass)
-            Return cachedObject
-        End Function
+        ''
+        ''====================================================================================================
+        '''' <summary>
+        '''' dotnet get cache object
+        '''' </summary>
+        '''' <typeparam name="T"></typeparam>
+        '''' <param name="cacheItemName"></param>
+        '''' <param name="cachetimeinminutes"></param>
+        '''' <param name="objectSettingFunction"></param>
+        '''' <returns></returns>
+        'Public Function getCacheWrapperDotNet(ByVal cacheName As String) As cacheObjectClass
+        '    Dim cache As ObjectCache = MemoryCache.Default
+        '    Dim cachedObject As cacheObjectClass = DirectCast(cache(cacheName), cacheObjectClass)
+        '    Return cachedObject
+        'End Function
         '/// <summary>
         '/// A generic method for getting And setting objects to the memory cache.
         '/// </summary>
@@ -211,76 +224,57 @@ Namespace Contensive.Core.Controllers
         Public Function getObject(Of objectClass)(ByVal cacheName As String) As objectClass
             Dim returnObject As objectClass = Nothing
             Try
-                Dim cacheObject As cacheObjectClass
+                Dim cacheWrapper As cacheWrapperClass
                 Dim cacheMiss As Boolean = False
-                Dim cacheMissReason As String = ""
                 Dim dateCompare As Integer
                 '
                 If Not (String.IsNullOrEmpty(cacheName)) Then
                     '
-                    cacheObject = getCacheObject(cacheName)
-                    '
-                    If (cacheObject IsNot Nothing) Then
-                        dateCompare = globalInvalidationDate.CompareTo(cacheObject.saveDate)
+                    ' -- read cacheWrapper
+                    appendCacheLog("getObject(" & cacheName & "), enter") : Dim sw As Stopwatch = Stopwatch.StartNew()
+                    cacheWrapper = getCacheWrapper(cacheName)
+                    If (cacheWrapper IsNot Nothing) Then
+                        '
+                        ' -- test for global invalidation
+                        dateCompare = globalInvalidationDate.CompareTo(cacheWrapper.saveDate)
                         If (dateCompare >= 0) Then
-                            cacheMissReason = "GetObject(" & cacheName & "), invalidated because the cacheObject's saveDate [" & cacheObject.saveDate.ToString() & "] is after the globalInvalidationDate [" & globalInvalidationDate & "]"
-                            appendCacheLog(cacheMissReason)
+                            '
+                            ' -- global invalidation
+                            appendCacheLog("GetObject(" & cacheName & "), invalidated because the cacheObject's saveDate [" & cacheWrapper.saveDate.ToString() & "] is after the globalInvalidationDate [" & globalInvalidationDate & "]")
                         Else
                             '
-                            ' if this data is newer that the last global invalidation, continue
-                            '
-                            If cacheObject.dependantObjectList.Count = 0 Then
-                                appendCacheLog("GetObject(" & cacheName & "), no taglist found")
+                            ' -- test all dependent objects for invalidation (if they have changed since this object changed, it is invalid)
+                            If cacheWrapper.dependantObjectList.Count = 0 Then
+                                '
+                                ' -- no dependent objects
+                                appendCacheLog("GetObject(" & cacheName & "), no dependantObjectList")
                             Else
-                                For Each dependantObjectCacheName As String In cacheObject.dependantObjectList
-                                    Dim dependantObject As cacheObjectClass = getCacheObject(dependantObjectCacheName)
+                                For Each dependantObjectCacheName As String In cacheWrapper.dependantObjectList
+                                    Dim dependantObject As cacheWrapperClass = getCacheWrapper(dependantObjectCacheName)
                                     If (dependantObject IsNot Nothing) Then
-                                        dateCompare = dependantObject.saveDate.CompareTo(cacheObject.saveDate)
-                                        'Dim ticks As Long = ((tagInvalidationDate - cacheObject.saveDate).Ticks)
-                                        'appendCacheLog("GetObject(" & cacheName & "), tagInvalidationDate[" & tagInvalidationDate & "], cacheData.saveDate[" & cacheObject.saveDate & "], dateCompare[" & dateCompare & "], tick diff [" & ticks & "]")
+                                        dateCompare = dependantObject.saveDate.CompareTo(cacheWrapper.saveDate)
                                         If (dateCompare >= 0) Then
                                             cacheMiss = True
-                                            cacheMissReason = "GetObject(" & cacheName & "), invalidated because the dependantobject [" & dependantObjectCacheName & "] has a saveDate [" & dependantObject.saveDate.ToString() & "] after the cacheObject's dateDate [" & cacheObject.saveDate.ToString() & "]"
-                                            appendCacheLog(cacheMissReason)
+                                            appendCacheLog("GetObject(" & cacheName & "), invalidated because the dependantobject [" & dependantObjectCacheName & "] has a saveDate [" & dependantObject.saveDate.ToString() & "] after the cacheObject's dateDate [" & cacheWrapper.saveDate.ToString() & "]")
                                             Exit For
                                         End If
                                     End If
                                 Next
-                            End If
-                            If Not cacheMiss Then
-                                appendCacheLog("GetObject(" & cacheName & "), valid")
-                                If (TypeOf cacheObject.data Is Newtonsoft.Json.Linq.JObject) Then
-                                    Dim data As Newtonsoft.Json.Linq.JObject = DirectCast(cacheObject.data, Newtonsoft.Json.Linq.JObject)
-                                    returnObject = data.ToObject(Of objectClass)()
-                                ElseIf (TypeOf cacheObject.data Is Newtonsoft.Json.Linq.JArray) Then
-                                    Dim data As Newtonsoft.Json.Linq.JArray = DirectCast(cacheObject.data, Newtonsoft.Json.Linq.JArray)
-                                    returnObject = data.ToObject(Of objectClass)()
-                                Else
-                                    returnObject = DirectCast(cacheObject.data, objectClass)
+                                If Not cacheMiss Then
+                                    If (TypeOf cacheWrapper.data Is Newtonsoft.Json.Linq.JObject) Then
+                                        Dim data As Newtonsoft.Json.Linq.JObject = DirectCast(cacheWrapper.data, Newtonsoft.Json.Linq.JObject)
+                                        returnObject = data.ToObject(Of objectClass)()
+                                    ElseIf (TypeOf cacheWrapper.data Is Newtonsoft.Json.Linq.JArray) Then
+                                        Dim data As Newtonsoft.Json.Linq.JArray = DirectCast(cacheWrapper.data, Newtonsoft.Json.Linq.JArray)
+                                        returnObject = data.ToObject(Of objectClass)()
+                                    Else
+                                        returnObject = DirectCast(cacheWrapper.data, objectClass)
+                                    End If
                                 End If
-                                'Try
-
-                                '    TryCast(cacheObject.data, Newtonsoft.Json.JsonToken.JObject)
-
-                                '    cacheObject.data.toObject
-
-
-                                '    returnObject = DirectCast(cacheObject.data, objectClass)
-                                '    'returnObject = TryCast(cacheObject.data, objectClass)
-                                'Catch ex As Exception
-                                '    cacheMissReason = "GetObject(" & cacheName & "), invalidated because the cacheObject.data type [" & cacheObject.data.GetType().ToString() & "] does not match the required return type. Over-writing the cache object."
-                                '    appendCacheLog(cacheMissReason)
-                                '    setCacheObject(cacheName, New cacheObjectClass With {.data = Nothing})
-                                'End Try
-                                'If TypeOf cacheObject.data Is objectClass Then
-                                '    returnObject = DirectCast(cacheObject.data, objectClass)
-                                'Else
-                                '    cacheMissReason = "GetObject(" & cacheName & "), invalidated because the cacheObject.data type [" & cacheObject.data.GetType().ToString() & "] does not match the required return type."
-                                '    appendCacheLog(cacheMissReason)
-                                'End If
                             End If
                         End If
                     End If
+                    appendCacheLog("getObject(" & cacheName & "), exit(" & sw.ElapsedMilliseconds & "ms)") : sw.Stop()
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -295,74 +289,128 @@ Namespace Contensive.Core.Controllers
         ''' <typeparam name="returnType"></typeparam>
         ''' <param name="cacheName"></param>
         ''' <returns></returns>
-        Private Function getCacheObject(ByVal cacheName As String) As cacheObjectClass
-            Dim returnObj As cacheObjectClass = Nothing
+        Private Function getCacheWrapper(ByVal cacheName As String) As cacheWrapperClass
+            Dim returnObj As cacheWrapperClass = Nothing
             Try
-                appendCacheLog("getCacheObject, enter [" & cacheName & "]")
+                appendCacheLog("getCacheWrapper(" & cacheName & "), enter ")
                 If (String.IsNullOrEmpty(cacheName)) Then
                     Throw New ArgumentException("CacheName cannot be blank")
                 Else
-                    If (cpCore.serverConfig.appConfig.enableCache) And (cpCore.siteProperties.allowCache_notCached) Then
-                        appendCacheLog("getCacheObject, config.enableCache and siteproperty.allowCache")
-                        Dim encodedCacheName As String = encodeCacheName(cpCore.serverConfig.appConfig.name, cacheName)
-                        If cpCore.serverConfig.isLocalCache Or remoteCacheDisabled Then
-                            appendCacheLog("getCacheObject, local cache, attempt memory cache")
+                    Dim cacheWrapperName As String = encodeCacheWrapperName(cpCore.serverConfig.appConfig.name, cacheName)
+                    If (remoteCacheInitialized) Then
+                        '
+                        ' -- use remote cache
+                        Try
+                            returnObj = cacheClient.Get(Of cacheWrapperClass)(cacheWrapperName)
+                        Catch ex As Exception
                             '
-                            ' implement a simple local cache using the filesystem/dotnet
-                            '
-                            returnObj = getCacheObjectDotNet(cacheName)
-                            If (returnObj IsNot Nothing) Then
-                                appendCacheLog("getCacheObject, memory cache hit")
+                            ' --client does not throw its own errors, so try to differentiate by message
+                            If (ex.Message.ToLower.IndexOf("unable to load type") >= 0) Then
+                                '
+                                ' -- trying to deserialize an object and this code does not have a matching class, clear cache and return empty
+                                cacheClient.Remove(cacheWrapperName)
+                                returnObj = Nothing
                             Else
-                                appendCacheLog("getCacheObject, memory cache miss, attempt file cache")
-                                Dim serializedDataObject As String = Nothing
-                                Using mutex As New System.Threading.Mutex(False, encodedCacheName)
-                                    mutex.WaitOne()
-                                    serializedDataObject = cpCore.privateFiles.readFile("appCache\" & genericController.encodeFilename(encodedCacheName & ".txt"))
-                                    mutex.ReleaseMutex()
-                                End Using
-                                If String.IsNullOrEmpty(serializedDataObject) Then
-                                    appendCacheLog("getCacheObject, file cache miss")
-                                Else
-                                    appendCacheLog("getCacheObject, file cache hit, write to memory cache")
-                                    returnObj = Newtonsoft.Json.JsonConvert.DeserializeObject(Of cacheObjectClass)(serializedDataObject)
-                                    setCacheObjectDotNet(cacheName, returnObj)
-                                End If
+                                '
+                                ' -- some other error
+                                cpCore.handleExceptionAndRethrow(ex)
                             End If
+                        End Try
+                        If (returnObj IsNot Nothing) Then
+                            appendCacheLog("getCacheWrapper(" & cacheName & "), remoteCache hit")
                         Else
-                            '
-                            ' -- use remote cache
-                            appendCacheLog("getCacheObject, remote cache")
-                            Try
-                                returnObj = cacheClient.Get(Of cacheObjectClass)(encodedCacheName)
-                            Catch ex As Exception
-                                '
-                                ' client does not throw its own errors, so try to differentiate by message
-                                '
-                                If (ex.Message.ToLower.IndexOf("unable to load type") >= 0) Then
-                                    '
-                                    ' trying to deserialize an object and this code does not have a matching class, clear cache and return empty
-                                    '
-                                    cacheClient.Remove(encodedCacheName)
-                                    returnObj = Nothing
-                                Else
-                                    '
-                                    ' some other error
-                                    '
-                                    cpCore.handleExceptionAndRethrow(ex)
-                                End If
-                            End Try
+                            appendCacheLog("getCacheWrapper(" & cacheName & "), remoteCache miss")
+                        End If
+                    End If
+                    If (returnObj Is Nothing) And cpCore.serverConfig.enableLocalMemoryCache Then
+                        '
+                        ' -- local memory cache
+                        'Dim cache As ObjectCache = MemoryCache.Default
+                        returnObj = DirectCast(MemoryCache.Default(cacheWrapperName), cacheWrapperClass)
+                        If (returnObj IsNot Nothing) Then
+                            appendCacheLog("getCacheWrapper(" & cacheName & "), memoryCache hit")
+                        Else
+                            appendCacheLog("getCacheWrapper(" & cacheName & "), memoryCache miss")
+                        End If
+                    End If
+                    If (returnObj Is Nothing) And cpCore.serverConfig.enableLocalFileCache Then
+                        '
+                        ' -- local file cache
+                        Dim serializedDataObject As String = Nothing
+                        Using mutex As New System.Threading.Mutex(False, cacheWrapperName)
+                            mutex.WaitOne()
+                            serializedDataObject = cpCore.privateFiles.readFile("appCache\" & genericController.encodeFilename(cacheWrapperName & ".txt"))
+                            mutex.ReleaseMutex()
+                        End Using
+                        If String.IsNullOrEmpty(serializedDataObject) Then
+                            appendCacheLog("getCacheWrapper(" & cacheName & "), file miss")
+                        Else
+                            appendCacheLog("getCacheWrapper(" & cacheName & "), file hit, write to memory cache")
+                            returnObj = Newtonsoft.Json.JsonConvert.DeserializeObject(Of cacheWrapperClass)(serializedDataObject)
+                            setCacheWrapper_MemoryCache(cacheWrapperName, returnObj)
                         End If
                         If (returnObj IsNot Nothing) Then
-                            '
-                            ' -- empty objects return nothing, empty lists return count=0
-                            If (returnObj.dependantObjectList Is Nothing) Then
-                                returnObj.dependantObjectList = New List(Of String)
-                            End If
+                            appendCacheLog("getCacheWrapper(" & cacheName & "), fileCache hit")
+                        Else
+                            appendCacheLog("getCacheWrapper(" & cacheName & "), fileCache miss")
+                        End If
+                    End If
+
+                    'If (cpCore.serverConfig.appConfig.enableCache) And (cpCore.siteProperties.allowCache_notCached) Then
+                    '    If cpCore.serverConfig.enableLocalMemoryCache Or remoteCacheDisabled Then
+                    '        '
+                    '        ' -- implement a simple local cache using the filesystem/dotnet
+                    '        'Dim cache As ObjectCache = MemoryCache.Default
+                    '        returnObj = DirectCast(MemoryCache.Default(cacheName), cacheWrapperClass)
+                    '        'returnObj = getCacheWrapperDotNet(cacheName)
+                    '        If (returnObj IsNot Nothing) Then
+                    '            appendCacheLog("getCacheWrapper(" & cacheName & "), memory hit")
+                    '        Else
+                    '            appendCacheLog("getCacheWrapper(" & cacheName & "), memory miss")
+                    '            Dim serializedDataObject As String = Nothing
+                    '            Using mutex As New System.Threading.Mutex(False, encodedCacheName)
+                    '                mutex.WaitOne()
+                    '                serializedDataObject = cpCore.privateFiles.readFile("appCache\" & genericController.encodeFilename(encodedCacheName & ".txt"))
+                    '                mutex.ReleaseMutex()
+                    '            End Using
+                    '            If String.IsNullOrEmpty(serializedDataObject) Then
+                    '                appendCacheLog("getCacheWrapper(" & cacheName & "), file miss")
+                    '            Else
+                    '                appendCacheLog("getCacheWrapper(" & cacheName & "), file hit, write to memory cache")
+                    '                returnObj = Newtonsoft.Json.JsonConvert.DeserializeObject(Of cacheWrapperClass)(serializedDataObject)
+                    '                setCacheWrapper_MemoryCache(cacheName, returnObj)
+                    '            End If
+                    '        End If
+                    '    Else
+                    '        ''
+                    '        '' -- use remote cache
+                    '        'Try
+                    '        '    returnObj = cacheClient.Get(Of cacheWrapperClass)(encodedCacheName)
+                    '        'Catch ex As Exception
+                    '        '    '
+                    '        '    ' --client does not throw its own errors, so try to differentiate by message
+                    '        '    If (ex.Message.ToLower.IndexOf("unable to load type") >= 0) Then
+                    '        '        '
+                    '        '        ' -- trying to deserialize an object and this code does not have a matching class, clear cache and return empty
+                    '        '        cacheClient.Remove(encodedCacheName)
+                    '        '        returnObj = Nothing
+                    '        '    Else
+                    '        '        '
+                    '        '        ' -- some other error
+                    '        '        cpCore.handleExceptionAndRethrow(ex)
+                    '        '    End If
+                    '        'End Try
+                    '    End If
+                    'End If
+                    If (returnObj IsNot Nothing) Then
+                        '
+                        ' -- empty objects return nothing, empty lists return count=0
+                        If (returnObj.dependantObjectList Is Nothing) Then
+                            returnObj.dependantObjectList = New List(Of String)
                         End If
                     End If
                 End If
-                appendCacheLog("getCacheObject, exit ")
+                appendCacheLog("getCacheWrapper(" & cacheName & "), exit ")
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -379,15 +427,13 @@ Namespace Contensive.Core.Controllers
         ''' <remarks></remarks>
         Public Sub setObject(cacheName As String, data As Object)
             Try
-                If allowCache Then
-                    Dim cacheObject As New cacheObjectClass With {
-                        .data = data,
-                        .saveDate = DateTime.Now(),
-                        .invalidationDate = Now.AddDays(invalidationDaysDefault),
-                        .dependantObjectList = Nothing
-                    }
-                    setCacheObject(cacheName, cacheObject)
-                End If
+                Dim cacheWrapper As New cacheWrapperClass With {
+                    .data = data,
+                    .saveDate = DateTime.Now(),
+                    .invalidationDate = Now.AddDays(invalidationDaysDefault),
+                    .dependantObjectList = Nothing
+                }
+                setCacheWrapper(cacheName, cacheWrapper)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -405,15 +451,13 @@ Namespace Contensive.Core.Controllers
         ''' <remarks></remarks>
         Public Sub setObject(cacheName As String, data As Object, invalidationDate As Date, dependantObjectList As List(Of String))
             Try
-                If allowCache Then
-                    Dim cacheObject As New cacheObjectClass With {
-                        .data = data,
-                        .saveDate = DateTime.Now(),
-                        .invalidationDate = invalidationDate,
-                        .dependantObjectList = dependantObjectList
-                    }
-                    setCacheObject(cacheName, cacheObject)
-                End If
+                Dim cacheWrapper As New cacheWrapperClass With {
+                    .data = data,
+                    .saveDate = DateTime.Now(),
+                    .invalidationDate = invalidationDate,
+                    .dependantObjectList = dependantObjectList
+                }
+                setCacheWrapper(cacheName, cacheWrapper)
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex)
             End Try
@@ -431,17 +475,15 @@ Namespace Contensive.Core.Controllers
         ''' <remarks></remarks>
         Public Sub setObject(cacheName As String, data As Object, invalidationDate As Date, dependantObject As String)
             Try
-                If allowCache Then
-                    Dim dependantObjectList As New List(Of String)
-                    dependantObjectList.Add(dependantObject)
-                    Dim cacheObject As New cacheObjectClass With {
-                        .data = data,
-                        .saveDate = DateTime.Now(),
-                        .invalidationDate = invalidationDate,
-                        .dependantObjectList = dependantObjectList
-                    }
-                    setCacheObject(cacheName, cacheObject)
-                End If
+                Dim dependantObjectList As New List(Of String)
+                dependantObjectList.Add(dependantObject)
+                Dim cacheWrapper As New cacheWrapperClass With {
+                    .data = data,
+                    .saveDate = DateTime.Now(),
+                    .invalidationDate = invalidationDate,
+                    .dependantObjectList = dependantObjectList
+                }
+                setCacheWrapper(cacheName, cacheWrapper)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -458,20 +500,15 @@ Namespace Contensive.Core.Controllers
         ''' <remarks></remarks>
         Public Sub setObject(cacheName As String, data As Object, dependantObjectList As List(Of String))
             Try
-                If allowCache Then
-                    Dim cacheObject As New cacheObjectClass With {
-                        .data = data,
-                        .saveDate = DateTime.Now(),
-                        .invalidationDate = Now.AddDays(invalidationDaysDefault),
-                        .dependantObjectList = dependantObjectList
-                    }
-                    setCacheObject(cacheName, cacheObject)
-                End If
+                Dim cacheWrapper As New cacheWrapperClass With {
+                    .data = data,
+                    .saveDate = DateTime.Now(),
+                    .invalidationDate = Now.AddDays(invalidationDaysDefault),
+                    .dependantObjectList = dependantObjectList
+                }
+                setCacheWrapper(cacheName, cacheWrapper)
             Catch ex As Exception
-                Try
-                    cpCore.handleExceptionAndRethrow(ex)
-                Catch errObj As Exception
-                End Try
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
@@ -486,17 +523,9 @@ Namespace Contensive.Core.Controllers
         ''' <remarks></remarks>
         Public Sub setObject(cacheName As String, data As Object, dependantObject As String)
             Try
-                If allowCache Then
-                    Dim dependantObjectList As New List(Of String)
-                    dependantObjectList.Add(dependantObject)
-                    Dim cacheObject As New cacheObjectClass With {
-                        .data = data,
-                        .saveDate = DateTime.Now(),
-                        .invalidationDate = Now.AddDays(invalidationDaysDefault),
-                        .dependantObjectList = dependantObjectList
-                    }
-                    setCacheObject(cacheName, cacheObject)
-                End If
+                'Dim dependantObjectList As New List(Of String)
+                'dependantObjectList.Add(dependantObject)
+                setObject(cacheName, data, New List(Of String)({dependantObject}))
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex)
             End Try
@@ -513,14 +542,12 @@ Namespace Contensive.Core.Controllers
         ''' <remarks></remarks>
         Public Sub setSecondaryObject(cacheName As String, primaryCacheName As String)
             Try
-                If allowCache Then
-                    Dim cacheObject As New cacheObjectClass With {
-                        .saveDate = DateTime.Now(),
-                        .invalidationDate = Now.AddDays(invalidationDaysDefault),
-                        .primaryObjectKey = primaryCacheName
-                    }
-                    setCacheObject(cacheName, cacheObject)
-                End If
+                Dim cacheWrapper As New cacheWrapperClass With {
+                    .saveDate = DateTime.Now(),
+                    .invalidationDate = Now.AddDays(invalidationDaysDefault),
+                    .primaryObjectKey = primaryCacheName
+                }
+                setCacheWrapper(cacheName, cacheWrapper)
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex)
             End Try
@@ -533,7 +560,7 @@ Namespace Contensive.Core.Controllers
         ''' <remarks></remarks>
         Public Sub invalidateAll()
             Try
-                Call setCacheObject("globalInvalidationDate", New cacheObjectClass With {.saveDate = Now()})
+                Call setCacheWrapper("globalInvalidationDate", New cacheWrapperClass With {.saveDate = Now()})
                 _globalInvalidationDate = Nothing
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -548,43 +575,44 @@ Namespace Contensive.Core.Controllers
         '''' <remarks></remarks>
         Public Sub invalidateObject(ByVal cacheName As String)
             Try
-                If cpCore.serverConfig.appConfig.enableCache Then
-                    If Not String.IsNullOrEmpty(cacheName) Then
-                        '
-                        ' set the object's invalidation date
-                        '
-                        Dim invalidatedCacheObject As New cacheObjectClass With {
-                            .saveDate = Now()
-                        }
-                        setCacheObject(cacheName, invalidatedCacheObject)
-                        '
-                        ' test if this tag is a content name
-                        '
-                        Dim cdef As coreMetaDataClass.CDefClass = cpCore.metaData.getCdef(cacheName)
-                        If Not cdef Is Nothing Then
-                            '
-                            ' Invalidate all child cdef
-                            '
-                            If cdef.childIdList.Count > 0 Then
-                                For Each childId As Integer In cdef.childIdList
-                                    Dim childCdef As coreMetaDataClass.CDefClass
-                                    childCdef = cpCore.metaData.getCdef(childId)
-                                    If Not childCdef Is Nothing Then
-                                        setCacheObject(childCdef.Name, invalidatedCacheObject)
-                                    End If
-                                Next
-                            End If
-                            '
-                            ' Now go up to the top-most parent
-                            '
-                            Do While cdef.parentID > 0
-                                cdef = cpCore.metaData.getCdef(cdef.parentID)
-                                If Not cdef Is Nothing Then
-                                    setCacheObject(cdef.Name, invalidatedCacheObject)
-                                End If
-                            Loop
-                        End If
-                    End If
+                If Not String.IsNullOrEmpty(cacheName.Trim()) Then
+                    setCacheWrapper(cacheName, New cacheWrapperClass With {.saveDate = Now()})
+                    ''
+                    '' set the object's invalidation date
+                    ''
+                    'Dim invalidatedCacheWrapper As New cacheWrapperClass With {
+                    '        .saveDate = Now()
+                    '    }
+                    'setCacheWrapper(cacheName, New cacheWrapperClass With {.saveDate = Now()})
+                    '
+                    ' -- this is expensive, cache objects should be tables, and parent cdef was always a bad idea
+                    ''
+                    '' test if this tag is a content name
+                    ''
+                    'Dim cdef As coreMetaDataClass.CDefClass = cpCore.metaData.getCdef(cacheName)
+                    'If Not cdef Is Nothing Then
+                    '    '
+                    '    ' Invalidate all child cdef
+                    '    '
+                    '    If cdef.childIdList.Count > 0 Then
+                    '        For Each childId As Integer In cdef.childIdList
+                    '            Dim childCdef As coreMetaDataClass.CDefClass
+                    '            childCdef = cpCore.metaData.getCdef(childId)
+                    '            If Not childCdef Is Nothing Then
+                    '                setCacheWrapper(childCdef.Name, invalidatedCacheWrapper)
+                    '            End If
+                    '        Next
+                    '    End If
+                    '    '
+                    '    ' Now go up to the top-most parent
+                    '    '
+                    '    Do While cdef.parentID > 0
+                    '        cdef = cpCore.metaData.getCdef(cdef.parentID)
+                    '        If Not cdef Is Nothing Then
+                    '            setCacheWrapper(cdef.Name, invalidatedCacheWrapper)
+                    '        End If
+                    '    Loop
+                    'End If
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -592,17 +620,27 @@ Namespace Contensive.Core.Controllers
         End Sub
         '
         '========================================================================
-        '   Clears all baked content in any content definition specified
-        '========================================================================
-        '
-        Public Sub invalidateObjectList(ByVal cacheNameCommaList As String)
+        ''' <summary>
+        ''' update the dbTablename cache entry. Do this anytime any record is updated in the table
+        ''' </summary>
+        ''' <param name="ContentName"></param>
+        Public Sub invalidateContent(ByVal ContentName As String)
             Try
-                Dim tagList As New List(Of String)
-                '
-                If Not String.IsNullOrEmpty(cacheNameCommaList.Trim) Then
-                    tagList.AddRange(cacheNameCommaList.Split(","c))
-                    invalidateObjectList(tagList)
-                End If
+                invalidateDbTable(cpCore.GetContentTablename(ContentName))
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+        End Sub
+        '
+        '========================================================================
+        ''' <summary>
+        ''' invalidate all cache entries to this table. "dbTableName"
+        ''' when any cache is saved, it should include a dependancy on a cachename=dbtablename
+        ''' </summary>
+        ''' <param name="dbTableName"></param>
+        Public Sub invalidateDbTable(ByVal dbTableName As String)
+            Try
+                invalidateObject(dbTableName.ToLower().Replace(" ", "_"))
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -616,11 +654,9 @@ Namespace Contensive.Core.Controllers
         ''' <remarks></remarks>
         Public Sub invalidateObjectList(ByVal cacheNameList As List(Of String))
             Try
-                If allowCache Then
-                    For Each tag In cacheNameList
-                        Call invalidateObject(tag)
-                    Next
-                End If
+                For Each cacheName In cacheNameList
+                    Call invalidateObject(cacheName)
+                Next
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -633,7 +669,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="key"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function encodeCacheName(appName As String, sourceKey As String) As String
+        Private Function encodeCacheWrapperName(appName As String, sourceKey As String) As String
             Dim returnKey As String
             returnKey = appName & "-" & sourceKey
             returnKey = Regex.Replace(returnKey, "0x[a-fA-F\d]{2}", "_")
@@ -652,16 +688,32 @@ Namespace Contensive.Core.Controllers
                 cpCore.handleExceptionAndContinue(New ApplicationException("appendCacheLog exception", ex))
             End Try
         End Sub
-        '
-        Private ReadOnly Property allowCache As Boolean
-            Get
-                Return cpCore.serverConfig.appConfig.enableCache
-            End Get
-        End Property
+        ''
+        'Private ReadOnly Property allowCache As Boolean
+        '    Get
+        '        Return cpCore.serverConfig.appConfig.enableCache
+        '    End Get
+        'End Property
         '
         '====================================================================================================
         Public Function getString(cacheName As String) As String
             Return genericController.encodeText(getObject(Of String)(cacheName))
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' produce a standard format cachename for this model
+        ''' </summary>
+        ''' <param name="tableName"></param>
+        ''' <param name="fieldName"></param>
+        ''' <param name="fieldValue"></param>
+        ''' <returns></returns>
+        Public Shared Function getDbRecordCacheName(tableName As String, fieldName As String, fieldValue As String) As String
+            Return (tableName & "-" & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
+        End Function
+        '
+        Public Shared Function getDbRecordCacheName(tableName As String, field1Name As String, field1Value As String, field2Name As String, field2Value As String) As String
+            Return (tableName & "-" & field1Name & "." & field1Value & "-" & field2Name & "." & field2Value).ToLower().Replace(" ", "_")
         End Function
         '
         '====================================================================================================

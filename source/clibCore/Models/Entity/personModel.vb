@@ -130,7 +130,7 @@ Namespace Contensive.Core.Models.Entity
             Dim result As personModel = Nothing
             Try
                 If recordId > 0 Then
-                    Dim cacheName As String = GetType(personModel).FullName & getCacheName("id", recordId.ToString())
+                    Dim cacheName As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", recordId.ToString())
                     result = cpCore.cache.getObject(Of personModel)(cacheName)
                     If (result Is Nothing) Then
                         result = loadObject(cpCore, "id=" & recordId.ToString(), cacheNameList)
@@ -153,7 +153,7 @@ Namespace Contensive.Core.Models.Entity
             Dim result As personModel = Nothing
             Try
                 If Not String.IsNullOrEmpty(recordGuid) Then
-                    Dim cacheName As String = GetType(personModel).FullName & getCacheName("ccguid", recordGuid)
+                    Dim cacheName As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "ccguid", recordGuid)
                     result = cpCore.cache.getObject(Of personModel)(cacheName)
                     If (result Is Nothing) Then
                         result = loadObject(cpCore, "ccGuid=" & cpCore.db.encodeSQLText(recordGuid), cacheNameList)
@@ -258,13 +258,13 @@ Namespace Contensive.Core.Models.Entity
                         '
                         ' -- set primary and secondary caches
                         ' -- add all cachenames to the injected cachenamelist
-                        Dim cacheName0 As String = getCacheName("id", result.id.ToString())
+                        Dim cacheName0 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", result.ID.ToString())
                         cacheNameList.Add(cacheName0)
                         cpCore.cache.setObject(cacheName0, result)
                         '
-                        Dim cacheName1 As String = getCacheName("ccguid", result.ccguid)
+                        Dim cacheName1 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "ccguid", result.ccGuid)
                         cacheNameList.Add(cacheName1)
-                        cpCore.cache.setObject(cacheName1, Nothing, cacheName0)
+                        cpCore.cache.setSecondaryObject(cacheName1, cacheName0)
                     End If
                 End If
                 Call cs.Close()
@@ -377,8 +377,13 @@ Namespace Contensive.Core.Models.Entity
                 Call cs.Close()
                 '
                 ' -- invalidate objects
-                cpCore.cache.invalidateObject(getCacheName("id", id.ToString))
-                cpCore.cache.invalidateObject(getCacheName("ccguid", ccguid))
+                ' -- no, the primary is invalidated by the cs.save()
+                'cpCore.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"id", id.ToString))
+                ' -- no, the secondary points to the pirmary, which is invalidated. Dont waste resources invalidating
+                'cpCore.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"ccguid", ccguid))
+                '
+                ' -- object is here, but the cache was invalidated, setting
+                cpCore.cache.setObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", Me.ID.ToString()), Me)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
                 Throw
@@ -456,7 +461,7 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="cpCore"></param>
         ''' <param name="recordId"></param>
         Public Shared Sub invalidateIdCache(cpCore As coreClass, recordId As Integer)
-            cpCore.cache.invalidateObject(getCacheName("id", recordId.ToString))
+            cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", recordId.ToString))
             '
             ' -- always clear the cache with the content name
             '?? cpCore.cache.invalidateObject(primaryContentName)
@@ -469,22 +474,21 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="cpCore"></param>
         ''' <param name="guid"></param>
         Public Shared Sub invalidateGuidCache(cpCore As coreClass, guid As String)
-            cpCore.cache.invalidateObject(getCacheName("ccguid", guid))
+            cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "ccguid", guid))
             '
             ' -- always clear the cache with the content name
             '?? cpCore.cache.invalidateObject(primaryContentName)
         End Sub
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' produce a standard format cachename for this model
-        ''' </summary>
-        ''' <param name="fieldName"></param>
-        ''' <param name="fieldValue"></param>
-        ''' <returns></returns>
-        Private Shared Function getCacheName(fieldName As String, fieldValue As String) As String
-            Return (primaryContentTableName & "." & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
-            'Return (GetType(personModel).FullName & "." & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
-        End Function
+        ''
+        ''====================================================================================================
+        '''' <summary>
+        '''' produce a standard format cachename for this model
+        '''' </summary>
+        '''' <param name="fieldName"></param>
+        '''' <param name="fieldValue"></param>
+        '''' <returns></returns>
+        'Private Shared Function Controllers.cacheController.getModelCacheName( primaryContentTableName,fieldName As String, fieldValue As String) As String
+        '    Return (primaryContentTableName & "." & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
+        'End Function
     End Class
 End Namespace

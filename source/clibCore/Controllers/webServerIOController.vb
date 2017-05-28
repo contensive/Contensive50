@@ -606,7 +606,7 @@ Namespace Contensive.Core
                         '
                         cpCore.domains.domainDetailsList = New Dictionary(Of String, Models.Entity.domainLegacyModel.domainDetailsClass)
                         domainDetailsListText = vbCrLf
-                        SQL = "select name,rootpageid,nofollow,typeid,visited,id,ForwardURL,DefaultTemplateId,PageNotFoundPageID,allowCrossLogin,ForwardDomainId from ccdomains where (active<>0)and(name is not null) order by id"
+                        SQL = "select name,rootpageid,nofollow,typeid,visited,id,ForwardURL,DefaultTemplateId,PageNotFoundPageID,0 as ignoreAllowCrossLogin,ForwardDomainId from ccdomains where (active<>0)and(name is not null) order by id"
                         Dim dt As DataTable
                         dt = cpCore.db.executeSql(SQL)
                         If dt.Rows.Count > 0 Then
@@ -626,7 +626,7 @@ Namespace Contensive.Core
                                             domainDetailsNew.forwardUrl = row.Item(6).ToString
                                             domainDetailsNew.defaultTemplateId = genericController.EncodeInteger(row.Item(7).ToString)
                                             domainDetailsNew.pageNotFoundPageId = genericController.EncodeInteger(row.Item(8).ToString)
-                                            domainDetailsNew.allowCrossLogin = genericController.EncodeBoolean(row.Item(9).ToString)
+                                            'domainDetailsNew.allowCrossLogin = genericController.EncodeBoolean(row.Item(9).ToString)
                                             domainDetailsNew.forwardDomainId = genericController.EncodeInteger(row.Item(10).ToString)
                                             cpCore.domains.domainDetailsList.Add(domainNameNew.ToLower(), domainDetailsNew)
                                         End If
@@ -651,7 +651,7 @@ Namespace Contensive.Core
                             domainDetailsNew.forwardUrl = ""
                             domainDetailsNew.defaultTemplateId = 0
                             domainDetailsNew.pageNotFoundPageId = 0
-                            domainDetailsNew.allowCrossLogin = False
+                            'domainDetailsNew.allowCrossLogin = False
                             domainDetailsNew.forwardDomainId = 0
                             cpCore.domains.domainDetailsList.Add(domain.ToLower(), domainDetailsNew)
                         End If
@@ -676,7 +676,7 @@ Namespace Contensive.Core
                                 Call cpCore.db.cs_set(CS, "Visited", cpCore.domains.domainDetails.visited.ToString)
                                 Call cpCore.db.cs_set(CS, "DefaultTemplateId", cpCore.domains.domainDetails.defaultTemplateId.ToString)
                                 Call cpCore.db.cs_set(CS, "PageNotFoundPageId", cpCore.domains.domainDetails.pageNotFoundPageId.ToString)
-                                Call cpCore.db.cs_set(CS, "allowCrossLogin", cpCore.domains.domainDetails.allowCrossLogin.ToString)
+                                'Call cpCore.db.cs_set(CS, "allowCrossLogin", cpCore.domains.domainDetails.allowCrossLogin.ToString)
                             End If
                             Call cpCore.db.cs_Close(CS)
                         End If
@@ -754,7 +754,7 @@ Namespace Contensive.Core
                         domainDetailsNew.forwardUrl = ""
                         domainDetailsNew.defaultTemplateId = 0
                         domainDetailsNew.pageNotFoundPageId = 0
-                        domainDetailsNew.allowCrossLogin = False
+                        'domainDetailsNew.allowCrossLogin = False
                         domainDetailsNew.forwardDomainId = 0
                         cpCore.domains.domainDetailsList.Add(requestDomain.ToLower(), domainDetailsNew)
                         '
@@ -1013,97 +1013,97 @@ Namespace Contensive.Core
                 MethodName = "main_addResponseCookie"
                 '
                 If cpCore.docOpen And cpCore.htmlDoc.outputBufferEnabled Then
-                    If (isMissing(domain)) And cpCore.domains.domainDetails.allowCrossLogin And genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("Write Cookies to All Domains", True)) Then
-                        '
-                        ' no domain provided, new mode
-                        '   - write cookie for current domains
-                        '   - write an iframe that called the cross-Site login
-                        '   - http://127.0.0.1/ccLib/clientside/cross.html?v=1&vPath=%2F&vExpires=1%2F1%2F2012
-                        '
-                        domainListSplit = Split(cpCore.main_ServerDomainCrossList, ",")
-                        For Ptr = 0 To UBound(domainListSplit)
-                            domainSet = Trim(domainListSplit(Ptr))
-                            If (domainSet <> "") And (InStr(1, "," & usedDomainList & ",", "," & domainSet & ",", vbTextCompare) = 0) Then
-                                usedDomainList = usedDomainList & "," & domainSet
-                                '
-                                ' valid, non-repeat domain
-                                '
-                                If genericController.vbLCase(domainSet) = genericController.vbLCase(requestDomain) Then
-                                    '
-                                    ' current domain, set cookie
-                                    '
-                                    If (iisContext IsNot Nothing) Then
-                                        '
-                                        ' Pass cookie to asp (compatibility)
-                                        '
-                                        iisContext.Response.Cookies(iCookieName).Value = iCookieValue
-                                        If Not isMinDate(DateExpires) Then
-                                            iisContext.Response.Cookies(iCookieName).Expires = DateExpires
-                                        End If
-                                        'main_ASPResponse.Cookies(iCookieName).domain = domainSet
-                                        If Not isMissing(Path) Then
-                                            iisContext.Response.Cookies(iCookieName).Path = genericController.encodeText(Path)
-                                        End If
-                                        If Not isMissing(Secure) Then
-                                            iisContext.Response.Cookies(iCookieName).Secure = Secure
-                                        End If
-                                    Else
-                                        '
-                                        ' Pass Cookie to non-asp parent
-                                        '   crlf delimited list of name,value,expires,domain,path,secure
-                                        '
-                                        If webServerIO_bufferCookies <> "" Then
-                                            webServerIO_bufferCookies = webServerIO_bufferCookies & vbCrLf
-                                        End If
-                                        webServerIO_bufferCookies = webServerIO_bufferCookies & CookieName
-                                        webServerIO_bufferCookies = webServerIO_bufferCookies & vbCrLf & iCookieValue
-                                        '
-                                        s = ""
-                                        If Not isMinDate(DateExpires) Then
-                                            s = DateExpires.ToString
-                                        End If
-                                        webServerIO_bufferCookies = webServerIO_bufferCookies & vbCrLf & s
-                                        ' skip bc this is exactly the current domain and /rfc2109 requires a leading dot if explicit
-                                        webServerIO_bufferCookies = webServerIO_bufferCookies & vbCrLf
-                                        'responseBufferCookie = responseBufferCookie & vbCrLf & domainSet
-                                        '
-                                        s = "/"
-                                        If Not isMissing(Path) Then
-                                            s = genericController.encodeText(Path)
-                                        End If
-                                        webServerIO_bufferCookies = webServerIO_bufferCookies & vbCrLf & s
-                                        '
-                                        s = "false"
-                                        If genericController.EncodeBoolean(Secure) Then
-                                            s = "true"
-                                        End If
-                                        webServerIO_bufferCookies = webServerIO_bufferCookies & vbCrLf & s
-                                    End If
-                                Else
-                                    '
-                                    ' other domain, add iframe
-                                    '
-                                    Dim C As String
-                                    Link = "http://" & domainSet & "/ccLib/clientside/cross.html"
-                                    Link = Link & "?n=" & EncodeRequestVariable(iCookieName)
-                                    Link = Link & "&v=" & EncodeRequestVariable(iCookieValue)
-                                    If Not isMissing(Path) Then
-                                        C = genericController.encodeText(Path)
-                                        C = EncodeRequestVariable(C)
-                                        C = genericController.vbReplace(C, "/", "%2F")
-                                        Link = Link & "&p=" & C
-                                    End If
-                                    If Not isMinDate(DateExpires) Then
-                                        C = genericController.encodeText(DateExpires)
-                                        C = EncodeRequestVariable(C)
-                                        C = genericController.vbReplace(C, "/", "%2F")
-                                        Link = Link & "&e=" & C
-                                    End If
-                                    Link = cpCore.htmlDoc.html_EncodeHTML(Link)
-                                    cpCore.htmlDoc.htmlForEndOfBody = cpCore.htmlDoc.htmlForEndOfBody & vbCrLf & vbTab & "<iframe style=""display:none;"" width=""0"" height=""0"" src=""" & Link & """></iframe>"
-                                End If
-                            End If
-                        Next
+                    If (False) Then
+                        ''
+                        '' no domain provided, new mode
+                        ''   - write cookie for current domains
+                        ''   - write an iframe that called the cross-Site login
+                        ''   - http://127.0.0.1/ccLib/clientside/cross.html?v=1&vPath=%2F&vExpires=1%2F1%2F2012
+                        ''
+                        'domainListSplit = Split(cpCore.main_ServerDomainCrossList, ",")
+                        'For Ptr = 0 To UBound(domainListSplit)
+                        '    domainSet = Trim(domainListSplit(Ptr))
+                        '    If (domainSet <> "") And (InStr(1, "," & usedDomainList & ",", "," & domainSet & ",", vbTextCompare) = 0) Then
+                        '        usedDomainList = usedDomainList & "," & domainSet
+                        '        '
+                        '        ' valid, non-repeat domain
+                        '        '
+                        '        If genericController.vbLCase(domainSet) = genericController.vbLCase(requestDomain) Then
+                        '            '
+                        '            ' current domain, set cookie
+                        '            '
+                        '            If (iisContext IsNot Nothing) Then
+                        '                '
+                        '                ' Pass cookie to asp (compatibility)
+                        '                '
+                        '                iisContext.Response.Cookies(iCookieName).Value = iCookieValue
+                        '                If Not isMinDate(DateExpires) Then
+                        '                    iisContext.Response.Cookies(iCookieName).Expires = DateExpires
+                        '                End If
+                        '                'main_ASPResponse.Cookies(iCookieName).domain = domainSet
+                        '                If Not isMissing(Path) Then
+                        '                    iisContext.Response.Cookies(iCookieName).Path = genericController.encodeText(Path)
+                        '                End If
+                        '                If Not isMissing(Secure) Then
+                        '                    iisContext.Response.Cookies(iCookieName).Secure = Secure
+                        '                End If
+                        '            Else
+                        '                '
+                        '                ' Pass Cookie to non-asp parent
+                        '                '   crlf delimited list of name,value,expires,domain,path,secure
+                        '                '
+                        '                If webServerIO_bufferCookies <> "" Then
+                        '                    webServerIO_bufferCookies = webServerIO_bufferCookies & vbCrLf
+                        '                End If
+                        '                webServerIO_bufferCookies = webServerIO_bufferCookies & CookieName
+                        '                webServerIO_bufferCookies = webServerIO_bufferCookies & vbCrLf & iCookieValue
+                        '                '
+                        '                s = ""
+                        '                If Not isMinDate(DateExpires) Then
+                        '                    s = DateExpires.ToString
+                        '                End If
+                        '                webServerIO_bufferCookies = webServerIO_bufferCookies & vbCrLf & s
+                        '                ' skip bc this is exactly the current domain and /rfc2109 requires a leading dot if explicit
+                        '                webServerIO_bufferCookies = webServerIO_bufferCookies & vbCrLf
+                        '                'responseBufferCookie = responseBufferCookie & vbCrLf & domainSet
+                        '                '
+                        '                s = "/"
+                        '                If Not isMissing(Path) Then
+                        '                    s = genericController.encodeText(Path)
+                        '                End If
+                        '                webServerIO_bufferCookies = webServerIO_bufferCookies & vbCrLf & s
+                        '                '
+                        '                s = "false"
+                        '                If genericController.EncodeBoolean(Secure) Then
+                        '                    s = "true"
+                        '                End If
+                        '                webServerIO_bufferCookies = webServerIO_bufferCookies & vbCrLf & s
+                        '            End If
+                        '        Else
+                        '            '
+                        '            ' other domain, add iframe
+                        '            '
+                        '            Dim C As String
+                        '            Link = "http://" & domainSet & "/ccLib/clientside/cross.html"
+                        '            Link = Link & "?n=" & EncodeRequestVariable(iCookieName)
+                        '            Link = Link & "&v=" & EncodeRequestVariable(iCookieValue)
+                        '            If Not isMissing(Path) Then
+                        '                C = genericController.encodeText(Path)
+                        '                C = EncodeRequestVariable(C)
+                        '                C = genericController.vbReplace(C, "/", "%2F")
+                        '                Link = Link & "&p=" & C
+                        '            End If
+                        '            If Not isMinDate(DateExpires) Then
+                        '                C = genericController.encodeText(DateExpires)
+                        '                C = EncodeRequestVariable(C)
+                        '                C = genericController.vbReplace(C, "/", "%2F")
+                        '                Link = Link & "&e=" & C
+                        '            End If
+                        '            Link = cpCore.htmlDoc.html_EncodeHTML(Link)
+                        '            cpCore.htmlDoc.htmlForEndOfBody = cpCore.htmlDoc.htmlForEndOfBody & vbCrLf & vbTab & "<iframe style=""display:none;"" width=""0"" height=""0"" src=""" & Link & """></iframe>"
+                        '        End If
+                        '    End If
+                        'Next
                     Else
                         '
                         ' Legacy mode - if no domain given just leave it off

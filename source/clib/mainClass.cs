@@ -97,13 +97,16 @@ namespace Contensive.CLI
                                     {
                                         Console.WriteLine("configuration file [c:\\ProgramData\\Contensive\\config.json] found.");
                                         Console.WriteLine("ServerGroup name: " + cp.core.serverConfig.name);
+                                        Console.WriteLine("enableLocalMemoryCache: " + cp.core.serverConfig.enableLocalMemoryCache);
+                                        Console.WriteLine("enableLocalFileCache: " + cp.core.serverConfig.enableLocalFileCache);
+                                        Console.WriteLine("enableRemoteCache: " + cp.core.serverConfig.enableRemoteCache);
                                         Console.WriteLine("ElastiCacheConfigurationEndpoint: " + cp.core.serverConfig.awsElastiCacheConfigurationEndpoint);
                                         Console.WriteLine("cdnFilesRemoteEndpoint: " + cp.core.serverConfig.cdnFilesRemoteEndpoint);
                                         Console.WriteLine("isLocal: " + cp.core.serverConfig.isLocalFileSystem.ToString());
                                         Console.WriteLine("defaultDataSourceAddress: " + cp.core.serverConfig.defaultDataSourceAddress.ToString());
                                         Console.WriteLine("defaultDataSourceType: " + cp.core.serverConfig.defaultDataSourceType.ToString());
                                         Console.WriteLine("defaultDataSourceUsername: " + cp.core.serverConfig.defaultDataSourceUsername.ToString());
-                                        Console.WriteLine("isLocalCache: " + cp.core.serverConfig.isLocalCache.ToString());
+                                        Console.WriteLine("isLocalCache: " + cp.core.serverConfig.enableLocalMemoryCache.ToString());
                                         Console.WriteLine("maxConcurrentTasksPerServer: " + cp.core.serverConfig.maxConcurrentTasksPerServer.ToString());
                                         Console.WriteLine("apps.Count: " + cp.core.serverConfig.apps.Count);
                                         foreach (KeyValuePair<string, Core.Models.Entity.serverConfigModel.appConfigModel> kvp in cp.core.serverConfig.apps)
@@ -120,7 +123,6 @@ namespace Contensive.CLI
                                             {
                                                 Console.WriteLine("\tdomain: " + domain);
                                             }
-                                            Console.WriteLine("\tenableCache: " + app.enableCache);
                                         }
                                     }
                                     exitArgumentProcessing = true;

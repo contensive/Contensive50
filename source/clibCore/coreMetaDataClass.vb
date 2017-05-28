@@ -23,7 +23,7 @@ Namespace Contensive.Core
         '------------------------------------------------------------------------------------------------------------------------
         '
         Private cdefList As Dictionary(Of String, CDefClass)
-        Private cdefNameIdXref As Dictionary(Of String, Integer)
+        Private contentNameIdDictionary As Dictionary(Of String, Integer)
         Private tableSchemaList As Dictionary(Of String, tableSchemaClass)
         '
         '====================================================================================================
@@ -267,16 +267,108 @@ Namespace Contensive.Core
             '   name is loaded from xml collection files 
             '   id is created during the cacheLoad process when loading from Db (and used in metaData)
             '
-            Public lookupContentName As String
             Public lookupContentID As Integer             ' If TYPELOOKUP, (for Db controled sites) this is the content ID of the source table
-            Public RedirectContentName As String
+            'Public RedirectContentName As String
             Public RedirectContentID As Integer           ' If TYPEREDIRECT, this is new contentID
-            Public ManyToManyContentName As String
+            'Public ManyToManyContentName As String
             Public manyToManyContentID As Integer         ' Content containing Secondary Records
-            Public ManyToManyRuleContentName As String
+            'public ManyToManyRuleContentName As String
             Public manyToManyRuleContentID As Integer     ' Content with rules between Primary and Secondary
-            Public MemberSelectGroupName As String ' If the Type is TypeMemberSelect, this is the group that the member will be selected from
+            'Public MemberSelectGroupName As String ' If the Type is TypeMemberSelect, this is the group that the member will be selected from
             Public MemberSelectGroupID As Integer
+            '
+            ' fields populated on demand from 
+            '
+            Public Property RedirectContentName(cpCore As coreClass) As String
+                Get
+                    If (_RedirectContentName Is Nothing) Then
+                        If RedirectContentID > 0 Then
+                            _RedirectContentName = ""
+                            Dim dt As DataTable = cpCore.db.executeSql("select name from cccontent where id=" & RedirectContentID.ToString())
+                            If dt.Rows.Count > 0 Then
+                                _RedirectContentName = genericController.encodeText(dt.Rows(0).Item(0))
+                            End If
+                        End If
+                    End If
+                    Return _RedirectContentName
+                End Get
+                Set(value As String)
+                    _RedirectContentName = value
+                End Set
+            End Property
+            Private _RedirectContentName As String = Nothing
+            Public Property MemberSelectGroupName(cpCore As coreClass) As String
+                Get
+                    If (_MemberSelectGroupName Is Nothing) Then
+                        If MemberSelectGroupID > 0 Then
+                            _MemberSelectGroupName = ""
+                            Dim dt As DataTable = cpCore.db.executeSql("select name from cccontent where id=" & MemberSelectGroupID.ToString())
+                            If dt.Rows.Count > 0 Then
+                                _MemberSelectGroupName = genericController.encodeText(dt.Rows(0).Item(0))
+                            End If
+                        End If
+                    End If
+                    Return _MemberSelectGroupName
+                End Get
+                Set(value As String)
+                    _MemberSelectGroupName = value
+                End Set
+            End Property
+            Private _MemberSelectGroupName As String = Nothing
+            Public Property ManyToManyContentName(cpCore As coreClass) As String
+                Get
+                    If (_ManyToManyRuleContentName Is Nothing) Then
+                        If manyToManyContentID > 0 Then
+                            _ManyToManyRuleContentName = ""
+                            Dim dt As DataTable = cpCore.db.executeSql("select name from cccontent where id=" & manyToManyContentID.ToString())
+                            If dt.Rows.Count > 0 Then
+                                _ManyToManyContentName = genericController.encodeText(dt.Rows(0).Item(0))
+                            End If
+                        End If
+                    End If
+                    Return _ManyToManyContentName
+                End Get
+                Set(value As String)
+                    _ManyToManyContentName = value
+                End Set
+            End Property
+            Private _ManyToManyContentName As String = Nothing
+            Public Property ManyToManyRuleContentName(cpCore As coreClass) As String
+                Get
+                    If (_ManyToManyRuleContentName Is Nothing) Then
+                        If manyToManyRuleContentID > 0 Then
+                            _ManyToManyRuleContentName = ""
+                            Dim dt As DataTable = cpCore.db.executeSql("select name from cccontent where id=" & manyToManyRuleContentID.ToString())
+                            If dt.Rows.Count > 0 Then
+                                _ManyToManyRuleContentName = genericController.encodeText(dt.Rows(0).Item(0))
+                            End If
+                        End If
+                    End If
+                    Return _ManyToManyRuleContentName
+                End Get
+                Set(value As String)
+                    _ManyToManyRuleContentName = value
+                End Set
+            End Property
+            Private _ManyToManyRuleContentName As String = Nothing
+            Public Property lookupContentName(cpCore As coreClass) As String
+                Get
+                    If (_lookupContentName Is Nothing) Then
+                        If lookupContentID > 0 Then
+                            _lookupContentName = ""
+                            Dim dt As DataTable = cpCore.db.executeSql("select name from cccontent where id=" & lookupContentID.ToString())
+                            If dt.Rows.Count > 0 Then
+                                _lookupContentName = genericController.encodeText(dt.Rows(0).Item(0))
+                            End If
+                        End If
+                    End If
+                    Return _lookupContentName
+                End Get
+                Set(value As String)
+                    _lookupContentName = value
+                End Set
+            End Property
+            Private _lookupContentName As String = Nothing
             '
             Public Function Clone() As Object Implements ICloneable.Clone
                 Return Me.MemberwiseClone
@@ -353,7 +445,29 @@ Namespace Contensive.Core
             Public ContentControlCriteria As String     ' String created from ParentIDs used to select records
             Public selectList As New List(Of String)
             Public SelectCommaList As String            ' Field list used in OpenCSContent calls (all active field definitions)
-            Public childIdList As New List(Of Integer)      ' Comma separated list of child content definition IDs
+            'Public childIdList As New List(Of Integer)      ' Comma separated list of child content definition IDs
+            '
+            Public Property childIdList(cpCore As coreClass) As List(Of Integer)
+                Get
+                    If (_childIdList Is Nothing) Then
+                        Dim Sql As String = "select id from cccontent where parentid=" & Id
+                        Dim dt As DataTable = cpCore.db.executeSql(Sql)
+                        If dt.Rows.Count = 0 Then
+                            _childIdList = New List(Of Integer)
+                            For Each parentrow As DataRow In dt.Rows
+                                _childIdList.Add(EncodeInteger(parentrow.Item(0)))
+                            Next
+                        End If
+                        dt.Dispose()
+                    End If
+                    Return _childIdList
+                End Get
+                Set(value As List(Of Integer))
+                    _childIdList = value
+                End Set
+            End Property
+            Private _childIdList As List(Of Integer) = Nothing
+
         End Class
         '
         ' ----- Table Schema caching to speed up update
@@ -374,14 +488,14 @@ Namespace Contensive.Core
         ''' <param name="cluster"></param>
         ''' <param name="appName"></param>
         ''' <remarks></remarks>
-        public Sub New(cpCore As coreClass)
+        Public Sub New(cpCore As coreClass)
             MyBase.New()
             Me.cpCore = cpCore
             '
             ' reset metaData
             '
             cdefList = New Dictionary(Of String, CDefClass)
-            cdefNameIdXref = Nothing
+            contentNameIdDictionary = Nothing
             tableSchemaList = Nothing
         End Sub
         '
@@ -394,11 +508,11 @@ Namespace Contensive.Core
         Public Function getContentId(contentName As String) As Integer
             Dim returnId As Integer = 0
             Try
-                If (cdefNameIdXref Is Nothing) Then
-                    Call cdefNameIdXref_load()
+                If (contentNameIdDictionary Is Nothing) Then
+                    Call contentNameIdDictionary_load()
                 End If
-                If (cdefNameIdXref.ContainsKey(contentName.ToLower)) Then
-                    returnId = cdefNameIdXref(contentName.ToLower)
+                If (contentNameIdDictionary.ContainsKey(contentName.ToLower)) Then
+                    returnId = contentNameIdDictionary(contentName.ToLower)
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -432,7 +546,7 @@ Namespace Contensive.Core
         ''' <summary>
         ''' load cdefNameIdXref from cache and/or Db
         ''' </summary>
-        Public Sub cdefNameIdXref_load()
+        Public Sub contentNameIdDictionary_load()
             Try
                 Dim dt As DataTable
                 Dim recordName As String
@@ -443,28 +557,28 @@ Namespace Contensive.Core
                     '
                     ' catch cache issues so cdef will load
                     '
-                    cdefNameIdXref = cpCore.cache.getObject(Of Dictionary(Of String, Integer))("cdefNameIdXref")
-                    'cdefNameIdXref = DirectCast(cpCore.cache.getObject(Of Dictionary(Of String, Integer))("cdefNameIdXref"), Dictionary(Of String, Integer))
+                    contentNameIdDictionary = cpCore.cache.getObject(Of Dictionary(Of String, Integer))("cccontent-name-id-dictionary")
+                    'cdefNameIdXref = DirectCast(cpCore.cache.getObject(Of Dictionary(Of String, Integer))("cccontent-name-id-dictionary"), Dictionary(Of String, Integer))
                 Catch ex As Exception
                     cpCore.handleExceptionAndContinue(ex)
                 End Try
-                If (cdefNameIdXref Is Nothing) OrElse (cdefNameIdXref.Count = 0) Then
+                If (contentNameIdDictionary Is Nothing) OrElse (contentNameIdDictionary.Count = 0) Then
                     '
                     ' load xref from Db
                     '
-                    cdefNameIdXref = New Dictionary(Of String, Integer)
+                    contentNameIdDictionary = New Dictionary(Of String, Integer)
                     dt = cpCore.db.executeSql("select id,name from ccContent where (active<>0)")
                     If dt.Rows.Count > 0 Then
                         For Each row As DataRow In dt.Rows
                             recordName = genericController.encodeText(row.Item("name")).ToLower
-                            If Not cdefNameIdXref.ContainsKey(recordName) Then
-                                cdefNameIdXref.Add(recordName, genericController.EncodeInteger(row.Item("id")))
+                            If Not contentNameIdDictionary.ContainsKey(recordName) Then
+                                contentNameIdDictionary.Add(recordName, genericController.EncodeInteger(row.Item("id")))
                             End If
                         Next
                     End If
                     dt.Dispose()
                     Try
-                        Call cpCore.cache.setObject("cdefNameIdXref", cdefNameIdXref, "content")
+                        Call cpCore.cache.setObject("cccontent-name-id-dictionary", contentNameIdDictionary, "content")
                     Catch ex As Exception
                         cpCore.handleExceptionAndContinue(ex)
                     End Try
@@ -498,9 +612,6 @@ Namespace Contensive.Core
                 Dim parentCdef As CDefClass
                 Dim contentIdKey As String = contentId.ToString
                 '
-                If contentId = 38 Then
-                    contentId = contentId
-                End If
                 If (contentId <= 0) Then
                     '
                     ' invalid id
@@ -520,10 +631,11 @@ Namespace Contensive.Core
                     '
                     ' load cache version
                     '
-                    '
+                    Dim cacheName As String = Controllers.cacheController.getDbRecordCacheName("cccontent", "id", contentId.ToString)
+                    Dim dependantCacheNameList As New List(Of String)
                     If (Not forceDbLoad) Then
                         Try
-                            returnCdef = cpCore.cache.getObject(Of CDefClass)("cdefId" & contentId.ToString)
+                            returnCdef = cpCore.cache.getObject(Of CDefClass)(cacheName)
                         Catch ex As Exception
                             cpCore.handleExceptionAndContinue(ex)
                         End Try
@@ -573,7 +685,7 @@ Namespace Contensive.Core
                             returnCdef = New CDefClass
                             With returnCdef
                                 .fields = New Dictionary(Of String, CDefFieldClass)
-                                .childIdList = New List(Of Integer)
+                                .childIdList(cpCore) = New List(Of Integer)
                                 .selectList = New List(Of String)
                                 ' -- !!!!! changed to string because dotnet json cannot serialize an integer key
                                 .adminColumns = New SortedList(Of String, CDefAdminColumnClass)
@@ -634,14 +746,14 @@ Namespace Contensive.Core
                                 '
                                 ' append child cdef
                                 '
-                                sql = "select id from cccontent where parentid=" & .Id
-                                dt = cpCore.db.executeSql(sql)
-                                If dt.Rows.Count = 0 Then
-                                    For Each parentrow As DataRow In dt.Rows
-                                        .childIdList.Add(EncodeInteger(parentrow.Item(0)))
-                                    Next
-                                End If
-                                dt.Dispose()
+                                'sql = "select id from cccontent where parentid=" & .Id
+                                'dt = cpCore.db.executeSql(sql)
+                                'If dt.Rows.Count = 0 Then
+                                '    For Each parentrow As DataRow In dt.Rows
+                                '        .childIdList.Add(EncodeInteger(parentrow.Item(0)))
+                                '    Next
+                                'End If
+                                'dt.Dispose()
                                 '
                                 ' ----- now load all the Content Definition Fields
                                 '
@@ -792,22 +904,22 @@ Namespace Contensive.Core
                                                 .isBaseField = genericController.EncodeBoolean(row.Item(38))
                                                 .isModifiedSinceInstalled = False
                                                 .lookupContentID = genericController.EncodeInteger(row.Item(18))
-                                                .lookupContentName = ""
+                                                '.lookupContentName = ""
                                                 .lookupList = genericController.encodeText(row.Item(37))
                                                 .manyToManyContentID = genericController.EncodeInteger(row.Item(28))
                                                 .manyToManyRuleContentID = genericController.EncodeInteger(row.Item(29))
                                                 .ManyToManyRulePrimaryField = genericController.encodeText(row.Item(30))
                                                 .ManyToManyRuleSecondaryField = genericController.encodeText(row.Item(31))
-                                                .ManyToManyContentName = ""
-                                                .ManyToManyRuleContentName = ""
+                                                '.ManyToManyContentName(cpCore) = ""
+                                                '.ManyToManyRuleContentName(cpCore) = ""
                                                 .MemberSelectGroupID = genericController.EncodeInteger(row.Item(36))
-                                                .MemberSelectGroupName = ""
+                                                '.MemberSelectGroupName(cpCore) = ""
                                                 .nameLc = fieldNameLower
                                                 .NotEditable = genericController.EncodeBoolean(row.Item(26))
                                                 .Password = genericController.EncodeBoolean(row.Item(3))
                                                 .ReadOnly = genericController.EncodeBoolean(row.Item(17))
                                                 .RedirectContentID = genericController.EncodeInteger(row.Item(19))
-                                                .RedirectContentName = ""
+                                                '.RedirectContentName(cpCore) = ""
                                                 .RedirectID = genericController.encodeText(row.Item(21))
                                                 .RedirectPath = genericController.encodeText(row.Item(20))
                                                 .Required = genericController.EncodeBoolean(row.Item(14))
@@ -826,36 +938,36 @@ Namespace Contensive.Core
                                                     .HelpMessage = .HelpCustom
                                                 End If
                                                 .HelpChanged = False
-                                                If .lookupContentID > 0 Then
-                                                    dt = cpCore.db.executeSql("select name from cccontent where id=" & .lookupContentID)
-                                                    If dt.Rows.Count > 0 Then
-                                                        .lookupContentName = genericController.encodeText(dt.Rows(0).Item(0))
-                                                    End If
-                                                End If
-                                                If .manyToManyContentID > 0 Then
-                                                    dt = cpCore.db.executeSql("select name from cccontent where id=" & .manyToManyContentID)
-                                                    If dt.Rows.Count > 0 Then
-                                                        .ManyToManyContentName = genericController.encodeText(dt.Rows(0).Item(0))
-                                                    End If
-                                                End If
-                                                If .manyToManyRuleContentID > 0 Then
-                                                    dt = cpCore.db.executeSql("select name from cccontent where id=" & .manyToManyRuleContentID)
-                                                    If dt.Rows.Count > 0 Then
-                                                        .ManyToManyRuleContentName = genericController.encodeText(dt.Rows(0).Item(0))
-                                                    End If
-                                                End If
-                                                If .MemberSelectGroupID > 0 Then
-                                                    dt = cpCore.db.executeSql("select name from ccgroups where id=" & .MemberSelectGroupID)
-                                                    If dt.Rows.Count > 0 Then
-                                                        .MemberSelectGroupName = genericController.encodeText(dt.Rows(0).Item(0))
-                                                    End If
-                                                End If
-                                                If .RedirectContentID > 0 Then
-                                                    dt = cpCore.db.executeSql("select name from cccontent where id=" & .RedirectContentID)
-                                                    If dt.Rows.Count > 0 Then
-                                                        .RedirectContentName = genericController.encodeText(dt.Rows(0).Item(0))
-                                                    End If
-                                                End If
+                                                'If .lookupContentID > 0 Then
+                                                '    dt = cpCore.db.executeSql("select name from cccontent where id=" & .lookupContentID)
+                                                '    If dt.Rows.Count > 0 Then
+                                                '        .lookupContentName(cpCore) = genericController.encodeText(dt.Rows(0).Item(0))
+                                                '    End If
+                                                'End If
+                                                'If .manyToManyContentID > 0 Then
+                                                '    dt = cpCore.db.executeSql("select name from cccontent where id=" & .manyToManyContentID)
+                                                '    If dt.Rows.Count > 0 Then
+                                                '        .ManyToManyContentName = genericController.encodeText(dt.Rows(0).Item(0))
+                                                '    End If
+                                                'End If
+                                                'If .manyToManyRuleContentID > 0 Then
+                                                '    dt = cpCore.db.executeSql("select name from cccontent where id=" & .manyToManyRuleContentID)
+                                                '    If dt.Rows.Count > 0 Then
+                                                '        .ManyToManyRuleContentName = genericController.encodeText(dt.Rows(0).Item(0))
+                                                '    End If
+                                                'End If
+                                                'If .MemberSelectGroupID > 0 Then
+                                                '    dt = cpCore.db.executeSql("select name from ccgroups where id=" & .MemberSelectGroupID)
+                                                '    If dt.Rows.Count > 0 Then
+                                                '        .MemberSelectGroupName(cpCore) = genericController.encodeText(dt.Rows(0).Item(0))
+                                                '    End If
+                                                'End If
+                                                'If .RedirectContentID > 0 Then
+                                                '    dt = cpCore.db.executeSql("select name from cccontent where id=" & .RedirectContentID)
+                                                '    If dt.Rows.Count > 0 Then
+                                                '        .RedirectContentName = genericController.encodeText(dt.Rows(0).Item(0))
+                                                '    End If
+                                                'End If
                                                 dt.Dispose()
                                             End With
                                             .fields.Add(fieldNameLower, field)
@@ -891,7 +1003,7 @@ Namespace Contensive.Core
                             getCdef_SetAdminColumns(returnCdef)
                         End If
                         Try
-                            Call cpCore.cache.setObject("cdefId" & contentId.ToString, returnCdef, "content,content fields")
+                            Call cpCore.cache.setObject(cacheName, returnCdef, dependantCacheNameList)
                         Catch ex As Exception
                             cpCore.handleExceptionAndContinue(ex)
                         End Try
@@ -1596,10 +1708,10 @@ Namespace Contensive.Core
                 Else
                     cdef = getCdef(ParentContentID)
                     If Not (cdef Is Nothing) Then
-                        If cdef.childIdList.Count > 0 Then
-                            returnOK = cdef.childIdList.Contains(ChildContentID)
+                        If cdef.childIdList(cpCore).Count > 0 Then
+                            returnOK = cdef.childIdList(cpCore).Contains(ChildContentID)
                             If Not returnOK Then
-                                For Each contentId As Integer In cdef.childIdList
+                                For Each contentId As Integer In cdef.childIdList(cpCore)
                                     returnOK = isWithinContent(contentId, ParentContentID)
                                     If returnOK Then Exit For
                                 Next
@@ -2258,7 +2370,7 @@ ErrorTrap:
                 & " Left Join ccGroupRules on ccMemberRules.GroupID=ccGroupRules.GroupID)" _
                 & " Left Join ccContent on ccGroupRules.ContentID=ccContent.ID)" _
                 & " WHERE" _
-                    & " (ccMemberRules.MemberID=" & cpcore.authContext.user.id & ")" _
+                    & " (ccMemberRules.MemberID=" & cpCore.authContext.user.ID & ")" _
                     & " AND(ccGroupRules.Active<>0)" _
                     & " AND(ccContent.Active<>0)" _
                     & " AND(ccMemberRules.Active<>0)"
@@ -2269,7 +2381,7 @@ ErrorTrap:
                     returnList.Add(ContentID)
                     CDef = getCdef(ContentID)
                     If Not (CDef Is Nothing) Then
-                        returnList.AddRange(CDef.childIdList)
+                        returnList.AddRange(CDef.childIdList(cpCore))
                     End If
                     ''main_GetContentManagementList = main_GetContentManagementList & "," & CStr(ContentID)
                     'ContentName = cpcore.metaData.getContentNameByID(ContentID)
@@ -2302,8 +2414,8 @@ ErrorTrap:
                 If (Not tableSchemaList Is Nothing) Then
                     tableSchemaList.Clear()
                 End If
-                If (Not cdefNameIdXref Is Nothing) Then
-                    cdefNameIdXref = Nothing
+                If (Not contentNameIdDictionary Is Nothing) Then
+                    contentNameIdDictionary = Nothing
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -3027,7 +3139,7 @@ ErrorTrap:
                                     field.editSortPriority = 9999
                                     field.authorable = False
                                     field.caption = "Created By"
-                                    field.lookupContentName = "People"
+                                    field.lookupContentName(cpCore) = "People"
                                     field.defaultValue = ""
                                     field.isBaseField = IsBaseContent
                                     Call metaData_VerifyCDefField_ReturnID(contentName, field)
@@ -3052,7 +3164,7 @@ ErrorTrap:
                                     field.editSortPriority = 9999
                                     field.authorable = False
                                     field.caption = "Modified By"
-                                    field.lookupContentName = "People"
+                                    field.lookupContentName(cpCore) = "People"
                                     field.defaultValue = ""
                                     field.isBaseField = IsBaseContent
                                     Call metaData_VerifyCDefField_ReturnID(contentName, field)
@@ -3065,7 +3177,7 @@ ErrorTrap:
                                     field.editSortPriority = 9999
                                     field.authorable = False
                                     field.caption = "Controlling Content"
-                                    field.lookupContentName = "Content"
+                                    field.lookupContentName(cpCore) = "Content"
                                     field.defaultValue = ""
                                     field.isBaseField = IsBaseContent
                                     Call metaData_VerifyCDefField_ReturnID(contentName, field)
@@ -3093,7 +3205,7 @@ ErrorTrap:
                                     field.editSortPriority = 9999
                                     field.authorable = False
                                     field.caption = "Edit Source ID"
-                                    field.lookupContentName = ""
+                                    field.lookupContentName(cpCore) = ""
                                     field.defaultValue = "null"
                                     field.isBaseField = IsBaseContent
                                     Call metaData_VerifyCDefField_ReturnID(contentName, field)
@@ -3106,7 +3218,7 @@ ErrorTrap:
                                     field.editSortPriority = 9999
                                     field.authorable = False
                                     field.caption = "Edit Archive"
-                                    field.lookupContentName = ""
+                                    field.lookupContentName(cpCore) = ""
                                     field.defaultValue = "0"
                                     field.isBaseField = IsBaseContent
                                     Call metaData_VerifyCDefField_ReturnID(contentName, field)
@@ -3119,7 +3231,7 @@ ErrorTrap:
                                     field.editSortPriority = 9999
                                     field.authorable = False
                                     field.caption = "Edit Blank"
-                                    field.lookupContentName = ""
+                                    field.lookupContentName(cpCore) = ""
                                     field.defaultValue = "0"
                                     field.isBaseField = IsBaseContent
                                     Call metaData_VerifyCDefField_ReturnID(contentName, field)
@@ -3132,7 +3244,7 @@ ErrorTrap:
                                     field.editSortPriority = 9999
                                     field.authorable = False
                                     field.caption = "Content Category"
-                                    field.lookupContentName = "Content Categories"
+                                    field.lookupContentName(cpCore) = "Content Categories"
                                     field.defaultValue = ""
                                     field.isBaseField = IsBaseContent
                                     Call metaData_VerifyCDefField_ReturnID(contentName, field)
@@ -3154,7 +3266,8 @@ ErrorTrap:
                             ' ----- Load CDef
                             '
                             If clearMetaCache Then
-                                cpCore.cache.invalidateObjectList("content,content fields")
+                                cpCore.cache.invalidateContent("content")
+                                cpCore.cache.invalidateContent("content fields")
                                 cpCore.metaData.clear()
                             End If
                         End If
@@ -3283,11 +3396,11 @@ ErrorTrap:
                     FieldAuthorable = field.authorable
                     DefaultValue = genericController.encodeText(field.defaultValue)
                     NotEditable = field.NotEditable
-                    LookupContentName = field.lookupContentName
+                    LookupContentName = field.lookupContentName(cpCore)
                     'field.indexColumn = field.indexColumn
                     AdminIndexWidth = field.indexWidth
                     AdminIndexSort = field.indexSortOrder
-                    RedirectContentName = field.RedirectContentName
+                    RedirectContentName = field.RedirectContentName(cpCore)
                     RedirectIDField = field.RedirectID
                     RedirectPath = field.RedirectPath
                     HTMLContent = field.htmlContent
@@ -3301,8 +3414,8 @@ ErrorTrap:
                     EditTab = field.editTabName
                     Scramble = field.Scramble
                     LookupList = field.lookupList
-                    ManyToManyContent = field.ManyToManyContentName
-                    ManyToManyRuleContent = field.ManyToManyRuleContentName
+                    ManyToManyContent = field.ManyToManyContentName(cpCore)
+                    ManyToManyRuleContent = field.ManyToManyRuleContentName(cpCore)
                     ManyToManyRulePrimaryField = field.ManyToManyRulePrimaryField
                     ManyToManyRuleSecondaryField = field.ManyToManyRuleSecondaryField
                     '

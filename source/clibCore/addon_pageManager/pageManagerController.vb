@@ -660,18 +660,18 @@ Namespace Contensive.Core.Controllers
                 ' ----- OnBodyStart add-ons
                 '
                 FilterStatusOK = False
-                Cnt = UBound(c.addonCache.localCache.onBodyStartPtrs) + 1
+                Cnt = UBound(c.addonCache.addonCache.onBodyStartPtrs) + 1
                 For Ptr = 0 To Cnt - 1
-                    addonCachePtr = c.addonCache.localCache.onBodyStartPtrs(Ptr)
+                    addonCachePtr = c.addonCache.addonCache.onBodyStartPtrs(Ptr)
                     If addonCachePtr > -1 Then
-                        addonId = c.addonCache.localCache.addonList(addonCachePtr.ToString).addonCache_Id
+                        addonId = c.addonCache.addonCache.addonList(addonCachePtr.ToString).id
                         'hint = hint & ",addonId=" & addonId
                         If addonId > 0 Then
-                            AddonName = c.addonCache.localCache.addonList(addonCachePtr.ToString).addonCache_name
+                            AddonName = c.addonCache.addonCache.addonList(addonCachePtr.ToString).name
                             'hint = hint & ",AddonName=" & AddonName
                             returnHtmlBody = returnHtmlBody & c.addon.execute_legacy2(addonId, "", "", CPUtilsBaseClass.addonContext.ContextOnBodyStart, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
                             If Not FilterStatusOK Then
-                                Call c.handleLegacyError12("pageManager_GetHtmlBody", "There was an error processing OnAfterBody [" & c.addonCache.localCache.addonList(addonCachePtr.ToString).addonCache_name & "]. Filtering was aborted.")
+                                Call c.handleLegacyError12("pageManager_GetHtmlBody", "There was an error processing OnAfterBody [" & c.addonCache.addonCache.addonList(addonCachePtr.ToString).name & "]. Filtering was aborted.")
                                 Exit For
                             End If
                         End If
@@ -751,16 +751,16 @@ Namespace Contensive.Core.Controllers
                     '
                     'hint = hint & ",onBodyEnd"
                     FilterStatusOK = False
-                    Cnt = UBound(c.addonCache.localCache.onBodyEndPtrs) + 1
+                    Cnt = UBound(c.addonCache.addonCache.onBodyEndPtrs) + 1
                     'hint = hint & ",cnt=" & Cnt
                     For Ptr = 0 To Cnt - 1
-                        addonCachePtr = c.addonCache.localCache.onBodyEndPtrs(Ptr)
+                        addonCachePtr = c.addonCache.addonCache.onBodyEndPtrs(Ptr)
                         'hint = hint & ",ptr=" & Ptr & ",addonCachePtr=" & addonCachePtr
                         If addonCachePtr > -1 Then
-                            addonId = c.addonCache.localCache.addonList(addonCachePtr.ToString).addonCache_Id
+                            addonId = c.addonCache.addonCache.addonList(addonCachePtr.ToString).id
                             'hint = hint & ",addonId=" & addonId
                             If addonId > 0 Then
-                                AddonName = c.addonCache.localCache.addonList(addonCachePtr.ToString).addonCache_name
+                                AddonName = c.addonCache.addonCache.addonList(addonCachePtr.ToString).name
                                 'hint = hint & ",AddonName=" & AddonName
                                 c.htmlDoc.html_DocBodyFilter = returnHtmlBody
                                 AddonReturn = c.addon.execute_legacy2(addonId, "", "", CPUtilsBaseClass.addonContext.ContextFilter, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
@@ -2294,13 +2294,13 @@ ErrorTrap:
                     '---------------------------------------------------------------------------------
                     '
                     pageManager_PageContent = returnHtml
-                    AddOnCnt = UBound(c.addonCache.localCache.onPageStartPtrs) + 1
+                    AddOnCnt = UBound(c.addonCache.addonCache.onPageStartPtrs) + 1
                     For addonPtr = 0 To AddOnCnt - 1
-                        addonCachePtr = c.addonCache.localCache.onPageStartPtrs(addonPtr)
+                        addonCachePtr = c.addonCache.addonCache.onPageStartPtrs(addonPtr)
                         If addonCachePtr > -1 Then
-                            addonId = c.addonCache.localCache.addonList(addonCachePtr.ToString).addonCache_Id
+                            addonId = c.addonCache.addonCache.addonList(addonCachePtr.ToString).id
                             If addonId > 0 Then
-                                AddonName = c.addonCache.localCache.addonList(addonCachePtr.ToString).addonCache_name
+                                AddonName = c.addonCache.addonCache.addonList(addonCachePtr.ToString).name
                                 AddonContent = c.addon.execute_legacy5(addonId, AddonName, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
                                 pageManager_PageContent = AddonContent & pageManager_PageContent
                             End If
@@ -2313,13 +2313,13 @@ ErrorTrap:
                     '---------------------------------------------------------------------------------
                     '
                     pageManager_PageContent = returnHtml
-                    AddOnCnt = UBound(c.addonCache.localCache.onPageEndPtrs) + 1
+                    AddOnCnt = UBound(c.addonCache.addonCache.onPageEndPtrs) + 1
                     For addonPtr = 0 To AddOnCnt - 1
-                        addonCachePtr = c.addonCache.localCache.onPageEndPtrs(addonPtr)
+                        addonCachePtr = c.addonCache.addonCache.onPageEndPtrs(addonPtr)
                         If addonCachePtr > -1 Then
-                            addonId = c.addonCache.localCache.addonList(addonCachePtr.ToString).addonCache_Id
+                            addonId = c.addonCache.addonCache.addonList(addonCachePtr.ToString).id
                             If addonId > 0 Then
-                                AddonName = c.addonCache.localCache.addonList(addonCachePtr.ToString).addonCache_name
+                                AddonName = c.addonCache.addonCache.addonList(addonCachePtr.ToString).name
                                 AddonContent = c.addon.execute_legacy5(addonId, AddonName, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
                                 pageManager_PageContent = pageManager_PageContent & AddonContent
                             End If
@@ -3626,7 +3626,7 @@ ErrorTrap:
                         If Not SaveButNoChanges Then
                             Call c.main_ProcessSpecialCaseAfterSave(False, ContentName, RecordID, RecordName, RecordParentID, False)
                             Call pageManager_cache_pageContent_clear()
-                            Call c.cache.invalidateObjectList(ContentName)
+                            Call c.cache.invalidateContent(ContentName)
                         End If
                     End If
                 End If
@@ -3658,7 +3658,7 @@ ErrorTrap:
                     '
                     'Call AppendLog("pageManager_ProcessFormQuickEditor, 7-call pageManager_cache_pageContent_clear")
                     Call pageManager_cache_pageContent_clear()
-                    Call c.cache.invalidateObjectList(ContentName)
+                    Call c.cache.invalidateContent(ContentName)
                 End If
                 If (Button = ButtonAddSiblingPage) Then
                     '
@@ -3695,7 +3695,7 @@ ErrorTrap:
                     '
                     'Call AppendLog("pageManager_ProcessFormQuickEditor, 8-call pageManager_cache_pageContent_clear")
                     Call pageManager_cache_pageContent_clear()
-                    Call c.cache.invalidateObjectList(ContentName)
+                    Call c.cache.invalidateContent(ContentName)
                 End If
                 If (Button = ButtonDelete) Then
                     CSBlock = c.csOpen(ContentName, RecordID)
@@ -3710,7 +3710,7 @@ ErrorTrap:
                     If Not main_WorkflowSupport Then
                         'Call AppendLog("pageManager_ProcessFormQuickEditor, 9-call pageManager_cache_pageContent_clear")
                         Call pageManager_cache_pageContent_clear()
-                        Call c.cache.invalidateObjectList(ContentName)
+                        Call c.cache.invalidateContent(ContentName)
                     End If
                     '
                     If Not main_WorkflowSupport Then
@@ -3741,7 +3741,7 @@ ErrorTrap:
                     '
                     If (Button = ButtonPublish) Then
                         Call c.workflow.publishEdit(ContentName, RecordID)
-                        Call c.cache.invalidateObjectList(ContentName)
+                        Call c.cache.invalidateContent(ContentName)
                     End If
                     If (Button = ButtonPublishApprove) Then
                         Call c.workflow.approveEdit(ContentName, RecordID)
@@ -6538,7 +6538,7 @@ ErrorTrap:
         Public Sub pageManager_cache_siteSection_clear()
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("pageManager_cache_siteSection_clear")
             '
-            Call c.cache.invalidateObjectList("site sections")
+            Call c.cache.invalidateContent("site sections")
             cache_siteSection = {}
             pageManager_cache_siteSection_rows = 0
             Call c.cache.setObject(pageManager_cache_siteSection_cacheName, cache_siteSection)
@@ -7230,7 +7230,8 @@ ErrorTrap:
                                                         '
                                                         ' Live Editing
                                                         '
-                                                        Call c.cache.invalidateObjectList(ClipChildContentName & "," & ClipParentContentName)
+                                                        Call c.cache.invalidateContent(ClipChildContentName)
+                                                        Call c.cache.invalidateContent(ClipParentContentName)
                                                         Call pageManager_cache_pageContent_clear()
                                                     End If
                                                 End If
@@ -7457,7 +7458,7 @@ ErrorTrap:
                                                 Content = "User-agent: *" & vbCrLf & "Disallow: /admin/" & vbCrLf & "Disallow: /images/"
                                                 Call c.appRootFiles.saveFile(Filename, Content)
                                             End If
-                                            Content = Content & c.addonCache.localCache.robotsTxt
+                                            Content = Content & c.addonCache.addonCache.robotsTxt
                                             Call c.webServer.webServerIO_setResponseContentType("text/plain")
                                             Call c.htmlDoc.writeAltBuffer(Content)
                                             c.docOpen = False '--- should be disposed by caller --- Call dispose
@@ -8979,7 +8980,7 @@ ErrorTrap:
                             ' the defaultemplateid in the domain is not valid
                             '
                             Call c.db.executeSql("update ccdomains set defaulttemplateid=0 where defaulttemplateid=" & c.domains.domainDetails.defaultTemplateId)
-                            Call c.cache.invalidateObjectList("domains")
+                            Call c.cache.invalidateContent("domains")
                         End If
                     End If
                     If Not c.db.cs_ok(CS) Then

@@ -56,7 +56,6 @@ namespace  Contensive.CLI {
                     appConfig.allowSiteMonitor = false;
                     domainName = cliController.promptForReply("Primary Domain Name", "www." + appName + ".com");
                     appConfig.domainList.Add(domainName);
-                    appConfig.enableCache = true;
                     appConfig.enabled = true;
                     appConfig.privateKey = Guid.NewGuid().ToString().Replace("{", "").Replace("}", "").Replace("-", "");
                     switch (appArchitecture)

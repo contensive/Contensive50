@@ -340,10 +340,10 @@ Namespace Contensive.Core.Controllers
         ''' <param name="startRecord"></param>
         ''' <param name="maxRecords"></param>
         ''' <returns></returns>
-        Public Function executeSql(ByVal sql As String, Optional ByVal dataSourceName As String = "", Optional ByVal startRecord As Integer = 0, Optional ByVal maxRecords As Integer = 9999) As DataTable
+        Public Function executeSql(ByVal sql As String, Optional ByVal dataSourceName As String = "", Optional ByVal startRecord As Integer = 0, Optional ByVal maxRecords As Integer = 9999, Optional ByRef recordsAffected As Integer = 0) As DataTable
             Dim returnData As New DataTable
             Try
-                returnData = executeSql_noErrorHandling(sql, getConnectionStringADONET(cpCore.serverConfig.appConfig.name, dataSourceName), startRecord, maxRecords)
+                returnData = executeSql_noErrorHandling(sql, getConnectionStringADONET(cpCore.serverConfig.appConfig.name, dataSourceName), startRecord, maxRecords, recordsAffected)
             Catch ex As Exception
                 Dim newEx As New ApplicationException("Exception [" & ex.Message & "] executing sql [" & sql & "], datasource [" & dataSourceName & "], startRecord [" & startRecord & "], maxRecords [" & maxRecords & "]", ex)
                 cpCore.handleExceptionAndRethrow(newEx)
@@ -360,12 +360,13 @@ Namespace Contensive.Core.Controllers
         ''' <param name="startRecord"></param>
         ''' <param name="maxRecords"></param>
         ''' <returns></returns>
-        Private Function executeSql_noErrorHandling(ByVal sql As String, ByVal connString As String, ByVal startRecord As Integer, ByVal maxRecords As Integer) As DataTable
+        Private Function executeSql_noErrorHandling(ByVal sql As String, ByVal connString As String, ByVal startRecord As Integer, ByVal maxRecords As Integer, ByRef recordsAffected As Integer) As DataTable
             '
             ' REFACTOR
             ' consider writing cs intrface to sql dataReader object -- one row at a time, vaster.
             ' https://msdn.microsoft.com/en-us/library/system.data.sqlclient.sqldatareader.aspx
             '
+            Dim sw As Stopwatch = Stopwatch.StartNew()
             Dim returnData As New DataTable
             Dim tickCountStart As Integer = GetTickCount
             If dbEnabled Then
@@ -376,15 +377,15 @@ Namespace Contensive.Core.Controllers
                         cmdSQL.CommandText = sql
                         cmdSQL.Connection = connSQL
                         Using adptSQL = New SqlClient.SqlDataAdapter(cmdSQL)
-                            adptSQL.Fill(startRecord, maxRecords, returnData)
+                            recordsAffected = adptSQL.Fill(startRecord, maxRecords, returnData)
                         End Using
                     End Using
                 End Using
                 dbVerified = True
-                Dim tickCountDuration As Integer = GetTickCount - tickCountStart
-                saveTransactionLog("duration [" & tickCountDuration & "], sql [" & sql & "]")
-                If (tickCountDuration > sqlSlowThreshholdMsec) Then
-                    saveSlowQueryLog(tickCountDuration, sql)
+                sw.Stop()
+                saveTransactionLog("duration [" & sw.ElapsedMilliseconds & "], sql [" & sql & "]")
+                If (sw.ElapsedMilliseconds > sqlSlowThreshholdMsec) Then
+                    saveSlowQueryLog(CInt(sw.ElapsedMilliseconds), sql)
                 End If
             End If
             Return returnData
@@ -1634,7 +1635,8 @@ Namespace Contensive.Core.Controllers
                             '
                             Call deleteTableRecord(ContentTableName, LiveRecordID, ContentDataSourceName)
                             If coreWorkflowClass.csv_AllowAutocsv_ClearContentTimeStamp Then
-                                Call cpCore.cache.invalidateObject(ContentName)
+                                Call cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(ContentTableName, "id", LiveRecordID.ToString()))
+                                'Call cpCore.cache.invalidateObject(ContentName)
                             End If
                             Call deleteContentRules(ContentID, LiveRecordID)
                         Else
@@ -2523,24 +2525,39 @@ Namespace Contensive.Core.Controllers
                         Throw New ArgumentException("ContentName [" & ContentName & "] was Not found")
                     ElseIf CDef.Id = 0 Then
                         Throw New ArgumentException("ContentName [" & ContentName & "] was Not found")
-                    ElseIf cpCore.siteProperties.allowWorkflowAuthoring And (CDef.AllowWorkflowAuthoring) Then
+                    Else
                         '
-                        ' Supports Workflow Authoring, handle it record at a time
+                        ' -- treat all deletes one at a time to invalidate the primary cache
+                        ' another option is invalidate the entire table (tablename-invalidate), but this also has performance problems
                         '
+                        Dim invaldiateObjectList As New List(Of String)
                         CSPointer = cs_open(ContentName, Criteria, , False, MemberID, True, True, "ID")
                         Do While cs_ok(CSPointer)
+                            invaldiateObjectList.Add(Controllers.cacheController.getDbRecordCacheName(CDef.ContentTableName, "id", cs_getInteger(CSPointer, "id").ToString()))
                             Call cs_deleteRecord(CSPointer)
                             Call cs_goNext(CSPointer)
                         Loop
                         Call cs_Close(CSPointer)
-                    Else
-                        '
-                        ' No Workflow Authoring, just delete records
-                        '
-                        Call DeleteTableRecords(CDef.ContentTableName, "(" & Criteria & ") And (" & CDef.ContentControlCriteria & ")", CDef.ContentDataSourceName)
-                        If coreWorkflowClass.csv_AllowAutocsv_ClearContentTimeStamp Then
-                            Call cpCore.cache.invalidateObject(ContentName)
-                        End If
+                        Call cpCore.cache.invalidateObjectList(invaldiateObjectList)
+
+                        '    ElseIf cpCore.siteProperties.allowWorkflowAuthoring And (CDef.AllowWorkflowAuthoring) Then
+                        '    '
+                        '    ' Supports Workflow Authoring, handle it record at a time
+                        '    '
+                        '    CSPointer = cs_open(ContentName, Criteria, , False, MemberID, True, True, "ID")
+                        '    Do While cs_ok(CSPointer)
+                        '        Call cs_deleteRecord(CSPointer)
+                        '        Call cs_goNext(CSPointer)
+                        '    Loop
+                        '    Call cs_Close(CSPointer)
+                        'Else
+                        '    '
+                        '    ' No Workflow Authoring, just delete records
+                        '    '
+                        '    Call DeleteTableRecords(CDef.ContentTableName, "(" & Criteria & ") And (" & CDef.ContentControlCriteria & ")", CDef.ContentDataSourceName)
+                        '    If coreWorkflowClass.csv_AllowAutocsv_ClearContentTimeStamp Then
+                        '        Call cpCore.cache.invalidateObject(CDef.ContentTableName & "-invalidate")
+                        '    End If
                     End If
                 End If
             Catch ex As Exception
@@ -2706,12 +2723,12 @@ Namespace Contensive.Core.Controllers
                             '
                             Criteria = "((createkey=" & CreateKeyString & ")And(DateAdded=" & DateAddedString & "))"
                             returnCs = cs_open(ContentName, Criteria, "ID DESC", False, MemberID, WorkflowAuthoringMode, True)
-                            '
-                            ' ----- Clear Time Stamp because a record changed
-                            '
-                            If coreWorkflowClass.csv_AllowAutocsv_ClearContentTimeStamp Then
-                                Call cpCore.cache.invalidateObject(ContentName)
-                            End If
+                            ''
+                            '' ----- Clear Time Stamp because a record changed
+                            ''
+                            'If coreWorkflowClass.csv_AllowAutocsv_ClearContentTimeStamp Then
+                            '    Call cpCore.cache.invalidateObject(ContentName)
+                            'End If
                         End With
                     End If
                 End If
@@ -3687,9 +3704,7 @@ Namespace Contensive.Core.Controllers
                                 '
                                 ' ----- reset the ContentTimeStamp to csv_ClearBake
                                 '
-                                If coreWorkflowClass.csv_AllowAutocsv_ClearContentTimeStamp And (Not Blockcsv_ClearBake) Then
-                                    Call cpCore.cache.invalidateObject(LiveRecordContentName)
-                                End If
+                                Call cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(LiveTableName, "id", LiveRecordID.ToString()))
                                 '
                                 ' ----- mark the record NOT UpToDate for SpiderDocs
                                 '
@@ -5059,7 +5074,7 @@ Namespace Contensive.Core.Controllers
                     Case "CREATEDBY"
                         field.caption = "Created By"
                         field.fieldTypeId = FieldTypeIdLookup
-                        field.lookupContentName = "Members"
+                        field.lookupContentName(cpCore) = "Members"
                         field.ReadOnly = True
                         field.editSortPriority = 5030
                     Case "MODIFIEDDATE"
@@ -5069,7 +5084,7 @@ Namespace Contensive.Core.Controllers
                     Case "MODIFIEDBY"
                         field.caption = "Modified By"
                         field.fieldTypeId = FieldTypeIdLookup
-                        field.lookupContentName = "Members"
+                        field.lookupContentName(cpCore) = "Members"
                         field.ReadOnly = True
                         field.editSortPriority = 5050
                     Case "ID"
@@ -5082,7 +5097,7 @@ Namespace Contensive.Core.Controllers
                     Case "CONTENTCONTROLID"
                         field.caption = "Content Definition"
                         field.fieldTypeId = FieldTypeIdLookup
-                        field.lookupContentName = "Content"
+                        field.lookupContentName(cpCore) = "Content"
                         field.editSortPriority = 5070
                         field.authorable = True
                         field.ReadOnly = False
@@ -5132,7 +5147,7 @@ Namespace Contensive.Core.Controllers
                     Case "ORGANIZATIONID"
                         field.caption = "Organization"
                         field.fieldTypeId = FieldTypeIdLookup
-                        field.lookupContentName = "Organizations"
+                        field.lookupContentName(cpCore) = "Organizations"
                         field.editSortPriority = 2005
                         field.authorable = True
                         field.ReadOnly = False
@@ -5166,7 +5181,7 @@ Namespace Contensive.Core.Controllers
                     Case "CONTENTID"
                         field.caption = "Content"
                         field.fieldTypeId = FieldTypeIdLookup
-                        field.lookupContentName = "Content"
+                        field.lookupContentName(cpCore) = "Content"
                         field.ReadOnly = False
                         field.editSortPriority = 2060
                     '
@@ -5175,19 +5190,19 @@ Namespace Contensive.Core.Controllers
                     Case "PARENTID"
                         field.caption = "Parent"
                         field.fieldTypeId = FieldTypeIdLookup
-                        field.lookupContentName = ContentName
+                        field.lookupContentName(cpCore) = ContentName
                         field.ReadOnly = False
                         field.editSortPriority = 3000
                     Case "MEMBERID"
                         field.caption = "Member"
                         field.fieldTypeId = FieldTypeIdLookup
-                        field.lookupContentName = "Members"
+                        field.lookupContentName(cpCore) = "Members"
                         field.ReadOnly = False
                         field.editSortPriority = 3005
                     Case "CONTACTMEMBERID"
                         field.caption = "Contact"
                         field.fieldTypeId = FieldTypeIdLookup
-                        field.lookupContentName = "Members"
+                        field.lookupContentName(cpCore) = "Members"
                         field.ReadOnly = False
                         field.editSortPriority = 3010
                     Case "ALLOWBULKEMAIL"

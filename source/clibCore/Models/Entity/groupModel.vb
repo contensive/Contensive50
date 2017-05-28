@@ -75,7 +75,7 @@ Namespace Contensive.Core.Models.Entity
             Dim result As groupModel = Nothing
             Try
                 If recordId > 0 Then
-                    Dim cacheName As String = GetType(groupModel).FullName & getCacheName("id", recordId.ToString())
+                    Dim cacheName As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", recordId.ToString())
                     result = cpCore.cache.getObject(Of groupModel)(cacheName)
                     If (result Is Nothing) Then
                         result = loadObject(cpCore, "id=" & recordId.ToString(), cacheNameList)
@@ -98,7 +98,7 @@ Namespace Contensive.Core.Models.Entity
             Dim result As groupModel = Nothing
             Try
                 If Not String.IsNullOrEmpty(recordGuid) Then
-                    Dim cacheName As String = GetType(groupModel).FullName & getCacheName("ccguid", recordGuid)
+                    Dim cacheName As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "ccguid", recordGuid)
                     result = cpCore.cache.getObject(Of groupModel)(cacheName)
                     If (result Is Nothing) Then
                         result = loadObject(cpCore, "ccGuid=" & cpCore.db.encodeSQLText(recordGuid), cacheNameList)
@@ -121,7 +121,7 @@ Namespace Contensive.Core.Models.Entity
             Dim result As groupModel = Nothing
             Try
                 If ((foreignKey1Id > 0) And (foreignKey2Id > 0)) Then
-                    result = cpCore.cache.getObject(Of groupModel)(getCacheName("foreignKey1", foreignKey1Id.ToString(), "foreignKey2", foreignKey2Id.ToString()))
+                    result = cpCore.cache.getObject(Of groupModel)(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "foreignKey1", foreignKey1Id.ToString(), "foreignKey2", foreignKey2Id.ToString()))
                     If (result Is Nothing) Then
                         result = loadObject(cpCore, "(foreignKey1=" & foreignKey1Id.ToString() & ")and(foreignKey1=" & foreignKey1Id.ToString() & ")", cacheNameList)
                     End If
@@ -173,11 +173,11 @@ Namespace Contensive.Core.Models.Entity
                         ' -- set primary cache to the object created
                         ' -- set secondary caches to the primary cache
                         ' -- add all cachenames to the injected cachenamelist
-                        Dim cacheName0 As String = getCacheName("id", result.id.ToString())
+                        Dim cacheName0 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", result.ID.ToString())
                         callersCacheNameList.Add(cacheName0)
                         cpCore.cache.setObject(cacheName0, result)
                         '
-                        Dim cacheName1 As String = getCacheName("ccguid", result.ccguid)
+                        Dim cacheName1 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "ccguid", result.ccGuid)
                         callersCacheNameList.Add(cacheName1)
                             cpCore.cache.setSecondaryObject(cacheName1, cacheName0)
                         End If
@@ -239,8 +239,13 @@ Namespace Contensive.Core.Models.Entity
                 Call cs.Close()
                 '
                 ' -- invalidate objects
-                cpCore.cache.invalidateObject(getCacheName("id", id.ToString))
-                cpCore.cache.invalidateObject(getCacheName("ccguid", ccguid))
+                ' -- no, the primary is invalidated by the cs.save()
+                'cpCore.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"id", id.ToString))
+                ' -- no, the secondary points to the pirmary, which is invalidated. Dont waste resources invalidating
+                'cpCore.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"ccguid", ccguid))
+                '
+                ' -- object is here, but the cache was invalidated, setting
+                cpCore.cache.setObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", Me.ID.ToString()), Me)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
                 Throw
@@ -258,7 +263,7 @@ Namespace Contensive.Core.Models.Entity
             Try
                 If (recordId > 0) Then
                     cpCore.db.deleteContentRecords(primaryContentName, "id=" & recordId.ToString)
-                    cpCore.cache.invalidateObject(getCacheName("id", recordId.ToString))
+                    cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", recordId.ToString))
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -276,7 +281,7 @@ Namespace Contensive.Core.Models.Entity
             Try
                 If (Not String.IsNullOrEmpty(ccguid)) Then
                     cpCore.db.deleteContentRecords(primaryContentName, "(ccguid=" & cpCore.db.encodeSQLText(ccguid) & ")")
-                    cpCore.cache.invalidateObject(getCacheName("ccguid", ccguid))
+                    cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "ccguid", ccguid))
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -296,7 +301,7 @@ Namespace Contensive.Core.Models.Entity
                 If (foreignKey2Id > 0) And (foreignKey1Id > 0) Then
                     Dim rule As groupModel = create(cpCore, foreignKey1Id, foreignKey2Id, New List(Of String))
                     If (rule IsNot Nothing) Then
-                        cpCore.cache.invalidateObject(GetType(groupModel).FullName & getCacheName("foreignKey1", foreignKey1Id.ToString()) & getCacheName("foreignKey2", foreignKey1Id.ToString()))
+                        cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "foreignKey1", foreignKey1Id.ToString()) & Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "foreignKey2", foreignKey1Id.ToString()))
                         cpCore.db.deleteTableRecord(primaryContentTableName, rule.id, primaryContentDataSource)
                     End If
                 End If
@@ -342,24 +347,24 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="cpCore"></param>
         ''' <param name="recordId"></param>
         Public Shared Sub invalidatePrimaryCache(cpCore As coreClass, recordId As Integer)
-            cpCore.cache.invalidateObject(getCacheName("id", recordId.ToString))
+            cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", recordId.ToString))
             '
             ' -- the zero record cache means any record was updated. Can be used to invalidate arbitraty lists of records in the table
-            cpCore.cache.invalidateObject(getCacheName("id", "0"))
+            cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", "0"))
         End Sub
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' produce a standard format cachename for this model
-        ''' </summary>
-        ''' <param name="fieldName"></param>
-        ''' <param name="fieldValue"></param>
-        ''' <returns></returns>
-        Private Shared Function getCacheName(fieldName As String, fieldValue As String) As String
-            Return (primaryContentTableName & "-" & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
-        End Function
-        Private Shared Function getCacheName(field1Name As String, field1Value As String, field2Name As String, field2Value As String) As String
-            Return (primaryContentTableName & "-" & field1Name & "." & field1Value & "-" & field2Name & "." & field2Value).ToLower().Replace(" ", "_")
-        End Function
+        ''
+        ''====================================================================================================
+        '''' <summary>
+        '''' produce a standard format cachename for this model
+        '''' </summary>
+        '''' <param name="fieldName"></param>
+        '''' <param name="fieldValue"></param>
+        '''' <returns></returns>
+        'Private Shared Function Controllers.cacheController.getModelCacheName( primaryContentTableName,fieldName As String, fieldValue As String) As String
+        '    Return (primaryContentTableName & "-" & fieldName & "." & fieldValue).ToLower().Replace(" ", "_")
+        'End Function
+        'Private Shared Function Controllers.cacheController.getModelCacheName( primaryContentTableName,field1Name As String, field1Value As String, field2Name As String, field2Value As String) As String
+        '    Return (primaryContentTableName & "-" & field1Name & "." & field1Value & "-" & field2Name & "." & field2Value).ToLower().Replace(" ", "_")
+        'End Function
     End Class
 End Namespace

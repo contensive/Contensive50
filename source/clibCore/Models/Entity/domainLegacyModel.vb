@@ -28,7 +28,7 @@ Namespace Contensive.Core.Models.Entity
             Public forwardUrl As String
             Public defaultTemplateId As Integer
             Public pageNotFoundPageId As Integer
-            Public allowCrossLogin As Boolean
+            'Public allowCrossLogin As Boolean
             Public forwardDomainId As Integer
         End Class
         '

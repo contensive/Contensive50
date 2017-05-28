@@ -53,8 +53,12 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="ContentNameList"></param>
         ''' <remarks></remarks>
-        Public Overrides Sub Clear(ByVal cacheDataSourceTag As String)
-            Call cpCore.cache.invalidateObjectList(cacheDataSourceTag)
+        Public Overrides Sub Clear(ByVal ContentNameList As String)
+            If (String.IsNullOrEmpty(ContentNameList)) Then
+                For Each contentName In New List(Of String)(ContentNameList.Split(","c))
+                    cpCore.cache.invalidateContent(contentName)
+                Next
+            End If
         End Sub
         '
         '====================================================================================================

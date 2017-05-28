@@ -7213,7 +7213,6 @@ DomainModel
 
 public ID as Integer
 public Active as Boolean
-public allowCrossLogin as Boolean
 public ccGuid as String
 public ContentCategoryID as Integer
 public ContentControlID as Integer
@@ -7238,7 +7237,6 @@ public Visited as Boolean
 
 .ID = cs.getInteger("ID")
 .Active = cs.getBoolean("Active")
-.allowCrossLogin = cs.getBoolean("allowCrossLogin")
 .ccGuid = cs.getText("ccGuid")
 .ContentCategoryID = cs.getInteger("ContentCategoryID")
 .ContentControlID = cs.getInteger("ContentControlID")
@@ -7262,7 +7260,6 @@ public Visited as Boolean
 .Visited = cs.getBoolean("Visited")
 
 cs.SetField("Active", Active.ToString())
-cs.SetField("allowCrossLogin", allowCrossLogin.ToString())
 cs.SetField("ccGuid", ccGuid)
 cs.SetField("ContentCategoryID", ContentCategoryID.ToString())
 cs.SetField("ContentControlID", ContentControlID.ToString())
@@ -7287,7 +7284,6 @@ cs.SetField("Visited", Visited.ToString())
 if (String.IsNullOrEmpty(.ccGuid)) Then .ccGuid = Controllers.genericController.getGUID()
 
 instance.Active = genericController.EncodeBoolean(.fields("Active").defaultValue)
-instance.allowCrossLogin = genericController.EncodeBoolean(.fields("allowCrossLogin").defaultValue)
 instance.ccGuid = genericController.EncodeText(.fields("ccGuid").defaultValue)
 instance.ContentCategoryID = genericController.EncodeInteger(.fields("ContentCategoryID").defaultValue)
 instance.ContentControlID = cdef.id

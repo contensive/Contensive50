@@ -993,7 +993,7 @@ ErrorTrap:
                                     ContentName = cpCore.docProperties.getText("RowContentName" & RowPtr)
                                     Call cpCore.workflow.publishEdit(ContentName, RecordID)
                                     Call cpCore.main_ProcessSpecialCaseAfterSave(False, ContentName, RecordID, "", 0, UseContentWatchLink)
-                                    Call cpCore.cache.invalidateObject(ContentName)
+                                    Call cpCore.cache.invalidateObject(cacheController.getDbRecordCacheName(adminContent.ContentTableName, "id", RecordID.ToString()))
                                     Call cpCore.db.executeSql("delete from ccAuthoringControls where recordid=" & RecordID & " and Contentid=" & cpCore.main_GetContentID(ContentName))
                                 End If
                             Next
@@ -1009,7 +1009,7 @@ ErrorTrap:
                                 If ContentName <> "" Then
                                     Call cpCore.workflow.publishEdit(ContentName, RecordID)
                                     Call cpCore.main_ProcessSpecialCaseAfterSave(False, ContentName, RecordID, "", 0, UseContentWatchLink)
-                                    Call cpCore.cache.invalidateObjectList(ContentName)
+                                    Call cpCore.cache.invalidateObject(cacheController.getDbRecordCacheName(adminContent.ContentTableName, "id", RecordID.ToString()))
                                 End If
                                 cpCore.db.cs_goNext(CS)
                             Loop
@@ -1068,7 +1068,7 @@ ErrorTrap:
                                 IsDeleted = Not cpCore.db.cs_ok(CS)
                                 Call cpCore.db.cs_Close(CS)
                                 Call cpCore.main_ProcessSpecialCaseAfterSave(IsDeleted, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
-                                Call cpCore.cache.invalidateObjectList(adminContent.Name)
+                                Call cpCore.cache.invalidateObject(cacheController.getDbRecordCacheName(adminContent.ContentTableName, "id", RecordID.ToString()))
                             Else
                                 AdminForm = AdminSourceForm
                             End If
@@ -1108,7 +1108,7 @@ ErrorTrap:
                                     End If
                                     Call cpCore.DeleteCSRecord(CSEditRecord)
                                     Call cpCore.main_ProcessSpecialCaseAfterSave(True, editRecord.contentControlId_Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
-                                    Call cpCore.cache.invalidateObjectList(editRecord.contentControlId_Name)
+                                    Call cpCore.cache.invalidateContent(editRecord.contentControlId_Name)
                                 End If
                                 Call cpCore.db.cs_Close(CSEditRecord)
                             End If
@@ -1354,7 +1354,7 @@ ErrorTrap:
                                                 ' non-Workflow Delete
                                                 '
                                                 ContentName = cpCore.metaData.getContentNameByID(cpCore.db.cs_getInteger(CSEditRecord, "ContentControlID"))
-                                                Call cpCore.cache.invalidateObjectList(ContentName)
+                                                Call cpCore.cache.invalidateObject(cacheController.getDbRecordCacheName(adminContent.ContentTableName, "id", RecordID.ToString()))
                                                 Call cpCore.main_ProcessSpecialCaseAfterSave(True, ContentName, RecordID, "", 0, UseContentWatchLink)
                                             End If
                                             '
@@ -1495,7 +1495,7 @@ ErrorTrap:
                 Call cpCore.db.executeSql(SQL)
             End If
             If RecordChanged Then
-                Call cpCore.cache.invalidateObjectList("Group Rules")
+                Call cpCore.cache.invalidateContent("Group Rules")
             End If
             Exit Sub
             '
@@ -1634,7 +1634,7 @@ ErrorTrap:
             End If
             Call cpCore.db.cs_Close(CSPointer)
             If RecordChanged Then
-                Call cpCore.cache.invalidateObjectList("Group Rules")
+                Call cpCore.cache.invalidateContent("Group Rules")
             End If
             Exit Sub
             '
@@ -3042,8 +3042,8 @@ ErrorTrap:
                 '
                 ' Clear any bakes involving this content
                 '
-                Call cpCore.cache.invalidateObjectList("Meta Content")
-                Call cpCore.cache.invalidateObjectList("Meta Keyword Rules")
+                Call cpCore.cache.invalidateContent("Meta Content")
+                Call cpCore.cache.invalidateContent("Meta Keyword Rules")
             End If
             '
             Exit Sub
@@ -3499,9 +3499,9 @@ ErrorTrap:
                         ' if record is changed, and not workflow, clear the contenttimestamp
                         '
                         If editRecord.contentControlId = 0 Then
-                            Call cpCore.cache.invalidateObjectList(adminContent.Name)
+                            Call cpCore.cache.invalidateContent(adminContent.Name)
                         Else
-                            Call cpCore.cache.invalidateObjectList(editRecord.contentControlId_Name)
+                            Call cpCore.cache.invalidateContent(editRecord.contentControlId_Name)
                             'call cpCore.main_ClearBake (cpCore.metaData.getContentNameByID(EditRecord.ContentID))
                         End If
                     End If

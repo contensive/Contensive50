@@ -31,9 +31,13 @@ Namespace Contensive.Core.Models.Entity
         ' -- old clusterConfig
         Public name As String = ""
         '
+        ' -- If true, use local dotnet memory cache backed by filesystem
+        Public enableLocalMemoryCache As Boolean = True
+        Public enableLocalFileCache As Boolean = True
+        '
         ' -- AWS dotnet elaticcache client wraps enyim, and provides node autodiscovery through the configuration object. this is the srver:port to the config file it uses.
-        Public isLocalCache As Boolean = False
-        Public awsElastiCacheConfigurationEndpoint As String
+        Public enableRemoteCache As Boolean = False
+        Public awsElastiCacheConfigurationEndpoint As String = ""
         '
         ' -- datasource for the cluster (only sql support for now)
         Public defaultDataSourceType As Models.Entity.dataSourceModel.dataSourceTypeEnum
@@ -70,15 +74,14 @@ Namespace Contensive.Core.Models.Entity
             Public appStatus As applicationStatusEnum = applicationStatusEnum.ApplicationStatusAppConfigNotFound
             Public enabled As Boolean = False
             Public privateKey As String = ""                ' rename hashKey
-            'Public defaultConnectionString As String
             Public appRootFilesPath As String = ""          ' local file path to the appRoot (i.e. d:\inetpub\myApp\wwwRoot\)
             Public cdnFilesPath As String = ""              ' local file path to the content files (i.e. d:\inetpub\myApp\files\)
             Public privateFilesPath As String = ""          ' local file path to the content files (i.e. d:\inetpub\myApp\private\)
             Public cdnFilesNetprefix As String = ""         ' in some cases (like legacy), cdnFiles are iis virtual folder mapped to appRoot (/appName/files/). Some cases this is a URL (http:\\cdn.domain.com pointing to s3)
             Public allowSiteMonitor As Boolean = False
             Public domainList As New List(Of String)        ' primary domain is the first item in the list
-            Public enableCache As Boolean = False
             Public adminRoute As String = ""              ' The url pathpath that executes the addon site
+            Public defaultPage As String = "default.aspx"   ' when exeecuting iis 
         End Class    '
         '
         '====================================================================================================

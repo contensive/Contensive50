@@ -24,20 +24,6 @@ Namespace Contensive.Core.Controllers
         '
         Private cpCore As coreClass
         '
-        ' ----- objects constructed that must be disposed
-        '
-        Private localObject As Object
-        '
-        ' ----- constants
-        '
-        Private Const localConstant As Integer = 100
-        '
-        ' ----- shared globals
-        '
-        '
-        ' ----- private globals
-        '
-        '
         Public Sub New(cpCore As coreClass)
             MyBase.New()
             Me.cpCore = cpCore
@@ -367,21 +353,21 @@ Namespace Contensive.Core.Controllers
                 Else
                     Dim addonCacheKey As String = addonCachePtr.ToString
                     FoundAddon = True
-                    Dim addonCache As Models.Entity.addonLegacyModel.addonClass = cpCore.addonCache.localCache.addonList(addonCacheKey)
-                    ProgramID = addonCache.addonCache_ObjectProgramID
-                    AddonName = genericController.encodeText(addonCache.addonCache_name)
-                    addonId = genericController.EncodeInteger(addonCache.addonCache_Id)
-                    addonCollectionId = genericController.EncodeInteger(addonCache.addonCache_collectionid)
+                    Dim addonCache As Models.Entity.addonLegacyModel.addonClass = cpCore.addonCache.addonCache.addonList(addonCacheKey)
+                    ProgramID = addonCache.ObjectProgramID
+                    AddonName = genericController.encodeText(addonCache.name)
+                    addonId = genericController.EncodeInteger(addonCache.id)
+                    addonCollectionId = genericController.EncodeInteger(addonCache.collectionid)
                     AddonGuid = genericController.encodeText(addonCache.addonCache_ccguid)
                     If AddonGuid <> "" Then
                         AddonNameOrGuid_Local = AddonGuid
                     Else
                         AddonNameOrGuid_Local = AddonName
                     End If
-                    HTMLContent = genericController.encodeText(addonCache.addonCache_Copy)
-                    Link = genericController.encodeText(addonCache.addonCache_Link)
-                    DotNetClassFullName = genericController.encodeText(addonCache.addonCache_DotNetClass)
-                    AddonOptionConstructor = genericController.encodeText(addonCache.addonCache_ArgumentList)
+                    HTMLContent = genericController.encodeText(addonCache.Copy)
+                    Link = genericController.encodeText(addonCache.Link)
+                    DotNetClassFullName = genericController.encodeText(addonCache.DotNetClass)
+                    AddonOptionConstructor = genericController.encodeText(addonCache.ArgumentList)
                     AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
                     AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbLf, vbCr)
                     AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
@@ -389,27 +375,27 @@ Namespace Contensive.Core.Controllers
                     AddonBlockEditTools = False
                     TextContent = ""
                     FormXML = ""
-                    TextContent = genericController.encodeText(addonCache.addonCache_CopyText)
-                    IsInline = genericController.EncodeBoolean(addonCache.addonCache_IsInline)
+                    TextContent = genericController.encodeText(addonCache.copyText)
+                    IsInline = genericController.EncodeBoolean(addonCache.isInline)
                     '
                     ' Support BlockDefaultStyles and CustomStylesFilename
                     '
-                    If Not addonCache.addonCache_BlockDefaultStyles Then
+                    If Not addonCache.blockDefaultStyles Then
                         '
                         ' Add default styles
                         '
-                        DefaultStylesFilename = genericController.encodeText(addonCache.addonCache_StylesFilename)
+                        DefaultStylesFilename = genericController.encodeText(addonCache.stylesFilename)
                     End If
                     '
                     ' Add custom styles
                     '
-                    CustomStylesFilename = genericController.encodeText(addonCache.addonCache_CustomStylesFilename)
-                    FormXML = genericController.encodeText(addonCache.addonCache_formxml)
-                    RemoteAssetLink = genericController.encodeText(addonCache.addonCache_RemoteAssetLink)
-                    AsAjax = genericController.EncodeBoolean(addonCache.addonCache_AsAjax)
-                    InFrame = genericController.EncodeBoolean(addonCache.addonCache_InFrame)
-                    ScriptingEntryPoint = genericController.encodeText(addonCache.addonCache_ScriptingEntryPoint)
-                    scriptinglanguageid = genericController.EncodeInteger(addonCache.addonCache_ScriptingLanguageID)
+                    CustomStylesFilename = genericController.encodeText(addonCache.customStylesFilename)
+                    FormXML = genericController.encodeText(addonCache.formxml)
+                    RemoteAssetLink = genericController.encodeText(addonCache.remoteAssetLink)
+                    AsAjax = genericController.EncodeBoolean(addonCache.asAjax)
+                    InFrame = genericController.EncodeBoolean(addonCache.InFrame)
+                    ScriptingEntryPoint = genericController.encodeText(addonCache.scriptingEntryPoint)
+                    scriptinglanguageid = genericController.EncodeInteger(addonCache.scriptingLanguageID)
                     '
                     ' Get Language
                     '
@@ -420,19 +406,19 @@ Namespace Contensive.Core.Controllers
                     If ScriptingLanguage = "" Then
                         ScriptingLanguage = "VBScript"
                     End If
-                    ScriptingCode = genericController.encodeText(addonCache.addonCache_ScriptingCode)
-                    AddonBlockEditTools = genericController.EncodeBoolean(addonCache.addonCache_BlockEditTools)
-                    ScriptingTimeout = genericController.EncodeInteger(addonCache.addonCache_ScriptingTimeout)
-                    inlineScript = genericController.encodeText(addonCache.addonCache_inlineScript)
-                    helpCopy = genericController.encodeText(addonCache.addonCache_help)
-                    helpLink = genericController.encodeText(addonCache.addonCache_helpLink)
-                    JSOnLoad = genericController.encodeText(addonCache.addonCache_JavaScriptOnLoad)
-                    JSBodyEnd = genericController.encodeText(addonCache.addonCache_JavaScriptBodyEnd)
-                    PageTitle = genericController.encodeText(addonCache.addonCache_PageTitle)
-                    MetaDescription = genericController.encodeText(addonCache.addonCache_MetaDescription)
-                    MetaKeywordList = genericController.encodeText(addonCache.addonCache_MetaKeywordList)
-                    OtherHeadTags = genericController.encodeText(addonCache.addonCache_OtherHeadTags)
-                    JSFilename = genericController.encodeText(addonCache.addonCache_JSFilename)
+                    ScriptingCode = genericController.encodeText(addonCache.scriptingCode)
+                    AddonBlockEditTools = genericController.EncodeBoolean(addonCache.blockEditTools)
+                    ScriptingTimeout = genericController.EncodeInteger(addonCache.scriptingTimeout)
+                    inlineScript = genericController.encodeText(addonCache.inlineScript)
+                    helpCopy = genericController.encodeText(addonCache.help)
+                    helpLink = genericController.encodeText(addonCache.helpLink)
+                    JSOnLoad = genericController.encodeText(addonCache.JavaScriptOnLoad)
+                    JSBodyEnd = genericController.encodeText(addonCache.JavaScriptBodyEnd)
+                    PageTitle = genericController.encodeText(addonCache.PageTitle)
+                    MetaDescription = genericController.encodeText(addonCache.MetaDescription)
+                    MetaKeywordList = genericController.encodeText(addonCache.MetaKeywordList)
+                    OtherHeadTags = genericController.encodeText(addonCache.OtherHeadTags)
+                    JSFilename = genericController.encodeText(addonCache.JSFilename)
                     If JSFilename <> "" Then
                         JSFilename = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
                     End If
@@ -583,7 +569,7 @@ Namespace Contensive.Core.Controllers
                             '
                             ' Block all output even on error
                             '
-                        ElseIf cpcore.authContext.isAuthenticatedAdmin(cpcore) Or cpcore.authContext.isAuthenticatedContentManager(cpcore, "Page Content") Then
+                        ElseIf cpCore.authContext.isAuthenticatedAdmin(cpCore) Or cpCore.authContext.isAuthenticatedContentManager(cpCore, "Page Content") Then
                             '
                             ' Provide hint to administrators
                             '
@@ -591,7 +577,7 @@ Namespace Contensive.Core.Controllers
                                 AddonName = "Addon #" & addonId
                             End If
                             If Context = CPUtilsBaseClass.addonContext.ContextAdmin Then
-                                returnVal = "The Add-on '" & AddonName & "' could not be found. It may have been deleted or marked inactive. If you are receiving this message after clicking an Add-on from the Navigator, their may be a problem with this Add-on. If you are receiving this message from the main admin page, your Dashboard Add-on may be set incorrectly. Use the Admin tab under Preferences to select the Dashboard, or <a href=""?" & RequestNameDashboardReset & "=" & cpCore.authContext.visit.Id & """>click here</a> to automatically reset the dashboard."
+                                returnVal = "The Add-on '" & AddonName & "' could not be found. It may have been deleted or marked inactive. If you are receiving this message after clicking an Add-on from the Navigator, their may be a problem with this Add-on. If you are receiving this message from the main admin page, your Dashboard Add-on may be set incorrectly. Use the Admin tab under Preferences to select the Dashboard, or <a href=""?" & RequestNameDashboardReset & "=" & cpCore.authContext.visit.ID & """>click here</a> to automatically reset the dashboard."
                             Else
                                 returnVal = "The Add-on '" & AddonName & "' could not be found. It may have been deleted or marked inactive. Please use the Add-on Manager to replace it, or edit this page and remove it."
                             End If
@@ -1104,7 +1090,7 @@ Namespace Contensive.Core.Controllers
                                                 '
                                                 ' Block all output even on error
                                                 '
-                                            ElseIf cpcore.authContext.isAuthenticatedAdmin(cpcore) Then
+                                            ElseIf cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                                                 '
                                                 ' Provide hint to administrators
                                                 '
@@ -1549,7 +1535,7 @@ Namespace Contensive.Core.Controllers
                 '
                 return_ExitAddonBlankWithResponse = True
                 Exit Function
-            ElseIf Not cpcore.authContext.isAuthenticatedAdmin(cpcore) Then
+            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 ' Not Admin Error
                 '
@@ -2828,8 +2814,8 @@ ErrorTrap:
             ProcessStartTick = GetTickCount
             addonPtr = cpCore.addonCache.getPtr(AddonIDGuidOrName)
             If addonPtr >= 0 Then
-                addonId = genericController.EncodeInteger(cpCore.addonCache.localCache.addonList(addonPtr.ToString).addonCache_Id)
-                AddonName = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonPtr.ToString).addonCache_name)
+                addonId = genericController.EncodeInteger(cpCore.addonCache.addonCache.addonList(addonPtr.ToString).id)
+                AddonName = genericController.encodeText(cpCore.addonCache.addonCache.addonList(addonPtr.ToString).name)
                 'hint = hint & ",020 addonname=[" & AddonName & "] addonid=[" & addonId & "]"
             End If
             '

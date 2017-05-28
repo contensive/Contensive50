@@ -118,27 +118,33 @@ Namespace Contensive.Core.Models.Entity
         Public Shared Function getObject(cpcore As coreClass, recordId As Integer, ByRef adminMessageList As List(Of String)) As addonModel
             Dim returnModel As addonModel = Nothing
             Try
-                Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer
-                Dim recordCacheName As String = primaryContentName & "CachedModelRecordId" & recordId
-                Dim recordCache As String = cpcore.cache.getString(recordCacheName)
-                Dim loadDbModel As Boolean = True
-                If Not String.IsNullOrEmpty(recordCache) Then
-                    Try
-                        returnModel = json_serializer.Deserialize(Of addonModel)(recordCache)
-                        '
-                        ' -- if model exposes any objects, verify they are created
-                        'If (returnModel.meetingItemList Is Nothing) Then
-                        '    returnModel.meetingItemList = New List(Of meetingItemModel)
-                        'End If
-                        loadDbModel = False
-                    Catch ex As Exception
-                        'ignore error - just roll through to rebuild model and save new cache
-                    End Try
-                End If
-                If loadDbModel Or (returnModel Is Nothing) Then
+                Dim recordCacheName As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", recordId.ToString)
+                returnModel = cpcore.cache.getObject(Of addonModel)(recordCacheName)
+                If (returnModel Is Nothing) Then
                     returnModel = getObjectNoCache(cpcore, recordId)
-                    Call cpcore.cache.setObject(recordCacheName, json_serializer.Serialize(returnModel), cacheTagList)
+                    Call cpcore.cache.setObject(recordCacheName, returnModel, cacheTagList)
                 End If
+                'Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer
+                'Dim recordCacheName As String = primaryContentName & "CachedModelRecordId" & recordId
+                'Dim recordCache As String = cpcore.cache.getString(recordCacheName)
+                'Dim loadDbModel As Boolean = True
+                'If Not String.IsNullOrEmpty(recordCache) Then
+                '    Try
+                '        returnModel = json_serializer.Deserialize(Of addonModel)(recordCache)
+                '        '
+                '        ' -- if model exposes any objects, verify they are created
+                '        'If (returnModel.meetingItemList Is Nothing) Then
+                '        '    returnModel.meetingItemList = New List(Of meetingItemModel)
+                '        'End If
+                '        loadDbModel = False
+                '    Catch ex As Exception
+                '        'ignore error - just roll through to rebuild model and save new cache
+                '    End Try
+                'End If
+                'If loadDbModel Or (returnModel Is Nothing) Then
+                '    returnModel = getObjectNoCache(cpcore, recordId)
+                '    Call cpcore.cache.setObject(recordCacheName, json_serializer.Serialize(returnModel), cacheTagList)
+                'End If
             Catch ex As Exception
                 cpcore.handleExceptionAndRethrow(ex)
             End Try

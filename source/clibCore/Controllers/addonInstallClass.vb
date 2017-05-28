@@ -4138,7 +4138,7 @@ Namespace Contensive.Core
                                                     .AuthoringTableName = GetXMLAttribute(Found, CDef_Node, "AuthoringTableName", DefaultCDef.AuthoringTableName)
                                                     .guid = GetXMLAttribute(Found, CDef_Node, "guid", DefaultCDef.guid)
                                                     .dataChanged = setAllDataChanged
-                                                    .childIdList = New List(Of Integer)
+                                                    .childIdList(cpCore) = New List(Of Integer)
                                                     .ContentControlCriteria = ""
                                                     .ContentDataSourceName = GetXMLAttribute(Found, CDef_Node, "ContentDataSourceName", DefaultCDef.ContentDataSourceName)
                                                     .ContentTableName = GetXMLAttribute(Found, CDef_Node, "ContentTableName", DefaultCDef.ContentTableName)
@@ -4243,15 +4243,15 @@ Namespace Contensive.Core
                                                             .lookupList = GetXMLAttribute(Found, CDefChildNode, "LookupList", DefaultCDefField.lookupList)
                                                             .ManyToManyRulePrimaryField = GetXMLAttribute(Found, CDefChildNode, "ManyToManyRulePrimaryField", DefaultCDefField.ManyToManyRulePrimaryField)
                                                             .ManyToManyRuleSecondaryField = GetXMLAttribute(Found, CDefChildNode, "ManyToManyRuleSecondaryField", DefaultCDefField.ManyToManyRuleSecondaryField)
-                                                            .lookupContentName = GetXMLAttribute(Found, CDefChildNode, "LookupContent", DefaultCDefField.lookupContentName)
+                                                            .lookupContentName(cpCore) = GetXMLAttribute(Found, CDefChildNode, "LookupContent", DefaultCDefField.lookupContentName(cpCore))
                                                             ' isbase should be set if the base file is loading, regardless of the state of any isBaseField attribute -- which will be removed later
                                                             ' case 1 - when the application collection is loaded from the exported xml file, isbasefield must follow the export file although the data is not the base collection
                                                             ' case 2 - when the base file is loaded, all fields must include the attribute
                                                             'Return_Collection.CDefExt(CDefPtr).Fields(FieldPtr).IsBaseField = IsccBaseFile
                                                             .isBaseField = GetXMLAttributeBoolean(Found, CDefChildNode, "IsBaseField", False) Or IsccBaseFile
-                                                            .RedirectContentName = GetXMLAttribute(Found, CDefChildNode, "RedirectContent", DefaultCDefField.RedirectContentName)
-                                                            .ManyToManyContentName = GetXMLAttribute(Found, CDefChildNode, "ManyToManyContent", DefaultCDefField.ManyToManyContentName)
-                                                            .ManyToManyRuleContentName = GetXMLAttribute(Found, CDefChildNode, "ManyToManyRuleContent", DefaultCDefField.ManyToManyRuleContentName)
+                                                            .RedirectContentName(cpCore) = GetXMLAttribute(Found, CDefChildNode, "RedirectContent", DefaultCDefField.RedirectContentName(cpCore))
+                                                            .ManyToManyContentName(cpCore) = GetXMLAttribute(Found, CDefChildNode, "ManyToManyContent", DefaultCDefField.ManyToManyContentName(cpCore))
+                                                            .ManyToManyRuleContentName(cpCore) = GetXMLAttribute(Found, CDefChildNode, "ManyToManyRuleContent", DefaultCDefField.ManyToManyRuleContentName(cpCore))
                                                             .isModifiedSinceInstalled = GetXMLAttributeBoolean(Found, CDefChildNode, "IsModified", DefaultCDefField.isModifiedSinceInstalled)
                                                             .installedByCollectionGuid = GetXMLAttribute(Found, CDefChildNode, "installedByCollectionId", DefaultCDefField.installedByCollectionGuid)
                                                             .dataChanged = setAllDataChanged
@@ -5600,16 +5600,16 @@ Namespace Contensive.Core
                                             okToUpdateDstFromSrc = okToUpdateDstFromSrc Or (.isBaseField <> dstCollectionCdefField.isBaseField)
                                             '
                                             If Not okToUpdateDstFromSrc Then n = "LookupContentName"
-                                            okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(.lookupContentName, dstCollectionCdefField.lookupContentName)
+                                            okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(.lookupContentName(cpCore), dstCollectionCdefField.lookupContentName(cpCore))
                                             '
                                             If Not okToUpdateDstFromSrc Then n = "ManyToManyContentName"
-                                            okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(.ManyToManyContentName, dstCollectionCdefField.ManyToManyContentName)
+                                            okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(.ManyToManyContentName(cpCore), dstCollectionCdefField.ManyToManyContentName(cpCore))
                                             '
                                             If Not okToUpdateDstFromSrc Then n = "ManyToManyRuleContentName"
-                                            okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(.ManyToManyRuleContentName, dstCollectionCdefField.ManyToManyRuleContentName)
+                                            okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(.ManyToManyRuleContentName(cpCore), dstCollectionCdefField.ManyToManyRuleContentName(cpCore))
                                             '
                                             If Not okToUpdateDstFromSrc Then n = "RedirectContentName"
-                                            okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(.RedirectContentName, dstCollectionCdefField.RedirectContentName)
+                                            okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(.RedirectContentName(cpCore), dstCollectionCdefField.RedirectContentName(cpCore))
                                             '
                                             If Not okToUpdateDstFromSrc Then n = "installedByCollectionid"
                                             okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(.installedByCollectionGuid, dstCollectionCdefField.installedByCollectionGuid)
@@ -5682,10 +5682,10 @@ Namespace Contensive.Core
                                         .TextBuffered = srcCollectionCdefField.TextBuffered
                                         .UniqueName = srcCollectionCdefField.UniqueName
                                         .isBaseField = srcCollectionCdefField.isBaseField
-                                        .lookupContentName = srcCollectionCdefField.lookupContentName
-                                        .ManyToManyContentName = srcCollectionCdefField.ManyToManyContentName
-                                        .ManyToManyRuleContentName = srcCollectionCdefField.ManyToManyRuleContentName
-                                        .RedirectContentName = srcCollectionCdefField.RedirectContentName
+                                        .lookupContentName(cpCore) = srcCollectionCdefField.lookupContentName(cpCore)
+                                        .ManyToManyContentName(cpCore) = srcCollectionCdefField.ManyToManyContentName(cpCore)
+                                        .ManyToManyRuleContentName(cpCore) = srcCollectionCdefField.ManyToManyRuleContentName(cpCore)
+                                        .RedirectContentName(cpCore) = srcCollectionCdefField.RedirectContentName(cpCore)
                                         .installedByCollectionGuid = srcCollectionCdefField.installedByCollectionGuid
                                         .dataChanged = True
                                         If HelpChanged Then

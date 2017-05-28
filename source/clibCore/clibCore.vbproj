@@ -488,6 +488,7 @@
     <Compile Include="Models\Entity\addonModel.vb" />
     <Compile Include="Models\Entity\groupModel.vb" />
     <Compile Include="Models\Entity\dataSourceModel.vb" />
+    <Compile Include="Models\Entity\sitePropertyModel.vb" />
     <Compile Include="Models\Entity\_blankModel.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

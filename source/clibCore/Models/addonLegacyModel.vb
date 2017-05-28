@@ -27,47 +27,47 @@ Namespace Contensive.Core.Models.Entity
         Public Const cacheName = "cache_addon"
         Public Const cache_addon2_fieldList = "id,active,name,ccguid,collectionid,Copy,ccguid,Link,ObjectProgramID,DotNetClass,ArgumentList,CopyText,IsInline,BlockDefaultStyles,StylesFilename,CustomStylesFilename,formxml,RemoteAssetLink,AsAjax,InFrame,ScriptingEntryPoint,ScriptingLanguageID,ScriptingCode,BlockEditTools,ScriptingTimeout,inlineScript,help,helplink,JavaScriptOnLoad,JavaScriptBodyEnd,PageTitle,MetaDescription,MetaKeywordList,OtherHeadTags,JSFilename,remoteMethod,onBodyStart,onBodyEnd,OnPageStartEvent,OnPageEndEvent,robotsTxt"
         Public Class addonClass
-            Public addonCache_Id As Integer
-            Public addonCache_active As Boolean
-            Public addonCache_name As String
-            Public addonCache_guid As String
-            Public addonCache_collectionid As Integer
-            Public addonCache_Copy As String
+            Public id As Integer
+            Public active As Boolean
+            Public name As String
+            Public ccguid As String
+            Public collectionid As Integer
+            Public Copy As String
             Public addonCache_ccguid As String
-            Public addonCache_Link As String
-            Public addonCache_ObjectProgramID As String
-            Public addonCache_DotNetClass As String
-            Public addonCache_ArgumentList As String
-            Public addonCache_CopyText As String
-            Public addonCache_IsInline As Boolean
-            Public addonCache_BlockDefaultStyles As Boolean
-            Public addonCache_StylesFilename As String
-            Public addonCache_CustomStylesFilename As String
-            Public addonCache_formxml As String
-            Public addonCache_RemoteAssetLink As String
-            Public addonCache_AsAjax As Boolean
-            Public addonCache_InFrame As Boolean
-            Public addonCache_ScriptingEntryPoint As String
-            Public addonCache_ScriptingLanguageID As Integer
-            Public addonCache_ScriptingCode As String
-            Public addonCache_BlockEditTools As Boolean
-            Public addonCache_ScriptingTimeout As String
-            Public addonCache_inlineScript As String
-            Public addonCache_help As String
-            Public addonCache_helpLink As String
-            Public addonCache_JavaScriptOnLoad As String
-            Public addonCache_JavaScriptBodyEnd As String
-            Public addonCache_PageTitle As String
-            Public addonCache_MetaDescription As String
-            Public addonCache_MetaKeywordList As String
-            Public addonCache_OtherHeadTags As String
-            Public addonCache_JSFilename As String
-            Public addonCache_remoteMethod As Boolean
-            Public addoncache_OnBodyStart As Boolean
-            Public addoncache_OnBodyEnd As Boolean
-            Public addoncache_OnPageStart As Boolean
-            Public addoncache_OnPageEnd As Boolean
-            Public addoncache_robotsTxt As String
+            Public Link As String
+            Public ObjectProgramID As String
+            Public DotNetClass As String
+            Public ArgumentList As String
+            Public copyText As String
+            Public isInline As Boolean
+            Public blockDefaultStyles As Boolean
+            Public stylesFilename As String
+            Public customStylesFilename As String
+            Public formxml As String
+            Public remoteAssetLink As String
+            Public asAjax As Boolean
+            Public InFrame As Boolean
+            Public scriptingEntryPoint As String
+            Public scriptingLanguageID As Integer
+            Public scriptingCode As String
+            Public blockEditTools As Boolean
+            Public scriptingTimeout As String
+            Public inlineScript As String
+            Public help As String
+            Public helpLink As String
+            Public JavaScriptOnLoad As String
+            Public JavaScriptBodyEnd As String
+            Public PageTitle As String
+            Public MetaDescription As String
+            Public MetaKeywordList As String
+            Public OtherHeadTags As String
+            Public JSFilename As String
+            Public remoteMethod As Boolean
+            Public OnBodyStart As Boolean
+            Public OnBodyEnd As Boolean
+            Public OnPageStart As Boolean
+            Public OnPageEnd As Boolean
+            Public robotsTxt As String
         End Class
         '
         <Serializable>
@@ -87,7 +87,7 @@ Namespace Contensive.Core.Models.Entity
             Public propertyBag_guidIndex As String
         End Class
         '
-        Public localCache As addonsCacheClass
+        Public addonCache As addonsCacheClass
         '
         '====================================================================================================
         ''' <summary>
@@ -95,21 +95,21 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         Public Sub clear()
             Try
-                If localCache Is Nothing Then
-                    localCache = New addonsCacheClass()
+                If addonCache Is Nothing Then
+                    addonCache = New addonsCacheClass()
                 End If
-                localCache.addonList = New Dictionary(Of String, addonClass)
-                localCache.guidIndex = New coreKeyPtrIndexClass
-                localCache.idIndex = New coreKeyPtrIndexClass
-                localCache.nameIndex = New coreKeyPtrIndexClass
-                localCache.onBodyEndPtrs = {}
-                localCache.onBodyStartPtrs = {}
-                localCache.onPageEndPtrs = {}
-                localCache.onPageStartPtrs = {}
-                localCache.propertyBag_guidIndex = ""
-                localCache.propertyBag_idIndex = ""
-                localCache.propertyBag_nameIndex = ""
-                Call cpCore.cache.setObject(cacheName, localCache, cnAddons)
+                addonCache.addonList = New Dictionary(Of String, addonClass)
+                addonCache.guidIndex = New coreKeyPtrIndexClass
+                addonCache.idIndex = New coreKeyPtrIndexClass
+                addonCache.nameIndex = New coreKeyPtrIndexClass
+                addonCache.onBodyEndPtrs = {}
+                addonCache.onBodyStartPtrs = {}
+                addonCache.onPageEndPtrs = {}
+                addonCache.onPageStartPtrs = {}
+                addonCache.propertyBag_guidIndex = ""
+                addonCache.propertyBag_idIndex = ""
+                addonCache.propertyBag_nameIndex = ""
+                Call cpCore.cache.setObject(cacheName, addonCache, cnAddons)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -135,10 +135,10 @@ Namespace Contensive.Core.Models.Entity
                     Throw New ArgumentException("argument invalid, recordid=[" & RecordID & "]")
                 Else
                     Call load()
-                    If localCache.addonList.Count > 0 Then
+                    If addonCache.addonList.Count > 0 Then
                         'hint = hint & ", 3 cache_addonCnt=[" & cache_addons.addonList.Count & "]"
-                        For addonPtr = 0 To localCache.addonList.Count - 1
-                            If genericController.EncodeInteger(localCache.addonList(addonPtr.ToString).addonCache_Id) = RecordID Then
+                        For addonPtr = 0 To addonCache.addonList.Count - 1
+                            If genericController.EncodeInteger(addonCache.addonList(addonPtr.ToString).id) = RecordID Then
                                 Exit For
                             End If
                         Next
@@ -148,48 +148,48 @@ Namespace Contensive.Core.Models.Entity
                         dt = cpCore.db.executeSql(SQL)
                         If dt.Rows.Count > 0 Then
                             With dt.Rows(0)
-                                addon.addonCache_Id = genericController.EncodeInteger(.Item(0))
-                                addon.addonCache_active = genericController.EncodeBoolean(.Item(1))
-                                addon.addonCache_name = genericController.encodeText(.Item(2))
-                                addon.addonCache_guid = genericController.encodeText(.Item(3))
-                                addon.addonCache_collectionid = genericController.EncodeInteger(.Item(4))
-                                addon.addonCache_Copy = genericController.encodeText(.Item(5))
+                                addon.id = genericController.EncodeInteger(.Item(0))
+                                addon.active = genericController.EncodeBoolean(.Item(1))
+                                addon.name = genericController.encodeText(.Item(2))
+                                addon.ccguid = genericController.encodeText(.Item(3))
+                                addon.collectionid = genericController.EncodeInteger(.Item(4))
+                                addon.Copy = genericController.encodeText(.Item(5))
                                 addon.addonCache_ccguid = genericController.encodeText(.Item(6))
-                                addon.addonCache_Link = genericController.encodeText(.Item(7))
-                                addon.addonCache_ObjectProgramID = genericController.encodeText(.Item(8))
-                                addon.addonCache_DotNetClass = genericController.encodeText(.Item(9))
-                                addon.addonCache_ArgumentList = genericController.encodeText(.Item(10))
-                                addon.addonCache_CopyText = genericController.encodeText(.Item(11))
-                                addon.addonCache_IsInline = genericController.EncodeBoolean(.Item(12))
-                                addon.addonCache_BlockDefaultStyles = genericController.EncodeBoolean(.Item(13))
-                                addon.addonCache_StylesFilename = genericController.encodeText(.Item(14))
-                                addon.addonCache_CustomStylesFilename = genericController.encodeText(.Item(15))
-                                addon.addonCache_formxml = genericController.encodeText(.Item(16))
-                                addon.addonCache_RemoteAssetLink = genericController.encodeText(.Item(17))
-                                addon.addonCache_AsAjax = genericController.EncodeBoolean(.Item(18))
-                                addon.addonCache_InFrame = genericController.EncodeBoolean(.Item(19))
-                                addon.addonCache_ScriptingEntryPoint = genericController.encodeText(.Item(20))
-                                addon.addonCache_ScriptingLanguageID = genericController.EncodeInteger(.Item(21))
-                                addon.addonCache_ScriptingCode = genericController.encodeText(.Item(22))
-                                addon.addonCache_BlockEditTools = genericController.EncodeBoolean(.Item(23))
-                                addon.addonCache_ScriptingTimeout = genericController.encodeText(.Item(24))
-                                addon.addonCache_inlineScript = genericController.encodeText(.Item(25))
-                                addon.addonCache_help = genericController.encodeText(.Item(26))
-                                addon.addonCache_helpLink = genericController.encodeText(.Item(27))
-                                addon.addonCache_JavaScriptOnLoad = genericController.encodeText(.Item(28))
-                                addon.addonCache_JavaScriptBodyEnd = genericController.encodeText(.Item(29))
-                                addon.addonCache_PageTitle = genericController.encodeText(.Item(30))
-                                addon.addonCache_MetaDescription = genericController.encodeText(.Item(31))
-                                addon.addonCache_MetaKeywordList = genericController.encodeText(.Item(32))
-                                addon.addonCache_OtherHeadTags = genericController.encodeText(.Item(33))
-                                addon.addonCache_JSFilename = genericController.encodeText(.Item(34))
-                                addon.addonCache_remoteMethod = genericController.EncodeBoolean(.Item(35))
-                                addon.addoncache_OnBodyStart = genericController.EncodeBoolean(.Item(36))
-                                addon.addoncache_OnBodyEnd = genericController.EncodeBoolean(.Item(37))
-                                addon.addoncache_OnPageStart = genericController.EncodeBoolean(.Item(38))
-                                addon.addoncache_OnPageEnd = genericController.EncodeBoolean(.Item(39))
-                                addon.addoncache_robotsTxt = genericController.encodeText(.Item(40))
-                                addon.addonCache_active = genericController.EncodeBoolean(.Item(41))
+                                addon.Link = genericController.encodeText(.Item(7))
+                                addon.ObjectProgramID = genericController.encodeText(.Item(8))
+                                addon.DotNetClass = genericController.encodeText(.Item(9))
+                                addon.ArgumentList = genericController.encodeText(.Item(10))
+                                addon.copyText = genericController.encodeText(.Item(11))
+                                addon.isInline = genericController.EncodeBoolean(.Item(12))
+                                addon.blockDefaultStyles = genericController.EncodeBoolean(.Item(13))
+                                addon.stylesFilename = genericController.encodeText(.Item(14))
+                                addon.customStylesFilename = genericController.encodeText(.Item(15))
+                                addon.formxml = genericController.encodeText(.Item(16))
+                                addon.remoteAssetLink = genericController.encodeText(.Item(17))
+                                addon.asAjax = genericController.EncodeBoolean(.Item(18))
+                                addon.InFrame = genericController.EncodeBoolean(.Item(19))
+                                addon.scriptingEntryPoint = genericController.encodeText(.Item(20))
+                                addon.scriptingLanguageID = genericController.EncodeInteger(.Item(21))
+                                addon.scriptingCode = genericController.encodeText(.Item(22))
+                                addon.blockEditTools = genericController.EncodeBoolean(.Item(23))
+                                addon.scriptingTimeout = genericController.encodeText(.Item(24))
+                                addon.inlineScript = genericController.encodeText(.Item(25))
+                                addon.help = genericController.encodeText(.Item(26))
+                                addon.helpLink = genericController.encodeText(.Item(27))
+                                addon.JavaScriptOnLoad = genericController.encodeText(.Item(28))
+                                addon.JavaScriptBodyEnd = genericController.encodeText(.Item(29))
+                                addon.PageTitle = genericController.encodeText(.Item(30))
+                                addon.MetaDescription = genericController.encodeText(.Item(31))
+                                addon.MetaKeywordList = genericController.encodeText(.Item(32))
+                                addon.OtherHeadTags = genericController.encodeText(.Item(33))
+                                addon.JSFilename = genericController.encodeText(.Item(34))
+                                addon.remoteMethod = genericController.EncodeBoolean(.Item(35))
+                                addon.OnBodyStart = genericController.EncodeBoolean(.Item(36))
+                                addon.OnBodyEnd = genericController.EncodeBoolean(.Item(37))
+                                addon.OnPageStart = genericController.EncodeBoolean(.Item(38))
+                                addon.OnPageEnd = genericController.EncodeBoolean(.Item(39))
+                                addon.robotsTxt = genericController.encodeText(.Item(40))
+                                addon.active = genericController.EncodeBoolean(.Item(41))
                             End With
                         End If
                         Call dt.Dispose()
@@ -211,12 +211,12 @@ Namespace Contensive.Core.Models.Entity
                         'End If
                         'hint = hint & ", 5 addonCacheRowOK=[" & addonCacheRowOK & "]"
                         If addonCacheRow.Length > 0 Then
-                            If addonPtr = localCache.addonList.Count Then
+                            If addonPtr = addonCache.addonList.Count Then
                                 '
                                 ' not found in cache - add a new entry
                                 '
                                 'hint = hint & ", 6"
-                                localCache.addonList.Add(localCache.addonList.Count.ToString, addon)
+                                addonCache.addonList.Add(addonCache.addonList.Count.ToString, addon)
                                 'ReDim Preserve cache_addons.addons(rowptr).addonCacheColCnt - 1, cache_addons.addonList.Count - 1)
                             End If
                             '
@@ -230,15 +230,15 @@ Namespace Contensive.Core.Models.Entity
                             ' build id and name indexes
                             '
                             'hint = hint & ", 8"
-                            Id = localCache.addonList(addonPtr.ToString).addonCache_Id
-                            RecordName = localCache.addonList(addonPtr.ToString).addonCache_name
+                            Id = addonCache.addonList(addonPtr.ToString).id
+                            RecordName = addonCache.addonList(addonPtr.ToString).name
                             '
                             'hint = hint & ", 9"
-                            Call localCache.idIndex.setPtr(genericController.encodeText(Id), addonPtr)
+                            Call addonCache.idIndex.setPtr(genericController.encodeText(Id), addonPtr)
                             '
                             If RecordName <> "" Then
                                 'hint = hint & ", 10"
-                                Call localCache.nameIndex.setPtr(RecordName, addonPtr)
+                                Call addonCache.nameIndex.setPtr(RecordName, addonPtr)
                             End If
                             '
                             'hint = hint & ", 11"
@@ -265,18 +265,18 @@ Namespace Contensive.Core.Models.Entity
                 Dim addonId As Integer
                 '
                 Call load()
-                If localCache.addonList.Count <= 0 Then
+                If addonCache.addonList.Count <= 0 Then
                     '
-                ElseIf (localCache.idIndex Is Nothing) Then
+                ElseIf (addonCache.idIndex Is Nothing) Then
                     '
                 Else
                     If genericController.vbIsNumeric(addonNameGuidOrId) Then
-                        ReturnPtr = localCache.idIndex.getPtr(addonNameGuidOrId.ToUpper())
+                        ReturnPtr = addonCache.idIndex.getPtr(addonNameGuidOrId.ToUpper())
                     End If
                     If ReturnPtr < 0 Then
-                        ReturnPtr = localCache.nameIndex.getPtr(addonNameGuidOrId)
+                        ReturnPtr = addonCache.nameIndex.getPtr(addonNameGuidOrId)
                         If ReturnPtr < 0 Then
-                            ReturnPtr = localCache.guidIndex.getPtr(CStr(addonNameGuidOrId))
+                            ReturnPtr = addonCache.guidIndex.getPtr(CStr(addonNameGuidOrId))
                         End If
                     End If
                     If ReturnPtr >= 0 Then
@@ -294,12 +294,12 @@ Namespace Contensive.Core.Models.Entity
                         If addonId > 0 Then
                             Call updateRow(addonId)
                             Call load()
-                            If localCache.addonList.Count <= 0 Then
+                            If addonCache.addonList.Count <= 0 Then
                                 '
-                            ElseIf (localCache.idIndex Is Nothing) Then
+                            ElseIf (addonCache.idIndex Is Nothing) Then
                                 '
                             Else
-                                ReturnPtr = localCache.idIndex.getPtr(CStr(addonId))
+                                ReturnPtr = addonCache.idIndex.getPtr(CStr(addonId))
                             End If
                         End If
                     End If
@@ -335,11 +335,11 @@ Namespace Contensive.Core.Models.Entity
                 Dim onPageEnd As Boolean
                 '
                 needLoad = False
-                If localCache Is Nothing Then
+                If addonCache Is Nothing Then
                     needLoad = True
-                ElseIf localCache.addonList Is Nothing Then
+                ElseIf addonCache.addonList Is Nothing Then
                     needLoad = True
-                ElseIf localCache.addonList.Count = 0 Then
+                ElseIf addonCache.addonList.Count = 0 Then
                     needLoad = True
                 End If
                 If needLoad Then
@@ -348,16 +348,16 @@ Namespace Contensive.Core.Models.Entity
                     '
                     Try
                         cacheTest = cpCore.cache.getObject(Of addonsCacheClass)(cacheName)
-                        Dim testCache1 = cpCore.cache.getObject(Of addonsCacheClass)("testCache1")
-                        Dim testCache2 = cpCore.cache.getObject(Of addonsCacheClass)("testCache2")
-                        Dim testCache3 = cpCore.cache.getObject(Of String)("testCache3")
+                        'Dim testCache1 = cpCore.cache.getObject(Of addonsCacheClass)("testCache1")
+                        'Dim testCache2 = cpCore.cache.getObject(Of addonsCacheClass)("testCache2")
+                        'Dim testCache3 = cpCore.cache.getObject(Of String)("testCache3")
                         If Not IsNothing(cacheTest) Then
-                            localCache = DirectCast(cacheTest, addonsCacheClass)
-                            If Not IsNothing(localCache) Then
-                                If localCache.addonList.Count > 0 Then
-                                    localCache.idIndex.importPropertyBag(localCache.propertyBag_idIndex)
-                                    localCache.nameIndex.importPropertyBag(localCache.propertyBag_nameIndex)
-                                    localCache.guidIndex.importPropertyBag(localCache.propertyBag_guidIndex)
+                            addonCache = DirectCast(cacheTest, addonsCacheClass)
+                            If Not IsNothing(addonCache) Then
+                                If addonCache.addonList.Count > 0 Then
+                                    addonCache.idIndex.importPropertyBag(addonCache.propertyBag_idIndex)
+                                    addonCache.nameIndex.importPropertyBag(addonCache.propertyBag_nameIndex)
+                                    addonCache.guidIndex.importPropertyBag(addonCache.propertyBag_guidIndex)
                                     needLoad = False
                                 End If
                             End If
@@ -369,11 +369,11 @@ Namespace Contensive.Core.Models.Entity
                         '
                         ' cache is empty, build it from scratch
                         '
-                        localCache = New addonsCacheClass
-                        localCache.addonList = New Dictionary(Of String, addonClass)
-                        localCache.guidIndex = New coreKeyPtrIndexClass
-                        localCache.idIndex = New coreKeyPtrIndexClass
-                        localCache.nameIndex = New coreKeyPtrIndexClass
+                        addonCache = New addonsCacheClass
+                        addonCache.addonList = New Dictionary(Of String, addonClass)
+                        addonCache.guidIndex = New coreKeyPtrIndexClass
+                        addonCache.idIndex = New coreKeyPtrIndexClass
+                        addonCache.nameIndex = New coreKeyPtrIndexClass
                         onBodyStartCnt = 0
                         onBodyEndCnt = 0
                         SQL = "select " & cache_addon2_fieldList & " from ccAggregateFunctions where (active<>0) order by id"
@@ -391,77 +391,77 @@ Namespace Contensive.Core.Models.Entity
                                     onPageStart = genericController.EncodeBoolean(dr.Item("onPageStartEvent"))
                                     onPageEnd = genericController.EncodeBoolean(dr.Item("onPageEndEvent"))
                                     robotsTxt = genericController.encodeText(dr.Item("robotsTxt"))
-                                    addon.addonCache_active = genericController.EncodeBoolean(dr.Item("active"))
-                                    addon.addonCache_ArgumentList = genericController.encodeText(dr.Item("ArgumentList"))
-                                    addon.addonCache_AsAjax = genericController.EncodeBoolean(dr.Item("AsAjax"))
-                                    addon.addonCache_BlockDefaultStyles = genericController.EncodeBoolean(dr.Item("BlockDefaultStyles"))
-                                    addon.addonCache_BlockEditTools = genericController.EncodeBoolean(dr.Item("BlockEditTools"))
+                                    addon.active = genericController.EncodeBoolean(dr.Item("active"))
+                                    addon.ArgumentList = genericController.encodeText(dr.Item("ArgumentList"))
+                                    addon.asAjax = genericController.EncodeBoolean(dr.Item("AsAjax"))
+                                    addon.blockDefaultStyles = genericController.EncodeBoolean(dr.Item("BlockDefaultStyles"))
+                                    addon.blockEditTools = genericController.EncodeBoolean(dr.Item("BlockEditTools"))
                                     addon.addonCache_ccguid = genericController.encodeText(dr.Item("ccguid"))
-                                    addon.addonCache_collectionid = genericController.EncodeInteger(dr.Item("collectionid"))
-                                    addon.addonCache_Copy = genericController.encodeText(dr.Item("Copy"))
-                                    addon.addonCache_CopyText = genericController.encodeText(dr.Item("CopyText"))
-                                    addon.addonCache_CustomStylesFilename = genericController.encodeText(dr.Item("CustomStylesFilename"))
-                                    addon.addonCache_DotNetClass = genericController.encodeText(dr.Item("DotNetClass"))
-                                    addon.addonCache_formxml = genericController.encodeText(dr.Item("formxml"))
-                                    addon.addonCache_guid = RecordGuid
-                                    addon.addonCache_help = genericController.encodeText(dr.Item("help"))
-                                    addon.addonCache_helpLink = genericController.encodeText(dr.Item("helpLink"))
-                                    addon.addonCache_Id = RecordID
-                                    addon.addonCache_InFrame = genericController.EncodeBoolean(dr.Item("InFrame"))
-                                    addon.addonCache_inlineScript = genericController.encodeText(dr.Item("inlineScript"))
-                                    addon.addonCache_IsInline = genericController.EncodeBoolean(dr.Item("IsInline"))
-                                    addon.addonCache_JavaScriptBodyEnd = genericController.encodeText(dr.Item("JavaScriptBodyEnd"))
-                                    addon.addonCache_JavaScriptOnLoad = genericController.encodeText(dr.Item("JavaScriptOnLoad"))
-                                    addon.addonCache_JSFilename = genericController.encodeText(dr.Item("JSFilename"))
-                                    addon.addonCache_Link = genericController.encodeText(dr.Item("Link"))
-                                    addon.addonCache_MetaDescription = genericController.encodeText(dr.Item("MetaDescription"))
-                                    addon.addonCache_MetaKeywordList = genericController.encodeText(dr.Item("MetaKeywordList"))
-                                    addon.addonCache_name = RecordName
-                                    addon.addonCache_ObjectProgramID = genericController.encodeText(dr.Item("ObjectProgramID"))
-                                    addon.addoncache_OnBodyEnd = onBodyEnd
-                                    addon.addoncache_OnBodyStart = onBodyStart
-                                    addon.addoncache_OnPageEnd = onPageEnd
-                                    addon.addoncache_OnPageStart = onPageStart
-                                    addon.addonCache_OtherHeadTags = genericController.encodeText(dr.Item("OtherHeadTags"))
-                                    addon.addonCache_PageTitle = genericController.encodeText(dr.Item("PageTitle"))
-                                    addon.addonCache_RemoteAssetLink = genericController.encodeText(dr.Item("RemoteAssetLink"))
-                                    addon.addonCache_remoteMethod = genericController.EncodeBoolean(dr.Item("remoteMethod"))
-                                    addon.addoncache_robotsTxt = robotsTxt
-                                    addon.addonCache_ScriptingCode = genericController.encodeText(dr.Item("ScriptingCode"))
-                                    addon.addonCache_ScriptingEntryPoint = genericController.encodeText(dr.Item("ScriptingEntryPoint"))
-                                    addon.addonCache_ScriptingLanguageID = genericController.EncodeInteger(dr.Item("ScriptingLanguageID"))
-                                    addon.addonCache_ScriptingTimeout = genericController.encodeText(dr.Item("ScriptingTimeout"))
-                                    addon.addonCache_StylesFilename = genericController.encodeText(dr.Item("StylesFilename"))
-                                    localCache.addonList.Add(addonPtr.ToString, addon)
+                                    addon.collectionid = genericController.EncodeInteger(dr.Item("collectionid"))
+                                    addon.Copy = genericController.encodeText(dr.Item("Copy"))
+                                    addon.copyText = genericController.encodeText(dr.Item("CopyText"))
+                                    addon.customStylesFilename = genericController.encodeText(dr.Item("CustomStylesFilename"))
+                                    addon.DotNetClass = genericController.encodeText(dr.Item("DotNetClass"))
+                                    addon.formxml = genericController.encodeText(dr.Item("formxml"))
+                                    addon.ccguid = RecordGuid
+                                    addon.help = genericController.encodeText(dr.Item("help"))
+                                    addon.helpLink = genericController.encodeText(dr.Item("helpLink"))
+                                    addon.id = RecordID
+                                    addon.InFrame = genericController.EncodeBoolean(dr.Item("InFrame"))
+                                    addon.inlineScript = genericController.encodeText(dr.Item("inlineScript"))
+                                    addon.isInline = genericController.EncodeBoolean(dr.Item("IsInline"))
+                                    addon.JavaScriptBodyEnd = genericController.encodeText(dr.Item("JavaScriptBodyEnd"))
+                                    addon.JavaScriptOnLoad = genericController.encodeText(dr.Item("JavaScriptOnLoad"))
+                                    addon.JSFilename = genericController.encodeText(dr.Item("JSFilename"))
+                                    addon.Link = genericController.encodeText(dr.Item("Link"))
+                                    addon.MetaDescription = genericController.encodeText(dr.Item("MetaDescription"))
+                                    addon.MetaKeywordList = genericController.encodeText(dr.Item("MetaKeywordList"))
+                                    addon.name = RecordName
+                                    addon.ObjectProgramID = genericController.encodeText(dr.Item("ObjectProgramID"))
+                                    addon.OnBodyEnd = onBodyEnd
+                                    addon.OnBodyStart = onBodyStart
+                                    addon.OnPageEnd = onPageEnd
+                                    addon.OnPageStart = onPageStart
+                                    addon.OtherHeadTags = genericController.encodeText(dr.Item("OtherHeadTags"))
+                                    addon.PageTitle = genericController.encodeText(dr.Item("PageTitle"))
+                                    addon.remoteAssetLink = genericController.encodeText(dr.Item("RemoteAssetLink"))
+                                    addon.remoteMethod = genericController.EncodeBoolean(dr.Item("remoteMethod"))
+                                    addon.robotsTxt = robotsTxt
+                                    addon.scriptingCode = genericController.encodeText(dr.Item("ScriptingCode"))
+                                    addon.scriptingEntryPoint = genericController.encodeText(dr.Item("ScriptingEntryPoint"))
+                                    addon.scriptingLanguageID = genericController.EncodeInteger(dr.Item("ScriptingLanguageID"))
+                                    addon.scriptingTimeout = genericController.encodeText(dr.Item("ScriptingTimeout"))
+                                    addon.stylesFilename = genericController.encodeText(dr.Item("StylesFilename"))
+                                    addonCache.addonList.Add(addonPtr.ToString, addon)
                                     '
                                     'hint = hint & ",1"
-                                    Call localCache.idIndex.setPtr(genericController.encodeText(RecordID), addonPtr)
+                                    Call addonCache.idIndex.setPtr(genericController.encodeText(RecordID), addonPtr)
                                     If RecordName <> "" Then
-                                        Call localCache.nameIndex.setPtr(RecordName, addonPtr)
+                                        Call addonCache.nameIndex.setPtr(RecordName, addonPtr)
                                     End If
                                     If RecordGuid <> "" Then
-                                        Call localCache.guidIndex.setPtr(RecordGuid, addonPtr)
+                                        Call addonCache.guidIndex.setPtr(RecordGuid, addonPtr)
                                     End If
                                     If onBodyStart Then
                                         ' save Id for now, lookup before save
-                                        ReDim Preserve localCache.onBodyStartPtrs(onBodyStartCnt)
-                                        localCache.onBodyStartPtrs(onBodyStartCnt) = RecordID
+                                        ReDim Preserve addonCache.onBodyStartPtrs(onBodyStartCnt)
+                                        addonCache.onBodyStartPtrs(onBodyStartCnt) = RecordID
                                         onBodyStartCnt = onBodyStartCnt + 1
                                     End If
                                     If onBodyEnd Then
-                                        ReDim Preserve localCache.onBodyEndPtrs(onBodyEndCnt)
-                                        localCache.onBodyEndPtrs(onBodyEndCnt) = RecordID
+                                        ReDim Preserve addonCache.onBodyEndPtrs(onBodyEndCnt)
+                                        addonCache.onBodyEndPtrs(onBodyEndCnt) = RecordID
                                         onBodyEndCnt = onBodyEndCnt + 1
                                     End If
                                     If onPageStart Then
-                                        ReDim Preserve localCache.onPageStartPtrs(onPageStartCnt)
-                                        localCache.onPageStartPtrs(onPageStartCnt) = RecordID
+                                        ReDim Preserve addonCache.onPageStartPtrs(onPageStartCnt)
+                                        addonCache.onPageStartPtrs(onPageStartCnt) = RecordID
                                         onPageStartCnt = onPageStartCnt + 1
                                     End If
                                     'hint = hint & ",2"
                                     If onPageEnd Then
-                                        ReDim Preserve localCache.onPageEndPtrs(onPageEndCnt)
-                                        localCache.onPageEndPtrs(onPageEndCnt) = RecordID
+                                        ReDim Preserve addonCache.onPageEndPtrs(onPageEndCnt)
+                                        addonCache.onPageEndPtrs(onPageEndCnt) = RecordID
                                         onPageEndCnt = onPageEndCnt + 1
                                     End If
                                     'hint = hint & ",3"
@@ -469,14 +469,14 @@ Namespace Contensive.Core.Models.Entity
                                     'hint = hint & ",4"
                                     If robotsTxt <> "" Then
                                         'hint = hint & ",5"
-                                        localCache.robotsTxt = localCache.robotsTxt & vbCrLf & robotsTxt
+                                        addonCache.robotsTxt = addonCache.robotsTxt & vbCrLf & robotsTxt
                                     End If
                                     'hint = hint & ",6"
                                     addonPtr += 1
                                 Next
                             End If
                         End Using
-                        If localCache.addonList.Count > 0 Then
+                        If addonCache.addonList.Count > 0 Then
                             save()
                         End If
                     End If
@@ -495,19 +495,19 @@ Namespace Contensive.Core.Models.Entity
             Try
                 ' access keyPtr indexes to clear dirty flag and export property bad (remove when the class will serialize)
                 '
-                Call localCache.idIndex.getPtr("test")
-                localCache.propertyBag_idIndex = localCache.idIndex.exportPropertyBag()
+                Call addonCache.idIndex.getPtr("test")
+                addonCache.propertyBag_idIndex = addonCache.idIndex.exportPropertyBag()
                 '
-                Call localCache.nameIndex.getPtr("test")
-                localCache.propertyBag_nameIndex = localCache.nameIndex.exportPropertyBag()
+                Call addonCache.nameIndex.getPtr("test")
+                addonCache.propertyBag_nameIndex = addonCache.nameIndex.exportPropertyBag()
                 '
-                Call localCache.guidIndex.getPtr("test")
-                localCache.propertyBag_guidIndex = localCache.guidIndex.exportPropertyBag()
+                Call addonCache.guidIndex.getPtr("test")
+                addonCache.propertyBag_guidIndex = addonCache.guidIndex.exportPropertyBag()
                 '
-                Call cpCore.cache.setObject(cacheName, localCache, cnAddons)
-                Call cpCore.cache.setObject("testCache1", localCache, cnAddons)
-                Call cpCore.cache.setObject("testCache2", localCache)
-                Call cpCore.cache.setObject("testCache3", "sampleName")
+                Call cpCore.cache.setObject(cacheName, addonCache, cnAddons)
+                'Call cpCore.cache.setObject("testCache1", localCache, cnAddons)
+                'Call cpCore.cache.setObject("testCache2", localCache)
+                'Call cpCore.cache.setObject("testCache3", "sampleName")
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try            '

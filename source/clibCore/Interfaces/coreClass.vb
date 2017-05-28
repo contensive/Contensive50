@@ -76,7 +76,7 @@ Namespace Contensive.Core
         '
         ' ----- cache styleAddonRules
         '
-        Public cache_addonStyleRules As coreCacheKeyPtrClass
+        'Public cache_addonStyleRules As coreCacheKeyPtrClass
         'Public Class styleAddonRuleClass
         '    Public addonId As Integer
         '    Public styleId As Integer
@@ -472,6 +472,23 @@ Namespace Contensive.Core
         ' storage moved here from main - if addon move to csv is successful, this will stay
         '
         Public pageManager_PageAddonCnt As Integer = 0
+        '
+        '===================================================================================================
+        ''' <summary>
+        ''' addonCache object
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public ReadOnly Property cache_addonStyleRules() As coreCacheKeyPtrClass
+            Get
+                If (_cache_addonStyleRules Is Nothing) Then
+                    _cache_addonStyleRules = New coreCacheKeyPtrClass(Me, cacheNameAddonStyleRules, sqlAddonStyles, "shared style add-on rules,add-ons,shared styles")
+                End If
+                Return _cache_addonStyleRules
+            End Get
+        End Property
+        Private _cache_addonStyleRules As coreCacheKeyPtrClass = Nothing
         '
         '===================================================================================================
         ''' <summary>
@@ -2990,7 +3007,7 @@ ErrorTrap:
                                 End If
                             End If
                         End If
-                        Call cache.invalidateObjectList("People")
+                        Call cache.invalidateContent("People")
                     End If
                     Call db.cs_Close(CSMember)
                 End If
@@ -7982,7 +7999,7 @@ ErrorTrap:
                 '        Next
             End If
             If RuleContentChanged Then
-                Call cache.invalidateObjectList(RulesContentName)
+                Call cache.invalidateContent(RulesContentName)
             End If
             Exit Sub
             '
@@ -10137,11 +10154,11 @@ ErrorTrap:
                     'hint = hint & ",130"
                     Select Case genericController.vbLCase(RecordName)
                         Case "allowlinkalias"
-                            Call cache.invalidateObjectList("Page Content")
+                            Call cache.invalidateContent("Page Content")
                         Case "sectionlandinglink"
-                            Call cache.invalidateObjectList("Page Content")
+                            Call cache.invalidateContent("Page Content")
                         Case siteproperty_serverPageDefault_name
-                            Call cache.invalidateObjectList("Page Content")
+                            Call cache.invalidateContent("Page Content")
                     End Select
                 Case "ccpagecontent"
                     '
@@ -12272,35 +12289,35 @@ ErrorTrap:
 ErrorTrap:
             handleLegacyError3(serverConfig.appConfig.name, "", "dll", "cpCoreClass", "main_GetNvaValue", Err.Number, Err.Source, Err.Description, True, False, "")
         End Function
-        '
-        '===========================================================================================
-        ' main_ServerDomainCrossList
-        '   comma delimited list of domains that should share in cross domain cookie save
-        '===========================================================================================
-        '
-        Public ReadOnly Property main_ServerDomainCrossList() As String
-            Get
-                Dim SQL As String
-                'dim dt as datatable
-                '
-                Const cacheName = "Domain Content Cross List Cache"
-                '
-                If Not htmlDoc.html_ServerDomainCrossList_Loaded Then
-                    htmlDoc.html_ServerDomainCrossList = genericController.encodeText(cache.getObject(Of String)(cacheName))
-                    If True And (htmlDoc.html_ServerDomainCrossList = "") Then
-                        htmlDoc.html_ServerDomainCrossList = ","
-                        SQL = "select name from ccDomains where (typeId=1)and(allowCrossLogin<>0)"
-                        Dim dt As DataTable = db.executeSql(SQL)
-                        For Each dr As DataRow In dt.Rows
-                            htmlDoc.html_ServerDomainCrossList &= dr(0).ToString
-                        Next
-                        Call cache.setObject(cacheName, htmlDoc.html_ServerDomainCrossList, "domains")
-                    End If
-                    htmlDoc.html_ServerDomainCrossList_Loaded = True
-                End If
-                main_ServerDomainCrossList = serverConfig.appConfig.domainList(0) & htmlDoc.html_ServerDomainCrossList
-            End Get
-        End Property
+        ''
+        ''===========================================================================================
+        '' main_ServerDomainCrossList
+        ''   comma delimited list of domains that should share in cross domain cookie save
+        ''===========================================================================================
+        ''
+        'Public ReadOnly Property main_ServerDomainCrossList() As String
+        '    Get
+        '        Dim SQL As String
+        '        'dim dt as datatable
+        '        '
+        '        Const cacheName = "Domain Content Cross List Cache"
+        '        '
+        '        If Not htmlDoc.html_ServerDomainCrossList_Loaded Then
+        '            htmlDoc.html_ServerDomainCrossList = genericController.encodeText(cache.getObject(Of String)(cacheName))
+        '            If True And (htmlDoc.html_ServerDomainCrossList = "") Then
+        '                htmlDoc.html_ServerDomainCrossList = ","
+        '                SQL = "select name from ccDomains where (typeId=1)and(allowCrossLogin<>0)"
+        '                Dim dt As DataTable = db.executeSql(SQL)
+        '                For Each dr As DataRow In dt.Rows
+        '                    htmlDoc.html_ServerDomainCrossList &= dr(0).ToString
+        '                Next
+        '                Call cache.setObject(cacheName, htmlDoc.html_ServerDomainCrossList, "domains")
+        '            End If
+        '            htmlDoc.html_ServerDomainCrossList_Loaded = True
+        '        End If
+        '        main_ServerDomainCrossList = serverConfig.appConfig.domainList(0) & htmlDoc.html_ServerDomainCrossList
+        '    End Get
+        'End Property
 
         '        '
         '
@@ -12932,7 +12949,7 @@ ErrorTrap:
                         routeTest = workingRoute
                         Dim addonPtr As Integer = addonCache.getPtr(routeTest)
                         If addonPtr >= 0 Then
-                            If addonCache.localCache.addonList(addonPtr.ToString).addonCache_remoteMethod Then
+                            If addonCache.addonCache.addonList(addonPtr.ToString).remoteMethod Then
                                 addonRoute = routeTest
                             End If
                         Else
@@ -12940,7 +12957,7 @@ ErrorTrap:
                                 routeTest = routeTest.Substring(1)
                                 addonPtr = addonCache.getPtr(routeTest)
                                 If addonPtr >= 0 Then
-                                    If addonCache.localCache.addonList(addonPtr.ToString).addonCache_remoteMethod Then
+                                    If addonCache.addonCache.addonList(addonPtr.ToString).remoteMethod Then
                                         addonRoute = routeTest
                                     End If
                                 End If
@@ -13429,9 +13446,9 @@ ErrorTrap:
                                             Call pageManager.pageManager_cache_pageContent_clear()
                                             Call pageManager.pageManager_cache_pageTemplate_clear()
                                             Call pageManager.pageManager_cache_siteSection_clear()
-                                            Call cache.invalidateObjectList("")
+                                            'Call cache.invalidateObjectList("")
                                             If contentName <> "" Then
-                                                Call cache.invalidateObjectList(contentName)
+                                                Call cache.invalidateContent(contentName)
                                                 tableName = GetContentTablename(contentName)
                                                 If genericController.vbLCase(tableName) = "cctemplates" Then
                                                     Call cache.setObject(pageManagerController.pageManager_cache_pageTemplate_cacheName, nothingObject)
@@ -13568,9 +13585,6 @@ ErrorTrap:
                 '
                 ' -- attempt auth load
                 authContext = Models.Context.authContextModel.create(Me, siteProperties.allowVisitTracking)
-                '
-                ' -- convert to lazy load
-                cache_addonStyleRules = New coreCacheKeyPtrClass(Me, cacheNameAddonStyleRules, sqlAddonStyles, "shared style add-on rules,add-ons,shared styles")
                 '
                 ' debug printed defaults on, so if not on, set it off and clear what was collected
                 If Not visitProperty.getBoolean("AllowDebugging") Then

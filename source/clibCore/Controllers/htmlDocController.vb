@@ -2655,7 +2655,7 @@ ErrorTrap:
             SecondaryCDef = cpCore.metaData.getCdef(SecondaryContentName)
             SecondaryTablename = SecondaryCDef.ContentTableName
             SecondaryContentID = SecondaryCDef.Id
-            SecondaryCDef.childIdList.Add(SecondaryContentID)
+            SecondaryCDef.childIdList(cpCore).Add(SecondaryContentID)
             SingularPrefix = genericController.GetSingular(SecondaryContentName) & "&nbsp;"
             '
             ' ----- Gather all the records, sorted by ContentName
@@ -6611,14 +6611,14 @@ ErrorTrap:
                 addonPtr = cpCore.addonCache.getPtr(AddonName)
                 If addonPtr >= 0 Then
                     FoundAddon = True
-                    AddonOptionConstructor = cpCore.addonCache.localCache.addonList(addonPtr.ToString).addonCache_ArgumentList
+                    AddonOptionConstructor = cpCore.addonCache.addonCache.addonList(addonPtr.ToString).ArgumentList
                     AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
                     AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbLf, vbCr)
                     AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
                     If AddonOptionConstructor <> "" Then
                         AddonOptionConstructor = AddonOptionConstructor & vbCrLf
                     End If
-                    If genericController.EncodeBoolean(cpCore.addonCache.localCache.addonList(addonPtr.ToString).addonCache_IsInline) Then
+                    If genericController.EncodeBoolean(cpCore.addonCache.addonCache.addonList(addonPtr.ToString).isInline) Then
                         AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Inline
                     Else
                         AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Block
@@ -6755,14 +6755,14 @@ ErrorTrap:
                                     addonPtr = cpCore.addonCache.getPtr(AddonName)
                                     If addonPtr >= 0 Then
                                         FoundAddon = True
-                                        AddonOptionConstructor = genericController.encodeText(cpCore.addonCache.localCache.addonList(addonPtr.ToString).addonCache_ArgumentList)
+                                        AddonOptionConstructor = genericController.encodeText(cpCore.addonCache.addonCache.addonList(addonPtr.ToString).ArgumentList)
                                         AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
                                         AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbLf, vbCr)
                                         AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
                                         If AddonOptionConstructor <> "" Then
                                             AddonOptionConstructor = AddonOptionConstructor & vbCrLf
                                         End If
-                                        If genericController.EncodeBoolean(cpCore.addonCache.localCache.addonList(addonPtr.ToString).addonCache_IsInline) Then
+                                        If genericController.EncodeBoolean(cpCore.addonCache.addonCache.addonList(addonPtr.ToString).isInline) Then
                                             AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Inline
                                         Else
                                             AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Block
@@ -6847,9 +6847,9 @@ ErrorTrap:
                 Call cpCore.pageManager.pageManager_cache_pageContent_clear()
                 Call cpCore.pageManager.pageManager_cache_pageTemplate_clear()
                 Call cpCore.pageManager.pageManager_cache_siteSection_clear()
-                Call cpCore.cache.invalidateObjectList("")
+                'Call cpCore.cache.invalidateObjectList("")
                 If ContentName <> "" Then
-                    Call cpCore.cache.invalidateObjectList(ContentName)
+                    Call cpCore.cache.invalidateContent(ContentName)
                     TableName = cpCore.GetContentTablename(ContentName)
                     If genericController.vbLCase(TableName) = "cctemplates" Then
                         Call cpCore.cache.setObject(pageManagerController.pageManager_cache_pageTemplate_cacheName, EmptyVariant)
@@ -7159,7 +7159,7 @@ ErrorTrap:
                     SecondaryTablename = SecondaryCDef.ContentTableName
                     SecondaryContentID = SecondaryCDef.Id
                     ContentIDList.Add(SecondaryContentID)
-                    ContentIDList.AddRange(SecondaryCDef.childIdList)
+                    ContentIDList.AddRange(SecondaryCDef.childIdList(cpCore))
                     '
                     '
                     '
@@ -9205,7 +9205,7 @@ ErrorTrap:
                         End If
                     End If
                 End If
-                Call cpCore.cache.invalidateObjectList("People")
+                Call cpCore.cache.invalidateContent("People")
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try

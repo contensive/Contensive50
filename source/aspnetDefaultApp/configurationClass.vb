@@ -22,7 +22,6 @@ Public Class configurationClass
             serverConfig.appConfig.cdnFilesNetprefix = ConfigurationManager.AppSettings("ContensiveCdnFilesNetprefix")
             serverConfig.appConfig.cdnFilesPath = ConfigurationManager.AppSettings("ContensiveCdnFilesPath")
             serverConfig.appConfig.domainList.Add(ConfigurationManager.AppSettings("ContensivePrimaryDomain"))
-            serverConfig.appConfig.enableCache = genericController.EncodeBoolean(ConfigurationManager.AppSettings("ContensiveEnableCache"))
             serverConfig.appConfig.enabled = True
             serverConfig.appConfig.name = ConfigurationManager.AppSettings("ContensiveAppName")
             serverConfig.appConfig.privateFilesPath = ConfigurationManager.AppSettings("ContensivePrivateFilesPath")
@@ -33,7 +32,7 @@ Public Class configurationClass
             serverConfig.defaultDataSourcePassword = ConfigurationManager.AppSettings("ContensiveDefaultDataSourcePassword")
             'serverConfig.defaultDataSourceType = genericController.EncodeInteger(ConfigurationManager.AppSettings("ContensiveDefaultDataSourceType"))
             serverConfig.defaultDataSourceUsername = ConfigurationManager.AppSettings("ContensiveDefaultDataSourceUsername")
-            serverConfig.isLocalCache = genericController.EncodeBoolean(ConfigurationManager.AppSettings("ContensiveIsLocalCache"))
+            serverConfig.enableLocalMemoryCache = genericController.EncodeBoolean(ConfigurationManager.AppSettings("ContensiveIsLocalCache"))
             serverConfig.isLocalFileSystem = genericController.EncodeBoolean(ConfigurationManager.AppSettings("ContensiveIsLocalFileSystem"))
             serverConfig.localDataDriveLetter = ConfigurationManager.AppSettings("ContensiveLocalDataDriveLetter")
             serverConfig.name = ConfigurationManager.AppSettings("ContensiveServerGroupName")
@@ -51,7 +50,8 @@ Public Class configurationClass
             Dim cs As Contensive.BaseClasses.CPCSBaseClass = cp.CSNew
             '
             ' -- drive all routes to the default page
-            Dim physicalFile As String = "~/" & cp.Site.GetText("serverpagedefault")
+            Dim defaultPage As String = cp.Site.GetText("serverpagedefault", "default.aspx")
+            Dim physicalFile As String = "~/" & defaultPage
             Dim adminRoute As String = cp.core.serverConfig.appConfig.adminRoute
             If (Not String.IsNullOrEmpty(adminRoute)) Then
                 '
