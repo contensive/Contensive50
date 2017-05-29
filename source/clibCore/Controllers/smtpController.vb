@@ -128,7 +128,7 @@ Namespace Contensive.Core.Controllers
                         ' ----- Update the System Email Log
                         '
                         LogLine = """" & CStr(Now()) & """,""To[" & EmailTo & "]"",""From[" & EmailFrom & "]"",""Bounce[" & BounceAddress & "]"",""Subject[" & EmailSubject & "]"",""Result[" & SendResult & "]""" & vbCrLf
-                        Call logController.log_appendLog(cpCore, LogLine, "email")
+                        Call logController.appendLog(cpCore, LogLine, "email")
                     End If
                 End If
                 '

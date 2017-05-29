@@ -424,7 +424,6 @@
     <Compile Include="addon_adminSite\addon_AdminClass.vb" />
     <Compile Include="coreAdminUIClass.vb" />
     <Compile Include="Controllers\dbController.vb" />
-    <Compile Include="coreClusterClass.vb" />
     <Compile Include="coreContentCmdClass.vb" />
     <Compile Include="Controllers\htmlDocController.vb" />
     <Compile Include="corePropertyCacheClass.vb" />
@@ -463,7 +462,7 @@
     <Compile Include="coreDataTreeClass.vb" />
     <Compile Include="coreKeyPtrIndexClass.vb" />
     <Compile Include="coreFastStringClass.vb" />
-    <Compile Include="coreFileSystemClass.vb" />
+    <Compile Include="Controllers\fileController.vb" />
     <Compile Include="coreHtmlToTextClass.vb" />
     <Compile Include="coreHtmlParseClass.vb" />
     <Compile Include="coreHttpRequestClass.vb" />
@@ -485,10 +484,11 @@
     <Compile Include="Models\Entity\visitModel.vb" />
     <Compile Include="Models\Entity\personModel.vb" />
     <Compile Include="Models\Entity\LanguageModel.vb" />
-    <Compile Include="Models\Entity\addonModel.vb" />
     <Compile Include="Models\Entity\groupModel.vb" />
     <Compile Include="Models\Entity\dataSourceModel.vb" />
     <Compile Include="Models\Entity\sitePropertyModel.vb" />
+    <Compile Include="Models\Entity\addonModel.vb" />
+    <Compile Include="Models\Entity\contentModel.vb" />
     <Compile Include="Models\Entity\_blankModel.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

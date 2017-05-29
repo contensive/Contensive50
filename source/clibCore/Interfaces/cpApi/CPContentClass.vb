@@ -305,7 +305,7 @@ Namespace Contensive.Core
             field.Scramble = False
             field.TextBuffered = False
             field.UniqueName = False
-            Return cpCore.metaData.metaData_VerifyCDefField_ReturnID(ContentName, field)
+            Return cpCore.metaData.verifyCDefField_ReturnID(ContentName, field)
         End Function
         '
         '====================================================================================================
@@ -323,7 +323,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function AddContent(ContentName As String, sqlTableName As String, dataSourceName As String) As Integer
-            Return cpCore.metaData.metaData_CreateContent4(True _
+            Return cpCore.metaData.createContent(True _
                 , Models.Entity.dataSourceModel.create(cpCore, dataSourceName, New List(Of String)) _
                 , sqlTableName _
                 , ContentName _

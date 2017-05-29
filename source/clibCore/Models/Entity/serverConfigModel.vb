@@ -56,6 +56,8 @@ Namespace Contensive.Core.Models.Entity
         Public username As String = ""
         Public password As String = ""
         '
+        Public enableLogging As Boolean = False
+        '
         ' -- deprecated
         'Public appPattern As String
         '

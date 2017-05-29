@@ -218,15 +218,15 @@ Namespace integrationTests
             ' arrange
             ' act
             ' assert
-            Assert.AreEqual(coreFileSystemClass.normalizePath(""), "")
-            Assert.AreEqual(coreFileSystemClass.normalizePath("c:\"), "c:\")
-            Assert.AreEqual(coreFileSystemClass.normalizePath("c:\test\"), "c:\test\")
-            Assert.AreEqual(coreFileSystemClass.normalizePath("c:\test"), "c:\test\")
-            Assert.AreEqual(coreFileSystemClass.normalizePath("c:\test/test"), "c:\test\test\")
-            Assert.AreEqual(coreFileSystemClass.normalizePath("test"), "test\")
-            Assert.AreEqual(coreFileSystemClass.normalizePath("\test"), "test\")
-            Assert.AreEqual(coreFileSystemClass.normalizePath("\test\"), "test\")
-            Assert.AreEqual(coreFileSystemClass.normalizePath("/test/"), "test\")
+            Assert.AreEqual(fileController.normalizePath(""), "")
+            Assert.AreEqual(fileController.normalizePath("c:\"), "c:\")
+            Assert.AreEqual(fileController.normalizePath("c:\test\"), "c:\test\")
+            Assert.AreEqual(fileController.normalizePath("c:\test"), "c:\test\")
+            Assert.AreEqual(fileController.normalizePath("c:\test/test"), "c:\test\test\")
+            Assert.AreEqual(fileController.normalizePath("test"), "test\")
+            Assert.AreEqual(fileController.normalizePath("\test"), "test\")
+            Assert.AreEqual(fileController.normalizePath("\test\"), "test\")
+            Assert.AreEqual(fileController.normalizePath("/test/"), "test\")
         End Sub
         '
         <TestMethod()> Public Sub normalizeRoute_unit()

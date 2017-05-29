@@ -2180,7 +2180,7 @@ Namespace Contensive.Core.Controllers
         '===========================================================================
         '
         Private Shared Sub handleClassException(cpCore As coreClass, ByVal ex As Exception, ByVal ApplicationName As String, ByVal MethodName As String)
-            logController.log_appendLog(cpCore, "exception in builderClass." & MethodName & ", application [" & ApplicationName & "], ex [" & ex.ToString & "]")
+            logController.appendLog(cpCore, "exception in builderClass." & MethodName & ", application [" & ApplicationName & "], ex [" & ex.ToString & "]")
         End Sub
         '
         '===========================================================================
@@ -2214,7 +2214,7 @@ Namespace Contensive.Core.Controllers
         '
         Private Shared Sub appendBuildLog(cpCore As coreClass, ByVal message As String)
             Console.WriteLine("upgrade: " & message)
-            logController.log_appendLog(cpCore, message, "Build")
+            logController.appendLog(cpCore, message, "Build")
         End Sub
         ''
         ''=============================================================================

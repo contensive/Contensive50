@@ -718,7 +718,7 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property appRootFiles() As coreFileSystemClass
+        Public ReadOnly Property appRootFiles() As fileController
             Get
                 If (_appRootFiles Is Nothing) Then
                     If (serverConfig.appConfig IsNot Nothing) Then
@@ -726,11 +726,11 @@ Namespace Contensive.Core
                             If serverConfig.isLocalFileSystem Then
                                 '
                                 ' local server -- everything is ephemeral
-                                _appRootFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.appRootFilesPath))
+                                _appRootFiles = New fileController(Me, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.noSync, fileController.normalizePath(serverConfig.appConfig.appRootFilesPath))
                             Else
                                 '
                                 ' cluster mode - each filesystem is configured accordingly
-                                _appRootFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.activeSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.appRootFilesPath))
+                                _appRootFiles = New fileController(Me, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.activeSync, fileController.normalizePath(serverConfig.appConfig.appRootFilesPath))
                             End If
                         End If
                     End If
@@ -738,7 +738,7 @@ Namespace Contensive.Core
                 Return _appRootFiles
             End Get
         End Property
-        Private _appRootFiles As coreFileSystemClass = Nothing
+        Private _appRootFiles As fileController = Nothing
         '
         '===================================================================================================
         ''' <summary>
@@ -747,23 +747,23 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property serverFiles() As coreFileSystemClass
+        Public ReadOnly Property serverFiles() As fileController
             Get
                 If (_serverFiles Is Nothing) Then
                     If serverConfig.isLocalFileSystem Then
                         '
                         ' local server -- everything is ephemeral
-                        _serverFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, "")
+                        _serverFiles = New fileController(Me, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.noSync, "")
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
-                        _serverFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, "")
+                        _serverFiles = New fileController(Me, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.noSync, "")
                     End If
                 End If
                 Return _serverFiles
             End Get
         End Property
-        Private _serverFiles As coreFileSystemClass = Nothing
+        Private _serverFiles As fileController = Nothing
         '
         '===================================================================================================
         ''' <summary>
@@ -772,7 +772,7 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property privateFiles() As coreFileSystemClass
+        Public ReadOnly Property privateFiles() As fileController
             Get
                 If (_privateFiles Is Nothing) Then
                     If (serverConfig.appConfig IsNot Nothing) Then
@@ -780,11 +780,11 @@ Namespace Contensive.Core
                             If serverConfig.isLocalFileSystem Then
                                 '
                                 ' local server -- everything is ephemeral
-                                _privateFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.privateFilesPath))
+                                _privateFiles = New fileController(Me, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.noSync, fileController.normalizePath(serverConfig.appConfig.privateFilesPath))
                             Else
                                 '
                                 ' cluster mode - each filesystem is configured accordingly
-                                _privateFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.privateFilesPath))
+                                _privateFiles = New fileController(Me, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.passiveSync, fileController.normalizePath(serverConfig.appConfig.privateFilesPath))
                             End If
                         End If
                     End If
@@ -792,7 +792,7 @@ Namespace Contensive.Core
                 Return _privateFiles
             End Get
         End Property
-        Private _privateFiles As coreFileSystemClass = Nothing
+        Private _privateFiles As fileController = Nothing
         '
         '===================================================================================================
         ''' <summary>
@@ -801,18 +801,18 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property programDataFiles() As coreFileSystemClass
+        Public ReadOnly Property programDataFiles() As fileController
             Get
                 If (_programDataFiles Is Nothing) Then
                     '
                     ' -- always local -- must be because this object is used to read serverConfig, before the object is valid
-                    Dim programDataPath As String = coreFileSystemClass.normalizePath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) & "Contensive\"
-                    _programDataFiles = New coreFileSystemClass(Me, True, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(programDataPath))
+                    Dim programDataPath As String = fileController.normalizePath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) & "Contensive\"
+                    _programDataFiles = New fileController(Me, True, fileController.fileSyncModeEnum.noSync, fileController.normalizePath(programDataPath))
                 End If
                 Return _programDataFiles
             End Get
         End Property
-        Private _programDataFiles As coreFileSystemClass = Nothing
+        Private _programDataFiles As fileController = Nothing
         '
         '===================================================================================================
         ''' <summary>
@@ -821,17 +821,17 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property programFiles() As coreFileSystemClass
+        Public ReadOnly Property programFiles() As fileController
             Get
                 If (_programFiles Is Nothing) Then
                     '
                     ' -- always local
-                    _programFiles = New coreFileSystemClass(Me, True, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.programFilesPath))
+                    _programFiles = New fileController(Me, True, fileController.fileSyncModeEnum.noSync, fileController.normalizePath(serverConfig.programFilesPath))
                 End If
                 Return _programFiles
             End Get
         End Property
-        Private _programFiles As coreFileSystemClass = Nothing
+        Private _programFiles As fileController = Nothing
         '
         '===================================================================================================
         ''' <summary>
@@ -840,7 +840,7 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property cdnFiles() As coreFileSystemClass
+        Public ReadOnly Property cdnFiles() As fileController
             Get
                 If (_cdnFiles Is Nothing) Then
                     If (serverConfig.appConfig IsNot Nothing) Then
@@ -848,11 +848,11 @@ Namespace Contensive.Core
                             If serverConfig.isLocalFileSystem Then
                                 '
                                 ' local server -- everything is ephemeral
-                                _cdnFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.cdnFilesPath))
+                                _cdnFiles = New fileController(Me, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.noSync, fileController.normalizePath(serverConfig.appConfig.cdnFilesPath))
                             Else
                                 '
                                 ' cluster mode - each filesystem is configured accordingly
-                                _cdnFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.cdnFilesPath))
+                                _cdnFiles = New fileController(Me, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.passiveSync, fileController.normalizePath(serverConfig.appConfig.cdnFilesPath))
                             End If
                         End If
                     End If
@@ -860,7 +860,7 @@ Namespace Contensive.Core
                 Return _cdnFiles
             End Get
         End Property
-        Private _cdnFiles As coreFileSystemClass = Nothing
+        Private _cdnFiles As fileController = Nothing
         '
         '===================================================================================================
         ''' <summary>
@@ -2501,7 +2501,7 @@ ErrorTrap:
         '================================================================================================
         '
         Public Sub csv_reportAlarm(Cause As String)
-            Call logController.log_appendLog(Me, Cause, "Alarms", "alarm")
+            Call logController.appendLog(Me, Cause, "Alarms", "alarm")
         End Sub
         ''
         ''------------------------------------------------------------------------------------------------------------
@@ -3184,7 +3184,7 @@ ErrorTrap:
                 iMessage = genericController.vbReplace(iMessage, vbLf, " ")
                 iMessage = FormatDateTime(Now, vbShortTime) & vbTab & Format((ElapsedTime), "00.000") & vbTab & authContext.visit.ID & vbTab & iMessage
                 '
-                logController.log_appendLog(Me, iMessage, "", "testPoints_" & serverConfig.appConfig.name)
+                logController.appendLog(Me, iMessage, "", "testPoints_" & serverConfig.appConfig.name)
             End If
             Exit Sub
             '
@@ -6108,7 +6108,7 @@ ErrorTrap:
         '=============================================================================
         '
         Public Sub metaData_CreateContentChild(ByVal ChildContentName As String, ByVal ParentContentName As String)
-            Call metaData.CreateContentChild(genericController.encodeText(ChildContentName), genericController.encodeText(ParentContentName), authContext.user.ID)
+            Call metaData.createContentChild(genericController.encodeText(ChildContentName), genericController.encodeText(ParentContentName), authContext.user.ID)
         End Sub
         '
         ' ----- alternate name
@@ -11317,7 +11317,7 @@ ErrorTrap:
         '
         Friend Sub log_appendLogPageNotFound(PageNotFoundLink As String)
             Try
-                Call logController.log_appendLog(Me, """" & FormatDateTime(app_startTime, vbGeneralDate) & """,""App=" & serverConfig.appConfig.name & """,""main_VisitId=" & authContext.visit.ID & """,""" & PageNotFoundLink & """,""Referrer=" & webServer.requestReferrer & """", "performance", "pagenotfound")
+                Call logController.appendLog(Me, """" & FormatDateTime(app_startTime, vbGeneralDate) & """,""App=" & serverConfig.appConfig.name & """,""main_VisitId=" & authContext.visit.ID & """,""" & PageNotFoundLink & """,""Referrer=" & webServer.requestReferrer & """", "performance", "pagenotfound")
             Catch ex As Exception
                 handleExceptionAndRethrow(ex)
             End Try
@@ -13669,7 +13669,7 @@ ErrorTrap:
                 '
                 ' append to daily trace log
                 '
-                logController.log_appendLog(Me, errMsg)
+                logController.appendLog(Me, errMsg)
                 '
                 ' add to doc exception list to display at top of webpage
                 '

@@ -555,14 +555,14 @@ Namespace Contensive.Core
                     End If
                     '
                     cpCore.blockExceptionReporting = False
-                    '
-                    '--------------------------------------------------------------------------
-                    ' ----- initialize server connection
-                    '--------------------------------------------------------------------------
-                    '
-                    If cpCore.domains.getDomainDbList.Contains("*") Then
-                        cpCore.domains.ServerMultiDomainMode = True
-                    End If
+                    '' -- servermultidomainmode not needed, so domainDbList not needed here
+                    ''--------------------------------------------------------------------------
+                    '' ----- initialize server connection
+                    ''--------------------------------------------------------------------------
+                    ''
+                    'If cpCore.domains.getDomainDbList.Contains("*") Then
+                    '    cpCore.domains.ServerMultiDomainMode = True
+                    'End If
                     '
                     '--------------------------------------------------------------------------
                     '   javascript cookie detect on page1 of all visits
@@ -875,7 +875,7 @@ Namespace Contensive.Core
                     '
                     'Call AppendLog("main_init(), 2300")
                     '
-                    If (RedirectLink = "") And (Not cpCore.domains.ServerMultiDomainMode) And (LCase(requestDomain) <> genericController.vbLCase(webServerIO_requestDomain)) Then
+                    If (RedirectLink = "") And (LCase(requestDomain) <> genericController.vbLCase(webServerIO_requestDomain)) Then
                         '
                         'Call AppendLog("main_init(), 2310 - exit in domain and path check")
                         '
@@ -1268,7 +1268,7 @@ ErrorTrap:
                         ' Go ahead and redirect
                         '
                         Copy = """" & FormatDateTime(cpCore.app_startTime, vbGeneralDate) & """,""" & requestDomain & """,""" & requestLinkSource & """,""" & NonEncodedLink & """,""" & RedirectReason & """"
-                        logController.log_appendLog(cpCore, Copy, "performance", "redirects")
+                        logController.appendLog(cpCore, Copy, "performance", "redirects")
                         '
                         If cpCore.testPointPrinting Then
                             '

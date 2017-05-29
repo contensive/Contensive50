@@ -143,7 +143,7 @@ Namespace Contensive
                     ' run tasks in task
                     '
                     Using cpCluster As New CPClass
-                        Using programDataFiles As New coreFileSystemClass(cpCluster.core, cpCluster.core.serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "clib\")
+                        Using programDataFiles As New fileController(cpCluster.core, cpCluster.core.serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.noSync, fileController.normalizePath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "clib\")
                             Dim JSONTemp = programDataFiles.readFile("serverConfig.json")
                             Dim serverConfig As Models.Entity.serverConfigModel = cpCluster.core.json.Deserialize(Of Models.Entity.serverConfigModel)(JSONTemp)
                             If (Not serverConfig.allowTaskRunnerService) Then
@@ -240,7 +240,7 @@ Namespace Contensive
         Private Sub appendLog(ByVal logText As String, Optional isImportant As Boolean = False)
             Using cp As New CPClass
                 If (isImportant Or allowVerboseLogging) Then
-                    logController.log_appendLog(cp.core, logText, "", "trace")
+                    logController.appendLog(cp.core, logText, "", "trace")
                 End If
                 If (allowConsoleWrite) Then
                     Console.WriteLine(logText)

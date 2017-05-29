@@ -10,71 +10,50 @@ Imports Contensive.Core.Controllers
 Imports Newtonsoft.Json
 
 Namespace Contensive.Core.Models.Entity
-    '
-    '====================================================================================================
-    ' entity model pattern
-    '   factory pattern load because if a record is not found, must rturn nothing
-    '   new() - empty constructor to allow deserialization
-    '   saveObject() - saves instance properties (nonstatic method)
-    '   create() - loads instance properties and returns a model 
-    '   delete() - deletes the record that matches the argument
-    '   getObjectList() - a pattern for creating model lists.
-    '   invalidateFIELDNAMEcache() - method to invalide the model cache. One per cache
-    '
-    '	1) set the primary content name in const cnPrimaryContent. avoid constants Like cnAddons used outside model
-    '	2) find-And-replace "_blankModel" with the name for this model
-    '	3) when adding model fields, add in three places: the Public Property, the saveObject(), the loadObject()
-    '	4) when adding create() methods to support other fields/combinations of fields, 
-    '       - add a secondary cache For that new create method argument in loadObjec()
-    '       - add it to the injected cachename list in loadObject()
-    '       - add an invalidate
-    '
-    ' Model Caching
-    '   caching applies to model objects only, not lists of models (for now)
-    '       - this is because of the challenge of invalidating the list object when individual records are added or deleted
-    '
-    '   a model should have 1 primary cache object which stores the data and can have other secondary cacheObjects which do not hold data
-    '    the cacheName of the 'primary' cacheObject for models and db records (cacheNamePrefix + ".id." + #id)
-    '    'secondary' cacheName is (cacheNamePrefix + . + fieldName + . + #)
-    '
-    '   cacheobjects can be used to hold data (primary cacheobjects), or to hold only metadata (secondary cacheobjects)
-    '       - primary cacheobjects are like 'personModel.id.99' that holds the model for id=99
-    '           - it is primary because the .primaryobject is null
-    '           - invalidationData. This cacheobject is invalid after this datetime
-    '           - dependentobjectlist() - this object is invalid if any of those objects are invalid
-    '       - secondary cachobjects are like 'person.ccguid.12345678'. It does not hold data, just a reference to the primary cacheobject
-    '
-    '   cacheNames spaces are replaced with underscores, so "addon collections" should be addon_collections
-    '
-    '   cacheNames that match content names are treated as caches of "any" record in the content, so invalidating "people" can be used to invalidate
-    '       any non-specific cache in the people table, by including "people" as a dependant cachename. the "people" cachename should not clear
-    '       specific people caches, like people.id.99, but can be used to clear lists of records like "staff_list_group"
-    '       - this can be used as a fallback strategy to cache record lists: a remote method list can be cached with a dependancy on "add-ons".
-    '       - models should always clear this content name cache entry on all cache clears
-    '
-    '   when a model is created, the code first attempts to read the model's cacheobject. if it fails, it builds it and saves the cache object and tags
-    '       - when building the model, is writes object to the primary cacheobject, and writes all the secondaries to be used
-    '       - when building the model, if a database record is opened, a dependantObject Tag is created for the tablename+'id'+id
-    '       - when building the model, if another model is added, that model returns its cachenames in the cacheNameList to be added as dependentObjects
-    '
-    '
-    Public Class _blankModel
+    Public Class contentModel
         '
         '-- const
-        Public Const primaryContentName As String = "" '<------ set content name
-        Private Const primaryContentTableName As String = "" '<------ set to tablename for the primary content (used for cache names)
+        Public Const primaryContentName As String = "content" '<------ set content name
+        Private Const primaryContentTableName As String = "cccontent" '<------ set to tablename for the primary content (used for cache names)
         Private Const primaryContentDataSource As String = "default" '<----- set to datasource if not default
         '
         ' -- instance properties
-        Public id As Integer
-        Public name As String
-        Public ccguid As String
-        '
-        Public foreignKey1Id As Integer ' <-- DELETE - sample field for create/delete patterns
-        Public foreignKey2Id As Integer ' <-- DELETE - sample field for create/delete patterns
-        '
-        ' -- publics not exposed to the UI (test/internal data)
-        <JsonIgnore> Public createKey As Integer
+        Public ID As Integer
+        Public Active As Boolean
+        Public AdminOnly As Boolean
+        Public AllowAdd As Boolean
+        Public AllowContentChildTool As Boolean
+        Public AllowContentTracking As Boolean
+        Public AllowDelete As Boolean
+        Public AllowMetaContent As Boolean
+        Public AllowTopicRules As Boolean
+        Public AllowWorkflowAuthoring As Boolean
+        Public AuthoringTableID As Integer
+        Public ccGuid As String
+        Public ContentCategoryID As Integer
+        Public ContentControlID As Integer
+        Public ContentTableID As Integer
+        Public CreatedBy As Integer
+        Public CreateKey As Integer
+        Public DateAdded As Date
+        Public DefaultSortMethodID As Integer
+        Public DeveloperOnly As Boolean
+        Public DropDownFieldList As String
+        Public EditArchive As Boolean
+        Public EditBlank As Boolean
+        Public EditorGroupID As Integer
+        Public EditSourceID As Integer
+        Public IconHeight As Integer
+        Public IconLink As String
+        Public IconSprites As Integer
+        Public IconWidth As Integer
+        Public InstalledByCollectionID As Integer
+        Public IsBaseContent As Boolean
+        Public ModifiedBy As Integer
+        Public ModifiedDate As Date
+        Public Name As String
+        Public ParentID As Integer
+        Public SortOrder As String
         '
         '====================================================================================================
         ''' <summary>
@@ -92,8 +71,8 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="cpCore"></param>
         ''' <param name="callersCacheNameList"></param>
         ''' <returns></returns>
-        Public Shared Function add(cpCore As coreClass, ByRef callersCacheNameList As List(Of String)) As _blankModel
-            Dim result As _blankModel = Nothing
+        Public Shared Function add(cpCore As coreClass, ByRef callersCacheNameList As List(Of String)) As contentModel
+            Dim result As contentModel = Nothing
             Try
                 result = create(cpCore, cpCore.db.metaData_InsertContentRecordGetID(primaryContentName, cpCore.authContext.user.ID), callersCacheNameList)
             Catch ex As Exception
@@ -110,12 +89,12 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="cp"></param>
         ''' <param name="recordId">The id of the record to be read into the new object</param>
         ''' <param name="callersCacheNameList">Any cachenames effected by this record will be added to this list. If the method consumer creates a cache object, add these cachenames to its dependent cachename list.</param>
-        Public Shared Function create(cpCore As coreClass, recordId As Integer, ByRef callersCacheNameList As List(Of String)) As _blankModel
-            Dim result As _blankModel = Nothing
+        Public Shared Function create(cpCore As coreClass, recordId As Integer, ByRef callersCacheNameList As List(Of String)) As contentModel
+            Dim result As contentModel = Nothing
             Try
                 If recordId > 0 Then
                     Dim cacheName As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", recordId.ToString())
-                    result = cpCore.cache.getObject(Of _blankModel)(cacheName)
+                    result = cpCore.cache.getObject(Of contentModel)(cacheName)
                     If (result Is Nothing) Then
                         Using cs As New csController(cpCore)
                             If cs.open(primaryContentName, "(id=" & recordId.ToString() & ")") Then
@@ -137,12 +116,12 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <param name="recordGuid"></param>
-        Public Shared Function create(cpCore As coreClass, recordGuid As String, ByRef callersCacheNameList As List(Of String)) As _blankModel
-            Dim result As _blankModel = Nothing
+        Public Shared Function create(cpCore As coreClass, recordGuid As String, ByRef callersCacheNameList As List(Of String)) As contentModel
+            Dim result As contentModel = Nothing
             Try
                 If Not String.IsNullOrEmpty(recordGuid) Then
                     Dim cacheName As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "ccguid", recordGuid)
-                    result = cpCore.cache.getObject(Of _blankModel)(cacheName)
+                    result = cpCore.cache.getObject(Of contentModel)(cacheName)
                     If (result Is Nothing) Then
                         Using cs As New csController(cpCore)
                             If cs.open(primaryContentName, "(ccGuid=" & cpCore.db.encodeSQLText(recordGuid) & ")") Then
@@ -164,11 +143,11 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <param name="foreignKey1Id"></param>
-        Public Shared Function create(cpCore As coreClass, foreignKey1Id As Integer, foreignKey2Id As Integer, ByRef callersCacheNameList As List(Of String)) As _blankModel
-            Dim result As _blankModel = Nothing
+        Public Shared Function create(cpCore As coreClass, foreignKey1Id As Integer, foreignKey2Id As Integer, ByRef callersCacheNameList As List(Of String)) As contentModel
+            Dim result As contentModel = Nothing
             Try
                 If ((foreignKey1Id > 0) And (foreignKey2Id > 0)) Then
-                    result = cpCore.cache.getObject(Of _blankModel)(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "foreignKey1", foreignKey1Id.ToString(), "foreignKey2", foreignKey2Id.ToString()))
+                    result = cpCore.cache.getObject(Of contentModel)(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "foreignKey1", foreignKey1Id.ToString(), "foreignKey2", foreignKey2Id.ToString()))
                     If (result Is Nothing) Then
                         Using cs As New csController(cpCore)
                             If cs.open(primaryContentName, "(foreignKey1=" & foreignKey1Id.ToString() & ")and(foreignKey1=" & foreignKey1Id.ToString() & ")") Then
@@ -190,18 +169,50 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <param name="sqlCriteria"></param>
-        Private Shared Function loadRecord(cpCore As coreClass, cs As csController, ByRef callersCacheNameList As List(Of String)) As _blankModel
-            Dim result As _blankModel = Nothing
+        Private Shared Function loadRecord(cpCore As coreClass, cs As csController, ByRef callersCacheNameList As List(Of String)) As contentModel
+            Dim result As contentModel = Nothing
             Try
                 If cs.ok() Then
-                    result = New _blankModel
+                    result = New contentModel
                     With result
                         '
                         ' -- populate result model
-                        .id = cs.getInteger("id")
-                        .name = cs.getText("name")
-                        .ccguid = cs.getText("ccGuid")
-                        .createKey = cs.getInteger("createKey")
+                        .ID = cs.getInteger("ID")
+                        .Active = cs.getBoolean("Active")
+                        .AdminOnly = cs.getBoolean("AdminOnly")
+                        .AllowAdd = cs.getBoolean("AllowAdd")
+                        .AllowContentChildTool = cs.getBoolean("AllowContentChildTool")
+                        .AllowContentTracking = cs.getBoolean("AllowContentTracking")
+                        .AllowDelete = cs.getBoolean("AllowDelete")
+                        .AllowMetaContent = cs.getBoolean("AllowMetaContent")
+                        .AllowTopicRules = cs.getBoolean("AllowTopicRules")
+                        .AllowWorkflowAuthoring = cs.getBoolean("AllowWorkflowAuthoring")
+                        .AuthoringTableID = cs.getInteger("AuthoringTableID")
+                        .ccGuid = cs.getText("ccGuid")
+                        .ContentCategoryID = cs.getInteger("ContentCategoryID")
+                        .ContentControlID = cs.getInteger("ContentControlID")
+                        .ContentTableID = cs.getInteger("ContentTableID")
+                        .CreatedBy = cs.getInteger("CreatedBy")
+                        .CreateKey = cs.getInteger("CreateKey")
+                        .DateAdded = cs.getDate("DateAdded")
+                        .DefaultSortMethodID = cs.getInteger("DefaultSortMethodID")
+                        .DeveloperOnly = cs.getBoolean("DeveloperOnly")
+                        .DropDownFieldList = cs.getText("DropDownFieldList")
+                        .EditArchive = cs.getBoolean("EditArchive")
+                        .EditBlank = cs.getBoolean("EditBlank")
+                        .EditorGroupID = cs.getInteger("EditorGroupID")
+                        .EditSourceID = cs.getInteger("EditSourceID")
+                        .IconHeight = cs.getInteger("IconHeight")
+                        .IconLink = cs.getText("IconLink")
+                        .IconSprites = cs.getInteger("IconSprites")
+                        .IconWidth = cs.getInteger("IconWidth")
+                        .InstalledByCollectionID = cs.getInteger("InstalledByCollectionID")
+                        .IsBaseContent = cs.getBoolean("IsBaseContent")
+                        .ModifiedBy = cs.getInteger("ModifiedBy")
+                        .ModifiedDate = cs.getDate("ModifiedDate")
+                        .Name = cs.getText("Name")
+                        .ParentID = cs.getInteger("ParentID")
+                        .SortOrder = cs.getText("SortOrder")
                     End With
                     If (result IsNot Nothing) Then
                         '
@@ -215,10 +226,6 @@ Namespace Contensive.Core.Models.Entity
                         Dim cacheName1 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "ccguid", result.ccguid)
                         callersCacheNameList.Add(cacheName1)
                         cpCore.cache.setSecondaryObject(cacheName1, cacheName0)
-                        '
-                        Dim cacheName2 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "foreignKey1", result.foreignKey1Id.ToString(), "foreignKey2", result.foreignKey2Id.ToString())
-                        callersCacheNameList.Add(cacheName2)
-                        cpCore.cache.setSecondaryObject(cacheName2, cacheName0)
                     End If
                 End If
             Catch ex As Exception
@@ -253,12 +260,42 @@ Namespace Contensive.Core.Models.Entity
                 End If
                 If cs.ok() Then
                     id = cs.getInteger("id")
-                    If (String.IsNullOrEmpty(ccguid)) Then
-                        ccguid = Controllers.genericController.getGUID()
-                    End If
-                    Call cs.setField("name", name)
-                    Call cs.setField("ccGuid", ccguid)
-                    Call cs.setField("createKey", createKey.ToString())
+                    cs.setField("Active", Active.ToString())
+                    cs.setField("AdminOnly", AdminOnly.ToString())
+                    cs.setField("AllowAdd", AllowAdd.ToString())
+                    cs.setField("AllowContentChildTool", AllowContentChildTool.ToString())
+                    cs.setField("AllowContentTracking", AllowContentTracking.ToString())
+                    cs.setField("AllowDelete", AllowDelete.ToString())
+                    cs.setField("AllowMetaContent", AllowMetaContent.ToString())
+                    cs.setField("AllowTopicRules", AllowTopicRules.ToString())
+                    cs.setField("AllowWorkflowAuthoring", AllowWorkflowAuthoring.ToString())
+                    cs.setField("AuthoringTableID", AuthoringTableID.ToString())
+                    cs.setField("ccGuid", ccGuid)
+                    cs.setField("ContentCategoryID", ContentCategoryID.ToString())
+                    cs.setField("ContentControlID", ContentControlID.ToString())
+                    cs.setField("ContentTableID", ContentTableID.ToString())
+                    cs.setField("CreatedBy", CreatedBy.ToString())
+                    cs.setField("CreateKey", CreateKey.ToString())
+                    cs.setField("DateAdded", DateAdded.ToString())
+                    cs.setField("DefaultSortMethodID", DefaultSortMethodID.ToString())
+                    cs.setField("DeveloperOnly", DeveloperOnly.ToString())
+                    cs.setField("DropDownFieldList", DropDownFieldList)
+                    cs.setField("EditArchive", EditArchive.ToString())
+                    cs.setField("EditBlank", EditBlank.ToString())
+                    cs.setField("EditorGroupID", EditorGroupID.ToString())
+                    cs.setField("EditSourceID", EditSourceID.ToString())
+                    cs.setField("IconHeight", IconHeight.ToString())
+                    cs.setField("IconLink", IconLink)
+                    cs.setField("IconSprites", IconSprites.ToString())
+                    cs.setField("IconWidth", IconWidth.ToString())
+                    cs.setField("InstalledByCollectionID", InstalledByCollectionID.ToString())
+                    cs.setField("IsBaseContent", IsBaseContent.ToString())
+                    cs.setField("ModifiedBy", ModifiedBy.ToString())
+                    cs.setField("ModifiedDate", ModifiedDate.ToString())
+                    cs.setField("Name", Name)
+                    cs.setField("ParentID", ParentID.ToString())
+                    cs.setField("SortOrder", SortOrder)
+                    If (String.IsNullOrEmpty(ccGuid)) Then ccGuid = Controllers.genericController.getGUID()
                 End If
                 Call cs.Close()
                 '
@@ -304,7 +341,7 @@ Namespace Contensive.Core.Models.Entity
         Public Shared Sub delete(cpCore As coreClass, ccguid As String)
             Try
                 If (Not String.IsNullOrEmpty(ccguid)) Then
-                    Dim instance As _blankModel = create(cpCore, ccguid, New List(Of String))
+                    Dim instance As contentModel = create(cpCore, ccguid, New List(Of String))
                     If (instance IsNot Nothing) Then
                         invalidatePrimaryCache(cpCore, instance.id)
                         cpCore.db.deleteContentRecords(primaryContentName, "(ccguid=" & cpCore.db.encodeSQLText(ccguid) & ")")
@@ -326,7 +363,7 @@ Namespace Contensive.Core.Models.Entity
         Public Shared Sub delete(cpCore As coreClass, foreignKey1Id As Integer, foreignKey2Id As Integer)
             Try
                 If (foreignKey2Id > 0) And (foreignKey1Id > 0) Then
-                    Dim instance As _blankModel = create(cpCore, foreignKey1Id, foreignKey2Id, New List(Of String))
+                    Dim instance As contentModel = create(cpCore, foreignKey1Id, foreignKey2Id, New List(Of String))
                     If (instance IsNot Nothing) Then
                         invalidatePrimaryCache(cpCore, instance.id)
                         cpCore.db.deleteTableRecord(primaryContentTableName, instance.id, primaryContentDataSource)
@@ -345,17 +382,19 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="cp"></param>
         ''' <param name="someCriteria"></param>
         ''' <returns></returns>
-        Public Shared Function createList_criteria(cpCore As coreClass, someCriteria As Integer, callersCacheNameList As List(Of String)) As List(Of _blankModel)
-            Dim result As New List(Of _blankModel)
+        Public Shared Function createDict(cpCore As coreClass, callersCacheNameList As List(Of String)) As Dictionary(Of Integer, contentModel)
+            Dim result As New Dictionary(Of Integer, contentModel)
             Try
                 Dim cs As New csController(cpCore)
                 Dim ignoreCacheNames As New List(Of String)
-                If (cs.open(primaryContentName, "(someCriteria=" & someCriteria & ")", "id")) Then
-                    Dim instance As _blankModel
+                '
+                ' -- use sql because this content is needed to create contentcontrolcriteria, so it recurses to neverland
+                If (cs.openSQL("select * from " & primaryContentTableName & " where (active>0)")) Then
+                    Dim instance As contentModel
                     Do
-                        instance = _blankModel.loadRecord(cpCore, cs, callersCacheNameList)
+                        instance = contentModel.loadRecord(cpCore, cs, callersCacheNameList)
                         If (instance IsNot Nothing) Then
-                            result.Add(instance)
+                            result.Add(instance.ID, instance)
                         End If
                         cs.goNext()
                     Loop While cs.ok()
@@ -403,7 +442,7 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="recordId"></param>record
         ''' <returns></returns>
         Public Shared Function getRecordName(cpcore As coreClass, recordId As Integer) As String
-            Return _blankModel.create(cpcore, recordId, New List(Of String)).name
+            Return contentModel.create(cpcore, recordId, New List(Of String)).name
         End Function
         '
         '====================================================================================================
@@ -414,7 +453,7 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="ccGuid"></param>record
         ''' <returns></returns>
         Public Shared Function getRecordName(cpcore As coreClass, ccGuid As String) As String
-            Return _blankModel.create(cpcore, ccGuid, New List(Of String)).name
+            Return contentModel.create(cpcore, ccGuid, New List(Of String)).name
         End Function
         '
         '====================================================================================================
@@ -425,13 +464,13 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="ccGuid"></param>record
         ''' <returns></returns>
         Public Shared Function getRecordId(cpcore As coreClass, ccGuid As String) As Integer
-            Return _blankModel.create(cpcore, ccGuid, New List(Of String)).id
+            Return contentModel.create(cpcore, ccGuid, New List(Of String)).id
         End Function
         '
         '====================================================================================================
         '
-        Public Shared Function createDefault(cpcore As coreClass) As _blankModel
-            Dim instance As New _blankModel
+        Public Shared Function createDefault(cpcore As coreClass) As contentModel
+            Dim instance As New contentModel
             Try
                 Dim CDef As coreMetaDataClass.CDefClass = cpcore.metaData.getCdef(primaryContentName)
                 If (CDef Is Nothing) Then
@@ -440,9 +479,41 @@ Namespace Contensive.Core.Models.Entity
                     Throw New ApplicationException("content [" & primaryContentName & "] could Not be found.")
                 Else
                     With CDef
-                        instance.ccguid = .fields("ccguid").defaultValue
-                        instance.createKey = genericController.EncodeInteger(.fields("createKey").defaultValue)
-                        instance.name = .fields("name").defaultValue
+                        instance.Active = genericController.EncodeBoolean(.fields("Active").defaultValue)
+                        instance.AdminOnly = genericController.EncodeBoolean(.fields("AdminOnly").defaultValue)
+                        instance.AllowAdd = genericController.EncodeBoolean(.fields("AllowAdd").defaultValue)
+                        instance.AllowContentChildTool = genericController.EncodeBoolean(.fields("AllowContentChildTool").defaultValue)
+                        instance.AllowContentTracking = genericController.EncodeBoolean(.fields("AllowContentTracking").defaultValue)
+                        instance.AllowDelete = genericController.EncodeBoolean(.fields("AllowDelete").defaultValue)
+                        instance.AllowMetaContent = genericController.EncodeBoolean(.fields("AllowMetaContent").defaultValue)
+                        instance.AllowTopicRules = genericController.EncodeBoolean(.fields("AllowTopicRules").defaultValue)
+                        instance.AllowWorkflowAuthoring = genericController.EncodeBoolean(.fields("AllowWorkflowAuthoring").defaultValue)
+                        instance.AuthoringTableID = genericController.EncodeInteger(.fields("AuthoringTableID").defaultValue)
+                        instance.ccGuid = genericController.encodeText(.fields("ccGuid").defaultValue)
+                        instance.ContentCategoryID = genericController.EncodeInteger(.fields("ContentCategoryID").defaultValue)
+                        instance.ContentControlID = CDef.Id
+                        instance.ContentTableID = genericController.EncodeInteger(.fields("ContentTableID").defaultValue)
+                        instance.CreatedBy = genericController.EncodeInteger(.fields("CreatedBy").defaultValue)
+                        instance.CreateKey = genericController.EncodeInteger(.fields("CreateKey").defaultValue)
+                        instance.DateAdded = genericController.EncodeDate(.fields("DateAdded").defaultValue)
+                        instance.DefaultSortMethodID = genericController.EncodeInteger(.fields("DefaultSortMethodID").defaultValue)
+                        instance.DeveloperOnly = genericController.EncodeBoolean(.fields("DeveloperOnly").defaultValue)
+                        instance.DropDownFieldList = genericController.encodeText(.fields("DropDownFieldList").defaultValue)
+                        instance.EditArchive = genericController.EncodeBoolean(.fields("EditArchive").defaultValue)
+                        instance.EditBlank = genericController.EncodeBoolean(.fields("EditBlank").defaultValue)
+                        instance.EditorGroupID = genericController.EncodeInteger(.fields("EditorGroupID").defaultValue)
+                        instance.EditSourceID = genericController.EncodeInteger(.fields("EditSourceID").defaultValue)
+                        instance.IconHeight = genericController.EncodeInteger(.fields("IconHeight").defaultValue)
+                        instance.IconLink = genericController.encodeText(.fields("IconLink").defaultValue)
+                        instance.IconSprites = genericController.EncodeInteger(.fields("IconSprites").defaultValue)
+                        instance.IconWidth = genericController.EncodeInteger(.fields("IconWidth").defaultValue)
+                        instance.InstalledByCollectionID = genericController.EncodeInteger(.fields("InstalledByCollectionID").defaultValue)
+                        instance.IsBaseContent = genericController.EncodeBoolean(.fields("IsBaseContent").defaultValue)
+                        instance.ModifiedBy = genericController.EncodeInteger(.fields("ModifiedBy").defaultValue)
+                        instance.ModifiedDate = genericController.EncodeDate(.fields("ModifiedDate").defaultValue)
+                        instance.Name = genericController.encodeText(.fields("Name").defaultValue)
+                        instance.ParentID = genericController.EncodeInteger(.fields("ParentID").defaultValue)
+                        instance.SortOrder = genericController.encodeText(.fields("SortOrder").defaultValue)
                     End With
                 End If
             Catch ex As Exception

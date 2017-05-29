@@ -640,7 +640,7 @@ Namespace Contensive.Core.Controllers
                             '
                             ' This addon is running, can not reenter
                             '
-                            Call logController.log_appendLog(cpCore, "addon_execute, Addon [" & AddonName & "] was called by itself. This is not allowed. AddonID [" & addonId & "], AddonNameOrGuid [" & AddonNameOrGuid_Local & "]")
+                            Call logController.appendLog(cpCore, "addon_execute, Addon [" & AddonName & "] was called by itself. This is not allowed. AddonID [" & addonId & "], AddonNameOrGuid [" & AddonNameOrGuid_Local & "]")
                         Else
                             cpCore.addonsCurrentlyRunningIdList.Add(addonId)
                             'csv_addon_execute_AddonsCurrentlyRunningIdList = csv_addon_execute_AddonsCurrentlyRunningIdList & "," & addonId

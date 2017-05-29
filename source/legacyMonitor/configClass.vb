@@ -315,7 +315,7 @@ ErrorTrap:
             ErrNumber = Err.Number
             ErrSource = Err.Source
             ErrDescription = Err.Description
-            logController.log_appendLog(cpCore, getAppExeName() & ".ConfigClass." & MethodName & "[" & ErrorMessage & "]-[" & ErrSource & " #" & ErrNumber & ", " & ErrDescription & "]", "Monitor")
+            logController.appendLog(cpCore, getAppExeName() & ".ConfigClass." & MethodName & "[" & ErrorMessage & "]-[" & ErrSource & " #" & ErrNumber & ", " & ErrDescription & "]", "Monitor")
             Err.Clear()
         End Sub
     End Class

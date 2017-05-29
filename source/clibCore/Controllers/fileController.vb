@@ -2,14 +2,18 @@
 Option Explicit On
 Option Strict On
 
-Imports Contensive.Core.Controllers
-Imports Contensive.Core.Controllers.genericController
 Imports System.IO
 Imports ICSharpCode.SharpZipLib.Core
 Imports ICSharpCode.SharpZipLib.Zip
 Imports Contensive.Core
-
-Namespace Contensive.Core
+Imports Contensive.BaseClasses
+Imports Contensive.Core.Controllers
+Imports Contensive.Core.Controllers.genericController
+Imports Contensive.Core.Models
+Imports Contensive.Core.Models.Context
+Imports Contensive.Core.Models.Entity
+'
+Namespace Contensive.Core.Controllers
     '
     '==============================================================================================================
     ''' <summary>
@@ -27,7 +31,7 @@ Namespace Contensive.Core
     '''       save - saves to a local folder, copied to S3 folder without public access, other webRoles copy changed files
     '''       read - read from local folder
     ''' </summary>
-    Public Class coreFileSystemClass
+    Public Class fileController
         Implements IDisposable
         '
         '====================================================================================================
@@ -405,7 +409,7 @@ Namespace Contensive.Core
         '   Copies a file to another location
         '========================================================================
         '
-        Public Sub copyFile(ByVal srcPathFilename As String, ByVal dstPathFilename As String, Optional dstFileSystem As coreFileSystemClass = Nothing)
+        Public Sub copyFile(ByVal srcPathFilename As String, ByVal dstPathFilename As String, Optional dstFileSystem As fileController = Nothing)
             Try
                 Dim dstPath As String = ""
                 Dim dstFilename As String = ""
@@ -664,7 +668,7 @@ Namespace Contensive.Core
         '
         ' copy one folder to another, include subfolders
         '
-        Public Sub copyFolder(ByVal srcPath As String, ByVal dstPath As String, Optional dstFileSystem As coreFileSystemClass = Nothing)
+        Public Sub copyFolder(ByVal srcPath As String, ByVal dstPath As String, Optional dstFileSystem As fileController = Nothing)
             Try
                 If Not isLocal Then
                     '
@@ -864,7 +868,7 @@ Namespace Contensive.Core
 
         '
         '====================================================================================================
-        public function isinPhysicalPath(path As String) As Boolean
+        Public Function isinPhysicalPath(path As String) As Boolean
             Return (normalizePath(path).ToLower().IndexOf(rootLocalPath.ToLower()) = 0)
         End Function
         '
@@ -902,7 +906,7 @@ Namespace Contensive.Core
                 If cpCore.docProperties.containsKey(key) Then
                     With cpCore.docProperties.getProperty(key)
                         If (.IsFile) And (.Name.ToLower() = key) Then
-                            Dim returnPathFilename As String = coreFileSystemClass.normalizePath(path)
+                            Dim returnPathFilename As String = fileController.normalizePath(path)
                             returnFilename = encodeFilename(.Value)
                             returnPathFilename &= returnFilename
                             Call deleteFile(returnPathFilename)

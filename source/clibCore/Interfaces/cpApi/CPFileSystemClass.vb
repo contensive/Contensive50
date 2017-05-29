@@ -1,5 +1,6 @@
 
 Imports Contensive.BaseClasses
+Imports Contensive.Core.Controllers
 Imports System.Runtime.InteropServices
 
 Namespace Contensive.Core
@@ -24,14 +25,14 @@ Namespace Contensive.Core
         Private core As Contensive.Core.coreClass
         Protected disposed As Boolean = False
         '
-        Private fileSystem As Core.coreFileSystemClass
+        Private fileSystem As fileController
         '
         '==========================================================================================
         ''' <summary>
         ''' Constructor
         ''' </summary>
         ''' <param name="core"></param>
-        Public Sub New(ByVal core As Contensive.Core.coreClass, fileSystem As coreFileSystemClass)
+        Public Sub New(ByVal core As Contensive.Core.coreClass, fileSystem As fileController)
             MyBase.New()
             Me.core = core
             Me.fileSystem = fileSystem

@@ -266,11 +266,11 @@ Namespace Contensive.Core
 
 
         Public Overrides Sub AppendLog(ByVal logFolder As String, ByVal Text As String)
-            logController.log_appendLog(CP.core, Text, logFolder)
+            logController.appendLog(CP.core, Text, logFolder)
         End Sub
 
         Public Overrides Sub AppendLog(ByVal Text As String)
-            logController.log_appendLog(CP.core, Text)
+            logController.appendLog(CP.core, Text)
         End Sub
 
         Public Overrides Function ConvertLinkToShortLink(ByVal URL As String, ByVal ServerHost As String, ByVal ServerVirtualPath As String) As String

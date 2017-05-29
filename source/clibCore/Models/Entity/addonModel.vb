@@ -6,15 +6,57 @@ Imports System
 Imports System.Collections.Generic
 Imports System.Text
 Imports Contensive.BaseClasses
+Imports Contensive.Core.Controllers
+Imports Newtonsoft.Json
 
 Namespace Contensive.Core.Models.Entity
     '
     '====================================================================================================
-    ' cached entity model pattern
-    '   factory pattern creator, constructor is a shared method that returns a loaded object
-    '   new() - to allow deserialization (so all methods must pass in cp)
-    '   shared getObject( cp, id ) - returns loaded model
-    '   saveObject( cp ) - saves instance properties, returns the record id
+    ' entity model pattern
+    '   factory pattern load because if a record is not found, must rturn nothing
+    '   new() - empty constructor to allow deserialization
+    '   saveObject() - saves instance properties (nonstatic method)
+    '   create() - loads instance properties and returns a model 
+    '   delete() - deletes the record that matches the argument
+    '   getObjectList() - a pattern for creating model lists.
+    '   invalidateFIELDNAMEcache() - method to invalide the model cache. One per cache
+    '
+    '	1) set the primary content name in const cnPrimaryContent. avoid constants Like cnAddons used outside model
+    '	2) find-And-replace "addonModel" with the name for this model
+    '	3) when adding model fields, add in three places: the Public Property, the saveObject(), the loadObject()
+    '	4) when adding create() methods to support other fields/combinations of fields, 
+    '       - add a secondary cache For that new create method argument in loadObjec()
+    '       - add it to the injected cachename list in loadObject()
+    '       - add an invalidate
+    '
+    ' Model Caching
+    '   caching applies to model objects only, not lists of models (for now)
+    '       - this is because of the challenge of invalidating the list object when individual records are added or deleted
+    '
+    '   a model should have 1 primary cache object which stores the data and can have other secondary cacheObjects which do not hold data
+    '    the cacheName of the 'primary' cacheObject for models and db records (cacheNamePrefix + ".id." + #id)
+    '    'secondary' cacheName is (cacheNamePrefix + . + fieldName + . + #)
+    '
+    '   cacheobjects can be used to hold data (primary cacheobjects), or to hold only metadata (secondary cacheobjects)
+    '       - primary cacheobjects are like 'personModel.id.99' that holds the model for id=99
+    '           - it is primary because the .primaryobject is null
+    '           - invalidationData. This cacheobject is invalid after this datetime
+    '           - dependentobjectlist() - this object is invalid if any of those objects are invalid
+    '       - secondary cachobjects are like 'person.ccguid.12345678'. It does not hold data, just a reference to the primary cacheobject
+    '
+    '   cacheNames spaces are replaced with underscores, so "addon collections" should be addon_collections
+    '
+    '   cacheNames that match content names are treated as caches of "any" record in the content, so invalidating "people" can be used to invalidate
+    '       any non-specific cache in the people table, by including "people" as a dependant cachename. the "people" cachename should not clear
+    '       specific people caches, like people.id.99, but can be used to clear lists of records like "staff_list_group"
+    '       - this can be used as a fallback strategy to cache record lists: a remote method list can be cached with a dependancy on "add-ons".
+    '       - models should always clear this content name cache entry on all cache clears
+    '
+    '   when a model is created, the code first attempts to read the model's cacheobject. if it fails, it builds it and saves the cache object and tags
+    '       - when building the model, is writes object to the primary cacheobject, and writes all the secondaries to be used
+    '       - when building the model, if a database record is opened, a dependantObject Tag is created for the tablename+'id'+id
+    '       - when building the model, if another model is added, that model returns its cachenames in the cacheNameList to be added as dependentObjects
+    '
     '
     Public Class addonModel
         '
@@ -23,87 +65,76 @@ Namespace Contensive.Core.Models.Entity
         Private Const primaryContentTableName As String = "ccaggregatefunctions" '<------ set to tablename for the primary content (used for cache names)
         Private Const primaryContentDataSource As String = "default" '<----- set to datasource if not default
         '
-        ' -- instance properties
-        '
-        Public id As Integer = 0
-        Public name As String = String.Empty
-        Public active As Boolean = False
-        Public sortorder As String = String.Empty
-        Public dateadded As Date = Date.MinValue
-        Public createdby As Integer = 0
-        Public modifieddate As Date = Date.MinValue
-        Public modifiedby As Integer = 0
-        Public ContentControlID As Integer = 0
-        Public CreateKey As Integer = 0
-        Public EditSourceID As Integer = 0
-        Public EditArchive As Boolean = False
-        Public EditBlank As Boolean = False
-        Public ContentCategoryID As Integer = 0
-        Public ccGuid As String = String.Empty
-        Public onpagestartevent As Boolean = False
-        Public blockdefaultstyles As Boolean = False
-        Public iconheight As Integer = 0
-        Public iconwidth As Integer = 0
-        Public customstylesfilename As String = String.Empty
-        Public iconsprites As Integer = 0
-        Public javascriptbodyend As String = String.Empty
-        Public onnewvisitevent As Boolean = False
-        Public remotemethod As Boolean = False
-        Public copytext As String = String.Empty
-        Public sharedstyles As String = String.Empty
-        Public stylesfilename As String = String.Empty
-        Public otherheadtags As String = String.Empty
-        Public metakeywordlist As String = String.Empty
-        Public onpageendevent As Boolean = False
-        Public pagetitle As String = String.Empty
-        Public iconfilename As String = String.Empty
-        Public javascriptonload As String = String.Empty
-        Public admin As Boolean = False
-        Public content As Boolean = False
-        Public template As Boolean = False
-        Public email As Boolean = False
-        Public helplink As String = String.Empty
-        Public navtypeid As Integer = 0
-        Public help As String = String.Empty
-        Public metadescription As String = String.Empty
-        Public scriptingcode As String = String.Empty
-        Public scriptingtimeout As String = String.Empty
-        Public inlinescript As String = String.Empty
-        Public collectionid As Integer = 0
-        Public onbodystart As Boolean = False
-        Public fieldtypeeditor As String = String.Empty
-        Public isinline As Boolean = False
-        Public dotnetclass As String = String.Empty
-        Public copy As String = String.Empty
-        Public argumentlist As String = String.Empty
-        Public link As String = String.Empty
-        Public onbodyend As Boolean = False
-        Public objectprogramid As String = String.Empty
-        Public jsfilename As String = String.Empty
-        Public robotstxt As String = String.Empty
-        Public includedaddons As String = String.Empty
-        Public formxml As String = String.Empty
-        Public inframe As Boolean = False
-        Public filter As Boolean = False
-        Public scriptinglanguageid As Integer = 0
-        Public remoteassetlink As String = String.Empty
-        Public blockedittools As Boolean = False
-        Public asajax As Boolean = False
-        Public processserverkey As String = String.Empty
-        Public processinterval As Integer = 0
-        Public processrunonce As Boolean = False
-        Public processnextrun As Date = Date.MinValue
-        Public processcontenttriggers As String = String.Empty
-        Public scriptingentrypoint As String = String.Empty
-        Public scriptingmodules As String = String.Empty
-        Public events As String = String.Empty
-        '
-        ' -- list of tag names that will flush the cache
-        Public Shared ReadOnly Property cacheTagList As String = "Aggregate Functions"
+        Public ID As Integer
+        Public Active As Boolean
+        Public Admin As Boolean
+        Public ArgumentList As String
+        Public AsAjax As Boolean
+        Public BlockDefaultStyles As Boolean
+        Public BlockEditTools As Boolean
+        Public ccGuid As String
+        Public CollectionID As Integer
+        Public Content As Boolean
+        Public ContentCategoryID As Integer
+        Public ContentControlID As Integer
+        Public Copy As String
+        Public CopyText As String
+        Public CreatedBy As Integer
+        Public CreateKey As Integer
+        Public CustomStylesFilename As String
+        Public DateAdded As Date
+        Public DotNetClass As String
+        Public EditArchive As Boolean
+        Public EditBlank As Boolean
+        Public EditSourceID As Integer
+        Public Email As Boolean
+        Public Filter As Boolean
+        Public FormXML As String
+        Public Help As String
+        Public HelpLink As String
+        Public IconFilename As String
+        Public IconHeight As Integer
+        Public IconSprites As Integer
+        Public IconWidth As Integer
+        Public InFrame As Boolean
+        Public inlineScript As String
+        Public IsInline As Boolean
+        Public JavaScriptBodyEnd As String
+        Public JavaScriptOnLoad As String
+        Public JSFilename As String
+        Public Link As String
+        Public MetaDescription As String
+        Public MetaKeywordList As String
+        Public ModifiedBy As Integer
+        Public ModifiedDate As Date
+        Public Name As String
+        Public NavTypeID As Integer
+        Public ObjectProgramID As String
+        Public OnBodyEnd As Boolean
+        Public OnBodyStart As Boolean
+        Public OnNewVisitEvent As Boolean
+        Public OnPageEndEvent As Boolean
+        Public OnPageStartEvent As Boolean
+        Public OtherHeadTags As String
+        Public PageTitle As String
+        Public ProcessInterval As Integer
+        Public ProcessNextRun As Date
+        Public ProcessRunOnce As Boolean
+        Public ProcessServerKey As String
+        Public RemoteAssetLink As String
+        Public RemoteMethod As Boolean
+        Public RobotsTxt As String
+        Public ScriptingCode As String
+        Public ScriptingEntryPoint As String
+        Public ScriptingLanguageID As Integer
+        Public ScriptingTimeout As String
+        Public SortOrder As String
+        Public StylesFilename As String
+        Public Template As Boolean
         '
         '====================================================================================================
         ''' <summary>
-        ''' Create an empty object. needed for deserialization. Use newModel() method as constructor, includes cache
+        ''' Create an empty object. needed for deserialization
         ''' </summary>
         Public Sub New()
             '
@@ -111,352 +142,564 @@ Namespace Contensive.Core.Models.Entity
         '
         '====================================================================================================
         ''' <summary>
-        ''' Open existing
+        ''' add a new recod to the db and open it. Starting a new model with this method will use the default
+        ''' values in Contensive metadata (active, contentcontrolid, etc)
         ''' </summary>
-        ''' <param name="cp"></param>
-        ''' <param name="recordId"></param>
-        Public Shared Function getObject(cpcore As coreClass, recordId As Integer, ByRef adminMessageList As List(Of String)) As addonModel
-            Dim returnModel As addonModel = Nothing
-            Try
-                Dim recordCacheName As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", recordId.ToString)
-                returnModel = cpcore.cache.getObject(Of addonModel)(recordCacheName)
-                If (returnModel Is Nothing) Then
-                    returnModel = getObjectNoCache(cpcore, recordId)
-                    Call cpcore.cache.setObject(recordCacheName, returnModel, cacheTagList)
-                End If
-                'Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer
-                'Dim recordCacheName As String = primaryContentName & "CachedModelRecordId" & recordId
-                'Dim recordCache As String = cpcore.cache.getString(recordCacheName)
-                'Dim loadDbModel As Boolean = True
-                'If Not String.IsNullOrEmpty(recordCache) Then
-                '    Try
-                '        returnModel = json_serializer.Deserialize(Of addonModel)(recordCache)
-                '        '
-                '        ' -- if model exposes any objects, verify they are created
-                '        'If (returnModel.meetingItemList Is Nothing) Then
-                '        '    returnModel.meetingItemList = New List(Of meetingItemModel)
-                '        'End If
-                '        loadDbModel = False
-                '    Catch ex As Exception
-                '        'ignore error - just roll through to rebuild model and save new cache
-                '    End Try
-                'End If
-                'If loadDbModel Or (returnModel Is Nothing) Then
-                '    returnModel = getObjectNoCache(cpcore, recordId)
-                '    Call cpcore.cache.setObject(recordCacheName, json_serializer.Serialize(returnModel), cacheTagList)
-                'End If
-            Catch ex As Exception
-                cpcore.handleExceptionAndRethrow(ex)
-            End Try
-            Return returnModel
-        End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' called only from getObject. Load the model from the Db without cache. If there are any properties or objects that cannot be used from cache, do not include them here either, load in getObject()
-        ''' </summary>
-        ''' <param name="recordId"></param>
-        Private Shared Function getObjectNoCache(cpcore As coreClass, recordId As Integer) As addonModel
-            Dim returnNewModel As New addonModel()
-            Try
-                Dim cs As New csController(cpcore)
-                returnNewModel.id = 0
-                If recordId <> 0 Then
-                    cs.open(primaryContentName, "(ID=" & recordId & ")")
-                    If cs.ok() Then
-                        With returnNewModel
-                            .id = recordId
-                            .name = cs.getText("Name")
-                            .active = cs.getBoolean("active")
-                            .sortorder = cs.getText("sortorder")
-                            .dateadded = cs.getDate("dateadded")
-                            .createdby = cs.getInteger("createdby")
-                            .modifieddate = cs.getDate("modifieddate")
-                            .modifiedby = cs.getInteger("modifiedby")
-                            .ContentControlID = cs.getInteger("ContentControlID")
-                            .CreateKey = cs.getInteger("CreateKey")
-                            .EditSourceID = cs.getInteger("EditSourceID")
-                            .EditArchive = cs.getBoolean("EditArchive")
-                            .EditBlank = cs.getBoolean("EditBlank")
-                            .ContentCategoryID = cs.getInteger("ContentCategoryID")
-                            .ccGuid = cs.getText("ccGuid")
-                            .onpagestartevent = cs.getBoolean("onpagestartevent")
-                            .blockdefaultstyles = cs.getBoolean("blockdefaultstyles")
-                            .iconheight = cs.getInteger("iconheight")
-                            .iconwidth = cs.getInteger("iconwidth")
-                            .customstylesfilename = cs.getText("customstylesfilename")
-                            .iconsprites = cs.getInteger("iconsprites")
-                            .javascriptbodyend = cs.getText("javascriptbodyend")
-                            .onnewvisitevent = cs.getBoolean("onnewvisitevent")
-                            .remotemethod = cs.getBoolean("remotemethod")
-                            .copytext = cs.getText("copytext")
-                            .sharedstyles = cs.getText("sharedstyles")
-                            .stylesfilename = cs.getText("stylesfilename")
-                            .otherheadtags = cs.getText("otherheadtags")
-                            .metakeywordlist = cs.getText("metakeywordlist")
-                            .onpageendevent = cs.getBoolean("onpageendevent")
-                            .pagetitle = cs.getText("pagetitle")
-                            .iconfilename = cs.getText("iconfilename")
-                            .javascriptonload = cs.getText("javascriptonload")
-                            .admin = cs.getBoolean("admin")
-                            .content = cs.getBoolean("content")
-                            .template = cs.getBoolean("template")
-                            .email = cs.getBoolean("email")
-                            .helplink = cs.getText("helplink")
-                            .navtypeid = cs.getInteger("navtypeid")
-                            .help = cs.getText("help")
-                            .metadescription = cs.getText("metadescription")
-                            .scriptingcode = cs.getText("scriptingcode")
-                            .scriptingtimeout = cs.getText("scriptingtimeout")
-                            .inlinescript = cs.getText("inlinescript")
-                            .collectionid = cs.getInteger("collectionid")
-                            .onbodystart = cs.getBoolean("onbodystart")
-                            .fieldtypeeditor = cs.getText("fieldtypeeditor")
-                            .isinline = cs.getBoolean("isinline")
-                            .dotnetclass = cs.getText("dotnetclass")
-                            .copy = cs.getText("copy")
-                            .argumentlist = cs.getText("argumentlist")
-                            .link = cs.getText("link")
-                            .onbodyend = cs.getBoolean("onbodyend")
-                            .objectprogramid = cs.getText("objectprogramid")
-                            .jsfilename = cs.getText("jsfilename")
-                            .robotstxt = cs.getText("robotstxt")
-                            .includedaddons = cs.getText("includedaddons")
-                            .formxml = cs.getText("formxml")
-                            .inframe = cs.getBoolean("inframe")
-                            .filter = cs.getBoolean("filter")
-                            .scriptinglanguageid = cs.getInteger("scriptinglanguageid")
-                            .remoteassetlink = cs.getText("remoteassetlink")
-                            .blockedittools = cs.getBoolean("blockedittools")
-                            .asajax = cs.getBoolean("asajax")
-                            .processserverkey = cs.getText("processserverkey")
-                            .processinterval = cs.getInteger("processinterval")
-                            .processrunonce = cs.getBoolean("processrunonce")
-                            .processnextrun = cs.getDate("processnextrun")
-                            .processcontenttriggers = cs.getText("processcontenttriggers")
-                            .scriptingentrypoint = cs.getText("scriptingentrypoint")
-                            .scriptingmodules = cs.getText("scriptingmodules")
-                            .events = cs.getText("events")
-                        End With
-                    End If
-                    Call cs.Close()
-                End If
-            Catch ex As Exception
-                cpcore.handleExceptionAndRethrow(ex)
-            End Try
-            Return returnNewModel
-        End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Save the object
-        ''' </summary>
-        ''' <param name="cp"></param>
+        ''' <param name="cpCore"></param>
+        ''' <param name="callersCacheNameList"></param>
         ''' <returns></returns>
-        Public Function saveObject(cpcore As coreClass) As Integer
+        Public Shared Function add(cpCore As coreClass, ByRef callersCacheNameList As List(Of String)) As addonModel
+            Dim result As addonModel = Nothing
             Try
-                Dim cs As New csController(cpcore)
-                If (id > 0) Then
-                    If Not cs.open(primaryContentName, "id=" & id) Then
-                        id = 0
+                result = create(cpCore, cpCore.db.metaData_InsertContentRecordGetID(primaryContentName, cpCore.authContext.user.ID), callersCacheNameList)
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+                Throw
+            End Try
+            Return result
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' return a new model with the data selected. All cacheNames related to the object will be added to the cacheNameList.
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="recordId">The id of the record to be read into the new object</param>
+        ''' <param name="callersCacheNameList">Any cachenames effected by this record will be added to this list. If the method consumer creates a cache object, add these cachenames to its dependent cachename list.</param>
+        Public Shared Function create(cpCore As coreClass, recordId As Integer, ByRef callersCacheNameList As List(Of String)) As addonModel
+            Dim result As addonModel = Nothing
+            Try
+                If recordId > 0 Then
+                    Dim cacheName As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", recordId.ToString())
+                    result = cpCore.cache.getObject(Of addonModel)(cacheName)
+                    If (result Is Nothing) Then
+                        Using cs As New csController(cpCore)
+                            If cs.open(primaryContentName, "(id=" & recordId.ToString() & ")") Then
+                                result = loadRecord(cpCore, cs, callersCacheNameList)
+                            End If
+                        End Using
+                    End If
+                End If
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+                Throw
+            End Try
+            Return result
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' open an existing object
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="recordGuid"></param>
+        Public Shared Function create(cpCore As coreClass, recordGuid As String, ByRef callersCacheNameList As List(Of String)) As addonModel
+            Dim result As addonModel = Nothing
+            Try
+                If Not String.IsNullOrEmpty(recordGuid) Then
+                    Dim cacheName As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "ccguid", recordGuid)
+                    result = cpCore.cache.getObject(Of addonModel)(cacheName)
+                    If (result Is Nothing) Then
+                        Using cs As New csController(cpCore)
+                            If cs.open(primaryContentName, "(ccGuid=" & cpCore.db.encodeSQLText(recordGuid) & ")") Then
+                                result = loadRecord(cpCore, cs, callersCacheNameList)
+                            End If
+                        End Using
+                    End If
+                End If
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+                Throw
+            End Try
+            Return result
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' template for open an existing object with multiple keys (like a rule)
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="foreignKey1Id"></param>
+        Public Shared Function create(cpCore As coreClass, foreignKey1Id As Integer, foreignKey2Id As Integer, ByRef callersCacheNameList As List(Of String)) As addonModel
+            Dim result As addonModel = Nothing
+            Try
+                If ((foreignKey1Id > 0) And (foreignKey2Id > 0)) Then
+                    result = cpCore.cache.getObject(Of addonModel)(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "foreignKey1", foreignKey1Id.ToString(), "foreignKey2", foreignKey2Id.ToString()))
+                    If (result Is Nothing) Then
+                        Using cs As New csController(cpCore)
+                            If cs.open(primaryContentName, "(foreignKey1=" & foreignKey1Id.ToString() & ")and(foreignKey1=" & foreignKey1Id.ToString() & ")") Then
+                                result = loadRecord(cpCore, cs, callersCacheNameList)
+                            End If
+                        End Using
+                    End If
+                End If
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+                Throw
+            End Try
+            Return result
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' open an existing object
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="sqlCriteria"></param>
+        Private Shared Function loadRecord(cpCore As coreClass, cs As csController, ByRef callersCacheNameList As List(Of String)) As addonModel
+            Dim result As addonModel = Nothing
+            Try
+                If cs.ok() Then
+                    result = New addonModel
+                    With result
+                        '
+                        ' -- populate result model
+                        .ID = cs.getInteger("ID")
+                        .Active = cs.getBoolean("Active")
+                        .Admin = cs.getBoolean("Admin")
+                        .ArgumentList = cs.getText("ArgumentList")
+                        .AsAjax = cs.getBoolean("AsAjax")
+                        .BlockDefaultStyles = cs.getBoolean("BlockDefaultStyles")
+                        .BlockEditTools = cs.getBoolean("BlockEditTools")
+                        .ccGuid = cs.getText("ccGuid")
+                        .CollectionID = cs.getInteger("CollectionID")
+                        .Content = cs.getBoolean("Content")
+                        .ContentCategoryID = cs.getInteger("ContentCategoryID")
+                        .ContentControlID = cs.getInteger("ContentControlID")
+                        .Copy = cs.getText("Copy")
+                        .CopyText = cs.getText("CopyText")
+                        .CreatedBy = cs.getInteger("CreatedBy")
+                        .CreateKey = cs.getInteger("CreateKey")
+                        .CustomStylesFilename = cs.getText("CustomStylesFilename")
+                        .DateAdded = cs.getDate("DateAdded")
+                        .DotNetClass = cs.getText("DotNetClass")
+                        .EditArchive = cs.getBoolean("EditArchive")
+                        .EditBlank = cs.getBoolean("EditBlank")
+                        .EditSourceID = cs.getInteger("EditSourceID")
+                        .Email = cs.getBoolean("Email")
+                        .Filter = cs.getBoolean("Filter")
+                        .FormXML = cs.getText("FormXML")
+                        .Help = cs.getText("Help")
+                        .HelpLink = cs.getText("HelpLink")
+                        .IconFilename = cs.getText("IconFilename")
+                        .IconHeight = cs.getInteger("IconHeight")
+                        .IconSprites = cs.getInteger("IconSprites")
+                        .IconWidth = cs.getInteger("IconWidth")
+                        .InFrame = cs.getBoolean("InFrame")
+                        .inlineScript = cs.getText("inlineScript")
+                        .IsInline = cs.getBoolean("IsInline")
+                        .JavaScriptBodyEnd = cs.getText("JavaScriptBodyEnd")
+                        .JavaScriptOnLoad = cs.getText("JavaScriptOnLoad")
+                        .JSFilename = cs.getText("JSFilename")
+                        .Link = cs.getText("Link")
+                        .MetaDescription = cs.getText("MetaDescription")
+                        .MetaKeywordList = cs.getText("MetaKeywordList")
+                        .ModifiedBy = cs.getInteger("ModifiedBy")
+                        .ModifiedDate = cs.getDate("ModifiedDate")
+                        .Name = cs.getText("Name")
+                        .NavTypeID = cs.getInteger("NavTypeID")
+                        .ObjectProgramID = cs.getText("ObjectProgramID")
+                        .OnBodyEnd = cs.getBoolean("OnBodyEnd")
+                        .OnBodyStart = cs.getBoolean("OnBodyStart")
+                        .OnNewVisitEvent = cs.getBoolean("OnNewVisitEvent")
+                        .OnPageEndEvent = cs.getBoolean("OnPageEndEvent")
+                        .OnPageStartEvent = cs.getBoolean("OnPageStartEvent")
+                        .OtherHeadTags = cs.getText("OtherHeadTags")
+                        .PageTitle = cs.getText("PageTitle")
+                        .ProcessInterval = cs.getInteger("ProcessInterval")
+                        .ProcessNextRun = cs.getDate("ProcessNextRun")
+                        .ProcessRunOnce = cs.getBoolean("ProcessRunOnce")
+                        .ProcessServerKey = cs.getText("ProcessServerKey")
+                        .RemoteAssetLink = cs.getText("RemoteAssetLink")
+                        .RemoteMethod = cs.getBoolean("RemoteMethod")
+                        .RobotsTxt = cs.getText("RobotsTxt")
+                        .ScriptingCode = cs.getText("ScriptingCode")
+                        .ScriptingEntryPoint = cs.getText("ScriptingEntryPoint")
+                        .ScriptingLanguageID = cs.getInteger("ScriptingLanguageID")
+                        .ScriptingTimeout = cs.getText("ScriptingTimeout")
+                        .SortOrder = cs.getText("SortOrder")
+                        .StylesFilename = cs.getText("StylesFilename")
+                        .Template = cs.getBoolean("Template")
+                    End With
+                    If (result IsNot Nothing) Then
+                        '
+                        ' -- set primary cache to the object created
+                        ' -- set secondary caches to the primary cache
+                        ' -- add all cachenames to the injected cachenamelist
+                        Dim cacheName0 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", result.ID.ToString())
+                        callersCacheNameList.Add(cacheName0)
+                        cpCore.cache.setObject(cacheName0, result)
+                        '
+                        Dim cacheName1 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "ccguid", result.ccGuid)
+                        callersCacheNameList.Add(cacheName1)
+                        cpCore.cache.setSecondaryObject(cacheName1, cacheName0)
+                    End If
+                End If
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+                Throw
+            End Try
+            Return result
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' save the instance properties to a record with matching id. If id is not provided, a new record is created.
+        ''' </summary>
+        ''' <param name="cpCore"></param>
+        ''' <returns></returns>
+        Public Function save(cpCore As coreClass) As Integer
+            Try
+                Dim cs As New csController(cpCore)
+                If (ID > 0) Then
+                    If Not cs.open(primaryContentName, "id=" & ID) Then
+                        Dim message As String = "Unable to open record in content [" & primaryContentName & "], with id [" & ID & "]"
                         cs.Close()
-                        Throw New ApplicationException("Unable to open record [" & id & "]")
+                        ID = 0
+                        Throw New ApplicationException(message)
                     End If
                 Else
                     If Not cs.Insert(primaryContentName) Then
                         cs.Close()
-                        id = 0
-                        Throw New ApplicationException("Unable to insert record")
+                        ID = 0
+                        Throw New ApplicationException("Unable to insert record in content [" & primaryContentName & "]")
                     End If
                 End If
                 If cs.ok() Then
-                    id = cs.getInteger("id")
-                    If (String.IsNullOrEmpty(ccGuid)) Then
-                        ccGuid = Controllers.genericController.getGUID()
-                    End If
-                    cs.setField("Name", name)
-                    cs.setField("active", active)
-                    cs.setField("sortorder", sortorder)
-                    cs.setField("dateadded", dateadded)
-                    cs.setField("createdby", createdby)
-                    cs.setField("modifieddate", modifieddate)
-                    cs.setField("modifiedby", modifiedby)
-                    cs.setField("ContentControlID", ContentControlID)
-                    cs.setField("CreateKey", CreateKey)
-                    cs.setField("EditSourceID", EditSourceID)
-                    cs.setField("EditArchive", EditArchive)
-                    cs.setField("EditBlank", EditBlank)
-                    cs.setField("ContentCategoryID", ContentCategoryID)
+                    ID = cs.getInteger("id")
+                    cs.setField("Active", Active.ToString())
+                    cs.setField("Admin", Admin.ToString())
+                    cs.setField("ArgumentList", ArgumentList)
+                    cs.setField("AsAjax", AsAjax.ToString())
+                    cs.setField("BlockDefaultStyles", BlockDefaultStyles.ToString())
+                    cs.setField("BlockEditTools", BlockEditTools.ToString())
                     cs.setField("ccGuid", ccGuid)
-                    cs.setField("onpagestartevent", onpagestartevent)
-                    cs.setField("blockdefaultstyles", blockdefaultstyles)
-                    cs.setField("iconheight", iconheight)
-                    cs.setField("iconwidth", iconwidth)
-                    cs.setField("customstylesfilename", customstylesfilename)
-                    cs.setField("iconsprites", iconsprites)
-                    cs.setField("javascriptbodyend", javascriptbodyend)
-                    cs.setField("onnewvisitevent", onnewvisitevent)
-                    cs.setField("remotemethod", remotemethod)
-                    cs.setField("copytext", copytext)
-                    cs.setField("sharedstyles", sharedstyles)
-                    cs.setField("stylesfilename", stylesfilename)
-                    cs.setField("otherheadtags", otherheadtags)
-                    cs.setField("metakeywordlist", metakeywordlist)
-                    cs.setField("onpageendevent", onpageendevent)
-                    cs.setField("pagetitle", pagetitle)
-                    cs.setField("iconfilename", iconfilename)
-                    cs.setField("javascriptonload", javascriptonload)
-                    cs.setField("admin", admin)
-                    cs.setField("content", content)
-                    cs.setField("template", template)
-                    cs.setField("email", email)
-                    cs.setField("helplink", helplink)
-                    cs.setField("navtypeid", navtypeid)
-                    cs.setField("help", help)
-                    cs.setField("metadescription", metadescription)
-                    cs.setField("scriptingcode", scriptingcode)
-                    cs.setField("scriptingtimeout", scriptingtimeout)
-                    cs.setField("inlinescript", inlinescript)
-                    cs.setField("collectionid", collectionid)
-                    cs.setField("onbodystart", onbodystart)
-                    cs.setField("fieldtypeeditor", fieldtypeeditor)
-                    cs.setField("isinline", isinline)
-                    cs.setField("dotnetclass", dotnetclass)
-                    cs.setField("copy", copy)
-                    cs.setField("argumentlist", argumentlist)
-                    cs.setField("link", link)
-                    cs.setField("onbodyend", onbodyend)
-                    cs.setField("objectprogramid", objectprogramid)
-                    cs.setField("jsfilename", jsfilename)
-                    cs.setField("robotstxt", robotstxt)
-                    cs.setField("includedaddons", includedaddons)
-                    cs.setField("formxml", formxml)
-                    cs.setField("inframe", inframe)
-                    cs.setField("filter", filter)
-                    cs.setField("scriptinglanguageid", scriptinglanguageid)
-                    cs.setField("remoteassetlink", remoteassetlink)
-                    cs.setField("blockedittools", blockedittools)
-                    cs.setField("asajax", asajax)
-                    cs.setField("processserverkey", processserverkey)
-                    cs.setField("processinterval", processinterval)
-                    cs.setField("processrunonce", processrunonce)
-                    cs.setField("processnextrun", processnextrun)
-                    cs.setField("processcontenttriggers", processcontenttriggers)
-                    cs.setField("scriptingentrypoint", scriptingentrypoint)
-                    cs.setField("scriptingmodules", scriptingmodules)
-                    cs.setField("events", events)
+                    cs.setField("CollectionID", CollectionID.ToString())
+                    cs.setField("Content", Content.ToString())
+                    cs.setField("ContentCategoryID", ContentCategoryID.ToString())
+                    cs.setField("ContentControlID", ContentControlID.ToString())
+                    cs.setField("Copy", Copy)
+                    cs.setField("CopyText", CopyText)
+                    cs.setField("CreatedBy", CreatedBy.ToString())
+                    cs.setField("CreateKey", CreateKey.ToString())
+                    cs.setField("CustomStylesFilename", CustomStylesFilename)
+                    cs.setField("DateAdded", DateAdded.ToString())
+                    cs.setField("DotNetClass", DotNetClass)
+                    cs.setField("EditArchive", EditArchive.ToString())
+                    cs.setField("EditBlank", EditBlank.ToString())
+                    cs.setField("EditSourceID", EditSourceID.ToString())
+                    cs.setField("Email", Email.ToString())
+                    cs.setField("Filter", Filter.ToString())
+                    cs.setField("FormXML", FormXML)
+                    cs.setField("Help", Help)
+                    cs.setField("HelpLink", HelpLink)
+                    cs.setField("IconFilename", IconFilename)
+                    cs.setField("IconHeight", IconHeight.ToString())
+                    cs.setField("IconSprites", IconSprites.ToString())
+                    cs.setField("IconWidth", IconWidth.ToString())
+                    cs.setField("InFrame", InFrame.ToString())
+                    cs.setField("inlineScript", inlineScript)
+                    cs.setField("IsInline", IsInline.ToString())
+                    cs.setField("JavaScriptBodyEnd", JavaScriptBodyEnd)
+                    cs.setField("JavaScriptOnLoad", JavaScriptOnLoad)
+                    cs.setField("JSFilename", JSFilename)
+                    cs.setField("Link", Link)
+                    cs.setField("MetaDescription", MetaDescription)
+                    cs.setField("MetaKeywordList", MetaKeywordList)
+                    cs.setField("ModifiedBy", ModifiedBy.ToString())
+                    cs.setField("ModifiedDate", ModifiedDate.ToString())
+                    cs.setField("Name", Name)
+                    cs.setField("NavTypeID", NavTypeID.ToString())
+                    cs.setField("ObjectProgramID", ObjectProgramID)
+                    cs.setField("OnBodyEnd", OnBodyEnd.ToString())
+                    cs.setField("OnBodyStart", OnBodyStart.ToString())
+                    cs.setField("OnNewVisitEvent", OnNewVisitEvent.ToString())
+                    cs.setField("OnPageEndEvent", OnPageEndEvent.ToString())
+                    cs.setField("OnPageStartEvent", OnPageStartEvent.ToString())
+                    cs.setField("OtherHeadTags", OtherHeadTags)
+                    cs.setField("PageTitle", PageTitle)
+                    cs.setField("ProcessInterval", ProcessInterval.ToString())
+                    cs.setField("ProcessNextRun", ProcessNextRun.ToString())
+                    cs.setField("ProcessRunOnce", ProcessRunOnce.ToString())
+                    cs.setField("ProcessServerKey", ProcessServerKey)
+                    cs.setField("RemoteAssetLink", RemoteAssetLink)
+                    cs.setField("RemoteMethod", RemoteMethod.ToString())
+                    cs.setField("RobotsTxt", RobotsTxt)
+                    cs.setField("ScriptingCode", ScriptingCode)
+                    cs.setField("ScriptingEntryPoint", ScriptingEntryPoint)
+                    cs.setField("ScriptingLanguageID", ScriptingLanguageID.ToString())
+                    cs.setField("ScriptingTimeout", ScriptingTimeout)
+                    cs.setField("SortOrder", SortOrder)
+                    cs.setField("StylesFilename", StylesFilename)
+                    cs.setField("Template", Template.ToString())
+                    If (String.IsNullOrEmpty(ccGuid)) Then ccGuid = Controllers.genericController.getGUID()
                 End If
                 Call cs.Close()
+                '
+                ' -- invalidate objects
+                ' -- no, the primary is invalidated by the cs.save()
+                'cpCore.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"id", id.ToString))
+                ' -- no, the secondary points to the pirmary, which is invalidated. Dont waste resources invalidating
+                'cpCore.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"ccguid", ccguid))
+                '
+                ' -- object is here, but the cache was invalidated, setting
+                cpCore.cache.setObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", Me.ID.ToString()), Me)
             Catch ex As Exception
-                cpcore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndRethrow(ex)
                 Throw
             End Try
-            Return id
+            Return ID
         End Function
         '
         '====================================================================================================
         ''' <summary>
-        ''' return a list of remote methods
+        ''' delete an existing database record by id
         ''' </summary>
         ''' <param name="cp"></param>
-        ''' <returns></returns>
-        Public Shared Function getRemoteMethods(cpcore As coreClass) As List(Of addonModel)
-            Dim result As List(Of addonModel) = Nothing
+        ''' <param name="recordId"></param>
+        Public Shared Sub delete(cpCore As coreClass, recordId As Integer)
             Try
-                Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer
-                Dim recordCacheName As String = primaryContentName & "CachedRemoteMethods"
-                Dim recordCache As String = cpcore.cache.getString(recordCacheName)
-                Dim loadDbModel As Boolean = True
-                If Not String.IsNullOrEmpty(recordCache) Then
-                    Try
-                        result = json_serializer.Deserialize(Of List(Of addonModel))(recordCache)
-                        '
-                        ' -- if model exposes any objects, verify they are created
-                        'If (returnModel.meetingItemList Is Nothing) Then
-                        '    returnModel.meetingItemList = New List(Of meetingItemModel)
-                        'End If
-                        loadDbModel = False
-                    Catch ex As Exception
-                        'ignore error - just roll through to rebuild model and save new cache
-                    End Try
-                End If
-                If loadDbModel Or (result Is Nothing) Then
-                    result = getRemoteMethodsNoCache(cpcore)
-                    Call cpcore.cache.setObject(recordCacheName, json_serializer.Serialize(result), cacheTagList)
+                If (recordId > 0) Then
+                    cpCore.db.deleteContentRecords(primaryContentName, "id=" & recordId.ToString)
+                    cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", recordId.ToString))
                 End If
             Catch ex As Exception
-                cpcore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndRethrow(ex)
+                Throw
             End Try
-            Return result
-        End Function
+        End Sub
         '
         '====================================================================================================
         ''' <summary>
-        ''' return a list of remote methods without cache
+        ''' delete an existing database record by guid
         ''' </summary>
         ''' <param name="cp"></param>
+        ''' <param name="ccguid"></param>
+        Public Shared Sub delete(cpCore As coreClass, ccguid As String)
+            Try
+                If (Not String.IsNullOrEmpty(ccguid)) Then
+                    Dim instance As addonModel = create(cpCore, ccguid, New List(Of String))
+                    If (instance IsNot Nothing) Then
+                        invalidatePrimaryCache(cpCore, instance.ID)
+                        cpCore.db.deleteContentRecords(primaryContentName, "(ccguid=" & cpCore.db.encodeSQLText(ccguid) & ")")
+                    End If
+                End If
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+                Throw
+            End Try
+        End Sub
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' pattern to delete an existing object based on multiple criteria (like a rule record)
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="foreignKey1Id"></param>
+        ''' <param name="foreignKey2Id"></param>
+        Public Shared Sub delete(cpCore As coreClass, foreignKey1Id As Integer, foreignKey2Id As Integer)
+            Try
+                If (foreignKey2Id > 0) And (foreignKey1Id > 0) Then
+                    Dim instance As addonModel = create(cpCore, foreignKey1Id, foreignKey2Id, New List(Of String))
+                    If (instance IsNot Nothing) Then
+                        invalidatePrimaryCache(cpCore, instance.ID)
+                        cpCore.db.deleteTableRecord(primaryContentTableName, instance.ID, primaryContentDataSource)
+                    End If
+                End If
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+                Throw
+            End Try
+        End Sub
+        'getAddonList_OnNewVisitEvent
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' pattern get a list of objects from this model
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="someCriteria"></param>
         ''' <returns></returns>
-        Public Shared Function getRemoteMethodsNoCache(cpcore As coreClass) As List(Of addonModel)
+        Public Shared Function createList_RemoteMethods(cpCore As coreClass, callersCacheNameList As List(Of String)) As List(Of addonModel)
             Dim result As New List(Of addonModel)
             Try
-                Dim cs As New csController(cpcore)
-                If (cs.open(primaryContentName, "(remoteMethod=1)", "name", True, "id")) Then
+                Dim cs As New csController(cpCore)
+                Dim ignoreCacheNames As New List(Of String)
+                If (cs.open(primaryContentName, "(remoteMethod=1)", "name")) Then
+                    Dim instance As addonModel
                     Do
-                        result.Add(getObject(cpcore, cs.getInteger("id"), New List(Of String)))
+                        instance = addonModel.loadRecord(cpCore, cs, callersCacheNameList)
+                        If (instance IsNot Nothing) Then
+                            result.Add(instance)
+                        End If
                         cs.goNext()
                     Loop While cs.ok()
                 End If
-
+                cs.Close()
             Catch ex As Exception
-                cpcore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return result
         End Function
         '
         '====================================================================================================
         ''' <summary>
-        ''' get the name of the meeting
+        ''' invalidate the primary key (which depends on all secondary keys)
+        ''' </summary>
+        ''' <param name="cpCore"></param>
+        ''' <param name="recordId"></param>
+        Public Shared Sub invalidatePrimaryCache(cpCore As coreClass, recordId As Integer)
+            cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", recordId.ToString))
+            '
+            ' -- the zero record cache means any record was updated. Can be used to invalidate arbitraty lists of records in the table
+            cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", "0"))
+        End Sub
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' get the name of the record by it's id
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <param name="recordId"></param>record
         ''' <returns></returns>
         Public Shared Function getRecordName(cpcore As coreClass, recordId As Integer) As String
-            Return cpcore.content_GetRecordName(primaryContentName, recordId)
+            Return addonModel.create(cpcore, recordId, New List(Of String)).Name
         End Function
         '
         '====================================================================================================
         ''' <summary>
-        ''' for internal use -- return a list of addons based on a sql criteria. To create a new list, create a shared method in the addonmodel so field names are not distributed without being typed
+        ''' get the name of the record by it's guid 
         ''' </summary>
-        ''' <param name="cpcore"></param>
-        ''' <param name="sqlCriteria"></param>
+        ''' <param name="cp"></param>
+        ''' <param name="ccGuid"></param>record
         ''' <returns></returns>
-        Private Shared Function getAddonList_SqlCriteria(cpcore As coreClass, sqlCriteria As String) As List(Of addonModel)
-            Dim resultList As New List(Of addonModel)
+        Public Shared Function getRecordName(cpcore As coreClass, ccGuid As String) As String
+            Return addonModel.create(cpcore, ccGuid, New List(Of String)).Name
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' get the id of the record by it's guid 
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="ccGuid"></param>record
+        ''' <returns></returns>
+        Public Shared Function getRecordId(cpcore As coreClass, ccGuid As String) As Integer
+            Return addonModel.create(cpcore, ccGuid, New List(Of String)).ID
+        End Function
+        '
+        '====================================================================================================
+        '
+        Public Shared Function createDefault(cpcore As coreClass) As addonModel
+            Dim instance As New addonModel
             Try
-                Dim cs As New csController(cpcore)
-                If cs.open(primaryContentName, sqlCriteria) Then
+                Dim CDef As coreMetaDataClass.CDefClass = cpcore.metaData.getCdef(primaryContentName)
+                If (CDef Is Nothing) Then
+                    Throw New ApplicationException("content [" & primaryContentName & "] could Not be found.")
+                ElseIf (CDef.Id <= 0) Then
+                    Throw New ApplicationException("content [" & primaryContentName & "] could Not be found.")
+                Else
+                    With CDef
+                        instance.Active = genericController.EncodeBoolean(.fields("Active").defaultValue)
+                        instance.Admin = genericController.EncodeBoolean(.fields("Admin").defaultValue)
+                        instance.ArgumentList = genericController.encodeText(.fields("ArgumentList").defaultValue)
+                        instance.AsAjax = genericController.EncodeBoolean(.fields("AsAjax").defaultValue)
+                        instance.BlockDefaultStyles = genericController.EncodeBoolean(.fields("BlockDefaultStyles").defaultValue)
+                        instance.BlockEditTools = genericController.EncodeBoolean(.fields("BlockEditTools").defaultValue)
+                        instance.ccGuid = genericController.encodeText(.fields("ccGuid").defaultValue)
+                        instance.CollectionID = genericController.EncodeInteger(.fields("CollectionID").defaultValue)
+                        instance.Content = genericController.EncodeBoolean(.fields("Content").defaultValue)
+                        instance.ContentCategoryID = genericController.EncodeInteger(.fields("ContentCategoryID").defaultValue)
+                        instance.ContentControlID = CDef.Id
+                        instance.Copy = genericController.encodeText(.fields("Copy").defaultValue)
+                        instance.CopyText = genericController.encodeText(.fields("CopyText").defaultValue)
+                        instance.CreatedBy = genericController.EncodeInteger(.fields("CreatedBy").defaultValue)
+                        instance.CreateKey = genericController.EncodeInteger(.fields("CreateKey").defaultValue)
+                        instance.CustomStylesFilename = genericController.encodeText(.fields("CustomStylesFilename").defaultValue)
+                        instance.DateAdded = genericController.EncodeDate(.fields("DateAdded").defaultValue)
+                        instance.DotNetClass = genericController.encodeText(.fields("DotNetClass").defaultValue)
+                        instance.EditArchive = genericController.EncodeBoolean(.fields("EditArchive").defaultValue)
+                        instance.EditBlank = genericController.EncodeBoolean(.fields("EditBlank").defaultValue)
+                        instance.EditSourceID = genericController.EncodeInteger(.fields("EditSourceID").defaultValue)
+                        instance.Email = genericController.EncodeBoolean(.fields("Email").defaultValue)
+                        instance.Filter = genericController.EncodeBoolean(.fields("Filter").defaultValue)
+                        instance.FormXML = genericController.encodeText(.fields("FormXML").defaultValue)
+                        instance.Help = genericController.encodeText(.fields("Help").defaultValue)
+                        instance.HelpLink = genericController.encodeText(.fields("HelpLink").defaultValue)
+                        instance.IconFilename = genericController.encodeText(.fields("IconFilename").defaultValue)
+                        instance.IconHeight = genericController.EncodeInteger(.fields("IconHeight").defaultValue)
+                        instance.IconSprites = genericController.EncodeInteger(.fields("IconSprites").defaultValue)
+                        instance.IconWidth = genericController.EncodeInteger(.fields("IconWidth").defaultValue)
+                        instance.InFrame = genericController.EncodeBoolean(.fields("InFrame").defaultValue)
+                        instance.inlineScript = genericController.encodeText(.fields("inlineScript").defaultValue)
+                        instance.IsInline = genericController.EncodeBoolean(.fields("IsInline").defaultValue)
+                        instance.JavaScriptBodyEnd = genericController.encodeText(.fields("JavaScriptBodyEnd").defaultValue)
+                        instance.JavaScriptOnLoad = genericController.encodeText(.fields("JavaScriptOnLoad").defaultValue)
+                        instance.JSFilename = genericController.encodeText(.fields("JSFilename").defaultValue)
+                        instance.Link = genericController.encodeText(.fields("Link").defaultValue)
+                        instance.MetaDescription = genericController.encodeText(.fields("MetaDescription").defaultValue)
+                        instance.MetaKeywordList = genericController.encodeText(.fields("MetaKeywordList").defaultValue)
+                        instance.ModifiedBy = genericController.EncodeInteger(.fields("ModifiedBy").defaultValue)
+                        instance.ModifiedDate = genericController.EncodeDate(.fields("ModifiedDate").defaultValue)
+                        instance.Name = genericController.encodeText(.fields("Name").defaultValue)
+                        instance.NavTypeID = genericController.EncodeInteger(.fields("NavTypeID").defaultValue)
+                        instance.ObjectProgramID = genericController.encodeText(.fields("ObjectProgramID").defaultValue)
+                        instance.OnBodyEnd = genericController.EncodeBoolean(.fields("OnBodyEnd").defaultValue)
+                        instance.OnBodyStart = genericController.EncodeBoolean(.fields("OnBodyStart").defaultValue)
+                        instance.OnNewVisitEvent = genericController.EncodeBoolean(.fields("OnNewVisitEvent").defaultValue)
+                        instance.OnPageEndEvent = genericController.EncodeBoolean(.fields("OnPageEndEvent").defaultValue)
+                        instance.OnPageStartEvent = genericController.EncodeBoolean(.fields("OnPageStartEvent").defaultValue)
+                        instance.OtherHeadTags = genericController.encodeText(.fields("OtherHeadTags").defaultValue)
+                        instance.PageTitle = genericController.encodeText(.fields("PageTitle").defaultValue)
+                        instance.ProcessInterval = genericController.EncodeInteger(.fields("ProcessInterval").defaultValue)
+                        instance.ProcessNextRun = genericController.EncodeDate(.fields("ProcessNextRun").defaultValue)
+                        instance.ProcessRunOnce = genericController.EncodeBoolean(.fields("ProcessRunOnce").defaultValue)
+                        instance.ProcessServerKey = genericController.encodeText(.fields("ProcessServerKey").defaultValue)
+                        instance.RemoteAssetLink = genericController.encodeText(.fields("RemoteAssetLink").defaultValue)
+                        instance.RemoteMethod = genericController.EncodeBoolean(.fields("RemoteMethod").defaultValue)
+                        instance.RobotsTxt = genericController.encodeText(.fields("RobotsTxt").defaultValue)
+                        instance.ScriptingCode = genericController.encodeText(.fields("ScriptingCode").defaultValue)
+                        instance.ScriptingEntryPoint = genericController.encodeText(.fields("ScriptingEntryPoint").defaultValue)
+                        instance.ScriptingLanguageID = genericController.EncodeInteger(.fields("ScriptingLanguageID").defaultValue)
+                        instance.ScriptingTimeout = genericController.encodeText(.fields("ScriptingTimeout").defaultValue)
+                        instance.SortOrder = genericController.encodeText(.fields("SortOrder").defaultValue)
+                        instance.StylesFilename = genericController.encodeText(.fields("StylesFilename").defaultValue)
+                        instance.Template = genericController.EncodeBoolean(.fields("Template").defaultValue)
+                    End With
+                End If
+            Catch ex As Exception
+                cpcore.handleExceptionAndContinue(ex)
+            End Try
+            Return instance
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' pattern get a list of objects from this model
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="someCriteria"></param>
+        ''' <returns></returns>
+        Public Shared Function createList_OnNewVisitEvent(cpCore As coreClass, callersCacheNameList As List(Of String)) As List(Of addonModel)
+            Dim result As New List(Of addonModel)
+            Try
+                Dim cs As New csController(cpCore)
+                Dim ignoreCacheNames As New List(Of String)
+                If (cs.open(primaryContentName, "(OnNewVisitEvent<>0)")) Then
+                    Dim instance As addonModel
                     Do
-                        resultList.Add(addonModel.getObject(cpcore, cs.getInteger("id"), New List(Of String)))
+                        instance = addonModel.loadRecord(cpCore, cs, callersCacheNameList)
+                        If (instance IsNot Nothing) Then
+                            result.Add(instance)
+                        End If
                         cs.goNext()
-                    Loop While cs.ok
+                    Loop While cs.ok()
                 End If
                 cs.Close()
             Catch ex As Exception
-                cpcore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
-            Return resultList
-        End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' return a list of addons to run onNewVisit
-        ''' </summary>
-        ''' <param name="cpcore"></param>
-        ''' <returns></returns>
-        Public Shared Function getAddonList_OnNewVisitEvent(cpcore As coreClass) As List(Of addonModel)
-            Return getAddonList_SqlCriteria(cpcore, "(OnNewVisitEvent<>0)")
+            Return result
         End Function
     End Class
 End Namespace
-

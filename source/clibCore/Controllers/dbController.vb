@@ -631,7 +631,7 @@ Namespace Contensive.Core.Controllers
             If Not String.IsNullOrEmpty(LogEntry) Then
                 Dim Message As String = LogEntry.Replace(vbCr, "")
                 Message = Message.Replace(vbLf, "")
-                logController.log_appendLog(cpCore, Message, "DbTransactions")
+                logController.appendLog(cpCore, Message, "DbTransactions")
             End If
         End Sub
         '
@@ -4963,7 +4963,7 @@ Namespace Contensive.Core.Controllers
                         ' ----- Content definition not found, create it
                         '
                         ContentIsNew = True
-                        Call cpCore.metaData.metaData_CreateContent4(True, DataSource, TableName, ContentName)
+                        Call cpCore.metaData.createContent(True, DataSource, TableName, ContentName)
                         'ContentID = csv_GetContentID(ContentName)
                         SQL = "Select ID from ccContent where name=" & cpCore.db.encodeSQLText(ContentName)
                         dt = cpCore.db.executeSql(SQL)
@@ -5232,7 +5232,7 @@ Namespace Contensive.Core.Controllers
                         field.editSortPriority = 5010
                         field.defaultValue = "0"
                 End Select
-                Call cpCore.metaData.metaData_VerifyCDefField_ReturnID(ContentName, field)
+                Call cpCore.metaData.verifyCDefField_ReturnID(ContentName, field)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try

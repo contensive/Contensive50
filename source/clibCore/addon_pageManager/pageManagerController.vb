@@ -1136,7 +1136,7 @@ Namespace Contensive.Core.Controllers
                 '
                 allowPageWithoutSectionDislay = c.siteProperties.getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default)
                 allowPageWithoutSectionDislay = True
-                Call logController.log_appendLog(c, "hardcoded allowPageWithoutSectionDislay in getHtmlBody_getSection")
+                Call logController.appendLog(c, "hardcoded allowPageWithoutSectionDislay in getHtmlBody_getSection")
                 If Not allowPageWithoutSectionDislay Then
                     '
                     ' the rootPageid is used to represent the section record's selection, and is used in main_GetPageRaw to check if the
@@ -5861,7 +5861,7 @@ ErrorTrap:
                         '
                         ' This PageID is missing from cache - try to reload
                         '
-                        Call logController.log_appendLog(c, "pageManager_cache_pageContent_getPtr, pageID[" & PageID & "] not found in index, attempting cache reload")
+                        Call logController.appendLog(c, "pageManager_cache_pageContent_getPtr, pageID[" & PageID & "] not found in index, attempting cache reload")
                         Call pageManager_cache_pageContent_clear()
                         Call pageManager_cache_pageContent_load(main_IsWorkflowRendering, main_IsQuickEditing)
                         If pageManager_cache_pageContent_rows > 0 Then
@@ -5869,7 +5869,7 @@ ErrorTrap:
                         End If
                         If (pageManager_cache_pageContent_getPtr < 0) Then
                             ' do not through error, this can happen if someone deletes a page.
-                            Call logController.log_appendLog(c, "pageManager_cache_pageContent_getPtr, pageID[" & PageID & "] not found in cache after reload. ERROR")
+                            Call logController.appendLog(c, "pageManager_cache_pageContent_getPtr, pageID[" & PageID & "] not found in cache after reload. ERROR")
                             'Call Err.Raise(ignoreInteger, "cpCoreClass", "pageManager_cache_pageContent_getPtr, pageID [" & PageID & "] reload failed. ERROR")
                             'Call AppendLog("pageManager_cache_pageContent_getPtr, pageID[" & PageID & "] reload failed. ERROR")
                         End If

@@ -4484,7 +4484,7 @@ ErrorTrap:
             Dim returnResult As String = ""
             Dim p As Process = New Process()
             '
-            logController.log_appendLog(cpCore, "ccCommonModule.runProcess, cmd=[" & Cmd & "], Arguments=[" & Arguments & "], WaitForReturn=[" & WaitForReturn & "]")
+            logController.appendLog(cpCore, "ccCommonModule.runProcess, cmd=[" & Cmd & "], Arguments=[" & Arguments & "], WaitForReturn=[" & WaitForReturn & "]")
             '
             p.StartInfo.FileName = Cmd
             p.StartInfo.Arguments = Arguments

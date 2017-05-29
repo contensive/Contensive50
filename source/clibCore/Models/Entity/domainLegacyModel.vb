@@ -14,7 +14,8 @@ Namespace Contensive.Core.Models.Entity
         '
         Private domainList_local As New List(Of String)
         Private serverDomainList_localLoaded As Boolean = False
-        Public ServerMultiDomainMode As Boolean = False    ' When true, the site can run from any domain name.
+        ' -- 20170528 no longer support this. host page includes app name so any domain works anyway
+        'Public ServerMultiDomainMode As Boolean = False    ' When true, the site can run from any domain name.
         '
         '   values read from the domain record during init
         '
@@ -50,7 +51,7 @@ Namespace Contensive.Core.Models.Entity
                 Dim SQL As String
                 Dim dt As DataTable
                 '
-                Const cacheName = "ccdomains.normal.0"
+                Const cacheName = "domainDbList"
                 '
                 Try
                     If Not serverDomainList_localLoaded Then

@@ -23,170 +23,198 @@ Namespace Contensive.Core
         '------------------------------------------------------------------------------------------------------------------------
         '
         Private cdefList As Dictionary(Of String, CDefClass)
-        Private contentNameIdDictionary As Dictionary(Of String, Integer)
+        'Private contentNameIdDictionary As Dictionary(Of String, Integer)
         Private tableSchemaList As Dictionary(Of String, tableSchemaClass)
+        '
+        Private ReadOnly Property contentNameIdDictionary As Dictionary(Of String, Integer)
+            Get
+                If (_contentNameIdDictionary Is Nothing) Then
+                    _contentNameIdDictionary = New Dictionary(Of String, Integer)
+                    For Each kvp As KeyValuePair(Of Integer, contentModel) In contentIdDict
+                        Dim key As String = kvp.Value.Name.Trim().ToLower()
+                        If Not String.IsNullOrEmpty(key) Then
+                            If (Not _contentNameIdDictionary.ContainsKey(key)) Then
+                                _contentNameIdDictionary.Add(key, kvp.Value.ID)
+                            End If
+                        End If
+                    Next
+                End If
+                Return _contentNameIdDictionary
+            End Get
+        End Property
+        Private _contentNameIdDictionary As Dictionary(Of String, Integer) = Nothing
+        '
+        Private ReadOnly Property contentIdDict As Dictionary(Of Integer, contentModel)
+            Get
+                If (_contentIdDict Is Nothing) Then
+                    _contentIdDict = contentModel.createDict(cpCore, New List(Of String))
+                End If
+                Return _contentIdDict
+            End Get
+        End Property
+        Private _contentIdDict As Dictionary(Of Integer, contentModel) = Nothing
         '
         '====================================================================================================
         ''' <summary>
         ''' Serializable classes that define the collection file structure. Originally in XML, now converting to json.
         ''' </summary>
-        <Serializable>
-        Public Class collectionFileWishListClass
-            Public name As String
-            Public guid As String
-            Public system As Boolean
-            Public Class addonClass
-                Public copy As String
-                Public copyText As String
-                Public activeXProgramId As String
-                Public dotNetClass As String
-                Public argumentList As String
-                Public asAjax As Boolean
-                Public filter As Boolean
-                Public help As String
-                Public helpLink As String
-                Public iconLInk As String
-                Public icons As List(Of iconClass)
-                Public inIFrame As Boolean
-                Public blockEditTools As Boolean
-                Public formXml As String
-                Public isInLine As Boolean
-                Public javascriptOnLoad As String
-                Public javascriptINHead As String
-                Public javascriptBodyEnd As String
-                Public metaDescription As String
-                Public otherHeadTags As String
-                Public content As Boolean
-                Public template As Boolean
-                Public email As Boolean
-                Public admin As Boolean
-                Public onPageEndEvent As Boolean
-                Public onPageStartEvent As Boolean
-                Public onBodyStart As Boolean
-                Public onBodyEnd As Boolean
-                Public remoteMethod As Boolean
-                Public processRunOnce As Boolean
-                Public processInterval As Boolean
-                Public pageTitle As String
-                Public remoteAssetLink As String
-                Public styles As String
-                Public Class scriptingClass
-                    Public language As String
-                    Public entryPoint As String
-                    Public timeout As Integer
-                End Class
-                Public Scriptings As List(Of scriptingClass)
-            End Class            '
-            Public Class iconClass
-                Public link As String
-                Public width As Integer
-                Public height As Integer
-                Public sprits As Integer
-            End Class            '
-            Public Class cdefClass
-                Public Name As String
-                Public ActiveOnly As Boolean
-                Public AliasID As Integer
-                Public AliasName As String
-                Public AllowAdd As Boolean
-                Public AllowContentTracking As Boolean
-                Public AllowDelete As Boolean
-                Public AllowTopicRules As Boolean
-                Public AllowWorkflowAuthoring As Boolean
-                Public AuthoringDataSourceName As String
-                Public AuthoringTableName As String
-                Public ContentDataSourceName As String
-                Public ContentTableName As String
-                Public ccDataSources As String
-                Public DefaultSortMethod As String
-                Public DeveloperOnly As String
-                Public DropDownFieldList As String
-                Public EditorGroupName As String
-                Public IgnoreContentControl As Boolean
-                Public Parent As String
-                Public AllowMetaContent As Boolean
-                Public AllowContentChildTool As Boolean
-                Public NavIconType As String
-                Public icon As iconClass
-                Public guid As String
-                Public Class cdefFieldClass
-                    Public Name As String
-                    Public active As Boolean
-                    Public AdminOnly As Boolean
-                    Public Authorable As Boolean
-                    Public Caption As String
-                    Public DeveloperOnly As Boolean
-                    Public EditSortPriority As String
-                    Public FieldType As String
-                    Public HTMLContent As Boolean
-                    Public IndexColumn As Integer
-                    Public IndexSortDirection As Boolean
-                    Public IndexSortOrder As String
-                    Public IndexWidth As String
-                    Public LookupContent As String
-                    Public NotEditable As Boolean
-                    Public Password As Boolean
-                    Public ReadOnlyField As Boolean
-                    Public RedirectContent As String
-                    Public RedirectID As Integer
-                    Public RedirectPath As String
-                    Public Required As Boolean
-                    Public TextBuffered As Boolean
-                    Public UniqueName As Boolean
-                    Public DefaultValue As String
-                    Public RSSTitle As String
-                    Public RSSDescription As String
-                    Public MemberSelectGroupID As Integer
-                    Public EditTab As String
-                    Public Scramble As Boolean
-                    Public LookupList As String
-                    Public ManyToManyContent As String
-                    Public ManyToManyRuleContent As String
-                    Public ManyToManyRulePrimaryField As String
-                    Public ManyToManyRuleSecondaryField As String
-                End Class
-                Public fields As List(Of cdefFieldClass)
-                Public Class sqlIndexFlass
-                    Public indexName As String
-                    Public dataSourceName As String
-                    Public tableName As String
-                    Public filenameList As String
-                End Class
-                Public sqlIndexes As List(Of sqlIndexFlass)
-            End Class
-            Public addons As List(Of addonClass)
-            Public Class navigatorClass
-                Public Name As String
-                Public NavigatorNamespace As String
-                Public navIconTitle As String
-                Public NavIconType As String
-                Public LinkPage As String
-                Public ContentName As String
-                Public AdminOnly As Boolean
-                Public DeveloperOnly As Boolean
-                Public NewWindow As Boolean
-                Public Active As Boolean
-                Public AddonName As String
-                Public guid As String
-            End Class
-            Public NavigatorEntries As List(Of navigatorClass)
-            Public Class recordClass
-                Public content As String
-                Public guid As String
-                Public name As String
-                Public Class recordFieldClass
-                    Public name As String
-                    Public value As String
-                End Class
-                Public fields As List(Of recordFieldClass)
-            End Class
-            Public data As List(Of recordClass)
-            Public Class importCollectionClass
-                Public name As String
-                Public value As String
-            End Class
-            Public ImportCollections As List(Of importCollectionClass)
-        End Class
+        '<Serializable>
+        'Public Class collectionFileWishListClass
+        '    Public name As String
+        '    Public guid As String
+        '    Public system As Boolean
+        '    'Public Class addonClass
+        '    '    Public copy As String
+        '    '    Public copyText As String
+        '    '    Public activeXProgramId As String
+        '    '    Public dotNetClass As String
+        '    '    Public argumentList As String
+        '    '    Public asAjax As Boolean
+        '    '    Public filter As Boolean
+        '    '    Public help As String
+        '    '    Public helpLink As String
+        '    '    Public iconLInk As String
+        '    '    Public icons As List(Of iconClass)
+        '    '    Public inIFrame As Boolean
+        '    '    Public blockEditTools As Boolean
+        '    '    Public formXml As String
+        '    '    Public isInLine As Boolean
+        '    '    Public javascriptOnLoad As String
+        '    '    Public javascriptINHead As String
+        '    '    Public javascriptBodyEnd As String
+        '    '    Public metaDescription As String
+        '    '    Public otherHeadTags As String
+        '    '    Public content As Boolean
+        '    '    Public template As Boolean
+        '    '    Public email As Boolean
+        '    '    Public admin As Boolean
+        '    '    Public onPageEndEvent As Boolean
+        '    '    Public onPageStartEvent As Boolean
+        '    '    Public onBodyStart As Boolean
+        '    '    Public onBodyEnd As Boolean
+        '    '    Public remoteMethod As Boolean
+        '    '    Public processRunOnce As Boolean
+        '    '    Public processInterval As Boolean
+        '    '    Public pageTitle As String
+        '    '    Public remoteAssetLink As String
+        '    '    Public styles As String
+        '    '    Public Class scriptingClass
+        '    '        Public language As String
+        '    '        Public entryPoint As String
+        '    '        Public timeout As Integer
+        '    '    End Class
+        '    '    Public Scriptings As List(Of scriptingClass)
+        '    'End Class            '
+        '    'Public Class iconClass
+        '    '    Public link As String
+        '    '    Public width As Integer
+        '    '    Public height As Integer
+        '    '    Public sprits As Integer
+        '    'End Class            '
+        '    'Public Class cdefClass
+        '    '    Public Name As String
+        '    '    Public ActiveOnly As Boolean
+        '    '    Public AliasID As Integer
+        '    '    Public AliasName As String
+        '    '    Public AllowAdd As Boolean
+        '    '    Public AllowContentTracking As Boolean
+        '    '    Public AllowDelete As Boolean
+        '    '    Public AllowTopicRules As Boolean
+        '    '    Public AllowWorkflowAuthoring As Boolean
+        '    '    Public AuthoringDataSourceName As String
+        '    '    Public AuthoringTableName As String
+        '    '    Public ContentDataSourceName As String
+        '    '    Public ContentTableName As String
+        '    '    Public ccDataSources As String
+        '    '    Public DefaultSortMethod As String
+        '    '    Public DeveloperOnly As String
+        '    '    Public DropDownFieldList As String
+        '    '    Public EditorGroupName As String
+        '    '    Public IgnoreContentControl As Boolean
+        '    '    Public Parent As String
+        '    '    Public AllowMetaContent As Boolean
+        '    '    Public AllowContentChildTool As Boolean
+        '    '    Public NavIconType As String
+        '    '    Public icon As iconClass
+        '    '    Public guid As String
+        '    '    'Public Class cdefFieldClass
+        '    '    '    Public Name As String
+        '    '    '    Public active As Boolean
+        '    '    '    Public AdminOnly As Boolean
+        '    '    '    Public Authorable As Boolean
+        '    '    '    Public Caption As String
+        '    '    '    Public DeveloperOnly As Boolean
+        '    '    '    Public EditSortPriority As String
+        '    '    '    Public FieldType As String
+        '    '    '    Public HTMLContent As Boolean
+        '    '    '    Public IndexColumn As Integer
+        '    '    '    Public IndexSortDirection As Boolean
+        '    '    '    Public IndexSortOrder As String
+        '    '    '    Public IndexWidth As String
+        '    '    '    Public LookupContent As String
+        '    '    '    Public NotEditable As Boolean
+        '    '    '    Public Password As Boolean
+        '    '    '    Public ReadOnlyField As Boolean
+        '    '    '    Public RedirectContent As String
+        '    '    '    Public RedirectID As Integer
+        '    '    '    Public RedirectPath As String
+        '    '    '    Public Required As Boolean
+        '    '    '    Public TextBuffered As Boolean
+        '    '    '    Public UniqueName As Boolean
+        '    '    '    Public DefaultValue As String
+        '    '    '    Public RSSTitle As String
+        '    '    '    Public RSSDescription As String
+        '    '    '    Public MemberSelectGroupID As Integer
+        '    '    '    Public EditTab As String
+        '    '    '    Public Scramble As Boolean
+        '    '    '    Public LookupList As String
+        '    '    '    Public ManyToManyContent As String
+        '    '    '    Public ManyToManyRuleContent As String
+        '    '    '    Public ManyToManyRulePrimaryField As String
+        '    '    '    Public ManyToManyRuleSecondaryField As String
+        '    '    'End Class
+        '    '    'Public fields As List(Of cdefFieldClass)
+        '    '    Public Class sqlIndexFlass
+        '    '        Public indexName As String
+        '    '        Public dataSourceName As String
+        '    '        Public tableName As String
+        '    '        Public filenameList As String
+        '    '    End Class
+        '    '    Public sqlIndexes As List(Of sqlIndexFlass)
+        '    'End Class
+        '    'Public addons As List(Of addonClass)
+        '    Public Class navigatorClass
+        '        Public Name As String
+        '        Public NavigatorNamespace As String
+        '        Public navIconTitle As String
+        '        Public NavIconType As String
+        '        Public LinkPage As String
+        '        Public ContentName As String
+        '        Public AdminOnly As Boolean
+        '        Public DeveloperOnly As Boolean
+        '        Public NewWindow As Boolean
+        '        Public Active As Boolean
+        '        Public AddonName As String
+        '        Public guid As String
+        '    End Class
+        '    Public NavigatorEntries As List(Of navigatorClass)
+        '    Public Class recordClass
+        '        Public content As String
+        '        Public guid As String
+        '        Public name As String
+        '        Public Class recordFieldClass
+        '            Public name As String
+        '            Public value As String
+        '        End Class
+        '        Public fields As List(Of recordFieldClass)
+        '    End Class
+        '    Public data As List(Of recordClass)
+        '    Public Class importCollectionClass
+        '        Public name As String
+        '        Public value As String
+        '    End Class
+        '    Public ImportCollections As List(Of importCollectionClass)
+        'End Class
         ''
         'Structure NavEntryType
         '    Dim NavigatorID As Integer
@@ -495,7 +523,7 @@ Namespace Contensive.Core
             ' reset metaData
             '
             cdefList = New Dictionary(Of String, CDefClass)
-            contentNameIdDictionary = Nothing
+            'contentNameIdDictionary = Nothing
             tableSchemaList = Nothing
         End Sub
         '
@@ -508,9 +536,6 @@ Namespace Contensive.Core
         Public Function getContentId(contentName As String) As Integer
             Dim returnId As Integer = 0
             Try
-                If (contentNameIdDictionary Is Nothing) Then
-                    Call contentNameIdDictionary_load()
-                End If
                 If (contentNameIdDictionary.ContainsKey(contentName.ToLower)) Then
                     returnId = contentNameIdDictionary(contentName.ToLower)
                 End If
@@ -546,47 +571,47 @@ Namespace Contensive.Core
         ''' <summary>
         ''' load cdefNameIdXref from cache and/or Db
         ''' </summary>
-        Public Sub contentNameIdDictionary_load()
-            Try
-                Dim dt As DataTable
-                Dim recordName As String
-                '
-                ' load xref from cache
-                '
-                Try
-                    '
-                    ' catch cache issues so cdef will load
-                    '
-                    contentNameIdDictionary = cpCore.cache.getObject(Of Dictionary(Of String, Integer))("cccontent-name-id-dictionary")
-                    'cdefNameIdXref = DirectCast(cpCore.cache.getObject(Of Dictionary(Of String, Integer))("cccontent-name-id-dictionary"), Dictionary(Of String, Integer))
-                Catch ex As Exception
-                    cpCore.handleExceptionAndContinue(ex)
-                End Try
-                If (contentNameIdDictionary Is Nothing) OrElse (contentNameIdDictionary.Count = 0) Then
-                    '
-                    ' load xref from Db
-                    '
-                    contentNameIdDictionary = New Dictionary(Of String, Integer)
-                    dt = cpCore.db.executeSql("select id,name from ccContent where (active<>0)")
-                    If dt.Rows.Count > 0 Then
-                        For Each row As DataRow In dt.Rows
-                            recordName = genericController.encodeText(row.Item("name")).ToLower
-                            If Not contentNameIdDictionary.ContainsKey(recordName) Then
-                                contentNameIdDictionary.Add(recordName, genericController.EncodeInteger(row.Item("id")))
-                            End If
-                        Next
-                    End If
-                    dt.Dispose()
-                    Try
-                        Call cpCore.cache.setObject("cccontent-name-id-dictionary", contentNameIdDictionary, "content")
-                    Catch ex As Exception
-                        cpCore.handleExceptionAndContinue(ex)
-                    End Try
-                End If
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-        End Sub
+        'Public Sub contentNameIdDictionary_load()
+        '    Try
+        '        Dim dt As DataTable
+        '        Dim recordName As String
+        '        '
+        '        ' load xref from cache
+        '        '
+        '        Try
+        '            '
+        '            ' catch cache issues so cdef will load
+        '            '
+        '            contentNameIdDictionary = cpCore.cache.getObject(Of Dictionary(Of String, Integer))("cccontent-name-id-dictionary")
+        '            'cdefNameIdXref = DirectCast(cpCore.cache.getObject(Of Dictionary(Of String, Integer))("cccontent-name-id-dictionary"), Dictionary(Of String, Integer))
+        '        Catch ex As Exception
+        '            cpCore.handleExceptionAndContinue(ex)
+        '        End Try
+        '        If (contentNameIdDictionary Is Nothing) OrElse (contentNameIdDictionary.Count = 0) Then
+        '            '
+        '            ' load xref from Db
+        '            '
+        '            contentNameIdDictionary = New Dictionary(Of String, Integer)
+        '            dt = cpCore.db.executeSql("select id,name from ccContent where (active<>0)")
+        '            If dt.Rows.Count > 0 Then
+        '                For Each row As DataRow In dt.Rows
+        '                    recordName = genericController.encodeText(row.Item("name")).ToLower
+        '                    If Not contentNameIdDictionary.ContainsKey(recordName) Then
+        '                        contentNameIdDictionary.Add(recordName, genericController.EncodeInteger(row.Item("id")))
+        '                    End If
+        '                Next
+        '            End If
+        '            dt.Dispose()
+        '            Try
+        '                Call cpCore.cache.setObject("cccontent-name-id-dictionary", contentNameIdDictionary, "content")
+        '            Catch ex As Exception
+        '                cpCore.handleExceptionAndContinue(ex)
+        '            End Try
+        '        End If
+        '    Catch ex As Exception
+        '        cpCore.handleExceptionAndRethrow(ex)
+        '    End Try
+        'End Sub
         '
         '====================================================================================================
         ''' <summary>
@@ -1091,22 +1116,28 @@ Namespace Contensive.Core
         Private Function getContentControlCriteria(ByVal contentId As Integer, contentTableName As String, contentDAtaSourceName As String, ByVal parentIdList As List(Of Integer)) As String
             Dim returnCriteria As String = ""
             Try
-                Dim dt As DataTable
-                Dim childContentId As Integer
+                'Dim dt As DataTable
+                'Dim childContentId As Integer
                 '
                 returnCriteria = "(1=0)"
                 If (contentId >= 0) Then
                     If Not parentIdList.Contains(contentId) Then
                         parentIdList.Add(contentId)
-                        returnCriteria = "((" & contentTableName & ".contentcontrolId=" & contentId & ")"
-                        dt = cpCore.db.executeSql("select id from cccontent where parentid=" & contentId, contentDAtaSourceName)
-                        For Each datarow As DataRow In dt.Rows
-                            childContentId = genericController.EncodeInteger(datarow.Item(0))
-                            returnCriteria &= "OR" & getContentControlCriteria(childContentId, contentTableName, contentDAtaSourceName, parentIdList)
+                        returnCriteria = "(" & contentTableName & ".contentcontrolId=" & contentId & ")"
+                        For Each kvp As KeyValuePair(Of Integer, contentModel) In contentIdDict
+                            If (kvp.Value.ParentID = contentId) Then
+                                returnCriteria &= "OR" & getContentControlCriteria(kvp.Value.ID, contentTableName, contentDAtaSourceName, parentIdList)
+                            End If
                         Next
-                        dt.Dispose()
+                        'returnCriteria = "((" & contentTableName & ".contentcontrolId=" & contentId & ")"
+                        'dt = cpCore.db.executeSql("select id from cccontent where parentid=" & contentId, contentDAtaSourceName)
+                        'For Each datarow As DataRow In dt.Rows
+                        '    childContentId = genericController.EncodeInteger(datarow.Item(0))
+                        '    returnCriteria &= "OR" & getContentControlCriteria(childContentId, contentTableName, contentDAtaSourceName, parentIdList)
+                        'Next
+                        'dt.Dispose()
                         parentIdList.Remove(contentId)
-                        returnCriteria = returnCriteria & ")"
+                        returnCriteria = "(" & returnCriteria & ")"
                     End If
                 End If
             Catch ex As Exception
@@ -2414,9 +2445,8 @@ ErrorTrap:
                 If (Not tableSchemaList Is Nothing) Then
                     tableSchemaList.Clear()
                 End If
-                If (Not contentNameIdDictionary Is Nothing) Then
-                    contentNameIdDictionary = Nothing
-                End If
+                _contentNameIdDictionary = Nothing
+                _contentIdDict = Nothing
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -2541,7 +2571,7 @@ ErrorTrap:
         '   If child already exists, add any missing fields from parent
         '=============================================================================
         '
-        Public Sub CreateContentChild(ByVal ChildContentName As String, ByVal ParentContentName As String, ByVal MemberID As Integer)
+        Public Sub createContentChild(ByVal ChildContentName As String, ByVal ParentContentName As String, ByVal MemberID As Integer)
             Try
                 Dim DataSourceName As String = ""
                 Dim MethodName As String
@@ -2850,7 +2880,7 @@ ErrorTrap:
         '       called from upgrade and DeveloperTools
         '========================================================================
         '
-        Public Function metaData_CreateContent4(ByVal Active As Boolean, datasource As datasourceModel, ByVal TableName As String, ByVal contentName As String, Optional ByVal AdminOnly As Boolean = False, Optional ByVal DeveloperOnly As Boolean = False, Optional ByVal AllowAdd As Boolean = True, Optional ByVal AllowDelete As Boolean = True, Optional ByVal ParentName As String = "", Optional ByVal DefaultSortMethod As String = "", Optional ByVal DropDownFieldList As String = "", Optional ByVal AllowWorkflowAuthoring As Boolean = False, Optional ByVal AllowCalendarEvents As Boolean = False, Optional ByVal AllowContentTracking As Boolean = False, Optional ByVal AllowTopicRules As Boolean = False, Optional ByVal AllowContentChildTool As Boolean = False, Optional ByVal AllowMetaContent As Boolean = False, Optional ByVal IconLink As String = "", Optional ByVal IconWidth As Integer = 0, Optional ByVal IconHeight As Integer = 0, Optional ByVal IconSprites As Integer = 0, Optional ByVal ccGuid As String = "", Optional ByVal IsBaseContent As Boolean = False, Optional ByVal installedByCollectionGuid As String = "", Optional clearMetaCache As Boolean = False) As Integer
+        Public Function createContent(ByVal Active As Boolean, datasource As dataSourceModel, ByVal TableName As String, ByVal contentName As String, Optional ByVal AdminOnly As Boolean = False, Optional ByVal DeveloperOnly As Boolean = False, Optional ByVal AllowAdd As Boolean = True, Optional ByVal AllowDelete As Boolean = True, Optional ByVal ParentName As String = "", Optional ByVal DefaultSortMethod As String = "", Optional ByVal DropDownFieldList As String = "", Optional ByVal AllowWorkflowAuthoring As Boolean = False, Optional ByVal AllowCalendarEvents As Boolean = False, Optional ByVal AllowContentTracking As Boolean = False, Optional ByVal AllowTopicRules As Boolean = False, Optional ByVal AllowContentChildTool As Boolean = False, Optional ByVal AllowMetaContent As Boolean = False, Optional ByVal IconLink As String = "", Optional ByVal IconWidth As Integer = 0, Optional ByVal IconHeight As Integer = 0, Optional ByVal IconSprites As Integer = 0, Optional ByVal ccGuid As String = "", Optional ByVal IsBaseContent As Boolean = False, Optional ByVal installedByCollectionGuid As String = "", Optional clearMetaCache As Boolean = False) As Integer
             Dim returnContentId As Integer = 0
             Try
                 '
@@ -3077,7 +3107,7 @@ ErrorTrap:
                                     field.caption = "ID"
                                     field.defaultValue = ""
                                     field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(contentName, field)
+                                    Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 '
                                 If Not cpCore.db.isCdefField(returnContentId, "name") Then
@@ -3090,7 +3120,7 @@ ErrorTrap:
                                     field.caption = "Name"
                                     field.defaultValue = ""
                                     field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(contentName, field)
+                                    Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 '
                                 If Not cpCore.db.isCdefField(returnContentId, "active") Then
@@ -3103,7 +3133,7 @@ ErrorTrap:
                                     field.caption = "Active"
                                     field.defaultValue = "1"
                                     field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(contentName, field)
+                                    Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 '
                                 If Not cpCore.db.isCdefField(returnContentId, "sortorder") Then
@@ -3116,7 +3146,7 @@ ErrorTrap:
                                     field.caption = "Alpha Sort Order"
                                     field.defaultValue = ""
                                     field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(contentName, field)
+                                    Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 '
                                 If Not cpCore.db.isCdefField(returnContentId, "dateadded") Then
@@ -3129,7 +3159,7 @@ ErrorTrap:
                                     field.caption = "Date Added"
                                     field.defaultValue = ""
                                     field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(contentName, field)
+                                    Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 If Not cpCore.db.isCdefField(returnContentId, "createdby") Then
                                     field = New coreMetaDataClass.CDefFieldClass
@@ -3142,7 +3172,7 @@ ErrorTrap:
                                     field.lookupContentName(cpCore) = "People"
                                     field.defaultValue = ""
                                     field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(contentName, field)
+                                    Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 If Not cpCore.db.isCdefField(returnContentId, "modifieddate") Then
                                     field = New coreMetaDataClass.CDefFieldClass
@@ -3154,7 +3184,7 @@ ErrorTrap:
                                     field.caption = "Date Modified"
                                     field.defaultValue = ""
                                     field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(contentName, field)
+                                    Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 If Not cpCore.db.isCdefField(returnContentId, "modifiedby") Then
                                     field = New coreMetaDataClass.CDefFieldClass
@@ -3167,7 +3197,7 @@ ErrorTrap:
                                     field.lookupContentName(cpCore) = "People"
                                     field.defaultValue = ""
                                     field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(contentName, field)
+                                    Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 If Not cpCore.db.isCdefField(returnContentId, "ContentControlID") Then
                                     field = New coreMetaDataClass.CDefFieldClass
@@ -3180,7 +3210,7 @@ ErrorTrap:
                                     field.lookupContentName(cpCore) = "Content"
                                     field.defaultValue = ""
                                     field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(contentName, field)
+                                    Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 If Not cpCore.db.isCdefField(returnContentId, "CreateKey") Then
                                     field = New coreMetaDataClass.CDefFieldClass
@@ -3192,7 +3222,7 @@ ErrorTrap:
                                     field.caption = "Create Key"
                                     field.defaultValue = ""
                                     field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(contentName, field)
+                                    Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 '
                                 ' REFACTOR - these fieldsonly apply to page content
@@ -3208,7 +3238,7 @@ ErrorTrap:
                                     field.lookupContentName(cpCore) = ""
                                     field.defaultValue = "null"
                                     field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(contentName, field)
+                                    Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 If Not cpCore.db.isCdefField(returnContentId, "EditArchive") Then
                                     field = New coreMetaDataClass.CDefFieldClass
@@ -3221,7 +3251,7 @@ ErrorTrap:
                                     field.lookupContentName(cpCore) = ""
                                     field.defaultValue = "0"
                                     field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(contentName, field)
+                                    Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 If Not cpCore.db.isCdefField(returnContentId, "EditBlank") Then
                                     field = New coreMetaDataClass.CDefFieldClass
@@ -3234,7 +3264,7 @@ ErrorTrap:
                                     field.lookupContentName(cpCore) = ""
                                     field.defaultValue = "0"
                                     field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(contentName, field)
+                                    Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 If Not cpCore.db.isCdefField(returnContentId, "ContentCategoryID") Then
                                     field = New coreMetaDataClass.CDefFieldClass
@@ -3247,7 +3277,7 @@ ErrorTrap:
                                     field.lookupContentName(cpCore) = "Content Categories"
                                     field.defaultValue = ""
                                     field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(contentName, field)
+                                    Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 If Not cpCore.db.isCdefField(returnContentId, "ccGuid") Then
                                     field = New coreMetaDataClass.CDefFieldClass
@@ -3259,7 +3289,7 @@ ErrorTrap:
                                     field.caption = "Guid"
                                     field.defaultValue = ""
                                     field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(contentName, field)
+                                    Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                             End If
                             '
@@ -3288,7 +3318,7 @@ ErrorTrap:
         '
         ' ====================================================================================================================
         '
-        Public Function metaData_VerifyCDefField_ReturnID(ByVal ContentName As String, field As coreMetaDataClass.CDefFieldClass) As Integer ' , ByVal FieldName As String, ByVal Args As String, ByVal Delimiter As String) As Integer
+        Public Function verifyCDefField_ReturnID(ByVal ContentName As String, field As coreMetaDataClass.CDefFieldClass) As Integer ' , ByVal FieldName As String, ByVal Args As String, ByVal Delimiter As String) As Integer
             Dim returnId As Integer = 0
             Try
                 '
@@ -3383,7 +3413,7 @@ ErrorTrap:
                     '
                     ' This update is not allowed
                     '
-                    cpCore.handleLegacyError2("cpCoreClass", "csv_VerifyCDefField_ReturnID", cpCore.serverconfig.appConfig.name & ", Warning, a Base field Is being updated To non-base. This should only happen When a base field Is removed from the base collection. Content [" & ContentName & "], field [" & field.nameLc & "].")
+                    cpCore.handleLegacyError2("cpCoreClass", "csv_VerifyCDefField_ReturnID", cpCore.serverConfig.appConfig.name & ", Warning, a Base field Is being updated To non-base. This should only happen When a base field Is removed from the base collection. Content [" & ContentName & "], field [" & field.nameLc & "].")
                 End If
                 If True Then
                     'FieldAdminOnly = field.adminOnly

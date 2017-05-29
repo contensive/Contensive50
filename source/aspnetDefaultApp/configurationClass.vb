@@ -68,14 +68,14 @@ Public Class configurationClass
                 End Try
             End If
             '
-            Dim remoteMethods As List(Of Contensive.Core.Models.Entity.addonModel) = Contensive.Core.Models.Entity.addonModel.getRemoteMethods(cp.core)
+            Dim remoteMethods As List(Of Contensive.Core.Models.Entity.addonModel) = Contensive.Core.Models.Entity.addonModel.createList_RemoteMethods(cp.core, New List(Of String))
             appendLog(cp, "RegisterRoutes, remoteMethods.Count=" & remoteMethods.Count.ToString())
             For Each remoteMethod As Contensive.Core.Models.Entity.addonModel In remoteMethods
                 '
                 ' -- register each remote method
                 Try
-                    Dim routeName As String = remoteMethod.name
-                    Dim routeUrl As String = remoteMethod.name
+                    Dim routeName As String = remoteMethod.Name
+                    Dim routeUrl As String = remoteMethod.Name
                     appendLog(cp, "RegisterRoutes, remoteMethods, routeName=[" & routeName & "], routeUrl =[" & routeUrl & "], physicalFile=[" & physicalFile & "]")
                     routes.MapPageRoute(routeName, routeUrl, physicalFile)
                 Catch ex As Exception

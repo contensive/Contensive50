@@ -8194,7 +8194,7 @@ ErrorTrap:
                         LineStart = genericController.vbInstr(1, returnValue, StartFlag)
                         LineEnd = genericController.vbInstr(LineStart, returnValue, EndFlag)
                         If LineEnd = 0 Then
-                            logController.log_appendLog(cpCore, "csv_EncodeContent9, Addon could not be inserted into content because the HTML comment holding the position is not formated correctly")
+                            logController.appendLog(cpCore, "csv_EncodeContent9, Addon could not be inserted into content because the HTML comment holding the position is not formated correctly")
                             Exit Do
                         Else
                             AddonName = ""

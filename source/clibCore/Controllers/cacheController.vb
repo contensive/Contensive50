@@ -683,7 +683,7 @@ Namespace Contensive.Core.Controllers
         '=======================================================================
         Private Sub appendCacheLog(line As String)
             Try
-                logController.log_appendLog(cpCore, line, "cache")
+                logController.appendLog(cpCore, line, "cache")
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(New ApplicationException("appendCacheLog exception", ex))
             End Try
