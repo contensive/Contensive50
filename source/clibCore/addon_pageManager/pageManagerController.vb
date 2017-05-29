@@ -100,16 +100,16 @@ Namespace Contensive.Core.Controllers
         Public Const pageManager_cache_siteSection_cacheName = "cache_siteSection"
         Public cache_siteSection As String(,)
         Public pageManager_cache_siteSection_rows As Integer = 0
-        Public pageManager_cache_siteSection_IDIndex As coreKeyPtrIndexClass
-        Public pageManager_cache_siteSection_RootPageIDIndex As coreKeyPtrIndexClass
-        Public pageManager_cache_siteSection_NameIndex As coreKeyPtrIndexClass
+        Public pageManager_cache_siteSection_IDIndex As keyPtrController
+        Public pageManager_cache_siteSection_RootPageIDIndex As keyPtrController
+        Public pageManager_cache_siteSection_NameIndex As keyPtrController
         '
         ' ----- Template Content store
         '
         Public Const pageManager_cache_pageTemplate_cacheName = "cache_pageTemplate"
         Public cache_pageTemplate As String(,)
         Public pageManager_cache_pageTemplate_rows As Integer = 0
-        Public pageManager_cache_pageTemplate_contentIdindex As coreKeyPtrIndexClass
+        Public pageManager_cache_pageTemplate_contentIdindex As keyPtrController
         '
         ' ----- Page Content store (old names for compatibility)
         '
@@ -117,9 +117,9 @@ Namespace Contensive.Core.Controllers
         Public _pageManager_cache_pageContent_rows As Integer = 0
         Public cache_pageContent As String(,)
         Public _pageManager_cache_pageContent_needsReload As Boolean = False
-        Public pageManager_cache_pageContent_idIndex As coreKeyPtrIndexClass
-        Public pageManager_cache_pageContent_parentIdIndex As coreKeyPtrIndexClass
-        Public pageManager_cache_pageContent_nameIndex As coreKeyPtrIndexClass
+        Public pageManager_cache_pageContent_idIndex As keyPtrController
+        Public pageManager_cache_pageContent_parentIdIndex As keyPtrController
+        Public pageManager_cache_pageContent_nameIndex As keyPtrController
         '
         '====================================================================================================
         ''' <summary>
@@ -639,16 +639,16 @@ Namespace Contensive.Core.Controllers
                 Dim FilterStatusOK As Boolean
                 Dim BlockFormatting As Boolean
                 Dim IndentCnt As Integer
-                Dim Result As New coreFastStringClass
+                Dim Result As New stringBuilderLegacyController
                 Dim Content As String
                 Dim ContentIndent As String
                 Dim ContentCnt As Integer
                 Dim PageContent As String
-                Dim Stream As New coreFastStringClass
+                Dim Stream As New stringBuilderLegacyController
                 Dim LocalTemplateID As Integer
                 Dim LocalTemplateName As String
                 Dim LocalTemplateBody As String
-                Dim Parse As coreHtmlParseClass
+                Dim Parse As htmlParserController
                 Dim blockSiteWithLogin As Boolean
                 Dim addonCachePtr As Integer
                 Dim addonId As Integer
@@ -777,7 +777,7 @@ Namespace Contensive.Core.Controllers
                     '
                     If c.siteProperties.getBoolean("AutoHTMLFormatting") Then
                         IndentCnt = 0
-                        Parse = New coreHtmlParseClass(c)
+                        Parse = New htmlParserController(c)
                         Call Parse.Load(returnHtmlBody)
                         If Parse.ElementCount > 0 Then
                             For Ptr = 0 To Parse.ElementCount - 1
@@ -3129,7 +3129,7 @@ ErrorTrap:
             Dim AllowApprove As Boolean
             Dim AllowMarkReviewed As Boolean
 
-            Dim CDef As coreMetaDataClass.CDefClass
+            Dim CDef As cdefModel
             Dim readOnlyField As Boolean
             '
             Dim IsEditLocked As Boolean
@@ -4296,7 +4296,7 @@ ErrorTrap:
             Dim PtrCnt As Integer
             Dim SortSplit() As String
             Dim SortSplitCnt As Integer
-            Dim Index As coreKeyPtrIndexClass
+            Dim Index As keyPtrController
             Dim PCCColPtr As Integer
             Dim PCCPtrsSorted As Integer()
             Dim AllowInMenus As Boolean
@@ -5697,7 +5697,7 @@ ErrorTrap:
             '
             Dim bag As String
             Dim Ticks As Integer
-            Dim IDList2 As New coreFastStringClass
+            Dim IDList2 As New stringBuilderLegacyController
             Dim IDList As String
             Dim PageName As String
             Dim CS As Integer
@@ -5716,9 +5716,9 @@ ErrorTrap:
             '
             ' Load cached PCC
             '
-            pageManager_cache_pageContent_idIndex = New coreKeyPtrIndexClass
-            pageManager_cache_pageContent_parentIdIndex = New coreKeyPtrIndexClass
-            pageManager_cache_pageContent_nameIndex = New coreKeyPtrIndexClass
+            pageManager_cache_pageContent_idIndex = New keyPtrController
+            pageManager_cache_pageContent_parentIdIndex = New keyPtrController
+            pageManager_cache_pageContent_nameIndex = New keyPtrController
             pageManager_cache_pageContent_rows = 0
             '
             On Error Resume Next
@@ -6124,7 +6124,7 @@ ErrorTrap:
             Dim PtrStep As Integer
             Dim PCCRowPtr As Integer
             Dim Ptr As Integer
-            Dim Index As coreKeyPtrIndexClass
+            Dim Index As keyPtrController
             Dim PCCSortFieldPtr As Integer
             Dim SortForward As Boolean
             Dim SortFieldName As String
@@ -6169,7 +6169,7 @@ ErrorTrap:
                     ' Store them in the index
                     '
                     If PCCSortFieldPtr >= 0 Then
-                        Index = New coreKeyPtrIndexClass
+                        Index = New keyPtrController
                         For Ptr = 0 To PCCPtrCnt - 1
                             PCCRowPtr = PCCPtrs(Ptr)
                             StringValue = genericController.encodeText(cache_pageContent(PCCSortFieldPtr, PCCRowPtr))
@@ -6407,9 +6407,9 @@ ErrorTrap:
             ' Load cache
             '
             pageManager_cache_siteSection_rows = 0
-            pageManager_cache_siteSection_IDIndex = New coreKeyPtrIndexClass
-            pageManager_cache_siteSection_RootPageIDIndex = New coreKeyPtrIndexClass
-            pageManager_cache_siteSection_NameIndex = New coreKeyPtrIndexClass
+            pageManager_cache_siteSection_IDIndex = New keyPtrController
+            pageManager_cache_siteSection_RootPageIDIndex = New keyPtrController
+            pageManager_cache_siteSection_NameIndex = New keyPtrController
             '
             On Error Resume Next
             If Not pagemanager_IsWorkflowRendering() Then
@@ -6594,7 +6594,7 @@ ErrorTrap:
             ' Load cached TC
             '
             pageManager_cache_pageTemplate_rows = 0
-            pageManager_cache_pageTemplate_contentIdindex = New coreKeyPtrIndexClass
+            pageManager_cache_pageTemplate_contentIdindex = New keyPtrController
             '
             On Error Resume Next
             If Not pagemanager_IsWorkflowRendering() Then
@@ -6707,7 +6707,7 @@ ErrorTrap:
                 cache_pageTemplate = cacheArray
                 '
                 If pageManager_cache_pageTemplate_rows > 0 Then
-                    pageManager_cache_pageTemplate_contentIdindex = New coreKeyPtrIndexClass
+                    pageManager_cache_pageTemplate_contentIdindex = New keyPtrController
                     For Ptr = 0 To pageManager_cache_pageTemplate_rows - 1
                         Id = genericController.EncodeInteger(cache_pageTemplate(TC_ID, Ptr))
                         Call pageManager_cache_pageTemplate_contentIdindex.setPtr(genericController.encodeText(Id), Ptr)
@@ -7817,7 +7817,7 @@ ErrorTrap:
             Dim SubmittedName As String
             Dim ApprovedName As String
             Dim ModifiedName As String
-            Dim CDef As coreMetaDataClass.CDefClass
+            Dim CDef As cdefModel
             Dim ModifiedDate As Date
             Dim SubmittedDate As Date
             Dim ApprovedDate As Date
@@ -8004,7 +8004,7 @@ ErrorTrap:
             'If Not (true) Then Exit Sub
             '
             Dim MethodName As String
-            Dim CDef As coreMetaDataClass.CDefClass
+            Dim CDef As cdefModel
             Dim Copy As String
             Dim Link As String
             Dim FromAddress As String
@@ -8221,7 +8221,7 @@ ErrorTrap:
             Dim CaptionSpan As String
             Dim Caption As String
             Dim IsRequiredByCDef As Boolean
-            Dim PeopleCDef As coreMetaDataClass.CDefClass
+            Dim PeopleCDef As cdefModel
             '
             IsRetry = (c.docProperties.getInteger("ContensiveFormPageID") <> 0)
             '
@@ -9417,7 +9417,7 @@ ErrorTrap:
         Public Function main_IsChildRecord(ByVal ContentName As String, ByVal ChildRecordID As Integer, ByVal ParentRecordID As Integer) As Boolean
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("IsChildRecord")
             '
-            Dim CDef As coreMetaDataClass.CDefClass
+            Dim CDef As cdefModel
             '
             main_IsChildRecord = (ChildRecordID = ParentRecordID)
             If Not main_IsChildRecord Then

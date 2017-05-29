@@ -67,7 +67,7 @@ Namespace Contensive.Core.Controllers
             Dim Updateable As Boolean               ' Can not update an csv_OpenCSSQL because Fields are not accessable
             Dim NewRecord As Boolean                ' true if it was created here
             Dim ContentName As String
-            Dim CDef As coreMetaDataClass.CDefClass
+            Dim CDef As cdefModel
             Dim OwnerMemberID As Integer               ' ID of the member who opened the csv_ContentSet
             '
             ' Workflow editing modes
@@ -467,7 +467,7 @@ Namespace Contensive.Core.Controllers
         Public Function getContentId(ByVal ContentName As String) As Integer
             Dim returnId As Integer = -1
             Try
-                Dim cdef As coreMetaDataClass.CDefClass
+                Dim cdef As cdefModel
                 '
                 cdef = cpCore.metaData.getCdef(ContentName)
                 If (cdef IsNot Nothing) Then
@@ -676,7 +676,7 @@ Namespace Contensive.Core.Controllers
         Public Function isSQLTableField(ByVal DataSourceName As String, ByVal TableName As String, ByVal FieldName As String) As Boolean
             Dim returnOK As Boolean = False
             Try
-                Dim tableSchema As coreMetaDataClass.tableSchemaClass = cpCore.metaData.getTableSchema(TableName, DataSourceName)
+                Dim tableSchema As tableSchemaModel = cpCore.metaData.getTableSchema(TableName, DataSourceName)
                 If (tableSchema IsNot Nothing) Then
                     returnOK = tableSchema.columns.Contains(FieldName.ToLower)
                 End If
@@ -908,7 +908,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="clearMetaCache"></param>
         Public Sub createSQLIndex(ByVal DataSourceName As String, ByVal TableName As String, ByVal IndexName As String, ByVal FieldNames As String, Optional clearMetaCache As Boolean = False)
             Try
-                Dim ts As coreMetaDataClass.tableSchemaClass
+                Dim ts As tableSchemaModel
                 If Not (String.IsNullOrEmpty(TableName) And String.IsNullOrEmpty(IndexName) And String.IsNullOrEmpty(FieldNames)) Then
                     ts = cpCore.metaData.getTableSchema(TableName, DataSourceName)
                     If (ts IsNot Nothing) Then
@@ -1049,7 +1049,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="IndexName"></param>
         Public Sub deleteSqlIndex(ByVal DataSourceName As String, ByVal TableName As String, ByVal IndexName As String)
             Try
-                Dim ts As coreMetaDataClass.tableSchemaClass
+                Dim ts As tableSchemaModel
                 Dim DataSourceType As Integer
                 Dim sql As String
                 '
@@ -1251,7 +1251,7 @@ Namespace Contensive.Core.Controllers
                 Dim iCriteria As String
                 Dim RecordID As Integer
                 Dim iSelectFieldList As String
-                Dim CDef As coreMetaDataClass.CDefClass
+                Dim CDef As cdefModel
                 Dim TestUcaseFieldList As String
                 Dim SQL As String
                 '
@@ -1603,7 +1603,7 @@ Namespace Contensive.Core.Controllers
                             ' delete any files
                             '
                             Dim fieldName As String
-                            Dim field As coreMetaDataClass.CDefFieldClass
+                            Dim field As CDefFieldModel
                             With contentSetStore(CSPointer).CDef
                                 For Each keyValue In .fields
                                     field = keyValue.Value
@@ -1634,7 +1634,7 @@ Namespace Contensive.Core.Controllers
                             ' non-workflow mode, delete the live record
                             '
                             Call deleteTableRecord(ContentTableName, LiveRecordID, ContentDataSourceName)
-                            If coreWorkflowClass.csv_AllowAutocsv_ClearContentTimeStamp Then
+                            If workflowController.csv_AllowAutocsv_ClearContentTimeStamp Then
                                 Call cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(ContentTableName, "id", LiveRecordID.ToString()))
                                 'Call cpCore.cache.invalidateObject(ContentName)
                             End If
@@ -2513,7 +2513,7 @@ Namespace Contensive.Core.Controllers
             Try
                 '
                 Dim CSPointer As Integer
-                Dim CDef As coreMetaDataClass.CDefClass
+                Dim CDef As cdefModel
                 '
                 If String.IsNullOrEmpty(ContentName.Trim()) Then
                     Throw New ArgumentException("contentName cannot be blank")
@@ -2584,7 +2584,7 @@ Namespace Contensive.Core.Controllers
                 Dim TableName As String
                 Dim WorkflowAuthoringMode As Boolean
                 Dim LiveRecordID As Integer
-                Dim CDef As coreMetaDataClass.CDefClass
+                Dim CDef As cdefModel
                 Dim DefaultValueText As String
                 Dim LookupContentName As String
                 Dim Ptr As Integer
@@ -2630,8 +2630,8 @@ Namespace Contensive.Core.Controllers
                                 TableName = .ContentTableName
                             End If
                             If .fields.Count > 0 Then
-                                For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In .fields
-                                    Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+                                For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In .fields
+                                    Dim field As CDefFieldModel = keyValuePair.Value
                                     With field
                                         FieldName = .nameLc
                                         If (FieldName <> "") And (Not String.IsNullOrEmpty(.defaultValue)) Then
@@ -2797,7 +2797,7 @@ Namespace Contensive.Core.Controllers
                 Dim DestRecordID As Integer
                 Dim DestFilename As String
                 Dim SourceFilename As String
-                Dim DestCDef As coreMetaDataClass.CDefClass
+                Dim DestCDef As cdefModel
                 '
                 If Not cs_ok(CSSource) Then
                     Throw New ArgumentException("source dataset is not valid")
@@ -2925,7 +2925,7 @@ Namespace Contensive.Core.Controllers
                             ' Updateable -- enterprete the value
                             '
                             'ContentName = .ContentName
-                            Dim field As coreMetaDataClass.CDefFieldClass
+                            Dim field As CDefFieldModel
                             If Not .CDef.fields.ContainsKey(FieldName.ToLower()) Then
                                 Try
                                     fieldValue = genericController.encodeText(cs_getField(CSPointer, FieldName))
@@ -3113,7 +3113,7 @@ Namespace Contensive.Core.Controllers
                             End If
                             With .CDef
                                 If .Name <> "" Then
-                                    Dim field As coreMetaDataClass.CDefFieldClass
+                                    Dim field As CDefFieldModel
                                     If Not .fields.ContainsKey(FieldNameLc) Then
                                         Throw New ArgumentException("The field [" & FieldName & "] could Not be found In content [" & .Name & "]")
                                     Else
@@ -3494,7 +3494,7 @@ Namespace Contensive.Core.Controllers
                                     LiveRecordInactive = True
                                 End If
                                 '
-                                Dim field As coreMetaDataClass.CDefFieldClass = .CDef.fields(FieldName.ToLower())
+                                Dim field As CDefFieldModel = .CDef.fields(FieldName.ToLower())
                                 If True Then
                                     FieldFoundCount = FieldFoundCount + 1
                                     With field
@@ -3937,7 +3937,7 @@ Namespace Contensive.Core.Controllers
                 Dim fieldTypeId As Integer
                 Dim TableName As String
                 Dim iOriginalFilename As String
-                Dim CDef As coreMetaDataClass.CDefClass
+                Dim CDef As cdefModel
                 '
                 If String.IsNullOrEmpty(ContentName.Trim()) Then
                     Throw New ArgumentException("contentname cannot be blank")
@@ -4579,8 +4579,8 @@ Namespace Contensive.Core.Controllers
                 If Not cs_ok(CS) Then
                     Throw New ArgumentException("dataset is not valid")
                 Else
-                    For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In contentSetStore(CS).CDef.fields
-                        Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+                    For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In contentSetStore(CS).CDef.fields
+                        Dim field As CDefFieldModel = keyValuePair.Value
                         With field
                             FieldName = .nameLc
                             If (FieldName <> "") And (Not String.IsNullOrEmpty(.defaultValue)) Then
@@ -4704,7 +4704,7 @@ Namespace Contensive.Core.Controllers
         Public Function getSQLIndexList(ByVal DataSourceName As String, ByVal TableName As String) As String
             Dim returnList As String = ""
             Try
-                Dim ts As coreMetaDataClass.tableSchemaClass = cpCore.metaData.getTableSchema(TableName, DataSourceName)
+                Dim ts As tableSchemaModel = cpCore.metaData.getTableSchema(TableName, DataSourceName)
                 If (ts IsNot Nothing) Then
                     For Each entry As String In ts.indexes
                         returnList &= "," & entry
@@ -4913,7 +4913,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="TableName"></param>
         ''' <param name="ContentName"></param>
         '
-        Public Sub createContentFromSQLTable(ByVal DataSource As datasourcemodel, ByVal TableName As String, ByVal ContentName As String)
+        Public Sub createContentFromSQLTable(ByVal DataSource As dataSourceModel, ByVal TableName As String, ByVal ContentName As String)
             Try
                 Dim SQL As String
                 Dim dtFields As DataTable
@@ -5043,7 +5043,7 @@ Namespace Contensive.Core.Controllers
         Public Sub createContentFieldFromTableField(ByVal ContentName As String, ByVal FieldName As String, ByVal ADOFieldType As Integer)
             Try
                 '
-                Dim field As New coreMetaDataClass.CDefFieldClass
+                Dim field As New CDefFieldModel
                 '
                 field.fieldTypeId = cpCore.db.getFieldTypeIdByADOType(ADOFieldType)
                 field.caption = FieldName

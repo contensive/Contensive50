@@ -4,9 +4,10 @@ Option Strict On
 '
 Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
-Imports Contensive.Core.coreCommonModule
+
 Imports System.Xml
 Imports Contensive.Core
+Imports Contensive.Core.Models.Entity
 '
 Namespace Contensive.Addons
     '
@@ -202,7 +203,7 @@ Namespace Contensive.Addons
             Dim CS As Integer
             Dim Panel As String
             Dim Copy As String
-            Dim Stream As New coreFastStringClass
+            Dim Stream As New stringBuilderLegacyController
             Dim AdminURL As String
             Dim MenuEntryContentName As String
             Dim addonId As Integer
@@ -213,7 +214,7 @@ Namespace Contensive.Addons
             'Dim ResponseFormID As String
             Dim returnStatus As Boolean
             Dim editRecord As New editRecordClass
-            Dim AdminContent As New coreMetaDataClass.CDefClass
+            Dim AdminContent As New cdefModel
             '
             '-------------------------------------------------------------------------------
             ' Setup defaults
@@ -245,7 +246,7 @@ leak200:
                 ' --- must be authenticated to continue
                 '
                 Stream.Add(cpCore.htmlDoc.getLoginPage(False))
-            ElseIf Not cpCore.authContext.isAuthenticatedContentManager(cpcore) Then
+            ElseIf Not cpCore.authContext.isAuthenticatedContentManager(cpCore) Then
                 '
                 ' --- member must have proper access to continue
                 '
@@ -603,7 +604,7 @@ ErrorTrap:
         '       the upl collection
         '========================================================================
         '
-        Private Sub GetForm_LoadControl(ByRef adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass)
+        Private Sub GetForm_LoadControl(ByRef adminContent As cdefModel, editRecord As editRecordClass)
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogAdminMethodEnter( "GetForm_LoadControl")
             '
             Dim editorpreferences As String
@@ -654,14 +655,14 @@ ErrorTrap:
             If requestedContentId <> 0 Then
                 adminContent = cpCore.metaData.getCdef(requestedContentId)
                 If adminContent Is Nothing Then
-                    adminContent = New coreMetaDataClass.CDefClass
+                    adminContent = New cdefModel
                     adminContent.Id = 0
                     cpCore.error_AddUserError("There is no content with the requested id [" & requestedContentId & "]")
                     requestedContentId = 0
                 End If
             End If
             If adminContent Is Nothing Then
-                adminContent = New coreMetaDataClass.CDefClass
+                adminContent = New cdefModel
             End If
             '
             ' determine user rights to this content
@@ -910,7 +911,7 @@ ErrorTrap:
         '       Email - (not done) Sends "body" field to "email" field in adminContent.id
         '========================================================================
         '
-        Private Sub ProcessActions(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass, UseContentWatchLink As Boolean)
+        Private Sub ProcessActions(adminContent As cdefModel, editRecord As editRecordClass, UseContentWatchLink As Boolean)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "ProcessActions")
             '
             'Dim Upload As KMAUpload3.UploadClass
@@ -1648,7 +1649,7 @@ ErrorTrap:
         '   Then load in any response elements
         '========================================================================
         '
-        Private Sub LoadEditRecord(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass, Optional ByVal CheckUserErrors As Boolean = False)
+        Private Sub LoadEditRecord(adminContent As cdefModel, editRecord As editRecordClass, Optional ByVal CheckUserErrors As Boolean = False)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "LoadEditRecord")
             '
             ' converted array to dictionary - Dim FieldPointer As Integer
@@ -1811,7 +1812,7 @@ ErrorTrap:
         '   Load both Live and Edit Record values from definition defaults
         '========================================================================
         '
-        Private Sub LoadEditRecord_Default(adminContent As coreMetaDataClass.CDefClass, editrecord As editRecordClass)
+        Private Sub LoadEditRecord_Default(adminContent As cdefModel, editrecord As editRecordClass)
             Try
                 Dim DefaultValueText As String
                 Dim LookupContentName As String
@@ -1823,7 +1824,7 @@ ErrorTrap:
                 Dim defaultValue As String
                 Dim MethodName As String
                 Dim editRecordField As editRecordFieldClass
-                Dim field As coreMetaDataClass.CDefFieldClass
+                Dim field As CDefFieldModel
                 '
                 MethodName = "Admin.Method()"
                 '
@@ -1922,7 +1923,7 @@ ErrorTrap:
         '   Load both Live and Edit Record values from definition defaults
         '========================================================================
         '
-        Private Sub LoadEditRecord_WherePairs(Admincontent As coreMetaDataClass.CDefClass, editRecord As editRecordClass)
+        Private Sub LoadEditRecord_WherePairs(Admincontent As cdefModel, editRecord As editRecordClass)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "LoadEditRecord_WherePairs")
             '
             ' converted array to dictionary - Dim FieldPointer As Integer
@@ -1933,7 +1934,7 @@ ErrorTrap:
             MethodName = "Admin.LoadEditRecord_WherePairs(adminContent, editRecord)"
             '
             For Each keyValuePair In Admincontent.fields
-                Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+                Dim field As CDefFieldModel = keyValuePair.Value
                 With field
                     DefaultValueText = GetWherePairValue(.nameLc)
                     If .active And (DefaultValueText <> "") Then
@@ -1974,7 +1975,7 @@ ErrorTrap:
         '   Load Records from the database
         '========================================================================
         '
-        Private Sub LoadEditRecord_Dbase(ByVal adminContent As coreMetaDataClass.CDefClass, ByRef editrecord As editRecordClass, Optional ByVal CheckUserErrors As Boolean = False)
+        Private Sub LoadEditRecord_Dbase(ByVal adminContent As cdefModel, ByRef editrecord As editRecordClass, Optional ByVal CheckUserErrors As Boolean = False)
             Try
                 '
                 Dim DBValueVariant As Object
@@ -2091,7 +2092,7 @@ ErrorTrap:
                         '
                         NullVariant = Nothing
                         For Each keyValuePair In adminContent.fields
-                            Dim adminContentField As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+                            Dim adminContentField As CDefFieldModel = keyValuePair.Value
                             Dim fieldNameLc As String = adminContentField.nameLc
                             Dim editRecordField As editRecordFieldClass
                             '
@@ -2211,7 +2212,7 @@ ErrorTrap:
         '   Read the Form into the fields array
         '========================================================================
         '
-        Private Sub LoadEditResponse(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass)
+        Private Sub LoadEditResponse(adminContent As cdefModel, editRecord As editRecordClass)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "LoadEditResponse")
             '
             ' converted array to dictionary - Dim FieldPointer As Integer
@@ -2252,7 +2253,7 @@ ErrorTrap:
                 Dim datasource As Models.Entity.dataSourceModel = Models.Entity.dataSourceModel.create(cpCore, adminContent.dataSourceId, New List(Of String))
                 'DataSourceName = cpCore.db.getDataSourceNameByID(adminContent.dataSourceId)
                 For Each keyValuePair In adminContent.fields
-                    Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+                    Dim field As CDefFieldModel = keyValuePair.Value
                     Call LoadEditResponseByPointer(adminContent, editRecord, field, datasource.Name, FormFieldListToBeLoaded, FormEmptyFieldList)
                 Next
                 '
@@ -2344,7 +2345,7 @@ ErrorTrap:
         '   Read the Form into the fields array
         '========================================================================
         '
-        Private Sub LoadEditResponseByPointer(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass, field As coreMetaDataClass.CDefFieldClass, DataSourceName As String, ByRef FormFieldListToBeLoaded As String, FormEmptyFieldList As String)
+        Private Sub LoadEditResponseByPointer(adminContent As cdefModel, editRecord As editRecordClass, field As CDefFieldModel, DataSourceName As String, ByRef FormFieldListToBeLoaded As String, FormEmptyFieldList As String)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "LoadEditResponseByPointer")
             '
             Dim blockDuplicateUsername As Boolean
@@ -2357,7 +2358,7 @@ ErrorTrap:
             'Dim ResponseText As String
             Dim EditorPixelHeight As Integer
             Dim EditorRowHeight As Integer
-            Dim HTMLDecode As coreHtmlToTextClass
+            Dim HTMLDecode As htmlToTextControllers
             Dim Copy As String
             'Dim ResponseValueVariant As Object
             Dim FieldName As String
@@ -2368,7 +2369,7 @@ ErrorTrap:
             Dim ResponseFieldValueText As String
             Dim Filename As String
             'Dim innovaEditor As New innovaEditorAddonClassFPO
-            Dim HTML As New coreHtmlParseClass(cpCore)
+            Dim HTML As New htmlParserController(cpCore)
             Dim ElementPointer As Integer
             Dim Result As String
             Dim Word As String
@@ -2526,12 +2527,12 @@ ErrorTrap:
                                 ' (many to many is handled during save)
                                 '
                                 ResponseFieldValueIsOKToSave = False
-                            ElseIf (.adminOnly) And (Not cpCore.authContext.isAuthenticatedAdmin(cpcore)) Then
+                            ElseIf (.adminOnly) And (Not cpCore.authContext.isAuthenticatedAdmin(cpCore)) Then
                                 '
                                 ' non-admin and admin only field, leave current value
                                 '
                                 ResponseFieldValueIsOKToSave = False
-                            ElseIf (.developerOnly) And (Not cpCore.authContext.isAuthenticatedDeveloper(cpcore)) Then
+                            ElseIf (.developerOnly) And (Not cpCore.authContext.isAuthenticatedDeveloper(cpCore)) Then
                                 '
                                 ' non-developer and developer only field, leave current value
                                 '
@@ -2675,7 +2676,7 @@ ErrorTrap:
                                                         If Not HasImg Then
                                                             HasAC = (InStr(1, ResponseFieldValueText, "<ac ") <> 0)
                                                             If Not HasAC Then
-                                                                HTMLDecode = New coreHtmlToTextClass(cpCore)
+                                                                HTMLDecode = New htmlToTextControllers(cpCore)
                                                                 Copy = Trim(HTMLDecode.convert(genericController.encodeText(ResponseFieldValueText)))
                                                                 If Copy = "" Then
                                                                     ResponseFieldValueText = ""
@@ -2859,7 +2860,7 @@ ErrorTrap:
         '   does NOT check AuthoringLocked -- you must check before calling
         '========================================================================
         '
-        Private Sub SaveContentTracking(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass)
+        Private Sub SaveContentTracking(adminContent As cdefModel, editRecord As editRecordClass)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "SaveContentTracking")
             '
             Dim ContentID As Integer
@@ -2947,7 +2948,7 @@ ErrorTrap:
         '   Read in Whats New values if present
         '========================================================================
         '
-        Private Sub LoadContentTrackingResponse(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass)
+        Private Sub LoadContentTrackingResponse(adminContent As cdefModel, editRecord As editRecordClass)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "LoadContentTrackingResponse")
             '
             Dim CSContentWatchList As Integer
@@ -3061,7 +3062,7 @@ ErrorTrap:
         '   if not, it appears in the LinkAlias tab, and must be saved here
         '========================================================================
         '
-        Private Sub SaveLinkAlias(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass)
+        Private Sub SaveLinkAlias(adminContent As cdefModel, editRecord As editRecordClass)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "SaveLinkAlias")
             '
             Dim isDupError As Boolean
@@ -3129,7 +3130,7 @@ ErrorTrap:
         '   Field values must be loaded
         '========================================================================
         '
-        Private Sub LoadContentTrackingDataBase(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass)
+        Private Sub LoadContentTrackingDataBase(adminContent As cdefModel, editRecord As editRecordClass)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "LoadContentTrackingDataBase")
             '
             Dim ContentID As Integer
@@ -3170,7 +3171,7 @@ ErrorTrap:
         '   The ResponseFormID is needed in case there is an upload file in the stream -- the content is not pre-processed
         '========================================================================
         '
-        Private Sub SaveEditRecord(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass)
+        Private Sub SaveEditRecord(adminContent As cdefModel, editRecord As editRecordClass)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "SaveEditRecord")
             '
             Dim testStr As String
@@ -3261,7 +3262,7 @@ ErrorTrap:
                     ' ----- Create the update sql
                     '
                     For Each keyValuePair In adminContent.fields
-                        Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+                        Dim field As CDefFieldModel = keyValuePair.Value
                         With field
                             Dim editRecordField As editRecordFieldClass = editRecord.fieldsLc(.nameLc)
                             fieldValueObject = editRecordField.value
@@ -3593,13 +3594,13 @@ ErrorTrap:
         '   Display a field in the admin index form
         '========================================================================
         '
-        Private Function GetForm_Index_GetCell(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass, fieldName As String, ByVal CS As Integer, ByVal IsLookupFieldValid As Boolean, ByVal IsEmailContent As Boolean) As String
+        Private Function GetForm_Index_GetCell(adminContent As cdefModel, editRecord As editRecordClass, fieldName As String, ByVal CS As Integer, ByVal IsLookupFieldValid As Boolean, ByVal IsEmailContent As Boolean) As String
             Dim return_formIndexCell As String = ""
             Try
                 Dim FieldText As String
                 Dim Filename As String
                 Dim Copy As String
-                Dim Stream As New coreFastStringClass
+                Dim Stream As New stringBuilderLegacyController
                 Dim lookups() As String
                 Dim LookupPtr As Integer
                 Dim Pos As Integer
@@ -3693,10 +3694,10 @@ ErrorTrap:
         '   used on Normal Edit and others
         '========================================================================
         '
-        Private Function GetForm_Edit_ButtonBar(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass, ByVal AllowDelete As Boolean, ByVal allowSave As Boolean, ByVal AllowAdd As Boolean, Optional ByVal AllowRefresh As Boolean = False) As String
+        Private Function GetForm_Edit_ButtonBar(adminContent As cdefModel, editRecord As editRecordClass, ByVal AllowDelete As Boolean, ByVal allowSave As Boolean, ByVal AllowAdd As Boolean, Optional ByVal AllowRefresh As Boolean = False) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "GetForm_Edit_ButtonBar")
             '
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             Dim IncludeCDefReload As Boolean
             Dim IsPageContent As Boolean
             Dim HasChildRecords As Boolean
@@ -3732,7 +3733,7 @@ ErrorTrap:
         '   AdminContent.type is not longer used
         '========================================================================
         '
-        Private Function GetForm_Edit(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass) As String
+        Private Function GetForm_Edit(adminContent As cdefModel, editRecord As editRecordClass) As String
             Dim returnHtml As String = ""
             Try
                 Dim ContentType As csv_contentTypeEnum
@@ -3764,7 +3765,7 @@ ErrorTrap:
                 Dim emailIdForStyles As Integer
                 Dim RootPageSectionID As Integer
                 Dim AllowajaxTabs As Boolean
-                Dim XMLTools As New coreXmlToolsClass(cpCore)
+                Dim XMLTools As New xmlController(cpCore)
                 Dim IsPageContentTable As Boolean
                 Dim IsSectionTable As Boolean
                 Dim IsEmailTable As Boolean
@@ -3786,11 +3787,11 @@ ErrorTrap:
                 Dim EditSectionButtonBar As String
                 Dim EmailSent As Boolean
                 Dim EmailSubmitted As Boolean
-                Dim Stream As New coreFastStringClass
+                Dim Stream As New stringBuilderLegacyController
                 Dim SystemEmailCID As Integer
                 Dim ConditionalEmailCID As Integer
                 Dim HeaderDescription As String
-                Dim Adminui As New coreAdminUIClass(cpCore)
+                Dim Adminui As New adminUIController(cpCore)
                 Dim IsLandingPage As Boolean
                 Dim IsRootPage As Boolean
                 Dim CreatedBy As String
@@ -3826,7 +3827,7 @@ ErrorTrap:
                     ' xx  I do not know why the following section says "reload even if it is loaded", but lets try this
                     '
                     For Each keyValuePair In adminContent.fields
-                        Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+                        Dim field As CDefFieldModel = keyValuePair.Value
                         Select Case field.fieldTypeId
                             Case FieldTypeIdFile, FieldTypeIdFileImage
                                 editRecord.fieldsLc(field.nameLc).value = editRecord.fieldsLc(field.nameLc).dbValue
@@ -4230,7 +4231,7 @@ ErrorTrap:
                 '
                 Select Case genericController.vbUCase(adminContent.ContentTableName)
                     Case genericController.vbUCase("ccMembers")
-                        If Not (cpCore.authContext.isAuthenticatedAdmin(cpcore)) Then
+                        If Not (cpCore.authContext.isAuthenticatedAdmin(cpCore)) Then
                             '
                             ' Must be admin
                             '
@@ -4256,7 +4257,7 @@ ErrorTrap:
                         End If
                     '
                     Case "CCPATHS"
-                        If Not (cpCore.authContext.isAuthenticatedAdmin(cpcore)) Then
+                        If Not (cpCore.authContext.isAuthenticatedAdmin(cpCore)) Then
                             '
                             ' Must be admin
                             '
@@ -4292,7 +4293,7 @@ ErrorTrap:
                                 LastSendTestDate = genericController.EncodeDate(editRecord.fieldsLc("lastsendtestdate").value)
                             End If
                         End If
-                        If Not (cpCore.authContext.isAuthenticatedAdmin(cpcore)) Then
+                        If Not (cpCore.authContext.isAuthenticatedAdmin(cpCore)) Then
                             '
                             ' Must be admin
                             '
@@ -4446,7 +4447,7 @@ ErrorTrap:
                             Call Stream.Add(EditSectionButtonBar)
                         End If
                     Case "CCCONTENT"
-                        If Not (cpCore.authContext.isAuthenticatedAdmin(cpcore)) Then
+                        If Not (cpCore.authContext.isAuthenticatedAdmin(cpCore)) Then
                             '
                             ' Must be admin
                             '
@@ -4667,7 +4668,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "GetForm_StaticPublishControl")
             '
             Dim WhereCount As Integer
-            Dim Content As New coreFastStringClass
+            Dim Content As New stringBuilderLegacyController
             Dim EDGPublishNow As Boolean
             Dim Activity As String
             Dim TargetDomain As String
@@ -4683,7 +4684,7 @@ ErrorTrap:
             Dim EDGAuthUsername As String
             Dim EDGAuthPassword As String
             Dim QueryString As String
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             Dim Description As String
             Dim ButtonList As String = ""
             '
@@ -4894,7 +4895,7 @@ ErrorTrap:
             Dim ModifiedDateString As String
             Dim SubmittedDateString As String
             Dim ApprovedDateString As String
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             Dim ButtonList As String = ""
             Dim Caption As String
             Dim CS As Integer
@@ -4928,7 +4929,7 @@ ErrorTrap:
             Dim IsApproved As Boolean
             Dim ApprovedName As String = ""
             Dim ApprovedDate As Date
-            Dim Stream As New coreFastStringClass
+            Dim Stream As New stringBuilderLegacyController
             Dim Body As String = ""
             Dim Description As String
             Dim Button As String
@@ -4940,7 +4941,7 @@ ErrorTrap:
                 '
                 '
                 Call cpCore.webServer.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "Admin Publish, Cancel Button Pressed", False)
-            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpcore) Then
+            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 '
                 '
@@ -5235,7 +5236,7 @@ ErrorTrap:
         '   Generate the content of a tab in the Edit Screen
         '========================================================================
         '
-        Private Function GetForm_Edit_Tab(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass, ByVal RecordID As Integer, ByVal ContentID As Integer, ByVal ForceReadOnly As Boolean, ByVal IsLandingPage As Boolean, ByVal IsRootPage As Boolean, ByVal EditTab As String, ByVal EditorContext As csv_contentTypeEnum, ByRef return_NewFieldList As String, ByVal TemplateIDForStyles As Integer, ByVal HelpCnt As Integer, ByVal HelpIDCache() As Integer, ByVal helpDefaultCache() As String, ByVal HelpCustomCache() As String, ByVal AllowHelpMsgCustom As Boolean, ByVal helpIdIndex As coreKeyPtrIndexClass, ByVal fieldTypeDefaultEditors As String(), ByVal fieldEditorPreferenceList As String, ByVal styleList As String, ByVal styleOptionList As String, ByVal emailIdForStyles As Integer, ByVal IsTemplateTable As Boolean, ByVal editorAddonListJSON As String) As String
+        Private Function GetForm_Edit_Tab(adminContent As cdefModel, editRecord As editRecordClass, ByVal RecordID As Integer, ByVal ContentID As Integer, ByVal ForceReadOnly As Boolean, ByVal IsLandingPage As Boolean, ByVal IsRootPage As Boolean, ByVal EditTab As String, ByVal EditorContext As csv_contentTypeEnum, ByRef return_NewFieldList As String, ByVal TemplateIDForStyles As Integer, ByVal HelpCnt As Integer, ByVal HelpIDCache() As Integer, ByVal helpDefaultCache() As String, ByVal HelpCustomCache() As String, ByVal AllowHelpMsgCustom As Boolean, ByVal helpIdIndex As keyPtrController, ByVal fieldTypeDefaultEditors As String(), ByVal fieldEditorPreferenceList As String, ByVal styleList As String, ByVal styleOptionList As String, ByVal emailIdForStyles As Integer, ByVal IsTemplateTable As Boolean, ByVal editorAddonListJSON As String) As String
             Dim returnHtml As String = ""
             Try
                 '
@@ -5297,7 +5298,7 @@ ErrorTrap:
                 Dim CSLookup As Integer
                 Dim RedirectPath As String
                 Dim LookupContentName As String
-                Dim s As New coreFastStringClass
+                Dim s As New stringBuilderLegacyController
                 Dim RecordReadOnly As Boolean
                 Dim MethodName As String
                 Dim FormFieldLCaseName As String
@@ -5310,7 +5311,7 @@ ErrorTrap:
                 Dim MTMRuleField0 As String
                 Dim MTMRuleField1 As String
                 Dim AlphaSort As String
-                Dim Adminui As New coreAdminUIClass(cpCore)
+                Dim Adminui As New adminUIController(cpCore)
                 Dim StartTickCount As Integer
                 Dim needUniqueEmailMessage As Boolean
                 '
@@ -5333,10 +5334,10 @@ ErrorTrap:
                     '
                     ' ----- Build an index to sort the fields by EditSortOrder
                     '
-                    Dim sortingFields As New Dictionary(Of String, coreMetaDataClass.CDefFieldClass)
+                    Dim sortingFields As New Dictionary(Of String, CDefFieldModel)
                     '
                     For Each keyValuePair In adminContent.fields
-                        Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+                        Dim field As CDefFieldModel = keyValuePair.Value
                         With field
                             If .editTabName.ToLower() = EditTab.ToLower() Then
                                 If IsVisibleUserField(.adminOnly, .developerOnly, .active, .authorable, .nameLc, adminContent.ContentTableName) Then
@@ -5351,7 +5352,7 @@ ErrorTrap:
                     '
                     AllowHelpIcon = cpCore.visitProperty.getBoolean("AllowHelpIcon")
                     For Each kvp In sortingFields
-                        Dim field As coreMetaDataClass.CDefFieldClass = kvp.Value
+                        Dim field As CDefFieldModel = kvp.Value
                         With field
                             fieldId = .id
                             WhyReadOnlyMsg = ""
@@ -6401,7 +6402,7 @@ ErrorTrap:
         '   Display field in the admin/edit
         '========================================================================
         '
-        Private Function GetForm_Edit_ContentTracking(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass) As String
+        Private Function GetForm_Edit_ContentTracking(adminContent As cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_ContentTracking")
             '
             Dim CSRules As Integer
@@ -6413,12 +6414,12 @@ ErrorTrap:
             Dim CSLists As Integer
             Dim RecordCount As Integer
             Dim ContentWatchListID As Integer
-            Dim FastString As coreFastStringClass
+            Dim FastString As stringBuilderLegacyController
             Dim Copy As String
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             '
             If adminContent.AllowContentTracking Then
-                FastString = New coreFastStringClass
+                FastString = New stringBuilderLegacyController
                 '
                 If Not ContentWatchLoaded Then
                     '
@@ -6539,7 +6540,7 @@ ErrorTrap:
         '   Display field in the admin/edit
         '========================================================================
         '
-        Private Function GetForm_Edit_Control(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass) As String
+        Private Function GetForm_Edit_Control(adminContent As cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_Control")
             '
             Dim s As String
@@ -6565,17 +6566,17 @@ ErrorTrap:
             Dim CSPointer As Integer
             Dim RecordID As Integer
             Dim hiddenInputs As String = ""
-            Dim FastString As coreFastStringClass
+            Dim FastString As stringBuilderLegacyController
             Dim FieldValueInteger As Integer
             Dim FieldRequired As Boolean
             Dim FieldHelp As String
             Dim AuthoringStatusMessage As String
             Dim Delimiter As String
             Dim Copy As String
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             '''Dim arrayOfFields() As appServices_metaDataClass.CDefFieldClass
             '
-            FastString = New coreFastStringClass
+            FastString = New stringBuilderLegacyController
             '
             'arrayOfFields = adminContent.fields
             With adminContent
@@ -6708,7 +6709,7 @@ ErrorTrap:
                 ' ----- GUID
                 '
                 If editRecord.fieldsLc.ContainsKey("ccguid") Then
-                    Dim contentField As coreMetaDataClass.CDefFieldClass = adminContent.fields.Item("ccguid")
+                    Dim contentField As CDefFieldModel = adminContent.fields.Item("ccguid")
                     HTMLFieldString = genericController.encodeText(editRecord.fieldsLc.Item("ccguid").value)
                     FieldHelp = "This is a unique number that identifies this record globally. A GUID is not required, but when set it should never be changed. GUIDs are used to synchronize records. When empty, you can create a new guid. Only Developers can modify the guid."
                     If HTMLFieldString = "" Then
@@ -6773,7 +6774,7 @@ ErrorTrap:
                 '
                 HTMLFieldString = ""
                 FieldHelp = "The content in which this record is stored. This is similar to a database table."
-                Dim field As coreMetaDataClass.CDefFieldClass
+                Dim field As CDefFieldModel
                 If adminContent.fields.ContainsKey("contentcontrolid") Then
                     field = adminContent.fields("contentcontrolid")
                     With field
@@ -6790,7 +6791,7 @@ ErrorTrap:
                             HTMLFieldString = HTMLFieldString & cpCore.htmlDoc.html_GetFormInputHidden("ContentControlID", FieldValueInteger)
                         Else
                             RecordContentName = editRecord.contentControlId_Name
-                            Dim RecordCDef As coreMetaDataClass.CDefClass
+                            Dim RecordCDef As cdefModel
                             TableName2 = cpCore.GetContentTablename(RecordContentName)
                             TableID = cpCore.main_GetRecordID("Tables", TableName2)
                             '
@@ -6955,7 +6956,7 @@ ErrorTrap:
         '   Display field in the admin/edit
         '========================================================================
         '
-        Private Function GetForm_Edit_SiteProperties(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass) As String
+        Private Function GetForm_Edit_SiteProperties(adminContent As cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_SiteProperties")
             '
             Dim ExpandedSelector As String = ""
@@ -6987,14 +6988,14 @@ ErrorTrap:
             ' converted array to dictionary - Dim FieldPointer As Integer
             Dim CSPointer As Integer
             Dim RecordID As Integer
-            Dim FastString As coreFastStringClass
+            Dim FastString As stringBuilderLegacyController
             Dim FieldValueInteger As Integer
             Dim FieldRequired As Boolean
             Dim FieldHelp As String
             Dim AuthoringStatusMessage As String
             Dim Delimiter As String
             Dim Copy As String = ""
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             '
             Dim FieldPtr As Integer
             Dim SitePropertyName As String
@@ -7002,13 +7003,13 @@ ErrorTrap:
             Dim selector As String
             Dim FieldName As String
             '
-            FastString = New coreFastStringClass
+            FastString = New stringBuilderLegacyController
             '
             SitePropertyName = ""
             SitePropertyValue = ""
             selector = ""
-            For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In adminContent.fields
-                Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+            For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In adminContent.fields
+                Dim field As CDefFieldModel = keyValuePair.Value
                 '
                 FieldName = field.nameLc
                 If genericController.vbLCase(FieldName) = "name" Then
@@ -7139,7 +7140,7 @@ ErrorTrap:
             Dim returnHtml As String = ""
             Try
                 Dim CS As Integer
-                Dim Stream As New coreFastStringClass
+                Dim Stream As New stringBuilderLegacyController
                 Dim addonId As Integer
                 Dim AddonIDText As String
                 '
@@ -7256,7 +7257,7 @@ ErrorTrap:
             Dim VisitID As Integer
             Dim VisitCount As Integer
             Dim PageCount As Double
-            Dim Stream As New coreFastStringClass
+            Dim Stream As New stringBuilderLegacyController
             '
             ' --- Start a form to make a refresh button
             '
@@ -7515,13 +7516,13 @@ ErrorTrap:
         '   Print the Topic Rules section of any edit form
         '========================================================================
         '
-        Private Function GetForm_Edit_LinkAliases(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass, ByVal readOnlyField As Boolean) As String
+        Private Function GetForm_Edit_LinkAliases(adminContent As cdefModel, editRecord As editRecordClass, ByVal readOnlyField As Boolean) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_LinkAliases")
             '
             Dim LinkCnt As Integer
             Dim LinkList As String = ""
-            Dim f As New coreFastStringClass
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim f As New stringBuilderLegacyController
+            Dim Adminui As New adminUIController(cpCore)
             Dim Ptr As Integer
             Dim linkAlias As String
             Dim AllowLinkAliasInTab As Boolean
@@ -7600,12 +7601,12 @@ ErrorTrap:
         '   Print the Topic Rules section of any edit form
         '========================================================================
         '
-        Private Function GetForm_Edit_MetaContent(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass, ByVal readOnlyField As Boolean) As String
+        Private Function GetForm_Edit_MetaContent(adminContent As cdefModel, editRecord As editRecordClass, ByVal readOnlyField As Boolean) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_MetaContent")
             '
             Dim s As String
             Dim SQL As String
-            Dim FastString As New coreFastStringClass
+            Dim FastString As New stringBuilderLegacyController
             Dim Checked As Boolean
             Dim TableID As Integer
             Dim MetaContentID As Integer
@@ -7614,7 +7615,7 @@ ErrorTrap:
             Dim MetaDescription As String = ""
             Dim MetaKeywordList As String = ""
             Dim OtherHeadTags As String = ""
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             '
             If adminContent.AllowMetaContent Then
                 CS = cpCore.db.cs_open("Meta Content", "(ContentID=" & editRecord.contentControlId & ")and(RecordID=" & editRecord.id & ")")
@@ -7714,10 +7715,10 @@ ErrorTrap:
         '   Content must conform to ccMember fields
         '========================================================================
         '
-        Private Function GetForm_Edit_EmailRules(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass, ByVal readOnlyField As Boolean) As String
+        Private Function GetForm_Edit_EmailRules(adminContent As cdefModel, editRecord As editRecordClass, ByVal readOnlyField As Boolean) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_EmailRules")
             '
-            Dim f As New coreFastStringClass
+            Dim f As New stringBuilderLegacyController
             Dim GroupList As String
             Dim GroupSplit() As String
             Dim Ptr As Integer
@@ -7726,7 +7727,7 @@ ErrorTrap:
             Dim GroupID As Integer
             Dim ReportLink As String
             Dim Cnt As Integer
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             Dim s As String
             '
             s = cpCore.htmlDoc.main_GetFormInputCheckListCategories("EmailGroups", "Group Email", editRecord.id, "Groups", "Email Groups", "EmailID", "GroupID", , "Caption", readOnlyField, "Groups")
@@ -7793,10 +7794,10 @@ ErrorTrap:
         '   Content must conform to ccMember fields
         '========================================================================
         '
-        Private Function GetForm_Edit_EmailTopics(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass, ByVal readOnlyField As Boolean) As String
+        Private Function GetForm_Edit_EmailTopics(adminContent As cdefModel, editRecord As editRecordClass, ByVal readOnlyField As Boolean) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_EmailTopics")
             '
-            Dim f As New coreFastStringClass
+            Dim f As New stringBuilderLegacyController
             Dim GroupList As String
             Dim GroupSplit() As String
             Dim Ptr As Integer
@@ -7805,7 +7806,7 @@ ErrorTrap:
             Dim GroupID As Integer
             Dim ReportLink As String
             Dim Cnt As Integer
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             '
             Dim s As String
             '
@@ -7874,9 +7875,9 @@ ErrorTrap:
         Private Function GetForm_Edit_EmailBounceStatus() As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_EmailBounceStatus")
             '
-            Dim f As New coreFastStringClass
+            Dim f As New stringBuilderLegacyController
             Dim Copy As String
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             '
             f.Add(Adminui.GetEditRow("<a href=?" & RequestNameAdminForm & "=28 target=_blank>Open in New Window</a>", "Email Control", "The settings in this section can be modified with the Email Control page."))
             f.Add(Adminui.GetEditRow(cpCore.siteProperties.getText("EmailBounceAddress", ""), "Bounce Email Address", "All bounced emails will be sent to this address automatically. This must be a valid email account, and you should either use Contensive Bounce processing to capture the emails, or manually remove them from the account yourself."))
@@ -7911,10 +7912,10 @@ ErrorTrap:
         '   Content must conform to ccMember fields
         '========================================================================
         '
-        Private Function GetForm_Edit_MemberGroups(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass) As String
+        Private Function GetForm_Edit_MemberGroups(adminContent As cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_MemberGroups")
             '
-            Dim f As New coreFastStringClass
+            Dim f As New stringBuilderLegacyController
             Dim Copy As String
             Dim SQL As String
             Dim CS As Integer
@@ -7937,7 +7938,7 @@ ErrorTrap:
             Dim Caption As String
             Dim MethodName As String
             Dim ReportLink As String
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             '
             MethodName = "GetForm_Edit_MemberGroups"
             '
@@ -8073,13 +8074,13 @@ ErrorTrap:
         '   Special case tab for Layout records
         '========================================================================
         '
-        Private Function GetForm_Edit_LayoutReports(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass) As String
+        Private Function GetForm_Edit_LayoutReports(adminContent As cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_LayoutReports")
             '
-            Dim FastString As coreFastStringClass
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim FastString As stringBuilderLegacyController
+            Dim Adminui As New adminUIController(cpCore)
             '
-            FastString = New coreFastStringClass
+            FastString = New stringBuilderLegacyController
             Call FastString.Add("<tr>")
             Call FastString.Add("<td valign=""top"" align=""right"">&nbsp;</td>")
             Call FastString.Add("<td colspan=""2"" class=""ccAdminEditField"" align=""left"">" & SpanClassAdminNormal)
@@ -8101,13 +8102,13 @@ ErrorTrap:
         '   Special case tab for People records
         '========================================================================
         '
-        Private Function GetForm_Edit_MemberReports(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass) As String
+        Private Function GetForm_Edit_MemberReports(adminContent As cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_MemberReports")
             '
-            Dim FastString As coreFastStringClass
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim FastString As stringBuilderLegacyController
+            Dim Adminui As New adminUIController(cpCore)
             '
-            FastString = New coreFastStringClass
+            FastString = New stringBuilderLegacyController
             Call FastString.Add("<tr>")
             Call FastString.Add("<td valign=""top"" align=""right"">&nbsp;</td>")
             Call FastString.Add("<td colspan=""2"" class=""ccAdminEditField"" align=""left"">" & SpanClassAdminNormal)
@@ -8130,13 +8131,13 @@ ErrorTrap:
         '   Print the path Rules section of the path edit form
         '========================================================================
         '
-        Private Function GetForm_Edit_PathRules(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass) As String
+        Private Function GetForm_Edit_PathRules(adminContent As cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_PathRules")
             '
-            Dim FastString As coreFastStringClass
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim FastString As stringBuilderLegacyController
+            Dim Adminui As New adminUIController(cpCore)
             '
-            FastString = New coreFastStringClass
+            FastString = New stringBuilderLegacyController
             Call FastString.Add("<tr>")
             Call FastString.Add("<td valign=""top"" align=""right"">" & SpanClassAdminSmall & "Groups</td>")
             Call FastString.Add("<td colspan=""2"" class=""ccAdminEditField"" align=""left"">" & SpanClassAdminNormal & cpCore.htmlDoc.main_GetFormInputCheckList("PathRules", "Paths", editRecord.id, "Groups", "Path Rules", "PathID", "GroupID", , "Caption") & "</span></td>")
@@ -8156,10 +8157,10 @@ ErrorTrap:
         '   Print the path Rules section of the path edit form
         '========================================================================
         '
-        Private Function GetForm_Edit_PageContentBlockRules(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass) As String
+        Private Function GetForm_Edit_PageContentBlockRules(adminContent As cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_PageContentBlockRules")
             '
-            Dim f As New coreFastStringClass
+            Dim f As New stringBuilderLegacyController
             Dim GroupList As String
             Dim GroupSplit() As String
             Dim Ptr As Integer
@@ -8167,7 +8168,7 @@ ErrorTrap:
             Dim IDEndPtr As Integer
             Dim GroupID As Integer
             Dim ReportLink As String
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             '
             GroupList = cpCore.htmlDoc.main_GetFormInputCheckList("PageContentBlockRules", adminContent.Name, editRecord.id, "Groups", "Page Content Block Rules", "RecordID", "GroupID", , "Caption", False)
             GroupSplit = Split(GroupList, "<br >", , vbTextCompare)
@@ -8203,11 +8204,11 @@ ErrorTrap:
         '   Print the path Rules section of the path edit form
         '========================================================================
         '
-        Private Function GetForm_Edit_LibraryFolderRules(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass) As String
+        Private Function GetForm_Edit_LibraryFolderRules(adminContent As cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_LibraryFolderRules")
             '
             Dim Copy As String
-            Dim f As New coreFastStringClass
+            Dim f As New stringBuilderLegacyController
             Dim GroupList As String
             Dim GroupSplit() As String
             Dim Ptr As Integer
@@ -8215,7 +8216,7 @@ ErrorTrap:
             Dim IDEndPtr As Integer
             Dim GroupID As Integer
             Dim ReportLink As String
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             '
             GroupList = cpCore.htmlDoc.main_GetFormInputCheckList("LibraryFolderRules", adminContent.Name, editRecord.id, "Groups", "Library Folder Rules", "FolderID", "GroupID", , "Caption")
             GroupSplit = Split(GroupList, "<br >", , vbTextCompare)
@@ -8252,10 +8253,10 @@ ErrorTrap:
         '
         '========================================================================
         '
-        Private Function GetForm_Edit_SectionDynamicMenuRules(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass) As String
+        Private Function GetForm_Edit_SectionDynamicMenuRules(adminContent As cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_SectionDynamicMenuRules")
             '
-            Dim f As New coreFastStringClass
+            Dim f As New stringBuilderLegacyController
             Dim DynamicMenuList As String
             Dim DynamicMenuSplit() As String
             Dim Ptr As Integer
@@ -8264,7 +8265,7 @@ ErrorTrap:
             Dim DynamicMenuID As Integer
             Dim ReportLink As String
             Dim WCPtr As Integer
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             Dim ForcedMenuID As Integer
             '
             ' Determine the forced Menu ID (in the URL as MenuID=99)
@@ -8333,10 +8334,10 @@ ErrorTrap:
         '
         '========================================================================
         '
-        Private Function GetForm_Edit_DynamicMenuSectionRules(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass) As String
+        Private Function GetForm_Edit_DynamicMenuSectionRules(adminContent As cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_DynamicMenuSectionRules")
             '
-            Dim f As New coreFastStringClass
+            Dim f As New stringBuilderLegacyController
             Dim SectionList As String
             Dim SectionSplit() As String
             Dim Ptr As Integer
@@ -8344,7 +8345,7 @@ ErrorTrap:
             Dim IDEndPtr As Integer
             Dim SectionID As Integer
             Dim ReportLink As String
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             '
             'Call cpCore.main_VerifyDynamicMenu("Default")
             SectionList = cpCore.htmlDoc.main_GetFormInputCheckList("DynamicMenuSectionRules", "Dynamic Menus", editRecord.id, "Site Sections", "Dynamic Menu Section Rules", "DynamicMenuID", "SectionID", , , False)
@@ -8381,10 +8382,10 @@ ErrorTrap:
         '   Print the path Rules section of the path edit form
         '========================================================================
         '
-        Private Function GetForm_Edit_SectionBlockRules(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass) As String
+        Private Function GetForm_Edit_SectionBlockRules(adminContent As cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_SectionBlockRules")
             '
-            Dim f As New coreFastStringClass
+            Dim f As New stringBuilderLegacyController
             Dim GroupList As String
             Dim GroupSplit() As String
             Dim Ptr As Integer
@@ -8392,7 +8393,7 @@ ErrorTrap:
             Dim IDEndPtr As Integer
             Dim GroupID As Integer
             Dim ReportLink As String
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             '
             GroupList = cpCore.htmlDoc.main_GetFormInputCheckList("SectionBlockRules", adminContent.Name, editRecord.id, "Groups", "Section Block Rules", "SectionID", "GroupID", , "Caption", False)
             GroupSplit = Split(GroupList, "<br >", , vbTextCompare)
@@ -8432,7 +8433,7 @@ ErrorTrap:
         '   EditRecord.ContentID is the ContentControlID of the Edit Record
         '========================================================================
         '
-        Private Function GetForm_Edit_GroupRules(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass) As String
+        Private Function GetForm_Edit_GroupRules(adminContent As cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_GroupRules")
             '
             Dim SQL As String
@@ -8445,12 +8446,12 @@ ErrorTrap:
             Dim GroupCount As Integer
             Dim GroupFound As Boolean
             Dim GroupRules() As GroupRuleType = {}
-            Dim FastString As coreFastStringClass
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim FastString As stringBuilderLegacyController
+            Dim Adminui As New adminUIController(cpCore)
             '
             ' ----- Open the panel
             '
-            FastString = New coreFastStringClass
+            FastString = New stringBuilderLegacyController
             '
             'Call cpCore.main_PrintPanelTop("ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)
             'Call call FastString.Add(adminui.EditTableOpen)
@@ -8565,7 +8566,7 @@ ErrorTrap:
         '   Get all content authorable by the current group
         '========================================================================
         '
-        Private Function GetForm_Edit_ContentGroupRules(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass) As String
+        Private Function GetForm_Edit_ContentGroupRules(adminContent As cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_ContentGroupRules")
             '
             Dim SQL As String
@@ -8577,14 +8578,14 @@ ErrorTrap:
             Dim ContentCount As Integer
             Dim ContentFound As Boolean
             Dim ContentGroupRules() As ContentGroupRuleType = {}
-            Dim FastString As coreFastStringClass
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim FastString As stringBuilderLegacyController
+            Dim Adminui As New adminUIController(cpCore)
             '
             If cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 ' ----- Open the panel
                 '
-                FastString = New coreFastStringClass
+                FastString = New stringBuilderLegacyController
                 '
                 'Call cpCore.main_PrintPanelTop("ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)
                 'Call call FastString.Add(adminui.EditTableOpen)
@@ -9090,11 +9091,11 @@ ErrorTrap:
             Try
                 Const AdminNavigatorGuid = "{5168964F-B6D2-4E9F-A5A8-BB1CF908A2C9}"
                 Dim AdminNavFull As String
-                Dim Stream As New coreFastStringClass
+                Dim Stream As New stringBuilderLegacyController
                 Dim LeftSide As String
                 Dim RightSide As String
                 Dim QS As String
-                Dim Adminui As New coreAdminUIClass(cpCore)
+                Dim Adminui As New adminUIController(cpCore)
                 '
                 ' create the with-menu version
                 '
@@ -9318,7 +9319,7 @@ ErrorTrap:
                 '
                 ' ----- Developer
                 '
-            ElseIf cpCore.authContext.isAuthenticatedAdmin(cpcore) Then
+            ElseIf cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 ' ----- Administrator
                 '
@@ -9502,7 +9503,7 @@ ErrorTrap:
         '
         '
         '
-        Private Sub ProcessForms(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass)
+        Private Sub ProcessForms(adminContent As cdefModel, editRecord As editRecordClass)
             On Error GoTo ErrorTrap
             'Dim th as integer
             'th = profileLogAdminMethodEnter("ProcessForms")
@@ -9737,7 +9738,7 @@ ErrorTrap:
         '
         '========================================================================
         '
-        Private Function GetForm_EditTitle(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass) As String
+        Private Function GetForm_EditTitle(adminContent As cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_EditTitle")
             '
             If (editRecord.id = 0) Then
@@ -9758,10 +9759,10 @@ ErrorTrap:
         '
         '========================================================================
         '
-        Private Function GetForm_EditTitleBar(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass) As String
+        Private Function GetForm_EditTitleBar(adminContent As cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_EditTitleBar")
             '
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             '
             GetForm_EditTitleBar = Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), "")
             '
@@ -9913,7 +9914,7 @@ ErrorTrap:
         ' true if the field is an editable user field (can edit on edit form and save to database)
         '=============================================================================================
         '
-        Private Function IsFieldEditable(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass, Field As coreMetaDataClass.CDefFieldClass) As Boolean
+        Private Function IsFieldEditable(adminContent As cdefModel, editRecord As editRecordClass, Field As CDefFieldModel) As Boolean
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("IsFieldEditable")
             '
             With Field
@@ -9956,7 +9957,7 @@ ErrorTrap:
         '
         '=============================================================================================
         '
-        Private Sub ProcessActionSave(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass, UseContentWatchLink As Boolean)
+        Private Sub ProcessActionSave(adminContent As cdefModel, editRecord As editRecordClass, UseContentWatchLink As Boolean)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("ProcessActionSave")
             '
             'Dim CS As Integer
@@ -10164,7 +10165,7 @@ ErrorTrap:
         '   Create a duplicate record
         '=============================================================================================
         '
-        Private Sub ProcessActionDuplicate(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass)
+        Private Sub ProcessActionDuplicate(adminContent As cdefModel, editRecord As editRecordClass)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("ProcessActionDuplicate")
             ' converted array to dictionary - Dim FieldPointer As Integer
             '
@@ -10227,8 +10228,8 @@ ErrorTrap:
                             '
                             ' block fields that must be unique
                             '
-                            For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In adminContent.fields
-                                Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+                            For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In adminContent.fields
+                                Dim field As CDefFieldModel = keyValuePair.Value
                                 With field
                                     If genericController.vbLCase(.nameLc) = "email" Then
                                         If (LCase(adminContent.ContentTableName) = "ccmembers") And (genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("allowemaillogin", False))) Then
@@ -10561,14 +10562,14 @@ ErrorTrap:
             Dim MenuName As String
             Dim AdminOnly As Boolean
             Dim DeveloperOnly As Boolean
-            Dim Content As New coreFastStringClass
+            Dim Content As New stringBuilderLegacyController
             Dim FieldValue As String
             Dim NewGroup As Boolean
             Dim GroupID As Integer
             Dim NewGroupName As String = ""
             Dim ButtonBar As String
             Dim Button As String
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             Dim Caption As String
             Dim Description As String = ""
             Dim ButtonList As String = ""
@@ -10580,7 +10581,7 @@ ErrorTrap:
                 '
                 '
                 Call cpCore.webServer.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "GetContentChildTool, Cancel Button Pressed", False)
-            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpcore) Then
+            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 '
                 '
@@ -10851,7 +10852,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_HouseKeepingControl")
             '
             Dim WhereCount As Integer
-            Dim Content As New coreFastStringClass
+            Dim Content As New stringBuilderLegacyController
             Dim AllowContentSpider As Boolean
             Dim status As String
             Dim TargetDomain As String
@@ -10886,7 +10887,7 @@ ErrorTrap:
             Dim ArchiveRecordAgeDays As Integer
             Dim ArchiveTimeOfDay As String
             Dim ArchiveAllowFileClean As Boolean
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             Dim ButtonList As String = ""
             Dim Description As String
             '
@@ -10897,7 +10898,7 @@ ErrorTrap:
                 '
                 '
                 Call cpCore.webServer.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "HouseKeepingControl, Cancel Button Pressed", False)
-            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpcore) Then
+            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 '
                 '
@@ -11089,11 +11090,11 @@ ErrorTrap:
         Private Function admin_GetForm_StyleEditor() As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_StyleEditor")
             '
-            Dim Content As New coreFastStringClass
+            Dim Content As New stringBuilderLegacyController
             Dim Button As String
             Dim Copy As String
             Dim ButtonList As String = ""
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             Dim Caption As String
             Dim Description As String
             'Dim StyleSN as integer
@@ -11105,7 +11106,7 @@ ErrorTrap:
                 '
                 '
                 Call cpCore.webServer.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "StyleEditor, Cancel Button Pressed", False)
-            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpcore) Then
+            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 '
                 '
@@ -11451,11 +11452,11 @@ ErrorTrap:
             Dim ButtonListRight As String
             Dim ContentPadding As Integer
             Dim ContentSummary As String = ""
-            Dim Tab0 As New coreFastStringClass
-            Dim Tab1 As New coreFastStringClass
+            Dim Tab0 As New stringBuilderLegacyController
+            Dim Tab1 As New stringBuilderLegacyController
             Dim Content As String = ""
             Dim Cell As String
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             Dim SQLFieldName As String
             '
             Const ColumnCnt = 5
@@ -11806,7 +11807,7 @@ ErrorTrap:
         '
         '
         '
-        Private Function GetForm_Edit_Tabs(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass, ByVal readOnlyField As Boolean, ByVal IsLandingPage As Boolean, ByVal IsRootPage As Boolean, ByVal EditorContext As csv_contentTypeEnum, ByVal allowAjaxTabs As Boolean, ByVal TemplateIDForStyles As Integer, ByVal fieldTypeDefaultEditors As String(), ByVal fieldEditorPreferenceList As String, ByVal styleList As String, ByVal styleOptionList As String, ByVal emailIdForStyles As Integer, ByVal IsTemplateTable As Boolean, ByVal editorAddonListJSON As String) As String
+        Private Function GetForm_Edit_Tabs(adminContent As cdefModel, editRecord As editRecordClass, ByVal readOnlyField As Boolean, ByVal IsLandingPage As Boolean, ByVal IsRootPage As Boolean, ByVal EditorContext As csv_contentTypeEnum, ByVal allowAjaxTabs As Boolean, ByVal TemplateIDForStyles As Integer, ByVal fieldTypeDefaultEditors As String(), ByVal fieldEditorPreferenceList As String, ByVal styleList As String, ByVal styleOptionList As String, ByVal emailIdForStyles As Integer, ByVal IsTemplateTable As Boolean, ByVal editorAddonListJSON As String) As String
             Dim returnHtml As String = ""
             Try
                 '
@@ -11827,14 +11828,14 @@ ErrorTrap:
                 Dim HelpIDCache() As Integer = {}
                 Dim helpDefaultCache() As String = {}
                 Dim HelpCustomCache() As String = {}
-                Dim helpIdIndex As New coreKeyPtrIndexClass
+                Dim helpIdIndex As New keyPtrController
                 Dim fieldNameLc As String
                 '
                 ' ----- read in help
                 '
                 IDList = ""
-                For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In adminContent.fields
-                    Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+                For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In adminContent.fields
+                    Dim field As CDefFieldModel = keyValuePair.Value
                     IDList = IDList & "," & field.id
                 Next
                 If IDList <> "" Then
@@ -11863,8 +11864,8 @@ ErrorTrap:
                 End If
                 '
                 FormFieldList = ","
-                For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In adminContent.fields
-                    Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+                For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In adminContent.fields
+                    Dim field As CDefFieldModel = keyValuePair.Value
                     If (field.authorable) And (field.active) And (Not TabsFound.Contains(field.editTabName.ToLower())) Then
                         TabsFound.Add(field.editTabName.ToLower())
                         fieldNameLc = field.nameLc
@@ -12118,8 +12119,8 @@ ErrorTrap:
             Dim ButtonListRight As String
             Dim ContentPadding As Integer
             Dim ContentSummary As String = ""
-            Dim Tab0 As New coreFastStringClass
-            Dim Tab1 As New coreFastStringClass
+            Dim Tab0 As New stringBuilderLegacyController
+            Dim Tab1 As New stringBuilderLegacyController
             Dim Content As String = ""
             Dim SQLFieldName As String
             '
@@ -12345,7 +12346,7 @@ ErrorTrap:
         '       Findstring( ColumnPointer )
         '========================================================================
         '
-        Private Function GetForm_Index(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass, ByVal IsEmailContent As Boolean) As String
+        Private Function GetForm_Index(adminContent As cdefModel, editRecord As editRecordClass, ByVal IsEmailContent As Boolean) As String
             Dim returnForm As String = ""
             Try
                 Const FilterClosedLabel = "<div style=""font-size:9px;text-align:center;"">&nbsp;<br>F<br>i<br>l<br>t<br>e<br>r<br>s</div>"
@@ -12415,12 +12416,12 @@ ErrorTrap:
                 Dim FieldUsedInColumns As New Dictionary(Of String, Boolean)                 ' used to prevent select SQL from being sorted by a field that does not appear
                 Dim ColumnWidthTotal As Integer
                 Dim SubForm As Integer
-                Dim Stream As New coreFastStringClass
+                Dim Stream As New stringBuilderLegacyController
                 Dim RecordID As Integer
                 Dim RecordName As String
                 Dim LeftButtons As String = ""
                 Dim RightButtons As String = ""
-                Dim Adminui As New coreAdminUIClass(cpCore)
+                Dim Adminui As New adminUIController(cpCore)
                 Dim IsLookupFieldValid As New Dictionary(Of String, Boolean)
                 Dim allowCMEdit As Boolean
                 Dim allowCMAdd As Boolean
@@ -12460,7 +12461,7 @@ ErrorTrap:
                         "This content [" & adminContent.Name & "] cannot be accessed because it has no fields. Please contact your application developer for more assistance." _
                         , "Content [" & adminContent.Name & "] has no field records."
                         ))
-                ElseIf (adminContent.DeveloperOnly And (Not cpCore.authContext.isAuthenticatedDeveloper(cpcore))) Then
+                ElseIf (adminContent.DeveloperOnly And (Not cpCore.authContext.isAuthenticatedDeveloper(cpCore))) Then
                     '
                     ' Developer Content and not developer
                     '
@@ -13174,7 +13175,7 @@ ErrorTrap:
         ''' </summary>
         ''' <param name="adminContent"></param>
         ''' <returns></returns>
-        Public Function GetForm_IndexFilterContent(adminContent As coreMetaDataClass.CDefClass) As String
+        Public Function GetForm_IndexFilterContent(adminContent As cdefModel) As String
             Dim returnContent As String = ""
             Try
                 Dim RecordID As Integer
@@ -13566,7 +13567,7 @@ ErrorTrap:
         '       if it is empty, setup defaults
         '=================================================================================
         '
-        Private Function LoadIndexConfig(adminContent As coreMetaDataClass.CDefClass) As indexConfigClass
+        Private Function LoadIndexConfig(adminContent As cdefModel) As indexConfigClass
             Dim returnIndexConfig As New indexConfigClass
             Try
                 '
@@ -13743,7 +13744,7 @@ ErrorTrap:
                         'ReDim .Columns(.Columns.Count - 1)
                         'Ptr = 0
                         For Each keyValuepair In adminContent.adminColumns
-                            Dim cdefAdminColumn As coreMetaDataClass.CDefAdminColumnClass = keyValuepair.Value
+                            Dim cdefAdminColumn As cdefModel.CDefAdminColumnClass = keyValuepair.Value
                             Dim column As New indexConfigColumnClass
                             column.Name = cdefAdminColumn.Name
                             column.Width = cdefAdminColumn.Width
@@ -13819,7 +13820,7 @@ ErrorTrap:
         '   Process request input on the IndexConfig
         '========================================================================================
         '
-        Private Sub ProcessIndexConfigRequests(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass, ByRef IndexConfig As indexConfigClass)
+        Private Sub ProcessIndexConfigRequests(adminContent As cdefModel, editRecord As editRecordClass, ByRef IndexConfig As indexConfigClass)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("ProcessIndexConfigRequests")
             '
             Dim TestInteger As Integer
@@ -14484,7 +14485,7 @@ ErrorTrap:
         '
         '=================================================================================
         '
-        Private Function GetForm_Index_AdvancedSearch(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass) As String
+        Private Function GetForm_Index_AdvancedSearch(adminContent As cdefModel, editRecord As editRecordClass) As String
             Dim returnForm As String = ""
             Try
                 '
@@ -14492,9 +14493,9 @@ ErrorTrap:
                 Dim MatchOption As FindWordMatchEnum
                 Dim FormFieldPtr As Integer
                 Dim FormFieldCnt As Integer
-                Dim CDef As coreMetaDataClass.CDefClass
+                Dim CDef As cdefModel
                 Dim FieldName As String
-                Dim Stream As New coreFastStringClass
+                Dim Stream As New stringBuilderLegacyController
                 Dim FieldPtr As Integer
                 Dim RowEven As Boolean
                 Dim Button As String
@@ -14512,7 +14513,7 @@ ErrorTrap:
                 Dim FieldCnt As Integer
                 Dim FieldSize As Integer
                 Dim RowPointer As Integer
-                Dim Adminui As New coreAdminUIClass(cpCore)
+                Dim Adminui As New adminUIController(cpCore)
                 Dim LeftButtons As String = ""
                 Dim ButtonBar As String
                 Dim Title As String
@@ -14607,8 +14608,8 @@ ErrorTrap:
                     ReDim Preserve FieldMatchOptions(FieldSize)
                     ReDim Preserve FieldLookupContentName(FieldSize)
                     ReDim Preserve FieldLookupList(FieldSize)
-                    For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In adminContent.fields
-                        Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+                    For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In adminContent.fields
+                        Dim field As CDefFieldModel = keyValuePair.Value
                         If FieldPtr >= FieldSize Then
                             FieldSize = FieldSize + 100
                             ReDim Preserve FieldNames(FieldSize)
@@ -14996,13 +14997,13 @@ ErrorTrap:
         '   Export the Admin List form results
         '=============================================================================
         '
-        Private Function GetForm_Index_Export(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass) As String
+        Private Function GetForm_Index_Export(adminContent As cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap
             '
             Dim AllowContentAccess As Boolean
             Dim ButtonList As String = ""
             Dim ExportName As String
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             Dim Description As String
             Dim Content As String = ""
             Dim ExportType As Integer
@@ -15212,7 +15213,7 @@ ErrorTrap:
         '   Print the Configure Index Form
         '=============================================================================
         '
-        Private Function GetForm_Index_SetColumns(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass) As String
+        Private Function GetForm_Index_SetColumns(adminContent As cdefModel, editRecord As editRecordClass) As String
             On Error GoTo ErrorTrap
             '
             Dim Button As String
@@ -15224,7 +15225,7 @@ ErrorTrap:
             Dim TitleBar As String
             Dim Content As String
             Dim ButtonBar As String
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             Dim SQL As String
             Dim MenuHeader As String
             Dim ColumnPtr As Integer
@@ -15254,7 +15255,7 @@ ErrorTrap:
             Dim CSPointer As Integer
             Dim RecordID As Integer
             Dim ContentID As Integer
-            Dim CDef As coreMetaDataClass.CDefClass
+            Dim CDef As cdefModel
             'Dim AdminColumn As appServices_metaDataClass.CDefAdminColumnType
             Dim RowFieldID() As Integer
             Dim RowFieldWidth() As Integer
@@ -15296,7 +15297,7 @@ ErrorTrap:
             'Dim ContentNameValues() As NameValuePrivateType
             Dim ContentCount As Integer
             Dim ContentSize As Integer
-            Dim Stream As New coreFastStringClass
+            Dim Stream As New stringBuilderLegacyController
             Dim ButtonList As String
             Dim FormPanel As String
             Dim ColumnWidthIncrease As Integer
@@ -15358,8 +15359,8 @@ ErrorTrap:
                     ' Make sure the FieldNameToAdd is not-inherited, if not, create new field
                     '
                     If (FieldIDToAdd <> 0) Then
-                        For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In adminContent.fields
-                            Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+                        For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In adminContent.fields
+                            Dim field As CDefFieldModel = keyValuePair.Value
                             If field.id = FieldIDToAdd Then
                                 'If CDef.fields(FieldPtr).Name = FieldNameToAdd Then
                                 If field.inherited Then
@@ -15386,7 +15387,7 @@ ErrorTrap:
                     '
                     For Each kvp In IndexConfig.Columns
                         Dim column As indexConfigColumnClass = kvp.Value
-                        Dim field As coreMetaDataClass.CDefFieldClass = adminContent.fields(column.Name.ToLower())
+                        Dim field As CDefFieldModel = adminContent.fields(column.Name.ToLower())
                         If field.inherited Then
                             SourceContentID = field.contentId
                             SourceName = field.nameLc
@@ -15654,7 +15655,7 @@ ErrorTrap:
                             ' print column headers - anchored so they sort columns
                             '
                             ColumnWidth = CInt(100 * (column.Width / ColumnWidthTotal))
-                            Dim field As coreMetaDataClass.CDefFieldClass
+                            Dim field As CDefFieldModel
                             field = adminContent.fields(column.Name.ToLower())
                             With field
                                 fieldId = .id
@@ -15693,8 +15694,8 @@ ErrorTrap:
                     Stream.Add(SpanClassAdminNormal & "This Content Definition has no fields</span><br>")
                 Else
                     Stream.Add(SpanClassAdminNormal & "<br>")
-                    For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In adminContent.fields
-                        Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+                    For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In adminContent.fields
+                        Dim field As CDefFieldModel = keyValuePair.Value
                         With field
                             '
                             ' display the column if it is not in use
@@ -15911,11 +15912,11 @@ ErrorTrap:
             Dim TDLeft As String
             Dim TDCenter As String
             Dim Ptr As Integer
-            Dim Content As New coreFastStringClass
+            Dim Content As New stringBuilderLegacyController
             Dim Button As String
             Dim Copy As String
             Dim ButtonList As String
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             Dim Caption As String
             Dim Description As String
             Dim StyleSN As Integer
@@ -16085,9 +16086,9 @@ ErrorTrap:
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogAdminMethodEnter( "GetForm_BuildCollection")
             '
             Dim Description As String
-            Dim Content As New coreFastStringClass
+            Dim Content As New stringBuilderLegacyController
             Dim Button As String
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             Dim ButtonList As String
             Dim AllowAutoLogin As Boolean
             Dim Copy As String
@@ -16098,7 +16099,7 @@ ErrorTrap:
                 ' Cancel just exits with no content
                 '
                 Exit Function
-            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpcore) Then
+            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 ' Not Admin Error
                 '
@@ -16553,9 +16554,9 @@ ErrorTrap:
         Private Function GetForm_ClearCache() As String
             Dim returnHtml As String = ""
             Try
-                Dim Content As New coreFastStringClass
+                Dim Content As New stringBuilderLegacyController
                 Dim Button As String
-                Dim Adminui As New coreAdminUIClass(cpCore)
+                Dim Adminui As New adminUIController(cpCore)
                 Dim Description As String
                 Dim ButtonList As String
                 '
@@ -16565,7 +16566,7 @@ ErrorTrap:
                     ' Cancel just exits with no content
                     '
                     Exit Function
-                ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpcore) Then
+                ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                     '
                     ' Not Admin Error
                     '
@@ -16625,11 +16626,11 @@ ErrorTrap:
             '
             Dim LoginMode As Integer
             Dim Help As String
-            Dim Content As New coreFastStringClass
+            Dim Content As New stringBuilderLegacyController
             Dim Copy As String
             Dim Button As String
             Dim PageNotFoundPageID As String
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             Dim Description As String
             Dim ButtonList As String
             Dim AllowLinkAlias As Boolean
@@ -16648,7 +16649,7 @@ ErrorTrap:
                 ' Cancel just exits with no content
                 '
                 Exit Function
-            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpcore) Then
+            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 ' Not Admin Error
                 '
@@ -16938,7 +16939,7 @@ ErrorTrap:
         '
         '
         '
-        Private Sub SetIndexSQL(adminContent As coreMetaDataClass.CDefClass, editRecord As editRecordClass, ByRef Return_AllowAccess As Boolean, ByRef return_sqlFieldList As String, ByRef return_sqlFrom As String, ByRef return_SQLWhere As String, ByRef return_SQLOrderBy As String, ByRef return_IsLimitedToSubContent As Boolean, ByRef return_ContentAccessLimitMessage As String, ByRef FieldUsedInColumns As Dictionary(Of String, Boolean), ByRef IsLookupFieldValid As Dictionary(Of String, Boolean), ByRef IndexConfig As indexConfigClass, DataSourceName As String, DataSourceType As Integer, RecordTop As Integer, RecordsPerPage As Integer)
+        Private Sub SetIndexSQL(adminContent As cdefModel, editRecord As editRecordClass, ByRef Return_AllowAccess As Boolean, ByRef return_sqlFieldList As String, ByRef return_sqlFrom As String, ByRef return_SQLWhere As String, ByRef return_SQLOrderBy As String, ByRef return_IsLimitedToSubContent As Boolean, ByRef return_ContentAccessLimitMessage As String, ByRef FieldUsedInColumns As Dictionary(Of String, Boolean), ByRef IsLookupFieldValid As Dictionary(Of String, Boolean), ByRef IndexConfig As indexConfigClass, DataSourceName As String, DataSourceType As Integer, RecordTop As Integer, RecordsPerPage As Integer)
             Try
                 Dim LookupQuery As String
                 Dim ContentName As String
@@ -17005,8 +17006,8 @@ ErrorTrap:
                 '        asfasdfasdfasdf
                 '    End If
                 'Next
-                For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In adminContent.fields
-                    Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+                For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In adminContent.fields
+                    Dim field As CDefFieldModel = keyValuePair.Value
                     With field
                         FieldPtr = .id ' quick fix for a replacement for the old fieldPtr (so multiple for loops will always use the same "table"+ptr string
                         IncludedInColumns = False
@@ -17238,8 +17239,8 @@ ErrorTrap:
                         ' Verify that the fieldname called out is in this table
                         '
                         If adminContent.fields.Count > 0 Then
-                            For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In adminContent.fields
-                                Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+                            For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In adminContent.fields
+                                Dim field As CDefFieldModel = keyValuePair.Value
                                 With field
                                     If genericController.vbUCase(.nameLc) = genericController.vbUCase(WherePair(0, WCount)) Then
                                         '
@@ -17272,8 +17273,8 @@ ErrorTrap:
                             ' Get FieldType
                             '
                             If adminContent.fields.Count > 0 Then
-                                For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In adminContent.fields
-                                    Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+                                For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In adminContent.fields
+                                    Dim field As CDefFieldModel = keyValuePair.Value
                                     With field
                                         FieldPtr = .id ' quick fix for a replacement for the old fieldPtr (so multiple for loops will always use the same "table"+ptr string
                                         If genericController.vbLCase(.nameLc) = FindWordName Then

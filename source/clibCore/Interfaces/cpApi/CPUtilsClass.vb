@@ -2,7 +2,7 @@
 Option Strict On
 Option Explicit On
 
-Imports Contensive.Core.coreCommonModule
+
 Imports Contensive.Core.Controllers
 Imports System.Web.Security.FormsAuthentication
 Imports System.Guid

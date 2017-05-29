@@ -2,15 +2,11 @@
 Option Explicit On
 Option Strict On
 
-
-Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
-Imports Contensive.Core.coreCommonModule
-'Imports Contensive.Core
 Imports System.Xml
 '
-Namespace Contensive.Core
-    Public Class coreDataTreeClass
+Namespace Contensive.Core.Controllers
+    Public Class dataTreeController
         '========================================================================
         ' This page and its contents are copyright by Kidwell McGowan Associates.
         '========================================================================

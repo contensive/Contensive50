@@ -5,6 +5,7 @@ Option Strict On
 Imports Contensive.BaseClasses
 Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
+Imports Contensive.Core.Models.Entity
 
 Namespace Contensive.Core.Models.Context
     '
@@ -903,7 +904,7 @@ Namespace Contensive.Core.Models.Context
         Public Sub getContentAccessRights(cpCore As coreClass, ByVal ContentName As String, ByRef returnAllowEdit As Boolean, ByRef returnAllowAdd As Boolean, ByRef returnAllowDelete As Boolean)
             Try
                 Dim ContentID As Integer
-                Dim CDef As coreMetaDataClass.CDefClass
+                Dim CDef As cdefModel
                 '
                 returnAllowEdit = False
                 returnAllowAdd = False
@@ -962,7 +963,7 @@ Namespace Contensive.Core.Models.Context
                 Dim CSPointer As Integer
                 Dim ParentID As Integer
                 Dim ContentName As String
-                Dim CDef As coreMetaDataClass.CDefClass
+                Dim CDef As cdefModel
                 '
                 returnAllowEdit = False
                 returnAllowAdd = False

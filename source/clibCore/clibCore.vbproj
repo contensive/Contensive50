@@ -407,29 +407,31 @@
     <Compile Include="Models\addonLegacyModel.vb" />
     <Compile Include="Controllers\addonController.vb" />
     <Compile Include="Controllers\cacheController.vb" />
-    <Compile Include="coreDocPropertiesClass.vb" />
+    <Compile Include="Controllers\docPropertyController.vb" />
     <Compile Include="Models\Context\authContextModel.vb" />
     <Compile Include="Models\Context\_blankModel.vb" />
+    <Compile Include="Models\Entity\tableSchemeModel.vb" />
+    <Compile Include="Models\Entity\cdefFieldModel.vb" />
+    <Compile Include="Models\Entity\cdefModel.vb" />
     <Compile Include="Models\Entity\domainLegacyModel.vb" />
-    <Compile Include="coreEncodeBase64Class.vb" />
     <Compile Include="addon_pageManager\pageManagerController.vb" />
     <Compile Include="addon_tools\addon_toolConfigureEdit.vb" />
     <Compile Include="Models\Context\coreSitePropertiesClass.vb" />
     <Compile Include="Controllers\webServerIOController.vb" />
-    <Compile Include="coreMetaDataClass.vb" />
-    <Compile Include="coreCacheKeyPtrClass.vb" />
-    <Compile Include="coreSecurityClass.vb" />
+    <Compile Include="Controllers\cdefController.vb" />
+    <Compile Include="Controllers\cacheKeyPtrController.vb" />
+    <Compile Include="Controllers\securityController.vb" />
     <Compile Include="Controllers\addonInstallClass.vb" />
     <Compile Include="addon_addonMngr\addon_AddonMngrSafeClass.vb" />
     <Compile Include="addon_adminSite\addon_AdminClass.vb" />
-    <Compile Include="coreAdminUIClass.vb" />
+    <Compile Include="Controllers\adminUIController.vb" />
     <Compile Include="Controllers\dbController.vb" />
-    <Compile Include="coreContentCmdClass.vb" />
+    <Compile Include="Controllers\contentCmdController.vb" />
     <Compile Include="Controllers\htmlDocController.vb" />
-    <Compile Include="corePropertyCacheClass.vb" />
-    <Compile Include="coreTaskRunnerServiceClass.vb" />
-    <Compile Include="coreTaskSchedulerServiceClass.vb" />
-    <Compile Include="coreWorkflowClass.vb" />
+    <Compile Include="Models\Context\propertyModel.vb" />
+    <Compile Include="Controllers\taskRunnerController.vb" />
+    <Compile Include="Controllers\taskSchedulerController.vb" />
+    <Compile Include="Controllers\workflowController.vb" />
     <Compile Include="Interfaces\cpApi\CPAddonClass.vb" />
     <Compile Include="Interfaces\cpApi\CPBlockClass.vb" />
     <Compile Include="Interfaces\cpApi\CPCacheClass.vb" />
@@ -458,22 +460,21 @@
       <DependentUpon>DataSet1.xsd</DependentUpon>
     </Compile>
     <Compile Include="Interfaces\coreClass.vb" />
-    <Compile Include="coreCommonModule.vb" />
-    <Compile Include="coreDataTreeClass.vb" />
-    <Compile Include="coreKeyPtrIndexClass.vb" />
-    <Compile Include="coreFastStringClass.vb" />
+    <Compile Include="Controllers\dataTreeController.vb" />
+    <Compile Include="Controllers\keyPtrController.vb" />
+    <Compile Include="Controllers\stringBuilderLegacyController.vb" />
     <Compile Include="Controllers\fileController.vb" />
-    <Compile Include="coreHtmlToTextClass.vb" />
-    <Compile Include="coreHtmlParseClass.vb" />
-    <Compile Include="coreHttpRequestClass.vb" />
-    <Compile Include="coreImageEditClass.vb" />
-    <Compile Include="coreIpDaemonClass.vb" />
-    <Compile Include="coreUploadItemStorageClass.vb" />
-    <Compile Include="coreMenuComboTabClass.vb" />
-    <Compile Include="coreMenuFlyoutClass.vb" />
-    <Compile Include="coreMenuLiveTabClass.vb" />
-    <Compile Include="coreMenuTabClass.vb" />
-    <Compile Include="coreMenuTreeClass.vb" />
+    <Compile Include="Controllers\htmlToTextControllers.vb" />
+    <Compile Include="Controllers\htmlParserController.vb" />
+    <Compile Include="Controllers\httpRequestController.vb" />
+    <Compile Include="Controllers\imageEditController.vb" />
+    <Compile Include="Controllers\ipDaemonController.vb" />
+    <Compile Include="Models\Context\uploadFileModel.vb" />
+    <Compile Include="Controllers\menuComboTabController.vb" />
+    <Compile Include="Controllers\menuFlyoutController.vb" />
+    <Compile Include="Controllers\menuLiveTabController.vb" />
+    <Compile Include="Controllers\menuTabController.vb" />
+    <Compile Include="Controllers\menuTreeController.vb" />
     <Compile Include="Controllers\appBuilderController.vb" />
     <Compile Include="Models\Entity\serverConfigModel.vb" />
     <Compile Include="Models\Entity\xdataSourceModel.vb" />
@@ -489,6 +490,7 @@
     <Compile Include="Models\Entity\sitePropertyModel.vb" />
     <Compile Include="Models\Entity\addonModel.vb" />
     <Compile Include="Models\Entity\contentModel.vb" />
+    <Compile Include="Models\Entity\miniCollectionModel.vb" />
     <Compile Include="Models\Entity\_blankModel.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -506,9 +508,9 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Controllers\smtpController.vb" />
-    <Compile Include="coreToolsClass.vb" />
-    <Compile Include="coreUploadClass.vb" />
-    <Compile Include="coreXmlToolsClass.vb" />
+    <Compile Include="addon_tools\coreToolsClass.vb" />
+    <Compile Include="Controllers\uploadFileController.vb" />
+    <Compile Include="Controllers\xmlController.vb" />
     <Compile Include="Views\genericLegacyView.vb" />
   </ItemGroup>
   <ItemGroup>

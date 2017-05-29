@@ -5,6 +5,8 @@ Option Strict On
 Imports System.Xml
 Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
+Imports Contensive.Core.Models
+Imports Contensive.Core.Models.Entity
 '
 Namespace Contensive.Core
     '
@@ -748,7 +750,7 @@ Namespace Contensive.Core
                 Dim CDefInterfaces As XmlNode
                 Dim StatusOK As Boolean
                 Dim CollectionFileBaseName As String
-                Dim XMLTools As New coreXmlToolsClass(cpCore)
+                Dim XMLTools As New xmlController(cpCore)
                 Dim CollectionFolderName As String = ""
                 Dim CollectionFileFound As Boolean = False
                 Dim ZipFileFound As Boolean = False
@@ -1137,7 +1139,7 @@ Namespace Contensive.Core
                 Dim ChildCollectionLastChangeDate As Date
                 Dim CollectionLastChangeDate As Date
                 Dim NavIconTypeString As String
-                Dim XMLTools As New coreXmlToolsClass(cpCore)
+                Dim XMLTools As New xmlController(cpCore)
                 Dim AddonGuidFieldName As String
                 Dim CollectionHelp As String
                 Dim CollectionHelpLink As String
@@ -1186,7 +1188,7 @@ Namespace Contensive.Core
                 Dim NavDoc As XmlDocument
                 Dim FieldNode As XmlNode
                 Dim ContentRecordGuid As String
-                Dim CDef As coreMetaDataClass.CDefClass
+                Dim CDef As cdefModel
                 Dim ContentRecordName As String
                 Dim IsFieldFound As Boolean
                 Dim FieldLookupContentID As Integer
@@ -1838,7 +1840,7 @@ Namespace Contensive.Core
                                                                                                             IsFieldFound = False
                                                                                                             FieldName = genericController.vbLCase(GetXMLAttribute(IsFound, FieldNode, "name", ""))
                                                                                                             For Each keyValuePair In CDef.fields
-                                                                                                                Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+                                                                                                                Dim field As CDefFieldModel = keyValuePair.Value
                                                                                                                 If genericController.vbLCase(field.nameLc) = FieldName Then
                                                                                                                     fieldTypeId = field.fieldTypeId
                                                                                                                     FieldLookupContentID = field.lookupContentID
@@ -3882,8 +3884,8 @@ Namespace Contensive.Core
                     '
                     Call appendInstallLog(cpCore.serverConfig.appConfig.name, "installBaseCollection", "Special case -- installing base collection on new site, run cdef first")
                     '
-                    Dim CollectionWorking As New MiniCollectionClass
-                    Dim CollectionNew As New MiniCollectionClass
+                    Dim CollectionWorking As New miniCollectionModel
+                    Dim CollectionNew As New miniCollectionModel
                     Dim baseCollectionXml As String
                     Dim ignoreRefactor As Boolean
                     '
@@ -3942,8 +3944,8 @@ Namespace Contensive.Core
         Public Sub installCollection_BuildDbFromXmlData(ByVal XMLText As String, isNewBuild As Boolean, isBaseCollection As Boolean)
             Try
                 '
-                Dim miniCollectionWorking As MiniCollectionClass
-                Dim miniCollectionToAdd As New MiniCollectionClass
+                Dim miniCollectionWorking As miniCollectionModel
+                Dim miniCollectionToAdd As New miniCollectionModel
                 '
                 ' ----- Import any CDef files, allowing for changes
                 '
@@ -3996,12 +3998,12 @@ Namespace Contensive.Core
         '       - cdef are added to the cdefs in the application collection
         '=========================================================================================
         '
-        Private Sub installCollection_LoadXmlToMiniCollection(ByVal srcCollecionXml As String, ByRef returnCollection As MiniCollectionClass, ByVal IsccBaseFile As Boolean, ByVal setAllDataChanged As Boolean, IsNewBuild As Boolean, defaultCollection As MiniCollectionClass)
+        Private Sub installCollection_LoadXmlToMiniCollection(ByVal srcCollecionXml As String, ByRef returnCollection As miniCollectionModel, ByVal IsccBaseFile As Boolean, ByVal setAllDataChanged As Boolean, IsNewBuild As Boolean, defaultCollection As miniCollectionModel)
             Try
-                Dim DefaultCDef As coreMetaDataClass.CDefClass
-                Dim DefaultCDefField As coreMetaDataClass.CDefFieldClass
+                Dim DefaultCDef As cdefModel
+                Dim DefaultCDefField As CDefFieldModel
                 Dim contentNameLc As String
-                Dim XMLTools As New coreXmlToolsClass(cpCore)
+                Dim XMLTools As New xmlController(cpCore)
                 'Dim AddonClass As New addonInstallClass(cpCore)
                 Dim status As String
                 Dim CollectionGuid As String
@@ -4029,7 +4031,7 @@ Namespace Contensive.Core
                 '
                 Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeCDef_LoadDataToCollection", "Application: " & cpCore.serverConfig.appConfig.name & ", UpgradeCDef_LoadDataToCollection")
                 '
-                returnCollection = New MiniCollectionClass()
+                returnCollection = New miniCollectionModel()
                 '
                 If String.IsNullOrEmpty(srcCollecionXml) Then
                     cpCore.handleExceptionAndRethrow(New ApplicationException("UpgradeCDef_LoadDataToCollection, srcCollectionXml is blank or null"))
@@ -4092,7 +4094,7 @@ Namespace Contensive.Core
                                             If defaultCollection.CDef.ContainsKey(contentNameLc) Then
                                                 DefaultCDef = defaultCollection.CDef(contentNameLc)
                                             Else
-                                                DefaultCDef = New coreMetaDataClass.CDefClass
+                                                DefaultCDef = New cdefModel
                                             End If
                                             '
                                             ContentTableName = GetXMLAttribute(Found, CDef_Node, "ContentTableName", DefaultCDef.ContentTableName)
@@ -4108,7 +4110,7 @@ Namespace Contensive.Core
                                                 ' ----- Add CDef if not already there
                                                 '
                                                 If Not returnCollection.CDef.ContainsKey(ContentName.ToLower) Then
-                                                    returnCollection.CDef.Add(ContentName.ToLower, New coreMetaDataClass.CDefClass())
+                                                    returnCollection.CDef.Add(ContentName.ToLower, New cdefModel())
                                                 End If
                                                 '
                                                 ' Get CDef attributes
@@ -4154,7 +4156,7 @@ Namespace Contensive.Core
                                                     .DeveloperOnly = GetXMLAttributeBoolean(Found, CDef_Node, "DeveloperOnly", DefaultCDef.DeveloperOnly)
                                                     .DropDownFieldList = GetXMLAttribute(Found, CDef_Node, "DropDownFieldList", DefaultCDef.DropDownFieldList)
                                                     .EditorGroupName = GetXMLAttribute(Found, CDef_Node, "EditorGroupName", DefaultCDef.EditorGroupName)
-                                                    .fields = New Dictionary(Of String, coreMetaDataClass.CDefFieldClass)
+                                                    .fields = New Dictionary(Of String, CDefFieldModel)
                                                     .IconLink = GetXMLAttribute(Found, CDef_Node, "IconLink", DefaultCDef.IconLink)
                                                     .IconHeight = GetXMLAttributeInteger(Found, CDef_Node, "IconHeight", DefaultCDef.IconHeight)
                                                     .IconWidth = GetXMLAttributeInteger(Found, CDef_Node, "IconWidth", DefaultCDef.IconWidth)
@@ -4186,11 +4188,11 @@ Namespace Contensive.Core
                                                         If (DefaultCDef.fields.ContainsKey(FieldName)) Then
                                                             DefaultCDefField = DefaultCDef.fields(FieldName)
                                                         Else
-                                                            DefaultCDefField = New coreMetaDataClass.CDefFieldClass()
+                                                            DefaultCDefField = New CDefFieldModel()
                                                         End If
                                                         '
                                                         If Not returnCollection.CDef(ContentName.ToLower).fields.ContainsKey(FieldName) Then
-                                                            returnCollection.CDef(ContentName.ToLower).fields.Add(FieldName.ToLower, New coreMetaDataClass.CDefFieldClass)
+                                                            returnCollection.CDef(ContentName.ToLower).fields.Add(FieldName.ToLower, New CDefFieldModel)
                                                         End If
                                                         With returnCollection.CDef(ContentName.ToLower).fields(FieldName.ToLower)
                                                             .nameLc = FieldName.ToLower
@@ -4542,7 +4544,7 @@ Namespace Contensive.Core
         ''' <param name="Collection"></param>
         ''' <param name="return_IISResetRequired"></param>
         ''' <param name="BuildVersion"></param>
-        Private Sub installCollection_BuildDbFromMiniCollection(ByVal Collection As MiniCollectionClass, ByVal BuildVersion As String, isNewBuild As Boolean)
+        Private Sub installCollection_BuildDbFromMiniCollection(ByVal Collection As miniCollectionModel, ByVal BuildVersion As String, isNewBuild As Boolean)
             Try
                 '
                 Dim FieldHelpID As Integer
@@ -4594,7 +4596,7 @@ Namespace Contensive.Core
                 UsedTables = ""
                 With Collection
                     For Each keypairvalue In .CDef
-                        Dim workingCdef As coreMetaDataClass.CDefClass = keypairvalue.Value
+                        Dim workingCdef As cdefModel = keypairvalue.Value
                         ContentName = workingCdef.Name
                         With workingCdef
                             If .dataChanged Then
@@ -4628,7 +4630,7 @@ Namespace Contensive.Core
                     rs.Dispose()
                     '
                     For Each keypairvalue In .CDef
-                        Dim workingCdef As coreMetaDataClass.CDefClass = keypairvalue.Value
+                        Dim workingCdef As cdefModel = keypairvalue.Value
                         ContentName = workingCdef.Name
                         If workingCdef.dataChanged Then
                             With workingCdef
@@ -4660,7 +4662,7 @@ Namespace Contensive.Core
                     '----------------------------------------------------------------------------------------------------------------------
                     '
                     For Each keypairvalue In .CDef
-                        Dim workingCdef As coreMetaDataClass.CDefClass = keypairvalue.Value
+                        Dim workingCdef As cdefModel = keypairvalue.Value
                         ContentName = workingCdef.Name
                         With workingCdef
                             ContentName = genericController.vbLCase(.Name)
@@ -4685,7 +4687,7 @@ Namespace Contensive.Core
                     '
                     RequireReload = False
                     For Each keypairvalue In .CDef
-                        Dim workingCdef As coreMetaDataClass.CDefClass = keypairvalue.Value
+                        Dim workingCdef As cdefModel = keypairvalue.Value
                         ContentName = workingCdef.Name
                         If workingCdef.dataChanged Or workingCdef.includesAFieldChange Then
                             With workingCdef
@@ -4713,10 +4715,10 @@ Namespace Contensive.Core
                     '
                     FieldHelpCID = cpCore.db.getRecordID("content", "Content Field Help")
                     For Each keypairvalue In .CDef
-                        Dim workingCdef As coreMetaDataClass.CDefClass = keypairvalue.Value
+                        Dim workingCdef As cdefModel = keypairvalue.Value
                         ContentName = workingCdef.Name
                         For Each fieldKeyValuePair In workingCdef.fields
-                            Dim field As coreMetaDataClass.CDefFieldClass = fieldKeyValuePair.Value
+                            Dim field As CDefFieldModel = fieldKeyValuePair.Value
                             FieldName = field.nameLc
                             With .CDef(ContentName.ToLower).fields(FieldName.ToLower)
                                 If .HelpChanged Then
@@ -4993,7 +4995,7 @@ Namespace Contensive.Core
         ' ----- Load the archive file application
         '========================================================================
         '
-        Private Sub installCollection_BuildDbFromCollection_AddCDefToDb(cdef As coreMetaDataClass.CDefClass, ByVal BuildVersion As String)
+        Private Sub installCollection_BuildDbFromCollection_AddCDefToDb(cdef As cdefModel, ByVal BuildVersion As String)
             Try
                 '
                 Dim FieldHelpCID As Integer
@@ -5116,7 +5118,7 @@ Namespace Contensive.Core
                             FieldSize = 0
                             FieldCount = 0
                             For Each nameValuePair In .fields
-                                Dim field As coreMetaDataClass.CDefFieldClass = nameValuePair.Value
+                                Dim field As CDefFieldModel = nameValuePair.Value
                                 With field
                                     If (.dataChanged) Then
                                         fieldId = cpCore.metaData.verifyCDefField_ReturnID(ContentName, field)
@@ -5182,7 +5184,7 @@ Namespace Contensive.Core
         '               field attributes updated if .isBaseField matches
         '==========================================================================================================================
         '
-        Private Function installCollection_AddMiniCollectionSrcToDst(ByRef dstCollection As MiniCollectionClass, ByVal srcCollection As MiniCollectionClass, ByVal SrcIsUserCDef As Boolean) As Boolean
+        Private Function installCollection_AddMiniCollectionSrcToDst(ByRef dstCollection As miniCollectionModel, ByVal srcCollection As miniCollectionModel, ByVal SrcIsUserCDef As Boolean) As Boolean
             Dim returnOk As Boolean = True
             Try
                 '
@@ -5192,9 +5194,9 @@ Namespace Contensive.Core
                 Dim HelpChanged As Boolean
                 Dim Copy As String
                 Dim n As String
-                Dim srcCollectionCdefField As coreMetaDataClass.CDefFieldClass
-                Dim dstCollectionCdef As coreMetaDataClass.CDefClass
-                Dim dstCollectionCdefField As coreMetaDataClass.CDefFieldClass
+                Dim srcCollectionCdefField As CDefFieldModel
+                Dim dstCollectionCdef As cdefModel
+                Dim dstCollectionCdefField As CDefFieldModel
                 Dim IsMatch As Boolean
                 Dim TEmpName As String
                 Dim DstKey As String
@@ -5215,7 +5217,7 @@ Namespace Contensive.Core
                 'Dim SrcPtr As Integer
                 'Dim SrcFPtr As Integer
                 Dim okToUpdateDstFromSrc As Boolean
-                Dim srcCollectionCdef As coreMetaDataClass.CDefClass
+                Dim srcCollectionCdef As cdefModel
                 Dim DebugName As String
                 Dim DebugSrcFound As Boolean
                 Dim DebugDstFound As Boolean
@@ -5226,7 +5228,7 @@ Namespace Contensive.Core
                 '
                 If srcCollection.isBaseCollection Then
                     For Each dstKeyValuePair In dstCollection.CDef
-                        Dim dstWorkingCdef As coreMetaDataClass.CDefClass = dstKeyValuePair.Value
+                        Dim dstWorkingCdef As cdefModel = dstKeyValuePair.Value
                         Dim contentName As String
                         contentName = dstWorkingCdef.Name
                         If dstCollection.CDef(contentName.ToLower).IsBaseContent Then
@@ -5241,7 +5243,7 @@ Namespace Contensive.Core
                                     .IsBaseContent = False
                                     .dataChanged = True
                                     For Each dstFieldKeyValuePair In .fields
-                                        Dim field As coreMetaDataClass.CDefFieldClass = dstFieldKeyValuePair.Value
+                                        Dim field As CDefFieldModel = dstFieldKeyValuePair.Value
                                         If field.isBaseField Then
                                             field.isBaseField = False
                                             'field.Changed = True
@@ -5285,7 +5287,7 @@ Namespace Contensive.Core
                         '
                         ' add src to dst
                         '
-                        dstCollection.CDef.Add(SrcContentName.ToLower, New coreMetaDataClass.CDefClass)
+                        dstCollection.CDef.Add(SrcContentName.ToLower, New cdefModel)
                         okToUpdateDstFromSrc = True
                     Else
                         dstCollectionCdef = dstCollection.CDef(SrcContentName.ToLower)
@@ -5633,7 +5635,7 @@ Namespace Contensive.Core
                                     '
                                     ' field was not found in dst, add it and populate
                                     '
-                                    dstCollectionCdef.fields.Add(SrcFieldName.ToLower, New coreMetaDataClass.CDefFieldClass)
+                                    dstCollectionCdef.fields.Add(SrcFieldName.ToLower, New CDefFieldModel)
                                     dstCollectionCdefField = dstCollectionCdef.fields(SrcFieldName.ToLower)
                                     okToUpdateDstFromSrc = True
                                     HelpChanged = True
@@ -6049,8 +6051,8 @@ Namespace Contensive.Core
         '
         '
         '
-        Private Function installCollection_GetApplicationMiniCollection(isNewBuild As Boolean) As MiniCollectionClass
-            Dim returnColl As New MiniCollectionClass
+        Private Function installCollection_GetApplicationMiniCollection(isNewBuild As Boolean) As miniCollectionModel
+            Dim returnColl As New miniCollectionModel
             Try
                 '
                 Dim ExportFilename As String
@@ -6066,7 +6068,7 @@ Namespace Contensive.Core
                     Call exportApplicationCDefXml(ExportPathPage, True)
                     CollectionData = cpCore.privateFiles.readFile(ExportPathPage)
                     Call cpCore.privateFiles.deleteFile(ExportPathPage)
-                    Call installCollection_LoadXmlToMiniCollection(CollectionData, returnColl, False, False, isNewBuild, New MiniCollectionClass)
+                    Call installCollection_LoadXmlToMiniCollection(CollectionData, returnColl, False, False, isNewBuild, New miniCollectionModel)
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -6143,7 +6145,7 @@ Namespace Contensive.Core
         '
         '
         '
-        Private Function GetMenuNameSpace(ByVal Collection As MiniCollectionClass, ByVal MenuPtr As Integer, ByVal IsNavigator As Boolean, ByVal UsedIDList As String) As String
+        Private Function GetMenuNameSpace(ByVal Collection As miniCollectionModel, ByVal MenuPtr As Integer, ByVal IsNavigator As Boolean, ByVal UsedIDList As String) As String
             Dim returnAttr As String = ""
             Try
                 Dim ParentName As String
@@ -6727,10 +6729,10 @@ Namespace Contensive.Core
         '
         Public Sub exportApplicationCDefXml(ByVal privateFilesPathFilename As String, ByVal IncludeBaseFields As Boolean)
             Try
-                Dim XML As coreXmlToolsClass
+                Dim XML As xmlController
                 Dim Content As String
                 '
-                XML = New coreXmlToolsClass(cpCore)
+                XML = New xmlController(cpCore)
                 Content = XML.GetXMLContentDefinition3("", IncludeBaseFields)
                 Call cpCore.privateFiles.saveFile(privateFilesPathFilename, Content)
                 XML = Nothing

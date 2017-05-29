@@ -735,7 +735,7 @@ Namespace Contensive.Core.Controllers
         Public Sub SaveRemoteFile(ByVal Link As String, ByVal pathFilename As String)
             Try
                 '
-                Dim HTTP As New coreHttpRequestClass()
+                Dim HTTP As New httpRequestController()
                 Dim URLLink As String
                 '
                 If (pathFilename <> "") And (Link <> "") Then

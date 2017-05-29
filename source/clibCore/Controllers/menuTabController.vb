@@ -2,10 +2,9 @@
 Option Explicit On
 Option Strict On
 
-Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
 
-Namespace Contensive.Core
+Namespace Contensive.Core.Controllers
     '
     '====================================================================================================
     ''' <summary>
@@ -14,7 +13,7 @@ Namespace Contensive.Core
     ''' - disposable region at end
     ''' - if disposable is not needed add: not IDisposable - not contained classes that need to be disposed
     ''' </summary>
-    Public Class coreMenuTabClass
+    Public Class menuTabController
         Implements IDisposable
         '
         ' ----- objects passed in constructor, do not dispose
@@ -88,7 +87,7 @@ Namespace Contensive.Core
                 Dim TabID As String
                 Dim FirstLiveBodyShown As Boolean
                 Dim TabEdgeStyle As String
-                Dim LiveTab As New coreMenuLiveTabClass
+                Dim LiveTab As New menuLiveTabController
                 Dim TabBlank As String
                 Dim TabCurrent As String
                 Dim TabStyle As String

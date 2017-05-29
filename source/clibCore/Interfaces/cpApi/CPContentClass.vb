@@ -1,5 +1,7 @@
 Imports Contensive.BaseClasses
 Imports System.Runtime.InteropServices
+Imports Contensive.Core.Models.Entity
+Imports Contensive.Core.Controllers
 
 Namespace Contensive.Core
     '
@@ -265,7 +267,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function AddContentField(ContentName As String, FieldName As String, FieldType As Integer) As Integer
-            Dim field As New coreMetaDataClass.CDefFieldClass()
+            Dim field As New CDefFieldModel()
             field.active = True
             field.adminOnly = False
             field.authorable = True

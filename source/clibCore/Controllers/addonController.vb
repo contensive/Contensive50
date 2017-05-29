@@ -256,7 +256,7 @@ Namespace Contensive.Core.Controllers
                 Dim OptionsForCPVars() As NameValuePrivateType
                 Dim OptionsForCPVars_Cnt As Integer
                 Dim RemoteAssetContent As String
-                Dim kmaHTTP As coreHttpRequestClass
+                Dim kmaHTTP As httpRequestController
                 Dim WorkingLink As String
                 Dim FormContent As String
                 Dim ExitAddonWithBlankResponse As Boolean
@@ -1159,7 +1159,7 @@ Namespace Contensive.Core.Controllers
                                             End If
                                         End If
                                         Dim PosStart As Integer
-                                        kmaHTTP = New coreHttpRequestClass()
+                                        kmaHTTP = New httpRequestController()
                                         RemoteAssetContent = kmaHTTP.getURL(WorkingLink)
                                         Pos = genericController.vbInstr(1, RemoteAssetContent, "<body", vbTextCompare)
                                         If Pos > 0 Then
@@ -1484,11 +1484,11 @@ Namespace Contensive.Core.Controllers
             Dim FieldSQL As String
             Dim LoginMode As Integer
             Dim Help As String
-            Dim Content As New coreFastStringClass
+            Dim Content As New stringBuilderLegacyController
             Dim Copy As String
             Dim Button As String
             Dim PageNotFoundPageID As String
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             Dim ButtonList As String
             Dim AllowLinkAlias As Boolean
             Dim LinkForwardAutoInsert As Boolean
@@ -1505,7 +1505,7 @@ Namespace Contensive.Core.Controllers
             Dim TabDescription As String
             Dim TabHeading As String
             Dim TabCnt As Integer
-            Dim TabCell As coreFastStringClass
+            Dim TabCell As stringBuilderLegacyController
             Dim loadOK As Boolean = True
             Dim FieldValue As String
             Dim FieldDescription As String
@@ -1739,7 +1739,7 @@ Namespace Contensive.Core.Controllers
                                             If TabHeading = "Debug and Trace Settings" Then
                                                 TabHeading = TabHeading
                                             End If
-                                            TabCell = New coreFastStringClass
+                                            TabCell = New stringBuilderLegacyController
                                             For Each TabNode In SettingNode.ChildNodes
                                                 Select Case genericController.vbLCase(TabNode.Name)
                                                     Case "heading"
@@ -2153,7 +2153,7 @@ ErrorTrap:
             ' converted array to dictionary - Dim FieldPointer As Integer
             Dim CSPointer As Integer
             Dim RecordID As Integer
-            Dim FastString As coreFastStringClass
+            Dim FastString As stringBuilderLegacyController
             Dim FieldValueInteger As Integer
             Dim FieldRequired As Boolean
             Dim FieldHelp As String
@@ -2163,7 +2163,7 @@ ErrorTrap:
             '
             Dim FieldName As String
             '
-            FastString = New coreFastStringClass
+            FastString = New stringBuilderLegacyController
             '
             Call buildAddonOptionLists(ignore, ExpandedSelector, SitePropertyName & "=" & selector, SitePropertyName & "=" & SitePropertyValue, "0", True)
             Pos = genericController.vbInstr(1, ExpandedSelector, "[")
@@ -2833,7 +2833,7 @@ ErrorTrap:
                     & "&AddonID=" & CStr(addonId) _
                     & "&OptionString=" & encodeNvaArgument(EncodeRequestVariable(OptionString))
             'hint = hint & ",035"
-            Dim taskScheduler As New coreTaskSchedulerServiceClass()
+            Dim taskScheduler As New taskSchedulerController()
             Dim cmdDetail As New cmdDetailClass
             cmdDetail.addonId = addonId
             cmdDetail.addonName = AddonName
@@ -3541,11 +3541,11 @@ ErrorTrap:
             Dim FieldSQL As String
             Dim LoginMode As Integer
             Dim Help As String
-            Dim Content As New coreFastStringClass
+            Dim Content As New stringBuilderLegacyController
             Dim Copy As String
             Dim Button As String
             Dim PageNotFoundPageID As String
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             Dim ButtonList As String
             Dim AllowLinkAlias As Boolean
             'Dim AllowExternalLinksInChildList As Boolean
@@ -3567,7 +3567,7 @@ ErrorTrap:
             Dim TabDescription As String
             Dim TabHeading As String
             Dim TabCnt As Integer
-            Dim TabCell As coreFastStringClass
+            Dim TabCell As stringBuilderLegacyController
             Dim FieldValue As String
             Dim FieldDescription As String
             Dim FieldDefaultValue As String
@@ -3813,7 +3813,7 @@ ErrorTrap:
                                             TabName = cpCore.main_GetXMLAttribute(IsFound, SettingNode, "name", "")
                                             TabDescription = cpCore.main_GetXMLAttribute(IsFound, SettingNode, "description", "")
                                             TabHeading = cpCore.main_GetXMLAttribute(IsFound, SettingNode, "heading", "")
-                                            TabCell = New coreFastStringClass
+                                            TabCell = New stringBuilderLegacyController
                                             For Each TabNode In SettingNode.ChildNodes
                                                 Select Case genericController.vbLCase(TabNode.Name)
                                                     Case "heading"
@@ -4233,18 +4233,18 @@ ErrorTrap:
             ' converted array to dictionary - Dim FieldPointer As Integer
             Dim CSPointer As Integer
             Dim RecordID As Integer
-            Dim FastString As coreFastStringClass
+            Dim FastString As stringBuilderLegacyController
             Dim FieldValueInteger As Integer
             Dim FieldRequired As Boolean
             Dim FieldHelp As String
             Dim AuthoringStatusMessage As String
             Dim Delimiter As String
             Dim Copy As String
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             '
             Dim FieldName As String
             '
-            FastString = New coreFastStringClass
+            FastString = New stringBuilderLegacyController
             '
             Call buildAddonOptionLists(ignore, ExpandedSelector, SitePropertyName & "=" & selector, SitePropertyName & "=" & SitePropertyValue, "0", True)
             Pos = genericController.vbInstr(1, ExpandedSelector, "[")

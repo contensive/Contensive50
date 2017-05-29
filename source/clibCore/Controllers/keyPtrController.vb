@@ -5,10 +5,10 @@ Option Strict On
 Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
 '
-Namespace Contensive.Core
+Namespace Contensive.Core.Controllers
     '
     <Serializable()>
-    Public Class coreKeyPtrIndexClass
+    Public Class keyPtrController
         '
         ' new serializable and deserialize
         '   declare a private instance of a class that holds everything

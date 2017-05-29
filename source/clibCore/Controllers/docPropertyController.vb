@@ -5,17 +5,15 @@ Option Strict On
 Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
 
-Namespace Contensive.Core
+Namespace Contensive.Core.Controllers
     '
     '====================================================================================================
     ''' <summary>
     ''' doc properties are properties limited in scope to this single hit, or viewing
     ''' </summary>
-    Public Class coreDocPropertiesClass
+    Public Class docPropertyController
         '
         Private cpCore As coreClass
-        '
-        ' refactor -- this should be private
         '
         Private docPropertiesDict As New Dictionary(Of String, docPropertiesClass)
         '

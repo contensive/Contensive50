@@ -62,8 +62,8 @@ Namespace Contensive.Core
         Public Const cache_linkAlias_cacheName = "cache_linkAlias"
         Public cache_linkAlias As String(,)
         Public cache_linkAliasCnt As Integer = 0
-        Public cache_linkAlias_NameIndex As coreKeyPtrIndexClass
-        Public cache_linkAlias_PageIdQSSIndex As coreKeyPtrIndexClass
+        Public cache_linkAlias_NameIndex As keyPtrController
+        Public cache_linkAlias_PageIdQSSIndex As keyPtrController
         '-
         '-----------------------------------------------------------------------
         '-----------------------------------------------------------------------
@@ -93,7 +93,7 @@ Namespace Contensive.Core
         Public Class addonIncludeRulesClass
             Public item As String(,)
             Public itemCnt As Integer = 0
-            Public addonIdIndex As coreKeyPtrIndexClass
+            Public addonIdIndex As keyPtrController
         End Class
         Public cache_addonIncludeRules As addonIncludeRulesClass
         '
@@ -101,7 +101,7 @@ Namespace Contensive.Core
         '
         Public cache_libraryFiles As String(,)
         Public cache_libraryFilesCnt As Integer = 0
-        Public cache_libraryFilesIdIndex As coreKeyPtrIndexClass
+        Public cache_libraryFilesIdIndex As keyPtrController
         '
         ' ----- linkForwward
         '
@@ -309,7 +309,7 @@ Namespace Contensive.Core
             Dim NewRecord As Boolean                ' true if it was created here
             'ContentPointer as integer              ' Pointer to the content for this Set
             Dim ContentName As String
-            Dim CDef As coreMetaDataClass.CDefClass
+            Dim CDef As cdefModel
             Dim OwnerMemberID As Integer               ' ID of the member who opened the app.csv_ContentSet
             '
             ' Workflow editing modes
@@ -480,15 +480,15 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property cache_addonStyleRules() As coreCacheKeyPtrClass
+        Public ReadOnly Property cache_addonStyleRules() As cacheKeyPtrController
             Get
                 If (_cache_addonStyleRules Is Nothing) Then
-                    _cache_addonStyleRules = New coreCacheKeyPtrClass(Me, cacheNameAddonStyleRules, sqlAddonStyles, "shared style add-on rules,add-ons,shared styles")
+                    _cache_addonStyleRules = New cacheKeyPtrController(Me, cacheNameAddonStyleRules, sqlAddonStyles, "shared style add-on rules,add-ons,shared styles")
                 End If
                 Return _cache_addonStyleRules
             End Get
         End Property
-        Private _cache_addonStyleRules As coreCacheKeyPtrClass = Nothing
+        Private _cache_addonStyleRules As cacheKeyPtrController = Nothing
         '
         '===================================================================================================
         ''' <summary>
@@ -548,15 +548,15 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property menuTab As coreMenuTabClass
+        Public ReadOnly Property menuTab As menuTabController
             Get
                 If (_menuTab Is Nothing) Then
-                    _menuTab = New coreMenuTabClass(Me)
+                    _menuTab = New menuTabController(Me)
                 End If
                 Return _menuTab
             End Get
         End Property
-        Private _menuTab As coreMenuTabClass
+        Private _menuTab As menuTabController
         '
         '===================================================================================================
         ''' <summary>
@@ -599,15 +599,15 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property menuFlyout As coreMenuFlyoutClass
+        Public ReadOnly Property menuFlyout As menuFlyoutController
             Get
                 If (_menuFlyout Is Nothing) Then
-                    _menuFlyout = New coreMenuFlyoutClass(Me)
+                    _menuFlyout = New menuFlyoutController(Me)
                 End If
                 Return _menuFlyout
             End Get
         End Property
-        Private _menuFlyout As coreMenuFlyoutClass
+        Private _menuFlyout As menuFlyoutController
         '
         '===================================================================================================
         ''' <summary>
@@ -616,15 +616,15 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property userProperty As corePropertyCacheClass
+        Public ReadOnly Property userProperty As propertyModelClass
             Get
                 If (_userProperty Is Nothing) Then
-                    _userProperty = New corePropertyCacheClass(Me, PropertyTypeMember)
+                    _userProperty = New propertyModelClass(Me, PropertyTypeMember)
                 End If
                 Return _userProperty
             End Get
         End Property
-        Private _userProperty As corePropertyCacheClass
+        Private _userProperty As propertyModelClass
         '
         '===================================================================================================
         ''' <summary>
@@ -633,15 +633,15 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property visitorProperty As corePropertyCacheClass
+        Public ReadOnly Property visitorProperty As propertyModelClass
             Get
                 If (_visitorProperty Is Nothing) Then
-                    _visitorProperty = New corePropertyCacheClass(Me, PropertyTypeVisitor)
+                    _visitorProperty = New propertyModelClass(Me, PropertyTypeVisitor)
                 End If
                 Return _visitorProperty
             End Get
         End Property
-        Private _visitorProperty As corePropertyCacheClass
+        Private _visitorProperty As propertyModelClass
         '
         '===================================================================================================
         ''' <summary>
@@ -650,15 +650,15 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property visitProperty As corePropertyCacheClass
+        Public ReadOnly Property visitProperty As propertyModelClass
             Get
                 If (_visitProperty Is Nothing) Then
-                    _visitProperty = New corePropertyCacheClass(Me, PropertyTypeVisit)
+                    _visitProperty = New propertyModelClass(Me, PropertyTypeVisit)
                 End If
                 Return _visitProperty
             End Get
         End Property
-        Private _visitProperty As corePropertyCacheClass
+        Private _visitProperty As propertyModelClass
         '
         '===================================================================================================
         ''' <summary>
@@ -684,15 +684,15 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property security() As coreSecurityClass
+        Public ReadOnly Property security() As securityController
             Get
                 If (_security Is Nothing) Then
-                    _security = New coreSecurityClass(Me, serverConfig.appConfig.privateKey)
+                    _security = New securityController(Me, serverConfig.appConfig.privateKey)
                 End If
                 Return _security
             End Get
         End Property
-        Private _security As coreSecurityClass = Nothing
+        Private _security As securityController = Nothing
         '
         '===================================================================================================
         ''' <summary>
@@ -701,15 +701,15 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property docProperties() As coreDocPropertiesClass
+        Public ReadOnly Property docProperties() As docPropertyController
             Get
                 If (_doc Is Nothing) Then
-                    _doc = New coreDocPropertiesClass(Me)
+                    _doc = New docPropertyController(Me)
                 End If
                 Return _doc
             End Get
         End Property
-        Private _doc As coreDocPropertiesClass = Nothing
+        Private _doc As docPropertyController = Nothing
         '
         '===================================================================================================
         ''' <summary>
@@ -937,15 +937,15 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property workflow() As coreWorkflowClass
+        Public ReadOnly Property workflow() As workflowController
             Get
                 If (_workflow Is Nothing) Then
-                    _workflow = New coreWorkflowClass(Me)
+                    _workflow = New workflowController(Me)
                 End If
                 Return _workflow
             End Get
         End Property
-        Private _workflow As coreWorkflowClass = Nothing
+        Private _workflow As workflowController = Nothing
         '
         '===================================================================================================
         ''' <summary>
@@ -964,15 +964,15 @@ Namespace Contensive.Core
         End Property
         Private _cache As Controllers.cacheController = Nothing
         '
-        Public ReadOnly Property metaData As coreMetaDataClass
+        Public ReadOnly Property metaData As cdefController
             Get
                 If _metaData Is Nothing Then
-                    _metaData = New coreMetaDataClass(Me)
+                    _metaData = New cdefController(Me)
                 End If
                 Return _metaData
             End Get
         End Property
-        Private _metaData As coreMetaDataClass = Nothing
+        Private _metaData As cdefController = Nothing
         '
         '===================================================================================================
         ''' <summary>
@@ -1289,7 +1289,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap 'Const Tn = "MethodName-032" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
             Dim MethodName As String
-            Dim CDef As coreMetaDataClass.CDefClass
+            Dim CDef As cdefModel
             '
             MethodName = "csv_GetContentControlCriteria"
             '
@@ -1427,11 +1427,11 @@ ErrorTrap:
             On Error GoTo ErrorTrap 'Const Tn = "MethodName-046" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
             Dim MethodName As String
-            Dim XML As coreXmlToolsClass
+            Dim XML As xmlController
             '
             MethodName = "csv_GetXMLContentDefinition3"
             '
-            XML = New coreXmlToolsClass(Me)
+            XML = New xmlController(Me)
             GetXMLContentDefinition3 = XML.GetXMLContentDefinition3(ContentName, IncludeBaseFields)
             XML = Nothing
             '
@@ -2279,7 +2279,7 @@ ErrorTrap:
         Public Sub image_ResizeImage2(SrcFilename As String, DstFilename As String, Width As Integer, Height As Integer, Algorithm As csv_SfImageResizeAlgorithms)
             On Error GoTo ErrorTrap 'Const Tn = "ResizeImage2": 'Dim th as integer: th = profileLogMethodEnter(Tn)
             '
-            Dim sf As New coreImageEditClass
+            Dim sf As New imageEditController
             '
             If Width = 0 And Height = 0 Then
                 '
@@ -2856,7 +2856,7 @@ ErrorTrap:
             Dim GroupCount As Integer
             Dim GroupPointer As Integer
             Dim CSPointer As Integer
-            Dim CDef As coreMetaDataClass.CDefClass
+            Dim CDef As cdefModel
             Dim ContentName As String
             ' converted array to dictionary - Dim FieldPointer As Integer
             Dim FieldName As String
@@ -2909,8 +2909,8 @@ ErrorTrap:
                             Call error_AddUserError("There was a problem locating the information you requested.")
                         Else
                             CDef = metaData.getCdef(ContentName)
-                            For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In CDef.fields
-                                Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+                            For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In CDef.fields
+                                Dim field As CDefFieldModel = keyValuePair.Value
                                 If field.UniqueName Then
                                     FieldName = field.nameLc
                                     FieldValue = docProperties.getText(FieldName)
@@ -3580,7 +3580,7 @@ ErrorTrap:
             '
             Dim iHeaderMessage As String
             Dim iRightSideMessage As String
-            Dim Adminui As New coreAdminUIClass(Me)
+            Dim Adminui As New adminUIController(Me)
             '
             'If Not (true) Then Exit Function
             '
@@ -3711,7 +3711,7 @@ ErrorTrap:
             Dim iButtonValueList As String
             Dim iButtonName As String
             Dim MethodName As String
-            Dim Adminui As New coreAdminUIClass(Me)
+            Dim Adminui As New adminUIController(Me)
             '
             iButtonValueList = genericController.encodeText(ButtonValueList)
             iButtonName = genericController.encodeText(ButtonName)
@@ -3787,18 +3787,18 @@ ErrorTrap:
             Dim MethodName As String
             Dim TagID As String
             Dim ButtonPanel As String
-            Dim ToolsPanel As coreFastStringClass
+            Dim ToolsPanel As stringBuilderLegacyController
             Dim OptionsPanel As String
-            Dim LinkPanel As coreFastStringClass
+            Dim LinkPanel As stringBuilderLegacyController
             Dim LoginPanel As String
             Dim iValueBoolean As Boolean
             Dim WorkingQueryString As String
             Dim ActionURL As String
             Dim BubbleCopy As String
-            Dim AnotherPanel As coreFastStringClass
+            Dim AnotherPanel As stringBuilderLegacyController
             Dim ClipBoard As String
             Dim RenderTimeString As String
-            Dim Adminui As New coreAdminUIClass(Me)
+            Dim Adminui As New adminUIController(Me)
             Dim ToolsPanelAddonID As Integer
             Dim ShowLegacyToolsPanel As Boolean
             Dim QS As String
@@ -3810,7 +3810,7 @@ ErrorTrap:
                 '
                 ' --- Link Panel - used for both Legacy Tools Panel, and without it
                 '
-                LinkPanel = New coreFastStringClass
+                LinkPanel = New stringBuilderLegacyController
                 LinkPanel.Add(SpanClassAdminSmall)
                 LinkPanel.Add("Contensive " & codeVersion() & " | ")
                 LinkPanel.Add(FormatDateTime(app_startTime) & " | ")
@@ -3832,7 +3832,7 @@ ErrorTrap:
                 LinkPanel.Add("</span>")
                 '
                 If ShowLegacyToolsPanel Then
-                    ToolsPanel = New coreFastStringClass
+                    ToolsPanel = New stringBuilderLegacyController
                     WorkingQueryString = genericController.ModifyQueryString(web_RefreshQueryString, "ma", "", False)
                     '
                     ' ----- Tools Panel Caption
@@ -4056,7 +4056,7 @@ ErrorTrap:
                     '
                     ' --- Debug Panel Header
                     '
-                    LinkPanel = New coreFastStringClass
+                    LinkPanel = New stringBuilderLegacyController
                     LinkPanel.Add(SpanClassAdminSmall)
                     'LinkPanel.Add( "WebClient " & main_WebClientVersion & " | "
                     LinkPanel.Add("Contensive " & codeVersion() & " | ")
@@ -7132,7 +7132,7 @@ ErrorTrap:
             'If Not (true) Then Exit Function
             '
             Dim MethodName As String
-            Dim Contentdefinition As coreMetaDataClass.CDefClass
+            Dim Contentdefinition As cdefModel
             '
             MethodName = "main_GetContentProperty"
             '
@@ -7213,7 +7213,7 @@ ErrorTrap:
             'If Not (true) Then Exit Function
             '
             Dim MethodName As String
-            Dim Contentdefinition As coreMetaDataClass.CDefClass
+            Dim Contentdefinition As cdefModel
             ' converted array to dictionary - Dim FieldPointer As Integer
             Dim UcaseFieldName As String
             '
@@ -7226,8 +7226,8 @@ ErrorTrap:
                 If (UcaseFieldName = "") Or (Contentdefinition.fields.Count < 1) Then
                     Call handleLegacyError14(MethodName, "Content Name [" & genericController.encodeText(ContentName) & "] or FieldName [" & genericController.encodeText(FieldName) & "] was not valid")
                 Else
-                    For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In Contentdefinition.fields
-                        Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+                    For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In Contentdefinition.fields
+                        Dim field As CDefFieldModel = keyValuePair.Value
                         With field
                             If UcaseFieldName = genericController.vbUCase(.nameLc) Then
                                 Select Case genericController.vbUCase(genericController.encodeText(PropertyName))
@@ -7530,7 +7530,7 @@ ErrorTrap:
             'If Not (true) Then Exit Sub
             '
             Dim SQL As String
-            Dim CDef As coreMetaDataClass.CDefClass
+            Dim CDef As cdefModel
             '
             CDef = metaData.getCdef(ContentName)
             Call main_IncrementTableField(CDef.ContentTableName, RecordID, FieldName, CDef.ContentDataSourceName)
@@ -8406,7 +8406,7 @@ ErrorTrap:
         Public Function main_GetReport(ByVal RowCount As Integer, ByVal ColCaption() As String, ByVal ColAlign() As String, ByVal ColWidth() As String, ByVal Cells As String(,), ByVal PageSize As Integer, ByVal PageNumber As Integer, ByVal PreTableCopy As String, ByVal PostTableCopy As String, ByVal DataRowCount As Integer, ByVal ClassStyle As String) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetReport")
             '
-            Dim Adminui As New coreAdminUIClass(Me)
+            Dim Adminui As New adminUIController(Me)
             '
             main_GetReport = Adminui.GetReport(RowCount, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, ClassStyle)
             Exit Function
@@ -9318,7 +9318,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function admin_GetAdminFormBody(Caption As String, ButtonListLeft As String, ButtonListRight As String, AllowAdd As Boolean, AllowDelete As Boolean, Description As String, ContentSummary As String, ContentPadding As Integer, Content As String) As String
-            Dim Adminui As New coreAdminUIClass(Me)
+            Dim Adminui As New adminUIController(Me)
             '
             admin_GetAdminFormBody = Adminui.GetBody(Caption, ButtonListLeft, ButtonListRight, AllowAdd, AllowDelete, Description, ContentSummary, ContentPadding, Content)
         End Function
@@ -9553,8 +9553,8 @@ ErrorTrap:
             Dim cacheTest As Object
             Dim bag As String
             '
-            cache_linkAlias_PageIdQSSIndex = New coreKeyPtrIndexClass
-            cache_linkAlias_NameIndex = New coreKeyPtrIndexClass
+            cache_linkAlias_PageIdQSSIndex = New keyPtrController
+            cache_linkAlias_NameIndex = New keyPtrController
             cache_linkAliasCnt = 0
             '
             ' Load cache
@@ -9590,8 +9590,8 @@ ErrorTrap:
                 Dim rs As DataTable
                 rs = db.executeSql("select " & cache_linkAlias_fieldList & " from ccLinkAliases where (active<>0) order by id desc")
                 If rs.Rows.Count > 0 Then
-                    cache_linkAlias_NameIndex = New coreKeyPtrIndexClass
-                    cache_linkAlias_PageIdQSSIndex = New coreKeyPtrIndexClass
+                    cache_linkAlias_NameIndex = New keyPtrController
+                    cache_linkAlias_PageIdQSSIndex = New keyPtrController
                     ReDim cache_linkAlias(rs.Rows.Count, 4)
                     For Each row As DataRow In rs.Rows
                         cache_linkAlias(0, Ptr) = row(0).ToString
@@ -9615,8 +9615,8 @@ ErrorTrap:
                 ' Load Index
                 '
                 If cache_linkAliasCnt > 0 Then
-                    cache_linkAlias_NameIndex = New coreKeyPtrIndexClass
-                    cache_linkAlias_PageIdQSSIndex = New coreKeyPtrIndexClass
+                    cache_linkAlias_NameIndex = New keyPtrController
+                    cache_linkAlias_PageIdQSSIndex = New keyPtrController
                     For Ptr = 0 To cache_linkAliasCnt - 1
                         LinkAliasName = genericController.encodeText(cache_linkAlias(1, Ptr))
                         LinkAliasPageID = genericController.encodeText(cache_linkAlias(3, Ptr))
@@ -10091,7 +10091,7 @@ ErrorTrap:
             Dim Pos As Integer
             Dim AltSizeList As String
             'Dim innovaEditor As innovaEditorAddonClassFPO
-            Dim sf As coreImageEditClass
+            Dim sf As imageEditController
             Dim RebuildSizes As Boolean
             Dim AddonStatusOK As Boolean
             Dim pageContentName As String
@@ -10284,7 +10284,7 @@ ErrorTrap:
                                     FilenameExt = Mid(Filename, Pos + 1)
                                     FilenameNoExt = Mid(Filename, 1, Pos - 1)
                                     If genericController.vbInstr(1, "jpg,gif,png", FilenameExt, vbTextCompare) <> 0 Then
-                                        sf = New coreImageEditClass
+                                        sf = New imageEditController
                                         If sf.load(appRootFiles.rootLocalPath & FilePath & Filename) Then
                                             '
                                             '
@@ -10594,14 +10594,14 @@ ErrorTrap:
             Dim ElementCount As Integer
             Dim TagCount As Integer
             Dim TagName As String
-            Dim kmaParse As coreHtmlParseClass
+            Dim kmaParse As htmlParserController
             Dim ElementPointer As Integer
-            Dim Output As New coreFastStringClass
+            Dim Output As New stringBuilderLegacyController
             Dim ElementText As String
             Dim RootRelativeLink As String
             Dim TagDone As Boolean
             '
-            kmaParse = New coreHtmlParseClass(Me)
+            kmaParse = New htmlParserController(Me)
             Call kmaParse.Load(Doc)
             ElementPointer = 0
             ElementCount = kmaParse.ElementCount
@@ -10671,7 +10671,7 @@ ErrorTrap:
             '
             Dim Pos As Integer
             Dim ImportedStyle As String
-            Dim HTTP As New coreHttpRequestClass()
+            Dim HTTP As New httpRequestController()
             Dim Filename As String
             Dim RootRelativeLink As String
             Dim ImportLink As String
@@ -10729,7 +10729,7 @@ ErrorTrap:
             Dim RootRelativeLink As String
             Dim LoopCnt As Integer
             Dim ImportedStyle As String
-            Dim HTTP As New coreHttpRequestClass()
+            Dim HTTP As New httpRequestController()
             Dim Output As String
             '
             Pos = 1
@@ -10874,7 +10874,7 @@ ErrorTrap:
                 Dim FieldValue As String
                 Dim SetPairString As String
                 Dim ArgCnt As Integer
-                Dim s As New coreFastStringClass
+                Dim s As New stringBuilderLegacyController
                 Dim FieldName As String
                 Dim Copy As String
                 Dim PageSize As Integer
@@ -11233,7 +11233,7 @@ ErrorTrap:
         '
         Public Function main_FormatRemoteQueryOutput(gd As GoogleDataType, RemoteFormat As RemoteFormatEnum) As String
             '
-            Dim s As coreFastStringClass
+            Dim s As stringBuilderLegacyController
             Dim ColDelim As String
             Dim RowDelim As String
             Dim ColPtr As Integer
@@ -11241,7 +11241,7 @@ ErrorTrap:
             '
             ' Select output format
             '
-            s = New coreFastStringClass
+            s = New stringBuilderLegacyController
             Select Case RemoteFormat
                 Case RemoteFormatEnum.RemoteFormatJsonNameValue
                     '
@@ -12597,7 +12597,7 @@ ErrorTrap:
             ' Load cached addonIncludeRulesCache
             '
             cache_addonIncludeRules = New addonIncludeRulesClass
-            cache_addonIncludeRules.addonIdIndex = New coreKeyPtrIndexClass
+            cache_addonIncludeRules.addonIdIndex = New keyPtrController
             cache_addonIncludeRules.itemCnt = 0
             '
             On Error Resume Next
@@ -12647,7 +12647,7 @@ ErrorTrap:
                     cache_addonIncludeRules.itemCnt = UBound(cache_addonIncludeRules.item, 2) + 1
                     If cache_addonIncludeRules.itemCnt > 0 Then
                         'hint = hint & ",23"
-                        cache_addonIncludeRules.addonIdIndex = New coreKeyPtrIndexClass
+                        cache_addonIncludeRules.addonIdIndex = New keyPtrController
                         For Ptr = 0 To cache_addonIncludeRules.itemCnt - 1
                             RecordAddonID = genericController.EncodeInteger(cache_addonIncludeRules.item(addonIncludeRulesCache_addonId, Ptr))
                             'RecordIncludedAddonID = genericController.EncodeInteger(cache_addonIncludeRules(addonIncludeRulesCache_includedAddonId, Ptr))
@@ -12817,7 +12817,7 @@ ErrorTrap:
                 ' Load cached libraryFilesCache
                 '
                 'hint = hint & ",cnt=0, not loaded or cleared"
-                cache_libraryFilesIdIndex = New coreKeyPtrIndexClass
+                cache_libraryFilesIdIndex = New keyPtrController
                 cache_libraryFilesCnt = 0
                 '
                 cacheTest = cache.getObject(Of Object())(cache_LibraryFiles_cacheName)
@@ -12856,7 +12856,7 @@ ErrorTrap:
                         cache_libraryFilesCnt = UBound(cache_libraryFiles, 2) + 1
                         If cache_libraryFilesCnt > 0 Then
                             'hint = hint & ",reloaded cache_libraryFilesCnt=" & cache_libraryFilesCnt
-                            cache_libraryFilesIdIndex = New coreKeyPtrIndexClass
+                            cache_libraryFilesIdIndex = New keyPtrController
                             For Ptr = 0 To cache_libraryFilesCnt - 1
                                 RecordID = genericController.EncodeInteger(cache_libraryFiles(LibraryFilesCache_Id, Ptr))
                                 Call cache_libraryFilesIdIndex.setPtr(genericController.encodeText(RecordID), Ptr)
@@ -13271,7 +13271,7 @@ ErrorTrap:
                                         If ContentID = 0 Then
                                             returnResult = "No filter is available"
                                         Else
-                                            Dim cdef As coreMetaDataClass.CDefClass = metaData.getCdef(ContentID)
+                                            Dim cdef As cdefModel = metaData.getCdef(ContentID)
                                             returnResult = adminSite.GetForm_IndexFilterContent(cdef)
                                         End If
                                         adminSite = Nothing
@@ -14116,10 +14116,10 @@ ErrorTrap:
                             If groupCaption = "" Then
                                 groupCaption = groupName
                             End If
-                            Call cs.SetField("name", groupName)
-                            Call cs.SetField("caption", groupCaption)
-                            Call cs.SetField("ccGuid", groupGuid)
-                            Call cs.SetField("active", "1")
+                            Call cs.setField("name", groupName)
+                            Call cs.setField("caption", groupCaption)
+                            Call cs.setField("ccGuid", groupGuid)
+                            Call cs.setField("active", "1")
                         End If
                         Call cs.Close()
                     End If
@@ -14156,11 +14156,11 @@ ErrorTrap:
                                 groupName = GetRecordName("groups", groupId)
                                 handleExceptionAndRethrow(New ApplicationException("Could not find or create the Member Rule to add this member [" & userid & "] to the Group [" & groupId & ", " & groupName & "]"))
                             Else
-                                Call cs.SetField("active", "1")
-                                Call cs.SetField("memberid", userid.ToString)
-                                Call cs.SetField("groupid", groupId.ToString)
+                                Call cs.setField("active", "1")
+                                Call cs.setField("memberid", userid.ToString)
+                                Call cs.setField("groupid", groupId.ToString)
                                 If dateExpires <> #12:00:00 AM# Then
-                                    Call cs.SetField("DateExpires", dateExpires.ToString)
+                                    Call cs.setField("DateExpires", dateExpires.ToString)
                                 Else
                                     Call cs.setField("DateExpires", "")
                                 End If
@@ -14202,11 +14202,11 @@ ErrorTrap:
                             If Not cs.ok Then
                                 handleExceptionAndRethrow(New ApplicationException("Could not find or create the Member Rule to add this member [" & userid & "] to the Group [" & GroupID & ", " & groupNameOrGuid & "]"))
                             Else
-                                Call cs.SetField("active", "1")
-                                Call cs.SetField("memberid", userid.ToString)
-                                Call cs.SetField("groupid", GroupID.ToString)
+                                Call cs.setField("active", "1")
+                                Call cs.setField("memberid", userid.ToString)
+                                Call cs.setField("groupid", GroupID.ToString)
                                 If dateExpires <> #12:00:00 AM# Then
-                                    Call cs.SetField("DateExpires", dateExpires.ToString)
+                                    Call cs.setField("DateExpires", dateExpires.ToString)
                                 Else
                                     Call cs.setField("DateExpires", "")
                                 End If

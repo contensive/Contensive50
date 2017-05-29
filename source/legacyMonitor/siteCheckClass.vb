@@ -129,7 +129,7 @@ Namespace Contensive.Core
         Private Function GetDoc(ByVal Link As String, ByVal AppName As String, ByVal RequestTimeout As Integer, ByRef return_needsErrorRecovery As Boolean) As String
             On Error GoTo ErrorTrap
             '
-            Dim kmaHTTP As New coreHttpRequestClass()
+            Dim kmaHTTP As New httpRequestController()
             Dim CookiePointer As Integer
             Dim CookieGood As Boolean
             Dim CookieMatchCount As Integer

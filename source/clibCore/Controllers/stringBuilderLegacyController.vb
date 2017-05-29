@@ -2,8 +2,8 @@
 Option Explicit On
 Option Strict On
 
-Namespace Contensive.Core
-    Public Class coreFastStringClass
+Namespace Contensive.Core.Controllers
+    Public Class stringBuilderLegacyController
         '
         Private iSize As Integer
         Private Const iChunk = 100

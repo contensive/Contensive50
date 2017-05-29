@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
+using Contensive.Core.Controllers;
 
 namespace Contensive.CLI
 {
@@ -181,7 +182,7 @@ namespace Contensive.CLI
                                             //
                                             // run the taskscheduler in the console
                                             Console.WriteLine("Beginning command line taskScheduler. Hit any key to exit");
-                                            coreTaskSchedulerServiceClass taskScheduler = new coreTaskSchedulerServiceClass();
+                                            taskSchedulerController taskScheduler = new taskSchedulerController();
                                             taskScheduler.allowVerboseLogging = true;
                                             taskScheduler.allowConsoleWrite = true;
                                             taskScheduler.StartService(true, false);
@@ -210,7 +211,7 @@ namespace Contensive.CLI
                                             //
                                             // -- run the taskrunner in the console
                                             Console.WriteLine("Beginning command line taskRunner. Hit any key to exit");
-                                            coreTaskRunnerServiceClass taskRunner = new coreTaskRunnerServiceClass();
+                                            taskRunnerController taskRunner = new taskRunnerController();
                                             taskRunner.allowVerboseLogging = true;
                                             taskRunner.allowConsoleWrite = true;
                                             taskRunner.StartService();
@@ -241,12 +242,12 @@ namespace Contensive.CLI
                                             //
                                             Console.WriteLine("Beginning command line taskScheduler and taskRunner. Hit any key to exit");
                                             //
-                                            coreTaskSchedulerServiceClass taskScheduler = new coreTaskSchedulerServiceClass();
+                                            taskSchedulerController taskScheduler = new taskSchedulerController();
                                             taskScheduler.allowVerboseLogging = true;
                                             taskScheduler.allowConsoleWrite = true;
                                             taskScheduler.StartService(true, false);
                                             //
-                                            coreTaskRunnerServiceClass taskRunner = new coreTaskRunnerServiceClass();
+                                            taskRunnerController taskRunner = new taskRunnerController();
                                             taskRunner.allowVerboseLogging = true;
                                             taskRunner.allowConsoleWrite = true;
                                             taskRunner.StartService();

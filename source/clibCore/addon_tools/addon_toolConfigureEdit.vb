@@ -2,7 +2,7 @@
 Option Explicit On
 Option Strict On
 '
-Imports Contensive.Core.coreCommonModule
+
 Imports System.Xml
 Imports Contensive.Core
 Imports Contensive.BaseClasses

@@ -5,9 +5,9 @@ Option Strict On
 Imports Contensive.Core
 Imports Contensive.Core.Controllers
 '
-Namespace Contensive
+Namespace Contensive.Core.Controllers
 #Const includeTracing = False
-    Public Class coreTaskSchedulerServiceClass
+    Public Class taskSchedulerController
         Implements IDisposable
         '
         'Private cpCore As cpCoreClass

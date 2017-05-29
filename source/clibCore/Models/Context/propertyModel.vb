@@ -5,15 +5,15 @@ Option Strict On
 Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
 
-Namespace Contensive.Core
-    Public Class corePropertyCacheClass
+Namespace Contensive.Core.Models.Context
+    Public Class propertyModelClass
         '
         Private cpCore As coreClass
         '
         ' visit property cache
         '
         Private propertyCache(,) As String
-        Private propertyCache_nameIndex As coreKeyPtrIndexClass
+        Private propertyCache_nameIndex As keyPtrController
         Private propertyCacheLoaded As Boolean = False
         Private propertyCacheCnt As Integer
         Private propertyTypeId As Integer
@@ -79,11 +79,11 @@ Namespace Contensive.Core
         Public Sub setProperty(ByVal propertyName As String, ByVal PropertyValue As String)
             Select Case propertyTypeId
                 Case PropertyTypeVisit
-                    setProperty(propertyName, PropertyValue, cpCore.authContext.visit.Id)
+                    setProperty(propertyName, PropertyValue, cpCore.authContext.visit.ID)
                 Case PropertyTypeVisitor
-                    setProperty(propertyName, PropertyValue, cpCore.authContext.visitor.id)
+                    setProperty(propertyName, PropertyValue, cpCore.authContext.visitor.ID)
                 Case PropertyTypeMember
-                    setProperty(propertyName, PropertyValue, cpCore.authContext.user.id)
+                    setProperty(propertyName, PropertyValue, cpCore.authContext.user.ID)
             End Select
         End Sub
         '
@@ -173,11 +173,11 @@ ErrorTrap:
         Public Function getDate(ByVal propertyName As String, ByVal defaultValue As Date) As Date
             Select Case propertyTypeId
                 Case PropertyTypeVisit
-                    Return getDate(propertyName, defaultValue, cpCore.authContext.visit.Id)
+                    Return getDate(propertyName, defaultValue, cpCore.authContext.visit.ID)
                 Case PropertyTypeVisitor
-                    Return getDate(propertyName, defaultValue, cpCore.authContext.visitor.id)
+                    Return getDate(propertyName, defaultValue, cpCore.authContext.visitor.ID)
                 Case PropertyTypeMember
-                    Return getDate(propertyName, defaultValue, cpCore.authContext.user.id)
+                    Return getDate(propertyName, defaultValue, cpCore.authContext.user.ID)
             End Select
             Return Date.MinValue
         End Function
@@ -217,11 +217,11 @@ ErrorTrap:
         Public Function getNumber(ByVal propertyName As String, ByVal defaultValue As Double) As Double
             Select Case propertyTypeId
                 Case PropertyTypeVisit
-                    Return getNumber(propertyName, defaultValue, cpCore.authContext.visit.Id)
+                    Return getNumber(propertyName, defaultValue, cpCore.authContext.visit.ID)
                 Case PropertyTypeVisitor
-                    Return getNumber(propertyName, defaultValue, cpCore.authContext.visitor.id)
+                    Return getNumber(propertyName, defaultValue, cpCore.authContext.visitor.ID)
                 Case PropertyTypeMember
-                    Return getNumber(propertyName, defaultValue, cpCore.authContext.user.id)
+                    Return getNumber(propertyName, defaultValue, cpCore.authContext.user.ID)
             End Select
             Return 0
         End Function
@@ -261,11 +261,11 @@ ErrorTrap:
         Public Function getBoolean(ByVal propertyName As String, ByVal defaultValue As Boolean) As Boolean
             Select Case propertyTypeId
                 Case PropertyTypeVisit
-                    Return getBoolean(propertyName, defaultValue, cpCore.authContext.visit.Id)
+                    Return getBoolean(propertyName, defaultValue, cpCore.authContext.visit.ID)
                 Case PropertyTypeVisitor
-                    Return getBoolean(propertyName, defaultValue, cpCore.authContext.visitor.id)
+                    Return getBoolean(propertyName, defaultValue, cpCore.authContext.visitor.ID)
                 Case PropertyTypeMember
-                    Return getBoolean(propertyName, defaultValue, cpCore.authContext.user.id)
+                    Return getBoolean(propertyName, defaultValue, cpCore.authContext.user.ID)
             End Select
             Return False
         End Function
@@ -305,11 +305,11 @@ ErrorTrap:
         Public Function getInteger(ByVal propertyName As String, ByVal defaultValue As Integer) As Integer
             Select Case propertyTypeId
                 Case PropertyTypeVisit
-                    Return getInteger(propertyName, defaultValue, cpCore.authContext.visit.Id)
+                    Return getInteger(propertyName, defaultValue, cpCore.authContext.visit.ID)
                 Case PropertyTypeVisitor
-                    Return getInteger(propertyName, defaultValue, cpCore.authContext.visitor.id)
+                    Return getInteger(propertyName, defaultValue, cpCore.authContext.visitor.ID)
                 Case PropertyTypeMember
-                    Return getInteger(propertyName, defaultValue, cpCore.authContext.user.id)
+                    Return getInteger(propertyName, defaultValue, cpCore.authContext.user.ID)
             End Select
             Return 0
         End Function
@@ -349,11 +349,11 @@ ErrorTrap:
         Public Function getText(ByVal propertyName As String, ByVal defaultValue As String) As String
             Select Case propertyTypeId
                 Case PropertyTypeVisit
-                    Return getText(propertyName, defaultValue, cpCore.authContext.visit.Id)
+                    Return getText(propertyName, defaultValue, cpCore.authContext.visit.ID)
                 Case PropertyTypeVisitor
-                    Return getText(propertyName, defaultValue, cpCore.authContext.visitor.id)
+                    Return getText(propertyName, defaultValue, cpCore.authContext.visitor.ID)
                 Case PropertyTypeMember
-                    Return getText(propertyName, defaultValue, cpCore.authContext.user.id)
+                    Return getText(propertyName, defaultValue, cpCore.authContext.user.ID)
             End Select
             Return ""
         End Function
@@ -403,7 +403,7 @@ ErrorTrap:
             Dim Name As String
             Dim db As dbController = cpCore.db
             '
-            propertyCache_nameIndex = New coreKeyPtrIndexClass
+            propertyCache_nameIndex = New keyPtrController
             propertyCacheCnt = 0
             '
             Using dt As DataTable = db.executeSql("select Name,FieldValue,ID from ccProperties where (active<>0)and(TypeID=" & propertyTypeId & ")and(KeyID=" & keyId & ")")

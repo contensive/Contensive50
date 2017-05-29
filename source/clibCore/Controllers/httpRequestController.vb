@@ -7,9 +7,9 @@ Imports System.Net
 '
 #Const DebugBuild = True
 
-Namespace Contensive.Core
+Namespace Contensive.Core.Controllers
     '
-    Public Class coreHttpRequestClass
+    Public Class httpRequestController
         '
         Private http As webClientExt
         Private privateRequestHeaders As System.Net.WebHeaderCollection

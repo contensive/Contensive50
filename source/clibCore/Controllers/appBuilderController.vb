@@ -5,6 +5,7 @@ Option Strict On
 Imports System.Xml
 Imports Microsoft.Web.Administration
 Imports Contensive.Core.Controllers.genericController
+Imports Contensive.Core.Models.Entity
 '
 Namespace Contensive.Core.Controllers
     '
@@ -280,7 +281,7 @@ Namespace Contensive.Core.Controllers
                 Dim LocalGuid As String
                 Dim IISResetRequired As Boolean
                 Dim ErrorMessage As String
-                Dim XMLTools As New coreXmlToolsClass(cpcore)
+                Dim XMLTools As New xmlController(cpcore)
                 Dim addonInstall As New addonInstallClass(cpcore)
                 Dim StyleSN As Integer
                 Dim Doc As XmlDocument
@@ -1294,7 +1295,7 @@ Namespace Contensive.Core.Controllers
                 Dim sql3 As String
                 '
                 Active = Not InActive
-                Dim cdef As coreMetaDataClass.CDefClass = cpcore.metaData.getCdef(ContentName)
+                Dim cdef As cdefModel = cpcore.metaData.getCdef(ContentName)
                 Dim tableName As String = cdef.ContentTableName
                 Dim cid As Integer = cdef.Id
                 '

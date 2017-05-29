@@ -5,8 +5,8 @@ Option Strict On
 Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
 '
-Namespace Contensive.Core
-    Public Class coreMenuFlyoutClass
+Namespace Contensive.Core.Controllers
+    Public Class menuFlyoutController
         '
         '==============================================================================
         '
@@ -52,7 +52,7 @@ Namespace Contensive.Core
         Private iMenuCloseString As String  ' String returned for closing menus
         '
         Private UsedEntries As String       ' String of EntryNames that have been used (for unique test)
-        Private EntryIndexName As coreKeyPtrIndexClass
+        Private EntryIndexName As keyPtrController
         'Private EntryIndexID As keyPtrIndex8Class
         '
         ' ----- RollOverFlyout storage
@@ -70,7 +70,7 @@ Namespace Contensive.Core
             MyBase.New()
             Me.cpCore = cpCore
             '
-            EntryIndexName = New coreKeyPtrIndexClass
+            EntryIndexName = New keyPtrController
             Randomize()
             MenuFlyoutNamePrefix = "id" & CStr(Int(9999 * Rnd()))
             MenuFlyoutIcon_Local = "&nbsp;&#187;"
@@ -467,7 +467,7 @@ ErrorTrap:
                                     '
                                     ' ----- Link but no child panel
                                     '
-                                    PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ href=""" & cpcore.htmlDoc.html_EncodeHTML(.Link) & """" & target & " onmouseover=""ccFlyoutHoverMode(1); ccFlyoutPanelButtonHover(event,'','" & StyleSheetPrefix & "');"">" & HotSpotHTML & "</a>"
+                                    PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ href=""" & cpCore.htmlDoc.html_EncodeHTML(.Link) & """" & target & " onmouseover=""ccFlyoutHoverMode(1); ccFlyoutPanelButtonHover(event,'','" & StyleSheetPrefix & "');"">" & HotSpotHTML & "</a>"
                                 End If
                             Else
                                 If .Link = "" Then
@@ -484,9 +484,9 @@ ErrorTrap:
                                     ' ----- Child Panel and a link
                                     '
                                     If FlyoutHover Then
-                                        PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ onmouseover=""ccFlyoutHoverMode(1); ccFlyoutPanelButtonHover(event,'" & MenuFlyoutNamePrefix & "_" & .Name & "','" & StyleSheetPrefix & "');"" onmouseout=""ccFlyoutHoverMode(0);"" href=""" & cpcore.htmlDoc.html_EncodeHTML(.Link) & """" & target & ">" & HotSpotHTML & MenuFlyoutIcon_Local & "</a>"
+                                        PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ onmouseover=""ccFlyoutHoverMode(1); ccFlyoutPanelButtonHover(event,'" & MenuFlyoutNamePrefix & "_" & .Name & "','" & StyleSheetPrefix & "');"" onmouseout=""ccFlyoutHoverMode(0);"" href=""" & cpCore.htmlDoc.html_EncodeHTML(.Link) & """" & target & ">" & HotSpotHTML & MenuFlyoutIcon_Local & "</a>"
                                     Else
-                                        PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ onmouseover=""ccFlyoutPanelButtonHover(event,'" & MenuFlyoutNamePrefix & "_" & .Name & "','" & StyleSheetPrefix & "');"" href=""" & cpcore.htmlDoc.html_EncodeHTML(.Link) & """" & target & ">" & HotSpotHTML & MenuFlyoutIcon_Local & "</a>"
+                                        PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ onmouseover=""ccFlyoutPanelButtonHover(event,'" & MenuFlyoutNamePrefix & "_" & .Name & "','" & StyleSheetPrefix & "');"" href=""" & cpCore.htmlDoc.html_EncodeHTML(.Link) & """" & target & ">" & HotSpotHTML & MenuFlyoutIcon_Local & "</a>"
                                     End If
                                 End If
                             End If

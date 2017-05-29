@@ -2,7 +2,7 @@
 Option Explicit On
 Option Strict On
 
-Imports Contensive.Core.coreCommonModule
+
 'Imports Contensive.Core.cpCommonUtilsClass
 'Imports Interop.adodb
 
@@ -16,8 +16,8 @@ Imports Contensive.Core.coreCommonModule
 ' Sleep becomes Threading.Thread.Sleep(
 ' as object to as object
 '
-Namespace Contensive.Core
-    Public Class coreUploadItemStorageClass
+Namespace Contensive.Core.Models.Context
+    Public Class uploadFileModel
 
         Private FileNameLocal As String
         Private FileSizeLocal As Integer

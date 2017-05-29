@@ -3,13 +3,12 @@ Option Explicit On
 Option Strict On
 
 Imports Contensive.Core.Models
-Imports Contensive.Core.Models.Entity
 Imports Contensive.Core.Models.Context
-Imports Contensive.Core.Controllers
+Imports Contensive.Core.Models.Entity
 Imports Contensive.Core.Controllers.genericController
 
-Namespace Contensive.Core
-    Public Class coreMetaDataClass
+Namespace Contensive.Core.Controllers
+    Public Class cdefController
         Implements IDisposable
         '
         '------------------------------------------------------------------------------------------------------------------------
@@ -22,9 +21,8 @@ Namespace Contensive.Core
         ' objects to destruct during dispose
         '------------------------------------------------------------------------------------------------------------------------
         '
-        Private cdefList As Dictionary(Of String, CDefClass)
-        'Private contentNameIdDictionary As Dictionary(Of String, Integer)
-        Private tableSchemaList As Dictionary(Of String, tableSchemaClass)
+        Private cdefList As Dictionary(Of String, cdefModel)
+        Private tableSchemaList As Dictionary(Of String, tableSchemaModel)
         '
         Private ReadOnly Property contentNameIdDictionary As Dictionary(Of String, Integer)
             Get
@@ -43,7 +41,7 @@ Namespace Contensive.Core
             End Get
         End Property
         Private _contentNameIdDictionary As Dictionary(Of String, Integer) = Nothing
-        '
+
         Private ReadOnly Property contentIdDict As Dictionary(Of Integer, contentModel)
             Get
                 If (_contentIdDict Is Nothing) Then
@@ -53,460 +51,6 @@ Namespace Contensive.Core
             End Get
         End Property
         Private _contentIdDict As Dictionary(Of Integer, contentModel) = Nothing
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Serializable classes that define the collection file structure. Originally in XML, now converting to json.
-        ''' </summary>
-        '<Serializable>
-        'Public Class collectionFileWishListClass
-        '    Public name As String
-        '    Public guid As String
-        '    Public system As Boolean
-        '    'Public Class addonClass
-        '    '    Public copy As String
-        '    '    Public copyText As String
-        '    '    Public activeXProgramId As String
-        '    '    Public dotNetClass As String
-        '    '    Public argumentList As String
-        '    '    Public asAjax As Boolean
-        '    '    Public filter As Boolean
-        '    '    Public help As String
-        '    '    Public helpLink As String
-        '    '    Public iconLInk As String
-        '    '    Public icons As List(Of iconClass)
-        '    '    Public inIFrame As Boolean
-        '    '    Public blockEditTools As Boolean
-        '    '    Public formXml As String
-        '    '    Public isInLine As Boolean
-        '    '    Public javascriptOnLoad As String
-        '    '    Public javascriptINHead As String
-        '    '    Public javascriptBodyEnd As String
-        '    '    Public metaDescription As String
-        '    '    Public otherHeadTags As String
-        '    '    Public content As Boolean
-        '    '    Public template As Boolean
-        '    '    Public email As Boolean
-        '    '    Public admin As Boolean
-        '    '    Public onPageEndEvent As Boolean
-        '    '    Public onPageStartEvent As Boolean
-        '    '    Public onBodyStart As Boolean
-        '    '    Public onBodyEnd As Boolean
-        '    '    Public remoteMethod As Boolean
-        '    '    Public processRunOnce As Boolean
-        '    '    Public processInterval As Boolean
-        '    '    Public pageTitle As String
-        '    '    Public remoteAssetLink As String
-        '    '    Public styles As String
-        '    '    Public Class scriptingClass
-        '    '        Public language As String
-        '    '        Public entryPoint As String
-        '    '        Public timeout As Integer
-        '    '    End Class
-        '    '    Public Scriptings As List(Of scriptingClass)
-        '    'End Class            '
-        '    'Public Class iconClass
-        '    '    Public link As String
-        '    '    Public width As Integer
-        '    '    Public height As Integer
-        '    '    Public sprits As Integer
-        '    'End Class            '
-        '    'Public Class cdefClass
-        '    '    Public Name As String
-        '    '    Public ActiveOnly As Boolean
-        '    '    Public AliasID As Integer
-        '    '    Public AliasName As String
-        '    '    Public AllowAdd As Boolean
-        '    '    Public AllowContentTracking As Boolean
-        '    '    Public AllowDelete As Boolean
-        '    '    Public AllowTopicRules As Boolean
-        '    '    Public AllowWorkflowAuthoring As Boolean
-        '    '    Public AuthoringDataSourceName As String
-        '    '    Public AuthoringTableName As String
-        '    '    Public ContentDataSourceName As String
-        '    '    Public ContentTableName As String
-        '    '    Public ccDataSources As String
-        '    '    Public DefaultSortMethod As String
-        '    '    Public DeveloperOnly As String
-        '    '    Public DropDownFieldList As String
-        '    '    Public EditorGroupName As String
-        '    '    Public IgnoreContentControl As Boolean
-        '    '    Public Parent As String
-        '    '    Public AllowMetaContent As Boolean
-        '    '    Public AllowContentChildTool As Boolean
-        '    '    Public NavIconType As String
-        '    '    Public icon As iconClass
-        '    '    Public guid As String
-        '    '    'Public Class cdefFieldClass
-        '    '    '    Public Name As String
-        '    '    '    Public active As Boolean
-        '    '    '    Public AdminOnly As Boolean
-        '    '    '    Public Authorable As Boolean
-        '    '    '    Public Caption As String
-        '    '    '    Public DeveloperOnly As Boolean
-        '    '    '    Public EditSortPriority As String
-        '    '    '    Public FieldType As String
-        '    '    '    Public HTMLContent As Boolean
-        '    '    '    Public IndexColumn As Integer
-        '    '    '    Public IndexSortDirection As Boolean
-        '    '    '    Public IndexSortOrder As String
-        '    '    '    Public IndexWidth As String
-        '    '    '    Public LookupContent As String
-        '    '    '    Public NotEditable As Boolean
-        '    '    '    Public Password As Boolean
-        '    '    '    Public ReadOnlyField As Boolean
-        '    '    '    Public RedirectContent As String
-        '    '    '    Public RedirectID As Integer
-        '    '    '    Public RedirectPath As String
-        '    '    '    Public Required As Boolean
-        '    '    '    Public TextBuffered As Boolean
-        '    '    '    Public UniqueName As Boolean
-        '    '    '    Public DefaultValue As String
-        '    '    '    Public RSSTitle As String
-        '    '    '    Public RSSDescription As String
-        '    '    '    Public MemberSelectGroupID As Integer
-        '    '    '    Public EditTab As String
-        '    '    '    Public Scramble As Boolean
-        '    '    '    Public LookupList As String
-        '    '    '    Public ManyToManyContent As String
-        '    '    '    Public ManyToManyRuleContent As String
-        '    '    '    Public ManyToManyRulePrimaryField As String
-        '    '    '    Public ManyToManyRuleSecondaryField As String
-        '    '    'End Class
-        '    '    'Public fields As List(Of cdefFieldClass)
-        '    '    Public Class sqlIndexFlass
-        '    '        Public indexName As String
-        '    '        Public dataSourceName As String
-        '    '        Public tableName As String
-        '    '        Public filenameList As String
-        '    '    End Class
-        '    '    Public sqlIndexes As List(Of sqlIndexFlass)
-        '    'End Class
-        '    'Public addons As List(Of addonClass)
-        '    Public Class navigatorClass
-        '        Public Name As String
-        '        Public NavigatorNamespace As String
-        '        Public navIconTitle As String
-        '        Public NavIconType As String
-        '        Public LinkPage As String
-        '        Public ContentName As String
-        '        Public AdminOnly As Boolean
-        '        Public DeveloperOnly As Boolean
-        '        Public NewWindow As Boolean
-        '        Public Active As Boolean
-        '        Public AddonName As String
-        '        Public guid As String
-        '    End Class
-        '    Public NavigatorEntries As List(Of navigatorClass)
-        '    Public Class recordClass
-        '        Public content As String
-        '        Public guid As String
-        '        Public name As String
-        '        Public Class recordFieldClass
-        '            Public name As String
-        '            Public value As String
-        '        End Class
-        '        Public fields As List(Of recordFieldClass)
-        '    End Class
-        '    Public data As List(Of recordClass)
-        '    Public Class importCollectionClass
-        '        Public name As String
-        '        Public value As String
-        '    End Class
-        '    Public ImportCollections As List(Of importCollectionClass)
-        'End Class
-        ''
-        'Structure NavEntryType
-        '    Dim NavigatorID As Integer
-        '    Dim ContentName As String
-        'End Structure
-        ''
-        '
-        ' ---------------------------------------------------------------------------------------------------
-        ' ----- CDefAdminColumnType
-        ' ---------------------------------------------------------------------------------------------------
-        '
-        <Serializable>
-        Public Class CDefAdminColumnClass
-            Public Name As String
-            'Public FieldPointer As Integer
-            Public Width As Integer
-            Public SortPriority As Integer
-            Public SortDirection As Integer
-        End Class
-        '
-        ' ---------------------------------------------------------------------------------------------------
-        ' ----- CDefFieldClass
-        '       class not structure because it has to marshall to vb6
-        ' ---------------------------------------------------------------------------------------------------
-        '
-        <Serializable>
-        Public Class CDefFieldClass
-            Implements ICloneable
-            Implements IComparable
-
-            Public nameLc As String                      ' The name of the field
-            'Public ValueVariant As Object             ' The value carried to and from the database
-            Public id As Integer                          ' the ID in the ccContentFields Table that this came from
-            Public active As Boolean                   ' if the field is available in the admin area
-            Public fieldTypeId As Integer                   ' The type of data the field holds
-            Public caption As String                   ' The caption for displaying the field
-            Public [ReadOnly] As Boolean            ' was ReadOnly -- If true, this field can not be written back to the database
-            Public NotEditable As Boolean              ' if true, you can only edit new records
-            Public Required As Boolean                 ' if true, this field must be entered
-            Public defaultValue As String         ' default value on a new record
-            Public HelpMessage As String               ' explaination of this field
-            Public UniqueName As Boolean               '
-            Public TextBuffered As Boolean             ' if true, the input is run through RemoveControlCharacters()
-            Public Password As Boolean                 ' for text boxes, sets the password attribute
-            Public RedirectID As String                ' If TYPEREDIRECT, this is the field that must match ID of this record
-            Public RedirectPath As String              ' New Field, If TYPEREDIRECT, this is the path to the next page (if blank, current page is used)
-            Public indexColumn As Integer                 ' the column desired in the admin index form
-            Public indexWidth As String                ' either number or percentage, blank if not included 
-            Public indexSortOrder As Integer            ' alpha sort on index page
-            Public indexSortDirection As Integer          ' 1 sorts forward, -1 backward
-            'Public Changed As Boolean                  ' if true, field value needs to be saved to database
-            Public adminOnly As Boolean                ' This field is only available to administrators
-            Public developerOnly As Boolean            ' This field is only available to administrators
-            Public blockAccess As Boolean              ' ***** Field Reused to keep binary compatiblity - "IsBaseField" - if true this is a CDefBase field
-            Public htmlContent As Boolean              ' if true, the HTML editor (active edit) can be used
-            Public authorable As Boolean               ' true if it can be seen in the admin form
-            Public inherited As Boolean                ' if true, this field takes its values from a parent, see ContentID
-            Public contentId As Integer                   ' This is the ID of the Content Def that defines these properties
-            Public editSortPriority As Integer            ' The Admin Edit Sort Order
-            Public ManyToManyRulePrimaryField As String     ' Rule Field Name for Primary Table
-            Public ManyToManyRuleSecondaryField As String   ' Rule Field Name for Secondary Table
-            Public RSSTitleField As Boolean             ' When creating RSS fields from this content, this is the title
-            Public RSSDescriptionField As Boolean       ' When creating RSS fields from this content, this is the description
-            Public editTabName As String                   ' Editing group - used for the tabs
-            Public Scramble As Boolean                 ' save the field scrambled in the Db
-            Public lookupList As String                ' If TYPELOOKUP, and LookupContentID is null, this is a comma separated list of choices
-            'Public AllowContentTracking As Boolean      ' tmp 
-            '
-            Public dataChanged As Boolean
-            Public isBaseField As Boolean
-            Public isModifiedSinceInstalled As Boolean
-            Public installedByCollectionGuid As String
-            Public HelpDefault As String
-            Public HelpCustom As String
-            Public HelpChanged As Boolean
-            '
-            ' fields stored differently in xml collection files
-            '   name is loaded from xml collection files 
-            '   id is created during the cacheLoad process when loading from Db (and used in metaData)
-            '
-            Public lookupContentID As Integer             ' If TYPELOOKUP, (for Db controled sites) this is the content ID of the source table
-            'Public RedirectContentName As String
-            Public RedirectContentID As Integer           ' If TYPEREDIRECT, this is new contentID
-            'Public ManyToManyContentName As String
-            Public manyToManyContentID As Integer         ' Content containing Secondary Records
-            'public ManyToManyRuleContentName As String
-            Public manyToManyRuleContentID As Integer     ' Content with rules between Primary and Secondary
-            'Public MemberSelectGroupName As String ' If the Type is TypeMemberSelect, this is the group that the member will be selected from
-            Public MemberSelectGroupID As Integer
-            '
-            ' fields populated on demand from 
-            '
-            Public Property RedirectContentName(cpCore As coreClass) As String
-                Get
-                    If (_RedirectContentName Is Nothing) Then
-                        If RedirectContentID > 0 Then
-                            _RedirectContentName = ""
-                            Dim dt As DataTable = cpCore.db.executeSql("select name from cccontent where id=" & RedirectContentID.ToString())
-                            If dt.Rows.Count > 0 Then
-                                _RedirectContentName = genericController.encodeText(dt.Rows(0).Item(0))
-                            End If
-                        End If
-                    End If
-                    Return _RedirectContentName
-                End Get
-                Set(value As String)
-                    _RedirectContentName = value
-                End Set
-            End Property
-            Private _RedirectContentName As String = Nothing
-            Public Property MemberSelectGroupName(cpCore As coreClass) As String
-                Get
-                    If (_MemberSelectGroupName Is Nothing) Then
-                        If MemberSelectGroupID > 0 Then
-                            _MemberSelectGroupName = ""
-                            Dim dt As DataTable = cpCore.db.executeSql("select name from cccontent where id=" & MemberSelectGroupID.ToString())
-                            If dt.Rows.Count > 0 Then
-                                _MemberSelectGroupName = genericController.encodeText(dt.Rows(0).Item(0))
-                            End If
-                        End If
-                    End If
-                    Return _MemberSelectGroupName
-                End Get
-                Set(value As String)
-                    _MemberSelectGroupName = value
-                End Set
-            End Property
-            Private _MemberSelectGroupName As String = Nothing
-            Public Property ManyToManyContentName(cpCore As coreClass) As String
-                Get
-                    If (_ManyToManyRuleContentName Is Nothing) Then
-                        If manyToManyContentID > 0 Then
-                            _ManyToManyRuleContentName = ""
-                            Dim dt As DataTable = cpCore.db.executeSql("select name from cccontent where id=" & manyToManyContentID.ToString())
-                            If dt.Rows.Count > 0 Then
-                                _ManyToManyContentName = genericController.encodeText(dt.Rows(0).Item(0))
-                            End If
-                        End If
-                    End If
-                    Return _ManyToManyContentName
-                End Get
-                Set(value As String)
-                    _ManyToManyContentName = value
-                End Set
-            End Property
-            Private _ManyToManyContentName As String = Nothing
-            Public Property ManyToManyRuleContentName(cpCore As coreClass) As String
-                Get
-                    If (_ManyToManyRuleContentName Is Nothing) Then
-                        If manyToManyRuleContentID > 0 Then
-                            _ManyToManyRuleContentName = ""
-                            Dim dt As DataTable = cpCore.db.executeSql("select name from cccontent where id=" & manyToManyRuleContentID.ToString())
-                            If dt.Rows.Count > 0 Then
-                                _ManyToManyRuleContentName = genericController.encodeText(dt.Rows(0).Item(0))
-                            End If
-                        End If
-                    End If
-                    Return _ManyToManyRuleContentName
-                End Get
-                Set(value As String)
-                    _ManyToManyRuleContentName = value
-                End Set
-            End Property
-            Private _ManyToManyRuleContentName As String = Nothing
-            Public Property lookupContentName(cpCore As coreClass) As String
-                Get
-                    If (_lookupContentName Is Nothing) Then
-                        If lookupContentID > 0 Then
-                            _lookupContentName = ""
-                            Dim dt As DataTable = cpCore.db.executeSql("select name from cccontent where id=" & lookupContentID.ToString())
-                            If dt.Rows.Count > 0 Then
-                                _lookupContentName = genericController.encodeText(dt.Rows(0).Item(0))
-                            End If
-                        End If
-                    End If
-                    Return _lookupContentName
-                End Get
-                Set(value As String)
-                    _lookupContentName = value
-                End Set
-            End Property
-            Private _lookupContentName As String = Nothing
-            '
-            Public Function Clone() As Object Implements ICloneable.Clone
-                Return Me.MemberwiseClone
-            End Function
-            '
-            Public Function CompareTo(obj As Object) As Integer Implements IComparable.CompareTo
-                Dim c As CDefFieldClass = CType(obj, CDefFieldClass)
-                Return String.Compare(Me.nameLc.ToLower, c.nameLc.ToLower)
-            End Function
-        End Class
-        '
-        ' ---------------------------------------------------------------------------------------------------
-        ' ----- CDefType
-        '       class not structure because it has to marshall to vb6
-        ' ---------------------------------------------------------------------------------------------------
-        '
-        <Serializable>
-        Public Class CDefClass
-            '
-            Public Id As Integer                           ' index in content table
-            Public Name As String                       ' Name of Content
-            Public ContentTableName As String           ' the name of the content table
-            Public ContentDataSourceName As String      '
-            Public AuthoringTableName As String         ' the name of the authoring table
-            Public AuthoringDataSourceName As String    '
-            Public AllowAdd As Boolean                  ' Allow adding records
-            Public AllowDelete As Boolean               ' Allow deleting records
-            Public WhereClause As String                ' Used to filter records in the admin area
-            Public DefaultSortMethod As String          ' FieldName Direction, ....
-            Public ActiveOnly As Boolean                ' When true
-            Public AdminOnly As Boolean                 ' Only allow administrators to modify content
-            Public DeveloperOnly As Boolean             ' Only allow developers to modify content
-            Public AllowWorkflowAuthoring As Boolean    ' if true, treat this content with authoring proceses
-            Public DropDownFieldList As String          ' String used to populate select boxes
-            Public EditorGroupName As String            ' Group of members who administer Workflow Authoring
-            Public dataSourceId As Integer
-            Private _dataSourceName As String = ""
-            '
-            Public IgnoreContentControl As Boolean     ' if true, all records in the source are in this content
-            Public AliasName As String                 ' Field Name of the required "name" field
-            Public AliasID As String                   ' Field Name of the required "id" field
-            '
-            Public AllowTopicRules As Boolean          ' For admin edit page
-            Public AllowContentTracking As Boolean     ' For admin edit page
-            Public AllowCalendarEvents As Boolean      ' For admin edit page
-            Public AllowMetaContent As Boolean         ' For admin edit page - Adds the Meta Content Section
-            '
-            Public dataChanged As Boolean
-            Public includesAFieldChange As Boolean                     ' if any fields().changed, this is set true to
-            Public Active As Boolean
-            Public AllowContentChildTool As Boolean
-            Public IsModifiedSinceInstalled As Boolean
-            Public IconLink As String
-            Public IconWidth As Integer
-            Public IconHeight As Integer
-            Public IconSprites As Integer
-            Public guid As String
-            Public IsBaseContent As Boolean
-            Public installedByCollectionGuid As String
-            '
-            ' fields stored differently in xml collection files
-            '   name is loaded from xml collection files 
-            '   id is created during the cacheLoad process when loading from Db (and used in metaData)
-            '
-            Public parentID As Integer                  ' read from Db, if not IgnoreContentControl, the ID of the parent content
-            Public parentName As String                 ' read from xml, used to set parentId
-            '
-            ' calculated after load
-            '
-            Public TimeStamp As String                 ' string that changes if any record in Content Definition changes, in memory only
-            Public fields As New Dictionary(Of String, CDefFieldClass)
-            ' -- !!!!! changed to string because dotnet json cannot serialize an integer key
-            Public adminColumns As New SortedList(Of String, CDefAdminColumnClass)
-            Public ContentControlCriteria As String     ' String created from ParentIDs used to select records
-            Public selectList As New List(Of String)
-            Public SelectCommaList As String            ' Field list used in OpenCSContent calls (all active field definitions)
-            'Public childIdList As New List(Of Integer)      ' Comma separated list of child content definition IDs
-            '
-            Public Property childIdList(cpCore As coreClass) As List(Of Integer)
-                Get
-                    If (_childIdList Is Nothing) Then
-                        Dim Sql As String = "select id from cccontent where parentid=" & Id
-                        Dim dt As DataTable = cpCore.db.executeSql(Sql)
-                        If dt.Rows.Count = 0 Then
-                            _childIdList = New List(Of Integer)
-                            For Each parentrow As DataRow In dt.Rows
-                                _childIdList.Add(EncodeInteger(parentrow.Item(0)))
-                            Next
-                        End If
-                        dt.Dispose()
-                    End If
-                    Return _childIdList
-                End Get
-                Set(value As List(Of Integer))
-                    _childIdList = value
-                End Set
-            End Property
-            Private _childIdList As List(Of Integer) = Nothing
-
-        End Class
-        '
-        ' ----- Table Schema caching to speed up update
-        '
-        Public Class tableSchemaClass
-            Public TableName As String
-            Public Dirty As Boolean
-            Public columns As List(Of String)
-            ' list of all indexes, with the field it covers
-            Public indexes As List(Of String)
-        End Class
         '
         '==========================================================================================
         ''' <summary>
@@ -522,7 +66,7 @@ Namespace Contensive.Core
             '
             ' reset metaData
             '
-            cdefList = New Dictionary(Of String, CDefClass)
+            cdefList = New Dictionary(Of String, cdefModel)
             'contentNameIdDictionary = Nothing
             tableSchemaList = Nothing
         End Sub
@@ -551,8 +95,8 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="contentName"></param>
         ''' <returns></returns>
-        Public Function getCdef(contentName As String) As CDefClass
-            Dim returnCdef As CDefClass = Nothing
+        Public Function getCdef(contentName As String) As cdefModel
+            Dim returnCdef As cdefModel = Nothing
             Try
                 Dim ContentId As Integer
                 ContentId = getContentId(contentName)
@@ -566,91 +110,40 @@ Namespace Contensive.Core
             End Try
             Return returnCdef
         End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' load cdefNameIdXref from cache and/or Db
-        ''' </summary>
-        'Public Sub contentNameIdDictionary_load()
-        '    Try
-        '        Dim dt As DataTable
-        '        Dim recordName As String
-        '        '
-        '        ' load xref from cache
-        '        '
-        '        Try
-        '            '
-        '            ' catch cache issues so cdef will load
-        '            '
-        '            contentNameIdDictionary = cpCore.cache.getObject(Of Dictionary(Of String, Integer))("cccontent-name-id-dictionary")
-        '            'cdefNameIdXref = DirectCast(cpCore.cache.getObject(Of Dictionary(Of String, Integer))("cccontent-name-id-dictionary"), Dictionary(Of String, Integer))
-        '        Catch ex As Exception
-        '            cpCore.handleExceptionAndContinue(ex)
-        '        End Try
-        '        If (contentNameIdDictionary Is Nothing) OrElse (contentNameIdDictionary.Count = 0) Then
-        '            '
-        '            ' load xref from Db
-        '            '
-        '            contentNameIdDictionary = New Dictionary(Of String, Integer)
-        '            dt = cpCore.db.executeSql("select id,name from ccContent where (active<>0)")
-        '            If dt.Rows.Count > 0 Then
-        '                For Each row As DataRow In dt.Rows
-        '                    recordName = genericController.encodeText(row.Item("name")).ToLower
-        '                    If Not contentNameIdDictionary.ContainsKey(recordName) Then
-        '                        contentNameIdDictionary.Add(recordName, genericController.EncodeInteger(row.Item("id")))
-        '                    End If
-        '                Next
-        '            End If
-        '            dt.Dispose()
-        '            Try
-        '                Call cpCore.cache.setObject("cccontent-name-id-dictionary", contentNameIdDictionary, "content")
-        '            Catch ex As Exception
-        '                cpCore.handleExceptionAndContinue(ex)
-        '            End Try
-        '        End If
-        '    Catch ex As Exception
-        '        cpCore.handleExceptionAndRethrow(ex)
-        '    End Try
-        'End Sub
-        '
+        '        
         '====================================================================================================
         ''' <summary>
         ''' return a cdef class from content id
         ''' </summary>
         ''' <param name="contentId"></param>
         ''' <returns></returns>
-        Public Function getCdef(contentId As Integer, Optional forceDbLoad As Boolean = False, Optional loadInvalidFields As Boolean = False) As CDefClass
-            Dim returnCdef As CDefClass = Nothing
+        Public Function getCdef(contentId As Integer, Optional forceDbLoad As Boolean = False, Optional loadInvalidFields As Boolean = False) As cdefModel
+            Dim returnCdef As cdefModel = Nothing
             Try
                 Dim sql As String
                 Dim dt As DataTable
                 Dim contentName As String
-                'Dim contentId As Integer
                 Dim contentTablename As String
-                Dim field As CDefFieldClass
+                Dim field As CDefFieldModel
                 Dim row As DataRow
                 Dim fieldId As Integer
                 Dim fieldTypeId As Integer
                 Dim fieldHtmlContent As Boolean
-                'Dim fieldActive As Boolean
                 Dim fieldName As String
-                Dim parentCdef As CDefClass
+                Dim parentCdef As cdefModel
                 Dim contentIdKey As String = contentId.ToString
                 '
                 If (contentId <= 0) Then
                     '
-                    ' invalid id
-                    '
+                    ' -- invalid id                    
                 ElseIf (Not forceDbLoad) And (cdefList.ContainsKey(contentIdKey)) Then
                     '
-                    ' already loaded and no force re-load, just return the current cdef
-                    '
+                    ' -- already loaded and no force re-load, just return the current cdef                    
                     returnCdef = cdefList.Item(contentIdKey)
                 Else
                     If (cdefList.ContainsKey(contentIdKey)) Then
                         '
-                        ' key is already there, remove it first
-                        '
+                        ' -- key is already there, remove it first                        
                         cdefList.Remove(contentIdKey)
                     End If
                     '
@@ -660,7 +153,7 @@ Namespace Contensive.Core
                     Dim dependantCacheNameList As New List(Of String)
                     If (Not forceDbLoad) Then
                         Try
-                            returnCdef = cpCore.cache.getObject(Of CDefClass)(cacheName)
+                            returnCdef = cpCore.cache.getObject(Of cdefModel)(cacheName)
                         Catch ex As Exception
                             cpCore.handleExceptionAndContinue(ex)
                         End Try
@@ -707,13 +200,13 @@ Namespace Contensive.Core
                             ' cdef not found
                             '
                         Else
-                            returnCdef = New CDefClass
+                            returnCdef = New cdefModel
                             With returnCdef
-                                .fields = New Dictionary(Of String, CDefFieldClass)
+                                .fields = New Dictionary(Of String, CDefFieldModel)
                                 .childIdList(cpCore) = New List(Of Integer)
                                 .selectList = New List(Of String)
                                 ' -- !!!!! changed to string because dotnet json cannot serialize an integer key
-                                .adminColumns = New SortedList(Of String, CDefAdminColumnClass)
+                                .adminColumns = New SortedList(Of String, cdefModel.CDefAdminColumnClass)
                                 '
                                 ' ----- save values in definition
                                 '
@@ -756,9 +249,9 @@ Namespace Contensive.Core
                                 Else
                                     parentCdef = getCdef(.parentID, forceDbLoad)
                                     For Each keyvaluepair In parentCdef.fields
-                                        Dim parentField As CDefFieldClass = keyvaluepair.Value
-                                        Dim childField As New CDefFieldClass
-                                        childField = DirectCast(parentField.Clone, CDefFieldClass)
+                                        Dim parentField As CDefFieldModel = keyvaluepair.Value
+                                        Dim childField As New CDefFieldModel
+                                        childField = DirectCast(parentField.Clone, CDefFieldModel)
                                         childField.inherited = True
                                         .fields.Add(childField.nameLc.ToLower, childField)
                                         If Not ((parentField.fieldTypeId = FieldTypeIdManyToMany) Or (parentField.fieldTypeId = FieldTypeIdRedirect)) Then
@@ -884,7 +377,7 @@ Namespace Contensive.Core
                                                 '
                                                 .fields.Remove(fieldNameLower)
                                             End If
-                                            field = New CDefFieldClass
+                                            field = New CDefFieldModel
                                             With field
                                                 Dim fieldIndexColumn As Integer
                                                 fieldTypeId = genericController.EncodeInteger(row.Item(15))
@@ -1040,61 +533,7 @@ Namespace Contensive.Core
             End Try
             Return returnCdef
         End Function
-        '''
-        '''========================================================================
-        '''   Returns a comma separated list of ContentPointers whos parent is the ContentPointer
-        '''========================================================================
-        '''
-        ''Private Function GetChildPointerList(ByVal ContentPointer As Integer, Optional ByVal ParentContentPointerList As String = "") As String
-        ''    Dim returnList As String = ""
-        ''    Try
-        ''        Dim ContentID As Integer
-        ''        Dim ChildContentPointer As Integer
-        ''        Dim ChildPointerList As String = ""
-        ''        Dim GrandChildPointerList As String
-        ''        Dim ParentContentPointerListLocal As String
-        ''        '
-        ''        returnList = ""
-        ''        If (ContentPointer >= 0) And (InStr(1, "," & ContentPointer & ",", "," & ParentContentPointerList & ",") = 0) Then
-        ''            '
-        ''            ' ----- ContentPointer is good, and it is not in the parent list
-        ''            '
-        ''            ParentContentPointerListLocal = ParentContentPointerList & "," & ContentPointer
-        ''            returnList = metaCache.cdef(ContentPointer).ChildPointerList
-        ''            If returnList = "" Then
-        ''                '
-        ''                ' ----- List needs to be created
-        ''                '
-        ''                ContentID = metaCache.cdef(ContentPointer).Id
-        ''                If ContentID = 106 Then
-        ''                    ContentID = ContentID
-        ''                End If
-        ''                If ContentID > 0 Then
-        ''                    For ChildContentPointer = 0 To metaCache.cdefCount - 1
-        ''                        If metaCache.cdef(ChildContentPointer).ParentID = ContentID Then
-        ''                            '
-        ''                            ' ----- child content found
-        ''                            '
-        ''                            If ChildPointerList <> "" Then
-        ''                                ChildPointerList = ChildPointerList & ","
-        ''                            End If
-        ''                            ChildPointerList = ChildPointerList & ChildContentPointer
-        ''                            GrandChildPointerList = GetChildPointerList(ChildContentPointer, ParentContentPointerListLocal)
-        ''                            If GrandChildPointerList <> "" Then
-        ''                                ChildPointerList = ChildPointerList & "," & GrandChildPointerList
-        ''                            End If
-        ''                        End If
-        ''                    Next
-        ''                End If
-        ''                returnList = ChildPointerList
-        ''                metaCache.cdef(ContentPointer).ChildPointerList = ChildPointerList
-        ''            End If
-        ''        End If
-        ''    Catch ex As Exception
-        ''        cpCore.handleException(ex)
-        ''    End Try
-        ''    Return returnList
-        'End Function
+
         '
         '========================================================================
         '   Get Child Criteria
@@ -1116,8 +555,6 @@ Namespace Contensive.Core
         Private Function getContentControlCriteria(ByVal contentId As Integer, contentTableName As String, contentDAtaSourceName As String, ByVal parentIdList As List(Of Integer)) As String
             Dim returnCriteria As String = ""
             Try
-                'Dim dt As DataTable
-                'Dim childContentId As Integer
                 '
                 returnCriteria = "(1=0)"
                 If (contentId >= 0) Then
@@ -1129,13 +566,6 @@ Namespace Contensive.Core
                                 returnCriteria &= "OR" & getContentControlCriteria(kvp.Value.ID, contentTableName, contentDAtaSourceName, parentIdList)
                             End If
                         Next
-                        'returnCriteria = "((" & contentTableName & ".contentcontrolId=" & contentId & ")"
-                        'dt = cpCore.db.executeSql("select id from cccontent where parentid=" & contentId, contentDAtaSourceName)
-                        'For Each datarow As DataRow In dt.Rows
-                        '    childContentId = genericController.EncodeInteger(datarow.Item(0))
-                        '    returnCriteria &= "OR" & getContentControlCriteria(childContentId, contentTableName, contentDAtaSourceName, parentIdList)
-                        'Next
-                        'dt.Dispose()
                         parentIdList.Remove(contentId)
                         returnCriteria = "(" & returnCriteria & ")"
                     End If
@@ -1145,584 +575,7 @@ Namespace Contensive.Core
             End Try
             Return returnCriteria
         End Function
-        ''
-        ''========================================================================
-        '' Load the fields for a content provided
-        ''
-        ''   Definitions that are in the cache before the load, and are not reloaded, are
-        ''   cleared by altering their names and IDs
-        ''========================================================================
-        ''
-        'Public Sub StoreCDef(ByVal dt As DataTable)
-        '    Try
-        '        '
-        '        Dim CSPointer As Integer
-        '        Dim SQL As String
-        '        Dim SortMethodCount As Integer
-        '        Dim SortMethodSize As Integer
-        '        Dim SortMethodPointer As Integer
-        '        Dim DefaultSortMethodID As Integer
-        '        Dim ContentPointer As Integer
-        '        Dim TablePointer As Integer
-        '        Dim ContentID As Integer
-        '        Dim ContentTableName As String
-        '        Dim RowMax As Integer
-        '        Dim RowPointer As Integer
-        '        Dim ColumnMax As Integer
-        '        Dim ColumnPointer As Integer
-        '        Dim NamePointer As Integer
-        '        Dim IDPointer As Integer
-        '        Dim DataSourceName As String
-        '        Dim activepointer As Integer
-        '        Dim UsedNames As String
-        '        Dim WorkingPointer As Integer
-        '        Dim ParentID As Integer
-        '        Dim ParentName As String
-        '        Dim ParentPointer As Integer
-        '        Dim CDef As appServices_metaDataClass.CDefClass
-        '        Dim ContentName As String
-        '        Dim UcaseContentName As String
-        '        '
-        '        Dim AuthoringDataSourceNamePointer As Integer
-        '        Dim AppSupportsWorkFlowAuthoring As Boolean
-        '        '
-        '        Dim x As Integer
-        '        '
-        '        '   clear all indexes for a full reload
-        '        '
-        '        'metaCache.cdefContentNameIndex = New keyPtrIndexClass
-        '        'metaCache.cdefContentIDIndex = New keyPtrIndexClass
-        '        'metaCache.cdefContentTableNameIndex = New keyPtrIndexClass
-        '        '
-        '        ' set count to 0 to start re-using the array
-        '        '
-        '        'metaCache.cdefCount = 0
-        '        'metaCache.cdefSize = 0
-        '        'ReDim metaCache.cdef(metaCache.cdefSize)
-        '        ''
-        '        ''   safe method, preload the content definitions with not 'touched'
-        '        ''
-        '        'If CDefCount > 0 Then
-        '        '    For RowPointer = 0 To CDefCount - 1
-        '        '        metaCache.cdef(RowPointer).SingleRecord = False
-        '        '        Next
-        '        '    End If
-        '        '
-        '        '   load content definition from array
-        '        '
-        '        RowMax = dt.Rows.Count - 1
-        '        For RowPointer = 0 To RowMax
-        '            ContentName = Trim(genericController.encodeText(dt.Rows(RowPointer).Item(1)))
-        '            UcaseContentName = genericController.vbUCase(ContentName)
-        '            ContentID = genericController.EncodeInteger(dt.Rows(RowPointer).Item(0))
-        '            ContentTableName = genericController.encodeText(dt.Rows(RowPointer).Item(10))
-        '            '
-        '            ContentPointer = metaCache.cdefContentIDIndex.getPtr(CStr(ContentID))
-        '            If ContentPointer = -1 Then
-        '                '
-        '                ' CDef not found, add it
-        '                '
-        '                ContentPointer = AddCDef(ContentName, ContentID, ContentTableName)
-        '            End If
-        '            With metaCache.cdef(ContentPointer)
-        '                '
-        '                ' ----- save values in definition
-        '                '
-        '                '.SingleRecord = True ' marked this record touched
-        '                '.WhereClause = genericController.encodeText(RSRows(2, RowPointer))
-        '                .AllowAdd = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(3))
-        '                .DeveloperOnly = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(4))
-        '                .AdminOnly = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(5))
-        '                .AllowDelete = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(6))
-        '                .ParentID = genericController.EncodeInteger(dt.Rows(RowPointer).Item(7))
-        '                .DropDownFieldList = genericController.vbUCase(genericController.encodeText(dt.Rows(RowPointer).Item(9)))
-        '                '
-        '                .ContentTableName = genericController.encodeText(ContentTableName)
-        '                '.TableName = .ContentTableName
-        '                '
-        '                DataSourceName = genericController.encodeText(dt.Rows(RowPointer).Item(11))
-        '                If DataSourceName = "" Then
-        '                    DataSourceName = "DEFAULT"
-        '                End If
-        '                .ContentDataSourceName = DataSourceName
-        '                '
-        '                .AuthoringTableName = genericController.encodeText(dt.Rows(RowPointer).Item(12))
-        '                '
-        '                DataSourceName = genericController.encodeText(dt.Rows(RowPointer).Item(13))
-        '                If DataSourceName = "" Then
-        '                    DataSourceName = "DEFAULT"
-        '                End If
-        '                .AuthoringDataSourceName = DataSourceName
-        '                .AllowWorkflowAuthoring = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(14))
-        '                .AllowCalendarEvents = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(15))
-        '                .dataSourceId = genericController.EncodeInteger(dt.Rows(RowPointer).Item(16))
-        '                .DefaultSortMethod = genericController.encodeText(dt.Rows(RowPointer).Item(17))
-        '                If .DefaultSortMethod = "" Then
-        '                    .DefaultSortMethod = "Name"
-        '                End If
-        '                .EditorGroupName = genericController.encodeText(dt.Rows(RowPointer).Item(18))
-        '                '
-        '                .AllowContentTracking = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(19))
-        '                .AllowTopicRules = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(20))
-        '                .AllowMetaContent = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(21))
-        '                '
-        '                ' future
-        '                '
-        '                .ActiveOnly = True
-        '                .AliasID = "ID"
-        '                .AliasName = "NAME"
-        '                .IgnoreContentControl = False
-        '                '
-        '                ' Special cases
-        '                '
-        '                If (.AuthoringDataSourceName = "") Or (.AuthoringTableName = "") Then
-        '                    .AuthoringDataSourceName = .ContentDataSourceName
-        '                    .AuthoringTableName = .ContentTableName
-        '                End If
-        '                If .dataSourceId = 0 Then
-        '                    .dataSourceId = -1
-        '                End If
-        '                If .ParentID = 0 Then
-        '                    .ParentID = -1
-        '                End If
-        '                ' 20151114 - test removing these. They should be added when fields are added, and these block child content .field() records from being added
-        '                .SelectFieldList = ""
-        '                '.SelectFieldList = "id,name,dateadded,modifieddate,createdby,modifiedby,active,sortorder,contentcategoryid"
-        '            End With
-        '            '''DoEvents()
-        '        Next
-        '        '
-        '        ' Force all child content definitions to use their parent's tables
-        '        '
-        '        Dim RootPointer As Integer
-        '        Dim CDefPointer As Integer
-        '        For CDefPointer = 0 To metaCache.cdefCount - 1
-        '            If metaCache.cdef(CDefPointer).ParentID > 0 Then
-        '                RootPointer = GetCDefRootPointer(CDefPointer)
-        '                If RootPointer >= 0 Then
-        '                    metaCache.cdef(CDefPointer).ContentTableName = metaCache.cdef(RootPointer).ContentTableName
-        '                    metaCache.cdef(CDefPointer).AuthoringTableName = metaCache.cdef(RootPointer).AuthoringTableName
-        '                    metaCache.cdef(CDefPointer).ContentDataSourceName = metaCache.cdef(RootPointer).ContentDataSourceName
-        '                    metaCache.cdef(CDefPointer).AuthoringDataSourceName = metaCache.cdef(RootPointer).AuthoringDataSourceName
-        '                    metaCache.cdef(CDefPointer).AllowWorkflowAuthoring = metaCache.cdef(RootPointer).AllowWorkflowAuthoring
-        '                End If
-        '            End If
-        '            '''DoEvents()
-        '        Next
-        '    Catch ex As Exception
-        '        cpCore.handleException(ex)
-        '    End Try
-        'End Sub
-        ''
-        ''========================================================================
-        '' Load the fields for a content provided
-        ''
-        ''   All Content Definitions must be loaded first
-        ''========================================================================
-        ''
-        'Public Sub StoreCDefFields(ByVal dt As DataTable)
-        '    Try
-        '        '
-        '        Dim ChildArray() As String
-        '        Dim Pointer As Integer
-        '        Dim ChildIDList As String
-        '        ' converted array to dictionary - Dim FieldPointer As Integer
-        '        Dim FieldName As String
-        '        Dim fieldType As Integer
-        '        Dim fieldId As Integer
-        '        Dim FieldContentID As Integer
-        '        Dim LastFieldContentID As Integer
-        '        'Dim ContentPointer As Integer
-        '        Dim rowMax As Integer
-        '        Dim RowPointer As Integer
-        '        Dim ContentName As String
-        '        Dim UsedNames As String
-        '        Dim WorkingPointer As Integer
-        '        Dim ParentID As Integer
-        '        Dim ParentName As String
-        '        Dim x As Integer
-        '        Dim FieldEditSortPriority As Integer
-        '        Dim IsSelectField As Boolean
-        '        Dim fieldHtmlContent As Boolean
-        '        Dim fieldActive As Boolean
-        '        Dim cdef As CDefClass
-        '        '
-        '        rowMax = dt.Rows.Count - 1
-        '        LastFieldContentID = -1
-        '        For RowPointer = 0 To rowMax
-        '            FieldName = genericController.encodeText(dt.Rows(RowPointer).Item(13)).ToLower
-        '            If Not String.IsNullOrEmpty(FieldName) Then
-        '                IsSelectField = True
-        '                FieldEditSortPriority = genericController.EncodeInteger(dt.Rows(RowPointer).Item(10))
-        '                FieldContentID = genericController.EncodeInteger(dt.Rows(RowPointer).Item(11))
-        '                fieldId = genericController.EncodeInteger(dt.Rows(RowPointer).Item(12))
-        '                fieldType = genericController.EncodeInteger(dt.Rows(RowPointer).Item(15))
-        '                fieldHtmlContent = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(25))
-        '                fieldActive = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(24))
-        '                '
-        '                ' translate htmlContent to fieldtypehtml
-        '                '   this is also converted in upgrade, daily housekeep, addon install
-        '                '
-        '                If fieldHtmlContent Then
-        '                    If fieldType = FieldTypeLongText Then
-        '                        fieldType = FieldTypeHTML
-        '                    ElseIf fieldType = FieldTypeTextFile Then
-        '                        fieldType = FieldTypeHTMLFile
-        '                    End If
-        '                End If
-        '                '
-        '                ' Determine if it is a select field or not (actual field in the select list)
-        '                '
-        '                If (Not fieldActive) Or (fieldType = FieldTypeRedirect) Or (fieldType = FieldTypeManyToMany) Then
-        '                    '
-        '                    ' Special exception, Redirect fields may not have field names
-        '                    '
-        '                    IsSelectField = False
-        '                ElseIf (InStr(1, FieldName, "unnamedfield", vbTextCompare) <> 0) Then
-        '                    '
-        '                    ' Special exception, fields named "UnnamedField..." fields may not have field names
-        '                    '
-        '                    IsSelectField = False
-        '                End If
-        '                '
-        '                ' Check for next content definition
-        '                '
-        '                If FieldContentID <> LastFieldContentID Then
-        '                    '
-        '                    ' New Content Definition, get new CDef object
-        '                    '
-        '                    cdef = getCdef(FieldContentID)
-        '                    'ContentPointer = metaCache.cdefContentIDIndex.getPtr(CStr(FieldContentID))
-        '                    ContentName = cdef.Name
-        '                    LastFieldContentID = FieldContentID
-        '                End If
-        '                '
-        '                ' Get Field Pointer within CDef
-        '                '
-        '                Dim field As CDefFieldClass
-        '                If Not cdef.fields.ContainsKey(FieldName) Then
-        '                    field = New CDefFieldClass()
-        '                    cdef.fields.Add(FieldName, field)
-        '                Else
-        '                    field = cdef.fields(fieldName.ToLower())
-        '                End If
 
-        '                With field
-        '                    .DeveloperOnly = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(0))
-        '                    .UniqueName = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(1))
-        '                    .TextBuffered = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(2))
-        '                    .Password = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(3))
-        '                    If (genericController.encodeText(dt.Rows(RowPointer).Item(4)) = "") Then
-        '                        .IndexColumn = -1
-        '                    Else
-        '                        .IndexColumn = genericController.EncodeInteger(dt.Rows(RowPointer).Item(4))
-        '                    End If
-        '                    .IndexWidth = genericController.encodeText(dt.Rows(RowPointer).Item(5))
-        '                    .IndexWidth = genericController.encodeText(EncodeInteger(Replace(.IndexWidth, "%", "")))
-        '                    .IndexSortOrder = genericController.encodeText(dt.Rows(RowPointer).Item(6))
-        '                    .IndexSortDirection = genericController.EncodeInteger(dt.Rows(RowPointer).Item(7))
-        '                    .AdminOnly = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(8))
-        '                    ' sortorder
-        '                    .EditSortPriority = FieldEditSortPriority
-        '                    .ContentID = FieldContentID
-        '                    .Id = fieldId
-        '                    ' name
-        '                    .Required = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(14))
-        '                    .fieldType = fieldType
-        '                    .Caption = genericController.encodeText(dt.Rows(RowPointer).Item(16))
-        '                    .ReadOnlyField = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(17))
-        '                    .LookupContentID = genericController.EncodeInteger(dt.Rows(RowPointer).Item(18))
-        '                    .RedirectContentID = genericController.EncodeInteger(dt.Rows(RowPointer).Item(19))
-        '                    .RedirectPath = genericController.encodeText(dt.Rows(RowPointer).Item(20))
-        '                    .RedirectID = genericController.encodeText(dt.Rows(RowPointer).Item(21))
-        '                    .DefaultValueObject = dt.Rows(RowPointer).Item(22)
-        '                    .HelpMessage = "deprecated"
-        '                    .active = fieldActive
-        '                    .htmlContent = fieldHtmlContent
-        '                    .NotEditable = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(26))
-        '                    .Authorable = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(27))
-        '                    '
-        '                    .ManyToManyContentID = genericController.EncodeInteger(dt.Rows(RowPointer).Item(28))
-        '                    .ManyToManyRuleContentID = genericController.EncodeInteger(dt.Rows(RowPointer).Item(29))
-        '                    .ManyToManyRulePrimaryField = genericController.encodeText(dt.Rows(RowPointer).Item(30))
-        '                    .ManyToManyRuleSecondaryField = genericController.encodeText(dt.Rows(RowPointer).Item(31))
-        '                    '
-        '                    .RSSTitleField = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(32))
-        '                    .RSSDescriptionField = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(33))
-        '                    .EditTab = genericController.encodeText(dt.Rows(RowPointer).Item(34))
-        '                    .Scramble = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(35))
-        '                    .MemberSelectGroupID = genericController.EncodeInteger(dt.Rows(RowPointer).Item(36))
-        '                    .LookupList = genericController.encodeText(dt.Rows(RowPointer).Item(37))
-        '                    '
-        '                    .Inherited = False
-        '                    Dim testFieldList As String
-        '                    testFieldList = cdef.SelectFieldList
-        '                    If String.IsNullOrEmpty(testFieldList) Then
-        '                        cdef.SelectFieldList = .Name
-        '                    ElseIf IsSelectField And (InStr(1, "," & testFieldList & ",", "," & .Name & ",", vbTextCompare) = 0) Then
-        '                        '
-        '                        ' Create SelectFieldList if active, non-redirect, non-empty and not already there
-        '                        '
-        '                        cdef.SelectFieldList &= "," & .Name
-        '                    End If
-        '                    '
-        '                    ' IsBaseField - true this is a custom field, false is it a cdef field
-        '                    '
-        '                    .BlockAccess = genericController.EncodeBoolean(dt.Rows(RowPointer).Item(38))
-        '                End With
-        '            End If
-        '        Next
-        '        '
-        '        ' ----- now do custom fields
-        '        '
-        '        For ContentPointer = 0 To metaCache.cdefCount - 1
-        '            '
-        '            ' ----- Apply WorkflowAuthoring Rule to prevent cyclic ParentIDs
-        '            '
-        '            UsedNames = ""
-        '            ContentName = metaCache.cdef(ContentPointer).Name
-        '            ParentName = ContentName
-        '            WorkingPointer = metaCache.cdefContentNameIndex.getPtr(Trim(ParentName))
-        '            Do While (WorkingPointer <> -1) And (InStr(1, UsedNames & ".", "." & ParentName & ".") = 0)
-        '                UsedNames = UsedNames & "." & ParentName
-        '                ParentID = metaCache.cdef(metaCache.cdefContentNameIndex.getPtr(Trim(ParentName))).ParentID
-        '                If ParentID = -1 Then
-        '                    WorkingPointer = -1
-        '                Else
-        '                    WorkingPointer = metaCache.cdefContentIDIndex.getPtr(CStr(ParentID))
-        '                    ParentName = metaCache.cdef(WorkingPointer).Name
-        '                End If
-        '            Loop
-        '            If WorkingPointer <> -1 Then
-        '                metaCache.cdef(ContentPointer).ParentID = 0
-        '            End If
-        '            '
-        '            ' ----- Apply WorkflowAuthoring Rule that any definition must match its parent
-        '            '
-        '            If ParentName <> ContentName Then
-        '                metaCache.cdef(ContentPointer).AllowWorkflowAuthoring = metaCache.cdef(metaCache.cdefContentNameIndex.getPtr(Trim(ParentName))).AllowWorkflowAuthoring
-        '            End If
-        '            '
-        '            ' ----- Create the ContentControlCriteria
-        '            '
-        '            metaCache.cdef(ContentPointer).ContentControlCriteria = GetChildCriteria(ContentName, "ContentControlID")
-        '            '
-        '            ' ----- Create the ChildPointerList
-        '            '
-        '            metaCache.cdef(ContentPointer).ChildPointerList = GetChildPointerList(ContentPointer)
-        '            '
-        '            ' ----- Create the ChildIDList from the ChildPointerList
-        '            '
-        '            If metaCache.cdef(ContentPointer).ChildPointerList <> "" Then
-        '                ChildArray = Split(metaCache.cdef(ContentPointer).ChildPointerList, ",")
-        '                ChildIDList = ""
-        '                For Pointer = 0 To UBound(ChildArray)
-        '                    ChildIDList = ChildIDList & "," & metaCache.cdef(EncodeInteger(ChildArray(Pointer))).Id
-        '                Next
-        '                metaCache.cdef(ContentPointer).ChildIDList = Mid(ChildIDList, 2)
-        '            End If
-        '            '''DoEvents()
-        '        Next
-        '        '
-        '        ' ----- populate inherated fields
-        '        '
-        '        For ContentPointer = 0 To metaCache.cdefCount - 1
-        '            If (metaCache.cdef(ContentPointer).ParentID = -1) And (metaCache.cdef(ContentPointer).ChildPointerList <> "") Then
-        '                '
-        '                ' ----- Start with root pages (no parent) that have children
-        '                '
-        '                'Call StoreCDefFields_ShareWithChildren(ContentPointer)
-        '            End If
-        '        Next
-        '        '
-        '        ' ----- Precalculate Admin Field structure
-        '        '
-        '        For Each cdefWorking As CDefClass In metaCache.cdef
-        '            Call getCdef_SetAdminColumns(cdefWorking)
-        '        Next
-        '    Catch ex As Exception
-        '        cpCore.handleException(ex)
-        '    End Try
-        'End Sub
-        ''
-        ''========================================================================
-        ''   Share inheritable fields with children
-        ''========================================================================
-        ''
-        'Private Sub StoreCDefFields_ShareWithChildren(ByVal ParentCDefPointer As Integer)
-        '    Try
-        '        '
-        '        Dim ChildCDefPointerList As String
-        '        Dim ChildCDefPointerArray As String()
-        '        Dim ChildCDefPointerArray_Pointer As Integer
-        '        Dim ChildCDefPointer As Integer
-        '        Dim ChildFieldPointer As Integer
-        '        Dim ParentFieldPointer As Integer
-        '        Dim FieldName As String
-        '        Dim FieldEditSortPriority As Integer
-        '        Dim ChildFieldList As String
-        '        Dim lcaseName As String
-        '        Dim SelectFieldList As String
-        '        '
-        '        If metaCache.cdef(ParentCDefPointer).Id > 0 Then
-        '            ChildCDefPointerList = metaCache.cdef(ParentCDefPointer).ChildPointerList
-        '            If ChildCDefPointerList <> "" Then
-        '                ChildCDefPointerArray = Split(ChildCDefPointerList, ",")
-        '                For ChildCDefPointerArray_Pointer = 0 To UBound(ChildCDefPointerArray)
-        '                    '
-        '                    ' inherit the parent definition fields to this child definition
-        '                    '
-        '                    ChildCDefPointer = genericController.EncodeInteger(ChildCDefPointerArray(ChildCDefPointerArray_Pointer))
-        '                    '
-        '                    ' Create a string of Child FieldNames to search
-        '                    '
-        '                    '20151113 - list should include common fields so child does not inherit 'sortorder' and create a duplicate
-        '                    ChildFieldList = "," & metaCache.cdef(ChildCDefPointer).SelectFieldList & ","
-        '                    SelectFieldList = ""
-        '                    For ParentFieldPointer = 0 To metaCache.cdef(ParentCDefPointer).fields.Count - 1
-        '                        '
-        '                        ' check childfieldlist for parent field
-        '                        '
-        '                        If (InStr(1, ChildFieldList, "," & metaCache.cdef(ParentCDefPointer).fields(ParentFieldPointer).Name & ",", vbTextCompare) = 0) Then
-        '                            '
-        '                            ' Add inherited Field needs to be inherited because a child field was not found
-        '                            '
-        '                            With metaCache.cdef(ParentCDefPointer).fields(ParentFieldPointer)
-        '                                FieldName = .Name
-        '                                FieldEditSortPriority = .EditSortPriority
-        '                            End With
-        '                            ChildFieldPointer = AddField(ChildCDefPointer, FieldName)
-        '                            metaCache.cdef(ChildCDefPointer).fields(ChildFieldPointer) = metaCache.cdef(ParentCDefPointer).fields(ParentFieldPointer)
-        '                            With metaCache.cdef(ChildCDefPointer).fields(ChildFieldPointer)
-        '                                .Inherited = True
-        '                                lcaseName = genericController.vbLCase(.Name)
-        '                                ' 20151114 - dont understand why id is excluded
-        '                                If .active And (.fieldType <> FieldTypeRedirect) And (.fieldType <> FieldTypeManyToMany) And (.Name <> "") Then
-        '                                    'If .active And (.fieldType <> FieldTypeRedirect) And (.fieldType <> FieldTypeManyToMany) And (.Name <> "") And (lcaseName <> "id") Then
-        '                                    'If .active And (.FieldType <> FieldTypeRedirect) And (.FieldType <> FieldTypeManyToMany) And (.Name <> "") And (lcaseName <> "id") And (lcaseName <> "ccguid") Then
-        '                                    '
-        '                                    ' can not select fields with no name, redirects, inactives and "ID" was added when fields was added
-        '                                    '
-        '                                    SelectFieldList = SelectFieldList & "," & FieldName
-        '                                End If
-        '                            End With
-        '                        End If
-        '                        '''DoEvents()
-        '                    Next
-        '                    metaCache.cdef(ChildCDefPointer).SelectFieldList &= SelectFieldList
-        '                    '
-        '                    If metaCache.cdef(ChildCDefPointer).ChildPointerList <> "" Then
-        '                        '
-        '                        ' inherit the child definition fields to the childs children
-        '                        '
-        '                        Call StoreCDefFields_ShareWithChildren(ChildCDefPointer)
-        '                    End If
-        '                    '''DoEvents()
-        '                Next
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        cpCore.handleException(ex)
-        '    End Try
-        'End Sub
-        ''
-        '' Add a Field to the CDef structure
-        ''
-        ''
-        'Private Function AddField(ByVal ContentPointer As Integer, ByVal FieldName As String) As Integer
-        '    Try
-        '        '
-        '        With metaCache.cdef(ContentPointer)
-        '            If .fields.Count >= .FieldSize Then
-        '                .FieldSize = .FieldSize + 100
-        '                ReDim Preserve .fields(.FieldSize)
-        '                'Call .redimFields(.FieldSize)
-        '            End If
-        '            AddField = .fields.Count
-        '            .fields.Count = .fields.Count + 1
-        '            .fields(AddField).Name = Trim(FieldName)
-        '        End With
-        '    Catch ex As Exception
-        '        cpCore.handleException(ex)
-        '    End Try
-        'End Function
-        ''
-        ''
-        ''
-        'Private Function GetFieldPointer(ByVal ContentPointer As Integer, ByVal FieldName As String) As Integer
-        '    Dim returnPtr As Integer = -1
-        '    Try
-        '        '
-        '        Dim UcaseFieldName As String
-        '        '
-        '        returnPtr = -1
-        '        With metaCache.cdef(ContentPointer)
-        '            If .fields.Count > 0 Then
-        '                UcaseFieldName = genericController.vbUCase(FieldName)
-        '                For returnPtr = 0 To .fields.Count - 1
-        '                    If genericController.vbUCase(.fields(returnPtr).Name) = UcaseFieldName Then
-        '                        Exit For
-        '                    End If
-        '                    '''DoEvents()
-        '                Next
-        '            End If
-        '            If returnPtr >= .fields.Count Then
-        '                returnPtr = -1
-        '            End If
-        '        End With
-        '    Catch ex As Exception
-        '        cpCore.handleException(ex)
-        '    End Try
-        '    Return returnPtr
-        'End Function
-        ''
-        '' ----- Add a new Content Definition
-        ''
-        'Private Function AddCDef(ByVal ContentName As String, ByVal ContentID As Integer, ByVal TableName As String) As Integer
-        '    Dim returnPtr As Integer
-        '    Try
-        '        '
-        '        If metaCache.cdefCount >= metaCache.cdefSize Then
-        '            metaCache.cdefSize = metaCache.cdefSize + 10
-        '            ReDim Preserve metaCache.cdef(metaCache.cdefSize)
-        '            ReDim Preserve CDefName(metaCache.cdefSize)
-        '            ReDim Preserve CDefID(metaCache.cdefSize)
-        '        End If
-        '        metaCache.cdef(metaCache.cdefCount).Name = ContentName
-        '        metaCache.cdef(metaCache.cdefCount).Id = ContentID
-        '        metaCache.cdef(metaCache.cdefCount).ContentTableName = TableName
-        '        metaCache.cdef(metaCache.cdefCount).SelectFieldList = "ID"
-        '        '
-        '        CDefName(metaCache.cdefCount) = ContentName
-        '        CDefID(metaCache.cdefCount) = ContentID
-        '        '
-        '        'Call metaCache.cdefContentNameIndex.setPtr(ContentName, metaCache.cdefCount)
-        '        'Call metaCache.cdefContentIDIndex.setPtr(CStr(ContentID), metaCache.cdefCount)
-        '        'Call metaCache.cdefContentTableNameIndex.setPtr(TableName, metaCache.cdefCount)
-        '        returnPtr = metaCache.cdefCount
-        '        metaCache.cdefCount = metaCache.cdefCount + 1
-        '    Catch ex As Exception
-        '        cpCore.handleException(ex)
-        '    End Try
-        '    Return returnPtr
-        'End Function
-        ''
-        '' ----- GetContentNameByID
-        ''
-        'Public Function getContentNameByID(ByVal ContentID As Integer) As String
-        '    Dim returnName As String = ""
-        '    Try
-        '        Dim ContentPointer As Integer
-        '        '
-        '        ContentPointer = metaCache.cdefContentIDIndex.getPtr(CStr(ContentID))
-        '        If ContentPointer >= 0 Then
-        '            returnName = metaCache.cdef(ContentPointer).Name
-        '        End If
-        '    Catch ex As Exception
-        '        cpCore.handleException(ex)
-        '    End Try
-        '    Return returnName
-        'End Function
         '
         '========================================================================
         '   IsWithinContent( ChildContentID, ParentContentID )
@@ -1733,7 +586,7 @@ Namespace Contensive.Core
         Function isWithinContent(ByVal ChildContentID As Integer, ByVal ParentContentID As Integer) As Boolean
             Dim returnOK As Boolean = False
             Try
-                Dim cdef As CDefClass
+                Dim cdef As cdefModel
                 If (ChildContentID = ParentContentID) Then
                     returnOK = True
                 Else
@@ -1756,56 +609,6 @@ Namespace Contensive.Core
             Return returnOK
         End Function
         ''
-        ''========================================================================
-        ''   Get the CDef Count
-        ''========================================================================
-        ''
-        'Public Function GetCDefCount() As Integer
-        '    Return metaCache.cdefCount
-        'End Function
-        ''
-        ''========================================================================
-        ''   Get the CDefName array
-        ''========================================================================
-        ''
-        'Public Function GetCDefNames() As String()
-        '    GetCDefNames = CDefName
-        'End Function
-        ''
-        ''========================================================================
-        ''   Get the CDefID array
-        ''========================================================================
-        ''
-        'Public Function GetCDefIDs() As Integer()
-        '    GetCDefIDs = CDefID
-        'End Function
-        ''
-        ''=================================================================
-        ''   Returns a pointer to the topmost CDef entry -- the one that holds the table entries
-        ''       (if there is not a valid parent, the current entry is the top-most)
-        ''=================================================================
-        ''
-        'Private Function GetCDefRootPointer(ByVal CDefPointer As Integer) As Integer
-        '    Dim returnPtr As Integer = -1
-        '    Try
-        '        Dim ParentPointer As Integer
-        '        Dim ParentID As Integer
-        '        '
-        '        GetCDefRootPointer = CDefPointer
-        '        If CDefPointer >= 0 Then
-        '            ParentID = metaCache.cdef(CDefPointer).ParentID
-        '            If ParentID > 0 Then
-        '                ParentPointer = metaCache.cdefContentIDIndex.getPtr(CStr(ParentID))
-        '                If ParentPointer >= 0 Then
-        '                    GetCDefRootPointer = GetCDefRootPointer(ParentPointer)
-        '                End If
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        cpCore.handleException(ex)
-        '    End Try
-        '    Return returnPtr
-        'End Function
         '
         '=================================================================================
         '
@@ -1816,7 +619,7 @@ Namespace Contensive.Core
         '
         '=================================================================================
         '
-        Public Sub getCdef_SetAdminColumns(cdef As CDefClass)
+        Public Sub getCdef_SetAdminColumns(cdef As cdefModel)
             Try
                 '
                 'Dim DestPtr As Integer
@@ -1824,18 +627,18 @@ Namespace Contensive.Core
                 Dim FieldActive As Boolean
                 Dim FieldWidth As Integer
                 Dim FieldWidthTotal As Integer
-                Dim adminColumn As CDefAdminColumnClass
+                Dim adminColumn As cdefModel.CDefAdminColumnClass
                 '
                 With cdef
                     If .Id > 0 Then
                         Dim cnt As Integer = 0
-                        For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In cdef.fields
-                            Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+                        For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In cdef.fields
+                            Dim field As CDefFieldModel = keyValuePair.Value
                             FieldActive = field.active
                             FieldWidth = genericController.EncodeInteger(field.indexWidth)
                             If FieldActive And (FieldWidth > 0) Then
                                 FieldWidthTotal = FieldWidthTotal + FieldWidth
-                                adminColumn = New CDefAdminColumnClass
+                                adminColumn = New cdefModel.CDefAdminColumnClass
                                 With adminColumn
                                     .Name = field.nameLc
                                     .SortDirection = field.indexSortDirection
@@ -1857,7 +660,7 @@ Namespace Contensive.Core
                                 ' Force the Name field as the only column
                                 '
                                 If .fields.ContainsKey("name") Then
-                                    adminColumn = New CDefAdminColumnClass
+                                    adminColumn = New cdefModel.CDefAdminColumnClass
                                     With adminColumn
                                         .Name = "Name"
                                         .SortDirection = 1
@@ -1884,170 +687,6 @@ Namespace Contensive.Core
             End Try
         End Sub
         ''
-        ''========================================================================
-        ''   Load the Content Definitions
-        ''
-        ''   Reloads or appends a content definition from the table
-        ''   Call executesqlTrapless because executesql calls this routine
-        ''========================================================================
-        ''
-        'Public Sub loadMetaCache_cdef()
-        '    Try
-        '        Dim dt As DataTable
-        '        Dim SQL As String
-        '        Dim SQLMeta As String
-        '        Dim SQLOrderBy As String
-        '        '
-        '        ' Clear the local cache
-        '        '
-        '        metaCache = New metaCacheClass()
-        '        'metaCache.cdefCount = 0
-        '        '
-        '        ' ---- Setup Content Definition loads for older data versions
-        '        '
-        '        SQLMeta = "ccContent.AllowMetaContent as AllowMetaContent"
-        '        '
-        '        ' ----- Disable Duplicates which may prevent proper reload
-        '        '
-        '        If cpCore.cluster.config.defaultDataSourceType = dataSourceTypeEnum.mySqlNative Then
-        '            '
-        '            ' MySQL - need a dedup solution ******************************************************
-        '            '
-        '        Else
-        '            SQL = "update cccontent set Active = 0 where ID IN ("
-        '            sql &=  " select C2.ID"
-        '            sql &=  " from ccContent AS C1 LEFT JOIN ccContent AS C2 ON C1.Name = C2.Name"
-        '            sql &=  " WHERE (C2.Active<>0) AND (C1.Active<>0) AND (C1.ID<C2.ID)"
-        '            sql &=  ")"
-        '            Call cpCore.app.executeSql(SQL)
-        '            '
-        '            SQL = "update ccFields set Active = 0 where ID IN ("
-        '            sql &=  " select F2.ID"
-        '            sql &=  " from ccFields AS F1 LEFT JOIN ccFields AS F2 ON F1.Name = F2.Name"
-        '            sql &=  " WHERE (F1.contentid=F2.contentid) and (F2.Active<>0) AND (F1.Active<>0) AND (F1.ID<F2.ID)"
-        '            sql &=  ")"
-        '            Call cpCore.app.executeSql(SQL)
-        '        End If
-        '        '
-        '        ' ----- Convert all boolean defaults from null to 0
-        '        '
-        '        SQL = "update ccfields set defaultValue='0' where type=4 and defaultValue is null"
-        '        Call cpCore.app.executeSql(SQL)
-        '        '
-        '        ' ----- load all content records
-        '        '
-        '        SQL = "SELECT " _
-        '        & "ccContent.ID" _
-        '        & ", ccContent.Name" _
-        '        & ", ccContent.name" _
-        '        & ", ccContent.AllowAdd" _
-        '        & ", ccContent.DeveloperOnly" _
-        '        & ", ccContent.AdminOnly" _
-        '        & ", ccContent.AllowDelete" _
-        '        & ", ccContent.ParentID" _
-        '        & ", ccContent.DefaultSortMethodID" _
-        '        & ", ccContent.DropDownFieldList" _
-        '        & ", ContentTable.Name AS ContentTableName" _
-        '        & ", ContentDataSource.Name AS ContentDataSourceName" _
-        '        & ", AuthoringTable.Name AS AuthoringTableName" _
-        '        & ", AuthoringDataSource.Name AS AuthoringDataSourceName" _
-        '        & ", ccContent.AllowWorkflowAuthoring AS AllowWorkflowAuthoring" _
-        '        & ", ccContent.AllowCalendarEvents as AllowCalendarEvents" _
-        '        & ", ContentTable.DataSourceID" _
-        '        & ", ccSortMethods.OrderByClause as DefaultSortMethod" _
-        '        & ", ccGroups.Name as EditorGroupName" _
-        '        & ", ccContent.AllowContentTracking as AllowContentTracking" _
-        '        & ", ccContent.AllowTopicRules as AllowTopicRules" _
-        '        & ", ccContent.AllowMetaContent as AllowMetaContent" _
-        '        & " FROM (((((ccContent LEFT JOIN ccTables AS ContentTable ON ccContent.ContentTableID = ContentTable.ID) LEFT JOIN ccTables AS AuthoringTable ON ccContent.AuthoringTableID = AuthoringTable.ID) LEFT JOIN ccDataSources AS ContentDataSource ON ContentTable.DataSourceID = ContentDataSource.ID) LEFT JOIN ccDataSources AS AuthoringDataSource ON AuthoringTable.DataSourceID = AuthoringDataSource.ID) LEFT JOIN ccSortMethods ON ccContent.DefaultSortMethodID = ccSortMethods.ID) LEFT JOIN ccGroups ON ccContent.EditorGroupID = ccGroups.ID" _
-        '        & " WHERE (ccContent.Active<>0)"
-        '        dt = cpCore.app.executeSql(SQL)
-        '        If dt.Rows.Count = 0 Then
-        '            '
-        '        Else
-        '            Call StoreCDef(dt)
-        '            '
-        '            ' ----- now load all the Content Definition Fields
-        '            '
-        '            SQL = "SELECT" _
-        '            & "  ccFields.DeveloperOnly" _
-        '            & ", ccFields.UniqueName" _
-        '            & ", ccFields.TextBuffered" _
-        '            & ", ccFields.Password" _
-        '            & ", ccFields.IndexColumn" _
-        '            & ", ccFields.IndexWidth" _
-        '            & ", ccFields.IndexSortPriority" _
-        '            & ", ccFields.IndexSortDirection" _
-        '            & ", ccFields.AdminOnly" _
-        '            & ", ccFields.SortOrder" _
-        '            & ", ccFields.EditSortPriority" _
-        '            & ", ccFields.ContentID" _
-        '            & ", ccFields.ID" _
-        '            & ", ccFields.Name" _
-        '            & ", ccFields.Required" _
-        '            & ", ccFields.Type" _
-        '            & ", ccFields.Caption" _
-        '            & ", ccFields.readonly" _
-        '            & ", ccFields.LookupContentID" _
-        '            & ", ccFields.RedirectContentID" _
-        '            & ", ccFields.RedirectPath" _
-        '            & ", ccFields.RedirectID" _
-        '            & ", ccFields.DefaultValue"
-        '            sql &=  ", '' as HelpMessageDeprecated" _
-        '            & ", ccFields.Active" _
-        '            & ", ccFields.HTMLContent" _
-        '            & ", ccFields.NotEditable" _
-        '            & ", ccFields.authorable"
-        '            SQLOrderBy = "ccFields.ContentID,ccFields.EditTab,ccFields.EditSortPriority;"
-        '            sql &= "" _
-        '            & ", ccFields.ManyToManyContentID" _
-        '            & ",ccFields.ManyToManyRuleContentID" _
-        '            & ",ccFields.ManyToManyRulePrimaryField" _
-        '            & ",ccFields.ManyToManyRuleSecondaryField" _
-        '            & ",ccFields.RSSTitleField" _
-        '            & ",ccFields.RSSDescriptionField" _
-        '            & ",ccFields.EditTab" _
-        '            & ",ccFields.Scramble" _
-        '            & ",ccFields.MemberSelectGroupID" _
-        '            & ",ccFields.LookupList" _
-        '            & ",ccFields.IsBaseField"
-        '            sql &=  " FROM ccFields LEFT JOIN ccContent ON ccFields.ContentID = ccContent.ID"
-        '            sql &=  " WHERE (ccContent.ID Is not Null)AND(ccContent.Active<>0)and(ccFields.active<>0)and(ccFields.Type<>0)"
-        '            sql &=  " AND(ccfields.name<>'')"
-        '            sql &=  " ORDER BY " & SQLOrderBy
-        '            '
-        '            dt = cpCore.app.executeSql(SQL)
-        '            If dt.Rows.Count = 0 Then
-        '                '
-        '            Else
-        '                Call StoreCDefFields(dt)
-        '            End If
-        '        End If
-        '        '
-        '        ' setup local storage for this cdef
-        '        '
-        '        Dim pointer As Integer
-        '        ReDim Preserve metaCache.cdefContentFieldIndex(metaCache.cdefCount)
-        '        ReDim Preserve metaCache.cdefContentFieldIndexPopulated(metaCache.cdefCount)
-        '        For pointer = 0 To metaCache.cdefCount - 1
-        '            '
-        '            ' setup local storage for this cdef
-        '            '
-        '            Dim lcaseContentName As String
-        '            lcaseContentName = metaCache.cdef(pointer).Name.ToLower
-        '            Call metaCache.cdefContentNameIndex.setPtr(lcaseContentName, pointer)
-        '            metaCache.cdefContentFieldIndex(pointer) = New keyPtrIndexClass
-        '            metaCache.cdefContentFieldIndexPopulated(pointer) = False
-        '        Next
-        '        '
-        '        metaCache.cdefCount = GetCDefCount()
-        '        metaCache.cdefName = GetCDefNames()
-        '        metaCache.cdefID = GetCDefIDs()
-        '    Catch ex As Exception
-        '        cpCore.handleException(ex)
-        '    End Try
-        'End Sub
-
         '
         '
         '========================================================================
@@ -2123,7 +762,7 @@ Namespace Contensive.Core
             dt = cpCore.db.executeSql("select id,name from ccContent where active<>0")
             If Not (dt Is Nothing) Then
                 For Each row As DataRow In dt.Rows
-                    Dim cdef As CDefClass = getCdef(EncodeInteger(row("id")))
+                    Dim cdef As cdefModel = getCdef(EncodeInteger(row("id")))
                     'If genericController.vbUCase(cdef.Name) = "PAGE CONTENT" Then
                     '    Copy = Copy
                     '    End If
@@ -2183,7 +822,7 @@ Namespace Contensive.Core
                                             LiveRecordID = LiveRecordID
                                         End If
                                         For Each keyValuePair In cdef.fields
-                                            Dim field As CDefFieldClass = keyValuePair.Value
+                                            Dim field As CDefFieldModel = keyValuePair.Value
                                             Select Case field.fieldTypeId
                                                 Case FieldTypeIdManyToMany, FieldTypeIdRedirect
                                                     '
@@ -2323,63 +962,7 @@ Namespace Contensive.Core
 ErrorTrap:
             'Call handleLegacyClassError1(MethodName, "trap")
         End Sub
-        ''
-        ''===============================================================================
-        ''   Load the records needed to run the Content Server
-        ''===============================================================================
-        ''
-        'Public Function loadMetaCache() As Boolean
-        '    Dim returnOk As Boolean = False
-        '    Try
-        '        Dim needToLoadCdefCache As Boolean = True
-        '        Dim jsonMetaTemp As String
-        '        Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer
-        '        Const cacheName As String = "metaData"
-        '        '
-        '        ' legacy -- convert all to lazy cache and remove from the metaCache class -- too slow to load all at once
-        '        '
-        '        metaCache = New appServices_metaDataClass.metaCacheClass()
-        '        metaCache.tableSchema = New Dictionary(Of String, appServices_metaDataClass.tableSchemaClass)
-        '        'metaCache.cdefContentNameIndex = New keyPtrIndexClass
-        '        'metaCache.cdefContentIDIndex = New keyPtrIndexClass
-        '        'metaCache.cdefContentTableNameIndex = New keyPtrIndexClass
-        '        'ReDim metaCache.cdefContentFieldIndex(0)
-        '        'metaCache.cdefContentFieldIndex(0) = New keyPtrIndexClass
-        '        '
-        '        metaCache = DirectCast(cpCore.cache.cache_read(Of metaCacheClass)(cacheName), metaCacheClass)
-        '        If metaCache Is Nothing Then
-        '            needToLoadCdefCache = True
-        '        Else
-        '            With metaCache
-        '                If (.contentNameIndexBag <> "") And (.contentIdIndexBag <> "") And (.contentTableNameIndexBag <> "") Then
-        '                    '.cdefContentNameIndex.importPropertyBag(.contentNameIndexBag)
-        '                    '.cdefContentIDIndex.importPropertyBag(.contentIdIndexBag)
-        '                    .cdefContentTableNameIndex.importPropertyBag(.contentTableNameIndexBag)
-        '                    needToLoadCdefCache = False
-        '                    returnOk = True
-        '                End If
-        '            End With
-        '        End If
-        '        If needToLoadCdefCache Then
-        '            Call loadMetaCache_DataSources()
-        '            Call loadMetaCache_cdef()
-        '            Call loadMetaCache_VerifyAuthoring()
-        '            '
-        '            With metaCache
-        '                .contentNameIndexBag = .cdefContentNameIndex.exportPropertyBag()
-        '                .contentIdIndexBag = .cdefContentIDIndex.exportPropertyBag()
-        '                .contentTableNameIndexBag = .cdefContentTableNameIndex.exportPropertyBag()
-        '                jsonMetaTemp = json_serializer.Serialize(metaCache)
-        '            End With
-        '            Call cpCore.cache.cache_save(cacheName, metaCache, "cdef")
-        '            'Call cpCore.app.privateFiles.SaveFile("metaCache.json", jsonMetaTemp)
-        '            returnOk = True
-        '        End If
-        '    Catch ex As Exception
-        '        cpCore.handleException(ex)
-        '    End Try
-        '    Return returnOk
-        'End Function
+
         '
         '===========================================================================
         '   main_Get Authoring List
@@ -2393,7 +976,7 @@ ErrorTrap:
                 Dim cidDataTable As DataTable
                 Dim CIDCount As Integer
                 Dim CIDPointer As Integer
-                Dim CDef As coreMetaDataClass.CDefClass
+                Dim CDef As cdefModel
                 Dim ContentID As Integer
                 '
                 SQL = "Select ccGroupRules.ContentID as ID" _
@@ -2457,8 +1040,8 @@ ErrorTrap:
         '   returns -1 if the table is not found
         '=================================================================================
         '
-        Public Function getTableSchema(ByVal TableName As String, ByVal DataSourceName As String) As coreMetaDataClass.tableSchemaClass
-            Dim tableSchema As coreMetaDataClass.tableSchemaClass = Nothing
+        Public Function getTableSchema(ByVal TableName As String, ByVal DataSourceName As String) As tableSchemaModel
+            Dim tableSchema As tableSchemaModel = Nothing
             Try
                 Dim dt As DataTable
                 Dim isInCache As Boolean = False
@@ -2473,7 +1056,7 @@ ErrorTrap:
                     If TableName <> "" Then
                         lowerTablename = TableName.ToLower
                         If (tableSchemaList) Is Nothing Then
-                            tableSchemaList = New Dictionary(Of String, tableSchemaClass)
+                            tableSchemaList = New Dictionary(Of String, tableSchemaModel)
                         Else
                             isInCache = tableSchemaList.TryGetValue(lowerTablename, tableSchema)
                         End If
@@ -2490,7 +1073,7 @@ ErrorTrap:
                                 tableSchema = Nothing
                             Else
                                 isInDb = True
-                                tableSchema = New coreMetaDataClass.tableSchemaClass
+                                tableSchema = New tableSchemaModel
                                 tableSchema.columns = New List(Of String)
                                 tableSchema.indexes = New List(Of String)
                                 tableSchema.TableName = lowerTablename
@@ -2538,11 +1121,10 @@ ErrorTrap:
         ''' <summary>
         ''' delete a content based on name or guid, without removing the table
         ''' </summary>
-        ''' <param name="contentNameOrGuid"></param>
-        Public Sub deleteContent(contentNameOrGuid As String)
+        ''' <param name="ContentName"></param>
+        Public Sub deleteContent(ContentName As String)
             Try
-                cpCore.db.executeSql("delete from cccontent where (name=" & cpCore.db.encodeSQLText(contentNameOrGuid) & ")or(ccguid=" & cpCore.db.encodeSQLText(contentNameOrGuid) & ")")
-                cpCore.cache.invalidateObject("content")
+                Models.Entity.contentModel.delete(cpCore, cpCore.metaData.getContentId(ContentName))
                 clear()
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -2823,7 +1405,7 @@ ErrorTrap:
         Public Function getContentTablename(ByVal ContentName As String) As String
             Dim returnTableName As String = ""
             Try
-                Dim CDef As coreMetaDataClass.CDefClass
+                Dim CDef As cdefModel
                 '
                 CDef = getCdef(ContentName)
                 If (CDef IsNot Nothing) Then
@@ -2841,7 +1423,7 @@ ErrorTrap:
         Public Function getContentDataSource(ContentName As String) As String
             Dim returnDataSource As String = ""
             Try
-                Dim CDef As coreMetaDataClass.CDefClass
+                Dim CDef As cdefModel
                 '
                 CDef = getCdef(ContentName)
                 If (CDef Is Nothing) Then
@@ -2863,7 +1445,7 @@ ErrorTrap:
         Public Function getContentNameByID(ByVal ContentID As Integer) As String
             Dim returnName As String = ""
             Try
-                Dim cdef As coreMetaDataClass.CDefClass
+                Dim cdef As cdefModel
                 '
                 cdef = getCdef(ContentID)
                 If cdef IsNot Nothing Then
@@ -2898,7 +1480,7 @@ ErrorTrap:
                 Dim CDefFound As Boolean
                 Dim InstalledByCollectionID As Integer
                 Dim sqlList As sqlFieldListClass
-                Dim field As coreMetaDataClass.CDefFieldClass
+                Dim field As CDefFieldModel
                 Dim ContentIDofContent As Integer
                 '
                 If String.IsNullOrEmpty(contentName) Then
@@ -3098,7 +1680,7 @@ ErrorTrap:
                                 ' CDef does not inherit its fields, create what is needed for a non-inherited CDef
                                 '
                                 If Not cpCore.db.isCdefField(returnContentId, "ID") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
+                                    field = New CDefFieldModel
                                     field.nameLc = "id"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdAutoIdIncrement
@@ -3111,7 +1693,7 @@ ErrorTrap:
                                 End If
                                 '
                                 If Not cpCore.db.isCdefField(returnContentId, "name") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
+                                    field = New CDefFieldModel
                                     field.nameLc = "name"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdText
@@ -3124,7 +1706,7 @@ ErrorTrap:
                                 End If
                                 '
                                 If Not cpCore.db.isCdefField(returnContentId, "active") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
+                                    field = New CDefFieldModel
                                     field.nameLc = "active"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdBoolean
@@ -3137,7 +1719,7 @@ ErrorTrap:
                                 End If
                                 '
                                 If Not cpCore.db.isCdefField(returnContentId, "sortorder") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
+                                    field = New CDefFieldModel
                                     field.nameLc = "sortorder"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdText
@@ -3150,7 +1732,7 @@ ErrorTrap:
                                 End If
                                 '
                                 If Not cpCore.db.isCdefField(returnContentId, "dateadded") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
+                                    field = New CDefFieldModel
                                     field.nameLc = "dateadded"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdDate
@@ -3162,7 +1744,7 @@ ErrorTrap:
                                     Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 If Not cpCore.db.isCdefField(returnContentId, "createdby") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
+                                    field = New CDefFieldModel
                                     field.nameLc = "createdby"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdLookup
@@ -3175,7 +1757,7 @@ ErrorTrap:
                                     Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 If Not cpCore.db.isCdefField(returnContentId, "modifieddate") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
+                                    field = New CDefFieldModel
                                     field.nameLc = "modifieddate"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdDate
@@ -3187,7 +1769,7 @@ ErrorTrap:
                                     Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 If Not cpCore.db.isCdefField(returnContentId, "modifiedby") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
+                                    field = New CDefFieldModel
                                     field.nameLc = "modifiedby"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdLookup
@@ -3200,7 +1782,7 @@ ErrorTrap:
                                     Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 If Not cpCore.db.isCdefField(returnContentId, "ContentControlID") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
+                                    field = New CDefFieldModel
                                     field.nameLc = "ContentControlID"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdLookup
@@ -3213,7 +1795,7 @@ ErrorTrap:
                                     Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 If Not cpCore.db.isCdefField(returnContentId, "CreateKey") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
+                                    field = New CDefFieldModel
                                     field.nameLc = "CreateKey"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdInteger
@@ -3228,7 +1810,7 @@ ErrorTrap:
                                 ' REFACTOR - these fieldsonly apply to page content
                                 '
                                 If Not cpCore.db.isCdefField(returnContentId, "EditSourceID") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
+                                    field = New CDefFieldModel
                                     field.nameLc = "EditSourceID"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdInteger
@@ -3241,7 +1823,7 @@ ErrorTrap:
                                     Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 If Not cpCore.db.isCdefField(returnContentId, "EditArchive") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
+                                    field = New CDefFieldModel
                                     field.nameLc = "EditArchive"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdBoolean
@@ -3254,7 +1836,7 @@ ErrorTrap:
                                     Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 If Not cpCore.db.isCdefField(returnContentId, "EditBlank") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
+                                    field = New CDefFieldModel
                                     field.nameLc = "EditBlank"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdBoolean
@@ -3267,7 +1849,7 @@ ErrorTrap:
                                     Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 If Not cpCore.db.isCdefField(returnContentId, "ContentCategoryID") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
+                                    field = New CDefFieldModel
                                     field.nameLc = "ContentCategoryID"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdLookup
@@ -3280,7 +1862,7 @@ ErrorTrap:
                                     Call verifyCDefField_ReturnID(contentName, field)
                                 End If
                                 If Not cpCore.db.isCdefField(returnContentId, "ccGuid") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
+                                    field = New CDefFieldModel
                                     field.nameLc = "ccGuid"
                                     field.active = True
                                     field.fieldTypeId = FieldTypeIdText
@@ -3318,7 +1900,7 @@ ErrorTrap:
         '
         ' ====================================================================================================================
         '
-        Public Function verifyCDefField_ReturnID(ByVal ContentName As String, field As coreMetaDataClass.CDefFieldClass) As Integer ' , ByVal FieldName As String, ByVal Args As String, ByVal Delimiter As String) As Integer
+        Public Function verifyCDefField_ReturnID(ByVal ContentName As String, field As CDefFieldModel) As Integer ' , ByVal FieldName As String, ByVal Args As String, ByVal Delimiter As String) As Integer
             Dim returnId As Integer = 0
             Try
                 '
@@ -3638,7 +2220,7 @@ ErrorTrap:
         Public Function isContentFieldSupported(ByVal ContentName As String, ByVal FieldName As String) As Boolean
             Dim returnOk As Boolean = False
             Try
-                Dim cdef As coreMetaDataClass.CDefClass
+                Dim cdef As cdefModel
                 '
                 cdef = getCdef(ContentName)
                 If (cdef IsNot Nothing) Then

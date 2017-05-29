@@ -2,8 +2,8 @@
 Option Explicit On
 Option Strict On
 '
-Namespace Contensive.Core
-    Public Class coreMenuLiveTabClass
+Namespace Contensive.Core.Controllers
+    Public Class menuLiveTabController
         '
         Private Structure TabType
             Dim Caption As String
@@ -14,7 +14,7 @@ Namespace Contensive.Core
         Private TabsCnt As Integer
         Private TabsSize As Integer
         '
-        Private comboTab As New coreMenuComboTabClass
+        Private comboTab As New menuComboTabController
         '
         Public Sub AddEntry(ByVal Caption As String, ByVal LiveBody As String, Optional ByVal StylePrefix As String = "")
             Call comboTab.AddEntry(Caption, "", "", LiveBody, False, "ccAdminTab")

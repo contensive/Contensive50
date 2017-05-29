@@ -2,22 +2,11 @@
 Option Explicit On
 Option Strict On
 
-Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
-Imports Contensive.Core.coreCommonModule
 
 '
-' findReplace as integer to as integer
-' just the document -- replace out 
-' if 'Imports Interop.adodb, replace in ObjectStateEnum.adState...
-' findreplace encode to encode
-' findreplace ''DoEvents to '''DoEvents
-' runProcess becomes runProcess
-' Sleep becomes Threading.Thread.Sleep(
-' as object to as object
-'
-Namespace Contensive.Core
-    Public Class coreHtmlToTextClass
+Namespace Contensive.Core.Controllers
+    Public Class htmlToTextControllers
         '
         Private cpCore As coreClass
         '
@@ -45,7 +34,7 @@ Namespace Contensive.Core
                 Dim BlockOpenLast As Boolean
                 Dim BlockClose As Boolean
                 Dim BlockCloseLast As Boolean
-                Dim Parse As coreHtmlParseClass
+                Dim Parse As htmlParserController
                 Dim ElementCount As Integer
                 Dim ElementPointer As Integer
                 Dim ElementText As String
@@ -72,7 +61,7 @@ Namespace Contensive.Core
                     '
                     ' ----- Remove HTML tags
                     '
-                    Parse = New coreHtmlParseClass(cpCore)
+                    Parse = New htmlParserController(cpCore)
                     If Not (Parse Is Nothing) Then
                         Call Parse.Load(iBody)
                         ElementCount = Parse.ElementCount

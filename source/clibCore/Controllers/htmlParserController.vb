@@ -2,7 +2,7 @@
 Option Explicit On
 Option Strict On
 
-Imports Contensive.Core.coreCommonModule
+
 Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
 '
@@ -15,9 +15,8 @@ Imports Contensive.Core.Controllers.genericController
 ' Sleep becomes Threading.Thread.Sleep(
 ' as object to as object
 '
-Namespace Contensive.Core
-    Public Class coreHtmlParseClass
-
+Namespace Contensive.Core.Controllers
+    Public Class htmlParserController
         '
         '============================================================================
         '

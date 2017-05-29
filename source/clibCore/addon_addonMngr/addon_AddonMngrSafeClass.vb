@@ -58,7 +58,7 @@ Namespace Contensive.Core
                 Dim LocalCollectionXML As String
                 Dim DisplaySystem As Boolean
                 Dim DbUpToDate As Boolean
-                Dim XMLTools As New coreXmlToolsClass(cpCore)
+                Dim XMLTools As New xmlController(cpCore)
                 Dim GuidFieldName As String
                 Dim InstalledCollectionIDList As New List(Of Integer)
                 Dim InstalledCollectionGuidList As New List(Of String)
@@ -84,10 +84,10 @@ Namespace Contensive.Core
                 Dim FormInput As String
                 Dim Cnt As Integer
                 Dim Ptr As Integer
-                Dim UploadTab As New coreFastStringClass
-                Dim ModifyTab As New coreFastStringClass
+                Dim UploadTab As New stringBuilderLegacyController
+                Dim ModifyTab As New stringBuilderLegacyController
                 Dim RowPtr As Integer
-                Dim Body As coreFastStringClass
+                Dim Body As stringBuilderLegacyController
                 Dim Cells As String(,)
                 Dim PageNumber As Integer
                 Dim ColumnCnt As Integer
@@ -100,7 +100,7 @@ Namespace Contensive.Core
                 Dim BodyHTML As String
                 Dim CS As Integer
                 Dim UserError As String
-                Dim Content As New coreFastStringClass
+                Dim Content As New stringBuilderLegacyController
                 Dim Button As String
                 Dim Caption As String
                 Dim Description As String
@@ -115,7 +115,7 @@ Namespace Contensive.Core
                 Dim InstallLibCollectionList As String = ""
                 Dim TargetCollectionID As Integer
                 Dim privateFilesInstallPath As String
-                Dim Adminui As New coreAdminUIClass(cpCore)
+                Dim Adminui As New adminUIController(cpCore)
                 Dim addonInstall As New addonInstallClass(cpCore)
                 '
                 ' BuildVersion = cpcore.app.dataBuildVersion
@@ -830,7 +830,7 @@ Namespace Contensive.Core
                                 ' Get the Upload Add-ons tab
                                 ' --------------------------------------------------------------------------------
                                 '
-                                Body = New coreFastStringClass
+                                Body = New stringBuilderLegacyController
                                     If Not DbUpToDate Then
                                         Call Body.Add("<p>Add-on upload is disabled because your site database needs to be updated.</p>")
                                     Else

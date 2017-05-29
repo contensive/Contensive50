@@ -4,9 +4,9 @@ Option Strict On
 
 Imports System.Drawing
 '
-Namespace Contensive.Core
+Namespace Contensive.Core.Controllers
 
-    Public Class coreImageEditClass
+    Public Class imageEditController
         Implements IDisposable
         '
         Private loaded As Boolean = False

@@ -7,8 +7,8 @@ Imports Contensive.Core.Controllers.genericController
 Imports System.Text
 Imports System.Security.Cryptography
 
-Namespace Contensive.Core
-    Public Class coreSecurityClass
+Namespace Contensive.Core.Controllers
+    Public Class securityController
         '
         ' privateKey
         '
@@ -476,7 +476,7 @@ Namespace Contensive.Core
                 parts = decodedString.Split(CChar(vbTab))
                 If parts.Length = 2 Then '
                     returnNumber = genericController.EncodeInteger(parts(0))
-                    returnDate =  genericController.EncodeDate(parts(1))
+                    returnDate = genericController.EncodeDate(parts(1))
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex, "DecodeToken failure. Returning blank result for token [" & token & "]")

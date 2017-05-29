@@ -73,9 +73,9 @@ Namespace Contensive.Core.Models.Entity
         <Serializable>
         Public Class addonsCacheClass
             Public addonList As Dictionary(Of String, addonClass)
-            Public idIndex As coreKeyPtrIndexClass
-            Public nameIndex As coreKeyPtrIndexClass
-            Public guidIndex As coreKeyPtrIndexClass
+            Public idIndex As keyPtrController
+            Public nameIndex As keyPtrController
+            Public guidIndex As keyPtrController
             Public onBodyStartPtrs As Integer()
             Public onBodyEndPtrs As Integer()
             Public onPageStartPtrs As Integer()
@@ -99,9 +99,9 @@ Namespace Contensive.Core.Models.Entity
                     addonCache = New addonsCacheClass()
                 End If
                 addonCache.addonList = New Dictionary(Of String, addonClass)
-                addonCache.guidIndex = New coreKeyPtrIndexClass
-                addonCache.idIndex = New coreKeyPtrIndexClass
-                addonCache.nameIndex = New coreKeyPtrIndexClass
+                addonCache.guidIndex = New keyPtrController
+                addonCache.idIndex = New keyPtrController
+                addonCache.nameIndex = New keyPtrController
                 addonCache.onBodyEndPtrs = {}
                 addonCache.onBodyStartPtrs = {}
                 addonCache.onPageEndPtrs = {}
@@ -371,9 +371,9 @@ Namespace Contensive.Core.Models.Entity
                         '
                         addonCache = New addonsCacheClass
                         addonCache.addonList = New Dictionary(Of String, addonClass)
-                        addonCache.guidIndex = New coreKeyPtrIndexClass
-                        addonCache.idIndex = New coreKeyPtrIndexClass
-                        addonCache.nameIndex = New coreKeyPtrIndexClass
+                        addonCache.guidIndex = New keyPtrController
+                        addonCache.idIndex = New keyPtrController
+                        addonCache.nameIndex = New keyPtrController
                         onBodyStartCnt = 0
                         onBodyEndCnt = 0
                         SQL = "select " & cache_addon2_fieldList & " from ccAggregateFunctions where (active<>0) order by id"

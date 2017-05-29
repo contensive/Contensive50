@@ -12,9 +12,9 @@ Imports System.Web
 Imports Microsoft.VisualBasic
 Imports System.Runtime.InteropServices
 
-Namespace Contensive.Core
+Namespace Contensive.Core.Controllers
     '
-    Public Class coreIpDaemonClass
+    Public Class ipDaemonController
         '
         Private cmdCallbackObject As Object
         Private cmdListenPort As Integer

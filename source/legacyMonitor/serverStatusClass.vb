@@ -7,7 +7,7 @@ Imports Contensive.Core.Controllers
 
 Namespace Contensive.Core
     Public Class statusServerClass
-        Private cmdListener As New coreIpDaemonClass
+        Private cmdListener As New ipDaemonController
         Private cpCore As coreClass
         '
         public Sub startListening()

@@ -4,9 +4,10 @@ Option Strict On
 
 
 Imports Contensive.BaseClasses
-Imports Contensive.Core.coreCommonModule
+
 Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
+Imports Contensive.Core.Models.Entity
 
 Namespace Contensive.Core.Controllers
     Public Class htmlDocController
@@ -73,9 +74,9 @@ Namespace Contensive.Core.Controllers
         Public main_MetaContent_TemplateStyleSheetTag As String = ""
         Public main_MetaContent_SharedStyleIDList As String = ""
         '
-        Public main_TabObject As coreMenuTabClass
-        Public html_ComboTabObject As coreMenuComboTabClass
-        Public main_LiveTabObject As coreMenuLiveTabClass
+        Public main_TabObject As menuTabController
+        Public html_ComboTabObject As menuComboTabController
+        Public main_LiveTabObject As menuLiveTabController
         '
         Public main_AdminWarning As String = ""                                      ' Message - when set displays in an admin hint box in the page
         Public main_AdminWarningPageID As Integer = 0                                  ' PageID that goes with the warning
@@ -1197,7 +1198,7 @@ ErrorTrap:
             Const MenuNameFPO = "<MenuName>"
             Const NoneCaptionFPO = "<NoneCaption>"
             '
-            Dim CDef As coreMetaDataClass.CDefClass
+            Dim CDef As cdefModel
             'dim dt as datatable
             Dim ContentControlCriteria As String
             Dim LcaseCriteria As String
@@ -1221,7 +1222,7 @@ ErrorTrap:
             Dim AllowedCharacters As String
             'Dim CSContent as integer
             Dim IDFieldPointer As Integer
-            Dim FastString As New coreFastStringClass
+            Dim FastString As New stringBuilderLegacyController
             '
             Dim RowsArray(,) As String
             Dim RowFieldArray() As String
@@ -1571,7 +1572,7 @@ ErrorTrap:
             Dim AllowedCharacters As String
             'Dim CSContent as integer
             Dim IDFieldPointer As Integer
-            Dim FastString As New coreFastStringClass
+            Dim FastString As New stringBuilderLegacyController
             '
             Dim RowsArray As String(,)
             Dim RowFieldArray() As String
@@ -1880,7 +1881,7 @@ ErrorTrap:
         Public Function main_GetFormInputSelectList2(ByVal MenuName As String, ByVal CurrentValue As Integer, ByVal SelectList As String, ByVal NoneCaption As String, ByVal htmlId As String, Optional ByVal HtmlClass As String = "") As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetFormInputSelectList2")
             '
-            Dim FastString As New coreFastStringClass
+            Dim FastString As New stringBuilderLegacyController
             Dim lookups() As String
             Dim iSelectList As String
             Dim Ptr As Integer
@@ -2640,7 +2641,7 @@ ErrorTrap:
             Dim GroupName As String
             Dim GroupCaption As String
             Dim CanSeeHiddenFields As Boolean
-            Dim SecondaryCDef As coreMetaDataClass.CDefClass
+            Dim SecondaryCDef As cdefModel
             Dim ContentIDList As String
             Dim Found As Boolean
             Dim RecordID As Integer
@@ -2742,7 +2743,7 @@ ErrorTrap:
                 Dim FieldLookupContentID As Integer
                 Dim FieldMemberSelectGroupID As Integer
                 Dim FieldLookupContentName As String
-                Dim Contentdefinition As coreMetaDataClass.CDefClass
+                Dim Contentdefinition As cdefModel
                 Dim FieldHTMLContent As Boolean
                 Dim CSLookup As Integer
                 Dim FieldLookupList As String
@@ -2753,8 +2754,8 @@ ErrorTrap:
                 If True Then
                     fieldFound = False
                     Contentdefinition = cpCore.metaData.getCdef(ContentName)
-                    For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In Contentdefinition.fields
-                        Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+                    For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In Contentdefinition.fields
+                        Dim field As CDefFieldModel = keyValuePair.Value
                         With field
                             If genericController.vbUCase(.nameLc) = genericController.vbUCase(FieldName) Then
                                 FieldValueVariant = .defaultValue
@@ -3184,14 +3185,14 @@ ErrorTrap:
             Dim fieldType As Integer
             Dim InputName As String
             Dim GroupID As Integer
-            Dim CDef As coreMetaDataClass.CDefClass
+            Dim CDef As cdefModel
             Dim MTMContent0 As String
             Dim MTMContent1 As String
             Dim MTMRuleContent As String
             Dim MTMRuleField0 As String
             Dim MTMRuleField1 As String
             Dim FieldPtr As Integer
-            Dim arrayOfFields As coreMetaDataClass.CDefFieldClass()
+            Dim arrayOfFields As CDefFieldModel()
             '
             InputName = htmlName
             If InputName = "" Then
@@ -3309,8 +3310,8 @@ ErrorTrap:
                     CDef = cpCore.metaData.getCdef(ContentName)
                     LookupContentName = ""
                     With CDef
-                        For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In CDef.fields
-                            Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+                        For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In CDef.fields
+                            Dim field As CDefFieldModel = keyValuePair.Value
                             With field
                                 If genericController.vbUCase(.nameLc) = genericController.vbUCase(FieldName) Then
                                     If .lookupContentID <> 0 Then
@@ -3496,7 +3497,7 @@ ErrorTrap:
             Dim CSFields As Integer
             Dim FieldName As String
             Dim ArgumentList As String
-            Dim Index As coreKeyPtrIndexClass
+            Dim Index As keyPtrController
             Dim Items() As String
             Dim ItemsSize As Integer
             Dim ItemsCnt As Integer
@@ -3523,7 +3524,7 @@ ErrorTrap:
                 ItemsSize = 100
                 ReDim Items(100)
                 ItemsCnt = 0
-                Index = New coreKeyPtrIndexClass
+                Index = New keyPtrController
                 'Set main_cmc = main_cs_getv()
                 '
                 ' AC StartBlockText
@@ -3764,7 +3765,7 @@ ErrorTrap:
             Dim returnValue As String = ""
             Try
                 Dim LoopPtr As Integer
-                Dim contentCmd As New coreContentCmdClass(cpCore)
+                Dim contentCmd As New contentCmdController(cpCore)
                 '
                 returnValue = Source
                 LoopPtr = 0
@@ -3878,7 +3879,7 @@ ErrorTrap:
                 Dim ACField As String
                 Dim ACName As String = ""
                 Dim Copy As String
-                Dim KmaHTML As coreHtmlParseClass
+                Dim KmaHTML As htmlParserController
                 Dim AttributeCount As Integer
                 Dim AttributePointer As Integer
                 Dim Name As String
@@ -3897,7 +3898,7 @@ ErrorTrap:
                 Dim ProcessAnchorTags As Boolean
                 Dim ProcessACTags As Boolean
                 Dim ACLanguageName As String
-                Dim Stream As New coreFastStringClass
+                Dim Stream As New stringBuilderLegacyController
                 Dim AnchorQuery As String = ""
                 Dim CSOrganization As Integer
                 Dim CSOrganizationSet As Boolean
@@ -4039,7 +4040,7 @@ ErrorTrap:
                     '
                     ' ----- Load the Active Elements
                     '
-                    KmaHTML = New coreHtmlParseClass(cpCore)
+                    KmaHTML = New htmlParserController(cpCore)
                     Call KmaHTML.Load(workingContent)
                     '
                     ' ----- Execute and output elements
@@ -4049,7 +4050,7 @@ ErrorTrap:
                         ElementPointer = 0
                         workingContent = ""
                         serverFilePath = ProtocolHostString & "/" & cpCore.serverConfig.appConfig.name & "/files/"
-                        Stream = New coreFastStringClass
+                        Stream = New stringBuilderLegacyController
                         Do While ElementPointer < KmaHTML.ElementCount
                             Copy = KmaHTML.Text(ElementPointer)
                             If KmaHTML.IsTag(ElementPointer) Then
@@ -4898,7 +4899,7 @@ ErrorTrap:
             Dim NewImageFilename As String
             '
             Dim MethodName As String
-            Dim DHTML As New coreHtmlParseClass(cpCore)
+            Dim DHTML As New htmlParserController(cpCore)
             Dim ElementPointer As Integer
             Dim ElementCount As Integer
             Dim AttributeCount As Integer
@@ -4943,7 +4944,7 @@ ErrorTrap:
             Dim PositionColon As Integer
             Dim ImageStylePairName As String
             Dim ImageStylePairValue As String
-            Dim Stream As coreFastStringClass
+            Dim Stream As stringBuilderLegacyController
             Dim ImageIDArray As String() = {}
             Dim ImageIDArrayCount As Integer
             Dim ImageIDArrayPointer As Integer
@@ -4952,7 +4953,7 @@ ErrorTrap:
             Dim QSPtr As Integer
             Dim serverFilePath As String
             Dim ImageAllowSFResize As Boolean
-            Dim sf As coreImageEditClass
+            Dim sf As imageEditController
             '
             html_DecodeActiveContent = SourceCopy
             If html_DecodeActiveContent <> "" Then
@@ -4971,7 +4972,7 @@ ErrorTrap:
                         '
                         ' ----- Locate and replace IMG Edit icons with AC tags
                         '
-                        Stream = New coreFastStringClass
+                        Stream = New stringBuilderLegacyController
                         For ElementPointer = 0 To ElementCount - 1
                             ElementText = DHTML.Text(ElementPointer)
                             If DHTML.IsTag(ElementPointer) Then
@@ -5383,7 +5384,7 @@ ErrorTrap:
                                                                                 ' if recordwidth or height are missing, get them from the file
                                                                                 '
                                                                                 If RecordWidth = 0 Or RecordHeight = 0 Then
-                                                                                    sf = New coreImageEditClass
+                                                                                    sf = New imageEditController
                                                                                     On Error Resume Next
                                                                                     If sf.load(cpCore.csv_getPhysicalFilename(ImageVirtualFilename)) Then
                                                                                         RecordWidth = sf.width
@@ -5418,7 +5419,7 @@ ErrorTrap:
                                                                                         ' This happens when you hit 'reset' on the image properties dialog
                                                                                         '
                                                                                         On Error Resume Next
-                                                                                        sf = New coreImageEditClass
+                                                                                        sf = New imageEditController
                                                                                         If sf.load(cpCore.csv_getPhysicalFilename(ImageVirtualFilename)) Then
                                                                                             ImageWidth = sf.width
                                                                                             ImageHeight = sf.height
@@ -5489,7 +5490,7 @@ ErrorTrap:
                                                                                                 '
                                                                                                 ' Alt image has not been built
                                                                                                 '
-                                                                                                sf = New coreImageEditClass
+                                                                                                sf = New imageEditController
                                                                                                 If Not sf.load(cpCore.csv_getPhysicalFilename(RecordVirtualFilename)) Then
                                                                                                     '
                                                                                                     ' image load failed, use raw filename
@@ -5723,7 +5724,7 @@ ErrorTrap:
         '
         Public Function main_ConvertHTML2Text(ByVal Source As String) As String
             Try
-                Dim Decoder As New coreHtmlToTextClass(cpCore)
+                Dim Decoder As New htmlToTextControllers(cpCore)
                 Return Decoder.convert(Source)
             Catch ex As Exception
                 Call cpCore.handleLegacyError18("main_ConvertHTML2Text")
@@ -7118,7 +7119,7 @@ ErrorTrap:
                 Dim OptionCaption As String
                 Dim optionCaptionHtmlEncoded As String
                 Dim CanSeeHiddenFields As Boolean
-                Dim SecondaryCDef As coreMetaDataClass.CDefClass
+                Dim SecondaryCDef As cdefModel
                 Dim ContentIDList As New List(Of Integer)
                 Dim Found As Boolean
                 Dim RecordID As Integer
@@ -8016,7 +8017,7 @@ ErrorTrap:
             Dim hint As String
             Dim AdminURL As String
             '
-            Dim converthtmlToText As coreHtmlToTextClass
+            Dim converthtmlToText As htmlToTextControllers
             Dim Pos As Integer
             Dim LayoutEngineOptionString As String
             Dim LayoutErrorMessage As String
@@ -8062,7 +8063,7 @@ ErrorTrap:
                 '
                 'hint = hint & ",040"
                 If PlainText Then
-                    converthtmlToText = New coreHtmlToTextClass(cpCore)
+                    converthtmlToText = New htmlToTextControllers(cpCore)
                     returnValue = converthtmlToText.convert(returnValue)
                     converthtmlToText = Nothing
                 End If
@@ -8461,7 +8462,7 @@ ErrorTrap:
             Dim LinkLabel As String
             Dim Overview As String
             'Dim CSContext as integer
-            Dim KmaHTML As coreHtmlParseClass
+            Dim KmaHTML As htmlParserController
             Dim AttributeCount As Integer
             Dim AttributePointer As Integer
             Dim Name As String
@@ -8483,7 +8484,7 @@ ErrorTrap:
             Dim ProcessACTags As Boolean
             Dim SelectFieldList As String
             Dim ACLanguageName As String
-            Dim Stream As coreFastStringClass
+            Dim Stream As stringBuilderLegacyController
             Dim AnchorQuery As String
             '
             Dim CSOrganization As Integer
@@ -8524,7 +8525,7 @@ ErrorTrap:
 
             Dim FormCount As Integer
             Dim FormInputCount As Integer
-            Dim CDef As coreMetaDataClass.CDefClass
+            Dim CDef As cdefModel
             Dim FieldList As String
             Dim ImageAllowUpdate As Boolean
             Dim ContentFilesLinkPrefix As String
@@ -9033,7 +9034,7 @@ ErrorTrap:
             ' should use the ccNav object, no the ccCommon module for this code
             '
             If (main_LiveTabObject Is Nothing) Then
-                main_LiveTabObject = New coreMenuLiveTabClass
+                main_LiveTabObject = New menuLiveTabController
             End If
             Call main_LiveTabObject.AddEntry(genericController.encodeText(Caption), genericController.encodeText(LiveBody), genericController.encodeText(StylePrefix))
             '
@@ -9050,7 +9051,7 @@ ErrorTrap:
             ' should use the ccNav object, no the ccCommon module for this code
             '
             If (main_LiveTabObject Is Nothing) Then
-                main_LiveTabObject = New coreMenuLiveTabClass
+                main_LiveTabObject = New menuLiveTabController
             End If
             main_GetLiveTabs = main_LiveTabObject.GetTabs()
             '
@@ -9067,7 +9068,7 @@ ErrorTrap:
             ' should use the ccNav object, no the ccCommon module for this code
             '
             If (html_ComboTabObject Is Nothing) Then
-                html_ComboTabObject = New coreMenuComboTabClass
+                html_ComboTabObject = New menuComboTabController
             End If
             Call html_ComboTabObject.AddEntry(Caption, Link, AjaxLink, LiveBody, IsHit, ContainerClass)
             '
@@ -9084,7 +9085,7 @@ ErrorTrap:
             ' should use the ccNav object, no the ccCommon module for this code
             '
             If (html_ComboTabObject Is Nothing) Then
-                html_ComboTabObject = New coreMenuComboTabClass
+                html_ComboTabObject = New menuComboTabController
             End If
             menu_GetComboTabs = html_ComboTabObject.GetTabs()
             '

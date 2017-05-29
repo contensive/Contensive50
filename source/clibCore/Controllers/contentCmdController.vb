@@ -2,10 +2,8 @@
 Option Explicit On
 Option Strict On
 
-Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
 Imports Contensive.BaseClasses
-Imports Contensive.Core.coreCommonModule
 
 '
 ' findReplace as integer to as integer
@@ -17,8 +15,8 @@ Imports Contensive.Core.coreCommonModule
 ' Sleep becomes Threading.Thread.Sleep(
 ' as object to as object
 
-Namespace Contensive.Core
-    Public Class coreContentCmdClass
+Namespace Contensive.Core.Controllers
+    Public Class contentCmdController
         '
         Private cpCore As coreClass
         '
@@ -679,7 +677,7 @@ Namespace Contensive.Core
                                         importHead = Controllers.htmlDocController.getTagInnerHTML(CmdAccumulator, "head", False)
                                         If importHead <> "" Then
                                             ' try this, but it may not be implemented yet
-                                            Call cpCore.htmldoc.html_addHeadTags(importHead)
+                                            Call cpCore.htmlDoc.html_addHeadTags(importHead)
                                         End If
                                         CmdAccumulator = Controllers.htmlDocController.getTagInnerHTML(CmdAccumulator, "body", False)
                                     End If

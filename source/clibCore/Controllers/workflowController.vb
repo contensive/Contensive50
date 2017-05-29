@@ -4,9 +4,10 @@ Option Strict On
 
 Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
+Imports Contensive.Core.Models.Entity
 
-Namespace Contensive.Core
-    Public Class coreWorkflowClass
+Namespace Contensive.Core.Controllers
+    Public Class workflowController
         Implements IDisposable
         '
         '------------------------------------------------------------------------------------------------------------------------
@@ -58,7 +59,7 @@ Namespace Contensive.Core
         ''' <param name="cluster"></param>
         ''' <param name="appName"></param>
         ''' <remarks></remarks>
-        public Sub New(cpCore As coreClass)
+        Public Sub New(cpCore As coreClass)
             MyBase.New()
             Try
                 '
@@ -92,7 +93,7 @@ Namespace Contensive.Core
                 main_EditLockStatus_Local = False
                 '
                 main_EditLockStatus_Local = getEditLock(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), ReturnMemberID, ReturnDateExpires)
-                If main_EditLockStatus_Local And (ReturnMemberID <> cpcore.authContext.user.id) Then
+                If main_EditLockStatus_Local And (ReturnMemberID <> cpCore.authContext.user.ID) Then
                     main_EditLockStatus_Local = True
                     main_EditLockDateExpires_Local = ReturnDateExpires
                     main_EditLockMemberID_Local = ReturnMemberID
@@ -160,7 +161,7 @@ Namespace Contensive.Core
         '========================================================================
         '
         Public Sub SetEditLock(ByVal ContentName As String, ByVal RecordID As Integer)
-            Call setEditLock(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpcore.authContext.user.id)
+            Call setEditLock(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.authContext.user.ID)
         End Sub
         '
         '========================================================================
@@ -168,7 +169,7 @@ Namespace Contensive.Core
         '========================================================================
         '
         Public Sub ClearEditLock(ByVal ContentName As String, ByVal RecordID As Integer)
-            Call clearEditLock(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpcore.authContext.user.id)
+            Call clearEditLock(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.authContext.user.ID)
         End Sub
         '
         '========================================================================
@@ -176,7 +177,7 @@ Namespace Contensive.Core
         '========================================================================
         '
         Public Sub publishEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-            Call publishEdit(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpcore.authContext.user.id)
+            Call publishEdit(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.authContext.user.ID)
         End Sub
         '
         '========================================================================
@@ -184,7 +185,7 @@ Namespace Contensive.Core
         '========================================================================
         '
         Public Sub approveEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-            Call approveEdit(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpcore.authContext.user.id)
+            Call approveEdit(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.authContext.user.ID)
         End Sub
         '
         '========================================================================
@@ -192,7 +193,7 @@ Namespace Contensive.Core
         '========================================================================
         '
         Public Sub main_SubmitEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-            Call submitEdit2(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpcore.authContext.user.id)
+            Call submitEdit2(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.authContext.user.ID)
         End Sub
         '
         '=========================================================================================
@@ -255,7 +256,7 @@ Namespace Contensive.Core
                 Dim FieldArraySize As Integer
                 Dim PublishingDelete As Boolean
                 Dim PublishingInactive As Boolean
-                Dim CDef As coreMetaDataClass.CDefClass
+                Dim CDef As cdefModel
                 Dim FieldList As String
                 '
                 MethodName = "csv_PublishEdit"
@@ -323,8 +324,8 @@ Namespace Contensive.Core
                                             ' ----- create update arrays
                                             '
                                             FieldPointer = 0
-                                            For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In CDef.fields
-                                                Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+                                            For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In CDef.fields
+                                                Dim field As CDefFieldModel = keyValuePair.Value
                                                 With field
                                                     FieldName = .nameLc
                                                     fieldTypeId = .fieldTypeId
@@ -566,7 +567,7 @@ Namespace Contensive.Core
                 Dim FieldCount As Integer
                 Dim FieldName As String
                 Dim fieldTypeId As Integer
-                Dim CDef As coreMetaDataClass.CDefClass
+                Dim CDef As cdefModel
                 Dim sqlFieldList As New sqlFieldListClass
                 '
                 CDef = cpCore.metaData.getCdef(ContentName)
@@ -615,8 +616,8 @@ Namespace Contensive.Core
                                         ' create update arrays
                                         '
                                         FieldPointer = 0
-                                        For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In CDef.fields
-                                            Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+                                        For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In CDef.fields
+                                            Dim field As CDefFieldModel = keyValuePair.Value
                                             With field
                                                 FieldName = .nameLc
                                                 If cpCore.db.isSQLTableField(EditDataSourceName, EditTableName, FieldName) Then
@@ -692,7 +693,7 @@ Namespace Contensive.Core
         Public Sub approveEdit(ByVal ContentName As String, ByVal RecordID As Integer, ByVal MemberID As Integer)
             Try
                 '
-                Dim CDef As coreMetaDataClass.CDefClass
+                Dim CDef As cdefModel
                 '
                 CDef = cpCore.metaData.getCdef(ContentName)
                 If CDef.Id > 0 Then
@@ -712,7 +713,7 @@ Namespace Contensive.Core
         Public Sub submitEdit2(ByVal ContentName As String, ByVal RecordID As Integer, ByVal MemberID As Integer)
             Try
                 '
-                Dim CDef As coreMetaDataClass.CDefClass
+                Dim CDef As cdefModel
                 '
                 CDef = cpCore.metaData.getCdef(ContentName)
                 If CDef.Id > 0 Then
@@ -828,7 +829,7 @@ Namespace Contensive.Core
                 Dim sqlCriteria As String
                 Dim EditLockTimeoutDays As Double
                 Dim EditLockTimeoutMinutes As Double
-                Dim CDef As coreMetaDataClass.CDefClass
+                Dim CDef As cdefModel
                 '
                 MethodName = "csv_SetAuthoringControl"
                 '
@@ -923,7 +924,7 @@ Namespace Contensive.Core
                 Dim ContentTableName As String
                 Dim AuthoringTableName As String
                 Dim DataSourceName As String
-                Dim CDef As coreMetaDataClass.CDefClass
+                Dim CDef As cdefModel
                 '
                 IsModified = False
                 ModifiedName = ""

@@ -5,8 +5,8 @@ Option Strict On
 Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
 
-Namespace Contensive.Core
-    Public Class coreMenuComboTabClass
+Namespace Contensive.Core.Controllers
+    Public Class menuComboTabController
 
         Private Structure TabType
             Dim Caption As String

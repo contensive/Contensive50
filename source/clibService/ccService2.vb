@@ -6,8 +6,8 @@ Imports Contensive.Core.Controllers
 
 Namespace Contensive.Core
     Public Class ccService2
-        Dim taskScheduler As coreTaskSchedulerServiceClass = Nothing
-        Dim taskRunner As coreTaskRunnerServiceClass = Nothing
+        Dim taskScheduler As taskSchedulerController = Nothing
+        Dim taskRunner As taskRunnerController = Nothing
         '
         '====================================================================================================
         ''' <summary>
@@ -25,7 +25,7 @@ Namespace Contensive.Core
                     ' this server is the scheduler
                     '
                     logController.appendLog(cp.core, "ccService2.OnStart, start taskScheduler")
-                    taskScheduler = New coreTaskSchedulerServiceClass()
+                    taskScheduler = New taskSchedulerController()
                     Call taskScheduler.StartService(True, False)
                 End If
                 If (True) Then
@@ -33,7 +33,7 @@ Namespace Contensive.Core
                     ' this server is a runner
                     '
                     logController.appendLog(cp.core, "ccService2.OnStart, start taskRunner")
-                    taskRunner = New coreTaskRunnerServiceClass()
+                    taskRunner = New taskRunnerController()
                     Call taskRunner.StartService()
                 End If
                 logController.appendLog(cp.core, "ccService2.OnStart exit")

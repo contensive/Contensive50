@@ -349,7 +349,7 @@ Namespace Contensive.Core.Models.Entity
         Public Shared Function getDefault(cpcore As coreClass) As visitorModel
             Dim instance As New visitorModel
             Try
-                Dim CDef As coreMetaDataClass.CDefClass = cpcore.metaData.getCdef(primaryContentName)
+                Dim CDef As cdefModel = cpcore.metaData.getCdef(primaryContentName)
                 If (CDef Is Nothing) Then
                     Throw New ApplicationException("content [" & primaryContentName & "] could Not be found.")
                 ElseIf (CDef.Id <= 0) Then

@@ -2,11 +2,10 @@
 Option Explicit On
 Option Strict On
 
-Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
 '
-Namespace Contensive.Core
-    Public Class coreMenuTreeClass
+Namespace Contensive.Core.Controllers
+    Public Class menuTreeController
         '
         '==============================================================================
         '
@@ -79,7 +78,7 @@ Namespace Contensive.Core
         Private iMenuCloseString As String  ' String returned for closing menus
         '
         Private UsedEntries As String       ' String of EntryNames that have been used (for unique test)
-        Private EntryIndexName As coreKeyPtrIndexClass
+        Private EntryIndexName As keyPtrController
         ' Private EntryIndexID As keyPtrIndex8Class
         '
         ' ----- RollOverFlyout storage
@@ -99,7 +98,7 @@ Namespace Contensive.Core
         Public Sub New(cpCore As coreClass)
             MyBase.New()
             Me.cpCore = cpCore
-            EntryIndexName = New coreKeyPtrIndexClass
+            EntryIndexName = New keyPtrController
             Randomize()
             MenuFlyoutNamePrefix = "id" & CStr(Int(9999 * Rnd()))
         End Sub

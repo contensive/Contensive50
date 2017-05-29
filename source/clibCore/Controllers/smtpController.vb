@@ -61,7 +61,7 @@ Namespace Contensive.Core.Controllers
         Public Function sendEmail5(ByVal EmailTo As String, ByVal EmailFrom As String, ByVal EmailSubject As String, ByVal EmailBody As String, ByVal BounceAddress As String, ByVal ReplyToAddress As String, ByVal ResultLogPathPage As String, ByVal EmailSMTPServer As String, ByVal Immediate As Boolean, ByVal HTML As Boolean, ByVal EmailOutPath As String) As String
             Try
                 Dim LogLine As String
-                Dim converthtmlToText As coreHtmlToTextClass
+                Dim converthtmlToText As htmlToTextControllers
                 'Dim Mailer As SMTP5Class
                 Dim EmailBodyText As String
                 Dim EmailBodyHTML As String
@@ -91,7 +91,7 @@ Namespace Contensive.Core.Controllers
                             '
                             ' ----- send HTML email (and plain text conversion)
                             '
-                            converthtmlToText = New coreHtmlToTextClass(cpCore)
+                            converthtmlToText = New htmlToTextControllers(cpCore)
                             EmailBodyHTML = EmailBody
                             If genericController.vbInstr(1, EmailBodyHTML, "<BODY", vbTextCompare) = 0 Then
                                 EmailBodyHTML = "<BODY>" & EmailBodyHTML & "</BODY>"

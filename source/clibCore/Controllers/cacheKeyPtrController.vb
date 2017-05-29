@@ -4,7 +4,7 @@ Option Strict On
 
 
 
-Namespace Contensive.Core
+Namespace Contensive.Core.Controllers
     '
     '====================================================================================================
     ''' <summary>
@@ -17,7 +17,7 @@ Namespace Contensive.Core
     ''' when cleared, loads on demand
     '''  combines a key ptr index and a value store, referenced by ptr
     ''' </summary>
-    Public Class coreCacheKeyPtrClass
+    Public Class cacheKeyPtrController
         '
         ' ----- objects passed in constructor, do not dispose
         '
@@ -33,7 +33,7 @@ Namespace Contensive.Core
         '
         Public Class dataStoreClass
             Public dataList As List(Of String)
-            Public keyPtrIndex As coreKeyPtrIndexClass
+            Public keyPtrIndex As keyPtrController
             Public loaded As Boolean
         End Class
         Private dataStore As New dataStoreClass
@@ -48,7 +48,7 @@ Namespace Contensive.Core
             Me.cacheInvalidationTagCommaList = cacheInvalidationTagCommaList
             dataStore = New dataStoreClass
             dataStore.dataList = New List(Of String)
-            dataStore.keyPtrIndex = New coreKeyPtrIndexClass
+            dataStore.keyPtrIndex = New keyPtrController
             dataStore.loaded = False
         End Sub
         '
@@ -60,7 +60,7 @@ Namespace Contensive.Core
             Try
                 dataStore.loaded = False
                 dataStore.dataList.Clear()
-                dataStore.keyPtrIndex = New coreKeyPtrIndexClass
+                dataStore.keyPtrIndex = New keyPtrController
                 Call cpCore.cache.setObject(cacheName & "-dataList", dataStore.dataList)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -201,7 +201,7 @@ Namespace Contensive.Core
                         '
                         dataStore = New dataStoreClass
                         dataStore.dataList = New List(Of String)
-                        dataStore.keyPtrIndex = New coreKeyPtrIndexClass
+                        dataStore.keyPtrIndex = New keyPtrController
                         Using dt As DataTable = cpCore.db.executeSql(sqlLoadKeyValue)
                             Ptr = 0
                             For Each dr As DataRow In dt.Rows
@@ -212,7 +212,7 @@ Namespace Contensive.Core
                         End Using
                         '
                         If dataStore.dataList.Count > 0 Then
-                            dataStore.keyPtrIndex = New coreKeyPtrIndexClass
+                            dataStore.keyPtrIndex = New keyPtrController
                             For Ptr = 0 To dataStore.dataList.Count - 1
                                 RecordIdTextValue = dataStore.dataList(Ptr)
                                 Call dataStore.keyPtrIndex.setPtr(RecordIdTextValue, Ptr)

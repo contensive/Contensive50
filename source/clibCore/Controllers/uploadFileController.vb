@@ -2,23 +2,25 @@
 Option Explicit On
 Option Strict On
 
+Imports Contensive.Core.Models.Context
+Imports Contensive.Core.Models.Entity
 Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
 
 '
-Namespace Contensive.Core
-    Public Class coreUploadClass
+Namespace Contensive.Core.Controllers
+    Public Class uploadFileController
         Friend Property binaryHeader As Byte()
         Private BinaryHeaderLocal As Object
-        Private ItemStorageCollection As Dictionary(Of String, coreUploadItemStorageClass)
+        Private ItemStorageCollection As Dictionary(Of String, uploadFileModel)
         Private ItemNames() As String
         Private ItemCount As Integer
         '
         '
         '
-        Public ReadOnly Property Form(ByVal Key As String) As coreUploadItemStorageClass
+        Public ReadOnly Property Form(ByVal Key As String) As uploadFileModel
             Get
-                Dim returnForm As coreUploadItemStorageClass = Nothing
+                Dim returnForm As uploadFileModel = Nothing
                 If Not ItemStorageCollection Is Nothing Then
                     If ItemStorageCollection.Count > 0 Then
                         If FieldExists(Key) Then

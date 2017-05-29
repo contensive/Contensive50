@@ -170,8 +170,8 @@ Namespace Contensive.Core
             Dim MenuEntryID As Integer
             Dim MenuHeaderID As Integer
             Dim MenuDirection As Integer
-            Dim Stream As New coreFastStringClass
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Stream As New stringBuilderLegacyController
+            Dim Adminui As New adminUIController(cpCore)
             '
             Button = cpCore.docProperties.getText("Button")
             If (Button = ButtonCancelAll) Then
@@ -344,7 +344,7 @@ ErrorTrap:
             Dim DataSourceCount As Integer
             Dim ItemCount As Integer
             Dim CSPointer As Integer
-            Dim Stream As New coreFastStringClass
+            Dim Stream As New stringBuilderLegacyController
             Dim ButtonList As String = ""
             '
             Stream.Add(SpanClassAdminNormal & "<strong><A href=""" & cpCore.webServer.webServerIO_requestPage & "?af=" & AdminFormToolRoot & """>Tools</A></strong></SPAN>")
@@ -413,7 +413,7 @@ ErrorTrap:
         '
         Private Class fieldSortClass
             Public sort As String
-            Public field As coreMetaDataClass.CDefFieldClass
+            Public field As CDefFieldModel
         End Class
         '
         '=============================================================================
@@ -423,7 +423,7 @@ ErrorTrap:
         Private Function GetForm_Root() As String
             On Error GoTo ErrorTrap
             '
-            Dim Stream As New coreFastStringClass
+            Dim Stream As New stringBuilderLegacyController
             Dim ButtonList As String
             '
             ButtonList = ButtonCancelAll
@@ -533,7 +533,7 @@ ErrorTrap:
                 Dim CellData As String
                 Dim SelectFieldWidthLimit As Integer
                 Dim SQLName As String
-                Dim Stream As New coreFastStringClass
+                Dim Stream As New stringBuilderLegacyController
                 Dim ButtonList As String
                 Dim datasource As dataSourceModel = dataSourceModel.create(cpCore, cpCore.docProperties.getInteger("dataSourceid"), New List(Of String))
                 '
@@ -734,9 +734,9 @@ ErrorTrap:
             Dim ContentID As Integer
             Dim TableName As String = ""
             Dim ContentName As String = ""
-            Dim Stream As New coreFastStringClass
+            Dim Stream As New stringBuilderLegacyController
             Dim ButtonList As String
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             Dim Description As String
             Dim Caption As String
             Dim NavID As Integer
@@ -856,7 +856,7 @@ ErrorTrap:
             Dim CSPointer As Integer
             Dim RecordID As Integer
             Dim ContentID As Integer
-            Dim CDef As coreMetaDataClass.CDefClass
+            Dim CDef As cdefModel
             'Dim AdminColumn As appServices_metaDataClass.CDefAdminColumnClass
             Dim RowFieldID() As Integer
             Dim RowFieldWidth() As Integer
@@ -898,7 +898,7 @@ ErrorTrap:
             'Dim ContentNameValues() As NameValuePrivateType
             Dim ContentCount As Integer
             Dim ContentSize As Integer
-            Dim Stream As New coreFastStringClass
+            Dim Stream As New stringBuilderLegacyController
             Dim ButtonList As String
             Dim FormPanel As String = ""
             Dim ColumnWidthIncrease As Integer
@@ -941,7 +941,7 @@ ErrorTrap:
                     '
                     If (FieldIDToAdd <> 0) Then
                         For Each keyValuePair In CDef.fields
-                            Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+                            Dim field As CDefFieldModel = keyValuePair.Value
                             If field.id = FieldIDToAdd Then
                                 'If field.Name = FieldNameToAdd Then
                                 If field.inherited Then
@@ -968,8 +968,8 @@ ErrorTrap:
                     '
                     ColumnNumberMax = 0
                     For Each keyValuePair In CDef.adminColumns
-                        Dim adminColumn As coreMetaDataClass.CDefAdminColumnClass = keyValuePair.Value
-                        Dim field As coreMetaDataClass.CDefFieldClass = CDef.fields(adminColumn.Name)
+                        Dim adminColumn As cdefModel.CDefAdminColumnClass = keyValuePair.Value
+                        Dim field As CDefFieldModel = CDef.fields(adminColumn.Name)
                         If field.inherited Then
                             SourceContentID = field.contentId
                             SourceName = field.nameLc
@@ -1004,8 +1004,8 @@ ErrorTrap:
                                 columnPtr = 0
                                 If CDef.adminColumns.Count > 1 Then
                                     For Each keyValuePair In CDef.adminColumns
-                                        Dim adminColumn As coreMetaDataClass.CDefAdminColumnClass = keyValuePair.Value
-                                        Dim field As coreMetaDataClass.CDefFieldClass = CDef.fields(adminColumn.Name)
+                                        Dim adminColumn As cdefModel.CDefAdminColumnClass = keyValuePair.Value
+                                        Dim field As CDefFieldModel = CDef.fields(adminColumn.Name)
                                         CSPointer = cpCore.csOpen("Content Fields", field.id)
                                         Call cpCore.db.cs_set(CSPointer, "IndexColumn", (columnPtr) * 10)
                                         Call cpCore.db.cs_set(CSPointer, "IndexWidth", Int((adminColumn.Width * 80) / ColumnWidthTotal))
@@ -1031,8 +1031,8 @@ ErrorTrap:
                             If CDef.adminColumns.Count > 1 Then
                                 columnPtr = 0
                                 For Each keyValuePair In CDef.adminColumns
-                                    Dim adminColumn As coreMetaDataClass.CDefAdminColumnClass = keyValuePair.Value
-                                    Dim field As coreMetaDataClass.CDefFieldClass = CDef.fields(adminColumn.Name)
+                                    Dim adminColumn As cdefModel.CDefAdminColumnClass = keyValuePair.Value
+                                    Dim field As CDefFieldModel = CDef.fields(adminColumn.Name)
                                     CSPointer = cpCore.csOpen("Content Fields", field.id)
                                     If fieldId = TargetFieldID Then
                                         Call cpCore.db.cs_set(CSPointer, "IndexColumn", 0)
@@ -1056,8 +1056,8 @@ ErrorTrap:
                                 MoveNextColumn = False
                                 columnPtr = 0
                                 For Each keyValuePair In CDef.adminColumns
-                                    Dim adminColumn As coreMetaDataClass.CDefAdminColumnClass = keyValuePair.Value
-                                    Dim field As coreMetaDataClass.CDefFieldClass = CDef.fields(adminColumn.Name)
+                                    Dim adminColumn As cdefModel.CDefAdminColumnClass = keyValuePair.Value
+                                    Dim field As CDefFieldModel = CDef.fields(adminColumn.Name)
                                     FieldName = adminColumn.Name
                                     CS1 = cpCore.csOpen("Content Fields", field.id)
                                     If (CDef.fields(FieldName.ToLower()).id = TargetFieldID) And (columnPtr < CDef.adminColumns.Count) Then
@@ -1092,8 +1092,8 @@ ErrorTrap:
                                 MoveNextColumn = False
                                 columnPtr = 0
                                 For Each keyValuePair In CDef.adminColumns.Reverse
-                                    Dim adminColumn As coreMetaDataClass.CDefAdminColumnClass = keyValuePair.Value
-                                    Dim field As coreMetaDataClass.CDefFieldClass = CDef.fields(adminColumn.Name)
+                                    Dim adminColumn As cdefModel.CDefAdminColumnClass = keyValuePair.Value
+                                    Dim field As CDefFieldModel = CDef.fields(adminColumn.Name)
                                     FieldName = adminColumn.Name
                                     CS1 = cpCore.csOpen("Content Fields", field.id)
                                     If (field.id = TargetFieldID) And (columnPtr < CDef.adminColumns.Count) Then
@@ -1317,7 +1317,7 @@ ErrorTrap:
                     '
                     ' Calc total width
                     '
-                    For Each kvp As KeyValuePair(Of String, coreMetaDataClass.CDefAdminColumnClass) In CDef.adminColumns
+                    For Each kvp As KeyValuePair(Of String, cdefModel.CDefAdminColumnClass) In CDef.adminColumns
                         ColumnWidthTotal += kvp.Value.Width
                     Next
                     'For ColumnCount = 0 To CDef.adminColumns.Count - 1
@@ -1326,7 +1326,7 @@ ErrorTrap:
                     If ColumnWidthTotal > 0 Then
                         Stream.Add("<table border=""0"" cellpadding=""5"" cellspacing=""0"" width=""90%"">")
                         Dim ColumnCount As Integer = 0
-                        For Each kvp As KeyValuePair(Of String, coreMetaDataClass.CDefAdminColumnClass) In CDef.adminColumns
+                        For Each kvp As KeyValuePair(Of String, cdefModel.CDefAdminColumnClass) In CDef.adminColumns
                             '
                             ' print column headers - anchored so they sort columns
                             '
@@ -1371,8 +1371,8 @@ ErrorTrap:
                 Else
                     Stream.Add(SpanClassAdminNormal & "<br>")
                     Dim skipField As Boolean
-                    For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In CDef.fields
-                        Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
+                    For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In CDef.fields
+                        Dim field As CDefFieldModel = keyValuePair.Value
                         With field
                             '
                             ' test if this column is in use
@@ -1380,7 +1380,7 @@ ErrorTrap:
                             skipField = False
                             'ColumnPointer = CDef.adminColumns.Count
                             If CDef.adminColumns.Count > 0 Then
-                                For Each kvp As KeyValuePair(Of String, coreMetaDataClass.CDefAdminColumnClass) In CDef.adminColumns
+                                For Each kvp As KeyValuePair(Of String, cdefModel.CDefAdminColumnClass) In CDef.adminColumns
                                     If .nameLc = kvp.Value.Name Then
                                         skipField = True
                                         Exit For
@@ -1528,7 +1528,7 @@ ErrorTrap:
             Dim NextWhiteSpace As Integer
             Dim SampleName As String
             Dim LinePosition As Integer
-            Dim Stream As New coreFastStringClass
+            Dim Stream As New stringBuilderLegacyController
             Dim ButtonList As String
             '
             Const ButtonFix = "Make Corrections"
@@ -2050,7 +2050,7 @@ ErrorTrap:
             Dim MenuName As String = ""
             Dim AdminOnly As Boolean
             Dim DeveloperOnly As Boolean
-            Dim Stream As New coreFastStringClass
+            Dim Stream As New stringBuilderLegacyController
             Dim ButtonList As String
             '
             ButtonList = ButtonCancel & "," & ButtonRun
@@ -2138,7 +2138,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap
             '
             Dim SQL As String
-            Dim Stream As New coreFastStringClass
+            Dim Stream As New stringBuilderLegacyController
             Dim ButtonList As String
             '
             ButtonList = ButtonCancel & ",Clear Content Watch Links"
@@ -2179,8 +2179,8 @@ ErrorTrap:
             Dim returnValue As String = ""
             Try
                 Dim CSContent As Integer
-                Dim CD As coreMetaDataClass.CDefClass
-                Dim Stream As New coreFastStringClass
+                Dim CD As cdefModel
+                Dim Stream As New stringBuilderLegacyController
                 Dim ContentNameArray As String(,)
                 Dim ContentNameCount As Integer
                 Dim TableName As String
@@ -2204,7 +2204,7 @@ ErrorTrap:
                             Call cpCore.db.createSQLTable(CD.ContentDataSourceName, TableName)
                             If CD.fields.Count > 0 Then
                                 For Each keyValuePair In CD.fields
-                                    Dim field As coreMetaDataClass.CDefFieldClass
+                                    Dim field As CDefFieldModel
                                     field = keyValuePair.Value
                                     Call Stream.Add("...Field " & field.nameLc & "<br>")
                                     Call cpCore.db.createSQLTableField(CD.ContentDataSourceName, TableName, field.nameLc, field.fieldTypeId)
@@ -2328,7 +2328,7 @@ ErrorTrap:
             Dim RecordCount As Integer
             Dim SQL As String
             Dim CS As Integer
-            Dim Stream As New coreFastStringClass
+            Dim Stream As New stringBuilderLegacyController
             Dim ButtonList As String
             '
             ButtonList = ButtonCancel & "," & ButtonRun
@@ -2616,7 +2616,7 @@ ErrorTrap:
             Dim SelectFieldWidthLimit As Integer
             Dim SQLName As String
             Dim TableName As String = ""
-            Dim Stream As New coreFastStringClass
+            Dim Stream As New stringBuilderLegacyController
             Dim ButtonList As String
             Dim RSSchema As DataTable
             Dim datasource As dataSourceModel = dataSourceModel.create(cpCore, cpCore.docProperties.getInteger("DataSourceID"), New List(Of String))
@@ -2865,7 +2865,7 @@ ErrorTrap:
             '
             Call Stream.Add("<br><br>")
             Call Stream.Add("Data Source<br>")
-            Stream.Add(cpCore.htmlDoc.main_GetFormInputSelect("DataSourceID", DataSource.ID, "Data Sources", "", "Default"))
+            Stream.Add(cpCore.htmlDoc.main_GetFormInputSelect("DataSourceID", datasource.ID, "Data Sources", "", "Default"))
             '
             ''Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolSchema)
             Call Stream.Add("</SPAN>")
@@ -2899,7 +2899,7 @@ ErrorTrap:
                 Dim CSPointer As Integer
                 Dim formFieldId As Integer
                 Dim ContentName As String
-                Dim CDef As coreMetaDataClass.CDefClass
+                Dim CDef As cdefModel
                 Dim formFieldName As String
                 Dim formFieldTypeId As Integer
                 Dim TableName As String
@@ -2914,18 +2914,18 @@ ErrorTrap:
                 Dim AllowCDefInherit As Boolean
                 Dim ParentContentID As Integer
                 Dim ParentContentName As String
-                Dim ParentCDef As coreMetaDataClass.CDefClass = Nothing
+                Dim ParentCDef As cdefModel = Nothing
                 Dim NeedFootNote1 As Boolean
                 Dim NeedFootNote2 As Boolean
                 Dim FormPanel As String = ""
-                Dim Index As New coreKeyPtrIndexClass
+                Dim Index As New keyPtrController
                 Dim ButtonList As String
-                Dim Stream As New coreFastStringClass
-                Dim StreamValidRows As New coreFastStringClass
+                Dim Stream As New stringBuilderLegacyController
+                Dim StreamValidRows As New stringBuilderLegacyController
                 Dim TypeSelectTemplate As String
                 Dim TypeSelect As String
                 Dim FieldCount As Integer
-                Dim parentField As coreMetaDataClass.CDefFieldClass = Nothing
+                Dim parentField As CDefFieldModel = Nothing
                 '
                 ButtonList = ButtonCancel & "," & ButtonSelect
                 '
@@ -2963,7 +2963,7 @@ ErrorTrap:
                                 ' problem - looking for the name in the Db using the form's name, but it could have changed.
                                 ' have to look field up by id
                                 '
-                                For Each cdefFieldKvp As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In CDef.fields
+                                For Each cdefFieldKvp As KeyValuePair(Of String, CDefFieldModel) In CDef.fields
                                     If cdefFieldKvp.Value.id = formFieldId Then
                                         '
                                         ' Field was found in CDef
@@ -3227,7 +3227,7 @@ ErrorTrap:
                         Next
                         fieldList.Sort(Function(p1, p2) p1.sort.CompareTo(p2.sort))
                         For Each fieldsort As fieldSortClass In fieldList
-                            Dim streamRow As New coreFastStringClass
+                            Dim streamRow As New stringBuilderLegacyController
                             Dim rowValid As Boolean = True
                             With fieldsort.field
                                 '
@@ -3267,7 +3267,7 @@ ErrorTrap:
                                     ' CDef has a parent, but the field is non-inherited, test for a matching Parent Field
                                     '
                                     If (ParentCDef Is Nothing) Then
-                                        For Each kvp As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In ParentCDef.fields
+                                        For Each kvp As KeyValuePair(Of String, CDefFieldModel) In ParentCDef.fields
                                             If kvp.Value.nameLc = .nameLc Then
                                                 parentField = kvp.Value
                                                 Exit For
@@ -3920,7 +3920,7 @@ ErrorTrap:
             Dim result As String = ""
             Try
                 '
-                Dim Stream As New coreFastStringClass
+                Dim Stream As New stringBuilderLegacyController
                 Dim ButtonList As String
                 '
                 ButtonList = ButtonCancel & "," & ButtonSaveandInvalidateCache
@@ -3960,7 +3960,7 @@ ErrorTrap:
         Private Function GetForm_Restart() As String
             On Error GoTo ErrorTrap
             '
-            Dim Stream As New coreFastStringClass
+            Dim Stream As New stringBuilderLegacyController
             Dim ButtonList As String
             ' Dim runAtServer As runAtServerClass
             '
@@ -3979,7 +3979,7 @@ ErrorTrap:
                 '
                 ' Restart
                 '
-                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " & cpcore.authContext.user.name & " (" & cpcore.authContext.user.id & ") restarted using the Restart tool", False, True, cpCore.webServer.webServerIO_ServerLink, "", "")
+                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " & cpCore.authContext.user.Name & " (" & cpCore.authContext.user.ID & ") restarted using the Restart tool", False, True, cpCore.webServer.webServerIO_ServerLink, "", "")
                 'runAtServer = New runAtServerClass(cpCore)
                 Call cpCore.main_Redirect("/ccLib/Popup/WaitForIISReset.htm")
                 Call Threading.Thread.Sleep(2000)
@@ -3988,7 +3988,7 @@ ErrorTrap:
                 '
                 Throw New NotImplementedException("GetForm_Restart")
                 'hint = hint & ",035"
-                Dim taskScheduler As New coreTaskSchedulerServiceClass()
+                Dim taskScheduler As New taskSchedulerController()
                 Dim cmdDetail As New cmdDetailClass
                 cmdDetail.addonId = 0
                 cmdDetail.addonName = "commandRestart"
@@ -4017,7 +4017,7 @@ ErrorTrap:
         '
         '
         '
-        Private Function GetCDef(ByVal ContentName As String) As coreMetaDataClass.CDefClass
+        Private Function GetCDef(ByVal ContentName As String) As cdefModel
             Return cpCore.metaData.getCdef(ContentName)
         End Function
 
@@ -4057,7 +4057,7 @@ ErrorTrap:
         Private Function GetForm_LoadTemplates() As String
             On Error GoTo ErrorTrap
             '
-            Dim Stream As New coreFastStringClass
+            Dim Stream As New stringBuilderLegacyController
             Dim ButtonList As String
             '
             Dim Folders() As String
@@ -4139,7 +4139,7 @@ ErrorTrap:
             Dim result As String = ""
             Try
                 '
-                Dim Stream As New coreFastStringClass
+                Dim Stream As New stringBuilderLegacyController
                 Dim Folders() As String
                 Dim FolderList As String
                 Dim FolderDetailString As String
@@ -4418,7 +4418,7 @@ ErrorTrap:
             Dim ButtonList As String
             'Dim FileView As New FileViewClass
             Dim IsContentManager As Boolean
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             Dim Content As String
             Dim Description As String
             Dim InstanceOptionString As String
@@ -4455,7 +4455,7 @@ ErrorTrap:
             Dim ButtonList As String
             'Dim FileView As New FileViewClass
             Dim IsContentManager As Boolean
-            Dim Adminui As New coreAdminUIClass(cpCore)
+            Dim Adminui As New adminUIController(cpCore)
             Dim Content As String
             Dim Description As String
             Dim InstanceOptionString As String
@@ -4496,7 +4496,7 @@ ErrorTrap:
             Dim RowPtr As Integer
             Dim RecordID As Integer
             Dim CS As Integer
-            Dim Stream As New coreFastStringClass
+            Dim Stream As New stringBuilderLegacyController
             ' Dim runAtServer As New runAtServerClass(cpCore)
             Dim CDefList As String = ""
             Dim FindText As String = ""
@@ -4535,7 +4535,7 @@ ErrorTrap:
                     QS = "app=" & encodeNvaArgument(cpCore.serverConfig.appConfig.name) & "&FindText=" & encodeNvaArgument(FindText) & "&ReplaceText=" & encodeNvaArgument(ReplaceText) & "&CDefNameList=" & encodeNvaArgument(CDefList)
 
                     Throw New NotImplementedException("GetForm_FindAndReplace")
-                    Dim taskScheduler As New coreTaskSchedulerServiceClass()
+                    Dim taskScheduler As New taskSchedulerController()
                     Dim cmdDetail As New cmdDetailClass
                     cmdDetail.addonId = 0
                     cmdDetail.addonName = "GetForm_FindAndReplace"
@@ -4613,10 +4613,10 @@ ErrorTrap:
             '
             Dim Button As String
             'Dim GUIDGenerator As guidClass
-            Dim s As coreFastStringClass
+            Dim s As stringBuilderLegacyController
             'Dim runAtServer As runAtServerClass
             '
-            s = New coreFastStringClass
+            s = New stringBuilderLegacyController
             s.Add(GetTitle("IIS Reset", "Reset the webserver."))
             '
             ' Process the form
@@ -4635,7 +4635,7 @@ ErrorTrap:
 
 
                 Throw New NotImplementedException("GetForm_IISReset")
-                Dim taskScheduler As New coreTaskSchedulerServiceClass()
+                Dim taskScheduler As New taskSchedulerController()
                 Dim cmdDetail As New cmdDetailClass
                 cmdDetail.addonId = 0
                 cmdDetail.addonName = "GetForm_IISReset"
@@ -4666,9 +4666,9 @@ ErrorTrap:
             '
             Dim Button As String
             ''Dim GUIDGenerator As guidClass
-            Dim s As coreFastStringClass
+            Dim s As stringBuilderLegacyController
             '
-            s = New coreFastStringClass
+            s = New stringBuilderLegacyController
             s.Add(GetTitle("Create GUID", "Use this tool to create a GUID. This is useful when creating new Addons."))
             '
             ' Process the form
