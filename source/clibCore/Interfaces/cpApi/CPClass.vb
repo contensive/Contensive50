@@ -530,6 +530,7 @@ Namespace Contensive.Core
                     If Not (_cdnFiles Is Nothing) Then _cdnFiles.Dispose()
                     If Not (_appRootFiles Is Nothing) Then _appRootFiles.Dispose()
                     If Not (_privateFiles Is Nothing) Then _privateFiles.Dispose()
+                    If Not (core Is Nothing) Then core.Dispose()
                 End If
                 '
                 ' cleanup non-managed objects
