@@ -3584,32 +3584,33 @@ ErrorTrap:
         '========================================================================
         '
         Public Shared Function EncodeURL(ByVal Source As String) As String
-            ' ##### removed to catch err<>0 problem on error resume next
-            '
-            Dim URLSplit() As String
-            'Dim LeftSide As String
-            'Dim RightSide As String
-            '
-            EncodeURL = Source
-            If Source <> "" Then
-                URLSplit = Split(Source, "?")
-                EncodeURL = URLSplit(0)
-                EncodeURL = vbReplace(EncodeURL, "%", "%25")
-                '
-                EncodeURL = vbReplace(EncodeURL, """", "%22")
-                EncodeURL = vbReplace(EncodeURL, " ", "%20")
-                EncodeURL = vbReplace(EncodeURL, "$", "%24")
-                EncodeURL = vbReplace(EncodeURL, "+", "%2B")
-                EncodeURL = vbReplace(EncodeURL, ",", "%2C")
-                EncodeURL = vbReplace(EncodeURL, ";", "%3B")
-                EncodeURL = vbReplace(EncodeURL, "<", "%3C")
-                EncodeURL = vbReplace(EncodeURL, "=", "%3D")
-                EncodeURL = vbReplace(EncodeURL, ">", "%3E")
-                EncodeURL = vbReplace(EncodeURL, "@", "%40")
-                If UBound(URLSplit) > 0 Then
-                    EncodeURL = EncodeURL & "?" & EncodeQueryString(URLSplit(1))
-                End If
-            End If
+            Return WebUtility.UrlEncode(Source)
+            '' ##### removed to catch err<>0 problem on error resume next
+            ''
+            'Dim URLSplit() As String
+            ''Dim LeftSide As String
+            ''Dim RightSide As String
+            ''
+            'EncodeURL = Source
+            'If Source <> "" Then
+            '    URLSplit = Split(Source, "?")
+            '    EncodeURL = URLSplit(0)
+            '    EncodeURL = vbReplace(EncodeURL, "%", "%25")
+            '    '
+            '    EncodeURL = vbReplace(EncodeURL, """", "%22")
+            '    EncodeURL = vbReplace(EncodeURL, " ", "%20")
+            '    EncodeURL = vbReplace(EncodeURL, "$", "%24")
+            '    EncodeURL = vbReplace(EncodeURL, "+", "%2B")
+            '    EncodeURL = vbReplace(EncodeURL, ",", "%2C")
+            '    EncodeURL = vbReplace(EncodeURL, ";", "%3B")
+            '    EncodeURL = vbReplace(EncodeURL, "<", "%3C")
+            '    EncodeURL = vbReplace(EncodeURL, "=", "%3D")
+            '    EncodeURL = vbReplace(EncodeURL, ">", "%3E")
+            '    EncodeURL = vbReplace(EncodeURL, "@", "%40")
+            '    If UBound(URLSplit) > 0 Then
+            '        EncodeURL = EncodeURL & "?" & EncodeQueryString(URLSplit(1))
+            '    End If
+            'End If
             '
         End Function
         '

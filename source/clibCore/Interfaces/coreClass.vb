@@ -13553,11 +13553,20 @@ ErrorTrap:
                             'debugLog("executeRoute, route is Default Route AddonId")
                             '
                             Dim defaultAddonId As Integer = siteProperties.getinteger("Default Route AddonId")
-                            If defaultAddonId <> 0 Then
+                            If (defaultAddonId = 0) Then
+                                '
+                                ' -- no default route set, assume html hit
+                                returnResult = "<p>This site is not configured for website traffic. Please set the default route.</p>"
+                            Else
                                 Dim addonStatusOk As Boolean = False
                                 returnResult = addon.execute(defaultAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", addonStatusOk, Nothing, "", Nothing, "", authContext.user.ID, authContext.visit.VisitAuthenticated)
+                                If (Not addonStatusOk) Then
+                                    '
+                                    ' -- there was an error in the default route addon
+                                    returnResult = "<p>This site is temporarily unavailable.</p>"
+                                Else
+                                End If
                             End If
-                            'returnResult = addonToBe_pageManager()
                         End If
                     End If
                 End If

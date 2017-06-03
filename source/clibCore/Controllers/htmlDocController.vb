@@ -6853,7 +6853,7 @@ ErrorTrap:
                     Call cpCore.cache.invalidateContent(ContentName)
                     TableName = cpCore.GetContentTablename(ContentName)
                     If genericController.vbLCase(TableName) = "cctemplates" Then
-                        Call cpCore.cache.setObject(pageManagerController.pageManager_cache_pageTemplate_cacheName, EmptyVariant)
+                        Call cpCore.cache.setObject(pageManagerController.pageManager_cache_pageTemplate_cacheName, Nothing)
                         Call cpCore.pageManager.pageManager_cache_pageTemplate_load()
                     End If
                     If genericController.vbLCase(TableName) = "ccpagecontent" Then

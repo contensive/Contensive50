@@ -2174,7 +2174,7 @@ ErrorTrap:
                                 Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit #", CStr(c.authContext.visit.ID), True)
                                 Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit IP", c.webServer.requestRemoteIP, False)
                                 Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Browser ", c.webServer.requestBrowser, True)
-                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visitor #", CStr(c.authContext.visitor.id), False)
+                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visitor #", CStr(c.authContext.visitor.ID), False)
                                 Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Authenticated", CStr(c.authContext.visit.VisitAuthenticated), True)
                                 Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Referrer", c.authContext.visit.HTTP_REFERER, False)
                                 Body = Body & kmaEndTable
