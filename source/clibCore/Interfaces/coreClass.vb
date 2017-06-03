@@ -44,6 +44,7 @@ Namespace Contensive.Core
         '
         ' -- Debugging
         '
+        Private appStopWatch As Stopwatch = Stopwatch.StartNew()
         Public app_startTime As Date                                   ' set in constructor
         Public app_startTickCount As Integer = 0
         Public debug_allowDebugLog As Boolean = False                             ' turn on in script -- use to write /debug.log in content files for whatever is needed
@@ -1016,7 +1017,7 @@ Namespace Contensive.Core
         ''' <remarks></remarks>
         Public Sub New(cp As CPClass)
             MyBase.New()
-            Me.cp_forAddonExecutionOnly = cp
+            cp_forAddonExecutionOnly = cp
             '
             ' -- create default auth objects for non-user methods, or until auth is available
             authContext = New authContextModel
@@ -14387,6 +14388,8 @@ ErrorTrap:
         ''' </summary>
         ''' <param name="disposing"></param>
         Protected Overridable Overloads Sub Dispose(ByVal disposing As Boolean)
+            'Exit Sub
+
             Dim SQL As String
             Dim ViewingName As String
             Dim CSMax As Integer
@@ -14440,14 +14443,15 @@ ErrorTrap:
                                 & "," & db.encodeSQLDate(app_startTime) _
                                 & "," & db.encodeSQLBoolean(authContext.visit_stateOK) _
                                 & "," & db.encodeSQLNumber(main_GetContentID("Viewings")) _
-                                & "," & db.encodeSQLNumber(GetTickCount - app_startTickCount) _
+                                & "," & db.encodeSQLNumber(appStopWatch.ElapsedMilliseconds) _
                                 & ",1" _
                                 & "," & db.encodeSQLNumber(CSMax) _
                                 & "," & db.encodeSQLNumber(PageID)
                             SQL &= "," & db.encodeSQLBoolean(webServer.webServerIO_PageExcludeFromAnalytics)
                             SQL &= "," & db.encodeSQLText(htmlDoc.main_MetaContent_Title)
                             SQL &= ");"
-                            Call db.executeSqlAsync(SQL)
+                            Call db.executeSql(SQL)
+                            'Call db.executeSqlAsync(SQL)
                         End If
                     End If
                     '

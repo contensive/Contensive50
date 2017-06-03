@@ -437,6 +437,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="dataSourceName"></param>
         '
         Public Sub executeSqlAsync(ByVal sql As String, Optional ByVal dataSourceName As String = "")
+            Exit Sub
             Try
                 If dbEnabled Then
                     Dim connString As String = getConnectionStringADONET(cpCore.serverConfig.appConfig.name, dataSourceName)
@@ -446,7 +447,8 @@ Namespace Contensive.Core.Controllers
                             cmdSQL.CommandType = Data.CommandType.Text
                             cmdSQL.CommandText = sql
                             cmdSQL.Connection = connSQL
-                            cmdSQL.BeginExecuteNonQuery()
+                            cmdSQL.ExecuteNonQuery()
+                            'cmdSQL.BeginExecuteNonQuery()
                         End Using
                     End Using
                     dbVerified = True
