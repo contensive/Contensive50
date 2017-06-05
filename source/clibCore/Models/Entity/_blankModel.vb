@@ -97,7 +97,7 @@ Namespace Contensive.Core.Models.Entity
             Try
                 result = create(cpCore, cpCore.db.metaData_InsertContentRecordGetID(primaryContentName, cpCore.authContext.user.ID), callersCacheNameList)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
                 Throw
             End Try
             Return result
@@ -125,7 +125,7 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
                 Throw
             End Try
             Return result
@@ -152,7 +152,7 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
                 Throw
             End Try
             Return result
@@ -178,7 +178,34 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
+                Throw
+            End Try
+            Return result
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' open an existing object
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="recordName"></param>
+        Public Shared Function createByName(cpCore As coreClass, recordName As String, ByRef callersCacheNameList As List(Of String)) As _blankModel
+            Dim result As _blankModel = Nothing
+            Try
+                If Not String.IsNullOrEmpty(recordName) Then
+                    Dim cacheName As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "name", recordName)
+                    result = cpCore.cache.getObject(Of _blankModel)(cacheName)
+                    If (result Is Nothing) Then
+                        Using cs As New csController(cpCore)
+                            If cs.open(primaryContentName, "(name=" & cpCore.db.encodeSQLText(recordName) & ")", "id") Then
+                                result = loadRecord(cpCore, cs, callersCacheNameList)
+                            End If
+                        End Using
+                    End If
+                End If
+            Catch ex As Exception
+                cpCore.handleExceptionAndContinue(ex) : Throw
                 Throw
             End Try
             Return result
@@ -222,7 +249,7 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
                 Throw
             End Try
             Return result
@@ -271,7 +298,7 @@ Namespace Contensive.Core.Models.Entity
                 ' -- object is here, but the cache was invalidated, setting
                 cpCore.cache.setObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", Me.id.ToString()), Me)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
                 Throw
             End Try
             Return id
@@ -290,7 +317,7 @@ Namespace Contensive.Core.Models.Entity
                     cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", recordId.ToString))
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
                 Throw
             End Try
         End Sub
@@ -311,7 +338,7 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
                 Throw
             End Try
         End Sub
@@ -333,7 +360,7 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
                 Throw
             End Try
         End Sub
@@ -362,7 +389,7 @@ Namespace Contensive.Core.Models.Entity
                 End If
                 cs.Close()
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return result
         End Function

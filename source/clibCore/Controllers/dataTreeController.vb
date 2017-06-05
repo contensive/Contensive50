@@ -85,7 +85,7 @@ Namespace Contensive.Core.Controllers
                             Call MSxml.LoadXml(XMLSource)
                     End Select
                 Catch ex As Exception
-                    Call cpCore.handleExceptionAndRethrow(ex)
+                    Call cpCore.handleExceptionAndContinue(ex) : Throw
                     loadOK = False
                 End Try
                 If loadOK Then
@@ -116,7 +116,7 @@ Namespace Contensive.Core.Controllers
             '
             Exit Function
 ErrorTrap:
-            Call cpCore.handleExceptionAndRethrow(New Exception("unexpected exception"))
+            Throw (New Exception("unexpected exception"))
         End Function
         '
         '
@@ -187,7 +187,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -259,7 +259,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
 

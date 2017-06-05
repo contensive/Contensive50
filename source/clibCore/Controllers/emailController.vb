@@ -190,7 +190,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpcore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnStatus
         End Function
@@ -211,7 +211,7 @@ Namespace Contensive.Core.Controllers
             '
             Exit Function
 ErrorTrap:
-            cpcore.handleExceptionAndRethrow(New Exception("Unexpected exception"))
+            cpCore.handleExceptionAndContinue(New Exception("Unexpected exception"))
         End Function
         '  
         '========================================================================
@@ -287,7 +287,7 @@ ErrorTrap:
                 End If
                 Call cpcore.db.cs_Close(CS)
             Catch ex As Exception
-                cpcore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnStatus
         End Function
@@ -547,7 +547,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpcore.handleLegacyError7("csv_SendSystemEmail", "Unexpected Trap")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError7("csv_SendSystemEmail", "Unexpected Trap")
         End Function
         '
         '========================================================================
@@ -567,7 +567,7 @@ ErrorTrap:
             Try
                 returnStatus = send(genericController.encodeText(ToAddress), genericController.encodeText(FromAddress), genericController.encodeText(SubjectMessage), genericController.encodeText(BodyMessage), "", "", "", Immediate, genericController.EncodeBoolean(HTML), genericController.EncodeInteger(optionalEmailIdForLog))
             Catch ex As Exception
-                cpcore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnStatus
         End Function
@@ -742,7 +742,7 @@ ErrorTrap:
                 End If
                 Call cpcore.db.cs_Close(CS)
             Catch ex As Exception
-                cpcore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -803,7 +803,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpcore.handleLegacyError18(MethodName)
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Sub
         '
@@ -899,7 +899,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpcore.handleLegacyError18(MethodName)
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Sub
         '
@@ -930,7 +930,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call cpcore.handleLegacyError18("main_GetFormSendPassword")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetFormSendPassword")
         End Function
         '
         '=============================================================================
@@ -1119,7 +1119,7 @@ ErrorTrap:
                     '    main_ClosePageHTML = main_ClosePageHTML & main_GetPopupMessage(app.publicFiles.ReadFile("ccLib\Popup\PasswordSent.htm"), 300, 300, "no")
                 End If
             Catch ex As Exception
-                cpcore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnREsult
         End Function

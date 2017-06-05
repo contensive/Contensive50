@@ -66,7 +66,7 @@ Namespace Contensive.Core.Controllers
                 Me.cpCore = cpCore
                 constructed = True
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
                 Throw (ex)
             End Try
         End Sub
@@ -100,7 +100,7 @@ Namespace Contensive.Core.Controllers
                     main_EditLockMemberName_Local = ""
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return main_EditLockStatus_Local
         End Function
@@ -132,7 +132,7 @@ Namespace Contensive.Core.Controllers
                     GetEditLockMemberName = main_EditLockMemberName_Local
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return main_EditLockMemberName_Local
         End Function
@@ -151,7 +151,7 @@ Namespace Contensive.Core.Controllers
                     returnDate = main_EditLockDateExpires_Local
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnDate
         End Function
@@ -289,7 +289,7 @@ Namespace Contensive.Core.Controllers
                         'RSLive = appservices.cpcore.db.executeSql(LiveDataSourceName, "SELECT " & FieldList & " FROM " & LiveTableName & " WHERE ID=" & encodeSQLNumber(LiveRecordID) & ";")
                         If RSLive.Rows.Count <= 0 Then
                             '
-                            Call cpCore.handleExceptionAndRethrow(New ApplicationException("During record publishing, there was an error opening the live record, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
+                            Throw (New ApplicationException("During record publishing, there was an error opening the live record, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
                         Else
                             If True Then
                                 LiveRecordID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(RSLive.Rows(0), "ID"))
@@ -301,7 +301,7 @@ Namespace Contensive.Core.Controllers
                                 'RSEdit = appservices.cpcore.db.executeSql(EditDataSourceName, "SELECT " & FieldList & " FROM " & EditTableName & " WHERE (EditSourceID=" & encodeSQLNumber(LiveRecordID) & ")and(EditArchive=0) Order By ID DESC;")
                                 If RSEdit.Rows.Count <= 0 Then
                                     '
-                                    Call cpCore.handleExceptionAndRethrow(New ApplicationException("During record publishing, there was an error opening the edit record [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
+                                    Throw (New ApplicationException("During record publishing, there was an error opening the edit record [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
                                 Else
                                     If True Then
                                         EditRecordID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), "ID"))
@@ -316,7 +316,7 @@ Namespace Contensive.Core.Controllers
                                             NewEditRecordID = cpCore.db.insertTableRecordGetId(EditDataSourceName, EditTableName, SystemMemberID)
                                             If NewEditRecordID < 1 Then
                                                 '
-                                                Call cpCore.handleExceptionAndRethrow(New ApplicationException("During record publishing, a new edit record could not be create, table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
+                                                Throw (New ApplicationException("During record publishing, a new edit record could not be create, table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
                                             End If
                                         End If
                                         If True Then
@@ -539,7 +539,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -592,11 +592,11 @@ Namespace Contensive.Core.Controllers
                         RSLive = cpCore.db.executeSql("SELECT * FROM " & LiveTableName & " WHERE ID=" & cpCore.db.encodeSQLNumber(LiveRecordID) & ";", LiveDataSourceName)
                         If (RSLive Is Nothing) Then
                             '
-                            Call cpCore.handleExceptionAndRethrow(New ApplicationException("During record publishing, there was an error opening the live record, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
+                            Throw (New ApplicationException("During record publishing, there was an error opening the live record, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
                         Else
                             If RSLive.Rows.Count <= 0 Then
                                 '
-                                Call cpCore.handleExceptionAndRethrow(New ApplicationException("During record publishing, the live record could not be found, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
+                                Throw (New ApplicationException("During record publishing, the live record could not be found, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
                             Else
                                 LiveRecordID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(RSLive.Rows(0), "ID"))
                                 '
@@ -605,11 +605,11 @@ Namespace Contensive.Core.Controllers
                                 RSEdit = cpCore.db.executeSql("SELECT * FROM " & EditTableName & " WHERE (EditSourceID=" & cpCore.db.encodeSQLNumber(LiveRecordID) & ")and(EditArchive=0) Order By ID DESC;", EditDataSourceName)
                                 If (RSEdit Is Nothing) Then
                                     '
-                                    Call cpCore.handleExceptionAndRethrow(New ApplicationException("During record publishing, there was an error opening the edit record [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
+                                    Throw (New ApplicationException("During record publishing, there was an error opening the edit record [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
                                 Else
                                     If RSEdit.Rows.Count <= 0 Then
                                         '
-                                        Call cpCore.handleExceptionAndRethrow(New ApplicationException("During record publishing, the edit record could not be found, [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
+                                        Throw (New ApplicationException("During record publishing, the edit record could not be found, [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
                                     Else
                                         EditRecordID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), "ID"))
                                         '
@@ -682,7 +682,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -702,7 +702,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -722,7 +722,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -741,7 +741,7 @@ Namespace Contensive.Core.Controllers
                 result = cpCore.db.cs_ok(CS)
                 Call cpCore.db.cs_Close(CS)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return result
         End Function
@@ -774,7 +774,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' No references to this table
                     '
-                    cpCore.handleExceptionAndRethrow(New ApplicationException("TableID [" & TableID & "] could not be found in any ccContent.ContentTableID"))
+                    Throw (New ApplicationException("TableID [" & TableID & "] could not be found in any ccContent.ContentTableID"))
                     result = "(1=0)"
                 ElseIf ContentCnt = 1 Then
                     '
@@ -788,7 +788,7 @@ Namespace Contensive.Core.Controllers
                     result = "(ContentID In (" & Mid(Criteria, 2) & "))And(RecordID=" & cpCore.db.encodeSQLNumber(RecordID) & ")And((DateExpires>" & cpCore.db.encodeSQLDate(Now) & ")Or(DateExpires Is null))"
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return result
         End Function
@@ -809,7 +809,7 @@ Namespace Contensive.Core.Controllers
                         Call cpCore.db.deleteContentRecords("Authoring Controls", Criteria, MemberID)
                 End Select
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -905,7 +905,7 @@ Namespace Contensive.Core.Controllers
                     End Select
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -995,7 +995,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -1008,7 +1008,7 @@ Namespace Contensive.Core.Controllers
             Try
                 Call setEditLock2(ContentName, RecordID, MemberID, False)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -1021,7 +1021,7 @@ Namespace Contensive.Core.Controllers
             Try
                 Call setEditLock2(ContentName, RecordID, MemberID, True)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -1119,7 +1119,7 @@ Namespace Contensive.Core.Controllers
                     EditLockCount = DestinationPointer
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -1151,7 +1151,7 @@ Namespace Contensive.Core.Controllers
                     Next
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return EditLock2
         End Function

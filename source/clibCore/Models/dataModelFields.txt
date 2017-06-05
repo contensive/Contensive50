@@ -3009,8 +3009,6 @@ public AllowPrinterVersion as Boolean
 public AllowReturnLinkDisplay as Boolean
 public AllowReviewedFooter as Boolean
 public AllowSeeAlso as Boolean
-public AlternateContentID as Integer
-public AlternateContentLink as String
 public ArchiveParentID as Integer
 public BlockContent as Boolean
 public BlockPage as Boolean
@@ -3033,8 +3031,6 @@ public DateAdded as Date
 public DateArchive as Date
 public DateExpires as Date
 public DateReviewed as Date
-public DocFilename as String
-public DocLabel as String
 public EditArchive as Boolean
 public EditBlank as Boolean
 public EditSourceID as Integer
@@ -3045,9 +3041,7 @@ public JSEndBody as String
 public JSFilename as String
 public JSHead as String
 public JSOnLoad as String
-public Link as String
 public LinkAlias as String
-public LinkLabel as String
 public Marquee as String
 public MenuHeadline as String
 public MenuImageFileName as String
@@ -3095,8 +3089,6 @@ public Viewings as Integer
 .AllowReturnLinkDisplay = cs.getBoolean("AllowReturnLinkDisplay")
 .AllowReviewedFooter = cs.getBoolean("AllowReviewedFooter")
 .AllowSeeAlso = cs.getBoolean("AllowSeeAlso")
-.AlternateContentID = cs.getInteger("AlternateContentID")
-.AlternateContentLink = cs.getText("AlternateContentLink")
 .ArchiveParentID = cs.getInteger("ArchiveParentID")
 .BlockContent = cs.getBoolean("BlockContent")
 .BlockPage = cs.getBoolean("BlockPage")
@@ -3119,8 +3111,6 @@ public Viewings as Integer
 .DateArchive = cs.getDate("DateArchive")
 .DateExpires = cs.getDate("DateExpires")
 .DateReviewed = cs.getDate("DateReviewed")
-.DocFilename = cs.getText("DocFilename")
-.DocLabel = cs.getText("DocLabel")
 .EditArchive = cs.getBoolean("EditArchive")
 .EditBlank = cs.getBoolean("EditBlank")
 .EditSourceID = cs.getInteger("EditSourceID")
@@ -3131,9 +3121,7 @@ public Viewings as Integer
 .JSFilename = cs.getText("JSFilename")
 .JSHead = cs.getText("JSHead")
 .JSOnLoad = cs.getText("JSOnLoad")
-.Link = cs.getText("Link")
 .LinkAlias = cs.getText("LinkAlias")
-.LinkLabel = cs.getText("LinkLabel")
 .Marquee = cs.getText("Marquee")
 .MenuHeadline = cs.getText("MenuHeadline")
 .MenuImageFileName = cs.getText("MenuImageFileName")
@@ -3180,8 +3168,6 @@ cs.SetField("AllowPrinterVersion", AllowPrinterVersion.ToString())
 cs.SetField("AllowReturnLinkDisplay", AllowReturnLinkDisplay.ToString())
 cs.SetField("AllowReviewedFooter", AllowReviewedFooter.ToString())
 cs.SetField("AllowSeeAlso", AllowSeeAlso.ToString())
-cs.SetField("AlternateContentID", AlternateContentID.ToString())
-cs.SetField("AlternateContentLink", AlternateContentLink)
 cs.SetField("ArchiveParentID", ArchiveParentID.ToString())
 cs.SetField("BlockContent", BlockContent.ToString())
 cs.SetField("BlockPage", BlockPage.ToString())
@@ -3204,8 +3190,6 @@ cs.SetField("DateAdded", DateAdded.ToString())
 cs.SetField("DateArchive", DateArchive.ToString())
 cs.SetField("DateExpires", DateExpires.ToString())
 cs.SetField("DateReviewed", DateReviewed.ToString())
-cs.SetField("DocFilename", DocFilename)
-cs.SetField("DocLabel", DocLabel)
 cs.SetField("EditArchive", EditArchive.ToString())
 cs.SetField("EditBlank", EditBlank.ToString())
 cs.SetField("EditSourceID", EditSourceID.ToString())
@@ -3216,9 +3200,7 @@ cs.SetField("JSEndBody", JSEndBody)
 cs.SetField("JSFilename", JSFilename)
 cs.SetField("JSHead", JSHead)
 cs.SetField("JSOnLoad", JSOnLoad)
-cs.SetField("Link", Link)
 cs.SetField("LinkAlias", LinkAlias)
-cs.SetField("LinkLabel", LinkLabel)
 cs.SetField("Marquee", Marquee)
 cs.SetField("MenuHeadline", MenuHeadline)
 cs.SetField("MenuImageFileName", MenuImageFileName)
@@ -3266,8 +3248,6 @@ instance.AllowPrinterVersion = genericController.EncodeBoolean(.fields("AllowPri
 instance.AllowReturnLinkDisplay = genericController.EncodeBoolean(.fields("AllowReturnLinkDisplay").defaultValue)
 instance.AllowReviewedFooter = genericController.EncodeBoolean(.fields("AllowReviewedFooter").defaultValue)
 instance.AllowSeeAlso = genericController.EncodeBoolean(.fields("AllowSeeAlso").defaultValue)
-instance.AlternateContentID = genericController.EncodeInteger(.fields("AlternateContentID").defaultValue)
-instance.AlternateContentLink = genericController.EncodeText(.fields("AlternateContentLink").defaultValue)
 instance.ArchiveParentID = genericController.EncodeInteger(.fields("ArchiveParentID").defaultValue)
 instance.BlockContent = genericController.EncodeBoolean(.fields("BlockContent").defaultValue)
 instance.BlockPage = genericController.EncodeBoolean(.fields("BlockPage").defaultValue)
@@ -3290,8 +3270,6 @@ instance.DateAdded = genericController.EncodeDate(.fields("DateAdded").defaultVa
 instance.DateArchive = genericController.EncodeDate(.fields("DateArchive").defaultValue)
 instance.DateExpires = genericController.EncodeDate(.fields("DateExpires").defaultValue)
 instance.DateReviewed = genericController.EncodeDate(.fields("DateReviewed").defaultValue)
-instance.DocFilename = genericController.EncodeText(.fields("DocFilename").defaultValue)
-instance.DocLabel = genericController.EncodeText(.fields("DocLabel").defaultValue)
 instance.EditArchive = genericController.EncodeBoolean(.fields("EditArchive").defaultValue)
 instance.EditBlank = genericController.EncodeBoolean(.fields("EditBlank").defaultValue)
 instance.EditSourceID = genericController.EncodeInteger(.fields("EditSourceID").defaultValue)
@@ -3302,9 +3280,7 @@ instance.JSEndBody = genericController.EncodeText(.fields("JSEndBody").defaultVa
 instance.JSFilename = genericController.EncodeText(.fields("JSFilename").defaultValue)
 instance.JSHead = genericController.EncodeText(.fields("JSHead").defaultValue)
 instance.JSOnLoad = genericController.EncodeText(.fields("JSOnLoad").defaultValue)
-instance.Link = genericController.EncodeText(.fields("Link").defaultValue)
 instance.LinkAlias = genericController.EncodeText(.fields("LinkAlias").defaultValue)
-instance.LinkLabel = genericController.EncodeText(.fields("LinkLabel").defaultValue)
 instance.Marquee = genericController.EncodeText(.fields("Marquee").defaultValue)
 instance.MenuHeadline = genericController.EncodeText(.fields("MenuHeadline").defaultValue)
 instance.MenuImageFileName = genericController.EncodeText(.fields("MenuImageFileName").defaultValue)
@@ -7590,10 +7566,10 @@ public JSEndBody as String
 public JSFilename as String
 public JSHead as String
 public JSOnLoad as String
-public MenuImageDownFilename as String
-public menuImageDownOverFilename as String
-public MenuImageFilename as String
-public MenuImageOverFilename as String
+'public MenuImageDownFilename as String
+'public menuImageDownOverFilename as String
+'public MenuImageFilename as String
+'public MenuImageOverFilename as String
 public ModifiedBy as Integer
 public ModifiedDate as Date
 public Name as String
@@ -7620,10 +7596,10 @@ public TemplateID as Integer
 .JSFilename = cs.getText("JSFilename")
 .JSHead = cs.getText("JSHead")
 .JSOnLoad = cs.getText("JSOnLoad")
-.MenuImageDownFilename = cs.getText("MenuImageDownFilename")
-.menuImageDownOverFilename = cs.getText("menuImageDownOverFilename")
-.MenuImageFilename = cs.getText("MenuImageFilename")
-.MenuImageOverFilename = cs.getText("MenuImageOverFilename")
+'.MenuImageDownFilename = cs.getText("MenuImageDownFilename")
+'.menuImageDownOverFilename = cs.getText("menuImageDownOverFilename")
+'.MenuImageFilename = cs.getText("MenuImageFilename")
+'.MenuImageOverFilename = cs.getText("MenuImageOverFilename")
 .ModifiedBy = cs.getInteger("ModifiedBy")
 .ModifiedDate = cs.getDate("ModifiedDate")
 .Name = cs.getText("Name")
@@ -7649,10 +7625,10 @@ cs.SetField("JSEndBody", JSEndBody)
 cs.SetField("JSFilename", JSFilename)
 cs.SetField("JSHead", JSHead)
 cs.SetField("JSOnLoad", JSOnLoad)
-cs.SetField("MenuImageDownFilename", MenuImageDownFilename)
-cs.SetField("menuImageDownOverFilename", menuImageDownOverFilename)
-cs.SetField("MenuImageFilename", MenuImageFilename)
-cs.SetField("MenuImageOverFilename", MenuImageOverFilename)
+'cs.SetField("MenuImageDownFilename", MenuImageDownFilename)
+'cs.SetField("menuImageDownOverFilename", menuImageDownOverFilename)
+'cs.SetField("MenuImageFilename", MenuImageFilename)
+'cs.SetField("MenuImageOverFilename", MenuImageOverFilename)
 cs.SetField("ModifiedBy", ModifiedBy.ToString())
 cs.SetField("ModifiedDate", ModifiedDate.ToString())
 cs.SetField("Name", Name)
@@ -7679,10 +7655,10 @@ instance.JSEndBody = genericController.EncodeText(.fields("JSEndBody").defaultVa
 instance.JSFilename = genericController.EncodeText(.fields("JSFilename").defaultValue)
 instance.JSHead = genericController.EncodeText(.fields("JSHead").defaultValue)
 instance.JSOnLoad = genericController.EncodeText(.fields("JSOnLoad").defaultValue)
-instance.MenuImageDownFilename = genericController.EncodeText(.fields("MenuImageDownFilename").defaultValue)
-instance.menuImageDownOverFilename = genericController.EncodeText(.fields("menuImageDownOverFilename").defaultValue)
-instance.MenuImageFilename = genericController.EncodeText(.fields("MenuImageFilename").defaultValue)
-instance.MenuImageOverFilename = genericController.EncodeText(.fields("MenuImageOverFilename").defaultValue)
+'instance.MenuImageDownFilename = genericController.EncodeText(.fields("MenuImageDownFilename").defaultValue)
+'instance.menuImageDownOverFilename = genericController.EncodeText(.fields("menuImageDownOverFilename").defaultValue)
+'instance.MenuImageFilename = genericController.EncodeText(.fields("MenuImageFilename").defaultValue)
+'instance.MenuImageOverFilename = genericController.EncodeText(.fields("MenuImageOverFilename").defaultValue)
 instance.ModifiedBy = genericController.EncodeInteger(.fields("ModifiedBy").defaultValue)
 instance.ModifiedDate = genericController.EncodeDate(.fields("ModifiedDate").defaultValue)
 instance.Name = genericController.EncodeText(.fields("Name").defaultValue)

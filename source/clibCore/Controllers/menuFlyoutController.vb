@@ -109,7 +109,7 @@ Namespace Contensive.Core.Controllers
                         returnHtml = getMenuType(menuName, True, 0, encodeEmptyText(StyleSheetPrefix, ""))
                 End Select
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnHtml
         End Function
@@ -544,7 +544,7 @@ ErrorTrap:
         ''' <remarks></remarks>
         Private Sub handleLegacyClassError(ByVal MethodName As String, ByVal ErrNumber As Integer, ByVal ErrSource As String, ByVal ErrDescription As String)
             '
-            Call cpCore.handleExceptionAndRethrow(New Exception("unexpected error in method [" & MethodName & "], errDescription [" & ErrDescription & "]"))
+            Throw (New Exception("unexpected error in method [" & MethodName & "], errDescription [" & ErrDescription & "]"))
             '
         End Sub
     End Class

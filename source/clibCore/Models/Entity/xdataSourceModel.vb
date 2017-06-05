@@ -80,7 +80,7 @@
 '                    Call cpcore.cache.setObject(recordCacheName, json_serializer.Serialize(returnModel), cacheTagList)
 '                End If
 '            Catch ex As Exception
-'                cpcore.handleExceptionAndRethrow(ex)
+'                cpCore.handleExceptionAndContinue(ex) : Throw
 '            End Try
 '            Return returnModel
 '        End Function
@@ -105,7 +105,7 @@
 '                    Call cs.Close()
 '                End If
 '            Catch ex As Exception
-'                cpcore.handleExceptionAndRethrow(ex)
+'                cpCore.handleExceptionAndContinue(ex) : Throw
 '            End Try
 '            Return returnNewModel
 '        End Function
@@ -139,7 +139,7 @@
 '                End If
 '                Call cs.Close()
 '            Catch ex As Exception
-'                cpcore.handleExceptionAndRethrow(ex)
+'                cpCore.handleExceptionAndContinue(ex) : Throw
 '                Throw
 '            End Try
 '            Return id
@@ -164,7 +164,7 @@
 '                    End If
 '                End Using
 '            Catch ex As Exception
-'                cpcore.handleExceptionAndRethrow(ex)
+'                cpCore.handleExceptionAndContinue(ex) : Throw
 '            End Try
 '            Return result
 '        End Function
@@ -206,7 +206,7 @@
 '            Try
 '                result = create(cpCore, cpCore.db.metaData_InsertContentRecordGetID(primaryContentName, 0), cacheNameList)
 '            Catch ex As Exception
-'                cpCore.handleExceptionAndRethrow(ex)
+'                cpCore.handleExceptionAndContinue(ex) : Throw
 '                Throw
 '            End Try
 '            Return result

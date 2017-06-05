@@ -84,7 +84,7 @@ Namespace Contensive.Core.Controllers
                     returnId = contentNameIdDictionary(contentName.ToLower)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnId
         End Function
@@ -106,7 +106,7 @@ Namespace Contensive.Core.Controllers
                     returnCdef = getCdef(ContentId)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnCdef
         End Function
@@ -529,7 +529,7 @@ Namespace Contensive.Core.Controllers
                     cdefList.Add(contentIdKey, returnCdef)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnCdef
         End Function
@@ -571,7 +571,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnCriteria
         End Function
@@ -604,7 +604,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnOK
         End Function
@@ -683,7 +683,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End With
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         ''
@@ -1011,7 +1011,7 @@ ErrorTrap:
                 '    main_GetContentManagementList = Mid(main_GetContentManagementList, 2)
                 'End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnList
         End Function
@@ -1031,7 +1031,7 @@ ErrorTrap:
                 _contentNameIdDictionary = Nothing
                 _contentIdDict = Nothing
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -1051,7 +1051,7 @@ ErrorTrap:
                 Dim buildCache As Boolean
                 '
                 If (DataSourceName <> "") And (DataSourceName <> "-1") And (DataSourceName.ToLower <> "default") Then
-                    cpCore.handleExceptionAndRethrow(New NotImplementedException("alternate datasources not supported yet"))
+                    Throw New NotImplementedException("alternate datasources not supported yet")
                 Else
                     If TableName <> "" Then
                         lowerTablename = TableName.ToLower
@@ -1107,7 +1107,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return tableSchema
         End Function
@@ -1127,7 +1127,7 @@ ErrorTrap:
                 Models.Entity.contentModel.delete(cpCore, cpCore.metaData.getContentId(ContentName))
                 clear()
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -1142,7 +1142,7 @@ ErrorTrap:
                 cpCore.cache.invalidateObject("content")
                 clear()
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -1219,7 +1219,7 @@ ErrorTrap:
                     End If
                     '
                     If ParentContentID = 0 Then
-                        cpCore.handleExceptionAndRethrow(New ApplicationException("Can not create Child Content [" & ChildContentName & "] because the Parent Content [" & ParentContentName & "] was not found."))
+                        Throw (New ApplicationException("Can not create Child Content [" & ChildContentName & "] because the Parent Content [" & ParentContentName & "] was not found."))
                     Else
                         '
                         ' ----- create child content record, let the csv_ExecuteSQL reload CDef
@@ -1227,15 +1227,15 @@ ErrorTrap:
                         DataSourceName = "Default"
                         CSContent = cpCore.db.cs_openContentRecord("Content", ParentContentID)
                         If Not cpCore.db.cs_ok(CSContent) Then
-                            cpCore.handleExceptionAndRethrow(New ApplicationException("Can not create Child Content [" & ChildContentName & "] because the Parent Content [" & ParentContentName & "] was not found."))
+                            Throw (New ApplicationException("Can not create Child Content [" & ChildContentName & "] because the Parent Content [" & ParentContentName & "] was not found."))
                         Else
                             SelectFieldList = cpCore.db.cs_getSelectFieldList(CSContent)
                             If SelectFieldList = "" Then
-                                cpCore.handleExceptionAndRethrow(New ApplicationException("Can not create Child Content [" & ChildContentName & "] because the Parent Content [" & ParentContentName & "] record has not fields."))
+                                Throw (New ApplicationException("Can not create Child Content [" & ChildContentName & "] because the Parent Content [" & ParentContentName & "] record has not fields."))
                             Else
                                 CSNew = cpCore.db.cs_insertRecord("Content", 0)
                                 If Not cpCore.db.cs_ok(CSNew) Then
-                                    Call cpCore.handleExceptionAndRethrow(New ApplicationException("Can not create Child Content [" & ChildContentName & "] because there was an error creating a new record in ccContent."))
+                                    Throw (New ApplicationException("Can not create Child Content [" & ChildContentName & "] because there was an error creating a new record in ccContent."))
                                 Else
                                     Fields = Split(SelectFieldList, ",")
                                     DateNow = DateTime.Now()
@@ -1280,7 +1280,7 @@ ErrorTrap:
                 cpCore.cache.invalidateAll()
                 clear()
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(New ApplicationException("Exception in CreateContentChild"))
+                Throw (New ApplicationException("Exception in CreateContentChild"))
             End Try
         End Sub
         '
@@ -1342,7 +1342,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnCopy
         End Function
@@ -1393,7 +1393,7 @@ ErrorTrap:
                 '
                 returnCopy = "_a" & returnCopy & CStr(crc Mod 9)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnCopy
         End Function
@@ -1412,7 +1412,7 @@ ErrorTrap:
                     returnTableName = CDef.ContentTableName
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnTableName
         End Function
@@ -1432,7 +1432,7 @@ ErrorTrap:
                     returnDataSource = CDef.ContentDataSourceName
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnDataSource
         End Function
@@ -1452,7 +1452,7 @@ ErrorTrap:
                     returnName = cdef.Name
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnName
         End Function
@@ -1577,7 +1577,7 @@ ErrorTrap:
                                 'Else
                                 '    DataSourceID = cpCore.db.getDataSourceId(DataSourceName)
                                 '    If DataSourceID = -1 Then
-                                '        Call cpCore.handleExceptionAndRethrow(New ApplicationException("Could not find DataSource [" & DataSourceName & "] for table [" & TableName & "]"))
+                                '        throw (New ApplicationException("Could not find DataSource [" & DataSourceName & "] for table [" & TableName & "]"))
                                 '    End If
                                 'End If
                                 TableID = cpCore.db.insertTableRecordGetId("Default", "ccTables", SystemMemberID)
@@ -1886,7 +1886,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnContentId
         End Function
@@ -1995,7 +1995,7 @@ ErrorTrap:
                     '
                     ' This update is not allowed
                     '
-                    cpCore.handleLegacyError2("cpCoreClass", "csv_VerifyCDefField_ReturnID", cpCore.serverConfig.appConfig.name & ", Warning, a Base field Is being updated To non-base. This should only happen When a base field Is removed from the base collection. Content [" & ContentName & "], field [" & field.nameLc & "].")
+                    Throw (New ApplicationException("Unexpected exception")) '  cpCore.handleLegacyError2("cpCoreClass", "csv_VerifyCDefField_ReturnID", cpCore.serverConfig.appConfig.name & ", Warning, a Base field Is being updated To non-base. This should only happen When a base field Is removed from the base collection. Content [" & ContentName & "], field [" & field.nameLc & "].")
                 End If
                 If True Then
                     'FieldAdminOnly = field.adminOnly
@@ -2034,28 +2034,28 @@ ErrorTrap:
                     If RedirectContentName <> "" Then
                         RedirectContentID = cpCore.db.getContentId(RedirectContentName)
                         If RedirectContentID <= 0 Then
-                            Call cpCore.handleExceptionAndRethrow(New Exception("Could Not create redirect For field [" & field.nameLc & "] For Content Definition [" & ContentName & "] because no Content Definition was found For RedirectContentName [" & RedirectContentName & "]."))
+                            Throw (New Exception("Could Not create redirect For field [" & field.nameLc & "] For Content Definition [" & ContentName & "] because no Content Definition was found For RedirectContentName [" & RedirectContentName & "]."))
                         End If
                     End If
                     '
                     If LookupContentName <> "" Then
                         LookupContentID = cpCore.db.getContentId(LookupContentName)
                         If LookupContentID <= 0 Then
-                            Call cpCore.handleExceptionAndRethrow(New Exception("Could Not create lookup For field [" & field.nameLc & "] For Content Definition [" & ContentName & "] because no Content Definition was found For [" & LookupContentName & "]."))
+                            Throw (New Exception("Could Not create lookup For field [" & field.nameLc & "] For Content Definition [" & ContentName & "] because no Content Definition was found For [" & LookupContentName & "]."))
                         End If
                     End If
                     '
                     If ManyToManyContent <> "" Then
                         ManyToManyContentID = cpCore.db.getContentId(ManyToManyContent)
                         If ManyToManyContentID <= 0 Then
-                            Call cpCore.handleExceptionAndRethrow(New ApplicationException("Could Not create many To many For field [" & field.nameLc & "] For Content Definition [" & ContentName & "] because no Content Definition was found For ManyToManyContent [" & ManyToManyContent & "]."))
+                            Throw (New ApplicationException("Could Not create many To many For field [" & field.nameLc & "] For Content Definition [" & ContentName & "] because no Content Definition was found For ManyToManyContent [" & ManyToManyContent & "]."))
                         End If
                     End If
                     '
                     If ManyToManyRuleContent <> "" Then
                         ManyToManyRuleContentID = cpCore.db.getContentId(ManyToManyRuleContent)
                         If ManyToManyRuleContentID <= 0 Then
-                            Call cpCore.handleExceptionAndRethrow(New ApplicationException("Could Not create many To many For field [" & field.nameLc & "] For Content Definition [" & ContentName & "] because no Content Definition was found For ManyToManyRuleContent [" & ManyToManyRuleContent & "]."))
+                            Throw (New ApplicationException("Could Not create many To many For field [" & field.nameLc & "] For Content Definition [" & ContentName & "] because no Content Definition was found For ManyToManyRuleContent [" & ManyToManyRuleContent & "]."))
                         End If
                     End If
                     '
@@ -2065,17 +2065,17 @@ ErrorTrap:
                         '
                         ' Content Definition not found
                         '
-                        Call cpCore.handleExceptionAndRethrow(New ApplicationException("Could Not create Field [" & field.nameLc & "] because Content Definition [" & ContentName & "] was Not found In ccContent Table."))
+                        Throw (New ApplicationException("Could Not create Field [" & field.nameLc & "] because Content Definition [" & ContentName & "] was Not found In ccContent Table."))
                     ElseIf TableID <= 0 Then
                         '
                         ' Content Definition not found
                         '
-                        Call cpCore.handleExceptionAndRethrow(New ApplicationException("Could Not create Field [" & field.nameLc & "] because Content Definition [" & ContentName & "] has no associated Content Table."))
+                        Throw (New ApplicationException("Could Not create Field [" & field.nameLc & "] because Content Definition [" & ContentName & "] has no associated Content Table."))
                     ElseIf fieldTypeId <= 0 Then
                         '
                         ' invalid field type
                         '
-                        Call cpCore.handleExceptionAndRethrow(New ApplicationException("Could Not create Field [" & field.nameLc & "] because the field type [" & fieldTypeId & "] Is Not valid."))
+                        Throw (New ApplicationException("Could Not create Field [" & field.nameLc & "] because the field type [" & fieldTypeId & "] Is Not valid."))
                     Else
                         '
                         ' Get the TableName and DataSourceID
@@ -2083,7 +2083,7 @@ ErrorTrap:
                         TableName = ""
                         rs = cpCore.db.executeSql("Select Name, DataSourceID from ccTables where ID=" & cpCore.db.encodeSQLNumber(TableID) & ";")
                         If Not isDataTableOk(rs) Then
-                            Call cpCore.handleExceptionAndRethrow(New ApplicationException("Could Not create Field [" & field.nameLc & "] because table For tableID [" & TableID & "] was Not found."))
+                            Throw (New ApplicationException("Could Not create Field [" & field.nameLc & "] because table For tableID [" & TableID & "] was Not found."))
                         Else
                             DataSourceID = genericController.EncodeInteger(cpCore.db.getDataRowColumnName(rs.Rows(0), "DataSourceID"))
                             TableName = genericController.encodeText(cpCore.db.getDataRowColumnName(rs.Rows(0), "Name"))
@@ -2192,7 +2192,7 @@ ErrorTrap:
                                 RecordID = cpCore.db.insertTableRecordGetId("Default", "ccFields")
                             End If
                             If RecordID = 0 Then
-                                Call cpCore.handleExceptionAndRethrow(New ApplicationException("Could Not create Field [" & field.nameLc & "] because insert into ccfields failed."))
+                                Throw (New ApplicationException("Could Not create Field [" & field.nameLc & "] because insert into ccfields failed."))
                             Else
                                 Call cpCore.db.updateTableRecord("Default", "ccFields", "ID=" & RecordID, sqlList)
                             End If
@@ -2208,7 +2208,7 @@ ErrorTrap:
                 '
                 returnId = RecordID
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnId
         End Function
@@ -2227,7 +2227,7 @@ ErrorTrap:
                     returnOk = cdef.fields.ContainsKey(FieldName.ToLower)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnOk
         End Function

@@ -82,7 +82,7 @@ Namespace Contensive.Core
             '
             Exit Sub
 ErrorTrap:
-            cpCore.handleLegacyError3("unknown", "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail", Err.Number, Err.Source, Err.Description, True, True, "")
+            throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3("unknown", "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail", Err.Number, Err.Source, Err.Description, True, True, "")
             Err.Clear()
         End Sub
         '
@@ -103,7 +103,7 @@ ErrorTrap:
             Dim appStatus As Integer
             '
             'hint = "1"
-            appName = cpCore.serverconfig.appConfig.name
+            appName = cpCore.serverConfig.appConfig.name
             appStatus = cpCore.serverConfig.appConfig.appStatus
             'hint = "3"
             If (appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady) Or (appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusUpgrading) Then
@@ -137,7 +137,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            cpCore.handleLegacyError3(appName, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmailForApp, hint=" & hint, Err.Number, Err.Source, Err.Description, True, True, "")
+            throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(appName, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmailForApp, hint=" & hint, Err.Number, Err.Source, Err.Description, True, True, "")
             Err.Clear()
         End Sub
         '
@@ -338,7 +338,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_GroupEmail", Err.Number, Err.Source, Err.Description, True, True, "")
+            throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_GroupEmail", Err.Number, Err.Source, Err.Description, True, True, "")
             Err.Clear()
         End Sub
         '
@@ -594,7 +594,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_ConditionalEmail", Err.Number, Err.Source, Err.Description, True, True, "")
+            throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_ConditionalEmail", Err.Number, Err.Source, Err.Description, True, True, "")
             Err.Clear()
         End Sub
         '
@@ -692,12 +692,12 @@ ErrorTrap:
                         '
                         ' Encode body and subject
                         '
-                        EmailBodyEncoded = cpCore.htmldoc.html_executeContentCommands(Nothing, EmailBodyEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, True, errorMessage)
-                        EmailBodyEncoded = cpCore.htmldoc.html_encodeContent10(EmailBodyEncoded, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
+                        EmailBodyEncoded = cpCore.htmlDoc.html_executeContentCommands(Nothing, EmailBodyEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, True, errorMessage)
+                        EmailBodyEncoded = cpCore.htmlDoc.html_encodeContent10(EmailBodyEncoded, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                         'EmailBodyEncoded = cpCore.csv_EncodeContent8(Nothing, EmailBodyEncoded, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
                         '
-                        EmailSubjectEncoded = cpCore.htmldoc.html_executeContentCommands(Nothing, EmailSubjectEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, True, errorMessage)
-                        EmailSubjectEncoded = cpCore.htmldoc.html_encodeContent10(EmailSubjectEncoded, MemberID, "", 0, 0, True, False, False, False, False, True, "", PrimaryLink, True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
+                        EmailSubjectEncoded = cpCore.htmlDoc.html_executeContentCommands(Nothing, EmailSubjectEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, True, errorMessage)
+                        EmailSubjectEncoded = cpCore.htmlDoc.html_encodeContent10(EmailSubjectEncoded, MemberID, "", 0, 0, True, False, False, False, False, True, "", PrimaryLink, True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                         'EmailSubjectEncoded = cpCore.csv_EncodeContent8(Nothing, EmailSubjectEncoded, MemberID, "", 0, 0, True, False, False, False, False, True, "", PrimaryLink, True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
                         '
                         ' Encode/Merge Template
@@ -711,8 +711,8 @@ ErrorTrap:
                             '
                             ' use provided template
                             '
-                            EmailTemplateEncoded = cpCore.htmldoc.html_executeContentCommands(Nothing, EmailTemplateEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, True, errorMessage)
-                            EmailTemplateEncoded = cpCore.htmldoc.html_encodeContent10(EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
+                            EmailTemplateEncoded = cpCore.htmlDoc.html_executeContentCommands(Nothing, EmailTemplateEncoded, CPUtilsClass.addonContext.ContextEmail, MemberID, True, errorMessage)
+                            EmailTemplateEncoded = cpCore.htmlDoc.html_encodeContent10(EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                             'EmailTemplateEncoded = cpCore.csv_EncodeContent8(Nothing, EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
                             'EmailTemplateEncoded = cpCore.csv_encodecontent8(Nothing, EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, ContentPlaceHolder, True, CPUtilsClass.addonContext.contextemail)
                             If genericController.vbInstr(1, EmailTemplateEncoded, fpoContentBox) <> 0 Then
@@ -781,7 +781,7 @@ ErrorTrap:
                 End If
                 'Call cpCore.app.closeCS(CSLog)
             Catch ex As Exception
-                cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "SendEmailRecord", Err.Number, Err.Source, Err.Description, True, True, "")
+                throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "SendEmailRecord", Err.Number, Err.Source, Err.Description, True, True, "")
                 Err.Clear()
             Finally
                 Call cpCore.db.cs_Close(CSPeople)
@@ -820,7 +820,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "GetEmailTemplate", Err.Number, Err.Source, Err.Description, True, True, "")
+            throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "GetEmailTemplate", Err.Number, Err.Source, Err.Description, True, True, "")
             Err.Clear()
         End Function
         '
@@ -908,7 +908,7 @@ ErrorTrap:
                 End If
                 Call cpCore.db.cs_Close(CSPeople)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
     End Class

@@ -480,9 +480,7 @@
     <Compile Include="Models\Entity\serverConfigModel.vb" />
     <Compile Include="Models\Entity\xdataSourceModel.vb" />
     <Compile Include="Models\Entity\visitorModel.vb" />
-    <Compile Include="Models\Entity\pageContentModel.vb" />
     <Compile Include="Models\Entity\siteSectionModel.vb" />
-    <Compile Include="Models\Entity\pageTemplateModel.vb" />
     <Compile Include="Models\Entity\visitModel.vb" />
     <Compile Include="Models\Entity\personModel.vb" />
     <Compile Include="Models\Entity\LanguageModel.vb" />
@@ -492,6 +490,9 @@
     <Compile Include="Models\Entity\addonModel.vb" />
     <Compile Include="Models\Entity\contentModel.vb" />
     <Compile Include="Models\Entity\miniCollectionModel.vb" />
+    <Compile Include="Models\Entity\domainModel.vb" />
+    <Compile Include="Models\Entity\pageContentModel.vb" />
+    <Compile Include="Models\Entity\pageTemplateModel.vb" />
     <Compile Include="Models\Entity\_blankModel.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

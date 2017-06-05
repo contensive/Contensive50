@@ -69,7 +69,7 @@ Namespace Contensive.Core
             Try
                 Call cpCore.email.send(ToAddress, FromAddress, Subject, Body, "", "", "", SendImmediately, BodyIsHTML, 0)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '====================================================================================================
@@ -83,7 +83,7 @@ Namespace Contensive.Core
             Try
                 Call cpCore.email.sendForm(ToAddress, FromAddress, Subject)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '====================================================================================================
@@ -100,7 +100,7 @@ Namespace Contensive.Core
             Try
                 Call cpCore.email.sendGroup(GroupList, FromAddress, Subject, Body, SendImmediately, BodyIsHTML)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
 

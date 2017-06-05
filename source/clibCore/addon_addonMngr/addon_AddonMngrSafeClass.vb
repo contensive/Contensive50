@@ -878,7 +878,7 @@ Namespace Contensive.Core
                     Call cpCore.htmlDoc.main_AddPagetitle("Add-on Manager")
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return addonManager
         End Function
@@ -965,9 +965,7 @@ ErrorTrap:
         '===========================================================================
         '
         Private Sub HandleClassTrapError(ByVal MethodName As String, Optional ByVal Context As String = "context unknown")
-            '
-            cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, Context, "dll", "AddonManClass", MethodName, Err.Number, Err.Source, Err.Description, True, False, cpCore.webServer.webServerIO_ServerLink)
-            '
+            Throw New ApplicationException("Unexpected exception in method [" & MethodName & "], cause [" & Context & "]")
         End Sub
         '
         '

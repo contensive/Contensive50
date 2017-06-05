@@ -61,7 +61,7 @@ Namespace Contensive.Core
             Try
                 Controllers.appBuilderController.upgrade(CP.core, isNewApp)
             Catch ex As Exception
-                CP.core.handleExceptionAndRethrow(ex)
+                CP.core.handleExceptionAndContinue(ex)
             End Try
         End Sub
         '

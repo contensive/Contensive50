@@ -36,7 +36,7 @@ Namespace Contensive.Core.Controllers
                 verifyAppPool(cpCore, appName)
                 verifyWebsite(cpCore, appName, DomainName, rootPublicFilesPath, appName)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex, "verifySite")
+                cpCore.handleExceptionAndContinue(ex, "verifySite")
             End Try
         End Sub
         '
@@ -68,7 +68,7 @@ Namespace Contensive.Core.Controllers
                     serverManager.CommitChanges()
                 End Using
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex, "verifyAppPool")
+                cpCore.handleExceptionAndContinue(ex, "verifyAppPool")
             End Try
         End Sub
         '
@@ -120,7 +120,7 @@ Namespace Contensive.Core.Controllers
                     iisManager.CommitChanges()
                 End Using
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex, "verifyWebsite")
+                cpCore.handleExceptionAndContinue(ex, "verifyWebsite")
             End Try
         End Sub
         '
@@ -153,7 +153,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End Using
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex, "verifyWebsite_Binding")
+                cpCore.handleExceptionAndContinue(ex, "verifyWebsite_Binding")
             End Try
         End Sub
         '
@@ -194,7 +194,7 @@ Namespace Contensive.Core.Controllers
                     If found Then Exit For
                 Next
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex, "verifyWebsite_VirtualDirectory")
+                cpCore.handleExceptionAndContinue(ex, "verifyWebsite_VirtualDirectory")
             End Try
         End Sub
     End Class

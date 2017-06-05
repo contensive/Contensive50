@@ -1154,7 +1154,7 @@ ErrorTrap:
         '
         Private Sub HandleClassErrorAndBubble(ByVal appName As String, ByVal MethodName As String, Optional ByVal Cause As String = "unknown")
             '
-            cpCore.handleLegacyError3(appName, Cause, "dll", "XMLToolsClass", MethodName, Err.Number, Err.Source, Err.Description, False, False, "")
+            throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(appName, Cause, "dll", "XMLToolsClass", MethodName, Err.Number, Err.Source, Err.Description, False, False, "")
             '
         End Sub
         '
@@ -1164,7 +1164,7 @@ ErrorTrap:
         '
         Private Sub HandleClassErrorAndResume(ByVal appName As String, ByVal MethodName As String, ByVal Cause As String)
             '
-            cpCore.handleLegacyError3(appName, Cause, "dll", "XMLToolsClass", MethodName, Err.Number, Err.Source, Err.Description, False, True, "")
+            throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(appName, Cause, "dll", "XMLToolsClass", MethodName, Err.Number, Err.Source, Err.Description, False, True, "")
             '
         End Sub
 

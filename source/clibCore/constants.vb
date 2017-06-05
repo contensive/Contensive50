@@ -40,6 +40,7 @@ Namespace Contensive.Core
         Public Const CoreCollectionGuid = "{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}"                  ' contains core Contensive objects, loaded from Library
         Public Const ApplicationCollectionGuid = "{C58A76E2-248B-4DE8-BF9C-849A960F79C6}"           ' exported from application during upgrade
         '
+        ' -- addons
         Public Const adminSiteAddonGuid As String = "{c2de2acf-ca39-4668-b417-aa491e7d8460}"
         Public Const adminCommonAddonGuid = "{76E7F79E-489F-4B0F-8EE5-0BAC3E4CD782}"
         Public Const DashboardAddonGuid = "{4BA7B4A2-ED6C-46C5-9C7B-8CE251FC8FF5}"
@@ -110,6 +111,9 @@ Namespace Contensive.Core
         Public Const LegacyLandingPageName = "Landing Page Content"
         Public Const DefaultNewLandingPageName = "Home"
         Public Const DefaultLandingSectionName = "Home"
+        '
+        Public Const defaultLandingPageHtml = ""
+        Public Const defaultTemplateHtml = "{% {""addon"":{""addon"":""menu"",""name"":""Default""}} %}{% ""Content Box"" %}"
         '
         '
         '
@@ -268,10 +272,15 @@ Namespace Contensive.Core
             Dim RemotePort As Integer
         End Class
         '
-        ' Default username/password
+        ' -- Default username/password
         '
         Public Const DefaultServerUsername = "root"
         Public Const DefaultServerPassword = "contensive"
+        '
+        ' -- Request Names
+        '
+        Public Const rnRedirectContentId As String = "rc"
+        Public Const rnRedirectRecordId As String = "ri"
         '
         '-----------------------------------------------------------------------
         '   Form Contension Strategy
@@ -344,6 +353,7 @@ Namespace Contensive.Core
         '
         '-----------------------------------------------------------------------
         ' Ajax functions intercepted during init, answered and response closed
+        ' todo - convert built-in request name functions to remoteMethods
         '   These are hard-coded internal Contensive functions
         '   These should eventually be replaced with (HardcodedAddons) remote methods
         '   They should all be prefixed "cc"

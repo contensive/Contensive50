@@ -321,7 +321,7 @@ ErrorTrap:
             '
             ' ----- Append to the Content Server Log File
             '
-            cpCore.handleLegacyError3(appName, Context, "ccTasks", "TasksClass", MethodName, Err.Number, Err.Source, Err.Description, True, True, "")
+            throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(appName, Context, "ccTasks", "TasksClass", MethodName, Err.Number, Err.Source, Err.Description, True, True, "")
         End Sub
         '
         '==========================================================================================

@@ -41,7 +41,7 @@ Namespace Contensive.Core
         '
         Private Sub reportClassError(ByVal ex As Exception, ByVal methodName As String)
             Try
-                Call cp.core.handleExceptionAndRethrow(ex, "Unexpected Trap Error in CP.DB." & methodName)
+                Call cp.core.handleExceptionAndContinue(ex, "Unexpected Trap Error in CP.DB." & methodName)
             Catch exInner As Exception
                 '
             End Try
@@ -176,7 +176,7 @@ Namespace Contensive.Core
                 Call cs.Close()
                 '
             Catch ex As Exception
-                Call cp.core.handleExceptionAndRethrow(ex)
+                Call cp.core.handleExceptionAndContinue(ex)
             End Try
             Return returnKey
         End Function

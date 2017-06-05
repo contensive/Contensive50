@@ -27,6 +27,18 @@ Namespace Contensive.Core.Models.Context
         '
         '====================================================================================================
         '
+        Friend ReadOnly Property landingPageID() As Integer
+            Get
+                If _landingPageID Is Nothing Then
+                    _landingPageID = getinteger("LandingPageID", 0)
+                End If
+                Return CInt(_landingPageID)
+            End Get
+        End Property
+        Private _landingPageID As Integer? = Nothing
+        '
+        '====================================================================================================
+        '
         Friend ReadOnly Property sitePropertyContentId() As Integer
             Get
                 If _sitePropertyContentId Is Nothing Then
@@ -237,7 +249,7 @@ Namespace Contensive.Core.Models.Context
                         End If
                     End If
                 Catch ex As Exception
-                    cpCore.handleExceptionAndRethrow(ex)
+                    cpCore.handleExceptionAndContinue(ex) : Throw
                 End Try
                 Return _childListAddonID_Local
             End Get
@@ -547,7 +559,7 @@ Namespace Contensive.Core.Models.Context
                 'End If
                 'Call cpCore.cache.setObject(cacheName, Value)
             Catch ex As Exception
-                Call cpCore.handleExceptionAndRethrow(ex)
+                Call cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -602,7 +614,7 @@ Namespace Contensive.Core.Models.Context
                     End If
                 End Using
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnString
         End Function
@@ -640,7 +652,7 @@ Namespace Contensive.Core.Models.Context
                 '    End If
                 'End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnString
         End Function
@@ -729,7 +741,7 @@ Namespace Contensive.Core.Models.Context
                     End If
                     returnString = _dataBuildVersion
                 Catch ex As Exception
-                    cpCore.handleExceptionAndRethrow(ex)
+                    cpCore.handleExceptionAndContinue(ex) : Throw
                 End Try
                 Return returnString
             End Get
@@ -763,7 +775,7 @@ Namespace Contensive.Core.Models.Context
                 End If
                 cs.Close()
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return result
         End Function

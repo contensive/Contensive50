@@ -982,7 +982,7 @@ ErrorTrap:
                             '
                             ' Mark the record reviewed without making any changes
                             '
-                            Call cpCore.pageManager.pageManager_MarkRecordReviewed(adminContent.Name, editRecord.id)
+                            Call cpCore.db.markRecordReviewed(adminContent.Name, editRecord.id)
                         Case AdminActionWorkflowPublishSelected
                             '
                             ' Publish everything selected
@@ -1235,7 +1235,7 @@ ErrorTrap:
                                     Else
                                         CS = cpCore.csOpen("Group Email", editRecord.id)
                                         If Not cpCore.db.cs_ok(CS) Then
-                                            Call cpCore.handleLegacyError23("Email ID [" & editRecord.id & "] could not be found in Group Email.")
+                                            Throw New ApplicationException("Unexpected exception") ' throw new applicationException("Unexpected exception")'  cpCore.handleLegacyError23("Email ID [" & editRecord.id & "] could not be found in Group Email.")
                                         ElseIf cpCore.db.cs_get(CS, "FromAddress") = "" Then
                                             Call cpCore.error_AddUserError("A 'From Address' is required before sending an email.")
                                         ElseIf cpCore.db.cs_get(CS, "Subject") = "" Then
@@ -1268,7 +1268,7 @@ ErrorTrap:
                                     Else
                                         CS = cpCore.csOpen("Conditional Email", editRecord.id)
                                         If Not cpCore.db.cs_ok(CS) Then
-                                            Call cpCore.handleLegacyError23("Email ID [" & editRecord.id & "] could not be opened.")
+                                            Throw New ApplicationException("Unexpected exception") ' throw new applicationException("Unexpected exception")'  cpCore.handleLegacyError23("Email ID [" & editRecord.id & "] could not be opened.")
                                         Else
                                             Call cpCore.db.cs_set(CS, "submitted", False)
                                         End If
@@ -1296,7 +1296,7 @@ ErrorTrap:
                                     Else
                                         CS = cpCore.csOpen("Conditional Email", editRecord.id)
                                         If Not cpCore.db.cs_ok(CS) Then
-                                            Call cpCore.handleLegacyError23("Email ID [" & editRecord.id & "] could not be opened.")
+                                            Throw New ApplicationException("Unexpected exception") ' throw new applicationException("Unexpected exception")'  cpCore.handleLegacyError23("Email ID [" & editRecord.id & "] could not be opened.")
                                         ElseIf cpCore.db.cs_getInteger(CS, "ConditionID") = 0 Then
                                             cpCore.error_AddUserError("A condition must be set.")
                                         Else
@@ -1362,7 +1362,7 @@ ErrorTrap:
                                             ' Page Content special cases
                                             '
                                             If genericController.vbLCase(adminContent.ContentTableName) = "ccpagecontent" Then
-                                                Call cpCore.pageManager.pageManager_cache_pageContent_removeRow(RecordID, False, False)
+                                                Call cpCore.pageManager.cache_pageContent_removeRow(RecordID, False, False)
                                                 If RecordID = (cpCore.siteProperties.getinteger("PageNotFoundPageID", 0)) Then
                                                     Call cpCore.siteProperties.getText("PageNotFoundPageID", "0")
                                                 End If
@@ -1536,7 +1536,7 @@ ErrorTrap:
             ' --- Create Group Rules for this content
             '
             If CBool(InStr(1, ParentIDString, "," & ContentID & ",")) Then
-                Call cpCore.handleExceptionAndRethrow(New Exception("Child ContentID [" & ContentID & "] Is its own parent"))
+                Throw (New Exception("Child ContentID [" & ContentID & "] Is its own parent"))
             Else
                 MyParentIDString = ParentIDString & "," & ContentID & ","
                 Call LoadAndSaveGroupRules_ForContent(ContentID)
@@ -1662,9 +1662,9 @@ ErrorTrap:
                 ' Can not load edit record because bad content definition
                 '
                 If adminContent.Id = 0 Then
-                    Call cpCore.handleExceptionAndRethrow(New Exception("The record can Not be edited because no content definition was specified."))
+                    Throw (New Exception("The record can Not be edited because no content definition was specified."))
                 Else
-                    Call cpCore.handleExceptionAndRethrow(New Exception("The record can Not be edited because a content definition For ID [" & adminContent.Id & "] was Not found."))
+                    Throw (New Exception("The record can Not be edited because a content definition For ID [" & adminContent.Id & "] was Not found."))
                 End If
             Else
                 '
@@ -1915,7 +1915,7 @@ ErrorTrap:
                     End With
                 Next
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -2204,7 +2204,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -2219,7 +2219,7 @@ ErrorTrap:
             Dim FieldCount As Integer
             Dim DataSourceName As String
             Dim PageNotFoundPageID As Integer
-            Dim LandingPageID As Integer
+            'Dim LandingPageID As Integer
             Dim FormFieldListToBeLoaded As String
             Dim FormEmptyFieldList As String
             '
@@ -2261,7 +2261,7 @@ ErrorTrap:
                 '
                 If AllowAdminFieldCheck() And (FormFieldListToBeLoaded <> ",") Then
                     Call cpCore.error_AddUserError("There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The following fields where Not found [" & Mid(FormFieldListToBeLoaded, 2, Len(FormFieldListToBeLoaded) - 2) & "].")
-                    cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", There were fields In the fieldlist sent out To the browser that did Not Return, [" & Mid(FormFieldListToBeLoaded, 2, Len(FormFieldListToBeLoaded) - 2) & "]")
+                    Throw (New ApplicationException("Unexpected exception")) '  cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", There were fields In the fieldlist sent out To the browser that did Not Return, [" & Mid(FormFieldListToBeLoaded, 2, Len(FormFieldListToBeLoaded) - 2) & "]")
                 Else
                     '
                     ' if page content, check for the 'pagenotfound','landingpageid' checkboxes in control tab
@@ -2275,14 +2275,13 @@ ErrorTrap:
                             Call cpCore.siteProperties.setProperty("PageNotFoundPageID", "0")
                         End If
                         '
-                        LandingPageID = (cpCore.siteProperties.getinteger("LandingPageID", 0))
                         If cpCore.docProperties.getBoolean("LandingPageID") Then
                             editRecord.SetLandingPageID = True
                         ElseIf (editRecord.id = 0) Then
                             '
                             ' New record, allow it to be set, but do not compare it to LandingPageID
                             '
-                        ElseIf (editRecord.id = LandingPageID) Then
+                        ElseIf (editRecord.id = cpCore.siteProperties.landingPageID) Then
                             '
                             ' Do not reset the LandingPageID from here -- set another instead
                             '
@@ -2433,7 +2432,7 @@ ErrorTrap:
                                         '
                                         Call cpCore.error_AddUserError("There has been an Error reading the response from your browser. Please Try again, taking care Not To submit the page until your browser has finished loading. If this Error occurs again, please report this problem To your site administrator. The first Error was [" & FieldName & " Not found]. There may have been others.")
                                     End If
-                                    cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
+                                    Throw (New ApplicationException("Unexpected exception")) '  cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
                                     Exit Sub
                                 End If
                             End If
@@ -2461,7 +2460,7 @@ ErrorTrap:
                             If AllowAdminFieldCheck() Then
                                 If (Not InResponse) And (Not InEmptyFieldList) Then
                                     Call cpCore.error_AddUserError("There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [" & FieldName & " Not found].")
-                                    cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
+                                    Throw (New ApplicationException("Unexpected exception")) '  cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
                                     Exit Sub
                                 End If
                             End If
@@ -2488,7 +2487,7 @@ ErrorTrap:
                             If AllowAdminFieldCheck() Then
                                 If (Not InResponse) And (Not InEmptyFieldList) Then
                                     Call cpCore.error_AddUserError("There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [" & FieldName & " Not found].")
-                                    cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
+                                    Throw (New ApplicationException("Unexpected exception")) '  cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
                                     Exit Sub
                                 End If
                             End If
@@ -2559,7 +2558,7 @@ ErrorTrap:
                                 ' Was sent out non-blank, and no response back, flag error and leave the current value to a retry
                                 '
                                 Call cpCore.error_AddUserError("There has been an Error reading the response from your browser. The field [" & .caption & "]" & TabCopy & " was missing. Please Try your change again. If this Error happens repeatedly, please report this problem To your site administrator.")
-                                cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
+                                Throw (New ApplicationException("Unexpected exception")) '  cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
                                 ResponseFieldValueIsOKToSave = False
                             Else
                                 '
@@ -3585,7 +3584,7 @@ ErrorTrap:
                     returnHas = cpCore.authContext.isAuthenticatedContentManager(cpCore, ContentName)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnHas
         End Function
@@ -3682,7 +3681,7 @@ ErrorTrap:
                 '
                 return_formIndexCell = cpCore.htmlDoc.html_EncodeHTML(Stream.Text)
             Catch ex As Exception
-                Call cpCore.handleExceptionAndRethrow(ex)
+                Call cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return return_formIndexCell
 
@@ -3771,7 +3770,7 @@ ErrorTrap:
                 Dim IsEmailTable As Boolean
                 Dim IsLandingPageTemp As Boolean
                 Dim Pos As Integer
-                Dim LandingPageID As Integer
+                'Dim LandingPageID As Integer
                 Dim PCC As String(,)
                 Dim TestPageID As Integer
                 Dim EditRecordRootPageID As Integer
@@ -3866,8 +3865,8 @@ ErrorTrap:
                 '
                 AdminContentWorkflowAuthoring = AdminContentWorkflowAuthoring
                 'IsWorkflowMode = cpCore.app.SiteProperty_AllowWorkflowAuthoring And AdminContent.AllowWorkflowAuthoring
-                If cpCore.pageManager.pageManager_cache_pageContent_rows = 0 Then
-                    Call cpCore.pageManager.pageManager_cache_pageContent_load(AdminContentWorkflowAuthoring, False)
+                If cpCore.pageManager.cache_pageContent_rows = 0 Then
+                    Call cpCore.pageManager.cache_pageContent_load(AdminContentWorkflowAuthoring, False)
                 End If
                 'Ptr = cpCore.pageManager.pageManager_cache_pageContent_getPtr(0, AdminContentWorkflowAuthoring, False)
                 '
@@ -3915,7 +3914,7 @@ ErrorTrap:
                 Call Stream.Add(GetForm_EditFormStart(AdminFormEdit))
                 '
                 IsLandingPageParent = False
-                LandingPageID = 0
+                'LandingPageID = 0
                 IsLandingPage = False
                 IsRootPage = False
                 TemplateIDForStyles = 0
@@ -3940,15 +3939,15 @@ ErrorTrap:
                         ' landing page case
                         '
                         '$$$$$ problem -- could be landing page based on domain, not property
-                        LandingPageID = (cpCore.siteProperties.getinteger("LandingPageID", 0))
-                        If LandingPageID = 0 Then
+                        'LandingPageID = (cpCore.siteProperties.getinteger("LandingPageID", 0))
+                        If cpCore.siteProperties.landingPageID = 0 Then
                             '
                             ' The call generated a user error because the landingpageid could not be determined
                             ' block it
                             '
                             'Call cpCore.main_GetUserError
                         Else
-                            IsLandingPage = (editRecord.id = LandingPageID)
+                            IsLandingPage = (editRecord.id = cpCore.siteProperties.landingPageID)
                             'If IsLandingPage Then
                             '    If genericController.EncodeInteger(cpCore.main_GetSiteProperty2("LandingPageID", "", True)) <> LandingPageID Then
                             '        IsLandingPageTemp = True
@@ -3972,16 +3971,16 @@ ErrorTrap:
                     '
                     ' ----- special case, Is this page a LandingPageParent (Parent of the landing page), or is this section the landing page section
                     '
-                    PCC = cpCore.pageManager.pageManager_cache_pageContent_get(False, False)
+                    PCC = cpCore.pageManager.cache_pageContent_get(False, False)
                     If Not IsNothing(PCC) Then
-                        TestPageID = LandingPageID
+                        TestPageID = cpCore.siteProperties.landingPageID
                         Do While LoopPtr < 20 And (TestPageID <> 0)
                             IsLandingPageParent = IsPageContentTable And (editRecord.id = TestPageID)
                             IsLandingSection = IsSectionTable And (EditRecordRootPageID = TestPageID)
                             If IsLandingPageParent Or IsLandingSection Then
                                 Exit Do
                             End If
-                            PCCPtr = cpCore.pageManager.pageManager_cache_pageContent_getPtr(TestPageID, False, False)
+                            PCCPtr = cpCore.pageManager.cache_pageContent_getPtr(TestPageID, False, False)
                             If PCCPtr >= 0 Then
                                 TestPageID = genericController.EncodeInteger(PCC(PCC_ParentID, PCCPtr))
                             End If
@@ -4623,7 +4622,7 @@ ErrorTrap:
                     Call cpCore.htmlDoc.main_AddPagetitle("Edit " & editRecord.nameLc & " in " & editRecord.contentControlId_Name)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnHtml
         End Function
@@ -4993,7 +4992,7 @@ ErrorTrap:
                         ContentID = cpCore.db.cs_getInteger(CS, "contentID")
                         ContentName = cpCore.db.cs_getText(CS, "contentname")
                         RecordID = cpCore.db.cs_getInteger(CS, "recordid")
-                        Link = cpCore.pageManager.pageManager_GetPageLink4(RecordID, "", True, False)
+                        Link = cpCore.pageManager.getPageLink4(RecordID, "", True, False)
                         'Link = cpCore.main_GetPageLink3(RecordID, "", True)
                         'If Link = "" Then
                         '    Link = cpCore.db.cs_getText(CS, "Link")
@@ -5328,7 +5327,7 @@ ErrorTrap:
                     '
                     ' There are no visible fiels, return empty
                     '
-                    cpCore.handleExceptionAndRethrow(New ApplicationException("The content definition for this record is invalid. It contains no valid fields."))
+                    Throw (New ApplicationException("The content definition for this record is invalid. It contains no valid fields."))
                 Else
                     RecordReadOnly = ForceReadOnly
                     '
@@ -5903,7 +5902,7 @@ ErrorTrap:
                                                     EditorString &= cpCore.htmlDoc.main_GetFormInputSelectList2(FormFieldLCaseName, FieldValueInteger, .lookupList, "", "", "select")
                                                 End If
                                             Else
-                                                cpCore.handleExceptionAndRethrow(New ApplicationException("Field [" & FieldName & "] is a Lookup field, but no LookupContent or LookupList has been configured"))
+                                                Throw (New ApplicationException("Field [" & FieldName & "] is a Lookup field, but no LookupContent or LookupList has been configured"))
                                                 EditorString &= "[Selection not configured]"
                                             End If
                                             '
@@ -6393,7 +6392,7 @@ ErrorTrap:
                     'End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnHtml
         End Function
@@ -6660,7 +6659,7 @@ ErrorTrap:
                 '
                 If (UCase(adminContent.ContentTableName) = "CCPAGECONTENT") Or (UCase(adminContent.ContentTableName) = "ITEMS") Then
                     FieldHelp = "This is the URL where this record was last displayed on the site. It may be blank if the record has not been displayed yet."
-                    Copy = cpCore.pageManager.main_GetContentWatchLinkByKey(editRecord.contentControlId & "." & editRecord.id, , False)
+                    Copy = cpCore.pageManager.getContentWatchLinkByKey(editRecord.contentControlId & "." & editRecord.id, , False)
                     If Copy = "" Then
                         HTMLFieldString = "unknown"
                     Else
@@ -7238,7 +7237,7 @@ ErrorTrap:
                     & ""
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnHtml
         End Function
@@ -8881,7 +8880,7 @@ ErrorTrap:
         '        Panel = Panel & "</table>"
         '        deprecate_menu_getLeftMode = cpCore.main_GetPanel(Panel, "ccPanel", "ccPanelHilite", "ccPanelShadow", "150", 10)
         '    Catch ex As Exception
-        '        cpCore.handleExceptionAndRethrow(ex)
+        '        cpCore.handleExceptionAndContinue(ex) : Throw
         '    End Try
         '    Return returnString
         'End Function
@@ -9184,7 +9183,7 @@ ErrorTrap:
                 '
                 return_formTop = Stream.Text
             Catch ex As Exception
-                Call cpCore.handleExceptionAndRethrow(ex)
+                Call cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return return_formTop
         End Function
@@ -9247,7 +9246,7 @@ ErrorTrap:
                 '    End If
                 GetActiveImage = Panel
             Catch ex As Exception
-                Call cpCore.handleExceptionAndRethrow(ex)
+                Call cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return return_ActiveImage
         End Function
@@ -10524,7 +10523,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Error")
             '
             If DeveloperError <> "" Then
-                Call cpCore.handleExceptionAndRethrow(New Exception("error [" & DeveloperError & "], user error [" & UserError & "]"))
+                Throw (New Exception("error [" & DeveloperError & "], user error [" & UserError & "]"))
             End If
             If UserError <> "" Then
                 Call cpCore.error_AddUserError(UserError)
@@ -10806,7 +10805,7 @@ ErrorTrap:
                 Loop
                 Call cpCore.db.cs_Close(CS)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnOptions
         End Function
@@ -11913,7 +11912,7 @@ ErrorTrap:
                 '
                 returnHtml &= cpCore.htmlDoc.html_GetFormInputHidden("FormFieldList", FormFieldList)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnHtml
         End Function
@@ -13126,7 +13125,7 @@ ErrorTrap:
                 returnForm = Stream.Text
                 '
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnForm
         End Function
@@ -13557,7 +13556,7 @@ ErrorTrap:
                     returnContent = "<div style=""padding-left:10px;padding-right:10px;"">" & returnContent & "</div>"
                 End With
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnContent
         End Function
@@ -13811,7 +13810,7 @@ ErrorTrap:
                     '        End If
                 End With
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnIndexConfig
         End Function
@@ -14988,7 +14987,7 @@ ErrorTrap:
                     Call cpCore.htmlDoc.main_AddPagetitle(adminContent.Name & " Advanced Search")
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnForm
         End Function
@@ -16608,7 +16607,7 @@ ErrorTrap:
                 returnHtml = Adminui.GetBody("Clear Cache", ButtonList, "", True, True, Description, "", 0, Content.Text)
                 Content = Nothing
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnHtml
         End Function
@@ -16820,7 +16819,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return addonHelp
         End Function
@@ -16904,7 +16903,7 @@ ErrorTrap:
                     returnHelp = returnHelp & "</div>"
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnHelp
         End Function
@@ -16932,7 +16931,7 @@ ErrorTrap:
                     addonManager = AddonMan.GetForm_SafeModeAddonManager()
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return addonManager
         End Function
@@ -17463,7 +17462,7 @@ ErrorTrap:
                     orderByDelim = ","
                 Next
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -17505,7 +17504,7 @@ ErrorTrap:
             Exit Sub
             '
 ErrorTrap:
-            Call cpCore.handleExceptionAndRethrow(New Exception("unexpected exception"))
+            Throw (New Exception("unexpected exception"))
         End Sub
         '
         '===========================================================================
@@ -17517,7 +17516,7 @@ ErrorTrap:
         ''' <remarks></remarks>
         Private Sub handleLegacyClassError3(ByVal MethodName As String, Optional ByVal Context As String = "")
             '
-            Call cpCore.handleExceptionAndRethrow(New Exception("error in method [" & MethodName & "], contect [" & Context & "]"))
+            Throw (New Exception("error in method [" & MethodName & "], contect [" & Context & "]"))
             '
         End Sub
         '
@@ -17530,7 +17529,7 @@ ErrorTrap:
         ''' <remarks></remarks>
         Private Sub handleLegacyClassError2(ByVal MethodName As String, Optional ByVal Context As String = "")
             '
-            Call cpCore.handleExceptionAndRethrow(New Exception("error in method [" & MethodName & "], Context [" & Context & "]"))
+            Throw (New Exception("error in method [" & MethodName & "], Context [" & Context & "]"))
             Err.Clear()
             '
         End Sub
@@ -17543,7 +17542,7 @@ ErrorTrap:
         ''' <param name="ErrDescription"></param>
         ''' <remarks></remarks>
         Private Sub handleLegacyClassError(MethodName As String, ErrDescription As String)
-            Call cpCore.handleExceptionAndRethrow(New Exception("error in method [" & MethodName & "], ErrDescription [" & ErrDescription & "]"))
+            Throw (New Exception("error in method [" & MethodName & "], ErrDescription [" & ErrDescription & "]"))
         End Sub
         'Private Sub pattern1()
         '    Dim admincontent As coreMetaDataClass.CDefClass

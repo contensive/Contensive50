@@ -116,7 +116,7 @@ Namespace Contensive.Core
                 Copy = genericController.vbReplace(Copy, vbCr, "\n")
                 Copy = genericController.vbReplace(Copy, vbLf, "\n")
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -142,7 +142,7 @@ Namespace Contensive.Core
                 Copy = genericController.vbReplace(Copy, vbCr, "\n")
                 Copy = genericController.vbReplace(Copy, vbLf, "\n")
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -168,7 +168,7 @@ Namespace Contensive.Core
                 Copy = genericController.vbReplace(Copy, vbCr, "\n")
                 Copy = genericController.vbReplace(Copy, vbLf, "\n")
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -190,7 +190,7 @@ Namespace Contensive.Core
                     End If
                 Next
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -362,11 +362,11 @@ Namespace Contensive.Core
                 Try
                     Dim inputStream As IO.Stream = iisContext.Request.InputStream
                 Catch ex As httpException
-                    Call cpCore.handleExceptionAndRethrow(ex)
+                    Call cpCore.handleExceptionAndContinue(ex) : Throw
                     cpCore.error_AddUserError(ex.Message)
                     postError = True
                 Catch ex As Exception
-                    Call cpCore.handleExceptionAndRethrow(ex)
+                    Call cpCore.handleExceptionAndContinue(ex) : Throw
                     cpCore.error_AddUserError(ex.Message)
                     postError = True
                 End Try
@@ -943,7 +943,7 @@ Namespace Contensive.Core
                 '
                 '
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return cpCore.docOpen
         End Function
@@ -972,7 +972,7 @@ Namespace Contensive.Core
                 '    Next
                 'End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return cookieValue
         End Function
@@ -1161,7 +1161,7 @@ Namespace Contensive.Core
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -1196,7 +1196,7 @@ Namespace Contensive.Core
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_SetStreamHeader")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_SetStreamHeader")
             '
         End Sub
         '
@@ -1499,7 +1499,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_GetHTMLInternalHead")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetHTMLInternalHead")
         End Function
     End Class
 End Namespace

@@ -151,7 +151,7 @@ End Namespace
 '        '            '
 '        '            Exit Function
 '        'ErrorTrap:
-'        '            cpCore.handleLegacyError3("(unknown)", "errorTrap in ccCmd", "App.EXEName", "cmdModule", "GetNextAsyncCmd", Err.Number, Err.Source, Err.Description, True, True, "")
+'        '           throw (New ApplicationException("Unexpected exception"))'cpCore.handleLegacyError3("(unknown)", "errorTrap in ccCmd", "App.EXEName", "cmdModule", "GetNextAsyncCmd", Err.Number, Err.Source, Err.Description, True, True, "")
 '        '            Err.Clear()
 '        '        End Function
 '        '
@@ -507,7 +507,7 @@ End Namespace
 '                                '
 '                                ' Unknown
 '                                '
-'                                cpCore.handleLegacyError2("CmdModule", "ExecuteServerCmd", "Unknown command [" & genericController.vbUCase(Method) & "]")
+'                               throw (New ApplicationException("Unexpected exception"))'cpCore.handleLegacyError2("CmdModule", "ExecuteServerCmd", "Unknown command [" & genericController.vbUCase(Method) & "]")
 '                        End Select
 '                    End If
 '                End If
@@ -545,7 +545,7 @@ End Namespace
 '        '            '
 '        '            Exit Sub
 '        'ErrorTrap:
-'        '            cpCore.handleLegacyError3(cpCore.app.config.name, "errorTrap in ccCmd", "App.EXEName", "cmdModule", "InstallAddons", Err.Number, Err.Source, Err.Description, True, True, "")
+'        '           throw (New ApplicationException("Unexpected exception"))'cpCore.handleLegacyError3(cpCore.app.config.name, "errorTrap in ccCmd", "App.EXEName", "cmdModule", "InstallAddons", Err.Number, Err.Source, Err.Description, True, True, "")
 '        '            Err.Clear()
 '        '        End Sub
 '        '
@@ -558,7 +558,7 @@ End Namespace
 '            '
 '            Exit Sub
 'ErrorTrap:
-'            cpCore.handleLegacyError3("(unknown)", "errorTrap in ccCmd", "App.EXEName", "cmdModule", "appendCmdLog", Err.Number, Err.Source, Err.Description, True, True, "")
+'           throw (New ApplicationException("Unexpected exception"))'cpCore.handleLegacyError3("(unknown)", "errorTrap in ccCmd", "App.EXEName", "cmdModule", "appendCmdLog", Err.Number, Err.Source, Err.Description, True, True, "")
 '            Err.Clear()
 '        End Sub
 '        '

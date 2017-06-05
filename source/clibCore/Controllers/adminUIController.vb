@@ -1032,7 +1032,7 @@ ErrorTrap:
         ''' <remarks></remarks>
         Private Sub handleLegacyClassError(ByVal MethodName As String)
             '
-            Call cpCore.handleExceptionAndRethrow(New Exception("unexpected exception in method [" & MethodName & "]"))
+            Throw (New Exception("unexpected exception in method [" & MethodName & "]"))
             '
         End Sub
     End Class

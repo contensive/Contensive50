@@ -55,7 +55,7 @@ Namespace Contensive.Core
                 csPtr = cpCore.db.cs_insertRecord(ContentName, OpeningMemberID)
                 success = cpCore.db.cs_ok(csPtr)
             Catch ex As Exception
-                Call cpCore.handleExceptionAndRethrow(ex)
+                Call cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return success
         End Function
@@ -70,7 +70,7 @@ Namespace Contensive.Core
                 csPtr = cpCore.db.cs_open(ContentName, "id=" & recordId, , ActiveOnly, , , , SelectFieldList, 1, 1)
                 success = cpCore.db.cs_ok(csPtr)
             Catch ex As Exception
-                Call cpCore.handleExceptionAndRethrow(ex)
+                Call cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return success
         End Function
@@ -85,7 +85,7 @@ Namespace Contensive.Core
                 csPtr = cpCore.db.cs_open(ContentName, SQLCriteria, SortFieldList, ActiveOnly, , , , SelectFieldList, pageSize, PageNumber)
                 success = cpCore.db.cs_ok(csPtr)
             Catch ex As Exception
-                Call cpCore.handleExceptionAndRethrow(ex)
+                Call cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return success
         End Function
@@ -100,7 +100,7 @@ Namespace Contensive.Core
                 csPtr = cpCore.db.cs_openGroupUsers(GroupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber)
                 success = ok()
             Catch ex As Exception
-                Call cpCore.handleExceptionAndRethrow(ex)
+                Call cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return success
         End Function
@@ -117,7 +117,7 @@ Namespace Contensive.Core
                 csPtr = cpCore.db.cs_openGroupUsers(groupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber)
                 success = ok()
             Catch ex As Exception
-                Call cpCore.handleExceptionAndRethrow(ex)
+                Call cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return success
         End Function
@@ -130,7 +130,7 @@ Namespace Contensive.Core
                 groupList.AddRange(GroupCommaList.Split(","c))
                 result = openGroupUsers(groupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return result
         End Function
@@ -145,7 +145,7 @@ Namespace Contensive.Core
                 csPtr = cpCore.db.cs_openCsSql_rev("default", sql)
                 success = cpCore.db.cs_ok(csPtr)
             Catch ex As Exception
-                Call cpCore.handleExceptionAndRethrow(ex)
+                Call cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return success
         End Function
@@ -160,7 +160,7 @@ Namespace Contensive.Core
                 csPtr = cpCore.db.cs_openSql(sql, DataSourcename, PageSize, PageNumber)
                 success = cpCore.db.cs_ok(csPtr)
             Catch ex As Exception
-                Call cpCore.handleExceptionAndRethrow(ex)
+                Call cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return success
         End Function
@@ -173,7 +173,7 @@ Namespace Contensive.Core
                     csPtr = -1
                 End If
             Catch ex As Exception
-                Call cpCore.handleExceptionAndRethrow(ex)
+                Call cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -206,7 +206,7 @@ Namespace Contensive.Core
                     result = String.Empty
                 End If
             Catch ex As Exception
-                Call cpCore.handleExceptionAndRethrow(ex)
+                Call cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return result
         End Function
@@ -230,7 +230,7 @@ Namespace Contensive.Core
                     result = String.Empty
                 End If
             Catch ex As Exception
-                Call cpCore.handleExceptionAndRethrow(ex)
+                Call cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return result
         End Function
@@ -244,7 +244,7 @@ Namespace Contensive.Core
                     result = String.Empty
                 End If
             Catch ex As Exception
-                Call cpCore.handleExceptionAndRethrow(ex)
+                Call cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return result
         End Function
@@ -273,7 +273,7 @@ Namespace Contensive.Core
                     result = String.Empty
                 End If
             Catch ex As Exception
-                Call cpCore.handleExceptionAndRethrow(ex)
+                Call cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return result
         End Function
@@ -287,7 +287,7 @@ Namespace Contensive.Core
                     result = String.Empty
                 End If
             Catch ex As Exception
-                Call cpCore.handleExceptionAndRethrow(ex)
+                Call cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return result
         End Function
@@ -307,7 +307,7 @@ Namespace Contensive.Core
                     result = String.Empty
                 End If
             Catch ex As Exception
-                Call cpCore.handleExceptionAndRethrow(ex)
+                Call cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return result
         End Function
@@ -324,7 +324,7 @@ Namespace Contensive.Core
                 Call cpCore.db.cs_goNext(csPtr)
                 result = cpCore.db.cs_ok(csPtr)
             Catch ex As Exception
-                Call cpCore.handleExceptionAndRethrow(ex)
+                Call cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return result
         End Function

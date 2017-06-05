@@ -276,7 +276,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub ErrorReport(ByVal Cause As String) 'Inherits BaseClasses.CPSiteBaseClass.ErrorReport
             '
-            cpCore.handleLegacyError8(Cause, "", True)
+            throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError8(Cause, "", True)
         End Sub
         '
         ' Report a structured exception object event, with a message
@@ -396,7 +396,7 @@ Namespace Contensive.Core
         '        '
         '        ' if main is available, report it out that way too
         '        '
-        '        Call cpCore.handleLegacyError23(Message)
+        '        throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError23(Message)
         '    End If
         'End Sub
         '

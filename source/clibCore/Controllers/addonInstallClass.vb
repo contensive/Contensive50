@@ -35,12 +35,12 @@ Namespace Contensive.Core
                     '
                     ' Block entries to the root node - this is to block entries made for system collections I may have missed
                     '
-                    Call cpCore.handleExceptionAndRethrow(New Exception("Adding root navigator entry [" & EntryName & "] by collection [" & cpCore.GetRecordName("content", InstalledByCollectionID) & "]. This Is Not allowed."))
+                    Throw (New Exception("Adding root navigator entry [" & EntryName & "] by collection [" & cpCore.GetRecordName("content", InstalledByCollectionID) & "]. This Is Not allowed."))
                 Else
                     result = GetNavigatorID(EntryName, ParentID, addonId, ContentID, NavIconType, NavIconTitle, DeveloperOnly, ignore, LinkPage, HelpCollectionID, HelpAddonID, InstalledByCollectionID, AdminOnly)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return result
         End Function
@@ -103,7 +103,7 @@ Namespace Contensive.Core
                 End If
                 Call cpCore.db.cs_Close(CS)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return result
         End Function
@@ -302,7 +302,7 @@ Namespace Contensive.Core
                 'End If
                 '
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return DownloadCollectionFiles
         End Function
@@ -369,7 +369,7 @@ Namespace Contensive.Core
                     UpgradeOK = installCollectionFromLocalRepo(CollectionGuid, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
                 Throw ex
             End Try
             Return UpgradeOK
@@ -678,7 +678,7 @@ Namespace Contensive.Core
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnOk
         End Function
@@ -714,7 +714,7 @@ Namespace Contensive.Core
                     Next
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return success
         End Function
@@ -1096,7 +1096,7 @@ Namespace Contensive.Core
                 BuildLocalCollectionRepoFromFile = (return_ErrorMessage = "")
                 return_CollectionGUID = CollectionGuid
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return result
         End Function
@@ -2174,7 +2174,7 @@ Namespace Contensive.Core
                 '
                 ' Log error and exit with failure. This way any other upgrading will still continue
                 '
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return result
         End Function
@@ -2239,7 +2239,7 @@ Namespace Contensive.Core
                     Call cpCore.privateFiles.saveFile(collectionFilePathFilename, returnXml)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnXml
         End Function
@@ -2333,7 +2333,7 @@ Namespace Contensive.Core
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -2346,7 +2346,7 @@ Namespace Contensive.Core
                 Dim Collectionname As String = ""
                 Call GetCollectionConfig(CollectionGuid, result, LastChangeDate, Collectionname)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return result
         End Function
@@ -2433,7 +2433,7 @@ Namespace Contensive.Core
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -2521,7 +2521,7 @@ Namespace Contensive.Core
                 End If
                 Call cpCore.db.cs_Close(CS)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return navId
         End Function
@@ -2579,7 +2579,7 @@ Namespace Contensive.Core
                     Next
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -2626,7 +2626,7 @@ Namespace Contensive.Core
                     Next
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return result
         End Function
@@ -2639,7 +2639,7 @@ Namespace Contensive.Core
                 result = GetNavigatorID("Manage Add-ons", 0, 0, 0, NavIconTypeAddon, "Manage Add-ons", False, 0, "", 0, 0, 0, False)
                 'result = ManagerAddonNavID_Local
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return result
         End Function
@@ -3100,7 +3100,7 @@ Namespace Contensive.Core
                                             '
                                             ' Bad field name - need to report it somehow
                                             '
-                                            cpCore.handleExceptionAndRethrow(New Exception("bad field found [" & FieldName & "], in addon node [" & addonName & "], of collection [" & cpCore.GetRecordName("add-on collections", CollectionID) & "]"))
+                                            Throw New ApplicationException("bad field found [" & FieldName & "], in addon node [" & addonName & "], of collection [" & cpCore.GetRecordName("add-on collections", CollectionID) & "]")
                                         Else
                                             Call cpCore.db.cs_set(CS, FieldName, FieldValue)
                                         End If
@@ -3210,7 +3210,7 @@ Namespace Contensive.Core
                                     Next
                                 End If
                             Catch ex As Exception
-                                cpCore.handleExceptionAndRethrow(ex)
+                                cpCore.handleExceptionAndContinue(ex) : Throw
                             End Try
                         End If
                         Call cpCore.db.cs_goNext(CS)
@@ -3218,7 +3218,7 @@ Namespace Contensive.Core
                     Call cpCore.db.cs_Close(CS)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -3341,7 +3341,7 @@ Namespace Contensive.Core
                     Call cpCore.db.cs_Close(CS)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return result
             '
@@ -3933,7 +3933,7 @@ Namespace Contensive.Core
                 'cpCore.metaData.clear()
                 'End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -3965,7 +3965,7 @@ Namespace Contensive.Core
                 '
                 Call appendInstallLog(cpCore.serverConfig.appConfig.name, "ImportCDefData", "Application: " & cpCore.serverConfig.appConfig.name & ", ImportCDefData done")
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '        '
@@ -4034,7 +4034,7 @@ Namespace Contensive.Core
                 returnCollection = New miniCollectionModel()
                 '
                 If String.IsNullOrEmpty(srcCollecionXml) Then
-                    cpCore.handleExceptionAndRethrow(New ApplicationException("UpgradeCDef_LoadDataToCollection, srcCollectionXml is blank or null"))
+                    Throw (New ApplicationException("UpgradeCDef_LoadDataToCollection, srcCollectionXml is blank or null"))
                 Else
                     'hint = "loading xmlText file"
                     Try
@@ -4086,7 +4086,7 @@ Namespace Contensive.Core
                                         ContentName = GetXMLAttribute(Found, CDef_Node, "name", "")
                                         contentNameLc = genericController.vbLCase(ContentName)
                                         If ContentName = "" Then
-                                            cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "collection file contains a CDEF node with no name attribute. This is not allowed.", "dll", "builderClass", "UpgradeCDef_LoadDataToCollection", 0, "", "", False, True, "")
+                                            Throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "collection file contains a CDEF node with no name attribute. This is not allowed.", "dll", "builderClass", "UpgradeCDef_LoadDataToCollection", 0, "", "", False, True, "")
                                         Else
                                             '
                                             ' setup a cdef from the application collection to use as a default for missing attributes (for inherited cdef)
@@ -4533,7 +4533,7 @@ Namespace Contensive.Core
                     End With
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -4730,7 +4730,7 @@ Namespace Contensive.Core
                                     End If
                                     rs.Dispose()
                                     If fieldId = 0 Then
-                                        cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "Can not update help field for content [" & ContentName & "], field [" & FieldName & "] because the field was not found in the Db.", "dll", "builderClass", "UpgradeCDef_BuildDbFromCollection", 0, "", "", False, True, "")
+                                        Throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "Can not update help field for content [" & ContentName & "], field [" & FieldName & "] because the field was not found in the Db.", "dll", "builderClass", "UpgradeCDef_BuildDbFromCollection", 0, "", "", False, True, "")
                                     Else
                                         SQL = "select id from ccfieldhelp where fieldid=" & fieldId & " order by id"
                                         rs = cpCore.db.executeSql(SQL)
@@ -4876,7 +4876,7 @@ Namespace Contensive.Core
                                     Dim addonInstallOk As Boolean
                                     addonInstallOk = installCollectionFromRemoteRepo(Guid, errorMessage, "", isNewBuild)
                                     If Not addonInstallOk Then
-                                        cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "Error upgrading Addon Collection [" & Guid & "], " & errorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
+                                        Throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "Error upgrading Addon Collection [" & Guid & "], " & errorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                                     End If
 
                                 End If
@@ -4987,7 +4987,7 @@ Namespace Contensive.Core
                 '
                 Call cpCore.siteProperties.setProperty("AllowContentAutoLoad", CStr(AllowContentAutoLoad))
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -5022,7 +5022,7 @@ Namespace Contensive.Core
                         ContentName = .Name
                         ContentIsBaseContent = False
                         FieldHelpCID = cpCore.db.getContentId("Field Help")
-                        Dim datasource As Contensive.Core.Models.Entity.dataSourceModel = Models.Entity.dataSourceModel.create(cpCore, .ContentDataSourceName, New List(Of String))
+                        Dim datasource As Contensive.Core.Models.Entity.dataSourceModel = Models.Entity.dataSourceModel.createByName(cpCore, .ContentDataSourceName, New List(Of String))
                         '
                         ' get contentid and protect content with IsBaseContent true
                         '
@@ -5110,7 +5110,7 @@ Namespace Contensive.Core
                             '
                             ' CAn not add fields if there is no content record
                             '
-                            cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "Can not add field records to content [" & ContentName & "] because the content definition was not found", "dll", "builderClass", "UpgradeCDef_BuildDbFromCollection_AddCDefToDb", 0, "", "", False, True, "")
+                            Throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "Can not add field records to content [" & ContentName & "] because the content definition was not found", "dll", "builderClass", "UpgradeCDef_BuildDbFromCollection_AddCDefToDb", 0, "", "", False, True, "")
                         Else
                             '
                             '
@@ -5168,7 +5168,7 @@ Namespace Contensive.Core
                     End With
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -5404,7 +5404,7 @@ Namespace Contensive.Core
                                     '
                                     Copy = "An attempt was made to update a Base Content Definition [" & DstName & "] from a collection that is not the Base Collection. This is not allowed."
                                     Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeCDef_AddSrcToDst", "UpgradeCDef_AddSrcToDst, " & Copy)
-                                    cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, Copy, "dll", "builderClass", "UpgradeCDef_AddSrcToDst", 0, "", "", False, True, "")
+                                    Throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, Copy, "dll", "builderClass", "UpgradeCDef_AddSrcToDst", 0, "", "", False, True, "")
                                     okToUpdateDstFromSrc = False
                                 Else
                                     '
@@ -5481,7 +5481,7 @@ Namespace Contensive.Core
                                 '
                                 ' should have been the collection
                                 '
-                                cpCore.handleExceptionAndRethrow(New ApplicationException("ERROR - cannot update destination content because it was not found after being added."))
+                                Throw (New ApplicationException("ERROR - cannot update destination content because it was not found after being added."))
                             Else
                                 dstCollectionCdef = dstCollection.CDef(SrcContentName.ToLower)
                                 If dstCollectionCdef.fields.ContainsKey(SrcFieldName.ToLower) Then
@@ -6032,7 +6032,7 @@ Namespace Contensive.Core
                 '
                 '
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnOk
         End Function
@@ -6045,7 +6045,7 @@ Namespace Contensive.Core
         '    '
         '    'Call App.LogEvent("addonInstallClass.HandleClassTrapError called from " & MethodName)
         '    '
-        '    cpCore.handleLegacyError3(ApplicationName, "unknown", "dll", "AddonInstallClass", MethodName, ErrNumber, ErrSource, ErrDescription, ErrorTrap, ResumeNext, "")
+        '   throw (New ApplicationException("Unexpected exception"))'cpCore.handleLegacyError3(ApplicationName, "unknown", "dll", "AddonInstallClass", MethodName, ErrNumber, ErrSource, ErrDescription, ErrorTrap, ResumeNext, "")
         '    '
         'End Sub
         '
@@ -6071,7 +6071,7 @@ Namespace Contensive.Core
                     Call installCollection_LoadXmlToMiniCollection(CollectionData, returnColl, False, False, isNewBuild, New miniCollectionModel)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnColl
         End Function
@@ -6106,7 +6106,7 @@ Namespace Contensive.Core
                     Found = True
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnAttr
         End Function
@@ -6174,7 +6174,7 @@ Namespace Contensive.Core
                     End If
                 End With
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnAttr
         End Function
@@ -6208,7 +6208,7 @@ Namespace Contensive.Core
                     Call cpCore.db.insertTableRecord("Default", "ccSortMethods", sqlList)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -6227,7 +6227,7 @@ Namespace Contensive.Core
                 Call VerifySortMethod("By Date Reverse", "DateAdded Desc")
                 Call VerifySortMethod("By Alpha Sort Order Then Oldest First", "SortOrder,ID")
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -6323,7 +6323,7 @@ Namespace Contensive.Core
                 Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='HTML' where ID=21;")
                 Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='HTML File' where ID=22;")
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -6549,7 +6549,7 @@ Namespace Contensive.Core
                 '
                 returnEntry = EntryID
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnEntry
         End Function
@@ -6586,7 +6586,7 @@ Namespace Contensive.Core
                 End If
                 Call cpCore.db.cs_Close(CSEntry)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -6630,7 +6630,7 @@ Namespace Contensive.Core
                 End If
                 Call cpCore.db.cs_Close(CSEntry)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub        '
         '
@@ -6668,7 +6668,7 @@ Namespace Contensive.Core
                 End If
                 Call cpCore.db.cs_Close(CSEntry)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -6719,7 +6719,7 @@ Namespace Contensive.Core
                 '
                 getParentIDFromNameSpace = ParentID
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Function
         '
@@ -6737,7 +6737,7 @@ Namespace Contensive.Core
                 Call cpCore.privateFiles.saveFile(privateFilesPathFilename, Content)
                 XML = Nothing
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
     End Class

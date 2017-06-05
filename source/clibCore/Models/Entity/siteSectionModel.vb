@@ -36,10 +36,10 @@ Namespace Contensive.Core.Models.Entity
         Public JSFilename As String
         Public JSHead As String
         Public JSOnLoad As String
-        Public MenuImageDownFilename As String
-        Public menuImageDownOverFilename As String
-        Public MenuImageFilename As String
-        Public MenuImageOverFilename As String
+        'Public MenuImageDownFilename As String
+        'Public menuImageDownOverFilename As String
+        'Public MenuImageFilename As String
+        'Public MenuImageOverFilename As String
         Public ModifiedBy As Integer
         Public ModifiedDate As Date
         Public Name As String
@@ -76,7 +76,7 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
                 Throw
             End Try
             Return result
@@ -99,7 +99,7 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
                 Throw
             End Try
             Return result
@@ -139,10 +139,10 @@ Namespace Contensive.Core.Models.Entity
                         .JSFilename = cs.getText("JSFilename")
                         .JSHead = cs.getText("JSHead")
                         .JSOnLoad = cs.getText("JSOnLoad")
-                        .MenuImageDownFilename = cs.getText("MenuImageDownFilename")
-                        .menuImageDownOverFilename = cs.getText("menuImageDownOverFilename")
-                        .MenuImageFilename = cs.getText("MenuImageFilename")
-                        .MenuImageOverFilename = cs.getText("MenuImageOverFilename")
+                        '.MenuImageDownFilename = cs.getText("MenuImageDownFilename")
+                        '.menuImageDownOverFilename = cs.getText("menuImageDownOverFilename")
+                        '.MenuImageFilename = cs.getText("MenuImageFilename")
+                        '.MenuImageOverFilename = cs.getText("MenuImageOverFilename")
                         .ModifiedBy = cs.getInteger("ModifiedBy")
                         .ModifiedDate = cs.getDate("ModifiedDate")
                         .Name = cs.getText("Name")
@@ -166,7 +166,7 @@ Namespace Contensive.Core.Models.Entity
                 End If
                 Call cs.Close()
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
                 Throw
             End Try
             Return result
@@ -217,10 +217,10 @@ Namespace Contensive.Core.Models.Entity
                     cs.SetField("JSFilename", JSFilename)
                     cs.SetField("JSHead", JSHead)
                     cs.SetField("JSOnLoad", JSOnLoad)
-                    cs.SetField("MenuImageDownFilename", MenuImageDownFilename)
-                    cs.SetField("menuImageDownOverFilename", menuImageDownOverFilename)
-                    cs.SetField("MenuImageFilename", MenuImageFilename)
-                    cs.SetField("MenuImageOverFilename", MenuImageOverFilename)
+                    'cs.SetField("MenuImageDownFilename", MenuImageDownFilename)
+                    'cs.SetField("menuImageDownOverFilename", menuImageDownOverFilename)
+                    'cs.SetField("MenuImageFilename", MenuImageFilename)
+                    'cs.SetField("MenuImageOverFilename", MenuImageOverFilename)
                     cs.SetField("ModifiedBy", ModifiedBy.ToString())
                     cs.SetField("ModifiedDate", ModifiedDate.ToString())
                     cs.SetField("Name", Name)
@@ -239,7 +239,7 @@ Namespace Contensive.Core.Models.Entity
                 ' -- object is here, but the cache was invalidated, setting
                 cpCore.cache.setObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", Me.ID.ToString()), Me)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
                 Throw
             End Try
             Return id
@@ -257,7 +257,7 @@ Namespace Contensive.Core.Models.Entity
                     cpCore.db.deleteContentRecords(primaryContentName, "id=" & recordId.ToString)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
                 Throw
             End Try
         End Sub
@@ -274,7 +274,7 @@ Namespace Contensive.Core.Models.Entity
                     cpCore.db.deleteContentRecords(primaryContentName, "(ccguid=" & cpCore.db.encodeSQLText(guid) & ")")
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
                 Throw
             End Try
         End Sub
@@ -303,7 +303,7 @@ Namespace Contensive.Core.Models.Entity
                 End If
                 cs.Close()
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return result
         End Function
@@ -328,7 +328,7 @@ Namespace Contensive.Core.Models.Entity
                 End If
                 cs.Close()
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return result
         End Function
@@ -383,7 +383,7 @@ Namespace Contensive.Core.Models.Entity
             Try
                 result = create(cpCore, cpCore.db.metaData_InsertContentRecordGetID(primaryContentName, 0), cacheNameList)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
                 Throw
             End Try
             Return result

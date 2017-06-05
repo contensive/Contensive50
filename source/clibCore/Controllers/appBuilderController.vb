@@ -459,6 +459,66 @@ Namespace Contensive.Core.Controllers
                     '
                     Call cpcore.cache.invalidateAll()
                     '
+                    If isNewBuild Then
+                        With cpcore.serverConfig.appConfig
+                            Dim primaryDomain As String = .name
+                            If .domainList.Count > 0 Then
+                                primaryDomain = .domainList(0)
+                            End If
+                            '
+                            ' -- primary domain
+                            Dim domain As Models.Entity.domainModel = Models.Entity.domainModel.createByName(cpcore, primaryDomain, New List(Of String))
+                            If (domain Is Nothing) Then
+                                domain = Models.Entity.domainModel.add(cpcore, New List(Of String))
+                                domain.Name = primaryDomain
+                            End If
+                            '
+                            ' -- Landing Page
+                            Dim landingPage As Models.Entity.pageContentModel = pageContentModel.create(cpcore, DefaultLandingPageGuid, New List(Of String))
+                            If (landingPage Is Nothing) Then
+                                landingPage = pageContentModel.add(cpcore, New List(Of String))
+                                landingPage.ccGuid = DefaultLandingPageGuid
+                            End If
+                            '
+                            ' -- landing section
+                            Dim landingSection As Models.Entity.siteSectionModel = siteSectionModel.create(cpcore, DefaultLandingSectionGuid, New List(Of String))
+                            If (landingSection Is Nothing) Then
+                                landingSection = siteSectionModel.add(cpcore, New List(Of String))
+                                landingSection.ccGuid = DefaultLandingSectionGuid
+                            End If
+                            '
+                            ' -- default template
+                            Dim defaultTemplate As Models.Entity.pageTemplateModel = pageTemplateModel.createByName(cpcore, "Default", New List(Of String))
+                            If (defaultTemplate Is Nothing) Then
+                                defaultTemplate = pageTemplateModel.add(cpcore, New List(Of String))
+                                defaultTemplate.Name = "Default"
+                            End If
+                            domain.DefaultTemplateId = defaultTemplate.ID
+                            domain.Name = primaryDomain
+                            domain.PageNotFoundPageID = landingPage.ID
+                            domain.RootPageID = landingPage.ID
+                            domain.TypeID = domainModel.domainTypeEnum.Normal
+                            domain.Visited = False
+                            domain.save(cpcore)
+                            '
+                            landingPage.TemplateID = defaultTemplate.ID
+                            landingPage.Copyfilename = constants.defaultLandingPageHtml
+                            landingPage.save(cpcore)
+                            '
+                            landingSection.Caption = "Default Section"
+                            landingSection.RootPageID = landingPage.ID
+                            landingSection.TemplateID = defaultTemplate.ID
+                            landingSection.saveObject(cpcore)
+                            '
+                            defaultTemplate.BodyHTML = constants.defaultTemplateHtml
+                            defaultTemplate.save(cpcore)
+                            '
+                            If cpcore.siteProperties.getinteger("LandingPageID", landingPage.ID) = 0 Then
+                                cpcore.siteProperties.setProperty("LandingPageID", landingPage.ID)
+                            End If
+                        End With
+                    End If
+                    '
                     '---------------------------------------------------------------------
                     ' ----- internal upgrade complete
                     '---------------------------------------------------------------------
@@ -485,9 +545,9 @@ Namespace Contensive.Core.Controllers
                             Call appendBuildLog(cpcore, "Upgrading All Local Collections to new server build.")
                             UpgradeOK = addonInstall.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(ErrorMessage, "", IISResetRequired, isNewBuild)
                             If ErrorMessage <> "" Then
-                                cpcore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
+                                throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             ElseIf Not UpgradeOK Then
-                                cpcore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, NotOK was returned without an error message", "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
+                                throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, NotOK was returned without an error message", "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             End If
                             ''
                             ''---------------------------------------------------------------------
@@ -523,7 +583,7 @@ Namespace Contensive.Core.Controllers
                             '                addonInstallOk = addonInstall.installCollectionFromRemoteRepo(Guid, DataBuildVersion, IISResetRequired, "", ErrorMessage, "", isNewBuild)
                             '                classLogFolder = saveLogFolder
                             '                If Not addonInstallOk Then
-                            '                    cpCore.handleLegacyError3(cpCore.app.config.name, "Error upgrading Addon Collection [" & Guid & "], " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
+                            '                   throw (New ApplicationException("Unexpected exception"))'cpCore.handleLegacyError3(cpCore.app.config.name, "Error upgrading Addon Collection [" & Guid & "], " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             '                End If
 
                             '            End If
@@ -545,7 +605,7 @@ Namespace Contensive.Core.Controllers
                                 Call Doc.LoadXml(addonInstall.getCollectionListFile)
                                 If True Then
                                     If genericController.vbLCase(Doc.DocumentElement.Name) <> genericController.vbLCase(CollectionListRootNode) Then
-                                        cpcore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "Error loading Collection config file. The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.", "dll", "builderClass", "Upgrade", 0, "", "", False, True, "")
+                                        throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "Error loading Collection config file. The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.", "dll", "builderClass", "Upgrade", 0, "", "", False, True, "")
                                     Else
                                         With Doc.DocumentElement
                                             If genericController.vbLCase(.Name) = "collectionlist" Then
@@ -650,7 +710,7 @@ Namespace Contensive.Core.Controllers
                     cpcore.upgradeInProgress = False
                 End If
             Catch ex As Exception
-                cpcore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '        '
@@ -1280,7 +1340,7 @@ Namespace Contensive.Core.Controllers
                     Next
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -1311,7 +1371,7 @@ Namespace Contensive.Core.Controllers
                     Call cpcore.db.executeSql(sql1 & sql2 & sql3)
                 End If
             Catch ex As Exception
-                cpcore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -1358,7 +1418,7 @@ Namespace Contensive.Core.Controllers
                 Call cpCore.cache.invalidateAll()
                 Call cpCore.metaData.clear()
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -1402,7 +1462,7 @@ Namespace Contensive.Core.Controllers
                     ptr += 1
                 Loop
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -1418,7 +1478,7 @@ Namespace Contensive.Core.Controllers
                 Call VerifyRecord(cpCore, "Scripting Languages", "VBScript", "", "")
                 Call VerifyRecord(cpCore, "Scripting Languages", "JScript", "", "")
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -1436,7 +1496,7 @@ Namespace Contensive.Core.Controllers
                 Call VerifyRecord(cpCore, "Languages", "French", "HTTP_Accept_Language", "'fr'")
                 Call VerifyRecord(cpCore, "Languages", "Any", "HTTP_Accept_Language", "'any'")
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -1454,7 +1514,7 @@ Namespace Contensive.Core.Controllers
                     Call VerifyRecord(cpCore, "Library Folders", "Downloads")
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '        '
@@ -1615,7 +1675,7 @@ Namespace Contensive.Core.Controllers
                 End If
                 rs.Dispose()
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnid
         End Function
@@ -1699,7 +1759,7 @@ Namespace Contensive.Core.Controllers
                     Call VerifyRecord(cpCore, "Library File Types", "Default", "IsFlash", "0", False)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -1734,7 +1794,7 @@ Namespace Contensive.Core.Controllers
                 End If
                 Call cpcore.db.cs_Close(CS)
             Catch ex As Exception
-                cpcore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -1808,7 +1868,7 @@ Namespace Contensive.Core.Controllers
                 Call VerifyState(cpCore, "West Virginia", "WV", 0.0#, CountryID, "")
                 Call VerifyState(cpCore, "Wyoming", "WY", 0.0#, CountryID, "")
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -1835,7 +1895,7 @@ Namespace Contensive.Core.Controllers
                 End If
                 Call cpCore.db.cs_Close(CS)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -1870,7 +1930,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 Next
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -1890,7 +1950,7 @@ Namespace Contensive.Core.Controllers
                 SQL = "Update ccContent Set EditorGroupID=" & cpCore.db.encodeSQLNumber(GroupID) & " where EditorGroupID is null;"
                 Call cpCore.db.executeSql(SQL)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         ''
@@ -2171,7 +2231,7 @@ Namespace Contensive.Core.Controllers
                     Call cpCore.db.createSQLTable("Default", "ccContentCategories")
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
 
@@ -2331,7 +2391,7 @@ Namespace Contensive.Core.Controllers
                 End If
                 Call cpCore.db.cs_Close(CSEntry)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
     End Class

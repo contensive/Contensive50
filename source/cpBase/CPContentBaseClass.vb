@@ -215,7 +215,6 @@ Namespace Contensive.BaseClasses
         ''' Delete records based from a table based on a content name and SQL criteria.
         ''' </summary>
         ''' <param name="ContentName"></param>
-        ''' <param name="SQLCriteria"></param>
         ''' <remarks></remarks>
         '''
         Public MustOverride Function AddContent(ByVal ContentName As String) As Integer

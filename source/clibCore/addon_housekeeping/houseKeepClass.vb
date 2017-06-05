@@ -627,8 +627,7 @@ Namespace Contensive.Core
             '
             Exit Sub
 ErrorTrap:
-            Call HandleClassTrapError("", "HouseKeep", "Trap", True)
-            Err.Clear()
+            Throw New ApplicationException("Unexpected exception")
         End Sub
         '
         '
@@ -725,7 +724,7 @@ ErrorTrap:
                 On Error Resume Next
                 Call cp.core.db.executeSql(SQL)
                 If Err.Number <> 0 Then
-                    Call HandleClassTrapError(appName, "HouseKeep_App_Daily", GetErrString(Err), True)
+                    Throw New ApplicationException("Unexpected exception")
                 End If
                 Err.Clear()
                 On Error GoTo ErrorTrap
@@ -803,7 +802,7 @@ ErrorTrap:
                 On Error Resume Next
                 Call cp.core.db.executeSql(SQL)
                 If Err.Number <> 0 Then
-                    Call HandleClassTrapError(appName, "HouseKeep_App_Daily", GetErrString(Err), True)
+                    Throw New ApplicationException("Unexpected exception")
                 End If
                 Err.Clear()
                 On Error GoTo ErrorTrap
@@ -832,7 +831,7 @@ ErrorTrap:
                 On Error Resume Next
                 Call cp.core.db.executeSql(SQL)
                 If Err.Number <> 0 Then
-                    Call HandleClassTrapError(appName, "HouseKeep_App_Daily", GetErrString(Err), True)
+                    Throw New ApplicationException("Unexpected exception")
                 End If
                 Err.Clear()
                 On Error GoTo ErrorTrap
@@ -861,7 +860,7 @@ ErrorTrap:
                 On Error Resume Next
                 Call cp.core.db.executeSql(SQL)
                 If Err.Number <> 0 Then
-                    Call HandleClassTrapError(appName, "HouseKeep_App_Daily", GetErrString(Err), True)
+                    Throw New ApplicationException("Unexpected exception")
                 End If
                 Err.Clear()
                 On Error GoTo ErrorTrap
@@ -966,7 +965,7 @@ ErrorTrap:
             On Error Resume Next
             Call cp.core.db.executeSql(SQL)
             If Err.Number <> 0 Then
-                Call HandleClassTrapError(appName, "HouseKeep_App_Daily", GetErrString(Err), True)
+                Throw New ApplicationException("Unexpected exception")
             End If
             Err.Clear()
             On Error GoTo ErrorTrap
@@ -1015,7 +1014,7 @@ ErrorTrap:
             On Error Resume Next
             Call cp.core.db.executeSql(SQL)
             If Err.Number <> 0 Then
-                Call HandleClassTrapError(appName, "HouseKeep_App_Daily", GetErrString(Err), True)
+                Throw New ApplicationException("Unexpected exception")
             End If
             Err.Clear()
             On Error GoTo ErrorTrap
@@ -1027,7 +1026,7 @@ ErrorTrap:
             On Error Resume Next
             Call cp.core.db.deleteContentRecords("Email drops", "(DateAdded is null)or(DateAdded<=" & cp.core.db.encodeSQLDate(ArchiveEmailDropDate) & ")")
             If Err.Number <> 0 Then
-                Call HandleClassTrapError(appName, "HouseKeep_App_Daily", "Error while deleting old email drops, " & GetErrString(Err), True)
+                Throw New ApplicationException("Unexpected exception")
             End If
             Err.Clear()
             On Error GoTo ErrorTrap
@@ -1039,7 +1038,7 @@ ErrorTrap:
             On Error Resume Next
             Call cp.core.db.deleteContentRecords("Email Log", "(emailDropId is null)and((DateAdded is null)or(DateAdded<=" & cp.core.db.encodeSQLDate(ArchiveEmailDropDate) & "))")
             If Err.Number <> 0 Then
-                Call HandleClassTrapError(appName, "HouseKeep_App_Daily", "Error while deleting old email log, " & GetErrString(Err), True)
+                Throw New ApplicationException("Unexpected Exception")
             End If
             Err.Clear()
             On Error GoTo ErrorTrap
@@ -1073,7 +1072,7 @@ ErrorTrap:
             On Error Resume Next
             Call cp.core.db.executeSql(SQL)
             If Err.Number <> 0 Then
-                Call HandleClassTrapError(appName, "HouseKeep_App_Daily", "Deleting email log entries for drops without a valid drop record, " & GetErrString(Err), True)
+                Throw New ApplicationException("Unexpected Exception")
             End If
             Err.Clear()
             On Error GoTo ErrorTrap
@@ -1652,8 +1651,7 @@ ErrorTrap:
             Exit Sub
             '
 ErrorTrap:
-            Call HandleClassTrapError(appName, "HouseKeep_App_Daily", "Trap", True)
-            Err.Clear()
+            Throw New ApplicationException("Unexpected Exception")
             If TimeoutSave <> 0 Then
                 cp.core.db.sqlCommandTimeout = TimeoutSave
             End If
@@ -1769,8 +1767,7 @@ ErrorTrap:
             Exit Sub
             '
 ErrorTrap:
-            Call HandleClassTrapError(appName, "HouseKeep_App_Daily_RemoveVisitRecords", "Trap", True)
-            Err.Clear()
+            Throw New ApplicationException("Unexpected Exception")
             '
             ' restore saved timeout
             '
@@ -1889,8 +1886,7 @@ ErrorTrap:
             Exit Sub
             '
 ErrorTrap:
-            Call HandleClassTrapError(appName, "HouseKeep_App_Daily_RemoveGuestRecords", "Trap", True)
-            Err.Clear()
+            Throw New ApplicationException("Unexpected Exception")
             '
             ' restore saved timeout
             '
@@ -2034,7 +2030,7 @@ ErrorTrap:
             'Dim AddonInstall As New addonInstallClass
             '
             If BuildVersion < cp.Version Then
-                Call HandleClassInternalError(cp.core.serverConfig.appConfig.name, "HouseKeep_VisitSummary", ignoreInteger, "Can not summarize analytics until this site's data needs been upgraded.")
+                Throw New ApplicationException("Unexpected Exception")
             Else
                 PeriodStart = StartTimeDate
                 If PeriodStart < OldestVisitSummaryWeCareAbout Then
@@ -2245,8 +2241,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call HandleClassTrapError(cp.core.serverConfig.appConfig.name, "HouseKeep_VisitSummary", "Trap", True)
-            Err.Clear()
+            Throw New ApplicationException("Unexpected Exception")
         End Sub
         '
         '======================================================================================
@@ -2278,23 +2273,22 @@ ErrorTrap:
             Exit Sub
             '
 ErrorTrap:
-            Call HandleClassTrapError(appName, "HouseKeepLogFolder", "Trap", True)
-            Err.Clear()
+            Throw New ApplicationException("Unexpected exception")
         End Sub
-        '
-        Private Sub HandleClassTrapError(ByVal ApplicationName As String, ByVal MethodName As String, ByVal Cause As String, ByVal ResumeNext As Boolean)
-            '
-            cp.core.handleLegacyError3(ApplicationName, Cause, "ccHouseKeep", "HouseKeepClass", MethodName, Err.Number, Err.Source, Err.Description, True, ResumeNext, "")
-            '
-        End Sub
-        '
-        ' ----- temp solution to convert error reporting without spending the time right now
-        '
-        Private Sub HandleClassInternalError(ByVal ApplicationName As String, ByVal MethodName As String, ByVal ErrNumber As Integer, ByVal Cause As String)
-            '
-            cp.core.handleLegacyError3(ApplicationName, Cause, "ccHouseKeep", "HouseKeepClass", MethodName, ErrNumber, "App.EXEName", Cause, False, True, "")
-            '
-        End Sub
+        ''
+        'Private Sub HandleClassTrapError(ByVal ApplicationName As String, ByVal MethodName As String, ByVal Cause As String, ByVal ResumeNext As Boolean)
+        '    '
+        '    Throw New ApplicationException("Unexpected exception")
+        '    '
+        'End Sub
+        ''
+        '' ----- temp solution to convert error reporting without spending the time right now
+        ''
+        'Private Sub HandleClassInternalError(ByVal ApplicationName As String, ByVal MethodName As String, ByVal ErrNumber As Integer, ByVal Cause As String)
+        '    '
+        '    Throw New ApplicationException("Unexpected exception")
+        '    '
+        'End Sub
         '
         '
         '
@@ -2317,8 +2311,7 @@ ErrorTrap:
             Exit Sub
             '
 ErrorTrap:
-            Call HandleClassTrapError(cp.core.serverConfig.appConfig.name, "HouseKeepLogFolder", "Trap", True)
-            Err.Clear()
+            Throw New ApplicationException("Unexpected Exception")
         End Sub
         '
         '
@@ -2374,8 +2367,7 @@ ErrorTrap:
                 ' error - Need a way to reach the user that submitted the file
                 '
                 DownloadUpdates = False
-                Call HandleClassTrapError("", "DownloadUpdates", "GetUpdates returned error", True)
-                loadOK = False
+                Throw New ApplicationException("Unexpected Exception")
             End Try
             Return loadOK
         End Function
@@ -2496,7 +2488,7 @@ ErrorTrap:
 
             '
             If BuildVersion < cp.Version Then
-                Call HandleClassInternalError(cp.core.serverConfig.appConfig.name, "HouseKeep_PageViewSummary", ignoreInteger, "Can not summarize analytics until this site's data needs been upgraded.")
+                cp.core.handleExceptionAndContinue(New ApplicationException("Can not summarize analytics until this site's data needs been upgraded."))
             Else
                 PeriodStart = StartTimeDate
                 If PeriodStart < OldestVisitSummaryWeCareAbout Then
@@ -2703,8 +2695,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call HandleClassTrapError(cp.core.serverConfig.appConfig.name, "HouseKeep_PageViewSummary", "Trap", True)
-            Err.Clear()
+            Throw New ApplicationException("Unexpected Exception")
         End Sub
         '
         '====================================================================================================
@@ -2740,7 +2731,6 @@ ErrorTrap:
                     collectionFileFilename = cp.core.addon.getPrivateFilesAddonPath & "Collections.xml"
                     Call Doc.LoadXml(collectionFileFilename)
                 Catch ex As Exception
-                    'hint = hint & ",parse error"
                     Call AppendClassLog(cpcore, "Server", "", "RegisterAddonFolder, Hint=[" & hint & "], Error loading Collections.xml file.")
                     loadOK = False
                 End Try
@@ -2917,7 +2907,7 @@ ErrorTrap:
                 '
                 Call AppendClassLog(cpcore, "Server", "RegisterAddonFolder", "Exiting RegisterAddonFolder")
             Catch ex As Exception
-                cp.core.handleExceptionAndRethrow(ex)
+                Throw New ApplicationException("Unexpected Exception", ex)
             End Try
         End Sub
     End Class

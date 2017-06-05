@@ -94,7 +94,7 @@ Namespace Contensive.Core
                     Call cpCore.cache.setObject(key, Value, invalidationDate, invalidationTagList)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '

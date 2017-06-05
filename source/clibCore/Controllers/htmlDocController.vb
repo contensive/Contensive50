@@ -56,8 +56,8 @@ Namespace Contensive.Core.Controllers
         Public Const htmlDoc_OutStreamJavaScript = 1
         '
         Public htmlDoc_RefreshQueryString As String = ""      ' the querystring required to return to the current state (perform a refresh)
-        Public htmlDoc_RedirectContentID As Integer = 0
-        Public htmlDoc_RedirectRecordID As Integer = 0
+        Public pageManager_RedirectContentID As Integer = 0
+        Public pageManager_RedirectRecordID As Integer = 0
         Public htmlDoc_JavaStreamHolder() As String
         Public htmlDoc_JavaStreamSize As Integer = 0
         Public htmlDoc_JavaStreamCount As Integer = 0
@@ -165,7 +165,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnValue
         End Function
@@ -200,7 +200,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnValue
         End Function
@@ -251,7 +251,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnValue
         End Function
@@ -292,7 +292,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnValue
         End Function
@@ -455,7 +455,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnValue
         End Function
@@ -644,7 +644,7 @@ Namespace Contensive.Core.Controllers
                 '
                 returnValue = returnPos
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnValue
         End Function
@@ -655,7 +655,7 @@ Namespace Contensive.Core.Controllers
             Try
                 returnValue = getTagStartPos2(ignore, layout, layoutStartPos, Key)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnValue
         End Function
@@ -772,7 +772,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnValue
         End Function
@@ -898,7 +898,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError18(MethodName)
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Sub
         '
@@ -930,7 +930,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError18(MethodName)
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -952,13 +952,13 @@ ErrorTrap:
                 '
                 cpCore.main_ClosePageCounter = cpCore.main_ClosePageCounter + 1
                 If cpCore.webServer.webServerIO_InitCounter = 0 Then
-                    cpCore.handleExceptionAndRethrow(New Exception("Page was not initialized properly. Init(...) call may be missing."))
+                    cpCore.handleExceptionAndContinue(New Exception("Page was not initialized properly. Init(...) call may be missing."))
                 End If
                 If cpCore.webServer.webServerIO_InitCounter > 1 Then
-                    cpCore.handleExceptionAndRethrow(New Exception("Page was not initialized properly. Init(...) was called multiple times."))
+                    cpCore.handleExceptionAndContinue(New Exception("Page was not initialized properly. Init(...) was called multiple times."))
                 End If
                 If cpCore.main_ClosePageCounter > 1 Then
-                    cpCore.handleExceptionAndRethrow(New Exception("Page was not closed properly. main_GetEndOfBody was called multiple times."))
+                    cpCore.handleExceptionAndContinue(New Exception("Page was not closed properly. main_GetEndOfBody was called multiple times."))
                 End If
                 '
                 ' ----- add window.print if this is the Printerversion
@@ -1175,7 +1175,7 @@ ErrorTrap:
                     s = s & main_endOfBodyString
                 End If
             Catch ex As Exception
-                Call cpCore.handleExceptionAndRethrow(ex)
+                Call cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return s
         End Function
@@ -1306,7 +1306,7 @@ ErrorTrap:
                     Call cpCore.error_AddUserError("The drop down list for " & ContentName & " called " & MenuName & " is too long to display. The site administrator has been notified and the problem will be resolved shortly. To fix this issue temporarily, go to the admin tab of the Preferences page and set the Select Field Limit larger than " & RowCnt & ".")
                     '                    cpcore.handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
 
-                    cpCore.handleExceptionAndRethrow(New Exception("Error creating select list from content [" & ContentName & "] called [" & MenuName & "]. Selection of [" & RowCnt & "] records exceeds [" & cpCore.siteProperties.selectFieldLimit & "], the current Site Property SelectFieldLimit."))
+                    cpCore.handleExceptionAndContinue(New Exception("Error creating select list from content [" & ContentName & "] called [" & MenuName & "]. Selection of [" & RowCnt & "] records exceeds [" & cpCore.siteProperties.selectFieldLimit & "], the current Site Property SelectFieldLimit."))
                     main_GetFormInputSelect2 = main_GetFormInputSelect2 & html_GetFormInputHidden(MenuNameFPO, CurrentValue)
                     If CurrentValue = 0 Then
                         main_GetFormInputSelect2 = html_GetFormInputText2(MenuName, "0")
@@ -1383,7 +1383,7 @@ ErrorTrap:
                         DropDownFieldCount = DropDownFieldCount + 1
                     End If
                     If DropDownFieldCount = 0 Then
-                        cpCore.handleExceptionAndRethrow(New Exception("No drop down field names found for content [" & ContentName & "]."))
+                        cpCore.handleExceptionAndContinue(New Exception("No drop down field names found for content [" & ContentName & "]."))
                     Else
                         ReDim DropDownFieldPointer(DropDownFieldCount - 1)
                         SelectFields = "ID"
@@ -1531,7 +1531,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError13(MethodName)
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError13(MethodName)
         End Function
         '
         '========================================================================
@@ -1654,7 +1654,7 @@ ErrorTrap:
                     '
                     ' Selection is too big
                     '
-                    cpCore.handleExceptionAndRethrow(New Exception("While building a group members list for group [" & cpCore.group_GetGroupName(GroupID) & "], too many rows were selected. [" & RowMax & "] records exceeds [" & cpCore.siteProperties.selectFieldLimit & "], the current Site Property app.SiteProperty_SelectFieldLimit."))
+                    cpCore.handleExceptionAndContinue(New Exception("While building a group members list for group [" & cpCore.group_GetGroupName(GroupID) & "], too many rows were selected. [" & RowMax & "] records exceeds [" & cpCore.siteProperties.selectFieldLimit & "], the current Site Property app.SiteProperty_SelectFieldLimit."))
                     html_GetFormInputMemberSelect2 = html_GetFormInputMemberSelect2 & html_GetFormInputHidden(MenuNameFPO, iCurrentValue)
                     If iCurrentValue <> 0 Then
                         CSPointer = cpCore.csOpen("people", iCurrentValue)
@@ -1728,7 +1728,7 @@ ErrorTrap:
                         DropDownFieldCount = DropDownFieldCount + 1
                     End If
                     If DropDownFieldCount = 0 Then
-                        cpCore.handleExceptionAndRethrow(New Exception("No drop down field names found for content [" & GroupID & "]."))
+                        cpCore.handleExceptionAndContinue(New Exception("No drop down field names found for content [" & GroupID & "]."))
                     Else
                         ReDim DropDownFieldPointer(DropDownFieldCount - 1)
                         SelectFields = "P.ID"
@@ -1861,7 +1861,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError13(MethodName)
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError13(MethodName)
         End Function
         '
         '========================================================================
@@ -1933,7 +1933,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError13("main_GetFormInputSelectList2")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_GetFormInputSelectList2")
         End Function
         '
         '========================================================================
@@ -1973,7 +1973,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_GetLoginLink")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetLoginLink")
         End Function
         '
         '========================================================================
@@ -1992,7 +1992,7 @@ ErrorTrap:
             Try
                 main_GetClosePage2 = main_GetClosePage3(AllowLogin, AllowTools, False, False)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Function
         '
@@ -2009,7 +2009,7 @@ ErrorTrap:
             Try
                 main_GetClosePage3 = html_GetEndOfBody(AllowLogin, AllowTools, BlockNonContentExtras, False)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Function
         '
@@ -2037,7 +2037,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call cpCore.handleLegacyError18("writeAltBuffer")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("writeAltBuffer")
         End Sub
 
         '
@@ -2054,7 +2054,7 @@ ErrorTrap:
             Exit Sub
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError13("main_JavaStream_Add")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_JavaStream_Add")
         End Sub
         '
         '
@@ -2088,7 +2088,7 @@ ErrorTrap:
                     htmlDoc_RefreshQueryString = genericController.ModifyQueryString(htmlDoc_RefreshQueryString, Name, Value, True)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             '
         End Sub
@@ -2125,7 +2125,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call cpCore.handleLegacyError13("main_GetLegacySiteStyles")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_GetLegacySiteStyles")
         End Function
         '
         '===================================================================================================
@@ -2152,7 +2152,7 @@ ErrorTrap:
 
             Exit Function
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_GetAdminHintWrapper")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetAdminHintWrapper")
         End Function
         '
         '
@@ -2171,7 +2171,7 @@ ErrorTrap:
                     outputBufferEnabled = BufferOn
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
 
@@ -2196,7 +2196,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_GetUploadFormStart")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetUploadFormStart")
         End Function
         '
         '========================================================================
@@ -2277,7 +2277,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError18(MethodName)
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -2346,7 +2346,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_GetFormInputText2")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetFormInputText2")
         End Function
         '
         '========================================================================
@@ -2429,7 +2429,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            cpCore.handleExceptionAndRethrow(New Exception("Unexpected exception"))
+            cpCore.handleExceptionAndContinue(New Exception("Unexpected exception"))
             '
         End Function
         '
@@ -2507,7 +2507,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError18(MethodName)
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -2566,7 +2566,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError18(MethodName)
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -2603,7 +2603,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_GetFormInputCheckBox2")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetFormInputCheckBox2")
         End Function
         '
         '========================================================================
@@ -2720,7 +2720,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError18(MethodName)
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -2772,7 +2772,7 @@ ErrorTrap:
                         End With
                     Next
                     If Not fieldFound Then
-                        cpCore.handleExceptionAndRethrow(New Exception("Field [" & FieldName & "] was not found in Content Definition [" & ContentName & "]"))
+                        cpCore.handleExceptionAndContinue(New Exception("Field [" & FieldName & "] was not found in Content Definition [" & ContentName & "]"))
                     Else
                         '
                         ' main_Get the current value if the record was found
@@ -2944,7 +2944,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Function
         '
@@ -2986,7 +2986,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError18(MethodName)
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -3022,7 +3022,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_GetFormInputHidden")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetFormInputHidden")
         End Function
         '
         Public Function html_GetFormInputHidden(ByVal TagName As String, ByVal TagValue As Boolean, Optional ByVal htmlId As String = "") As String
@@ -3081,7 +3081,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError18(MethodName)
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -3127,7 +3127,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError18(MethodName)
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -3171,7 +3171,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError18("AddEvent")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("AddEvent")
         End Sub
         '
         '
@@ -3409,7 +3409,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            cpCore.handleExceptionAndRethrow(New Exception("Unexpected exception"))
+            cpCore.handleExceptionAndContinue(New Exception("Unexpected exception"))
             '
         End Function
         ''
@@ -3433,7 +3433,7 @@ ErrorTrap:
         '            ' ----- Error Trap
         '            '
         'ErrorTrap:
-        '            cpcore.handleExceptionAndRethrow(New Exception("Unexpected exception"))
+        '            cpCore.handleExceptionAndContinue(New Exception("Unexpected exception"))
         '            '
         '        End Function
         '
@@ -3738,7 +3738,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError11("main_GetEditorAddonListJSON, hint=[" & hint & "]", "trap")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError11("main_GetEditorAddonListJSON, hint=[" & hint & "]", "trap")
         End Function
         '
         '========================================================================
@@ -3774,7 +3774,7 @@ ErrorTrap:
                     LoopPtr = LoopPtr + 1
                 Loop
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnValue
         End Function
@@ -4841,7 +4841,7 @@ ErrorTrap:
                 End If
                 result = workingContent
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return result
         End Function
@@ -5495,7 +5495,7 @@ ErrorTrap:
                                                                                                     '
                                                                                                     ' image load failed, use raw filename
                                                                                                     '
-                                                                                                    cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "Error while loading image to resize, [" & RecordVirtualFilename & "]", "dll", "cpCoreClass", "DecodeAciveContent", Err.Number, Err.Source, Err.Description, False, True, "")
+                                                                                                    throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "Error while loading image to resize, [" & RecordVirtualFilename & "]", "dll", "cpCoreClass", "DecodeAciveContent", Err.Number, Err.Source, Err.Description, False, True, "")
                                                                                                     Err.Clear()
                                                                                                     NewImageFilename = ImageFilename
                                                                                                 Else
@@ -5594,7 +5594,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_DecodeActiveContent", True)
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_DecodeActiveContent", True)
         End Function
         '
         '========================================================================
@@ -5616,7 +5616,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_DecodeContent", True)
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_DecodeContent", True)
         End Function
         '
         '========================================================================
@@ -5642,7 +5642,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_EncodeCRLF")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_EncodeCRLF")
         End Function
         '
         '========================================================================
@@ -5662,7 +5662,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError18("EncodeHTML")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("EncodeHTML")
         End Function
         '
         '========================================================================
@@ -5683,7 +5683,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_ConvertText2HTML")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_ConvertText2HTML")
         End Function
         '
         '========================================================================
@@ -5715,7 +5715,7 @@ ErrorTrap:
             '
 ErrorTrap:
             'Set Decoder = Nothing
-            Call cpCore.handleLegacyError18("main_DecodeHTML")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_DecodeHTML")
         End Function
         '
         '========================================================================
@@ -5727,7 +5727,7 @@ ErrorTrap:
                 Dim Decoder As New htmlToTextControllers(cpCore)
                 Return Decoder.convert(Source)
             Catch ex As Exception
-                Call cpCore.handleLegacyError18("main_ConvertHTML2Text")
+                throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_ConvertHTML2Text")
             End Try
         End Function
         '
@@ -5745,7 +5745,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_EncodeRequestVariable")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_EncodeRequestVariable")
         End Function
         '
         '========================================================================
@@ -5763,7 +5763,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_EncodeURL")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_EncodeURL")
         End Function
         '
         '========================================================================
@@ -5779,7 +5779,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError18("DecodeUrl")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("DecodeUrl")
         End Function
         '
         '
@@ -5843,7 +5843,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_DecodeActiveContent_ProcessDynamicMenu", True, True)
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_DecodeActiveContent_ProcessDynamicMenu", True, True)
         End Function
         '
         '=======================================================================================================
@@ -6040,7 +6040,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call cpCore.handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_getStyleSheet2", True, False)
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_getStyleSheet2", True, False)
         End Function
         '
         '
@@ -6063,7 +6063,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call cpCore.handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_getStyleSheetDefault", True, False)
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_getStyleSheetDefault", True, False)
         End Function
         ''
         '
@@ -6311,7 +6311,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            cpCore.handleExceptionAndRethrow(New Exception("Unexpected exception"))
+            cpCore.handleExceptionAndContinue(New Exception("Unexpected exception"))
         End Function
         '
         '========================================================================
@@ -6369,7 +6369,7 @@ ErrorTrap:
                 End If
 
             Catch ex As Exception
-                Call cpCore.handleExceptionAndRethrow(ex)
+                Call cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnHtml
         End Function
@@ -6481,7 +6481,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError18(MethodName)
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Sub
         '
@@ -6695,14 +6695,14 @@ ErrorTrap:
                 '
                 ' ----- Public Site call, must have contentname and recordid
                 '
-                cpCore.handleExceptionAndRethrow(New Exception("invalid content [" & ContentName & "], RecordID [" & RecordID & "]"))
+                cpCore.handleExceptionAndContinue(New Exception("invalid content [" & ContentName & "], RecordID [" & RecordID & "]"))
             Else
                 '
                 ' ----- Normal Content Edit - find instance in the content
                 '
                 CS = cpCore.csOpen(ContentName, RecordID)
                 If Not cpCore.db.cs_ok(CS) Then
-                    cpCore.handleExceptionAndRethrow(New Exception("No record found with content [" & ContentName & "] and RecordID [" & RecordID & "]"))
+                    cpCore.handleExceptionAndContinue(New Exception("No record found with content [" & ContentName & "] and RecordID [" & RecordID & "]"))
                 Else
                     If FieldName <> "" Then
                         '
@@ -6736,7 +6736,7 @@ ErrorTrap:
                     ' Parse out the Addon Name
                     '
                     If PosACInstanceID = 0 Then
-                        cpCore.handleExceptionAndRethrow(New Exception("AC Instance [" & ACInstanceID & "] not found in record with content [" & ContentName & "] and RecordID [" & RecordID & "]"))
+                        cpCore.handleExceptionAndContinue(New Exception("AC Instance [" & ACInstanceID & "] not found in record with content [" & ContentName & "] and RecordID [" & RecordID & "]"))
                     Else
                         Copy = html_EncodeContentUpgrades(Copy)
                         ParseOK = False
@@ -6835,7 +6835,7 @@ ErrorTrap:
                             End If
                         End If
                         If Not ParseOK Then
-                            cpCore.handleExceptionAndRethrow(New Exception("There was a problem parsing AC Instance [" & ACInstanceID & "] record with content [" & ContentName & "] and RecordID [" & RecordID & "]"))
+                            cpCore.handleExceptionAndContinue(New Exception("There was a problem parsing AC Instance [" & ACInstanceID & "] record with content [" & ContentName & "] and RecordID [" & RecordID & "]"))
                         End If
                     End If
                 End If
@@ -6845,7 +6845,7 @@ ErrorTrap:
                 '
                 ' Clear Caches
                 '
-                Call cpCore.pageManager.pageManager_cache_pageContent_clear()
+                Call cpCore.pageManager.cache_pageContent_clear()
                 Call cpCore.pageManager.pageManager_cache_pageTemplate_clear()
                 Call cpCore.pageManager.pageManager_cache_siteSection_clear()
                 'Call cpCore.cache.invalidateObjectList("")
@@ -6853,11 +6853,11 @@ ErrorTrap:
                     Call cpCore.cache.invalidateContent(ContentName)
                     TableName = cpCore.GetContentTablename(ContentName)
                     If genericController.vbLCase(TableName) = "cctemplates" Then
-                        Call cpCore.cache.setObject(pageManagerController.pageManager_cache_pageTemplate_cacheName, Nothing)
+                        Call cpCore.cache.setObject(pageManagerController.cache_pageTemplate_cacheName, Nothing)
                         Call cpCore.pageManager.pageManager_cache_pageTemplate_load()
                     End If
                     If genericController.vbLCase(TableName) = "ccpagecontent" Then
-                        Call cpCore.pageManager.pageManager_cache_pageContent_updateRow(RecordID, cpCore.pageManager.pagemanager_IsWorkflowRendering, cpCore.pageManager.main_RenderCache_CurrentPage_IsQuickEditing)
+                        Call cpCore.pageManager.cache_pageContent_updateRow(RecordID, cpCore.pageManager.pagemanager_IsWorkflowRendering, cpCore.pageManager.main_RenderCache_CurrentPage_IsQuickEditing)
                     End If
                 End If
             End If
@@ -6869,7 +6869,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError18(MethodName)
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Sub
         '
@@ -6917,7 +6917,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError18(MethodName)
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Sub
         '
@@ -6941,7 +6941,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_EncodeContent9")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_EncodeContent9")
         End Function
         ''
         '' To support the special case when the template calls this to encode itself, and the page content has already been rendered.
@@ -7008,7 +7008,7 @@ ErrorTrap:
         '            ' ----- Error Trap
         '            '
         'ErrorTrap:
-        '            Call cpcore.handleLegacyError18("EncodeContent")
+        '            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("EncodeContent")
         '        End Function
         '
         '========================================================================
@@ -7028,7 +7028,7 @@ ErrorTrap:
             '
 ErrorTrap:
             'Set main_DecodeHTML = Nothing
-            Call cpCore.handleLegacyError18("main_DecodeContent")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_DecodeContent")
         End Function
         '
         '==========================================================================================================================================
@@ -7047,7 +7047,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call cpCore.handleLegacyError18("EncodeContentForWeb")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("EncodeContentForWeb")
         End Function
         '
         '========================================================================
@@ -7150,7 +7150,7 @@ ErrorTrap:
                 CaptionFieldName = genericController.encodeEmptyText(CaptionFieldName, "name")
                 If PrimaryContentName = "" Or SecondaryContentName = "" Or RulesContentName = "" Or RulesPrimaryFieldname = "" Or RulesSecondaryFieldName = "" Then
                     returnHtml = "[Checklist not configured]"
-                    cpCore.handleExceptionAndRethrow(New Exception("Creating checklist, all required fields were not supplied, Caption=[" & CaptionFieldName & "], PrimaryContentName=[" & PrimaryContentName & "], SecondaryContentName=[" & SecondaryContentName & "], RulesContentName=[" & RulesContentName & "], RulesPrimaryFieldName=[" & RulesPrimaryFieldname & "], RulesSecondaryFieldName=[" & RulesSecondaryFieldName & "]"))
+                    cpCore.handleExceptionAndContinue(New Exception("Creating checklist, all required fields were not supplied, Caption=[" & CaptionFieldName & "], PrimaryContentName=[" & PrimaryContentName & "], SecondaryContentName=[" & SecondaryContentName & "], RulesContentName=[" & RulesContentName & "], RulesPrimaryFieldName=[" & RulesPrimaryFieldname & "], RulesSecondaryFieldName=[" & RulesSecondaryFieldName & "]"))
                 Else
                     '
                     ' ----- Gather all the SecondaryContent that associates to the PrimaryContent
@@ -7419,7 +7419,7 @@ ErrorTrap:
                     main_CheckListCnt = main_CheckListCnt + 1
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnHtml
         End Function
@@ -7547,7 +7547,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_GetFormInputCheckListCategories")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetFormInputCheckListCategories")
         End Function
         '
         '=========================================================================================================
@@ -7581,7 +7581,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_AddOnLoadJavascript2")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddOnLoadJavascript2")
         End Sub
         '
         '=========================================================================================================
@@ -7613,7 +7613,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_AddEndOfBodyJavascript2")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddEndOfBodyJavascript2")
         End Sub
         '
         '=========================================================================================================
@@ -7691,7 +7691,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_AddHeadScriptCode")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddHeadScriptCode")
         End Sub
         '
         '
@@ -7715,7 +7715,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_AddHeadScriptLink")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddHeadScriptLink")
         End Sub
         '
         '=========================================================================================================
@@ -7744,7 +7744,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_AddPagetitle")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddPagetitle")
         End Sub
         '
         '=========================================================================================================
@@ -7772,7 +7772,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_addMetaDescription2")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_addMetaDescription2")
         End Sub
         '
         '=========================================================================================================
@@ -7806,7 +7806,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_AddStylesheetLink2")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddStylesheetLink2")
         End Sub
         '
         '=========================================================================================================
@@ -7831,7 +7831,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_AddSharedStyleID2")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddSharedStyleID2")
         End Sub
         '
         '=========================================================================================================
@@ -7859,7 +7859,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_addMetaKeywordList2")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_addMetaKeywordList2")
         End Sub
         '
         '=========================================================================================================
@@ -7887,7 +7887,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_AddHeadTag")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddHeadTag")
         End Sub
         '
         '
@@ -7958,7 +7958,7 @@ ErrorTrap:
 
             Exit Function
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_GetEditWrapper")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetEditWrapper")
         End Function
         '
         ' To support the special case when the template calls this to encode itself, and the page content has already been rendered.
@@ -8277,14 +8277,14 @@ ErrorTrap:
                     'hint = hint & ",500, Adding edit wrappers"
                     If isEditingAnything Then
                         If (InStr(1, returnValue, "<!-- AFScript -->", vbTextCompare) <> 0) Then
-                            Call cpCore.handleLegacyError7("returnValue", "AFScript Style edit wrappers are not supported")
+                            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError7("returnValue", "AFScript Style edit wrappers are not supported")
                             Copy = main_GetEditWrapper("Aggregate Script", "##MARKER##")
                             Wrapper = Split(Copy, "##MARKER##")
                             returnValue = genericController.vbReplace(returnValue, "<!-- AFScript -->", Wrapper(0), 1, 99, vbTextCompare)
                             returnValue = genericController.vbReplace(returnValue, "<!-- /AFScript -->", Wrapper(1), 1, 99, vbTextCompare)
                         End If
                         If (InStr(1, returnValue, "<!-- AFReplacement -->", vbTextCompare) <> 0) Then
-                            Call cpCore.handleLegacyError7("returnValue", "AFReplacement Style edit wrappers are not supported")
+                            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError7("returnValue", "AFReplacement Style edit wrappers are not supported")
                             Copy = main_GetEditWrapper("Aggregate Replacement", "##MARKER##")
                             Wrapper = Split(Copy, "##MARKER##")
                             returnValue = genericController.vbReplace(returnValue, "<!-- AFReplacement -->", Wrapper(0), 1, 99, vbTextCompare)
@@ -8356,9 +8356,9 @@ ErrorTrap:
             '
 ErrorTrap:
             If hint <> "" Then
-                Call cpCore.handleLegacyError7("csv_EncodeContent9-" & hint, "Unexpected Trap Error")
+                throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError7("csv_EncodeContent9-" & hint, "Unexpected Trap Error")
             Else
-                Call cpCore.handleLegacyError7("csv_EncodeContent9", "Unexpected Trap Error")
+                throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError7("csv_EncodeContent9", "Unexpected Trap Error")
             End If
         End Function
         '
@@ -8939,7 +8939,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            cpCore.handleExceptionAndRethrow(New Exception("Unexpected exception"))
+            cpCore.handleExceptionAndContinue(New Exception("Unexpected exception"))
             'Call csv_HandleClassTrapError(Err.Number, Err.Source, Err.Description, "unknownMethodNameLegacyCall" & ", hint=[" & hint & "]", True)
         End Function
         '
@@ -8989,7 +8989,7 @@ ErrorTrap:
                 End If
                 Call cpCore.db.cs_Close(CS)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnCopy
         End Function
@@ -9007,7 +9007,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_AddTabEntry")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddTabEntry")
         End Sub
         '        '
         '        '
@@ -9023,7 +9023,7 @@ ErrorTrap:
         '            '
         '            Exit Function
         'ErrorTrap:
-        '            Call cpcore.handleLegacyError18("main_GetTabs")
+        '            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetTabs")
         '        End Function
         '
         '
@@ -9040,7 +9040,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_AddLiveTabEntry")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddLiveTabEntry")
         End Sub
         '
         '
@@ -9057,7 +9057,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_GetLiveTabs")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetLiveTabs")
         End Function
         '
         '
@@ -9074,7 +9074,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_AddComboTabEntry")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddComboTabEntry")
         End Sub
         '
         '
@@ -9091,7 +9091,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call cpCore.handleLegacyError18("main_GetComboTabs")
+            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetComboTabs")
         End Function
         '
         '========================================================================
@@ -9135,7 +9135,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnREsult
         End Function
@@ -9148,7 +9148,7 @@ ErrorTrap:
             Try
                 Call cpCore.email.sendPassword(cpCore.docProperties.getText("email"))
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -9183,7 +9183,7 @@ ErrorTrap:
                         If Not cpCore.error_IsUserError() Then
                             CS = cpCore.db.cs_open("people", "ID=" & cpCore.db.encodeSQLNumber(cpCore.authContext.user.ID))
                             If Not cpCore.db.cs_ok(CS) Then
-                                cpCore.handleExceptionAndRethrow(New Exception("Could not open the current members account to set the username and password."))
+                                cpCore.handleExceptionAndContinue(New Exception("Could not open the current members account to set the username and password."))
                             Else
                                 If (cpCore.db.cs_getText(CS, "username") <> "") Or (cpCore.db.cs_getText(CS, "password") <> "") Or (cpCore.db.cs_getBoolean(CS, "admin")) Or (cpCore.db.cs_getBoolean(CS, "developer")) Then
                                     '
@@ -9208,7 +9208,7 @@ ErrorTrap:
                 End If
                 Call cpCore.cache.invalidateContent("People")
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -9262,7 +9262,7 @@ ErrorTrap:
                 'Call AppendLog("call main_getEndOfBody, from main_getLoginPage2 ")
                 returnREsult = cpCore.main_assembleHtmlDoc(cpCore.main_docType, head, bodyTag, Body & cpCore.htmlDoc.html_GetEndOfBody(False, False, False, False))
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnREsult
         End Function
@@ -9403,7 +9403,7 @@ ErrorTrap:
                         & ""
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnHtml
         End Function
@@ -9455,7 +9455,7 @@ ErrorTrap:
                     returnHtml = getLoginForm_Default()
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnHtml
         End Function
@@ -9517,7 +9517,7 @@ ErrorTrap:
                     & ""
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnResult
         End Function

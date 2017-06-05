@@ -101,7 +101,7 @@ Namespace Contensive.Core
             ElseIf cpCore.cdnFiles.isinPhysicalPath(folderPath) Then
                 Call cpCore.cdnFiles.createPath(folderPath)
             Else
-                cpCore.handleExceptionAndRethrow(New ApplicationException("Application cannot access this path [" & folderPath & "]"))
+                throw (New ApplicationException("Application cannot access this path [" & folderPath & "]"))
             End If
         End Sub
         '
@@ -119,7 +119,7 @@ Namespace Contensive.Core
             ElseIf cpCore.cdnFiles.isinPhysicalPath(pathFilename) Then
                 Call cpCore.cdnFiles.deleteFile(pathFilename)
             Else
-                cpCore.handleExceptionAndRethrow(New ApplicationException("Application cannot access this path [" & pathFilename & "]"))
+                throw (New ApplicationException("Application cannot access this path [" & pathFilename & "]"))
             End If
         End Sub
         '
@@ -148,7 +148,7 @@ Namespace Contensive.Core
             ElseIf cpCore.cdnFiles.isinPhysicalPath(pathFilename) Then
                 Return cpCore.cdnFiles.readFile(pathFilename)
             Else
-                cpCore.handleExceptionAndRethrow(New ApplicationException("Application cannot access this path [" & pathFilename & "]"))
+                throw (New ApplicationException("Application cannot access this path [" & pathFilename & "]"))
             End If
             Return String.Empty
         End Function
@@ -179,7 +179,7 @@ Namespace Contensive.Core
             ElseIf cpCore.cdnFiles.isinPhysicalPath(pathFilename) Then
                 cpCore.cdnFiles.saveFile(pathFilename, fileContent)
             Else
-                cpCore.handleExceptionAndRethrow(New ApplicationException("Application cannot access this path [" & pathFilename & "]"))
+                throw (New ApplicationException("Application cannot access this path [" & pathFilename & "]"))
             End If
         End Sub
         '
@@ -210,7 +210,7 @@ Namespace Contensive.Core
             ElseIf cpCore.cdnFiles.isinPhysicalPath(pathFileName) Then
                 result = cpCore.cdnFiles.fileExists(pathFileName)
             Else
-                cpCore.handleExceptionAndRethrow(New ApplicationException("Application cannot access this path [" & pathFileName & "]"))
+                throw (New ApplicationException("Application cannot access this path [" & pathFileName & "]"))
             End If
             Return result
         End Function
@@ -231,7 +231,7 @@ Namespace Contensive.Core
             ElseIf cpCore.cdnFiles.isinPhysicalPath(pathFolderName) Then
                 result = cpCore.cdnFiles.pathExists(pathFolderName)
             Else
-                cpCore.handleExceptionAndRethrow(New ApplicationException("Application cannot access this path [" & pathFolderName & "]"))
+                throw (New ApplicationException("Application cannot access this path [" & pathFolderName & "]"))
             End If
             Return result
         End Function
@@ -257,7 +257,7 @@ Namespace Contensive.Core
                 Dim fi As IO.FileInfo() = cpCore.cdnFiles.getFileList(pathFolderName)
                 result = cpCore.cdnFiles.convertFileINfoArrayToParseString(fi)
             Else
-                cpCore.handleExceptionAndRethrow(New ApplicationException("Application cannot access this path [" & pathFolderName & "]"))
+                throw (New ApplicationException("Application cannot access this path [" & pathFolderName & "]"))
             End If
             Return result
         End Function
@@ -281,7 +281,7 @@ Namespace Contensive.Core
                 Dim fi As IO.DirectoryInfo() = cpCore.cdnFiles.getFolderList(pathFolderName)
                 result = cpCore.cdnFiles.convertDirectoryInfoArrayToParseString(fi)
             Else
-                cpCore.handleExceptionAndRethrow(New ApplicationException("Application cannot access this path [" & pathFolderName & "]"))
+                throw (New ApplicationException("Application cannot access this path [" & pathFolderName & "]"))
             End If
             Return result
         End Function
@@ -300,7 +300,7 @@ Namespace Contensive.Core
             ElseIf cpCore.cdnFiles.isinPhysicalPath(pathFolderName) Then
                 cpCore.appRootFiles.DeleteFileFolder(pathFolderName)
             Else
-                cpCore.handleExceptionAndRethrow(New ApplicationException("Application cannot access this path [" & pathFolderName & "]"))
+                throw (New ApplicationException("Application cannot access this path [" & pathFolderName & "]"))
             End If
         End Sub
 #Region " IDisposable Support "

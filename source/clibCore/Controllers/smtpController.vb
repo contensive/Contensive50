@@ -133,7 +133,7 @@ Namespace Contensive.Core.Controllers
                 End If
                 '
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
                 'Mailer = Nothing
                 'converthtmlToText = Nothing
                 sendEmail5 = "There was an unexpected error sending the email."
@@ -328,7 +328,7 @@ ErrorTrap:
                     Body = Mid(Body, EOL + 2)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return line
         End Function
@@ -342,13 +342,13 @@ ErrorTrap:
         '
         '
         Private Sub HandleClassTrapError(ByVal MethodName As String, ByVal ResumeNext As Boolean)
-            cpCore.handleLegacyError3("", "trap error", "ccEmail4", "SMTPHandlerClass", MethodName, Err.Number, Err.Source, Err.Description, True, ResumeNext, "unknown")
+            throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3("", "trap error", "ccEmail4", "SMTPHandlerClass", MethodName, Err.Number, Err.Source, Err.Description, True, ResumeNext, "unknown")
         End Sub
         '
         '
         '
         Private Sub HandleClassInternalError(ByVal ErrNumber As Integer, ByVal ErrSource As String, ByVal ErrDescription As String, ByVal MethodName As String, ByVal ResumeNext As Boolean)
-            cpCore.handleLegacyError3("", "internal error", "ccEmail4", "SMTPHandlerClass", MethodName, ErrNumber, ErrSource, ErrDescription, True, ResumeNext, "unknown")
+            throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3("", "internal error", "ccEmail4", "SMTPHandlerClass", MethodName, ErrNumber, ErrSource, ErrDescription, True, ResumeNext, "unknown")
         End Sub
         '
         '

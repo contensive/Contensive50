@@ -147,7 +147,7 @@ Namespace Contensive.Core.Models.Context
             ' ----- Error Trap
             '
 ErrorTrap:
-            cpCore.handleExceptionAndRethrow(New Exception("Unexpected exception"))
+            cpCore.handleExceptionAndContinue(New Exception("Unexpected exception"))
         End Sub
         '
         '====================================================================================================
@@ -390,7 +390,7 @@ ErrorTrap:
                     Call setProperty(propertyName, defaultValue, keyId)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnString
         End Function
@@ -429,7 +429,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            cpCore.handleExceptionAndRethrow(New Exception("Unexpected exception"))
+            cpCore.handleExceptionAndContinue(New Exception("Unexpected exception"))
         End Sub
     End Class
 End Namespace

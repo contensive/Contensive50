@@ -28,7 +28,7 @@ Namespace Contensive.Core.Controllers
             Try
                 Me.cpCore = cpCore
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -61,7 +61,7 @@ Namespace Contensive.Core.Controllers
                     & "Password=" & cpCore.serverConfig.defaultDataSourcePassword & ";" _
                     & ""
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnConnString
         End Function
@@ -75,7 +75,7 @@ Namespace Contensive.Core.Controllers
             Try
                 executeSql("create database " + catalogName)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
         '
@@ -97,7 +97,7 @@ Namespace Contensive.Core.Controllers
                 returnOk = (dt.Rows.Count > 0)
                 dt.Dispose()
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnOk
         End Function
@@ -130,7 +130,7 @@ Namespace Contensive.Core.Controllers
                 End If
             Catch ex As Exception
                 Dim newEx As New ApplicationException("Exception [" & ex.Message & "] executing master sql [" & sql & "]", ex)
-                cpCore.handleExceptionAndRethrow(newEx)
+                cpCore.handleExceptionAndContinue(newEx)
             End Try
             Return returnData
         End Function

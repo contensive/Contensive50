@@ -282,7 +282,7 @@ Namespace Contensive.Core.Controllers
                 '
                 returnValue = dst
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnValue
         End Function
@@ -374,7 +374,7 @@ Namespace Contensive.Core.Controllers
                         Try
                             cmdDictionary = cpCore.json.Deserialize(Of Dictionary(Of String, Object))(cmdSrc)
                         Catch ex As Exception
-                            cpCore.handleExceptionAndRethrow(ex, "Error parsing JSON command list [" & GetErrString() & "]")
+                            cpCore.handleExceptionAndContinue(ex, "Error parsing JSON command list [" & GetErrString() & "]")
                         End Try
                         '
                         dictionaryKeys = cmdDictionary.Keys
@@ -894,7 +894,7 @@ Namespace Contensive.Core.Controllers
                 '
                 ExecuteAllCmdLists_Execute = CmdAccumulator
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnValue
         End Function

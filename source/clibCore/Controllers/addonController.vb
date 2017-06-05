@@ -184,6 +184,8 @@ Namespace Contensive.Core.Controllers
             Return result
         End Function
         '
+        'todo convert to addon model, and pass new model to subroutines to enhandle error reporting
+        '
         '====================================================================================================
         ''' <summary>
         ''' 
@@ -314,6 +316,9 @@ Namespace Contensive.Core.Controllers
                 Dim addonCachePtr As Integer
                 Dim addonCollectionId As Integer
                 '
+                ' -- build a parallel addon model to convert later, but for now so it will pass to subroutines to include in error reporting
+                Dim addon As Models.Entity.addonModel
+                '
                 ' ----- OptionString and FilterInput values before this call are saved on the stack
                 '
                 Dim PushOptionString As String
@@ -345,6 +350,7 @@ Namespace Contensive.Core.Controllers
                 '
                 If addonId <> 0 Then
                     addonCachePtr = cpCore.addonCache.getPtr(CStr(addonId))
+                    addon = Models.Entity.addonModel.create(cpCore, addonId, New List(Of String))
                 Else
                     addonCachePtr = cpCore.addonCache.getPtr(AddonNameOrGuid)
                 End If
@@ -1057,7 +1063,7 @@ Namespace Contensive.Core.Controllers
                                     If (ScriptingCode <> "") Then
                                         'hint = "Processing Addon [" & AddonName & "], calling script component."
                                         Try
-                                            ScriptContent = executeScript4(ScriptingLanguage, ScriptingCode, ScriptingEntryPoint, errorMessageForAdmin, ScriptingTimeout, "Addon [" & AddonName & "]", ReplaceCnt, ReplaceNames, ReplaceValues)
+                                            ScriptContent = executeScript(ScriptingLanguage, ScriptingCode, ScriptingEntryPoint, errorMessageForAdmin, ScriptingTimeout, "Addon [" & AddonName & "]", ReplaceCnt, ReplaceNames, ReplaceValues)
                                         Catch ex As Exception
                                             Throw New ApplicationException("There was an error executing the script component of Add-on [" & AddonName & "], AddonOptionString [" & WorkingOptionString & "]. The details of this error follow.</p><p>" & errorMessageForAdmin & "")
                                         End Try
@@ -1082,7 +1088,7 @@ Namespace Contensive.Core.Controllers
                                             '
                                             ' log the error
                                             '
-                                            Call cpCore.handleLegacyError8("Error during cmc.csv_ExecuteAssembly [" & errorMessageForAdmin & "]", "cpCoreClass.addon_execute_internal", True)
+                                            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError8("Error during cmc.csv_ExecuteAssembly [" & errorMessageForAdmin & "]", "cpCoreClass.addon_execute_internal", True)
                                             '
                                             ' Put up an admin hint
                                             '
@@ -2115,7 +2121,7 @@ Namespace Contensive.Core.Controllers
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError5("addon_execute_getFormContent", "trap", Err.Number, Err.Source, Err.Description, False)
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError5("addon_execute_getFormContent", "trap", Err.Number, Err.Source, Err.Description, False)
         End Function
         '
         '========================================================================
@@ -2263,55 +2269,9 @@ ErrorTrap:
             '
 ErrorTrap:
             FastString = Nothing
-            Call cpCore.handleLegacyError7("addon_execute_getFormContent_decodeSelector", "trap")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError7("addon_execute_getFormContent_decodeSelector", "trap")
         End Function
-        '
-        ' ================================================================================================================
-        '   Execute a script
-        '   returns the results
-        '
-        '       - cp argument should be set during csv_OpenConnection3, not passed in here as nothingObject
-        ' ================================================================================================================
-        '
-        Private Function executeScript(ByVal Language As String, ByVal Code As String, ByVal EntryPoint As String, ByVal cmcObj As coreClass, ByVal nothingObject As Object, ByRef return_AddonErrorMessage As String) As String
-            Dim ScriptName As String
-            Dim FirstLine As String
-            Dim Pos As Integer
-            Dim EmptyArray(0) As String
-            '
-            If EntryPoint <> "" Then
-                ScriptName = "unnamed script with method [" & EntryPoint & "] and length [" & Len(Code) & "]"
-            Else
-                FirstLine = Code
-                FirstLine = genericController.vbReplace(FirstLine, vbTab, "")
-                Pos = genericController.vbInstr(1, FirstLine, vbCrLf)
-                If (Pos <= 0) Or (Pos > 50) Then
-                    FirstLine = Left(FirstLine, 50)
-                Else
-                    FirstLine = Left(FirstLine, Pos - 1)
-                End If
-                ScriptName = "unnamed script with length [" & Len(Code) & "] starting with [" & FirstLine & "]"
-            End If
-            Return executeScript3(Language, Code, EntryPoint, cmcObj, nothingObject, return_AddonErrorMessage, 60000, ScriptName, 0, EmptyArray, EmptyArray)
-        End Function
-        ''
-        '' ================================================================================================================
-        ''   Execute a script
-        ''   returns the results
-        '' ================================================================================================================
-        ''
-        'Private Function addon_execute_executeScript2(ByVal Language As String, ByVal Code As String, ByVal EntryPoint As String, ByVal cmcObj As coreClass, ByVal nothingObject As Object, ByRef return_AddonErrorMessage As String, ByVal ScriptingTimeout As Integer, ByVal ScriptName As String) As String
-        '    Dim EmptyArray(0) As String
-        '    addon_execute_executeScript2 = addon_execute_executeScript3(Language, Code, EntryPoint, cmcObj, nothingObject, return_AddonErrorMessage, ScriptingTimeout, ScriptName, 0, EmptyArray, EmptyArray)
-        'End Function
-        '
-        ' ================================================================================================================
-        '   conversion to 2005 - pass 2
-        ' ================================================================================================================
-        '
-        Private Function executeScript3(ByVal Language As String, ByVal Code As String, ByVal EntryPoint As String, ByVal nothingObject As Object, ByVal nothingObject2 As Object, ByRef return_AddonErrorMessage As String, ByVal ScriptingTimeout As Integer, ByVal ScriptName As String, ByVal ReplaceCnt As Integer, ByVal ReplaceNames() As String, ByVal ReplaceValues() As String) As String
-            Return executeScript4(Language, Code, EntryPoint, return_AddonErrorMessage, ScriptingTimeout, ScriptName, ReplaceCnt, ReplaceNames, ReplaceValues)
-        End Function
+
         '
         ' ================================================================================================================
         ''' <summary>
@@ -2328,7 +2288,7 @@ ErrorTrap:
         ''' <param name="ReplaceValues"></param>
         ''' <returns></returns>
         ''' <remarks>long run, use either csscript.net, or use .net tools to build compile/run funtion</remarks>
-        Private Function executeScript4(ByVal Language As String, ByVal Code As String, ByVal EntryPoint As String, ByRef return_errorMessage As String, ByVal ScriptingTimeout As Integer, ByVal ScriptName As String, ByVal ReplaceCnt As Integer, ByVal ReplaceNames() As String, ByVal ReplaceValues() As String) As String
+        Private Function executeScript(ByVal Language As String, ByVal Code As String, ByVal EntryPoint As String, ByRef return_errorMessage As String, ByVal ScriptingTimeout As Integer, ByVal ScriptName As String, ByVal ReplaceCnt As Integer, ByVal ReplaceNames() As String, ByVal ReplaceValues() As String) As String
             Dim returnText As String = ""
             Try
                 Dim Lines() As String
@@ -2402,7 +2362,7 @@ ErrorTrap:
                     Else
                         return_errorMessage &= ", no scripting error"
                     End If
-                    cpCore.handleExceptionAndRethrow(ex, return_errorMessage)
+                    Throw New ApplicationException(return_errorMessage, ex)
                 End Try
                 If String.IsNullOrEmpty(return_errorMessage) Then
                     If True Then
@@ -2429,7 +2389,7 @@ ErrorTrap:
                                         Else
                                             return_errorMessage &= ", no scripting error"
                                         End If
-                                        cpCore.handleExceptionAndRethrow(ex, return_errorMessage)
+                                        Throw New ApplicationException(return_errorMessage, ex)
                                     End Try
                                     If String.IsNullOrEmpty(return_errorMessage) Then
                                         '
@@ -2465,11 +2425,11 @@ ErrorTrap:
                                                     Case 9
                                                         returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6), Args(7), Args(8), Args(9)))
                                                     Case Else
-                                                        Call cpCore.handleLegacyError6("csv_ExecuteScript4", "Scripting only supports 10 arguments.")
+                                                        Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError6("csv_ExecuteScript4", "Scripting only supports 10 arguments.")
                                                 End Select
                                             End If
                                         Catch ex As Exception
-                                            return_errorMessage = "Error executing script"
+                                            return_errorMessage = "Error executing script [" & ScriptName & "]"
                                             If sc.Error.Number <> 0 Then
                                                 With sc.Error
                                                     return_errorMessage = return_errorMessage & ", #" & .Number & ", " & .Description & ", line " & .Line & ", character " & .Column
@@ -2483,7 +2443,7 @@ ErrorTrap:
                                             Else
                                                 return_errorMessage = return_errorMessage & ", " & GetErrString()
                                             End If
-                                            cpCore.handleExceptionAndRethrow(ex, return_errorMessage)
+                                            Throw New ApplicationException(return_errorMessage, ex)
                                         End Try
                                     End If
                                 End If
@@ -2492,7 +2452,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnText
         End Function
@@ -2557,7 +2517,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
                 Throw ex
             End Try
             Return result
@@ -2724,7 +2684,7 @@ ErrorTrap:
             Catch ex As Exception
                 '
                 ' -- this exception should interrupt the caller
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnValue
         End Function
@@ -2850,7 +2810,7 @@ ErrorTrap:
             ErrDescription = Err.Description
             Call Err.Clear()
             logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "errortrap exit(" & (GetTickCount - ProcessStartTick) & " msec): execute now, addon [" & AddonIDGuidOrName & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
-            Call cpCore.handleLegacyError4(ErrNumber, ErrSource, ErrDescription, "unknownMethodNameLegacyCall" & ", hint=" & hint, True)
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError4(ErrNumber, ErrSource, ErrDescription, "unknownMethodNameLegacyCall" & ", hint=" & hint, True)
         End Function
         '
         '=============================================================================================================
@@ -3196,7 +3156,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call cpCore.handleLegacyError18("addon_execute_GetInstanceBubble")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("addon_execute_GetInstanceBubble")
         End Function
         '
         '===============================================================================================================================================
@@ -3307,7 +3267,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call cpCore.handleLegacyError18("addon_execute_GetAddonStylesBubble")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("addon_execute_GetAddonStylesBubble")
         End Function
         '
         '===============================================================================================================================================
@@ -3418,7 +3378,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call cpCore.handleLegacyError18("addon_execute_GetHelpBubble")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("addon_execute_GetHelpBubble")
         End Function
         '
         '===============================================================================================================================================
@@ -3511,7 +3471,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call cpCore.handleLegacyError18("addon_execute_GetHTMLViewerBubble")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("addon_execute_GetHTMLViewerBubble")
         End Function
         '
         '
@@ -3596,7 +3556,7 @@ ErrorTrap:
                 '
                 return_ExitRequest = True
                 Exit Function
-            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpcore) Then
+            ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 ' Not Admin Error
                 '
@@ -4195,7 +4155,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError10(Err.Number, Err.Source, Err.Description, "addon_execute_GetFormContent", True, False)
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError10(Err.Number, Err.Source, Err.Description, "addon_execute_GetFormContent", True, False)
         End Function
         '
         '========================================================================
@@ -4344,7 +4304,7 @@ ErrorTrap:
             '
 ErrorTrap:
             FastString = Nothing
-            Call cpCore.handleLegacyError18("addon_execute_GetFormContent_decodeSelector")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("addon_execute_GetFormContent_decodeSelector")
         End Function
         '
         '===================================================================================================
@@ -4528,7 +4488,7 @@ ErrorTrap:
             Exit Sub
             '
 ErrorTrap:
-            cpCore.handleExceptionAndRethrow(New Exception("Unexpected exception"))
+            Throw New Exception("Unexpected exception")
         End Sub
         '
         '===================================================================================================
@@ -4629,7 +4589,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call cpCore.handleLegacyError18("WrapContent")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("WrapContent")
         End Function        '
         '====================================================================================================
 #Region " IDisposable Support "

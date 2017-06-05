@@ -1195,7 +1195,7 @@ Namespace Contensive.Core
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, MethodName, True)
+            handleExceptionAndContinue(New ApplicationException("Unexpected exception")) : Throw New ApplicationException("Unexpected exception")
         End Function
         '
         '========================================================================
@@ -1277,7 +1277,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, "app.csv_DeleteTableRecordChunks", True)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError4(Err.Number, Err.Source, Err.Description, "app.csv_DeleteTableRecordChunks", True)
         End Sub
         '
         '========================================================================
@@ -1302,7 +1302,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, MethodName, True)
+            handleExceptionAndContinue(New ApplicationException("Unexpected exception")) : Throw New ApplicationException("Unexpected exception") ' handleLegacyError4(Err.Number, Err.Source, Err.Description, MethodName, True)
         End Function
         '
         '=============================================================================
@@ -1344,7 +1344,7 @@ ErrorTrap:
             Dim dt As DataTable
             dt = db.executeSql(SQL)
             If dt.Rows.Count = 0 Then
-                Call handleLegacyError25(MethodName, ("No Content Definition could be found for records in table [" & TableName & "]"))
+                Throw (New ApplicationException("No Content Definition could be found for records in table [" & TableName & "]")) ' handleLegacyError25(MethodName, (""))
             Else
                 '
                 '----------------------------------------------------------------
@@ -1373,14 +1373,14 @@ ErrorTrap:
                     SQL = db.GetSQLSelect("default", TableName, "ID", "DateAdded=" & db.encodeSQLDate(DateAdded) & " AND CreateKey=" & db.encodeSQLNumber(CreateKey))
                     dtTargetTable = db.executeSql(SQL, DataSourceName)
                     If dtTargetTable.Rows.Count = 0 Then
-                        Call handleLegacyError25(MethodName, ("Could not locate a new re   cord added to table [" & TableName & "]"))
+                        Throw (New ApplicationException("Could not locate a new re   cord added to table [" & TableName & "]")) ' handleLegacyError25(MethodName, (""))
                     Else
                         BlankRecordID = genericController.EncodeInteger(dtTargetTable.Rows(0).Item("id"))
                     End If
                     SQL = db.GetSQLSelect("default", TableName, , , , , 1)
                     dtTargetTable = db.executeSql(SQL, DataSourceName)
                     If dtTargetTable.Rows.Count = 0 Then
-                        Call handleLegacyError25(MethodName, ("Could not open a record to table [" & TableName & "]."))
+                        Throw (New ApplicationException("Could not open a record to table [" & TableName & "].")) ' handleLegacyError25(MethodName, (""))
                     End If
                 Else
                     '
@@ -1416,7 +1416,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, MethodName, True)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError4(Err.Number, Err.Source, Err.Description, MethodName, True)
         End Sub
 
         '
@@ -1442,7 +1442,7 @@ ErrorTrap:
             '
 ErrorTrap:
             XML = Nothing
-            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, MethodName, True)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError4(Err.Number, Err.Source, Err.Description, MethodName, True)
         End Function
 
 
@@ -1534,7 +1534,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_DeleteContentTracking", True)
+            Throw New ApplicationException("Unexpected exception") ' handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_DeleteContentTracking", True)
         End Sub
         '        '
         '        '========================================================================
@@ -1570,7 +1570,7 @@ ErrorTrap:
         '            Exit Function
         '            '
         'ErrorTrap:
-        '            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, MethodName, True)
+        '            throw New ApplicationException("Unexpected exception") ' handleLegacyError4(Err.Number, Err.Source, Err.Description, MethodName, True)
         '        End Function
         '        '
         '        '========================================================================
@@ -1596,7 +1596,7 @@ ErrorTrap:
         '            ' ----- Error Trap
         '            '
         'ErrorTrap:
-        '            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, MethodName, True)
+        '            throw New ApplicationException("Unexpected exception") ' handleLegacyError4(Err.Number, Err.Source, Err.Description, MethodName, True)
         '        End Sub
         '        '
         '        '========================================================================
@@ -1618,7 +1618,7 @@ ErrorTrap:
         '            ' ----- Error Trap
         '            '
         'ErrorTrap:
-        '            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, MethodName, True)
+        '            throw New ApplicationException("Unexpected exception") ' handleLegacyError4(Err.Number, Err.Source, Err.Description, MethodName, True)
         '        End Sub
         '        '
         '        '========================================================================
@@ -1647,7 +1647,7 @@ ErrorTrap:
         '            ' ----- Error Trap
         '            '
         'ErrorTrap:
-        '            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, MethodName, True)
+        '            throw New ApplicationException("Unexpected exception") ' handleLegacyError4(Err.Number, Err.Source, Err.Description, MethodName, True)
         '        End Sub
         '
         ' Get the applications root path (ServerAppcsv_RootPath to WebClient)
@@ -1705,7 +1705,7 @@ ErrorTrap:
         '            End If
         '        End If
         '    Catch ex As Exception
-        '        Call handleExceptionAndRethrow(ex)
+        '        Call throw (ex)
         '    End Try
         'End Function
 
@@ -1768,7 +1768,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_RequestTask", True)
+            Throw New ApplicationException("Unexpected exception") ' handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_RequestTask", True)
         End Sub
         '
         '========================================================================
@@ -1836,7 +1836,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, "csOpenWatchList", True)
+            Throw New ApplicationException("Unexpected exception") ' handleLegacyError4(Err.Number, Err.Source, Err.Description, "csOpenWatchList", True)
         End Function
         '        '
         '        '=============================================================================
@@ -2024,7 +2024,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_VerifyDynamicMenu", True, True)
+            Throw New ApplicationException("Unexpected exception") ' handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_VerifyDynamicMenu", True, True)
         End Function
         '
         '===========================================================================================
@@ -2063,7 +2063,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, "VerifyDefaultDynamicMenu", True, True)
+            Throw New ApplicationException("Unexpected exception") ' handleLegacyError4(Err.Number, Err.Source, Err.Description, "VerifyDefaultDynamicMenu", True, True)
         End Function
         ''
         ''
@@ -2105,7 +2105,7 @@ ErrorTrap:
             Exit Sub
             '
 ErrorTrap:
-            handleExceptionAndRethrow(New Exception("Unexpected exception"))
+            Throw (New Exception("Unexpected exception"))
         End Sub
         '
         '=================================================================================================================
@@ -2167,7 +2167,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            handleExceptionAndRethrow(New Exception("Unexpected exception"))
+            Throw (New Exception("Unexpected exception"))
         End Function
         '
         '   Returns the next entry in the array, empty when there are no more
@@ -2189,7 +2189,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            handleExceptionAndRethrow(New Exception("Unexpected exception"))
+            Throw (New Exception("Unexpected exception"))
         End Function
         '
         '   Returns the next entry in the array, empty when there are no more
@@ -2211,7 +2211,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            handleExceptionAndRethrow(New Exception("Unexpected exception"))
+            Throw (New Exception("Unexpected exception"))
         End Function
         '
         '   Returns the next entry in the array, empty when there are no more
@@ -2233,7 +2233,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            handleExceptionAndRethrow(New Exception("Unexpected exception"))
+            Throw (New Exception("Unexpected exception"))
         End Function
         '
         '   Returns the next entry in the array, empty when there are no more
@@ -2255,7 +2255,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            handleExceptionAndRethrow(New Exception("Unexpected exception"))
+            Throw (New Exception("Unexpected exception"))
         End Function
         '
         '========================================================================================================
@@ -2268,12 +2268,12 @@ ErrorTrap:
             web_EncodeContent_HeadTags = ""
             '
         End Function
-        '
-        ' ----- temp solution to convert error reporting without spending the time right now
-        '
-        Friend Sub handleLegacyError25(MethodName As String, ErrDescription As String)
-            Throw New ApplicationException(MethodName & ", " & ErrDescription)
-        End Sub
+        ''
+        '' ----- temp solution to convert error reporting without spending the time right now
+        ''
+        'Friend Sub handleLegacyError25(MethodName As String, ErrDescription As String)
+        '    Throw New ApplicationException(MethodName & ", " & ErrDescription)
+        'End Sub
         '
         '
         '
@@ -2286,7 +2286,7 @@ ErrorTrap:
                 '
                 ' error, do nothing but log
                 '
-                handleLegacyError3(serverConfig.appConfig.name, "Attempt to resize an image to 0,0. This is not allowed.", "dll", "cpCoreClass", "csv_ResizeImage2", ignoreInteger, "", "", False, True, "")
+                handleExceptionAndContinue(New ApplicationException("Attempt to resize an image to 0,0. This is not allowed.")) ' handleLegacyError3(serverConfig.appConfig.name, "", "dll", "cpCoreClass", "csv_ResizeImage2", ignoreInteger, "", "", False, True, "")
             Else
                 If sf.load(SrcFilename) Then
                     If Width = 0 Then
@@ -2305,7 +2305,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            handleExceptionAndRethrow(New Exception("Unexpected exception"))
+            Throw (New Exception("Unexpected exception"))
         End Sub
         '
         '
@@ -2317,7 +2317,7 @@ ErrorTrap:
                 Algorithm = genericController.EncodeInteger(siteProperties.getText("ImageResizeSFAlgorithm", "5"))
                 Call image_ResizeImage2(SrcFilename, DstFilename, Width, Height, DirectCast(Algorithm, csv_SfImageResizeAlgorithms))
             Catch ex As Exception
-                handleExceptionAndRethrow(ex)
+                Throw (ex)
             End Try
         End Sub
         ''
@@ -2332,7 +2332,7 @@ ErrorTrap:
         '        Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
         '        Return json.Serialize(source)
         '    Catch ex As Exception
-        '        handleExceptionAndRethrow(ex)
+        '        throw (ex)
         '        Return ""
         '    End Try
         'End Function
@@ -2349,7 +2349,7 @@ ErrorTrap:
         '        Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
         '        returnObj = json.Deserialize(Of Object)(Source)
         '    Catch ex As Exception
-        '        handleExceptionAndRethrow(ex)
+        '        throw (ex)
         '    End Try
         '    Return returnObj
         'End Function
@@ -2414,7 +2414,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            handleLegacyError3("", "", "dll", "ccCommonModule", "csv_GetAddonOptionStringValue", Err.Number, Err.Source, Err.Description, True, False, "")
+            Throw New ApplicationException("Unexpected exception") ' handleLegacyError3("", "", "dll", "ccCommonModule", "csv_GetAddonOptionStringValue", Err.Number, Err.Source, Err.Description, True, False, "")
         End Function
         '
         '================================================================================================
@@ -2741,7 +2741,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_addLinkAlias", True)
+            Throw New ApplicationException("Unexpected exception") ' handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_addLinkAlias", True)
         End Sub
         '
         '
@@ -2784,7 +2784,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError7(MethodName, "Unexpected Trap")
+            Throw New ApplicationException("Unexpected exception") ' handleLegacyError7(MethodName, "Unexpected Trap")
             '
         End Function
         '
@@ -3019,7 +3019,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError13(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' handleLegacyError13(MethodName)
         End Sub
         '
         '========================================================================
@@ -3041,7 +3041,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError13("main_ProcessFormMyProfile_UpdateField")
+            Throw New ApplicationException("Unexpected exception") ' handleLegacyError13("main_ProcessFormMyProfile_UpdateField")
         End Sub
         '
         '========================================================================
@@ -3063,7 +3063,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError13("main_ProcessFormMyProfile_UpdateFieldBoolean")
+            Throw New ApplicationException("Unexpected exception") ' handleLegacyError13("main_ProcessFormMyProfile_UpdateFieldBoolean")
         End Sub
         '
         '===========================================================================================
@@ -3148,7 +3148,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' handleLegacyError18(MethodName)
         End Function
         '
         '========================================================================
@@ -3192,7 +3192,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18("main_TestPoint")
+            Throw New ApplicationException("Unexpected exception") ' handleLegacyError18("main_TestPoint")
         End Sub
         ''
         ''========================================================================
@@ -3319,7 +3319,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' handleLegacyError18(MethodName)
         End Function
         '
         '========================================================================
@@ -3378,7 +3378,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            Call handleLegacyError18("main_GetNameValue")
+            Throw New ApplicationException("Unexpected exception") ' handleLegacyError18("main_GetNameValue")
         End Function
         '
         '=============================================================================
@@ -3444,7 +3444,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError13(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' handleLegacyError13(MethodName)
         End Function
         '
         '========================================================================
@@ -3543,7 +3543,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            Call handleLegacyError18("main_GetPanel")
+            Throw New ApplicationException("Unexpected exception") ' handleLegacyError18("main_GetPanel")
         End Function
         '
         '========================================================================
@@ -3569,7 +3569,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            Call handleLegacyError18("main_GetReversePanel")
+            Throw New ApplicationException("Unexpected exception") ' handleLegacyError18("main_GetReversePanel")
         End Function
         '
         '========================================================================
@@ -3592,7 +3592,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            Call handleLegacyError18("main_GetPanelHeader")
+            Throw New ApplicationException("Unexpected exception") ' handleLegacyError18("main_GetPanelHeader")
         End Function
 
         '
@@ -3652,7 +3652,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -3696,7 +3696,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -3726,7 +3726,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' handleLegacyError18(MethodName)
         End Function
         '
         '
@@ -3740,7 +3740,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            Call handleLegacyError18("main_GetPanelRev")
+            Throw New ApplicationException("Unexpected exception") ' handleLegacyError18("main_GetPanelRev")
         End Function
         '
         '
@@ -3754,7 +3754,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            Call handleLegacyError18("main_GetPanelInput")
+            Throw New ApplicationException("Unexpected exception") ' handleLegacyError18("main_GetPanelInput")
         End Function
         '
         '========================================================================
@@ -4174,7 +4174,7 @@ ErrorTrap:
             LinkPanel = Nothing
             ToolsPanel = Nothing
             AnotherPanel = Nothing
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' handleLegacyError18(MethodName)
         End Function
         '
         '
@@ -4189,7 +4189,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            Call handleLegacyError13("main_DebugPanelRow")
+            Throw New ApplicationException("Unexpected exception") ' handleLegacyError13("main_DebugPanelRow")
         End Function
         '        '
         '        '========================================================================
@@ -4218,7 +4218,7 @@ ErrorTrap:
         '                '
         '                CSPointer = main_OpenCSContentRecord2(iContentName, iRecordID)
         '                If Not app.IsCSOK(CSPointer) Then
-        '                    Call handleLegacyError14(MethodName, "main_TrackContent, Error opening ContentSet from Content/Record [" & iContentName & "/" & genericController.encodeText(iRecordID) & "].")
+        '                    throw New ApplicationException("Unexpected exception") ' handleLegacyError14(MethodName, "main_TrackContent, Error opening ContentSet from Content/Record [" & iContentName & "/" & genericController.encodeText(iRecordID) & "].")
         '                Else
         '                    Call main_TrackContentSet(CSPointer)
         '                End If
@@ -4229,7 +4229,7 @@ ErrorTrap:
         '            ' ----- Error Trap
         '            '
         'ErrorTrap:
-        '            Call handleLegacyError18(MethodName)
+        '            throw New ApplicationException("Unexpected exception") ' handleLegacyError18(MethodName)
         '            '
         '        End Sub
         '        '
@@ -4252,7 +4252,7 @@ ErrorTrap:
         '            Exit Function
         '            '
         'ErrorTrap:
-        '            Call handleLegacyError18("main_GetTitle")
+        '            throw New ApplicationException("Unexpected exception") ' handleLegacyError18("main_GetTitle")
         '        End Function
         ''
         ''========================================================================
@@ -4292,7 +4292,7 @@ ErrorTrap:
         '                '
         '                ' ----- could not open people, can not continue
         '                '
-        '                Call handleLegacyError14(MethodName, "main_GetJoinForm, could not open the guest identity")
+        '                throw New ApplicationException("Unexpected exception") ' handleLegacyError14(MethodName, "main_GetJoinForm, could not open the guest identity")
         '            Else
         '                If True Then
         '                    If authcontext.user.user_isRecognized() And Not authcontext.user.user_isAuthenticated() Then
@@ -4349,7 +4349,7 @@ ErrorTrap:
         '            ' ----- Error Trap
         '            '
         'ErrorTrap:
-        '            Call handleLegacyError18(MethodName)
+        '            throw New ApplicationException("Unexpected exception") ' handleLegacyError18(MethodName)
         '            '
         '        End Function
         '        '
@@ -4527,7 +4527,7 @@ ErrorTrap:
         '            ' ----- Error Trap
         '            '
         'ErrorTrap:
-        '            Call handleLegacyError18(MethodName)
+        '            throw New ApplicationException("Unexpected exception") ' handleLegacyError18(MethodName)
         '            '
         '        End Function
         '        '
@@ -4693,7 +4693,7 @@ ErrorTrap:
         '            ' ----- Error Trap
         '            '
         'ErrorTrap:
-        '            Call handleLegacyError18(MethodName)
+        '            throw New ApplicationException("Unexpected exception") ' handleLegacyError18(MethodName)
         '            '
         '        End Function
         '        '
@@ -4716,7 +4716,7 @@ ErrorTrap:
         '            End If
         '            '
         '            If Not db.csOk(CSPointer) Then
-        '                handleExceptionAndRethrow(New Exception("ContentSet argument is not valid"))
+        '                throw (New Exception("ContentSet argument is not valid"))
         '            Else
         '                If readOnlyField Then
         '                    Stream = db.cs_getText(CSPointer, FieldName)
@@ -4730,7 +4730,7 @@ ErrorTrap:
         '            ' ----- Error Trap
         '            '
         'ErrorTrap:
-        '            Call handleLegacyError13(MethodName)
+        '            throw New ApplicationException("Unexpected exception") ' handleLegacyError13(MethodName)
         '        End Function
         '        '
         '        ' ----- main_GetMyProfileForm_RowCS()
@@ -4747,7 +4747,7 @@ ErrorTrap:
         '                & "</tr>"
         '            Exit Function
         'ErrorTrap:
-        '            Call handleLegacyError13("main_GetMyProfileForm_Row")
+        '            throw New ApplicationException("Unexpected exception") ' handleLegacyError13("main_GetMyProfileForm_Row")
         '        End Function
         '        '
         '        '========================================================================
@@ -4780,7 +4780,7 @@ ErrorTrap:
         '            ' ----- Error Trap
         '            '
         'ErrorTrap:
-        '            Call handleLegacyError13("main_GetMyProfileForm_Topics")
+        '            throw New ApplicationException("Unexpected exception") ' handleLegacyError13("main_GetMyProfileForm_Topics")
         '        End Function
         '        '
         '        '========================================================================
@@ -4833,7 +4833,7 @@ ErrorTrap:
         '            ' ----- Error Trap
         '            '
         'ErrorTrap:
-        '            Call handleLegacyError13(MethodName)
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13(MethodName)
         '        End Function
         '        '
         '        '========================================================================
@@ -4871,7 +4871,7 @@ ErrorTrap:
         '            ' ----- Error Trap
         '            '
         'ErrorTrap:
-        '            Call handleLegacyError13(MethodName)
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13(MethodName)
         '        End Function
         '
         '=============================================================================
@@ -4905,7 +4905,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
         End Function
         '
         '=============================================================================
@@ -4941,7 +4941,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -4985,7 +4985,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
         End Function
 
         '
@@ -5005,7 +5005,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18("main_DeleteGroup")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_DeleteGroup")
         End Sub
         '
         '=============================================================================
@@ -5034,7 +5034,7 @@ ErrorTrap:
                     GroupID = group_Add(GroupName, GroupName)
                 End If
                 If (GroupID < 1) Then
-                    Call handleLegacyError14(MethodName, "main_AddGroupMember could not find or add Group [" & GroupName & "]")
+                    Throw (New ApplicationException("main_AddGroupMember could not find or add Group [" & GroupName & "]")) ' handleLegacyError14(MethodName, "")
                 Else
                     CS = db.cs_open("Member Rules", "(MemberID=" & db.encodeSQLNumber(NewMemberID) & ")and(GroupID=" & db.encodeSQLNumber(GroupID) & ")", , False)
                     If Not db.cs_ok(CS) Then
@@ -5042,7 +5042,7 @@ ErrorTrap:
                         CS = db.cs_insertRecord("Member Rules")
                     End If
                     If Not db.cs_ok(CS) Then
-                        Call handleLegacyError14(MethodName, "main_AddGroupMember could not add this member to the Group [" & GroupName & "]")
+                        Throw (New ApplicationException("main_AddGroupMember could not add this member to the Group [" & GroupName & "]")) ' handleLegacyError14(MethodName, "")
                     Else
                         Call db.cs_set(CS, "active", True)
                         Call db.cs_set(CS, "memberid", NewMemberID)
@@ -5062,7 +5062,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Sub
         '
@@ -5087,7 +5087,7 @@ ErrorTrap:
                 GroupID = group_GetGroupID(iGroupName)
                 If (GroupID < 1) Then
                 ElseIf (NewMemberID < 1) Then
-                    Call handleLegacyError14(MethodName, "Member ID is invalid")
+                    Throw (New ApplicationException("Member ID is invalid")) ' handleLegacyError14(MethodName, "")
                 Else
                     Call db.deleteContentRecords("Member Rules", "(MemberID=" & db.encodeSQLNumber(NewMemberID) & ")AND(groupid=" & db.encodeSQLNumber(GroupID) & ")")
                 End If
@@ -5098,7 +5098,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Sub
         '        '
@@ -5124,7 +5124,7 @@ ErrorTrap:
         '            '
         'ErrorTrap:
         '            Admin = Nothing
-        '            Call handleLegacyError18("main_GetAdminForm")
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetAdminForm")
         '        End Function
         ''
         ''=============================================================================
@@ -5150,7 +5150,7 @@ ErrorTrap:
             '
 ErrorTrap:
             Tools = Nothing
-            Call handleLegacyError18("PrintToolsForm")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("PrintToolsForm")
         End Function
         '
         '=============================================================================
@@ -5170,7 +5170,7 @@ ErrorTrap:
             '
             '  BuildVersion = app.dataBuildVersion
             If False Then '.3.210" Then
-                handleExceptionAndRethrow(New Exception("Contensive database was created with version " & siteProperties.dataBuildVersion & ". main_SetContentCopy requires an builder."))
+                Throw (New Exception("Contensive database was created with version " & siteProperties.dataBuildVersion & ". main_SetContentCopy requires an builder."))
             Else
                 iCopyName = genericController.encodeText(CopyName)
                 iContent = genericController.encodeText(Content)
@@ -5190,7 +5190,7 @@ ErrorTrap:
             '
 ErrorTrap:
             '    PageList = Nothing
-            Call handleLegacyError18("main_GetContentCopy")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetContentCopy")
         End Sub
 
         '        '
@@ -5261,7 +5261,7 @@ ErrorTrap:
         '            '
         'ErrorTrap:
         '            '    PageList = Nothing
-        '            Call handleLegacyError18("main_GetContentPage")
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetContentPage")
         '        End Function
         '        '
         '        '=============================================================================
@@ -5302,7 +5302,7 @@ ErrorTrap:
         '            '
         'ErrorTrap:
         '            '   PageList = Nothing
-        '            Call handleLegacyError18("main_GetContentPageArchive")
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetContentPageArchive")
         '        End Function
         '        '
         '        '=============================================================================
@@ -5343,7 +5343,7 @@ ErrorTrap:
         '            '
         'ErrorTrap:
         '            'Set PageList = Nothing
-        '            Call handleLegacyError18("main_GetContentPageMenu")
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetContentPageMenu")
         '        End Function
         '        '
         '        '   2.0 compatibility
@@ -5356,7 +5356,7 @@ ErrorTrap:
         '            '
         '            Exit Function
         'ErrorTrap:
-        '            Call handleLegacyError18("main_OpenContent")
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_OpenContent")
         '        End Function
         '
         '========================================================================
@@ -5380,10 +5380,10 @@ ErrorTrap:
             MethodName = "main_cs_getRecordEditLink"
             '
             If iCSPointer = -1 Then
-                Call handleLegacyError14(MethodName, "main_cs_getRecordEditLink called with invalid iCSPointer")
+                Throw (New ApplicationException("main_cs_getRecordEditLink called with invalid iCSPointer")) ' handleLegacyError14(MethodName, "")
             Else
                 If Not db.cs_ok(iCSPointer) Then
-                    Call handleLegacyError14(MethodName, "main_cs_getRecordEditLink called with Not main_CSOK")
+                    Throw (New ApplicationException("main_cs_getRecordEditLink called with Not main_CSOK")) ' handleLegacyError14(MethodName, "")
                 Else
                     '
                     ' Print an edit link for the records Content (may not be iCSPointer content)
@@ -5402,7 +5402,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -5591,7 +5591,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Function
         '        '
@@ -5612,7 +5612,7 @@ ErrorTrap:
         '            '
         '            CSPointer = db.csOpen("people", "id=" & db.EncodeSQLNumber(iPeopleID))
         '            If Not db.csOk(CSPointer) Then
-        '                Call handleLegacyError14(MethodName, "main_SetMember ErrorTrap, could not find RecordID [" & iPeopleID & "] in people content.")
+        '                Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError14(MethodName, "main_SetMember ErrorTrap, could not find RecordID [" & iPeopleID & "] in people content.")
         '            Else
         '                Call db.setCS(CSPointer, "ContentControlID", main_GetContentID("Members"))
         '            End If
@@ -5623,7 +5623,7 @@ ErrorTrap:
         '            ' ----- Error Trap
         '            '
         'ErrorTrap:
-        '            Call handleLegacyError18("main_SetMember")
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_SetMember")
         '        End Sub
         '
         '
@@ -5640,7 +5640,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18("main_ClearStream")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_ClearStream")
             '
         End Sub
         '        '
@@ -5660,7 +5660,7 @@ ErrorTrap:
         '            ' ----- Error Trap
         '            '
         'ErrorTrap:
-        '            Call handleLegacyError18("main_ReadVirtualFile")
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_ReadVirtualFile")
         '        End Function
         '            '
         '            '========================================================================
@@ -5727,7 +5727,7 @@ ErrorTrap:
         '            ' ----- Error Trap
         '            '
         'ErrorTrap:
-        '            Call handleLegacyError18(MethodName)
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
         '            '
         '        End Sub
         '        '
@@ -5749,7 +5749,7 @@ ErrorTrap:
         '            ' ----- Error Trap
         '            '
         'ErrorTrap:
-        '            Call handleLegacyError18(MethodName)
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
         '        End Sub
         '        '
         '        '========================================================================
@@ -5897,7 +5897,7 @@ ErrorTrap:
         '            ' ----- Error Trap
         '            '
         'ErrorTrap:
-        '            Call handleLegacyError18("main_GetFileCount")
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetFileCount")
         '        End Function
         '
         '========================================================================
@@ -5916,7 +5916,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18("main_GetFolderList")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetFolderList")
         End Function
         '            '
         '            '========================================================================
@@ -5954,7 +5954,7 @@ ErrorTrap:
         '            ' ----- Error Trap
         '            '
         'ErrorTrap:
-        '            Call handleLegacyError18("main_GetVirtualFileCount")
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetVirtualFileCount")
         '        End Function
         '
         '========================================================================
@@ -5973,7 +5973,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18("main_GetVirtualFolderList")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetVirtualFolderList")
         End Function
         '
         '========================================================================
@@ -5995,7 +5995,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Function
         ''
@@ -6023,7 +6023,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Function
 
@@ -6053,7 +6053,7 @@ ErrorTrap:
                 If (genericController.encodeText(RecordID) <> "") And (genericController.encodeText(RecordID) <> "0") Then
                     Call db.deleteContentRecord(ContentName, RecordID)
                 Else
-                    handleExceptionAndRethrow(New Exception("Invalid ContentName [" & iContentName & "] or RecordID [" & genericController.encodeText(RecordID) & "]"))
+                    Throw (New Exception("Invalid ContentName [" & iContentName & "] or RecordID [" & genericController.encodeText(RecordID) & "]"))
                 End If
             Else
                 Call db.deleteContentRecord(iContentName, iRecordID, authContext.user.ID)
@@ -6064,7 +6064,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Sub
         '
@@ -6087,7 +6087,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Sub
         '
@@ -6197,7 +6197,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Sub
         '
@@ -6260,10 +6260,10 @@ ErrorTrap:
             '
             main_GetRecordEditLink2 = ""
             If (iContentName = "") Then
-                Call handleLegacyError14(MethodName, "ContentName [" & ContentName & "] is invalid")
+                Throw (New ApplicationException("ContentName [" & ContentName & "] is invalid")) ' handleLegacyError14(MethodName, "")
             Else
                 If (iRecordID < 1) Then
-                    Call handleLegacyError14(MethodName, "RecordID [" & RecordID & "] is invalid")
+                    Throw (New ApplicationException("RecordID [" & RecordID & "] is invalid")) ' handleLegacyError14(MethodName, "")
                 Else
                     If IsEditing Then
                         '
@@ -6327,7 +6327,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -6353,14 +6353,14 @@ ErrorTrap:
             MethodName = "main_cs_getRecordAddLink"
             '
             If iCSPointer < 0 Then
-                Call handleLegacyError14(MethodName, "main_cs_getRecordAddLink was called with invalid ContentSet pointer [" & iCSPointer & "]")
+                Throw (New ApplicationException("invalid ContentSet pointer [" & iCSPointer & "]")) ' handleLegacyError14(MethodName, "main_cs_getRecordAddLink was called with ")
             Else
                 '
                 ' Print an add tag to the iCSPointers Content
                 '
                 ContentName = db.cs_getContentName(iCSPointer)
                 If ContentName = "" Then
-                    Call handleLegacyError14(MethodName, "main_cs_getRecordAddLink was called with a ContentSet that was created with an SQL statement. The function requires a ContentSet opened with an OpenCSContent.")
+                    Throw (New ApplicationException("main_cs_getRecordAddLink was called with a ContentSet that was created with an SQL statement. The function requires a ContentSet opened with an OpenCSContent.")) ' handleLegacyError14(MethodName, "")
                 Else
                     main_cs_getRecordAddLink = main_GetRecordAddLink(ContentName, iPresetNameValueList, AllowPaste)
                 End If
@@ -6370,7 +6370,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -6453,7 +6453,7 @@ ErrorTrap:
                 iAllowPaste = genericController.EncodeBoolean(AllowPaste)
 
                 If iContentName = "" Then
-                    Call handleLegacyError14(MethodName, "Method called with blank ContentName")
+                    Throw (New ApplicationException("Method called with blank ContentName")) ' handleLegacyError14(MethodName, "")
                 Else
                     iContentID = main_GetContentID(iContentName)
                     csChildContent = db.cs_open("Content", "ParentID=" & iContentID, , , , , , "id")
@@ -6574,7 +6574,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -6625,10 +6625,10 @@ ErrorTrap:
             Link = ""
             MyContentNameList = ContentNameList
             If (ContentName = "") Then
-                Call handleLegacyError14(MethodName, "main_GetRecordAddLink, ContentName is empty")
+                Throw (New ApplicationException("main_GetRecordAddLink, ContentName is empty")) ' handleLegacyError14(MethodName, "")
             Else
                 If (InStr(1, MyContentNameList, "," & genericController.vbUCase(ContentName) & ",") >= 0) Then
-                    Call handleLegacyError14(MethodName, "main_GetRecordAddLink_AddMenuEntry, Content Child [" & ContentName & "] is one of its own parents")
+                    Throw (New ApplicationException("main_GetRecordAddLink_AddMenuEntry, Content Child [" & ContentName & "] is one of its own parents")) ' handleLegacyError14(MethodName, "")
                 Else
                     MyContentNameList = MyContentNameList & "," & genericController.vbUCase(ContentName) & ","
                     '
@@ -6762,7 +6762,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError18("main_GetRecordAddLink_AddMenuEntry")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetRecordAddLink_AddMenuEntry")
         End Function
         '
         '========================================================================
@@ -6793,7 +6793,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Function
 
@@ -6823,7 +6823,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18("main_GetFormCSInput")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetFormCSInput")
             '
         End Function
         '
@@ -6847,7 +6847,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Sub
         '
@@ -6865,7 +6865,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18("main_GetRandomLong")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetRandomLong")
         End Function
         '
         '=================================================================================
@@ -6886,7 +6886,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError13("main_GetRandomLong_Internal")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_GetRandomLong_Internal")
         End Function
         '
         '========================================================================
@@ -6928,7 +6928,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError18("main_GetPageStartAdmin")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetPageStartAdmin")
         End Function
         '
         '
@@ -6955,7 +6955,7 @@ ErrorTrap:
                     returnProperty = userProperty.getText(PropertyName, DefaultValue, TargetMemberID)
                 End If
             Catch ex As Exception
-                handleExceptionAndRethrow(ex)
+                Throw (ex)
             End Try
             Return returnProperty
         End Function
@@ -6976,7 +6976,7 @@ ErrorTrap:
         '            Call userProperty.setProperty(PropertyName, Value, TargetMemberID)
         '        End If
         '    Catch ex As Exception
-        '        handleExceptionAndRethrow(ex)
+        '        throw (ex)
         '    End Try
         'End Sub
         ''
@@ -6996,7 +6996,7 @@ ErrorTrap:
         '            Call visitProperty.setProperty(PropertyName, Value, TargetVisitId)
         '        End If
         '    Catch ex As Exception
-        '        handleExceptionAndRethrow(ex)
+        '        throw (ex)
         '    End Try
         'End Sub
         ''
@@ -7013,7 +7013,7 @@ ErrorTrap:
         '            returnProperty = visitorProperty.getText(PropertyName, DefaultValue, TargetVisitorid)
         '        End If
         '    Catch ex As Exception
-        '        handleExceptionAndRethrow(ex)
+        '        throw (ex)
         '    End Try
         '    Return returnProperty
         'End Function
@@ -7030,7 +7030,7 @@ ErrorTrap:
         '            Call visitorProperty.setProperty(PropertyName, Value, TargetVisitorid)
         '        End If
         '    Catch ex As Exception
-        '        handleExceptionAndRethrow(ex)
+        '        throw (ex)
         '    End Try
         'End Sub
         '
@@ -7071,7 +7071,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -7095,7 +7095,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Function
 
@@ -7119,7 +7119,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Sub
         '
@@ -7192,7 +7192,7 @@ ErrorTrap:
                 Case "SELECTFIELDLIST"
                     GetContentProperty = Contentdefinition.SelectCommaList
                 Case Else
-                    Call handleLegacyError14(MethodName, "Content Property [" & genericController.encodeText(PropertyName) & "] was not found in content [" & genericController.encodeText(ContentName) & "]")
+                    Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError14(MethodName, "Content Property [" & genericController.encodeText(PropertyName) & "] was not found in content [" & genericController.encodeText(ContentName) & "]")
             End Select
             '
             Exit Function
@@ -7200,7 +7200,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -7225,7 +7225,7 @@ ErrorTrap:
                 UcaseFieldName = genericController.vbUCase(genericController.encodeText(FieldName))
                 Contentdefinition = metaData.getCdef(genericController.encodeText(ContentName))
                 If (UcaseFieldName = "") Or (Contentdefinition.fields.Count < 1) Then
-                    Call handleLegacyError14(MethodName, "Content Name [" & genericController.encodeText(ContentName) & "] or FieldName [" & genericController.encodeText(FieldName) & "] was not valid")
+                    Throw (New ApplicationException("Content Name [" & genericController.encodeText(ContentName) & "] or FieldName [" & genericController.encodeText(FieldName) & "] was not valid")) ' handleLegacyError14(MethodName, "")
                 Else
                     For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In Contentdefinition.fields
                         Dim field As CDefFieldModel = keyValuePair.Value
@@ -7256,7 +7256,7 @@ ErrorTrap:
                                     Case "MEMBERSELECTGROUPID"
                                         GetContentFieldProperty = genericController.encodeText(.MemberSelectGroupID)
                                     Case Else
-                                        Call handleLegacyError14(MethodName, "Content Property [" & genericController.encodeText(PropertyName) & "] was not found in content [" & genericController.encodeText(ContentName) & "]")
+                                        Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError14(MethodName, "Content Property [" & genericController.encodeText(PropertyName) & "] was not found in content [" & genericController.encodeText(ContentName) & "]")
                                 End Select
                                 Exit For
                             End If
@@ -7270,7 +7270,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -7305,7 +7305,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                handleExceptionAndRethrow(ex)
+                Throw (ex)
             End Try
             Return returnTrue
         End Function
@@ -7341,7 +7341,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -7378,7 +7378,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -7400,7 +7400,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18("main_ReadStreamText")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_ReadStreamText")
             '
         End Function
         '
@@ -7415,7 +7415,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError18("main_GetContentTablename")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetContentTablename")
         End Function
 
         '
@@ -7441,7 +7441,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError13("main_OpenCSContentRecord_Internal")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_OpenCSContentRecord_Internal")
         End Function
         '
         '========================================================================
@@ -7466,7 +7466,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18("main_OpenCSContentRecord")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_OpenCSContentRecord")
         End Function
         '
         '========================================================================
@@ -7490,7 +7490,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -7519,7 +7519,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Sub
         '
@@ -7541,7 +7541,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError13("main_IncrementContentField_Internal")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_IncrementContentField_Internal")
         End Sub
         '
         '
@@ -7565,7 +7565,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Function
 
@@ -7588,7 +7588,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError13("main_cs_getField_Internal")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_cs_getField_Internal")
             '
         End Function
         '
@@ -7616,7 +7616,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -7763,7 +7763,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -7783,7 +7783,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18("main_IsLoginOK")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_IsLoginOK")
             '
         End Function
         '
@@ -7819,7 +7819,7 @@ ErrorTrap:
             '
 ErrorTrap:
             ResourceLibrary = Nothing
-            Call handleLegacyError18("main_GetResourceLibrary2")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetResourceLibrary2")
         End Function
         '
         '========================================================================
@@ -8007,7 +8007,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Sub
         '
@@ -8033,7 +8033,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18("main_cs_getEncodedField")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_cs_getEncodedField")
         End Function
         '
         '=============================================================================================
@@ -8050,7 +8050,7 @@ ErrorTrap:
         '            '
         '            Exit Function
         'ErrorTrap:
-        '            Call handleLegacyError18("main_cs_getText")
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_cs_getText")
         '        End Function
         '
         '=============================================================================================
@@ -8066,7 +8066,7 @@ ErrorTrap:
         '            '
         '            Exit Function
         'ErrorTrap:
-        '            Call handleLegacyError18("db.cs_getFilename")
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("db.cs_getFilename")
         '        End Function
         '        '
         '        Public Function db.cs_getBoolean(ByVal CSPointer As Integer, ByVal FieldName As String) As Boolean
@@ -8076,7 +8076,7 @@ ErrorTrap:
         '            '
         '            Exit Function
         'ErrorTrap:
-        '            Call handleLegacyError18("main_cs_getBoolean")
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_cs_getBoolean")
         '        End Function
         '
 
@@ -8120,7 +8120,7 @@ ErrorTrap:
         '            ' ----- Error Trap
         '            '
         'ErrorTrap:
-        '            Call handleLegacyError18("main_AbortEdit")
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_AbortEdit")
         '        End Sub
 
         '        '
@@ -8138,7 +8138,7 @@ ErrorTrap:
         '            ' ----- Error Trap
         '            '
         'ErrorTrap:
-        '            Call handleLegacyError18("main_cs_getRow")
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_cs_getRow")
         '            '
         '        End Function
         ''
@@ -8158,7 +8158,7 @@ ErrorTrap:
         ''
         'Public ReadOnly Property main_AllowencodeHTML() As Boolean
         '    Get
-        '        Call handleLegacyError18("AllowEncodeHTML is not supported")
+        '        Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("AllowEncodeHTML is not supported")
         '    End Get
         'End Property
         ''
@@ -8274,7 +8274,7 @@ ErrorTrap:
         '        Public Function main_GetContentPageField(ByVal FieldName As String) As String
         '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetContentPageField")
         '            '
-        '            Call handleLegacyError23("Deprecated Method: main_GetContentPageField")
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError23("Deprecated Method: main_GetContentPageField")
         '            'dim dt as datatable
         '            Dim returnString As String
         '            Dim rs As DataTable
@@ -8306,7 +8306,7 @@ ErrorTrap:
         '            '
         '            Exit Function
         'ErrorTrap:
-        '            Call handleLegacyError18("main_GetContentPageField")
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetContentPageField")
         '        End Function
         ''
         ''========================================================================
@@ -8316,7 +8316,7 @@ ErrorTrap:
         ''========================================================================
         ''
         'Public Sub main_PreloadContentPage(ByVal RootPageName As String, Optional ByVal RootContentName As String = "")
-        '    Call handleLegacyError23("Deprecated Method: main_GetAutoSite")
+        '    Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError23("Deprecated Method: main_GetAutoSite")
         'End Sub
         '
         '========================================================================
@@ -8353,7 +8353,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Function
         '        '
@@ -8373,7 +8373,7 @@ ErrorTrap:
         '            ' ----- Error Trap
         '            '
         'ErrorTrap:
-        '            Call handleLegacyError18("main_GetConnectionString")
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetConnectionString")
         'End Function
         '
         '
@@ -8396,7 +8396,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            Call handleLegacyError18("main_GetSortMethodByID")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetSortMethodByID")
         End Function
 
         '
@@ -8415,7 +8415,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError13("main_GetReport")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_GetReport")
         End Function
         '
         '
@@ -8438,7 +8438,7 @@ ErrorTrap:
         '            '
         '            Exit Sub
         'ErrorTrap:
-        '            Call handleLegacyError18("main_SetCS")
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_SetCS")
         '        End Sub
         '
         '=============================================================================================
@@ -8455,7 +8455,7 @@ ErrorTrap:
         '=============================================================================================
         '
         Public Function main_GetAutoSite() As String
-            Call handleLegacyError23("Deprecated Method: main_GetAutoSite")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError23("Deprecated Method: main_GetAutoSite")
         End Function
         '
         '=============================================================================================
@@ -8527,7 +8527,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError18("main_GetAutoSite_Template")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetAutoSite_Template")
         End Function
         '
         '=============================================================================
@@ -8607,7 +8607,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call handleLegacyError18("main_SetMetaContent")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_SetMetaContent")
         End Sub
         '
         '=============================================================================
@@ -8621,7 +8621,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError18("main_GetLastMetaTitle")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetLastMetaTitle")
         End Function
         '
         '=============================================================================
@@ -8635,7 +8635,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError18("main_GetLastMetaDescription")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetLastMetaDescription")
         End Function
         '
         '=============================================================================
@@ -8650,7 +8650,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError18("main_GetLastOtherHeadTags")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetLastOtherHeadTags")
         End Function
         '
         '=============================================================================
@@ -8664,7 +8664,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError18("main_GetLastMetaKeywordList")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetLastMetaKeywordList")
         End Function
         '
         '
@@ -8754,7 +8754,7 @@ ErrorTrap:
             Exit Sub
             '
 ErrorTrap:
-            Call handleLegacyError18("main_EncodePage_SplitBody")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_EncodePage_SplitBody")
         End Sub
         '
         '
@@ -8770,7 +8770,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            Call handleLegacyError18("main_EncodePage_SplitBody")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_EncodePage_SplitBody")
         End Function
         '
         '
@@ -8816,7 +8816,7 @@ ErrorTrap:
 
             Exit Function
 ErrorTrap:
-            Call handleLegacyError13("main_GetRecordID_Internal")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_GetRecordID_Internal")
         End Function
         '
         '=============================================================
@@ -8830,7 +8830,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError18("main_GetRecordID")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetRecordID")
         End Function
         '
         '=============================================================
@@ -8844,7 +8844,7 @@ ErrorTrap:
 
             Exit Function
 ErrorTrap:
-            Call handleLegacyError18("main_GetRecordName")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetRecordName")
         End Function
         ''
         ''   Buffered Site Property
@@ -8887,7 +8887,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError13("main_CreatePageGetID")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_CreatePageGetID")
         End Function
         '
         '---------------------------------------------------------------------------
@@ -8968,7 +8968,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError18("main_GetLandingPageID_CreateLandingSectionReturnID")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetLandingPageID_CreateLandingSectionReturnID")
         End Function
         '
         '
@@ -8993,7 +8993,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call handleLegacyError18("main_RollBackCS")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_RollBackCS")
         End Sub
 
         '
@@ -9057,7 +9057,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError18("main_isSectionBlocked")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_isSectionBlocked")
         End Function
         '
         '
@@ -9069,7 +9069,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call handleLegacyError18("main_RequestTask")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_RequestTask")
         End Sub
         '
         '=============================================================================
@@ -9176,7 +9176,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            Call handleLegacyError18("main_GetLinkByContentRecordKey")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetLinkByContentRecordKey")
         End Function
         '
         '============================================================================================================
@@ -9244,7 +9244,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError18("main_SetContentControl")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_SetContentControl")
         End Function
         '
         '========================================================================
@@ -9260,7 +9260,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError18("main_VerifyDynamicMenu")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_VerifyDynamicMenu")
         End Function
         '
         '========================================================================
@@ -9276,7 +9276,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError18("main_GetDynamicMenuACSelect")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetDynamicMenuACSelect")
         End Function
         '
         ' converted to add-on
@@ -9371,7 +9371,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError13("main_VerifyRegistrationFormPage")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_VerifyRegistrationFormPage")
         End Sub
         '
         ' Public Method to main_Get Contact Manager
@@ -9386,7 +9386,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError13("main_GetContactManager")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_GetContactManager")
         End Function
         '
         ' This is a copy of the routine in CSrv -- duplicated so I do not have to make a public until the interface is worked-out
@@ -9440,7 +9440,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError13("main_GetSQLSelect")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_GetSQLSelect")
         End Function
         '
         '
@@ -9502,7 +9502,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call handleLegacyError13("main_SetCSFormInput")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_SetCSFormInput")
         End Sub
         '
         '
@@ -9542,7 +9542,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap
             '
             Dim Key As String
-            Dim usedKeys As String
+            Dim usedKeys As String = ""
             Dim CS As Integer
             'dim dt as datatable
             Dim Ptr As Integer
@@ -9635,7 +9635,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call handleLegacyError18("cache_linkAlias_load")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("cache_linkAlias_load")
         End Sub
         '
         '
@@ -9657,7 +9657,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call handleLegacyError18("cache_linkAlias_save")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("cache_linkAlias_save")
         End Sub
         '
         '
@@ -9674,7 +9674,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, "cache_linkAlias_clear", True)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError4(Err.Number, Err.Source, Err.Description, "cache_linkAlias_clear", True)
         End Sub
         '
         '
@@ -9698,7 +9698,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, "cache_linkAlias_getPtrByPageIdQss", True)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError4(Err.Number, Err.Source, Err.Description, "cache_linkAlias_getPtrByPageIdQss", True)
         End Function
         '
         '
@@ -9722,7 +9722,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, "cache_linkAlias_getPtrByName", True)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError4(Err.Number, Err.Source, Err.Description, "cache_linkAlias_getPtrByName", True)
         End Function
         '
         '====================================================================================================
@@ -9751,7 +9751,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            Call handleLegacyError13("main_GetLinkAliasByPageID")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_GetLinkAliasByPageID")
         End Function
         '
         '====================================================================================================
@@ -9777,7 +9777,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            Call handleLegacyError13("main_GetURLRewriteLink")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_GetURLRewriteLink")
         End Function
         ''
         ''
@@ -9944,7 +9944,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError18("main_GetFormInputStyles")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetFormInputStyles")
         End Function
         '
         '==========================================================================================================================================
@@ -9959,7 +9959,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError18("main_GetFormInputStyles_Editor")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetFormInputStyles_Editor")
         End Function
         '
         '
@@ -9975,7 +9975,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError18("main_GetOnLoadJavascript")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetOnLoadJavascript")
         End Function
         '
         '
@@ -9989,7 +9989,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError18("main_IsContentFieldSupported")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_IsContentFieldSupported")
         End Function
         '
         '
@@ -10025,7 +10025,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError18("main_GetMobileBrowserList")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetMobileBrowserList")
         End Function
         '
         '=================================================================================================================
@@ -10072,7 +10072,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError18("main_GetAddonOptionConstructorValue")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetAddonOptionConstructorValue")
         End Function
         '
         '========================================================================
@@ -10110,7 +10110,7 @@ ErrorTrap:
             'hint = hint & ",000"
             ContentID = main_GetContentID(ContentName)
             TableName = GetContentTablename(ContentName)
-            Call pageManager.pageManager_MarkRecordReviewed(ContentName, RecordID)
+            Call db.markRecordReviewed(ContentName, RecordID)
             '
             ' Test for parentid=id loop
             '
@@ -10167,7 +10167,7 @@ ErrorTrap:
                     '
                     'hint = hint & ",140"
                     If RecordParentID > 0 Then
-                        Call pageManager.pageManager_cache_pageContent_updateRow(RecordParentID, False, False)
+                        Call pageManager.cache_pageContent_updateRow(RecordParentID, False, False)
                         If Not IsDelete Then
                             Call db.executeSql("update ccpagecontent set ChildPagesfound=1 where ID=" & RecordParentID)
                         End If
@@ -10186,12 +10186,12 @@ ErrorTrap:
                         '
 
                         If genericController.vbLCase(TableName) = "ccpagecontent" Then
-                            Call pageManager.pageManager_cache_pageContent_removeRow(RecordID, pageManager.pagemanager_IsWorkflowRendering, False)
+                            Call pageManager.cache_pageContent_removeRow(RecordID, pageManager.pagemanager_IsWorkflowRendering, False)
                             If RecordID = genericController.EncodeInteger(siteProperties.getText("PageNotFoundPageID", "0")) Then
                                 Call siteProperties.setProperty("PageNotFoundPageID", "0")
                             End If
-                            If RecordID = genericController.EncodeInteger(siteProperties.getText("LandingPageID", "0")) Then
-                                Call siteProperties.setProperty("LandingPageID", "0")
+                            If RecordID = siteProperties.landingPageID Then
+                                siteProperties.setProperty("landingPageId", "0")
                             End If
                         End If
                         '
@@ -10203,7 +10203,7 @@ ErrorTrap:
                         '
                         ' Attempt to update the PageContentCache (PCC) array stored in the PeristantVariants
                         '
-                        Call pageManager.pageManager_cache_pageContent_updateRow(RecordID, False, False)
+                        Call pageManager.cache_pageContent_updateRow(RecordID, False, False)
                     End If
                 Case "cctemplates", "ccsharedstyles"
                     '
@@ -10238,7 +10238,7 @@ ErrorTrap:
                                 pageContentName = "Page Content"
                             End If
                             Call db.cs_set(CS, "RootPageID", main_CreatePageGetID(PageName, "Page Content", authContext.user.ID, ""))
-                            Call pageManager.pageManager_cache_pageContent_clear()
+                            Call pageManager.cache_pageContent_clear()
                         End If
                     End If
                     Call db.cs_Close(CS)
@@ -10428,7 +10428,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18("main_ProcessSpecialCaseAfterSave, Hint=" & hint)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_ProcessSpecialCaseAfterSave, Hint=" & hint)
         End Sub
         '
         '================================================================================================================
@@ -10578,7 +10578,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18("main_GetSharedStyleFileList")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetSharedStyleFileList")
         End Function
         '
         '========================================================================
@@ -10657,7 +10657,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError10(Err.Number, Err.Source, Err.Description, "main_GetStyleListFromHTML", True, False)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(Err.Number, Err.Source, Err.Description, "main_GetStyleListFromHTML", True, False)
         End Function
         '
         ' ================================================================================================
@@ -10701,7 +10701,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError10(Err.Number, Err.Source, Err.Description, "main_GetStyleListFromLink", True, False)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(Err.Number, Err.Source, Err.Description, "main_GetStyleListFromLink", True, False)
         End Function
         '
         '
@@ -10770,7 +10770,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError10(Err.Number, Err.Source, Err.Description, "main_GetStyleListFromStylesheet", True, False)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(Err.Number, Err.Source, Err.Description, "main_GetStyleListFromStylesheet", True, False)
         End Function
         '
         '=================================================================================================================================================
@@ -10793,21 +10793,15 @@ ErrorTrap:
         ' +++++ 9/8/2011 4.1.482, added main_AddLinkAlias to csv and changed main to call
         '
         Public Sub main_AddLinkAlias(ByVal linkAlias As String, ByVal PageID As Integer, ByVal QueryStringSuffix As String, Optional ByVal OverRideDuplicate As Boolean = False, Optional ByVal DupCausesWarning As Boolean = False)
-            On Error GoTo ErrorTrap
-            '
-            Dim warningMessage As String
-            '
-            Call app_addLinkAlias2(linkAlias, PageID, QueryStringSuffix, OverRideDuplicate, DupCausesWarning, warningMessage)
-            If warningMessage <> "" Then
-                Call error_AddUserError(warningMessage)
-            End If
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError10(Err.Number, Err.Source, Err.Description, "main_AddLinkAlias", True, False)
+            Try
+                Dim warningMessage As String = ""
+                Call app_addLinkAlias2(linkAlias, PageID, QueryStringSuffix, OverRideDuplicate, DupCausesWarning, warningMessage)
+                If warningMessage <> "" Then
+                    Call error_AddUserError(warningMessage)
+                End If
+            Catch ex As Exception
+                Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(Err.Number, Err.Source, Err.Description, "main_AddLinkAlias", True, False)
+            End Try
         End Sub
         '
         '   Used in reports
@@ -11160,7 +11154,7 @@ ErrorTrap:
                                                 FieldName = genericController.DecodeResponseVariable(Mid(SetPairs(Ptr), 1, Pos - 1))
                                                 If Not main_IsContentFieldSupported(ContentName, FieldName) Then
                                                     Dim errorMessage As String = "result, QueryTypeUpdateContent, key [" & RemoteKey & "], bad field [" & FieldName & "] skipped"
-                                                    Call handleExceptionAndRethrow(New ApplicationException(errorMessage))
+                                                    Throw (New ApplicationException(errorMessage))
                                                 Else
                                                     Call db.cs_set(CS, FieldName, FieldValue)
                                                 End If
@@ -11188,7 +11182,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                handleExceptionAndRethrow(ex)
+                Throw (ex)
             End Try
             Return result
         End Function
@@ -11227,7 +11221,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError10(Err.Number, Err.Source, Err.Description, "main_GetRemoteQueryKey", True, False)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(Err.Number, Err.Source, Err.Description, "main_GetRemoteQueryKey", True, False)
         End Function
         '
         '
@@ -11320,7 +11314,7 @@ ErrorTrap:
             Try
                 Call logController.appendLog(Me, """" & FormatDateTime(app_startTime, vbGeneralDate) & """,""App=" & serverConfig.appConfig.name & """,""main_VisitId=" & authContext.visit.ID & """,""" & PageNotFoundLink & """,""Referrer=" & webServer.requestReferrer & """", "performance", "pagenotfound")
             Catch ex As Exception
-                handleExceptionAndRethrow(ex)
+                Throw (ex)
             End Try
         End Sub
         '
@@ -11393,7 +11387,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError13("main_GetXMLAttribute")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_GetXMLAttribute")
         End Function
         '        '
         '        '=============================================================================================
@@ -11407,7 +11401,7 @@ ErrorTrap:
         '            '
         '            Exit Function
         'ErrorTrap:
-        '            Call handleLegacyError18("main_GetStreamText")
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetStreamText")
         '        End Function
         '
         '=============================================================================================
@@ -11421,7 +11415,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError18("main_GetStreamNumber")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetStreamNumber")
         End Function
         '        '
         '        '========================================================================
@@ -11444,7 +11438,7 @@ ErrorTrap:
         '            '
         '            Exit Function
         'ErrorTrap:
-        '            Call handleLegacyError18("main_GetStreamActiveContent")
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetStreamActiveContent")
         '        End Function
         '
         '
@@ -11741,7 +11735,7 @@ ErrorTrap:
                     InsertTestOK = False
                     CS = db.cs_insertRecord("Trap Log")
                     If Not db.cs_ok(CS) Then
-                        Call handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was not OK.", "Init", False, True)
+                        Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was not OK.", "Init", False, True)
                     Else
                         InsertTestOK = True
                         TrapID = db.cs_getInteger(CS, "ID")
@@ -11749,13 +11743,13 @@ ErrorTrap:
                     Call db.cs_Close(CS)
                     If InsertTestOK Then
                         If TrapID = 0 Then
-                            Call handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was OK, but ID=0.", "Init", False, True)
+                            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was OK, but ID=0.", "Init", False, True)
                         Else
                             Call DeleteContentRecord("Trap Log", TrapID)
                         End If
                     End If
                     If Err.Number <> 0 Then
-                        Call handleLegacyError10(ignoreInteger, "dll", "Error during Status. After traplog insert, " & genericController.GetErrString(Err), "Init", False, True)
+                        Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(ignoreInteger, "dll", "Error during Status. After traplog insert, " & genericController.GetErrString(Err), "Init", False, True)
                         Err.Clear()
                     End If
                     '
@@ -11847,12 +11841,12 @@ ErrorTrap:
                     '
                     ' ----- Redirect with RC and RI
                     '
-                    htmlDoc.htmlDoc_RedirectContentID = docProperties.getInteger("rc")
-                    htmlDoc.htmlDoc_RedirectRecordID = docProperties.getInteger("ri")
-                    If htmlDoc.htmlDoc_RedirectContentID <> 0 And htmlDoc.htmlDoc_RedirectRecordID <> 0 Then
-                        ContentName = metaData.getContentNameByID(htmlDoc.htmlDoc_RedirectContentID)
+                    htmlDoc.pageManager_RedirectContentID = docProperties.getInteger(rnRedirectContentId)
+                    htmlDoc.pageManager_RedirectRecordID = docProperties.getInteger(rnRedirectRecordId)
+                    If htmlDoc.pageManager_RedirectContentID <> 0 And htmlDoc.pageManager_RedirectRecordID <> 0 Then
+                        ContentName = metaData.getContentNameByID(htmlDoc.pageManager_RedirectContentID)
                         If ContentName <> "" Then
-                            Call main_RedirectByRecord_ReturnStatus(ContentName, htmlDoc.htmlDoc_RedirectRecordID)
+                            Call main_RedirectByRecord_ReturnStatus(ContentName, htmlDoc.pageManager_RedirectRecordID)
                         End If
                     End If
                     webServer.webServerIO_BlockClosePageCopyright = True
@@ -11937,7 +11931,7 @@ ErrorTrap:
                         '
                         Recipient = siteProperties.getText("EmailOrderNotifyAddress", siteProperties.emailAdmin)
                         If genericController.vbInstr(genericController.encodeText(Recipient), "@") = 0 Then
-                            Call handleLegacyError12("Init", "PayPal confirmation Order Process Notification email was not sent because EmailOrderNotifyAddress SiteProperty is not valid")
+                            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError12("Init", "PayPal confirmation Order Process Notification email was not sent because EmailOrderNotifyAddress SiteProperty is not valid")
                         Else
                             Sender = siteProperties.getText("EmailOrderFromAddress")
                             subject = webServer.webServerIO_requestDomain & " Online Order Pending, #" & ConfirmOrderID
@@ -11958,7 +11952,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError10(Err.Number, Err.Source, Err.Description, "main_Init_PrintHardCodedPage", True, False)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(Err.Number, Err.Source, Err.Description, "main_Init_PrintHardCodedPage", True, False)
             Return return_allowPostInitExecuteAddon
         End Function
         '
@@ -12022,7 +12016,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError11("main_GetActiveEditor", "trap")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError11("main_GetActiveEditor", "trap")
         End Function
         '
         '========================================================================
@@ -12084,7 +12078,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError11("main_ProcessActiveEditor", "trap")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError11("main_ProcessActiveEditor", "trap")
         End Sub
         '
         '
@@ -12194,7 +12188,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError11("main_GetDefaultAddonOption_String", "trap")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError11("main_GetDefaultAddonOption_String", "trap")
         End Function
         ''
         ''========================================================================
@@ -12248,7 +12242,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError11("main_GetDefaultAddonOption_String", "trap")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError11("main_GetDefaultAddonOption_String", "trap")
         End Function
         '
         '------------------------------------------------------------------------------------------------------------
@@ -12288,7 +12282,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            handleLegacyError3(serverConfig.appConfig.name, "", "dll", "cpCoreClass", "main_GetNvaValue", Err.Number, Err.Source, Err.Description, True, False, "")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError3(serverConfig.appConfig.name, "", "dll", "cpCoreClass", "main_GetNvaValue", Err.Number, Err.Source, Err.Description, True, False, "")
         End Function
         ''
         ''===========================================================================================
@@ -12354,7 +12348,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError11("main_GetDefaultTemplateId", "trap")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError11("main_GetDefaultTemplateId", "trap")
         End Function
         '        '
         '        '
@@ -12427,7 +12421,7 @@ ErrorTrap:
         '            '
         '            Exit Sub
         'ErrorTrap:
-        '            Call handleLegacyError11("main_mergeInStream", "trap")
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError11("main_mergeInStream", "trap")
         '        End Sub
         '
         '========================================================================
@@ -12456,7 +12450,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            Call handleLegacyError18("main_encodeCookieName")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_encodeCookieName")
         End Function
         ''
         ''========================================================================
@@ -12482,7 +12476,7 @@ ErrorTrap:
         '            Exit Function
         '            '
         'ErrorTrap:
-        '            Call handleLegacyError18("main_SendMemberEmail2")
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_SendMemberEmail2")
         '        End Function
         ''
         ''========================================================================
@@ -12528,7 +12522,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError6("csv_GetXMLAttribute", "trap")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError6("csv_GetXMLAttribute", "trap")
         End Function
         '
         '   clear addonIncludeRules cache
@@ -12546,7 +12540,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, "cache_addonIncludeRules_clear", True)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError4(Err.Number, Err.Source, Err.Description, "cache_addonIncludeRules_clear", True)
         End Sub
         '
         Public Sub cache_addonIncludeRules_save()
@@ -12564,7 +12558,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call handleLegacyError18("cache_addonIncludeRules_save")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("cache_addonIncludeRules_save")
         End Sub
         '
         '   load addonIncludeRules cache
@@ -12662,7 +12656,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call handleLegacyError10(Err.Number, Err.Source, Err.Description & " Hint=[" & hint & "]", "cache_addonIncludeRules_load", True, False)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(Err.Number, Err.Source, Err.Description & " Hint=[" & hint & "]", "cache_addonIncludeRules_load", True, False)
         End Sub
         '
         '   getPtr addonIncludeRules cache
@@ -12701,7 +12695,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError10(Err.Number, Err.Source, Err.Description, "cache_addonIncludeRules_getFirstPtr, hint=[" & hint & "]", True, False)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(Err.Number, Err.Source, Err.Description, "cache_addonIncludeRules_getFirstPtr, hint=[" & hint & "]", True, False)
         End Function
         '
         '=======================================================================================================================================
@@ -12737,7 +12731,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call handleLegacyError18("cache_linkForward_load")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("cache_linkForward_load")
         End Sub
         '
         '
@@ -12763,7 +12757,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, "cache_libraryFiles_clear", True)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError4(Err.Number, Err.Source, Err.Description, "cache_libraryFiles_clear", True)
         End Sub
         '
         '
@@ -12782,7 +12776,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call handleLegacyError18("cache_libraryFiles_save")
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("cache_libraryFiles_save")
         End Sub
         '
         '   load libraryFiles cache -- only if not loaded or cleared first
@@ -12873,7 +12867,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call handleLegacyError10(Err.Number, Err.Source, Err.Description & " Hint=[" & hint & "]", "cache_libraryFiles_loadIfNeeded", True, False)
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(Err.Number, Err.Source, Err.Description & " Hint=[" & hint & "]", "cache_libraryFiles_loadIfNeeded", True, False)
         End Sub
         '=============================================================================
         ''' <summary>
@@ -13011,7 +13005,7 @@ ErrorTrap:
                                                     Call db.cs_set(cs, "active", False)
                                                 End If
                                                 Call db.cs_Close(cs)
-                                                Call handleLegacyError12("Init", "Add-on call from [" & refHost & "] was blocked because this domain is not in the Aggregate Access Content. An inactive record was added. To allow this domain access, mark the record active.")
+                                                handleExceptionAndContinue(New ApplicationException("Add-on call from [" & refHost & "] was blocked because this domain is not in the Aggregate Access Content. An inactive record was added. To allow this domain access, mark the record active.")) ' handleLegacyError12("Init", "")
                                                 docOpen = False '--- should be disposed by caller --- Call dispose
                                                 Return htmlDoc.docBuffer
                                             ElseIf Not db.cs_getBoolean(cs, "active") Then
@@ -13019,7 +13013,7 @@ ErrorTrap:
                                                 ' inactive record, throw error
                                                 '
                                                 Call db.cs_Close(cs)
-                                                Call handleLegacyError12("Init", "Add-on call from [" & refHost & "] was blocked because this domain is not active in the Aggregate Access Content. To allow this domain access, mark the record active.")
+                                                handleExceptionAndContinue(New ApplicationException("Add-on call from [" & refHost & "] was blocked because this domain is not active in the Aggregate Access Content. To allow this domain access, mark the record active.")) ' handleLegacyError12("Init", "")
                                                 docOpen = False '--- should be disposed by caller --- Call dispose
                                                 Return htmlDoc.docBuffer
                                             Else
@@ -13444,7 +13438,7 @@ ErrorTrap:
                                             '
                                             ' Clear Caches
                                             '
-                                            Call pageManager.pageManager_cache_pageContent_clear()
+                                            Call pageManager.cache_pageContent_clear()
                                             Call pageManager.pageManager_cache_pageTemplate_clear()
                                             Call pageManager.pageManager_cache_siteSection_clear()
                                             'Call cache.invalidateObjectList("")
@@ -13452,7 +13446,7 @@ ErrorTrap:
                                                 Call cache.invalidateContent(contentName)
                                                 tableName = GetContentTablename(contentName)
                                                 If genericController.vbLCase(tableName) = "cctemplates" Then
-                                                    Call cache.setObject(pageManagerController.pageManager_cache_pageTemplate_cacheName, nothingObject)
+                                                    Call cache.setObject(pageManagerController.cache_pageTemplate_cacheName, nothingObject)
                                                     Call pageManager.pageManager_cache_pageTemplate_load()
                                                 End If
                                             End If
@@ -13594,15 +13588,19 @@ ErrorTrap:
                 testPointPrinting = True
                 '
                 ' -- attempt auth load
-                authContext = Models.Context.authContextModel.create(Me, siteProperties.allowVisitTracking)
-                '
-                ' debug printed defaults on, so if not on, set it off and clear what was collected
-                If Not visitProperty.getBoolean("AllowDebugging") Then
-                    testPointPrinting = False
-                    main_testPointMessage = ""
+                If (serverConfig.appConfig Is Nothing) Then
+                    authContext = Models.Context.authContextModel.create(Me, False)
+                Else
+                    authContext = Models.Context.authContextModel.create(Me, siteProperties.allowVisitTracking)
+                    '
+                    ' debug printed defaults on, so if not on, set it off and clear what was collected
+                    If Not visitProperty.getBoolean("AllowDebugging") Then
+                        testPointPrinting = False
+                        main_testPointMessage = ""
+                    End If
                 End If
             Catch ex As Exception
-                handleExceptionAndRethrow(ex)
+                Throw (ex)
             End Try
         End Sub
         '
@@ -13639,7 +13637,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                handleExceptionAndRethrow(ex)
+                Throw (ex)
             End Try
             Return returnHtmlList
         End Function
@@ -13700,20 +13698,14 @@ ErrorTrap:
             End If
         End Sub
         Private _handlingExceptionRecursionBlock As Boolean = False
-        '
-        '====================================================================================================
-        '
-        Public Sub handleExceptionAndRethrow(ByVal ex As Exception, ByVal cause As String)
-            Call handleException(ex, cause, 2)
-            Throw ex
-        End Sub
-        '
-        '====================================================================================================
-        '
-        Public Sub handleExceptionAndRethrow(ByVal ex As Exception)
-            Call handleException(ex, "n/a", 2)
-            'Throw ex
-        End Sub
+        ''
+        ''====================================================================================================
+        ''
+        'Public Sub throw (ByVal ex As Exception, ByVal cause As String)
+        '    Call handleException(ex, cause, 2)
+        '    Throw ex
+        'End Sub
+
         '
         Public Sub handleExceptionAndContinue(ByVal ex As Exception, ByVal cause As String)
             Call handleException(ex, cause, 2)
@@ -13744,311 +13736,311 @@ ErrorTrap:
             '    '
             'End Try
         End Function
-        '
-        '========================================================================
-        ''' <summary>
-        ''' handle legacy errors, v1
-        ''' </summary>
-        ''' <param name="cpCore"></param>
-        ''' <param name="ClassName"></param>
-        ''' <param name="MethodName"></param>
-        ''' <param name="ErrNumber"></param>
-        ''' <param name="ErrSource"></param>
-        ''' <param name="ErrDescription"></param>
-        ''' <param name="ErrorTrap"></param>
-        ''' <param name="ResumeNext"></param>
-        ''' <param name="URL"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Sub handleLegacyError(ByVal ClassName As String, ByVal MethodName As String, ByVal ErrNumber As Integer, ByVal ErrSource As String, ByVal ErrDescription As String, ByVal ErrorTrap As Boolean, ByVal ResumeNext As Boolean, Optional ByVal URL As String = "")
-            handleException(New Exception("Legacy error raised, className=[" & ClassName & "], methodName=[" & MethodName & "], url=[" & URL & "] [legacy error #" & ErrNumber & "," & ErrSource & "," & ErrDescription & "]"), "n/a", 2)
-            Throw New ApplicationException("handleLegacyError")
-        End Sub
-        '
-        '========================================================================
-        ''' <summary>
-        ''' handle legacy errors, v2
-        ''' </summary>
-        ''' <param name="cpCore"></param>
-        ''' <param name="ClassName"></param>
-        ''' <param name="MethodName"></param>
-        ''' <param name="Description"></param>
-        ''' <param name="ErrorNumber"></param>
-        ''' <remarks></remarks>
-        Public Sub handleLegacyError2(ByVal ClassName As String, ByVal MethodName As String, Optional ByVal Description As String = "", Optional ByVal ErrorNumber As Integer = 0)
-            handleException(New Exception("Legacy error, ClassName=[" & ClassName & "], MethodName=[" & MethodName & "], Description=[" & Description & "], [legacy error #" & ErrorNumber & "," & Description & "]"), "n/a", 2)
-            Throw New ApplicationException("handleLegacyError")
-        End Sub
-        '
-        '========================================================================
-        ''' <summary>
-        ''' handle legacy errors, v3
-        ''' </summary>
-        ''' <param name="cpCore"></param>
-        ''' <param name="ContensiveAppName"></param>
-        ''' <param name="Context"></param>
-        ''' <param name="ProgramName"></param>
-        ''' <param name="ClassName"></param>
-        ''' <param name="MethodName"></param>
-        ''' <param name="ErrNumber"></param>
-        ''' <param name="ErrSource"></param>
-        ''' <param name="ErrDescription"></param>
-        ''' <param name="ErrorTrap"></param>
-        ''' <param name="ResumeNext"></param>
-        ''' <param name="URL"></param>
-        ''' <remarks></remarks>
-        Public Sub handleLegacyError3(ByVal ContensiveAppName As String, ByVal Context As String, ByVal ProgramName As String, ByVal ClassName As String, ByVal MethodName As String, ByVal ErrNumber As Integer, ByVal ErrSource As String, ByVal ErrDescription As String, ByVal ErrorTrap As Boolean, ByVal ResumeNext As Boolean, ByVal URL As String)
-            handleException(New Exception("Legacy error, ContensiveAppName=[" & ContensiveAppName & "], Context=[" & Context & "], ProgramName=[" & ProgramName & "], ClassName=[" & ClassName & "], MethodName=[" & MethodName & "], [legacy error #" & ErrNumber & "," & ErrSource & "," & ErrDescription & "]"), Context, 2)
-            'Throw New ApplicationException("handleLegacyError")
-        End Sub
-        '
-        '======================================================================
-        ''' <summary>
-        ''' handle legacy errors, v3
-        ''' </summary>
-        ''' <param name="ErrNumber"></param>
-        ''' <param name="ErrSource"></param>
-        ''' <param name="ErrDescription"></param>
-        ''' <param name="MethodName"></param>
-        ''' <param name="ErrorTrap"></param>
-        ''' <param name="ResumeNext"></param>
-        ''' <param name="Context"></param>
-        ''' <remarks></remarks>
-        Friend Sub handleLegacyError4(ByVal ErrNumber As Integer, ByVal ErrSource As String, ByVal ErrDescription As String, ByVal MethodName As String, ByVal ErrorTrap As Boolean, Optional ByVal ignore As Boolean = False, Optional ByVal Context As String = "")
-            handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], Context=[" & Context & "] raised, [legacy error #" & ErrNumber & "," & ErrSource & "," & ErrDescription & "]"), Context, 2)
-            Throw New ApplicationException("handleLegacyError")
-        End Sub
-        '
-        '======================================================================
-        ''' <summary>
-        ''' handle legacy errors, v5
-        ''' </summary>
-        ''' <param name="MethodName"></param>
-        ''' <param name="Cause"></param>
-        ''' <param name="Err_Number"></param>
-        ''' <param name="Err_Source"></param>
-        ''' <param name="Err_Description"></param>
-        ''' <param name="ResumeNext"></param>
-        ''' <remarks></remarks>
-        Friend Sub handleLegacyError5(MethodName As String, Cause As String, Err_Number As Integer, Err_Source As String, Err_Description As String, ignore As Boolean)
-            handleException(New Exception("Legacy error raised, [legacy error #" & Err_Number & "," & Err_Source & "," & Err_Description & "]"), Cause, 2)
-            Throw New ApplicationException("handleLegacyError")
-        End Sub
-        '
-        '======================================================================
-        ''' <summary>
-        ''' handle legacy errors, v6
-        ''' </summary>
-        ''' <param name="MethodName"></param>
-        ''' <param name="Cause"></param>
-        ''' <remarks></remarks>
-        Friend Sub handleLegacyError6(MethodName As String, Cause As String)
-            handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
-            Throw New ApplicationException("handleLegacyError")
-        End Sub
-        '
-        '======================================================================
-        ''' <summary>
-        ''' handle legacy errors, v7
-        ''' </summary>
-        ''' <param name="MethodName"></param>
-        ''' <param name="Cause"></param>
-        ''' <remarks></remarks>
-        Friend Sub handleLegacyError7(MethodName As String, Cause As String)
-            handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
-            Throw New ApplicationException("handleLegacyError")
-        End Sub
-        '
-        '======================================================================
-        ''' <summary>
-        ''' handle legacy errors, v8
-        ''' </summary>
-        ''' <param name="Cause"></param>
-        ''' <param name="Source"></param>
-        ''' <param name="ResumeNext"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Sub handleLegacyError8(ByVal Cause As String, Optional ByVal ignore As String = "", Optional ByVal ignore2 As Boolean = False)
-            handleException(New Exception("Legacy error, cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
-            Throw New ApplicationException("handleLegacyError")
-        End Sub
-        '
-        '========================================================================
-        ''' <summary>
-        ''' handle legacy errors, v10
-        ''' </summary>
-        ''' <param name="Err_Number"></param>
-        ''' <param name="Err_Source"></param>
-        ''' <param name="Err_Description"></param>
-        ''' <param name="MethodName"></param>
-        ''' <param name="ErrorTrap"></param>
-        ''' <param name="ResumeNext"></param>
-        ''' <remarks></remarks>
-        Friend Sub handleLegacyError10(ByVal Err_Number As Integer, ByVal Err_Source As String, ByVal Err_Description As String, ByVal MethodName As String, ByVal ErrorTrap As Boolean, ByVal ResumeNext As Boolean)
-            handleException(New Exception("Legacy error, MethodName=[" & MethodName & "] [legacy error #" & Err_Number & "," & Err_Source & "," & Err_Description & "]"), "n/a", 2)
-            Throw New ApplicationException("handleLegacyError")
-        End Sub
-        '
-        '========================================================================
-        ''' <summary>
-        ''' handle legacy errors, v11
-        ''' </summary>
-        ''' <param name="MethodName"></param>
-        ''' <param name="Cause"></param>
-        ''' <remarks></remarks>
-        Friend Sub handleLegacyError11(ByVal MethodName As String, ByVal Cause As String)
-            handleException(New Exception("Legacy error #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
-            Throw New ApplicationException("handleLegacyError")
-        End Sub
-        '
-        '========================================================================
-        ''' <summary>
-        ''' handle legacy errors, v12
-        ''' </summary>
-        ''' <param name="MethodName"></param>
-        ''' <param name="Cause"></param>
-        ''' <remarks></remarks>
-        Friend Sub handleLegacyError12(ByVal MethodName As String, ByVal Cause As String)
-            handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
-            Throw New ApplicationException("handleLegacyError")
-        End Sub
-        '
-        '========================================================================
-        ''' <summary>
-        ''' handle legacy errors, v13
-        ''' </summary>
-        ''' <param name="MethodName"></param>
-        ''' <remarks></remarks>
-        Friend Sub handleLegacyError13(ByVal MethodName As String)
-            handleException(New Exception("Legacy error, MethodName=[" & MethodName & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), "n/a", 2)
-            Throw New ApplicationException("handleLegacyError")
-        End Sub
-        '
-        '========================================================================
-        ''' <summary>
-        ''' handle legacy errors, v14
-        ''' </summary>
-        ''' <param name="MethodName"></param>
-        ''' <param name="Cause"></param>
-        ''' <remarks></remarks>
-        Friend Sub handleLegacyError14(ByVal MethodName As String, ByVal Cause As String)
-            handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
-            Throw New ApplicationException("handleLegacyError")
-        End Sub
-        '
-        '========================================================================
-        ''' <summary>
-        ''' handle legacy errors, v15
-        ''' </summary>
-        ''' <param name="Cause"></param>
-        ''' <param name="MethodName"></param>
-        ''' <remarks></remarks>
-        Friend Sub handleLegacyError15(ByVal Cause As String, ByVal MethodName As String)
-            handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
-            Throw New ApplicationException("handleLegacyError")
-        End Sub
-        '
-        '========================================================================
-        ''' <summary>
-        ''' handle legacy errors, v16
-        ''' </summary>
-        ''' <param name="MethodName"></param>
-        ''' <param name="Cause"></param>
-        ''' <remarks></remarks>
-        Public Sub handleLegacyError16(ByVal MethodName As String, ByVal Cause As String)
-            handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
-            Throw New ApplicationException("handleLegacyError")
-        End Sub
-        '
-        '========================================================================
-        ''' <summary>
-        ''' handle legacy errors, v17
-        ''' </summary>
-        ''' <param name="MethodName"></param>
-        ''' <remarks></remarks>
-        Public Sub handleLegacyError17(ByVal MethodName As String)
-            handleException(New Exception("Legacy error, MethodName=[" & MethodName & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), "n/a", 2)
-        End Sub
-        '
-        '========================================================================
-        ''' <summary>
-        ''' handle legacy errors, v18
-        ''' </summary>
-        ''' <param name="MethodName"></param>
-        ''' <remarks></remarks>
-        Public Sub handleLegacyError18(ByVal MethodName As String)
-            handleException(New Exception("Legacy error, MethodName=[" & MethodName & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), "n/a", 2)
-            Throw New ApplicationException("handleLegacyError")
-        End Sub
-        '
-        '========================================================================
-        ''' <summary>
-        ''' handle legacy errors, v19
-        ''' </summary>
-        ''' <param name="MethodName"></param>
-        ''' <param name="Cause"></param>
-        ''' <param name="Err_Number"></param>
-        ''' <param name="Err_Source"></param>
-        ''' <param name="Err_Description"></param>
-        ''' <param name="ResumeNext"></param>
-        ''' <remarks></remarks>
-        Friend Sub handleLegacyError19(ByVal MethodName As String, ByVal Cause As String, ByVal Err_Number As Integer, ByVal Err_Source As String, ByVal Err_Description As String, ByVal ResumeNext As Boolean)
-            handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err_Number & "," & Err_Source & "," & Err_Description & ""), Cause, 2)
-            Throw New ApplicationException("handleLegacyError")
-        End Sub
-        '
-        '========================================================================
-        ''' <summary>
-        ''' handle legacy errors, v20
-        ''' </summary>
-        ''' <param name="appName"></param>
-        ''' <param name="ClassName"></param>
-        ''' <param name="MethodName"></param>
-        ''' <param name="Cause"></param>
-        ''' <param name="Err_Number"></param>
-        ''' <param name="Err_Source"></param>
-        ''' <param name="Err_Description"></param>
-        ''' <param name="WillResumeAfterLogging"></param>
-        ''' <remarks></remarks>
-        Public Sub handleLegacyError20(ByVal appName As String, ByVal ClassName As String, ByVal MethodName As String, ByVal Cause As String, ByVal Err_Number As Integer, ByVal Err_Source As String, ByVal Err_Description As String, ByVal WillResumeAfterLogging As Boolean)
-            handleException(New Exception("Legacy error, app=[" & appName & "], classname=[" & ClassName & "], methodname=[" & MethodName & "], cause=[" & Cause & "] #" & Err_Number & "," & Err_Source & "," & Err_Description & ""), Cause, 2)
-            Throw New ApplicationException("handleLegacyError")
-        End Sub
         ''
         ''========================================================================
         '''' <summary>
-        '''' handle legacy errors, v21
+        '''' handle legacy errors, v1
+        '''' </summary>
+        '''' <param name="cpCore"></param>
+        '''' <param name="ClassName"></param>
+        '''' <param name="MethodName"></param>
+        '''' <param name="ErrNumber"></param>
+        '''' <param name="ErrSource"></param>
+        '''' <param name="ErrDescription"></param>
+        '''' <param name="ErrorTrap"></param>
+        '''' <param name="ResumeNext"></param>
+        '''' <param name="URL"></param>
+        '''' <returns></returns>
+        '''' <remarks></remarks>
+        'Public Sub handleLegacyError(ByVal ClassName As String, ByVal MethodName As String, ByVal ErrNumber As Integer, ByVal ErrSource As String, ByVal ErrDescription As String, ByVal ErrorTrap As Boolean, ByVal ResumeNext As Boolean, Optional ByVal URL As String = "")
+        '    handleException(New Exception("Legacy error raised, className=[" & ClassName & "], methodName=[" & MethodName & "], url=[" & URL & "] [legacy error #" & ErrNumber & "," & ErrSource & "," & ErrDescription & "]"), "n/a", 2)
+        '    Throw New ApplicationException("handleLegacyError")
+        'End Sub
+        ''
+        ''========================================================================
+        '''' <summary>
+        '''' handle legacy errors, v2
+        '''' </summary>
+        '''' <param name="cpCore"></param>
+        '''' <param name="ClassName"></param>
+        '''' <param name="MethodName"></param>
+        '''' <param name="Description"></param>
+        '''' <param name="ErrorNumber"></param>
+        '''' <remarks></remarks>
+        'Public Sub handleLegacyError2(ByVal ClassName As String, ByVal MethodName As String, Optional ByVal Description As String = "", Optional ByVal ErrorNumber As Integer = 0)
+        '    handleException(New Exception("Legacy error, ClassName=[" & ClassName & "], MethodName=[" & MethodName & "], Description=[" & Description & "], [legacy error #" & ErrorNumber & "," & Description & "]"), "n/a", 2)
+        '    Throw New ApplicationException("handleLegacyError")
+        'End Sub
+        ''
+        ''========================================================================
+        '''' <summary>
+        '''' handle legacy errors, v3
+        '''' </summary>
+        '''' <param name="cpCore"></param>
+        '''' <param name="ContensiveAppName"></param>
+        '''' <param name="Context"></param>
+        '''' <param name="ProgramName"></param>
+        '''' <param name="ClassName"></param>
+        '''' <param name="MethodName"></param>
+        '''' <param name="ErrNumber"></param>
+        '''' <param name="ErrSource"></param>
+        '''' <param name="ErrDescription"></param>
+        '''' <param name="ErrorTrap"></param>
+        '''' <param name="ResumeNext"></param>
+        '''' <param name="URL"></param>
+        '''' <remarks></remarks>
+        'Public Sub handleLegacyError3(ByVal ContensiveAppName As String, ByVal Context As String, ByVal ProgramName As String, ByVal ClassName As String, ByVal MethodName As String, ByVal ErrNumber As Integer, ByVal ErrSource As String, ByVal ErrDescription As String, ByVal ErrorTrap As Boolean, ByVal ResumeNext As Boolean, ByVal URL As String)
+        '    handleException(New Exception("Legacy error, ContensiveAppName=[" & ContensiveAppName & "], Context=[" & Context & "], ProgramName=[" & ProgramName & "], ClassName=[" & ClassName & "], MethodName=[" & MethodName & "], [legacy error #" & ErrNumber & "," & ErrSource & "," & ErrDescription & "]"), Context, 2)
+        '    'Throw New ApplicationException("handleLegacyError")
+        'End Sub
+        ''
+        ''======================================================================
+        '''' <summary>
+        '''' handle legacy errors, v3
+        '''' </summary>
+        '''' <param name="ErrNumber"></param>
+        '''' <param name="ErrSource"></param>
+        '''' <param name="ErrDescription"></param>
+        '''' <param name="MethodName"></param>
+        '''' <param name="ErrorTrap"></param>
+        '''' <param name="ResumeNext"></param>
+        '''' <param name="Context"></param>
+        '''' <remarks></remarks>
+        'Friend Sub handleLegacyError4(ByVal ErrNumber As Integer, ByVal ErrSource As String, ByVal ErrDescription As String, ByVal MethodName As String, ByVal ErrorTrap As Boolean, Optional ByVal ignore As Boolean = False, Optional ByVal Context As String = "")
+        '    handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], Context=[" & Context & "] raised, [legacy error #" & ErrNumber & "," & ErrSource & "," & ErrDescription & "]"), Context, 2)
+        '    Throw New ApplicationException("handleLegacyError")
+        'End Sub
+        ''
+        ''======================================================================
+        '''' <summary>
+        '''' handle legacy errors, v5
+        '''' </summary>
+        '''' <param name="MethodName"></param>
+        '''' <param name="Cause"></param>
+        '''' <param name="Err_Number"></param>
+        '''' <param name="Err_Source"></param>
+        '''' <param name="Err_Description"></param>
+        '''' <param name="ResumeNext"></param>
+        '''' <remarks></remarks>
+        'Friend Sub handleLegacyError5(MethodName As String, Cause As String, Err_Number As Integer, Err_Source As String, Err_Description As String, ignore As Boolean)
+        '    handleException(New Exception("Legacy error raised, [legacy error #" & Err_Number & "," & Err_Source & "," & Err_Description & "]"), Cause, 2)
+        '    Throw New ApplicationException("handleLegacyError")
+        'End Sub
+        ''
+        ''======================================================================
+        '''' <summary>
+        '''' handle legacy errors, v6
+        '''' </summary>
+        '''' <param name="MethodName"></param>
+        '''' <param name="Cause"></param>
+        '''' <remarks></remarks>
+        'Friend Sub handleLegacyError6(MethodName As String, Cause As String)
+        '    handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
+        '    Throw New ApplicationException("handleLegacyError")
+        'End Sub
+        ''
+        ''======================================================================
+        '''' <summary>
+        '''' handle legacy errors, v7
+        '''' </summary>
+        '''' <param name="MethodName"></param>
+        '''' <param name="Cause"></param>
+        '''' <remarks></remarks>
+        'Friend Sub handleLegacyError7(MethodName As String, Cause As String)
+        '    handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
+        '    Throw New ApplicationException("handleLegacyError")
+        'End Sub
+        ''
+        ''======================================================================
+        '''' <summary>
+        '''' handle legacy errors, v8
+        '''' </summary>
+        '''' <param name="Cause"></param>
+        '''' <param name="Source"></param>
+        '''' <param name="ResumeNext"></param>
+        '''' <returns></returns>
+        '''' <remarks></remarks>
+        'Public Sub handleLegacyError8(ByVal Cause As String, Optional ByVal ignore As String = "", Optional ByVal ignore2 As Boolean = False)
+        '    handleException(New Exception("Legacy error, cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
+        '    Throw New ApplicationException("handleLegacyError")
+        'End Sub
+        ''
+        ''========================================================================
+        '''' <summary>
+        '''' handle legacy errors, v10
+        '''' </summary>
+        '''' <param name="Err_Number"></param>
+        '''' <param name="Err_Source"></param>
+        '''' <param name="Err_Description"></param>
+        '''' <param name="MethodName"></param>
+        '''' <param name="ErrorTrap"></param>
+        '''' <param name="ResumeNext"></param>
+        '''' <remarks></remarks>
+        'Friend Sub handleLegacyError10(ByVal Err_Number As Integer, ByVal Err_Source As String, ByVal Err_Description As String, ByVal MethodName As String, ByVal ErrorTrap As Boolean, ByVal ResumeNext As Boolean)
+        '    handleException(New Exception("Legacy error, MethodName=[" & MethodName & "] [legacy error #" & Err_Number & "," & Err_Source & "," & Err_Description & "]"), "n/a", 2)
+        '    Throw New ApplicationException("handleLegacyError")
+        'End Sub
+        ''
+        ''========================================================================
+        '''' <summary>
+        '''' handle legacy errors, v11
+        '''' </summary>
+        '''' <param name="MethodName"></param>
+        '''' <param name="Cause"></param>
+        '''' <remarks></remarks>
+        'Friend Sub handleLegacyError11(ByVal MethodName As String, ByVal Cause As String)
+        '    handleException(New Exception("Legacy error #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
+        '    Throw New ApplicationException("handleLegacyError")
+        'End Sub
+        ''
+        ''========================================================================
+        '''' <summary>
+        '''' handle legacy errors, v12
+        '''' </summary>
+        '''' <param name="MethodName"></param>
+        '''' <param name="Cause"></param>
+        '''' <remarks></remarks>
+        'Friend Sub handleLegacyError12(ByVal MethodName As String, ByVal Cause As String)
+        '    handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
+        '    Throw New ApplicationException("handleLegacyError")
+        'End Sub
+        ''
+        ''========================================================================
+        '''' <summary>
+        '''' handle legacy errors, v13
+        '''' </summary>
+        '''' <param name="MethodName"></param>
+        '''' <remarks></remarks>
+        'Friend Sub handleLegacyError13(ByVal MethodName As String)
+        '    handleException(New Exception("Legacy error, MethodName=[" & MethodName & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), "n/a", 2)
+        '    Throw New ApplicationException("handleLegacyError")
+        'End Sub
+        ''
+        ''========================================================================
+        '''' <summary>
+        '''' handle legacy errors, v14
+        '''' </summary>
+        '''' <param name="MethodName"></param>
+        '''' <param name="Cause"></param>
+        '''' <remarks></remarks>
+        'Friend Sub handleLegacyError14(ByVal MethodName As String, ByVal Cause As String)
+        '    handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
+        '    Throw New ApplicationException("handleLegacyError")
+        'End Sub
+        ''
+        ''========================================================================
+        '''' <summary>
+        '''' handle legacy errors, v15
+        '''' </summary>
+        '''' <param name="Cause"></param>
+        '''' <param name="MethodName"></param>
+        '''' <remarks></remarks>
+        'Friend Sub handleLegacyError15(ByVal Cause As String, ByVal MethodName As String)
+        '    handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
+        '    Throw New ApplicationException("handleLegacyError")
+        'End Sub
+        ''
+        ''========================================================================
+        '''' <summary>
+        '''' handle legacy errors, v16
+        '''' </summary>
+        '''' <param name="MethodName"></param>
+        '''' <param name="Cause"></param>
+        '''' <remarks></remarks>
+        'Public Sub handleLegacyError16(ByVal MethodName As String, ByVal Cause As String)
+        '    handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
+        '    Throw New ApplicationException("handleLegacyError")
+        'End Sub
+        ''
+        ''========================================================================
+        '''' <summary>
+        '''' handle legacy errors, v17
+        '''' </summary>
+        '''' <param name="MethodName"></param>
+        '''' <remarks></remarks>
+        'Public Sub handleLegacyError17(ByVal MethodName As String)
+        '    handleException(New Exception("Legacy error, MethodName=[" & MethodName & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), "n/a", 2)
+        'End Sub
+        ''
+        ''========================================================================
+        '''' <summary>
+        '''' handle legacy errors, v18
+        '''' </summary>
+        '''' <param name="MethodName"></param>
+        '''' <remarks></remarks>
+        'Public Sub handleLegacyError18(ByVal MethodName As String)
+        '    handleException(New Exception("Legacy error, MethodName=[" & MethodName & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), "n/a", 2)
+        '    Throw New ApplicationException("handleLegacyError")
+        'End Sub
+        ''
+        ''========================================================================
+        '''' <summary>
+        '''' handle legacy errors, v19
+        '''' </summary>
+        '''' <param name="MethodName"></param>
+        '''' <param name="Cause"></param>
+        '''' <param name="Err_Number"></param>
+        '''' <param name="Err_Source"></param>
+        '''' <param name="Err_Description"></param>
+        '''' <param name="ResumeNext"></param>
+        '''' <remarks></remarks>
+        'Friend Sub handleLegacyError19(ByVal MethodName As String, ByVal Cause As String, ByVal Err_Number As Integer, ByVal Err_Source As String, ByVal Err_Description As String, ByVal ResumeNext As Boolean)
+        '    handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err_Number & "," & Err_Source & "," & Err_Description & ""), Cause, 2)
+        '    Throw New ApplicationException("handleLegacyError")
+        'End Sub
+        ''
+        ''========================================================================
+        '''' <summary>
+        '''' handle legacy errors, v20
+        '''' </summary>
+        '''' <param name="appName"></param>
+        '''' <param name="ClassName"></param>
+        '''' <param name="MethodName"></param>
+        '''' <param name="Cause"></param>
+        '''' <param name="Err_Number"></param>
+        '''' <param name="Err_Source"></param>
+        '''' <param name="Err_Description"></param>
+        '''' <param name="WillResumeAfterLogging"></param>
+        '''' <remarks></remarks>
+        'Public Sub handleLegacyError20(ByVal appName As String, ByVal ClassName As String, ByVal MethodName As String, ByVal Cause As String, ByVal Err_Number As Integer, ByVal Err_Source As String, ByVal Err_Description As String, ByVal WillResumeAfterLogging As Boolean)
+        '    handleException(New Exception("Legacy error, app=[" & appName & "], classname=[" & ClassName & "], methodname=[" & MethodName & "], cause=[" & Cause & "] #" & Err_Number & "," & Err_Source & "," & Err_Description & ""), Cause, 2)
+        '    Throw New ApplicationException("handleLegacyError")
+        'End Sub
+        '''
+        '''========================================================================
+        ''''' <summary>
+        ''''' handle legacy errors, v21
+        ''''' </summary>
+        ''''' <param name="ErrorObject"></param>
+        ''''' <param name="Cause"></param>
+        ''''' <remarks></remarks>
+        ''Public Sub handleLegacyError21(ByVal ErrorObject As Object, ByVal Cause As String)
+        ''    handleException(New Exception("Legacy error, cause=[" & Cause & "] #" & ErrorObject.Number & "," & ErrorObject.Source & "," & ErrorObject.Description & ""), Cause, 2)
+        ''    Throw New ApplicationException("handleLegacyError")
+        ''End Sub
+        ''
+        ''========================================================================
+        '''' <summary>
+        '''' handle legacy errors, v22
         '''' </summary>
         '''' <param name="ErrorObject"></param>
         '''' <param name="Cause"></param>
         '''' <remarks></remarks>
-        'Public Sub handleLegacyError21(ByVal ErrorObject As Object, ByVal Cause As String)
+        'Friend Sub handleLegacyError22(ByVal ErrorObject As ErrObject, ByVal Cause As String)
         '    handleException(New Exception("Legacy error, cause=[" & Cause & "] #" & ErrorObject.Number & "," & ErrorObject.Source & "," & ErrorObject.Description & ""), Cause, 2)
         '    Throw New ApplicationException("handleLegacyError")
         'End Sub
-        '
-        '========================================================================
-        ''' <summary>
-        ''' handle legacy errors, v22
-        ''' </summary>
-        ''' <param name="ErrorObject"></param>
-        ''' <param name="Cause"></param>
-        ''' <remarks></remarks>
-        Friend Sub handleLegacyError22(ByVal ErrorObject As ErrObject, ByVal Cause As String)
-            handleException(New Exception("Legacy error, cause=[" & Cause & "] #" & ErrorObject.Number & "," & ErrorObject.Source & "," & ErrorObject.Description & ""), Cause, 2)
-            Throw New ApplicationException("handleLegacyError")
-        End Sub
-        '
-        '========================================================================
-        ''' <summary>
-        ''' handle legacy errors, v23
-        ''' </summary>
-        ''' <param name="Cause"></param>
-        ''' <remarks></remarks>
-        Public Sub handleLegacyError23(ByVal Cause As String)
-            handleException(New Exception("Legacy error, cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
-            Throw New ApplicationException("handleLegacyError")
-        End Sub
+        ''
+        ''========================================================================
+        '''' <summary>
+        '''' handle legacy errors, v23
+        '''' </summary>
+        '''' <param name="Cause"></param>
+        '''' <remarks></remarks>
+        'Public Sub handleLegacyError23(ByVal Cause As String)
+        '    handleException(New Exception("Legacy error, cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
+        '    Throw New ApplicationException("handleLegacyError")
+        'End Sub
         '
         '====================================================================================================
         ''' <summary>
@@ -14082,7 +14074,7 @@ ErrorTrap:
                 End If
                 dt.Dispose()
             Catch ex As Exception
-                handleExceptionAndRethrow(ex)
+                Throw (ex)
             End Try
             Return returnGroupId
         End Function
@@ -14105,7 +14097,7 @@ ErrorTrap:
                 Dim groupGuid As String
                 '
                 If (GroupNameOrGuid = "") Then
-                    handleExceptionAndRethrow(New ApplicationException("A group cannot be added with a blank name"))
+                    Throw (New ApplicationException("A group cannot be added with a blank name"))
                 Else
                     cs.open("Groups", sqlCriteria, , False, "id")
                     IsAlreadyThere = cs.ok
@@ -14113,7 +14105,7 @@ ErrorTrap:
                     If Not IsAlreadyThere Then
                         Call cs.Insert("Groups")
                         If Not cs.ok Then
-                            handleExceptionAndRethrow(New ApplicationException("There was an error inserting a new group record"))
+                            Throw (New ApplicationException("There was an error inserting a new group record"))
                         Else
                             returnGroupId = cs.getInteger("id")
                             If genericController.isGuid(GroupNameOrGuid) Then
@@ -14135,7 +14127,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                handleExceptionAndRethrow(ex, "Unexpected error in cp.group.add()")
+                Throw New ApplicationException("Unexpected error in cp.group.add()", ex)
             End Try
             Return returnGroupId
         End Function
@@ -14151,7 +14143,7 @@ ErrorTrap:
                 '
                 If True Then
                     If (groupId < 1) Then
-                        handleExceptionAndRethrow(New ApplicationException("Could not find or create the group with id [" & groupId & "]"))
+                        Throw (New ApplicationException("Could not find or create the group with id [" & groupId & "]"))
                     Else
                         If userid = 0 Then
                             userid = authContext.user.ID
@@ -14164,7 +14156,7 @@ ErrorTrap:
                             End If
                             If Not cs.ok Then
                                 groupName = GetRecordName("groups", groupId)
-                                handleExceptionAndRethrow(New ApplicationException("Could not find or create the Member Rule to add this member [" & userid & "] to the Group [" & groupId & ", " & groupName & "]"))
+                                Throw (New ApplicationException("Could not find or create the Member Rule to add this member [" & userid & "] to the Group [" & groupId & ", " & groupName & "]"))
                             Else
                                 Call cs.setField("active", "1")
                                 Call cs.setField("memberid", userid.ToString)
@@ -14180,7 +14172,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                handleExceptionAndRethrow(ex)
+                Throw (ex)
             End Try
         End Sub
         '
@@ -14198,7 +14190,7 @@ ErrorTrap:
                         GroupID = db.getRecordID("groups", groupNameOrGuid)
                     End If
                     If (GroupID < 1) Then
-                        handleExceptionAndRethrow(New ApplicationException("Could not find or create the group [" & groupNameOrGuid & "]"))
+                        Throw (New ApplicationException("Could not find or create the group [" & groupNameOrGuid & "]"))
                     Else
                         If userid = 0 Then
                             userid = authContext.user.ID
@@ -14210,7 +14202,7 @@ ErrorTrap:
                                 Call cs.Insert("Member Rules")
                             End If
                             If Not cs.ok Then
-                                handleExceptionAndRethrow(New ApplicationException("Could not find or create the Member Rule to add this member [" & userid & "] to the Group [" & GroupID & ", " & groupNameOrGuid & "]"))
+                                Throw (New ApplicationException("Could not find or create the Member Rule to add this member [" & userid & "] to the Group [" & GroupID & ", " & groupNameOrGuid & "]"))
                             Else
                                 Call cs.setField("active", "1")
                                 Call cs.setField("memberid", userid.ToString)
@@ -14226,7 +14218,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                handleExceptionAndRethrow(ex)
+                Throw (ex)
             End Try
         End Sub
         '
@@ -14241,7 +14233,7 @@ ErrorTrap:
             Try
                 returnIsGuid = (Len(guid) = 38) And (Left(guid, 1) = "{") And (Right(guid, 1) = "}")
             Catch ex As Exception
-                handleExceptionAndRethrow(ex)
+                Throw (ex)
             End Try
             Return returnIsGuid
         End Function
@@ -14259,7 +14251,7 @@ ErrorTrap:
                 response = rq.GetResponse()
                 returnstream = response.GetResponseStream()
             Catch ex As Exception
-                handleExceptionAndRethrow(ex)
+                Throw (ex)
             End Try
             Return returnstream
         End Function
@@ -14317,7 +14309,7 @@ ErrorTrap:
                     End With
                 Next
             Catch ex As Exception
-                handleExceptionAndRethrow(ex)
+                Throw (ex)
             End Try
             Return returnString
         End Function

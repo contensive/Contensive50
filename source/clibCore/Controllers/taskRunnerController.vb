@@ -87,16 +87,7 @@ Namespace Contensive.Core.Controllers
         ''' Stop all activity through the content server, but do not unload
         ''' </summary>
         Public Sub stopService()
-            Try
-                '
-                appendLog("taskRunnerService.stopService")
-                '
-                processTimer.Enabled = False
-            Catch ex As Exception
-                Using cp As New CPClass
-                    cp.core.handleExceptionAndRethrow(ex)
-                End Using
-            End Try
+            processTimer.Enabled = False
         End Sub
         '
         '====================================================================================================
@@ -108,19 +99,10 @@ Namespace Contensive.Core.Controllers
         ''' <returns></returns>
         Public Function StartService() As Boolean
             Dim returnStartedOk As Boolean = True
-            Try
-                '
-                appendLog("taskRunnerService.StartService")
-                '
-                processTimer = New System.Timers.Timer(ProcessTimerMsecPerTick)
-                AddHandler processTimer.Elapsed, AddressOf processTimerTick
-                processTimer.Interval = ProcessTimerMsecPerTick
-                processTimer.Enabled = True
-            Catch ex As Exception
-                Using cp As New CPClass
-                    cp.core.handleExceptionAndRethrow(ex)
-                End Using
-            End Try
+            processTimer = New System.Timers.Timer(ProcessTimerMsecPerTick)
+            AddHandler processTimer.Elapsed, AddressOf processTimerTick
+            processTimer.Interval = ProcessTimerMsecPerTick
+            processTimer.Enabled = True
             Return returnStartedOk
         End Function
         '
@@ -157,7 +139,7 @@ Namespace Contensive.Core.Controllers
                 End If
             Catch ex As Exception
                 Using cp As New CPClass
-                    cp.core.handleExceptionAndRethrow(ex)
+                    cp.core.handleExceptionAndContinue(ex)
                 End Using
             End Try
         End Sub
@@ -227,13 +209,13 @@ Namespace Contensive.Core.Controllers
                                     cpSite.core.db.cs_Close(CS)
                                 Loop While recordsRemaining
                             Catch ex As Exception
-                                cpClusterCore.handleExceptionAndRethrow(ex)
+                                cpClusterCore.handleExceptionAndContinue(ex)
                             End Try
                         End If
                     End Using
                 Next
             Catch ex As Exception
-                cpClusterCore.handleExceptionAndRethrow(ex)
+                cpClusterCore.handleExceptionAndContinue(ex)
             End Try
         End Sub
         '
