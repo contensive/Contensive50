@@ -510,7 +510,7 @@ Namespace Contensive.Core
         '
         '===================================================================================================
         ''' <summary>
-        ''' pageManager - too many page link tie-ins to make it a real addon. Code internal to handle models, then call it with an addon
+        ''' email controller
         ''' </summary>
         ''' <value></value>
         ''' <returns></returns>
@@ -532,15 +532,15 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property pageManager As pageManagerController
+        Public ReadOnly Property pages As pagesController
             Get
-                If (_pageManager Is Nothing) Then
-                    _pageManager = New pageManagerController(Me)
+                If (_pages Is Nothing) Then
+                    _pages = New pagesController(Me)
                 End If
-                Return _pageManager
+                Return _pages
             End Get
         End Property
-        Private _pageManager As pageManagerController
+        Private _pages As pagesController
         '
         '===================================================================================================
         ''' <summary>
@@ -4130,9 +4130,9 @@ ErrorTrap:
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Member Name", html.html_EncodeHTML(authContext.user.userName))
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Member New", genericController.encodeText(authContext.user.userIsNew))
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Member Language", authcontext.user.userLanguage)
-                    'DebugPanel = DebugPanel & main_DebugPanelRow("Page", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("page content") & "&af=4&id=" & main_RenderedPageID & """>" & main_RenderedPageID & ", " & main_RenderedPageName & "</a>")
-                    'DebugPanel = DebugPanel & main_DebugPanelRow("Section", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("site sections") & "&af=4&id=" & main_RenderedSectionID & """>" & main_RenderedSectionID & ", " & main_RenderedSectionName & "</a>")
-                    'DebugPanel = DebugPanel & main_DebugPanelRow("Template", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("page templates") & "&af=4&id=" & main_RenderedTemplateID & """>" & main_RenderedTemplateID & ", " & main_RenderedTemplateName & "</a>")
+                    'DebugPanel = DebugPanel & main_DebugPanelRow("Page", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("page content") & "&af=4&id=" & currentPageID & """>" & currentPageID & ", " & currentPageName & "</a>")
+                    'DebugPanel = DebugPanel & main_DebugPanelRow("Section", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("site sections") & "&af=4&id=" & currentSectionID & """>" & currentSectionID & ", " & currentSectionName & "</a>")
+                    'DebugPanel = DebugPanel & main_DebugPanelRow("Template", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("page templates") & "&af=4&id=" & currentTemplateID & """>" & currentTemplateID & ", " & currentTemplateName & "</a>")
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Domain", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("domains") & "&af=4&id=" & domains.domainDetails.id & """>" & domains.domainDetails.id & ", " & main_ServerDomain & "</a>")
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Template Reason", pageManager_TemplateReason)
                     'DebugPanel = DebugPanel & main_DebugPanelRow("ProcessID", GetProcessID.ToString())
@@ -6512,7 +6512,7 @@ ErrorTrap:
                                         End If
 
 
-                                        If (ParentID <> 0) And (Not pageManager.main_IsChildRecord(iContentName, ParentID, ClipChildRecordID)) Then
+                                        If (ParentID <> 0) And (Not pages.main_IsChildRecord(iContentName, ParentID, ClipChildRecordID)) Then
                                             '
                                             ' Can not paste as child of itself
                                             '
@@ -8280,7 +8280,7 @@ ErrorTrap:
         '            Dim rs As DataTable
         '            '
         '            returnString = ""
-        '            rs = db.executeSql("select " & genericController.encodeText(FieldName) & " from ccpagecontent where id=" & main_RenderedPageID)
+        '            rs = db.executeSql("select " & genericController.encodeText(FieldName) & " from ccpagecontent where id=" & currentPageID)
         '            If rs.Rows.Count > 0 Then
         '                returnString = genericController.encodeText(rs.Rows(0).Item(0))
         '            End If
@@ -8777,7 +8777,7 @@ ErrorTrap:
         '
         Public ReadOnly Property main_ServerStyleTag() As String
             Get
-                Return pageManager.pageManager_GetStyleTagPublic()
+                Return pages.pageManager_GetStyleTagPublic()
             End Get
         End Property
         '
@@ -8910,7 +8910,7 @@ ErrorTrap:
             '
             If (app_errorCount = 0) And siteProperties.getBoolean("AllowAutoHomeSectionOnce") Then
                 '
-                SectionTemplateID = pageManager.pageManager_LoadTemplateGetID(0)
+                SectionTemplateID = pages.pageManager_LoadTemplateGetID(0)
                 '
                 ' main_Get a unique section name
                 '
@@ -8944,7 +8944,7 @@ ErrorTrap:
                     End If
                 End If
                 Call db.cs_Close(CS)
-                Call pageManager.pageManager_cache_siteSection_clear()
+                Call pages.pageManager_cache_siteSection_clear()
                 '
                 ' main_Get the Default Menu ID
                 '
@@ -9512,9 +9512,9 @@ ErrorTrap:
             '
             StyleSN = genericController.EncodeInteger(siteProperties.getText("StylesheetSerialNumber", "0"))
             If StyleSN = 0 Then
-                admin_GetStyleTagAdmin = cr & StyleSheetStart & pageManager.pageManager_GetStyleSheetDefault() & cr & StyleSheetEnd
+                admin_GetStyleTagAdmin = cr & StyleSheetStart & pages.pageManager_GetStyleSheetDefault() & cr & StyleSheetEnd
             ElseIf (siteProperties.dataBuildVersion <> codeVersion()) Then
-                admin_GetStyleTagAdmin = cr & "<!-- styles forced inline because database upgrade needed -->" & StyleSheetStart & pageManager.pageManager_GetStyleSheetDefault() & cr & StyleSheetEnd
+                admin_GetStyleTagAdmin = cr & "<!-- styles forced inline because database upgrade needed -->" & StyleSheetStart & pages.pageManager_GetStyleSheetDefault() & cr & StyleSheetEnd
             Else
                 If StyleSN < 0 Then
                     '
@@ -9562,7 +9562,7 @@ ErrorTrap:
             '
             On Error Resume Next
             cacheTest = cache.getObject(Of Object())(cache_linkAlias_cacheName)
-            If Not pageManager.pagemanager_IsWorkflowRendering() Then
+            If Not pages.pagemanager_IsWorkflowRendering() Then
                 If Not IsNothing(cacheTest) Then
                     cacheArray = DirectCast(cacheTest, Object())
                     If Not IsNothing(cacheArray) Then
@@ -10167,7 +10167,7 @@ ErrorTrap:
                     '
                     'hint = hint & ",140"
                     If RecordParentID > 0 Then
-                        Call pageManager.cache_pageContent_updateRow(RecordParentID, False, False)
+                        Call pages.cache_pageContent_updateRow(RecordParentID, False, False)
                         If Not IsDelete Then
                             Call db.executeSql("update ccpagecontent set ChildPagesfound=1 where ID=" & RecordParentID)
                         End If
@@ -10180,13 +10180,13 @@ ErrorTrap:
                         ' If this was a section's root page, clear the rootpageid so a new page will be created
                         '
                         Call db.executeSql("update ccsections set RootPageID=0 where RootPageID=" & RecordID)
-                        Call pageManager.pageManager_cache_siteSection_clear()
+                        Call pages.pageManager_cache_siteSection_clear()
                         '
                         ' Clear the Landing page and page not found site properties
                         '
 
                         If genericController.vbLCase(TableName) = "ccpagecontent" Then
-                            Call pageManager.cache_pageContent_removeRow(RecordID, pageManager.pagemanager_IsWorkflowRendering, False)
+                            Call pages.cache_pageContent_removeRow(RecordID, pages.pagemanager_IsWorkflowRendering, False)
                             If RecordID = genericController.EncodeInteger(siteProperties.getText("PageNotFoundPageID", "0")) Then
                                 Call siteProperties.setProperty("PageNotFoundPageID", "0")
                             End If
@@ -10203,14 +10203,14 @@ ErrorTrap:
                         '
                         ' Attempt to update the PageContentCache (PCC) array stored in the PeristantVariants
                         '
-                        Call pageManager.cache_pageContent_updateRow(RecordID, False, False)
+                        Call pages.cache_pageContent_updateRow(RecordID, False, False)
                     End If
                 Case "cctemplates", "ccsharedstyles"
                     '
                     ' Attempt to update the PageContentCache (PCC) array stored in the PeristantVariants
                     '
                     'hint = hint & ",150"
-                    Call pageManager.pageManager_cache_pageTemplate_clear()
+                    Call pages.pageManager_cache_pageTemplate_clear()
                     If Not IsNothing(cache_addonStyleRules) Then
                         Call cache_addonStyleRules.clear()
                     End If
@@ -10238,11 +10238,11 @@ ErrorTrap:
                                 pageContentName = "Page Content"
                             End If
                             Call db.cs_set(CS, "RootPageID", main_CreatePageGetID(PageName, "Page Content", authContext.user.ID, ""))
-                            Call pageManager.cache_pageContent_clear()
+                            Call pages.cache_pageContent_clear()
                         End If
                     End If
                     Call db.cs_Close(CS)
-                    Call pageManager.pageManager_cache_siteSection_clear()
+                    Call pages.pageManager_cache_siteSection_clear()
                 Case "ccaggregatefunctions"
                     '
                     ' Update wysiwyg addon menus
@@ -11520,73 +11520,73 @@ ErrorTrap:
                     Else
                         executeRoute_hardCodedPage = False
                     End If
-                Case HardCodedPagePrinterVersion
-                    '
-                    ' ----- Page Content Printer main_version
-                    '
-                    Call htmlDoc.webServerIO_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPagePrinterVersion)
-                    htmlDoc.pageManager_printVersion = True
-                    autoPrintText = docProperties.getText("AutoPrint")
-                    '
-                    If ContentName = "" Then
-                        ContentName = "Page Content"
-                    End If
-                    If autoPrintText = "" Then
-                        autoPrintText = siteProperties.getText("AllowAutoPrintDialog", "1")
-                    End If
-                    If RootPageName = "" Then
-                        blockSiteWithLogin = False
-                        PageCopy = pageManager.pageManager_GetHtmlBody_GetSection(AllowChildPage, False, False, blockSiteWithLogin)
-                        'PageCopy = main_GetSectionPage(AllowChildPage, False)
-                    Else
-                        OrderByClause = docProperties.getText(RequestNameOrderByClause)
-                        PageID = docProperties.getInteger("bid")
-                        '
-                        ' 5/12/2008 - converted to RootPageID call because we do not use RootPageName anymore
-                        '
-                        allowPageWithoutSectionDisplay = siteProperties.getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default)
-                        If Not allowPageWithoutSectionDisplay Then
-                            allowPageWithoutSectionDisplay = authContext.isAuthenticatedContentManager(Me, ContentName)
-                        End If
-                        PageCopy = pageManager.pageManager_GetHtmlBody_GetSection_GetContent(PageID, rootPageId, ContentName, OrderByClause, False, False, False, 0, siteProperties.useContentWatchLink, allowPageWithoutSectionDisplay)
-                        If pageManager.pageManager_RedirectLink <> "" Then
-                            Call webServer.webServerIO_Redirect2(pageManager.pageManager_RedirectLink, pageManager.pageManager_RedirectReason, False)
-                        End If
-                        'PageCopy = main_GetContentPage(RootPageName, ContentName, OrderByClause, AllowChildPage, False, PageID)
-                    End If
-                    '
-                    If genericController.EncodeBoolean(autoPrintText) Then
-                        Call htmlDoc.main_AddOnLoadJavascript2("window.print(); window.close()", "Print Page")
-                    End If
-                    BodyOpen = "<body class=""ccBodyPrint"">"
-
-                    'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage")
-                    Call htmlDoc.writeAltBuffer("" _
-                        & main_docType _
-                        & vbCrLf & "<html>" _
-                        & cr & "<head>" & main_GetHTMLHead() _
-                        & cr & "</head>" _
-                        & vbCrLf & BodyOpen _
-                        & cr & "<div align=""left"">" _
-                        & cr2 & "<table border=""0"" cellpadding=""20"" cellspacing=""0"" width=""100%""><tr><td width=""100%"">" _
-                        & cr3 & "<p>" _
-                        & genericController.kmaIndent(PageCopy) _
-                        & cr3 & "</p>" _
-                        & cr2 & "</td></tr></table>" _
-                        & cr & "</div>" _
-                        & genericController.kmaIndent(htmlDoc.html_GetEndOfBody(False, False, False, False)) _
-                        & cr & "</body>" _
-                        & vbCrLf & "</html>" _
-                        & "")
-
-                    executeRoute_hardCodedPage = True
-                'Case HardCodedPageMyProfile
+                'Case HardCodedPagePrinterVersion
                 '    '
-                '    ' Print a User Profile page with the current member
+                '    ' ----- Page Content Printer main_version
                 '    '
-                '    Call web_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageMyProfile)
-                '    Call writeAltBuffer(main_GetMyProfilePage())
+                '    Call htmlDoc.webServerIO_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPagePrinterVersion)
+                '    htmlDoc.pageManager_printVersion = True
+                '    autoPrintText = docProperties.getText("AutoPrint")
+                '    '
+                '    If ContentName = "" Then
+                '        ContentName = "Page Content"
+                '    End If
+                '    If autoPrintText = "" Then
+                '        autoPrintText = siteProperties.getText("AllowAutoPrintDialog", "1")
+                '    End If
+                '    If RootPageName = "" Then
+                '        blockSiteWithLogin = False
+                '        PageCopy = pages.pageManager_GetHtmlBody_GetSection(AllowChildPage, False, False, blockSiteWithLogin)
+                '        'PageCopy = main_GetSectionPage(AllowChildPage, False)
+                '    Else
+                '        OrderByClause = docProperties.getText(RequestNameOrderByClause)
+                '        PageID = docProperties.getInteger("bid")
+                '        '
+                '        ' 5/12/2008 - converted to RootPageID call because we do not use RootPageName anymore
+                '        '
+                '        allowPageWithoutSectionDisplay = siteProperties.getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default)
+                '        If Not allowPageWithoutSectionDisplay Then
+                '            allowPageWithoutSectionDisplay = authContext.isAuthenticatedContentManager(Me, ContentName)
+                '        End If
+                '        PageCopy = pages.pageManager_GetHtmlBody_GetSection_GetContent(PageID, rootPageId, ContentName, OrderByClause, False, False, False, 0, siteProperties.useContentWatchLink, allowPageWithoutSectionDisplay)
+                '        If pages.redirectLink <> "" Then
+                '            Call webServer.webServerIO_Redirect2(pages.redirectLink, pages.pageManager_RedirectReason, False)
+                '        End If
+                '        'PageCopy = main_GetContentPage(RootPageName, ContentName, OrderByClause, AllowChildPage, False, PageID)
+                '    End If
+                '    '
+                '    If genericController.EncodeBoolean(autoPrintText) Then
+                '        Call htmlDoc.main_AddOnLoadJavascript2("window.print(); window.close()", "Print Page")
+                '    End If
+                '    BodyOpen = "<body class=""ccBodyPrint"">"
+
+                '    'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage")
+                '    Call htmlDoc.writeAltBuffer("" _
+                '        & main_docType _
+                '        & vbCrLf & "<html>" _
+                '        & cr & "<head>" & main_GetHTMLHead() _
+                '        & cr & "</head>" _
+                '        & vbCrLf & BodyOpen _
+                '        & cr & "<div align=""left"">" _
+                '        & cr2 & "<table border=""0"" cellpadding=""20"" cellspacing=""0"" width=""100%""><tr><td width=""100%"">" _
+                '        & cr3 & "<p>" _
+                '        & genericController.kmaIndent(PageCopy) _
+                '        & cr3 & "</p>" _
+                '        & cr2 & "</td></tr></table>" _
+                '        & cr & "</div>" _
+                '        & genericController.kmaIndent(htmlDoc.html_GetEndOfBody(False, False, False, False)) _
+                '        & cr & "</body>" _
+                '        & vbCrLf & "</html>" _
+                '        & "")
+
                 '    executeRoute_hardCodedPage = True
+                ''Case HardCodedPageMyProfile
+                ''    '
+                ''    ' Print a User Profile page with the current member
+                ''    '
+                ''    Call web_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageMyProfile)
+                ''    Call writeAltBuffer(main_GetMyProfilePage())
+                ''    executeRoute_hardCodedPage = True
                 Case HardCodedPageResourceLibrary
                     '
                     ' main_Get FormIndex (the index to the InsertImage# function called on selection)
@@ -11794,7 +11794,7 @@ ErrorTrap:
                         If Not allowPageWithoutSectionDisplay Then
                             allowPageWithoutSectionDisplay = authContext.isAuthenticatedContentManager(Me, ContentName)
                         End If
-                        Copy = pageManager.pageManager_GetHtmlBody_GetSection_GetContent(PageID, rootPageId, "Page Content", "", True, True, False, 0, siteProperties.useContentWatchLink, allowPageWithoutSectionDisplay)
+                        Copy = pages.pageManager_GetHtmlBody_GetSection_GetContent(PageID, rootPageId, "Page Content", "", True, True, False, 0, siteProperties.useContentWatchLink, allowPageWithoutSectionDisplay)
                         'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2g")
                         Copy = Copy & htmlDoc.html_GetEndOfBody(False, True, False, False)
                         Copy = genericController.vbReplace(Copy, "'", "'+""'""+'")
@@ -12337,7 +12337,7 @@ ErrorTrap:
                     Call db.cs_set(CS, "name", TemplateDefaultName)
                     Call db.cs_set(CS, "Link", "")
                     If True Then
-                        Call db.cs_set(CS, "BodyHTML", pageManager.pageManager_TemplateBody)
+                        Call db.cs_set(CS, "BodyHTML", pages.templateBody)
                     End If
                     If True Then
                         Call db.cs_set(CS, "ccGuid", DefaultTemplateGuid)
@@ -12596,7 +12596,7 @@ ErrorTrap:
             cache_addonIncludeRules.itemCnt = 0
             '
             On Error Resume Next
-            If Not pageManager.pagemanager_IsWorkflowRendering() Then
+            If Not pages.pagemanager_IsWorkflowRendering() Then
                 cacheTest = cache.getObject(Of addonIncludeRulesClass)(cache_addonIncludeRules_cacheName)
                 If TypeOf cacheTest Is addonIncludeRulesClass Then
                     cache_addonIncludeRules = DirectCast(cacheTest, addonIncludeRulesClass)
@@ -13415,8 +13415,8 @@ ErrorTrap:
                                                 '
                                                 ' Save new public stylesheet
                                                 '
-                                                Call appRootFiles.saveFile("templates\Public" & StyleSN & ".css", pageManager.pageManager_GetStyleSheet)
-                                                Call appRootFiles.saveFile("templates\Admin" & StyleSN & ".css", pageManager.pageManager_GetStyleSheetDefault)
+                                                Call appRootFiles.saveFile("templates\Public" & StyleSN & ".css", pages.pageManager_GetStyleSheet)
+                                                Call appRootFiles.saveFile("templates\Admin" & StyleSN & ".css", pages.pageManager_GetStyleSheetDefault)
                                             End If
                                         End If
                                     Case FormTypeAddonStyleEditor
@@ -13438,16 +13438,16 @@ ErrorTrap:
                                             '
                                             ' Clear Caches
                                             '
-                                            Call pageManager.cache_pageContent_clear()
-                                            Call pageManager.pageManager_cache_pageTemplate_clear()
-                                            Call pageManager.pageManager_cache_siteSection_clear()
+                                            Call pages.cache_pageContent_clear()
+                                            Call pages.pageManager_cache_pageTemplate_clear()
+                                            Call pages.pageManager_cache_siteSection_clear()
                                             'Call cache.invalidateObjectList("")
                                             If contentName <> "" Then
                                                 Call cache.invalidateContent(contentName)
                                                 tableName = GetContentTablename(contentName)
                                                 If genericController.vbLCase(tableName) = "cctemplates" Then
-                                                    Call cache.setObject(pageManagerController.cache_pageTemplate_cacheName, nothingObject)
-                                                    Call pageManager.pageManager_cache_pageTemplate_load()
+                                                    Call cache.setObject(pagesController.cache_pageTemplate_cacheName, nothingObject)
+                                                    Call pages.pageManager_cache_pageTemplate_load()
                                                 End If
                                             End If
                                         End If
@@ -13485,7 +13485,7 @@ ErrorTrap:
                                         '
                                         ' ----- Page Authoring Tools Panel
                                         '
-                                        Call pageManager.pageManager_ProcessFormQuickEditing()
+                                        Call pages.pageManager_ProcessFormQuickEditing()
                                     Case FormTypeActiveEditor
                                         '
                                         ' ----- Active Editor
@@ -14416,7 +14416,7 @@ ErrorTrap:
                             ' If visit tracking, save the viewing record
                             '
                             ViewingName = Left(authContext.visit.ID & "." & authContext.visit.PageVisits, 10)
-                            PageID = pageManager.main_RenderedPageID
+                            PageID = pages.currentPageID
                             FieldNames = "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,ContentControlID,pagetime,Active,CreateKey,RecordID"
                             FieldNames = FieldNames & ",ExcludeFromAnalytics"
                             FieldNames = FieldNames & ",pagetitle"

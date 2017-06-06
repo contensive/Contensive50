@@ -4254,7 +4254,7 @@ ErrorTrap:
                                                     'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a line of text with contact information for this record's primary contact"" id=""AC," & ACType & """ src=""/ccLib/images/ACContact.GIF"">"
                                                 ElseIf EncodeCachableTags Then
                                                     If moreInfoPeopleId <> 0 Then
-                                                        Copy = cpCore.pageManager.pageManager_getMoreInfoHtml(cpCore, moreInfoPeopleId)
+                                                        Copy = cpCore.pages.pageManager_getMoreInfoHtml(cpCore, moreInfoPeopleId)
                                                     End If
                                                 End If
                                             Case ACTypeFeedback
@@ -6845,19 +6845,19 @@ ErrorTrap:
                 '
                 ' Clear Caches
                 '
-                Call cpCore.pageManager.cache_pageContent_clear()
-                Call cpCore.pageManager.pageManager_cache_pageTemplate_clear()
-                Call cpCore.pageManager.pageManager_cache_siteSection_clear()
+                Call cpCore.pages.cache_pageContent_clear()
+                Call cpCore.pages.pageManager_cache_pageTemplate_clear()
+                Call cpCore.pages.pageManager_cache_siteSection_clear()
                 'Call cpCore.cache.invalidateObjectList("")
                 If ContentName <> "" Then
                     Call cpCore.cache.invalidateContent(ContentName)
                     TableName = cpCore.GetContentTablename(ContentName)
                     If genericController.vbLCase(TableName) = "cctemplates" Then
-                        Call cpCore.cache.setObject(pageManagerController.cache_pageTemplate_cacheName, Nothing)
-                        Call cpCore.pageManager.pageManager_cache_pageTemplate_load()
+                        Call cpCore.cache.setObject(pagesController.cache_pageTemplate_cacheName, Nothing)
+                        Call cpCore.pages.pageManager_cache_pageTemplate_load()
                     End If
                     If genericController.vbLCase(TableName) = "ccpagecontent" Then
-                        Call cpCore.pageManager.cache_pageContent_updateRow(RecordID, cpCore.pageManager.pagemanager_IsWorkflowRendering, cpCore.pageManager.main_RenderCache_CurrentPage_IsQuickEditing)
+                        Call cpCore.pages.cache_pageContent_updateRow(RecordID, cpCore.pages.pagemanager_IsWorkflowRendering, cpCore.pages.main_RenderCache_CurrentPage_IsQuickEditing)
                     End If
                 End If
             End If
@@ -8130,7 +8130,7 @@ ErrorTrap:
                                             '
                                             'hint = hint & ",320"
                                             ListName = cpCore.csv_GetAddonOption("name", addonOptionString)
-                                            returnValue = returnValue & cpCore.pageManager.pageManager_GetChildPageList(ListName, ContextContentName, ContextRecordID, True)
+                                            returnValue = returnValue & cpCore.pages.pageManager_GetChildPageList(ListName, ContextContentName, ContextRecordID, True)
                                         Case ACTypeTemplateText
                                             '
                                             ' Text Box = copied here from gethtmlbody
@@ -8148,7 +8148,7 @@ ErrorTrap:
                                             ' Dynamic Menu
                                             '
                                             'hint = hint & ",320"
-                                            returnValue = returnValue & cpCore.pageManager.pageManager_GetDynamicMenu(addonOptionString, cpCore.siteProperties.useContentWatchLink)
+                                            returnValue = returnValue & cpCore.pages.pageManager_GetDynamicMenu(addonOptionString, cpCore.siteProperties.useContentWatchLink)
                                         Case ACTypeWatchList
                                             '
                                             ' Watch List
@@ -8157,7 +8157,7 @@ ErrorTrap:
                                             ListName = cpCore.csv_GetAddonOption("LISTNAME", addonOptionString)
                                             SortField = cpCore.csv_GetAddonOption("SORTFIELD", addonOptionString)
                                             SortReverse = genericController.EncodeBoolean(cpCore.csv_GetAddonOption("SORTDIRECTION", addonOptionString))
-                                            returnValue = returnValue & cpCore.pageManager.main_GetWatchList(cpCore, ListName, SortField, SortReverse)
+                                            returnValue = returnValue & cpCore.pages.main_GetWatchList(cpCore, ListName, SortField, SortReverse)
                                         Case Else
                                             '
                                             ' Unrecognized command - put all the syntax back in
@@ -8296,7 +8296,7 @@ ErrorTrap:
                     '
                     'hint = hint & ",600, Handle webclient features"
                     If genericController.vbInstr(1, returnValue, FeedbackFormNotSupportedComment, vbTextCompare) <> 0 Then
-                        returnValue = genericController.vbReplace(returnValue, FeedbackFormNotSupportedComment, cpCore.pageManager.main_GetFeedbackForm(cpCore, ContextContentName, ContextRecordID, ContextContactPeopleID), 1, 99, vbTextCompare)
+                        returnValue = genericController.vbReplace(returnValue, FeedbackFormNotSupportedComment, cpCore.pages.main_GetFeedbackForm(cpCore, ContextContentName, ContextRecordID, ContextContactPeopleID), 1, 99, vbTextCompare)
                     End If
                     '
                     ' if call from webpage, push addon js and css out to cpCoreClass
@@ -9254,8 +9254,8 @@ ErrorTrap:
                 Call cpCore.main_SetMetaContent(0, 0)
                 Call cpCore.htmlDoc.main_AddPagetitle2("Login", "loginPage")
                 head = cpCore.webServer.webServerIO_GetHTMLInternalHead(False)
-                If cpCore.pageManager.pageManager_TemplateBodyTag <> "" Then
-                    bodyTag = cpCore.pageManager.pageManager_TemplateBodyTag
+                If cpCore.pages.templateBodyTag <> "" Then
+                    bodyTag = cpCore.pages.templateBodyTag
                 Else
                     bodyTag = TemplateDefaultBodyTag
                 End If

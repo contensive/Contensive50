@@ -415,7 +415,7 @@
     <Compile Include="Models\Entity\cdefFieldModel.vb" />
     <Compile Include="Models\Entity\cdefModel.vb" />
     <Compile Include="Models\Entity\domainLegacyModel.vb" />
-    <Compile Include="addon_pageManager\pageManagerController.vb" />
+    <Compile Include="Controllers\pagesController.vb" />
     <Compile Include="addon_tools\addon_toolConfigureEdit.vb" />
     <Compile Include="Models\Context\coreSitePropertiesClass.vb" />
     <Compile Include="Controllers\webServerIOController.vb" />

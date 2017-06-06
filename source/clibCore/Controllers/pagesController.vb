@@ -10,44 +10,44 @@ Imports Contensive.Core.Controllers.genericController
 '
 Namespace Contensive.Core.Controllers
     '
-    Public Class pageManagerController
+    Public Class pagesController
         Inherits Contensive.BaseClasses.AddonBaseClass
         '
         ' -- not sure if this is the best plan, buts lets try this and see if we can get out of it later (to make this an addon) 
         Private cpcore As coreClass
         '
-        Public pageManager_SiteStructure As String = ""
-        Public pageManager_SiteStructure_LocalLoaded As Boolean = False
-        Public Const pageManager_NavStruc_Descriptor = 1           ' Descriptors:0 = RootPage, 1 = Parent Page, 2 = Current Page, 3 = Child Page
-        Public Const pageManager_NavStruc_Descriptor_CurrentPage = 2
-        Public Const pageManager_NavStruc_Descriptor_ChildPage = 3
-        Public Const pageManager_NavStruc_TemplateId = 7
-        Public pageManager_PageContent As String = ""                    ' The page's content at the OnPageEndEvent - used to let OnPageStart and OnPageEnd Add-ons change the content
-        Public pageManager_ContentPageStructure As String = ""           ' deprecated name for main_RenderedNavigationStructure
-        Public pageManager_LandingPageID As Integer = 0                              ' Set from Site Property (use main_GetLandingPageID)
-        Public pageManager_LandingPageID_Loaded As Boolean = False                   '   true when pageManager_LandingPageID is loaded
-        Public pageManager_LandingPageName As String = ""                          ' Set from pageManager_LandingPageID (use main_GetLandingPageName)
-        Public pageManager_LandingLink As String = ""                              ' Default Landing page - managed through main_GetLandingLink()
-        Public pageManager_TemplateReason As String = ""                           ' a message that explains why this template was selected
-        Public pageManager_TemplateName As String = ""                             ' Name of the template
-        Public pageManager_TemplateLink As String = ""                             ' Link this template requires - redirect caused if this is not the current link
-        Public pageManager_TemplateBody As String = ""                             ' Body field of the TemplateID
-        Public pageManager_TemplateBodyTag As String = ""                          ' BodyTag - from Template record, if blank, use TemplateDefaultBodyTag
-        Public pageManager_SectionMenuLinkDefault As String = ""
-        Public Const pageManager_BlockMessageDefault = "<p>The content on this page has restricted access. If you have a username and password for this system, <a href=""?method=login"" rel=""nofollow"">Click Here</a>. For more information, please contact the administrator.</p>"
-        Public pageManager_RedirectLink As String = ""                             ' If there is a problem, a redirect is forced
+        Public siteStructure As String = ""
+        Public siteStructure_LocalLoaded As Boolean = False
+        Public Const navStruc_Descriptor = 1           ' Descriptors:0 = RootPage, 1 = Parent Page, 2 = Current Page, 3 = Child Page
+        Public Const navStruc_Descriptor_CurrentPage = 2
+        Public Const navStruc_Descriptor_ChildPage = 3
+        Public Const navStruc_TemplateId = 7
+        Public bodyContent As String = ""                    ' The page's content at the OnPageEndEvent - used to let OnPageStart and OnPageEnd Add-ons change the content
+        'Public pageManager_ContentPageStructure As String = ""           ' deprecated name for currentNavigationStructure
+        Public landingPageID As Integer = 0                              ' Set from Site Property (use main_GetLandingPageID)
+        Public landingPageID_Loaded As Boolean = False                   '   true when pageManager_LandingPageID is loaded
+        Public landingPageName As String = ""                          ' Set from pageManager_LandingPageID (use main_GetLandingPageName)
+        Public landingLink As String = ""                              ' Default Landing page - managed through main_GetLandingLink()
+        Public templateReason As String = ""                           ' a message that explains why this template was selected
+        Public templateName As String = ""                             ' Name of the template
+        Public templateLink As String = ""                             ' Link this template requires - redirect caused if this is not the current link
+        Public templateBody As String = ""                             ' Body field of the TemplateID
+        Public templateBodyTag As String = ""                          ' BodyTag - from Template record, if blank, use TemplateDefaultBodyTag
+        Public sectionMenuLinkDefault As String = ""
+        Public Const blockMessageDefault = "<p>The content on this page has restricted access. If you have a username and password for this system, <a href=""?method=login"" rel=""nofollow"">Click Here</a>. For more information, please contact the administrator.</p>"
+        Public redirectLink As String = ""                             ' If there is a problem, a redirect is forced
         Public pageManager_RedirectReason As String = ""                           ' reason for redirect
         Public pageManager_RedirectBecausePageNotFound As Boolean = False            ' if true, redirect will go through a 404 so bots will not follow
         Public pageManager_RedirectSourcePageID As Integer = 0                       ' the pageid of the page with this issue, 0 if not a page problem
         '
-        Public main_RenderedPageID As Integer = 0                   ' The current page's id
-        Public main_RenderedPageName As String = ""               ' The current page's name
-        Public main_RenderedSectionID As Integer = 0                ' The current page's section id
-        Public main_RenderedSectionName As String = ""            ' The current Section's name
-        Public main_RenderedTemplateID As Integer = 0               ' The current template's Id
-        Public main_RenderedTemplateName As String = ""           ' The current template's name
-        Public main_RenderedNavigationStructure As String = ""    ' Public string describing the current page
-        Public main_RenderedParentID As Integer = 0               '
+        Public currentPageID As Integer = 0                   ' The current page's id
+        Public currentPageName As String = ""               ' The current page's name
+        Public currentSectionID As Integer = 0                ' The current page's section id
+        Public currentSectionName As String = ""            ' The current Section's name
+        Public currentTemplateID As Integer = 0               ' The current template's Id
+        Public currentTemplateName As String = ""           ' The current template's name
+        Public currentNavigationStructure As String = ""    ' Public string describing the current page
+        Public currentParentID As Integer = 0               '
         Public main_RenderCache_Loaded As Boolean = False                               ' true after main_loadRenderCache
         Public main_RenderCache_CurrentPage_PCCPtr As Integer = 0
         Public main_RenderCache_CurrentPage_ContentId As Integer = 0                        '
@@ -74,7 +74,7 @@ Namespace Contensive.Core.Controllers
         Private Const main_IPosPeopleField = 3
         Private Const main_IPosGroupName = 3
         '
-        Private Structure main_FormPagetype_InstType
+        Public Structure main_FormPagetype_InstType
             Dim Type As Integer
             Dim Caption As String
             Dim REquired As Boolean
@@ -82,7 +82,7 @@ Namespace Contensive.Core.Controllers
             Dim GroupName As String
         End Structure
         '
-        Private Structure main_FormPagetype
+        Public Structure main_FormPagetype
             Dim PreRepeat As String
             Dim PostRepeat As String
             Dim RepeatCell As String
@@ -610,1010 +610,18 @@ Namespace Contensive.Core.Controllers
         Public ReadOnly Property main_SiteStructure(cpcore As coreClass) As String
             Get
                 Dim returnStatus As Boolean = False
-                If Not pageManager_SiteStructure_LocalLoaded Then
-                    pageManager_SiteStructure = Me.cpcore.addon.execute_legacy2(0, addonSiteStructureGuid, "", CPUtilsBaseClass.addonContext.ContextSimple, "", 0, "", "", False, -1, "", returnStatus, Nothing)
-                    pageManager_SiteStructure_LocalLoaded = True
+                If Not siteStructure_LocalLoaded Then
+                    siteStructure = Me.cpcore.addon.execute_legacy2(0, addonSiteStructureGuid, "", CPUtilsBaseClass.addonContext.ContextSimple, "", 0, "", "", False, -1, "", returnStatus, Nothing)
+                    siteStructure_LocalLoaded = True
                 End If
-                main_SiteStructure = pageManager_SiteStructure
+                main_SiteStructure = siteStructure
 
             End Get
         End Property
-        '
-        '========================================================================
-        '   Returns the HTML body
-        '
-        '   This code is based on the GoMethod site script
-        '========================================================================
-        '
-        Public Function pageManager_GetHtmlBody() As String
-            Dim returnHtmlBody As String = ""
-            Try
-                '
-                Dim AddonReturn As String
-                Dim Ptr As Integer
-                Dim Cnt As Integer
-                Dim layoutError As String
-                Dim FilterStatusOK As Boolean
-                Dim BlockFormatting As Boolean
-                Dim IndentCnt As Integer
-                Dim Result As New stringBuilderLegacyController
-                Dim Content As String
-                Dim ContentIndent As String
-                Dim ContentCnt As Integer
-                Dim PageContent As String
-                Dim Stream As New stringBuilderLegacyController
-                Dim LocalTemplateID As Integer
-                Dim LocalTemplateName As String
-                Dim LocalTemplateBody As String
-                Dim Parse As htmlParserController
-                Dim blockSiteWithLogin As Boolean
-                Dim addonCachePtr As Integer
-                Dim addonId As Integer
-                Dim AddonName As String
-                '
-                Call cpcore.addonCache.load()
-                returnHtmlBody = ""
-                '
-                ' ----- OnBodyStart add-ons
-                '
-                FilterStatusOK = False
-                Cnt = UBound(cpcore.addonCache.addonCache.onBodyStartPtrs) + 1
-                For Ptr = 0 To Cnt - 1
-                    addonCachePtr = cpcore.addonCache.addonCache.onBodyStartPtrs(Ptr)
-                    If addonCachePtr > -1 Then
-                        addonId = cpcore.addonCache.addonCache.addonList(addonCachePtr.ToString).id
-                        'hint = hint & ",addonId=" & addonId
-                        If addonId > 0 Then
-                            AddonName = cpcore.addonCache.addonCache.addonList(addonCachePtr.ToString).name
-                            'hint = hint & ",AddonName=" & AddonName
-                            returnHtmlBody = returnHtmlBody & cpcore.addon.execute_legacy2(addonId, "", "", CPUtilsBaseClass.addonContext.ContextOnBodyStart, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
-                            If Not FilterStatusOK Then
-                                Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError12("pageManager_GetHtmlBody", "There was an error processing OnAfterBody [" & cpcore.addonCache.addonCache.addonList(addonCachePtr.ToString).name & "]. Filtering was aborted.")
-                                Exit For
-                            End If
-                        End If
-                    End If
-                Next
-                '
-                ' ----- main_Get Content (Already Encoded)
-                '
-                blockSiteWithLogin = False
-                PageContent = pageManager_GetHtmlBody_GetSection(True, True, False, blockSiteWithLogin)
-                If blockSiteWithLogin Then
-                    '
-                    ' section blocked, just return the login box in the page content
-                    '
-                    returnHtmlBody = "" _
-                        & cr & "<div class=""ccLoginPageCon"">" _
-                        & genericController.kmaIndent(PageContent) _
-                        & cr & "</div>" _
-                        & ""
-                ElseIf Not cpcore.docOpen Then
-                    '
-                    ' exit if stream closed during main_GetSectionpage
-                    '
-                    returnHtmlBody = ""
-                Else
-                    '
-                    ' no section block, continue
-                    '
-                    'PageContent = CR & "<!-- Page Content -->" & genericController.kmaIndent(pageManager_GetHtmlBody_GetSection(True, True, False)) & CR & "<!-- /Page Content -->"
-
-                    Call pageManager_LoadTemplateGetID(main_RenderedTemplateID)
-                    '
-                    ' ----- main_Get Template
-                    '
-                    LocalTemplateID = main_RenderedTemplateID
-                    LocalTemplateBody = pageManager_TemplateBody
-                    If LocalTemplateBody = "" Then
-                        LocalTemplateBody = TemplateDefaultBody
-                    End If
-                    LocalTemplateName = pageManager_TemplateName
-                    If LocalTemplateName = "" Then
-                        LocalTemplateName = "Template " & LocalTemplateID
-                    End If
-                    '
-                    ' ----- Encode Template
-                    '
-                    If Not cpcore.htmlDoc.pageManager_printVersion Then
-                        LocalTemplateBody = cpcore.htmlDoc.html_executeContentCommands(Nothing, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, cpcore.authContext.user.ID, cpcore.authContext.isAuthenticated, layoutError)
-                        returnHtmlBody = returnHtmlBody & cpcore.htmlDoc.html_encodeContent9(LocalTemplateBody, cpcore.authContext.user.ID, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, PageContent, CPUtilsBaseClass.addonContext.ContextTemplate)
-                        'returnHtmlBody = returnHtmlBody & EncodeContent8(LocalTemplateBody, memberID, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", main_ServerProtocol, False, app.SiteProperty_DefaultWrapperID, PageContent, ContextTemplate)
-                    End If
-                    '
-                    ' If Content was not found, add it to the end
-                    '
-                    If (InStr(1, returnHtmlBody, fpoContentBox) <> 0) Then
-                        returnHtmlBody = genericController.vbReplace(returnHtmlBody, fpoContentBox, PageContent)
-                    Else
-                        returnHtmlBody = returnHtmlBody & PageContent
-                    End If
-                    '
-                    ' ----- Add tools Panel
-                    '
-                    If Not cpcore.authContext.isAuthenticated() Then
-                        '
-                        ' not logged in
-                        '
-                    Else
-                        '
-                        ' Add template editing
-                        '
-                        If cpcore.visitProperty.getBoolean("AllowAdvancedEditor") And cpcore.authContext.isEditing(cpcore, "Page Templates") Then
-                            returnHtmlBody = cpcore.htmlDoc.main_GetEditWrapper("Page Template [" & LocalTemplateName & "]", cpcore.main_GetRecordEditLink2("Page Templates", LocalTemplateID, False, LocalTemplateName, cpcore.authContext.isEditing(cpcore, "Page Templates")) & returnHtmlBody)
-                        End If
-                    End If
-                    '
-                    ' ----- OnBodyEnd add-ons
-                    '
-                    'hint = hint & ",onBodyEnd"
-                    FilterStatusOK = False
-                    Cnt = UBound(cpcore.addonCache.addonCache.onBodyEndPtrs) + 1
-                    'hint = hint & ",cnt=" & Cnt
-                    For Ptr = 0 To Cnt - 1
-                        addonCachePtr = cpcore.addonCache.addonCache.onBodyEndPtrs(Ptr)
-                        'hint = hint & ",ptr=" & Ptr & ",addonCachePtr=" & addonCachePtr
-                        If addonCachePtr > -1 Then
-                            addonId = cpcore.addonCache.addonCache.addonList(addonCachePtr.ToString).id
-                            'hint = hint & ",addonId=" & addonId
-                            If addonId > 0 Then
-                                AddonName = cpcore.addonCache.addonCache.addonList(addonCachePtr.ToString).name
-                                'hint = hint & ",AddonName=" & AddonName
-                                cpcore.htmlDoc.html_DocBodyFilter = returnHtmlBody
-                                AddonReturn = cpcore.addon.execute_legacy2(addonId, "", "", CPUtilsBaseClass.addonContext.ContextFilter, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
-                                returnHtmlBody = cpcore.htmlDoc.html_DocBodyFilter & AddonReturn
-                                If Not FilterStatusOK Then
-                                    Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError12("pageManager_GetHtmlBody", "There was an error processing OnBodyEnd for [" & AddonName & "]. Filtering was aborted.")
-                                    Exit For
-                                End If
-                            End If
-                        End If
-                    Next
-                    '
-                    ' Make it pretty for those who care
-                    '
-                    If cpcore.siteProperties.getBoolean("AutoHTMLFormatting") Then
-                        IndentCnt = 0
-                        Parse = New htmlParserController(cpcore)
-                        Call Parse.Load(returnHtmlBody)
-                        If Parse.ElementCount > 0 Then
-                            For Ptr = 0 To Parse.ElementCount - 1
-                                If Not Parse.IsTag(Ptr) Then
-                                    Content = Parse.Text(Ptr)
-                                    If BlockFormatting Then
-                                        Result.Add(Content)
-                                    Else
-                                        If Content <> "" Then
-                                            If Trim(Content) <> "" Then
-                                                Result.Add(ContentIndent)
-                                                ContentIndent = ""
-                                            End If
-                                            Content = genericController.vbReplace(Content, vbCrLf, " ")
-                                            Content = genericController.vbReplace(Content, vbTab, " ")
-                                            Content = genericController.vbReplace(Content, vbCr, " ")
-                                            Content = genericController.vbReplace(Content, vbLf, " ")
-                                            Result.Add(Content)
-                                            ContentCnt = ContentCnt + 1
-                                        End If
-                                    End If
-                                Else
-                                    Select Case genericController.vbLCase(Parse.TagName(Ptr))
-                                        Case "pre", "script"
-                                            '
-                                            ' End block formating
-                                            '
-                                            Result.Add(vbCrLf & Parse.Text(Ptr))
-                                            BlockFormatting = True
-                                        Case "/pre", "/script"
-                                            '
-                                            ' end block formating
-                                            '
-                                            Result.Add(Parse.Text(Ptr) & vbCrLf)
-                                            BlockFormatting = False
-                                        Case Else
-                                            If BlockFormatting Then
-                                                '
-                                                ' formatting is blocked
-                                                '
-                                                Result.Add(Parse.Text(Ptr))
-                                            Else
-                                                '
-                                                ' format the tag
-                                                '
-                                                Select Case genericController.vbLCase(Parse.TagName(Ptr))
-                                                    Case "p", "h1", "h2", "h3", "h4", "h5", "h6", "li", "br"
-                                                        '
-                                                        ' new line
-                                                        '
-                                                        Result.Add(vbCrLf & New String(CChar(vbTab), IndentCnt) & Parse.Text(Ptr))
-                                                    Case "div", "td", "table", "tr", "tbody", "ol", "ul", "form"
-                                                        '
-                                                        ' new line and +indent
-                                                        '
-                                                        Result.Add(vbCrLf & New String(CChar(vbTab), IndentCnt) & Parse.Text(Ptr))
-                                                        IndentCnt = IndentCnt + 1
-                                                        ContentIndent = vbCrLf & New String(CChar(vbTab), IndentCnt)
-                                                        ContentCnt = 0
-                                                    Case "/div", "/td", "/table", "/tr", "/tbody", "/ol", "/ul", "/form"
-                                                        '
-                                                        ' new line and -indent
-                                                        '
-                                                        IndentCnt = IndentCnt - 1
-                                                        If IndentCnt < 0 Then
-                                                            IndentCnt = 0
-                                                            '
-                                                            ' Add to 'Asset Errors' Table - a merge with Spider Doc Errors
-                                                            '
-                                                        End If
-                                                        If ContentCnt = 0 Then
-                                                            Result.Add(Parse.Text(Ptr))
-                                                        Else
-                                                            Result.Add(vbCrLf & New String(CChar(vbTab), IndentCnt) & Parse.Text(Ptr))
-                                                        End If
-                                                        ContentCnt = ContentCnt + 1
-                                                    Case Else
-                                                        '
-                                                        ' tag that acts like content
-                                                        '
-                                                        Content = Parse.Text(Ptr)
-                                                        If Content <> "" Then
-                                                            Result.Add(ContentIndent & Content)
-                                                            ContentIndent = ""
-                                                        End If
-                                                        ContentCnt = ContentCnt + 1
-                                                End Select
-                                            End If
-                                    End Select
-                                End If
-                            Next
-                            If IndentCnt <> 0 Then
-                                '
-                                ' Add to 'Asset Errors' Table - a merge with Spider Doc Errors
-                                '
-                                'Call main_AppendClassErrorLog("cpCoreClass(" & appEnvironment.name & ").GetHTMLBody AutoIndent error. At the end of the document, the last tag was still indented (more start tags than end tags). Link=[" & genericController.decodeHtml(main_ServerLink) & "], ")
-                            End If
-                            returnHtmlBody = Result.Text
-                        End If
-                    End If
-                End If
-                '
-            Catch ex As Exception
-                cpcore.handleExceptionAndContinue(ex) : Throw
-            End Try
-            Return returnHtmlBody
-        End Function
-        '
-        '=============================================================================
-        '   main_Get Section
-        '       Two modes
-        '           pre 3.3.613 - SectionName = RootPageName
-        '           else - (IsSectionRootPageIDMode) SectionRecord has a RootPageID field
-        '=============================================================================
-        '
-        Public Function pageManager_GetHtmlBody_GetSection(AllowChildPageList As Boolean, AllowReturnLink As Boolean, AllowEditWrapper As Boolean, ByRef return_blockSiteWithLogin As Boolean) As String
-            Dim returnHtml As String = ""
-            Try
-                Dim test As String
-                Dim Copy As String
-                Dim allowPageWithoutSectionDislay As Boolean
-                Dim domainIds() As String
-                Dim setdomainId As Integer
-                Dim linkDomain As String
-                Dim templatedomainIdList As String
-                Dim FieldRows As Integer
-                Dim PCCPtr As Integer
-                Dim SecureLink_CurrentURL As Boolean                ' the current page starts https://
-                Dim SecureLink_Template_Required As Boolean         ' the template record has 'secure' checked
-                Dim SecureLink_Page_Required As Boolean             ' teh page record has 'secure' checked
-                Dim SecureLink_Required As Boolean                  ' either the template or the page have secure checked
-                Dim templateLink As String                          ' the template record 'link' field
-                Dim TCPtr As Integer
-                Dim JSFilename As String
-                Dim StylesFilename As String
-                Dim SharedStylesIDList As String
-                Dim ListSplit() As String
-                Dim styleId As Integer
-                Dim templateId As Integer
-                Dim CurrentLink As String
-                Dim CurrentLinkNoQuery As String
-                Dim LinkSplit() As String
-                Dim LandingLink As String
-                Dim CSSection As Integer
-                Dim rootPageId As Integer
-                Dim RootPageName As String
-                Dim RootPageContentName As String
-                Dim SectionContentID As Integer
-                Dim SectionTemplateID As Integer
-                Dim SectionBlock As Boolean
-                Dim PageRow() As String
-                Dim PageRowCnt As Integer
-                Dim Ptr As Integer
-                Dim navStruc() As String
-                Dim SectionFieldList As String
-                Dim SectionCriteria As String
-                Dim SectionName As String
-                Dim IsSectionRootPageIDMode As Boolean
-                Dim PageID As Integer
-                Dim SectionID As Integer
-                Dim UseContentWatchLink As Boolean = cpcore.siteProperties.useContentWatchLink
-                '
-                ' ----- Determine LandingLink
-                '
-                LandingLink = pageManager_GetLandingLink()
-                IsSectionRootPageIDMode = True
-                SectionFieldList = "ID,Name,ContentID,TemplateID,BlockSection,RootPageID,JSOnLoad,JSHead,JSEndBody,JSFilename"
-                '
-                ' -- get page and section requests
-                PageID = cpcore.docProperties.getInteger("bid")
-                If PageID <> 0 Then
-                    Call cpcore.htmlDoc.webServerIO_addRefreshQueryString("bid", CStr(PageID))
-                End If
-                '
-                ' Handle Section ID Request Variable
-                '
-                SectionID = cpcore.docProperties.getInteger("sid")
-                If SectionID <> 0 Then
-                    Call cpcore.htmlDoc.webServerIO_addRefreshQueryString("sid", CStr(SectionID))
-                End If
-                '
-                '------------------------------------------------------------------------------------
-                '   Determine RootPageID, SectionID, SectionContentID, SectionTemplateID
-                '       SectionID=0 means deliver the landing page section
-                '------------------------------------------------------------------------------------
-                '
-                If (PageID = 0) And (SectionID = 0) Then
-                    'hint = "2"
-                    '
-                    ' Nothing specified, use the Landing Page
-                    '
-                    PageID = main_GetLandingPageID()
-                    If PageID = 0 Then
-                        '
-                        ' landing page is not valid -- display error
-                        '
-                        cpcore.handleExceptionAndContinue(New ApplicationException("Page could not be determined. Error message displayed."))
-                        Return "<div style=""width:300px; margin: 100px auto auto auto;text-align:center;"">This page is not valid.</div>"
-                    End If
-                End If
-                If (PageID <> 0) Then
-                    'hint = "3"
-                    '
-                    ' ----- PageID Given, determine the section from the pageid
-                    '
-                    If cache_siteSection_rows = 0 Then
-                        Call pageManager_cache_siteSection_load()
-                    End If
-                    rootPageId = pageManager_GetHtmlBody_GetSection_GetRootPageId(PageID)
-                    Ptr = cache_siteSection_RootPageIDIndex.getPtr(CStr(rootPageId))
-                    '
-                    ' Open Section Record
-                    '
-                    If Ptr < 0 Then
-                        SectionID = 0
-                    Else
-                        SectionID = genericController.EncodeInteger(cache_siteSection(SSC_ID, Ptr))
-                        SectionName = genericController.encodeText(cache_siteSection(SSC_Name, Ptr))
-                        SectionTemplateID = genericController.EncodeInteger(cache_siteSection(SSC_TemplateID, Ptr))
-                        SectionContentID = genericController.EncodeInteger(cache_siteSection(SSC_ContentID, Ptr))
-                        SectionBlock = genericController.EncodeBoolean(cache_siteSection(SSC_BlockSection, Ptr))
-                        Call cpcore.htmlDoc.main_AddOnLoadJavascript2(genericController.encodeText(cache_siteSection(SSC_JSOnLoad, Ptr)), "site section")
-                        Call cpcore.htmlDoc.main_AddHeadScriptCode(genericController.encodeText(cache_siteSection(SSC_JSHead, Ptr)), "site section")
-                        Call cpcore.htmlDoc.main_AddEndOfBodyJavascript2(genericController.encodeText(cache_siteSection(SSC_JSEndBody, Ptr)), "site section")
-                        JSFilename = genericController.encodeText(cache_siteSection(SSC_JSFilename, Ptr))
-                        If JSFilename <> "" Then
-                            JSFilename = cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.requestDomain & cpcore.csv_getVirtualFileLink(cpcore.serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
-                            Call cpcore.htmlDoc.main_AddHeadScriptLink(JSFilename, "site section")
-                        End If
-                    End If
-                ElseIf (SectionID <> 0) Then
-                    'hint = "4"
-                    '
-                    ' ----- pageid=0, sectionid OK -- determine the page from the sectionid
-                    '           main_Get SectionLink -> compare to actual Link -> redirect if mismatch
-                    '
-                    If cache_siteSection_rows = 0 Then
-                        Call pageManager_cache_siteSection_load()
-                    End If
-                    Ptr = cache_siteSection_IDIndex.getPtr(CStr(SectionID))
-                    If Ptr < 0 Then
-                        '
-                        ' Section not found, assume Landing Page
-                        '
-                        Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
-                        'Call main_LogPageNotFound(main_ServerLink)
-                        pageManager_RedirectBecausePageNotFound = True
-                        pageManager_RedirectReason = "The page could not be found because the section specified was not found. The section ID is [" & SectionID & "]. This section may have been deleted or marked inactive."
-                        pageManager_RedirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
-                        Exit Function
-                        'SectionID = 0
-                    Else
-                        SectionName = genericController.encodeText(cache_siteSection(SSC_Name, Ptr))
-                        rootPageId = genericController.EncodeInteger(cache_siteSection(SSC_RootPageID, Ptr))
-                        SectionTemplateID = genericController.EncodeInteger(cache_siteSection(SSC_TemplateID, Ptr))
-                        SectionContentID = genericController.EncodeInteger(cache_siteSection(SSC_ContentID, Ptr))
-                        SectionBlock = genericController.EncodeBoolean(cache_siteSection(SSC_BlockSection, Ptr))
-                        Call cpcore.htmlDoc.main_AddOnLoadJavascript2(genericController.encodeText(cache_siteSection(SSC_JSOnLoad, Ptr)), "site section")
-                        Call cpcore.htmlDoc.main_AddHeadScriptCode(genericController.encodeText(cache_siteSection(SSC_JSHead, Ptr)), "site section")
-                        Call cpcore.htmlDoc.main_AddEndOfBodyJavascript2(genericController.encodeText(cache_siteSection(SSC_JSEndBody, Ptr)), "site section")
-                        JSFilename = genericController.encodeText(cache_siteSection(SSC_JSFilename, Ptr))
-                        If JSFilename <> "" Then
-                            JSFilename = cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.requestDomain & cpcore.csv_getVirtualFileLink(cpcore.serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
-                            Call cpcore.htmlDoc.main_AddHeadScriptLink(JSFilename, "site section")
-                        End If
-                    End If
-                    '
-                    ' Test for new section that needs a new blank page
-                    '
-                    If (pageManager_RedirectLink = "") And (SectionID <> 0) Then
-                        '
-                        ' RootPageID Mode
-                        '
-                        If (rootPageId = 0) And (cpcore.app_errorCount = 0) Then
-                            '
-                            ' Root Page needs to be auto created
-                            ' OK to create page here because section has a good record with a 0 RootPageID (this is not AutoHomeCreate)
-                            '
-                            rootPageId = cpcore.main_CreatePageGetID(SectionName, "Page Content", SystemMemberID, "")
-                            Call cpcore.db.executeSql("update ccsections set RootPageID=" & rootPageId & " where id=" & SectionID)
-                            Call pageManager_cache_siteSection_clear()
-                            cpcore.htmlDoc.main_AdminWarning = "<p>This page was created automatically because the section [" & SectionName & "] was requested, and it did not reference a page. Use the links below to edit the new page.</p>"
-                            cpcore.htmlDoc.main_AdminWarningPageID = rootPageId
-                            cpcore.htmlDoc.main_AdminWarningSectionID = SectionID
-                            'Call app.csv_SetCS(CSSection, "RootPageID", RootPageID)
-                        End If
-                    End If
-                    If (pageManager_RedirectLink = "") And (PageID = 0) And (rootPageId <> 0) Then
-                        '
-                        ' if no page, set page to the root of the section
-                        '
-                        PageID = rootPageId
-                    End If
-                End If
-                '
-                If PageID = 0 Then
-                    '
-                    '------------------------------------------------------------------------------------
-                    ' Problem -- Page could not be determined
-                    '   2011/06/15 - changes
-                    '   this should not be a valid case because if the pageid is either given, set by section or set to landingpageid
-                    '
-                    '   allow a page that has no section -- so you can preview it, and so you can view any page in the page content
-                    '       - just display it with the default content
-                    '       - big change is that we now assume the parent + section was not blocked, before we assumed it was blocked
-                    '
-                    '   if pageid=0 at this point then the landing page could not be determined - put up an error message is all you can do
-                    '
-                    '   if pageid<>0 and sectionid=0 then the site will just display the default template
-                    '------------------------------------------------------------------------------------
-                    '
-                    Copy = "" _
-                    & cpcore.main_docType _
-                    & vbCrLf & "<html>" _
-                    & cr & "<body>" _
-                    & cr2 & "<p style=""text-align:center;margin-top:100px;"">The page you requested could not be found and no landing page is configured for this domain.</p>" _
-                    & cr & "</body>" _
-                    & vbCrLf & "</html>" _
-                    & ""
-                    'Call AppendLog("call main_getEndOfBody, from pageManager_getsection")
-                    Call cpcore.htmlDoc.writeAltBuffer(Copy & cpcore.htmlDoc.html_GetEndOfBody(False, False, False, False))
-                    Throw New ApplicationException("Unexpected exception") ' throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError12("PagList_GetSection", "The page you requested could not be found and no landing page is configured for this domain [" & cpcore.webServer.webServerIO_requestDomain & "].")
-                    '--- should be disposed by caller --- Call dispose
-                    Exit Function
-                End If
-                '
-                If SectionID = 0 Then
-                    '
-                    ' Orphan Page -- Section could not be determined
-                    '
-                    allowPageWithoutSectionDislay = cpcore.siteProperties.getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default)
-                    allowPageWithoutSectionDislay = True
-                    Call logController.appendLog(cpcore, "hardcoded allowPageWithoutSectionDislay in getHtmlBody_getSection")
-                    If Not allowPageWithoutSectionDislay Then
-                        '
-                        ' the rootPageid is used to represent the section record's selection, and is used in main_GetPageRaw to check if the
-                        '   pagelist is structured correction
-                        '
-                        rootPageId = -1
-                    End If
-                    If False Then
-                        'hint = "5"
-                        '
-                        ' No section specified, use LandingSection
-                        '
-                        rootPageId = main_GetLandingPageID()
-                        RootPageName = main_GetLandingPageName(rootPageId)
-                        If True Then
-                            'If IsSectionRootPageIDMode Then
-                            '
-                            ' Page linked by PageID
-                            '
-                            SectionName = DefaultLandingSectionName
-                            SectionCriteria = "RootPageID=" & rootPageId
-                        Else
-                            '
-                            ' Legacy - Page linked by PageName
-                            '
-                            SectionName = LegacyLandingPageName
-                            SectionCriteria = "Name = " & cpcore.db.encodeSQLText(SectionName)
-                        End If
-                        '
-                        ' main_Get Landing Section
-                        '
-                        CSSection = cpcore.db.cs_open("Site Sections", SectionCriteria, "ID", , ,, , SectionFieldList)
-                        '
-                        ' try something new - if no landing section, use a "dummy" section with no blocking, etc.
-                        '
-                        If Not cpcore.db.cs_ok(CSSection) Then
-                            SectionID = 0
-                            SectionName = ""
-                            SectionTemplateID = 0
-                            SectionContentID = 0
-                            SectionBlock = False
-                        Else
-                            SectionID = cpcore.db.cs_getInteger(CSSection, "ID")
-                            SectionName = cpcore.db.cs_getText(CSSection, "name")
-                            SectionTemplateID = cpcore.db.cs_getInteger(CSSection, "TemplateID")
-                            SectionContentID = cpcore.db.cs_getInteger(CSSection, "ContentID")
-                            SectionBlock = cpcore.db.cs_getBoolean(CSSection, "BlockSection")
-                            Call cpcore.htmlDoc.main_AddOnLoadJavascript2(cpcore.db.cs_getText(CSSection, "JSOnLoad"), "site section")
-                            Call cpcore.htmlDoc.main_AddHeadScriptCode(cpcore.db.cs_getText(CSSection, "JSHead"), "site section")
-                            Call cpcore.htmlDoc.main_AddEndOfBodyJavascript2(cpcore.db.cs_getText(CSSection, "JSEndBody"), "site section")
-                            JSFilename = cpcore.db.cs_getText(CSSection, "JSFilename")
-                            If JSFilename <> "" Then
-                                JSFilename = cpcore.webServer.webServerIO_requestPage & cpcore.webServer.requestDomain & cpcore.csv_getVirtualFileLink(cpcore.serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
-                                Call cpcore.htmlDoc.main_AddHeadScriptLink(JSFilename, "site section")
-                            End If
-                        End If
-                        Call cpcore.db.cs_Close(CSSection)
-                        '
-                        ' ????? if no landing section, lets try a dummy section
-                        '
-                    End If
-                End If
-                '
-                ' Save the SectionID publically to Add-ons can use it (dynamic menuing)
-                '
-                main_RenderedSectionID = SectionID
-                main_RenderedSectionName = SectionName
-                '
-                '------------------------------------------------------------------------------------
-                ' Determine RootPageContentName from SectionContentID
-                '------------------------------------------------------------------------------------
-                '
-                'hint = "5"
-                If SectionContentID = 0 And RootPageContentName = "" Then
-                    RootPageContentName = "Page Content"
-                    SectionContentID = cpcore.main_GetContentID(RootPageContentName)
-                ElseIf SectionContentID = 0 Then
-                    SectionContentID = cpcore.main_GetContentID(RootPageContentName)
-                Else
-                    RootPageContentName = cpcore.metaData.getContentNameByID(SectionContentID)
-                End If
-                '
-                '------------------------------------------------------------------------------------
-                '   main_RefreshQueryString before main_Getting content
-                '------------------------------------------------------------------------------------
-                '
-                '
-                ' =========================== PageId, rootPageId, and sectionId are GOOD from this point forward ==========================
-                '
-                'hint = "6"
-                If PageID <> 0 Then
-                    cpcore.web_RefreshQueryString = genericController.ModifyQueryString(cpcore.web_RefreshQueryString, "bid", CStr(PageID), True)
-                    cpcore.web_RefreshQueryString = genericController.ModifyQueryString(cpcore.web_RefreshQueryString, "sid", "")
-                ElseIf SectionID <> 0 Then
-                    cpcore.web_RefreshQueryString = genericController.ModifyQueryString(cpcore.web_RefreshQueryString, "bid", "")
-                    cpcore.web_RefreshQueryString = genericController.ModifyQueryString(cpcore.web_RefreshQueryString, "sid", CStr(SectionID), True)
-                Else
-                    cpcore.web_RefreshQueryString = genericController.ModifyQueryString(cpcore.web_RefreshQueryString, "bid", "")
-                    cpcore.web_RefreshQueryString = genericController.ModifyQueryString(cpcore.web_RefreshQueryString, "sid", "")
-                End If
-                '
-                '------------------------------------------------------------------------------------
-                '   main_Get the Content and Template
-                '   main_Get the TemplateID (link,body) from the main_RenderedNavigationStructure (already loaded)
-                '------------------------------------------------------------------------------------
-                '
-                'hint = "7"
-                '
-                ' ????? if no section, allow a dummy section with id=0
-                '
-                If pageManager_RedirectLink = "" Then
-                    If cpcore.main_isSectionBlocked(SectionID, SectionBlock) Then
-                        '
-                        ' Fake the meta content call to block the 'head before content' error and block with login panel
-                        '
-                        return_blockSiteWithLogin = True
-                        Call cpcore.main_SetMetaContent(0, 0)
-                        returnHtml = cpcore.htmlDoc.getLoginPanel()
-                    Else
-                        '
-                        ' main_Get the content
-                        ' if QuickEditing, the content comes back with fpo_QuickEditor where content should be because
-                        '   at this point we do not know which template it will be displayed on. After template calculate, if fpo_QucikEditor there,
-                        '   call the main_GetFormInputHTML and replace it out
-                        '
-                        returnHtml = pageManager_GetHtmlBody_GetSection_GetContent(PageID, rootPageId, RootPageContentName, "", AllowChildPageList, AllowReturnLink, False, SectionID, UseContentWatchLink, allowPageWithoutSectionDislay)
-                        pageManager_TemplateReason = "The reason this template was selected could not be determined."
-                        If pageManager_RedirectLink = "" Then
-                            '
-                            ' ----- Use the structure to Calculate the Template Link from the loaded content
-                            '
-                            If main_RenderedNavigationStructure = "" Then
-                                Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
-                                pageManager_RedirectBecausePageNotFound = True
-                                pageManager_RedirectReason = "Redirecting because the page selected could not be found."
-                                pageManager_RedirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
-                                Exit Function
-                            Else
-                                test = main_RenderedNavigationStructure
-                                If Left(test, 2) = vbCrLf Then
-                                    test = Mid(test, 3)
-                                End If
-                                If Right(test, 2) = vbCrLf Then
-                                    test = Mid(test, 1, Len(test) - 2)
-                                End If
-                                PageRow = genericController.SplitCRLF(test)
-                                PageRowCnt = UBound(PageRow) + 1
-                                For Ptr = PageRowCnt - 1 To 0 Step -1
-                                    navStruc = Split(PageRow(Ptr), vbTab)
-                                    If UBound(navStruc) > 6 Then
-                                        If genericController.EncodeInteger(navStruc(pageManager_NavStruc_Descriptor)) < pageManager_NavStruc_Descriptor_ChildPage Then
-                                            If navStruc(pageManager_NavStruc_TemplateId) <> "0" Then
-                                                templateId = genericController.EncodeInteger(navStruc(pageManager_NavStruc_TemplateId))
-                                                If genericController.EncodeInteger(navStruc(pageManager_NavStruc_Descriptor)) = pageManager_NavStruc_Descriptor_CurrentPage Then
-                                                    pageManager_TemplateReason = "This template was used because it is selected by the current page."
-                                                Else
-                                                    pageManager_TemplateReason = "This template was used because it is selected one of this page's parents."
-                                                End If
-                                                Exit For
-                                            End If
-                                        End If
-                                    End If
-                                Next
-                            End If
-                            If templateId <> 0 Then
-                                '
-                                ' check for valid template, if the template record has been deleted, it needs to be forgotten
-                                '
-                                TCPtr = pageManager_cache_pageTemplate_getPtr(templateId)
-                                If TCPtr < 0 Then
-                                    templateId = 0
-                                Else
-                                    main_RenderedTemplateID = genericController.EncodeInteger(cache_pageTemplate(TC_ID, TCPtr))
-                                    main_RenderedTemplateName = genericController.encodeText(cache_pageTemplate(TC_Name, TCPtr))
-                                End If
-                            End If
-                            If templateId = 0 Then
-                                '
-                                ' try section template
-                                '
-                                templateId = SectionTemplateID
-                                If templateId <> 0 Then
-                                    TCPtr = pageManager_cache_pageTemplate_getPtr(templateId)
-                                    If TCPtr < 0 Then
-                                        templateId = 0
-                                    Else
-                                        main_RenderedTemplateID = genericController.EncodeInteger(cache_pageTemplate(TC_ID, TCPtr))
-                                        main_RenderedTemplateName = genericController.encodeText(cache_pageTemplate(TC_Name, TCPtr))
-                                        pageManager_TemplateReason = "This template [" & main_RenderedTemplateName & "] was used because it is selected by the current section [" & main_RenderedSectionName & "]."
-                                    End If
-                                End If
-                                If (templateId = 0) And (cpcore.domains.domainDetails.defaultTemplateId <> 0) Then
-                                    '
-                                    ' try domain's default template
-                                    '
-                                    templateId = cpcore.domains.domainDetails.defaultTemplateId
-                                    TCPtr = pageManager_cache_pageTemplate_getPtr(templateId)
-                                    If TCPtr < 0 Then
-                                        templateId = 0
-                                    Else
-                                        main_RenderedTemplateID = genericController.EncodeInteger(cache_pageTemplate(TC_ID, TCPtr))
-                                        main_RenderedTemplateName = genericController.encodeText(cache_pageTemplate(TC_Name, TCPtr))
-                                        pageManager_TemplateReason = "This template [" & main_RenderedTemplateName & "] was used because it is selected as the default template for the current domain [" & cpcore.webServer.webServerIO_requestDomain & "]."
-                                    End If
-                                End If
-                                If templateId = 0 Then
-                                    '
-                                    ' try the template named 'default'
-                                    '
-                                    Call pageManager_cache_pageTemplate_load()
-                                    For TCPtr = 0 To cache_pageTemplate_rows - 1
-                                        If genericController.vbLCase(genericController.encodeText(cache_pageTemplate(TC_Name, TCPtr))) = "default" Then
-                                            templateId = genericController.EncodeInteger(cache_pageTemplate(TC_ID, TCPtr))
-                                            Exit For
-                                        End If
-                                    Next
-                                    If TCPtr >= cache_pageTemplate_rows Then
-                                        TCPtr = -1
-                                    Else
-                                        main_RenderedTemplateID = genericController.EncodeInteger(cache_pageTemplate(TC_ID, TCPtr))
-                                        main_RenderedTemplateName = genericController.encodeText(cache_pageTemplate(TC_Name, TCPtr))
-                                        pageManager_TemplateReason = "This template was used because it is the default template for the site and no other template was selected [" & main_RenderedTemplateName & "]."
-                                    End If
-                                End If
-                            End If
-                            '
-                            ' Set the Template buffers
-                            '
-                            If TCPtr >= 0 Then
-                                If cpcore.authContext.visit.Mobile Then
-                                    If cpcore.siteProperties.getBoolean("AllowMobileTemplates") Then
-                                        '
-                                        ' set Mobile Template
-                                        '
-                                        pageManager_TemplateBody = genericController.encodeText(cache_pageTemplate(TC_MobileBodyHTML, TCPtr))
-                                        If pageManager_TemplateBody <> "" Then
-                                            StylesFilename = genericController.encodeText(cache_pageTemplate(TC_MobileStylesFilename, TCPtr))
-                                        End If
-                                    End If
-                                End If
-                                If pageManager_TemplateBody = "" Then
-                                    '
-                                    ' set web template if no other template sets it
-                                    '
-                                    pageManager_TemplateBody = genericController.encodeText(cache_pageTemplate(TC_BodyHTML, TCPtr))
-                                    StylesFilename = genericController.encodeText(cache_pageTemplate(TC_StylesFilename, TCPtr))
-                                End If
-                                pageManager_TemplateLink = genericController.encodeText(cache_pageTemplate(TC_Link, TCPtr))
-                                pageManager_TemplateName = genericController.encodeText(cache_pageTemplate(TC_Name, TCPtr))
-                                Call cpcore.htmlDoc.main_AddOnLoadJavascript2(genericController.encodeText(cache_pageTemplate(TC_JSOnLoad, TCPtr)), "template")
-                                Call cpcore.htmlDoc.main_AddHeadScriptCode(genericController.encodeText(cache_pageTemplate(TC_JSInHeadLegacy, TCPtr)), "template")
-                                Call cpcore.htmlDoc.main_AddEndOfBodyJavascript2(genericController.encodeText(cache_pageTemplate(TC_JSEndBody, TCPtr)), "template")
-                                Call cpcore.htmlDoc.main_AddHeadTag2(genericController.encodeText(cache_pageTemplate(TC_OtherHeadTags, TCPtr)), "template")
-                                pageManager_TemplateBodyTag = genericController.encodeText(cache_pageTemplate(TC_BodyTag, TCPtr))
-                                JSFilename = genericController.encodeText(cache_pageTemplate(TC_JSInHeadFilename, TCPtr))
-                                If JSFilename <> "" Then
-                                    JSFilename = cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.requestDomain & cpcore.csv_getVirtualFileLink(cpcore.serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
-                                    Call cpcore.htmlDoc.main_AddHeadScriptLink(JSFilename, "template")
-                                End If
-                                '
-                                ' Add exclusive styles
-                                '
-                                If StylesFilename <> "" Then
-                                    If genericController.vbLCase(Right(StylesFilename, 4)) <> ".css" Then
-                                        Throw New ApplicationException("Unexpected exception") ' throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError15("Template [" & pageManager_TemplateName & "] StylesFilename is not a '.css' file, and will not display correct. Check that the field is setup as a CSSFile.", "pageManager_GetHtmlBody_GetSection")
-                                    Else
-                                        cpcore.htmlDoc.main_MetaContent_TemplateStyleSheetTag = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.requestDomain & cpcore.csv_getVirtualFileLink(cpcore.serverConfig.appConfig.cdnFilesNetprefix, StylesFilename) & """ >"
-                                    End If
-                                End If
-                                '
-                                ' Add shared styles
-                                '
-
-                                SharedStylesIDList = genericController.encodeText(cache_pageTemplate(TC_SharedStylesIDList, TCPtr))
-                                If SharedStylesIDList <> "" Then
-                                    ListSplit = Split(SharedStylesIDList, ",")
-                                    For Ptr = 0 To UBound(ListSplit)
-                                        styleId = genericController.EncodeInteger(ListSplit(Ptr))
-                                        If styleId <> 0 Then
-                                            Call cpcore.htmlDoc.main_AddSharedStyleID2(genericController.EncodeInteger(ListSplit(Ptr)), "template")
-                                        End If
-                                    Next
-                                End If
-                            End If
-                            ' (*B)
-                            templateLink = pageManager_TemplateLink
-                            '
-                            ' Verify Template Link matches the current page
-                            '
-                            If pageManager_RedirectLink = "" Then
-                                If (TCPtr >= 0) And (cpcore.siteProperties.allowTemplateLinkVerification) Then
-                                    PCCPtr = cache_pageContent_getPtr(main_RenderedPageID, pagemanager_IsWorkflowRendering, cpcore.authContext.isQuickEditing(cpcore, ""))
-                                    '$$$$$ must check for PPtr<0
-                                    SecureLink_CurrentURL = (Left(LCase(cpcore.webServer.webServerIO_ServerLink), 8) = "https://")
-                                    SecureLink_Template_Required = genericController.EncodeBoolean(cache_pageTemplate(TC_IsSecure, TCPtr))
-                                    SecureLink_Page_Required = genericController.EncodeBoolean(cache_pageContent(PCC_IsSecure, PCCPtr))
-                                    SecureLink_Required = SecureLink_Template_Required Or SecureLink_Page_Required
-                                    If (templateLink = "") Then
-                                        '
-                                        ' ----- no TemplateLink
-                                        '       test that current secure settings match the templates secure sectting
-                                        '
-                                        If (SecureLink_CurrentURL <> SecureLink_Required) Then
-                                            '
-                                            ' redirect because protocol is wrong
-                                            '
-                                            If SecureLink_CurrentURL Then
-                                                pageManager_RedirectLink = genericController.vbReplace(cpcore.webServer.webServerIO_ServerLink, "https://", "http://")
-                                                pageManager_RedirectReason = "Redirecting because neither the page or the template requires a secure link."
-                                            Else
-                                                pageManager_RedirectLink = genericController.vbReplace(cpcore.webServer.webServerIO_ServerLink, "http://", "https://")
-                                                If SecureLink_Page_Required Then
-                                                    pageManager_RedirectReason = "Redirecting because this page [" & main_RenderedPageName & "] requires a secure link."
-                                                Else
-                                                    pageManager_RedirectReason = "Redirecting because this template [" & main_RenderedTemplateName & "] requires a secure link."
-                                                End If
-                                            End If
-                                        End If
-                                    Else
-                                        '
-                                        ' ----- TemplateLink given
-                                        '
-                                        CurrentLink = cpcore.webServer.webServerIO_ServerLink
-                                        If genericController.vbInstr(1, templateLink, "://", vbTextCompare) <> 0 Then
-                                            '
-                                            ' ----- TemplateLink is full
-                                            '       this includes a short template with the secure checked case
-                                            '       ignore TC_IsSecure, use the link's protocol
-                                            '
-                                            LinkSplit = Split(CurrentLink, "?")
-                                            CurrentLinkNoQuery = LinkSplit(0)
-                                            If (UCase(templateLink) <> genericController.vbUCase(CurrentLinkNoQuery)) Then
-                                                '
-                                                ' redirect to template link
-                                                '
-                                                pageManager_RedirectLink = pageManager_GetSectionLink(templateLink, PageID, SectionID)
-                                                If PageID <> 0 Then
-                                                    pageManager_RedirectBecausePageNotFound = False
-                                                    pageManager_RedirectReason = "Redirecting because this template [" & main_RenderedTemplateName & "] is configured to use the link [" & templateLink & "]. This is may be a normal condition." & pageManager_TemplateReason
-                                                ElseIf SectionID <> 0 Then
-                                                    pageManager_RedirectBecausePageNotFound = False
-                                                    pageManager_RedirectReason = "Redirecting because this template [" & main_RenderedTemplateName & "] is configured to use the link [" & templateLink & "]. This is may be a normal condition." & pageManager_TemplateReason
-                                                Else
-                                                    pageManager_RedirectBecausePageNotFound = False
-                                                    pageManager_RedirectReason = "Redirecting because this template [" & main_RenderedTemplateName & "] is configured to use the link [" & templateLink & "]. This is may be a normal condition." & pageManager_TemplateReason
-                                                End If
-                                            End If
-                                        Else
-                                            '
-                                            ' ----- TemplateLink is short
-                                            '       test current short link vs template short link, and protocols
-                                            '
-                                            CurrentLink = genericController.vbReplace(CurrentLink, "https://", "http://", 1, 99, vbTextCompare)
-                                            CurrentLink = genericController.ConvertLinkToShortLink(CurrentLink, cpcore.webServer.requestDomain, cpcore.webServer.webServerIO_requestVirtualFilePath)
-                                            CurrentLink = genericController.EncodeAppRootPath(CurrentLink, cpcore.webServer.webServerIO_requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain)
-                                            LinkSplit = Split(CurrentLink, "?")
-                                            CurrentLinkNoQuery = LinkSplit(0)
-                                            If (SecureLink_CurrentURL <> SecureLink_Required) Or (UCase(templateLink) <> genericController.vbUCase(CurrentLinkNoQuery)) Then
-                                                '
-                                                ' This is not the correct page for this content, redirect
-                                                ' This is NOT a pagenotfound - but a correctable condition that can not be avoided
-                                                ' The pageid has as hard tamplate that must be redirected
-                                                '
-                                                pageManager_RedirectLink = getPageLink4(PageID, "", True, False)
-                                                If SecureLink_Required Then
-                                                    '
-                                                    ' Redirect to Secure
-                                                    '
-                                                    If genericController.vbInstr(1, pageManager_RedirectLink, "http", vbTextCompare) = 1 Then
-                                                        '
-                                                        ' link is full
-                                                        '
-                                                        pageManager_RedirectLink = genericController.vbReplace(pageManager_RedirectLink, "http://", "https://", 1, 99, vbTextCompare)
-                                                    Else
-                                                        '
-                                                        ' link is root relative
-                                                        '
-                                                        pageManager_RedirectLink = "https://" & cpcore.webServer.requestDomain & pageManager_RedirectLink
-                                                    End If
-                                                Else
-                                                    '
-                                                    ' Redirect to non-Secure
-                                                    '
-                                                    If genericController.vbInstr(1, pageManager_RedirectLink, "http", vbTextCompare) = 1 Then
-                                                        '
-                                                        ' link is full
-                                                        '
-                                                        pageManager_RedirectLink = genericController.vbReplace(pageManager_RedirectLink, "https://", "http://", 1, 99, vbTextCompare)
-                                                    Else
-                                                        '
-                                                        ' link is root relative
-                                                        '
-                                                        pageManager_RedirectLink = "http://" & cpcore.webServer.requestDomain & pageManager_RedirectLink
-                                                    End If
-                                                End If
-                                                'pageManager_RedirectLink = pageManager_GetSectionLink(TemplateLink, PageID, SectionID)
-                                                pageManager_RedirectBecausePageNotFound = False
-                                                pageManager_RedirectReason = "Redirecting because this template [" & main_RenderedTemplateName & "] is configured to use the link [" & templateLink & "]. This is may be a normal condition." & pageManager_TemplateReason
-                                            End If
-                                        End If
-                                    End If
-                                    '
-                                    ' check template domain requirements
-                                    '
-                                    If pageManager_RedirectLink = "" Then
-                                        templatedomainIdList = genericController.encodeText(cache_pageTemplate(TC_DomainIdList, TCPtr))
-                                        If (cpcore.domains.domainDetails.id = 0) Then
-                                            '
-                                            ' current domain not recognized or default, use current
-                                            '
-                                        ElseIf (templatedomainIdList = "") Then
-                                            '
-                                            ' current template has no domain preference, use current
-                                            '
-                                        ElseIf (InStr(1, "," & templatedomainIdList & ",", "," & cpcore.domains.domainDetails.id & ",") <> 0) Then
-                                            '
-                                            ' current domain is in the allowed c.domains list for this template, use it
-                                            '
-                                        Else
-                                            '
-                                            ' must redirect to a new template
-                                            '
-                                            domainIds = Split(templatedomainIdList, ",")
-                                            For Ptr = 0 To UBound(domainIds)
-                                                setdomainId = genericController.EncodeInteger(domainIds(Ptr))
-                                                If setdomainId <> 0 Then
-                                                    Exit For
-                                                End If
-                                            Next
-                                            linkDomain = cpcore.content_GetRecordName("domains", setdomainId)
-                                            If linkDomain <> "" Then
-                                                pageManager_RedirectLink = genericController.vbReplace(cpcore.webServer.webServerIO_ServerLink, "://" & cpcore.webServer.requestDomain, "://" & linkDomain, 1, 99, vbTextCompare)
-                                                pageManager_RedirectBecausePageNotFound = False
-                                                pageManager_RedirectReason = "Redirecting because this template [" & main_RenderedTemplateName & "] requires a different domain [" & linkDomain & "]." & pageManager_TemplateReason
-                                            End If
-                                        End If
-                                    End If
-                                End If
-                            End If
-                        End If
-                        '
-                        ' if fpo_QuickEdit it there, replace it out
-                        '
-                        Dim Editor As String
-                        Dim styleList As String
-                        Dim styleOptionList As String
-                        Dim addonListJSON As String
-
-                        If pageManager_RedirectLink = "" And (InStr(1, returnHtml, html_quickEdit_fpo) <> 0) Then
-                            FieldRows = genericController.EncodeInteger(cpcore.properties_user_getText("Page Content.copyFilename.PixelHeight", "500"))
-                            If FieldRows < 50 Then
-                                FieldRows = 50
-                                Call cpcore.userProperty.setProperty("Page Content.copyFilename.PixelHeight", 50)
-                            End If
-                            styleList = cpcore.htmlDoc.main_GetStyleSheet2(csv_contentTypeEnum.contentTypeWeb, templateId, 0)
-                            addonListJSON = cpcore.htmlDoc.main_GetEditorAddonListJSON(csv_contentTypeEnum.contentTypeWeb)
-                            Editor = cpcore.htmlDoc.html_GetFormInputHTML3("copyFilename", cpcore.htmlDoc.html_quickEdit_copy, CStr(FieldRows), "100%", False, True, addonListJSON, styleList, styleOptionList)
-                            returnHtml = genericController.vbReplace(returnHtml, html_quickEdit_fpo, Editor)
-                        End If
-                    End If
-                End If
-                '
-                '------------------------------------------------------------------------------------
-                ' Add admin warning to the top of the content
-                '------------------------------------------------------------------------------------
-                '
-                'hint = "8"
-                If cpcore.authContext.isAuthenticatedAdmin(cpcore) And cpcore.htmlDoc.main_AdminWarning <> "" Then
-                    '
-                    ' Display Admin Warnings with Edits for record errors
-                    '
-                    If cpcore.htmlDoc.main_AdminWarningPageID <> 0 Then
-                        cpcore.htmlDoc.main_AdminWarning = cpcore.htmlDoc.main_AdminWarning & "</p>" & cpcore.main_GetRecordEditLink2("Page Content", cpcore.htmlDoc.main_AdminWarningPageID, True, "Page " & cpcore.htmlDoc.main_AdminWarningPageID, cpcore.authContext.isAuthenticatedAdmin(cpcore)) & "&nbsp;Edit the page<p>"
-                        cpcore.htmlDoc.main_AdminWarningPageID = 0
-                    End If
-                    '
-                    If cpcore.htmlDoc.main_AdminWarningSectionID <> 0 Then
-                        cpcore.htmlDoc.main_AdminWarning = cpcore.htmlDoc.main_AdminWarning & "</p>" & cpcore.main_GetRecordEditLink2("Site Sections", cpcore.htmlDoc.main_AdminWarningSectionID, True, "Section " & cpcore.htmlDoc.main_AdminWarningSectionID, cpcore.authContext.isAuthenticatedAdmin(cpcore)) & "&nbsp;Edit the section<p>"
-                        cpcore.htmlDoc.main_AdminWarningSectionID = 0
-                    End If
-                    returnHtml = "" _
-                    & cpcore.htmlDoc.html_GetAdminHintWrapper(cpcore.htmlDoc.main_AdminWarning) _
-                    & returnHtml _
-                    & ""
-                    cpcore.htmlDoc.main_AdminWarning = ""
-                End If
-                '
-                '------------------------------------------------------------------------------------
-                ' handle redirect and edit wrapper
-                '------------------------------------------------------------------------------------
-                '
-                If pageManager_RedirectLink <> "" Then
-                    Call cpcore.webServer.webServerIO_Redirect2(pageManager_RedirectLink, pageManager_RedirectReason, pageManager_RedirectBecausePageNotFound)
-                ElseIf AllowEditWrapper Then
-                    returnHtml = cpcore.htmlDoc.main_GetEditWrapper("Page Content", returnHtml)
-                End If
-                '
-            Catch ex As Exception
-                cpcore.handleExceptionAndContinue(ex)
-            End Try
-            Return returnHtml
-        End Function
         ''
         ''
         ''
-        Private Function pageManager_GetHtmlBody_GetSection_GetRootPageId(ByVal PageID As Integer, Optional ByVal UsedIDString As String = "") As Integer
+        Friend Function pageManager_GetHtmlBody_GetSection_GetRootPageId(ByVal PageID As Integer, Optional ByVal UsedIDString As String = "") As Integer
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("pageManager_GetHtmlBody_GetSection_GetRootPageId")
             '
             Dim CS As Integer
@@ -1753,7 +761,7 @@ ErrorTrap:
                 Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
                 pageManager_RedirectBecausePageNotFound = True
                 pageManager_RedirectReason = "The page could not be determined from URL."
-                pageManager_RedirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
+                redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
             Else
                 '
                 ' PageRecordID and RootPageID are good
@@ -1773,7 +781,7 @@ ErrorTrap:
                 '---------------------------------------------------------------------------------
                 '
                 returnHtml = pageManager_GetHtmlBody_GetSection_GetContentBox(PageRecordID, rootPageId, iRootPageContentName, OrderByClause, AllowChildPageList, AllowReturnLink, ArchivePages, SectionID, UseContentWatchLink, allowPageWithoutSectionDisplay)
-                If (returnHtml <> "") And (pageManager_RedirectLink = "") Then
+                If (returnHtml <> "") And (redirectLink = "") Then
                     '
                     ' This page is correct, main_Get the RecordID for later
                     '
@@ -1807,21 +815,21 @@ ErrorTrap:
                 JSEndBody = genericController.encodeText(cache_pageContent(PCC_JSEndBody, main_RenderCache_CurrentPage_PCCPtr))
                 DateModified = genericController.EncodeDate(cache_pageContent(PCC_ModifiedDate, main_RenderCache_CurrentPage_PCCPtr))
                 '
-                ' Save main_RenderedNavigationStructure in the Legacy Name
+                ' Save currentNavigationStructure in the Legacy Name
                 '
-                pageManager_ContentPageStructure = main_RenderedNavigationStructure
+                'pageManager_ContentPageStructure = currentNavigationStructure
                 '
                 '---------------------------------------------------------------------------------
                 ' ----- If Link field populated, do redirect
                 '---------------------------------------------------------------------------------
                 '
                 Dim Link As String
-                If (pageManager_RedirectLink = "") Then
+                If (redirectLink = "") Then
                     Link = genericController.encodeText(cache_pageContent(PCC_Link, main_RenderCache_CurrentPage_PCCPtr))
                     If (Link <> "") Then
-                        Call cpcore.db.executeSql("update ccpagecontent set clicks=clicks+1 where id=" & main_RenderedPageID)
-                        pageManager_RedirectLink = Link
-                        pageManager_RedirectReason = "Redirect required because this page (PageRecordID=" & main_RenderedPageID & ") has a Link Override [" & pageManager_RedirectLink & "]."
+                        Call cpcore.db.executeSql("update ccpagecontent set clicks=clicks+1 where id=" & currentPageID)
+                        redirectLink = Link
+                        pageManager_RedirectReason = "Redirect required because this page (PageRecordID=" & currentPageID & ") has a Link Override [" & redirectLink & "]."
                     End If
                 End If
                 '
@@ -1829,7 +837,7 @@ ErrorTrap:
                 ' ----- If Redirect, exit now
                 '---------------------------------------------------------------------------------
                 '
-                If pageManager_RedirectLink <> "" Then
+                If redirectLink <> "" Then
                     Exit Function
                 End If
                 '
@@ -2067,13 +1075,13 @@ ErrorTrap:
                     Else
                         ' $$$$$ convert to pcc cache
                         'SelectFieldList = "ID,Viewings,ContentControlID,ContactMemberID,AllowHitNotification,TriggerSendSystemEmailID,TriggerConditionID,TriggerConditionGroupID,TriggerAddGroupID,TriggerRemoveGroupID"
-                        '                If (main_RenderedPageID <> 0) And (main_RenderCache_CurrentPage_ContentId <> 0) Then
+                        '                If (currentPageID <> 0) And (main_RenderCache_CurrentPage_ContentId <> 0) Then
                         '                    'pageManager_ContentName = metaData.getContentNameByID(main_RenderCache_CurrentPage_ContentId)
                         '                    If main_RenderCache_CurrentPage_ContentName = "" Then
                         '                        main_RenderCache_CurrentPage_ContentName = iRootPageContentName
                         '                    End If
                         '                    If main_RenderCache_CurrentPage_ContentName <> "" Then
-                        '                        CS = main_OpenCSContentRecord_Internal(main_RenderCache_CurrentPage_ContentName, main_RenderedPageID, , , SelectFieldList)
+                        '                        CS = main_OpenCSContentRecord_Internal(main_RenderCache_CurrentPage_ContentName, currentPageID, , , SelectFieldList)
                         '                    End If
                         '                ElseIf (main_RenderCache_CurrentPage_ContentName <> "") Then
                         '                    CS = main_OpenCSContentRecord_Internal(main_RenderCache_CurrentPage_ContentName, PageRecordID, , , SelectFieldList)
@@ -2095,7 +1103,7 @@ ErrorTrap:
                             returnHtml = cpcore.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.ID, cpcore.authContext.isAuthenticated, layoutError)
                             returnHtml = cpcore.htmlDoc.html_encodeContent9(returnHtml, cpcore.authContext.user.ID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
                             'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
-                            Call cpcore.db.executeSql("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & main_RenderedPageID)
+                            Call cpcore.db.executeSql("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & currentPageID)
                             'Call app.csv_SetCS(CS, "Viewings", app.csv_cs_getInteger(CS, "Viewings") + 1)
                         Else
                             '
@@ -2108,9 +1116,9 @@ ErrorTrap:
                             returnHtml = cpcore.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.ID, cpcore.authContext.isAuthenticated, layoutError)
                             returnHtml = cpcore.htmlDoc.html_encodeContent9(returnHtml, cpcore.authContext.user.ID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
                             'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
-                            'Call main_TrackContent(main_RenderCache_CurrentPage_ContentName, main_RenderedPageID)
+                            'Call main_TrackContent(main_RenderCache_CurrentPage_ContentName, currentPageID)
                             'Call main_TrackContentSet(CS)
-                            Call cpcore.db.executeSql("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & main_RenderedPageID)
+                            Call cpcore.db.executeSql("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & currentPageID)
                             'Call app.csv_SetCS(CS, "Viewings", app.csv_cs_getInteger(CS, "Viewings") + 1)
                         End If
                         '
@@ -2256,13 +1264,13 @@ ErrorTrap:
                     ' Set the Meta Content flag
                     '---------------------------------------------------------------------------------
                     '
-                    Call cpcore.main_SetMetaContent(main_RenderCache_CurrentPage_ContentId, main_RenderedPageID)
+                    Call cpcore.main_SetMetaContent(main_RenderCache_CurrentPage_ContentId, currentPageID)
                     '
                     '---------------------------------------------------------------------------------
                     ' ----- OnPageStartEvent
                     '---------------------------------------------------------------------------------
                     '
-                    pageManager_PageContent = returnHtml
+                    bodyContent = returnHtml
                     AddOnCnt = UBound(cpcore.addonCache.addonCache.onPageStartPtrs) + 1
                     For addonPtr = 0 To AddOnCnt - 1
                         addonCachePtr = cpcore.addonCache.addonCache.onPageStartPtrs(addonPtr)
@@ -2271,17 +1279,17 @@ ErrorTrap:
                             If addonId > 0 Then
                                 AddonName = cpcore.addonCache.addonCache.addonList(addonCachePtr.ToString).name
                                 AddonContent = cpcore.addon.execute_legacy5(addonId, AddonName, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
-                                pageManager_PageContent = AddonContent & pageManager_PageContent
+                                bodyContent = AddonContent & bodyContent
                             End If
                         End If
                     Next
-                    returnHtml = pageManager_PageContent
+                    returnHtml = bodyContent
                     '
                     '---------------------------------------------------------------------------------
                     ' ----- OnPageEndEvent
                     '---------------------------------------------------------------------------------
                     '
-                    pageManager_PageContent = returnHtml
+                    bodyContent = returnHtml
                     AddOnCnt = UBound(cpcore.addonCache.addonCache.onPageEndPtrs) + 1
                     For addonPtr = 0 To AddOnCnt - 1
                         addonCachePtr = cpcore.addonCache.addonCache.onPageEndPtrs(addonPtr)
@@ -2290,24 +1298,24 @@ ErrorTrap:
                             If addonId > 0 Then
                                 AddonName = cpcore.addonCache.addonCache.addonList(addonCachePtr.ToString).name
                                 AddonContent = cpcore.addon.execute_legacy5(addonId, AddonName, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
-                                pageManager_PageContent = pageManager_PageContent & AddonContent
+                                bodyContent = bodyContent & AddonContent
                             End If
                         End If
                     Next
-                    returnHtml = pageManager_PageContent
+                    returnHtml = bodyContent
                     '
                 End If
                 If cpcore.htmlDoc.main_MetaContent_Title = "" Then
                     '
                     ' Set default page title
                     '
-                    cpcore.htmlDoc.main_MetaContent_Title = main_RenderedPageName
+                    cpcore.htmlDoc.main_MetaContent_Title = currentPageName
                 End If
                 '
                 ' add contentid and sectionid
                 '
-                Call cpcore.htmlDoc.main_AddHeadTag2("<meta name=""contentId"" content=""" & main_RenderedPageID & """ >", "page content")
-                Call cpcore.htmlDoc.main_AddHeadTag2("<meta name=""sectionId"" content=""" & main_RenderedSectionID & """ >", "page content")
+                Call cpcore.htmlDoc.main_AddHeadTag2("<meta name=""contentId"" content=""" & currentPageID & """ >", "page content")
+                Call cpcore.htmlDoc.main_AddHeadTag2("<meta name=""sectionId"" content=""" & currentSectionID & """ >", "page content")
             End If
             '
             ' Display Admin Warnings with Edits for record errors
@@ -2363,7 +1371,7 @@ ErrorTrap:
         '   If PageID is not within RootPageContentName, return the RootPageID
         '=============================================================================
         '
-        Private Function pageManager_GetHtmlBody_GetSection_GetContentBox(PageID As Integer, rootPageId As Integer, RootPageContentName As String, OrderByClause As String, AllowChildPageList As Boolean, AllowReturnLink As Boolean, ArchivePages As Boolean, SectionID As Integer, UseContentWatchLink As Boolean, allowPageWithoutSectionDisplay As Boolean) As String
+        Friend Function pageManager_GetHtmlBody_GetSection_GetContentBox(PageID As Integer, rootPageId As Integer, RootPageContentName As String, OrderByClause As String, AllowChildPageList As Boolean, AllowReturnLink As Boolean, ArchivePages As Boolean, SectionID As Integer, UseContentWatchLink As Boolean, allowPageWithoutSectionDisplay As Boolean) As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("pageManager_GetHtmlBody_GetSection_GetContentBox")
             '
             Dim iIsEditing As Boolean
@@ -2401,7 +1409,7 @@ ErrorTrap:
                 '
                 ' ????? test
                 'hint = hint & ",20"
-                If (pageManager_RedirectLink = "") And (main_RenderCache_CurrentPage_PCCPtr = -1) Then
+                If (redirectLink = "") And (main_RenderCache_CurrentPage_PCCPtr = -1) Then
                     'hint = hint & ",30"
                     If PageID <> 0 Then
                         '
@@ -2410,7 +1418,7 @@ ErrorTrap:
                         Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
                         pageManager_RedirectBecausePageNotFound = True
                         pageManager_RedirectReason = "The page could not be found from its ID [" & PageID & "]. It may have been deleted or marked inactive. "
-                        pageManager_RedirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
+                        redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
                         Exit Function
                     Else
                         '
@@ -2419,7 +1427,7 @@ ErrorTrap:
                         Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
                         pageManager_RedirectBecausePageNotFound = True
                         pageManager_RedirectReason = "The page could not be found because it's ID could not be determined."
-                        pageManager_RedirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
+                        redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
                         Exit Function
                     End If
                 End If
@@ -2427,7 +1435,7 @@ ErrorTrap:
                 ' ----- Verify this bid can be displayed on this RootPageName
                 '
                 'hint = hint & ",50"
-                If (pageManager_RedirectLink = "") Then
+                If (redirectLink = "") Then
                     'hint = hint & ",60"
                     If Not allowPageWithoutSectionDisplay Then
                         '????? test
@@ -2472,14 +1480,14 @@ ErrorTrap:
                                 pageManager_RedirectBecausePageNotFound = True
                                 '????? test
                                 pageManager_RedirectReason = "The page you requested [" & PageID & "] could not be displayed because there is a problem with one of it's parent pages. All parent pages must be available to verify security permissions. A parent page may have been deleted or inactivated, or the page may have been requested from an incorrect location."
-                                pageManager_RedirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
+                                redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
                                 Exit Function
                             End If
                         End If
                     End If
                 End If
                 'hint = hint & ",140"
-                If pageManager_RedirectLink = "" Then
+                If redirectLink = "" Then
                     '
                     ' ----- This page can be displayed
                     '
@@ -2508,7 +1516,7 @@ ErrorTrap:
                     '            Else
                     '' $$$$$ remove main_oldCacheRS_cs, use pccPtr
                     '                'hint = hint & ",190"
-                    '                'main_RenderedPageName = c.db.cs_getText(main_oldCacheRS_cs, "name")
+                    '                'currentPageName = c.db.cs_getText(main_oldCacheRS_cs, "name")
                     '' $$$$$ this should just be the pcc field list
                     '                'SelectFieldList = app.cs_getSelectFieldList(main_oldCacheRS_cs)
                     '' $$$$$ remove all uses of main_oldCacheRS_FieldNames/main_oldCacheRS_FieldValues
@@ -2539,19 +1547,19 @@ ErrorTrap:
                         returnHtml = returnHtml & LiveBody
                     End If
                     '
-                    ' Build the Public main_RenderedNavigationStructure
+                    ' Build the Public currentNavigationStructure
                     '
                     '????? test all this --------------------- start
                     'hint = hint & ",210"
-                    main_RenderedNavigationStructure = ""
+                    currentNavigationStructure = ""
                     If main_RenderCache_ParentBranch_PCCPtrCnt > 0 Then
                         'hint = hint & ",220"
                         For Pointer = main_RenderCache_ParentBranch_PCCPtrCnt - 1 To 0 Step -1
                             'hint = hint & ",230"
                             If Pointer = (main_RenderCache_ParentBranch_PCCPtrCnt - 1) Then
-                                main_RenderedNavigationStructure = main_RenderedNavigationStructure & vbTab & "0"
+                                currentNavigationStructure = currentNavigationStructure & vbTab & "0"
                             Else
-                                main_RenderedNavigationStructure = main_RenderedNavigationStructure & vbTab & "1"
+                                currentNavigationStructure = currentNavigationStructure & vbTab & "1"
                             End If
                             pagePCCPtr = genericController.EncodeInteger(main_RenderCache_ParentBranch_PCCPtrs(Pointer))
                             '
@@ -2584,7 +1592,7 @@ ErrorTrap:
                                     pageMenuHeadline = "Related Page"
                                 End If
                             End If
-                            main_RenderedNavigationStructure = main_RenderedNavigationStructure _
+                            currentNavigationStructure = currentNavigationStructure _
                             & vbTab & genericController.EncodeInteger(cache_pageContent(PCC_ID, pagePCCPtr)) _
                             & vbTab & genericController.EncodeInteger(cache_pageContent(PCC_ParentID, pagePCCPtr)) _
                             & vbTab & pageMenuHeadline _
@@ -2599,7 +1607,7 @@ ErrorTrap:
                     If main_RenderCache_CurrentPage_PCCPtr > -1 Then
                         'hint = hint & ",310"
                         pagePCCPtr = main_RenderCache_CurrentPage_PCCPtr
-                        main_RenderedPageID = genericController.EncodeInteger(cache_pageContent(PCC_ID, pagePCCPtr))
+                        currentPageID = genericController.EncodeInteger(cache_pageContent(PCC_ID, pagePCCPtr))
                         '
                         ' buffer text fields because this excode format does not allow them
                         '
@@ -2630,9 +1638,9 @@ ErrorTrap:
                                 pageMenuHeadline = "Related Page"
                             End If
                         End If
-                        main_RenderedNavigationStructure = main_RenderedNavigationStructure _
+                        currentNavigationStructure = currentNavigationStructure _
                         & vbTab & "2" _
-                        & vbTab & main_RenderedPageID _
+                        & vbTab & currentPageID _
                         & vbTab & genericController.EncodeInteger(cache_pageContent(PCC_ParentID, pagePCCPtr)) _
                         & vbTab & pageMenuHeadline _
                         & vbTab & PageName _
@@ -2679,10 +1687,10 @@ ErrorTrap:
                                 End If
                             End If
                             'hint = hint & ",440"
-                            main_RenderedNavigationStructure = main_RenderedNavigationStructure _
+                            currentNavigationStructure = currentNavigationStructure _
                             & vbTab & "3" _
                             & vbTab & genericController.EncodeInteger(cache_pageContent(PCC_ID, pagePCCPtr)) _
-                            & vbTab & main_RenderedPageID _
+                            & vbTab & currentPageID _
                             & vbTab & pageMenuHeadline _
                             & vbTab & PageName _
                             & vbTab & PageLink _
@@ -2717,7 +1725,7 @@ ErrorTrap:
         '   CSParentofChildPages is a contentset with the page that is the parent of all child pages for this render.
         '========================================================================
         '
-        Private Function pageManager_GetHtmlBody_GetSection_GetContentBox_Live_Body(ContentName As String, ContentID As Integer, OrderByClause As String, AllowChildList As Boolean, Authoring As Boolean, rootPageId As Integer, AllowReturnLink As Boolean, RootPageContentName As String, ArchivePage As Boolean) As String
+        Friend Function pageManager_GetHtmlBody_GetSection_GetContentBox_Live_Body(ContentName As String, ContentID As Integer, OrderByClause As String, AllowChildList As Boolean, Authoring As Boolean, rootPageId As Integer, AllowReturnLink As Boolean, RootPageContentName As String, ArchivePage As Boolean) As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("pageManager_GetHtmlBody_GetSection_GetContentBox_Live_Body")
             '
             Dim hint As String
@@ -2786,7 +1794,7 @@ ErrorTrap:
                 PageID = genericController.EncodeInteger(cache_pageContent(PCC_ID, main_RenderCache_CurrentPage_PCCPtr))
                 'pageID = (app.csv_cs_getInteger(CSPointer, "ID"))
                 '        s = "" _
-                '            & "<div>main_RenderedPageID=" & main_RenderedPageID & "</div>" _
+                '            & "<div>currentPageID=" & currentPageID & "</div>" _
                 '            & "<div>CSPointer id=" & PageID & "</div>" _
                 '            & "<div>main_RenderCache_CurrentPage_PCCPtr=" & main_RenderCache_CurrentPage_PCCPtr & "</div>" _
                 '            & "<div>main_pcc(PCC_ID, main_RenderCache_CurrentPage_PCCPtr )=" & main_pcc(PCC_ID, main_RenderCache_CurrentPage_PCCPtr) & "</div>" _
@@ -3072,7 +2080,7 @@ ErrorTrap:
         '   Use for both Root and non-root pages
         '=============================================================================
         '
-        Private Function pageManager_GetHtmlBody_GetSection_GetContentBox_QuickEditing(LiveRecordContentName As String, rootPageId As Integer, RootPageContentName As String, OrderByClause As String, AllowPageList As Boolean, AllowReturnLink As Boolean, ArchivePages As Boolean, contactMemberID As Integer, ContentName As String, childListSortMethodId As Integer, main_AllowChildListComposite As Boolean, ArchivePage As Boolean) As String
+        Friend Function pageManager_GetHtmlBody_GetSection_GetContentBox_QuickEditing(LiveRecordContentName As String, rootPageId As Integer, RootPageContentName As String, OrderByClause As String, AllowPageList As Boolean, AllowReturnLink As Boolean, ArchivePages As Boolean, contactMemberID As Integer, ContentName As String, childListSortMethodId As Integer, main_AllowChildListComposite As Boolean, ArchivePage As Boolean) As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("pageManager_GetHtmlBody_GetSection_GetContentBox_QuickEditing")
             '
             Dim AddonStatusOK As Boolean
@@ -3303,7 +2311,7 @@ ErrorTrap:
         '
         '========================================================================
         '
-        Private Function pageManager_GetHtmlBody_GetSection_GetContentBox_QuickEditing_Body(ByVal ContentName As String, ByVal OrderByClause As String, ByVal AllowChildList As Boolean, ByVal Authoring As Boolean, ByVal rootPageId As Integer, ByVal readOnlyField As Boolean, ByVal AllowReturnLink As Boolean, ByVal RootPageContentName As String, ByVal ArchivePage As Boolean, ByVal contactMemberID As Integer) As String
+        Friend Function pageManager_GetHtmlBody_GetSection_GetContentBox_QuickEditing_Body(ByVal ContentName As String, ByVal OrderByClause As String, ByVal AllowChildList As Boolean, ByVal Authoring As Boolean, ByVal rootPageId As Integer, ByVal readOnlyField As Boolean, ByVal AllowReturnLink As Boolean, ByVal RootPageContentName As String, ByVal ArchivePage As Boolean, ByVal contactMemberID As Integer) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("pageManager_GetHtmlBody_GetSection_GetContentBox_QuickEditing_Body")
             '
             Dim FieldRows As Integer
@@ -3354,7 +2362,7 @@ ErrorTrap:
         ' pageManager_GetHtmlBody_GetSection_GetContentBox_ReturnLink
         '=============================================================================
         '
-        Private Function pageManager_GetHtmlBody_GetSection_GetContentBox_ReturnLink(RootPageContentName As String, ignore As Integer, rootPageId As Integer, ParentIDPath As String, ArchivePage As Boolean, BreadCrumbDelimiter As String) As String
+        Friend Function pageManager_GetHtmlBody_GetSection_GetContentBox_ReturnLink(RootPageContentName As String, ignore As Integer, rootPageId As Integer, ParentIDPath As String, ArchivePage As Boolean, BreadCrumbDelimiter As String) As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("pageManager_GetHtmlBody_GetSection_GetContentBox_ReturnLink")
             '
             Dim pageCaption As String
@@ -3391,7 +2399,7 @@ ErrorTrap:
         '
         '
         '
-        Private Function pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow(ByVal Caption As String, ByVal Result As String, ByVal EvenRow As Boolean) As String
+        Friend Function pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow(ByVal Caption As String, ByVal Result As String, ByVal EvenRow As Boolean) As String
             '
             Dim CopyCaption As String
             Dim CopyResult As String
@@ -3414,7 +2422,7 @@ ErrorTrap:
         '       is called from main_GetPageRaw, as well as from higher up when blocking is turned on
         '=============================================================================
         '
-        Private Function pageManager_GetContentBoxWrapper(ByVal Content As String, ByVal ContentPadding As Integer) As String
+        Friend Function pageManager_GetContentBoxWrapper(ByVal Content As String, ByVal ContentPadding As Integer) As String
             'dim buildversion As String
             '
             ' BuildVersion = app.dataBuildVersion
@@ -3458,7 +2466,7 @@ ErrorTrap:
         ''
         ''========================================================================
         ''
-        'Private Function pageManager_GetHtmlBody_GetSection_GetContentBox_QuickEditing_BodyInput(Caption As String, FormInput As String) As String
+        'friend Function pageManager_GetHtmlBody_GetSection_GetContentBox_QuickEditing_BodyInput(Caption As String, FormInput As String) As String
         '    pageManager_GetHtmlBody_GetSection_GetContentBox_QuickEditing_BodyInput = "" _
         '        & "<table border=""0"" cellpadding=""2"" cellspacing=""1"" width=""100%""><tr>" _
         '        & "<td width=""150"" align=""right"" valign=""middle"">" & addSpan(Caption & "<BR ><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""150"" height=""1"">", "ccAdminSmall") & "</td>" _
@@ -3727,7 +2735,7 @@ ErrorTrap:
         '   main_Get a dynamic menu from Page Content
         '======================================================================================
         '
-        Private Function pageManager_GetSectionMenu_NameMenu(ByVal PageName As String, ByVal ContentName As String, ByVal DefaultLink As String, ByVal RootPageRecordID As Integer, ByVal DepthLimit As Integer, ByVal MenuStyle As Integer, ByVal StyleSheetPrefix As String, ByVal MenuImage As String, ByVal MenuImageOver As String, ByVal RootMenuCaption As String, ByVal SectionID As Integer, ByVal UseContentWatchLink As Boolean) As String
+        Friend Function pageManager_GetSectionMenu_NameMenu(ByVal PageName As String, ByVal ContentName As String, ByVal DefaultLink As String, ByVal RootPageRecordID As Integer, ByVal DepthLimit As Integer, ByVal MenuStyle As Integer, ByVal StyleSheetPrefix As String, ByVal MenuImage As String, ByVal MenuImageOver As String, ByVal RootMenuCaption As String, ByVal SectionID As Integer, ByVal UseContentWatchLink As Boolean) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00364")
             '
             Dim AllowInMenus As Boolean
@@ -3942,7 +2950,7 @@ ErrorTrap:
         '   main_Get a dynamic menu from Page Content
         '======================================================================================
         '
-        Private Function pageManager_GetSectionMenu_IdMenu(ByVal RootPageRecordID As Integer, ByVal DefaultLink As String, ByVal DepthLimit As Integer, ByVal MenuStyle As Integer, ByVal StyleSheetPrefix As String, ByVal MenuImage As String, ByVal MenuImageOver As String, ByVal RootMenuCaption As String, ByVal SectionID As Integer, ByVal UseContentWatchLink As Boolean) As String
+        Friend Function pageManager_GetSectionMenu_IdMenu(ByVal RootPageRecordID As Integer, ByVal DefaultLink As String, ByVal DepthLimit As Integer, ByVal MenuStyle As Integer, ByVal StyleSheetPrefix As String, ByVal MenuImage As String, ByVal MenuImageOver As String, ByVal RootMenuCaption As String, ByVal SectionID As Integer, ByVal UseContentWatchLink As Boolean) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("PageList_GetPageIDMenu")
             '
             Dim PseudoChildPagesFound As Boolean
@@ -4220,7 +3228,7 @@ ErrorTrap:
         ' 7/21/2009 - added -1 return if the child pages are not counted to prevent the page records from being set not ChildPagesFound
         '======================================================================================
         '
-        Private Function main_GetSectionMenu_AddChildMenu_ReturnChildCount(ByVal ParentMenuID As Integer, ByVal ContentName As String, ByVal DefaultLink As String, ByVal Tier1MenuCaption As String, ByVal UsedPageIDString As String, ByVal MenuNamePrefix As String, ByVal MenuDepth As Integer, ByVal MenuDepthMax As Integer, ByVal childListSortMethodId As Integer, ByVal SectionID As Integer, ByVal AddRootButton As Boolean, ByVal UseContentWatchLink As Boolean) As Integer
+        Friend Function main_GetSectionMenu_AddChildMenu_ReturnChildCount(ByVal ParentMenuID As Integer, ByVal ContentName As String, ByVal DefaultLink As String, ByVal Tier1MenuCaption As String, ByVal UsedPageIDString As String, ByVal MenuNamePrefix As String, ByVal MenuDepth As Integer, ByVal MenuDepthMax As Integer, ByVal childListSortMethodId As Integer, ByVal SectionID As Integer, ByVal AddRootButton As Boolean, ByVal UseContentWatchLink As Boolean) As Integer
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00365")
             '
             Dim Active As Boolean
@@ -5012,7 +4020,7 @@ ErrorTrap:
         '   I think this routine is over-written at this point. Since we now call with pageid and rootpageid, the loop is not needed -- I think
         '===========================================================================
         '
-        Private Sub pageManager_LoadRenderCache_CurrentPage(PageID As Integer, rootPageId As Integer, RootPageContentName As String, ArchivePage As Boolean, SectionID As Integer, UseContentWatchLink As Boolean)
+        Friend Sub pageManager_LoadRenderCache_CurrentPage(PageID As Integer, rootPageId As Integer, RootPageContentName As String, ArchivePage As Boolean, SectionID As Integer, UseContentWatchLink As Boolean)
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("main_LoadRenderCache_CurrentPage")
             '
             Dim SubMessage As String
@@ -5048,7 +4056,7 @@ ErrorTrap:
                 Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
                 pageManager_RedirectBecausePageNotFound = True
                 pageManager_RedirectReason = "The page could not be determined from URL. The PageID is [" & PageID & "], and the RootPageID is [" & rootPageId & "]."
-                pageManager_RedirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
+                redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
             ElseIf PageID = 0 Then
                 '
                 ' no page, redirect to root page
@@ -5056,7 +4064,7 @@ ErrorTrap:
                 Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
                 pageManager_RedirectBecausePageNotFound = True
                 pageManager_RedirectReason = "The page could not be determined from URL. The PageID is [" & PageID & "], and the RootPageID is [" & rootPageId & "]."
-                pageManager_RedirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
+                redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
             ElseIf rootPageId = 0 Then
                 '
                 ' no rootpage id
@@ -5064,7 +4072,7 @@ ErrorTrap:
                 Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
                 pageManager_RedirectBecausePageNotFound = True
                 pageManager_RedirectReason = "The page could not be determined from URL. The PageID is [" & PageID & "], and the RootPageID is [" & rootPageId & "]."
-                pageManager_RedirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
+                redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
             Else
                 '
                 reloadPage = True
@@ -5122,7 +4130,7 @@ ErrorTrap:
                                 'Call main_LogPageNotFound(main_ServerLink)
                                 pageManager_RedirectBecausePageNotFound = True
                                 pageManager_RedirectReason = "The page requested [" & PageID & "] can not be displayed" & SubMessage & ". It is the root page of the section [" & SectionID & "]."
-                                pageManager_RedirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
+                                redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
                                 Exit Sub
                             Else
                                 '
@@ -5133,7 +4141,7 @@ ErrorTrap:
                                 pageManager_RedirectBecausePageNotFound = True
                                 pageManager_RedirectReason = "The page requested [" & PageID & "] can not be displayed" & SubMessage & "."
                                 'pageManager_RedirectReason = "The page requested [" & PageID & "] is marked inactive."
-                                pageManager_RedirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
+                                redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
                                 Exit Sub
                             End If
                         End If
@@ -5202,7 +4210,7 @@ ErrorTrap:
                             'Call main_LogPageNotFound(main_ServerLink)
                             pageManager_RedirectBecausePageNotFound = True
                             pageManager_RedirectReason = "The root page [" & PageID & "] for this section [" & SectionID & "] could not be found. It may have been deleted. To correct this problem, edit this section and save it with 'none' selected for the Root Page. A new root page will be created automatically the next time the page is viewed. Alternately, you can manually select another root page in the section record."
-                            pageManager_RedirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
+                            redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
                             Exit Sub
                         Else
                             '
@@ -5211,17 +4219,17 @@ ErrorTrap:
                             ' the redirect does the logging -- Call main_LogPageNotFound(main_ServerLinkSource)
                             pageManager_RedirectBecausePageNotFound = True
                             pageManager_RedirectReason = "The page could not be found from its ID [" & PageID & "]. It may have been deleted."
-                            pageManager_RedirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
+                            redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
                             Exit Sub
                         End If
                     End If
                     loadPageCnt = loadPageCnt + 1
                 Loop
                 '
-                main_RenderedPageID = genericController.EncodeInteger(cache_pageContent(PCC_ID, main_RenderCache_CurrentPage_PCCPtr))
-                main_RenderedParentID = genericController.EncodeInteger(cache_pageContent(PCC_ParentID, main_RenderCache_CurrentPage_PCCPtr))
-                main_RenderedPageName = genericController.encodeText(cache_pageContent(PCC_Name, main_RenderCache_CurrentPage_PCCPtr))
-                main_RenderCache_CurrentPage_IsRootPage = (main_RenderedPageID = rootPageId) And (main_RenderedParentID = 0)
+                currentPageID = genericController.EncodeInteger(cache_pageContent(PCC_ID, main_RenderCache_CurrentPage_PCCPtr))
+                currentParentID = genericController.EncodeInteger(cache_pageContent(PCC_ParentID, main_RenderCache_CurrentPage_PCCPtr))
+                currentPageName = genericController.encodeText(cache_pageContent(PCC_Name, main_RenderCache_CurrentPage_PCCPtr))
+                main_RenderCache_CurrentPage_IsRootPage = (currentPageID = rootPageId) And (currentParentID = 0)
                 main_RenderCache_CurrentPage_ContentId = genericController.EncodeInteger(cache_pageContent(PCC_ContentControlID, main_RenderCache_CurrentPage_PCCPtr))
                 main_RenderCache_CurrentPage_ContentName = cpcore.metaData.getContentNameByID(main_RenderCache_CurrentPage_ContentId)
                 main_RenderCache_CurrentPage_IsEditing = cpcore.authContext.isEditing(cpcore, main_RenderCache_CurrentPage_ContentName)
@@ -5231,8 +4239,8 @@ ErrorTrap:
                 '
                 '        If main_oldCacheArray_CurrentPagePtr <> -1 Then
                 '            With main_oldCacheArray_CurrentPage(main_oldCacheArray_CurrentPagePtr)
-                '                'main_RenderedPageID = .Id
-                '                'main_RenderedPageName = .Name
+                '                'currentPageID = .Id
+                '                'currentPageName = .Name
                 '                'main_RenderCache_CurrentPage_IsRootPage = (.Id = rootPageId) And (.ParentID = 0)
                 '                'main_RenderCache_CurrentPage_ContentId = .ContentControlID
                 '                'main_RenderCache_CurrentPage_ContentName = metaData.getContentNameByID(.ContentControlID)
@@ -5255,7 +4263,7 @@ ErrorTrap:
         '   The PageID is the id of the page being checked for a parent, not the ID of the parent
         '===========================================================================
         '
-        Private Sub pageManager_LoadRenderCache_ParentBranch(PageID As Integer, rootPageId As Integer, RootPageContentName As String, ArchivePage As Boolean, ParentIDPath As String, SectionID As Integer, UseContentWatchLink As Boolean)
+        Friend Sub pageManager_LoadRenderCache_ParentBranch(PageID As Integer, rootPageId As Integer, RootPageContentName As String, ArchivePage As Boolean, ParentIDPath As String, SectionID As Integer, UseContentWatchLink As Boolean)
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("main_LoadRenderCache_ParentBranch")
             '
             Dim PCCPtr As Integer
@@ -5310,7 +4318,7 @@ ErrorTrap:
                 'Call main_LogPageNotFound(main_ServerLink)
                 pageManager_RedirectBecausePageNotFound = True
                 pageManager_RedirectReason = "The requested page could not be displayed because there is a circular reference within it's parent path. The page [" & PageID & "] was found two times in the parent pages [" & ParentIDPath & "," & PageID & "]."
-                pageManager_RedirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID)
+                redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID)
             Else
                 '
                 ' This is not the current page, and it is not 0, Look it up
@@ -5409,7 +4417,7 @@ ErrorTrap:
         '   Populate the root branch
         '===========================================================================
         '
-        Private Sub pageManager_LoadRenderCache_ChildBranch(ChildOrderByClause As String, IsRenderingMode As Boolean, ArchivePage As Boolean, SectionID As Integer, UseContentWatchLink As Boolean)
+        Friend Sub pageManager_LoadRenderCache_ChildBranch(ChildOrderByClause As String, IsRenderingMode As Boolean, ArchivePage As Boolean, SectionID As Integer, UseContentWatchLink As Boolean)
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("PageList_LoadContent_ChildBranch")
             '
             Dim PCCPtrs() As Integer
@@ -5522,7 +4530,7 @@ ErrorTrap:
                         '        pageCaption = pageCaption & ACTagEnd
                         '    End If
                         '    '
-                        '    ' remove crlf because not allowed (in main_RenderedNavigationStructure if nothing else)
+                        '    ' remove crlf because not allowed (in currentNavigationStructure if nothing else)
                         '    '
                         '    PageName = genericController.vbReplace(PageName, vbCrLf, " ")
                         '    PageName = genericController.vbReplace(PageName, vbTab, " ")
@@ -5592,7 +4600,7 @@ ErrorTrap:
             '
             Call pageManager_LoadRenderCache_CurrentPage(PageID, PageID, RootPageContentName, ArchivePage, SectionID, UseContentWatchLink)
             '
-            If (pageManager_RedirectLink = "") And (main_RenderCache_CurrentPage_PCCPtr > -1) Then
+            If (redirectLink = "") And (main_RenderCache_CurrentPage_PCCPtr > -1) Then
                 'If (pageManager_RedirectLink = "") And (main_oldCacheArray_CurrentPagePtr <> -1) Then
                 '
                 ' ----- Load Parent Branch
@@ -5606,7 +4614,7 @@ ErrorTrap:
                         Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
                         pageManager_RedirectBecausePageNotFound = True
                         pageManager_RedirectReason = "The page could not be displayed for security reasons. All valid pages must either have a valid parent page, or be selected by a section as the section's root page. This page has neither a parent page or a section."
-                        pageManager_RedirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
+                        redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
                     ElseIf ArchivePage Then
                         '
                         ' Archive section parent Branch
@@ -5619,7 +4627,7 @@ ErrorTrap:
                         Call pageManager_LoadRenderCache_ParentBranch(PageID, rootPageId, RootPageContentName, ArchivePage, "", SectionID, UseContentWatchLink)
                     End If
                 End If
-                If pageManager_RedirectLink = "" Then
+                If redirectLink = "" Then
                     '
                     ' ----- load the child branch
                     '
@@ -6324,7 +5332,7 @@ ErrorTrap:
         '
         '==========================================================================================================
         '
-        Private Sub pageManager_cache_siteSection_load()
+        Friend Sub pageManager_cache_siteSection_load()
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("IISReset")
             '
             Dim IDText As String
@@ -6423,7 +5431,7 @@ ErrorTrap:
         '
         '
         '
-        Private Sub pageManager_cache_siteSection_save()
+        Friend Sub pageManager_cache_siteSection_save()
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("MainClass.pageManager_cache_siteSection_save")
             '
             Dim hint As String
@@ -6763,7 +5771,7 @@ ErrorTrap:
         '
         '=========================================================================================
         '
-        Private Function main_GetTCLink(TCPtr As Integer) As String
+        Friend Function main_GetTCLink(TCPtr As Integer) As String
             '
             If TCPtr >= 0 Then
                 main_GetTCLink = genericController.encodeText(cache_pageTemplate(TC_Link, TCPtr))
@@ -6845,788 +5853,6 @@ ErrorTrap:
             main_GetPCCPtr = cache_pageContent_getPtr(PageID, main_IsWorkflowRendering, main_IsQuickEditing)
         End Function
 
-        '
-        '========================================================================
-        '   Returns the entire HTML page based on the bid/sid stream values
-        '
-        '   This code is based on the GoMethod site script
-        '========================================================================
-        '
-        Public Function pageManager_execute() As String
-            Dim returnDoc As String = ""
-            Try
-                Dim downloadId As Integer
-                Dim Pos As Integer
-                Dim htmlBody As String
-                Dim htmlHead As String
-                Dim TPMode As Integer
-                Dim EndOfBody As String
-                Dim bodyTag As String
-                Dim ToolsPanel As String
-                Dim bodyAddonId As Integer
-                Dim bodyAddonStatusOK As Boolean
-                '
-                Dim Clip As String
-                Dim ClipParentRecordID As Integer
-                Dim ClipParentContentID As Integer
-                Dim ClipParentContentName As String
-                Dim ClipChildContentID As Integer
-                Dim ClipChildContentName As String
-                Dim ClipChildRecordID As Integer
-                Dim ClipChildRecordName As String
-                Dim CSClip As Integer
-                'Dim ParentID As Integer
-                'Dim BufferString As String
-                Dim ClipBoardArray() As String
-                Dim ClipBoard As String
-                Dim ClipParentFieldList As String
-                Dim Fields As String()
-                Dim FieldCount As Integer
-                '
-                Dim NameValue As String
-                Dim NameValues() As String
-                Dim RedirectLink As String = ""
-                Dim RedirectReason As String = ""
-                Dim PageNotFoundReason As String = ""
-                Dim PageNotFoundSource As String = ""
-                Dim IsPageNotFound As Boolean = False
-                '
-                If cpcore.docOpen Then
-                    cpcore.htmlDoc.main_AdminWarning = cpcore.docProperties.getText("main_AdminWarningMsg")
-                    cpcore.htmlDoc.main_AdminWarningPageID = cpcore.docProperties.getInteger("main_AdminWarningPageID")
-                    cpcore.htmlDoc.main_AdminWarningSectionID = cpcore.docProperties.getInteger("main_AdminWarningSectionID")
-                    '
-                    '
-                    '--------------------------------------------------------------------------
-                    ' Add cookie test
-                    '   Ajax and RemoteMethods do not support cookie test
-                    '--------------------------------------------------------------------------
-                    '
-                    Dim AllowCookieTest As Boolean
-                    AllowCookieTest = cpcore.siteProperties.allowVisitTracking And (cpcore.authContext.visit.PageVisits = 1)
-                    If AllowCookieTest Then
-                        Call cpcore.htmlDoc.main_AddOnLoadJavascript2("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" & cpcore.security.encodeToken(cpcore.authContext.visit.ID, cpcore.app_startTime) & "')};", "Cookie Test")
-                    End If
-                    '
-                    '--------------------------------------------------------------------------
-                    '   User form processing
-                    '       if a form is created in the editor, process it by emailing and saving to the User Form Response content
-                    '--------------------------------------------------------------------------
-                    '
-                    If cpcore.docProperties.getInteger("ContensiveUserForm") = 1 Then
-                        Dim FromAddress As String = cpcore.siteProperties.getText("EmailFromAddress", "info@" & cpcore.webServer.webServerIO_requestDomain)
-                        Call cpcore.email.sendForm(cpcore.siteProperties.emailAdmin, FromAddress, "Form Submitted on " & cpcore.webServer.webServerIO_requestReferer)
-                        Dim cs As Integer = cpcore.db.cs_insertRecord("User Form Response")
-                        If cpcore.db.cs_ok(cs) Then
-                            Call cpcore.db.cs_set(cs, "name", "Form " & cpcore.webServer.requestReferrer)
-                            Dim Copy As String = ""
-
-                            For Each key As String In cpcore.docProperties.getKeyList()
-                                Dim docProperty As docPropertiesClass = cpcore.docProperties.getProperty(key)
-                                If (key.ToLower() <> "contensiveuserform") Then
-                                    Copy &= docProperty.Name & "=" & docProperty.Value & vbCrLf
-                                End If
-                            Next
-                            Call cpcore.db.cs_set(cs, "copy", Copy)
-                            Call cpcore.db.cs_set(cs, "VisitId", cpcore.authContext.visit.ID)
-                        End If
-                        Call cpcore.db.cs_Close(cs)
-                    End If
-                    '
-                    '--------------------------------------------------------------------------
-                    '   Contensive Form Page Processing
-                    '--------------------------------------------------------------------------
-                    '
-                    If cpcore.docProperties.getInteger("ContensiveFormPageID") <> 0 Then
-                        Call pageManager_ProcessFormPage(cpcore.docProperties.getInteger("ContensiveFormPageID"))
-                    End If
-                    '
-                    '--------------------------------------------------------------------------
-                    ' ----- Automatic Redirect to a full URL
-                    '   If the link field of the record is an absolution address
-                    '       rc = redirect contentID
-                    '       ri = redirect content recordid
-                    '--------------------------------------------------------------------------
-                    '
-                    cpcore.htmlDoc.pageManager_RedirectContentID = (cpcore.docProperties.getInteger(rnRedirectContentId))
-                    If (cpcore.htmlDoc.pageManager_RedirectContentID <> 0) Then
-                        cpcore.htmlDoc.pageManager_RedirectRecordID = (cpcore.docProperties.getInteger(rnRedirectRecordId))
-                        If (cpcore.htmlDoc.pageManager_RedirectRecordID <> 0) Then
-                            Dim contentName As String = cpcore.metaData.getContentNameByID(cpcore.htmlDoc.pageManager_RedirectContentID)
-                            If contentName <> "" Then
-                                If cpcore.main_RedirectByRecord_ReturnStatus(contentName, cpcore.htmlDoc.pageManager_RedirectRecordID) Then
-                                    '
-                                    'Call AppendLog("main_init(), 3210 - exit for rc/ri redirect ")
-                                    '
-                                    cpcore.docOpen = False '--- should be disposed by caller --- Call dispose
-                                    Return cpcore.htmlDoc.docBuffer
-                                Else
-                                    cpcore.htmlDoc.main_AdminWarning = "<p>The site attempted to automatically jump to another page, but there was a problem with the page that included the link.<p>"
-                                    cpcore.htmlDoc.main_AdminWarningPageID = cpcore.htmlDoc.pageManager_RedirectRecordID
-                                End If
-                            End If
-                        End If
-                    End If
-                    ''
-                    ''--------------------------------------------------------------------------
-                    '' ----- Tools Panel Mode
-                    ''       tpmode=0 movestools panel to the bottom
-                    ''       tpmode=1 moves tools panel to the left
-                    ''       tpmode=2 moves tools panel to the right
-                    ''       tpmode=3 moves tools panel to the top
-                    ''--------------------------------------------------------------------------
-                    ''
-                    'If cpcore.docProperties.getText("tpmode") <> "" Then
-                    '    Call cpcore.siteProperties.setProperty("ToolsPanelMode", cpcore.docProperties.getInteger("tpmode"))
-                    'End If
-                    '
-                    '--------------------------------------------------------------------------
-                    ' ----- Active Download hook
-                    '       downloads are actually redirects back to here
-                    '       RequestNameLibraryFileID has the Encoded ID in the ccLibraryFiles table
-                    '--------------------------------------------------------------------------
-                    '
-                    If True Then
-                        Dim libraryFilePtr As Integer
-                        Dim libraryFileClicks As Integer
-                        Dim link As String = ""
-                        Dim RecordEID As String = cpcore.docProperties.getText(RequestNameLibraryFileID)
-                        If (RecordEID <> "") Then
-                            Dim tokenDate As Date
-                            Call cpcore.security.decodeToken(RecordEID, downloadId, tokenDate)
-                            If downloadId <> 0 Then
-                                '
-                                ' ----- lookup record and set clicks
-                                '
-                                Call cpcore.cache_libraryFiles_loadIfNeeded()
-                                libraryFilePtr = cpcore.cache_libraryFilesIdIndex.getPtr(CStr(downloadId))
-                                If libraryFilePtr >= 0 Then
-                                    libraryFileClicks = genericController.EncodeInteger(cpcore.cache_libraryFiles(LibraryFilesCache_clicks, libraryFilePtr))
-                                    link = genericController.encodeText(cpcore.cache_libraryFiles(LibraryFilesCache_filename, libraryFilePtr))
-                                    Call cpcore.db.executeSql("update cclibraryfiles set clicks=" & (libraryFileClicks + 1) & " where id=" & downloadId)
-                                End If
-                                If link <> "" Then
-                                    '
-                                    ' ----- create log entry
-                                    '
-                                    Dim CSPointer As Integer = cpcore.db.cs_insertRecord("Library File Log")
-                                    If cpcore.db.cs_ok(CSPointer) Then
-                                        Call cpcore.db.cs_set(CSPointer, "FileID", downloadId)
-                                        Call cpcore.db.cs_set(CSPointer, "VisitId", cpcore.authContext.visit.ID)
-                                        Call cpcore.db.cs_set(CSPointer, "MemberID", cpcore.authContext.user.ID)
-                                    End If
-                                    Call cpcore.db.cs_Close(CSPointer)
-                                    '
-                                    ' ----- and go
-                                    '
-                                    Call cpcore.webServer.webServerIO_Redirect2(cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.requestDomain & cpcore.csv_getVirtualFileLink(cpcore.serverConfig.appConfig.cdnFilesNetprefix, link), "Redirecting because the active download request variable is set to a valid Library Files record. Library File Log has been appended.", False)
-                                End If
-                            End If
-                        End If
-                    End If
-                    '
-                    '--------------------------------------------------------------------------
-                    '   Process clipboard cut/paste
-                    '--------------------------------------------------------------------------
-                    '
-                    Clip = cpcore.docProperties.getText(RequestNameCut)
-                    If (Clip <> "") Then
-                        '
-                        ' if a cut, load the clipboard
-                        '
-                        Call cpcore.visitProperty.setProperty("Clipboard", Clip)
-                        Call genericController.modifyLinkQuery(cpcore.web_RefreshQueryString, RequestNameCut, "")
-                    End If
-                    ClipParentContentID = cpcore.docProperties.getInteger(RequestNamePasteParentContentID)
-                    ClipParentRecordID = cpcore.docProperties.getInteger(RequestNamePasteParentRecordID)
-                    ClipParentFieldList = cpcore.docProperties.getText(RequestNamePasteFieldList)
-                    If (ClipParentContentID <> 0) And (ClipParentRecordID <> 0) Then
-                        '
-                        ' Request for a paste, clear the cliboard
-                        '
-                        ClipBoard = cpcore.visitProperty.getText("Clipboard", "")
-                        Call cpcore.visitProperty.setProperty("Clipboard", "")
-                        Call genericController.ModifyQueryString(cpcore.web_RefreshQueryString, RequestNamePasteParentContentID, "")
-                        Call genericController.ModifyQueryString(cpcore.web_RefreshQueryString, RequestNamePasteParentRecordID, "")
-                        ClipParentContentName = cpcore.metaData.getContentNameByID(ClipParentContentID)
-                        If (ClipParentContentName = "") Then
-                            ' state not working...
-                        ElseIf (ClipBoard = "") Then
-                            ' state not working...
-                        Else
-                            If Not cpcore.authContext.isAuthenticatedContentManager(cpcore, ClipParentContentName) Then
-                                Call cpcore.error_AddUserError("The paste operation failed because you are not a content manager of the Clip Parent")
-                            Else
-                                '
-                                ' Current identity is a content manager for this content
-                                '
-                                Dim Position As Integer = genericController.vbInstr(1, ClipBoard, ".")
-                                If Position = 0 Then
-                                    Call cpcore.error_AddUserError("The paste operation failed because the clipboard data is configured incorrectly.")
-                                Else
-                                    ClipBoardArray = Split(ClipBoard, ".")
-                                    If UBound(ClipBoardArray) = 0 Then
-                                        Call cpcore.error_AddUserError("The paste operation failed because the clipboard data is configured incorrectly.")
-                                    Else
-                                        ClipChildContentID = genericController.EncodeInteger(ClipBoardArray(0))
-                                        ClipChildRecordID = genericController.EncodeInteger(ClipBoardArray(1))
-                                        If Not cpcore.IsWithinContent(ClipChildContentID, ClipParentContentID) Then
-                                            Call cpcore.error_AddUserError("The paste operation failed because the destination location is not compatible with the clipboard data.")
-                                        Else
-                                            '
-                                            ' the content definition relationship is OK between the child and parent record
-                                            '
-                                            ClipChildContentName = cpcore.metaData.getContentNameByID(ClipChildContentID)
-                                            If Not ClipChildContentName <> "" Then
-                                                Call cpcore.error_AddUserError("The paste operation failed because the clipboard data content is undefined.")
-                                            Else
-                                                If (ClipParentRecordID = 0) Then
-                                                    Call cpcore.error_AddUserError("The paste operation failed because the clipboard data record is undefined.")
-                                                ElseIf main_IsChildRecord(ClipChildContentName, ClipParentRecordID, ClipChildRecordID) Then
-                                                    Call cpcore.error_AddUserError("The paste operation failed because the destination location is a child of the clipboard data record.")
-                                                Else
-                                                    '
-                                                    ' the parent record is not a child of the child record (circular check)
-                                                    '
-                                                    ClipChildRecordName = "record " & ClipChildRecordID
-                                                    CSClip = cpcore.csOpenRecord(ClipChildContentName, ClipChildRecordID, True, True)
-                                                    If Not cpcore.db.cs_ok(CSClip) Then
-                                                        Call cpcore.error_AddUserError("The paste operation failed because the data record referenced by the clipboard could not found.")
-                                                    Else
-                                                        '
-                                                        ' Paste the edit record record
-                                                        '
-                                                        ClipChildRecordName = cpcore.db.cs_getText(CSClip, "name")
-                                                        If ClipParentFieldList = "" Then
-                                                            '
-                                                            ' Legacy paste - go right to the parent id
-                                                            '
-                                                            If Not cpcore.db.cs_isFieldSupported(CSClip, "ParentID") Then
-                                                                Call cpcore.error_AddUserError("The paste operation failed because the record you are pasting does not   support the necessary parenting feature.")
-                                                            Else
-                                                                Call cpcore.db.cs_set(CSClip, "ParentID", ClipParentRecordID)
-                                                            End If
-                                                        Else
-                                                            '
-                                                            ' Fill in the Field List name values
-                                                            '
-                                                            Fields = Split(ClipParentFieldList, ",")
-                                                            FieldCount = UBound(Fields) + 1
-                                                            For FieldPointer = 0 To FieldCount - 1
-                                                                Dim Pair As String
-                                                                Pair = Fields(FieldPointer)
-                                                                If Mid(Pair, 1, 1) = "(" And Mid(Pair, Len(Pair), 1) = ")" Then
-                                                                    Pair = Mid(Pair, 2, Len(Pair) - 2)
-                                                                End If
-                                                                NameValues = Split(Pair, "=")
-                                                                If UBound(NameValues) = 0 Then
-                                                                    Call cpcore.error_AddUserError("The paste operation failed because the clipboard data Field List is not configured correctly.")
-                                                                Else
-                                                                    If Not cpcore.db.cs_isFieldSupported(CSClip, CStr(NameValues(0))) Then
-                                                                        Call cpcore.error_AddUserError("The paste operation failed because the clipboard data Field [" & CStr(NameValues(0)) & "] is not supported by the location data.")
-                                                                    Else
-                                                                        Call cpcore.db.cs_set(CSClip, CStr(NameValues(0)), CStr(NameValues(1)))
-                                                                    End If
-                                                                End If
-                                                            Next
-                                                        End If
-                                                        ''
-                                                        '' Fixup Content Watch
-                                                        ''
-                                                        'ShortLink = main_ServerPathPage
-                                                        'ShortLink = ConvertLinkToShortLink(ShortLink, main_ServerHost, main_ServerVirtualPath)
-                                                        'ShortLink = genericController.modifyLinkQuery(ShortLink, "bid", CStr(ClipChildRecordID), True)
-                                                        'Call main_TrackContentSet(CSClip, ShortLink)
-                                                    End If
-                                                    Call cpcore.db.cs_Close(CSClip)
-                                                    '
-                                                    ' Set Child Pages Found and clear caches
-                                                    '
-                                                    CSClip = cpcore.csOpen(ClipParentContentName, ClipParentRecordID, , , "ChildPagesFound")
-                                                    If cpcore.db.cs_ok(CSClip) Then
-                                                        Call cpcore.db.cs_set(CSClip, "ChildPagesFound", True.ToString)
-                                                    End If
-                                                    Call cpcore.db.cs_Close(CSClip)
-                                                    Call cache_pageContent_clear()
-                                                    If (cpcore.siteProperties.allowWorkflowAuthoring And cpcore.workflow.isWorkflowAuthoringCompatible(ClipChildContentName)) Then
-                                                        '
-                                                        ' Workflow editing
-                                                        '
-                                                    Else
-                                                        '
-                                                        ' Live Editing
-                                                        '
-                                                        Call cpcore.cache.invalidateContent(ClipChildContentName)
-                                                        Call cpcore.cache.invalidateContent(ClipParentContentName)
-                                                        Call cache_pageContent_clear()
-                                                    End If
-                                                End If
-                                            End If
-                                        End If
-                                    End If
-                                End If
-                            End If
-                        End If
-                    End If
-                    Clip = cpcore.docProperties.getText(RequestNameCutClear)
-                    If (Clip <> "") Then
-                        '
-                        ' if a cut clear, clear the clipboard
-                        '
-                        Call cpcore.visitProperty.setProperty("Clipboard", "")
-                        Clip = cpcore.visitProperty.getText("Clipboard", "")
-                        Call genericController.modifyLinkQuery(cpcore.web_RefreshQueryString, RequestNameCutClear, "")
-                    End If
-                    '
-                    ' link alias and link forward
-                    '
-                    'Dim Custom404SourcePathPage As String = main_ServerPathPage ' refactor all of this
-                    'Dim Custom404SourceNoQueryString As String = main_ServerPathPage
-                    ' Dim Custom404SourceQueryString As String = main_ServerQueryString
-                    If True Then
-                        If True Then
-                            Dim LinkAliasCriteria As String = ""
-                            Dim linkAliasTest1 As String = ""
-                            Dim linkAliasTest2 As String
-                            Dim LinkNoProtocol As String = ""
-                            Dim linkDomain As String = ""
-                            Dim LinkFullPath As String = ""
-                            Dim LinkFullPathNoSlash As String = ""
-                            Dim isLinkForward As Boolean = False
-                            Dim LinkForwardCriteria As String = ""
-                            Dim Sql As String = ""
-                            Dim CSPointer As Integer = -1
-                            Dim IsInLinkForwardTable As Boolean = False
-                            Dim Viewings As Integer = 0
-                            Dim LinkSplit As String()
-                            Dim IsLinkAlias As Boolean = False
-                            '
-                            '--------------------------------------------------------------------------
-                            ' try link alias
-                            '--------------------------------------------------------------------------
-                            '
-                            LinkAliasCriteria = ""
-                            linkAliasTest1 = cpcore.webServer.requestPathPage
-                            If (linkAliasTest1.Substring(0, 1) = "/") Then
-                                linkAliasTest1 = linkAliasTest1.Substring(1)
-                            End If
-                            If linkAliasTest1.Length > 0 Then
-                                If (linkAliasTest1.Substring(linkAliasTest1.Length - 1, 1) = "/") Then
-                                    linkAliasTest1 = linkAliasTest1.Substring(0, linkAliasTest1.Length - 1)
-                                End If
-                            End If
-
-                            linkAliasTest2 = linkAliasTest1 & "/"
-                            If (Not IsPageNotFound) And (cpcore.webServer.requestPathPage <> "") Then
-                                '
-                                ' build link variations needed later
-                                '
-                                '
-                                Pos = genericController.vbInstr(1, cpcore.webServer.requestPathPage, "://", vbTextCompare)
-                                If Pos <> 0 Then
-                                    LinkNoProtocol = Mid(cpcore.webServer.requestPathPage, Pos + 3)
-                                    Pos = genericController.vbInstr(Pos + 3, cpcore.webServer.requestPathPage, "/", vbBinaryCompare)
-                                    If Pos <> 0 Then
-                                        linkDomain = Mid(cpcore.webServer.requestPathPage, 1, Pos - 1)
-                                        LinkFullPath = Mid(cpcore.webServer.requestPathPage, Pos)
-                                        '
-                                        ' strip off leading or trailing slashes, and return only the string between the leading and secton slash
-                                        '
-                                        If genericController.vbInstr(1, LinkFullPath, "/") <> 0 Then
-                                            LinkSplit = Split(LinkFullPath, "/")
-                                            LinkFullPathNoSlash = LinkSplit(0)
-                                            If LinkFullPathNoSlash = "" Then
-                                                If UBound(LinkSplit) > 0 Then
-                                                    LinkFullPathNoSlash = LinkSplit(1)
-                                                End If
-                                            End If
-                                        End If
-                                        linkAliasTest1 = LinkFullPath
-                                        linkAliasTest2 = LinkFullPathNoSlash
-                                    End If
-                                End If
-                                '
-                                '   if this has not already been recognized as a pagenot found, and the custom404source is present, try all these
-                                '   Build LinkForwardCritia and LinkAliasCriteria
-                                '   sample: http://www.a.com/kb/test
-                                '   LinkForwardCriteria = (Sourcelink='http://www.a.com/kb/test')or(Sourcelink='http://www.a.com/kb/test/')
-                                '
-                                Call cpcore.cache_linkForward_load()
-                                If cpcore.cache_linkForward <> "" Then
-                                    If 0 < genericController.vbInstr(1, cpcore.cache_linkForward, "," & cpcore.webServer.requestPathPage & ",", vbTextCompare) Then
-                                        isLinkForward = True
-                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & cpcore.db.encodeSQLText(cpcore.webServer.requestPathPage) & ")"
-                                    ElseIf 0 < genericController.vbInstr(1, cpcore.cache_linkForward, "," & cpcore.webServer.requestPathPage & "/,", vbTextCompare) Then
-                                        isLinkForward = True
-                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & cpcore.db.encodeSQLText(cpcore.webServer.requestPathPage & "/") & ")"
-                                    ElseIf 0 < genericController.vbInstr(1, cpcore.cache_linkForward, "," & LinkNoProtocol & ",", vbTextCompare) Then
-                                        isLinkForward = True
-                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & cpcore.db.encodeSQLText(LinkNoProtocol) & ")"
-                                    ElseIf 0 < genericController.vbInstr(1, cpcore.cache_linkForward, "," & LinkFullPath & ",", vbTextCompare) Then
-                                        isLinkForward = True
-                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & cpcore.db.encodeSQLText(LinkFullPath) & ")"
-                                    ElseIf 0 < genericController.vbInstr(1, cpcore.cache_linkForward, "," & LinkFullPathNoSlash & ",", vbTextCompare) Then
-                                        isLinkForward = True
-                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & cpcore.db.encodeSQLText(LinkFullPathNoSlash) & ")"
-                                    End If
-                                    If isLinkForward Then
-                                        '
-                                        ' if match, go look it up and verify all OK
-                                        '
-                                        isLinkForward = False
-                                        Sql = cpcore.GetSQLSelect("", "ccLinkForwards", "ID,DestinationLink,Viewings,GroupID", LinkForwardCriteria, "ID", , 1)
-                                        CSPointer = cpcore.db.cs_openSql(Sql)
-                                        If cpcore.db.cs_ok(CSPointer) Then
-                                            '
-                                            ' Link Forward found - update count
-                                            '
-                                            Dim Link As String
-                                            Dim GroupID As Integer
-                                            Dim groupName As String
-                                            '
-                                            IsInLinkForwardTable = True
-                                            Viewings = cpcore.db.cs_getInteger(CSPointer, "Viewings") + 1
-                                            Sql = "update ccLinkForwards set Viewings=" & Viewings & " where ID=" & cpcore.db.cs_getInteger(CSPointer, "ID")
-                                            Call cpcore.db.executeSql(Sql)
-                                            Link = cpcore.db.cs_getText(CSPointer, "DestinationLink")
-                                            If Link <> "" Then
-                                                '
-                                                ' Valid Link Forward (without link it is just a record created by the autocreate function
-                                                '
-                                                isLinkForward = True
-                                                Link = cpcore.db.cs_getText(CSPointer, "DestinationLink")
-                                                GroupID = cpcore.db.cs_getInteger(CSPointer, "GroupID")
-                                                If GroupID <> 0 Then
-                                                    groupName = cpcore.group_GetGroupName(GroupID)
-                                                    If groupName <> "" Then
-                                                        Call cpcore.group_AddGroupMember(groupName)
-                                                    End If
-                                                End If
-                                                If Link <> "" Then
-                                                    RedirectLink = Link
-                                                    RedirectReason = "Redirecting because the URL is a valid Link Forward entry."
-                                                End If
-                                            End If
-                                        End If
-                                        Call cpcore.db.cs_Close(CSPointer)
-                                    End If
-                                End If
-                                '
-                                If (RedirectLink = "") And Not isLinkForward Then
-                                    '
-                                    ' Test for Link Alias
-                                    '
-                                    If (linkAliasTest1 & linkAliasTest2 <> "") Then
-                                        Dim Ptr As Integer = cpcore.cache_linkAlias_getPtrByName(linkAliasTest1)
-                                        If (Ptr < 0) Then
-                                            Ptr = cpcore.cache_linkAlias_getPtrByName(linkAliasTest2)
-                                        End If
-                                        If Ptr >= 0 Then
-                                            '
-                                            ' Link Alias Found
-                                            '
-                                            IsLinkAlias = True
-                                            '
-                                            ' New Way - use pageid and QueryStringSuffix
-                                            '
-                                            Dim LinkQueryString As String = "bid=" & cpcore.cache_linkAlias(linkAliasCache_pageId, Ptr) & "&" & cpcore.cache_linkAlias(linkAliasCache_queryStringSuffix, Ptr)
-                                            cpcore.docProperties.setProperty("bid", cpcore.cache_linkAlias(linkAliasCache_pageId, Ptr), False)
-                                            Dim nameValuePairs As String() = Split(cpcore.cache_linkAlias(linkAliasCache_queryStringSuffix, Ptr), "&")
-                                            For Each nameValuePair As String In nameValuePairs
-                                                Dim nameValueThing As String() = Split(nameValuePair, "=")
-                                                If (nameValueThing.GetUpperBound(0) = 0) Then
-                                                    cpcore.docProperties.setProperty(nameValueThing(0), "", False)
-                                                Else
-                                                    cpcore.docProperties.setProperty(nameValueThing(0), nameValueThing(1), False)
-                                                End If
-                                            Next
-                                        End If
-                                    End If
-                                    '
-                                    If Not IsLinkAlias Then
-                                        '
-                                        ' Test for favicon.ico
-                                        '
-                                        If (LCase(cpcore.webServer.requestPathPage) = "/favicon.ico") Then
-                                            '
-                                            ' Handle Favicon.ico when the client did not recognize the meta tag
-                                            '
-                                            Dim Filename As String = cpcore.siteProperties.getText("FaviconFilename", "")
-                                            If Filename = "" Then
-                                                '
-                                                ' no favicon, 404 the call
-                                                '
-                                                Call cpcore.webServer.web_setResponseStatus("404 Not Found")
-                                                Call cpcore.webServer.webServerIO_setResponseContentType("image/gif")
-                                                cpcore.docOpen = False '--- should be disposed by caller --- Call dispose
-                                                Return cpcore.htmlDoc.docBuffer
-                                            Else
-                                                Call cpcore.webServer.webServerIO_Redirect2(cpcore.csv_getVirtualFileLink(cpcore.serverConfig.appConfig.cdnFilesNetprefix, Filename), "favicon request", False)
-                                                cpcore.docOpen = False '--- should be disposed by caller --- Call dispose
-                                                Return cpcore.htmlDoc.docBuffer
-                                            End If
-                                        End If
-                                        '
-                                        ' Test for robots.txt
-                                        '
-                                        If (LCase(LinkFullPathNoSlash) = "robots.txt") Or (LCase(LinkFullPathNoSlash) = "robots_txt") Then
-                                            '
-                                            ' Handle Robots.txt file
-                                            '
-                                            Dim Filename As String = "config/RobotsTxtBase.txt"
-                                            ' set this way because the preferences page needs a filename in a site property (enhance later)
-                                            Call cpcore.siteProperties.setProperty("RobotsTxtFilename", Filename)
-                                            Dim Content As String = cpcore.cdnFiles.readFile(Filename)
-                                            If Content = "" Then
-                                                '
-                                                ' save default robots.txt
-                                                '
-                                                Content = "User-agent: *" & vbCrLf & "Disallow: /admin/" & vbCrLf & "Disallow: /images/"
-                                                Call cpcore.appRootFiles.saveFile(Filename, Content)
-                                            End If
-                                            Content = Content & cpcore.addonCache.addonCache.robotsTxt
-                                            Call cpcore.webServer.webServerIO_setResponseContentType("text/plain")
-                                            Call cpcore.htmlDoc.writeAltBuffer(Content)
-                                            cpcore.docOpen = False '--- should be disposed by caller --- Call dispose
-                                            Return cpcore.htmlDoc.docBuffer
-                                        End If
-                                        '
-                                        ' No Link Forward, no Link Alias, no RemoteMethodFromPage, not Robots.txt
-                                        '
-                                        If (cpcore.app_errorCount = 0) And cpcore.siteProperties.getBoolean("LinkForwardAutoInsert") And (Not IsInLinkForwardTable) Then
-                                            '
-                                            ' Add a new Link Forward entry
-                                            '
-                                            CSPointer = cpcore.InsertCSContent("Link Forwards")
-                                            If cpcore.db.cs_ok(CSPointer) Then
-                                                Call cpcore.db.cs_set(CSPointer, "Name", cpcore.webServer.requestPathPage)
-                                                Call cpcore.db.cs_set(CSPointer, "sourcelink", cpcore.webServer.requestPathPage)
-                                                Call cpcore.db.cs_set(CSPointer, "Viewings", 1)
-                                            End If
-                                            Call cpcore.db.cs_Close(CSPointer)
-                                        End If
-                                        '
-                                        ' real 404
-                                        '
-                                        IsPageNotFound = True
-                                        PageNotFoundSource = cpcore.webServer.requestPathPage
-                                        PageNotFoundReason = "The page could not be displayed because the URL is not a valid page, Link Forward, Link Alias or RemoteMethod."
-                                    End If
-                                End If
-                            End If
-                        End If
-                    End If
-                    '
-                    ' ----- do anonymous access blocking
-                    '
-                    If Not cpcore.authContext.isAuthenticated() Then
-                        If (cpcore.webServer.webServerIO_requestPath <> "/") And genericController.vbInstr(1, cpcore.siteProperties.adminURL, cpcore.webServer.webServerIO_requestPath, vbTextCompare) <> 0 Then
-                            '
-                            ' admin page is excluded from custom blocking
-                            '
-                        Else
-                            Dim AnonymousUserResponseID As Integer = genericController.EncodeInteger(cpcore.siteProperties.getText("AnonymousUserResponseID", "0"))
-                            Select Case AnonymousUserResponseID
-                                Case 1
-                                    '
-                                    ' block with login
-                                    '
-                                    '
-                                    'Call AppendLog("main_init(), 3410 - exit for login block")
-                                    '
-                                    Call cpcore.main_SetMetaContent(0, 0)
-                                    Call cpcore.htmlDoc.writeAltBuffer(cpcore.htmlDoc.getLoginPage(False) & cpcore.htmlDoc.html_GetEndOfBody(False, False, False, False))
-                                    cpcore.docOpen = False '--- should be disposed by caller --- Call dispose
-                                    Return cpcore.htmlDoc.docBuffer
-                                Case 2
-                                    '
-                                    ' block with custom content
-                                    '
-                                    '
-                                    'Call AppendLog("main_init(), 3420 - exit for custom content block")
-                                    '
-                                    Call cpcore.main_SetMetaContent(0, 0)
-                                    Call cpcore.htmlDoc.main_AddOnLoadJavascript2("document.body.style.overflow='scroll'", "Anonymous User Block")
-                                    Dim Copy As String = cr & cpcore.htmlDoc.html_GetContentCopy("AnonymousUserResponseCopy", "<p style=""width:250px;margin:100px auto auto auto;"">The site is currently not available for anonymous access.</p>", cpcore.authContext.user.ID, True, cpcore.authContext.isAuthenticated)
-                                    ' -- already encoded
-                                    'Copy = EncodeContentForWeb(Copy, "copy content", 0, "", 0)
-                                    Copy = "" _
-                                            & cpcore.main_docType _
-                                            & vbCrLf & "<html>" _
-                                            & cr & "<head>" _
-                                            & genericController.kmaIndent(cpcore.main_GetHTMLHead()) _
-                                            & cr & "</head>" _
-                                            & cr & TemplateDefaultBodyTag _
-                                            & genericController.kmaIndent(Copy) _
-                                            & cr2 & "<div>" _
-                                            & cr3 & cpcore.htmlDoc.html_GetEndOfBody(True, True, False, False) _
-                                            & cr2 & "</div>" _
-                                            & cr & "</body>" _
-                                            & vbCrLf & "</html>"
-                                    '& "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">"
-                                    Call cpcore.htmlDoc.writeAltBuffer(Copy)
-                                    cpcore.docOpen = False '--- should be disposed by caller --- Call dispose
-                                    Return cpcore.htmlDoc.docBuffer
-                            End Select
-                        End If
-                    End If
-                    '-------------------------------------------
-                    '
-                    ' run the appropriate body addon
-                    '
-                    bodyAddonId = genericController.EncodeInteger(cpcore.siteProperties.getText("Html Body AddonId", "0"))
-                    If bodyAddonId <> 0 Then
-                        htmlBody = cpcore.addon.execute(bodyAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", bodyAddonStatusOK, Nothing, "", Nothing, "", cpcore.authContext.user.ID, cpcore.authContext.isAuthenticated)
-                    Else
-                        htmlBody = pageManager_GetHtmlBody()
-                    End If
-                    If cpcore.docOpen Then
-                        '
-                        ' Build Body Tag
-                        '
-                        htmlHead = cpcore.main_GetHTMLHead()
-                        If pageManager_TemplateBodyTag <> "" Then
-                            bodyTag = pageManager_TemplateBodyTag
-                        Else
-                            bodyTag = TemplateDefaultBodyTag
-                        End If
-                        '
-                        ' Add tools panel to body
-                        '
-                        htmlBody = htmlBody & cr & "<div>" & genericController.kmaIndent(cpcore.htmlDoc.html_GetEndOfBody(True, True, False, False)) & cr & "</div>"
-                        '
-                        ' build doc
-                        '
-                        returnDoc = cpcore.main_assembleHtmlDoc(cpcore.main_docType, htmlHead, bodyTag, cpcore.responseBuffer & htmlBody)
-                    End If
-                End If
-                '
-                ' all other routes should be handled here.
-                '   - this code is in initApp right now but should be migrated here.
-                '   - if all other routes fail, use the defaultRoute (pagemanager at first)
-                '
-                If True Then
-                    ' --- not reall sure what to do with this - was in appInit() and I am just sure it does not go there.
-                    '
-                    '--------------------------------------------------------------------------
-                    ' ----- check if the custom404pathpage matches the defaultdoc
-                    '       in this case, the 404 hit is a direct result of a 404 I justreturned to IIS
-                    '       currently, I am redirecting to the page-not-found page with a 404 - wrong
-                    '       I should realize here that this is a 404 caused by the page in the 404 custom string
-                    '           and display the 404 page. Even if all I can say is "the page was not found"
-                    '
-                    '--------------------------------------------------------------------------
-                    '
-                    If genericController.vbLCase(cpcore.webServer.requestPathPage) = genericController.vbLCase(requestAppRootPath & cpcore.siteProperties.serverPageDefault) Then
-                        '
-                        ' This is a 404 caused by Contensive returning a 404
-                        '   possibly because the pageid was not found or was inactive.
-                        '   contensive returned a 404 error, and the IIS custom error handler is hitting now
-                        '   what we returned as an error cause is lost
-                        '   ( because the Custom404Source page is the default page )
-                        '   send it to the 404 page
-                        '
-                        cpcore.webServer.requestPathPage = cpcore.webServer.requestPathPage
-                        IsPageNotFound = True
-                        PageNotFoundReason = "The page could not be displayed. The record may have been deleted, marked inactive. The page's parent pages or section may be invalid."
-                    End If
-                End If
-                If False Then
-                    '
-                    'todo consider if we will keep this. It is not straightforward, and and more straightforward method may exist
-                    '
-                    ' Determine where to go next
-                    '   If the current page is not the referring page, redirect to the referring page
-                    '   Because...
-                    '   - the page with the form (the referrer) was a link alias page. You can not post to a link alias, so internally we post to the default page, and redirect back.
-                    '   - This only acts on internal Contensive forms, so developer pages are not effected
-                    '   - This way, if the form post comes from a main_GetJSPage Remote Method, it posts to the Content Server,
-                    '       then redirects back to the static site (with the new changed content)
-                    '
-                    If cpcore.webServer.requestReferrer <> "" Then
-                        Dim main_ServerReferrerURL As String
-                        Dim main_ServerReferrerQs As String
-                        Dim Position As Integer
-                        main_ServerReferrerURL = cpcore.webServer.requestReferrer
-                        main_ServerReferrerQs = ""
-                        Position = genericController.vbInstr(1, main_ServerReferrerURL, "?")
-                        If Position <> 0 Then
-                            main_ServerReferrerQs = Mid(main_ServerReferrerURL, Position + 1)
-                            main_ServerReferrerURL = Mid(main_ServerReferrerURL, 1, Position - 1)
-                        End If
-                        If Right(main_ServerReferrerURL, 1) = "/" Then
-                            '
-                            ' Referer had no page, figure out what it should have been
-                            '
-                            If cpcore.webServer.webServerIO_requestPage <> "" Then
-                                '
-                                ' If the referer had no page, and there is one here now, it must have been from an IIS redirect, use the current page as the default page
-                                '
-                                main_ServerReferrerURL = main_ServerReferrerURL & cpcore.webServer.webServerIO_requestPage
-                            Else
-                                main_ServerReferrerURL = main_ServerReferrerURL & cpcore.siteProperties.serverPageDefault
-                            End If
-                        End If
-                        Dim linkDst As String
-                        'main_ServerPage = main_ServerPage
-                        If main_ServerReferrerURL <> cpcore.webServer.webServerIO_ServerFormActionURL Then
-                            '
-                            ' remove any methods from referrer
-                            '
-                            Dim Copy As String
-                            Copy = "Redirecting because a Contensive Form was detected, source URL [" & main_ServerReferrerURL & "] does not equal the current URL [" & cpcore.webServer.webServerIO_ServerFormActionURL & "]. This may be from a Contensive Add-on that now needs to redirect back to the host page."
-                            linkDst = cpcore.webServer.webServerIO_requestReferer
-                            If main_ServerReferrerQs <> "" Then
-                                linkDst = main_ServerReferrerURL
-                                main_ServerReferrerQs = genericController.ModifyQueryString(main_ServerReferrerQs, "method", "")
-                                If main_ServerReferrerQs <> "" Then
-                                    linkDst = linkDst & "?" & main_ServerReferrerQs
-                                End If
-                            End If
-                            Call cpcore.webServer.webServerIO_Redirect2(linkDst, Copy, False)
-                            cpcore.docOpen = False '--- should be disposed by caller --- Call dispose
-                        End If
-                    End If
-                End If
-                If True Then
-                    ' - same here, this was in appInit() to prcess the pagenotfounds - maybe here (at the end, maybe in pageManager)
-                    '--------------------------------------------------------------------------
-                    ' ----- Process Early page-not-found
-                    '--------------------------------------------------------------------------
-                    '
-                    If IsPageNotFound Then
-                        If True Then
-                            '
-                            ' new way -- if a (real) 404 page is received, just convert this hit to the page-not-found page, do not redirect to it
-                            '
-                            Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
-                            Call cpcore.webServer.web_setResponseStatus("404 Not Found")
-                            cpcore.docProperties.setProperty("bid", main_GetPageNotFoundPageId())
-                            'Call main_mergeInStream("bid=" & main_GetPageNotFoundPageId())
-                            If cpcore.authContext.isAuthenticatedAdmin(cpcore) Then
-                                cpcore.htmlDoc.main_AdminWarning = PageNotFoundReason
-                                cpcore.htmlDoc.main_AdminWarningPageID = 0
-                                cpcore.htmlDoc.main_AdminWarningSectionID = 0
-                            End If
-                        Else
-                            '
-                            ' old way -- if a (real) 404 page is received, redirect to it to the 404 page with content
-                            '
-                            RedirectReason = PageNotFoundReason
-                            RedirectLink = main_ProcessPageNotFound_GetLink(PageNotFoundReason, , PageNotFoundSource)
-                        End If
-                    End If
-                End If
-                '
-                ' add exception list header
-                '
-                returnDoc = cpcore.getDocExceptionHtmlList() & returnDoc
-                '
-            Catch ex As Exception
-                Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetHTMLDoc2")
-            End Try
-            Return returnDoc
-        End Function
         '
         '========================================================================
         ' main_DeleteChildRecords
@@ -7963,7 +6189,7 @@ ErrorTrap:
         '
         '
         '
-        Private Function pageManager_GetDefaultBlockMessage(UseContentWatchLink As Boolean) As String
+        Friend Function pageManager_GetDefaultBlockMessage(UseContentWatchLink As Boolean) As String
             pageManager_GetDefaultBlockMessage = ""
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("main_GetDefaultBlockMessage")
             '
@@ -8021,7 +6247,7 @@ ErrorTrap:
         '   {{CAPTION}} tags -- main_Gets the caption for each instruction line
         '   {{FIELD}} tags -- main_Gets the form field for each instruction line
         '
-        Private Function pageManager_LoadFormPageInstructions(FormInstructions As String, Formhtml As String) As main_FormPagetype
+        Friend Function pageManager_LoadFormPageInstructions(FormInstructions As String, Formhtml As String) As main_FormPagetype
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("main_LoadFormPageInstructions")
             '
             Dim RepeatBody As String
@@ -8119,7 +6345,7 @@ ErrorTrap:
         '
         '
         '
-        Private Function pageManager_GetFormPage(FormPageName As String, GroupIDToJoinOnSuccess As Integer) As String
+        Friend Function pageManager_GetFormPage(FormPageName As String, GroupIDToJoinOnSuccess As Integer) As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("main_GetFormPage")
             '
             Dim RepeatBody As String
@@ -8232,169 +6458,6 @@ ErrorTrap:
             Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_GetFormPage")
         End Function
         '
-        '
-        '
-        Private Sub pageManager_ProcessFormPage(FormPageID As Integer)
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("main_ProcessFormPage")
-            '
-            Dim CS As Integer
-            Dim SQL As String
-            Dim Formhtml As String
-            Dim FormInstructions As String
-            Dim f As main_FormPagetype
-            Dim Ptr As Integer
-            Dim CSPeople As Integer
-            Dim IsInGroup As Boolean
-            Dim WasInGroup As Boolean
-            Dim FormValue As String
-            Dim Success As Boolean
-            Dim PeopleFirstName As String
-            Dim PeopleLastName As String
-            Dim PeopleUsername As String
-            Dim PeoplePassword As String
-            Dim PeopleName As String
-            Dim PeopleEmail As String
-            Dim Groups() As String
-            Dim GroupName As String
-            Dim GroupIDToJoinOnSuccess As Integer
-            '
-            ' main_Get the instructions from the record
-            '
-            CS = cpcore.csOpen("Form Pages", FormPageID)
-            If cpcore.db.cs_ok(CS) Then
-                Formhtml = cpcore.db.cs_getText(CS, "Body")
-                FormInstructions = cpcore.db.cs_getText(CS, "Instructions")
-            End If
-            Call cpcore.db.cs_Close(CS)
-            If FormInstructions <> "" Then
-                '
-                ' Load the instructions
-                '
-                f = pageManager_LoadFormPageInstructions(FormInstructions, Formhtml)
-                If f.AuthenticateOnFormProcess And Not cpcore.authContext.isAuthenticated() And cpcore.authContext.isRecognized(cpcore) Then
-                    '
-                    ' If this form will authenticate when done, and their is a current, non-authenticated account -- logout first
-                    '
-                    Call cpcore.authContext.logout(cpcore)
-                End If
-                CSPeople = -1
-                Success = True
-                For Ptr = 0 To UBound(f.Inst)
-                    With f.Inst(Ptr)
-                        Select Case .Type
-                            Case 1
-                                '
-                                ' People Record
-                                '
-                                FormValue = cpcore.docProperties.getText(.PeopleField)
-                                If (FormValue <> "") And genericController.EncodeBoolean(cpcore.GetContentFieldProperty("people", .PeopleField, "uniquename")) Then
-                                    SQL = "select count(*) from ccMembers where " & .PeopleField & "=" & cpcore.db.encodeSQLText(FormValue)
-                                    CS = cpcore.db.cs_openSql(SQL)
-                                    If cpcore.db.cs_ok(CS) Then
-                                        Success = cpcore.db.cs_getInteger(CS, "cnt") = 0
-                                    End If
-                                    Call cpcore.db.cs_Close(CS)
-                                    If Not Success Then
-                                        cpcore.error_AddUserError("The field [" & .Caption & "] must be unique, and the value [" & cpcore.htmlDoc.html_EncodeHTML(FormValue) & "] has already been used.")
-                                    End If
-                                End If
-                                If (.REquired Or genericController.EncodeBoolean(cpcore.GetContentFieldProperty("people", .PeopleField, "required"))) And FormValue = "" Then
-                                    Success = False
-                                    cpcore.error_AddUserError("The field [" & cpcore.htmlDoc.html_EncodeHTML(.Caption) & "] is required.")
-                                Else
-                                    If Not cpcore.db.cs_ok(CSPeople) Then
-                                        CSPeople = cpcore.csOpen("people", cpcore.authContext.user.ID)
-                                    End If
-                                    If cpcore.db.cs_ok(CSPeople) Then
-                                        Select Case genericController.vbUCase(.PeopleField)
-                                            Case "NAME"
-                                                PeopleName = FormValue
-                                                Call cpcore.db.cs_set(CSPeople, .PeopleField, FormValue)
-                                            Case "FIRSTNAME"
-                                                PeopleFirstName = FormValue
-                                                Call cpcore.db.cs_set(CSPeople, .PeopleField, FormValue)
-                                            Case "LASTNAME"
-                                                PeopleLastName = FormValue
-                                                Call cpcore.db.cs_set(CSPeople, .PeopleField, FormValue)
-                                            Case "EMAIL"
-                                                PeopleEmail = FormValue
-                                                Call cpcore.db.cs_set(CSPeople, .PeopleField, FormValue)
-                                            Case "USERNAME"
-                                                PeopleUsername = FormValue
-                                                Call cpcore.db.cs_set(CSPeople, .PeopleField, FormValue)
-                                            Case "PASSWORD"
-                                                PeoplePassword = FormValue
-                                                Call cpcore.db.cs_set(CSPeople, .PeopleField, FormValue)
-                                            Case Else
-                                                Call cpcore.db.cs_set(CSPeople, .PeopleField, FormValue)
-                                        End Select
-                                    End If
-                                End If
-                            Case 2
-                                '
-                                ' Group main_MemberShip
-                                '
-                                IsInGroup = cpcore.docProperties.getBoolean("Group" & .GroupName)
-                                WasInGroup = cpcore.authContext.IsMemberOfGroup2(cpcore, .GroupName)
-                                If WasInGroup And Not IsInGroup Then
-                                    cpcore.group_DeleteGroupMember(.GroupName)
-                                ElseIf IsInGroup And Not WasInGroup Then
-                                    cpcore.group_AddGroupMember(.GroupName)
-                                End If
-                        End Select
-                    End With
-                Next
-                '
-                ' Create People Name
-                '
-                If PeopleName = "" And PeopleFirstName <> "" And PeopleLastName <> "" Then
-                    If cpcore.db.cs_ok(CSPeople) Then
-                        Call cpcore.db.cs_set(CSPeople, "name", PeopleFirstName & " " & PeopleLastName)
-                    End If
-                End If
-                Call cpcore.db.cs_Close(CSPeople)
-                '
-                ' AuthenticationOnFormProcess requires Username/Password and must be valid
-                '
-                If Success Then
-                    '
-                    ' Authenticate
-                    '
-                    If f.AuthenticateOnFormProcess Then
-                        Call cpcore.authContext.authenticateById(cpcore, cpcore.authContext.user.ID, cpcore.authContext)
-                    End If
-                    '
-                    ' Join Group requested by page that created form
-                    '
-                    Dim tokenDate As Date
-                    Call cpcore.security.decodeToken(cpcore.docProperties.getText("SuccessID"), GroupIDToJoinOnSuccess, tokenDate)
-                    'GroupIDToJoinOnSuccess = main_DecodeKeyNumber(main_GetStreamText2("SuccessID"))
-                    If GroupIDToJoinOnSuccess <> 0 Then
-                        Call cpcore.group_AddGroupMember(cpcore.group_GetGroupName(GroupIDToJoinOnSuccess))
-                    End If
-                    '
-                    ' Join Groups requested by pageform
-                    '
-                    If f.AddGroupNameList <> "" Then
-                        Groups = Split(Trim(f.AddGroupNameList), ",")
-                        For Ptr = 0 To UBound(Groups)
-                            GroupName = Trim(Groups(Ptr))
-                            If GroupName <> "" Then
-                                Call cpcore.group_AddGroupMember(GroupName)
-                            End If
-                        Next
-                    End If
-                End If
-            End If
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_ProcessFormPage")
-        End Sub
-        '
         '=============================================================================
         '
         '=============================================================================
@@ -8425,8 +6488,8 @@ ErrorTrap:
             pageManager_GetSectionMenuNamed = pageManager_GetSectionMenu(DepthLimit, MenuStyle, StyleSheetPrefixLocal, DefaultTemplateLink, MenuID, MenuNameLocal, cpcore.siteProperties.useContentWatchLink)
             pageManager_GetSectionMenuNamed = cpcore.htmlDoc.main_GetEditWrapper("Section Menu", pageManager_GetSectionMenuNamed)
             '
-            If pageManager_RedirectLink <> "" Then
-                Call cpcore.webServer.webServerIO_Redirect2(pageManager_RedirectLink, pageManager_RedirectReason, pageManager_RedirectBecausePageNotFound)
+            If Me.redirectLink <> "" Then
+                Call cpcore.webServer.webServerIO_Redirect2(Me.redirectLink, pageManager_RedirectReason, pageManager_RedirectBecausePageNotFound)
             End If
             '
             Exit Function
@@ -8815,7 +6878,7 @@ ErrorTrap:
         '
         '
         '
-        Private Function pageManager_GetSectionLink(ByVal ShortLink As String, ByVal PageID As Integer, ByVal SectionID As Integer) As String
+        Friend Function pageManager_GetSectionLink(ByVal ShortLink As String, ByVal PageID As Integer, ByVal SectionID As Integer) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00378")
             '
             Dim QSplit() As String
@@ -8874,14 +6937,14 @@ ErrorTrap:
             Dim FieldList As String
             Const ContentName = "Page Templates"
             '
-            If (templateId <> 0) And (main_RenderedTemplateID = templateId) Then
+            If (templateId <> 0) And (currentTemplateID = templateId) Then
                 '
                 ' Use the previous values already loaded
                 '
             Else
-                main_RenderedTemplateID = templateId
-                pageManager_TemplateBody = ""
-                pageManager_TemplateLink = ""
+                currentTemplateID = templateId
+                templateBody = ""
+                templateLink = ""
                 If True Then
                     FieldList = "ID,Link,BodyHTML"
                 Else
@@ -8896,7 +6959,7 @@ ErrorTrap:
                     ' ----- if template not found, return default template
                     '       if this operation fails, exit now -- do not continue and create new template
                     '
-                    main_RenderedTemplateID = 0
+                    currentTemplateID = 0
                     If cpcore.domains.domainDetails.defaultTemplateId <> 0 Then
                         '
                         ' ----- attempt to use the domain's default template
@@ -8919,30 +6982,30 @@ ErrorTrap:
                         CS = cpcore.db.cs_open(ContentName, "name=" & cpcore.db.encodeSQLText(TemplateDefaultName), "ID", , , , , FieldList)
                     End If
                     If cpcore.db.cs_ok(CS) Then
-                        main_RenderedTemplateID = cpcore.db.cs_getInteger(CS, "ID")
-                        main_RenderedTemplateName = cpcore.db.cs_getText(CS, "name")
-                        pageManager_TemplateName = main_RenderedTemplateName
-                        pageManager_TemplateLink = main_verifyTemplateLink(cpcore.db.cs_get(CS, "Link"))
+                        currentTemplateID = cpcore.db.cs_getInteger(CS, "ID")
+                        currentTemplateName = cpcore.db.cs_getText(CS, "name")
+                        templateName = currentTemplateName
+                        templateLink = main_verifyTemplateLink(cpcore.db.cs_get(CS, "Link"))
                         'pageManager_TemplateLink = app.csv_cs_get(CS, "Link")
                         If True Then
-                            pageManager_TemplateBody = cpcore.db.cs_get(CS, "BodyHTML")
+                            templateBody = cpcore.db.cs_get(CS, "BodyHTML")
                         End If
                     End If
                     Call cpcore.db.cs_Close(CS)
                     '
                     ' ----- if default template not found, create a simple default template
                     '
-                    If main_RenderedTemplateID = 0 Then
-                        pageManager_TemplateName = TemplateDefaultName
-                        pageManager_TemplateBody = TemplateDefaultBody
+                    If currentTemplateID = 0 Then
+                        templateName = TemplateDefaultName
+                        templateBody = TemplateDefaultBody
                         CS = cpcore.db.cs_insertRecord("Page Templates")
                         If cpcore.db.cs_ok(CS) Then
-                            main_RenderedTemplateID = cpcore.db.cs_getInteger(CS, "ID")
-                            main_RenderedTemplateName = TemplateDefaultName
+                            currentTemplateID = cpcore.db.cs_getInteger(CS, "ID")
+                            currentTemplateName = TemplateDefaultName
                             Call cpcore.db.cs_set(CS, "name", TemplateDefaultName)
                             Call cpcore.db.cs_set(CS, "Link", "")
                             If True Then
-                                Call cpcore.db.cs_set(CS, "BodyHTML", pageManager_TemplateBody)
+                                Call cpcore.db.cs_set(CS, "BodyHTML", templateBody)
                             End If
                             If True Then
                                 Call cpcore.db.cs_set(CS, "ccGuid", DefaultTemplateGuid)
@@ -8951,24 +7014,24 @@ ErrorTrap:
                         End If
                         Call pageManager_cache_pageTemplate_clear()
                     End If
-                    pageManager_TemplateLink = ""
+                    templateLink = ""
                 Else
                     '
                     ' ----- load template
                     '
                     If True Then
-                        pageManager_TemplateBody = cpcore.db.cs_get(CS, "BodyHTML")
+                        templateBody = cpcore.db.cs_get(CS, "BodyHTML")
                     Else
-                        pageManager_TemplateBody = "<!-- Template Body support requires a Contensive database upgrade through the Application Manager. -->" & TemplateDefaultBody
+                        templateBody = "<!-- Template Body support requires a Contensive database upgrade through the Application Manager. -->" & TemplateDefaultBody
                     End If
-                    pageManager_TemplateName = cpcore.db.cs_get(CS, "name")
-                    pageManager_TemplateLink = main_verifyTemplateLink(cpcore.db.cs_get(CS, "Link"))
+                    templateName = cpcore.db.cs_get(CS, "name")
+                    templateLink = main_verifyTemplateLink(cpcore.db.cs_get(CS, "Link"))
                 End If
                 Call cpcore.db.cs_Close(CS)
-                pageManager_TemplateLink = main_verifyTemplateLink(pageManager_TemplateLink)
+                templateLink = main_verifyTemplateLink(templateLink)
             End If
             '
-            pageManager_LoadTemplateGetID = main_RenderedTemplateID
+            pageManager_LoadTemplateGetID = currentTemplateID
             Exit Function
             '
 ErrorTrap:
@@ -9162,13 +7225,13 @@ ErrorTrap:
         '
         '
         '
-        Private Function pageManager_GetLandingLink() As String
-            If pageManager_LandingLink = "" Then
-                pageManager_LandingLink = cpcore.siteProperties.getText("SectionLandingLink", requestAppRootPath & cpcore.siteProperties.serverPageDefault)
-                pageManager_LandingLink = genericController.ConvertLinkToShortLink(pageManager_LandingLink, cpcore.webServer.requestDomain, cpcore.webServer.webServerIO_requestVirtualFilePath)
-                pageManager_LandingLink = genericController.EncodeAppRootPath(pageManager_LandingLink, cpcore.webServer.webServerIO_requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain)
+        Friend Function pageManager_GetLandingLink() As String
+            If landingLink = "" Then
+                landingLink = cpcore.siteProperties.getText("SectionLandingLink", requestAppRootPath & cpcore.siteProperties.serverPageDefault)
+                landingLink = genericController.ConvertLinkToShortLink(landingLink, cpcore.webServer.requestDomain, cpcore.webServer.webServerIO_requestVirtualFilePath)
+                landingLink = genericController.EncodeAppRootPath(landingLink, cpcore.webServer.webServerIO_requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain)
             End If
-            pageManager_GetLandingLink = pageManager_LandingLink
+            pageManager_GetLandingLink = landingLink
         End Function
 
         '
@@ -9300,7 +7363,7 @@ ErrorTrap:
         '
         '
         '
-        Private Function main_guessDefaultPage() As String
+        Friend Function main_guessDefaultPage() As String
             Return "default.aspx"
         End Function
         '
@@ -9337,7 +7400,7 @@ ErrorTrap:
         '   Tests if this record is in the ParentID->ID chain for this content
         '========================================================================
         '
-        Private Function main_IsChildRecord_Recurse(ByVal DataSourceName As String, ByVal TableName As String, ByVal ChildRecordID As Integer, ByVal ParentRecordID As Integer, ByVal History As String) As Boolean
+        Friend Function main_IsChildRecord_Recurse(ByVal DataSourceName As String, ByVal TableName As String, ByVal ChildRecordID As Integer, ByVal ParentRecordID As Integer, ByVal History As String) As Boolean
             '
             Dim SQL As String
             Dim CS As Integer
@@ -9360,7 +7423,7 @@ ErrorTrap:
         '
         '
         '
-        Private Function main_ProcessPageNotFound_GetLink(ByVal adminMessage As String, Optional ByVal BackupPageNotFoundLink As String = "", Optional ByVal PageNotFoundLink As String = "", Optional ByVal EditPageID As Integer = 0, Optional ByVal EditSectionID As Integer = 0) As String
+        Friend Function main_ProcessPageNotFound_GetLink(ByVal adminMessage As String, Optional ByVal BackupPageNotFoundLink As String = "", Optional ByVal PageNotFoundLink As String = "", Optional ByVal EditPageID As Integer = 0, Optional ByVal EditSectionID As Integer = 0) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("ProcessPageNotFound_GetLink")
             '
             Dim Pos As Integer
@@ -9464,23 +7527,23 @@ ErrorTrap:
             Try
                 Dim CS As Integer
                 '
-                If Not pageManager_LandingPageID_Loaded Then
-                    pageManager_LandingPageID_Loaded = True
+                If Not landingPageID_Loaded Then
+                    landingPageID_Loaded = True
                     '
                     ' try the domain landing page first
                     '
                     CS = cpcore.db.cs_open("Domains", "(name=" & cpcore.db.encodeSQLText(cpcore.webServer.requestDomain) & ")", , , , , , "RootPageID")
                     If cpcore.db.cs_ok(CS) Then
-                        pageManager_LandingPageID = genericController.EncodeInteger(cpcore.db.cs_getText(CS, "RootPageID"))
+                        Me.landingPageID = genericController.EncodeInteger(cpcore.db.cs_getText(CS, "RootPageID"))
                     End If
                     Call cpcore.db.cs_Close(CS)
-                    If pageManager_LandingPageID = 0 Then
+                    If Me.landingPageID = 0 Then
                         '
                         ' try the site property landing page id
                         '
-                        pageManager_LandingPageID = cpcore.siteProperties.getinteger("LandingPageID", 0)
+                        Me.landingPageID = cpcore.siteProperties.getinteger("LandingPageID", 0)
                     End If
-                    If pageManager_LandingPageID = 0 Then
+                    If Me.landingPageID = 0 Then
                         '
                         ' landing page could not be determined
                         '
@@ -9489,10 +7552,10 @@ ErrorTrap:
                             & " To configure any page as your landing page, edit the page, select the 'Control' tab, and check the checkbox marked 'Set Landing Page'.</p>" _
                             & "<p>The Landing Page is the page that is displayed when the domain name is requested without a specific page.</p>"
                         '
-                        pageManager_LandingPageID = main_GetPageNotFoundPageId()
+                        Me.landingPageID = main_GetPageNotFoundPageId()
                     End If
                 End If
-                landingPageid = pageManager_LandingPageID
+                landingPageid = Me.landingPageID
             Catch ex As Exception
                 cpcore.handleExceptionAndContinue(ex) : Throw
             End Try
@@ -9508,18 +7571,18 @@ ErrorTrap:
             '
             Dim PCCPtr As Integer
             '
-            If pageManager_LandingPageName = "" Then
+            If landingPageName = "" Then
                 PCCPtr = cache_pageContent_getPtr(LandingPageID, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
                 If PCCPtr < 0 Then
                     '
                     ' This case should have been covered in main_GetLandingPageID -- and should not be possible
                     '
-                    pageManager_LandingPageName = DefaultNewLandingPageName
+                    landingPageName = DefaultNewLandingPageName
                 Else
-                    pageManager_LandingPageName = cache_pageContent(PCC_Name, PCCPtr)
+                    landingPageName = cache_pageContent(PCC_Name, PCCPtr)
                 End If
             End If
-            main_GetLandingPageName = pageManager_LandingPageName
+            main_GetLandingPageName = landingPageName
             '
             Exit Function
 ErrorTrap:
@@ -9528,7 +7591,7 @@ ErrorTrap:
         '
         ' Verify a link from the template link field to be used as a Template Link
         '
-        Private Function main_verifyTemplateLink(ByVal linkSrc As String) As String
+        Friend Function main_verifyTemplateLink(ByVal linkSrc As String) As String
             On Error GoTo ErrorTrap
             '
             '
@@ -9600,7 +7663,7 @@ ErrorTrap:
         ' Dim siteSectionRootPageIndex As Dictionary(Of Integer, Integer) = siteSectionModel.getRootPageIdIndex(Me)
         '====================================================================================================
         '
-        Private Function getPageSectionId(ByVal PageID As Integer, ByRef UsedIDList As List(Of Integer), siteSectionRootPageIndex As Dictionary(Of Integer, Integer)) As Integer
+        Friend Function getPageSectionId(ByVal PageID As Integer, ByRef UsedIDList As List(Of Integer), siteSectionRootPageIndex As Dictionary(Of Integer, Integer)) As Integer
             Dim sectionId As Integer = 0
             Try
                 Dim page As Models.Entity.pageContentModel = Models.Entity.pageContentModel.create(cpcore, PageID, New List(Of String))
@@ -9626,7 +7689,7 @@ ErrorTrap:
         ' Used Interally by main_GetPageLink to main_Get the TemplateID of the parents
         '====================================================================================================
         '
-        Private Function main_GetPageDynamicLink_GetTemplateID(ByVal PageID As Integer, ByVal UsedIDList As String) As Integer
+        Friend Function main_GetPageDynamicLink_GetTemplateID(ByVal PageID As Integer, ByVal UsedIDList As String) As Integer
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetPageDynamicLink_GetTemplateID")
             '
             Dim CS As Integer
@@ -9723,7 +7786,7 @@ ErrorTrap:
         ''' <param name="MenuLinkOverRide"></param>
         ''' <param name="UseContentWatchLink"></param>
         ''' <returns></returns>
-        Private Function main_GetPageDynamicLinkWithArgs(ByVal ContentControlID As Integer, ByVal PageID As Integer, ByVal DefaultLink As String, ByVal IsRootPage As Boolean, ByVal templateId As Integer, ByVal SectionID As Integer, ByVal MenuLinkOverRide As String, ByVal UseContentWatchLink As Boolean) As String
+        Friend Function main_GetPageDynamicLinkWithArgs(ByVal ContentControlID As Integer, ByVal PageID As Integer, ByVal DefaultLink As String, ByVal IsRootPage As Boolean, ByVal templateId As Integer, ByVal SectionID As Integer, ByVal MenuLinkOverRide As String, ByVal UseContentWatchLink As Boolean) As String
             Dim resultLink As String = ""
             Try
                 If MenuLinkOverRide <> "" Then

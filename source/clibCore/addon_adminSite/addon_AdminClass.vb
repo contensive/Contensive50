@@ -89,7 +89,7 @@ Namespace Contensive.Addons
                     returnHtml = "" _
                     & PageOpen _
                     & AdminContent _
-                    & cpCore.pageManager.pagemanager_GetPageEnd() _
+                    & cpCore.pages.pagemanager_GetPageEnd() _
                     & ""
                 Else
                     '
@@ -102,7 +102,7 @@ Namespace Contensive.Addons
                     & PageOpen _
                     & AdminContent _
                     & cpCore.htmlDoc.html_GetEndOfBody(True, True, False, True) _
-                    & cpCore.pageManager.pagemanager_GetPageEnd() _
+                    & cpCore.pages.pagemanager_GetPageEnd() _
                     & ""
                 End If
                 '
@@ -1049,7 +1049,7 @@ ErrorTrap:
                                     'no - if WF, on process on publish
                                     'Call ProcessSpecialCaseAfterSave(false,AdminContent.Name, EditRecord.ID, EditRecord.Name, EditRecord.ParentID, UseContentWatchLink)
                                     Call cpCore.workflow.main_SubmitEdit(adminContent.Name, editRecord.id)
-                                    Call cpCore.pageManager.pageManager_SendPublishSubmitNotice(adminContent.Name, editRecord.id, editRecord.nameLc)
+                                    Call cpCore.pages.pageManager_SendPublishSubmitNotice(adminContent.Name, editRecord.id, editRecord.nameLc)
                                 Else
                                     AdminForm = AdminSourceForm
                                 End If
@@ -1104,7 +1104,7 @@ ErrorTrap:
                                         'ContentName = EditRecord.ContentName
                                         'ContentName = cpCore.metaData.getContentNameByID(cpCore.app.cs_getInteger(CSEditRecord, "ContentControlID"))
                                         If cpCore.main_IsContentFieldSupported(adminContent.Name, "parentid") Then
-                                            Call cpCore.pageManager.pageManager_DeleteChildRecords(adminContent.Name, editRecord.id, False)
+                                            Call cpCore.pages.pageManager_DeleteChildRecords(adminContent.Name, editRecord.id, False)
                                         End If
                                     End If
                                     Call cpCore.DeleteCSRecord(CSEditRecord)
@@ -1362,7 +1362,7 @@ ErrorTrap:
                                             ' Page Content special cases
                                             '
                                             If genericController.vbLCase(adminContent.ContentTableName) = "ccpagecontent" Then
-                                                Call cpCore.pageManager.cache_pageContent_removeRow(RecordID, False, False)
+                                                Call cpCore.pages.cache_pageContent_removeRow(RecordID, False, False)
                                                 If RecordID = (cpCore.siteProperties.getinteger("PageNotFoundPageID", 0)) Then
                                                     Call cpCore.siteProperties.getText("PageNotFoundPageID", "0")
                                                 End If
@@ -1724,11 +1724,11 @@ ErrorTrap:
                 '
                 ' ----- Set the local global copy of Edit Record Locks
                 '
-                Call cpCore.pageManager.pageManager_GetAuthoringStatus(adminContent.Name, editRecord.id, editRecord.SubmitLock, editRecord.ApproveLock, editRecord.SubmittedName, editRecord.ApprovedName, editRecord.IsInserted, editRecord.IsDeleted, editRecord.IsModified, editRecord.LockModifiedName, editRecord.LockModifiedDate, editRecord.SubmittedDate, editRecord.ApprovedDate)
+                Call cpCore.pages.pageManager_GetAuthoringStatus(adminContent.Name, editRecord.id, editRecord.SubmitLock, editRecord.ApproveLock, editRecord.SubmittedName, editRecord.ApprovedName, editRecord.IsInserted, editRecord.IsDeleted, editRecord.IsModified, editRecord.LockModifiedName, editRecord.LockModifiedDate, editRecord.SubmittedDate, editRecord.ApprovedDate)
                 '
                 ' ----- Set flags used to determine the Authoring State
                 '
-                Call cpCore.pageManager.pageManager_GetAuthoringPermissions(adminContent.Name, editRecord.id, editRecord.AllowInsert, editRecord.AllowCancel, editRecord.AllowSave, editRecord.AllowDelete, editRecord.AllowPublish, editRecord.AllowAbort, editRecord.AllowSubmit, editRecord.AllowApprove, editRecord.Read_Only)
+                Call cpCore.pages.pageManager_GetAuthoringPermissions(adminContent.Name, editRecord.id, editRecord.AllowInsert, editRecord.AllowCancel, editRecord.AllowSave, editRecord.AllowDelete, editRecord.AllowPublish, editRecord.AllowAbort, editRecord.AllowSubmit, editRecord.AllowApprove, editRecord.Read_Only)
                 '
                 ' ----- Set Edit Lock
                 '
@@ -3865,8 +3865,8 @@ ErrorTrap:
                 '
                 AdminContentWorkflowAuthoring = AdminContentWorkflowAuthoring
                 'IsWorkflowMode = cpCore.app.SiteProperty_AllowWorkflowAuthoring And AdminContent.AllowWorkflowAuthoring
-                If cpCore.pageManager.cache_pageContent_rows = 0 Then
-                    Call cpCore.pageManager.cache_pageContent_load(AdminContentWorkflowAuthoring, False)
+                If cpCore.pages.cache_pageContent_rows = 0 Then
+                    Call cpCore.pages.cache_pageContent_load(AdminContentWorkflowAuthoring, False)
                 End If
                 'Ptr = cpCore.pageManager.pageManager_cache_pageContent_getPtr(0, AdminContentWorkflowAuthoring, False)
                 '
@@ -3971,7 +3971,7 @@ ErrorTrap:
                     '
                     ' ----- special case, Is this page a LandingPageParent (Parent of the landing page), or is this section the landing page section
                     '
-                    PCC = cpCore.pageManager.cache_pageContent_get(False, False)
+                    PCC = cpCore.pages.cache_pageContent_get(False, False)
                     If Not IsNothing(PCC) Then
                         TestPageID = cpCore.siteProperties.landingPageID
                         Do While LoopPtr < 20 And (TestPageID <> 0)
@@ -3980,7 +3980,7 @@ ErrorTrap:
                             If IsLandingPageParent Or IsLandingSection Then
                                 Exit Do
                             End If
-                            PCCPtr = cpCore.pageManager.cache_pageContent_getPtr(TestPageID, False, False)
+                            PCCPtr = cpCore.pages.cache_pageContent_getPtr(TestPageID, False, False)
                             If PCCPtr >= 0 Then
                                 TestPageID = genericController.EncodeInteger(PCC(PCC_ParentID, PCCPtr))
                             End If
@@ -4008,7 +4008,7 @@ ErrorTrap:
                 If IsTemplateTable Then
                     TemplateIDForStyles = editRecord.id
                 ElseIf IsPageContentTable Then
-                    Call cpCore.pageManager.pageManager_GetPageArgs(editRecord.id, AdminContentWorkflowAuthoring, False, IgnoreInteger, TemplateIDForStyles, IgnoreInteger, IgnoreString, IgnoreBoolean, IgnoreInteger, IgnoreBoolean, "")
+                    Call cpCore.pages.pageManager_GetPageArgs(editRecord.id, AdminContentWorkflowAuthoring, False, IgnoreInteger, TemplateIDForStyles, IgnoreInteger, IgnoreString, IgnoreBoolean, IgnoreInteger, IgnoreBoolean, "")
                 End If
                 '
                 ' ----- create page headers
@@ -4992,7 +4992,7 @@ ErrorTrap:
                         ContentID = cpCore.db.cs_getInteger(CS, "contentID")
                         ContentName = cpCore.db.cs_getText(CS, "contentname")
                         RecordID = cpCore.db.cs_getInteger(CS, "recordid")
-                        Link = cpCore.pageManager.getPageLink4(RecordID, "", True, False)
+                        Link = cpCore.pages.getPageLink4(RecordID, "", True, False)
                         'Link = cpCore.main_GetPageLink3(RecordID, "", True)
                         'If Link = "" Then
                         '    Link = cpCore.db.cs_getText(CS, "Link")
@@ -5013,7 +5013,7 @@ ErrorTrap:
                                 'Call HandleInternalError("GetForm_Publish", "Admin Workflow Publish selected an authoring control record [" & ContentID & "." & RecordID & "] for a content definition [" & ContentName & "] that does not AllowWorkflowAuthoring.")
                             Else
 
-                                Call cpCore.pageManager.pageManager_GetAuthoringStatus(ContentName, RecordID, IsSubmitted, IsApproved, SubmitName, ApprovedName, IsInserted, IsDeleted, IsModified, ModifiedName, ModifiedDate, SubmittedDate, ApprovedDate)
+                                Call cpCore.pages.pageManager_GetAuthoringStatus(ContentName, RecordID, IsSubmitted, IsApproved, SubmitName, ApprovedName, IsInserted, IsDeleted, IsModified, ModifiedName, ModifiedDate, SubmittedDate, ApprovedDate)
                                 If RowColor = "class=""ccPanelRowOdd""" Then
                                     RowColor = "class=""ccPanelRowEven"""
                                 Else
@@ -6659,7 +6659,7 @@ ErrorTrap:
                 '
                 If (UCase(adminContent.ContentTableName) = "CCPAGECONTENT") Or (UCase(adminContent.ContentTableName) = "ITEMS") Then
                     FieldHelp = "This is the URL where this record was last displayed on the site. It may be blank if the record has not been displayed yet."
-                    Copy = cpCore.pageManager.getContentWatchLinkByKey(editRecord.contentControlId & "." & editRecord.id, , False)
+                    Copy = cpCore.pages.getContentWatchLinkByKey(editRecord.contentControlId & "." & editRecord.id, , False)
                     If Copy = "" Then
                         HTMLFieldString = "unknown"
                     Else
@@ -7570,7 +7570,7 @@ ErrorTrap:
                 '
                 ' Table of old Link Aliases
                 '
-                Link = cpCore.pageManager.main_GetPageDynamicLink(editRecord.id, False)
+                Link = cpCore.pages.main_GetPageDynamicLink(editRecord.id, False)
                 CS = cpCore.db.cs_open("Link Aliases", "pageid=" & editRecord.id, "ID Desc", , , , , "name")
                 Do While cpCore.db.cs_ok(CS)
                     LinkList = LinkList & "<div style=""margin-left:4px;margin-bottom:4px;"">" & cpCore.htmlDoc.html_EncodeHTML(cpCore.db.cs_getText(CS, "name")) & "</div>"
