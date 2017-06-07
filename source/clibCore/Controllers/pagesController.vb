@@ -1271,18 +1271,23 @@ ErrorTrap:
                     '---------------------------------------------------------------------------------
                     '
                     bodyContent = returnHtml
-                    AddOnCnt = UBound(cpcore.addonCache.addonCache.onPageStartPtrs) + 1
-                    For addonPtr = 0 To AddOnCnt - 1
-                        addonCachePtr = cpcore.addonCache.addonCache.onPageStartPtrs(addonPtr)
-                        If addonCachePtr > -1 Then
-                            addonId = cpcore.addonCache.addonCache.addonList(addonCachePtr.ToString).id
-                            If addonId > 0 Then
-                                AddonName = cpcore.addonCache.addonCache.addonList(addonCachePtr.ToString).name
-                                AddonContent = cpcore.addon.execute_legacy5(addonId, AddonName, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
-                                bodyContent = AddonContent & bodyContent
-                            End If
-                        End If
+                    Dim addonList As List(Of addonModel) = Models.Entity.addonModel.createList_OnPageStartEvent(cpcore, New List(Of String))
+                    For Each addon As Models.Entity.addonModel In addonList
+                        AddonContent = cpcore.addon.execute_legacy5(addon.ID, addon.Name, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
+                        bodyContent = AddonContent & bodyContent
                     Next
+                    'AddOnCnt = UBound(cpcore.addonCache.addonCache.onPageStartPtrs) + 1
+                    'For addonPtr = 0 To AddOnCnt - 1
+                    '    addonCachePtr = cpcore.addonCache.addonCache.onPageStartPtrs(addonPtr)
+                    '    If addonCachePtr > -1 Then
+                    '        addonId = cpcore.addonCache.addonCache.addonList(addonCachePtr.ToString).id
+                    '        If addonId > 0 Then
+                    '            AddonName = cpcore.addonCache.addonCache.addonList(addonCachePtr.ToString).name
+                    '            AddonContent = cpcore.addon.execute_legacy5(addonId, AddonName, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
+                    '            bodyContent = AddonContent & bodyContent
+                    '        End If
+                    '    End If
+                    'Next
                     returnHtml = bodyContent
                     '
                     '---------------------------------------------------------------------------------

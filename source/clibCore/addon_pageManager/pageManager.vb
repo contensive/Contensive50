@@ -24,7 +24,7 @@ Namespace Contensive.Addons
             Try
                 Dim processor As CPClass = DirectCast(cp, CPClass)
                 Dim cpCore As coreClass = processor.core
-                returnHtml = getHtmlDoc(cpCore)
+                returnHtml = getDoc(cpCore)
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)
             End Try
@@ -37,7 +37,7 @@ Namespace Contensive.Addons
         '   This code is based on the GoMethod site script
         '========================================================================
         '
-        Public Function getHtmlDoc(cpCore As coreClass) As String
+        Public Function getDoc(cpCore As coreClass) As String
             Dim returnHtml As String = ""
             Try
                 Dim downloadId As Integer
@@ -111,7 +111,7 @@ Namespace Contensive.Addons
                     '--------------------------------------------------------------------------
                     '
                     If cpCore.docProperties.getInteger("ContensiveFormPageID") <> 0 Then
-                        Call pageManager_ProcessFormPage(cpCore, cpCore.docProperties.getInteger("ContensiveFormPageID"))
+                        Call processForm(cpCore, cpCore.docProperties.getInteger("ContensiveFormPageID"))
                     End If
                     '
                     '--------------------------------------------------------------------------
@@ -633,7 +633,7 @@ Namespace Contensive.Addons
                     If bodyAddonId <> 0 Then
                         htmlBody = cpCore.addon.execute(bodyAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", bodyAddonStatusOK, Nothing, "", Nothing, "", cpCore.authContext.user.ID, cpCore.authContext.isAuthenticated)
                     Else
-                        htmlBody = pageManager_GetHtmlBody(cpCore)
+                        htmlBody = getBody(cpCore)
                     End If
                     If cpCore.docOpen Then
                         '
@@ -785,7 +785,7 @@ Namespace Contensive.Addons
         '
         '
         '
-        Private Sub pageManager_ProcessFormPage(cpcore As coreClass, FormPageID As Integer)
+        Private Sub processForm(cpcore As coreClass, FormPageID As Integer)
             Try
                 '
                 Dim CS As Integer
@@ -949,8 +949,8 @@ Namespace Contensive.Addons
         '   This code is based on the GoMethod site script
         '========================================================================
         '
-        Public Function pageManager_GetHtmlBody(cpCore As coreClass) As String
-            Dim returnHtmlBody As String = ""
+        Public Function getBody(cpCore As coreClass) As String
+            Dim returnBody As String = ""
             Try
                 '
                 Dim AddonReturn As String
@@ -976,7 +976,7 @@ Namespace Contensive.Addons
                 Dim AddonName As String
                 '
                 Call cpCore.addonCache.load()
-                returnHtmlBody = ""
+                returnBody = ""
                 '
                 ' ----- OnBodyStart add-ons
                 '
@@ -990,7 +990,7 @@ Namespace Contensive.Addons
                         If addonId > 0 Then
                             AddonName = cpCore.addonCache.addonCache.addonList(addonCachePtr.ToString).name
                             'hint = hint & ",AddonName=" & AddonName
-                            returnHtmlBody = returnHtmlBody & cpCore.addon.execute_legacy2(addonId, "", "", CPUtilsBaseClass.addonContext.ContextOnBodyStart, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
+                            returnBody = returnBody & cpCore.addon.execute_legacy2(addonId, "", "", CPUtilsBaseClass.addonContext.ContextOnBodyStart, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
                             If Not FilterStatusOK Then
                                 Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError12("pageManager_GetHtmlBody", "There was an error processing OnAfterBody [" & cpcore.addonCache.addonCache.addonList(addonCachePtr.ToString).name & "]. Filtering was aborted.")
                                 Exit For
@@ -1002,12 +1002,12 @@ Namespace Contensive.Addons
                 ' ----- main_Get Content (Already Encoded)
                 '
                 blockSiteWithLogin = False
-                PageContent = getHtmlBody_GetSection(cpCore, True, True, False, blockSiteWithLogin)
+                PageContent = getBodyContent(cpCore, True, True, False, blockSiteWithLogin)
                 If blockSiteWithLogin Then
                     '
                     ' section blocked, just return the login box in the page content
                     '
-                    returnHtmlBody = "" _
+                    returnBody = "" _
                         & cr & "<div class=""ccLoginPageCon"">" _
                         & genericController.kmaIndent(PageContent) _
                         & cr & "</div>" _
@@ -1016,7 +1016,7 @@ Namespace Contensive.Addons
                     '
                     ' exit if stream closed during main_GetSectionpage
                     '
-                    returnHtmlBody = ""
+                    returnBody = ""
                 Else
                     '
                     ' no section block, continue
@@ -1041,16 +1041,16 @@ Namespace Contensive.Addons
                     '
                     If Not cpCore.htmlDoc.pageManager_printVersion Then
                         LocalTemplateBody = cpCore.htmlDoc.html_executeContentCommands(Nothing, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, cpCore.authContext.user.ID, cpCore.authContext.isAuthenticated, layoutError)
-                        returnHtmlBody = returnHtmlBody & cpCore.htmlDoc.html_encodeContent9(LocalTemplateBody, cpCore.authContext.user.ID, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain, False, cpCore.siteProperties.defaultWrapperID, PageContent, CPUtilsBaseClass.addonContext.ContextTemplate)
+                        returnBody = returnBody & cpCore.htmlDoc.html_encodeContent9(LocalTemplateBody, cpCore.authContext.user.ID, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain, False, cpCore.siteProperties.defaultWrapperID, PageContent, CPUtilsBaseClass.addonContext.ContextTemplate)
                         'returnHtmlBody = returnHtmlBody & EncodeContent8(LocalTemplateBody, memberID, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", main_ServerProtocol, False, app.SiteProperty_DefaultWrapperID, PageContent, ContextTemplate)
                     End If
                     '
                     ' If Content was not found, add it to the end
                     '
-                    If (InStr(1, returnHtmlBody, fpoContentBox) <> 0) Then
-                        returnHtmlBody = genericController.vbReplace(returnHtmlBody, fpoContentBox, PageContent)
+                    If (InStr(1, returnBody, fpoContentBox) <> 0) Then
+                        returnBody = genericController.vbReplace(returnBody, fpoContentBox, PageContent)
                     Else
-                        returnHtmlBody = returnHtmlBody & PageContent
+                        returnBody = returnBody & PageContent
                     End If
                     '
                     ' ----- Add tools Panel
@@ -1064,7 +1064,7 @@ Namespace Contensive.Addons
                         ' Add template editing
                         '
                         If cpCore.visitProperty.getBoolean("AllowAdvancedEditor") And cpCore.authContext.isEditing(cpCore, "Page Templates") Then
-                            returnHtmlBody = cpCore.htmlDoc.main_GetEditWrapper("Page Template [" & LocalTemplateName & "]", cpCore.main_GetRecordEditLink2("Page Templates", LocalTemplateID, False, LocalTemplateName, cpCore.authContext.isEditing(cpCore, "Page Templates")) & returnHtmlBody)
+                            returnBody = cpCore.htmlDoc.main_GetEditWrapper("Page Template [" & LocalTemplateName & "]", cpCore.main_GetRecordEditLink2("Page Templates", LocalTemplateID, False, LocalTemplateName, cpCore.authContext.isEditing(cpCore, "Page Templates")) & returnBody)
                         End If
                     End If
                     '
@@ -1083,9 +1083,9 @@ Namespace Contensive.Addons
                             If addonId > 0 Then
                                 AddonName = cpCore.addonCache.addonCache.addonList(addonCachePtr.ToString).name
                                 'hint = hint & ",AddonName=" & AddonName
-                                cpCore.htmlDoc.html_DocBodyFilter = returnHtmlBody
+                                cpCore.htmlDoc.html_DocBodyFilter = returnBody
                                 AddonReturn = cpCore.addon.execute_legacy2(addonId, "", "", CPUtilsBaseClass.addonContext.ContextFilter, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
-                                returnHtmlBody = cpCore.htmlDoc.html_DocBodyFilter & AddonReturn
+                                returnBody = cpCore.htmlDoc.html_DocBodyFilter & AddonReturn
                                 If Not FilterStatusOK Then
                                     Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError12("pageManager_GetHtmlBody", "There was an error processing OnBodyEnd for [" & AddonName & "]. Filtering was aborted.")
                                     Exit For
@@ -1099,7 +1099,7 @@ Namespace Contensive.Addons
                     If cpCore.siteProperties.getBoolean("AutoHTMLFormatting") Then
                         IndentCnt = 0
                         Parse = New htmlParserController(cpCore)
-                        Call Parse.Load(returnHtmlBody)
+                        Call Parse.Load(returnBody)
                         If Parse.ElementCount > 0 Then
                             For Ptr = 0 To Parse.ElementCount - 1
                                 If Not Parse.IsTag(Ptr) Then
@@ -1196,7 +1196,7 @@ Namespace Contensive.Addons
                                 '
                                 'Call main_AppendClassErrorLog("cpCoreClass(" & appEnvironment.name & ").GetHTMLBody AutoIndent error. At the end of the document, the last tag was still indented (more start tags than end tags). Link=[" & genericController.decodeHtml(main_ServerLink) & "], ")
                             End If
-                            returnHtmlBody = Result.Text
+                            returnBody = Result.Text
                         End If
                     End If
                 End If
@@ -1204,7 +1204,7 @@ Namespace Contensive.Addons
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
-            Return returnHtmlBody
+            Return returnBody
         End Function
         '
         '=============================================================================
@@ -1214,7 +1214,7 @@ Namespace Contensive.Addons
         '           else - (IsSectionRootPageIDMode) SectionRecord has a RootPageID field
         '=============================================================================
         '
-        Public Function getHtmlBody_GetSection(cpCore As coreClass, AllowChildPageList As Boolean, AllowReturnLink As Boolean, AllowEditWrapper As Boolean, ByRef return_blockSiteWithLogin As Boolean) As String
+        Public Function getBodyContent(cpCore As coreClass, AllowChildPageList As Boolean, AllowReturnLink As Boolean, AllowEditWrapper As Boolean, ByRef return_blockSiteWithLogin As Boolean) As String
             Dim returnHtml As String = ""
             Try
                 Dim test As String

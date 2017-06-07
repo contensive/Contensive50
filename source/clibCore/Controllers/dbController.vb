@@ -1872,6 +1872,9 @@ Namespace Contensive.Core.Controllers
                 '
                 fieldNameTrim = FieldName.Trim()
                 fieldNameTrimUpper = genericController.vbUCase(fieldNameTrim)
+                If (fieldNameTrimUpper = "STYLESFILENAME") Then
+                    fieldNameTrimUpper = fieldNameTrimUpper
+                End If
                 If Not cs_ok(CSPointer) Then
                     Throw New ApplicationException("Attempt To getField fieldname[" & FieldName & "], but the dataset Is empty Or does Not point To a valid row")
                 Else
@@ -2211,7 +2214,8 @@ Namespace Contensive.Core.Controllers
                                 fieldTypeId = .CDef.fields(FieldName.ToLower()).fieldTypeId
                             End If
                             returnFilename = genericController.csv_GetVirtualFilenameByTable(TableName, FieldName, RecordID, OriginalFilename, fieldTypeId)
-                            Call cs_set(CSPointer, fieldNameUpper, returnFilename)
+                            ' 20160607 - no, if you call the cs_set, it stack-overflows. this is a get, so do not save it here.
+                            'Call cs_set(CSPointer, fieldNameUpper, returnFilename)
                         End With
                     End If
                 End If

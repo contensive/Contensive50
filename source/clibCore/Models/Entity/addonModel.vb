@@ -10,54 +10,6 @@ Imports Contensive.Core.Controllers
 Imports Newtonsoft.Json
 
 Namespace Contensive.Core.Models.Entity
-    '
-    '====================================================================================================
-    ' entity model pattern
-    '   factory pattern load because if a record is not found, must rturn nothing
-    '   new() - empty constructor to allow deserialization
-    '   saveObject() - saves instance properties (nonstatic method)
-    '   create() - loads instance properties and returns a model 
-    '   delete() - deletes the record that matches the argument
-    '   getObjectList() - a pattern for creating model lists.
-    '   invalidateFIELDNAMEcache() - method to invalide the model cache. One per cache
-    '
-    '	1) set the primary content name in const cnPrimaryContent. avoid constants Like cnAddons used outside model
-    '	2) find-And-replace "addonModel" with the name for this model
-    '	3) when adding model fields, add in three places: the Public Property, the saveObject(), the loadObject()
-    '	4) when adding create() methods to support other fields/combinations of fields, 
-    '       - add a secondary cache For that new create method argument in loadObjec()
-    '       - add it to the injected cachename list in loadObject()
-    '       - add an invalidate
-    '
-    ' Model Caching
-    '   caching applies to model objects only, not lists of models (for now)
-    '       - this is because of the challenge of invalidating the list object when individual records are added or deleted
-    '
-    '   a model should have 1 primary cache object which stores the data and can have other secondary cacheObjects which do not hold data
-    '    the cacheName of the 'primary' cacheObject for models and db records (cacheNamePrefix + ".id." + #id)
-    '    'secondary' cacheName is (cacheNamePrefix + . + fieldName + . + #)
-    '
-    '   cacheobjects can be used to hold data (primary cacheobjects), or to hold only metadata (secondary cacheobjects)
-    '       - primary cacheobjects are like 'personModel.id.99' that holds the model for id=99
-    '           - it is primary because the .primaryobject is null
-    '           - invalidationData. This cacheobject is invalid after this datetime
-    '           - dependentobjectlist() - this object is invalid if any of those objects are invalid
-    '       - secondary cachobjects are like 'person.ccguid.12345678'. It does not hold data, just a reference to the primary cacheobject
-    '
-    '   cacheNames spaces are replaced with underscores, so "addon collections" should be addon_collections
-    '
-    '   cacheNames that match content names are treated as caches of "any" record in the content, so invalidating "people" can be used to invalidate
-    '       any non-specific cache in the people table, by including "people" as a dependant cachename. the "people" cachename should not clear
-    '       specific people caches, like people.id.99, but can be used to clear lists of records like "staff_list_group"
-    '       - this can be used as a fallback strategy to cache record lists: a remote method list can be cached with a dependancy on "add-ons".
-    '       - models should always clear this content name cache entry on all cache clears
-    '
-    '   when a model is created, the code first attempts to read the model's cacheobject. if it fails, it builds it and saves the cache object and tags
-    '       - when building the model, is writes object to the primary cacheobject, and writes all the secondaries to be used
-    '       - when building the model, if a database record is opened, a dependantObject Tag is created for the tablename+'id'+id
-    '       - when building the model, if another model is added, that model returns its cachenames in the cacheNameList to be added as dependentObjects
-    '
-    '
     Public Class addonModel
         '
         '-- const
@@ -686,6 +638,35 @@ Namespace Contensive.Core.Models.Entity
                 Dim cs As New csController(cpCore)
                 Dim ignoreCacheNames As New List(Of String)
                 If (cs.open(primaryContentName, "(OnNewVisitEvent<>0)")) Then
+                    Dim instance As addonModel
+                    Do
+                        instance = addonModel.loadRecord(cpCore, cs, callersCacheNameList)
+                        If (instance IsNot Nothing) Then
+                            result.Add(instance)
+                        End If
+                        cs.goNext()
+                    Loop While cs.ok()
+                End If
+                cs.Close()
+            Catch ex As Exception
+                cpCore.handleExceptionAndContinue(ex) : Throw
+            End Try
+            Return result
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' pattern get a list of objects from this model
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="someCriteria"></param>
+        ''' <returns></returns>
+        Public Shared Function createList_OnPageStartEvent(cpCore As coreClass, callersCacheNameList As List(Of String)) As List(Of addonModel)
+            Dim result As New List(Of addonModel)
+            Try
+                Dim cs As New csController(cpCore)
+                Dim ignoreCacheNames As New List(Of String)
+                If (cs.open(primaryContentName, "(OnPageStartEvent<>0)")) Then
                     Dim instance As addonModel
                     Do
                         instance = addonModel.loadRecord(cpCore, cs, callersCacheNameList)

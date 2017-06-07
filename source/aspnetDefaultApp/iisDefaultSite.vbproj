@@ -589,6 +589,8 @@
     <Content Include="Global.asax" />
     <Content Include="helloworld.aspx" />
     <Content Include="helloworld.html" />
+    <Content Include="pageManager\pageManager.css" />
+    <Content Include="pageManager\pageManager.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
