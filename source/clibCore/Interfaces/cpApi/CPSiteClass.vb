@@ -2,7 +2,6 @@
 Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
 Imports System.Windows.Forms
-Imports CL = Contensive.Core.coreCommonModule
 Imports Contensive.BaseClasses
 Imports System.Runtime.InteropServices
 

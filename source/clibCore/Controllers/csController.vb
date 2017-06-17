@@ -374,7 +374,7 @@ Namespace Contensive.Core
             Dispose(True)
             GC.SuppressFinalize(Me)
         End Sub
-        Protected Sub Finalize()
+        Protected Overrides Sub Finalize()
             Dispose(False)
             MyBase.Finalize()
         End Sub
