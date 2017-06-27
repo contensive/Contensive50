@@ -209,6 +209,8 @@ Namespace Contensive.BaseClasses
         ''' <param name="ContentName"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
+        <Obsolete("Please use AddRecord(ContentName as String)", True)>
+        Public MustOverride Function AddRecord(ByVal ContentName As Object) As Integer
         Public MustOverride Function AddRecord(ByVal ContentName As String) As Integer
         Public MustOverride Function AddRecord(ByVal ContentName As String, ByVal recordName As String) As Integer
         ''' <summary>

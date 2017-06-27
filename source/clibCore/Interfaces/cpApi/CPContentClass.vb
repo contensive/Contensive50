@@ -238,6 +238,10 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         '
+        <Obsolete("Please use AddRecord( ContentName as string) ", True)>
+        Public Overrides Function AddRecord(ContentName As Object) As Integer
+            Return AddRecord(cp.Utils.encodeText(ContentName))
+        End Function
         Public Overrides Function AddRecord(ContentName As String) As Integer
             Dim recordId As Integer = 0
             Try
