@@ -10,57 +10,57 @@ Imports Contensive.Core.Controllers
 Imports Newtonsoft.Json
 
 Namespace Contensive.Core.Models.Entity
-    Public Class _blankModel
+    Public Class sortMethodModel
         Inherits baseModel
         '
         '====================================================================================================
         '-- const
-        Public Const contentName As String = "tables"                   '<------ set content name
-        Public Const contentTableName As String = "ccTables"            '<------ set to tablename for the primary content (used for cache names)
-        Private Shadows Const contentDataSource As String = "default"   '<------ set to datasource if not default
+        Public Const contentName As String = "sort methods"
+        Public Const contentTableName As String = "ccSortMethods"
+        Private Shadows Const contentDataSource As String = "default"
         '
         '====================================================================================================
         ' -- instance properties
-        Public Property DataSourceID As Integer                         '<------ replace this with a list all model fields not part of the base model
+        Public Property OrderByClause As String
         '
         '====================================================================================================
-        Public Overloads Shared Function add(cpCore As coreClass) As _blankModel
-            Return add(Of _blankModel)(cpCore)
+        Public Overloads Shared Function add(cpCore As coreClass) As sortMethodModel
+            Return add(Of sortMethodModel)(cpCore)
         End Function
         '
         '====================================================================================================
-        Public Overloads Shared Function add(cpCore As coreClass, ByRef callersCacheNameList As List(Of String)) As _blankModel
-            Return add(Of _blankModel)(cpCore, callersCacheNameList)
+        Public Overloads Shared Function add(cpCore As coreClass, ByRef callersCacheNameList As List(Of String)) As sortMethodModel
+            Return add(Of sortMethodModel)(cpCore, callersCacheNameList)
         End Function
         '
         '====================================================================================================
-        Public Overloads Shared Function create(cpCore As coreClass, recordId As Integer) As _blankModel
-            Return create(Of _blankModel)(cpCore, recordId)
+        Public Overloads Shared Function create(cpCore As coreClass, recordId As Integer) As sortMethodModel
+            Return create(Of sortMethodModel)(cpCore, recordId)
         End Function
         '
         '====================================================================================================
-        Public Overloads Shared Function create(cpCore As coreClass, recordId As Integer, ByRef callersCacheNameList As List(Of String)) As _blankModel
-            Return create(Of _blankModel)(cpCore, recordId, callersCacheNameList)
+        Public Overloads Shared Function create(cpCore As coreClass, recordId As Integer, ByRef callersCacheNameList As List(Of String)) As sortMethodModel
+            Return create(Of sortMethodModel)(cpCore, recordId, callersCacheNameList)
         End Function
         '
         '====================================================================================================
-        Public Overloads Shared Function create(cpCore As coreClass, recordGuid As String) As _blankModel
-            Return create(Of _blankModel)(cpCore, recordGuid)
+        Public Overloads Shared Function create(cpCore As coreClass, recordGuid As String) As sortMethodModel
+            Return create(Of sortMethodModel)(cpCore, recordGuid)
         End Function
         '
         '====================================================================================================
-        Public Overloads Shared Function create(cpCore As coreClass, recordGuid As String, ByRef callersCacheNameList As List(Of String)) As _blankModel
-            Return create(Of _blankModel)(cpCore, recordGuid, callersCacheNameList)
+        Public Overloads Shared Function create(cpCore As coreClass, recordGuid As String, ByRef callersCacheNameList As List(Of String)) As sortMethodModel
+            Return create(Of sortMethodModel)(cpCore, recordGuid, callersCacheNameList)
         End Function
         '
         '====================================================================================================
-        Public Overloads Shared Function createByName(cpCore As coreClass, recordName As String) As _blankModel
-            Return createByName(Of _blankModel)(cpCore, recordName)
+        Public Overloads Shared Function createByName(cpCore As coreClass, recordName As String) As sortMethodModel
+            Return createByName(Of sortMethodModel)(cpCore, recordName)
         End Function
         '
         '====================================================================================================
-        Public Overloads Shared Function createByName(cpCore As coreClass, recordName As String, ByRef callersCacheNameList As List(Of String)) As _blankModel
-            Return createByName(Of _blankModel)(cpCore, recordName, callersCacheNameList)
+        Public Overloads Shared Function createByName(cpCore As coreClass, recordName As String, ByRef callersCacheNameList As List(Of String)) As sortMethodModel
+            Return createByName(Of sortMethodModel)(cpCore, recordName, callersCacheNameList)
         End Function
         '
         '====================================================================================================
@@ -70,52 +70,52 @@ Namespace Contensive.Core.Models.Entity
         '
         '====================================================================================================
         Public Overloads Shared Sub delete(cpCore As coreClass, recordId As Integer)
-            delete(Of _blankModel)(cpCore, recordId)
+            delete(Of sortMethodModel)(cpCore, recordId)
         End Sub
         '
         '====================================================================================================
         Public Overloads Shared Sub delete(cpCore As coreClass, ccGuid As String)
-            delete(Of _blankModel)(cpCore, ccGuid)
+            delete(Of sortMethodModel)(cpCore, ccGuid)
         End Sub
         '
         '====================================================================================================
-        Public Overloads Shared Function createList(cpCore As coreClass, sqlCriteria As String, sqlOrderBy As String, callersCacheNameList As List(Of String)) As List(Of _blankModel)
-            Return createList(Of _blankModel)(cpCore, sqlCriteria, sqlOrderBy, callersCacheNameList)
+        Public Overloads Shared Function createList(cpCore As coreClass, sqlCriteria As String, sqlOrderBy As String, callersCacheNameList As List(Of String)) As List(Of sortMethodModel)
+            Return createList(Of sortMethodModel)(cpCore, sqlCriteria, sqlOrderBy, callersCacheNameList)
         End Function
         '
         '====================================================================================================
-        Public Overloads Shared Function createList(cpCore As coreClass, sqlCriteria As String, sqlOrderBy As String) As List(Of _blankModel)
-            Return createList(Of _blankModel)(cpCore, sqlCriteria, sqlOrderBy)
+        Public Overloads Shared Function createList(cpCore As coreClass, sqlCriteria As String, sqlOrderBy As String) As List(Of sortMethodModel)
+            Return createList(Of sortMethodModel)(cpCore, sqlCriteria, sqlOrderBy)
         End Function
         '
         '====================================================================================================
-        Public Overloads Shared Function createList(cpCore As coreClass, sqlCriteria As String) As List(Of _blankModel)
-            Return createList(Of _blankModel)(cpCore, sqlCriteria)
+        Public Overloads Shared Function createList(cpCore As coreClass, sqlCriteria As String) As List(Of sortMethodModel)
+            Return createList(Of sortMethodModel)(cpCore, sqlCriteria)
         End Function
         '
         '====================================================================================================
-        Public Overloads Sub invalidatePrimaryCache(cpCore As coreClass, recordId As Integer)
-            invalidateCacheSingleRecord(Of _blankModel)(cpCore, recordId)
+        Public Overloads Sub invalidateCacheSingleRecord(cpCore As coreClass, recordId As Integer)
+            invalidateCacheSingleRecord(Of sortMethodModel)(cpCore, recordId)
         End Sub
         '
         '====================================================================================================
         Public Overloads Shared Function getRecordName(cpcore As coreClass, recordId As Integer) As String
-            Return baseModel.getRecordName(Of _blankModel)(cpcore, recordId)
+            Return baseModel.getRecordName(Of sortMethodModel)(cpcore, recordId)
         End Function
         '
         '====================================================================================================
         Public Overloads Shared Function getRecordName(cpcore As coreClass, ccGuid As String) As String
-            Return baseModel.getRecordName(Of _blankModel)(cpcore, ccGuid)
+            Return baseModel.getRecordName(Of sortMethodModel)(cpcore, ccGuid)
         End Function
         '
         '====================================================================================================
         Public Overloads Shared Function getRecordId(cpcore As coreClass, ccGuid As String) As Integer
-            Return baseModel.getRecordId(Of _blankModel)(cpcore, ccGuid)
+            Return baseModel.getRecordId(Of sortMethodModel)(cpcore, ccGuid)
         End Function
         '
         '====================================================================================================
-        Public Overloads Shared Function createDefault(cpcore As coreClass) As _blankModel
-            Return createDefault(Of _blankModel)(cpcore)
+        Public Overloads Shared Function createDefault(cpcore As coreClass) As sortMethodModel
+            Return createDefault(Of sortMethodModel)(cpcore)
         End Function
     End Class
 End Namespace

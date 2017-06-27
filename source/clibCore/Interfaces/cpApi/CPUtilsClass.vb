@@ -59,7 +59,8 @@ Namespace Contensive.Core
         ''' <remarks></remarks>
         Public Overrides Sub Upgrade(isNewApp As Boolean)
             Try
-                Controllers.appBuilderController.upgrade(CP.core, isNewApp)
+                Throw New ApplicationException("Installation upgrade through the cp interface is deprecated. Please use the command line tool.")
+                ' Controllers.appBuilderController.upgrade(CP.core, isNewApp)
             Catch ex As Exception
                 CP.core.handleExceptionAndContinue(ex)
             End Try

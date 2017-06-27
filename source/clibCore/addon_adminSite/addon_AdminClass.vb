@@ -38,6 +38,7 @@ Namespace Contensive.Addons
                 Dim BinaryHeaderString As String
                 Dim rightNow As Date = DateTime.Now
                 '
+                ' -- ok to cast cpbase to cp because they build from the same solution
                 Me.cp = DirectCast(cp, CPClass)
                 cpCore = Me.cp.core
                 '
@@ -72,7 +73,7 @@ Namespace Contensive.Addons
                 '
                 ' main_Get Content
                 '
-                cpCore.main_SQLCommandTimeout = 300
+                cpCore.db.sqlCommandTimeout = 300
                 Call cpCore.main_SetMetaContent(0, 0)
                 '
                 AdminContent = execute_getContent("")    ' REFACTOR - passing the inner container's content is deprecated. We now execute addons within the admin addon
@@ -84,10 +85,10 @@ Namespace Contensive.Addons
                     '
                     ' admin page may have called getLoginPage, which includes getEndOfBody
                     '
-                    PageOpen = cpCore.admin_GetPageStart2()
+                    'PageOpen = cpCore.admin_GetPageStart2()
                     '
                     returnHtml = "" _
-                    & PageOpen _
+                    & cpCore.admin_GetPageStart2() _
                     & AdminContent _
                     & cpCore.pages.pagemanager_GetPageEnd() _
                     & ""
@@ -96,10 +97,10 @@ Namespace Contensive.Addons
                     ' normal
                     '
                     'Call AppendLog("call main_getEndOfBody, from main_getLoginPage2-b2 ")
-                    PageOpen = cpCore.admin_GetPageStart2()
+                    'PageOpen = cpCore.admin_GetPageStart2()
                     '
                     returnHtml = "" _
-                    & PageOpen _
+                    & cpCore.admin_GetPageStart2() _
                     & AdminContent _
                     & cpCore.htmlDoc.html_GetEndOfBody(True, True, False, True) _
                     & cpCore.pages.pagemanager_GetPageEnd() _
@@ -229,7 +230,6 @@ Namespace Contensive.Addons
             editRecord.Loaded = False
             UseContentWatchLink = cpCore.siteProperties.useContentWatchLink
             Call cpCore.htmlDoc.main_AddOnLoadJavascript2("document.getElementsByTagName('BODY')[0].onclick = BodyOnClick;", "Contensive")
-            Call cpCore.addon.execute_legacy4(adminCommonAddonGuid)
             '
             '-------------------------------------------------------------------------------
             ' check for member login, if logged in and no admin, lock out

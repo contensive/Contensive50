@@ -31,47 +31,62 @@ if ( cs.open( "content fields", "contentid=" & contentid, "name" )) then
     fieldName = cs.getText( "name" )
 	select case lcase( fieldName )
 		case "id"
-			p = vbcrlf & "public " & fieldName & " as Integer" & p
+			p = p & ""
 			l = vbcrlf & "." & fieldName & " = cs.getInteger(""" & fieldName & """)" & l
 			s = s & ""
 			d = d & ""
-		case "contentcontrolid"
-			p = p & vbcrlf & "public " & fieldName & " as Integer"
+		case "contentcontrolid","modifiedby","createdby","createkey"
+			p = p & ""
 			l = l & vbcrlf & "." & fieldName & " = cs.getInteger(""" & fieldName & """)"
 			s = s & vbcrlf & "cs.SetField(""" & fieldName & """, " & fieldName & ".ToString())"
 			d = d & vbcrlf & "instance." & fieldName & " = cdef.id"
+		case "modifieddate","dateadded"
+			p = p & ""
+			l = l & vbcrlf & "." & fieldName & " = cs.getDate(""" & fieldName & """)"
+			s = s & vbcrlf & "cs.SetField(""" & fieldName & """, " & fieldName & ".ToString())"
+			d = d & vbcrlf & "instance." & fieldName & " = genericController.EncodeDate(.fields(""" & fieldName & """).defaultValue)"
+		case "name","sortorder","ccguid"
+			p = p & ""
+			l = l & vbcrlf & "." & fieldName & " = cs.getText(""" & fieldName & """)"
+			s = s & vbcrlf & "cs.SetField(""" & fieldName & """, " & fieldName & ")"
+			d = d & vbcrlf & "instance." & fieldName & " = genericController.EncodeText(.fields(""" & fieldName & """).defaultValue)"
+		case "active"
+			p = p & ""
+			l = l & vbcrlf & "." & fieldName & " = cs.getBoolean(""" & fieldName & """)"
+			s = s & vbcrlf & "cs.SetField(""" & fieldName & """, " & fieldName & ".ToString())"
+			d = d & vbcrlf & "instance." & fieldName & " = genericController.EncodeBoolean(.fields(""" & fieldName & """).defaultValue)"
 		case else
 			select case cs.getInteger( "type" )
 			  case 13: 
 				' autoincrement (identity)
-				p = p & vbcrlf & "public " & fieldName & " as Integer"
+				p = p & vbcrlf & "public property " & fieldName & " as Integer"
 				l = l & vbcrlf & "." & fieldName & " = cs.getInteger(""" & fieldName & """)"
 				s = s & ""
 				d = d & ""
 			  case 1,7,15: 
-				p = p & vbcrlf & "public " & fieldName & " as Integer"
+				p = p & vbcrlf & "public property " & fieldName & " as Integer"
 				l = l & vbcrlf & "." & fieldName & " = cs.getInteger(""" & fieldName & """)"
 				s = s & vbcrlf & "cs.SetField(""" & fieldName & """, " & fieldName & ".ToString())"
 				d = d & vbcrlf & "instance." & fieldName & " = genericController.EncodeInteger(.fields(""" & fieldName & """).defaultValue)"
 			  case 4:
-				p = p & vbcrlf & "public " & fieldName & " as Boolean"
+				p = p & vbcrlf & "public property " & fieldName & " as Boolean"
 				l = l & vbcrlf & "." & fieldName & " = cs.getBoolean(""" & fieldName & """)"
 				s = s & vbcrlf & "cs.SetField(""" & fieldName & """, " & fieldName & ".ToString())"
 				d = d & vbcrlf & "instance." & fieldName & " = genericController.EncodeBoolean(.fields(""" & fieldName & """).defaultValue)"
 			  case 2,3,6,10,11,16,17,18,19,20,21,22:
-				p = p & vbcrlf & "public " & fieldName & " as String"
+				p = p & vbcrlf & "public property " & fieldName & " as String"
 				l = l & vbcrlf & "." & fieldName & " = cs.getText(""" & fieldName & """)"
 				s = s & vbcrlf & "cs.SetField(""" & fieldName & """, " & fieldName & ")"
 				d = d & vbcrlf & "instance." & fieldName & " = genericController.EncodeText(.fields(""" & fieldName & """).defaultValue)"
 			  case 5:
-				p = p & vbcrlf & "public " & fieldName & " as Date"
+				p = p & vbcrlf & "public property " & fieldName & " as Date"
 				l = l & vbcrlf & "." & fieldName & " = cs.getDate(""" & fieldName & """)"
 				s = s & vbcrlf & "cs.SetField(""" & fieldName & """, " & fieldName & ".ToString())"
 				d = d & vbcrlf & "instance." & fieldName & " = genericController.EncodeDate(.fields(""" & fieldName & """).defaultValue)"
 			  case 8,14:
 				' ignore
 			  case 9,12:
-				p = p & vbcrlf & "public " & fieldName & " as Double"
+				p = p & vbcrlf & "public property " & fieldName & " as Double"
 				l = l & vbcrlf & "." & fieldName & " = cs.getNumber(""" & fieldName & """)"
 				s = s & vbcrlf & "cs.SetField(""" & fieldName & """, " & fieldName & ".ToString())"
 				d = d & vbcrlf & "instance." & fieldName & " = genericController.EncodeNumber(.fields(""" & fieldName & """).defaultValue)"

@@ -2508,7 +2508,7 @@ ErrorTrap:
                                         '
                                         ' assembly not found
                                         '
-                                        Throw New ApplicationException("The addon [" & AddonCaption & "] could not be executed because it's assembly could not be found in the cluster's common assembly path [" & commonAssemblyPath & "], the apps binary folder [" & addonAppRootPath & "], or in the legacy collection folder [" & appAddonPath & "].")
+                                        Throw New ApplicationException("The addon [" & AddonCaption & "] could not be executed because it's assembly could not be found in the server common assembly path [" & commonAssemblyPath & "], the application binary folder [" & addonAppRootPath & "], or in the legacy collection folder [" & appAddonPath & "].")
                                     Else
                                     End If
                                 End If

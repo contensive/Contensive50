@@ -8,7 +8,7 @@ Imports Contensive.Core.Models.Entity
 Imports Contensive.Core.Controllers
 Imports Contensive.Core.Controllers.genericController
 '
-Namespace Contensive.Addons
+Namespace Contensive.Addons.PageManager
     '
     Public Class pageManagerClass
         Inherits Contensive.BaseClasses.AddonBaseClass

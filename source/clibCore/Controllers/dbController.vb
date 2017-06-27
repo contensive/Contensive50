@@ -343,7 +343,17 @@ Namespace Contensive.Core.Controllers
         Public Function executeSql(ByVal sql As String, Optional ByVal dataSourceName As String = "", Optional ByVal startRecord As Integer = 0, Optional ByVal maxRecords As Integer = 9999, Optional ByRef recordsAffected As Integer = 0) As DataTable
             Dim returnData As New DataTable
             Try
-                returnData = executeSql_noErrorHandling(sql, getConnectionStringADONET(cpCore.serverConfig.appConfig.name, dataSourceName), startRecord, maxRecords, recordsAffected)
+                If (cpCore.serverConfig Is Nothing) Then
+                    '
+                    ' -- server config fail
+                    cpCore.handleExceptionAndContinue(New ApplicationException("Cannot execute Sql in dbController without an application"))
+                ElseIf (cpCore.serverConfig.appConfig Is Nothing) Then
+                    '
+                    ' -- server config fail
+                    cpCore.handleExceptionAndContinue(New ApplicationException("Cannot execute Sql in dbController without an application"))
+                Else
+                    returnData = executeSql_noErrorHandling(sql, getConnectionStringADONET(cpCore.serverConfig.appConfig.name, dataSourceName), startRecord, maxRecords, recordsAffected)
+                End If
             Catch ex As Exception
                 Dim newEx As New ApplicationException("Exception [" & ex.Message & "] executing sql [" & sql & "], datasource [" & dataSourceName & "], startRecord [" & startRecord & "], maxRecords [" & maxRecords & "]", ex)
                 cpCore.handleExceptionAndContinue(newEx)

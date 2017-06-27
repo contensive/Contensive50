@@ -8669,14 +8669,14 @@ ErrorTrap:
         '
         '
         '
-        Public Property main_SQLCommandTimeout() As Integer
-            Get
-                Return db.sqlCommandTimeout
-            End Get
-            Set(ByVal value As Integer)
-                db.sqlCommandTimeout = value
-            End Set
-        End Property
+        'Public Property main_SQLCommandTimeout() As Integer
+        '    Get
+        '        Return db.sqlCommandTimeout
+        '    End Get
+        '    Set(ByVal value As Integer)
+        '        db.sqlCommandTimeout = value
+        '    End Set
+        'End Property
         '
         '
         '
@@ -13599,22 +13599,6 @@ ErrorTrap:
                         main_testPointMessage = ""
                     End If
                 End If
-                '
-                'Dim table As tableModel = tableModel.add(Of tableModel)()
-
-
-
-                Dim table As tableModel = tableModel.create(Me, 1)
-                If (table Is Nothing) Then
-                    table = tableModel.add(Me)
-                End If
-                Dim testName = table.name
-                Dim testDatasourceid = table.DataSourceID
-                '
-                '
-                '
-                'Dim tables As List(Of tableModel) = tableModel.createList(Me, "", New List(Of String))
-
             Catch ex As Exception
                 Throw (ex)
             End Try

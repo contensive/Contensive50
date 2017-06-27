@@ -1507,7 +1507,7 @@ Namespace Contensive.Core
                                                                     Call cpCore.db.cs_set(CSCollection, "help", CollectionHelp)
                                                                     Call cpCore.db.cs_set(CSCollection, AddonGuidFieldName, CollectionGuid)
                                                                     Call cpCore.db.cs_set(CSCollection, "lastchangedate", CollectionLastChangeDate)
-                                                                    Call cpCore.db.cs_set(CSCollection, "InstallFile", Doc.DocumentElement.OuterXml)
+                                                                    'Call cpCore.db.cs_set(CSCollection, "InstallFile", Doc.DocumentElement.OuterXml)
                                                                     Call cpCore.db.cs_set(CSCollection, "OtherXML", OtherXML)
                                                                     If True Then
                                                                         If CollectionSystem_fileValueOK Then
@@ -3125,97 +3125,100 @@ Namespace Contensive.Core
                     End If
                     Call cpCore.db.cs_Close(CS)
                     '
-                    ' Addon is now fully installed
-                    ' Go through all collection files on this site and see if there are
-                    ' any dependancies on this add-on that need to be attached
-                    ' src args are those for the addon that includes the current addon
-                    '   - if this addon is the target of another add-on's  "includeaddon" node
-                    '
-                    Doc = New XmlDocument
-                    CS = cpCore.db.cs_open("Add-on Collections")
-                    Do While cpCore.db.cs_ok(CS)
-                        CollectionFile = cpCore.db.cs_get(CS, "InstallFile")
-                        If CollectionFile <> "" Then
-                            Try
-                                Call Doc.LoadXml(CollectionFile)
-                                If Doc.DocumentElement.HasChildNodes Then
-                                    For Each TestObject In Doc.DocumentElement.ChildNodes
-                                        '
-                                        ' 20161002 - maybe this should be testing for an xmlElemetn, not node
-                                        '
-                                        If (TypeOf (TestObject) Is XmlElement) Then
-                                            SrcMainNode = DirectCast(TestObject, XmlElement)
-                                            If genericController.vbLCase(SrcMainNode.Name) = "addon" Then
-                                                SrcAddonGuid = SrcMainNode.GetAttribute("guid")
-                                                SrcAddonName = SrcMainNode.GetAttribute("name")
-                                                If SrcMainNode.HasChildNodes Then
-                                                    'On Error Resume Next
-                                                    For Each TestObject2 In SrcMainNode.ChildNodes
-                                                        'For Each SrcAddonNode In SrcMainNode.childNodes
-                                                        If TypeOf TestObject2 Is XmlNode Then
-                                                            SrcAddonNode = DirectCast(TestObject2, XmlElement)
-                                                            If True Then
-                                                                'If Err.Number <> 0 Then
-                                                                '    ' this is to catch nodes that are not elements
-                                                                '    Err.Clear
-                                                                'Else
-                                                                'On Error GoTo ErrorTrap
-                                                                If genericController.vbLCase(SrcAddonNode.Name) = "includeaddon" Then
-                                                                    TestGuid = SrcAddonNode.GetAttribute("guid")
-                                                                    TestName = SrcAddonNode.GetAttribute("name")
-                                                                    Criteria = ""
-                                                                    If TestGuid <> "" Then
-                                                                        If TestGuid = addonGuid Then
-                                                                            Criteria = "(" & AddonGuidFieldName & "=" & cpCore.db.encodeSQLText(SrcAddonGuid) & ")"
-                                                                        End If
-                                                                    ElseIf TestName <> "" Then
-                                                                        If TestName = addonName Then
-                                                                            Criteria = "(name=" & cpCore.db.encodeSQLText(SrcAddonName) & ")"
-                                                                        End If
-                                                                    End If
-                                                                    If Criteria <> "" Then
-                                                                        '$$$$$ cache this
-                                                                        CS2 = cpCore.db.cs_open(cnAddons, Criteria, "ID")
-                                                                        If cpCore.db.cs_ok(CS2) Then
-                                                                            SrcAddonID = cpCore.db.cs_getInteger(CS2, "ID")
-                                                                        End If
-                                                                        Call cpCore.db.cs_Close(CS2)
-                                                                        AddRule = False
-                                                                        If SrcAddonID = 0 Then
-                                                                            UserError = "The add-on being installed is referenced by another add-on in collection [], but this add-on could not be found by the respoective criteria [" & Criteria & "]"
-                                                                            Call appendInstallLog(cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAddFromLocalCollection_InstallAddonNode, UserError [" & UserError & "]")
-                                                                        Else
-                                                                            CS2 = cpCore.db.cs_openCsSql_rev("default", "select ID from ccAddonIncludeRules where Addonid=" & SrcAddonID & " and IncludedAddonID=" & addonId)
-                                                                            AddRule = Not cpCore.db.cs_ok(CS2)
-                                                                            Call cpCore.db.cs_Close(CS2)
-                                                                        End If
-                                                                        If AddRule Then
-                                                                            CS2 = cpCore.db.cs_insertRecord("Add-on Include Rules", 0)
-                                                                            If cpCore.db.cs_ok(CS2) Then
-                                                                                Call cpCore.db.cs_set(CS2, "Addonid", SrcAddonID)
-                                                                                Call cpCore.db.cs_set(CS2, "IncludedAddonID", addonId)
-                                                                            End If
-                                                                            Call cpCore.db.cs_Close(CS2)
-                                                                        End If
-                                                                    End If
-                                                                End If
-                                                            End If
-                                                        End If
-                                                    Next
-                                                End If
-                                            End If
-                                        Else
-                                            CS = CS
-                                        End If
-                                    Next
-                                End If
-                            Catch ex As Exception
-                                cpCore.handleExceptionAndContinue(ex) : Throw
-                            End Try
-                        End If
-                        Call cpCore.db.cs_goNext(CS)
-                    Loop
-                    Call cpCore.db.cs_Close(CS)
+                    ' -- if this is needed, the installation xml files are available in the addon install folder. - I do not believe this is important
+                    '       as if a collection is missing a dependancy, there is an error and you would expect to have to reinstall.
+                    ''
+                    '' Addon is now fully installed
+                    '' Go through all collection files on this site and see if there are
+                    '' any dependancies on this add-on that need to be attached
+                    '' src args are those for the addon that includes the current addon
+                    ''   - if this addon is the target of another add-on's  "includeaddon" node
+                    ''
+                    'Doc = New XmlDocument
+                    'CS = cpCore.db.cs_open("Add-on Collections")
+                    'Do While cpCore.db.cs_ok(CS)
+                    '    CollectionFile = cpCore.db.cs_get(CS, "InstallFile")
+                    '    If CollectionFile <> "" Then
+                    '        Try
+                    '            Call Doc.LoadXml(CollectionFile)
+                    '            If Doc.DocumentElement.HasChildNodes Then
+                    '                For Each TestObject In Doc.DocumentElement.ChildNodes
+                    '                    '
+                    '                    ' 20161002 - maybe this should be testing for an xmlElemetn, not node
+                    '                    '
+                    '                    If (TypeOf (TestObject) Is XmlElement) Then
+                    '                        SrcMainNode = DirectCast(TestObject, XmlElement)
+                    '                        If genericController.vbLCase(SrcMainNode.Name) = "addon" Then
+                    '                            SrcAddonGuid = SrcMainNode.GetAttribute("guid")
+                    '                            SrcAddonName = SrcMainNode.GetAttribute("name")
+                    '                            If SrcMainNode.HasChildNodes Then
+                    '                                'On Error Resume Next
+                    '                                For Each TestObject2 In SrcMainNode.ChildNodes
+                    '                                    'For Each SrcAddonNode In SrcMainNode.childNodes
+                    '                                    If TypeOf TestObject2 Is XmlNode Then
+                    '                                        SrcAddonNode = DirectCast(TestObject2, XmlElement)
+                    '                                        If True Then
+                    '                                            'If Err.Number <> 0 Then
+                    '                                            '    ' this is to catch nodes that are not elements
+                    '                                            '    Err.Clear
+                    '                                            'Else
+                    '                                            'On Error GoTo ErrorTrap
+                    '                                            If genericController.vbLCase(SrcAddonNode.Name) = "includeaddon" Then
+                    '                                                TestGuid = SrcAddonNode.GetAttribute("guid")
+                    '                                                TestName = SrcAddonNode.GetAttribute("name")
+                    '                                                Criteria = ""
+                    '                                                If TestGuid <> "" Then
+                    '                                                    If TestGuid = addonGuid Then
+                    '                                                        Criteria = "(" & AddonGuidFieldName & "=" & cpCore.db.encodeSQLText(SrcAddonGuid) & ")"
+                    '                                                    End If
+                    '                                                ElseIf TestName <> "" Then
+                    '                                                    If TestName = addonName Then
+                    '                                                        Criteria = "(name=" & cpCore.db.encodeSQLText(SrcAddonName) & ")"
+                    '                                                    End If
+                    '                                                End If
+                    '                                                If Criteria <> "" Then
+                    '                                                    '$$$$$ cache this
+                    '                                                    CS2 = cpCore.db.cs_open(cnAddons, Criteria, "ID")
+                    '                                                    If cpCore.db.cs_ok(CS2) Then
+                    '                                                        SrcAddonID = cpCore.db.cs_getInteger(CS2, "ID")
+                    '                                                    End If
+                    '                                                    Call cpCore.db.cs_Close(CS2)
+                    '                                                    AddRule = False
+                    '                                                    If SrcAddonID = 0 Then
+                    '                                                        UserError = "The add-on being installed is referenced by another add-on in collection [], but this add-on could not be found by the respoective criteria [" & Criteria & "]"
+                    '                                                        Call appendInstallLog(cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAddFromLocalCollection_InstallAddonNode, UserError [" & UserError & "]")
+                    '                                                    Else
+                    '                                                        CS2 = cpCore.db.cs_openCsSql_rev("default", "select ID from ccAddonIncludeRules where Addonid=" & SrcAddonID & " and IncludedAddonID=" & addonId)
+                    '                                                        AddRule = Not cpCore.db.cs_ok(CS2)
+                    '                                                        Call cpCore.db.cs_Close(CS2)
+                    '                                                    End If
+                    '                                                    If AddRule Then
+                    '                                                        CS2 = cpCore.db.cs_insertRecord("Add-on Include Rules", 0)
+                    '                                                        If cpCore.db.cs_ok(CS2) Then
+                    '                                                            Call cpCore.db.cs_set(CS2, "Addonid", SrcAddonID)
+                    '                                                            Call cpCore.db.cs_set(CS2, "IncludedAddonID", addonId)
+                    '                                                        End If
+                    '                                                        Call cpCore.db.cs_Close(CS2)
+                    '                                                    End If
+                    '                                                End If
+                    '                                            End If
+                    '                                        End If
+                    '                                    End If
+                    '                                Next
+                    '                            End If
+                    '                        End If
+                    '                    Else
+                    '                        CS = CS
+                    '                    End If
+                    '                Next
+                    '            End If
+                    '        Catch ex As Exception
+                    '            cpCore.handleExceptionAndContinue(ex) : Throw
+                    '        End Try
+                    '    End If
+                    '    Call cpCore.db.cs_goNext(CS)
+                    'Loop
+                    'Call cpCore.db.cs_Close(CS)
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw

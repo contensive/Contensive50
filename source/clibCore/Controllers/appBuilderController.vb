@@ -151,78 +151,78 @@ Namespace Contensive.Core.Controllers
         '    End Try
         '    Return returnOk
         'End Function
-        '
-        '=============================================================================================================
-        '   Main
-        '       Returns nothing if all OK, else returns an error message
-        '=============================================================================================================
-        '
-        Public Function importApp(cpCore As coreClass, ByVal siteName As String, ByVal IPAddress As String, ByVal DomainName As String, ByVal ODBCConnectionString As String, ByVal ContentFilesPath As String, ByVal WWWRootPath As String, ByVal defaultDoc As String, ByVal SMTPServer As String, ByVal AdminEmail As String) As String
-            Dim returnMessage As String = ""
-            Try
-                If siteName = "" Then
-                    returnMessage = "The application name was blank. It is required."
-                Else
-                    '
-                    If defaultDoc = "" Then
-                        '
-                        ' it was required, this is the best guess
-                        '
-                        defaultDoc = siteproperty_serverPageDefault_defaultValue
-                    End If
-                    '
-                    If IPAddress = "" Then
-                        IPAddress = "127.0.0.1"
-                    End If
-                    '
-                    If DomainName = "" Then
-                        DomainName = IPAddress
-                    End If
-                    '
-                    If ContentFilesPath = "" Then
-                        ContentFilesPath = "c:\inetpub\apps\" & siteName & "\cdnFiles"
-                    End If
-                    If Right(ContentFilesPath, 1) <> "\" Then
-                        ContentFilesPath = ContentFilesPath & "\"
-                    End If
-                    '
-                    If ODBCConnectionString = "" Then
-                        ODBCConnectionString = siteName
-                    End If
-                    '
-                    If WWWRootPath = "" Then
-                        WWWRootPath = "c:\inetpub\apps\" & siteName & "\appRoot"
-                    End If
-                    If Right(WWWRootPath, 1) <> "\" Then
-                        WWWRootPath = WWWRootPath & "\"
-                    End If
-                    '
-                    If SMTPServer = "" Then
-                        SMTPServer = "127.0.0.1"
-                    End If
-                    '
-                    If AdminEmail = "" Then
-                        AdminEmail = "admin@" & DomainName
-                    End If
-                    '
-                    ' Configure Contensive
-                    '
-                    'Call VerifyApp2(siteName, DomainName, ODBCConnectionString, ContentFilesPath, "/", WWWRootPath)
-                    '
-                    ' Rebuild IIS Server
-                    '
-                    Call iisController.verifySite(cpCore, siteName, DomainName, "\", defaultDoc)
-                    '
-                    ' Now wait here for site to start with upgrade
-                    '
-                    Call upgrade(cpCore, False)
-                    returnMessage = ""
-                End If
-            Catch ex As Exception
+        ''
+        ''=============================================================================================================
+        ''   Main
+        ''       Returns nothing if all OK, else returns an error message
+        ''=============================================================================================================
+        ''
+        'Public Function importApp(cpCore As coreClass, ByVal siteName As String, ByVal IPAddress As String, ByVal DomainName As String, ByVal ODBCConnectionString As String, ByVal ContentFilesPath As String, ByVal WWWRootPath As String, ByVal defaultDoc As String, ByVal SMTPServer As String, ByVal AdminEmail As String) As String
+        '    Dim returnMessage As String = ""
+        '    Try
+        '        If siteName = "" Then
+        '            returnMessage = "The application name was blank. It is required."
+        '        Else
+        '            '
+        '            If defaultDoc = "" Then
+        '                '
+        '                ' it was required, this is the best guess
+        '                '
+        '                defaultDoc = siteproperty_serverPageDefault_defaultValue
+        '            End If
+        '            '
+        '            If IPAddress = "" Then
+        '                IPAddress = "127.0.0.1"
+        '            End If
+        '            '
+        '            If DomainName = "" Then
+        '                DomainName = IPAddress
+        '            End If
+        '            '
+        '            If ContentFilesPath = "" Then
+        '                ContentFilesPath = "c:\inetpub\apps\" & siteName & "\cdnFiles"
+        '            End If
+        '            If Right(ContentFilesPath, 1) <> "\" Then
+        '                ContentFilesPath = ContentFilesPath & "\"
+        '            End If
+        '            '
+        '            If ODBCConnectionString = "" Then
+        '                ODBCConnectionString = siteName
+        '            End If
+        '            '
+        '            If WWWRootPath = "" Then
+        '                WWWRootPath = "c:\inetpub\apps\" & siteName & "\appRoot"
+        '            End If
+        '            If Right(WWWRootPath, 1) <> "\" Then
+        '                WWWRootPath = WWWRootPath & "\"
+        '            End If
+        '            '
+        '            If SMTPServer = "" Then
+        '                SMTPServer = "127.0.0.1"
+        '            End If
+        '            '
+        '            If AdminEmail = "" Then
+        '                AdminEmail = "admin@" & DomainName
+        '            End If
+        '            '
+        '            ' Configure Contensive
+        '            '
+        '            'Call VerifyApp2(siteName, DomainName, ODBCConnectionString, ContentFilesPath, "/", WWWRootPath)
+        '            '
+        '            ' Rebuild IIS Server
+        '            '
+        '            Call iisController.verifySite(cpCore, siteName, DomainName, "\", defaultDoc)
+        '            '
+        '            ' Now wait here for site to start with upgrade
+        '            '
+        '            Call upgrade(cpCore, False)
+        '            returnMessage = ""
+        '        End If
+        '    Catch ex As Exception
 
-            End Try
-            Return returnMessage
-        End Function
+        '    End Try
+        '    Return returnMessage
+        'End Function
 
         ''
         ''========================================================================

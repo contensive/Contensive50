@@ -44,13 +44,13 @@ Namespace Contensive.Core.Models.Entity
         End Function
         '
         '====================================================================================================
-        Public Overloads Function create(cpCore As coreClass, recordGuid As String) As tableModel
-            Return MyBase.create(Of tableModel)(cpCore, recordGuid)
+        Public shared Overloads Function create(cpCore As coreClass, recordGuid As String) As tableModel
+            Return create(Of tableModel)(cpCore, recordGuid)
         End Function
         '
         '====================================================================================================
-        Public Overloads Function create(cpCore As coreClass, recordGuid As String, ByRef callersCacheNameList As List(Of String)) As tableModel
-            Return MyBase.create(Of tableModel)(cpCore, recordGuid, callersCacheNameList)
+        Public shared Overloads Function create(cpCore As coreClass, recordGuid As String, ByRef callersCacheNameList As List(Of String)) As tableModel
+            Return create(Of tableModel)(cpCore, recordGuid, callersCacheNameList)
         End Function
         '
         '====================================================================================================
@@ -79,8 +79,13 @@ Namespace Contensive.Core.Models.Entity
         End Sub
         '
         '====================================================================================================
-        Public Overloads Shared Function createList(cpCore As coreClass, sqlCriteria As String, callersCacheNameList As List(Of String)) As List(Of tableModel)
-            Return createList(Of tableModel)(cpCore, sqlCriteria, callersCacheNameList)
+        Public Overloads Shared Function createList(cpCore As coreClass, sqlCriteria As String, sqlOrderBy As String, callersCacheNameList As List(Of String)) As List(Of tableModel)
+            Return createList(Of tableModel)(cpCore, sqlCriteria, sqlOrderBy, callersCacheNameList)
+        End Function
+        '
+        '====================================================================================================
+        Public Overloads Shared Function createList(cpCore As coreClass, sqlCriteria As String, sqlOrderBy As String) As List(Of tableModel)
+            Return createList(Of tableModel)(cpCore, sqlCriteria, sqlOrderBy)
         End Function
         '
         '====================================================================================================
@@ -90,7 +95,7 @@ Namespace Contensive.Core.Models.Entity
         '
         '====================================================================================================
         Public Overloads Sub invalidatePrimaryCache(cpCore As coreClass, recordId As Integer)
-            invalidatePrimaryCache(Of tableModel)(cpCore, recordId)
+            invalidateCacheSingleRecord(Of tableModel)(cpCore, recordId)
         End Sub
         '
         '====================================================================================================

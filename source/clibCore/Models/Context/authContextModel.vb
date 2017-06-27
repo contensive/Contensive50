@@ -580,8 +580,8 @@ Namespace Contensive.Core.Models.Context
                         End If
                         resultAuthContext.visit_initialized = True
                         If (AllowOnNewVisitEvent) And (True) Then
-                            For Each addon As Models.Entity.addonModel In Models.Entity.addonModel.createList_OnNewVisitEvent(cpCore, New List(Of String))
-                                Call cpCore.addon.execute_legacy5(addon.ID, "", "", CPUtilsBaseClass.addonContext.ContextOnNewVisit, "", 0, "", 0)
+                            For Each addon As addonModel In addonModel.createList_OnNewVisitEvent(cpCore, New List(Of String))
+                                Call cpCore.addon.execute_legacy5(addon.id, "", "", CPUtilsBaseClass.addonContext.ContextOnNewVisit, "", 0, "", 0)
                             Next
                         End If
                         '

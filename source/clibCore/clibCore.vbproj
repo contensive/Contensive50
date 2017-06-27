@@ -396,6 +396,7 @@
   <ItemGroup>
     <Compile Include="addon_emailProcess\processEmailClass.vb" />
     <Compile Include="addon_housekeeping\houseKeepClass.vb" />
+    <Compile Include="addon_pageManager\childPageResortClass.vb" />
     <Compile Include="addon_pageManager\pageManager.vb" />
     <Compile Include="constants.vb" />
     <Compile Include="Controllers\logController.vb" />
@@ -411,9 +412,11 @@
     <Compile Include="Controllers\docPropertyController.vb" />
     <Compile Include="Models\Context\authContextModel.vb" />
     <Compile Include="Models\Context\_blankModel.vb" />
+    <Compile Include="Models\Entity\addonModel.vb" />
+    <Compile Include="Models\Entity\sortMethodModel.vb" />
     <Compile Include="Models\Entity\_blankModel.vb" />
     <Compile Include="Models\Entity\tableModel.vb" />
-    <Compile Include="Models\Entity\_baseModel.vb" />
+    <Compile Include="Models\Entity\baseModel.vb" />
     <Compile Include="Models\Entity\tableSchemeModel.vb" />
     <Compile Include="Models\Entity\cdefFieldModel.vb" />
     <Compile Include="Models\Entity\cdefModel.vb" />
@@ -490,7 +493,7 @@
     <Compile Include="Models\Entity\groupModel.vb" />
     <Compile Include="Models\Entity\dataSourceModel.vb" />
     <Compile Include="Models\Entity\sitePropertyModel.vb" />
-    <Compile Include="Models\Entity\addonModel.vb" />
+    <Compile Include="Models\Entity\_oldaddonModel.vb" />
     <Compile Include="Models\Entity\contentModel.vb" />
     <Compile Include="Models\Entity\miniCollectionModel.vb" />
     <Compile Include="Models\Entity\domainModel.vb" />
