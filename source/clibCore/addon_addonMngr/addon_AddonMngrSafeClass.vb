@@ -135,7 +135,7 @@ Namespace Contensive.Core
                     '
                     ' ----- redirect back to the root
                     '
-                    Call cpCore.webServer.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "Addon Manager, Cancel Button Pressed", False)
+                    Call cpCore.webServer.redirect(cpCore.siteProperties.adminURL, "Addon Manager, Cancel Button Pressed", False)
                 Else
                     If Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                         '
@@ -551,7 +551,7 @@ Namespace Contensive.Core
                         ' --------------------------------------------------------------------------------
                         '
                         If (InstalledCollectionIDList.Count > 0) And (Not cpCore.error_IsUserError) Then
-                            Call cpCore.webServer.webServerIO_Redirect2(cpCore.siteProperties.adminURL & "?helpcollectionid=" & InstalledCollectionIDList(0).ToString(), "Redirecting to help page after collection installation", False)
+                            Call cpCore.webServer.redirect(cpCore.siteProperties.adminURL & "?helpcollectionid=" & InstalledCollectionIDList(0).ToString(), "Redirecting to help page after collection installation", False)
                         End If
                         '
                         ' --------------------------------------------------------------------------------

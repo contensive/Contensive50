@@ -281,7 +281,7 @@ Namespace Contensive.Core.Models.Context
                                             If (lastVisit IsNot Nothing) Then
                                                 If (lastVisit.VisitAuthenticated And (lastVisit.MemberID = resultAuthContext.visit.ID)) Then
                                                     If resultAuthContext.authenticateById(cpCore, resultAuthContext.user.ID, resultAuthContext) Then
-                                                        Call cpCore.log_LogActivity2("autologin", resultAuthContext.user.ID, resultAuthContext.user.OrganizationID)
+                                                        Call logController.logActivity2(cpCore, "autologin", resultAuthContext.user.ID, resultAuthContext.user.OrganizationID)
                                                         visitor_changes = True
                                                         user_changes = True
                                                     End If
@@ -290,7 +290,7 @@ Namespace Contensive.Core.Models.Context
                                         Else
                                             '
                                             ' -- Recognized, not auto login
-                                            Call cpCore.log_LogActivity2("recognized", resultAuthContext.user.ID, resultAuthContext.user.OrganizationID)
+                                            Call logController.logActivity2(cpCore, "recognized", resultAuthContext.user.ID, resultAuthContext.user.OrganizationID)
                                         End If
                                     End If
                                 End If
@@ -435,13 +435,13 @@ Namespace Contensive.Core.Models.Context
                                 '
                                 ' -- Link Login
                                 If resultAuthContext.authenticateById(cpCore, MemberLinkLoginID, resultAuthContext) Then
-                                    Call cpCore.log_LogActivity2("link login with eid " & MemberLinkinEID, resultAuthContext.user.ID, resultAuthContext.user.OrganizationID)
+                                    Call logController.logActivity2(cpCore, "link login with eid " & MemberLinkinEID, resultAuthContext.user.ID, resultAuthContext.user.OrganizationID)
                                 End If
                             ElseIf (MemberLinkRecognizeID <> 0) Then
                                 '
                                 ' -- Link Recognize
                                 Call resultAuthContext.recognizeById(cpCore, MemberLinkRecognizeID, resultAuthContext)
-                                Call cpCore.log_LogActivity2("link recognize with eid " & MemberLinkinEID, resultAuthContext.user.ID, resultAuthContext.user.OrganizationID)
+                                Call logController.logActivity2(cpCore, "link recognize with eid " & MemberLinkinEID, resultAuthContext.user.ID, resultAuthContext.user.OrganizationID)
                             End If
                             '
                             ' -- create guest identity if no identity
@@ -711,7 +711,7 @@ Namespace Contensive.Core.Models.Context
         '
         Public Sub logout(cpCore As coreClass)
             Try
-                Call cpCore.log_LogActivity2("logout", user.ID, user.OrganizationID)
+                Call logController.logActivity2(cpCore, "logout", user.ID, user.OrganizationID)
                 '
                 ' Clear MemberID for this page
                 '
@@ -720,7 +720,7 @@ Namespace Contensive.Core.Models.Context
                 visit.VisitAuthenticated = False
                 visit.saveObject(cpCore)
                 '
-                visitor.memberID = user.ID
+                visitor.MemberID = user.ID
                 visitor.saveObject(cpCore)
                 '
                 'isAuthenticatedAdmin_cache_isLoaded = False
@@ -932,14 +932,14 @@ Namespace Contensive.Core.Models.Context
                         '
                         ' no content given, do not handle the general case -- use authcontext.user.main_IsContentManager2()
                         '
-                    ElseIf isAuthenticatedDeveloper(cpcore) Then
+                    ElseIf isAuthenticatedDeveloper(cpCore) Then
                         '
                         ' developers are always content managers
                         '
                         returnAllowEdit = True
                         returnAllowAdd = True
                         returnAllowDelete = True
-                    ElseIf isAuthenticatedAdmin(cpcore) Then
+                    ElseIf isAuthenticatedAdmin(cpCore) Then
                         '
                         ' admin is content manager if the CDef is not developer only
                         '
@@ -1075,11 +1075,11 @@ Namespace Contensive.Core.Models.Context
                 If LocalMemberID <> 0 Then
                     returnREsult = authenticateById(cpCore, LocalMemberID, Me)
                     If returnREsult Then
-                        Call cpCore.log_LogActivity2("successful password login", user.ID, user.OrganizationID)
+                        Call logController.logActivity2(cpCore, "successful password login", user.ID, user.OrganizationID)
                         'isAuthenticatedAdmin_cache_isLoaded = False
                         'property_user_isMember_isLoaded = False
                     Else
-                        Call cpCore.log_LogActivity2("unsuccessful login (loginField:" & loginFieldValue & "/password:" & password & ")", user.ID, user.OrganizationID)
+                        Call logController.logActivity2(cpCore, "unsuccessful login (loginField:" & loginFieldValue & "/password:" & password & ")", user.ID, user.OrganizationID)
                     End If
                 End If
             Catch ex As Exception

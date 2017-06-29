@@ -40,6 +40,24 @@ Namespace Contensive.Core.Controllers
             privateRequestUserAgent = "kmaHTTP/" & My.Application.Info.Version.Major & "." & My.Application.Info.Version.Minor
             http = New webClientExt()
         End Sub
+        ''
+        ''============================================================================
+        ''
+        'Public Function common_getHttpRequest(url As String) As IO.Stream
+        '    Dim returnstream As IO.Stream = Nothing
+        '    Try
+        '        Dim rq As System.Net.WebRequest
+        '        Dim response As System.Net.WebResponse
+        '        '
+        '        rq = System.Net.WebRequest.Create(url)
+        '        rq.Timeout = 60000
+        '        response = rq.GetResponse()
+        '        returnstream = response.GetResponseStream()
+        '    Catch ex As Exception
+        '        Throw (ex)
+        '    End Try
+        '    Return returnstream
+        'End Function
         '
         '======================================================================================
         '   Requests the doc and saves the body in the file specified

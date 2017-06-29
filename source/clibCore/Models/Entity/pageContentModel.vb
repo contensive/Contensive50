@@ -13,9 +13,9 @@ Namespace Contensive.Core.Models.Entity
     Public Class pageContentModel
         '
         '-- const
-        Public Const primaryContentName As String = "page content"
-        Private Const primaryContentTableName As String = "ccpagecontent"
-        Private Const primaryContentDataSource As String = "default" '<----- set to datasource if not default
+        Public Const contentName As String = "page content"
+        Private Const tableName As String = "ccpagecontent"
+        Private Const dataSource As String = "default"
         '
         ' -- instance properties
         Public ID As Integer
@@ -117,7 +117,7 @@ Namespace Contensive.Core.Models.Entity
         Public Shared Function add(cpCore As coreClass, ByRef callersCacheNameList As List(Of String)) As pageContentModel
             Dim result As pageContentModel = Nothing
             Try
-                result = create(cpCore, cpCore.db.metaData_InsertContentRecordGetID(primaryContentName, cpCore.authContext.user.ID), callersCacheNameList)
+                result = create(cpCore, cpCore.db.metaData_InsertContentRecordGetID(contentName, cpCore.authContext.user.ID), callersCacheNameList)
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
                 Throw
@@ -136,11 +136,11 @@ Namespace Contensive.Core.Models.Entity
             Dim result As pageContentModel = Nothing
             Try
                 If recordId > 0 Then
-                    Dim cacheName As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", recordId.ToString())
+                    Dim cacheName As String = Controllers.cacheController.getDbRecordCacheName(tableName, "id", recordId.ToString())
                     result = cpCore.cache.getObject(Of pageContentModel)(cacheName)
                     If (result Is Nothing) Then
                         Using cs As New csController(cpCore)
-                            If cs.open(primaryContentName, "(id=" & recordId.ToString() & ")") Then
+                            If cs.open(contentName, "(id=" & recordId.ToString() & ")") Then
                                 result = loadRecord(cpCore, cs, callersCacheNameList)
                             End If
                         End Using
@@ -163,11 +163,11 @@ Namespace Contensive.Core.Models.Entity
             Dim result As pageContentModel = Nothing
             Try
                 If Not String.IsNullOrEmpty(recordGuid) Then
-                    Dim cacheName As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "ccguid", recordGuid)
+                    Dim cacheName As String = Controllers.cacheController.getDbRecordCacheName(tableName, "ccguid", recordGuid)
                     result = cpCore.cache.getObject(Of pageContentModel)(cacheName)
                     If (result Is Nothing) Then
                         Using cs As New csController(cpCore)
-                            If cs.open(primaryContentName, "(ccGuid=" & cpCore.db.encodeSQLText(recordGuid) & ")") Then
+                            If cs.open(contentName, "(ccGuid=" & cpCore.db.encodeSQLText(recordGuid) & ")") Then
                                 result = loadRecord(cpCore, cs, callersCacheNameList)
                             End If
                         End Using
@@ -190,10 +190,10 @@ Namespace Contensive.Core.Models.Entity
             Dim result As pageContentModel = Nothing
             Try
                 If ((foreignKey1Id > 0) And (foreignKey2Id > 0)) Then
-                    result = cpCore.cache.getObject(Of pageContentModel)(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "foreignKey1", foreignKey1Id.ToString(), "foreignKey2", foreignKey2Id.ToString()))
+                    result = cpCore.cache.getObject(Of pageContentModel)(Controllers.cacheController.getDbRecordCacheName(tableName, "foreignKey1", foreignKey1Id.ToString(), "foreignKey2", foreignKey2Id.ToString()))
                     If (result Is Nothing) Then
                         Using cs As New csController(cpCore)
-                            If cs.open(primaryContentName, "(foreignKey1=" & foreignKey1Id.ToString() & ")and(foreignKey1=" & foreignKey1Id.ToString() & ")") Then
+                            If cs.open(contentName, "(foreignKey1=" & foreignKey1Id.ToString() & ")and(foreignKey1=" & foreignKey1Id.ToString() & ")") Then
                                 result = loadRecord(cpCore, cs, callersCacheNameList)
                             End If
                         End Using
@@ -216,11 +216,11 @@ Namespace Contensive.Core.Models.Entity
             Dim result As pageContentModel = Nothing
             Try
                 If Not String.IsNullOrEmpty(recordName) Then
-                    Dim cacheName As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "name", recordName)
+                    Dim cacheName As String = Controllers.cacheController.getDbRecordCacheName(tableName, "name", recordName)
                     result = cpCore.cache.getObject(Of pageContentModel)(cacheName)
                     If (result Is Nothing) Then
                         Using cs As New csController(cpCore)
-                            If cs.open(primaryContentName, "(name=" & cpCore.db.encodeSQLText(recordName) & ")", "id") Then
+                            If cs.open(contentName, "(name=" & cpCore.db.encodeSQLText(recordName) & ")", "id") Then
                                 result = loadRecord(cpCore, cs, callersCacheNameList)
                             End If
                         End Using
@@ -332,11 +332,11 @@ Namespace Contensive.Core.Models.Entity
                         ' -- set primary cache to the object created
                         ' -- set secondary caches to the primary cache
                         ' -- add all cachenames to the injected cachenamelist
-                        Dim cacheName0 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", result.ID.ToString())
+                        Dim cacheName0 As String = Controllers.cacheController.getDbRecordCacheName(tableName, "id", result.ID.ToString())
                         callersCacheNameList.Add(cacheName0)
                         cpCore.cache.setObject(cacheName0, result)
                         '
-                        Dim cacheName1 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "ccguid", result.ccGuid)
+                        Dim cacheName1 As String = Controllers.cacheController.getDbRecordCacheName(tableName, "ccguid", result.ccGuid)
                         callersCacheNameList.Add(cacheName1)
                         cpCore.cache.setSecondaryObject(cacheName1, cacheName0)
                         '
@@ -362,17 +362,17 @@ Namespace Contensive.Core.Models.Entity
             Try
                 Dim cs As New csController(cpCore)
                 If (ID > 0) Then
-                    If Not cs.open(primaryContentName, "id=" & ID) Then
-                        Dim message As String = "Unable to open record in content [" & primaryContentName & "], with id [" & ID & "]"
+                    If Not cs.open(contentName, "id=" & ID) Then
+                        Dim message As String = "Unable to open record in content [" & contentName & "], with id [" & ID & "]"
                         cs.Close()
                         ID = 0
                         Throw New ApplicationException(message)
                     End If
                 Else
-                    If Not cs.Insert(primaryContentName) Then
+                    If Not cs.Insert(contentName) Then
                         cs.Close()
                         ID = 0
-                        Throw New ApplicationException("Unable to insert record in content [" & primaryContentName & "]")
+                        Throw New ApplicationException("Unable to insert record in content [" & contentName & "]")
                     End If
                 End If
                 If cs.ok() Then
@@ -466,7 +466,7 @@ Namespace Contensive.Core.Models.Entity
                 'cpCore.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"ccguid", ccguid))
                 '
                 ' -- object is here, but the cache was invalidated, setting
-                cpCore.cache.setObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", Me.ID.ToString()), Me)
+                cpCore.cache.setObject(Controllers.cacheController.getDbRecordCacheName(tableName, "id", Me.ID.ToString()), Me)
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
                 Throw
@@ -483,8 +483,8 @@ Namespace Contensive.Core.Models.Entity
         Public Shared Sub delete(cpCore As coreClass, recordId As Integer)
             Try
                 If (recordId > 0) Then
-                    cpCore.db.deleteContentRecords(primaryContentName, "id=" & recordId.ToString)
-                    cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", recordId.ToString))
+                    cpCore.db.deleteContentRecords(contentName, "id=" & recordId.ToString)
+                    cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(tableName, "id", recordId.ToString))
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
@@ -504,7 +504,7 @@ Namespace Contensive.Core.Models.Entity
                     Dim instance As pageContentModel = create(cpCore, ccguid, New List(Of String))
                     If (instance IsNot Nothing) Then
                         invalidatePrimaryCache(cpCore, instance.ID)
-                        cpCore.db.deleteContentRecords(primaryContentName, "(ccguid=" & cpCore.db.encodeSQLText(ccguid) & ")")
+                        cpCore.db.deleteContentRecords(contentName, "(ccguid=" & cpCore.db.encodeSQLText(ccguid) & ")")
                     End If
                 End If
             Catch ex As Exception
@@ -526,7 +526,7 @@ Namespace Contensive.Core.Models.Entity
                     Dim instance As pageContentModel = create(cpCore, foreignKey1Id, foreignKey2Id, New List(Of String))
                     If (instance IsNot Nothing) Then
                         invalidatePrimaryCache(cpCore, instance.ID)
-                        cpCore.db.deleteTableRecord(primaryContentTableName, instance.ID, primaryContentDataSource)
+                        cpCore.db.deleteTableRecord(tableName, instance.ID, dataSource)
                     End If
                 End If
             Catch ex As Exception
@@ -547,7 +547,7 @@ Namespace Contensive.Core.Models.Entity
             Try
                 Dim cs As New csController(cpCore)
                 Dim ignoreCacheNames As New List(Of String)
-                If (cs.open(primaryContentName, "(someCriteria=" & someCriteria & ")", "id")) Then
+                If (cs.open(contentName, "(someCriteria=" & someCriteria & ")", "id")) Then
                     Dim instance As pageContentModel
                     Do
                         instance = pageContentModel.loadRecord(cpCore, cs, callersCacheNameList)
@@ -571,10 +571,10 @@ Namespace Contensive.Core.Models.Entity
         ''' <param name="cpCore"></param>
         ''' <param name="recordId"></param>
         Public Shared Sub invalidatePrimaryCache(cpCore As coreClass, recordId As Integer)
-            cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", recordId.ToString))
+            cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(tableName, "id", recordId.ToString))
             '
             ' -- the zero record cache means any record was updated. Can be used to invalidate arbitraty lists of records in the table
-            cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", "0"))
+            cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(tableName, "id", "0"))
         End Sub
         ''
         ''====================================================================================================
@@ -630,11 +630,11 @@ Namespace Contensive.Core.Models.Entity
         Public Shared Function createDefault(cpcore As coreClass) As pageContentModel
             Dim instance As New pageContentModel
             Try
-                Dim CDef As cdefModel = cpcore.metaData.getCdef(primaryContentName)
+                Dim CDef As cdefModel = cpcore.metaData.getCdef(contentName)
                 If (CDef Is Nothing) Then
-                    Throw New ApplicationException("content [" & primaryContentName & "] could Not be found.")
+                    Throw New ApplicationException("content [" & contentName & "] could Not be found.")
                 ElseIf (CDef.Id <= 0) Then
-                    Throw New ApplicationException("content [" & primaryContentName & "] could Not be found.")
+                    Throw New ApplicationException("content [" & contentName & "] could Not be found.")
                 Else
                     With CDef
                         instance.Active = genericController.EncodeBoolean(.fields("Active").defaultValue)

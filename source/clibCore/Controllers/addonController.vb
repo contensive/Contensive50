@@ -613,7 +613,7 @@ Namespace Contensive.Core.Controllers
                         'csv_addon_execute_AddonsRunOnThisPageIdList = csv_addon_execute_AddonsRunOnThisPageIdList & "," & addonId
                         '
                         '-----------------------------------------------------------------
-                        ' Enable Edit Wrapper for Page Content and Dynamic Menu for edit mode
+                        ' Enable Edit Wrapper for Page Content edit mode
                         '-----------------------------------------------------------------
                         '
                         If isMainOk Then
@@ -873,7 +873,7 @@ Namespace Contensive.Core.Controllers
                                         & RequestNameRemoteMethodAddon & "=" & EncodeRequestVariable(AddonNameOrGuid_Local) _
                                         & "&HostContentName=" & EncodeRequestVariable(HostContentName) _
                                         & "&HostRecordID=" & HostRecordID _
-                                        & "&HostRQS=" & EncodeRequestVariable(cpCore.web_RefreshQueryString) _
+                                        & "&HostRQS=" & EncodeRequestVariable(cpCore.htmlDoc.refreshQueryString) _
                                         & "&HostQS=" & EncodeRequestVariable(cpCore.webServer.requestQueryString) _
                                         & "&HostForm=" & EncodeRequestVariable(cpCore.webServer.requestFormString) _
                                         & "&optionstring=" & EncodeRequestVariable(WorkingOptionString) _
@@ -3119,7 +3119,7 @@ ErrorTrap:
                     End If
                     '
                     BubbleJS = " onClick=""HelpBubbleOn( 'HelpBubble" & cpCore.htmlDoc.htmlDoc_HelpCodeCount & "',this);return false;"""
-                    QueryString = cpCore.web_RefreshQueryString
+                    QueryString = cpCore.htmlDoc.refreshQueryString
                     QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
                     'QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                     return_DialogList = return_DialogList _
@@ -3234,7 +3234,7 @@ ErrorTrap:
                         & ""
                     '
                     BubbleJS = " onClick=""HelpBubbleOn( 'HelpBubble" & cpCore.htmlDoc.htmlDoc_HelpCodeCount & "',this);return false;"""
-                    QueryString = cpCore.web_RefreshQueryString
+                    QueryString = cpCore.htmlDoc.refreshQueryString
                     QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
                     'QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                     Dim Dialog As String
@@ -3343,7 +3343,7 @@ ErrorTrap:
                         & "</table>" _
                         & ""
                     '
-                    QueryString = cpCore.web_RefreshQueryString
+                    QueryString = cpCore.htmlDoc.refreshQueryString
                     QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
                     'QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                     return_DialogList = return_DialogList _
@@ -3437,7 +3437,7 @@ ErrorTrap:
                         & "</table>" _
                         & ""
                     '
-                    QueryString = cpCore.web_RefreshQueryString
+                    QueryString = cpCore.htmlDoc.refreshQueryString
                     QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
                     'QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                     return_DialogList = return_DialogList _

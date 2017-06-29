@@ -189,10 +189,6 @@ Namespace Contensive.Core
         Public csv_ConnectionHandleLocal As Integer = 0              ' Local storage for connection handle established when appServices opened
         Public csv_ConnectionID As Integer = 0                     ' Random number (semi) unique to this hit
         '
-        ' app.config.urlencoder is a string from the licence system used to encode cookies
-        '
-        'Private app.config.urlencoderLocal As String
-        'Private app.siteProperty_ServerPageDefault As String
         '
         '================================================================================
         '   (NOT thread safe)
@@ -1110,6 +1106,687 @@ Namespace Contensive.Core
                 constructorInitialize()
             End If
         End Sub
+        '=============================================================================
+        ''' <summary>
+        ''' Executes the current route (pathPage and/or querystring based). If not found, the default route (addon) is executed. Initially the default route is the pageManager.
+        ''' </summary>
+        ''' <returns>The doc created by the default addon. (html, json, etc)</returns>
+        Public Function executeRoute(Optional route As String = "") As String
+            Dim returnResult As String = ""
+            Try
+                If (serverConfig.appConfig IsNot Nothing) Then
+                    '
+                    ' -- if app is not configured, cannot execute route
+                    Dim pairs() As String
+                    Dim pairName As String
+                    Dim pairValue As String
+                    Dim addonRoute As String = ""
+                    Dim routeTest As String
+                    Dim workingRoute As String
+                    Dim adminRoute As String = serverConfig.appConfig.adminRoute.ToLower
+                    Dim AjaxFunction As String = docProperties.getText(RequestNameAjaxFunction)
+                    Dim AjaxFastFunction As String = docProperties.getText(RequestNameAjaxFastFunction)
+                    Dim RemoteMethodFromQueryString As String = docProperties.getText(RequestNameRemoteMethodAddon)
+                    '
+                    'debugLog("executeRoute, enter")
+                    '
+                    ' determine route from either url or querystring 
+                    '
+                    If (Not String.IsNullOrEmpty(route)) Then
+                        '
+                        ' route privided as argument
+                        '
+                        workingRoute = route
+                    ElseIf (Not String.IsNullOrEmpty(RemoteMethodFromQueryString)) Then
+                        '
+                        ' route comes from a remoteMethod=route querystring argument
+                        '
+                        workingRoute = "/" & RemoteMethodFromQueryString.ToLower()
+                    Else
+                        '
+                        ' routine comes from the url
+                        '
+                        workingRoute = webServer.requestPathPage.ToLower
+                    End If
+                    '
+                    ' normalize route to /path/page or /path
+                    '
+                    workingRoute = genericController.normalizeRoute(workingRoute)
+                    '
+                    ' call with no addon route returns admin site
+                    '
+                    If True Then
+                        '
+                        '------------------------------------------------------------------------------------------
+                        '   remote method
+                        '       for hardcoded_addons (simple ajax functions) and addons with asajax and inframe
+                        '       Eventually replace the hard-coded ajax hood with this process
+                        '       so cj. methods can be consolidated into the cj.ajax.addon (can callback) calls
+                        '------------------------------------------------------------------------------------------
+                        '
+                        ' if route is a remote method, use it
+                        '
+                        routeTest = workingRoute
+                        Dim addonPtr As Integer = addonCache.getPtr(routeTest)
+                        If addonPtr >= 0 Then
+                            If addonCache.addonCache.addonList(addonPtr.ToString).remoteMethod Then
+                                addonRoute = routeTest
+                            End If
+                        Else
+                            If (InStr(routeTest, "/", CompareMethod.Text) = 1) Then
+                                routeTest = routeTest.Substring(1)
+                                addonPtr = addonCache.getPtr(routeTest)
+                                If addonPtr >= 0 Then
+                                    If addonCache.addonCache.addonList(addonPtr.ToString).remoteMethod Then
+                                        addonRoute = routeTest
+                                    End If
+                                End If
+                            End If
+                        End If
+                        If addonRoute = "" Then
+                            '
+                            ' if remote method is not in route, get nameGuid from querystring
+                            '
+                            addonRoute = docProperties.getText(RequestNameRemoteMethodAddon)
+                        End If
+                        If addonRoute <> "" Then
+                            '
+                            ' -- this section was added here. it came from an earlier processing section of initApp() but appears to apply only to remote method processing
+                            '--------------------------------------------------------------------------
+                            '   Verify Add-ons are run from Referrers on the Aggregate Access List
+                            '--------------------------------------------------------------------------
+                            '
+                            If webServer.webServerIO_ReadStreamJSForm Then
+                                If webServer.requestReferrer = "" Then
+                                    '
+                                    ' Allow it to be hand typed
+                                    '
+                                Else
+                                    '
+                                    ' Test source site
+                                    '
+                                    Dim refProtocol As String = ""
+                                    Dim refHost As String = ""
+                                    Dim refPath As String = ""
+                                    Dim refPage As String = ""
+                                    Dim refQueryString As String = ""
+                                    Dim cs As Integer
+                                    Call genericController.SeparateURL(webServer.requestReferrer, refProtocol, refHost, refPath, refPage, refQueryString)
+                                    If genericController.vbUCase(refHost) <> genericController.vbUCase(webServer.requestDomain) Then
+                                        '
+                                        ' Not from this site
+                                        '
+                                        If siteProperties.getBoolean("AllowAggregateAccessBlocking") Then
+                                            cs = db.cs_open("Aggregate Access", "Link=" & EncodeSQLText(refHost), , False, , , , "active")
+                                            If Not db.cs_ok(cs) Then
+                                                '
+                                                ' no record, add an inactive record and throw error
+                                                '
+                                                Call db.cs_Close(cs)
+                                                cs = db.cs_insertRecord("Aggregate Access")
+                                                If db.cs_ok(cs) Then
+                                                    Call db.cs_set(cs, "Name", refHost)
+                                                    Call db.cs_set(cs, "Link", refHost)
+                                                    Call db.cs_set(cs, "active", False)
+                                                End If
+                                                Call db.cs_Close(cs)
+                                                handleExceptionAndContinue(New ApplicationException("Add-on call from [" & refHost & "] was blocked because this domain is not in the Aggregate Access Content. An inactive record was added. To allow this domain access, mark the record active.")) ' handleLegacyError12("Init", "")
+                                                docOpen = False '--- should be disposed by caller --- Call dispose
+                                                Return htmlDoc.docBuffer
+                                            ElseIf Not db.cs_getBoolean(cs, "active") Then
+                                                '
+                                                ' inactive record, throw error
+                                                '
+                                                Call db.cs_Close(cs)
+                                                handleExceptionAndContinue(New ApplicationException("Add-on call from [" & refHost & "] was blocked because this domain is not active in the Aggregate Access Content. To allow this domain access, mark the record active.")) ' handleLegacyError12("Init", "")
+                                                docOpen = False '--- should be disposed by caller --- Call dispose
+                                                Return htmlDoc.docBuffer
+                                            Else
+                                                '
+                                                ' Active record, allow hit
+                                                '
+                                                Call db.cs_Close(cs)
+                                            End If
+                                        End If
+                                    End If
+                                End If
+                            End If
+                            '
+                            'Call AppendLog("main_init(), 2710 - exit for remote method")
+                            '
+                            If True Then
+                                Dim Option_String As String = ""
+                                Dim pos As Integer
+                                Dim HostContentName As String
+                                Dim hostRecordId As Integer
+                                If docProperties.containsKey("Option_String") Then
+                                    Option_String = docProperties.getText("Option_String")
+                                Else
+                                    '
+                                    ' convert Querystring encoding to (internal) NVA
+                                    '
+                                    If webServer.requestQueryString <> "" Then
+                                        pairs = Split(webServer.requestQueryString, "&")
+                                        For addonPtr = 0 To UBound(pairs)
+                                            pairName = pairs(addonPtr)
+                                            pairValue = ""
+                                            pos = genericController.vbInstr(1, pairName, "=")
+                                            If pos > 0 Then
+                                                pairValue = genericController.DecodeResponseVariable(Mid(pairName, pos + 1))
+                                                pairName = genericController.DecodeResponseVariable(Mid(pairName, 1, pos - 1))
+                                            End If
+                                            Option_String = Option_String & "&" & genericController.encodeNvaArgument(pairName) & "=" & genericController.encodeNvaArgument(pairValue)
+                                        Next
+                                        Option_String = Mid(Option_String, 2)
+                                    End If
+                                End If
+                                HostContentName = docProperties.getText("hostcontentname")
+                                hostRecordId = docProperties.getInteger("HostRecordID")
+                                '
+                                ' remote methods are add-ons
+                                '
+                                Dim AddonStatusOK As Boolean = True
+                                '
+                                ' REFACTOR -- must know if this is json or html remote before call because it is an argument -- assume this is a json for now -- must deal with it somehow
+                                '
+                                returnResult = addon.execute(0, addonRoute, Option_String, CPUtilsBaseClass.addonContext.ContextRemoteMethodJson, HostContentName, hostRecordId, "", "0", False, 0, "", AddonStatusOK, Nothing, "", Nothing, "", authContext.user.ID, authContext.isAuthenticated)
+                            End If
+                            '
+                            ' deliver styles, javascript and other head tags as javascript appends
+                            '
+                            webServer.webServerIO_BlockClosePageCopyright = True
+                            html_BlockClosePageLink = True
+                            If (webServer.webServerIO_OutStreamDevice = htmlDocController.htmlDoc_OutStreamJavaScript) Then
+                                If genericController.vbInstr(1, returnResult, "<form ", vbTextCompare) <> 0 Then
+                                    Dim FormSplit As String() = Split(returnResult, "<form ", , vbTextCompare)
+                                    returnResult = FormSplit(0)
+                                    For addonPtr = 1 To UBound(FormSplit)
+                                        Dim FormEndPos As Integer = genericController.vbInstr(1, FormSplit(addonPtr), ">")
+                                        Dim FormInner As String = Mid(FormSplit(addonPtr), 1, FormEndPos)
+                                        Dim FormSuffix As String = Mid(FormSplit(addonPtr), FormEndPos + 1)
+                                        FormInner = genericController.vbReplace(FormInner, "method=""post""", "method=""main_Get""", 1, 99, vbTextCompare)
+                                        FormInner = genericController.vbReplace(FormInner, "method=post", "method=""main_Get""", 1, 99, vbTextCompare)
+                                        returnResult = returnResult & "<form " & FormInner & FormSuffix
+                                    Next
+                                End If
+                                '
+                                Call htmlDoc.writeAltBuffer(returnResult)
+                                returnResult = ""
+                            End If
+                            Return returnResult
+                        End If
+                        If True Then
+                            '
+                            '------------------------------------------------------------------------------------------
+                            '   These should all be converted to system add-ons
+                            '
+                            '   AJAX late functions (slower then the early functions, but they include visit state, etc.
+                            '------------------------------------------------------------------------------------------
+                            '
+                            If AjaxFunction <> "" Then
+                                returnResult = ""
+                                Select Case AjaxFunction
+                                    Case ajaxGetFieldEditorPreferenceForm
+                                        '
+                                        ' When editing in admin site, if a field has multiple editors (addons as editors), you main_Get an icon
+                                        '   to click to select the editor. When clicked, a fancybox opens to display a form. The onStart of
+                                        '   he fancybox calls this ajax call and puts the return in the div that is displayed. Return a list
+                                        '   of addon editors compatible with the field type.
+                                        '
+                                        Dim addonDefaultEditorName As String = ""
+                                        Dim addonDefaultEditorId As Integer = 0
+                                        Dim fieldId As Integer = docProperties.getInteger("fieldid")
+                                        '
+                                        ' main_Get name of default editor
+                                        '
+                                        Dim Sql As String = "select top 1" _
+                                        & " a.name,a.id" _
+                                        & " from ccfields f left join ccAggregateFunctions a on a.id=f.editorAddonId" _
+                                        & " where" _
+                                        & " f.ID = " & fieldId _
+                                        & ""
+                                        Dim dt As DataTable
+                                        dt = db.executeSql(Sql)
+                                        If dt.Rows.Count > 0 Then
+                                            For Each rsDr As DataRow In dt.Rows
+                                                addonDefaultEditorName = "&nbsp;(" & genericController.encodeText(rsDr("name")) & ")"
+                                                addonDefaultEditorId = genericController.EncodeInteger(rsDr("id"))
+                                            Next
+                                        End If
+                                        '
+                                        Dim radioGroupName As String = "setEditorPreference" & fieldId
+                                        Dim currentEditorAddonId As Integer = docProperties.getInteger("currentEditorAddonId")
+                                        Dim submitFormId As Integer = docProperties.getInteger("submitFormId")
+                                        Sql = "select f.name,c.name,r.addonid,a.name as addonName" _
+                                        & " from (((cccontent c" _
+                                        & " left join ccfields f on f.contentid=c.id)" _
+                                        & " left join ccAddonContentFieldTypeRules r on r.contentFieldTypeID=f.type)" _
+                                        & " left join ccAggregateFunctions a on a.id=r.AddonId)" _
+                                        & " where f.id=" & fieldId
+
+                                        dt = db.executeSql(Sql)
+                                        If dt.Rows.Count > 0 Then
+                                            For Each rsDr As DataRow In dt.Rows
+                                                Dim addonId As Integer = genericController.EncodeInteger(rsDr("addonid"))
+                                                If (addonId <> 0) And (addonId <> addonDefaultEditorId) Then
+                                                    returnResult = returnResult _
+                                                    & vbCrLf & vbTab & "<div class=""radioCon"">" & htmlDoc.html_GetFormInputRadioBox(radioGroupName, genericController.encodeText(addonId), CStr(currentEditorAddonId)) & "&nbsp;Use " & genericController.encodeText(rsDr("addonName")) & "</div>" _
+                                                    & ""
+                                                End If
+
+                                            Next
+                                        End If
+
+                                        Dim OnClick As String = "" _
+                                        & "var a=document.getElementsByName('" & radioGroupName & "');" _
+                                        & "for(i=0;i<a.length;i++) {" _
+                                        & "if(a[i].checked){var v=a[i].value}" _
+                                        & "}" _
+                                        & "document.getElementById('fieldEditorPreference').value='" & fieldId & ":'+v;" _
+                                        & "cj.admin.saveEmptyFieldList('" & "FormEmptyFieldList');" _
+                                        & "document.getElementById('adminEditForm').submit();" _
+                                        & ""
+
+                                        returnResult = "" _
+                                        & vbCrLf & vbTab & "<h1>Editor Preference</h1>" _
+                                        & vbCrLf & vbTab & "<p>Select the editor you will use for this field. Select default if you want to use the current system default.</p>" _
+                                        & vbCrLf & vbTab & "<div class=""radioCon"">" & htmlDoc.html_GetFormInputRadioBox("setEditorPreference" & fieldId, "0", "0") & "&nbsp;Use Default Editor" & addonDefaultEditorName & "</div>" _
+                                        & vbCrLf & vbTab & returnResult _
+                                        & vbCrLf & vbTab & "<div class=""buttonCon"">" _
+                                        & vbCrLf & vbTab & "<button type=""button"" onclick=""" & OnClick & """>Select</button>" _
+                                        & vbCrLf & vbTab & "</div>" _
+                                        & ""
+                                    Case AjaxGetDefaultAddonOptionString
+                                        '
+                                        ' return the addons defult AddonOption_String
+                                        ' used in wysiwyg editor - addons in select list have no defaultOption_String
+                                        ' because created it is expensive (lookuplists, etc). This is only called
+                                        ' when the addon is double-clicked in the editor after being dropped
+                                        '
+                                        Dim AddonGuid As String = docProperties.getText("guid")
+                                        '$$$$$ cache this
+                                        Dim CS As Integer = db.cs_open(cnAddons, "ccguid=" & db.encodeSQLText(AddonGuid))
+                                        Dim addonArgumentList As String = ""
+                                        Dim addonIsInline As Boolean = False
+                                        If db.cs_ok(CS) Then
+                                            addonArgumentList = db.cs_getText(CS, "argumentlist")
+                                            addonIsInline = db.cs_getBoolean(CS, "IsInline")
+                                            returnResult = main_GetDefaultAddonOption_String(addonArgumentList, AddonGuid, addonIsInline)
+                                        End If
+                                        Call db.cs_Close(CS)
+                                    Case AjaxSetVisitProperty
+                                        '
+                                        ' 7/7/2009 - Moved from HardCodedPages - sets a visit property from the cj object
+                                        '
+                                        Dim ArgList As String = docProperties.getText("args")
+                                        Dim Args As String() = Split(ArgList, "&")
+                                        Dim gd As GoogleDataType = New GoogleDataType
+                                        gd.IsEmpty = True
+                                        For Ptr = 0 To UBound(Args)
+                                            Dim ArgNameValue As String() = Split(Args(Ptr), "=")
+                                            Dim PropertyName As String = ArgNameValue(0)
+                                            Dim PropertyValue As String = ""
+                                            If UBound(ArgNameValue) > 0 Then
+                                                PropertyValue = ArgNameValue(1)
+                                            End If
+                                            Call visitProperty.setProperty(PropertyName, PropertyValue)
+                                        Next
+                                        returnResult = main_FormatRemoteQueryOutput(gd, RemoteFormatEnum.RemoteFormatJsonNameValue)
+                                        returnResult = htmlDoc.main_encodeHTML(returnResult)
+                                        Call htmlDoc.writeAltBuffer(returnResult)
+                                    Case AjaxGetVisitProperty
+                                        '
+                                        ' 7/7/2009 - Moved from HardCodedPages - sets a visit property from the cj object
+                                        '
+                                        Dim ArgList As String = docProperties.getText("args")
+                                        Dim Args As String() = Split(ArgList, "&")
+                                        Dim gd As GoogleDataType = New GoogleDataType
+                                        gd.IsEmpty = False
+                                        ReDim gd.row(0)
+
+                                        For Ptr = 0 To UBound(Args)
+                                            ReDim Preserve gd.col(Ptr)
+                                            ReDim Preserve gd.row(0).Cell(Ptr)
+                                            Dim ArgNameValue As String() = Split(Args(Ptr), "=")
+                                            Dim PropertyName As String = ArgNameValue(0)
+                                            gd.col(Ptr).Id = PropertyName
+                                            gd.col(Ptr).Label = PropertyName
+                                            gd.col(Ptr).Type = "string"
+                                            Dim PropertyValue As String = ""
+                                            If UBound(ArgNameValue) > 0 Then
+                                                PropertyValue = ArgNameValue(1)
+                                            End If
+                                            gd.row(0).Cell(Ptr).v = visitProperty.getText(PropertyName, PropertyValue)
+                                        Next
+                                        returnResult = main_FormatRemoteQueryOutput(gd, RemoteFormatEnum.RemoteFormatJsonNameValue)
+                                        returnResult = htmlDoc.main_encodeHTML(returnResult)
+                                        Call htmlDoc.writeAltBuffer(returnResult)
+                                    Case AjaxData
+                                        '
+                                        ' 7/7/2009 - Moved from HardCodedPages - Run remote query from cj.remote object call, and return results html encoded in a <result></result> block
+                                        ' 20050427 - not used
+                                        Call htmlDoc.writeAltBuffer(init_ProcessAjaxData())
+                                    Case AjaxPing
+                                        '
+                                        ' returns OK if the server is alive
+                                        '
+                                        returnResult = "ok"
+                                    Case AjaxOpenIndexFilter
+                                        Call visitProperty.setProperty("IndexFilterOpen", "1")
+                                    Case AjaxOpenIndexFilterGetContent
+                                        '
+                                        ' should be converted to adminClass remoteMethod
+                                        '
+                                        Call visitProperty.setProperty("IndexFilterOpen", "1")
+                                        Dim adminSite As New Contensive.Addons.addon_AdminSiteClass(cp_forAddonExecutionOnly)
+                                        Dim ContentID As Integer = docProperties.getInteger("cid")
+                                        If ContentID = 0 Then
+                                            returnResult = "No filter is available"
+                                        Else
+                                            Dim cdef As cdefModel = metaData.getCdef(ContentID)
+                                            returnResult = adminSite.GetForm_IndexFilterContent(cdef)
+                                        End If
+                                        adminSite = Nothing
+                                    Case AjaxCloseIndexFilter
+                                        Call visitProperty.setProperty("IndexFilterOpen", "0")
+                                    Case AjaxOpenAdminNav
+                                        Call visitProperty.setProperty("AdminNavOpen", "1")
+                                    Case Else
+                                End Select
+                                '
+                                'Call AppendLog("main_init(), 2810 - exit for ajax hook")
+                                '
+                                webServer.webServerIO_BlockClosePageCopyright = True
+                                html_BlockClosePageLink = True
+                                'Call AppendLog("call main_getEndOfBody, from main_initf")
+                                returnResult = returnResult & htmlDoc.html_GetEndOfBody(False, False, True, False)
+                                Call htmlDoc.writeAltBuffer(returnResult)
+                                docOpen = False '--- should be disposed by caller --- Call dispose
+                                Return htmlDoc.docBuffer
+                            End If
+                        End If
+                        '
+                        '--------------------------------------------------------------------------
+                        '   Process Email Open and Click Intercepts
+                        '   works with DropID -> spacer.gif, or DropCssID -> styles.css
+                        '--------------------------------------------------------------------------
+                        '
+                        If True Then
+                            Dim recordid As Integer
+                            Dim emailDropId As Integer
+                            Dim RedirectLink As String
+                            Dim EmailMemberID As Integer
+                            Dim CSLog As Integer
+                            Dim EmailSpamBlock As String
+                            recordid = 0
+                            emailDropId = docProperties.getInteger(RequestNameEmailOpenFlag)
+                            If emailDropId <> 0 Then
+                                recordid = emailDropId
+                            End If
+                            '    End If
+                            If (recordid <> 0) Then
+                                '
+                                ' ----- Email open detected. Log it and redirect to a 1x1 spacer
+                                '
+                                EmailMemberID = docProperties.getInteger(RequestNameEmailMemberID)
+                                CSLog = db.cs_insertRecord("Email Log")
+                                If db.cs_ok(CSLog) Then
+                                    Call db.cs_set(CSLog, "Name", "Opened " & CStr(app_startTime))
+                                    Call db.cs_set(CSLog, "EmailDropID", recordid)
+                                    Call db.cs_set(CSLog, "MemberID", EmailMemberID)
+                                    Call db.cs_set(CSLog, "LogType", EmailLogTypeOpen)
+                                End If
+                                Call db.cs_Close(CSLog)
+                                RedirectLink = webServer.webServerIO_requestProtocol & webServer.requestDomain & "/ccLib/images/spacer.gif"
+                                Call webServer.redirect(RedirectLink, "Group Email Open hit, redirecting to a dummy image", False)
+                            End If
+                            '
+                            emailDropId = docProperties.getInteger(RequestNameEmailClickFlag)
+                            EmailSpamBlock = docProperties.getText(RequestNameEmailSpamFlag)
+                            If (emailDropId <> 0) And (EmailSpamBlock = "") Then
+                                '
+                                ' ----- Email click detected. Log it.
+                                '
+                                EmailMemberID = docProperties.getInteger(RequestNameEmailMemberID)
+                                CSLog = db.cs_insertRecord("Email Log")
+                                If db.cs_ok(CSLog) Then
+                                    Call db.cs_set(CSLog, "Name", "Clicked " & CStr(app_startTime))
+                                    Call db.cs_set(CSLog, "EmailDropID", emailDropId)
+                                    Call db.cs_set(CSLog, "MemberID", EmailMemberID)
+                                    Call db.cs_set(CSLog, "VisitId", authContext.visit.ID)
+                                    Call db.cs_set(CSLog, "LogType", EmailLogTypeClick)
+                                End If
+                                Call db.cs_Close(CSLog)
+                            End If
+                            If EmailSpamBlock <> "" Then
+                                '
+                                ' ----- Email spam footer was clicked, clear the AllowBulkEmail field
+                                '
+                                Call email.addToBlockList(EmailSpamBlock)
+                                '
+                                CSLog = db.cs_open("people", "email=" & db.encodeSQLText(EmailSpamBlock), , , , , , "AllowBulkEmail")
+                                Do While db.cs_ok(CSLog)
+                                    Call db.cs_set(CSLog, "AllowBulkEmail", False)
+                                    Call db.cs_goNext(CSLog)
+                                Loop
+                                Call db.cs_Close(CSLog)
+                                '
+                                ' ----- Make a log entry to track the result of this email drop
+                                '
+                                emailDropId = docProperties.getInteger(RequestNameEmailBlockRequestDropID)
+                                If emailDropId <> 0 Then
+                                    '
+                                    ' ----- Email click detected. Log it.
+                                    '
+                                    EmailMemberID = docProperties.getInteger(RequestNameEmailMemberID)
+                                    CSLog = db.cs_insertRecord("Email Log")
+                                    If db.cs_ok(CSLog) Then
+                                        Call db.cs_set(CSLog, "Name", "Email Block Request " & CStr(app_startTime))
+                                        Call db.cs_set(CSLog, "EmailDropID", emailDropId)
+                                        Call db.cs_set(CSLog, "MemberID", EmailMemberID)
+                                        Call db.cs_set(CSLog, "VisitId", authContext.visit.ID)
+                                        Call db.cs_set(CSLog, "LogType", EmailLogTypeBlockRequest)
+                                    End If
+                                    Call db.cs_Close(CSLog)
+                                End If
+                                Call webServer.redirect(webServer.webServerIO_requestProtocol & webServer.requestDomain & "/ccLib/popup/EmailBlocked.htm", "Group Email Spam Block hit. Redirecting to EmailBlocked page.", False)
+                            End If
+                        End If
+                        '
+                        '--------------------------------------------------------------------------
+                        '   Process Intercept Pages
+                        '       must be before main_Get Intercept Pages
+                        '       must be before path block, so a login will main_Get you through
+                        '       must be before verbose check, so a change is reflected on this page
+                        '--------------------------------------------------------------------------
+                        '
+                        If True Then
+                            Dim formType As String
+                            Dim StyleSN As Integer
+                            formType = docProperties.getText("type")
+                            If (formType <> "") Then
+                                '
+                                ' set the meta content flag to show it is not needed for the head tag
+                                '
+                                Call main_SetMetaContent(0, 0)
+                                Select Case formType
+                                    Case FormTypeSiteStyleEditor
+                                        If authContext.isAuthenticated() And authContext.isAuthenticatedAdmin(Me) Then
+                                            '
+                                            ' Save the site sites
+                                            '
+                                            Call appRootFiles.saveFile(DynamicStylesFilename, docProperties.getText("SiteStyles"))
+                                            If docProperties.getBoolean(RequestNameInlineStyles) Then
+                                                '
+                                                ' Inline Styles
+                                                '
+                                                Call siteProperties.setProperty("StylesheetSerialNumber", "0")
+                                            Else
+                                                '
+                                                ' Linked Styles
+                                                ' Bump the Style Serial Number so next fetch is not cached
+                                                '
+                                                StyleSN = siteProperties.getinteger("StylesheetSerialNumber", 0)
+                                                StyleSN = StyleSN + 1
+                                                Call siteProperties.setProperty("StylesheetSerialNumber", genericController.encodeText(StyleSN))
+                                                '
+                                                ' Save new public stylesheet
+                                                '
+                                                Call appRootFiles.saveFile("templates\Public" & StyleSN & ".css", pages.pageManager_GetStyleSheet)
+                                                Call appRootFiles.saveFile("templates\Admin" & StyleSN & ".css", pages.pageManager_GetStyleSheetDefault)
+                                            End If
+                                        End If
+                                    Case FormTypeAddonStyleEditor
+                                        '
+                                        ' save custom styles
+                                        '
+                                        If authContext.isAuthenticated() And authContext.isAuthenticatedAdmin(Me) Then
+                                            Dim addonId As Integer
+                                            Dim contentName As String = ""
+                                            Dim tableName As String
+                                            Dim nothingObject As Object = Nothing
+                                            Dim cs As Integer
+                                            addonId = docProperties.getInteger("AddonID")
+                                            cs = csOpen(cnAddons, addonId)
+                                            If db.cs_ok(cs) Then
+                                                Call db.cs_set(cs, "CustomStylesFilename", docProperties.getText("CustomStyles"))
+                                            End If
+                                            Call db.cs_Close(cs)
+                                            '
+                                            ' Clear Caches
+                                            '
+                                            Call pages.cache_pageContent_clear()
+                                            Call pages.pageManager_cache_pageTemplate_clear()
+                                            Call pages.pageManager_cache_siteSection_clear()
+                                            'Call cache.invalidateObjectList("")
+                                            If contentName <> "" Then
+                                                Call cache.invalidateContent(contentName)
+                                                tableName = GetContentTablename(contentName)
+                                                If genericController.vbLCase(tableName) = "cctemplates" Then
+                                                    Call cache.setObject(pagesController.cache_pageTemplate_cacheName, nothingObject)
+                                                    Call pages.pageManager_cache_pageTemplate_load()
+                                                End If
+                                            End If
+                                        End If
+                                    Case FormTypeAddonSettingsEditor
+                                        '
+                                        '
+                                        '
+                                        Call htmlDoc.pageManager_ProcessAddonSettingsEditor()
+                                    Case FormTypeHelpBubbleEditor
+                                        '
+                                        '
+                                        '
+                                        Call htmlDoc.main_ProcessHelpBubbleEditor()
+                                    Case FormTypeJoin
+                                        '
+                                        '
+                                        '
+                                        Call htmlDoc.processFormJoin()
+                                    Case FormTypeSendPassword
+                                        '
+                                        '
+                                        '
+                                        Call htmlDoc.processFormSendPassword()
+                                    Case FormTypeLogin, "l09H58a195"
+                                        '
+                                        '
+                                        '
+                                        Call htmlDoc.processFormLoginDefault()
+                                    Case FormTypeToolsPanel
+                                        '
+                                        ' ----- Administrator Tools Panel
+                                        '
+                                        Call htmlDoc.pageManager_ProcessFormToolsPanel()
+                                    Case FormTypePageAuthoring
+                                        '
+                                        ' ----- Page Authoring Tools Panel
+                                        '
+                                        Call pages.pageManager_ProcessFormQuickEditing()
+                                    Case FormTypeActiveEditor
+                                        '
+                                        ' ----- Active Editor
+                                        '
+                                        Call main_ProcessActiveEditor()
+                                End Select
+                            End If
+                        End If
+                        '
+                        '--------------------------------------------------------------------------
+                        ' Process HardCoded Methods
+                        ' must go after form processing bc some of these pages have forms that are processed
+                        '--------------------------------------------------------------------------
+                        '
+                        Dim HardCodedPage As String
+                        HardCodedPage = docProperties.getText(RequestNameHardCodedPage)
+                        If (HardCodedPage <> "") Then
+                            '
+                            'Call AppendLog("main_init(), 3110 - exit for hardcodedpage hook")
+                            '
+                            Dim ExitNow As Boolean = executeRoute_hardCodedPage(HardCodedPage)
+                            If ExitNow Then
+                                docOpen = False '--- should be disposed by caller --- Call dispose
+                                Return htmlDoc.docBuffer
+                            End If
+                        End If
+                        '
+                        '--------------------------------------------------------------------------
+                        ' normalize adminRoute and test for hit
+                        '--------------------------------------------------------------------------
+                        '
+                        If (workingRoute = genericController.normalizeRoute(adminRoute)) Then
+                            '
+                            'debugLog("executeRoute, route is admin")
+                            '
+                            '--------------------------------------------------------------------------
+                            ' route is admin
+                            '   If the Then admin route Is taken -- the login panel processing Is bypassed. those methods need To be a different kind Of route, Or it should be an addon
+                            '   runAtServerClass in the admin addon.
+                            '--------------------------------------------------------------------------
+                            '
+                            Dim returnStatusOK As Boolean = False
+                            '
+                            ' REFACTOR -- when admin code is broken cleanly into an addon, run it through execute
+                            '
+                            'returnResult = executeAddon(0, adminSiteAddonGuid, "", CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "", False, 0, "", returnStatusOK, Nothing, "", Nothing, "", authcontext.user.userid, visit.visitAuthenticated)
+                            '
+                            ' until then, run it as an internal class
+                            '
+                            Dim admin As New Contensive.Addons.addon_AdminSiteClass()
+                            returnResult = admin.execute(cp_forAddonExecutionOnly).ToString()
+                        Else
+                            '--------------------------------------------------------------------------
+                            ' default routing addon takes what is left
+                            '
+                            ' Here was read a site property set to the default addon. Might be performanceCloud-type web application. Might be page-manager
+                            '
+                            '--------------------------------------------------------------------------
+                            '
+                            'debugLog("executeRoute, route is Default Route AddonId")
+                            '
+                            Dim defaultAddonId As Integer = siteProperties.getinteger("Default Route AddonId")
+                            If (defaultAddonId = 0) Then
+                                '
+                                ' -- no default route set, assume html hit
+                                returnResult = "<p>This site is not configured for website traffic. Please set the default route.</p>"
+                            Else
+                                Dim addonStatusOk As Boolean = False
+                                returnResult = addon.execute(defaultAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", addonStatusOk, Nothing, "", Nothing, "", authContext.user.ID, authContext.visit.VisitAuthenticated)
+                                If (Not addonStatusOk) Then
+                                    '
+                                    ' -- there was an error in the default route addon
+                                    returnResult = "<p>This site is temporarily unavailable.</p>"
+                                Else
+                                End If
+                            End If
+                        End If
+                    End If
+                End If
+            Catch ex As Exception
+                handleExceptionLegacyRow2(ex, "cpCoreClass", System.Reflection.MethodInfo.GetCurrentMethod.Name, "Unexpected Exception")
+            End Try
+            Return returnResult
+        End Function
         ''
         '' ----- Get a DataSource ID from its Name
         ''       If it is not found, -1 is returned (for system datasource)
@@ -1958,113 +2635,113 @@ ErrorTrap:
         'ErrorTrap:
         '            Call csv_HandleClassTrapError(Err.Number, Err.Source, Err.Description, "csv_TextScramble", True)
         '        End Function
-        '
-        '===========================================================================================
-        '   Verify the Menu record is there, add it if not
-        '   If it is default, add all existing sections to it
-        '   If this version is too old, it returns 0
-        '===========================================================================================
-        '
-        Public Function csv_VerifyDynamicMenu(ByVal MenuName As String) As Integer
-            On Error GoTo ErrorTrap 'Const Tn = "VerifyDynamicMenu" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim CS As Integer
-            Dim CSRule As Integer
-            Dim DefaultFound As Boolean
-            Dim iMenuName As String
-            '
-            If True Then
-                '
-                iMenuName = MenuName
-                If iMenuName = "" Then
-                    iMenuName = "Default"
-                End If
-                '
-                CS = db.cs_openCsSql_rev("default", "select ID from ccDynamicMenus where name=" & db.encodeSQLText(iMenuName))
-                If db.cs_ok(CS) Then
-                    csv_VerifyDynamicMenu = db.cs_getInteger(CS, "ID")
-                End If
-                Call db.cs_Close(CS)
-                '
-                If csv_VerifyDynamicMenu = 0 Then
-                    '
-                    ' Add the Menu
-                    '
-                    CS = db.cs_insertRecord("Dynamic Menus", SystemMemberID)
-                    If db.cs_ok(CS) Then
-                        csv_VerifyDynamicMenu = db.cs_getInteger(CS, "ID")
-                        Call db.cs_set(CS, "name", iMenuName)
-                        If True Then
-                            Call db.cs_set(CS, "ccGuid", DefaultDynamicMenuGuid)
-                        End If
-                    End If
-                    Call db.cs_Close(CS)
-                    '
-                    If genericController.vbUCase(iMenuName) = "DEFAULT" Then
-                        '
-                        ' Adding the Default menu - put all sections into this when it is created
-                        '
-                        CS = db.cs_open("Site Sections")
-                        Do While db.cs_ok(CS)
-                            CSRule = db.cs_insertRecord("Dynamic Menu Section Rules", SystemMemberID)
-                            If db.cs_ok(CSRule) Then
-                                Call db.cs_set(CSRule, "DynamicMenuID", csv_VerifyDynamicMenu)
-                                Call db.cs_set(CSRule, "SectionID", db.cs_getInteger(CS, "ID"))
-                            End If
-                            Call db.cs_Close(CSRule)
-                            db.cs_goNext(CS)
-                        Loop
-                        Call db.cs_Close(CS)
-                    End If
-                End If
-            End If
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_VerifyDynamicMenu", True, True)
-        End Function
-        '
-        '===========================================================================================
-        '   Verify the Menu record is there, add it if not
-        '   If it is default, add all existing sections to it
-        '===========================================================================================
-        '
-        Public Function csv_GetDynamicMenuACSelect() As String
-            On Error GoTo ErrorTrap 'Const Tn = "cs_getv_DynamicMenuACSelect" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim CS As Integer
-            '
-            If True Then
-                '
-                If csv_DynamicMenuACSelect = "" Then
-                    CS = db.cs_open("Dynamic Menus", , "Name", , , , , "Name")
-                    If Not db.cs_ok(CS) Then
-                        Call db.cs_Close(CS)
-                        Call csv_VerifyDynamicMenu("Default")
-                        CS = db.cs_open("Dynamic Menus", , "Name", , , , , "Name")
-                    End If
-                    Do While db.cs_ok(CS)
-                        If csv_DynamicMenuACSelect <> "" Then
-                            csv_DynamicMenuACSelect = csv_DynamicMenuACSelect & "|"
-                        End If
-                        csv_DynamicMenuACSelect = csv_DynamicMenuACSelect & db.cs_getText(CS, "name")
-                        db.cs_goNext(CS)
-                    Loop
-                    Call db.cs_Close(CS)
-                End If
-                csv_GetDynamicMenuACSelect = csv_DynamicMenuACSelect
-            End If
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' handleLegacyError4(Err.Number, Err.Source, Err.Description, "VerifyDefaultDynamicMenu", True, True)
-        End Function
+        '        '
+        '        '===========================================================================================
+        '        '   Verify the Menu record is there, add it if not
+        '        '   If it is default, add all existing sections to it
+        '        '   If this version is too old, it returns 0
+        '        '===========================================================================================
+        '        '
+        '        Public Function csv_VerifyDynamicMenu(ByVal MenuName As String) As Integer
+        '            On Error GoTo ErrorTrap 'Const Tn = "VerifyDynamicMenu" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
+        '            '
+        '            Dim CS As Integer
+        '            Dim CSRule As Integer
+        '            Dim DefaultFound As Boolean
+        '            Dim iMenuName As String
+        '            '
+        '            If True Then
+        '                '
+        '                iMenuName = MenuName
+        '                If iMenuName = "" Then
+        '                    iMenuName = "Default"
+        '                End If
+        '                '
+        '                CS = db.cs_openCsSql_rev("default", "select ID from ccDynamicMenus where name=" & db.encodeSQLText(iMenuName))
+        '                If db.cs_ok(CS) Then
+        '                    csv_VerifyDynamicMenu = db.cs_getInteger(CS, "ID")
+        '                End If
+        '                Call db.cs_Close(CS)
+        '                '
+        '                If csv_VerifyDynamicMenu = 0 Then
+        '                    '
+        '                    ' Add the Menu
+        '                    '
+        '                    CS = db.cs_insertRecord("Dynamic Menus", SystemMemberID)
+        '                    If db.cs_ok(CS) Then
+        '                        csv_VerifyDynamicMenu = db.cs_getInteger(CS, "ID")
+        '                        Call db.cs_set(CS, "name", iMenuName)
+        '                        If True Then
+        '                            Call db.cs_set(CS, "ccGuid", DefaultDynamicMenuGuid)
+        '                        End If
+        '                    End If
+        '                    Call db.cs_Close(CS)
+        '                    '
+        '                    If genericController.vbUCase(iMenuName) = "DEFAULT" Then
+        '                        '
+        '                        ' Adding the Default menu - put all sections into this when it is created
+        '                        '
+        '                        CS = db.cs_open("Site Sections")
+        '                        Do While db.cs_ok(CS)
+        '                            CSRule = db.cs_insertRecord("Dynamic Menu Section Rules", SystemMemberID)
+        '                            If db.cs_ok(CSRule) Then
+        '                                Call db.cs_set(CSRule, "DynamicMenuID", csv_VerifyDynamicMenu)
+        '                                Call db.cs_set(CSRule, "SectionID", db.cs_getInteger(CS, "ID"))
+        '                            End If
+        '                            Call db.cs_Close(CSRule)
+        '                            db.cs_goNext(CS)
+        '                        Loop
+        '                        Call db.cs_Close(CS)
+        '                    End If
+        '                End If
+        '            End If
+        '            '
+        '            Exit Function
+        '            '
+        '            ' ----- Error Trap
+        '            '
+        'ErrorTrap:
+        '            Throw New ApplicationException("Unexpected exception") ' handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_VerifyDynamicMenu", True, True)
+        '        End Function
+        '        '
+        '        '===========================================================================================
+        '        '   Verify the Menu record is there, add it if not
+        '        '   If it is default, add all existing sections to it
+        '        '===========================================================================================
+        '        '
+        '        Public Function csv_GetDynamicMenuACSelect() As String
+        '            On Error GoTo ErrorTrap 'Const Tn = "cs_getv_DynamicMenuACSelect" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
+        '            '
+        '            Dim CS As Integer
+        '            '
+        '            If True Then
+        '                '
+        '                If csv_DynamicMenuACSelect = "" Then
+        '                    CS = db.cs_open("Dynamic Menus", , "Name", , , , , "Name")
+        '                    If Not db.cs_ok(CS) Then
+        '                        Call db.cs_Close(CS)
+        '                        Call csv_VerifyDynamicMenu("Default")
+        '                        CS = db.cs_open("Dynamic Menus", , "Name", , , , , "Name")
+        '                    End If
+        '                    Do While db.cs_ok(CS)
+        '                        If csv_DynamicMenuACSelect <> "" Then
+        '                            csv_DynamicMenuACSelect = csv_DynamicMenuACSelect & "|"
+        '                        End If
+        '                        csv_DynamicMenuACSelect = csv_DynamicMenuACSelect & db.cs_getText(CS, "name")
+        '                        db.cs_goNext(CS)
+        '                    Loop
+        '                    Call db.cs_Close(CS)
+        '                End If
+        '                csv_GetDynamicMenuACSelect = csv_DynamicMenuACSelect
+        '            End If
+        '            '
+        '            Exit Function
+        '            '
+        '            ' ----- Error Trap
+        '            '
+        'ErrorTrap:
+        '            Throw New ApplicationException("Unexpected exception") ' handleLegacyError4(Err.Number, Err.Source, Err.Description, "VerifyDefaultDynamicMenu", True, True)
+        '        End Function
         ''
         ''
         ''
@@ -2081,32 +2758,6 @@ ErrorTrap:
         '
         '
         '
-        '
-        '=====================================================================================================
-        '   Insert into the ActivityLog
-        '=====================================================================================================
-        '
-        Public Sub log_logActivity(ByVal Message As String, ByVal ByMemberID As Integer, ByVal SubjectMemberID As Integer, ByVal SubjectOrganizationID As Integer, Optional ByVal Link As String = "", Optional ByVal VisitorID As Integer = 0, Optional ByVal VisitID As Integer = 0)
-            On Error GoTo ErrorTrap 'Const Tn = "LogActivity2" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim CS As Integer
-            '
-            CS = db.cs_insertRecord("Activity Log", ByMemberID)
-            If db.cs_ok(CS) Then
-                Call db.cs_set(CS, "MemberID", SubjectMemberID)
-                Call db.cs_set(CS, "OrganizationID", SubjectOrganizationID)
-                Call db.cs_set(CS, "Message", Message)
-                Call db.cs_set(CS, "Link", Link)
-                Call db.cs_set(CS, "VisitorID", VisitorID)
-                Call db.cs_set(CS, "VisitID", VisitID)
-            End If
-            Call db.cs_Close(CS)
-            '
-            Exit Sub
-            '
-ErrorTrap:
-            Throw (New Exception("Unexpected exception"))
-        End Sub
         '
         '=================================================================================================================
         '   csv_GetAddonOption
@@ -3033,7 +3684,7 @@ ErrorTrap:
             '
             FieldValue = docProperties.getText(FieldName)
             If db.cs_getText(CSMember, FieldName) <> FieldValue Then
-                Call log_LogActivity2("profile changed " & FieldName, authContext.user.ID, authContext.user.OrganizationID)
+                Call logController.logActivity2(Me, "profile changed " & FieldName, authContext.user.ID, authContext.user.OrganizationID)
                 Call db.cs_set(CSMember, FieldName, FieldValue)
             End If
             Exit Sub
@@ -3055,7 +3706,7 @@ ErrorTrap:
             '
             FieldValue = docProperties.getBoolean(FieldName)
             If db.cs_getBoolean(CSMember, FieldName) <> FieldValue Then
-                Call log_LogActivity2("profile changed " & FieldName, authContext.user.ID, authContext.user.OrganizationID)
+                Call logController.logActivity2(Me, "profile changed " & FieldName, authContext.user.ID, authContext.user.OrganizationID)
                 Call db.cs_set(CSMember, FieldName, FieldValue)
             End If
             Exit Sub
@@ -3077,7 +3728,7 @@ ErrorTrap:
             If Not genericController.isInStr(1, Link, "://") Then
                 Link = webServer.webServerIO_requestProtocol & Link
             End If
-            Call webServer.webServerIO_Redirect2(Link, "call to main_RedirectHTTP(" & genericController.encodeText(Link) & "), no reason given.", False)
+            Call webServer.redirect(Link, "call to main_RedirectHTTP(" & genericController.encodeText(Link) & "), no reason given.", False)
         End Sub
         '
         '===========================================================================================
@@ -3085,7 +3736,7 @@ ErrorTrap:
         '===========================================================================================
         '
         Public Sub main_Redirect(ByVal Link As Object)
-            Call webServer.webServerIO_Redirect2(genericController.encodeText(Link), "No explaination provided", False)
+            Call webServer.redirect(genericController.encodeText(Link), "No explaination provided", False)
         End Sub
         '
         '========================================================================
@@ -3309,7 +3960,7 @@ ErrorTrap:
                     If db.cs_isFieldSupported(CSPointer, "Clicks") Then
                         Call db.cs_set(CSPointer, "Clicks", (db.cs_getNumber(CSPointer, "Clicks")) + 1)
                     End If
-                    Call webServer.webServerIO_Redirect2(LinkPrefix & NonEncodedLink, "Call to " & MethodName & ", no reason given.", False)
+                    Call webServer.redirect(LinkPrefix & NonEncodedLink, "Call to " & MethodName & ", no reason given.", False)
                     main_RedirectByRecord_ReturnStatus = True
                 End If
             End If
@@ -3821,11 +4472,11 @@ ErrorTrap:
                 LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & htmlDoc.html_EncodeHTML(siteProperties.adminURL & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
                 If siteProperties.getBoolean("AllowMobileTemplates", False) Then
                     If authContext.visit.Mobile Then
-                        QS = web_RefreshQueryString
+                        QS = htmlDoc.refreshQueryString
                         QS = genericController.ModifyQueryString(QS, "method", "forcenonmobile")
                         LinkPanel.Add("<a class=""ccAdminLink"" href=""?" & QS & """>Non-Mobile Version</A> | ")
                     Else
-                        QS = web_RefreshQueryString
+                        QS = htmlDoc.refreshQueryString
                         QS = genericController.ModifyQueryString(QS, "method", "forcemobile")
                         LinkPanel.Add("<a class=""ccAdminLink"" href=""?" & QS & """>Mobile Version</A> | ")
                     End If
@@ -3834,7 +4485,7 @@ ErrorTrap:
                 '
                 If ShowLegacyToolsPanel Then
                     ToolsPanel = New stringBuilderLegacyController
-                    WorkingQueryString = genericController.ModifyQueryString(web_RefreshQueryString, "ma", "", False)
+                    WorkingQueryString = genericController.ModifyQueryString(htmlDoc.refreshQueryString, "ma", "", False)
                     '
                     ' ----- Tools Panel Caption
                     '
@@ -4309,7 +4960,7 @@ ErrorTrap:
         '                        If genericController.vbLCase(FirstName) = "guest" Then
         '                            FirstName = ""
         '                        End If
-        '                        QS = web_RefreshQueryString
+        '                        QS = htmlDoc.refreshQueryString
         '                        QS = genericController.ModifyQueryString(QS, "S", "")
         '                        QS = genericController.ModifyQueryString(QS, "ccIPage", "")
         '                        returnHtml = returnHtml & main_GetFormStart(QS)
@@ -5406,226 +6057,6 @@ ErrorTrap:
             '
         End Function
         '
-        ''========================================================================
-        ''   upgraded
-        ''========================================================================
-        ''
-        'Public Function main_GetFormStart(Optional ByVal ActionQueryString As String = "") As String
-        '    main_GetFormStart = main_GetFormStart(ActionQueryString)
-        'End Function
-        ''
-        ''========================================================================
-        '' ----- Starts an HTML form
-        ''       Should be closed with PrintFormEnd
-        ''========================================================================
-        ''
-        'Public Function main_GetFormStart(Optional ByVal ActionQueryString As String = "", Optional ByVal htmlName As String = "", Optional ByVal HtmlId As String = "") As String
-        '    main_GetFormStart2 = main_GetFormStart3(ActionQueryString, htmlName, HtmlId)
-
-        'End Function
-        '
-        '
-        '
-        Public Function exportAscii_GetAsciiExport(ByVal ContentName As String, Optional ByVal PageSize As Integer = 1000, Optional ByVal PageNumber As Integer = 1) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetAsciiExport")
-            '
-            'If Not (true) Then Exit Function
-            '
-            'dim dt as datatable
-            Dim SQL As String
-            Dim Criteria As String
-            ' converted array to dictionary - Dim FieldPointer As Integer
-            Dim Delimiter As String
-            Dim Copy As String
-            Dim DataSourceName As String
-            Dim TableName As String
-            Dim CSPointer As Integer
-            Dim FieldNameVariant As String
-            Dim FieldName As String
-            Dim UcaseFieldName As String
-            Dim fieldType As Integer
-            Dim MethodName As String
-            Dim iContentName As String
-            Dim sb As New System.Text.StringBuilder
-            'Dim PageSize As Integer
-            'Dim PageNumber As Integer
-            Dim TestFilename As String
-            '
-            TestFilename = "AsciiExport" & common_GetRandomLong_Internal() & ".txt"
-            '
-            iContentName = genericController.encodeText(ContentName)
-            'PageSize = encodeEmptyInteger(PageSize, 1000)
-            If PageSize = 0 Then
-                PageSize = 1000
-            End If
-            'PageNumber = encodeEmptyInteger(PageNumber, 1)
-            If PageNumber = 0 Then
-                PageNumber = 1
-            End If
-            '
-            MethodName = "main_GetAsciiExport"
-            '
-            ' ----- Check for special case iContentNames
-            '
-            Call webServer.webServerIO_setResponseContentType("text/plain")
-            Call htmlDoc.enableOutputBuffer(False)
-            TableName = genericController.GetDbObjectTableName(GetContentTablename(iContentName))
-            Select Case genericController.vbUCase(TableName)
-                Case "CCMEMBERS"
-                    '
-                    ' ----- People and member content export
-                    '
-                    If Not authContext.isAuthenticatedAdmin(Me) Then
-                        Call sb.Append("Warning: You must be a site administrator to export this information.")
-                    Else
-                        CSPointer = db.cs_open(iContentName, , "ID", False, , , ,, PageSize, PageNumber)
-                        '
-                        ' ----- print out the field names
-                        '
-                        If db.cs_ok(CSPointer) Then
-                            Call sb.Append("""EID""")
-                            Delimiter = ","
-                            FieldNameVariant = db.cs_getFirstFieldName(CSPointer)
-                            Do While (FieldNameVariant <> "")
-                                FieldName = genericController.encodeText(FieldNameVariant)
-                                UcaseFieldName = genericController.vbUCase(FieldName)
-                                If (UcaseFieldName <> "USERNAME") And (UcaseFieldName <> "PASSWORD") Then
-                                    Call sb.Append(Delimiter & """" & FieldName & """")
-                                End If
-                                FieldNameVariant = db.cs_getNextFieldName(CSPointer)
-                                '''DoEvents
-                            Loop
-                            Call sb.Append(vbCrLf)
-                        End If
-                        '
-                        ' ----- print out the values
-                        '
-                        Do While db.cs_ok(CSPointer)
-                            If Not (db.cs_getBoolean(CSPointer, "Developer")) Then
-                                Copy = security.encodeToken((db.cs_getInteger(CSPointer, "ID")), app_startTime)
-                                Call sb.Append("""" & Copy & """")
-                                Delimiter = ","
-                                FieldNameVariant = db.cs_getFirstFieldName(CSPointer)
-                                Do While (FieldNameVariant <> "")
-                                    FieldName = genericController.encodeText(FieldNameVariant)
-                                    UcaseFieldName = genericController.vbUCase(FieldName)
-                                    If (UcaseFieldName <> "USERNAME") And (UcaseFieldName <> "PASSWORD") Then
-                                        Copy = db.cs_get(CSPointer, FieldName)
-                                        If Copy <> "" Then
-                                            Copy = genericController.vbReplace(Copy, """", "'")
-                                            Copy = genericController.vbReplace(Copy, vbCrLf, " ")
-                                            Copy = genericController.vbReplace(Copy, vbCr, " ")
-                                            Copy = genericController.vbReplace(Copy, vbLf, " ")
-                                        End If
-                                        Call sb.Append(Delimiter & """" & Copy & """")
-                                    End If
-                                    FieldNameVariant = db.cs_getNextFieldName(CSPointer)
-                                    '''DoEvents
-                                Loop
-                                Call sb.Append(vbCrLf)
-                            End If
-                            Call db.cs_goNext(CSPointer)
-                            '''DoEvents
-                        Loop
-                    End If
-                    ' End Case
-                Case Else
-                    '
-                    ' ----- All other content
-                    '
-                    If Not authContext.isAuthenticatedContentManager(Me, iContentName) Then
-                        Call sb.Append("Error: You must be a content manager to export this data.")
-                    Else
-                        CSPointer = db.cs_open(iContentName, , "ID", False, , , ,, PageSize, PageNumber)
-                        '
-                        ' ----- print out the field names
-                        '
-                        If db.cs_ok(CSPointer) Then
-                            Delimiter = ""
-                            FieldNameVariant = db.cs_getFirstFieldName(CSPointer)
-                            Do While (FieldNameVariant <> "")
-                                Call appRootFiles.appendFile(TestFilename, Delimiter & """" & FieldNameVariant & """")
-                                Delimiter = ","
-                                FieldNameVariant = db.cs_getNextFieldName(CSPointer)
-                                '''DoEvents
-                            Loop
-                            Call appRootFiles.appendFile(TestFilename, vbCrLf)
-                        End If
-                        '
-                        ' ----- print out the values
-                        '
-                        Do While db.cs_ok(CSPointer)
-                            Delimiter = ""
-                            FieldNameVariant = db.cs_getFirstFieldName(CSPointer)
-                            Do While (FieldNameVariant <> "")
-                                Select Case db.cs_getFieldTypeId(CSPointer, genericController.encodeText(FieldNameVariant))
-                                    Case FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdFileHTMLPrivate
-                                        Copy = main_cs_getEncodedField(CSPointer, genericController.encodeText(FieldNameVariant))
-                                    Case FieldTypeIdLookup
-                                        Copy = db.cs_getLookup(CSPointer, genericController.encodeText(FieldNameVariant))
-                                    Case FieldTypeIdRedirect, FieldTypeIdManyToMany
-                                    Case Else
-                                        Copy = db.cs_getText(CSPointer, genericController.encodeText(FieldNameVariant))
-                                End Select
-                                If Copy <> "" Then
-                                    Copy = genericController.vbReplace(Copy, """", "'")
-                                    Copy = genericController.vbReplace(Copy, vbCrLf, " ")
-                                    Copy = genericController.vbReplace(Copy, vbCr, " ")
-                                    Copy = genericController.vbReplace(Copy, vbLf, " ")
-                                End If
-                                Call appRootFiles.appendFile(TestFilename, Delimiter & """" & Copy & """")
-                                Delimiter = ","
-                                FieldNameVariant = db.cs_getNextFieldName(CSPointer)
-                                '''DoEvents
-                            Loop
-                            Call appRootFiles.appendFile(TestFilename, vbCrLf)
-                            Call db.cs_goNext(CSPointer)
-                            '''DoEvents
-                        Loop
-                    End If
-            End Select
-            exportAscii_GetAsciiExport = appRootFiles.readFile(TestFilename)
-            Call appRootFiles.deleteFile(TestFilename)
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
-            '
-        End Function
-        '        '
-        '        '
-        '        '
-        '        Public Sub user_SetMember(PeopleID As Integer)
-        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SetMember")
-        '            '
-        '            'If Not (true) Then Exit Sub
-        '            '
-        '            Dim CSPointer As Integer
-        '            Dim MethodName As String
-        '            Dim iPeopleID As Integer
-        '            '
-        '            iPeopleID = genericController.EncodeInteger(PeopleID)
-        '            '
-        '            MethodName = "main_SetMember"
-        '            '
-        '            CSPointer = db.csOpen("people", "id=" & db.EncodeSQLNumber(iPeopleID))
-        '            If Not db.csOk(CSPointer) Then
-        '                Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError14(MethodName, "main_SetMember ErrorTrap, could not find RecordID [" & iPeopleID & "] in people content.")
-        '            Else
-        '                Call db.setCS(CSPointer, "ContentControlID", main_GetContentID("Members"))
-        '            End If
-        '            Call db.csClose(CSPointer)
-        '            '
-        '            Exit Sub
-        '            '
-        '            ' ----- Error Trap
-        '            '
-        'ErrorTrap:
-        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_SetMember")
-        '        End Sub
-        '
         '
         '
         Public Sub main_ClearStream()
@@ -6291,7 +6722,7 @@ ErrorTrap:
                         ' Cut Link if enabled
                         '
                         If iAllowCut Then
-                            WorkingLink = genericController.modifyLinkQuery(webServer.webServerIO_requestPage & "?" & web_RefreshQueryString, RequestNameCut, genericController.encodeText(ContentID) & "." & genericController.encodeText(RecordID), True)
+                            WorkingLink = genericController.modifyLinkQuery(webServer.webServerIO_requestPage & "?" & htmlDoc.refreshQueryString, RequestNameCut, genericController.encodeText(ContentID) & "." & genericController.encodeText(RecordID), True)
                             main_GetRecordEditLink2 = "" _
                                 & main_GetRecordEditLink2 _
                                 & "<a class=""ccRecordCutLink"" TabIndex=""-1"" href=""" & htmlDoc.html_EncodeHTML(WorkingLink) & """><img src=""/ccLib/images/Contentcut.gif"" border=""0"" alt=""Cut this " & ContentCaption & " to clipboard"" title=""Cut this " & ContentCaption & " to clipboard"" align=""absmiddle""></a>"
@@ -6516,7 +6947,7 @@ ErrorTrap:
                                             '
                                             ' Can not paste as child of itself
                                             '
-                                            PasteLink = webServer.webServerIO_requestPage & "?" & web_RefreshQueryString
+                                            PasteLink = webServer.webServerIO_requestPage & "?" & htmlDoc.refreshQueryString
                                             PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePaste, "1", True)
                                             PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteParentContentID, CStr(iContentID), True)
                                             PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteParentRecordID, CStr(ParentID), True)
@@ -6922,7 +7353,7 @@ ErrorTrap:
                 & main_DocTypeAdmin _
                 & vbCrLf & "<html>" _
                 & vbCrLf & "<head>" _
-                & webServer.webServerIO_GetHTMLInternalHead(True) _
+                & webServer.getHTMLInternalHead(True) _
                 & vbCrLf & "</head>" _
                 & vbCrLf & "<body class=""ccBodyAdmin ccCon"">"
             '
@@ -6930,20 +7361,18 @@ ErrorTrap:
 ErrorTrap:
             Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetPageStartAdmin")
         End Function
+        ''
+        ''==========================================================================
+        ''
+        'Public Property htmlDoc.refreshQueryString() As String
+        '    Get
+        '        htmlDoc.refreshQueryString = htmlDoc.refreshQueryString
+        '    End Get
+        '    Set(ByVal value As String)
+        '        htmlDoc.refreshQueryString = value
+        '    End Set
+        'End Property
         '
-        '
-        '
-        Public Property web_RefreshQueryString() As String
-            Get
-                web_RefreshQueryString = htmlDoc.htmlDoc_RefreshQueryString
-            End Get
-            Set(ByVal value As String)
-                htmlDoc.htmlDoc_RefreshQueryString = value
-            End Set
-        End Property
-        '
-        '========================================================================
-        ' -----
         '========================================================================
         '
         Public Function properties_user_getText(ByVal PropertyName As String, Optional ByVal DefaultValue As String = "", Optional ByVal TargetMemberID As Integer = SystemMemberID) As String
@@ -6960,90 +7389,20 @@ ErrorTrap:
             Return returnProperty
         End Function
         '
+        '==========================================================================
+        '
         Public Function properties_user_getInteger(ByVal PropertyName As String, Optional ByVal DefaultValue As Integer = 0, Optional ByVal TargetMemberID As Integer = SystemMemberID) As Integer
             Return genericController.EncodeInteger(properties_user_getText(PropertyName, DefaultValue.ToString, TargetMemberID))
         End Function
-        ''
-        ''========================================================================
-        '' -----
-        ''========================================================================
-        ''
-        'Public Sub userProperty_SetProperty(ByVal PropertyName As String, ByVal Value As String, Optional ByVal TargetMemberID As Integer = SystemMemberID)
-        '    Try
-        '        If TargetMemberID = SystemMemberID Then
-        '            Call userProperty.setProperty(PropertyName, Value, authcontext.user.userId)
-        '        Else
-        '            Call userProperty.setProperty(PropertyName, Value, TargetMemberID)
-        '        End If
-        '    Catch ex As Exception
-        '        throw (ex)
-        '    End Try
-        'End Sub
-        ''
-        'public Sub userProperty_SetProperty(ByVal PropertyName As String, ByVal Value As Integer, Optional ByVal TargetMemberID As Integer = SystemMemberID)
-        '    userProperty_SetProperty(PropertyName, Value.ToString, TargetMemberID)
-        'End Sub
-        ''
-        ''========================================================================
-        '' -----
-        ''========================================================================
-        ''
-        'Public Sub properties_SetVisitProperty(ByVal PropertyName As String, ByVal Value As String, Optional ByVal TargetVisitId As Integer = 0)
-        '    Try
-        '        If TargetVisitId = 0 Then
-        '            Call visitProperty.setProperty(PropertyName, Value, main_VisitId)
-        '        Else
-        '            Call visitProperty.setProperty(PropertyName, Value, TargetVisitId)
-        '        End If
-        '    Catch ex As Exception
-        '        throw (ex)
-        '    End Try
-        'End Sub
-        ''
-        ''========================================================================
-        '' -----
-        ''========================================================================
-        ''
-        'Public Function vistorProperty_getText(ByVal PropertyName As String, Optional ByVal DefaultValue As String = "", Optional ByVal TargetVisitorid As Integer = 0) As String
-        '    Dim returnProperty As String = DefaultValue
-        '    Try
-        '        If TargetVisitorid = 0 Then
-        '            returnProperty = visitorProperty.getText(PropertyName, DefaultValue, main_VisitorID)
-        '        Else
-        '            returnProperty = visitorProperty.getText(PropertyName, DefaultValue, TargetVisitorid)
-        '        End If
-        '    Catch ex As Exception
-        '        throw (ex)
-        '    End Try
-        '    Return returnProperty
-        'End Function
-        ''
-        ''========================================================================
-        '' -----
-        ''========================================================================
-        ''
-        'Public Sub visitorProperty_SetProperty(ByVal PropertyName As String, ByVal Value As String, Optional ByVal TargetVisitorid As Integer = 0)
-        '    Try
-        '        If TargetVisitorid = 0 Then
-        '            Call visitorProperty.setProperty(PropertyName, Value, main_VisitorID)
-        '        Else
-        '            Call visitorProperty.setProperty(PropertyName, Value, TargetVisitorid)
-        '        End If
-        '    Catch ex As Exception
-        '        throw (ex)
-        '    End Try
-        'End Sub
         '
         '==========================================================================
         '   Add on to the common error message
         '==========================================================================
         '
         Public Sub error_AddUserError(ByVal Message As String)
-            '
             If (InStr(1, debug_iUserError, Message, vbTextCompare) = 0) Then
                 debug_iUserError = debug_iUserError & cr & "<li class=""ccError"">" & genericController.encodeText(Message) & "</LI>"
             End If
-            '
         End Sub
         '
         '==========================================================================
@@ -7052,27 +7411,12 @@ ErrorTrap:
         '==========================================================================
         '
         Public Function error_GetUserError() As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00224")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim MethodName As String
-            '
-            MethodName = "main_GetUserError"
-            '
             error_GetUserError = genericController.encodeText(debug_iUserError)
             If error_GetUserError <> "" Then
                 error_GetUserError = "<ul class=""ccError"">" & genericController.kmaIndent(error_GetUserError) & cr & "</ul>"
                 error_GetUserError = UserErrorHeadline & "" & error_GetUserError
                 debug_iUserError = ""
             End If
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
-            '
         End Function
         '
         '==========================================================================
@@ -7081,22 +7425,7 @@ ErrorTrap:
         '==========================================================================
         '
         Public Function error_IsUserError() As Boolean
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00225")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim MethodName As String
-            '
-            MethodName = "main_IsUserError"
-            '
-            error_IsUserError = (debug_iUserError <> "")
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
-            '
+            Return (debug_iUserError <> "")
         End Function
 
         '
@@ -7105,22 +7434,7 @@ ErrorTrap:
         '==========================================================================
         '
         Public Sub cs_CopyRecord(ByVal CSSource As Object, ByVal CSDestination As Object)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00229")
-            '
-            'If Not (true) Then Exit Sub
-            '
-            Dim MethodName As String
-            '
-            MethodName = "main_CopyCSRecord"
-            '
             Call db.cs_copyRecord(genericController.EncodeInteger(CSSource), genericController.EncodeInteger(CSDestination))
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
-            '
         End Sub
         '
         '========================================================================
@@ -8799,7 +9113,7 @@ ErrorTrap:
         ' main_Get the Head innerHTML for public pages
         '
         Public Function main_GetHTMLHead() As String
-            main_GetHTMLHead = webServer.webServerIO_GetHTMLInternalHead(False)
+            main_GetHTMLHead = webServer.getHTMLInternalHead(False)
         End Function
         '
         '
@@ -8890,87 +9204,6 @@ ErrorTrap:
             Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_CreatePageGetID")
         End Function
         '
-        '---------------------------------------------------------------------------
-        '   Create the default landing page if it is missing
-        '       This can only be called when site property AllowAutoHomeSectionOnce is true
-        '---------------------------------------------------------------------------
-        '
-        Private Function main_GetLandingPageID_CreateLandingSectionReturnID(ByVal SectionName As String, ByVal rootPageId As Integer, ByVal SectionContentID As Integer) As Integer
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetLandingPageID_CreateLandingSectionReturnID")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim SectionTemplateID As Integer
-            Dim SectionID As Integer
-            Dim DefaultMenuID As Integer
-            Dim CS As Integer
-            Dim LoopPtr As Integer
-            Dim NameOK As Boolean
-            Dim SectionNameTry As String
-            '
-            If (app_errorCount = 0) And siteProperties.getBoolean("AllowAutoHomeSectionOnce") Then
-                '
-                SectionTemplateID = pages.pageManager_LoadTemplateGetID(0)
-                '
-                ' main_Get a unique section name
-                '
-                SectionNameTry = SectionName
-                NameOK = False
-                LoopPtr = 0
-                Do While Not NameOK And (LoopPtr < 10)
-                    If LoopPtr <> 0 Then
-                        SectionNameTry = SectionName & " " & (LoopPtr + 1)
-                    End If
-                    CS = db.cs_open("Site Sections", "name=" & db.encodeSQLText(SectionNameTry), , ,, , , "ID")
-                    NameOK = Not db.cs_ok(CS)
-                    Call db.cs_Close(CS)
-                    LoopPtr = LoopPtr + 1
-                Loop
-                '
-                CS = db.cs_insertRecord("Site Sections")
-                If db.cs_ok(CS) Then
-                    SectionID = db.cs_getInteger(CS, "ID")
-                    Call db.cs_set(CS, "Name", SectionNameTry)
-                    Call db.cs_set(CS, "Caption", DefaultLandingSectionName)
-                    Call db.cs_set(CS, "SortOrder", -1)
-                    Call db.cs_set(CS, "HideMenu", False)
-                    Call db.cs_set(CS, "contentid", SectionContentID)
-                    Call db.cs_set(CS, "TemplateID", SectionTemplateID)
-                    If True Then
-                        Call db.cs_set(CS, "RootPageID", rootPageId)
-                    End If
-                    If True Then
-                        Call db.cs_set(CS, "ccGuid", DefaultLandingSectionGuid)
-                    End If
-                End If
-                Call db.cs_Close(CS)
-                Call pages.pageManager_cache_siteSection_clear()
-                '
-                ' main_Get the Default Menu ID
-                '
-                CS = db.cs_open("Dynamic Menus", "(name='Default')", "ID", , ,, , "ID")
-                If db.cs_ok(CS) Then
-                    DefaultMenuID = db.cs_getInteger(CS, "ID")
-                End If
-                Call db.cs_Close(CS)
-                '
-                ' Add the new landing section to the default menu
-                '
-                CS = db.cs_insertRecord("Dynamic Menu Section Rules")
-                If db.cs_ok(CS) Then
-                    Call db.cs_set(CS, "DynamicMenuID", DefaultMenuID)
-                    Call db.cs_set(CS, "SectionID", SectionID)
-                End If
-                Call db.cs_Close(CS)
-                '
-                main_GetLandingPageID_CreateLandingSectionReturnID = SectionID
-            End If
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetLandingPageID_CreateLandingSectionReturnID")
-        End Function
-        '
         '
         '
         Public Property main_MetaContentNoFollow() As Boolean
@@ -8981,84 +9214,70 @@ ErrorTrap:
                 webServer.webServerIO_response_NoFollow = value
             End Set
         End Property
-        '
-        '
-        '
-        Public Sub main_RollBackCS(ByVal CSPointer As Integer)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00419")
-            '
-            'If Not (true) Then Exit Sub
-            '
-            Call db.cs_rollBack(genericController.EncodeInteger(CSPointer))
-            '
-            Exit Sub
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_RollBackCS")
-        End Sub
 
-        '
-        '
-        '
-        Public Function main_isSectionBlocked(ByVal SectionID As Integer, ByVal AllowSectionBlocking As Boolean) As Boolean
-            On Error GoTo ErrorTrap 'Const Tn = "isSectionBlocked" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim CS As Integer
-            Dim SQL As String
-            Dim SQLWhere As String
-            '
-            main_isSectionBlocked = False
-            If AllowSectionBlocking Then
-                main_isSectionBlocked = True
-                If authContext.isAuthenticatedAdmin(Me) Then
-                    '
-                    ' Admin always main_Gets in
-                    '
-                    main_isSectionBlocked = False
-                ElseIf Not authContext.isAuthenticated() Then
-                    '
-                    ' not authenticated never main_Gets in
-                    '
-                Else
-                    '
-                    ' check if this member is in one of the SectionRule groups
-                    '
-                    SQLWhere = "" _
-                        & " M.MemberID=" & authContext.user.ID _
-                        & " and R.SectionID=" & SectionID _
-                        & " and M.GroupID=R.GroupID" _
-                        & " and R.Active<>0" _
-                        & " and M.Active<>0" _
-                        & " and ((M.DateExpires is null)or(M.DateExpires>" & db.encodeSQLDate(app_startTime) & "))"
-                    SQL = GetSQLSelect("", "ccmemberRules M,ccSectionBlockRules R", "M.ID", SQLWhere, , , 1)
-                    CS = db.cs_openSql(SQL)
-                    'SQL = "select ID" _
-                    '    & " from ccMemberRules M,ccSectionBlockRules R" _
-                    '    & " where M.MemberID=" & memberID _
-                    '    & " and R.SectionID=" & SectionID _
-                    '    & " and M.GroupID=R.GroupID" _
-                    '    & " and R.Active<>0" _
-                    '    & " and M.Active<>0" _
-                    '    & " and ((M.DateExpires is null)or(M.DateExpires>" & main_SQlPageStartTime & "))"
-                    'CS = app.openCsSql_rev("default", SQL, 1, 1)
-                    'SQL = "select top 1 *" _
-                    '    & " from ccMemberRules M,ccSectionBlockRules R" _
-                    '    & " where M.MemberID=" & memberID _
-                    '    & " and R.SectionID=" & SectionID _
-                    '    & " and M.GroupID=R.GroupID" _
-                    '    & " and R.Active<>0" _
-                    '    & " and M.Active<>0" _
-                    '    & " and ((M.DateExpires is null)or(M.DateExpires>" & main_SQlPageStartTime & "))"
-                    'CS = app.openCsSql(SQL)
-                    main_isSectionBlocked = Not (db.cs_ok(CS))
-                    Call db.cs_Close(CS)
-                End If
-            End If
+        '        '
+        '        '
+        '        '
+        '        Public Function main_isSectionBlocked(ByVal SectionID As Integer, ByVal AllowSectionBlocking As Boolean) As Boolean
+        '            On Error GoTo ErrorTrap 'Const Tn = "isSectionBlocked" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
+        '            '
+        '            Dim CS As Integer
+        '            Dim SQL As String
+        '            Dim SQLWhere As String
+        '            '
+        '            main_isSectionBlocked = False
+        '            If AllowSectionBlocking Then
+        '                main_isSectionBlocked = True
+        '                If authContext.isAuthenticatedAdmin(Me) Then
+        '                    '
+        '                    ' Admin always main_Gets in
+        '                    '
+        '                    main_isSectionBlocked = False
+        '                ElseIf Not authContext.isAuthenticated() Then
+        '                    '
+        '                    ' not authenticated never main_Gets in
+        '                    '
+        '                Else
+        '                    '
+        '                    ' check if this member is in one of the SectionRule groups
+        '                    '
+        '                    SQLWhere = "" _
+        '                        & " M.MemberID=" & authContext.user.ID _
+        '                        & " and R.SectionID=" & SectionID _
+        '                        & " and M.GroupID=R.GroupID" _
+        '                        & " and R.Active<>0" _
+        '                        & " and M.Active<>0" _
+        '                        & " and ((M.DateExpires is null)or(M.DateExpires>" & db.encodeSQLDate(app_startTime) & "))"
+        '                    SQL = db.GetSQLSelect("", "ccmemberRules M,ccSectionBlockRules R", "M.ID", SQLWhere, , , 1)
+        '                    CS = db.cs_openSql(SQL)
+        '                    'SQL = "select ID" _
+        '                    '    & " from ccMemberRules M,ccSectionBlockRules R" _
+        '                    '    & " where M.MemberID=" & memberID _
+        '                    '    & " and R.SectionID=" & SectionID _
+        '                    '    & " and M.GroupID=R.GroupID" _
+        '                    '    & " and R.Active<>0" _
+        '                    '    & " and M.Active<>0" _
+        '                    '    & " and ((M.DateExpires is null)or(M.DateExpires>" & main_SQlPageStartTime & "))"
+        '                    'CS = app.openCsSql_rev("default", SQL, 1, 1)
+        '                    'SQL = "select top 1 *" _
+        '                    '    & " from ccMemberRules M,ccSectionBlockRules R" _
+        '                    '    & " where M.MemberID=" & memberID _
+        '                    '    & " and R.SectionID=" & SectionID _
+        '                    '    & " and M.GroupID=R.GroupID" _
+        '                    '    & " and R.Active<>0" _
+        '                    '    & " and M.Active<>0" _
+        '                    '    & " and ((M.DateExpires is null)or(M.DateExpires>" & main_SQlPageStartTime & "))"
+        '                    'CS = app.openCsSql(SQL)
+        '                    main_isSectionBlocked = Not (db.cs_ok(CS))
+        '                    Call db.cs_Close(CS)
+        '                End If
+        '            End If
 
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_isSectionBlocked")
-        End Function
+        '            '
+        '            Exit Function
+        'ErrorTrap:
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_isSectionBlocked")
+        '        End Function
         '
         '
         '
@@ -9246,38 +9465,38 @@ ErrorTrap:
 ErrorTrap:
             Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_SetContentControl")
         End Function
-        '
-        '========================================================================
-        '
-        '========================================================================
-        '
-        Public Function menu_VerifyDynamicMenu(ByVal MenuName As String) As Integer
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("VerifyDynamicMenu")
-            '
-            'If Not (true) Then Exit Function
-            '
-            menu_VerifyDynamicMenu = csv_VerifyDynamicMenu(genericController.encodeText(MenuName))
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_VerifyDynamicMenu")
-        End Function
-        '
-        '========================================================================
-        '
-        '========================================================================
-        '
-        Public Function menu_GetDynamicMenuACSelect() As String
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetDynamicMenuACSelect")
-            '
-            'If Not (true) Then Exit Function
-            '
-            menu_GetDynamicMenuACSelect = csv_GetDynamicMenuACSelect()
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetDynamicMenuACSelect")
-        End Function
+        '        '
+        '        '========================================================================
+        '        '
+        '        '========================================================================
+        '        '
+        '        Public Function menu_VerifyDynamicMenu(ByVal MenuName As String) As Integer
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("VerifyDynamicMenu")
+        '            '
+        '            'If Not (true) Then Exit Function
+        '            '
+        '            menu_VerifyDynamicMenu = csv_VerifyDynamicMenu(genericController.encodeText(MenuName))
+        '            '
+        '            Exit Function
+        'ErrorTrap:
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_VerifyDynamicMenu")
+        '        End Function
+        '        '
+        '        '========================================================================
+        '        '
+        '        '========================================================================
+        '        '
+        '        Public Function menu_GetDynamicMenuACSelect() As String
+        '            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetDynamicMenuACSelect")
+        '            '
+        '            'If Not (true) Then Exit Function
+        '            '
+        '            menu_GetDynamicMenuACSelect = csv_GetDynamicMenuACSelect()
+        '            '
+        '            Exit Function
+        'ErrorTrap:
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetDynamicMenuACSelect")
+        '        End Function
         '
         ' converted to add-on
         '
@@ -9314,65 +9533,8 @@ ErrorTrap:
         '    Call main_HandleClassErrorAndResume_TrapPatch1("Mergetemplate")
         'End Function
         '
-        '========================================================================
-        '
-        '========================================================================
-        '
-        Public Function admin_GetAdminFormBody(Caption As String, ButtonListLeft As String, ButtonListRight As String, AllowAdd As Boolean, AllowDelete As Boolean, Description As String, ContentSummary As String, ContentPadding As Integer, Content As String) As String
-            Dim Adminui As New adminUIController(Me)
-            '
-            admin_GetAdminFormBody = Adminui.GetBody(Caption, ButtonListLeft, ButtonListRight, AllowAdd, AllowDelete, Description, ContentSummary, ContentPadding, Content)
-        End Function
-        '
         ' Verify Registration Form Page
         '
-        Public Sub main_VerifyRegistrationFormPage()
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("main_VerifyRegistrationFormPage")
-            '
-            Dim CS As Integer
-            Dim GroupNameList As String
-            Dim Copy As String
-            '
-            Call db.deleteContentRecords("Form Pages", "name=" & db.encodeSQLText("Registration Form"))
-            CS = db.cs_open("Form Pages", "name=" & db.encodeSQLText("Registration Form"))
-            If Not db.cs_ok(CS) Then
-                '
-                ' create Version 1 template - just to main_Get it started
-                '
-                Call db.cs_Close(CS)
-                GroupNameList = "Registered"
-                CS = db.cs_insertRecord("Form Pages")
-                If db.cs_ok(CS) Then
-                    Call db.cs_set(CS, "name", "Registration Form")
-                    Copy = "" _
-                        & vbCrLf & "<table border=""0"" cellpadding=""2"" cellspacing=""0"" width=""100%"">" _
-                        & vbCrLf & "{{REPEATSTART}}<tr><td align=right style=""height:22px;"">{{CAPTION}}&nbsp;</td><td align=left>{{FIELD}}</td></tr>{{REPEATEND}}" _
-                        & vbCrLf & "<tr><td align=right><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=135 height=1></td><td width=""100%"">&nbsp;</td></tr>" _
-                        & vbCrLf & "<tr><td colspan=2>&nbsp;<br>" & main_GetPanelButtons(ButtonRegister, "Button") & "</td></tr>" _
-                        & vbCrLf & "</table>"
-                    Call db.cs_set(CS, "Body", Copy)
-                    Copy = "" _
-                        & "1" _
-                        & vbCrLf & GroupNameList _
-                        & vbCrLf & "true" _
-                        & vbCrLf & "1,First Name,true,FirstName" _
-                        & vbCrLf & "1,Last Name,true,LastName" _
-                        & vbCrLf & "1,Email Address,true,Email" _
-                        & vbCrLf & "1,Phone,true,Phone" _
-                        & vbCrLf & "2,Please keep me informed of news and events,false,Subscribers" _
-                        & ""
-                    Call db.cs_set(CS, "Instructions", Copy)
-                End If
-            End If
-            Call db.cs_Close(CS)
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_VerifyRegistrationFormPage")
-        End Sub
         '
         ' Public Method to main_Get Contact Manager
         '
@@ -9387,60 +9549,6 @@ ErrorTrap:
             '
 ErrorTrap:
             Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_GetContactManager")
-        End Function
-        '
-        ' This is a copy of the routine in CSrv -- duplicated so I do not have to make a public until the interface is worked-out
-        '
-        Public Function GetSQLSelect(ByVal DataSourceName As String, ByVal From As String, Optional ByVal FieldList As String = "", Optional ByVal Where As String = "", Optional ByVal OrderBy As String = "", Optional ByVal GroupBy As String = "", Optional ByVal RecordLimit As Integer = 0) As String
-            On Error GoTo ErrorTrap
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim SQL As String
-            '
-            Select Case db.getDataSourceType(DataSourceName)
-                Case DataSourceTypeODBCMySQL
-                    SQL = "SELECT"
-                    SQL &= " " & FieldList
-                    SQL &= " FROM " & From
-                    If Where <> "" Then
-                        SQL &= " WHERE " & Where
-                    End If
-                    If OrderBy <> "" Then
-                        SQL &= " ORDER BY " & OrderBy
-                    End If
-                    If GroupBy <> "" Then
-                        SQL &= " GROUP BY " & GroupBy
-                    End If
-                    If RecordLimit <> 0 Then
-                        SQL &= " LIMIT " & RecordLimit
-                    End If
-                Case Else
-                    SQL = "SELECT"
-                    If RecordLimit <> 0 Then
-                        SQL &= " TOP " & RecordLimit
-                    End If
-                    If FieldList = "" Then
-                        SQL &= " *"
-                    Else
-                        SQL &= " " & FieldList
-                    End If
-                    SQL &= " FROM " & From
-                    If Where <> "" Then
-                        SQL &= " WHERE " & Where
-                    End If
-                    If OrderBy <> "" Then
-                        SQL &= " ORDER BY " & OrderBy
-                    End If
-                    If GroupBy <> "" Then
-                        SQL &= " GROUP BY " & GroupBy
-                    End If
-            End Select
-            GetSQLSelect = SQL
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_GetSQLSelect")
         End Function
         '
         '
@@ -9876,7 +9984,7 @@ ErrorTrap:
             '
             RightSideHeader = "&nbsp;"
             IsAuthoringMode = True
-            LinkBase = web_RefreshQueryString
+            LinkBase = htmlDoc.refreshQueryString
             LeftPane = "List of Styles"
             RightPane = "Style Tag Editor"
             TempFilename = "AppCache\StyleTemp" & genericController.GetRandomInteger() & ".css"
@@ -10134,9 +10242,9 @@ ErrorTrap:
                     End If
                     Call db.cs_Close(CS)
                     If IsDelete Then
-                        Call log_LogActivity2("deleting user #" & RecordID & " (" & RecordName & ")", RecordID, ActivityLogOrganizationID)
+                        Call logController.logActivity2(Me, "deleting user #" & RecordID & " (" & RecordName & ")", RecordID, ActivityLogOrganizationID)
                     Else
-                        Call log_LogActivity2("saving changes to user #" & RecordID & " (" & RecordName & ")", RecordID, ActivityLogOrganizationID)
+                        Call logController.logActivity2(Me, "saving changes to user #" & RecordID & " (" & RecordName & ")", RecordID, ActivityLogOrganizationID)
                     End If
                 Case "organizations"
                     '
@@ -10144,9 +10252,9 @@ ErrorTrap:
                     '
                     'hint = hint & ",120"
                     If IsDelete Then
-                        Call log_LogActivity2("deleting organization #" & RecordID & " (" & RecordName & ")", 0, RecordID)
+                        Call logController.logActivity2(Me, "deleting organization #" & RecordID & " (" & RecordName & ")", 0, RecordID)
                     Else
-                        Call log_LogActivity2("saving changes to organization #" & RecordID & " (" & RecordName & ")", 0, RecordID)
+                        Call logController.logActivity2(Me, "saving changes to organization #" & RecordID & " (" & RecordName & ")", 0, RecordID)
                     End If
                 Case "ccsetup"
                     '
@@ -10819,7 +10927,7 @@ ErrorTrap:
             If Not main_PleaseWaitStarted Then
                 main_PleaseWaitStarted = True
                 Call htmlDoc.writeAltBuffer(main_GetPleaseWaitStart)
-                Call webServer.webServerIO_FlushStream()
+                Call webServer.flushStream()
             End If
             '
         End Sub
@@ -10836,20 +10944,8 @@ ErrorTrap:
         Public Sub main_WritePleaseWaitEnd()
             If main_PleaseWaitStarted Then
                 Call htmlDoc.writeAltBuffer(main_GetPleaseWaitEnd)
-                Call webServer.webServerIO_FlushStream()
+                Call webServer.flushStream()
             End If
-        End Sub
-        ''
-        ''   Pass-through to AppService main_LogActivity
-        ''
-        'Public Sub main_LogActivity(Message As String)
-        '    Call log_LogActivity2(Message, 0, 0)
-        'End Sub
-        '
-        '
-        '
-        Public Sub log_LogActivity2(Message As String, SubjectMemberID As Integer, SubjectOrganizationID As Integer)
-            Call log_logActivity(Message, authContext.user.ID, SubjectMemberID, SubjectOrganizationID, webServer.webServerIO_ServerLink, authContext.visitor.ID, authContext.visit.ID)
         End Sub
         '
         '=================================================================================================
@@ -11462,64 +11558,48 @@ ErrorTrap:
         '=========================================================================================
         '
         Private Function executeRoute_hardCodedPage(ByVal HardCodedPage As String) As Boolean
-            Dim return_allowPostInitExecuteAddon As Boolean = False
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Init_PrintHardCodedPage")
-            '
-            Dim blockSiteWithLogin As Boolean
-            Dim allowPageWithoutSectionDisplay As Boolean
-            Dim InsertTestOK As Boolean
-            Dim ConfirmOrderID As Integer
-            Dim PageSize As Integer
-            Dim PageNumber As Integer
-            Dim ContentName As String
-            Dim MsgLabel As String
-            Dim PageID As Integer
-            Dim rootPageId As Integer
-            Dim Pos As Integer
-            Dim TrapID As Integer
-            Dim CS As Integer
-            Dim Name As String
-            Dim Copy As String
-            Dim Ptr As Integer
-            Dim ArgList As String
-            Dim Args() As String
-            Dim ArgNameValue() As String
-            Dim gd As GoogleDataType
-            Dim PropertyName As String
-            Dim PropertyValue As String
-            Dim Recipient As String
-            Dim Sender As String
-            Dim subject As String
-            Dim Message As String
-            Dim Emailtext As String
-            '
-            Dim LinkObjectName As String
-            Dim EditorObjectName As String
-            Dim BodyOpen As String
-            Dim AllowChildPage As Boolean
-            Dim autoPrintText As String
-            Dim RootPageName As String
-            Dim PageCopy As String
-            Dim OrderByClause As String
-            '
-            Select Case genericController.vbLCase(HardCodedPage)
-                Case HardCodedPageSendPassword
-                    '
-                    ' send password to the email address in the querystring
-                    '
-                    Emailtext = docProperties.getText("email")
-                    If Emailtext <> "" Then
-                        Call email.sendPassword(Emailtext)
-                        Copy = "" _
+            Dim result As Boolean = False
+            Try
+                Dim allowPageWithoutSectionDisplay As Boolean
+                Dim InsertTestOK As Boolean
+                Dim ConfirmOrderID As Integer
+                Dim PageSize As Integer
+                Dim PageNumber As Integer
+                Dim ContentName As String
+                Dim MsgLabel As String
+                Dim PageID As Integer
+                Dim rootPageId As Integer
+                Dim Pos As Integer
+                Dim TrapID As Integer
+                Dim CS As Integer
+                Dim Name As String
+                Dim Copy As String
+                Dim Recipient As String
+                Dim Sender As String
+                Dim subject As String
+                Dim Message As String
+                Dim Emailtext As String
+                Dim LinkObjectName As String
+                Dim EditorObjectName As String
+                '
+                Select Case genericController.vbLCase(HardCodedPage)
+                    Case HardCodedPageSendPassword
+                        '
+                        ' send password to the email address in the querystring
+                        '
+                        Emailtext = docProperties.getText("email")
+                        If Emailtext <> "" Then
+                            Call email.sendPassword(Emailtext)
+                            Copy = "" _
                             & "<div style=""width:300px;margin:100px auto 0 auto;"">" _
                             & "<p>An attempt to send login information for email address '" & Emailtext & "' has been made.</p>" _
-                            & "<p><a href=""?" & web_RefreshQueryString & """>Return to the Site.</a></p>" _
+                            & "<p><a href=""?" & htmlDoc.refreshQueryString & """>Return to the Site.</a></p>" _
                             & "</div>"
-                        Call htmlDoc.writeAltBuffer(Copy)
-                        executeRoute_hardCodedPage = True
-                    Else
-                        executeRoute_hardCodedPage = False
-                    End If
+                            Call htmlDoc.writeAltBuffer(Copy)
+                            result = True
+                        Else
+                            result = False
+                        End If
                 'Case HardCodedPagePrinterVersion
                 '    '
                 '    ' ----- Page Content Printer main_version
@@ -11579,33 +11659,33 @@ ErrorTrap:
                 '        & vbCrLf & "</html>" _
                 '        & "")
 
-                '    executeRoute_hardCodedPage = True
+                '    result = True
                 ''Case HardCodedPageMyProfile
                 ''    '
                 ''    ' Print a User Profile page with the current member
                 ''    '
                 ''    Call web_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageMyProfile)
                 ''    Call writeAltBuffer(main_GetMyProfilePage())
-                ''    executeRoute_hardCodedPage = True
-                Case HardCodedPageResourceLibrary
-                    '
-                    ' main_Get FormIndex (the index to the InsertImage# function called on selection)
-                    '
-                    Call htmlDoc.webServerIO_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageResourceLibrary)
-                    EditorObjectName = docProperties.getText("EditorObjectName")
-                    LinkObjectName = docProperties.getText("LinkObjectName")
-                    If EditorObjectName <> "" Then
+                ''    result = True
+                    Case HardCodedPageResourceLibrary
                         '
-                        ' Open a page compatible with a dialog
+                        ' main_Get FormIndex (the index to the InsertImage# function called on selection)
                         '
-                        Call htmlDoc.webServerIO_addRefreshQueryString("EditorObjectName", EditorObjectName)
-                        Call htmlDoc.main_AddHeadScriptLink("/ccLib/ClientSide/dialogs.js", "Resource Library")
-                        'Call AddHeadScript("<script type=""text/javascript"" src=""/ccLib/ClientSide/dialogs.js""></script>")
-                        Call main_SetMetaContent(0, 0)
-                        Call htmlDoc.main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Resource Library")
-                        Copy = main_GetResourceLibrary2("", True, EditorObjectName, LinkObjectName, True)
-                        'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2b")
-                        Copy = "" _
+                        Call htmlDoc.webServerIO_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageResourceLibrary)
+                        EditorObjectName = docProperties.getText("EditorObjectName")
+                        LinkObjectName = docProperties.getText("LinkObjectName")
+                        If EditorObjectName <> "" Then
+                            '
+                            ' Open a page compatible with a dialog
+                            '
+                            Call htmlDoc.webServerIO_addRefreshQueryString("EditorObjectName", EditorObjectName)
+                            Call htmlDoc.main_AddHeadScriptLink("/ccLib/ClientSide/dialogs.js", "Resource Library")
+                            'Call AddHeadScript("<script type=""text/javascript"" src=""/ccLib/ClientSide/dialogs.js""></script>")
+                            Call main_SetMetaContent(0, 0)
+                            Call htmlDoc.main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Resource Library")
+                            Copy = main_GetResourceLibrary2("", True, EditorObjectName, LinkObjectName, True)
+                            'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2b")
+                            Copy = "" _
                             & main_docType _
                             & "<html>" _
                             & cr & "<head>" _
@@ -11623,27 +11703,27 @@ ErrorTrap:
                             & cr & "<script language=javascript type=""text/javascript"">fixDialog();</script>" _
                             & cr & "</body>" _
                             & "</html>"
-                        Call htmlDoc.writeAltBuffer(Copy)
-                        executeRoute_hardCodedPage = True
-                        'Call main_GetEndOfBody(False, False)
-                        ''--- should be disposed by caller --- Call dispose
-                        'Call main_CloseStream
-                        'true = False
-                        'Set main_cmc = Nothing
-                        'Exit Sub
-                        'Call main_CloseStream
-                    ElseIf LinkObjectName <> "" Then
-                        '
-                        ' Open a page compatible with a dialog
-                        '
-                        Call htmlDoc.webServerIO_addRefreshQueryString("LinkObjectName", LinkObjectName)
-                        Call htmlDoc.main_AddHeadScriptLink("/ccLib/ClientSide/dialogs.js", "Resource Library")
-                        'Call AddHeadScript("<script type=""text/javascript"" src=""/ccLib/ClientSide/dialogs.js""></script>")
-                        Call main_SetMetaContent(0, 0)
-                        Call htmlDoc.main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Resource Library")
-                        Copy = main_GetResourceLibrary2("", True, EditorObjectName, LinkObjectName, True)
-                        'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2c")
-                        Copy = "" _
+                            Call htmlDoc.writeAltBuffer(Copy)
+                            result = True
+                            'Call main_GetEndOfBody(False, False)
+                            ''--- should be disposed by caller --- Call dispose
+                            'Call main_CloseStream
+                            'true = False
+                            'Set main_cmc = Nothing
+                            'Exit Sub
+                            'Call main_CloseStream
+                        ElseIf LinkObjectName <> "" Then
+                            '
+                            ' Open a page compatible with a dialog
+                            '
+                            Call htmlDoc.webServerIO_addRefreshQueryString("LinkObjectName", LinkObjectName)
+                            Call htmlDoc.main_AddHeadScriptLink("/ccLib/ClientSide/dialogs.js", "Resource Library")
+                            'Call AddHeadScript("<script type=""text/javascript"" src=""/ccLib/ClientSide/dialogs.js""></script>")
+                            Call main_SetMetaContent(0, 0)
+                            Call htmlDoc.main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Resource Library")
+                            Copy = main_GetResourceLibrary2("", True, EditorObjectName, LinkObjectName, True)
+                            'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2c")
+                            Copy = "" _
                             & main_docType _
                             & cr & "<html>" _
                             & cr & "<head>" _
@@ -11657,55 +11737,55 @@ ErrorTrap:
                             & cr & "<script language=javascript type=text/javascript>fixDialog();</script>" _
                             & cr & "</body>" _
                             & vbCrLf & "</html>"
-                        Call htmlDoc.writeAltBuffer(Copy)
-                        executeRoute_hardCodedPage = True
-                    End If
-                Case HardCodedPageLoginDefault
-                    '
-                    ' 9/4/2012 added to prevent lockout if login addon fails
-                    web_RefreshQueryString = webServer.requestQueryString
-                    'Call main_AddRefreshQueryString("method", "")
-                    Call htmlDoc.writeAltBuffer(htmlDoc.getLoginPage(True))
-                    executeRoute_hardCodedPage = True
-                Case HardCodedPageLogin, HardCodedPageLogoutLogin
-                    '
-                    ' 7/8/9 - Moved from intercept pages
-                    '
-                    ' Print the Login form as an intercept page
-                    ' Special case - set the current URL to the Refresh Query String
-                    ' Because you want the form created to save the refresh values
-                    '
-                    If genericController.vbUCase(HardCodedPage) = "LOGOUTLOGIN" Then
+                            Call htmlDoc.writeAltBuffer(Copy)
+                            result = True
+                        End If
+                    Case HardCodedPageLoginDefault
+                        '
+                        ' 9/4/2012 added to prevent lockout if login addon fails
+                        htmlDoc.refreshQueryString = webServer.requestQueryString
+                        'Call main_AddRefreshQueryString("method", "")
+                        Call htmlDoc.writeAltBuffer(htmlDoc.getLoginPage(True))
+                        result = True
+                    Case HardCodedPageLogin, HardCodedPageLogoutLogin
+                        '
+                        ' 7/8/9 - Moved from intercept pages
+                        '
+                        ' Print the Login form as an intercept page
+                        ' Special case - set the current URL to the Refresh Query String
+                        ' Because you want the form created to save the refresh values
+                        '
+                        If genericController.vbUCase(HardCodedPage) = "LOGOUTLOGIN" Then
+                            Call authContext.logout(Me)
+                        End If
+                        htmlDoc.refreshQueryString = webServer.requestQueryString
+                        'Call main_AddRefreshQueryString("method", "")
+                        Call htmlDoc.writeAltBuffer(htmlDoc.getLoginPage(False))
+                        'Call writeAltBuffer(main_GetLoginPage2(false) & main_GetEndOfBody(False, False, False))
+                        result = True
+                    Case HardCodedPageLogout
+                        '
+                        ' ----- logout the current member
+                        '
                         Call authContext.logout(Me)
-                    End If
-                    web_RefreshQueryString = webServer.requestQueryString
-                    'Call main_AddRefreshQueryString("method", "")
-                    Call htmlDoc.writeAltBuffer(htmlDoc.getLoginPage(False))
-                    'Call writeAltBuffer(main_GetLoginPage2(false) & main_GetEndOfBody(False, False, False))
-                    executeRoute_hardCodedPage = True
-                Case HardCodedPageLogout
-                    '
-                    ' ----- logout the current member
-                    '
-                    Call authContext.logout(Me)
-                    executeRoute_hardCodedPage = False
-                Case HardCodedPageSiteExplorer
-                    '
-                    ' 7/8/9 - Moved from intercept pages
-                    '
-                    Call htmlDoc.webServerIO_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageSiteExplorer)
-                    LinkObjectName = docProperties.getText("LinkObjectName")
-                    If LinkObjectName <> "" Then
+                        result = False
+                    Case HardCodedPageSiteExplorer
                         '
-                        ' Open a page compatible with a dialog
+                        ' 7/8/9 - Moved from intercept pages
                         '
-                        Call htmlDoc.webServerIO_addRefreshQueryString("LinkObjectName", LinkObjectName)
-                        Call htmlDoc.main_AddPagetitle("Site Explorer")
-                        Call main_SetMetaContent(0, 0)
-                        Copy = addon.execute_legacy5(0, "Site Explorer", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", 0)
-                        Call htmlDoc.main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Site Explorer")
-                        'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2d")
-                        Copy = "" _
+                        Call htmlDoc.webServerIO_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageSiteExplorer)
+                        LinkObjectName = docProperties.getText("LinkObjectName")
+                        If LinkObjectName <> "" Then
+                            '
+                            ' Open a page compatible with a dialog
+                            '
+                            Call htmlDoc.webServerIO_addRefreshQueryString("LinkObjectName", LinkObjectName)
+                            Call htmlDoc.main_AddPagetitle("Site Explorer")
+                            Call main_SetMetaContent(0, 0)
+                            Copy = addon.execute_legacy5(0, "Site Explorer", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", 0)
+                            Call htmlDoc.main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Site Explorer")
+                            'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2d")
+                            Copy = "" _
                             & main_docType _
                             & cr & "<html>" _
                             & cr & "<head>" _
@@ -11718,242 +11798,234 @@ ErrorTrap:
                             & cr & "</td></tr><tr><td>" & htmlDoc.html_GetEndOfBody(False, False, False, False) & "</td></tr></table>" _
                             & cr & "</body>" _
                             & cr & "</html>"
-                        'Set Obj = Nothing
-                        Call htmlDoc.writeAltBuffer(Copy)
-                        executeRoute_hardCodedPage = True
-                    End If
-                Case HardCodedPageStatus
-                    '
-                    ' Status call
-                    '
-                    webServer.webServerIO_BlockClosePageCopyright = True
-                    '
-                    ' test default data connection
-                    '
-                    On Error Resume Next
-                    Err.Clear()
-                    InsertTestOK = False
-                    CS = db.cs_insertRecord("Trap Log")
-                    If Not db.cs_ok(CS) Then
-                        Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was not OK.", "Init", False, True)
-                    Else
-                        InsertTestOK = True
-                        TrapID = db.cs_getInteger(CS, "ID")
-                    End If
-                    Call db.cs_Close(CS)
-                    If InsertTestOK Then
-                        If TrapID = 0 Then
-                            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was OK, but ID=0.", "Init", False, True)
-                        Else
-                            Call DeleteContentRecord("Trap Log", TrapID)
+                            'Set Obj = Nothing
+                            Call htmlDoc.writeAltBuffer(Copy)
+                            result = True
                         End If
-                    End If
-                    If Err.Number <> 0 Then
-                        Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(ignoreInteger, "dll", "Error during Status. After traplog insert, " & genericController.GetErrString(Err), "Init", False, True)
-                        Err.Clear()
-                    End If
-                    '
-                    ' Close page
-                    '
-                    Call main_ClearStream()
-                    If app_errorCount = 0 Then
-                        Call htmlDoc.writeAltBuffer("Contensive OK")
-                    Else
-                        Call htmlDoc.writeAltBuffer("Contensive Error Count = " & app_errorCount)
-                    End If
-                    webServer.webServerIO_BlockClosePageCopyright = True
-                    html_BlockClosePageLink = True
-                    'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2f")
-                    Call htmlDoc.html_GetEndOfBody(False, False, False, False)
-                    executeRoute_hardCodedPage = True
-                Case HardCodedPageGetJSPage
-                    '
-                    ' ----- Create a Javascript page that outputs a page content record
-                    '
-                    Name = docProperties.getText("name")
-                    If Name <> "" Then
+                    Case HardCodedPageStatus
+                        '
+                        ' Status call
+                        '
                         webServer.webServerIO_BlockClosePageCopyright = True
                         '
-                        ' Determine bid (PageID) from referer querystring
+                        ' test default data connection
                         '
-                        Copy = webServer.requestReferrer
-                        Pos = genericController.vbInstr(1, Copy, "bid=")
-                        If Pos <> 0 Then
-                            Copy = Trim(Mid(Copy, Pos + 4))
-                            Pos = genericController.vbInstr(1, Copy, "&")
-                            If Pos <> 0 Then
-                                Copy = Trim(Mid(Copy, 1, Pos))
+                        InsertTestOK = False
+                        CS = db.cs_insertRecord("Trap Log")
+                        If Not db.cs_ok(CS) Then
+                            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was not OK.", "Init", False, True)
+                        Else
+                            InsertTestOK = True
+                            TrapID = db.cs_getInteger(CS, "ID")
+                        End If
+                        Call db.cs_Close(CS)
+                        If InsertTestOK Then
+                            If TrapID = 0 Then
+                                Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was OK, but ID=0.", "Init", False, True)
+                            Else
+                                Call DeleteContentRecord("Trap Log", TrapID)
                             End If
-                            PageID = genericController.EncodeInteger(Copy)
+                        End If
+                        If Err.Number <> 0 Then
+                            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(ignoreInteger, "dll", "Error during Status. After traplog insert, " & genericController.GetErrString(Err), "Init", False, True)
+                            Err.Clear()
                         End If
                         '
-                        ' main_Get the page
+                        ' Close page
                         '
-                        rootPageId = main_GetRecordID("Page Content", Name)
-                        allowPageWithoutSectionDisplay = siteProperties.getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default)
-                        If Not allowPageWithoutSectionDisplay Then
-                            allowPageWithoutSectionDisplay = authContext.isAuthenticatedContentManager(Me, ContentName)
+                        Call main_ClearStream()
+                        If app_errorCount = 0 Then
+                            Call htmlDoc.writeAltBuffer("Contensive OK")
+                        Else
+                            Call htmlDoc.writeAltBuffer("Contensive Error Count = " & app_errorCount)
                         End If
-                        Copy = pages.pageManager_GetHtmlBody_GetSection_GetContent(PageID, rootPageId, "Page Content", "", True, True, False, 0, siteProperties.useContentWatchLink, allowPageWithoutSectionDisplay)
-                        'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2g")
-                        Copy = Copy & htmlDoc.html_GetEndOfBody(False, True, False, False)
+                        webServer.webServerIO_BlockClosePageCopyright = True
+                        html_BlockClosePageLink = True
+                        'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2f")
+                        Call htmlDoc.html_GetEndOfBody(False, False, False, False)
+                        result = True
+                    Case HardCodedPageGetJSPage
+                        '
+                        ' ----- Create a Javascript page that outputs a page content record
+                        '
+                        Name = docProperties.getText("name")
+                        If Name <> "" Then
+                            webServer.webServerIO_BlockClosePageCopyright = True
+                            '
+                            ' Determine bid (PageID) from referer querystring
+                            '
+                            Copy = webServer.requestReferrer
+                            Pos = genericController.vbInstr(1, Copy, "bid=")
+                            If Pos <> 0 Then
+                                Copy = Trim(Mid(Copy, Pos + 4))
+                                Pos = genericController.vbInstr(1, Copy, "&")
+                                If Pos <> 0 Then
+                                    Copy = Trim(Mid(Copy, 1, Pos))
+                                End If
+                                PageID = genericController.EncodeInteger(Copy)
+                            End If
+                            '
+                            ' main_Get the page
+                            '
+                            rootPageId = main_GetRecordID("Page Content", Name)
+                            allowPageWithoutSectionDisplay = siteProperties.getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default)
+                            If Not allowPageWithoutSectionDisplay Then
+                                allowPageWithoutSectionDisplay = authContext.isAuthenticatedContentManager(Me, ContentName)
+                            End If
+                            Copy = pages.getContentBox(PageID, rootPageId, "Page Content", "", True, True, False, 0, siteProperties.useContentWatchLink, allowPageWithoutSectionDisplay)
+                            'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2g")
+                            Copy = Copy & htmlDoc.html_GetEndOfBody(False, True, False, False)
+                            Copy = genericController.vbReplace(Copy, "'", "'+""'""+'")
+                            Copy = genericController.vbReplace(Copy, vbCr, "\n")
+                            Copy = genericController.vbReplace(Copy, vbLf, " ")
+                            '
+                            ' Write the page to the stream, with a javascript wrapper
+                            '
+                            MsgLabel = "Msg" & genericController.encodeText(genericController.GetRandomInteger)
+                            Call webServer.setResponseContentType("text/plain")
+                            Call htmlDoc.writeAltBuffer("var " & MsgLabel & " = '" & Copy & "'; " & vbCrLf)
+                            Call htmlDoc.writeAltBuffer("document.write( " & MsgLabel & " ); " & vbCrLf)
+                        End If
+                        result = True
+                    Case HardCodedPageGetJSLogin
+                        '
+                        ' ----- Create a Javascript login page
+                        '
+                        webServer.webServerIO_BlockClosePageCopyright = True
+                        Copy = Copy & "<p align=""center""><CENTER>"
+                        If Not authContext.isAuthenticated() Then
+                            Copy = Copy & htmlDoc.getLoginPanel()
+                        ElseIf authContext.isAuthenticatedContentManager(Me, "Page Content") Then
+                            'Copy = Copy & main_GetToolsPanel
+                        Else
+                            Copy = Copy & "You are currently logged in as " & authContext.user.Name & ". To logout, click <a HREF=""" & webServer.webServerIO_ServerFormActionURL & "?Method=logout"" rel=""nofollow"">Here</A>."
+                        End If
+                        'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2h")
+                        Copy = Copy & htmlDoc.html_GetEndOfBody(True, True, False, False)
+                        Copy = Copy & "</CENTER></p>"
                         Copy = genericController.vbReplace(Copy, "'", "'+""'""+'")
-                        Copy = genericController.vbReplace(Copy, vbCr, "\n")
-                        Copy = genericController.vbReplace(Copy, vbLf, " ")
+                        Copy = genericController.vbReplace(Copy, vbCr, "")
+                        Copy = genericController.vbReplace(Copy, vbLf, "")
+                        'Copy = "<b>login Page</b>"
                         '
                         ' Write the page to the stream, with a javascript wrapper
                         '
                         MsgLabel = "Msg" & genericController.encodeText(genericController.GetRandomInteger)
-                        Call webServer.webServerIO_setResponseContentType("text/plain")
+                        Call webServer.setResponseContentType("text/plain")
                         Call htmlDoc.writeAltBuffer("var " & MsgLabel & " = '" & Copy & "'; " & vbCrLf)
                         Call htmlDoc.writeAltBuffer("document.write( " & MsgLabel & " ); " & vbCrLf)
-                    End If
-                    executeRoute_hardCodedPage = True
-                Case HardCodedPageGetJSLogin
-                    '
-                    ' ----- Create a Javascript login page
-                    '
-                    webServer.webServerIO_BlockClosePageCopyright = True
-                    Copy = Copy & "<p align=""center""><CENTER>"
-                    If Not authContext.isAuthenticated() Then
-                        Copy = Copy & htmlDoc.getLoginPanel()
-                    ElseIf authContext.isAuthenticatedContentManager(Me, "Page Content") Then
-                        'Copy = Copy & main_GetToolsPanel
-                    Else
-                        Copy = Copy & "You are currently logged in as " & authContext.user.Name & ". To logout, click <a HREF=""" & webServer.webServerIO_ServerFormActionURL & "?Method=logout"" rel=""nofollow"">Here</A>."
-                    End If
-                    'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2h")
-                    Copy = Copy & htmlDoc.html_GetEndOfBody(True, True, False, False)
-                    Copy = Copy & "</CENTER></p>"
-                    Copy = genericController.vbReplace(Copy, "'", "'+""'""+'")
-                    Copy = genericController.vbReplace(Copy, vbCr, "")
-                    Copy = genericController.vbReplace(Copy, vbLf, "")
-                    'Copy = "<b>login Page</b>"
-                    '
-                    ' Write the page to the stream, with a javascript wrapper
-                    '
-                    MsgLabel = "Msg" & genericController.encodeText(genericController.GetRandomInteger)
-                    Call webServer.webServerIO_setResponseContentType("text/plain")
-                    Call htmlDoc.writeAltBuffer("var " & MsgLabel & " = '" & Copy & "'; " & vbCrLf)
-                    Call htmlDoc.writeAltBuffer("document.write( " & MsgLabel & " ); " & vbCrLf)
-                    executeRoute_hardCodedPage = True
-                Case HardCodedPageRedirect
-                    '
-                    ' ----- Redirect with RC and RI
-                    '
-                    htmlDoc.pageManager_RedirectContentID = docProperties.getInteger(rnRedirectContentId)
-                    htmlDoc.pageManager_RedirectRecordID = docProperties.getInteger(rnRedirectRecordId)
-                    If htmlDoc.pageManager_RedirectContentID <> 0 And htmlDoc.pageManager_RedirectRecordID <> 0 Then
-                        ContentName = metaData.getContentNameByID(htmlDoc.pageManager_RedirectContentID)
-                        If ContentName <> "" Then
-                            Call main_RedirectByRecord_ReturnStatus(ContentName, htmlDoc.pageManager_RedirectRecordID)
+                        result = True
+                    Case HardCodedPageRedirect
+                        '
+                        ' ----- Redirect with RC and RI
+                        '
+                        htmlDoc.pageManager_RedirectContentID = docProperties.getInteger(rnRedirectContentId)
+                        htmlDoc.pageManager_RedirectRecordID = docProperties.getInteger(rnRedirectRecordId)
+                        If htmlDoc.pageManager_RedirectContentID <> 0 And htmlDoc.pageManager_RedirectRecordID <> 0 Then
+                            ContentName = metaData.getContentNameByID(htmlDoc.pageManager_RedirectContentID)
+                            If ContentName <> "" Then
+                                Call main_RedirectByRecord_ReturnStatus(ContentName, htmlDoc.pageManager_RedirectRecordID)
+                            End If
                         End If
-                    End If
-                    webServer.webServerIO_BlockClosePageCopyright = True
-                    html_BlockClosePageLink = True
-                    return_allowPostInitExecuteAddon = False '--- should be disposed by caller --- Call dispose
-                    executeRoute_hardCodedPage = True
-                Case HardCodedPageExportAscii
-                    '
-                    '----------------------------------------------------
-                    '   Should be a remote method in commerce
-                    '----------------------------------------------------
-                    '
-                    If Not authContext.isAuthenticatedAdmin(Me) Then
-                        '
-                        ' Administrator required
-                        '
-                        Call htmlDoc.writeAltBuffer("Error: You must be an administrator to use the ExportAscii method")
-                    Else
                         webServer.webServerIO_BlockClosePageCopyright = True
-                        ContentName = docProperties.getText("content")
-                        PageSize = docProperties.getInteger("PageSize")
-                        If PageSize = 0 Then
-                            PageSize = 20
-                        End If
-                        PageNumber = docProperties.getInteger("PageNumber")
-                        If PageNumber = 0 Then
-                            PageNumber = 1
-                        End If
-                        If (ContentName = "") Then
-                            Call htmlDoc.writeAltBuffer("Error: ExportAscii method requires ContentName")
+                        html_BlockClosePageLink = True
+                        result = False '--- should be disposed by caller --- Call dispose
+                        result = True
+                    Case HardCodedPageExportAscii
+                        '
+                        '----------------------------------------------------
+                        '   Should be a remote method in commerce
+                        '----------------------------------------------------
+                        '
+                        If Not authContext.isAuthenticatedAdmin(Me) Then
+                            '
+                            ' Administrator required
+                            '
+                            Call htmlDoc.writeAltBuffer("Error: You must be an administrator to use the ExportAscii method")
                         Else
-                            Call htmlDoc.writeAltBuffer(exportAscii_GetAsciiExport(ContentName, PageSize, PageNumber))
+                            webServer.webServerIO_BlockClosePageCopyright = True
+                            ContentName = docProperties.getText("content")
+                            PageSize = docProperties.getInteger("PageSize")
+                            If PageSize = 0 Then
+                                PageSize = 20
+                            End If
+                            PageNumber = docProperties.getInteger("PageNumber")
+                            If PageNumber = 0 Then
+                                PageNumber = 1
+                            End If
+                            If (ContentName = "") Then
+                                Call htmlDoc.writeAltBuffer("Error: ExportAscii method requires ContentName")
+                            Else
+                                Call htmlDoc.writeAltBuffer(Controllers.exportAsciiController.exportAscii_GetAsciiExport(Me, ContentName, PageSize, PageNumber))
+                            End If
                         End If
-                    End If
-                    executeRoute_hardCodedPage = True
-                    webServer.webServerIO_BlockClosePageCopyright = True
-                    html_BlockClosePageLink = True
-                    return_allowPostInitExecuteAddon = False '--- should be disposed by caller --- Call dispose
-                    executeRoute_hardCodedPage = True
-                Case HardCodedPagePayPalConfirm
-                    '
-                    '
-                    '----------------------------------------------------
-                    '   Should be a remote method in commerce
-                    '----------------------------------------------------
-                    '
-                    '
-                    ConfirmOrderID = docProperties.getInteger("item_name")
-                    If ConfirmOrderID <> 0 Then
+                        result = True
+                        webServer.webServerIO_BlockClosePageCopyright = True
+                        html_BlockClosePageLink = True
+                        result = False '--- should be disposed by caller --- Call dispose
+                        result = True
+                    Case HardCodedPagePayPalConfirm
                         '
-                        ' Confirm the order
                         '
-                        CS = db.cs_open("Orders", "(ID=" & ConfirmOrderID & ") and ((OrderCompleted=0)or(OrderCompleted is Null))")
-                        If db.cs_ok(CS) Then
-                            Call db.cs_set(CS, "OrderCompleted", True)
-                            Call db.cs_set(CS, "DateCompleted", app_startTime)
-                            Call db.cs_set(CS, "ccAuthCode", docProperties.getText("txn_id"))
-                            Call db.cs_set(CS, "ccActionCode", docProperties.getText("payment_status"))
-                            Call db.cs_set(CS, "ccRefCode", docProperties.getText("pending_reason"))
-                            Call db.cs_set(CS, "PayMethod", "PayPal " & docProperties.getText("payment_type"))
-                            Call db.cs_set(CS, "ShipName", docProperties.getText("first_name") & " " & docProperties.getText("last_name"))
-                            Call db.cs_set(CS, "ShipAddress", docProperties.getText("address_street"))
-                            Call db.cs_set(CS, "ShipCity", docProperties.getText("address_city"))
-                            Call db.cs_set(CS, "ShipState", docProperties.getText("address_state"))
-                            Call db.cs_set(CS, "ShipZip", docProperties.getText("address_zip"))
-                            Call db.cs_set(CS, "BilleMail", docProperties.getText("payer_email"))
-                            Call db.cs_set(CS, "ContentControlID", main_GetContentID("Orders Completed"))
-                            Call db.cs_save2(CS)
+                        '----------------------------------------------------
+                        '   Should be a remote method in commerce
+                        '----------------------------------------------------
+                        '
+                        '
+                        ConfirmOrderID = docProperties.getInteger("item_name")
+                        If ConfirmOrderID <> 0 Then
+                            '
+                            ' Confirm the order
+                            '
+                            CS = db.cs_open("Orders", "(ID=" & ConfirmOrderID & ") and ((OrderCompleted=0)or(OrderCompleted is Null))")
+                            If db.cs_ok(CS) Then
+                                Call db.cs_set(CS, "OrderCompleted", True)
+                                Call db.cs_set(CS, "DateCompleted", app_startTime)
+                                Call db.cs_set(CS, "ccAuthCode", docProperties.getText("txn_id"))
+                                Call db.cs_set(CS, "ccActionCode", docProperties.getText("payment_status"))
+                                Call db.cs_set(CS, "ccRefCode", docProperties.getText("pending_reason"))
+                                Call db.cs_set(CS, "PayMethod", "PayPal " & docProperties.getText("payment_type"))
+                                Call db.cs_set(CS, "ShipName", docProperties.getText("first_name") & " " & docProperties.getText("last_name"))
+                                Call db.cs_set(CS, "ShipAddress", docProperties.getText("address_street"))
+                                Call db.cs_set(CS, "ShipCity", docProperties.getText("address_city"))
+                                Call db.cs_set(CS, "ShipState", docProperties.getText("address_state"))
+                                Call db.cs_set(CS, "ShipZip", docProperties.getText("address_zip"))
+                                Call db.cs_set(CS, "BilleMail", docProperties.getText("payer_email"))
+                                Call db.cs_set(CS, "ContentControlID", main_GetContentID("Orders Completed"))
+                                Call db.cs_save2(CS)
+                            End If
+                            Call db.cs_Close(CS)
+                            '
+                            ' Empty the cart
+                            '
+                            CS = db.cs_open("Visitors", "OrderID=" & ConfirmOrderID)
+                            If db.cs_ok(CS) Then
+                                Call db.cs_set(CS, "OrderID", 0)
+                                Call db.cs_save2(CS)
+                            End If
+                            Call db.cs_Close(CS)
+                            '
+                            ' TEmp fix until HardCodedPage is complete
+                            '
+                            Recipient = siteProperties.getText("EmailOrderNotifyAddress", siteProperties.emailAdmin)
+                            If genericController.vbInstr(genericController.encodeText(Recipient), "@") = 0 Then
+                                Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError12("Init", "PayPal confirmation Order Process Notification email was not sent because EmailOrderNotifyAddress SiteProperty is not valid")
+                            Else
+                                Sender = siteProperties.getText("EmailOrderFromAddress")
+                                subject = webServer.webServerIO_requestDomain & " Online Order Pending, #" & ConfirmOrderID
+                                Message = "<p>An order confirmation has been recieved from PayPal for " & webServer.webServerIO_requestDomain & "</p>"
+                                Call email.send_Legacy(Recipient, Sender, subject, Message, , False, True)
+                            End If
                         End If
-                        Call db.cs_Close(CS)
-                        '
-                        ' Empty the cart
-                        '
-                        CS = db.cs_open("Visitors", "OrderID=" & ConfirmOrderID)
-                        If db.cs_ok(CS) Then
-                            Call db.cs_set(CS, "OrderID", 0)
-                            Call db.cs_save2(CS)
-                        End If
-                        Call db.cs_Close(CS)
-                        '
-                        ' TEmp fix until HardCodedPage is complete
-                        '
-                        Recipient = siteProperties.getText("EmailOrderNotifyAddress", siteProperties.emailAdmin)
-                        If genericController.vbInstr(genericController.encodeText(Recipient), "@") = 0 Then
-                            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError12("Init", "PayPal confirmation Order Process Notification email was not sent because EmailOrderNotifyAddress SiteProperty is not valid")
-                        Else
-                            Sender = siteProperties.getText("EmailOrderFromAddress")
-                            subject = webServer.webServerIO_requestDomain & " Online Order Pending, #" & ConfirmOrderID
-                            Message = "<p>An order confirmation has been recieved from PayPal for " & webServer.webServerIO_requestDomain & "</p>"
-                            Call email.send_Legacy(Recipient, Sender, subject, Message, , False, True)
-                        End If
-                    End If
-                    webServer.webServerIO_BlockClosePageCopyright = True
-                    html_BlockClosePageLink = True
-                    return_allowPostInitExecuteAddon = False '--- should be disposed by caller --- Call dispose
-                    executeRoute_hardCodedPage = True
-            End Select
-            '
-            '
-            Return return_allowPostInitExecuteAddon
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(Err.Number, Err.Source, Err.Description, "main_Init_PrintHardCodedPage", True, False)
-            Return return_allowPostInitExecuteAddon
+                        webServer.webServerIO_BlockClosePageCopyright = True
+                        html_BlockClosePageLink = True
+                        result = False '--- should be disposed by caller --- Call dispose
+                        result = True
+                End Select
+            Catch ex As Exception
+                handleExceptionAndContinue(ex)
+            End Try
+            Return result
         End Function
         '
         '========================================================================
@@ -12869,707 +12941,6 @@ ErrorTrap:
 ErrorTrap:
             Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(Err.Number, Err.Source, Err.Description & " Hint=[" & hint & "]", "cache_libraryFiles_loadIfNeeded", True, False)
         End Sub
-        '=============================================================================
-        ''' <summary>
-        ''' Executes the current route (pathPage and/or querystring based). If not found, the default route (addon) is executed. Initially the default route is the pageManager.
-        ''' </summary>
-        ''' <returns>The doc created by the default addon. (html, json, etc)</returns>
-        Public Function executeRoute(Optional route As String = "") As String
-            Dim returnResult As String = ""
-            Try
-                If (serverConfig.appConfig IsNot Nothing) Then
-                    '
-                    ' -- if app is not configured, cannot execute route
-                    Dim pairs() As String
-                    Dim pairName As String
-                    Dim pairValue As String
-                    Dim addonRoute As String = ""
-                    Dim routeTest As String
-                    Dim workingRoute As String
-                    Dim adminRoute As String = serverConfig.appConfig.adminRoute.ToLower
-                    Dim AjaxFunction As String = docProperties.getText(RequestNameAjaxFunction)
-                    Dim AjaxFastFunction As String = docProperties.getText(RequestNameAjaxFastFunction)
-                    Dim RemoteMethodFromQueryString As String = docProperties.getText(RequestNameRemoteMethodAddon)
-                    '
-                    'debugLog("executeRoute, enter")
-                    '
-                    ' determine route from either url or querystring 
-                    '
-                    If (Not String.IsNullOrEmpty(route)) Then
-                        '
-                        ' route privided as argument
-                        '
-                        workingRoute = route
-                    ElseIf (Not String.IsNullOrEmpty(RemoteMethodFromQueryString)) Then
-                        '
-                        ' route comes from a remoteMethod=route querystring argument
-                        '
-                        workingRoute = "/" & RemoteMethodFromQueryString.ToLower()
-                    Else
-                        '
-                        ' routine comes from the url
-                        '
-                        workingRoute = webServer.requestPathPage.ToLower
-                    End If
-                    '
-                    ' normalize route to /path/page or /path
-                    '
-                    workingRoute = genericController.normalizeRoute(workingRoute)
-                    '
-                    ' call with no addon route returns admin site
-                    '
-                    If False Then
-                        ''
-                        ''--------------------------------------------------------------------------
-                        '' route is admin
-                        ''--------------------------------------------------------------------------
-                        ''
-
-                        ''If the Then admin route Is taken -- the login panel processing Is bypassed. those methods need To be a different kind Of route, Or it should be an addon
-                        ''runAtServerClass in the admin addon.
-
-                        'Dim admin As New adminClass(Me)
-                        'returnResult = admin.addonToBe_admin()
-                    Else
-                        '
-                        '------------------------------------------------------------------------------------------
-                        '   remote method
-                        '       for hardcoded_addons (simple ajax functions) and addons with asajax and inframe
-                        '       Eventually replace the hard-coded ajax hood with this process
-                        '       so cj. methods can be consolidated into the cj.ajax.addon (can callback) calls
-                        '------------------------------------------------------------------------------------------
-                        '
-                        ' if route is a remote method, use it
-                        '
-                        routeTest = workingRoute
-                        Dim addonPtr As Integer = addonCache.getPtr(routeTest)
-                        If addonPtr >= 0 Then
-                            If addonCache.addonCache.addonList(addonPtr.ToString).remoteMethod Then
-                                addonRoute = routeTest
-                            End If
-                        Else
-                            If (InStr(routeTest, "/", CompareMethod.Text) = 1) Then
-                                routeTest = routeTest.Substring(1)
-                                addonPtr = addonCache.getPtr(routeTest)
-                                If addonPtr >= 0 Then
-                                    If addonCache.addonCache.addonList(addonPtr.ToString).remoteMethod Then
-                                        addonRoute = routeTest
-                                    End If
-                                End If
-                            End If
-                        End If
-                        If addonRoute = "" Then
-                            '
-                            ' if remote method is not in route, get nameGuid from querystring
-                            '
-                            addonRoute = docProperties.getText(RequestNameRemoteMethodAddon)
-                        End If
-                        If addonRoute <> "" Then
-                            '
-                            ' -- this section was added here. it came from an earlier processing section of initApp() but appears to apply only to remote method processing
-                            '--------------------------------------------------------------------------
-                            '   Verify Add-ons are run from Referrers on the Aggregate Access List
-                            '--------------------------------------------------------------------------
-                            '
-                            If webServer.webServerIO_ReadStreamJSForm Then
-                                If webServer.requestReferrer = "" Then
-                                    '
-                                    ' Allow it to be hand typed
-                                    '
-                                Else
-                                    '
-                                    ' Test source site
-                                    '
-                                    Dim refProtocol As String = ""
-                                    Dim refHost As String = ""
-                                    Dim refPath As String = ""
-                                    Dim refPage As String = ""
-                                    Dim refQueryString As String = ""
-                                    Dim cs As Integer
-                                    Call genericController.SeparateURL(webServer.requestReferrer, refProtocol, refHost, refPath, refPage, refQueryString)
-                                    If genericController.vbUCase(refHost) <> genericController.vbUCase(webServer.requestDomain) Then
-                                        '
-                                        ' Not from this site
-                                        '
-                                        If siteProperties.getBoolean("AllowAggregateAccessBlocking") Then
-                                            cs = db.cs_open("Aggregate Access", "Link=" & EncodeSQLText(refHost), , False, , , , "active")
-                                            If Not db.cs_ok(cs) Then
-                                                '
-                                                ' no record, add an inactive record and throw error
-                                                '
-                                                Call db.cs_Close(cs)
-                                                cs = db.cs_insertRecord("Aggregate Access")
-                                                If db.cs_ok(cs) Then
-                                                    Call db.cs_set(cs, "Name", refHost)
-                                                    Call db.cs_set(cs, "Link", refHost)
-                                                    Call db.cs_set(cs, "active", False)
-                                                End If
-                                                Call db.cs_Close(cs)
-                                                handleExceptionAndContinue(New ApplicationException("Add-on call from [" & refHost & "] was blocked because this domain is not in the Aggregate Access Content. An inactive record was added. To allow this domain access, mark the record active.")) ' handleLegacyError12("Init", "")
-                                                docOpen = False '--- should be disposed by caller --- Call dispose
-                                                Return htmlDoc.docBuffer
-                                            ElseIf Not db.cs_getBoolean(cs, "active") Then
-                                                '
-                                                ' inactive record, throw error
-                                                '
-                                                Call db.cs_Close(cs)
-                                                handleExceptionAndContinue(New ApplicationException("Add-on call from [" & refHost & "] was blocked because this domain is not active in the Aggregate Access Content. To allow this domain access, mark the record active.")) ' handleLegacyError12("Init", "")
-                                                docOpen = False '--- should be disposed by caller --- Call dispose
-                                                Return htmlDoc.docBuffer
-                                            Else
-                                                '
-                                                ' Active record, allow hit
-                                                '
-                                                Call db.cs_Close(cs)
-                                            End If
-                                        End If
-                                    End If
-                                End If
-                            End If
-                            '
-                            'Call AppendLog("main_init(), 2710 - exit for remote method")
-                            '
-                            If True Then
-                                Dim Option_String As String = ""
-                                Dim pos As Integer
-                                Dim HostContentName As String
-                                Dim hostRecordId As Integer
-                                If docProperties.containsKey("Option_String") Then
-                                    Option_String = docProperties.getText("Option_String")
-                                Else
-                                    '
-                                    ' convert Querystring encoding to (internal) NVA
-                                    '
-                                    If webServer.requestQueryString <> "" Then
-                                        pairs = Split(webServer.requestQueryString, "&")
-                                        For addonPtr = 0 To UBound(pairs)
-                                            pairName = pairs(addonPtr)
-                                            pairValue = ""
-                                            pos = genericController.vbInstr(1, pairName, "=")
-                                            If pos > 0 Then
-                                                pairValue = genericController.DecodeResponseVariable(Mid(pairName, pos + 1))
-                                                pairName = genericController.DecodeResponseVariable(Mid(pairName, 1, pos - 1))
-                                            End If
-                                            Option_String = Option_String & "&" & genericController.encodeNvaArgument(pairName) & "=" & genericController.encodeNvaArgument(pairValue)
-                                        Next
-                                        Option_String = Mid(Option_String, 2)
-                                    End If
-                                End If
-                                HostContentName = docProperties.getText("hostcontentname")
-                                hostRecordId = docProperties.getInteger("HostRecordID")
-                                '
-                                ' remote methods are add-ons
-                                '
-                                Dim AddonStatusOK As Boolean = True
-                                '
-                                ' REFACTOR -- must know if this is json or html remote before call because it is an argument -- assume this is a json for now -- must deal with it somehow
-                                '
-                                returnResult = addon.execute(0, addonRoute, Option_String, CPUtilsBaseClass.addonContext.ContextRemoteMethodJson, HostContentName, hostRecordId, "", "0", False, 0, "", AddonStatusOK, Nothing, "", Nothing, "", authContext.user.ID, authContext.isAuthenticated)
-                            End If
-                            '
-                            ' deliver styles, javascript and other head tags as javascript appends
-                            '
-                            webServer.webServerIO_BlockClosePageCopyright = True
-                            html_BlockClosePageLink = True
-                            If (webServer.webServerIO_OutStreamDevice = htmlDocController.htmlDoc_OutStreamJavaScript) Then
-                                If genericController.vbInstr(1, returnResult, "<form ", vbTextCompare) <> 0 Then
-                                    Dim FormSplit As String() = Split(returnResult, "<form ", , vbTextCompare)
-                                    returnResult = FormSplit(0)
-                                    For addonPtr = 1 To UBound(FormSplit)
-                                        Dim FormEndPos As Integer = genericController.vbInstr(1, FormSplit(addonPtr), ">")
-                                        Dim FormInner As String = Mid(FormSplit(addonPtr), 1, FormEndPos)
-                                        Dim FormSuffix As String = Mid(FormSplit(addonPtr), FormEndPos + 1)
-                                        FormInner = genericController.vbReplace(FormInner, "method=""post""", "method=""main_Get""", 1, 99, vbTextCompare)
-                                        FormInner = genericController.vbReplace(FormInner, "method=post", "method=""main_Get""", 1, 99, vbTextCompare)
-                                        returnResult = returnResult & "<form " & FormInner & FormSuffix
-                                    Next
-                                End If
-                                '
-                                Call htmlDoc.writeAltBuffer(returnResult)
-                                returnResult = ""
-                            End If
-                            '
-                            ' 20161227 - executeRoute came from old init(), which used the altBuffer to mock a return. Back that out and return the result directly.
-                            '
-                            Return returnResult
-                            'Call AppendLog("call main_getEndOfBody, from main_inite")
-                            'returnResult = returnResult & main_GetEndOfBody(False, False, True, False)
-                            'Call writeAltBuffer(returnResult)
-                            'docOpen = False '--- should be disposed by caller --- Call dispose
-                            'Return _docBuffer
-                        End If
-                        If True Then
-                            '
-                            '------------------------------------------------------------------------------------------
-                            '   These should all be converted to system add-ons
-                            '
-                            '   AJAX late functions (slower then the early functions, but they include visit state, etc.
-                            '------------------------------------------------------------------------------------------
-                            '
-                            If AjaxFunction <> "" Then
-                                returnResult = ""
-                                Select Case AjaxFunction
-                                    Case ajaxGetFieldEditorPreferenceForm
-                                        '
-                                        ' When editing in admin site, if a field has multiple editors (addons as editors), you main_Get an icon
-                                        '   to click to select the editor. When clicked, a fancybox opens to display a form. The onStart of
-                                        '   he fancybox calls this ajax call and puts the return in the div that is displayed. Return a list
-                                        '   of addon editors compatible with the field type.
-                                        '
-                                        Dim addonDefaultEditorName As String = ""
-                                        Dim addonDefaultEditorId As Integer = 0
-                                        Dim fieldId As Integer = docProperties.getInteger("fieldid")
-                                        '
-                                        ' main_Get name of default editor
-                                        '
-                                        Dim Sql As String = "select top 1" _
-                                        & " a.name,a.id" _
-                                        & " from ccfields f left join ccAggregateFunctions a on a.id=f.editorAddonId" _
-                                        & " where" _
-                                        & " f.ID = " & fieldId _
-                                        & ""
-                                        Dim dt As DataTable
-                                        dt = db.executeSql(Sql)
-                                        If dt.Rows.Count > 0 Then
-                                            For Each rsDr As DataRow In dt.Rows
-                                                addonDefaultEditorName = "&nbsp;(" & genericController.encodeText(rsDr("name")) & ")"
-                                                addonDefaultEditorId = genericController.EncodeInteger(rsDr("id"))
-                                            Next
-                                        End If
-                                        '
-                                        Dim radioGroupName As String = "setEditorPreference" & fieldId
-                                        Dim currentEditorAddonId As Integer = docProperties.getInteger("currentEditorAddonId")
-                                        Dim submitFormId As Integer = docProperties.getInteger("submitFormId")
-                                        Sql = "select f.name,c.name,r.addonid,a.name as addonName" _
-                                        & " from (((cccontent c" _
-                                        & " left join ccfields f on f.contentid=c.id)" _
-                                        & " left join ccAddonContentFieldTypeRules r on r.contentFieldTypeID=f.type)" _
-                                        & " left join ccAggregateFunctions a on a.id=r.AddonId)" _
-                                        & " where f.id=" & fieldId
-
-                                        dt = db.executeSql(Sql)
-                                        If dt.Rows.Count > 0 Then
-                                            For Each rsDr As DataRow In dt.Rows
-                                                Dim addonId As Integer = genericController.EncodeInteger(rsDr("addonid"))
-                                                If (addonId <> 0) And (addonId <> addonDefaultEditorId) Then
-                                                    returnResult = returnResult _
-                                                    & vbCrLf & vbTab & "<div class=""radioCon"">" & htmlDoc.html_GetFormInputRadioBox(radioGroupName, genericController.encodeText(addonId), CStr(currentEditorAddonId)) & "&nbsp;Use " & genericController.encodeText(rsDr("addonName")) & "</div>" _
-                                                    & ""
-                                                End If
-
-                                            Next
-                                        End If
-
-                                        Dim OnClick As String = "" _
-                                        & "var a=document.getElementsByName('" & radioGroupName & "');" _
-                                        & "for(i=0;i<a.length;i++) {" _
-                                        & "if(a[i].checked){var v=a[i].value}" _
-                                        & "}" _
-                                        & "document.getElementById('fieldEditorPreference').value='" & fieldId & ":'+v;" _
-                                        & "cj.admin.saveEmptyFieldList('" & "FormEmptyFieldList');" _
-                                        & "document.getElementById('adminEditForm').submit();" _
-                                        & ""
-
-                                        returnResult = "" _
-                                        & vbCrLf & vbTab & "<h1>Editor Preference</h1>" _
-                                        & vbCrLf & vbTab & "<p>Select the editor you will use for this field. Select default if you want to use the current system default.</p>" _
-                                        & vbCrLf & vbTab & "<div class=""radioCon"">" & htmlDoc.html_GetFormInputRadioBox("setEditorPreference" & fieldId, "0", "0") & "&nbsp;Use Default Editor" & addonDefaultEditorName & "</div>" _
-                                        & vbCrLf & vbTab & returnResult _
-                                        & vbCrLf & vbTab & "<div class=""buttonCon"">" _
-                                        & vbCrLf & vbTab & "<button type=""button"" onclick=""" & OnClick & """>Select</button>" _
-                                        & vbCrLf & vbTab & "</div>" _
-                                        & ""
-                                    Case AjaxGetDefaultAddonOptionString
-                                        '
-                                        ' return the addons defult AddonOption_String
-                                        ' used in wysiwyg editor - addons in select list have no defaultOption_String
-                                        ' because created it is expensive (lookuplists, etc). This is only called
-                                        ' when the addon is double-clicked in the editor after being dropped
-                                        '
-                                        Dim AddonGuid As String = docProperties.getText("guid")
-                                        '$$$$$ cache this
-                                        Dim CS As Integer = db.cs_open(cnAddons, "ccguid=" & db.encodeSQLText(AddonGuid))
-                                        Dim addonArgumentList As String = ""
-                                        Dim addonIsInline As Boolean = False
-                                        If db.cs_ok(CS) Then
-                                            addonArgumentList = db.cs_getText(CS, "argumentlist")
-                                            addonIsInline = db.cs_getBoolean(CS, "IsInline")
-                                            returnResult = main_GetDefaultAddonOption_String(addonArgumentList, AddonGuid, addonIsInline)
-                                        End If
-                                        Call db.cs_Close(CS)
-                                    Case AjaxSetVisitProperty
-                                        '
-                                        ' 7/7/2009 - Moved from HardCodedPages - sets a visit property from the cj object
-                                        '
-                                        Dim ArgList As String = docProperties.getText("args")
-                                        Dim Args As String() = Split(ArgList, "&")
-                                        Dim gd As GoogleDataType = New GoogleDataType
-                                        gd.IsEmpty = True
-                                        For Ptr = 0 To UBound(Args)
-                                            Dim ArgNameValue As String() = Split(Args(Ptr), "=")
-                                            Dim PropertyName As String = ArgNameValue(0)
-                                            Dim PropertyValue As String = ""
-                                            If UBound(ArgNameValue) > 0 Then
-                                                PropertyValue = ArgNameValue(1)
-                                            End If
-                                            Call visitProperty.setProperty(PropertyName, PropertyValue)
-                                        Next
-                                        returnResult = main_FormatRemoteQueryOutput(gd, RemoteFormatEnum.RemoteFormatJsonNameValue)
-                                        returnResult = htmlDoc.main_encodeHTML(returnResult)
-                                        Call htmlDoc.writeAltBuffer(returnResult)
-                                    Case AjaxGetVisitProperty
-                                        '
-                                        ' 7/7/2009 - Moved from HardCodedPages - sets a visit property from the cj object
-                                        '
-                                        Dim ArgList As String = docProperties.getText("args")
-                                        Dim Args As String() = Split(ArgList, "&")
-                                        Dim gd As GoogleDataType = New GoogleDataType
-                                        gd.IsEmpty = False
-                                        ReDim gd.row(0)
-
-                                        For Ptr = 0 To UBound(Args)
-                                            ReDim Preserve gd.col(Ptr)
-                                            ReDim Preserve gd.row(0).Cell(Ptr)
-                                            Dim ArgNameValue As String() = Split(Args(Ptr), "=")
-                                            Dim PropertyName As String = ArgNameValue(0)
-                                            gd.col(Ptr).Id = PropertyName
-                                            gd.col(Ptr).Label = PropertyName
-                                            gd.col(Ptr).Type = "string"
-                                            Dim PropertyValue As String = ""
-                                            If UBound(ArgNameValue) > 0 Then
-                                                PropertyValue = ArgNameValue(1)
-                                            End If
-                                            gd.row(0).Cell(Ptr).v = visitProperty.getText(PropertyName, PropertyValue)
-                                        Next
-                                        returnResult = main_FormatRemoteQueryOutput(gd, RemoteFormatEnum.RemoteFormatJsonNameValue)
-                                        returnResult = htmlDoc.main_encodeHTML(returnResult)
-                                        Call htmlDoc.writeAltBuffer(returnResult)
-                                    Case AjaxData
-                                        '
-                                        ' 7/7/2009 - Moved from HardCodedPages - Run remote query from cj.remote object call, and return results html encoded in a <result></result> block
-                                        ' 20050427 - not used
-                                        Call htmlDoc.writeAltBuffer(init_ProcessAjaxData())
-                                    Case AjaxPing
-                                        '
-                                        ' returns OK if the server is alive
-                                        '
-                                        returnResult = "ok"
-                                    Case AjaxOpenIndexFilter
-                                        Call visitProperty.setProperty("IndexFilterOpen", "1")
-                                    Case AjaxOpenIndexFilterGetContent
-                                        '
-                                        ' should be converted to adminClass remoteMethod
-                                        '
-                                        Call visitProperty.setProperty("IndexFilterOpen", "1")
-                                        Dim adminSite As New Contensive.Addons.addon_AdminSiteClass(cp_forAddonExecutionOnly)
-                                        Dim ContentID As Integer = docProperties.getInteger("cid")
-                                        If ContentID = 0 Then
-                                            returnResult = "No filter is available"
-                                        Else
-                                            Dim cdef As cdefModel = metaData.getCdef(ContentID)
-                                            returnResult = adminSite.GetForm_IndexFilterContent(cdef)
-                                        End If
-                                        adminSite = Nothing
-                                    Case AjaxCloseIndexFilter
-                                        Call visitProperty.setProperty("IndexFilterOpen", "0")
-                                    Case AjaxOpenAdminNav
-                                        Call visitProperty.setProperty("AdminNavOpen", "1")
-                                    Case Else
-                                End Select
-                                '
-                                'Call AppendLog("main_init(), 2810 - exit for ajax hook")
-                                '
-                                webServer.webServerIO_BlockClosePageCopyright = True
-                                html_BlockClosePageLink = True
-                                'Call AppendLog("call main_getEndOfBody, from main_initf")
-                                returnResult = returnResult & htmlDoc.html_GetEndOfBody(False, False, True, False)
-                                Call htmlDoc.writeAltBuffer(returnResult)
-                                docOpen = False '--- should be disposed by caller --- Call dispose
-                                Return htmlDoc.docBuffer
-                            End If
-                        End If
-                        '
-                        '--------------------------------------------------------------------------
-                        '   Process Email Open and Click Intercepts
-                        '   works with DropID -> spacer.gif, or DropCssID -> styles.css
-                        '--------------------------------------------------------------------------
-                        '
-                        If True Then
-                            Dim recordid As Integer
-                            Dim emailDropId As Integer
-                            Dim RedirectLink As String
-                            Dim EmailMemberID As Integer
-                            Dim CSLog As Integer
-                            Dim EmailSpamBlock As String
-                            recordid = 0
-                            emailDropId = docProperties.getInteger(RequestNameEmailOpenFlag)
-                            If emailDropId <> 0 Then
-                                recordid = emailDropId
-                            End If
-                            '    End If
-                            If (recordid <> 0) Then
-                                '
-                                ' ----- Email open detected. Log it and redirect to a 1x1 spacer
-                                '
-                                EmailMemberID = docProperties.getInteger(RequestNameEmailMemberID)
-                                CSLog = db.cs_insertRecord("Email Log")
-                                If db.cs_ok(CSLog) Then
-                                    Call db.cs_set(CSLog, "Name", "Opened " & CStr(app_startTime))
-                                    Call db.cs_set(CSLog, "EmailDropID", recordid)
-                                    Call db.cs_set(CSLog, "MemberID", EmailMemberID)
-                                    Call db.cs_set(CSLog, "LogType", EmailLogTypeOpen)
-                                End If
-                                Call db.cs_Close(CSLog)
-                                RedirectLink = webServer.webServerIO_requestProtocol & webServer.requestDomain & "/ccLib/images/spacer.gif"
-                                Call webServer.webServerIO_Redirect2(RedirectLink, "Group Email Open hit, redirecting to a dummy image", False)
-                            End If
-                            '
-                            emailDropId = docProperties.getInteger(RequestNameEmailClickFlag)
-                            EmailSpamBlock = docProperties.getText(RequestNameEmailSpamFlag)
-                            If (emailDropId <> 0) And (EmailSpamBlock = "") Then
-                                '
-                                ' ----- Email click detected. Log it.
-                                '
-                                EmailMemberID = docProperties.getInteger(RequestNameEmailMemberID)
-                                CSLog = db.cs_insertRecord("Email Log")
-                                If db.cs_ok(CSLog) Then
-                                    Call db.cs_set(CSLog, "Name", "Clicked " & CStr(app_startTime))
-                                    Call db.cs_set(CSLog, "EmailDropID", emailDropId)
-                                    Call db.cs_set(CSLog, "MemberID", EmailMemberID)
-                                    Call db.cs_set(CSLog, "VisitId", authContext.visit.ID)
-                                    Call db.cs_set(CSLog, "LogType", EmailLogTypeClick)
-                                End If
-                                Call db.cs_Close(CSLog)
-                            End If
-                            If EmailSpamBlock <> "" Then
-                                '
-                                ' ----- Email spam footer was clicked, clear the AllowBulkEmail field
-                                '
-                                Call email.addToBlockList(EmailSpamBlock)
-                                '
-                                CSLog = db.cs_open("people", "email=" & db.encodeSQLText(EmailSpamBlock), , , , , , "AllowBulkEmail")
-                                Do While db.cs_ok(CSLog)
-                                    Call db.cs_set(CSLog, "AllowBulkEmail", False)
-                                    Call db.cs_goNext(CSLog)
-                                Loop
-                                Call db.cs_Close(CSLog)
-                                '
-                                ' ----- Make a log entry to track the result of this email drop
-                                '
-                                emailDropId = docProperties.getInteger(RequestNameEmailBlockRequestDropID)
-                                If emailDropId <> 0 Then
-                                    '
-                                    ' ----- Email click detected. Log it.
-                                    '
-                                    EmailMemberID = docProperties.getInteger(RequestNameEmailMemberID)
-                                    CSLog = db.cs_insertRecord("Email Log")
-                                    If db.cs_ok(CSLog) Then
-                                        Call db.cs_set(CSLog, "Name", "Email Block Request " & CStr(app_startTime))
-                                        Call db.cs_set(CSLog, "EmailDropID", emailDropId)
-                                        Call db.cs_set(CSLog, "MemberID", EmailMemberID)
-                                        Call db.cs_set(CSLog, "VisitId", authContext.visit.ID)
-                                        Call db.cs_set(CSLog, "LogType", EmailLogTypeBlockRequest)
-                                    End If
-                                    Call db.cs_Close(CSLog)
-                                End If
-                                Call webServer.webServerIO_Redirect2(webServer.webServerIO_requestProtocol & webServer.requestDomain & "/ccLib/popup/EmailBlocked.htm", "Group Email Spam Block hit. Redirecting to EmailBlocked page.", False)
-                            End If
-                        End If
-                        '
-                        '--------------------------------------------------------------------------
-                        '   Process Intercept Pages
-                        '       must be before main_Get Intercept Pages
-                        '       must be before path block, so a login will main_Get you through
-                        '       must be before verbose check, so a change is reflected on this page
-                        '--------------------------------------------------------------------------
-                        '
-                        If True Then
-                            Dim formType As String
-                            Dim StyleSN As Integer
-                            formType = docProperties.getText("type")
-                            If (formType <> "") Then
-                                '
-                                ' set the meta content flag to show it is not needed for the head tag
-                                '
-                                Call main_SetMetaContent(0, 0)
-                                Select Case formType
-                                    Case FormTypeSiteStyleEditor
-                                        If authContext.isAuthenticated() And authContext.isAuthenticatedAdmin(Me) Then
-                                            '
-                                            ' Save the site sites
-                                            '
-                                            Call appRootFiles.saveFile(DynamicStylesFilename, docProperties.getText("SiteStyles"))
-                                            If docProperties.getBoolean(RequestNameInlineStyles) Then
-                                                '
-                                                ' Inline Styles
-                                                '
-                                                Call siteProperties.setProperty("StylesheetSerialNumber", "0")
-                                            Else
-                                                '
-                                                ' Linked Styles
-                                                ' Bump the Style Serial Number so next fetch is not cached
-                                                '
-                                                StyleSN = siteProperties.getinteger("StylesheetSerialNumber", 0)
-                                                StyleSN = StyleSN + 1
-                                                Call siteProperties.setProperty("StylesheetSerialNumber", genericController.encodeText(StyleSN))
-                                                '
-                                                ' Save new public stylesheet
-                                                '
-                                                Call appRootFiles.saveFile("templates\Public" & StyleSN & ".css", pages.pageManager_GetStyleSheet)
-                                                Call appRootFiles.saveFile("templates\Admin" & StyleSN & ".css", pages.pageManager_GetStyleSheetDefault)
-                                            End If
-                                        End If
-                                    Case FormTypeAddonStyleEditor
-                                        '
-                                        ' save custom styles
-                                        '
-                                        If authContext.isAuthenticated() And authContext.isAuthenticatedAdmin(Me) Then
-                                            Dim addonId As Integer
-                                            Dim contentName As String = ""
-                                            Dim tableName As String
-                                            Dim nothingObject As Object = Nothing
-                                            Dim cs As Integer
-                                            addonId = docProperties.getInteger("AddonID")
-                                            cs = csOpen(cnAddons, addonId)
-                                            If db.cs_ok(cs) Then
-                                                Call db.cs_set(cs, "CustomStylesFilename", docProperties.getText("CustomStyles"))
-                                            End If
-                                            Call db.cs_Close(cs)
-                                            '
-                                            ' Clear Caches
-                                            '
-                                            Call pages.cache_pageContent_clear()
-                                            Call pages.pageManager_cache_pageTemplate_clear()
-                                            Call pages.pageManager_cache_siteSection_clear()
-                                            'Call cache.invalidateObjectList("")
-                                            If contentName <> "" Then
-                                                Call cache.invalidateContent(contentName)
-                                                tableName = GetContentTablename(contentName)
-                                                If genericController.vbLCase(tableName) = "cctemplates" Then
-                                                    Call cache.setObject(pagesController.cache_pageTemplate_cacheName, nothingObject)
-                                                    Call pages.pageManager_cache_pageTemplate_load()
-                                                End If
-                                            End If
-                                        End If
-                                    Case FormTypeAddonSettingsEditor
-                                        '
-                                        '
-                                        '
-                                        Call htmlDoc.pageManager_ProcessAddonSettingsEditor()
-                                    Case FormTypeHelpBubbleEditor
-                                        '
-                                        '
-                                        '
-                                        Call htmlDoc.main_ProcessHelpBubbleEditor()
-                                    Case FormTypeJoin
-                                        '
-                                        '
-                                        '
-                                        Call htmlDoc.processFormJoin()
-                                    Case FormTypeSendPassword
-                                        '
-                                        '
-                                        '
-                                        Call htmlDoc.processFormSendPassword()
-                                    Case FormTypeLogin, "l09H58a195"
-                                        '
-                                        '
-                                        '
-                                        Call htmlDoc.processFormLoginDefault()
-                                    Case FormTypeToolsPanel
-                                        '
-                                        ' ----- Administrator Tools Panel
-                                        '
-                                        Call htmlDoc.pageManager_ProcessFormToolsPanel()
-                                    Case FormTypePageAuthoring
-                                        '
-                                        ' ----- Page Authoring Tools Panel
-                                        '
-                                        Call pages.pageManager_ProcessFormQuickEditing()
-                                    Case FormTypeActiveEditor
-                                        '
-                                        ' ----- Active Editor
-                                        '
-                                        Call main_ProcessActiveEditor()
-                                End Select
-                            End If
-                        End If
-                        '
-                        '--------------------------------------------------------------------------
-                        ' Process HardCoded Methods
-                        ' must go after form processing bc some of these pages have forms that are processed
-                        '--------------------------------------------------------------------------
-                        '
-                        Dim HardCodedPage As String
-                        HardCodedPage = docProperties.getText(RequestNameHardCodedPage)
-                        If (HardCodedPage <> "") Then
-                            '
-                            'Call AppendLog("main_init(), 3110 - exit for hardcodedpage hook")
-                            '
-                            Dim ExitNow As Boolean = executeRoute_hardCodedPage(HardCodedPage)
-                            If ExitNow Then
-                                docOpen = False '--- should be disposed by caller --- Call dispose
-                                Return htmlDoc.docBuffer
-                            End If
-                        End If
-                        '
-                        '--------------------------------------------------------------------------
-                        ' normalize adminRoute and test for hit
-                        '--------------------------------------------------------------------------
-                        '
-                        If (workingRoute = genericController.normalizeRoute(adminRoute)) Then
-                            '
-                            'debugLog("executeRoute, route is admin")
-                            '
-                            '--------------------------------------------------------------------------
-                            ' route is admin
-                            '   If the Then admin route Is taken -- the login panel processing Is bypassed. those methods need To be a different kind Of route, Or it should be an addon
-                            '   runAtServerClass in the admin addon.
-                            '--------------------------------------------------------------------------
-                            '
-                            Dim returnStatusOK As Boolean = False
-                            '
-                            ' REFACTOR -- when admin code is broken cleanly into an addon, run it through execute
-                            '
-                            'returnResult = executeAddon(0, adminSiteAddonGuid, "", CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "", False, 0, "", returnStatusOK, Nothing, "", Nothing, "", authcontext.user.userid, visit.visitAuthenticated)
-                            '
-                            ' until then, run it as an internal class
-                            '
-                            Dim admin As New Contensive.Addons.addon_AdminSiteClass()
-                            returnResult = admin.execute(cp_forAddonExecutionOnly).ToString()
-                        Else
-                            '--------------------------------------------------------------------------
-                            ' default routing addon takes what is left
-                            '
-                            ' Here was read a site property set to the default addon. Might be performanceCloud-type web application. Might be page-manager
-                            '
-                            '--------------------------------------------------------------------------
-                            '
-                            'debugLog("executeRoute, route is Default Route AddonId")
-                            '
-                            Dim defaultAddonId As Integer = siteProperties.getinteger("Default Route AddonId")
-                            If (defaultAddonId = 0) Then
-                                '
-                                ' -- no default route set, assume html hit
-                                returnResult = "<p>This site is not configured for website traffic. Please set the default route.</p>"
-                            Else
-                                Dim addonStatusOk As Boolean = False
-                                returnResult = addon.execute(defaultAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", addonStatusOk, Nothing, "", Nothing, "", authContext.user.ID, authContext.visit.VisitAuthenticated)
-                                If (Not addonStatusOk) Then
-                                    '
-                                    ' -- there was an error in the default route addon
-                                    returnResult = "<p>This site is temporarily unavailable.</p>"
-                                Else
-                                End If
-                            End If
-                        End If
-                    End If
-                End If
-            Catch ex As Exception
-                handleExceptionLegacyRow2(ex, "cpCoreClass", System.Reflection.MethodInfo.GetCurrentMethod.Name, "Unexpected Exception")
-            End Try
-            Return returnResult
-        End Function
         '
         '====================================================================================================
         ''' <summary>
@@ -14236,24 +13607,6 @@ ErrorTrap:
                 Throw (ex)
             End Try
             Return returnIsGuid
-        End Function
-        '
-        '============================================================================
-        '
-        Public Function common_getHttpRequest(url As String) As IO.Stream
-            Dim returnstream As IO.Stream = Nothing
-            Try
-                Dim rq As System.Net.WebRequest
-                Dim response As System.Net.WebResponse
-                '
-                rq = System.Net.WebRequest.Create(url)
-                rq.Timeout = 60000
-                response = rq.GetResponse()
-                returnstream = response.GetResponseStream()
-            Catch ex As Exception
-                Throw (ex)
-            End Try
-            Return returnstream
         End Function
         '
         '============================================================================

@@ -3814,7 +3814,7 @@ ErrorTrap:
                 ' Return the content of the file
                 '
 
-                Call cpCore.webServer.webServerIO_setResponseContentType("text/text")
+                Call cpCore.webServer.setResponseContentType("text/text")
                 Call cpCore.htmlDoc.writeAltBuffer(cpCore.appRootFiles.readFile(cpCore.docProperties.getText("SourceFile")))
                 Call cpCore.doc_close()
                 'GetForm_LogFiles_Details = cpCore.app.publicFiles.ReadFile(cpCore.main_GetStreamText2("SourceFile"))
@@ -3866,7 +3866,7 @@ ErrorTrap:
                             FileSize = LineSplit(5)
                             FileDate = LineSplit(3)
                             FileURL = StartPath & CurrentPath & "\" & Filename
-                            QueryString = cpCore.web_RefreshQueryString
+                            QueryString = cpCore.htmlDoc.refreshQueryString
                             QueryString = genericController.ModifyQueryString(QueryString, RequestNameAdminForm, CStr(AdminFormTool), True)
                             QueryString = genericController.ModifyQueryString(QueryString, "at", AdminFormToolLogFileView, True)
                             QueryString = genericController.ModifyQueryString(QueryString, "SourceFile", FileURL, True)

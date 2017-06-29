@@ -120,11 +120,7 @@ Namespace Contensive.Core
         ''' <returns></returns>
         Public Overrides ReadOnly Property pageId() As Integer
             Get
-                If True Then
-                    Return cpCore.pages.currentPageID
-                Else
-                    Return 0
-                End If
+                Return cpCore.pages.currentPageID
             End Get
         End Property
         '
@@ -135,16 +131,7 @@ Namespace Contensive.Core
         ''' <returns></returns>
         Public Overrides ReadOnly Property pageName() As String
             Get
-                Dim s As String
-                If True Then
-                    s = cpCore.pages.currentPageName
-                    If (s Is Nothing) Then
-                        s = ""
-                    End If
-                    Return s
-                Else
-                    Return ""
-                End If
+                Return cpCore.pages.currentPageName
             End Get
         End Property
         '
@@ -155,16 +142,7 @@ Namespace Contensive.Core
         ''' <returns></returns>
         Public Overrides ReadOnly Property refreshQueryString() As String
             Get
-                Dim s As String
-                If True Then
-                    s = cpCore.web_RefreshQueryString
-                    If (s Is Nothing) Then
-                        s = ""
-                    End If
-                    Return s
-                Else
-                    Return ""
-                End If
+                Return cpCore.htmlDoc.refreshQueryString
             End Get
         End Property
         '
@@ -175,11 +153,7 @@ Namespace Contensive.Core
         ''' <returns></returns>
         Public Overrides ReadOnly Property sectionId() As Integer
             Get
-                If True Then
-                    Return cpCore.pages.currentSectionID
-                Else
-                    Return 0
-                End If
+                Return cpCore.pages.currentSectionID
             End Get
         End Property
         '

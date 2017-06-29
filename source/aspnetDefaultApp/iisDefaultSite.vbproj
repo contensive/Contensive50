@@ -111,9 +111,6 @@
     <Content Include="ccLib\ClientSide\mktree.js" />
     <Content Include="ccLib\ClientSide\tdpopup.htm" />
     <Content Include="ccLib\Config\aoSample.xml" />
-    <Content Include="ccLib\Config\ccBase-PreFieldHtml.xml" />
-    <Content Include="ccLib\Config\ccBase-r2.xml" />
-    <Content Include="ccLib\Config\ccBase.xml" />
     <Content Include="ccLib\Config\ccCountries.xml" />
     <Content Include="ccLib\Config\CDefCompatibility21.xml" />
     <Content Include="ccLib\Config\CDefMemberSmart.xml" />

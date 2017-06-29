@@ -11,7 +11,6 @@ Imports Contensive.Core.Controllers.genericController
 Namespace Contensive.Core.Controllers
     '
     Public Class pagesController
-        Inherits Contensive.BaseClasses.AddonBaseClass
         '
         ' -- not sure if this is the best plan, buts lets try this and see if we can get out of it later (to make this an addon) 
         Private cpcore As coreClass
@@ -128,23 +127,1329 @@ Namespace Contensive.Core.Controllers
             Me.cpcore = cpCore
         End Sub
         '
-        '====================================================================================================
-        ''' <summary>
-        ''' future pageManager addon interface
-        ''' </summary>
-        ''' <param name="cp"></param>
-        ''' <returns></returns>
-        Public Overrides Function execute(cp As Contensive.BaseClasses.CPBaseClass) As Object
+        '=============================================================================
+        '   pageManager_GetHtmlBody_GetSection_GetContent
+        '
+        '   PageID is the page to display. If it is 0, the root page is displayed
+        '   RootPageID has to be the ID of the root page for PageID
+        '=============================================================================
+        '
+        Public Function getContentBox(PageID As Integer, rootPageId As Integer, RootPageContentName As String, OrderByClause As String, AllowChildPageList As Boolean, AllowReturnLink As Boolean, ArchivePages As Boolean, SectionID As Integer, UseContentWatchLink As Boolean, allowPageWithoutSectionDisplay As Boolean) As String
             Dim returnHtml As String = ""
             Try
                 '
+                Dim ParentPtr As Integer
+
+                Dim AddonName As String
+                Dim addonCachePtr As Integer
+                Dim addonPtr As Integer
+                Dim AddOnCnt As Integer
+                Dim layoutError As String
+                Dim addonId As Integer
+                Dim AddonContent As String
+                Dim Err_Number As Integer
+                Dim Err_Source As String
+                Dim Err_Description As String
+                Dim DateModified As Date
+                Dim ErrString As String
+                Dim JSOnLoad As String
+                Dim JSHead As String
+                Dim JSFilename As String
+                Dim JSCopy As String
+                Dim JSEndBody As String
+                Dim PageRecordID As Integer
+                Dim ContentPadding As Integer
+                Dim Copy As String
+                Dim RQS As String
+                Dim Body As String
+                Dim PageName As String
+                Dim AllowHitNotification As Boolean
+                'Dim cacheName As String
+                Dim RootPageContentCID As Integer
+                Dim PageContentCID As Integer
+                Dim DateExpires As Date
+                Dim dateArchive As Date
+                Dim BakeExpires As Date
+                Dim iRootPageContentName As String
+                Dim PubDate As Date
+                Dim PagePointer As Integer
+                Dim CS As Integer
+                Dim LineBuffer As String
+                Dim LineSplit() As String
+                'Dim RecordID as integer
+                'Dim ContentID as integer
+                'Dim ContentName As String
+                Dim BlockedRecordIDList As String
+                Dim Pointer As Integer
+                Dim SQL As String
+                Dim ContentBlocked As Boolean
+                Dim RecordCount As Integer
+                Dim RecordSplit() As String
+                Dim BakeHeader As String
+                Dim Delimiter As String
+                Dim BakedStructure As String
+                'Dim AuthoringMode As Boolean
+                Dim NewPageCreated As Boolean
+                Dim LineLeft As String
+                Dim LineRight As String
+                Dim LinePosition As Integer
+                Dim SelectFieldList As String
+                'dim buildversion As String
+                Dim contactMemberID As Integer
+                Dim BakeVersion As String
+                'Dim AllowPageBaking As Boolean
+                Dim SystemEMailID As Integer
+                Dim ConditionID As Integer
+                Dim ConditionGroupID As Integer
+                Dim main_AddGroupID As Integer
+                Dim RemoveGroupID As Integer
+                Dim BlockSourceID As Integer
+                Dim RegistrationGroupID As Integer
+                Dim CustomBlockMessageFilename As String
+                Dim BlockedPages() As String
+                Dim BlockedPageRecordID As Integer
+                Dim BlockForm As String
+                Dim BlockCopy As String
+                Dim PCCPtr As Integer
+                Dim pageViewings As Integer
                 '
+                ' BuildVersion = app.dataBuildVersion
                 '
+                ' If no PageRecordID, use the RootPage
+                '
+                PageRecordID = PageID
+                If PageRecordID = 0 Then
+                    PageRecordID = rootPageId
+                End If
+                If PageRecordID = 0 Then
+                    '
+                    ' no page and no root page, redirect to landing page
+                    '
+                    Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
+                    pageManager_RedirectBecausePageNotFound = True
+                    pageManager_RedirectReason = "The page could not be determined from URL."
+                    redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
+                Else
+                    '
+                    ' PageRecordID and RootPageID are good
+                    '
+                    Call cpcore.htmlDoc.main_AddHeadTag2("<meta name=""contentId"" content=""" & PageRecordID & """ >", "page content")
+                    '
+                    'main_oldCacheArray_CurrentPagePtr = -1
+                    If RootPageContentName = "" Then
+                        iRootPageContentName = "Page Content"
+                    Else
+                        iRootPageContentName = RootPageContentName
+                    End If
+                    RootPageContentCID = cpcore.main_GetContentID(iRootPageContentName)
+                    '
+                    '---------------------------------------------------------------------------------
+                    ' ----- Build Page if needed
+                    '---------------------------------------------------------------------------------
+                    '
+                    returnHtml = getContentBox_content(PageRecordID, rootPageId, iRootPageContentName, OrderByClause, AllowChildPageList, AllowReturnLink, ArchivePages, SectionID, UseContentWatchLink, allowPageWithoutSectionDisplay)
+                    If (returnHtml <> "") And (redirectLink = "") Then
+                        '
+                        ' This page is correct, main_Get the RecordID for later
+                        '
+                        NewPageCreated = True
+                        BlockedRecordIDList = ""
+                        If main_RenderCache_CurrentPage_PCCPtr >= 0 Then
+                            '
+                            ' Build the BlockedRecordIDList
+                            '
+                            PCCPtr = main_RenderCache_CurrentPage_PCCPtr
+                            If genericController.EncodeBoolean(cache_pageContent(PCC_BlockContent, PCCPtr)) Or genericController.EncodeBoolean(cache_pageContent(PCC_BlockPage, PCCPtr)) Then
+                                BlockedRecordIDList = BlockedRecordIDList & "," & genericController.encodeText(cache_pageContent(PCC_ID, PCCPtr))
+                            End If
+                            If main_RenderCache_ParentBranch_PCCPtrCnt > 0 Then
+                                For ParentPtr = 0 To main_RenderCache_ParentBranch_PCCPtrCnt - 1
+                                    PCCPtr = genericController.EncodeInteger(main_RenderCache_ParentBranch_PCCPtrs(ParentPtr))
+                                    If genericController.EncodeBoolean(cache_pageContent(PCC_BlockContent, PCCPtr)) Or genericController.EncodeBoolean(cache_pageContent(PCC_BlockPage, PCCPtr)) Then
+                                        BlockedRecordIDList = BlockedRecordIDList & "," & genericController.encodeText(cache_pageContent(PCC_ID, PCCPtr))
+                                    End If
+                                Next
+                            End If
+                            If BlockedRecordIDList <> "" Then
+                                BlockedRecordIDList = Mid(BlockedRecordIDList, 2)
+                            End If
+                        End If
+                    End If
+                    '
+                    JSOnLoad = genericController.encodeText(cache_pageContent(PCC_JSOnLoad, main_RenderCache_CurrentPage_PCCPtr))
+                    JSHead = genericController.encodeText(cache_pageContent(PCC_JSHead, main_RenderCache_CurrentPage_PCCPtr))
+                    JSFilename = genericController.encodeText(cache_pageContent(PCC_JSFilename, main_RenderCache_CurrentPage_PCCPtr))
+                    JSEndBody = genericController.encodeText(cache_pageContent(PCC_JSEndBody, main_RenderCache_CurrentPage_PCCPtr))
+                    DateModified = genericController.EncodeDate(cache_pageContent(PCC_ModifiedDate, main_RenderCache_CurrentPage_PCCPtr))
+                    '
+                    ' Save currentNavigationStructure in the Legacy Name
+                    '
+                    'pageManager_ContentPageStructure = currentNavigationStructure
+                    '
+                    '---------------------------------------------------------------------------------
+                    ' ----- If Link field populated, do redirect
+                    '---------------------------------------------------------------------------------
+                    '
+                    Dim Link As String
+                    If (redirectLink = "") Then
+                        Link = genericController.encodeText(cache_pageContent(PCC_Link, main_RenderCache_CurrentPage_PCCPtr))
+                        If (Link <> "") Then
+                            Call cpcore.db.executeSql("update ccpagecontent set clicks=clicks+1 where id=" & currentPageID)
+                            redirectLink = Link
+                            pageManager_RedirectReason = "Redirect required because this page (PageRecordID=" & currentPageID & ") has a Link Override [" & redirectLink & "]."
+                        End If
+                    End If
+                    '
+                    '---------------------------------------------------------------------------------
+                    ' ----- If Redirect, exit now
+                    '---------------------------------------------------------------------------------
+                    '
+                    If redirectLink <> "" Then
+                        Exit Function
+                    End If
+                    '
+                    '---------------------------------------------------------------------------------
+                    ' ----- Content Blocking
+                    '---------------------------------------------------------------------------------
+                    '
+                    If (BlockedRecordIDList <> "") Then
+                        If cpcore.authContext.isAuthenticatedAdmin(cpcore) Then
+                            '
+                            ' Administrators are never blocked
+                            '
+                        ElseIf (Not cpcore.authContext.isAuthenticated()) Then
+                            '
+                            ' non-authenticated are always blocked
+                            '
+                            ContentBlocked = True
+                        Else
+                            '
+                            ' Check Access Groups, if in access groups, remove group from BlockedRecordIDList
+                            '
+                            SQL = "SELECT DISTINCT ccPageContentBlockRules.RecordID" _
+                            & " FROM (ccPageContentBlockRules" _
+                            & " LEFT JOIN ccgroups ON ccPageContentBlockRules.GroupID = ccgroups.ID)" _
+                            & " LEFT JOIN ccMemberRules ON ccgroups.ID = ccMemberRules.GroupID" _
+                            & " WHERE (((ccMemberRules.MemberID)=" & cpcore.db.encodeSQLNumber(cpcore.authContext.user.ID) & ")" _
+                            & " AND ((ccPageContentBlockRules.RecordID) In (" & BlockedRecordIDList & "))" _
+                            & " AND ((ccPageContentBlockRules.Active)<>0)" _
+                            & " AND ((ccgroups.Active)<>0)" _
+                            & " AND ((ccMemberRules.Active)<>0)" _
+                            & " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" & cpcore.db.encodeSQLDate(cpcore.app_startTime) & "));"
+                            CS = cpcore.db.cs_openSql(SQL)
+                            BlockedRecordIDList = "," & BlockedRecordIDList
+                            Do While cpcore.db.cs_ok(CS)
+                                BlockedRecordIDList = genericController.vbReplace(BlockedRecordIDList, "," & cpcore.db.cs_getText(CS, "RecordID"), "")
+                                cpcore.db.cs_goNext(CS)
+                            Loop
+                            Call cpcore.db.cs_Close(CS)
+                            If BlockedRecordIDList <> "" Then
+                                '
+                                ' ##### remove the leading comma
+                                BlockedRecordIDList = Mid(BlockedRecordIDList, 2)
+                                ' Check the remaining blocked records against the members Content Management
+                                ' ##### removed hardcoded mistakes from the sql
+                                SQL = "SELECT DISTINCT ccPageContent.ID as RecordID" _
+                                & " FROM ((ccPageContent" _
+                                & " LEFT JOIN ccGroupRules ON ccPageContent.ContentControlID = ccGroupRules.ContentID)" _
+                                & " LEFT JOIN ccgroups AS ManagementGroups ON ccGroupRules.GroupID = ManagementGroups.ID)" _
+                                & " LEFT JOIN ccMemberRules AS ManagementMemberRules ON ManagementGroups.ID = ManagementMemberRules.GroupID" _
+                                & " WHERE (((ccPageContent.ID) In (" & BlockedRecordIDList & "))" _
+                                & " AND ((ccGroupRules.Active)<>0)" _
+                                & " AND ((ManagementGroups.Active)<>0)" _
+                                & " AND ((ManagementMemberRules.Active)<>0)" _
+                                & " AND ((ManagementMemberRules.DateExpires) Is Null Or (ManagementMemberRules.DateExpires)>" & cpcore.db.encodeSQLDate(cpcore.app_startTime) & ")" _
+                                & " AND ((ManagementMemberRules.MemberID)=" & cpcore.authContext.user.ID & " ));"
+                                CS = cpcore.db.cs_openSql(SQL)
+                                Do While cpcore.db.cs_ok(CS)
+                                    BlockedRecordIDList = genericController.vbReplace(BlockedRecordIDList, "," & cpcore.db.cs_getText(CS, "RecordID"), "")
+                                    cpcore.db.cs_goNext(CS)
+                                Loop
+                                Call cpcore.db.cs_Close(CS)
+                            End If
+                            If BlockedRecordIDList <> "" Then
+                                ContentBlocked = True
+                            End If
+                            Call cpcore.db.cs_Close(CS)
+                        End If
+                    End If
+                    '
+                    '
+                    '
+                    If ContentBlocked Then
+                        BlockSourceID = main_BlockSourceDefaultMessage
+                        ContentPadding = 20
+                        BlockedPages = Split(BlockedRecordIDList, ",")
+                        BlockedPageRecordID = genericController.EncodeInteger(BlockedPages(UBound(BlockedPages)))
+                        If True Then
+                            If BlockedPageRecordID <> 0 Then
+                                '$$$$$ cache this
+                                CS = cpcore.csOpen("Page Content", BlockedPageRecordID, , , "CustomBlockMessage,BlockSourceID,RegistrationGroupID,ContentPadding")
+                                If cpcore.db.cs_ok(CS) Then
+                                    BlockSourceID = cpcore.db.cs_getInteger(CS, "BlockSourceID")
+                                    ContentPadding = cpcore.db.cs_getInteger(CS, "ContentPadding")
+                                    CustomBlockMessageFilename = cpcore.db.cs_getText(CS, "CustomBlockMessage")
+                                    RegistrationGroupID = cpcore.db.cs_getInteger(CS, "RegistrationGroupID")
+                                End If
+                                Call cpcore.db.cs_Close(CS)
+                            End If
+                        End If
+                        '
+                        ' Block Appropriately
+                        '
+                        Select Case BlockSourceID
+                            Case main_BlockSourceCustomMessage
+                                '
+                                ' ----- Custom Message
+                                '
+                                returnHtml = cpcore.cdnFiles.readFile(CustomBlockMessageFilename)
+                            Case main_BlockSourceLogin
+                                '
+                                ' ----- Login page
+                                '
+                                If Not cpcore.authContext.isAuthenticated() Then
+                                    If Not cpcore.authContext.isRecognized(cpcore) Then
+                                        '
+                                        ' not recognized
+                                        '
+                                        BlockCopy = "" _
+                                        & "<p>This content has limited access. If you have an account, please login using this form.</p>" _
+                                        & ""
+                                        BlockForm = cpcore.htmlDoc.getLoginForm()
+                                    Else
+                                        '
+                                        ' recognized, not authenticated
+                                        '
+                                        BlockCopy = "" _
+                                        & "<p>This content has limited access. You were recognized as ""<b>" & cpcore.authContext.user.Name & "</b>"", but you need to login to continue. To login to this account or another, please use this form.</p>" _
+                                        & ""
+                                        BlockForm = cpcore.htmlDoc.getLoginForm()
+                                    End If
+                                Else
+                                    '
+                                    ' authenticated
+                                    '
+                                    BlockCopy = "" _
+                                    & "<p>You are currently logged in as ""<b>" & cpcore.authContext.user.Name & "</b>"". If this is not you, please <a href=""?" & cpcore.htmlDoc.refreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
+                                    & "<p>This account does not have access to this content. If you want to login with a different account, please use this form.</p>" _
+                                    & ""
+                                    BlockForm = cpcore.htmlDoc.getLoginForm()
+                                End If
+                                returnHtml = "" _
+                                & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td align=center>" _
+                                & "<div style=""width:400px;text-align:left;"">" _
+                                & cpcore.error_GetUserError() _
+                                & BlockCopy _
+                                & BlockForm _
+                                & "</div></td></tr></table>"
+                            Case main_BlockSourceRegistration
+                                '
+                                ' ----- Registration
+                                '
+                                If cpcore.docProperties.getInteger("subform") = main_BlockSourceLogin Then
+                                    '
+                                    ' login subform form
+                                    '
+                                    BlockForm = cpcore.htmlDoc.getLoginForm()
+                                    BlockCopy = "" _
+                                    & "<p>This content has limited access. If you have an account, please login using this form.</p>" _
+                                    & "<p>If you do not have an account, <a href=?" & cpcore.htmlDoc.refreshQueryString & "&subform=0>click here to register</a>.</p>" _
+                                    & ""
+                                Else
+                                    '
+                                    ' Register Form
+                                    '
+                                    If Not cpcore.authContext.isAuthenticated() And cpcore.authContext.isRecognized(cpcore) Then
+                                        '
+                                        ' Can not take the chance, if you go to a registration page, and you are recognized but not auth -- logout first
+                                        '
+                                        Call cpcore.authContext.logout(cpcore)
+                                    End If
+                                    If Not cpcore.authContext.isAuthenticated() Then
+                                        '
+                                        ' Not Authenticated
+                                        '
+                                        BlockCopy = "" _
+                                        & "<p>This content has limited access. If you have an account, <a href=?" & cpcore.htmlDoc.refreshQueryString & "&subform=" & main_BlockSourceLogin & ">Click Here to login</a>.</p>" _
+                                        & "<p>To view this content, please complete this form.</p>" _
+                                        & ""
+                                    Else
+                                        BlockCopy = "" _
+                                        & "<p>You are currently logged in as ""<b>" & cpcore.authContext.user.Name & "</b>"". If this is not you, please <a href=""?" & cpcore.htmlDoc.refreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
+                                        & "<p>This account does not have access to this content. To view this content, please complete this form.</p>" _
+                                        & ""
+                                    End If
+                                    '
+                                    If False Then '.3.551" Then
+                                        '
+                                        ' Old Db - use Joinform
+                                        '
+                                        'BlockForm = main_GetJoinForm()
+                                    Else
+                                        '
+                                        ' Use Registration FormPage
+                                        '
+                                        Call verifyRegistrationFormPage(cpcore)
+                                        BlockForm = pageManager_GetFormPage("Registration Form", RegistrationGroupID)
+                                    End If
+                                End If
+                                returnHtml = "" _
+                                & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td align=center>" _
+                                & "<div style=""width:400px;text-align:left;"">" _
+                                & cpcore.error_GetUserError() _
+                                & BlockCopy _
+                                & BlockForm _
+                                & "</div></td></tr></table>"
+                            Case Else
+                                '
+                                ' ----- Content as blocked - convert from site property to content page
+                                '
+                                returnHtml = pageManager_GetDefaultBlockMessage(UseContentWatchLink)
+                        End Select
+                        '
+                        ' If the output is blank, put default message in
+                        '
+                        If returnHtml = "" Then
+                            returnHtml = pageManager_GetDefaultBlockMessage(UseContentWatchLink)
+                        End If
+                        '
+                        ' Encode the copy
+                        '
+                        returnHtml = cpcore.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.ID, cpcore.authContext.isAuthenticated, layoutError)
+                        returnHtml = cpcore.htmlDoc.html_encodeContent9(returnHtml, cpcore.authContext.user.ID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+                        'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, 0, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
+                        RQS = cpcore.htmlDoc.refreshQueryString
+                        If RQS <> "" Then
+                            returnHtml = genericController.vbReplace(returnHtml, "?method=login", "?method=Login&" & RQS, 1, 99, vbTextCompare)
+                        End If
+                        '
+                        ' Add in content padding required for integration with the template
+                        '
+                        returnHtml = pageManager_GetContentBoxWrapper(returnHtml, ContentPadding)
+                    End If
+                    '
+                    '---------------------------------------------------------------------------------
+                    ' ----- Encoding, Tracking and Triggers
+                    '---------------------------------------------------------------------------------
+                    '
+                    '????? test triggers and trackcontentset
+                    If Not ContentBlocked Then
+                        'IsPrinterversion = main_GetStreamText2(RequestNameInterceptpage) = LegacyInterceptPageSNPrinterversion)
+                        If cpcore.visitProperty.getBoolean("AllowQuickEditor") Then
+                            '
+                            ' Quick Editor, no encoding or tracking
+                            '
+                        Else
+                            ' $$$$$ convert to pcc cache
+                            'SelectFieldList = "ID,Viewings,ContentControlID,ContactMemberID,AllowHitNotification,TriggerSendSystemEmailID,TriggerConditionID,TriggerConditionGroupID,TriggerAddGroupID,TriggerRemoveGroupID"
+                            '                If (currentPageID <> 0) And (main_RenderCache_CurrentPage_ContentId <> 0) Then
+                            '                    'pageManager_ContentName = metaData.getContentNameByID(main_RenderCache_CurrentPage_ContentId)
+                            '                    If main_RenderCache_CurrentPage_ContentName = "" Then
+                            '                        main_RenderCache_CurrentPage_ContentName = iRootPageContentName
+                            '                    End If
+                            '                    If main_RenderCache_CurrentPage_ContentName <> "" Then
+                            '                        CS = main_OpenCSContentRecord_Internal(main_RenderCache_CurrentPage_ContentName, currentPageID, , , SelectFieldList)
+                            '                    End If
+                            '                ElseIf (main_RenderCache_CurrentPage_ContentName <> "") Then
+                            '                    CS = main_OpenCSContentRecord_Internal(main_RenderCache_CurrentPage_ContentName, PageRecordID, , , SelectFieldList)
+                            '                End If
+                            'If app.csv_IsCSOK(CS) Then
+                            contactMemberID = genericController.EncodeInteger(cache_pageContent(PCC_ContactMemberID, main_RenderCache_CurrentPage_PCCPtr))
+                            pageViewings = genericController.EncodeInteger(cache_pageContent(PCC_Viewings, main_RenderCache_CurrentPage_PCCPtr))
+                            'contactMemberID = app.csv_cs_getInteger(CS, "ContactMemberID")
+                            If cpcore.authContext.isEditing(cpcore, main_RenderCache_CurrentPage_ContentName) Or cpcore.visitProperty.getBoolean("AllowWorkflowRendering") Then
+                                '
+                                ' Link authoring, workflow rendering -> do encoding, but no tracking
+                                '
+                                returnHtml = cpcore.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.ID, cpcore.authContext.isAuthenticated, layoutError)
+                                returnHtml = cpcore.htmlDoc.html_encodeContent9(returnHtml, cpcore.authContext.user.ID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+                            ElseIf cpcore.htmlDoc.pageManager_printVersion Then
+                                '
+                                ' Printer Version -> personalize and count viewings, no tracking
+                                '
+                                returnHtml = cpcore.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.ID, cpcore.authContext.isAuthenticated, layoutError)
+                                returnHtml = cpcore.htmlDoc.html_encodeContent9(returnHtml, cpcore.authContext.user.ID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+                                'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
+                                Call cpcore.db.executeSql("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & currentPageID)
+                                'Call app.csv_SetCS(CS, "Viewings", app.csv_cs_getInteger(CS, "Viewings") + 1)
+                            Else
+                                '
+                                ' Live content
+                                '
+                                '!!!!!!!!!!!!!!!!!!!!!!!!
+                                ' this should be done before the contentbox is added
+                                ' so a stray blocktext does not truncate the html
+                                '!!!!!!!!!!!!!!!!!!!!!!!!!
+                                returnHtml = cpcore.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.ID, cpcore.authContext.isAuthenticated, layoutError)
+                                returnHtml = cpcore.htmlDoc.html_encodeContent9(returnHtml, cpcore.authContext.user.ID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+                                'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
+                                'Call main_TrackContent(main_RenderCache_CurrentPage_ContentName, currentPageID)
+                                'Call main_TrackContentSet(CS)
+                                Call cpcore.db.executeSql("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & currentPageID)
+                                'Call app.csv_SetCS(CS, "Viewings", app.csv_cs_getInteger(CS, "Viewings") + 1)
+                            End If
+                            '
+                            ' Page Hit Notification
+                            '
+                            If (Not cpcore.authContext.visit.ExcludeFromAnalytics) And (contactMemberID <> 0) And (InStr(1, cpcore.webServer.requestBrowser, "kmahttp", vbTextCompare) = 0) Then
+                                AllowHitNotification = genericController.EncodeBoolean(cache_pageContent(PCC_AllowHitNotification, main_RenderCache_CurrentPage_PCCPtr))
+                                'AllowHitNotification = app.csv_cs_getBoolean(CS, "AllowHitNotification")
+                                If AllowHitNotification Then
+                                    PageName = genericController.encodeText(cache_pageContent(PCC_Name, main_RenderCache_CurrentPage_PCCPtr))
+                                    If PageName = "" Then
+                                        PageName = genericController.encodeText(cache_pageContent(PCC_MenuHeadline, main_RenderCache_CurrentPage_PCCPtr))
+                                        If PageName = "" Then
+                                            PageName = genericController.encodeText(cache_pageContent(PCC_Headline, main_RenderCache_CurrentPage_PCCPtr))
+                                            If PageName = "" Then
+                                                PageName = "[no name]"
+                                            End If
+                                        End If
+                                    End If
+                                    Body = Body & "<p><b>Page Hit Notification.</b></p>"
+                                    Body = Body & "<p>This email was sent to you by the Contensive Server as a notification of the following content viewing details.</p>"
+                                    Body = Body & genericController.StartTable(4, 1, 1)
+                                    Body = Body & "<tr><td align=""right"" width=""150"" Class=""ccPanelHeader"">Description<br><img alt=""image"" src=""http://" & cpcore.webServer.requestDomain & "/ccLib/images/spacer.gif"" width=""150"" height=""1""></td><td align=""left"" width=""100%"" Class=""ccPanelHeader"">Value</td></tr>"
+                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Domain", cpcore.webServer.webServerIO_requestDomain, True)
+                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Link", cpcore.webServer.webServerIO_ServerLink, False)
+                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Page Name", PageName, True)
+                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Member Name", cpcore.authContext.user.Name, False)
+                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Member #", CStr(cpcore.authContext.user.ID), True)
+                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Start Time", CStr(cpcore.authContext.visit.StartTime), False)
+                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit #", CStr(cpcore.authContext.visit.ID), True)
+                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit IP", cpcore.webServer.requestRemoteIP, False)
+                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Browser ", cpcore.webServer.requestBrowser, True)
+                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visitor #", CStr(cpcore.authContext.visitor.ID), False)
+                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Authenticated", CStr(cpcore.authContext.visit.VisitAuthenticated), True)
+                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Referrer", cpcore.authContext.visit.HTTP_REFERER, False)
+                                    Body = Body & kmaEndTable
+                                    Call cpcore.email.sendPerson(contactMemberID, cpcore.siteProperties.getText("EmailFromAddress", "info@" & cpcore.webServer.webServerIO_requestDomain), "Page Hit Notification", Body, False, True, 0, "", False)
+                                End If
+                            End If
+                            '
+                            ' Process Trigger Conditions
+                            '
+                            '   1) If Condition w/ Trigger Group
+                            '   2) Then Send Email
+                            '   3) Then Add to Group
+                            '   4) Then Remove From Group
+                            '
+                            ConditionID = genericController.EncodeInteger(cache_pageContent(PCC_TriggerConditionID, main_RenderCache_CurrentPage_PCCPtr))
+                            'ConditionID = app.csv_cs_getInteger(CS, "TriggerConditionID")
+                            ConditionGroupID = genericController.EncodeInteger(cache_pageContent(PCC_TriggerConditionGroupID, main_RenderCache_CurrentPage_PCCPtr))
+                            'ConditionGroupID = app.csv_cs_getInteger(CS, "TriggerConditionGroupID")
+                            main_AddGroupID = genericController.EncodeInteger(cache_pageContent(PCC_TriggerAddGroupID, main_RenderCache_CurrentPage_PCCPtr))
+                            'main_AddGroupID = app.csv_cs_getInteger(CS, "TriggerAddGroupID")
+                            RemoveGroupID = genericController.EncodeInteger(cache_pageContent(PCC_TriggerRemoveGroupID, main_RenderCache_CurrentPage_PCCPtr))
+                            'RemoveGroupID = app.csv_cs_getInteger(CS, "TriggerRemoveGroupID")
+                            SystemEMailID = genericController.EncodeInteger(cache_pageContent(PCC_TriggerSendSystemEmailID, main_RenderCache_CurrentPage_PCCPtr))
+                            'SystemEMailID = app.csv_cs_getInteger(CS, "TriggerSendSystemEmailID")
+                            Select Case ConditionID
+                                Case 1
+                                    '
+                                    ' Always
+                                    '
+                                    If SystemEMailID <> 0 Then
+                                        Call cpcore.email.sendSystem_Legacy(cpcore.content_GetRecordName("System Email", SystemEMailID), "", cpcore.authContext.user.ID)
+                                    End If
+                                    If main_AddGroupID <> 0 Then
+                                        Call cpcore.group_AddGroupMember(cpcore.group_GetGroupName(main_AddGroupID))
+                                    End If
+                                    If RemoveGroupID <> 0 Then
+                                        Call cpcore.group_DeleteGroupMember(cpcore.group_GetGroupName(RemoveGroupID))
+                                    End If
+                                Case 2
+                                    '
+                                    ' If in Condition Group
+                                    '
+                                    If ConditionGroupID <> 0 Then
+                                        If cpcore.authContext.IsMemberOfGroup2(cpcore, cpcore.group_GetGroupName(ConditionGroupID)) Then
+                                            If SystemEMailID <> 0 Then
+                                                Call cpcore.email.sendSystem_Legacy(cpcore.content_GetRecordName("System Email", SystemEMailID), "", cpcore.authContext.user.ID)
+                                            End If
+                                            If main_AddGroupID <> 0 Then
+                                                Call cpcore.group_AddGroupMember(cpcore.group_GetGroupName(main_AddGroupID))
+                                            End If
+                                            If RemoveGroupID <> 0 Then
+                                                Call cpcore.group_DeleteGroupMember(cpcore.group_GetGroupName(RemoveGroupID))
+                                            End If
+                                        End If
+                                    End If
+                                Case 3
+                                    '
+                                    ' If not in Condition Group
+                                    '
+                                    If ConditionGroupID <> 0 Then
+                                        If Not cpcore.authContext.IsMemberOfGroup2(cpcore, cpcore.group_GetGroupName(ConditionGroupID)) Then
+                                            If main_AddGroupID <> 0 Then
+                                                Call cpcore.group_AddGroupMember(cpcore.group_GetGroupName(main_AddGroupID))
+                                            End If
+                                            If RemoveGroupID <> 0 Then
+                                                Call cpcore.group_DeleteGroupMember(cpcore.group_GetGroupName(RemoveGroupID))
+                                            End If
+                                            If SystemEMailID <> 0 Then
+                                                Call cpcore.email.sendSystem_Legacy(cpcore.content_GetRecordName("System Email", SystemEMailID), "", cpcore.authContext.user.ID)
+                                            End If
+                                        End If
+                                    End If
+                            End Select
+                            'End If
+                            'Call app.closeCS(CS)
+                        End If
+                        '
+                        '---------------------------------------------------------------------------------
+                        ' ----- Add in ContentPadding (a table around content with the appropriate padding added)
+                        '---------------------------------------------------------------------------------
+                        '
+                        If True And (returnHtml <> "") Then
+                            ContentPadding = genericController.EncodeInteger(cache_pageContent(PCC_ContentPadding, main_RenderCache_CurrentPage_PCCPtr))
+                            returnHtml = pageManager_GetContentBoxWrapper(returnHtml, ContentPadding)
+                        End If
+
+
+                        '
+                        '---------------------------------------------------------------------------------
+                        ' ----- Set Headers
+                        '---------------------------------------------------------------------------------
+                        '
+                        If DateModified <> Date.MinValue Then
+                            Call cpcore.webServer.addResponseHeader("LAST-MODIFIED", genericController.GetGMTFromDate(DateModified))
+                            'Date: Sun, 07 Dec 2008 21:06:14 GMT
+                        End If
+                        '
+                        '---------------------------------------------------------------------------------
+                        ' ----- Store page javascript
+                        '---------------------------------------------------------------------------------
+                        '
+                        Call cpcore.htmlDoc.main_AddOnLoadJavascript2(JSOnLoad, "page content")
+                        Call cpcore.htmlDoc.main_AddHeadScriptCode(JSHead, "page content")
+                        If JSFilename <> "" Then
+                            Call cpcore.htmlDoc.main_AddHeadScriptLink(cpcore.csv_getVirtualFileLink(cpcore.serverConfig.appConfig.cdnFilesNetprefix, JSFilename), "page content")
+                        End If
+                        Call cpcore.htmlDoc.main_AddEndOfBodyJavascript2(JSEndBody, "page content")
+                        '
+                        '---------------------------------------------------------------------------------
+                        ' Set the Meta Content flag
+                        '---------------------------------------------------------------------------------
+                        '
+                        Call cpcore.main_SetMetaContent(main_RenderCache_CurrentPage_ContentId, currentPageID)
+                        '
+                        '---------------------------------------------------------------------------------
+                        ' ----- OnPageStartEvent
+                        '---------------------------------------------------------------------------------
+                        '
+                        bodyContent = returnHtml
+                        Dim addonList As List(Of addonModel) = Models.Entity.addonModel.createList_OnPageStartEvent(cpcore, New List(Of String))
+                        For Each addon As Models.Entity.addonModel In addonList
+                            AddonContent = cpcore.addon.execute_legacy5(addon.id, addon.name, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
+                            bodyContent = AddonContent & bodyContent
+                        Next
+                        'AddOnCnt = UBound(cpcore.addonCache.addonCache.onPageStartPtrs) + 1
+                        'For addonPtr = 0 To AddOnCnt - 1
+                        '    addonCachePtr = cpcore.addonCache.addonCache.onPageStartPtrs(addonPtr)
+                        '    If addonCachePtr > -1 Then
+                        '        addonId = cpcore.addonCache.addonCache.addonList(addonCachePtr.ToString).id
+                        '        If addonId > 0 Then
+                        '            AddonName = cpcore.addonCache.addonCache.addonList(addonCachePtr.ToString).name
+                        '            AddonContent = cpcore.addon.execute_legacy5(addonId, AddonName, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
+                        '            bodyContent = AddonContent & bodyContent
+                        '        End If
+                        '    End If
+                        'Next
+                        returnHtml = bodyContent
+                        '
+                        '---------------------------------------------------------------------------------
+                        ' ----- OnPageEndEvent
+                        '---------------------------------------------------------------------------------
+                        '
+                        bodyContent = returnHtml
+                        AddOnCnt = UBound(cpcore.addonCache.addonCache.onPageEndPtrs) + 1
+                        For addonPtr = 0 To AddOnCnt - 1
+                            addonCachePtr = cpcore.addonCache.addonCache.onPageEndPtrs(addonPtr)
+                            If addonCachePtr > -1 Then
+                                addonId = cpcore.addonCache.addonCache.addonList(addonCachePtr.ToString).id
+                                If addonId > 0 Then
+                                    AddonName = cpcore.addonCache.addonCache.addonList(addonCachePtr.ToString).name
+                                    AddonContent = cpcore.addon.execute_legacy5(addonId, AddonName, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
+                                    bodyContent = bodyContent & AddonContent
+                                End If
+                            End If
+                        Next
+                        returnHtml = bodyContent
+                        '
+                    End If
+                    If cpcore.htmlDoc.main_MetaContent_Title = "" Then
+                        '
+                        ' Set default page title
+                        '
+                        cpcore.htmlDoc.main_MetaContent_Title = currentPageName
+                    End If
+                    '
+                    ' add contentid and sectionid
+                    '
+                    Call cpcore.htmlDoc.main_AddHeadTag2("<meta name=""contentId"" content=""" & currentPageID & """ >", "page content")
+                    Call cpcore.htmlDoc.main_AddHeadTag2("<meta name=""sectionId"" content=""" & currentSectionID & """ >", "page content")
+                End If
+                '
+                ' Display Admin Warnings with Edits for record errors
+                '
+                If cpcore.htmlDoc.main_AdminWarning <> "" Then
+                    '
+                    If cpcore.htmlDoc.main_AdminWarningPageID <> 0 Then
+                        cpcore.htmlDoc.main_AdminWarning = cpcore.htmlDoc.main_AdminWarning & "</p>" & cpcore.main_GetRecordEditLink2("Page Content", cpcore.htmlDoc.main_AdminWarningPageID, True, "Page " & cpcore.htmlDoc.main_AdminWarningPageID, cpcore.authContext.isAuthenticatedAdmin(cpcore)) & "&nbsp;Edit the page<p>"
+                        cpcore.htmlDoc.main_AdminWarningPageID = 0
+                    End If
+                    '
+                    If cpcore.htmlDoc.main_AdminWarningSectionID <> 0 Then
+                        cpcore.htmlDoc.main_AdminWarning = cpcore.htmlDoc.main_AdminWarning & "</p>" & cpcore.main_GetRecordEditLink2("Site Sections", cpcore.htmlDoc.main_AdminWarningSectionID, True, "Section " & cpcore.htmlDoc.main_AdminWarningSectionID, cpcore.authContext.isAuthenticatedAdmin(cpcore)) & "&nbsp;Edit the section<p>"
+                        cpcore.htmlDoc.main_AdminWarningSectionID = 0
+                    End If
+
+                    returnHtml = "" _
+                    & cpcore.htmlDoc.html_GetAdminHintWrapper(cpcore.htmlDoc.main_AdminWarning) _
+                    & returnHtml _
+                    & ""
+                    cpcore.htmlDoc.main_AdminWarning = ""
+                End If
             Catch ex As Exception
-                cp.Site.ErrorReport(ex)
+                cpcore.handleExceptionAndContinue(ex)
             End Try
             Return returnHtml
         End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' pageManager_GetHtmlBody_GetSection_GetContentBox
+        ''' </summary>
+        ''' <param name="PageID"></param>
+        ''' <param name="rootPageId"></param>
+        ''' <param name="RootPageContentName"></param>
+        ''' <param name="OrderByClause"></param>
+        ''' <param name="AllowChildPageList"></param>
+        ''' <param name="AllowReturnLink"></param>
+        ''' <param name="ArchivePages"></param>
+        ''' <param name="SectionID"></param>
+        ''' <param name="UseContentWatchLink"></param>
+        ''' <param name="allowPageWithoutSectionDisplay"></param>
+        ''' <returns></returns>
+        '
+        Friend Function getContentBox_content(PageID As Integer, rootPageId As Integer, RootPageContentName As String, OrderByClause As String, AllowChildPageList As Boolean, AllowReturnLink As Boolean, ArchivePages As Boolean, SectionID As Integer, UseContentWatchLink As Boolean, allowPageWithoutSectionDisplay As Boolean) As String
+            Dim result As String = ""
+            Try
+                Dim iIsEditing As Boolean
+                Dim LiveBody As String
+                Dim topOfParentBranchPtr As Integer
+                Dim topOfParentBranchPageId As Integer
+                Dim currentPageContentName As String
+                Dim pageAdminMessage As String
+                Dim isPageWithoutSection As Boolean
+                Dim Pointer As Integer
+                Dim SelectFieldList As String
+                Dim Copy As String
+                Dim PagePointer As Integer
+                'Dim NowDate As Date
+                Dim ContentName As String
+                Dim EditTag As String
+                Dim ContentPadding As Integer
+                Dim pagePCCPtr As Integer
+                Dim hint As String
+                Dim EditLink As String
+                Dim PageName As String
+                Dim pageMenuHeadline As String
+                Dim PageLink As String
+                '
+                'hint = "pageManager_GetHtmlBody_GetSection_GetContentBox, enter"
+                If cpcore.docOpen Then
+                    '
+                    ' ----- Load the content
+                    '
+                    'hint = hint & ",10"
+                    Call main_LoadRenderCache(PageID, rootPageId, RootPageContentName, OrderByClause, AllowChildPageList, AllowReturnLink, ArchivePages, SectionID, UseContentWatchLink)
+                    '
+                    ' ----- Verify a valid current page was found
+                    '
+                    ' ????? test
+                    'hint = hint & ",20"
+                    If (redirectLink = "") And (main_RenderCache_CurrentPage_PCCPtr = -1) Then
+                        'hint = hint & ",30"
+                        If PageID <> 0 Then
+                            '
+                            ' BID was not found, redirect to RootPage
+                            '
+                            Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
+                            pageManager_RedirectBecausePageNotFound = True
+                            pageManager_RedirectReason = "The page could not be found from its ID [" & PageID & "]. It may have been deleted or marked inactive. "
+                            redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
+                            Exit Function
+                        Else
+                            '
+                            ' Root page was requested, but not found and could not be created, this is an error
+                            '
+                            Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
+                            pageManager_RedirectBecausePageNotFound = True
+                            pageManager_RedirectReason = "The page could not be found because it's ID could not be determined."
+                            redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
+                            Exit Function
+                        End If
+                    End If
+                    '
+                    ' ----- Verify this bid can be displayed on this RootPageName
+                    '
+                    'hint = hint & ",50"
+                    If (redirectLink = "") Then
+                        'hint = hint & ",60"
+                        If Not allowPageWithoutSectionDisplay Then
+                            '????? test
+                            'hint = hint & ",70"
+                            If (main_RenderCache_ParentBranch_PCCPtrCnt > 0) Then
+                                '
+                                ' check top of parent branch
+                                '
+                                '????? test
+                                'hint = hint & ",80"
+                                topOfParentBranchPtr = genericController.EncodeInteger(main_RenderCache_ParentBranch_PCCPtrs(main_RenderCache_ParentBranch_PCCPtrCnt - 1))
+                                topOfParentBranchPageId = genericController.EncodeInteger(cache_pageContent(PCC_ID, topOfParentBranchPtr))
+                                isPageWithoutSection = (topOfParentBranchPageId <> rootPageId)
+                            Else
+                                '
+                                ' no parent pages, check the current page name against root page name
+                                '
+                                '????? test
+                                'hint = hint & ",90"
+                                isPageWithoutSection = (genericController.EncodeInteger(cache_pageContent(PCC_ID, main_RenderCache_CurrentPage_PCCPtr)) <> rootPageId)
+                            End If
+                            'hint = hint & ",100"
+                            If isPageWithoutSection Then
+                                '
+                                '
+                                '
+                                '????? test this
+                                'hint = hint & ",110"
+                                currentPageContentName = cpcore.metaData.getContentNameByID(genericController.EncodeInteger(cache_pageContent(PCC_ContentControlID, main_RenderCache_CurrentPage_PCCPtr)))
+                                If cpcore.authContext.isAuthenticatedContentManager(cpcore, currentPageContentName) Then
+                                    '
+                                    ' allow page without section because this is a content manager -- but give them a message
+                                    '
+                                    'hint = hint & ",120"
+                                    pageAdminMessage = "<p>This page can only be displayed to content managers because it is not part of a valid section. You can allow this type of access by setting the site property 'Allow Page Without Section Display' but care should be taken. If a blocked page is deleted, any child pages it may have had could be available for public display.</p>"
+                                Else
+                                    '
+                                    ' page without section (root page name is the legacy section) not allowed
+                                    '
+                                    'hint = hint & ",130"
+                                    Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
+                                    pageManager_RedirectBecausePageNotFound = True
+                                    '????? test
+                                    pageManager_RedirectReason = "The page you requested [" & PageID & "] could not be displayed because there is a problem with one of it's parent pages. All parent pages must be available to verify security permissions. A parent page may have been deleted or inactivated, or the page may have been requested from an incorrect location."
+                                    redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
+                                    Exit Function
+                                End If
+                            End If
+                        End If
+                    End If
+                    'hint = hint & ",140"
+                    If redirectLink = "" Then
+                        '
+                        ' ----- This page can be displayed
+                        '
+                        '            'hint = hint & ",150"
+                        '            If app.csv_IsCSOK(main_oldCacheRS_cs) Then
+                        '                '
+                        '                ' if this is not the first pagecontent to be opened on this page, close the previous first
+                        '                '
+                        '                Call app.closeCS(main_oldCacheRS_cs)
+                        '            End If
+                        '            'hint = hint & ",160"
+                        '            main_oldCacheRS_cs = main_OpenCSContentRecord_Internal(main_RenderCache_CurrentPage_ContentName, PageID, main_RenderCache_CurrentPage_IsRenderingMode Or main_RenderCache_CurrentPage_IsQuickEditing, main_RenderCache_CurrentPage_IsQuickEditing)
+                        '
+                        'hint = hint & ",170"
+                        '            If Not app.csv_IsCSOK(main_oldCacheRS_cs) Then
+                        '                '
+                        '                ' freak bug - page was not found - maybe deleted in a concurrent process
+                        '                '
+                        '                'hint = hint & ",180"
+                        '                Call app.closeCS(main_oldCacheRS_cs)
+                        '                pageManager_RedirectBecausePageNotFound = True
+                        ''????? test
+                        '                pageManager_RedirectReason = "The page [" & PageID & "] could not be found."
+                        '                pageManager_RedirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
+                        '                Exit Function
+                        '            Else
+                        '' $$$$$ remove main_oldCacheRS_cs, use pccPtr
+                        '                'hint = hint & ",190"
+                        '                'currentPageName = c.db.cs_getText(main_oldCacheRS_cs, "name")
+                        '' $$$$$ this should just be the pcc field list
+                        '                'SelectFieldList = app.cs_getSelectFieldList(main_oldCacheRS_cs)
+                        '' $$$$$ remove all uses of main_oldCacheRS_FieldNames/main_oldCacheRS_FieldValues
+                        '                'main_oldCacheRS_FieldNames = Split(SelectFieldList, ",")
+                        '                'main_oldCacheRS_FieldValues = c.db.cs_getRow(main_oldCacheRS_cs)
+                        '                'For Pointer = 0 To UBound(main_oldCacheRS_FieldValues)
+                        '                '    main_oldCacheRS_FieldValues(Pointer) = genericController.vbReplace(Replace(main_oldCacheRS_FieldValues(Pointer), vbTab, ""), vbCrLf, "")
+                        '                'Next
+                        '            End If
+                        '
+                        ' ----- all calls go through Live body routine, Quick Editor added directly to live routine
+                        '
+                        ' $$$$$ remove main_oldCacheRS_cs, use pccPtr
+                        'hint = hint & ",200"
+                        '????? test - this was a routine placed in-line
+                        iIsEditing = cpcore.authContext.isEditing(cpcore, main_RenderCache_CurrentPage_ContentName)
+                        '
+                        ' ----- Render the Body
+                        '
+                        LiveBody = pageManager_GetHtmlBody_GetSection_GetContentBox_Live_Body(OrderByClause, AllowChildPageList, False, rootPageId, AllowReturnLink, RootPageContentName, ArchivePages)
+                        If cpcore.authContext.isAdvancedEditing(cpcore, "") Then
+                            result = result & cpcore.main_GetRecordEditLink(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage)) & LiveBody
+                        ElseIf iIsEditing Then
+                            PageName = genericController.encodeText(cache_pageContent(PCC_Name, main_RenderCache_CurrentPage_PCCPtr))
+                            EditLink = cpcore.main_GetRecordEditLink2(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage), PageName, cpcore.authContext.isEditing(cpcore, ContentName))
+                            result = result & cpcore.htmlDoc.main_GetEditWrapper("", cpcore.main_GetRecordEditLink(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage)) & LiveBody)
+                        Else
+                            result = result & LiveBody
+                        End If
+                        '
+                        ' Build the Public currentNavigationStructure
+                        '
+                        '????? test all this --------------------- start
+                        'hint = hint & ",210"
+                        currentNavigationStructure = ""
+                        If main_RenderCache_ParentBranch_PCCPtrCnt > 0 Then
+                            'hint = hint & ",220"
+                            For Pointer = main_RenderCache_ParentBranch_PCCPtrCnt - 1 To 0 Step -1
+                                'hint = hint & ",230"
+                                If Pointer = (main_RenderCache_ParentBranch_PCCPtrCnt - 1) Then
+                                    currentNavigationStructure = currentNavigationStructure & vbTab & "0"
+                                Else
+                                    currentNavigationStructure = currentNavigationStructure & vbTab & "1"
+                                End If
+                                pagePCCPtr = genericController.EncodeInteger(main_RenderCache_ParentBranch_PCCPtrs(Pointer))
+                                '
+                                ' buffer text fields because this excode format does not allow them
+                                '
+                                PageName = genericController.encodeText(cache_pageContent(PCC_Name, pagePCCPtr))
+                                PageName = genericController.vbReplace(PageName, vbCrLf, " ")
+                                PageName = genericController.vbReplace(PageName, vbCr, " ")
+                                PageName = genericController.vbReplace(PageName, vbLf, " ")
+                                PageName = genericController.vbReplace(PageName, vbTab, " ")
+                                PageName = Trim(PageName)
+                                '
+                                PageLink = genericController.encodeText(cache_pageContent(PCC_Link, pagePCCPtr))
+                                PageLink = genericController.vbReplace(PageLink, vbCrLf, " ")
+                                PageLink = genericController.vbReplace(PageLink, vbCr, " ")
+                                PageLink = genericController.vbReplace(PageLink, vbLf, " ")
+                                PageLink = genericController.vbReplace(PageLink, vbTab, " ")
+                                PageLink = Trim(PageLink)
+                                '
+                                pageMenuHeadline = Trim(genericController.encodeText(cache_pageContent(PCC_MenuHeadline, pagePCCPtr)))
+                                If pageMenuHeadline <> "" Then
+                                    pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbCrLf, " ")
+                                    pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbCr, " ")
+                                    pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbLf, " ")
+                                    pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbTab, " ")
+                                    pageMenuHeadline = Trim(pageMenuHeadline)
+                                Else
+                                    pageMenuHeadline = PageName
+                                    If pageMenuHeadline = "" Then
+                                        pageMenuHeadline = "Related Page"
+                                    End If
+                                End If
+                                currentNavigationStructure = currentNavigationStructure _
+                            & vbTab & genericController.EncodeInteger(cache_pageContent(PCC_ID, pagePCCPtr)) _
+                            & vbTab & genericController.EncodeInteger(cache_pageContent(PCC_ParentID, pagePCCPtr)) _
+                            & vbTab & pageMenuHeadline _
+                            & vbTab & PageName _
+                            & vbTab & PageLink _
+                            & vbTab & genericController.EncodeInteger(cache_pageContent(PCC_TemplateID, pagePCCPtr)) _
+                            & vbTab & genericController.EncodeBoolean(cache_pageContent(PCC_AllowInMenus, pagePCCPtr)) _
+                            & vbCrLf
+                            Next
+                        End If
+                        'hint = hint & ",300"
+                        If main_RenderCache_CurrentPage_PCCPtr > -1 Then
+                            'hint = hint & ",310"
+                            pagePCCPtr = main_RenderCache_CurrentPage_PCCPtr
+                            currentPageID = genericController.EncodeInteger(cache_pageContent(PCC_ID, pagePCCPtr))
+                            '
+                            ' buffer text fields because this excode format does not allow them
+                            '
+                            PageName = genericController.encodeText(cache_pageContent(PCC_Name, pagePCCPtr))
+                            PageName = genericController.vbReplace(PageName, vbCrLf, " ")
+                            PageName = genericController.vbReplace(PageName, vbCr, " ")
+                            PageName = genericController.vbReplace(PageName, vbLf, " ")
+                            PageName = genericController.vbReplace(PageName, vbTab, " ")
+                            PageName = Trim(PageName)
+                            '
+                            PageLink = genericController.encodeText(cache_pageContent(PCC_Link, pagePCCPtr))
+                            PageLink = genericController.vbReplace(PageLink, vbCrLf, " ")
+                            PageLink = genericController.vbReplace(PageLink, vbCr, " ")
+                            PageLink = genericController.vbReplace(PageLink, vbLf, " ")
+                            PageLink = genericController.vbReplace(PageLink, vbTab, " ")
+                            PageLink = Trim(PageLink)
+                            '
+                            pageMenuHeadline = Trim(genericController.encodeText(cache_pageContent(PCC_MenuHeadline, pagePCCPtr)))
+                            If pageMenuHeadline <> "" Then
+                                pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbCrLf, " ")
+                                pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbCr, " ")
+                                pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbLf, " ")
+                                pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbTab, " ")
+                                pageMenuHeadline = Trim(pageMenuHeadline)
+                            Else
+                                pageMenuHeadline = PageName
+                                If pageMenuHeadline = "" Then
+                                    pageMenuHeadline = "Related Page"
+                                End If
+                            End If
+                            currentNavigationStructure = currentNavigationStructure _
+                        & vbTab & "2" _
+                        & vbTab & currentPageID _
+                        & vbTab & genericController.EncodeInteger(cache_pageContent(PCC_ParentID, pagePCCPtr)) _
+                        & vbTab & pageMenuHeadline _
+                        & vbTab & PageName _
+                        & vbTab & PageLink _
+                        & vbTab & genericController.EncodeInteger(cache_pageContent(PCC_TemplateID, pagePCCPtr)) _
+                        & vbTab & genericController.EncodeBoolean(cache_pageContent(PCC_AllowInMenus, pagePCCPtr)) _
+                        & vbCrLf
+                        End If
+                        'hint = hint & ",400"
+                        If main_RenderCache_ChildBranch_PCCPtrCnt > 0 Then
+                            'hint = hint & ",410 main_RenderCache_ChildBranch_PCCPtrCnt=" & main_RenderCache_ChildBranch_PCCPtrCnt
+                            For Pointer = main_RenderCache_ChildBranch_PCCPtrCnt - 1 To 0 Step -1
+                                'hint = hint & ",420 Pointer=" & Pointer
+                                pagePCCPtr = genericController.EncodeInteger(main_RenderCache_ChildBranch_PCCPtrs(Pointer))
+                                '
+                                ' buffer text fields because this excode format does not allow them
+                                '
+                                'hint = hint & ",430 pagePCCPtr=" & pagePCCPtr
+                                PageName = genericController.encodeText(cache_pageContent(PCC_Name, pagePCCPtr))
+                                PageName = genericController.vbReplace(PageName, vbCrLf, " ")
+                                PageName = genericController.vbReplace(PageName, vbCr, " ")
+                                PageName = genericController.vbReplace(PageName, vbLf, " ")
+                                PageName = genericController.vbReplace(PageName, vbTab, " ")
+                                PageName = Trim(PageName)
+                                '
+                                PageLink = genericController.encodeText(cache_pageContent(PCC_Link, pagePCCPtr))
+                                PageLink = genericController.vbReplace(PageLink, vbCrLf, " ")
+                                PageLink = genericController.vbReplace(PageLink, vbCr, " ")
+                                PageLink = genericController.vbReplace(PageLink, vbLf, " ")
+                                PageLink = genericController.vbReplace(PageLink, vbTab, " ")
+                                PageLink = Trim(PageLink)
+                                '
+                                pageMenuHeadline = Trim(genericController.encodeText(cache_pageContent(PCC_MenuHeadline, pagePCCPtr)))
+                                If pageMenuHeadline <> "" Then
+                                    pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbCrLf, " ")
+                                    pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbCr, " ")
+                                    pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbLf, " ")
+                                    pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbTab, " ")
+                                    pageMenuHeadline = Trim(pageMenuHeadline)
+                                Else
+                                    pageMenuHeadline = PageName
+                                    If pageMenuHeadline = "" Then
+                                        pageMenuHeadline = "Related Page"
+                                    End If
+                                End If
+                                'hint = hint & ",440"
+                                currentNavigationStructure = currentNavigationStructure _
+                            & vbTab & "3" _
+                            & vbTab & genericController.EncodeInteger(cache_pageContent(PCC_ID, pagePCCPtr)) _
+                            & vbTab & currentPageID _
+                            & vbTab & pageMenuHeadline _
+                            & vbTab & PageName _
+                            & vbTab & PageLink _
+                            & vbTab & genericController.EncodeInteger(cache_pageContent(PCC_TemplateID, pagePCCPtr)) _
+                            & vbTab & genericController.EncodeBoolean(cache_pageContent(PCC_AllowInMenus, pagePCCPtr)) _
+                            & vbCrLf
+                                'hint = hint & ",450"
+                            Next
+                        End If
+                    End If
+                    '????? test all this --------------------- end
+                    'hint = hint & ",900"
+                    If pageAdminMessage <> "" Then
+                        result = "" _
+                    & cpcore.htmlDoc.html_GetAdminHintWrapper(pageAdminMessage) _
+                    & result _
+                    & ""
+                    End If
+                End If
+                '
+                Call cpcore.debug_testPoint("pageManager_GetHtmlBody_GetSection_GetContentBox, hint=[" & hint & "]")
+            Catch ex As Exception
+                cpcore.handleExceptionAndContinue(ex)
+            End Try
+            Return result
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' render the page content
+        ''' </summary>
+        ''' <param name="ContentName"></param>
+        ''' <param name="ContentID"></param>
+        ''' <param name="OrderByClause"></param>
+        ''' <param name="AllowChildList"></param>
+        ''' <param name="Authoring"></param>
+        ''' <param name="rootPageId"></param>
+        ''' <param name="AllowReturnLink"></param>
+        ''' <param name="RootPageContentName"></param>
+        ''' <param name="ArchivePage"></param>
+        ''' <returns></returns>
+
+        Friend Function pageManager_GetHtmlBody_GetSection_GetContentBox_Live_Body(OrderByClause As String, AllowChildList As Boolean, Authoring As Boolean, rootPageId As Integer, AllowReturnLink As Boolean, RootPageContentName As String, ArchivePage As Boolean) As String
+            Dim result As String = ""
+            Try
+                Dim Cell As String
+                Dim AddonStatusOK As Boolean
+                Dim ChildListInstanceOptions As String
+                Dim Name As String
+                Dim DateReviewed As Date
+                Dim ReviewedBy As Integer
+                Dim CS As Integer
+                Dim IconRow As String
+                Dim contactMemberID As Integer
+                Dim QueryString As String
+                Dim LastModified As Date
+                Dim childListSortMethodId As Integer
+                Dim AllowEmailPage As Boolean
+                Dim AllowPrinterVersion As Boolean
+                Dim Caption As String
+                Dim PageID As Integer
+                Dim parentPageID As Integer
+                Dim allowChildListDisplay As Boolean
+                Dim dateArchive As Date
+                Dim allowChildListComposite As Boolean
+                Dim allowReturnLinkComposite As Boolean
+                Dim allowReturnLinkDisplay As Boolean
+                Dim headline As String
+                Dim copyFilename As String
+                Dim Copy As String
+                Dim EmailBody As String
+                Dim Body As String
+                Dim allowSeeAlso As Boolean
+                Dim allowMoreInfo As Boolean
+                Dim allowFeedback As Boolean
+                Dim allowLastModifiedFooter As Boolean
+                Dim ModifiedBy As Integer
+                Dim allowReviewedFooter As Boolean
+                Dim allowMessageFooter As Boolean
+                Dim pageContentMessageFooter As String
+                '
+                PageID = genericController.EncodeInteger(cache_pageContent(PCC_ID, main_RenderCache_CurrentPage_PCCPtr))
+                parentPageID = genericController.EncodeInteger(cache_pageContent(PCC_ParentID, main_RenderCache_CurrentPage_PCCPtr))
+                contactMemberID = genericController.EncodeInteger(cache_pageContent(PCC_ContactMemberID, main_RenderCache_CurrentPage_PCCPtr))
+                allowChildListDisplay = genericController.EncodeBoolean(cache_pageContent(PCC_AllowChildListDisplay, main_RenderCache_CurrentPage_PCCPtr))
+                allowChildListComposite = AllowChildList And allowChildListDisplay
+                dateArchive = genericController.EncodeDate(cache_pageContent(PCC_DateArchive, main_RenderCache_CurrentPage_PCCPtr))
+                childListSortMethodId = genericController.EncodeInteger(cache_pageContent(PCC_ChildListSortMethodID, main_RenderCache_CurrentPage_PCCPtr))
+                allowReturnLinkDisplay = genericController.EncodeBoolean(cache_pageContent(PCC_allowReturnLinkDisplay, main_RenderCache_CurrentPage_PCCPtr))
+                allowReturnLinkComposite = AllowReturnLink And allowReturnLinkDisplay
+                AllowPrinterVersion = genericController.EncodeBoolean(cache_pageContent(pcc_allowPrinterVersion, main_RenderCache_CurrentPage_PCCPtr))
+                AllowEmailPage = genericController.EncodeBoolean(cache_pageContent(pcc_allowEmailPage, main_RenderCache_CurrentPage_PCCPtr))
+                headline = genericController.encodeText(cache_pageContent(PCC_Headline, main_RenderCache_CurrentPage_PCCPtr))
+                copyFilename = genericController.encodeText(cache_pageContent(PCC_CopyFilename, main_RenderCache_CurrentPage_PCCPtr))
+                If copyFilename <> "" Then
+                    Copy = cpcore.privateFiles.readFile(copyFilename)
+                End If
+                allowSeeAlso = genericController.EncodeBoolean(cache_pageContent(pcc_allowSeeAlso, main_RenderCache_CurrentPage_PCCPtr))
+                allowMoreInfo = genericController.EncodeBoolean(cache_pageContent(pcc_allowMoreInfo, main_RenderCache_CurrentPage_PCCPtr))
+                allowFeedback = genericController.EncodeBoolean(cache_pageContent(pcc_allowFeedback, main_RenderCache_CurrentPage_PCCPtr))
+                LastModified = genericController.EncodeDate(cache_pageContent(PCC_ModifiedDate, main_RenderCache_CurrentPage_PCCPtr))
+                allowLastModifiedFooter = genericController.EncodeBoolean(cache_pageContent(pcc_allowLastModifiedFooter, main_RenderCache_CurrentPage_PCCPtr))
+                ModifiedBy = genericController.EncodeInteger(cache_pageContent(PCC_ModifiedBy, main_RenderCache_CurrentPage_PCCPtr))
+                DateReviewed = genericController.EncodeDate(cache_pageContent(PCC_DateReviewed, main_RenderCache_CurrentPage_PCCPtr))
+                ReviewedBy = genericController.EncodeInteger(cache_pageContent(PCC_ReviewedBy, main_RenderCache_CurrentPage_PCCPtr))
+                allowReviewedFooter = genericController.EncodeBoolean(cache_pageContent(PCC_allowReviewedFooter, main_RenderCache_CurrentPage_PCCPtr))
+                allowMessageFooter = genericController.EncodeBoolean(cache_pageContent(PCC_allowMessageFooter, main_RenderCache_CurrentPage_PCCPtr))
+                '
+                Dim breadCrumb As String
+                Dim BreadCrumbDelimiter As String
+                Dim BreadCrumbPrefix As String
+                '
+                If allowReturnLinkComposite And (Not main_RenderCache_CurrentPage_IsRootPage) And (Not cpcore.htmlDoc.pageManager_printVersion) Then
+                    '
+                    ' ----- Print Heading if not at root Page
+                    '
+                    BreadCrumbPrefix = cpcore.siteProperties.getText("BreadCrumbPrefix", "Return to")
+                    BreadCrumbDelimiter = cpcore.siteProperties.getText("BreadCrumbDelimiter", " &gt; ")
+                    breadCrumb = pageManager_GetHtmlBody_GetSection_GetContentBox_ReturnLink(RootPageContentName, parentPageID, rootPageId, "", ArchivePage, BreadCrumbDelimiter)
+                    If breadCrumb <> "" Then
+                        breadCrumb = cr & "<p class=""ccPageListNavigation"">" & BreadCrumbPrefix & " " & breadCrumb & "</p>"
+                    End If
+                End If
+                result = result & breadCrumb
+                '
+                ' move print and email icons here - ASBO 5/24/2007
+                If (Not cpcore.htmlDoc.pageManager_printVersion) Then
+                    IconRow = ""
+                    If (Not cpcore.authContext.visit.Bot) And (AllowPrinterVersion Or AllowEmailPage) Then
+                        '
+                        ' not a bot, and either print or email allowed
+                        '
+                        If AllowPrinterVersion Then
+                            QueryString = cpcore.htmlDoc.refreshQueryString
+                            QueryString = genericController.ModifyQueryString(QueryString, "bid", genericController.encodeText(PageID), True)
+                            QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, HardCodedPagePrinterVersion, True)
+                            Caption = cpcore.siteProperties.getText("PagePrinterVersionCaption", "Printer Version")
+                            Caption = genericController.vbReplace(Caption, " ", "&nbsp;")
+                            IconRow = IconRow & cr & "&nbsp;&nbsp;<a href=""" & cpcore.htmlDoc.html_EncodeHTML(cpcore.webServer.webServerIO_requestPage & "?" & QueryString) & """ target=""_blank""><img alt=""image"" src=""/ccLib/images/IconSmallPrinter.gif"" width=""13"" height=""13"" border=""0"" align=""absmiddle""></a>&nbsp<a href=""" & cpcore.htmlDoc.html_EncodeHTML(cpcore.webServer.webServerIO_requestPage & "?" & QueryString) & """ target=""_blank"" style=""text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;"">" & Caption & "</a>"
+                        End If
+                        If AllowEmailPage Then
+                            QueryString = cpcore.htmlDoc.refreshQueryString
+                            If QueryString <> "" Then
+                                QueryString = "?" & QueryString
+                            End If
+                            EmailBody = cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.requestDomain & cpcore.webServer.requestPathPage & QueryString
+                            Caption = cpcore.siteProperties.getText("PageAllowEmailCaption", "Email This Page")
+                            Caption = genericController.vbReplace(Caption, " ", "&nbsp;")
+                            IconRow = IconRow & cr & "&nbsp;&nbsp;<a HREF=""mailto:?SUBJECT=You might be interested in this&amp;BODY=" & EmailBody & """><img alt=""image"" src=""/ccLib/images/IconSmallEmail.gif"" width=""13"" height=""13"" border=""0"" align=""absmiddle""></a>&nbsp;<a HREF=""mailto:?SUBJECT=You might be interested in this&amp;BODY=" & EmailBody & """ style=""text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;"">" & Caption & "</a>"
+                        End If
+                    End If
+                    If IconRow <> "" Then
+                        result = result _
+                        & cr & "<div style=""text-align:right;"">" _
+                        & genericController.kmaIndent(IconRow) _
+                        & cr & "</div>"
+                    End If
+                End If
+                '
+                ' ----- Start Text Search
+                '
+                Cell = ""
+                If main_RenderCache_CurrentPage_IsQuickEditing Then
+                    Cell = Cell & pageManager_GetHtmlBody_GetSection_GetContentBox_QuickEditing(main_RenderCache_CurrentPage_ContentName, rootPageId, RootPageContentName, OrderByClause, AllowChildList, AllowReturnLink, ArchivePage, contactMemberID, childListSortMethodId, allowChildListComposite, ArchivePage)
+                Else
+                    '
+                    ' ----- Headline
+                    '
+                    If headline <> "" Then
+                        headline = cpcore.htmlDoc.main_encodeHTML(headline)
+                        If cpcore.siteProperties.getBoolean("PageHeadlineUseccHeadline") Then
+                            Cell = Cell & cr & "<p>" & AddSpan(headline, "ccHeadline") & "</p>"
+                        Else
+                            Cell = Cell & cr & "<h1>" & headline & "</h1>"
+                        End If
+                        '
+                        ' Add AC end here to force the end of any left over AC tags (like language)
+                        Cell = Cell & ACTagEnd
+                    End If
+                    '
+                    ' ----- Page Copy
+                    If Copy = "" Then
+                        '
+                        ' Page copy is empty if  Links Enabled put in a blank line to separate edit from add tag
+                        If cpcore.authContext.isEditing(cpcore, main_RenderCache_CurrentPage_ContentName) Then
+                            Body = cr & "<p><!-- Empty Content Placeholder --></p>"
+                        End If
+                    Else
+                        Body = Copy & cr & ACTagEnd
+                    End If
+                    '
+                    ' ----- Wrap content body
+                    Cell = Cell _
+                            & cr & "<!-- ContentBoxBodyStart -->" _
+                            & genericController.kmaIndent(Body) _
+                            & cr & "<!-- ContentBoxBodyEnd -->"
+                    '
+                    ' ----- Child pages
+                    If allowChildListComposite Or cpcore.authContext.isEditingAnything(cpcore) Then
+                        If Not allowChildListComposite Then
+                            Cell = Cell & cpcore.htmlDoc.html_GetAdminHintWrapper("Automatic Child List display is disabled for this page. It is displayed here because you are in editing mode. To enable automatic child list display, see the features tab for this page.")
+                        End If
+                        ChildListInstanceOptions = genericController.encodeText(cache_pageContent(PCC_ChildListInstanceOptions, main_RenderCache_CurrentPage_PCCPtr))
+                        Cell = Cell & cpcore.addon.execute_legacy2(cpcore.siteProperties.childListAddonID, "", ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, Models.Entity.pageContentModel.contentName, PageID, "", PageChildListInstanceID, False, cpcore.siteProperties.defaultWrapperID, "", AddonStatusOK, Nothing)
+                    End If
+                End If
+                '
+                ' ----- End Text Search
+                result = result _
+                        & cr & "<!-- TextSearchStart -->" _
+                        & genericController.kmaIndent(Cell) _
+                        & cr & "<!-- TextSearchEnd -->"
+                '
+                ' ----- Page See Also
+                If allowSeeAlso Then
+                    result = result _
+                            & cr & "<div>" _
+                            & genericController.kmaIndent(main_GetSeeAlso(cpcore, main_RenderCache_CurrentPage_ContentName, PageID)) _
+                            & cr & "</div>"
+                End If
+                '
+                ' ----- Allow More Info
+                If (contactMemberID <> 0) And allowMoreInfo Then
+                    result = result & cr & "<ac TYPE=""" & ACTypeContact & """>"
+                    's = s &  "<p>" & main_GetMoreInfo(ContactMemberID) & "</p>"
+                End If
+                '
+                ' ----- Feedback
+                If (Not cpcore.htmlDoc.pageManager_printVersion) And (contactMemberID <> 0) And allowFeedback Then
+                    result = result & cr & "<ac TYPE=""" & ACTypeFeedback & """>"
+                End If
+                '
+                ' ----- Last Modified line
+                If (LastModified <> Date.MinValue) And allowLastModifiedFooter Then
+                    result = result & cr & "<p>This page was last modified " & FormatDateTime(LastModified)
+                    If cpcore.authContext.isAuthenticatedAdmin(cpcore) Then
+                        If ModifiedBy = 0 Then
+                            result = result & " (admin only: modified by unknown)"
+                        Else
+                            Name = cpcore.content_GetRecordName("people", ModifiedBy)
+                            If Name = "" Then
+                                result = result & " (admin only: modified by person with unnamed or deleted record #" & ReviewedBy & ")"
+                            Else
+                                result = result & " (admin only: modified by " & Name & ")"
+                            End If
+                        End If
+                    End If
+                    result = result & "</p>"
+                End If
+                '
+                ' ----- Last Reviewed line
+                If (DateReviewed <> Date.MinValue) And allowReviewedFooter Then
+                    result = result & cr & "<p>This page was last reviewed " & FormatDateTime(DateReviewed, vbLongDate)
+                    If cpcore.authContext.isAuthenticatedAdmin(cpcore) Then
+                        If ReviewedBy = 0 Then
+                            result = result & " (by unknown)"
+                        Else
+                            Name = cpcore.content_GetRecordName("people", ReviewedBy)
+                            If Name = "" Then
+                                result = result & " (by person with unnamed or deleted record #" & ReviewedBy & ")"
+                            Else
+                                result = result & " (by " & Name & ")"
+                            End If
+                        End If
+                        result = result & ".</p>"
+                    End If
+                End If
+                '
+                ' ----- Page Content Message Footer
+                If allowMessageFooter Then
+                    pageContentMessageFooter = cpcore.siteProperties.getText("PageContentMessageFooter", "")
+                    If (pageContentMessageFooter <> "") Then
+                        result = result & cr & "<p>" & pageContentMessageFooter & "</p>"
+                    End If
+                End If
+                Call cpcore.db.cs_Close(CS)
+            Catch ex As Exception
+                cpcore.handleExceptionAndContinue(ex)
+            End Try
+            Return result
+        End Function
+        ''
+        ''====================================================================================================
+        '''' <summary>
+        '''' future pageManager addon interface
+        '''' </summary>
+        '''' <param name="cp"></param>
+        '''' <returns></returns>
+        'Public Overrides Function execute(cp As Contensive.BaseClasses.CPBaseClass) As Object
+        '    Dim returnHtml As String = ""
+        '    Try
+        '        '
+        '        '
+        '        '
+        '    Catch ex As Exception
+        '        cp.Site.ErrorReport(ex)
+        '    End Try
+        '    Return returnHtml
+        'End Function
         '
         '=============================================================================
         ' Print the See Also listing
@@ -155,10 +1460,6 @@ Namespace Contensive.Core.Controllers
         Public Function main_GetSeeAlso(cpcore As coreClass, ByVal ContentName As String, ByVal RecordID As Integer) As String
             Dim result As String = ""
             Try
-                '
-                'If Not (true) Then Exit Function
-                '
-                Dim SQL As String
                 Dim CS As Integer
                 Dim SeeAlsoLink As String
                 Dim ContentID As Integer
@@ -324,7 +1625,7 @@ Namespace Contensive.Core.Controllers
                         '
                         ' ----- print the feedback submit form
                         '
-                        Panel = "<form Action=""" & Me.cpcore.webServer.webServerIO_ServerFormActionURL & "?" & Me.cpcore.web_RefreshQueryString & """ Method=""post"">"
+                        Panel = "<form Action=""" & Me.cpcore.webServer.webServerIO_ServerFormActionURL & "?" & Me.cpcore.htmlDoc.refreshQueryString & """ Method=""post"">"
                         Panel = Panel & "<table border=""0"" cellpadding=""4"" cellspacing=""0"" width=""100%"">"
                         Panel = Panel & "<tr>"
                         Panel = Panel & "<td colspan=""2""><p>Your feedback is welcome</p></td>"
@@ -662,1430 +1963,13 @@ ErrorTrap:
         End Function
         '
         '=============================================================================
-        '   pageManager_GetHtmlBody_GetSection_GetContent
-        '
-        '   PageID is the page to display. If it is 0, the root page is displayed
-        '   RootPageID has to be the ID of the root page for PageID
-        '=============================================================================
-        '
-        Public Function pageManager_GetHtmlBody_GetSection_GetContent(PageID As Integer, rootPageId As Integer, RootPageContentName As String, OrderByClause As String, AllowChildPageList As Boolean, AllowReturnLink As Boolean, ArchivePages As Boolean, SectionID As Integer, UseContentWatchLink As Boolean, allowPageWithoutSectionDisplay As Boolean) As String
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("pageManager_GetHtmlBody_GetSection_GetContent")
-            '
-            Dim ParentPtr As Integer
-            Dim returnHtml As String
-            Dim AddonName As String
-            Dim addonCachePtr As Integer
-            Dim addonPtr As Integer
-            Dim AddOnCnt As Integer
-            Dim layoutError As String
-            Dim addonId As Integer
-            Dim AddonContent As String
-            Dim Err_Number As Integer
-            Dim Err_Source As String
-            Dim Err_Description As String
-            Dim DateModified As Date
-            Dim ErrString As String
-            Dim JSOnLoad As String
-            Dim JSHead As String
-            Dim JSFilename As String
-            Dim JSCopy As String
-            Dim JSEndBody As String
-            Dim PageRecordID As Integer
-            Dim ContentPadding As Integer
-            Dim Copy As String
-            Dim RQS As String
-            Dim Body As String
-            Dim PageName As String
-            Dim AllowHitNotification As Boolean
-            'Dim cacheName As String
-            Dim RootPageContentCID As Integer
-            Dim PageContentCID As Integer
-            Dim DateExpires As Date
-            Dim dateArchive As Date
-            Dim BakeExpires As Date
-            Dim iRootPageContentName As String
-            Dim PubDate As Date
-            Dim PagePointer As Integer
-            Dim CS As Integer
-            Dim LineBuffer As String
-            Dim LineSplit() As String
-            'Dim RecordID as integer
-            'Dim ContentID as integer
-            'Dim ContentName As String
-            Dim BlockedRecordIDList As String
-            Dim Pointer As Integer
-            Dim SQL As String
-            Dim ContentBlocked As Boolean
-            Dim RecordCount As Integer
-            Dim RecordSplit() As String
-            Dim BakeHeader As String
-            Dim Delimiter As String
-            Dim BakedStructure As String
-            'Dim AuthoringMode As Boolean
-            Dim NewPageCreated As Boolean
-            Dim LineLeft As String
-            Dim LineRight As String
-            Dim LinePosition As Integer
-            Dim SelectFieldList As String
-            'dim buildversion As String
-            Dim contactMemberID As Integer
-            Dim BakeVersion As String
-            'Dim AllowPageBaking As Boolean
-            Dim SystemEMailID As Integer
-            Dim ConditionID As Integer
-            Dim ConditionGroupID As Integer
-            Dim main_AddGroupID As Integer
-            Dim RemoveGroupID As Integer
-            Dim BlockSourceID As Integer
-            Dim RegistrationGroupID As Integer
-            Dim CustomBlockMessageFilename As String
-            Dim BlockedPages() As String
-            Dim BlockedPageRecordID As Integer
-            Dim BlockForm As String
-            Dim BlockCopy As String
-            Dim PCCPtr As Integer
-            Dim pageViewings As Integer
-            '
-            ' BuildVersion = app.dataBuildVersion
-            '
-            ' If no PageRecordID, use the RootPage
-            '
-            PageRecordID = PageID
-            If PageRecordID = 0 Then
-                PageRecordID = rootPageId
-            End If
-            If PageRecordID = 0 Then
-                '
-                ' no page and no root page, redirect to landing page
-                '
-                Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
-                pageManager_RedirectBecausePageNotFound = True
-                pageManager_RedirectReason = "The page could not be determined from URL."
-                redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
-            Else
-                '
-                ' PageRecordID and RootPageID are good
-                '
-                Call cpcore.htmlDoc.main_AddHeadTag2("<meta name=""contentId"" content=""" & PageRecordID & """ >", "page content")
-                '
-                'main_oldCacheArray_CurrentPagePtr = -1
-                If RootPageContentName = "" Then
-                    iRootPageContentName = "Page Content"
-                Else
-                    iRootPageContentName = RootPageContentName
-                End If
-                RootPageContentCID = cpcore.main_GetContentID(iRootPageContentName)
-                '
-                '---------------------------------------------------------------------------------
-                ' ----- Build Page if needed
-                '---------------------------------------------------------------------------------
-                '
-                returnHtml = pageManager_GetHtmlBody_GetSection_GetContentBox(PageRecordID, rootPageId, iRootPageContentName, OrderByClause, AllowChildPageList, AllowReturnLink, ArchivePages, SectionID, UseContentWatchLink, allowPageWithoutSectionDisplay)
-                If (returnHtml <> "") And (redirectLink = "") Then
-                    '
-                    ' This page is correct, main_Get the RecordID for later
-                    '
-                    NewPageCreated = True
-                    BlockedRecordIDList = ""
-                    If main_RenderCache_CurrentPage_PCCPtr >= 0 Then
-                        '
-                        ' Build the BlockedRecordIDList
-                        '
-                        PCCPtr = main_RenderCache_CurrentPage_PCCPtr
-                        If genericController.EncodeBoolean(cache_pageContent(PCC_BlockContent, PCCPtr)) Or genericController.EncodeBoolean(cache_pageContent(PCC_BlockPage, PCCPtr)) Then
-                            BlockedRecordIDList = BlockedRecordIDList & "," & genericController.encodeText(cache_pageContent(PCC_ID, PCCPtr))
-                        End If
-                        If main_RenderCache_ParentBranch_PCCPtrCnt > 0 Then
-                            For ParentPtr = 0 To main_RenderCache_ParentBranch_PCCPtrCnt - 1
-                                PCCPtr = genericController.EncodeInteger(main_RenderCache_ParentBranch_PCCPtrs(ParentPtr))
-                                If genericController.EncodeBoolean(cache_pageContent(PCC_BlockContent, PCCPtr)) Or genericController.EncodeBoolean(cache_pageContent(PCC_BlockPage, PCCPtr)) Then
-                                    BlockedRecordIDList = BlockedRecordIDList & "," & genericController.encodeText(cache_pageContent(PCC_ID, PCCPtr))
-                                End If
-                            Next
-                        End If
-                        If BlockedRecordIDList <> "" Then
-                            BlockedRecordIDList = Mid(BlockedRecordIDList, 2)
-                        End If
-                    End If
-                End If
-                '
-                JSOnLoad = genericController.encodeText(cache_pageContent(PCC_JSOnLoad, main_RenderCache_CurrentPage_PCCPtr))
-                JSHead = genericController.encodeText(cache_pageContent(PCC_JSHead, main_RenderCache_CurrentPage_PCCPtr))
-                JSFilename = genericController.encodeText(cache_pageContent(PCC_JSFilename, main_RenderCache_CurrentPage_PCCPtr))
-                JSEndBody = genericController.encodeText(cache_pageContent(PCC_JSEndBody, main_RenderCache_CurrentPage_PCCPtr))
-                DateModified = genericController.EncodeDate(cache_pageContent(PCC_ModifiedDate, main_RenderCache_CurrentPage_PCCPtr))
-                '
-                ' Save currentNavigationStructure in the Legacy Name
-                '
-                'pageManager_ContentPageStructure = currentNavigationStructure
-                '
-                '---------------------------------------------------------------------------------
-                ' ----- If Link field populated, do redirect
-                '---------------------------------------------------------------------------------
-                '
-                Dim Link As String
-                If (redirectLink = "") Then
-                    Link = genericController.encodeText(cache_pageContent(PCC_Link, main_RenderCache_CurrentPage_PCCPtr))
-                    If (Link <> "") Then
-                        Call cpcore.db.executeSql("update ccpagecontent set clicks=clicks+1 where id=" & currentPageID)
-                        redirectLink = Link
-                        pageManager_RedirectReason = "Redirect required because this page (PageRecordID=" & currentPageID & ") has a Link Override [" & redirectLink & "]."
-                    End If
-                End If
-                '
-                '---------------------------------------------------------------------------------
-                ' ----- If Redirect, exit now
-                '---------------------------------------------------------------------------------
-                '
-                If redirectLink <> "" Then
-                    Exit Function
-                End If
-                '
-                '---------------------------------------------------------------------------------
-                ' ----- Content Blocking
-                '---------------------------------------------------------------------------------
-                '
-                If (BlockedRecordIDList <> "") Then
-                    If cpcore.authContext.isAuthenticatedAdmin(cpcore) Then
-                        '
-                        ' Administrators are never blocked
-                        '
-                    ElseIf (Not cpcore.authContext.isAuthenticated()) Then
-                        '
-                        ' non-authenticated are always blocked
-                        '
-                        ContentBlocked = True
-                    Else
-                        '
-                        ' Check Access Groups, if in access groups, remove group from BlockedRecordIDList
-                        '
-                        SQL = "SELECT DISTINCT ccPageContentBlockRules.RecordID" _
-                            & " FROM (ccPageContentBlockRules" _
-                            & " LEFT JOIN ccgroups ON ccPageContentBlockRules.GroupID = ccgroups.ID)" _
-                            & " LEFT JOIN ccMemberRules ON ccgroups.ID = ccMemberRules.GroupID" _
-                            & " WHERE (((ccMemberRules.MemberID)=" & cpcore.db.encodeSQLNumber(cpcore.authContext.user.ID) & ")" _
-                            & " AND ((ccPageContentBlockRules.RecordID) In (" & BlockedRecordIDList & "))" _
-                            & " AND ((ccPageContentBlockRules.Active)<>0)" _
-                            & " AND ((ccgroups.Active)<>0)" _
-                            & " AND ((ccMemberRules.Active)<>0)" _
-                            & " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" & cpcore.db.encodeSQLDate(cpcore.app_startTime) & "));"
-                        CS = cpcore.db.cs_openSql(SQL)
-                        BlockedRecordIDList = "," & BlockedRecordIDList
-                        Do While cpcore.db.cs_ok(CS)
-                            BlockedRecordIDList = genericController.vbReplace(BlockedRecordIDList, "," & cpcore.db.cs_getText(CS, "RecordID"), "")
-                            cpcore.db.cs_goNext(CS)
-                        Loop
-                        Call cpcore.db.cs_Close(CS)
-                        If BlockedRecordIDList <> "" Then
-                            '
-                            ' ##### remove the leading comma
-                            BlockedRecordIDList = Mid(BlockedRecordIDList, 2)
-                            ' Check the remaining blocked records against the members Content Management
-                            ' ##### removed hardcoded mistakes from the sql
-                            SQL = "SELECT DISTINCT ccPageContent.ID as RecordID" _
-                                & " FROM ((ccPageContent" _
-                                & " LEFT JOIN ccGroupRules ON ccPageContent.ContentControlID = ccGroupRules.ContentID)" _
-                                & " LEFT JOIN ccgroups AS ManagementGroups ON ccGroupRules.GroupID = ManagementGroups.ID)" _
-                                & " LEFT JOIN ccMemberRules AS ManagementMemberRules ON ManagementGroups.ID = ManagementMemberRules.GroupID" _
-                                & " WHERE (((ccPageContent.ID) In (" & BlockedRecordIDList & "))" _
-                                & " AND ((ccGroupRules.Active)<>0)" _
-                                & " AND ((ManagementGroups.Active)<>0)" _
-                                & " AND ((ManagementMemberRules.Active)<>0)" _
-                                & " AND ((ManagementMemberRules.DateExpires) Is Null Or (ManagementMemberRules.DateExpires)>" & cpcore.db.encodeSQLDate(cpcore.app_startTime) & ")" _
-                                & " AND ((ManagementMemberRules.MemberID)=" & cpcore.authContext.user.ID & " ));"
-                            CS = cpcore.db.cs_openSql(SQL)
-                            Do While cpcore.db.cs_ok(CS)
-                                BlockedRecordIDList = genericController.vbReplace(BlockedRecordIDList, "," & cpcore.db.cs_getText(CS, "RecordID"), "")
-                                cpcore.db.cs_goNext(CS)
-                            Loop
-                            Call cpcore.db.cs_Close(CS)
-                        End If
-                        If BlockedRecordIDList <> "" Then
-                            ContentBlocked = True
-                        End If
-                        Call cpcore.db.cs_Close(CS)
-                    End If
-                End If
-                '
-                '
-                '
-                If ContentBlocked Then
-                    BlockSourceID = main_BlockSourceDefaultMessage
-                    ContentPadding = 20
-                    BlockedPages = Split(BlockedRecordIDList, ",")
-                    BlockedPageRecordID = genericController.EncodeInteger(BlockedPages(UBound(BlockedPages)))
-                    If True Then
-                        If BlockedPageRecordID <> 0 Then
-                            '$$$$$ cache this
-                            CS = cpcore.csOpen("Page Content", BlockedPageRecordID, , , "CustomBlockMessage,BlockSourceID,RegistrationGroupID,ContentPadding")
-                            If cpcore.db.cs_ok(CS) Then
-                                BlockSourceID = cpcore.db.cs_getInteger(CS, "BlockSourceID")
-                                ContentPadding = cpcore.db.cs_getInteger(CS, "ContentPadding")
-                                CustomBlockMessageFilename = cpcore.db.cs_getText(CS, "CustomBlockMessage")
-                                RegistrationGroupID = cpcore.db.cs_getInteger(CS, "RegistrationGroupID")
-                            End If
-                            Call cpcore.db.cs_Close(CS)
-                        End If
-                    End If
-                    '
-                    ' Block Appropriately
-                    '
-                    Select Case BlockSourceID
-                        Case main_BlockSourceCustomMessage
-                            '
-                            ' ----- Custom Message
-                            '
-                            returnHtml = cpcore.cdnFiles.readFile(CustomBlockMessageFilename)
-                        Case main_BlockSourceLogin
-                            '
-                            ' ----- Login page
-                            '
-                            If Not cpcore.authContext.isAuthenticated() Then
-                                If Not cpcore.authContext.isRecognized(cpcore) Then
-                                    '
-                                    ' not recognized
-                                    '
-                                    BlockCopy = "" _
-                                        & "<p>This content has limited access. If you have an account, please login using this form.</p>" _
-                                        & ""
-                                    BlockForm = cpcore.htmlDoc.getLoginForm()
-                                Else
-                                    '
-                                    ' recognized, not authenticated
-                                    '
-                                    BlockCopy = "" _
-                                        & "<p>This content has limited access. You were recognized as ""<b>" & cpcore.authContext.user.Name & "</b>"", but you need to login to continue. To login to this account or another, please use this form.</p>" _
-                                        & ""
-                                    BlockForm = cpcore.htmlDoc.getLoginForm()
-                                End If
-                            Else
-                                '
-                                ' authenticated
-                                '
-                                BlockCopy = "" _
-                                    & "<p>You are currently logged in as ""<b>" & cpcore.authContext.user.Name & "</b>"". If this is not you, please <a href=""?" & cpcore.web_RefreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
-                                    & "<p>This account does not have access to this content. If you want to login with a different account, please use this form.</p>" _
-                                    & ""
-                                BlockForm = cpcore.htmlDoc.getLoginForm()
-                            End If
-                            returnHtml = "" _
-                                & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td align=center>" _
-                                & "<div style=""width:400px;text-align:left;"">" _
-                                & cpcore.error_GetUserError() _
-                                & BlockCopy _
-                                & BlockForm _
-                                & "</div></td></tr></table>"
-                        Case main_BlockSourceRegistration
-                            '
-                            ' ----- Registration
-                            '
-                            If cpcore.docProperties.getInteger("subform") = main_BlockSourceLogin Then
-                                '
-                                ' login subform form
-                                '
-                                BlockForm = cpcore.htmlDoc.getLoginForm()
-                                BlockCopy = "" _
-                                    & "<p>This content has limited access. If you have an account, please login using this form.</p>" _
-                                    & "<p>If you do not have an account, <a href=?" & cpcore.web_RefreshQueryString & "&subform=0>click here to register</a>.</p>" _
-                                    & ""
-                            Else
-                                '
-                                ' Register Form
-                                '
-                                If Not cpcore.authContext.isAuthenticated() And cpcore.authContext.isRecognized(cpcore) Then
-                                    '
-                                    ' Can not take the chance, if you go to a registration page, and you are recognized but not auth -- logout first
-                                    '
-                                    Call cpcore.authContext.logout(cpcore)
-                                End If
-                                If Not cpcore.authContext.isAuthenticated() Then
-                                    '
-                                    ' Not Authenticated
-                                    '
-                                    BlockCopy = "" _
-                                        & "<p>This content has limited access. If you have an account, <a href=?" & cpcore.web_RefreshQueryString & "&subform=" & main_BlockSourceLogin & ">Click Here to login</a>.</p>" _
-                                        & "<p>To view this content, please complete this form.</p>" _
-                                        & ""
-                                Else
-                                    BlockCopy = "" _
-                                        & "<p>You are currently logged in as ""<b>" & cpcore.authContext.user.Name & "</b>"". If this is not you, please <a href=""?" & cpcore.web_RefreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
-                                        & "<p>This account does not have access to this content. To view this content, please complete this form.</p>" _
-                                        & ""
-                                End If
-                                '
-                                If False Then '.3.551" Then
-                                    '
-                                    ' Old Db - use Joinform
-                                    '
-                                    'BlockForm = main_GetJoinForm()
-                                Else
-                                    '
-                                    ' Use Registration FormPage
-                                    '
-                                    Call cpcore.main_VerifyRegistrationFormPage()
-                                    BlockForm = pageManager_GetFormPage("Registration Form", RegistrationGroupID)
-                                End If
-                            End If
-                            returnHtml = "" _
-                                & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td align=center>" _
-                                & "<div style=""width:400px;text-align:left;"">" _
-                                & cpcore.error_GetUserError() _
-                                & BlockCopy _
-                                & BlockForm _
-                                & "</div></td></tr></table>"
-                        Case Else
-                            '
-                            ' ----- Content as blocked - convert from site property to content page
-                            '
-                            returnHtml = pageManager_GetDefaultBlockMessage(UseContentWatchLink)
-                    End Select
-                    '
-                    ' If the output is blank, put default message in
-                    '
-                    If returnHtml = "" Then
-                        returnHtml = pageManager_GetDefaultBlockMessage(UseContentWatchLink)
-                    End If
-                    '
-                    ' Encode the copy
-                    '
-                    returnHtml = cpcore.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.ID, cpcore.authContext.isAuthenticated, layoutError)
-                    returnHtml = cpcore.htmlDoc.html_encodeContent9(returnHtml, cpcore.authContext.user.ID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
-                    'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, 0, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
-                    RQS = cpcore.web_RefreshQueryString
-                    If RQS <> "" Then
-                        returnHtml = genericController.vbReplace(returnHtml, "?method=login", "?method=Login&" & RQS, 1, 99, vbTextCompare)
-                    End If
-                    '
-                    ' Add in content padding required for integration with the template
-                    '
-                    returnHtml = pageManager_GetContentBoxWrapper(returnHtml, ContentPadding)
-                End If
-                '
-                '---------------------------------------------------------------------------------
-                ' ----- Encoding, Tracking and Triggers
-                '---------------------------------------------------------------------------------
-                '
-                '????? test triggers and trackcontentset
-                If Not ContentBlocked Then
-                    'IsPrinterversion = main_GetStreamText2(RequestNameInterceptpage) = LegacyInterceptPageSNPrinterversion)
-                    If cpcore.visitProperty.getBoolean("AllowQuickEditor") Then
-                        '
-                        ' Quick Editor, no encoding or tracking
-                        '
-                    Else
-                        ' $$$$$ convert to pcc cache
-                        'SelectFieldList = "ID,Viewings,ContentControlID,ContactMemberID,AllowHitNotification,TriggerSendSystemEmailID,TriggerConditionID,TriggerConditionGroupID,TriggerAddGroupID,TriggerRemoveGroupID"
-                        '                If (currentPageID <> 0) And (main_RenderCache_CurrentPage_ContentId <> 0) Then
-                        '                    'pageManager_ContentName = metaData.getContentNameByID(main_RenderCache_CurrentPage_ContentId)
-                        '                    If main_RenderCache_CurrentPage_ContentName = "" Then
-                        '                        main_RenderCache_CurrentPage_ContentName = iRootPageContentName
-                        '                    End If
-                        '                    If main_RenderCache_CurrentPage_ContentName <> "" Then
-                        '                        CS = main_OpenCSContentRecord_Internal(main_RenderCache_CurrentPage_ContentName, currentPageID, , , SelectFieldList)
-                        '                    End If
-                        '                ElseIf (main_RenderCache_CurrentPage_ContentName <> "") Then
-                        '                    CS = main_OpenCSContentRecord_Internal(main_RenderCache_CurrentPage_ContentName, PageRecordID, , , SelectFieldList)
-                        '                End If
-                        'If app.csv_IsCSOK(CS) Then
-                        contactMemberID = genericController.EncodeInteger(cache_pageContent(PCC_ContactMemberID, main_RenderCache_CurrentPage_PCCPtr))
-                        pageViewings = genericController.EncodeInteger(cache_pageContent(PCC_Viewings, main_RenderCache_CurrentPage_PCCPtr))
-                        'contactMemberID = app.csv_cs_getInteger(CS, "ContactMemberID")
-                        If cpcore.authContext.isEditing(cpcore, main_RenderCache_CurrentPage_ContentName) Or cpcore.visitProperty.getBoolean("AllowWorkflowRendering") Then
-                            '
-                            ' Link authoring, workflow rendering -> do encoding, but no tracking
-                            '
-                            returnHtml = cpcore.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.ID, cpcore.authContext.isAuthenticated, layoutError)
-                            returnHtml = cpcore.htmlDoc.html_encodeContent9(returnHtml, cpcore.authContext.user.ID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
-                        ElseIf cpcore.htmlDoc.pageManager_printVersion Then
-                            '
-                            ' Printer Version -> personalize and count viewings, no tracking
-                            '
-                            returnHtml = cpcore.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.ID, cpcore.authContext.isAuthenticated, layoutError)
-                            returnHtml = cpcore.htmlDoc.html_encodeContent9(returnHtml, cpcore.authContext.user.ID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
-                            'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
-                            Call cpcore.db.executeSql("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & currentPageID)
-                            'Call app.csv_SetCS(CS, "Viewings", app.csv_cs_getInteger(CS, "Viewings") + 1)
-                        Else
-                            '
-                            ' Live content
-                            '
-                            '!!!!!!!!!!!!!!!!!!!!!!!!
-                            ' this should be done before the contentbox is added
-                            ' so a stray blocktext does not truncate the html
-                            '!!!!!!!!!!!!!!!!!!!!!!!!!
-                            returnHtml = cpcore.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.ID, cpcore.authContext.isAuthenticated, layoutError)
-                            returnHtml = cpcore.htmlDoc.html_encodeContent9(returnHtml, cpcore.authContext.user.ID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
-                            'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
-                            'Call main_TrackContent(main_RenderCache_CurrentPage_ContentName, currentPageID)
-                            'Call main_TrackContentSet(CS)
-                            Call cpcore.db.executeSql("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & currentPageID)
-                            'Call app.csv_SetCS(CS, "Viewings", app.csv_cs_getInteger(CS, "Viewings") + 1)
-                        End If
-                        '
-                        ' Page Hit Notification
-                        '
-                        If (Not cpcore.authContext.visit.ExcludeFromAnalytics) And (contactMemberID <> 0) And (InStr(1, cpcore.webServer.requestBrowser, "kmahttp", vbTextCompare) = 0) Then
-                            AllowHitNotification = genericController.EncodeBoolean(cache_pageContent(PCC_AllowHitNotification, main_RenderCache_CurrentPage_PCCPtr))
-                            'AllowHitNotification = app.csv_cs_getBoolean(CS, "AllowHitNotification")
-                            If AllowHitNotification Then
-                                PageName = genericController.encodeText(cache_pageContent(PCC_Name, main_RenderCache_CurrentPage_PCCPtr))
-                                If PageName = "" Then
-                                    PageName = genericController.encodeText(cache_pageContent(PCC_MenuHeadline, main_RenderCache_CurrentPage_PCCPtr))
-                                    If PageName = "" Then
-                                        PageName = genericController.encodeText(cache_pageContent(PCC_Headline, main_RenderCache_CurrentPage_PCCPtr))
-                                        If PageName = "" Then
-                                            PageName = "[no name]"
-                                        End If
-                                    End If
-                                End If
-                                Body = Body & "<p><b>Page Hit Notification.</b></p>"
-                                Body = Body & "<p>This email was sent to you by the Contensive Server as a notification of the following content viewing details.</p>"
-                                Body = Body & genericController.StartTable(4, 1, 1)
-                                Body = Body & "<tr><td align=""right"" width=""150"" Class=""ccPanelHeader"">Description<br><img alt=""image"" src=""http://" & cpcore.webServer.requestDomain & "/ccLib/images/spacer.gif"" width=""150"" height=""1""></td><td align=""left"" width=""100%"" Class=""ccPanelHeader"">Value</td></tr>"
-                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Domain", cpcore.webServer.webServerIO_requestDomain, True)
-                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Link", cpcore.webServer.webServerIO_ServerLink, False)
-                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Page Name", PageName, True)
-                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Member Name", cpcore.authContext.user.Name, False)
-                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Member #", CStr(cpcore.authContext.user.ID), True)
-                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Start Time", CStr(cpcore.authContext.visit.StartTime), False)
-                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit #", CStr(cpcore.authContext.visit.ID), True)
-                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit IP", cpcore.webServer.requestRemoteIP, False)
-                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Browser ", cpcore.webServer.requestBrowser, True)
-                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visitor #", CStr(cpcore.authContext.visitor.ID), False)
-                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Authenticated", CStr(cpcore.authContext.visit.VisitAuthenticated), True)
-                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Referrer", cpcore.authContext.visit.HTTP_REFERER, False)
-                                Body = Body & kmaEndTable
-                                Call cpcore.email.sendPerson(contactMemberID, cpcore.siteProperties.getText("EmailFromAddress", "info@" & cpcore.webServer.webServerIO_requestDomain), "Page Hit Notification", Body, False, True, 0, "", False)
-                            End If
-                        End If
-                        '
-                        ' Process Trigger Conditions
-                        '
-                        '   1) If Condition w/ Trigger Group
-                        '   2) Then Send Email
-                        '   3) Then Add to Group
-                        '   4) Then Remove From Group
-                        '
-                        ConditionID = genericController.EncodeInteger(cache_pageContent(PCC_TriggerConditionID, main_RenderCache_CurrentPage_PCCPtr))
-                        'ConditionID = app.csv_cs_getInteger(CS, "TriggerConditionID")
-                        ConditionGroupID = genericController.EncodeInteger(cache_pageContent(PCC_TriggerConditionGroupID, main_RenderCache_CurrentPage_PCCPtr))
-                        'ConditionGroupID = app.csv_cs_getInteger(CS, "TriggerConditionGroupID")
-                        main_AddGroupID = genericController.EncodeInteger(cache_pageContent(PCC_TriggerAddGroupID, main_RenderCache_CurrentPage_PCCPtr))
-                        'main_AddGroupID = app.csv_cs_getInteger(CS, "TriggerAddGroupID")
-                        RemoveGroupID = genericController.EncodeInteger(cache_pageContent(PCC_TriggerRemoveGroupID, main_RenderCache_CurrentPage_PCCPtr))
-                        'RemoveGroupID = app.csv_cs_getInteger(CS, "TriggerRemoveGroupID")
-                        SystemEMailID = genericController.EncodeInteger(cache_pageContent(PCC_TriggerSendSystemEmailID, main_RenderCache_CurrentPage_PCCPtr))
-                        'SystemEMailID = app.csv_cs_getInteger(CS, "TriggerSendSystemEmailID")
-                        Select Case ConditionID
-                            Case 1
-                                '
-                                ' Always
-                                '
-                                If SystemEMailID <> 0 Then
-                                    Call cpcore.email.sendSystem_Legacy(cpcore.content_GetRecordName("System Email", SystemEMailID), "", cpcore.authContext.user.ID)
-                                End If
-                                If main_AddGroupID <> 0 Then
-                                    Call cpcore.group_AddGroupMember(cpcore.group_GetGroupName(main_AddGroupID))
-                                End If
-                                If RemoveGroupID <> 0 Then
-                                    Call cpcore.group_DeleteGroupMember(cpcore.group_GetGroupName(RemoveGroupID))
-                                End If
-                            Case 2
-                                '
-                                ' If in Condition Group
-                                '
-                                If ConditionGroupID <> 0 Then
-                                    If cpcore.authContext.IsMemberOfGroup2(cpcore, cpcore.group_GetGroupName(ConditionGroupID)) Then
-                                        If SystemEMailID <> 0 Then
-                                            Call cpcore.email.sendSystem_Legacy(cpcore.content_GetRecordName("System Email", SystemEMailID), "", cpcore.authContext.user.ID)
-                                        End If
-                                        If main_AddGroupID <> 0 Then
-                                            Call cpcore.group_AddGroupMember(cpcore.group_GetGroupName(main_AddGroupID))
-                                        End If
-                                        If RemoveGroupID <> 0 Then
-                                            Call cpcore.group_DeleteGroupMember(cpcore.group_GetGroupName(RemoveGroupID))
-                                        End If
-                                    End If
-                                End If
-                            Case 3
-                                '
-                                ' If not in Condition Group
-                                '
-                                If ConditionGroupID <> 0 Then
-                                    If Not cpcore.authContext.IsMemberOfGroup2(cpcore, cpcore.group_GetGroupName(ConditionGroupID)) Then
-                                        If main_AddGroupID <> 0 Then
-                                            Call cpcore.group_AddGroupMember(cpcore.group_GetGroupName(main_AddGroupID))
-                                        End If
-                                        If RemoveGroupID <> 0 Then
-                                            Call cpcore.group_DeleteGroupMember(cpcore.group_GetGroupName(RemoveGroupID))
-                                        End If
-                                        If SystemEMailID <> 0 Then
-                                            Call cpcore.email.sendSystem_Legacy(cpcore.content_GetRecordName("System Email", SystemEMailID), "", cpcore.authContext.user.ID)
-                                        End If
-                                    End If
-                                End If
-                        End Select
-                        'End If
-                        'Call app.closeCS(CS)
-                    End If
-                    '
-                    '---------------------------------------------------------------------------------
-                    ' ----- Add in ContentPadding (a table around content with the appropriate padding added)
-                    '---------------------------------------------------------------------------------
-                    '
-                    If True And (returnHtml <> "") Then
-                        ContentPadding = genericController.EncodeInteger(cache_pageContent(PCC_ContentPadding, main_RenderCache_CurrentPage_PCCPtr))
-                        returnHtml = pageManager_GetContentBoxWrapper(returnHtml, ContentPadding)
-                    End If
-
-
-                    '
-                    '---------------------------------------------------------------------------------
-                    ' ----- Set Headers
-                    '---------------------------------------------------------------------------------
-                    '
-                    If DateModified <> Date.MinValue Then
-                        Call cpcore.webServer.web_addResponseHeader("LAST-MODIFIED", genericController.GetGMTFromDate(DateModified))
-                        'Date: Sun, 07 Dec 2008 21:06:14 GMT
-                    End If
-                    '
-                    '---------------------------------------------------------------------------------
-                    ' ----- Store page javascript
-                    '---------------------------------------------------------------------------------
-                    '
-                    Call cpcore.htmlDoc.main_AddOnLoadJavascript2(JSOnLoad, "page content")
-                    Call cpcore.htmlDoc.main_AddHeadScriptCode(JSHead, "page content")
-                    If JSFilename <> "" Then
-                        Call cpcore.htmlDoc.main_AddHeadScriptLink(cpcore.csv_getVirtualFileLink(cpcore.serverConfig.appConfig.cdnFilesNetprefix, JSFilename), "page content")
-                    End If
-                    Call cpcore.htmlDoc.main_AddEndOfBodyJavascript2(JSEndBody, "page content")
-                    '
-                    '---------------------------------------------------------------------------------
-                    ' Set the Meta Content flag
-                    '---------------------------------------------------------------------------------
-                    '
-                    Call cpcore.main_SetMetaContent(main_RenderCache_CurrentPage_ContentId, currentPageID)
-                    '
-                    '---------------------------------------------------------------------------------
-                    ' ----- OnPageStartEvent
-                    '---------------------------------------------------------------------------------
-                    '
-                    bodyContent = returnHtml
-                    Dim addonList As List(Of addonModel) = Models.Entity.addonModel.createList_OnPageStartEvent(cpcore, New List(Of String))
-                    For Each addon As Models.Entity.addonModel In addonList
-                        AddonContent = cpcore.addon.execute_legacy5(addon.ID, addon.Name, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
-                        bodyContent = AddonContent & bodyContent
-                    Next
-                    'AddOnCnt = UBound(cpcore.addonCache.addonCache.onPageStartPtrs) + 1
-                    'For addonPtr = 0 To AddOnCnt - 1
-                    '    addonCachePtr = cpcore.addonCache.addonCache.onPageStartPtrs(addonPtr)
-                    '    If addonCachePtr > -1 Then
-                    '        addonId = cpcore.addonCache.addonCache.addonList(addonCachePtr.ToString).id
-                    '        If addonId > 0 Then
-                    '            AddonName = cpcore.addonCache.addonCache.addonList(addonCachePtr.ToString).name
-                    '            AddonContent = cpcore.addon.execute_legacy5(addonId, AddonName, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
-                    '            bodyContent = AddonContent & bodyContent
-                    '        End If
-                    '    End If
-                    'Next
-                    returnHtml = bodyContent
-                    '
-                    '---------------------------------------------------------------------------------
-                    ' ----- OnPageEndEvent
-                    '---------------------------------------------------------------------------------
-                    '
-                    bodyContent = returnHtml
-                    AddOnCnt = UBound(cpcore.addonCache.addonCache.onPageEndPtrs) + 1
-                    For addonPtr = 0 To AddOnCnt - 1
-                        addonCachePtr = cpcore.addonCache.addonCache.onPageEndPtrs(addonPtr)
-                        If addonCachePtr > -1 Then
-                            addonId = cpcore.addonCache.addonCache.addonList(addonCachePtr.ToString).id
-                            If addonId > 0 Then
-                                AddonName = cpcore.addonCache.addonCache.addonList(addonCachePtr.ToString).name
-                                AddonContent = cpcore.addon.execute_legacy5(addonId, AddonName, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
-                                bodyContent = bodyContent & AddonContent
-                            End If
-                        End If
-                    Next
-                    returnHtml = bodyContent
-                    '
-                End If
-                If cpcore.htmlDoc.main_MetaContent_Title = "" Then
-                    '
-                    ' Set default page title
-                    '
-                    cpcore.htmlDoc.main_MetaContent_Title = currentPageName
-                End If
-                '
-                ' add contentid and sectionid
-                '
-                Call cpcore.htmlDoc.main_AddHeadTag2("<meta name=""contentId"" content=""" & currentPageID & """ >", "page content")
-                Call cpcore.htmlDoc.main_AddHeadTag2("<meta name=""sectionId"" content=""" & currentSectionID & """ >", "page content")
-            End If
-            '
-            ' Display Admin Warnings with Edits for record errors
-            '
-            If cpcore.htmlDoc.main_AdminWarning <> "" Then
-                '
-                If cpcore.htmlDoc.main_AdminWarningPageID <> 0 Then
-                    cpcore.htmlDoc.main_AdminWarning = cpcore.htmlDoc.main_AdminWarning & "</p>" & cpcore.main_GetRecordEditLink2("Page Content", cpcore.htmlDoc.main_AdminWarningPageID, True, "Page " & cpcore.htmlDoc.main_AdminWarningPageID, cpcore.authContext.isAuthenticatedAdmin(cpcore)) & "&nbsp;Edit the page<p>"
-                    cpcore.htmlDoc.main_AdminWarningPageID = 0
-                End If
-                '
-                If cpcore.htmlDoc.main_AdminWarningSectionID <> 0 Then
-                    cpcore.htmlDoc.main_AdminWarning = cpcore.htmlDoc.main_AdminWarning & "</p>" & cpcore.main_GetRecordEditLink2("Site Sections", cpcore.htmlDoc.main_AdminWarningSectionID, True, "Section " & cpcore.htmlDoc.main_AdminWarningSectionID, cpcore.authContext.isAuthenticatedAdmin(cpcore)) & "&nbsp;Edit the section<p>"
-                    cpcore.htmlDoc.main_AdminWarningSectionID = 0
-                End If
-
-                returnHtml = "" _
-                    & cpcore.htmlDoc.html_GetAdminHintWrapper(cpcore.htmlDoc.main_AdminWarning) _
-                    & returnHtml _
-                    & ""
-                cpcore.htmlDoc.main_AdminWarning = ""
-            End If
-            '
-            pageManager_GetHtmlBody_GetSection_GetContent = returnHtml
-            '
-            Exit Function
-            '
-ErrorTrap:
-            Err_Number = Err.Number
-            Err_Source = Err.Source
-            Err_Description = Err.Description
-            ErrString = genericController.GetErrString(Err)
-            Throw New ApplicationException("Unexpected exception") ' throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError19("pageManager_GetHtmlBody_GetSection_GetContent", "Trap", Err_Number, Err_Source, Err_Description, True)
-            Err.Clear()
-            If cpcore.authContext.isAuthenticatedAdmin(cpcore) Then
-                '
-                ' Put up an admin hint
-                '
-                pageManager_GetHtmlBody_GetSection_GetContent = cpcore.htmlDoc.html_GetAdminHintWrapper("<p>There was an error creating the content for this page. The details of this error follow.</p><p>" & ErrString & "</p>")
-            Else
-                '
-                ' There was a problem
-                '
-                pageManager_GetHtmlBody_GetSection_GetContent = "<!-- Error creating page content -->"
-            End If
-        End Function
-        '
-        '=============================================================================
-        ' pageManager_GetHtmlBody_GetSection_GetContentBox
-        '   PageID is the page to display. Must be non-0
-        '   RootPageID is the id of the top-most page in the tree. Must be non-0
-        '   If PageID is not under RootPageID, redirect to RootPageID
-        '   If PageID is not within RootPageContentName, return the RootPageID
-        '=============================================================================
-        '
-        Friend Function pageManager_GetHtmlBody_GetSection_GetContentBox(PageID As Integer, rootPageId As Integer, RootPageContentName As String, OrderByClause As String, AllowChildPageList As Boolean, AllowReturnLink As Boolean, ArchivePages As Boolean, SectionID As Integer, UseContentWatchLink As Boolean, allowPageWithoutSectionDisplay As Boolean) As String
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("pageManager_GetHtmlBody_GetSection_GetContentBox")
-            '
-            Dim iIsEditing As Boolean
-            Dim LiveBody As String
-            Dim topOfParentBranchPtr As Integer
-            Dim topOfParentBranchPageId As Integer
-            Dim returnHtml As String
-            Dim currentPageContentName As String
-            Dim pageAdminMessage As String
-            Dim isPageWithoutSection As Boolean
-            Dim Pointer As Integer
-            Dim SelectFieldList As String
-            Dim Copy As String
-            Dim PagePointer As Integer
-            'Dim NowDate As Date
-            Dim ContentName As String
-            Dim EditTag As String
-            Dim ContentPadding As Integer
-            Dim pagePCCPtr As Integer
-            Dim hint As String
-            Dim EditLink As String
-            Dim PageName As String
-            Dim pageMenuHeadline As String
-            Dim PageLink As String
-            '
-            'hint = "pageManager_GetHtmlBody_GetSection_GetContentBox, enter"
-            If cpcore.docOpen Then
-                '
-                ' ----- Load the content
-                '
-                'hint = hint & ",10"
-                Call main_LoadRenderCache(PageID, rootPageId, RootPageContentName, OrderByClause, AllowChildPageList, AllowReturnLink, ArchivePages, SectionID, UseContentWatchLink)
-                '
-                ' ----- Verify a valid current page was found
-                '
-                ' ????? test
-                'hint = hint & ",20"
-                If (redirectLink = "") And (main_RenderCache_CurrentPage_PCCPtr = -1) Then
-                    'hint = hint & ",30"
-                    If PageID <> 0 Then
-                        '
-                        ' BID was not found, redirect to RootPage
-                        '
-                        Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
-                        pageManager_RedirectBecausePageNotFound = True
-                        pageManager_RedirectReason = "The page could not be found from its ID [" & PageID & "]. It may have been deleted or marked inactive. "
-                        redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
-                        Exit Function
-                    Else
-                        '
-                        ' Root page was requested, but not found and could not be created, this is an error
-                        '
-                        Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
-                        pageManager_RedirectBecausePageNotFound = True
-                        pageManager_RedirectReason = "The page could not be found because it's ID could not be determined."
-                        redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
-                        Exit Function
-                    End If
-                End If
-                '
-                ' ----- Verify this bid can be displayed on this RootPageName
-                '
-                'hint = hint & ",50"
-                If (redirectLink = "") Then
-                    'hint = hint & ",60"
-                    If Not allowPageWithoutSectionDisplay Then
-                        '????? test
-                        'hint = hint & ",70"
-                        If (main_RenderCache_ParentBranch_PCCPtrCnt > 0) Then
-                            '
-                            ' check top of parent branch
-                            '
-                            '????? test
-                            'hint = hint & ",80"
-                            topOfParentBranchPtr = genericController.EncodeInteger(main_RenderCache_ParentBranch_PCCPtrs(main_RenderCache_ParentBranch_PCCPtrCnt - 1))
-                            topOfParentBranchPageId = genericController.EncodeInteger(cache_pageContent(PCC_ID, topOfParentBranchPtr))
-                            isPageWithoutSection = (topOfParentBranchPageId <> rootPageId)
-                        Else
-                            '
-                            ' no parent pages, check the current page name against root page name
-                            '
-                            '????? test
-                            'hint = hint & ",90"
-                            isPageWithoutSection = (genericController.EncodeInteger(cache_pageContent(PCC_ID, main_RenderCache_CurrentPage_PCCPtr)) <> rootPageId)
-                        End If
-                        'hint = hint & ",100"
-                        If isPageWithoutSection Then
-                            '
-                            '
-                            '
-                            '????? test this
-                            'hint = hint & ",110"
-                            currentPageContentName = cpcore.metaData.getContentNameByID(genericController.EncodeInteger(cache_pageContent(PCC_ContentControlID, main_RenderCache_CurrentPage_PCCPtr)))
-                            If cpcore.authContext.isAuthenticatedContentManager(cpcore, currentPageContentName) Then
-                                '
-                                ' allow page without section because this is a content manager -- but give them a message
-                                '
-                                'hint = hint & ",120"
-                                pageAdminMessage = "<p>This page can only be displayed to content managers because it is not part of a valid section. You can allow this type of access by setting the site property 'Allow Page Without Section Display' but care should be taken. If a blocked page is deleted, any child pages it may have had could be available for public display.</p>"
-                            Else
-                                '
-                                ' page without section (root page name is the legacy section) not allowed
-                                '
-                                'hint = hint & ",130"
-                                Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
-                                pageManager_RedirectBecausePageNotFound = True
-                                '????? test
-                                pageManager_RedirectReason = "The page you requested [" & PageID & "] could not be displayed because there is a problem with one of it's parent pages. All parent pages must be available to verify security permissions. A parent page may have been deleted or inactivated, or the page may have been requested from an incorrect location."
-                                redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
-                                Exit Function
-                            End If
-                        End If
-                    End If
-                End If
-                'hint = hint & ",140"
-                If redirectLink = "" Then
-                    '
-                    ' ----- This page can be displayed
-                    '
-                    '            'hint = hint & ",150"
-                    '            If app.csv_IsCSOK(main_oldCacheRS_cs) Then
-                    '                '
-                    '                ' if this is not the first pagecontent to be opened on this page, close the previous first
-                    '                '
-                    '                Call app.closeCS(main_oldCacheRS_cs)
-                    '            End If
-                    '            'hint = hint & ",160"
-                    '            main_oldCacheRS_cs = main_OpenCSContentRecord_Internal(main_RenderCache_CurrentPage_ContentName, PageID, main_RenderCache_CurrentPage_IsRenderingMode Or main_RenderCache_CurrentPage_IsQuickEditing, main_RenderCache_CurrentPage_IsQuickEditing)
-                    '
-                    'hint = hint & ",170"
-                    '            If Not app.csv_IsCSOK(main_oldCacheRS_cs) Then
-                    '                '
-                    '                ' freak bug - page was not found - maybe deleted in a concurrent process
-                    '                '
-                    '                'hint = hint & ",180"
-                    '                Call app.closeCS(main_oldCacheRS_cs)
-                    '                pageManager_RedirectBecausePageNotFound = True
-                    ''????? test
-                    '                pageManager_RedirectReason = "The page [" & PageID & "] could not be found."
-                    '                pageManager_RedirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
-                    '                Exit Function
-                    '            Else
-                    '' $$$$$ remove main_oldCacheRS_cs, use pccPtr
-                    '                'hint = hint & ",190"
-                    '                'currentPageName = c.db.cs_getText(main_oldCacheRS_cs, "name")
-                    '' $$$$$ this should just be the pcc field list
-                    '                'SelectFieldList = app.cs_getSelectFieldList(main_oldCacheRS_cs)
-                    '' $$$$$ remove all uses of main_oldCacheRS_FieldNames/main_oldCacheRS_FieldValues
-                    '                'main_oldCacheRS_FieldNames = Split(SelectFieldList, ",")
-                    '                'main_oldCacheRS_FieldValues = c.db.cs_getRow(main_oldCacheRS_cs)
-                    '                'For Pointer = 0 To UBound(main_oldCacheRS_FieldValues)
-                    '                '    main_oldCacheRS_FieldValues(Pointer) = genericController.vbReplace(Replace(main_oldCacheRS_FieldValues(Pointer), vbTab, ""), vbCrLf, "")
-                    '                'Next
-                    '            End If
-                    '
-                    ' ----- all calls go through Live body routine, Quick Editor added directly to live routine
-                    '
-                    ' $$$$$ remove main_oldCacheRS_cs, use pccPtr
-                    'hint = hint & ",200"
-                    '????? test - this was a routine placed in-line
-                    iIsEditing = cpcore.authContext.isEditing(cpcore, main_RenderCache_CurrentPage_ContentName)
-                    '
-                    ' ----- Render the Body
-                    '
-                    LiveBody = pageManager_GetHtmlBody_GetSection_GetContentBox_Live_Body(main_RenderCache_CurrentPage_ContentName, main_RenderCache_CurrentPage_ContentId, OrderByClause, AllowChildPageList, False, rootPageId, AllowReturnLink, RootPageContentName, ArchivePages)
-                    If cpcore.authContext.isAdvancedEditing(cpcore, "") Then
-                        returnHtml = returnHtml & cpcore.main_GetRecordEditLink(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage)) & LiveBody
-                    ElseIf iIsEditing Then
-                        PageName = genericController.encodeText(cache_pageContent(PCC_Name, main_RenderCache_CurrentPage_PCCPtr))
-                        EditLink = cpcore.main_GetRecordEditLink2(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage), PageName, cpcore.authContext.isEditing(cpcore, ContentName))
-                        returnHtml = returnHtml & cpcore.htmlDoc.main_GetEditWrapper("", cpcore.main_GetRecordEditLink(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage)) & LiveBody)
-                    Else
-                        returnHtml = returnHtml & LiveBody
-                    End If
-                    '
-                    ' Build the Public currentNavigationStructure
-                    '
-                    '????? test all this --------------------- start
-                    'hint = hint & ",210"
-                    currentNavigationStructure = ""
-                    If main_RenderCache_ParentBranch_PCCPtrCnt > 0 Then
-                        'hint = hint & ",220"
-                        For Pointer = main_RenderCache_ParentBranch_PCCPtrCnt - 1 To 0 Step -1
-                            'hint = hint & ",230"
-                            If Pointer = (main_RenderCache_ParentBranch_PCCPtrCnt - 1) Then
-                                currentNavigationStructure = currentNavigationStructure & vbTab & "0"
-                            Else
-                                currentNavigationStructure = currentNavigationStructure & vbTab & "1"
-                            End If
-                            pagePCCPtr = genericController.EncodeInteger(main_RenderCache_ParentBranch_PCCPtrs(Pointer))
-                            '
-                            ' buffer text fields because this excode format does not allow them
-                            '
-                            PageName = genericController.encodeText(cache_pageContent(PCC_Name, pagePCCPtr))
-                            PageName = genericController.vbReplace(PageName, vbCrLf, " ")
-                            PageName = genericController.vbReplace(PageName, vbCr, " ")
-                            PageName = genericController.vbReplace(PageName, vbLf, " ")
-                            PageName = genericController.vbReplace(PageName, vbTab, " ")
-                            PageName = Trim(PageName)
-                            '
-                            PageLink = genericController.encodeText(cache_pageContent(PCC_Link, pagePCCPtr))
-                            PageLink = genericController.vbReplace(PageLink, vbCrLf, " ")
-                            PageLink = genericController.vbReplace(PageLink, vbCr, " ")
-                            PageLink = genericController.vbReplace(PageLink, vbLf, " ")
-                            PageLink = genericController.vbReplace(PageLink, vbTab, " ")
-                            PageLink = Trim(PageLink)
-                            '
-                            pageMenuHeadline = Trim(genericController.encodeText(cache_pageContent(PCC_MenuHeadline, pagePCCPtr)))
-                            If pageMenuHeadline <> "" Then
-                                pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbCrLf, " ")
-                                pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbCr, " ")
-                                pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbLf, " ")
-                                pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbTab, " ")
-                                pageMenuHeadline = Trim(pageMenuHeadline)
-                            Else
-                                pageMenuHeadline = PageName
-                                If pageMenuHeadline = "" Then
-                                    pageMenuHeadline = "Related Page"
-                                End If
-                            End If
-                            currentNavigationStructure = currentNavigationStructure _
-                            & vbTab & genericController.EncodeInteger(cache_pageContent(PCC_ID, pagePCCPtr)) _
-                            & vbTab & genericController.EncodeInteger(cache_pageContent(PCC_ParentID, pagePCCPtr)) _
-                            & vbTab & pageMenuHeadline _
-                            & vbTab & PageName _
-                            & vbTab & PageLink _
-                            & vbTab & genericController.EncodeInteger(cache_pageContent(PCC_TemplateID, pagePCCPtr)) _
-                            & vbTab & genericController.EncodeBoolean(cache_pageContent(PCC_AllowInMenus, pagePCCPtr)) _
-                            & vbCrLf
-                        Next
-                    End If
-                    'hint = hint & ",300"
-                    If main_RenderCache_CurrentPage_PCCPtr > -1 Then
-                        'hint = hint & ",310"
-                        pagePCCPtr = main_RenderCache_CurrentPage_PCCPtr
-                        currentPageID = genericController.EncodeInteger(cache_pageContent(PCC_ID, pagePCCPtr))
-                        '
-                        ' buffer text fields because this excode format does not allow them
-                        '
-                        PageName = genericController.encodeText(cache_pageContent(PCC_Name, pagePCCPtr))
-                        PageName = genericController.vbReplace(PageName, vbCrLf, " ")
-                        PageName = genericController.vbReplace(PageName, vbCr, " ")
-                        PageName = genericController.vbReplace(PageName, vbLf, " ")
-                        PageName = genericController.vbReplace(PageName, vbTab, " ")
-                        PageName = Trim(PageName)
-                        '
-                        PageLink = genericController.encodeText(cache_pageContent(PCC_Link, pagePCCPtr))
-                        PageLink = genericController.vbReplace(PageLink, vbCrLf, " ")
-                        PageLink = genericController.vbReplace(PageLink, vbCr, " ")
-                        PageLink = genericController.vbReplace(PageLink, vbLf, " ")
-                        PageLink = genericController.vbReplace(PageLink, vbTab, " ")
-                        PageLink = Trim(PageLink)
-                        '
-                        pageMenuHeadline = Trim(genericController.encodeText(cache_pageContent(PCC_MenuHeadline, pagePCCPtr)))
-                        If pageMenuHeadline <> "" Then
-                            pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbCrLf, " ")
-                            pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbCr, " ")
-                            pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbLf, " ")
-                            pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbTab, " ")
-                            pageMenuHeadline = Trim(pageMenuHeadline)
-                        Else
-                            pageMenuHeadline = PageName
-                            If pageMenuHeadline = "" Then
-                                pageMenuHeadline = "Related Page"
-                            End If
-                        End If
-                        currentNavigationStructure = currentNavigationStructure _
-                        & vbTab & "2" _
-                        & vbTab & currentPageID _
-                        & vbTab & genericController.EncodeInteger(cache_pageContent(PCC_ParentID, pagePCCPtr)) _
-                        & vbTab & pageMenuHeadline _
-                        & vbTab & PageName _
-                        & vbTab & PageLink _
-                        & vbTab & genericController.EncodeInteger(cache_pageContent(PCC_TemplateID, pagePCCPtr)) _
-                        & vbTab & genericController.EncodeBoolean(cache_pageContent(PCC_AllowInMenus, pagePCCPtr)) _
-                        & vbCrLf
-                    End If
-                    'hint = hint & ",400"
-                    If main_RenderCache_ChildBranch_PCCPtrCnt > 0 Then
-                        'hint = hint & ",410 main_RenderCache_ChildBranch_PCCPtrCnt=" & main_RenderCache_ChildBranch_PCCPtrCnt
-                        For Pointer = main_RenderCache_ChildBranch_PCCPtrCnt - 1 To 0 Step -1
-                            'hint = hint & ",420 Pointer=" & Pointer
-                            pagePCCPtr = genericController.EncodeInteger(main_RenderCache_ChildBranch_PCCPtrs(Pointer))
-                            '
-                            ' buffer text fields because this excode format does not allow them
-                            '
-                            'hint = hint & ",430 pagePCCPtr=" & pagePCCPtr
-                            PageName = genericController.encodeText(cache_pageContent(PCC_Name, pagePCCPtr))
-                            PageName = genericController.vbReplace(PageName, vbCrLf, " ")
-                            PageName = genericController.vbReplace(PageName, vbCr, " ")
-                            PageName = genericController.vbReplace(PageName, vbLf, " ")
-                            PageName = genericController.vbReplace(PageName, vbTab, " ")
-                            PageName = Trim(PageName)
-                            '
-                            PageLink = genericController.encodeText(cache_pageContent(PCC_Link, pagePCCPtr))
-                            PageLink = genericController.vbReplace(PageLink, vbCrLf, " ")
-                            PageLink = genericController.vbReplace(PageLink, vbCr, " ")
-                            PageLink = genericController.vbReplace(PageLink, vbLf, " ")
-                            PageLink = genericController.vbReplace(PageLink, vbTab, " ")
-                            PageLink = Trim(PageLink)
-                            '
-                            pageMenuHeadline = Trim(genericController.encodeText(cache_pageContent(PCC_MenuHeadline, pagePCCPtr)))
-                            If pageMenuHeadline <> "" Then
-                                pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbCrLf, " ")
-                                pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbCr, " ")
-                                pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbLf, " ")
-                                pageMenuHeadline = genericController.vbReplace(pageMenuHeadline, vbTab, " ")
-                                pageMenuHeadline = Trim(pageMenuHeadline)
-                            Else
-                                pageMenuHeadline = PageName
-                                If pageMenuHeadline = "" Then
-                                    pageMenuHeadline = "Related Page"
-                                End If
-                            End If
-                            'hint = hint & ",440"
-                            currentNavigationStructure = currentNavigationStructure _
-                            & vbTab & "3" _
-                            & vbTab & genericController.EncodeInteger(cache_pageContent(PCC_ID, pagePCCPtr)) _
-                            & vbTab & currentPageID _
-                            & vbTab & pageMenuHeadline _
-                            & vbTab & PageName _
-                            & vbTab & PageLink _
-                            & vbTab & genericController.EncodeInteger(cache_pageContent(PCC_TemplateID, pagePCCPtr)) _
-                            & vbTab & genericController.EncodeBoolean(cache_pageContent(PCC_AllowInMenus, pagePCCPtr)) _
-                            & vbCrLf
-                            'hint = hint & ",450"
-                        Next
-                    End If
-                End If
-                '????? test all this --------------------- end
-                'hint = hint & ",900"
-                If pageAdminMessage <> "" Then
-                    returnHtml = "" _
-                    & cpcore.htmlDoc.html_GetAdminHintWrapper(pageAdminMessage) _
-                    & returnHtml _
-                    & ""
-                End If
-            End If
-            '
-            Call cpcore.debug_testPoint("pageManager_GetHtmlBody_GetSection_GetContentBox, hint=[" & hint & "]")
-            pageManager_GetHtmlBody_GetSection_GetContentBox = returnHtml
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("pageManager_GetHtmlBody_GetSection_GetContentBox, hint=[" & hint & "]")
-        End Function
-        '
-        '========================================================================
-        '   Render the Page Body.
-        '
-        '   CSParentofChildPages is a contentset with the page that is the parent of all child pages for this render.
-        '========================================================================
-        '
-        Friend Function pageManager_GetHtmlBody_GetSection_GetContentBox_Live_Body(ContentName As String, ContentID As Integer, OrderByClause As String, AllowChildList As Boolean, Authoring As Boolean, rootPageId As Integer, AllowReturnLink As Boolean, RootPageContentName As String, ArchivePage As Boolean) As String
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("pageManager_GetHtmlBody_GetSection_GetContentBox_Live_Body")
-            '
-            Dim hint As String
-            Dim Cell As String
-            Dim AddonStatusOK As Boolean
-            Dim ChildListInstanceOptions As String
-            Dim Name As String
-            Dim DateReviewed As Date
-            Dim ReviewedBy As Integer
-            Dim Link As String
-            Dim CS As Integer
-            Dim IconRow As String
-            Dim Filename As String
-            Dim contactMemberID As Integer
-            Dim s As String
-            Dim QueryString As String
-            Dim ParentofChildPageID As Integer
-            Dim LastModified As Date
-            Dim MethodName As String
-            'Dim Compatibility21 As Boolean
-            Dim StreamAdd As String
-            Dim LoopCount As Integer
-            Dim ACStart As Integer
-            Dim ACStop As Integer
-            Dim TagBuffer As String
-            Dim TagSplit() As String
-            Dim NVSplit() As String
-            Dim ListName As String
-            Dim ChildList As String
-            Dim childListSortMethodId As Integer
-            Dim ContentStarted As Boolean
-            Dim AllowEmailPage As Boolean
-            Dim AllowPrinterVersion As Boolean
-            Dim Caption As String
-            Dim PageID As Integer
-            Dim parentPageID As Integer
-            Dim allowChildListDisplay As Boolean
-            Dim dateArchive As Date
-            Dim allowChildListComposite As Boolean
-            Dim allowReturnLinkComposite As Boolean
-            Dim allowReturnLinkDisplay As Boolean
-            Dim headline As String
-            Dim copyFilename As String
-            Dim Copy As String
-            Dim EmailBody As String
-            Dim Body As String
-            Dim allowSeeAlso As Boolean
-            Dim allowMoreInfo As Boolean
-            Dim allowFeedback As Boolean
-            Dim allowLastModifiedFooter As Boolean
-            Dim ModifiedBy As Integer
-            Dim allowReviewedFooter As Boolean
-            Dim allowMessageFooter As Boolean
-            Dim pageContentMessageFooter As String
-            '
-            'hint = hint & "pageManager_GetHtmlBody_GetSection_GetContentBox_Live_Body,010"
-            MethodName = "pageManager_GetHtmlBody_GetSection_GetContentBox_Live_Body"
-            '
-            ' ContentID = genericController.EncodeInteger(main_GetContentID(ContentName))
-            '
-            If True Then
-                'If app.csv_IsCSOK(CSPointer) Then
-                '
-                ' ----- A page was found
-                '
-                PageID = genericController.EncodeInteger(cache_pageContent(PCC_ID, main_RenderCache_CurrentPage_PCCPtr))
-                'pageID = (app.csv_cs_getInteger(CSPointer, "ID"))
-                '        s = "" _
-                '            & "<div>currentPageID=" & currentPageID & "</div>" _
-                '            & "<div>CSPointer id=" & PageID & "</div>" _
-                '            & "<div>main_RenderCache_CurrentPage_PCCPtr=" & main_RenderCache_CurrentPage_PCCPtr & "</div>" _
-                '            & "<div>main_pcc(PCC_ID, main_RenderCache_CurrentPage_PCCPtr )=" & main_pcc(PCC_ID, main_RenderCache_CurrentPage_PCCPtr) & "</div>" _
-                '            & ""
-                parentPageID = genericController.EncodeInteger(cache_pageContent(PCC_ParentID, main_RenderCache_CurrentPage_PCCPtr))
-                'ParentPageID = (app.csv_cs_getInteger(CSPointer, "parentid"))
-                contactMemberID = genericController.EncodeInteger(cache_pageContent(PCC_ContactMemberID, main_RenderCache_CurrentPage_PCCPtr))
-                'contactMemberID = (app.csv_cs_getInteger(CSPointer, "ContactMemberID"))
-                allowChildListDisplay = genericController.EncodeBoolean(cache_pageContent(PCC_AllowChildListDisplay, main_RenderCache_CurrentPage_PCCPtr))
-                allowChildListComposite = AllowChildList And allowChildListDisplay
-                'allowChildListComposite = AllowChildList And (app.csv_cs_getBoolean(CSPointer, "AllowChildListDisplay"))
-                dateArchive = genericController.EncodeDate(cache_pageContent(PCC_DateArchive, main_RenderCache_CurrentPage_PCCPtr))
-                'DateArchive = app.csv_cs_getDate(CSPointer, "DateArchive")
-                'Compatibility21 = genericController.EncodeBoolean(csv_GetSiteProperty("ContentPageCompatibility21", False))
-                childListSortMethodId = genericController.EncodeInteger(cache_pageContent(PCC_ChildListSortMethodID, main_RenderCache_CurrentPage_PCCPtr))
-                'ChildListSortMethodID = app.csv_cs_getInteger(CSPointer, "ChildListSortMethodID")
-                allowReturnLinkDisplay = genericController.EncodeBoolean(cache_pageContent(PCC_allowReturnLinkDisplay, main_RenderCache_CurrentPage_PCCPtr))
-                allowReturnLinkComposite = AllowReturnLink And allowReturnLinkDisplay
-                '
-                AllowPrinterVersion = genericController.EncodeBoolean(cache_pageContent(pcc_allowPrinterVersion, main_RenderCache_CurrentPage_PCCPtr))
-                'AllowPrinterVersion = app.csv_cs_getBoolean(CSPointer, "AllowPrinterVersion")
-                AllowEmailPage = genericController.EncodeBoolean(cache_pageContent(pcc_allowEmailPage, main_RenderCache_CurrentPage_PCCPtr))
-                'AllowEmailPage = app.csv_cs_getBoolean(CSPointer, "AllowEmailPage")
-                headline = genericController.encodeText(cache_pageContent(PCC_Headline, main_RenderCache_CurrentPage_PCCPtr))
-                'headline = app.csv_cs_get(CSPointer, "Headline")
-                copyFilename = genericController.encodeText(cache_pageContent(PCC_CopyFilename, main_RenderCache_CurrentPage_PCCPtr))
-                If copyFilename <> "" Then
-                    Copy = cpcore.cdnFiles.readFile(copyFilename)
-                End If
-                'copy = app.csv_cs_get(CSPointer, "copyFilename")
-                allowSeeAlso = genericController.EncodeBoolean(cache_pageContent(pcc_allowSeeAlso, main_RenderCache_CurrentPage_PCCPtr))
-                'allowSeeAlso = genericController.EncodeBoolean(app.csv_cs_getBoolean(CSPointer, "AllowSeeAlso"))        '
-                allowMoreInfo = genericController.EncodeBoolean(cache_pageContent(pcc_allowMoreInfo, main_RenderCache_CurrentPage_PCCPtr))
-                'allowMoreInfo = genericController.EncodeBoolean(app.csv_cs_getBoolean(CSPointer, "AllowMoreInfo"))
-                allowFeedback = genericController.EncodeBoolean(cache_pageContent(pcc_allowFeedback, main_RenderCache_CurrentPage_PCCPtr))
-                'AllowFeedBack = genericController.EncodeBoolean(app.csv_cs_getBoolean(CSPointer, "AllowFeedBack"))
-                LastModified = genericController.EncodeDate(cache_pageContent(PCC_ModifiedDate, main_RenderCache_CurrentPage_PCCPtr))
-                'LastModified = app.csv_cs_getDate(CSPointer, "ModifiedDate")
-                allowLastModifiedFooter = genericController.EncodeBoolean(cache_pageContent(pcc_allowLastModifiedFooter, main_RenderCache_CurrentPage_PCCPtr))
-                'AllowLastModifiedFooter = app.csv_cs_getBoolean(CSPointer, "AllowLastModifiedFooter")
-                ModifiedBy = genericController.EncodeInteger(cache_pageContent(PCC_ModifiedBy, main_RenderCache_CurrentPage_PCCPtr))
-                'ModifiedBy = app.cs_getInteger(CSPointer, "ModifiedBy")
-                DateReviewed = genericController.EncodeDate(cache_pageContent(PCC_DateReviewed, main_RenderCache_CurrentPage_PCCPtr))
-                'DateReviewed = app.csv_cs_getDate(CSPointer, "DateReviewed")
-                ReviewedBy = genericController.EncodeInteger(cache_pageContent(PCC_ReviewedBy, main_RenderCache_CurrentPage_PCCPtr))
-                'ReviewedBy = app.cs_getInteger(CSPointer, "ReviewedBy")
-                allowReviewedFooter = genericController.EncodeBoolean(cache_pageContent(PCC_allowReviewedFooter, main_RenderCache_CurrentPage_PCCPtr))
-                'allowReviewedFooter = (app.csv_cs_getBoolean(CSPointer, "AllowReviewedFooter"))
-                allowMessageFooter = genericController.EncodeBoolean(cache_pageContent(PCC_allowMessageFooter, main_RenderCache_CurrentPage_PCCPtr))
-                'allowMessageFooter = (app.csv_cs_getBoolean(CSPointer, "AllowMessageFooter"))
-                '
-                ' ----- Print Breadcrumb if not at root Page
-                '
-                'hint = hint & ",020"
-                Dim breadCrumb As String
-                Dim BreadCrumbDelimiter As String
-                Dim BreadCrumbPrefix As String
-                '
-                If allowReturnLinkComposite And (Not main_RenderCache_CurrentPage_IsRootPage) And (Not cpcore.htmlDoc.pageManager_printVersion) Then
-                    '
-                    ' ----- Print Heading if not at root Page
-                    '
-                    BreadCrumbPrefix = cpcore.siteProperties.getText("BreadCrumbPrefix", "Return to")
-                    BreadCrumbDelimiter = cpcore.siteProperties.getText("BreadCrumbDelimiter", " &gt; ")
-                    breadCrumb = pageManager_GetHtmlBody_GetSection_GetContentBox_ReturnLink(RootPageContentName, parentPageID, rootPageId, "", ArchivePage, BreadCrumbDelimiter)
-                    If breadCrumb <> "" Then
-                        breadCrumb = cr & "<p class=""ccPageListNavigation"">" & BreadCrumbPrefix & " " & breadCrumb & "</p>"
-                    End If
-                End If
-                s = s & breadCrumb
-                '
-                ' move print and email icons here - ASBO 5/24/2007
-                '
-                'hint = hint & ",030"
-                If (Not cpcore.htmlDoc.pageManager_printVersion) Then
-                    IconRow = ""
-                    If (Not cpcore.authContext.visit.Bot) And (AllowPrinterVersion Or AllowEmailPage) Then
-                        '
-                        ' not a bot, and either print or email allowed
-                        '
-                        If AllowPrinterVersion Then
-                            QueryString = cpcore.web_RefreshQueryString
-                            'QueryString = genericController.ModifyQueryString(QueryString, RequestNameRootPageID, CStr(RootPageID), True)
-                            QueryString = genericController.ModifyQueryString(QueryString, "bid", genericController.encodeText(PageID), True)
-                            'QueryString = genericController.ModifyQueryString(QueryString, RequestNameAllowChildPageList, genericController.encodeText(allowChildListComposite), True)
-                            'QueryString = genericController.ModifyQueryString(QueryString, RequestNameContent, RootPageContentName, True)
-                            'QueryString = genericController.ModifyQueryString(QueryString, RequestNameOrderByClause, OrderByClause, True)
-                            QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, HardCodedPagePrinterVersion, True)
-                            '                    QueryString = genericController.ModifyQueryString(QueryString, RequestNameRootPageID, CStr(RootPageID), True)
-                            '                    QueryString = genericController.ModifyQueryString(QueryString, "bid", genericController.encodeText(pageId), True)
-                            '                    QueryString = genericController.ModifyQueryString(QueryString, RequestNameAllowChildPageList, genericController.encodeText(allowChildListComposite), True)
-                            '                    QueryString = genericController.ModifyQueryString(QueryString, RequestNameContent, RootPageContentName, True)
-                            '                    QueryString = genericController.ModifyQueryString(QueryString, RequestNameOrderByClause, OrderByClause, True)
-                            '                    QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, HardCodedPagePrinterVersion, True)
-                            Caption = cpcore.siteProperties.getText("PagePrinterVersionCaption", "Printer Version")
-                            Caption = genericController.vbReplace(Caption, " ", "&nbsp;")
-                            IconRow = IconRow & cr & "&nbsp;&nbsp;<a href=""" & cpcore.htmlDoc.html_EncodeHTML(cpcore.webServer.webServerIO_requestPage & "?" & QueryString) & """ target=""_blank""><img alt=""image"" src=""/ccLib/images/IconSmallPrinter.gif"" width=""13"" height=""13"" border=""0"" align=""absmiddle""></a>&nbsp<a href=""" & cpcore.htmlDoc.html_EncodeHTML(cpcore.webServer.webServerIO_requestPage & "?" & QueryString) & """ target=""_blank"" style=""text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;"">" & Caption & "</a>"
-                        End If
-                        If AllowEmailPage Then
-                            QueryString = cpcore.web_RefreshQueryString
-                            If QueryString <> "" Then
-                                QueryString = "?" & QueryString
-                            End If
-                            EmailBody = cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.requestDomain & cpcore.webServer.requestPathPage & QueryString
-                            Caption = cpcore.siteProperties.getText("PageAllowEmailCaption", "Email This Page")
-                            Caption = genericController.vbReplace(Caption, " ", "&nbsp;")
-                            IconRow = IconRow & cr & "&nbsp;&nbsp;<a HREF=""mailto:?SUBJECT=You might be interested in this&amp;BODY=" & EmailBody & """><img alt=""image"" src=""/ccLib/images/IconSmallEmail.gif"" width=""13"" height=""13"" border=""0"" align=""absmiddle""></a>&nbsp;<a HREF=""mailto:?SUBJECT=You might be interested in this&amp;BODY=" & EmailBody & """ style=""text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;"">" & Caption & "</a>"
-                        End If
-                    End If
-                    If IconRow <> "" Then
-                        s = s _
-                        & cr & "<div style=""text-align:right;"">" _
-                        & genericController.kmaIndent(IconRow) _
-                        & cr & "</div>"
-                    End If
-                End If
-                '
-                ' ----- Start Text Search
-                '
-                Cell = ""
-                'Cell = Cell & main_GetSiteProperty2("TextSearchStartTag", TextSearchStartTagDefault)         '
-                'hint = hint & ",040"
-                If main_RenderCache_CurrentPage_IsQuickEditing Then
-                    '
-                    ' ----- Copy in Quick Editor Mode - ##### new part
-                    '       ##### Put presentatin authoring right in the live body
-                    '
-                    'hint = hint & ",041"
-                    Cell = Cell & pageManager_GetHtmlBody_GetSection_GetContentBox_QuickEditing(main_RenderCache_CurrentPage_ContentName, rootPageId, RootPageContentName, OrderByClause, AllowChildList, AllowReturnLink, ArchivePage, contactMemberID, ContentName, childListSortMethodId, allowChildListComposite, ArchivePage)
-                Else
-                    '
-                    ' ----- Headline
-                    '
-                    'hint = hint & ",042"
-                    If headline <> "" Then
-                        'hint = hint & ",043"
-                        ' an html field can be added to an html stream. a non-html field should be html encoded before being added.
-                        headline = cpcore.htmlDoc.main_encodeHTML(headline)
-                        If cpcore.siteProperties.getBoolean("PageHeadlineUseccHeadline") Then
-                            Cell = Cell & cr & "<p>" & AddSpan(headline, "ccHeadline") & "</p>"
-                        Else
-                            Cell = Cell & cr & "<h1>" & headline & "</h1>"
-                        End If
-                        '
-                        ' Add AC end here to force the end of any left over AC tags (like language)
-                        '
-                        Cell = Cell & ACTagEnd
-                    End If
-                    '
-                    ' ----- Page Copy
-                    '
-                    'hint = hint & ",044"
-                    If Copy = "" Then
-                        'hint = hint & ",045"
-                        '
-                        ' Page copy is empty if  Links Enabled put in a blank line to separate edit from add tag
-                        '
-                        If cpcore.authContext.isEditing(cpcore, main_RenderCache_CurrentPage_ContentName) Then
-                            Body = cr & "<p><!-- Empty Content Placeholder --></p>"
-                        End If
-                    Else
-                        Body = Copy & cr & ACTagEnd
-                    End If
-                    '
-                    ' ----- Wrap content body
-                    '
-                    Cell = Cell _
-                    & cr & "<!-- ContentBoxBodyStart -->" _
-                    & genericController.kmaIndent(Body) _
-                    & cr & "<!-- ContentBoxBodyEnd -->"
-                    '
-                    ' ----- Child pages
-                    '
-                    'hint = hint & ",046"
-                    If allowChildListComposite Or cpcore.authContext.isEditingAnything(cpcore) Then
-                        'hint = hint & ",047"
-                        If Not allowChildListComposite Then
-                            Cell = Cell & cpcore.htmlDoc.html_GetAdminHintWrapper("Automatic Child List display is disabled for this page. It is displayed here because you are in editing mode. To enable automatic child list display, see the features tab for this page.")
-                        End If
-                        'hint = hint & ",048"
-                        ChildListInstanceOptions = genericController.encodeText(cache_pageContent(PCC_ChildListInstanceOptions, main_RenderCache_CurrentPage_PCCPtr))
-                        'hint = hint & ",049"
-                        Cell = Cell & cpcore.addon.execute_legacy2(cpcore.siteProperties.childListAddonID, "", ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, ContentName, PageID, "", PageChildListInstanceID, False, cpcore.siteProperties.defaultWrapperID, "", AddonStatusOK, Nothing)
-                    End If
-                End If
-                '
-                ' ----- End Text Search
-                '
-                'hint = hint & ",050"
-                s = s _
-                & cr & "<!-- TextSearchStart -->" _
-                & genericController.kmaIndent(Cell) _
-                & cr & "<!-- TextSearchEnd -->"
-                '
-                ' ----- Page See Also
-                '
-                If allowSeeAlso Then
-                    s = s _
-                    & cr & "<div>" _
-                    & genericController.kmaIndent(main_GetSeeAlso(cpcore, main_RenderCache_CurrentPage_ContentName, PageID)) _
-                    & cr & "</div>"
-                End If
-                '
-                ' ----- Allow More Info
-                '
-                If (contactMemberID <> 0) And allowMoreInfo Then
-                    s = s & cr & "<ac TYPE=""" & ACTypeContact & """>"
-                    's = s &  "<p>" & main_GetMoreInfo(ContactMemberID) & "</p>"
-                End If
-                '
-                ' ----- Feedback
-                '
-                If (Not cpcore.htmlDoc.pageManager_printVersion) And (contactMemberID <> 0) And allowFeedback Then
-                    's = s &  "<BR ><img alt=""image"" src=""/ccLib/images/808080.gif"" width=""100%"" height=""1"" >"
-                    s = s & cr & "<ac TYPE=""" & ACTypeFeedback & """>"
-                    's = s &  main_GetFeedbackForm(ContentName, PageID, ContactMemberID)
-                End If
-                '
-                ' ----- Last Modified line
-                '
-                'hint = hint & ",060"
-                If (LastModified <> Date.MinValue) And allowLastModifiedFooter Then
-                    s = s & cr & "<p>This page was last modified " & FormatDateTime(LastModified)
-                    If cpcore.authContext.isAuthenticatedAdmin(cpcore) Then
-                        If ModifiedBy = 0 Then
-                            s = s & " (admin only: modified by unknown)"
-                        Else
-                            Name = cpcore.content_GetRecordName("people", ModifiedBy)
-                            If Name = "" Then
-                                s = s & " (admin only: modified by person with unnamed or deleted record #" & ReviewedBy & ")"
-                            Else
-                                s = s & " (admin only: modified by " & Name & ")"
-                            End If
-                        End If
-                    End If
-                    s = s & "</p>"
-                End If
-                '
-                ' ----- Last Reviewed line
-                '
-                If True Then
-                    If (DateReviewed <> Date.MinValue) And allowReviewedFooter Then
-                        s = s & cr & "<p>This page was last reviewed " & FormatDateTime(DateReviewed, vbLongDate)
-                        If cpcore.authContext.isAuthenticatedAdmin(cpcore) Then
-                            If ReviewedBy = 0 Then
-                                s = s & " (by unknown)"
-                            Else
-                                Name = cpcore.content_GetRecordName("people", ReviewedBy)
-                                If Name = "" Then
-                                    s = s & " (by person with unnamed or deleted record #" & ReviewedBy & ")"
-                                Else
-                                    s = s & " (by " & Name & ")"
-                                End If
-                            End If
-                            s = s & ".</p>"
-                        End If
-                    End If
-                End If
-                '
-                ' ----- Page Content Message Footer
-                '
-                'hint = hint & ",070"
-                If allowMessageFooter Then
-                    pageContentMessageFooter = cpcore.siteProperties.getText("PageContentMessageFooter", "")
-                    If (pageContentMessageFooter <> "") Then
-                        s = s & cr & "<p>" & pageContentMessageFooter & "</p>"
-                    End If
-                End If
-            End If
-            Call cpcore.db.cs_Close(CS)
-            'hint = hint & ",080"
-            pageManager_GetHtmlBody_GetSection_GetContentBox_Live_Body = s
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("pageManager_GetHtmlBody_GetSection_GetContentBox_Live_Body, hint=" & hint)
-        End Function
-        '
-        '=============================================================================
         '   Content Page Authoring
         '
         '   Display Quick Editor for the first active record found
         '   Use for both Root and non-root pages
         '=============================================================================
         '
-        Friend Function pageManager_GetHtmlBody_GetSection_GetContentBox_QuickEditing(LiveRecordContentName As String, rootPageId As Integer, RootPageContentName As String, OrderByClause As String, AllowPageList As Boolean, AllowReturnLink As Boolean, ArchivePages As Boolean, contactMemberID As Integer, ContentName As String, childListSortMethodId As Integer, main_AllowChildListComposite As Boolean, ArchivePage As Boolean) As String
+        Friend Function pageManager_GetHtmlBody_GetSection_GetContentBox_QuickEditing(LiveRecordContentName As String, rootPageId As Integer, RootPageContentName As String, OrderByClause As String, AllowPageList As Boolean, AllowReturnLink As Boolean, ArchivePages As Boolean, contactMemberID As Integer, childListSortMethodId As Integer, main_AllowChildListComposite As Boolean, ArchivePage As Boolean) As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("pageManager_GetHtmlBody_GetSection_GetContentBox_QuickEditing")
             '
             Dim AddonStatusOK As Boolean
@@ -2158,7 +2042,7 @@ ErrorTrap:
             End If
             Call pageManager_GetAuthoringStatus(LiveRecordContentName, RecordID, IsSubmitted, IsApproved, SubmittedMemberName, ApprovedMemberName, IsInserted, IsDeleted, IsModified, ModifiedMemberName, ModifiedDate, SubmittedDate, ApprovedDate)
             Call pageManager_GetAuthoringPermissions(LiveRecordContentName, RecordID, AllowInsert, AllowCancel, allowSave, AllowDelete, AllowPublish, AllowAbort, AllowSubmit, AllowApprove, readOnlyField)
-            AllowMarkReviewed = cpcore.main_IsContentFieldSupported(ContentName, "DateReviewed")
+            AllowMarkReviewed = cpcore.main_IsContentFieldSupported(Models.Entity.pageContentModel.contentName, "DateReviewed")
             OptionsPanelAuthoringStatus = cpcore.main_GetAuthoringStatusMessage(CDef.AllowWorkflowAuthoring, IsEditLocked, main_EditLockMemberName, main_EditLockDateExpires, IsApproved, ApprovedMemberName, IsSubmitted, SubmittedMemberName, IsDeleted, IsInserted, IsModified, ModifiedMemberName)
             IsRootPage = (ParentID = 0)
             If Not IsRootPage Then
@@ -2271,7 +2155,7 @@ ErrorTrap:
             ' ----- Child pages
             '
             ChildListInstanceOptions = genericController.encodeText(cache_pageContent(PCC_ChildListInstanceOptions, main_RenderCache_CurrentPage_PCCPtr))
-            PageList = cpcore.addon.execute_legacy2(cpcore.siteProperties.childListAddonID, "", ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, ContentName, RecordID, "", PageChildListInstanceID, False, -1, "", AddonStatusOK, Nothing)
+            PageList = cpcore.addon.execute_legacy2(cpcore.siteProperties.childListAddonID, "", ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, Models.Entity.pageContentModel.contentName, RecordID, "", PageChildListInstanceID, False, -1, "", AddonStatusOK, Nothing)
             If genericController.vbInstr(1, PageList, "<ul", vbTextCompare) = 0 Then
                 PageList = "(there are no child pages)"
             End If
@@ -2634,7 +2518,7 @@ ErrorTrap:
                                 Call cpcore.siteProperties.setProperty("AllowWorkflowRendering", True)
                             End If
                         End If
-                        Call cpcore.webServer.webServerIO_Redirect2(Link, "Redirecting because a new page has been added with the quick editor.", False)
+                        Call cpcore.webServer.redirect(Link, "Redirecting because a new page has been added with the quick editor.", False)
                     End If
                     Call cpcore.db.cs_Close(CSBlock)
                     '
@@ -2670,7 +2554,7 @@ ErrorTrap:
                                     Call cpcore.siteProperties.setProperty("AllowWorkflowRendering", True)
                                 End If
                             End If
-                            Call cpcore.webServer.webServerIO_Redirect2(Link, "Redirecting because a new page has been added with the quick editor.", False)
+                            Call cpcore.webServer.redirect(Link, "Redirecting because a new page has been added with the quick editor.", False)
                         End If
                         Call cpcore.db.cs_Close(CSBlock)
                     End If
@@ -2699,7 +2583,7 @@ ErrorTrap:
                         Link = getPageLink4(ParentID, "", True, False)
                         'Link = main_GetPageLink(ParentID)
                         Link = genericController.modifyLinkQuery(Link, "main_AdminWarningMsg", "The page has been deleted, and you have been redirected to the parent of the deleted page.", True)
-                        Call cpcore.webServer.webServerIO_Redirect2(Link, "Redirecting to the parent page because the page was deleted with the quick editor.", pageManager_RedirectBecausePageNotFound)
+                        Call cpcore.webServer.redirect(Link, "Redirecting to the parent page because the page was deleted with the quick editor.", pageManager_RedirectBecausePageNotFound)
                         Exit Sub
                     End If
                 End If
@@ -2735,730 +2619,730 @@ ErrorTrap:
 ErrorTrap:
             Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13(MethodName)
         End Sub
-        '
-        '======================================================================================
-        '   main_Get a dynamic menu from Page Content
-        '======================================================================================
-        '
-        Friend Function pageManager_GetSectionMenu_NameMenu(ByVal PageName As String, ByVal ContentName As String, ByVal DefaultLink As String, ByVal RootPageRecordID As Integer, ByVal DepthLimit As Integer, ByVal MenuStyle As Integer, ByVal StyleSheetPrefix As String, ByVal MenuImage As String, ByVal MenuImageOver As String, ByVal RootMenuCaption As String, ByVal SectionID As Integer, ByVal UseContentWatchLink As Boolean) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00364")
-            '
-            Dim AllowInMenus As Boolean
-            Dim PCCPtr As Integer
-            Dim PageFound As Boolean
-            Dim ChildPageCount As Integer
-            Dim ChildPagesFoundTest As String
-            Dim AddRootButton As Boolean
-            Dim TopMenuCaption As String
-            Dim Tier1MenuCaption As String
-            '
-            Dim CSPointer As Integer
-            Dim MenuID As Integer
-            Dim ContentID As Integer
-            Dim BakeName As String
-            Dim Criteria As String
-            Dim MenuNamePrefix As String
-            Dim childListSortMethodId As Integer
-            Dim LinkWorking As String
-            Dim ParentID As Integer
-            Dim templateId As Integer
-            Dim ContentControlID As Integer
-            Dim allowChildListDisplay As Boolean
-            Dim MenuLinkOverRide As String
-            Dim ChildPagesFound As Boolean
-            Dim FieldList As String
-            Dim DateExpires As Date
-            Dim dateArchive As Date
-            Dim PubDate As Date
-            '
-            '
-            '
-            If (PageName = "") Or (ContentName = "") Then
-                Call Err.Raise(ignoreInteger, "dll", "main_GetPageMenu requires a valid page name and content name")
-            Else
-                '
-                ' ----- Read Bake Version
-                '
-                BakeName = "main_GetMenu-" & cpcore.webServer.webServerIO_requestProtocol & "-" & cpcore.webServer.requestDomain & "-" & PageName & "-" & ContentName & "-" & DefaultLink & "-" & RootPageRecordID & "-" & DepthLimit & "-" & MenuStyle & "-" & StyleSheetPrefix
-                BakeName = genericController.vbReplace(BakeName, "/", "_")
-                BakeName = genericController.vbReplace(BakeName, ":", "_")
-                BakeName = genericController.vbReplace(BakeName, ".", "_")
-                BakeName = genericController.vbReplace(BakeName, " ", "_")
-                pageManager_GetSectionMenu_NameMenu = genericController.encodeText(cpcore.cache.getObject(Of String)(BakeName))
-                If pageManager_GetSectionMenu_NameMenu <> "" Then
-                    pageManager_GetSectionMenu_NameMenu = pageManager_GetSectionMenu_NameMenu
-                Else
-                    '
-                    ' ----- Add Root Page to Menu System
-                    '
-                    If RootPageRecordID > 0 Then
-                        PCCPtr = cache_pageContent_getPtr(RootPageRecordID, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
-                        'Criteria = "(ID=" & encodeSQLNumber(RootPageRecordID) & ")"
-                    Else
-                        PCCPtr = cache_pageContent_getFirstNamePtr(PageName, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
-                        'Criteria = "(name=" & encodeSQLText(PageName) & ")"
-                    End If
-                    '
-                    ' Skip over expired, archive and non-published
-                    '
-                    PageFound = False
-                    Do While PCCPtr >= 0 And Not PageFound
-                        DateExpires = genericController.EncodeDate(cache_pageContent(PCC_DateExpires, PCCPtr))
-                        dateArchive = genericController.EncodeDate(cache_pageContent(PCC_DateArchive, PCCPtr))
-                        PubDate = genericController.EncodeDate(cache_pageContent(PCC_PubDate, PCCPtr))
-                        PageFound = ((DateExpires = Date.MinValue) Or (DateExpires > cpcore.app_startTime)) And ((PubDate = Date.MinValue) Or (PubDate < cpcore.app_startTime))
-                        'PageFound = ((DateExpires = Date.MinValue) Or (DateExpires > main_PageStartTime)) And ((DateArchive = Date.MinValue) Or (DateArchive > main_PageStartTime)) And ((PubDate = Date.MinValue) Or (PubDate < main_PageStartTime))
-                        If (Not PageFound) Then
-                            If (RootPageRecordID = 0) Then
-                                PCCPtr = cache_pageContent_nameIndex.getNextPtr
-                            Else
-                                PCCPtr = -1
-                            End If
-                        End If
-                    Loop
-                    If Not PageFound Then
-                        '
-                        ' menu root was not found, just put up what we have. If the link is there, the page will be created
-                        '
-                        AllowInMenus = True
-                        LinkWorking = DefaultLink
-                        LinkWorking = genericController.EncodeAppRootPath(LinkWorking, cpcore.webServer.webServerIO_requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain)
-                        LinkWorking = genericController.modifyLinkQuery(LinkWorking, "bid", "", False)
-                        MenuNamePrefix = genericController.encodeText(genericController.GetRandomInteger) & "_"
-                        MenuID = 0
-                        childListSortMethodId = 0
-                        ParentID = 0
-                        templateId = 0
-                        allowChildListDisplay = False
-                        MenuLinkOverRide = ""
-                        ChildPagesFound = False
-                    Else
-                        AllowInMenus = genericController.EncodeBoolean(cache_pageContent(PCC_AllowInMenus, PCCPtr))
-                        If AllowInMenus Then
-                            MenuNamePrefix = genericController.encodeText(genericController.GetRandomInteger) & "_"
-                            MenuID = genericController.EncodeInteger(cache_pageContent(PCC_ID, PCCPtr))
-                            childListSortMethodId = genericController.EncodeInteger(cache_pageContent(PCC_ChildListSortMethodID, PCCPtr))
-                            Tier1MenuCaption = genericController.encodeText(cache_pageContent(PCC_MenuHeadline, PCCPtr))
-                            If Tier1MenuCaption = "" Then
-                                Tier1MenuCaption = genericController.encodeText(cache_pageContent(PCC_Headline, PCCPtr))
-                                If Tier1MenuCaption = "" Then
-                                    Tier1MenuCaption = genericController.encodeText(cache_pageContent(PCC_Name, PCCPtr))
-                                    If Tier1MenuCaption = "" Then
-                                        Tier1MenuCaption = "Page " & CStr(MenuID)
-                                    End If
-                                End If
-                            End If
-                            ContentControlID = genericController.EncodeInteger(cache_pageContent(PCC_ContentControlID, PCCPtr))
-                            templateId = genericController.EncodeInteger(cache_pageContent(PCC_TemplateID, PCCPtr))
-                            allowChildListDisplay = genericController.EncodeBoolean(cache_pageContent(PCC_AllowChildListDisplay, PCCPtr))
-                            MenuLinkOverRide = genericController.encodeText(cache_pageContent(PCC_Link, PCCPtr))
-                            ChildPagesFoundTest = cache_pageContent(PCC_ChildPagesFound, PCCPtr)
-                            If ChildPagesFoundTest = "" Then
-                                '
-                                ' Not initialized, assume true
-                                '
-                                ChildPagesFound = True
-                            Else
-                                ChildPagesFound = genericController.EncodeBoolean(ChildPagesFoundTest)
-                            End If
-                            '
-                            ' Use parentid to detect if this record needs to be called with the bid
-                            '
-                            ParentID = genericController.EncodeInteger(cache_pageContent(PCC_ParentID, PCCPtr))
-                            '
-                            ' main_Get the Link
-                            '
-                            LinkWorking = getPageLink4(MenuID, "", True, False)
-                            'LinkWorking = main_GetPageDynamicLinkWithArgs(ContentControlID, MenuID, DefaultLink, True, TemplateID, SectionID, MenuLinkOverRide, UseContentWatchLink)
-                        End If
-                    End If
-                    '
-                    If AllowInMenus Then
-                        '
-                        ' ----- Set Tier1 Menu Caption (top element of the first flyout panel)
-                        '
-                        If Tier1MenuCaption = "" Then
-                            Tier1MenuCaption = RootMenuCaption
-                            If Tier1MenuCaption = "" Then
-                                Tier1MenuCaption = PageName
-                            End If
-                        End If
-                        '
-                        ' ----- Set Top Menu Caption (clickable label that opens the menus)
-                        '
-                        TopMenuCaption = RootMenuCaption
-                        If TopMenuCaption = "" Then
-                            TopMenuCaption = Tier1MenuCaption
-                        End If
-                        '
-                        If LinkWorking = "" Then
-                            '
-                            ' ----- Blank LinkWorking, this entry has no link
-                            ' ----- Add menu header, and first entry for the root page
-                            '
-                            Call cpcore.htmlDoc.menu_AddEntry(MenuNamePrefix & MenuID, "", MenuImage, MenuImageOver, , TopMenuCaption)
-                            '
-                            ' ----- Root menu only, add a repeat of the button to the first menu
-                            '
-                            If (MenuStyle < 8) Or (MenuStyle > 11) Then
-                                '
-                                ' ##### Josh says Quadrem says they dont like the repeat on hovers
-                                '
-                                Call cpcore.htmlDoc.menu_AddEntry(MenuNamePrefix & MenuID & ".entry", MenuNamePrefix & MenuID, , , , Tier1MenuCaption)
-                            End If
-                        Else
-                            '
-                            ' ----- LinkWorking is here, put MenuID on the end of it
-                            ' ----- Add menu header, and first entry for the root page
-                            '
-                            Call cpcore.htmlDoc.menu_AddEntry(MenuNamePrefix & MenuID, "", MenuImage, MenuImageOver, LinkWorking, TopMenuCaption)
-                            '
-                            ' ----- Root menu only, add a repeat of the button to the first menu
-                            '
-                            AddRootButton = False
-                            If (MenuStyle < 8) Or (MenuStyle > 11) Then
-                                '
-                                ' ##### Josh says Quadrem says they dont like the repeat on hovers
-                                '
-                                AddRootButton = True
-                                If ParentID <> 0 Then
-                                    '
-                                    ' This Top-most page is not the RootPage, include the bid
-                                    '
-                                Else
-                                    '
-                                    ' This Top-most page is the RootPage, include no bid
-                                    '
-                                End If
-                            End If
-                        End If
-                        ' ##### can not block, this is being used
-                        If ChildPagesFound Then
-                            ChildPageCount = main_GetSectionMenu_AddChildMenu_ReturnChildCount(MenuID, ContentName, LinkWorking, Tier1MenuCaption, "," & genericController.encodeText(MenuID), MenuNamePrefix, 1, DepthLimit, childListSortMethodId, SectionID, AddRootButton, UseContentWatchLink)
-                            If (ChildPageCount = 0) And (True) Then
-                                Call cpcore.db.executeSql("update ccpagecontent set ChildPagesFound=0 where id=" & MenuID)
-                            End If
-                        End If
-                        pageManager_GetSectionMenu_NameMenu = pageManager_GetSectionMenu_NameMenu & genericController.vbReplace(cpcore.menuFlyout.getMenu(MenuNamePrefix & genericController.encodeText(MenuID), MenuStyle, StyleSheetPrefix), vbCrLf, "")
-                        pageManager_GetSectionMenu_NameMenu = pageManager_GetSectionMenu_NameMenu & cpcore.htmlDoc.menu_GetClose()
-                        Call cpcore.cache.setObject(BakeName, pageManager_GetSectionMenu_NameMenu, ContentName & ",Site Sections,Dynamic Menus,Dynamic Menu Section Rules")
-                    End If
-                End If
-            End If
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_GetSectionMenu_NameMenu")
-        End Function
-        '
-        '======================================================================================
-        '   main_Get a dynamic menu from Page Content
-        '======================================================================================
-        '
-        Friend Function pageManager_GetSectionMenu_IdMenu(ByVal RootPageRecordID As Integer, ByVal DefaultLink As String, ByVal DepthLimit As Integer, ByVal MenuStyle As Integer, ByVal StyleSheetPrefix As String, ByVal MenuImage As String, ByVal MenuImageOver As String, ByVal RootMenuCaption As String, ByVal SectionID As Integer, ByVal UseContentWatchLink As Boolean) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("PageList_GetPageIDMenu")
-            '
-            Dim PseudoChildPagesFound As Boolean
-            Dim AllowInMenus As Boolean
-            Dim DateExpires As Date
-            Dim dateArchive As Date
-            Dim PubDate As Date
-            Dim PCCPtr As Integer
-            Dim PageFound As Boolean
-            Dim ChildPageCount As Integer
-            Dim ContentName As String
-            Dim AddRootButton As Boolean
-            Dim TopMenuCaption As String
-            Dim Tier1MenuCaption As String
-            '
-            Dim CSPointer As Integer
-            Dim PageID As Integer
-            Dim ContentID As Integer
-            Dim BakeName As String
-            Dim Criteria As String
-            Dim MenuNamePrefix As String
-            Dim childListSortMethodId As Integer
-            Dim LinkWorking As String
-            Dim LinkWorkingNoRedirect As String
-            Dim ParentID As Integer
-            Dim templateId As Integer
-            Dim ContentControlID As Integer
-            Dim allowChildListDisplay As Boolean
-            Dim MenuLinkOverRide As String
-            Dim ChildPagesFound As Boolean
-            Dim FieldList As String
-            Dim ChildPagesFoundTest As String
-            '
-            If RootPageRecordID = 610 Then
-                RootPageRecordID = RootPageRecordID
-            End If
-            '
-            '$$$$$ cache this - somewhere in here it opens cs with contentname
-            ContentName = "Page Content"
-            If False Then
-                Call Err.Raise(ignoreInteger, "dll", "main_GetPageMenu requires a valid page name and content name")
-            Else
-                '
-                ' ----- Read Bake Version
-                '
-                BakeName = "main_GetMenu-" & cpcore.webServer.webServerIO_requestProtocol & "-" & cpcore.webServer.requestDomain & "-" & RootPageRecordID & "-" & DefaultLink & "-" & DepthLimit & "-" & MenuStyle & "-" & StyleSheetPrefix
-                BakeName = genericController.vbReplace(BakeName, "/", "_")
-                BakeName = genericController.vbReplace(BakeName, ":", "_")
-                BakeName = genericController.vbReplace(BakeName, ".", "_")
-                BakeName = genericController.vbReplace(BakeName, " ", "_")
-                pageManager_GetSectionMenu_IdMenu = genericController.encodeText(cpcore.cache.getObject(Of String)(BakeName))
-                If pageManager_GetSectionMenu_IdMenu <> "" Then
-                    pageManager_GetSectionMenu_IdMenu = pageManager_GetSectionMenu_IdMenu
-                Else
-                    '
-                    ' ----- Add Root Page to Menu System
-                    '
-                    PCCPtr = cache_pageContent_getPtr(RootPageRecordID, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
-                    PageFound = (PCCPtr >= 0)
-                    '
-                    ' Skip if expired, archive and non-published
-                    '
-                    If PageFound Then
-                        DateExpires = genericController.EncodeDate(cache_pageContent(PCC_DateExpires, PCCPtr))
-                        dateArchive = genericController.EncodeDate(cache_pageContent(PCC_DateArchive, PCCPtr))
-                        PubDate = genericController.EncodeDate(cache_pageContent(PCC_PubDate, PCCPtr))
-                        PageFound = ((DateExpires = Date.MinValue) Or (DateExpires > cpcore.app_startTime)) And ((PubDate = Date.MinValue) Or (PubDate < cpcore.app_startTime))
-                        'PageFound = ((DateExpires = Date.MinValue) Or (DateExpires > main_PageStartTime)) And ((DateArchive = Date.MinValue) Or (DateArchive > main_PageStartTime)) And ((PubDate = Date.MinValue) Or (PubDate < main_PageStartTime))
-                    End If
-                    If Not PageFound Then
-                        '
-                        ' menu root was not found, just put up what we have. If the link is there, the page will be created
-                        '
-                        AllowInMenus = True
-                        LinkWorking = DefaultLink
-                        LinkWorkingNoRedirect = LinkWorking
-                        LinkWorking = genericController.EncodeAppRootPath(LinkWorking, cpcore.webServer.webServerIO_requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain)
-                        LinkWorking = genericController.modifyLinkQuery(LinkWorking, "bid", "", False)
-                        MenuNamePrefix = genericController.encodeText(genericController.GetRandomInteger) & "_"
-                        ' ***** just want to know what would happen here
-                        PageID = RootPageRecordID
-                        'pageId = 0
-                        childListSortMethodId = 0
-                        ParentID = 0
-                        templateId = 0
-                        allowChildListDisplay = False
-                        MenuLinkOverRide = ""
-                        ChildPagesFound = False
-                    Else
-                        '
-                        ' AllowInMenus does not work for root pages, which are the only pages being handled here. This menu is hidden from the section record
-                        '
-                        AllowInMenus = True
-                        If AllowInMenus Then
-                            MenuNamePrefix = genericController.encodeText(genericController.GetRandomInteger) & "_"
-                            PageID = genericController.EncodeInteger(cache_pageContent(PCC_ID, PCCPtr))
-                            childListSortMethodId = genericController.EncodeInteger(cache_pageContent(PCC_ChildListSortMethodID, PCCPtr))
-                            Tier1MenuCaption = genericController.encodeText(cache_pageContent(PCC_MenuHeadline, PCCPtr))
-                            If Tier1MenuCaption = "" Then
-                                Tier1MenuCaption = genericController.encodeText(cache_pageContent(PCC_Name, PCCPtr))
-                                If Tier1MenuCaption = "" Then
-                                    Tier1MenuCaption = "Page " & CStr(PageID)
-                                End If
-                            End If
-                            ContentControlID = genericController.EncodeInteger(cache_pageContent(PCC_ContentControlID, PCCPtr))
-                            templateId = genericController.EncodeInteger(cache_pageContent(PCC_TemplateID, PCCPtr))
-                            allowChildListDisplay = genericController.EncodeBoolean(cache_pageContent(PCC_AllowChildListDisplay, PCCPtr))
-                            MenuLinkOverRide = genericController.encodeText(cache_pageContent(PCC_Link, PCCPtr))
-                            ChildPagesFoundTest = genericController.encodeText(cache_pageContent(PCC_ChildPagesFound, PCCPtr))
-                            If ChildPagesFoundTest = "" Then
-                                '
-                                ' Not initialized, assume true
-                                '
-                                ChildPagesFound = True
-                            Else
-                                ChildPagesFound = genericController.EncodeBoolean(ChildPagesFoundTest)
-                            End If
-                            '
-                            ' Use parentid to detect if this record needs to be called with the bid
-                            '
-                            ParentID = genericController.EncodeInteger(cache_pageContent(PCC_ParentID, PCCPtr))
-                            '
-                            ' main_Get the Link
-                            '
-                            '1/13/2010 - convert everything to use linkalias and issecure
-                            'LinkWorkingNoRedirect = main_GetPageLink4()
-                            LinkWorkingNoRedirect = getPageLink4(PageID, "", True, False)
-                            '                    LinkWorkingNoRedirect = main_GetPageDynamicLinkWithArgs(contentcontrolid, pageId, DefaultLink, True, TemplateID, SectionID, "", UseContentWatchLink)
-                            LinkWorking = LinkWorkingNoRedirect
-                            '                    If MenuLinkOverRide <> "" Then
-                            '                        LinkWorking = "?rc=" & contentcontrolid & "&ri=" & pageId
-                            '                    End If
-                            'LinkWorking = main_GetPageDynamicLinkWithArgs(ContentControlID, pageId, DefaultLink, True, TemplateID, SectionID, MenuLinkOverRide, UseContentWatchLink)
-                        End If
-                    End If
-                    '
-                    If AllowInMenus Then
-                        '
-                        ' ----- Set Tier1 Menu Caption (top element of the first flyout panel)
-                        '
-                        If Tier1MenuCaption = "" Then
-                            Tier1MenuCaption = RootMenuCaption
-                        End If
-                        '
-                        ' ----- Set Top Menu Caption (clickable label that opens the menus)
-                        '
-                        TopMenuCaption = RootMenuCaption
-                        If TopMenuCaption = "" Then
-                            TopMenuCaption = Tier1MenuCaption
-                        End If
-                        '
-                        If LinkWorking = "" Then
-                            '
-                            ' ----- Blank LinkWorking, this entry has no link
-                            ' ----- Add menu header, and first entry for the root page
-                            '
-                            Call cpcore.htmlDoc.menu_AddEntry(MenuNamePrefix & PageID, "", MenuImage, MenuImageOver, , TopMenuCaption)
-                            '
-                            ' ----- Root menu only, add a repeat of the button to the first menu
-                            '
-                            If (MenuStyle < 8) Or (MenuStyle > 11) Then
-                                '
-                                ' ##### Josh says Quadrem says they dont like the repeat on hovers
-                                '
-                                Call cpcore.htmlDoc.menu_AddEntry(MenuNamePrefix & PageID & ".entry", MenuNamePrefix & PageID, , , , Tier1MenuCaption)
-                            End If
-                        Else
-                            '
-                            ' ----- LinkWorking is here, put pageId on the end of it
-                            ' ----- Add menu header, and first entry for the root page
-                            '
-                            If PageID <> 0 Then
-                                Call cpcore.htmlDoc.menu_AddEntry(MenuNamePrefix & PageID, "", MenuImage, MenuImageOver, LinkWorking, TopMenuCaption)
-                            ElseIf (SectionID <> 0) And (RootPageRecordID <> 0) Then
-                                Dim CSSection As Integer
-                                Call cpcore.htmlDoc.menu_AddEntry(MenuNamePrefix & RootPageRecordID, "", MenuImage, MenuImageOver, LinkWorking, TopMenuCaption)
-                                'Dim linkAlias
-                            Else
-                                Call cpcore.htmlDoc.menu_AddEntry(MenuNamePrefix & PageID, "", MenuImage, MenuImageOver, LinkWorking, TopMenuCaption)
-                            End If
-                            '
-                            ' ----- Root menu only, add a repeat of the button to the first menu
-                            '
-                            AddRootButton = False
-                            If (MenuStyle < 8) Or (MenuStyle > 11) Then
-                                '
-                                ' ##### Josh says Quadrem says they dont like the repeat on hovers
-                                '
-                                AddRootButton = True
-                                If ParentID <> 0 Then
-                                    '
-                                    ' This Top-most page is not the RootPage, include the bid
-                                    '
-                                Else
-                                    '
-                                    ' This Top-most page is the RootPage, include no bid
-                                    '
-                                End If
-                            End If
-                        End If
-                        '
-                        ' 9/18/2009 - Build Submenu if child pages found
-                        '
-                        If pagemanager_IsWorkflowRendering() Then
-                            '
-                            ' If workflow mode, just assume there are child pages
-                            '
-                            ChildPageCount = main_GetSectionMenu_AddChildMenu_ReturnChildCount(PageID, ContentName, LinkWorking, Tier1MenuCaption, "," & genericController.encodeText(PageID), MenuNamePrefix, 1, DepthLimit, childListSortMethodId, SectionID, AddRootButton, UseContentWatchLink)
-                        Else
-                            '
-                            ' In production mode, use the ChildPagesFound field
-                            '
-                            PseudoChildPagesFound = ChildPagesFound
-                            If Not PseudoChildPagesFound Then
-                                '
-                                ' Even when child pages is false, try it 10% of the time anyway
-                                '
-                                Randomize()
-                                PseudoChildPagesFound = (Rnd() > 0.8)
-                                If PseudoChildPagesFound Then
-                                    TopMenuCaption = TopMenuCaption
-                                End If
-                            End If
-                            If PseudoChildPagesFound Then
-                                '
-                                ' Child pages were found, create child menu
-                                '
-                                ChildPageCount = main_GetSectionMenu_AddChildMenu_ReturnChildCount(PageID, ContentName, LinkWorking, Tier1MenuCaption, "," & genericController.encodeText(PageID), MenuNamePrefix, 1, DepthLimit, childListSortMethodId, SectionID, AddRootButton, UseContentWatchLink)
-                                'ChildPageCount = main_GetSectionMenu_AddChildMenu_ReturnChildCount(pageId, ContentName, LinkWorkingNoRedirect, Tier1MenuCaption, "," & genericController.encodeText(pageId), MenuNamePrefix, 1, DepthLimit, ChildListSortMethodID, SectionID, AddRootButton, UseContentWatchLink)
-                                If (True) Then
-                                    If (ChildPageCount = 0) And (ChildPagesFound) Then
-                                        '
-                                        ' ChildPagesFound flag is true, but no pages were found - clear flag
-                                        '
-                                        Call cpcore.db.executeSql("update ccpagecontent set ChildPagesFound=0 where id=" & PageID)
-                                        'Call AppendLog("main_GetSectionMenu_IdMenu, 4-call pageManager_cache_pageContent_updateRow")
-                                        Call cache_pageContent_updateRow(PageID, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
-                                    ElseIf (ChildPageCount > 0) And (Not ChildPagesFound) Then
-                                        '
-                                        ' ChildPagesFlag is cleared, but pages were found -- set the flag
-                                        '
-                                        Call cpcore.db.executeSql("update ccpagecontent set ChildPagesFound=1 where id=" & PageID)
-                                        'Call AppendLog("main_GetSectionMenu_IdMenu, 5-call pageManager_cache_pageContent_updateRow")
-                                        Call cache_pageContent_updateRow(PageID, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
-                                    End If
-                                End If
-                            End If
-                        End If
-                        '
-                        ' ----- main_Get the Menu Header
-                        '
-                        pageManager_GetSectionMenu_IdMenu = pageManager_GetSectionMenu_IdMenu & genericController.vbReplace(cpcore.menuFlyout.getMenu(MenuNamePrefix & genericController.encodeText(PageID), MenuStyle, StyleSheetPrefix), vbCrLf, "")
-                        '
-                        ' ----- Add in the rest of the menu details
-                        ' ##### this must be here because it must go into the bake, else a baked page fails without he menus
-                        '
-                        pageManager_GetSectionMenu_IdMenu = pageManager_GetSectionMenu_IdMenu & cpcore.htmlDoc.menu_GetClose()
-                        '
-                        ' ----- Bake the completed menu
-                        '
-                        Call cpcore.cache.setObject(BakeName, pageManager_GetSectionMenu_IdMenu, ContentName & ",Site Sections,Dynamic Menus,Dynamic Menu Section Rules")
-                    End If
-                End If
-            End If
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_GetSectionMenu_IdMenu")
-        End Function
-        '
-        '======================================================================================
-        '   Add child pages to the menu system
-        '       REturns the count of total child pages (with grand-child, etc)
-        '       Returns -1 if child count not checked
-        ' 7/21/2009 - added -1 return if the child pages are not counted to prevent the page records from being set not ChildPagesFound
-        '======================================================================================
-        '
-        Friend Function main_GetSectionMenu_AddChildMenu_ReturnChildCount(ByVal ParentMenuID As Integer, ByVal ContentName As String, ByVal DefaultLink As String, ByVal Tier1MenuCaption As String, ByVal UsedPageIDString As String, ByVal MenuNamePrefix As String, ByVal MenuDepth As Integer, ByVal MenuDepthMax As Integer, ByVal childListSortMethodId As Integer, ByVal SectionID As Integer, ByVal AddRootButton As Boolean, ByVal UseContentWatchLink As Boolean) As Integer
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00365")
-            '
-            Dim Active As Boolean
-            Dim PseudoChildChildPagesFound As Boolean
-            Dim PCCRowPtr As Integer
-            Dim SortForward As Boolean
-            Dim SortFieldName As String
-            Dim SortPtr As Integer
-            Dim Ptr As Integer
-            Dim ChildPageCount As Integer
-            Dim ChildPagesFoundTest As String
-            Dim FieldList As String
-            Dim ChildCountWithNoPubs As Integer
-            Dim MenuID As Integer
-            Dim MenuCaption As String
-            Dim ChildCount As Integer
-            Dim ChildSize As Integer
-            Dim ChildPointer As Integer
-            Dim ChildID() As Integer
-            Dim ChildAllowChild() As Boolean
-            Dim ChildCaption() As String
-            Dim ChildLink() As String
-            Dim ChildSortMethodID() As Integer
-            Dim ChildChildPagesFound() As Boolean
-            Dim ContentID As Integer
-            Dim MenuLinkOverRide As String
-            Dim PageID As Integer
-            Dim UsedPageIDStringLocal As String
-            Dim Criteria As String
-            Dim MenuDepthLocal As Integer
-            Dim OrderByCriteria As String
-            Dim WorkingLink As String
-            Dim templateId As Integer
-            Dim ContentControlID As Integer
-            Dim Link As String
-            Dim PubDate As Date
-            Dim PCCPtr As Integer
-            Dim DateExpires As Date
-            Dim dateArchive As Date
-            Dim IsIncludedInMenu As Boolean
-            Dim PCCPtrs() As Integer
-            Dim PtrCnt As Integer
-            Dim SortSplit() As String
-            Dim SortSplitCnt As Integer
-            Dim Index As keyPtrController
-            Dim PCCColPtr As Integer
-            Dim PCCPtrsSorted As Integer()
-            Dim AllowInMenus As Boolean
-            '
-            ' ----- Gather all child menus
-            '
-            ' 7/21/2009 - added -1 return if the child pages are not counted to prevent the page records from being set not ChildPagesFound
-            ChildCountWithNoPubs = -1
-            If (ParentMenuID > 0) And (MenuDepth <= MenuDepthMax) Then
-                MenuDepthLocal = MenuDepth + 1
-                UsedPageIDStringLocal = UsedPageIDString
-                OrderByCriteria = cpcore.GetSortMethodByID(childListSortMethodId)
-                If OrderByCriteria = "" Then
-                    OrderByCriteria = cpcore.GetContentProperty(ContentName, "defaultsortmethod")
-                End If
-                If OrderByCriteria = "" Then
-                    OrderByCriteria = "ID"
-                End If
-                '
-                ' Populate PCCPtrs()
-                '
-                PCCPtr = cache_pageContent_getFirstChildPtr(ParentMenuID, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
-                PtrCnt = 0
-                Do While PCCPtr >= 0
-                    ReDim Preserve PCCPtrs(PtrCnt)
-                    PCCPtrs(PtrCnt) = PCCPtr
-                    PtrCnt = PtrCnt + 1
-                    PCCPtr = cache_pageContent_parentIdIndex.getNextPtrMatch(CStr(ParentMenuID))
-                Loop
-                If PtrCnt > 0 Then
-                    PCCPtrsSorted = cache_pageContent_getPtrsSorted(PCCPtrs, OrderByCriteria)
-                End If
-                '
-                Ptr = 0
-                Do While Ptr < PtrCnt
-                    PCCPtr = PCCPtrsSorted(Ptr)
-                    DateExpires = genericController.EncodeDate(cache_pageContent(PCC_DateExpires, PCCPtr))
-                    dateArchive = genericController.EncodeDate(cache_pageContent(PCC_DateArchive, PCCPtr))
-                    PubDate = genericController.EncodeDate(cache_pageContent(PCC_PubDate, PCCPtr))
-                    MenuCaption = Trim(genericController.encodeText(cache_pageContent(PCC_MenuHeadline, PCCPtr)))
-                    If False Then '.3.752" Then
-                        AllowInMenus = (MenuCaption <> "")
-                    Else
-                        AllowInMenus = genericController.EncodeBoolean(cache_pageContent(PCC_AllowInMenus, PCCPtr))
-                    End If
-                    Active = genericController.EncodeBoolean(cache_pageContent(PCC_Active, PCCPtr))
-                    IsIncludedInMenu = Active And AllowInMenus And ((PubDate = Date.MinValue) Or (PubDate < cpcore.app_startTime)) And ((DateExpires = Date.MinValue) Or (DateExpires > cpcore.app_startTime))
-                    'IsIncludedInMenu = Active And AllowInMenus And ((PubDate = Date.MinValue) Or (PubDate < main_PageStartTime)) And ((DateExpires = Date.MinValue) Or (DateExpires > main_PageStartTime)) And ((DateArchive = Date.MinValue) Or (DateArchive > main_PageStartTime))
-                    If IsIncludedInMenu Then
-                        If MenuCaption = "" Then
-                            MenuCaption = Trim(genericController.encodeText(cache_pageContent(PCC_Name, PCCPtr)))
-                        End If
-                        If MenuCaption = "" Then
-                            MenuCaption = "Related Page"
-                        End If
-                        If (MenuCaption <> "") Then
-                            PageID = genericController.EncodeInteger(cache_pageContent(PCC_ID, PCCPtr))
-                            If genericController.vbInstr(1, UsedPageIDStringLocal & ",", "," & genericController.encodeText(PageID) & ",") = 0 Then
-                                UsedPageIDStringLocal = UsedPageIDStringLocal & "," & genericController.encodeText(PageID)
-                                If ChildCount >= ChildSize Then
-                                    ChildSize = ChildSize + 100
-                                    ReDim Preserve ChildID(ChildSize)
-                                    ReDim Preserve ChildCaption(ChildSize)
-                                    ReDim Preserve ChildLink(ChildSize)
-                                    ReDim Preserve ChildSortMethodID(ChildSize)
-                                    ReDim Preserve ChildAllowChild(ChildSize)
-                                    ReDim Preserve ChildChildPagesFound(ChildSize)
-                                End If
-                                ContentControlID = genericController.EncodeInteger(cache_pageContent(PCC_ContentControlID, PCCPtr))
-                                MenuLinkOverRide = genericController.encodeText(cache_pageContent(PCC_Link, PCCPtr))
-                                '
-                                ChildCaption(ChildCount) = MenuCaption
-                                ChildID(ChildCount) = PageID
-                                ChildAllowChild(ChildCount) = genericController.EncodeBoolean(cache_pageContent(PCC_AllowChildListDisplay, PCCPtr))
-                                ChildSortMethodID(ChildCount) = genericController.EncodeInteger(cache_pageContent(PCC_ChildListSortMethodID, PCCPtr))
-                                templateId = genericController.EncodeInteger(cache_pageContent(PCC_TemplateID, PCCPtr))
-                                '
-                                Link = getPageLink4(PageID, "", True, UseContentWatchLink)
-                                'Link = main_GetPageDynamicLinkWithArgs(contentcontrolid, PageID, DefaultLink, False, TemplateID, SectionID, MenuLinkOverRide, UseContentWatchLink)
-                                ChildLink(ChildCount) = Link
-                                ChildPagesFoundTest = cache_pageContent(PCC_ChildPagesFound, PCCPtr)
-                                If ChildPagesFoundTest = "" Then
-                                    '
-                                    ' Not initialized
-                                    '
-                                    ChildChildPagesFound(ChildCount) = True
-                                Else
-                                    ChildChildPagesFound(ChildCount) = genericController.EncodeBoolean(ChildPagesFoundTest)
-                                End If
-                                ChildCount = ChildCount + 1
-                            End If
-                        End If
-                    End If
-                    Ptr = Ptr + 1
-                Loop
-                ChildCountWithNoPubs = Ptr
-                '
-                ' ----- Output menu entries
-                '
-                If ChildCount > 0 Then
-                    '
-                    ' menu entry has children, output menu entry, child menu entry, and group of child entries
-                    '
-                    If AddRootButton Then
-                        '
-                        ' Root Button is a redundent menu entry at the top of tier 1 panels that links to the root page
-                        '
-                        Call cpcore.htmlDoc.menu_AddEntry(MenuNamePrefix & ParentMenuID & ".entry", MenuNamePrefix & ParentMenuID, "", "", DefaultLink, Tier1MenuCaption)
-                        'Call main_AddMenuEntry(MenuNamePrefix & ParentMenuID & ".entry", MenuNamePrefix & ParentMenuID, "", "", main_GetLinkAliasByPageID(ParentMenuID, "", DefaultLink), Tier1MenuCaption)
-                        'Call main_AddMenuEntry(MenuNamePrefix & ParentMenuID & ".entry", MenuNamePrefix & ParentMenuID, "", "", main_GetLinkAliasByLink(DefaultLink), Tier1MenuCaption)
-                    End If
-                    '
-                    For ChildPointer = 0 To ChildCount - 1
-                        MenuID = ChildID(ChildPointer)
-                        MenuCaption = ChildCaption(ChildPointer)
-                        WorkingLink = ChildLink(ChildPointer)
-                        Call cpcore.htmlDoc.menu_AddEntry(MenuNamePrefix & MenuID, MenuNamePrefix & ParentMenuID, "", "", WorkingLink, MenuCaption)
-                        'Call main_AddMenuEntry(MenuNamePrefix & MenuID, MenuNamePrefix & ParentMenuID, "", "", main_GetLinkAliasByPageID(MenuID, "", WorkingLink), MenuCaption)
-                        'Call main_AddMenuEntry(MenuNamePrefix & MenuID, MenuNamePrefix & ParentMenuID, "", "", main_GetLinkAliasByLink(WorkingLink), MenuCaption)
-                        '
-                        ' if child pages are found, print the next menu deeper
-                        '
-                        If (ParentMenuID > 0) And (MenuDepthLocal <= MenuDepthMax) Then
-                            If pagemanager_IsWorkflowRendering() Then
-                                '
-                                ' Workflow mode - go main_Get the child pages
-                                '
-                                ChildPageCount = main_GetSectionMenu_AddChildMenu_ReturnChildCount(MenuID, ContentName, WorkingLink, MenuCaption, UsedPageIDStringLocal, MenuNamePrefix, MenuDepthLocal, MenuDepthMax, ChildSortMethodID(ChildPointer), SectionID, False, UseContentWatchLink)
-                            Else
-                                '
-                                ' Production mode - main_Get them only if the parent record says there are child pages
-                                '
-                                PseudoChildChildPagesFound = ChildChildPagesFound(ChildPointer)
-                                If Not PseudoChildChildPagesFound Then
-                                    '
-                                    ' Even when child pages is false, try it 10% of the time anyway
-                                    '
-                                    Randomize()
-                                    PseudoChildChildPagesFound = (Rnd() > 0.8)
-                                End If
-                                If PseudoChildChildPagesFound Then
-                                    '
-                                    ' Child pages were found, create child menu
-                                    '
-                                    ' 7/21/2009 - added -1 return if the child pages are not counted to prevent the page records from being set not ChildPagesFound
-                                    ChildPageCount = main_GetSectionMenu_AddChildMenu_ReturnChildCount(MenuID, ContentName, WorkingLink, MenuCaption, UsedPageIDStringLocal, MenuNamePrefix, MenuDepthLocal, MenuDepthMax, ChildSortMethodID(ChildPointer), SectionID, False, UseContentWatchLink)
-                                    If ChildPageCount >= 0 Then
-                                        If (True) Then
-                                            If ChildChildPagesFound(ChildPointer) And (ChildPageCount = 0) Then
-                                                '
-                                                ' no pages were found, clear the child pages found property
-                                                ' child pages found property is set at admin site when a page is saved with this as the parent id
-                                                '
-                                                Call cpcore.db.executeSql("update ccpagecontent set ChildPagesFound=0 where id=" & MenuID)
-                                                'Call AppendLog("pageManager_GetHtmlBody_GetSection_GetContentMenu_AddChildMenu, 6-call pageManager_cache_pageContent_updateRow -- fix here to NOT call pageManager_cache_pageContent_updateRow()")
-                                                cache_pageContent(PCC_ChildPagesFound, ChildPointer) = "0"
-                                                'Call pageManager_cache_pageContent_updateRow(MenuID, main_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
-                                            ElseIf (ChildPageCount > 0) And (Not ChildChildPagesFound(ChildPointer)) Then
-                                                '
-                                                ' pages were found, set the child pages found property
-                                                '
-                                                Call cpcore.db.executeSql("update ccpagecontent set ChildPagesFound=1 where id=" & MenuID)
-                                                'Call AppendLog("pageManager_GetHtmlBody_GetSection_GetContentMenu_AddChildMenu, 7-call pageManager_cache_pageContent_updateRow -- fix here to NOT call pageManager_cache_pageContent_updateRow()")
-                                                cache_pageContent(PCC_ChildPagesFound, ChildPointer) = "1"
-                                                'Call pageManager_cache_pageContent_updateRow(MenuID, main_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
-                                            End If
-                                        End If
-                                    End If
-                                End If
-                            End If
-                        End If
-                    Next
-                End If
-            End If
-            main_GetSectionMenu_AddChildMenu_ReturnChildCount = ChildCountWithNoPubs
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_GetSectionMenu_AddChildMenu_ReturnChildCount")
-        End Function
+        '        '
+        '        '======================================================================================
+        '        '   main_Get a dynamic menu from Page Content
+        '        '======================================================================================
+        '        '
+        '        Friend Function pageManager_GetSectionMenu_NameMenu(ByVal PageName As String, ByVal ContentName As String, ByVal DefaultLink As String, ByVal RootPageRecordID As Integer, ByVal DepthLimit As Integer, ByVal MenuStyle As Integer, ByVal StyleSheetPrefix As String, ByVal MenuImage As String, ByVal MenuImageOver As String, ByVal RootMenuCaption As String, ByVal SectionID As Integer, ByVal UseContentWatchLink As Boolean) As String
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00364")
+        '            '
+        '            Dim AllowInMenus As Boolean
+        '            Dim PCCPtr As Integer
+        '            Dim PageFound As Boolean
+        '            Dim ChildPageCount As Integer
+        '            Dim ChildPagesFoundTest As String
+        '            Dim AddRootButton As Boolean
+        '            Dim TopMenuCaption As String
+        '            Dim Tier1MenuCaption As String
+        '            '
+        '            Dim CSPointer As Integer
+        '            Dim MenuID As Integer
+        '            Dim ContentID As Integer
+        '            Dim BakeName As String
+        '            Dim Criteria As String
+        '            Dim MenuNamePrefix As String
+        '            Dim childListSortMethodId As Integer
+        '            Dim LinkWorking As String
+        '            Dim ParentID As Integer
+        '            Dim templateId As Integer
+        '            Dim ContentControlID As Integer
+        '            Dim allowChildListDisplay As Boolean
+        '            Dim MenuLinkOverRide As String
+        '            Dim ChildPagesFound As Boolean
+        '            Dim FieldList As String
+        '            Dim DateExpires As Date
+        '            Dim dateArchive As Date
+        '            Dim PubDate As Date
+        '            '
+        '            '
+        '            '
+        '            If (PageName = "") Or (ContentName = "") Then
+        '                Call Err.Raise(ignoreInteger, "dll", "main_GetPageMenu requires a valid page name and content name")
+        '            Else
+        '                '
+        '                ' ----- Read Bake Version
+        '                '
+        '                BakeName = "main_GetMenu-" & cpcore.webServer.webServerIO_requestProtocol & "-" & cpcore.webServer.requestDomain & "-" & PageName & "-" & ContentName & "-" & DefaultLink & "-" & RootPageRecordID & "-" & DepthLimit & "-" & MenuStyle & "-" & StyleSheetPrefix
+        '                BakeName = genericController.vbReplace(BakeName, "/", "_")
+        '                BakeName = genericController.vbReplace(BakeName, ":", "_")
+        '                BakeName = genericController.vbReplace(BakeName, ".", "_")
+        '                BakeName = genericController.vbReplace(BakeName, " ", "_")
+        '                pageManager_GetSectionMenu_NameMenu = genericController.encodeText(cpcore.cache.getObject(Of String)(BakeName))
+        '                If pageManager_GetSectionMenu_NameMenu <> "" Then
+        '                    pageManager_GetSectionMenu_NameMenu = pageManager_GetSectionMenu_NameMenu
+        '                Else
+        '                    '
+        '                    ' ----- Add Root Page to Menu System
+        '                    '
+        '                    If RootPageRecordID > 0 Then
+        '                        PCCPtr = cache_pageContent_getPtr(RootPageRecordID, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
+        '                        'Criteria = "(ID=" & encodeSQLNumber(RootPageRecordID) & ")"
+        '                    Else
+        '                        PCCPtr = cache_pageContent_getFirstNamePtr(PageName, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
+        '                        'Criteria = "(name=" & encodeSQLText(PageName) & ")"
+        '                    End If
+        '                    '
+        '                    ' Skip over expired, archive and non-published
+        '                    '
+        '                    PageFound = False
+        '                    Do While PCCPtr >= 0 And Not PageFound
+        '                        DateExpires = genericController.EncodeDate(cache_pageContent(PCC_DateExpires, PCCPtr))
+        '                        dateArchive = genericController.EncodeDate(cache_pageContent(PCC_DateArchive, PCCPtr))
+        '                        PubDate = genericController.EncodeDate(cache_pageContent(PCC_PubDate, PCCPtr))
+        '                        PageFound = ((DateExpires = Date.MinValue) Or (DateExpires > cpcore.app_startTime)) And ((PubDate = Date.MinValue) Or (PubDate < cpcore.app_startTime))
+        '                        'PageFound = ((DateExpires = Date.MinValue) Or (DateExpires > main_PageStartTime)) And ((DateArchive = Date.MinValue) Or (DateArchive > main_PageStartTime)) And ((PubDate = Date.MinValue) Or (PubDate < main_PageStartTime))
+        '                        If (Not PageFound) Then
+        '                            If (RootPageRecordID = 0) Then
+        '                                PCCPtr = cache_pageContent_nameIndex.getNextPtr
+        '                            Else
+        '                                PCCPtr = -1
+        '                            End If
+        '                        End If
+        '                    Loop
+        '                    If Not PageFound Then
+        '                        '
+        '                        ' menu root was not found, just put up what we have. If the link is there, the page will be created
+        '                        '
+        '                        AllowInMenus = True
+        '                        LinkWorking = DefaultLink
+        '                        LinkWorking = genericController.EncodeAppRootPath(LinkWorking, cpcore.webServer.webServerIO_requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain)
+        '                        LinkWorking = genericController.modifyLinkQuery(LinkWorking, "bid", "", False)
+        '                        MenuNamePrefix = genericController.encodeText(genericController.GetRandomInteger) & "_"
+        '                        MenuID = 0
+        '                        childListSortMethodId = 0
+        '                        ParentID = 0
+        '                        templateId = 0
+        '                        allowChildListDisplay = False
+        '                        MenuLinkOverRide = ""
+        '                        ChildPagesFound = False
+        '                    Else
+        '                        AllowInMenus = genericController.EncodeBoolean(cache_pageContent(PCC_AllowInMenus, PCCPtr))
+        '                        If AllowInMenus Then
+        '                            MenuNamePrefix = genericController.encodeText(genericController.GetRandomInteger) & "_"
+        '                            MenuID = genericController.EncodeInteger(cache_pageContent(PCC_ID, PCCPtr))
+        '                            childListSortMethodId = genericController.EncodeInteger(cache_pageContent(PCC_ChildListSortMethodID, PCCPtr))
+        '                            Tier1MenuCaption = genericController.encodeText(cache_pageContent(PCC_MenuHeadline, PCCPtr))
+        '                            If Tier1MenuCaption = "" Then
+        '                                Tier1MenuCaption = genericController.encodeText(cache_pageContent(PCC_Headline, PCCPtr))
+        '                                If Tier1MenuCaption = "" Then
+        '                                    Tier1MenuCaption = genericController.encodeText(cache_pageContent(PCC_Name, PCCPtr))
+        '                                    If Tier1MenuCaption = "" Then
+        '                                        Tier1MenuCaption = "Page " & CStr(MenuID)
+        '                                    End If
+        '                                End If
+        '                            End If
+        '                            ContentControlID = genericController.EncodeInteger(cache_pageContent(PCC_ContentControlID, PCCPtr))
+        '                            templateId = genericController.EncodeInteger(cache_pageContent(PCC_TemplateID, PCCPtr))
+        '                            allowChildListDisplay = genericController.EncodeBoolean(cache_pageContent(PCC_AllowChildListDisplay, PCCPtr))
+        '                            MenuLinkOverRide = genericController.encodeText(cache_pageContent(PCC_Link, PCCPtr))
+        '                            ChildPagesFoundTest = cache_pageContent(PCC_ChildPagesFound, PCCPtr)
+        '                            If ChildPagesFoundTest = "" Then
+        '                                '
+        '                                ' Not initialized, assume true
+        '                                '
+        '                                ChildPagesFound = True
+        '                            Else
+        '                                ChildPagesFound = genericController.EncodeBoolean(ChildPagesFoundTest)
+        '                            End If
+        '                            '
+        '                            ' Use parentid to detect if this record needs to be called with the bid
+        '                            '
+        '                            ParentID = genericController.EncodeInteger(cache_pageContent(PCC_ParentID, PCCPtr))
+        '                            '
+        '                            ' main_Get the Link
+        '                            '
+        '                            LinkWorking = getPageLink4(MenuID, "", True, False)
+        '                            'LinkWorking = main_GetPageDynamicLinkWithArgs(ContentControlID, MenuID, DefaultLink, True, TemplateID, SectionID, MenuLinkOverRide, UseContentWatchLink)
+        '                        End If
+        '                    End If
+        '                    '
+        '                    If AllowInMenus Then
+        '                        '
+        '                        ' ----- Set Tier1 Menu Caption (top element of the first flyout panel)
+        '                        '
+        '                        If Tier1MenuCaption = "" Then
+        '                            Tier1MenuCaption = RootMenuCaption
+        '                            If Tier1MenuCaption = "" Then
+        '                                Tier1MenuCaption = PageName
+        '                            End If
+        '                        End If
+        '                        '
+        '                        ' ----- Set Top Menu Caption (clickable label that opens the menus)
+        '                        '
+        '                        TopMenuCaption = RootMenuCaption
+        '                        If TopMenuCaption = "" Then
+        '                            TopMenuCaption = Tier1MenuCaption
+        '                        End If
+        '                        '
+        '                        If LinkWorking = "" Then
+        '                            '
+        '                            ' ----- Blank LinkWorking, this entry has no link
+        '                            ' ----- Add menu header, and first entry for the root page
+        '                            '
+        '                            Call cpcore.htmlDoc.menu_AddEntry(MenuNamePrefix & MenuID, "", MenuImage, MenuImageOver, , TopMenuCaption)
+        '                            '
+        '                            ' ----- Root menu only, add a repeat of the button to the first menu
+        '                            '
+        '                            If (MenuStyle < 8) Or (MenuStyle > 11) Then
+        '                                '
+        '                                ' ##### Josh says Quadrem says they dont like the repeat on hovers
+        '                                '
+        '                                Call cpcore.htmlDoc.menu_AddEntry(MenuNamePrefix & MenuID & ".entry", MenuNamePrefix & MenuID, , , , Tier1MenuCaption)
+        '                            End If
+        '                        Else
+        '                            '
+        '                            ' ----- LinkWorking is here, put MenuID on the end of it
+        '                            ' ----- Add menu header, and first entry for the root page
+        '                            '
+        '                            Call cpcore.htmlDoc.menu_AddEntry(MenuNamePrefix & MenuID, "", MenuImage, MenuImageOver, LinkWorking, TopMenuCaption)
+        '                            '
+        '                            ' ----- Root menu only, add a repeat of the button to the first menu
+        '                            '
+        '                            AddRootButton = False
+        '                            If (MenuStyle < 8) Or (MenuStyle > 11) Then
+        '                                '
+        '                                ' ##### Josh says Quadrem says they dont like the repeat on hovers
+        '                                '
+        '                                AddRootButton = True
+        '                                If ParentID <> 0 Then
+        '                                    '
+        '                                    ' This Top-most page is not the RootPage, include the bid
+        '                                    '
+        '                                Else
+        '                                    '
+        '                                    ' This Top-most page is the RootPage, include no bid
+        '                                    '
+        '                                End If
+        '                            End If
+        '                        End If
+        '                        ' ##### can not block, this is being used
+        '                        If ChildPagesFound Then
+        '                            ChildPageCount = main_GetSectionMenu_AddChildMenu_ReturnChildCount(MenuID, ContentName, LinkWorking, Tier1MenuCaption, "," & genericController.encodeText(MenuID), MenuNamePrefix, 1, DepthLimit, childListSortMethodId, SectionID, AddRootButton, UseContentWatchLink)
+        '                            If (ChildPageCount = 0) And (True) Then
+        '                                Call cpcore.db.executeSql("update ccpagecontent set ChildPagesFound=0 where id=" & MenuID)
+        '                            End If
+        '                        End If
+        '                        pageManager_GetSectionMenu_NameMenu = pageManager_GetSectionMenu_NameMenu & genericController.vbReplace(cpcore.menuFlyout.getMenu(MenuNamePrefix & genericController.encodeText(MenuID), MenuStyle, StyleSheetPrefix), vbCrLf, "")
+        '                        pageManager_GetSectionMenu_NameMenu = pageManager_GetSectionMenu_NameMenu & cpcore.htmlDoc.menu_GetClose()
+        '                        Call cpcore.cache.setObject(BakeName, pageManager_GetSectionMenu_NameMenu, ContentName & ",Site Sections,Dynamic Menus,Dynamic Menu Section Rules")
+        '                    End If
+        '                End If
+        '            End If
+        '            '
+        '            Exit Function
+        'ErrorTrap:
+        '            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_GetSectionMenu_NameMenu")
+        '        End Function
+        '        '
+        '        '======================================================================================
+        '        '   main_Get a dynamic menu from Page Content
+        '        '======================================================================================
+        '        '
+        '        Friend Function pageManager_GetSectionMenu_IdMenu(ByVal RootPageRecordID As Integer, ByVal DefaultLink As String, ByVal DepthLimit As Integer, ByVal MenuStyle As Integer, ByVal StyleSheetPrefix As String, ByVal MenuImage As String, ByVal MenuImageOver As String, ByVal RootMenuCaption As String, ByVal SectionID As Integer, ByVal UseContentWatchLink As Boolean) As String
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("PageList_GetPageIDMenu")
+        '            '
+        '            Dim PseudoChildPagesFound As Boolean
+        '            Dim AllowInMenus As Boolean
+        '            Dim DateExpires As Date
+        '            Dim dateArchive As Date
+        '            Dim PubDate As Date
+        '            Dim PCCPtr As Integer
+        '            Dim PageFound As Boolean
+        '            Dim ChildPageCount As Integer
+        '            Dim ContentName As String
+        '            Dim AddRootButton As Boolean
+        '            Dim TopMenuCaption As String
+        '            Dim Tier1MenuCaption As String
+        '            '
+        '            Dim CSPointer As Integer
+        '            Dim PageID As Integer
+        '            Dim ContentID As Integer
+        '            Dim BakeName As String
+        '            Dim Criteria As String
+        '            Dim MenuNamePrefix As String
+        '            Dim childListSortMethodId As Integer
+        '            Dim LinkWorking As String
+        '            Dim LinkWorkingNoRedirect As String
+        '            Dim ParentID As Integer
+        '            Dim templateId As Integer
+        '            Dim ContentControlID As Integer
+        '            Dim allowChildListDisplay As Boolean
+        '            Dim MenuLinkOverRide As String
+        '            Dim ChildPagesFound As Boolean
+        '            Dim FieldList As String
+        '            Dim ChildPagesFoundTest As String
+        '            '
+        '            If RootPageRecordID = 610 Then
+        '                RootPageRecordID = RootPageRecordID
+        '            End If
+        '            '
+        '            '$$$$$ cache this - somewhere in here it opens cs with contentname
+        '            ContentName = "Page Content"
+        '            If False Then
+        '                Call Err.Raise(ignoreInteger, "dll", "main_GetPageMenu requires a valid page name and content name")
+        '            Else
+        '                '
+        '                ' ----- Read Bake Version
+        '                '
+        '                BakeName = "main_GetMenu-" & cpcore.webServer.webServerIO_requestProtocol & "-" & cpcore.webServer.requestDomain & "-" & RootPageRecordID & "-" & DefaultLink & "-" & DepthLimit & "-" & MenuStyle & "-" & StyleSheetPrefix
+        '                BakeName = genericController.vbReplace(BakeName, "/", "_")
+        '                BakeName = genericController.vbReplace(BakeName, ":", "_")
+        '                BakeName = genericController.vbReplace(BakeName, ".", "_")
+        '                BakeName = genericController.vbReplace(BakeName, " ", "_")
+        '                pageManager_GetSectionMenu_IdMenu = genericController.encodeText(cpcore.cache.getObject(Of String)(BakeName))
+        '                If pageManager_GetSectionMenu_IdMenu <> "" Then
+        '                    pageManager_GetSectionMenu_IdMenu = pageManager_GetSectionMenu_IdMenu
+        '                Else
+        '                    '
+        '                    ' ----- Add Root Page to Menu System
+        '                    '
+        '                    PCCPtr = cache_pageContent_getPtr(RootPageRecordID, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
+        '                    PageFound = (PCCPtr >= 0)
+        '                    '
+        '                    ' Skip if expired, archive and non-published
+        '                    '
+        '                    If PageFound Then
+        '                        DateExpires = genericController.EncodeDate(cache_pageContent(PCC_DateExpires, PCCPtr))
+        '                        dateArchive = genericController.EncodeDate(cache_pageContent(PCC_DateArchive, PCCPtr))
+        '                        PubDate = genericController.EncodeDate(cache_pageContent(PCC_PubDate, PCCPtr))
+        '                        PageFound = ((DateExpires = Date.MinValue) Or (DateExpires > cpcore.app_startTime)) And ((PubDate = Date.MinValue) Or (PubDate < cpcore.app_startTime))
+        '                        'PageFound = ((DateExpires = Date.MinValue) Or (DateExpires > main_PageStartTime)) And ((DateArchive = Date.MinValue) Or (DateArchive > main_PageStartTime)) And ((PubDate = Date.MinValue) Or (PubDate < main_PageStartTime))
+        '                    End If
+        '                    If Not PageFound Then
+        '                        '
+        '                        ' menu root was not found, just put up what we have. If the link is there, the page will be created
+        '                        '
+        '                        AllowInMenus = True
+        '                        LinkWorking = DefaultLink
+        '                        LinkWorkingNoRedirect = LinkWorking
+        '                        LinkWorking = genericController.EncodeAppRootPath(LinkWorking, cpcore.webServer.webServerIO_requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain)
+        '                        LinkWorking = genericController.modifyLinkQuery(LinkWorking, "bid", "", False)
+        '                        MenuNamePrefix = genericController.encodeText(genericController.GetRandomInteger) & "_"
+        '                        ' ***** just want to know what would happen here
+        '                        PageID = RootPageRecordID
+        '                        'pageId = 0
+        '                        childListSortMethodId = 0
+        '                        ParentID = 0
+        '                        templateId = 0
+        '                        allowChildListDisplay = False
+        '                        MenuLinkOverRide = ""
+        '                        ChildPagesFound = False
+        '                    Else
+        '                        '
+        '                        ' AllowInMenus does not work for root pages, which are the only pages being handled here. This menu is hidden from the section record
+        '                        '
+        '                        AllowInMenus = True
+        '                        If AllowInMenus Then
+        '                            MenuNamePrefix = genericController.encodeText(genericController.GetRandomInteger) & "_"
+        '                            PageID = genericController.EncodeInteger(cache_pageContent(PCC_ID, PCCPtr))
+        '                            childListSortMethodId = genericController.EncodeInteger(cache_pageContent(PCC_ChildListSortMethodID, PCCPtr))
+        '                            Tier1MenuCaption = genericController.encodeText(cache_pageContent(PCC_MenuHeadline, PCCPtr))
+        '                            If Tier1MenuCaption = "" Then
+        '                                Tier1MenuCaption = genericController.encodeText(cache_pageContent(PCC_Name, PCCPtr))
+        '                                If Tier1MenuCaption = "" Then
+        '                                    Tier1MenuCaption = "Page " & CStr(PageID)
+        '                                End If
+        '                            End If
+        '                            ContentControlID = genericController.EncodeInteger(cache_pageContent(PCC_ContentControlID, PCCPtr))
+        '                            templateId = genericController.EncodeInteger(cache_pageContent(PCC_TemplateID, PCCPtr))
+        '                            allowChildListDisplay = genericController.EncodeBoolean(cache_pageContent(PCC_AllowChildListDisplay, PCCPtr))
+        '                            MenuLinkOverRide = genericController.encodeText(cache_pageContent(PCC_Link, PCCPtr))
+        '                            ChildPagesFoundTest = genericController.encodeText(cache_pageContent(PCC_ChildPagesFound, PCCPtr))
+        '                            If ChildPagesFoundTest = "" Then
+        '                                '
+        '                                ' Not initialized, assume true
+        '                                '
+        '                                ChildPagesFound = True
+        '                            Else
+        '                                ChildPagesFound = genericController.EncodeBoolean(ChildPagesFoundTest)
+        '                            End If
+        '                            '
+        '                            ' Use parentid to detect if this record needs to be called with the bid
+        '                            '
+        '                            ParentID = genericController.EncodeInteger(cache_pageContent(PCC_ParentID, PCCPtr))
+        '                            '
+        '                            ' main_Get the Link
+        '                            '
+        '                            '1/13/2010 - convert everything to use linkalias and issecure
+        '                            'LinkWorkingNoRedirect = main_GetPageLink4()
+        '                            LinkWorkingNoRedirect = getPageLink4(PageID, "", True, False)
+        '                            '                    LinkWorkingNoRedirect = main_GetPageDynamicLinkWithArgs(contentcontrolid, pageId, DefaultLink, True, TemplateID, SectionID, "", UseContentWatchLink)
+        '                            LinkWorking = LinkWorkingNoRedirect
+        '                            '                    If MenuLinkOverRide <> "" Then
+        '                            '                        LinkWorking = "?rc=" & contentcontrolid & "&ri=" & pageId
+        '                            '                    End If
+        '                            'LinkWorking = main_GetPageDynamicLinkWithArgs(ContentControlID, pageId, DefaultLink, True, TemplateID, SectionID, MenuLinkOverRide, UseContentWatchLink)
+        '                        End If
+        '                    End If
+        '                    '
+        '                    If AllowInMenus Then
+        '                        '
+        '                        ' ----- Set Tier1 Menu Caption (top element of the first flyout panel)
+        '                        '
+        '                        If Tier1MenuCaption = "" Then
+        '                            Tier1MenuCaption = RootMenuCaption
+        '                        End If
+        '                        '
+        '                        ' ----- Set Top Menu Caption (clickable label that opens the menus)
+        '                        '
+        '                        TopMenuCaption = RootMenuCaption
+        '                        If TopMenuCaption = "" Then
+        '                            TopMenuCaption = Tier1MenuCaption
+        '                        End If
+        '                        '
+        '                        If LinkWorking = "" Then
+        '                            '
+        '                            ' ----- Blank LinkWorking, this entry has no link
+        '                            ' ----- Add menu header, and first entry for the root page
+        '                            '
+        '                            Call cpcore.htmlDoc.menu_AddEntry(MenuNamePrefix & PageID, "", MenuImage, MenuImageOver, , TopMenuCaption)
+        '                            '
+        '                            ' ----- Root menu only, add a repeat of the button to the first menu
+        '                            '
+        '                            If (MenuStyle < 8) Or (MenuStyle > 11) Then
+        '                                '
+        '                                ' ##### Josh says Quadrem says they dont like the repeat on hovers
+        '                                '
+        '                                Call cpcore.htmlDoc.menu_AddEntry(MenuNamePrefix & PageID & ".entry", MenuNamePrefix & PageID, , , , Tier1MenuCaption)
+        '                            End If
+        '                        Else
+        '                            '
+        '                            ' ----- LinkWorking is here, put pageId on the end of it
+        '                            ' ----- Add menu header, and first entry for the root page
+        '                            '
+        '                            If PageID <> 0 Then
+        '                                Call cpcore.htmlDoc.menu_AddEntry(MenuNamePrefix & PageID, "", MenuImage, MenuImageOver, LinkWorking, TopMenuCaption)
+        '                            ElseIf (SectionID <> 0) And (RootPageRecordID <> 0) Then
+        '                                Dim CSSection As Integer
+        '                                Call cpcore.htmlDoc.menu_AddEntry(MenuNamePrefix & RootPageRecordID, "", MenuImage, MenuImageOver, LinkWorking, TopMenuCaption)
+        '                                'Dim linkAlias
+        '                            Else
+        '                                Call cpcore.htmlDoc.menu_AddEntry(MenuNamePrefix & PageID, "", MenuImage, MenuImageOver, LinkWorking, TopMenuCaption)
+        '                            End If
+        '                            '
+        '                            ' ----- Root menu only, add a repeat of the button to the first menu
+        '                            '
+        '                            AddRootButton = False
+        '                            If (MenuStyle < 8) Or (MenuStyle > 11) Then
+        '                                '
+        '                                ' ##### Josh says Quadrem says they dont like the repeat on hovers
+        '                                '
+        '                                AddRootButton = True
+        '                                If ParentID <> 0 Then
+        '                                    '
+        '                                    ' This Top-most page is not the RootPage, include the bid
+        '                                    '
+        '                                Else
+        '                                    '
+        '                                    ' This Top-most page is the RootPage, include no bid
+        '                                    '
+        '                                End If
+        '                            End If
+        '                        End If
+        '                        '
+        '                        ' 9/18/2009 - Build Submenu if child pages found
+        '                        '
+        '                        If pagemanager_IsWorkflowRendering() Then
+        '                            '
+        '                            ' If workflow mode, just assume there are child pages
+        '                            '
+        '                            ChildPageCount = main_GetSectionMenu_AddChildMenu_ReturnChildCount(PageID, ContentName, LinkWorking, Tier1MenuCaption, "," & genericController.encodeText(PageID), MenuNamePrefix, 1, DepthLimit, childListSortMethodId, SectionID, AddRootButton, UseContentWatchLink)
+        '                        Else
+        '                            '
+        '                            ' In production mode, use the ChildPagesFound field
+        '                            '
+        '                            PseudoChildPagesFound = ChildPagesFound
+        '                            If Not PseudoChildPagesFound Then
+        '                                '
+        '                                ' Even when child pages is false, try it 10% of the time anyway
+        '                                '
+        '                                Randomize()
+        '                                PseudoChildPagesFound = (Rnd() > 0.8)
+        '                                If PseudoChildPagesFound Then
+        '                                    TopMenuCaption = TopMenuCaption
+        '                                End If
+        '                            End If
+        '                            If PseudoChildPagesFound Then
+        '                                '
+        '                                ' Child pages were found, create child menu
+        '                                '
+        '                                ChildPageCount = main_GetSectionMenu_AddChildMenu_ReturnChildCount(PageID, ContentName, LinkWorking, Tier1MenuCaption, "," & genericController.encodeText(PageID), MenuNamePrefix, 1, DepthLimit, childListSortMethodId, SectionID, AddRootButton, UseContentWatchLink)
+        '                                'ChildPageCount = main_GetSectionMenu_AddChildMenu_ReturnChildCount(pageId, ContentName, LinkWorkingNoRedirect, Tier1MenuCaption, "," & genericController.encodeText(pageId), MenuNamePrefix, 1, DepthLimit, ChildListSortMethodID, SectionID, AddRootButton, UseContentWatchLink)
+        '                                If (True) Then
+        '                                    If (ChildPageCount = 0) And (ChildPagesFound) Then
+        '                                        '
+        '                                        ' ChildPagesFound flag is true, but no pages were found - clear flag
+        '                                        '
+        '                                        Call cpcore.db.executeSql("update ccpagecontent set ChildPagesFound=0 where id=" & PageID)
+        '                                        'Call AppendLog("main_GetSectionMenu_IdMenu, 4-call pageManager_cache_pageContent_updateRow")
+        '                                        Call cache_pageContent_updateRow(PageID, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
+        '                                    ElseIf (ChildPageCount > 0) And (Not ChildPagesFound) Then
+        '                                        '
+        '                                        ' ChildPagesFlag is cleared, but pages were found -- set the flag
+        '                                        '
+        '                                        Call cpcore.db.executeSql("update ccpagecontent set ChildPagesFound=1 where id=" & PageID)
+        '                                        'Call AppendLog("main_GetSectionMenu_IdMenu, 5-call pageManager_cache_pageContent_updateRow")
+        '                                        Call cache_pageContent_updateRow(PageID, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
+        '                                    End If
+        '                                End If
+        '                            End If
+        '                        End If
+        '                        '
+        '                        ' ----- main_Get the Menu Header
+        '                        '
+        '                        pageManager_GetSectionMenu_IdMenu = pageManager_GetSectionMenu_IdMenu & genericController.vbReplace(cpcore.menuFlyout.getMenu(MenuNamePrefix & genericController.encodeText(PageID), MenuStyle, StyleSheetPrefix), vbCrLf, "")
+        '                        '
+        '                        ' ----- Add in the rest of the menu details
+        '                        ' ##### this must be here because it must go into the bake, else a baked page fails without he menus
+        '                        '
+        '                        pageManager_GetSectionMenu_IdMenu = pageManager_GetSectionMenu_IdMenu & cpcore.htmlDoc.menu_GetClose()
+        '                        '
+        '                        ' ----- Bake the completed menu
+        '                        '
+        '                        Call cpcore.cache.setObject(BakeName, pageManager_GetSectionMenu_IdMenu, ContentName & ",Site Sections,Dynamic Menus,Dynamic Menu Section Rules")
+        '                    End If
+        '                End If
+        '            End If
+        '            '
+        '            Exit Function
+        'ErrorTrap:
+        '            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_GetSectionMenu_IdMenu")
+        '        End Function
+        '        '
+        '        '======================================================================================
+        '        '   Add child pages to the menu system
+        '        '       REturns the count of total child pages (with grand-child, etc)
+        '        '       Returns -1 if child count not checked
+        '        ' 7/21/2009 - added -1 return if the child pages are not counted to prevent the page records from being set not ChildPagesFound
+        '        '======================================================================================
+        '        '
+        '        Friend Function main_GetSectionMenu_AddChildMenu_ReturnChildCount(ByVal ParentMenuID As Integer, ByVal ContentName As String, ByVal DefaultLink As String, ByVal Tier1MenuCaption As String, ByVal UsedPageIDString As String, ByVal MenuNamePrefix As String, ByVal MenuDepth As Integer, ByVal MenuDepthMax As Integer, ByVal childListSortMethodId As Integer, ByVal SectionID As Integer, ByVal AddRootButton As Boolean, ByVal UseContentWatchLink As Boolean) As Integer
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00365")
+        '            '
+        '            Dim Active As Boolean
+        '            Dim PseudoChildChildPagesFound As Boolean
+        '            Dim PCCRowPtr As Integer
+        '            Dim SortForward As Boolean
+        '            Dim SortFieldName As String
+        '            Dim SortPtr As Integer
+        '            Dim Ptr As Integer
+        '            Dim ChildPageCount As Integer
+        '            Dim ChildPagesFoundTest As String
+        '            Dim FieldList As String
+        '            Dim ChildCountWithNoPubs As Integer
+        '            Dim MenuID As Integer
+        '            Dim MenuCaption As String
+        '            Dim ChildCount As Integer
+        '            Dim ChildSize As Integer
+        '            Dim ChildPointer As Integer
+        '            Dim ChildID() As Integer
+        '            Dim ChildAllowChild() As Boolean
+        '            Dim ChildCaption() As String
+        '            Dim ChildLink() As String
+        '            Dim ChildSortMethodID() As Integer
+        '            Dim ChildChildPagesFound() As Boolean
+        '            Dim ContentID As Integer
+        '            Dim MenuLinkOverRide As String
+        '            Dim PageID As Integer
+        '            Dim UsedPageIDStringLocal As String
+        '            Dim Criteria As String
+        '            Dim MenuDepthLocal As Integer
+        '            Dim OrderByCriteria As String
+        '            Dim WorkingLink As String
+        '            Dim templateId As Integer
+        '            Dim ContentControlID As Integer
+        '            Dim Link As String
+        '            Dim PubDate As Date
+        '            Dim PCCPtr As Integer
+        '            Dim DateExpires As Date
+        '            Dim dateArchive As Date
+        '            Dim IsIncludedInMenu As Boolean
+        '            Dim PCCPtrs() As Integer
+        '            Dim PtrCnt As Integer
+        '            Dim SortSplit() As String
+        '            Dim SortSplitCnt As Integer
+        '            Dim Index As keyPtrController
+        '            Dim PCCColPtr As Integer
+        '            Dim PCCPtrsSorted As Integer()
+        '            Dim AllowInMenus As Boolean
+        '            '
+        '            ' ----- Gather all child menus
+        '            '
+        '            ' 7/21/2009 - added -1 return if the child pages are not counted to prevent the page records from being set not ChildPagesFound
+        '            ChildCountWithNoPubs = -1
+        '            If (ParentMenuID > 0) And (MenuDepth <= MenuDepthMax) Then
+        '                MenuDepthLocal = MenuDepth + 1
+        '                UsedPageIDStringLocal = UsedPageIDString
+        '                OrderByCriteria = cpcore.GetSortMethodByID(childListSortMethodId)
+        '                If OrderByCriteria = "" Then
+        '                    OrderByCriteria = cpcore.GetContentProperty(ContentName, "defaultsortmethod")
+        '                End If
+        '                If OrderByCriteria = "" Then
+        '                    OrderByCriteria = "ID"
+        '                End If
+        '                '
+        '                ' Populate PCCPtrs()
+        '                '
+        '                PCCPtr = cache_pageContent_getFirstChildPtr(ParentMenuID, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
+        '                PtrCnt = 0
+        '                Do While PCCPtr >= 0
+        '                    ReDim Preserve PCCPtrs(PtrCnt)
+        '                    PCCPtrs(PtrCnt) = PCCPtr
+        '                    PtrCnt = PtrCnt + 1
+        '                    PCCPtr = cache_pageContent_parentIdIndex.getNextPtrMatch(CStr(ParentMenuID))
+        '                Loop
+        '                If PtrCnt > 0 Then
+        '                    PCCPtrsSorted = cache_pageContent_getPtrsSorted(PCCPtrs, OrderByCriteria)
+        '                End If
+        '                '
+        '                Ptr = 0
+        '                Do While Ptr < PtrCnt
+        '                    PCCPtr = PCCPtrsSorted(Ptr)
+        '                    DateExpires = genericController.EncodeDate(cache_pageContent(PCC_DateExpires, PCCPtr))
+        '                    dateArchive = genericController.EncodeDate(cache_pageContent(PCC_DateArchive, PCCPtr))
+        '                    PubDate = genericController.EncodeDate(cache_pageContent(PCC_PubDate, PCCPtr))
+        '                    MenuCaption = Trim(genericController.encodeText(cache_pageContent(PCC_MenuHeadline, PCCPtr)))
+        '                    If False Then '.3.752" Then
+        '                        AllowInMenus = (MenuCaption <> "")
+        '                    Else
+        '                        AllowInMenus = genericController.EncodeBoolean(cache_pageContent(PCC_AllowInMenus, PCCPtr))
+        '                    End If
+        '                    Active = genericController.EncodeBoolean(cache_pageContent(PCC_Active, PCCPtr))
+        '                    IsIncludedInMenu = Active And AllowInMenus And ((PubDate = Date.MinValue) Or (PubDate < cpcore.app_startTime)) And ((DateExpires = Date.MinValue) Or (DateExpires > cpcore.app_startTime))
+        '                    'IsIncludedInMenu = Active And AllowInMenus And ((PubDate = Date.MinValue) Or (PubDate < main_PageStartTime)) And ((DateExpires = Date.MinValue) Or (DateExpires > main_PageStartTime)) And ((DateArchive = Date.MinValue) Or (DateArchive > main_PageStartTime))
+        '                    If IsIncludedInMenu Then
+        '                        If MenuCaption = "" Then
+        '                            MenuCaption = Trim(genericController.encodeText(cache_pageContent(PCC_Name, PCCPtr)))
+        '                        End If
+        '                        If MenuCaption = "" Then
+        '                            MenuCaption = "Related Page"
+        '                        End If
+        '                        If (MenuCaption <> "") Then
+        '                            PageID = genericController.EncodeInteger(cache_pageContent(PCC_ID, PCCPtr))
+        '                            If genericController.vbInstr(1, UsedPageIDStringLocal & ",", "," & genericController.encodeText(PageID) & ",") = 0 Then
+        '                                UsedPageIDStringLocal = UsedPageIDStringLocal & "," & genericController.encodeText(PageID)
+        '                                If ChildCount >= ChildSize Then
+        '                                    ChildSize = ChildSize + 100
+        '                                    ReDim Preserve ChildID(ChildSize)
+        '                                    ReDim Preserve ChildCaption(ChildSize)
+        '                                    ReDim Preserve ChildLink(ChildSize)
+        '                                    ReDim Preserve ChildSortMethodID(ChildSize)
+        '                                    ReDim Preserve ChildAllowChild(ChildSize)
+        '                                    ReDim Preserve ChildChildPagesFound(ChildSize)
+        '                                End If
+        '                                ContentControlID = genericController.EncodeInteger(cache_pageContent(PCC_ContentControlID, PCCPtr))
+        '                                MenuLinkOverRide = genericController.encodeText(cache_pageContent(PCC_Link, PCCPtr))
+        '                                '
+        '                                ChildCaption(ChildCount) = MenuCaption
+        '                                ChildID(ChildCount) = PageID
+        '                                ChildAllowChild(ChildCount) = genericController.EncodeBoolean(cache_pageContent(PCC_AllowChildListDisplay, PCCPtr))
+        '                                ChildSortMethodID(ChildCount) = genericController.EncodeInteger(cache_pageContent(PCC_ChildListSortMethodID, PCCPtr))
+        '                                templateId = genericController.EncodeInteger(cache_pageContent(PCC_TemplateID, PCCPtr))
+        '                                '
+        '                                Link = getPageLink4(PageID, "", True, UseContentWatchLink)
+        '                                'Link = main_GetPageDynamicLinkWithArgs(contentcontrolid, PageID, DefaultLink, False, TemplateID, SectionID, MenuLinkOverRide, UseContentWatchLink)
+        '                                ChildLink(ChildCount) = Link
+        '                                ChildPagesFoundTest = cache_pageContent(PCC_ChildPagesFound, PCCPtr)
+        '                                If ChildPagesFoundTest = "" Then
+        '                                    '
+        '                                    ' Not initialized
+        '                                    '
+        '                                    ChildChildPagesFound(ChildCount) = True
+        '                                Else
+        '                                    ChildChildPagesFound(ChildCount) = genericController.EncodeBoolean(ChildPagesFoundTest)
+        '                                End If
+        '                                ChildCount = ChildCount + 1
+        '                            End If
+        '                        End If
+        '                    End If
+        '                    Ptr = Ptr + 1
+        '                Loop
+        '                ChildCountWithNoPubs = Ptr
+        '                '
+        '                ' ----- Output menu entries
+        '                '
+        '                If ChildCount > 0 Then
+        '                    '
+        '                    ' menu entry has children, output menu entry, child menu entry, and group of child entries
+        '                    '
+        '                    If AddRootButton Then
+        '                        '
+        '                        ' Root Button is a redundent menu entry at the top of tier 1 panels that links to the root page
+        '                        '
+        '                        Call cpcore.htmlDoc.menu_AddEntry(MenuNamePrefix & ParentMenuID & ".entry", MenuNamePrefix & ParentMenuID, "", "", DefaultLink, Tier1MenuCaption)
+        '                        'Call main_AddMenuEntry(MenuNamePrefix & ParentMenuID & ".entry", MenuNamePrefix & ParentMenuID, "", "", main_GetLinkAliasByPageID(ParentMenuID, "", DefaultLink), Tier1MenuCaption)
+        '                        'Call main_AddMenuEntry(MenuNamePrefix & ParentMenuID & ".entry", MenuNamePrefix & ParentMenuID, "", "", main_GetLinkAliasByLink(DefaultLink), Tier1MenuCaption)
+        '                    End If
+        '                    '
+        '                    For ChildPointer = 0 To ChildCount - 1
+        '                        MenuID = ChildID(ChildPointer)
+        '                        MenuCaption = ChildCaption(ChildPointer)
+        '                        WorkingLink = ChildLink(ChildPointer)
+        '                        Call cpcore.htmlDoc.menu_AddEntry(MenuNamePrefix & MenuID, MenuNamePrefix & ParentMenuID, "", "", WorkingLink, MenuCaption)
+        '                        'Call main_AddMenuEntry(MenuNamePrefix & MenuID, MenuNamePrefix & ParentMenuID, "", "", main_GetLinkAliasByPageID(MenuID, "", WorkingLink), MenuCaption)
+        '                        'Call main_AddMenuEntry(MenuNamePrefix & MenuID, MenuNamePrefix & ParentMenuID, "", "", main_GetLinkAliasByLink(WorkingLink), MenuCaption)
+        '                        '
+        '                        ' if child pages are found, print the next menu deeper
+        '                        '
+        '                        If (ParentMenuID > 0) And (MenuDepthLocal <= MenuDepthMax) Then
+        '                            If pagemanager_IsWorkflowRendering() Then
+        '                                '
+        '                                ' Workflow mode - go main_Get the child pages
+        '                                '
+        '                                ChildPageCount = main_GetSectionMenu_AddChildMenu_ReturnChildCount(MenuID, ContentName, WorkingLink, MenuCaption, UsedPageIDStringLocal, MenuNamePrefix, MenuDepthLocal, MenuDepthMax, ChildSortMethodID(ChildPointer), SectionID, False, UseContentWatchLink)
+        '                            Else
+        '                                '
+        '                                ' Production mode - main_Get them only if the parent record says there are child pages
+        '                                '
+        '                                PseudoChildChildPagesFound = ChildChildPagesFound(ChildPointer)
+        '                                If Not PseudoChildChildPagesFound Then
+        '                                    '
+        '                                    ' Even when child pages is false, try it 10% of the time anyway
+        '                                    '
+        '                                    Randomize()
+        '                                    PseudoChildChildPagesFound = (Rnd() > 0.8)
+        '                                End If
+        '                                If PseudoChildChildPagesFound Then
+        '                                    '
+        '                                    ' Child pages were found, create child menu
+        '                                    '
+        '                                    ' 7/21/2009 - added -1 return if the child pages are not counted to prevent the page records from being set not ChildPagesFound
+        '                                    ChildPageCount = main_GetSectionMenu_AddChildMenu_ReturnChildCount(MenuID, ContentName, WorkingLink, MenuCaption, UsedPageIDStringLocal, MenuNamePrefix, MenuDepthLocal, MenuDepthMax, ChildSortMethodID(ChildPointer), SectionID, False, UseContentWatchLink)
+        '                                    If ChildPageCount >= 0 Then
+        '                                        If (True) Then
+        '                                            If ChildChildPagesFound(ChildPointer) And (ChildPageCount = 0) Then
+        '                                                '
+        '                                                ' no pages were found, clear the child pages found property
+        '                                                ' child pages found property is set at admin site when a page is saved with this as the parent id
+        '                                                '
+        '                                                Call cpcore.db.executeSql("update ccpagecontent set ChildPagesFound=0 where id=" & MenuID)
+        '                                                'Call AppendLog("pageManager_GetHtmlBody_GetSection_GetContentMenu_AddChildMenu, 6-call pageManager_cache_pageContent_updateRow -- fix here to NOT call pageManager_cache_pageContent_updateRow()")
+        '                                                cache_pageContent(PCC_ChildPagesFound, ChildPointer) = "0"
+        '                                                'Call pageManager_cache_pageContent_updateRow(MenuID, main_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
+        '                                            ElseIf (ChildPageCount > 0) And (Not ChildChildPagesFound(ChildPointer)) Then
+        '                                                '
+        '                                                ' pages were found, set the child pages found property
+        '                                                '
+        '                                                Call cpcore.db.executeSql("update ccpagecontent set ChildPagesFound=1 where id=" & MenuID)
+        '                                                'Call AppendLog("pageManager_GetHtmlBody_GetSection_GetContentMenu_AddChildMenu, 7-call pageManager_cache_pageContent_updateRow -- fix here to NOT call pageManager_cache_pageContent_updateRow()")
+        '                                                cache_pageContent(PCC_ChildPagesFound, ChildPointer) = "1"
+        '                                                'Call pageManager_cache_pageContent_updateRow(MenuID, main_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
+        '                                            End If
+        '                                        End If
+        '                                    End If
+        '                                End If
+        '                            End If
+        '                        End If
+        '                    Next
+        '                End If
+        '            End If
+        '            main_GetSectionMenu_AddChildMenu_ReturnChildCount = ChildCountWithNoPubs
+        '            '
+        '            Exit Function
+        'ErrorTrap:
+        '            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_GetSectionMenu_AddChildMenu_ReturnChildCount")
+        '        End Function
         '
         '=============================================================================
         '   Creates the child page list used by PageContent
@@ -3696,293 +3580,293 @@ ErrorTrap:
 ErrorTrap:
             Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_GetChildPageList")
         End Function
-        '
-        '=============================================================================
-        '   main_Get the Section Menu
-        '   MenuName blank reverse menu to legacy mode (all sections on menu)
-        '=============================================================================
-        '
-        Public Function pageManager_GetSectionMenu(ByVal DepthLimit As Integer, ByVal MenuStyle As Integer, ByVal StyleSheetPrefix As String, ByVal DefaultTemplateLink As String, ByVal MenuID As Integer, ByVal MenuName As String, ByVal UseContentWatchLink As Boolean) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("PageList_GetSectionMenu")
-            '
-            Dim layoutError As String
-            Dim pageActive As Boolean
-            Dim TCPtr As Integer
-            Dim PCCPtr As Integer
-            Dim rootPageId As Integer
-            Dim CSSections As Integer
-            Dim CSTemplates As Integer
-            Dim CSPage As Integer
-            Dim SectionName As String
-            Dim templateId As Integer
-            Dim ContentID As Integer
-            Dim ContentName As String
-            'Dim main_oldCacheArray_ParentBranchPointer as integer
-            Dim Link As String
-            Dim SectionID As Integer
-            Dim AuthoringTag As String
-            Dim MenuImage As String
-            Dim MenuImageOver As String
-            'Dim SectionCount as integer
-            Dim LandingLink As String
-            Dim MenuString As String
-            Dim SectionCaption As String
-            Dim SectionTemplateID As Integer
-            Dim Criteria As String
-            Dim SelectFieldList As String
-            Dim ShowHiddenMenu As Boolean
-            Dim HideMenu As Boolean
-            'dim buildversion As String
-            Dim PageContentCID As Integer
-            Dim BlockPage As Boolean
-            Dim BlockSection As Boolean
-            Dim SQL As String
-            Dim IsAllSectionsMenuMode As Boolean
-            '
-            '
-            '
-            ' fixed? - !! Problem: new upgraded site with old menu object (MenuName=""). We take the third option here, but later in the
-            '   routine we use RootPageID because the check is on Version only
-            '
-            IsAllSectionsMenuMode = (MenuName = "")
-            PageContentCID = cpcore.main_GetContentID("Page Content")
-            If (True) Then
-                SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,BlockSection,RootPageID"
-                ShowHiddenMenu = cpcore.authContext.isEditingAnything(cpcore)
-                'ShowHiddenMenu = main_IsEditing("Site Sections")
-                If IsAllSectionsMenuMode Then
-                    '
-                    ' Section/Page connection at RootPageID, show all sections
-                    '
-                    CSSections = cpcore.db.cs_open("Site Sections", , , , , ,, SelectFieldList)
-                Else
-                    '
-                    ' Section/Page connection at RootPageID, only show sections connected to the menu
-                    '
-                    SQL = "Select Distinct S.ID" _
-                        & " from ((ccSections S" _
-                        & " left join ccDynamicMenuSectionRules R on R.SectionID=S.ID)" _
-                        & " left join ccDynamicMenus M on M.ID=R.DynamicMenuID)" _
-                        & " where M.ID=" & MenuID
-                    Criteria = "ID in (" & SQL & ")"
-                    CSSections = cpcore.db.cs_open("Site Sections", Criteria, , , , , , SelectFieldList)
-                End If
-                '        '
-                '        ' Section/Page connection at RootPageID
-                '        '
-                '        SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,BlockSection,RootPageID"
-                '        SQL = "Select Distinct S.ID" _
-                '            & " from ((ccSections S" _
-                '            & " left join ccDynamicMenuSectionRules R on R.SectionID=S.ID)" _
-                '            & " left join ccDynamicMenus M on M.ID=R.DynamicMenuID)" _
-                '            & " where M.ID=" & MenuID
-                '        Criteria = "ID in (" & SQL & ")"
-                '        ShowHiddenMenu = main_IsEditing("Site Sections")
-                '        CSSections = app.csOpen("Site Sections", Criteria, , , , , SelectFieldList)
-            ElseIf (True) Then
-                '
-                ' Multiple Menus with ccDynamicMenuSectionRules
-                '
-                SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,BlockSection,0 as RootPageID"
-                ShowHiddenMenu = cpcore.authContext.isEditingAnything(cpcore)
-                'ShowHiddenMenu = main_IsEditing("Site Sections")
-                If IsAllSectionsMenuMode Then
-                    '
-                    ' Section/Page connection at RootPageID, show all sections
-                    '
-                    CSSections = cpcore.db.cs_open("Site Sections", , , , , , , SelectFieldList)
-                Else
-                    '
-                    ' Section/Page connection at RootPageID, only show sections connected to the menu
-                    '
-                    SQL = "Select Distinct S.ID" _
-                        & " from ((ccSections S" _
-                        & " left join ccDynamicMenuSectionRules R on R.SectionID=S.ID)" _
-                        & " left join ccDynamicMenus M on M.ID=R.DynamicMenuID)" _
-                        & " where M.ID=" & MenuID
-                    Criteria = "ID in (" & SQL & ")"
-                    CSSections = cpcore.db.cs_open("Site Sections", Criteria, , , , ,, SelectFieldList)
-                End If
-                '        SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,BlockSection"
-                '        SQL = "Select Distinct S.ID" _
-                '            & " from ((ccSections S" _
-                '            & " left join ccDynamicMenuSectionRules R on R.SectionID=S.ID)" _
-                '            & " left join ccDynamicMenus M on M.ID=R.DynamicMenuID)" _
-                '            & " where M.ID=" & MenuID
-                '        Criteria = "ID in (" & SQL & ")"
-                '        ShowHiddenMenu = main_IsEditing("Site Sections")
-                '        CSSections = app.csOpen("Site Sections", Criteria, , , , , SelectFieldList)
-            ElseIf cpcore.IsSQLTableField("Default", "ccSections", "BlockSection") Then
-                '
-                ' All sections menu mode with block sections
-                '
-                SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,BlockSection,0 as RootPageID"
-                Criteria = ""
-                ShowHiddenMenu = cpcore.authContext.isEditingAnything(cpcore)
-                'ShowHiddenMenu = main_IsEditing("Site Sections")
-                CSSections = cpcore.db.cs_open("Site Sections", Criteria, , , , ,, SelectFieldList)
-            ElseIf cpcore.IsSQLTableField("Default", "ccSections", "MenuImageOverFilename") Then
-                '
-                ' All sections menu mode with Image Over
-                '
-                SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,0 as BlockSection,0 as RootPageID"
-                Criteria = ""
-                ShowHiddenMenu = cpcore.authContext.isEditingAnything(cpcore)
-                'ShowHiddenMenu = main_IsEditing("Site Sections")
-                CSSections = cpcore.db.cs_open("Site Sections", Criteria, , , , ,, SelectFieldList)
-            ElseIf cpcore.IsSQLTableField("Default", "ccSections", "HideMenu") Then
-                '
-                ' All sections menu mode with HideMenu
-                '
-                SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,'' as MenuImageOverFilename,HideMenu,0 as BlockSection,0 as RootPageID"
-                Criteria = ""
-                ShowHiddenMenu = cpcore.authContext.isEditingAnything(cpcore)
-                'ShowHiddenMenu = main_IsEditing("Site Sections")
-                CSSections = cpcore.db.cs_open("Site Sections", Criteria, , , , ,, SelectFieldList)
-            Else
-                SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,'' as MenuImageOverFilename,0 as HideMenu,0 as BlockSection,0 as RootPageID"
-                Criteria = ""
-                ShowHiddenMenu = True
-                CSSections = cpcore.db.cs_open("Site Sections", Criteria, , , , ,, SelectFieldList)
-            End If
-            Do While cpcore.db.cs_ok(CSSections)
-                HideMenu = cpcore.db.cs_getBoolean(CSSections, "HideMenu")
-                BlockSection = cpcore.db.cs_getBoolean(CSSections, "BlockSection")
-                SectionID = cpcore.db.cs_getInteger(CSSections, "ID")
-                If ShowHiddenMenu Or Not (HideMenu Or cpcore.main_isSectionBlocked(SectionID, BlockSection)) Then
-                    SectionName = Trim(cpcore.db.cs_getText(CSSections, "Name"))
-                    If SectionName = "" Then
-                        SectionName = "Section " & SectionID
-                        Call cpcore.db.executeSql("update ccSections set Name=" & cpcore.db.encodeSQLText(SectionName) & " where ID=" & SectionID)
-                    End If
-                    SectionCaption = cpcore.db.cs_getText(CSSections, "Caption")
-                    If SectionCaption = "" Then
-                        SectionCaption = SectionName
-                        Call cpcore.db.executeSql("update ccSections set Caption=" & cpcore.db.encodeSQLText(SectionCaption) & " where ID=" & SectionID)
-                    End If
-                    If HideMenu Then
-                        SectionCaption = "[Hidden: " & SectionCaption & "]"
-                    End If
-                    SectionTemplateID = cpcore.db.cs_getInteger(CSSections, "TemplateID")
-                    ContentID = cpcore.db.cs_getInteger(CSSections, "ContentID")
-                    If (ContentID <> PageContentCID) And (Not cpcore.IsWithinContent(ContentID, PageContentCID)) Then
-                        ContentID = PageContentCID
-                        Call cpcore.db.cs_set(CSSections, "ContentID", ContentID)
-                    End If
-                    If ContentID = PageContentCID Then
-                        ContentName = "Page Content"
-                    Else
-                        ContentName = cpcore.metaData.getContentNameByID(ContentID)
-                        If ContentName = "" Then
-                            ContentName = "Page Content"
-                            ContentID = cpcore.main_GetContentID(ContentName)
-                            Call cpcore.db.executeSql("update ccSections set ContentID=" & ContentID & " where ID=" & SectionID)
-                        End If
-                    End If
-                    MenuImage = cpcore.db.cs_getText(CSSections, "MenuImageFilename")
-                    If MenuImage <> "" Then
-                        MenuImage = cpcore.csv_getVirtualFileLink(cpcore.serverConfig.appConfig.cdnFilesNetprefix, MenuImage)
-                    End If
-                    MenuImageOver = cpcore.db.cs_getText(CSSections, "MenuImageOverFilename")
-                    If MenuImageOver <> "" Then
-                        MenuImageOver = cpcore.csv_getVirtualFileLink(cpcore.serverConfig.appConfig.cdnFilesNetprefix, MenuImageOver)
-                    End If
-                    '
-                    ' main_Get Root Page for templateID
-                    '
-                    templateId = 0
-                    BlockPage = False
-                    Link = ""
-                    If False Then '.3.451" Then
-                        '
-                        ' no blockpage,section-page connection by name
-                        '
-                        PCCPtr = cache_pageContent_getFirstNamePtr(SectionName, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
-                        'SelectFieldList = "ID,TemplateID,0 as BlockPage"
-                        'CSPage = app.csOpen(ContentName, "name=" & encodeSQLText(SectionName), "ID", , , , SelectFieldList)
-                    ElseIf False Then '.3.613" Then
-                        '
-                        ' blockpage,section-page connection by name
-                        '
-                        PCCPtr = cache_pageContent_getFirstNamePtr(SectionName, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
-                        'SelectFieldList = "ID,TemplateID,BlockPage"
-                        'CSPage = app.csOpen(ContentName, "name=" & encodeSQLText(SectionName), "ID", , , , SelectFieldList)
-                    Else
-                        '
-                        ' section-page connection by name
-                        '
-                        rootPageId = cpcore.db.cs_getInteger(CSSections, "rootpageid")
-                        PCCPtr = cache_pageContent_getPtr(rootPageId, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
-                        'SelectFieldList = "ID,TemplateID,BlockPage"
-                        'CSPage = main_OpenCSContentRecord_Internal(ContentName, RootPageID, , , SelectFieldList)
-                    End If
-                    If PCCPtr >= 0 Then
-                        rootPageId = genericController.EncodeInteger(cache_pageContent(PCC_ID, PCCPtr))
-                        templateId = genericController.EncodeInteger(cache_pageContent(PCC_TemplateID, PCCPtr))
-                        BlockPage = genericController.EncodeBoolean(cache_pageContent(PCC_BlockPage, PCCPtr))
-                        pageActive = genericController.EncodeBoolean(cache_pageContent(PCC_Active, PCCPtr))
-                    End If
-                    If pageActive Or ShowHiddenMenu Then
-                        If PCCPtr < 0 Then
-                            '
-                            ' Page Missing
-                            '
-                            SectionCaption = "[Missing Page: " & SectionCaption & "]"
-                        ElseIf Not pageActive Then
-                            '
-                            ' Page Inactive
-                            '
-                            SectionCaption = "[Inactive Page: " & SectionCaption & "]"
-                        End If
-                        If templateId = 0 Then
-                            templateId = SectionTemplateID
-                        End If
-                        '
-                        ' main_Get the link from either the template, or use the default link
-                        '
-                        If templateId <> 0 Then
-                            TCPtr = pageManager_cache_pageTemplate_getPtr(templateId)
-                            If TCPtr >= 0 Then
-                                Link = genericController.encodeText(cache_pageTemplate(TC_Link, TCPtr))
-                            End If
-                            'Link = main_GetTCLink(TCPtr)
-                        End If
-                        If Link = "" Then
-                            Link = DefaultTemplateLink
-                        End If
-                        AuthoringTag = cpcore.main_GetRecordEditLink2("Site Sections", SectionID, False, SectionName, cpcore.authContext.isEditing(cpcore, "Site Sections"))
-                        Link = genericController.modifyLinkQuery(Link, "sid", CStr(SectionID), True)
-                        '
-                        ' main_Get Menu, remove crlf, and parse the line with crlf
-                        '
-                        MenuString = pageManager_GetSectionMenu_IdMenu(rootPageId, Link, DepthLimit, MenuStyle, StyleSheetPrefix, MenuImage, MenuImageOver, SectionCaption, SectionID, UseContentWatchLink)
-                        MenuString = genericController.vbReplace(AuthoringTag & MenuString, vbCrLf, "")
-                        If (MenuString <> "") Then
-                            If (pageManager_GetSectionMenu = "") Then
-                                pageManager_GetSectionMenu = MenuString
-                            Else
-                                pageManager_GetSectionMenu = pageManager_GetSectionMenu & vbCrLf & MenuString
-                            End If
-                        End If
-                    End If
-                    '
-                End If
-                Call cpcore.db.cs_goNext(CSSections)
-            Loop
-            AuthoringTag = cpcore.main_GetRecordAddLink("Site Sections", "MenuID=" & MenuID)
-            If AuthoringTag <> "" Then
-                pageManager_GetSectionMenu = pageManager_GetSectionMenu & AuthoringTag
-            End If
-            Call cpcore.db.cs_Close(CSSections)
-            '
-            pageManager_GetSectionMenu = cpcore.htmlDoc.html_executeContentCommands(Nothing, pageManager_GetSectionMenu, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.ID, cpcore.authContext.isAuthenticated, layoutError)
-            pageManager_GetSectionMenu = cpcore.htmlDoc.html_encodeContent10(pageManager_GetSectionMenu, cpcore.authContext.user.ID, "", 0, 0, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.isAuthenticated, Nothing, cpcore.authContext.isEditingAnything(cpcore))
-            'pageManager_GetSectionMenu = main_EncodeContent5(pageManager_GetSectionMenu, memberID, "", 0, 0, False, False, True, True, False, True, "", "", False, 0)
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("pageManager_GetSectionMenu")
-        End Function
+        '        '
+        '        '=============================================================================
+        '        '   main_Get the Section Menu
+        '        '   MenuName blank reverse menu to legacy mode (all sections on menu)
+        '        '=============================================================================
+        '        '
+        '        Public Function pageManager_GetSectionMenu(ByVal DepthLimit As Integer, ByVal MenuStyle As Integer, ByVal StyleSheetPrefix As String, ByVal DefaultTemplateLink As String, ByVal MenuID As Integer, ByVal MenuName As String, ByVal UseContentWatchLink As Boolean) As String
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("PageList_GetSectionMenu")
+        '            '
+        '            Dim layoutError As String
+        '            Dim pageActive As Boolean
+        '            Dim TCPtr As Integer
+        '            Dim PCCPtr As Integer
+        '            Dim rootPageId As Integer
+        '            Dim CSSections As Integer
+        '            Dim CSTemplates As Integer
+        '            Dim CSPage As Integer
+        '            Dim SectionName As String
+        '            Dim templateId As Integer
+        '            Dim ContentID As Integer
+        '            Dim ContentName As String
+        '            'Dim main_oldCacheArray_ParentBranchPointer as integer
+        '            Dim Link As String
+        '            Dim SectionID As Integer
+        '            Dim AuthoringTag As String
+        '            Dim MenuImage As String
+        '            Dim MenuImageOver As String
+        '            'Dim SectionCount as integer
+        '            Dim LandingLink As String
+        '            Dim MenuString As String
+        '            Dim SectionCaption As String
+        '            Dim SectionTemplateID As Integer
+        '            Dim Criteria As String
+        '            Dim SelectFieldList As String
+        '            Dim ShowHiddenMenu As Boolean
+        '            Dim HideMenu As Boolean
+        '            'dim buildversion As String
+        '            Dim PageContentCID As Integer
+        '            Dim BlockPage As Boolean
+        '            Dim BlockSection As Boolean
+        '            Dim SQL As String
+        '            Dim IsAllSectionsMenuMode As Boolean
+        '            '
+        '            '
+        '            '
+        '            ' fixed? - !! Problem: new upgraded site with old menu object (MenuName=""). We take the third option here, but later in the
+        '            '   routine we use RootPageID because the check is on Version only
+        '            '
+        '            IsAllSectionsMenuMode = (MenuName = "")
+        '            PageContentCID = cpcore.main_GetContentID("Page Content")
+        '            If (True) Then
+        '                SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,BlockSection,RootPageID"
+        '                ShowHiddenMenu = cpcore.authContext.isEditingAnything(cpcore)
+        '                'ShowHiddenMenu = main_IsEditing("Site Sections")
+        '                If IsAllSectionsMenuMode Then
+        '                    '
+        '                    ' Section/Page connection at RootPageID, show all sections
+        '                    '
+        '                    CSSections = cpcore.db.cs_open("Site Sections", , , , , ,, SelectFieldList)
+        '                Else
+        '                    '
+        '                    ' Section/Page connection at RootPageID, only show sections connected to the menu
+        '                    '
+        '                    SQL = "Select Distinct S.ID" _
+        '                        & " from ((ccSections S" _
+        '                        & " left join ccDynamicMenuSectionRules R on R.SectionID=S.ID)" _
+        '                        & " left join ccDynamicMenus M on M.ID=R.DynamicMenuID)" _
+        '                        & " where M.ID=" & MenuID
+        '                    Criteria = "ID in (" & SQL & ")"
+        '                    CSSections = cpcore.db.cs_open("Site Sections", Criteria, , , , , , SelectFieldList)
+        '                End If
+        '                '        '
+        '                '        ' Section/Page connection at RootPageID
+        '                '        '
+        '                '        SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,BlockSection,RootPageID"
+        '                '        SQL = "Select Distinct S.ID" _
+        '                '            & " from ((ccSections S" _
+        '                '            & " left join ccDynamicMenuSectionRules R on R.SectionID=S.ID)" _
+        '                '            & " left join ccDynamicMenus M on M.ID=R.DynamicMenuID)" _
+        '                '            & " where M.ID=" & MenuID
+        '                '        Criteria = "ID in (" & SQL & ")"
+        '                '        ShowHiddenMenu = main_IsEditing("Site Sections")
+        '                '        CSSections = app.csOpen("Site Sections", Criteria, , , , , SelectFieldList)
+        '            ElseIf (True) Then
+        '                '
+        '                ' Multiple Menus with ccDynamicMenuSectionRules
+        '                '
+        '                SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,BlockSection,0 as RootPageID"
+        '                ShowHiddenMenu = cpcore.authContext.isEditingAnything(cpcore)
+        '                'ShowHiddenMenu = main_IsEditing("Site Sections")
+        '                If IsAllSectionsMenuMode Then
+        '                    '
+        '                    ' Section/Page connection at RootPageID, show all sections
+        '                    '
+        '                    CSSections = cpcore.db.cs_open("Site Sections", , , , , , , SelectFieldList)
+        '                Else
+        '                    '
+        '                    ' Section/Page connection at RootPageID, only show sections connected to the menu
+        '                    '
+        '                    SQL = "Select Distinct S.ID" _
+        '                        & " from ((ccSections S" _
+        '                        & " left join ccDynamicMenuSectionRules R on R.SectionID=S.ID)" _
+        '                        & " left join ccDynamicMenus M on M.ID=R.DynamicMenuID)" _
+        '                        & " where M.ID=" & MenuID
+        '                    Criteria = "ID in (" & SQL & ")"
+        '                    CSSections = cpcore.db.cs_open("Site Sections", Criteria, , , , ,, SelectFieldList)
+        '                End If
+        '                '        SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,BlockSection"
+        '                '        SQL = "Select Distinct S.ID" _
+        '                '            & " from ((ccSections S" _
+        '                '            & " left join ccDynamicMenuSectionRules R on R.SectionID=S.ID)" _
+        '                '            & " left join ccDynamicMenus M on M.ID=R.DynamicMenuID)" _
+        '                '            & " where M.ID=" & MenuID
+        '                '        Criteria = "ID in (" & SQL & ")"
+        '                '        ShowHiddenMenu = main_IsEditing("Site Sections")
+        '                '        CSSections = app.csOpen("Site Sections", Criteria, , , , , SelectFieldList)
+        '            ElseIf cpcore.IsSQLTableField("Default", "ccSections", "BlockSection") Then
+        '                '
+        '                ' All sections menu mode with block sections
+        '                '
+        '                SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,BlockSection,0 as RootPageID"
+        '                Criteria = ""
+        '                ShowHiddenMenu = cpcore.authContext.isEditingAnything(cpcore)
+        '                'ShowHiddenMenu = main_IsEditing("Site Sections")
+        '                CSSections = cpcore.db.cs_open("Site Sections", Criteria, , , , ,, SelectFieldList)
+        '            ElseIf cpcore.IsSQLTableField("Default", "ccSections", "MenuImageOverFilename") Then
+        '                '
+        '                ' All sections menu mode with Image Over
+        '                '
+        '                SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,0 as BlockSection,0 as RootPageID"
+        '                Criteria = ""
+        '                ShowHiddenMenu = cpcore.authContext.isEditingAnything(cpcore)
+        '                'ShowHiddenMenu = main_IsEditing("Site Sections")
+        '                CSSections = cpcore.db.cs_open("Site Sections", Criteria, , , , ,, SelectFieldList)
+        '            ElseIf cpcore.IsSQLTableField("Default", "ccSections", "HideMenu") Then
+        '                '
+        '                ' All sections menu mode with HideMenu
+        '                '
+        '                SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,'' as MenuImageOverFilename,HideMenu,0 as BlockSection,0 as RootPageID"
+        '                Criteria = ""
+        '                ShowHiddenMenu = cpcore.authContext.isEditingAnything(cpcore)
+        '                'ShowHiddenMenu = main_IsEditing("Site Sections")
+        '                CSSections = cpcore.db.cs_open("Site Sections", Criteria, , , , ,, SelectFieldList)
+        '            Else
+        '                SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,'' as MenuImageOverFilename,0 as HideMenu,0 as BlockSection,0 as RootPageID"
+        '                Criteria = ""
+        '                ShowHiddenMenu = True
+        '                CSSections = cpcore.db.cs_open("Site Sections", Criteria, , , , ,, SelectFieldList)
+        '            End If
+        '            Do While cpcore.db.cs_ok(CSSections)
+        '                HideMenu = cpcore.db.cs_getBoolean(CSSections, "HideMenu")
+        '                BlockSection = cpcore.db.cs_getBoolean(CSSections, "BlockSection")
+        '                SectionID = cpcore.db.cs_getInteger(CSSections, "ID")
+        '                If ShowHiddenMenu Or Not HideMenu Then
+        '                    SectionName = Trim(cpcore.db.cs_getText(CSSections, "Name"))
+        '                    If SectionName = "" Then
+        '                        SectionName = "Section " & SectionID
+        '                        Call cpcore.db.executeSql("update ccSections set Name=" & cpcore.db.encodeSQLText(SectionName) & " where ID=" & SectionID)
+        '                    End If
+        '                    SectionCaption = cpcore.db.cs_getText(CSSections, "Caption")
+        '                    If SectionCaption = "" Then
+        '                        SectionCaption = SectionName
+        '                        Call cpcore.db.executeSql("update ccSections set Caption=" & cpcore.db.encodeSQLText(SectionCaption) & " where ID=" & SectionID)
+        '                    End If
+        '                    If HideMenu Then
+        '                        SectionCaption = "[Hidden: " & SectionCaption & "]"
+        '                    End If
+        '                    SectionTemplateID = cpcore.db.cs_getInteger(CSSections, "TemplateID")
+        '                    ContentID = cpcore.db.cs_getInteger(CSSections, "ContentID")
+        '                    If (ContentID <> PageContentCID) And (Not cpcore.IsWithinContent(ContentID, PageContentCID)) Then
+        '                        ContentID = PageContentCID
+        '                        Call cpcore.db.cs_set(CSSections, "ContentID", ContentID)
+        '                    End If
+        '                    If ContentID = PageContentCID Then
+        '                        ContentName = "Page Content"
+        '                    Else
+        '                        ContentName = cpcore.metaData.getContentNameByID(ContentID)
+        '                        If ContentName = "" Then
+        '                            ContentName = "Page Content"
+        '                            ContentID = cpcore.main_GetContentID(ContentName)
+        '                            Call cpcore.db.executeSql("update ccSections set ContentID=" & ContentID & " where ID=" & SectionID)
+        '                        End If
+        '                    End If
+        '                    MenuImage = cpcore.db.cs_getText(CSSections, "MenuImageFilename")
+        '                    If MenuImage <> "" Then
+        '                        MenuImage = cpcore.csv_getVirtualFileLink(cpcore.serverConfig.appConfig.cdnFilesNetprefix, MenuImage)
+        '                    End If
+        '                    MenuImageOver = cpcore.db.cs_getText(CSSections, "MenuImageOverFilename")
+        '                    If MenuImageOver <> "" Then
+        '                        MenuImageOver = cpcore.csv_getVirtualFileLink(cpcore.serverConfig.appConfig.cdnFilesNetprefix, MenuImageOver)
+        '                    End If
+        '                    '
+        '                    ' main_Get Root Page for templateID
+        '                    '
+        '                    templateId = 0
+        '                    BlockPage = False
+        '                    Link = ""
+        '                    If False Then '.3.451" Then
+        '                        '
+        '                        ' no blockpage,section-page connection by name
+        '                        '
+        '                        PCCPtr = cache_pageContent_getFirstNamePtr(SectionName, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
+        '                        'SelectFieldList = "ID,TemplateID,0 as BlockPage"
+        '                        'CSPage = app.csOpen(ContentName, "name=" & encodeSQLText(SectionName), "ID", , , , SelectFieldList)
+        '                    ElseIf False Then '.3.613" Then
+        '                        '
+        '                        ' blockpage,section-page connection by name
+        '                        '
+        '                        PCCPtr = cache_pageContent_getFirstNamePtr(SectionName, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
+        '                        'SelectFieldList = "ID,TemplateID,BlockPage"
+        '                        'CSPage = app.csOpen(ContentName, "name=" & encodeSQLText(SectionName), "ID", , , , SelectFieldList)
+        '                    Else
+        '                        '
+        '                        ' section-page connection by name
+        '                        '
+        '                        rootPageId = cpcore.db.cs_getInteger(CSSections, "rootpageid")
+        '                        PCCPtr = cache_pageContent_getPtr(rootPageId, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
+        '                        'SelectFieldList = "ID,TemplateID,BlockPage"
+        '                        'CSPage = main_OpenCSContentRecord_Internal(ContentName, RootPageID, , , SelectFieldList)
+        '                    End If
+        '                    If PCCPtr >= 0 Then
+        '                        rootPageId = genericController.EncodeInteger(cache_pageContent(PCC_ID, PCCPtr))
+        '                        templateId = genericController.EncodeInteger(cache_pageContent(PCC_TemplateID, PCCPtr))
+        '                        BlockPage = genericController.EncodeBoolean(cache_pageContent(PCC_BlockPage, PCCPtr))
+        '                        pageActive = genericController.EncodeBoolean(cache_pageContent(PCC_Active, PCCPtr))
+        '                    End If
+        '                    If pageActive Or ShowHiddenMenu Then
+        '                        If PCCPtr < 0 Then
+        '                            '
+        '                            ' Page Missing
+        '                            '
+        '                            SectionCaption = "[Missing Page: " & SectionCaption & "]"
+        '                        ElseIf Not pageActive Then
+        '                            '
+        '                            ' Page Inactive
+        '                            '
+        '                            SectionCaption = "[Inactive Page: " & SectionCaption & "]"
+        '                        End If
+        '                        If templateId = 0 Then
+        '                            templateId = SectionTemplateID
+        '                        End If
+        '                        '
+        '                        ' main_Get the link from either the template, or use the default link
+        '                        '
+        '                        If templateId <> 0 Then
+        '                            TCPtr = pageManager_cache_pageTemplate_getPtr(templateId)
+        '                            If TCPtr >= 0 Then
+        '                                Link = genericController.encodeText(cache_pageTemplate(TC_Link, TCPtr))
+        '                            End If
+        '                            'Link = main_GetTCLink(TCPtr)
+        '                        End If
+        '                        If Link = "" Then
+        '                            Link = DefaultTemplateLink
+        '                        End If
+        '                        AuthoringTag = cpcore.main_GetRecordEditLink2("Site Sections", SectionID, False, SectionName, cpcore.authContext.isEditing(cpcore, "Site Sections"))
+        '                        Link = genericController.modifyLinkQuery(Link, "sid", CStr(SectionID), True)
+        '                        '
+        '                        ' main_Get Menu, remove crlf, and parse the line with crlf
+        '                        '
+        '                        MenuString = pageManager_GetSectionMenu_IdMenu(rootPageId, Link, DepthLimit, MenuStyle, StyleSheetPrefix, MenuImage, MenuImageOver, SectionCaption, SectionID, UseContentWatchLink)
+        '                        MenuString = genericController.vbReplace(AuthoringTag & MenuString, vbCrLf, "")
+        '                        If (MenuString <> "") Then
+        '                            If (pageManager_GetSectionMenu = "") Then
+        '                                pageManager_GetSectionMenu = MenuString
+        '                            Else
+        '                                pageManager_GetSectionMenu = pageManager_GetSectionMenu & vbCrLf & MenuString
+        '                            End If
+        '                        End If
+        '                    End If
+        '                    '
+        '                End If
+        '                Call cpcore.db.cs_goNext(CSSections)
+        '            Loop
+        '            AuthoringTag = cpcore.main_GetRecordAddLink("Site Sections", "MenuID=" & MenuID)
+        '            If AuthoringTag <> "" Then
+        '                pageManager_GetSectionMenu = pageManager_GetSectionMenu & AuthoringTag
+        '            End If
+        '            Call cpcore.db.cs_Close(CSSections)
+        '            '
+        '            pageManager_GetSectionMenu = cpcore.htmlDoc.html_executeContentCommands(Nothing, pageManager_GetSectionMenu, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.ID, cpcore.authContext.isAuthenticated, layoutError)
+        '            pageManager_GetSectionMenu = cpcore.htmlDoc.html_encodeContent10(pageManager_GetSectionMenu, cpcore.authContext.user.ID, "", 0, 0, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.isAuthenticated, Nothing, cpcore.authContext.isEditingAnything(cpcore))
+        '            'pageManager_GetSectionMenu = main_EncodeContent5(pageManager_GetSectionMenu, memberID, "", 0, 0, False, False, True, True, False, True, "", "", False, 0)
+        '            '
+        '            Exit Function
+        'ErrorTrap:
+        '            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("pageManager_GetSectionMenu")
+        '        End Function
         '
         '=============================================================================
         '   pageManager_BypassContentBlock
@@ -6462,55 +6346,55 @@ ErrorTrap:
 ErrorTrap:
             Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_GetFormPage")
         End Function
-        '
-        '=============================================================================
-        '
-        '=============================================================================
-        '
-        Public Function pageManager_GetSectionMenuNamed(Optional ByVal DepthLimit As Integer = 3, Optional ByVal MenuStyle As Integer = 1, Optional ByVal StyleSheetPrefix As String = "", Optional ByVal MenuName As String = "") As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetSectionMenuNamed")
-            '
-            'If Not (true) Then Exit Function
-            '
-            'Dim DepthLimit As Integer
-            'Dim MenuStyle As Integer
-            Dim StyleSheetPrefixLocal As String
-            Dim RedirectLink As String
-            Dim DefaultTemplateLink As String
-            Dim MenuNameLocal As String
-            Dim MenuID As Integer
-            '
-            'DepthLimit = encodeEmptyInteger(DepthLimit, 3)
-            'MenuStyle = encodeEmptyInteger(MenuStyle, 1)
-            StyleSheetPrefixLocal = genericController.encodeEmptyText(StyleSheetPrefix, "ccFlyout")
-            MenuNameLocal = genericController.encodeEmptyText(MenuName, "Default")
-            If MenuNameLocal = "" Then
-                MenuNameLocal = "Default"
-            End If
-            MenuID = cpcore.csv_VerifyDynamicMenu(MenuNameLocal)
-            '
-            DefaultTemplateLink = cpcore.siteProperties.getText("SectionLandingLink", requestAppRootPath & cpcore.siteProperties.serverPageDefault)
-            pageManager_GetSectionMenuNamed = pageManager_GetSectionMenu(DepthLimit, MenuStyle, StyleSheetPrefixLocal, DefaultTemplateLink, MenuID, MenuNameLocal, cpcore.siteProperties.useContentWatchLink)
-            pageManager_GetSectionMenuNamed = cpcore.htmlDoc.main_GetEditWrapper("Section Menu", pageManager_GetSectionMenuNamed)
-            '
-            If Me.redirectLink <> "" Then
-                Call cpcore.webServer.webServerIO_Redirect2(Me.redirectLink, pageManager_RedirectReason, pageManager_RedirectBecausePageNotFound)
-            End If
-            '
-            Exit Function
-            '
-ErrorTrap:
-            'Set PageList = Nothing
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetSectionMenuNamed")
-        End Function
-        '
-        '=============================================================================
-        ' 3.3 Compatibility
-        '=============================================================================
-        '
-        Public Function main_GetSectionMenu(Optional ByVal DepthLimit As Integer = 3, Optional ByVal MenuStyle As Integer = 1, Optional ByVal StyleSheetPrefix As String = "") As String
-            main_GetSectionMenu = pageManager_GetSectionMenuNamed(DepthLimit, MenuStyle, StyleSheetPrefix)
-        End Function
+        '        '
+        '        '=============================================================================
+        '        '
+        '        '=============================================================================
+        '        '
+        '        Public Function pageManager_GetSectionMenuNamed(Optional ByVal DepthLimit As Integer = 3, Optional ByVal MenuStyle As Integer = 1, Optional ByVal StyleSheetPrefix As String = "", Optional ByVal MenuName As String = "") As String
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetSectionMenuNamed")
+        '            '
+        '            'If Not (true) Then Exit Function
+        '            '
+        '            'Dim DepthLimit As Integer
+        '            'Dim MenuStyle As Integer
+        '            Dim StyleSheetPrefixLocal As String
+        '            Dim RedirectLink As String
+        '            Dim DefaultTemplateLink As String
+        '            Dim MenuNameLocal As String
+        '            Dim MenuID As Integer
+        '            '
+        '            'DepthLimit = encodeEmptyInteger(DepthLimit, 3)
+        '            'MenuStyle = encodeEmptyInteger(MenuStyle, 1)
+        '            StyleSheetPrefixLocal = genericController.encodeEmptyText(StyleSheetPrefix, "ccFlyout")
+        '            MenuNameLocal = genericController.encodeEmptyText(MenuName, "Default")
+        '            If MenuNameLocal = "" Then
+        '                MenuNameLocal = "Default"
+        '            End If
+        '            MenuID = cpcore.csv_VerifyDynamicMenu(MenuNameLocal)
+        '            '
+        '            DefaultTemplateLink = cpcore.siteProperties.getText("SectionLandingLink", requestAppRootPath & cpcore.siteProperties.serverPageDefault)
+        '            pageManager_GetSectionMenuNamed = pageManager_GetSectionMenu(DepthLimit, MenuStyle, StyleSheetPrefixLocal, DefaultTemplateLink, MenuID, MenuNameLocal, cpcore.siteProperties.useContentWatchLink)
+        '            pageManager_GetSectionMenuNamed = cpcore.htmlDoc.main_GetEditWrapper("Section Menu", pageManager_GetSectionMenuNamed)
+        '            '
+        '            If Me.redirectLink <> "" Then
+        '                Call cpcore.webServer.redirect(Me.redirectLink, pageManager_RedirectReason, pageManager_RedirectBecausePageNotFound)
+        '            End If
+        '            '
+        '            Exit Function
+        '            '
+        'ErrorTrap:
+        '            'Set PageList = Nothing
+        '            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetSectionMenuNamed")
+        '        End Function
+        '        '
+        '        '=============================================================================
+        '        ' 3.3 Compatibility
+        '        '=============================================================================
+        '        '
+        '        Public Function main_GetSectionMenu(Optional ByVal DepthLimit As Integer = 3, Optional ByVal MenuStyle As Integer = 1, Optional ByVal StyleSheetPrefix As String = "") As String
+        '            main_GetSectionMenu = pageManager_GetSectionMenuNamed(DepthLimit, MenuStyle, StyleSheetPrefix)
+        '        End Function
         '
         '=============================================================================
         '   main_Get the link for a Content Record by the ContentName and RecordID
@@ -6892,8 +6776,8 @@ ErrorTrap:
             Dim NVSplit() As String
             '
             pageManager_GetSectionLink = ShortLink
-            If cpcore.web_RefreshQueryString <> "" Then
-                QSplit = Split(cpcore.web_RefreshQueryString, "&")
+            If cpcore.htmlDoc.refreshQueryString <> "" Then
+                QSplit = Split(cpcore.htmlDoc.refreshQueryString, "&")
                 QSPlitCount = UBound(QSplit) + 1
                 For QSplitPointer = 0 To QSPlitCount - 1
                     NVSplit = Split(QSplit(QSplitPointer), "=")
@@ -7042,191 +6926,190 @@ ErrorTrap:
 ErrorTrap:
             Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("pageManager_LoadTemplateGetID")
         End Function
-        '
-        '
-        '
-        Public Function pageManager_GetDynamicMenu(addonOption_String As String, UseContentWatchLink As Boolean) As String
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetDynamicMenu")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim EditLink As String
-            Dim StylesFilename As String
-            Dim MenuDepth As Integer
-            Dim MenuStyle As Integer
-            Dim MenuName As String
-            Dim MenuStylePrefix As String
-            Dim MenuDelimiter As String
-            Dim DefaultTemplateLink As String
-            Dim FlyoutDirection As String
-            Dim FlyoutOnHover As String
-            Dim Layout As String
-            Dim PreButton As String
-            Dim PostButton As String
-            Dim MenuID As Integer
-            Dim IsAuthoring As Boolean
-            Dim Menu As String
-            Dim MenuNew As String
-            Dim CS As Integer
-            Dim IsOldMenu As Boolean
-            Dim CompatibilitySpanAroundButton As Boolean
-            '
-            IsAuthoring = cpcore.authContext.isEditing(cpcore, "Dynamic Menus")
-            DefaultTemplateLink = requestAppRootPath & cpcore.webServer.webServerIO_requestPage
-            If False Then '.292" Then
-                CompatibilitySpanAroundButton = True
-            Else
-                CompatibilitySpanAroundButton = cpcore.siteProperties.getBoolean("Compatibility Dynamic Menu Span Around Button", False)
-            End If
-            '
-            ' Check for MenuID - if present, arguments are in the Dynamic Menu content - else it is old, and they are in the addonOption_String
-            '
-            If True And genericController.vbInstr(1, addonOption_String, "menu=", vbTextCompare) <> 0 Then
-                MenuNew = cpcore.main_GetAddonOption("menunew", addonOption_String)
-                'MenuNew = Trim( genericController.DecodeResponseVariable(main_GetArgument("menunew", addonOption_String, "", "&")))
-                If MenuNew <> "" Then
-                    '
-                    ' Create New Menu
-                    '
-                    Menu = MenuNew
-                End If
-                If Menu = "" Then
-                    '
-                    ' No new menu, try a selected menu
-                    '
-                    Menu = cpcore.main_GetAddonOption("menu", addonOption_String)
-                    'Menu = Trim( genericController.DecodeResponseVariable(main_GetArgument("menu", addonOption_String, "", "&")))
-                    If Menu = "" Then
-                        '
-                        ' No selected, use Default
-                        '
-                        Menu = "Default"
-                    End If
-                End If
-                MenuID = cpcore.menu_VerifyDynamicMenu(Menu)
-                '
-                ' Open the Menu
-                '
-                CS = cpcore.csOpen("Dynamic Menus", MenuID)
-                If Not cpcore.db.cs_ok(CS) Then
-                    '
-                    ' ID was given, but no found in Db
-                    '
-                    Call cpcore.db.cs_Close(CS)
-                    CS = cpcore.csOpen("Dynamic Menus", cpcore.menu_VerifyDynamicMenu("Default"))
-                End If
-                If cpcore.db.cs_ok(CS) Then
-                    '
-                    ' setup arguments from Content
-                    '
-                    EditLink = cpcore.cs_cs_getRecordEditLink(CS)
-                    MenuName = cpcore.db.cs_getText(CS, "Name")
-                    MenuDepth = cpcore.db.cs_getInteger(CS, "Depth")
-                    MenuStylePrefix = cpcore.db.cs_getText(CS, "StylePrefix")
-                    MenuDelimiter = cpcore.db.cs_getText(CS, "Delimiter")
-                    FlyoutOnHover = cpcore.db.cs_getBoolean(CS, "FlyoutOnHover").ToString
-                    ' LookupList should return the text for the value saved - to be compatible with the old hardcoded text
-                    FlyoutDirection = cpcore.db.cs_get(CS, "FlyoutDirection")
-                    Layout = cpcore.db.cs_get(CS, "Layout")
-                    MenuStyle = 0
-                    '
-                    ' Add exclusive styles
-                    '
-                    If True Then
-                        StylesFilename = cpcore.db.cs_getText(CS, "StylesFilename")
-                        If StylesFilename <> "" Then
-                            If genericController.vbLCase(Right(StylesFilename, 4)) <> ".css" Then
-                                Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError15("Dynamic Menu [" & MenuName & "] StylesFilename is not a '.css' file, and will not display correct. Check that the field is setup as a CSSFile.", "main_GetDynamicMenu")
-                            Else
-                                Call cpcore.htmlDoc.main_AddStylesheetLink2(cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.requestDomain & cpcore.csv_getVirtualFileLink(cpcore.serverConfig.appConfig.cdnFilesNetprefix, StylesFilename), "dynamic menu")
-                            End If
-                        End If
-                    End If
-                End If
-                Call cpcore.db.cs_Close(CS)
-            Else
-                '
-                ' Old style menu - main_Get arguments from AC tag
-                '   MenuName="" is legacy mode (all sections show)
-                '
-                IsOldMenu = True
-                MenuName = ""
-                '
-                MenuDepth = genericController.EncodeInteger(cpcore.main_GetAddonOption("DEPTH", addonOption_String))
-                MenuStylePrefix = Trim(cpcore.main_GetAddonOption("STYLEPREFIX", addonOption_String))
-                MenuDelimiter = cpcore.main_GetAddonOption("DELIMITER", addonOption_String)
-                FlyoutOnHover = cpcore.main_GetAddonOption("FlyoutOnHover", addonOption_String)
-                FlyoutDirection = cpcore.main_GetAddonOption("FlyoutDirection", addonOption_String)
-                Layout = cpcore.main_GetAddonOption("Layout", addonOption_String)
-                '
-                ' really old value
-                '
-                MenuStyle = genericController.EncodeInteger(cpcore.main_GetAddonOption("FORMAT", addonOption_String))
-            End If
-            '
-            ' Check values
-            '
-            If MenuStylePrefix = "" Then
-                MenuStylePrefix = "ccFlyout"
-            End If
-            '
-            ' determine MenuStyle from input
-            '
-            If MenuStyle = 0 Then
-                If genericController.EncodeBoolean(FlyoutOnHover) Then
-                    MenuStyle = 8
-                Else
-                    MenuStyle = 4
-                End If
-                Select Case genericController.vbUCase(FlyoutDirection)
-                    Case "RIGHT"
-                        MenuStyle = MenuStyle + 1
-                    Case "UP"
-                        MenuStyle = MenuStyle + 2
-                    Case "LEFT"
-                        MenuStyle = MenuStyle + 3
-                End Select
-            End If
-            pageManager_GetDynamicMenu = pageManager_GetSectionMenu(MenuDepth, MenuStyle, MenuStylePrefix, DefaultTemplateLink, MenuID, MenuName, UseContentWatchLink)
-            '
-            ' Now adjust results using arguments
-            '
-            If genericController.vbUCase(Layout) = "VERTICAL" Then
-                '
-                ' vertical menu: Set dislay block
-                '
-                pageManager_GetDynamicMenu = genericController.vbReplace(pageManager_GetDynamicMenu, "class=""" & MenuStylePrefix & "Button""", "style=""display:block;"" class=""" & MenuStylePrefix & "Button""")
-                '
-                PreButton = "<div style=""WHITE-SPACE: nowrap;"">"
-                PostButton = "</div>"
-                '
-                If MenuDelimiter <> "" Then
-                    MenuDelimiter = "<div style=""WHITE-SPACE: nowrap;"" class=""" & MenuStylePrefix & "Delimiter"">" & MenuDelimiter & "</div>"
-                End If
-            Else
-                '
-                ' horizontal menu: Set dislay inline
-                '
-                pageManager_GetDynamicMenu = genericController.vbReplace(pageManager_GetDynamicMenu, "class=""" & MenuStylePrefix & "Button""", "style=""display:inline;"" class=""" & MenuStylePrefix & "Button""")
-                '
-                If CompatibilitySpanAroundButton Then
-                    PreButton = "<span style=""WHITE-SPACE: nowrap"">"
-                    PostButton = "</span>"
-                End If
-                '
-                If MenuDelimiter <> "" Then
-                    MenuDelimiter = "<span style=""WHITE-SPACE: nowrap;"" class=""" & MenuStylePrefix & "Delimiter"">" & MenuDelimiter & "</span>"
-                End If
-            End If
-            pageManager_GetDynamicMenu = PreButton & genericController.vbReplace(pageManager_GetDynamicMenu, vbCrLf, PostButton & MenuDelimiter & PreButton) & PostButton
-            If cpcore.authContext.isAdvancedEditing(cpcore, "") Then
-                pageManager_GetDynamicMenu = "<div style=""border-bottom:1px dashed #404040; padding:5px;margin-bottom:5px;"">Dynamic Menu [" & MenuName & "]" & EditLink & "</div><div>" & pageManager_GetDynamicMenu & "</div>"
-            End If
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_GetDynamicMenu")
-        End Function
+        ''
+        ''
+        ''
+        'Public Function pageManager_GetDynamicMenu(addonOption_String As String, UseContentWatchLink As Boolean) As String
+        '    Dim result As String = ""
+        '    Try
+        '        Dim EditLink As String
+        '        Dim StylesFilename As String
+        '        Dim MenuDepth As Integer
+        '        Dim MenuStyle As Integer
+        '        Dim MenuName As String
+        '        Dim MenuStylePrefix As String
+        '        Dim MenuDelimiter As String
+        '        Dim DefaultTemplateLink As String
+        '        Dim FlyoutDirection As String
+        '        Dim FlyoutOnHover As String
+        '        Dim Layout As String
+        '        Dim PreButton As String
+        '        Dim PostButton As String
+        '        Dim MenuID As Integer
+        '        Dim IsAuthoring As Boolean
+        '        Dim Menu As String
+        '        Dim MenuNew As String
+        '        Dim CS As Integer
+        '        Dim IsOldMenu As Boolean
+        '        Dim CompatibilitySpanAroundButton As Boolean
+        '        '
+        '        IsAuthoring = cpcore.authContext.isEditing(cpcore, "Dynamic Menus")
+        '        DefaultTemplateLink = requestAppRootPath & cpcore.webServer.webServerIO_requestPage
+        '        If False Then '.292" Then
+        '            CompatibilitySpanAroundButton = True
+        '        Else
+        '            CompatibilitySpanAroundButton = cpcore.siteProperties.getBoolean("Compatibility Dynamic Menu Span Around Button", False)
+        '        End If
+        '        '
+        '        ' Check for MenuID - if present, arguments are in the Dynamic Menu content - else it is old, and they are in the addonOption_String
+        '        '
+        '        If True And genericController.vbInstr(1, addonOption_String, "menu=", vbTextCompare) <> 0 Then
+        '            MenuNew = cpcore.main_GetAddonOption("menunew", addonOption_String)
+        '            'MenuNew = Trim( genericController.DecodeResponseVariable(main_GetArgument("menunew", addonOption_String, "", "&")))
+        '            If MenuNew <> "" Then
+        '                '
+        '                ' Create New Menu
+        '                '
+        '                Menu = MenuNew
+        '            End If
+        '            If Menu = "" Then
+        '                '
+        '                ' No new menu, try a selected menu
+        '                '
+        '                Menu = cpcore.main_GetAddonOption("menu", addonOption_String)
+        '                'Menu = Trim( genericController.DecodeResponseVariable(main_GetArgument("menu", addonOption_String, "", "&")))
+        '                If Menu = "" Then
+        '                    '
+        '                    ' No selected, use Default
+        '                    '
+        '                    Menu = "Default"
+        '                End If
+        '            End If
+        '            MenuID = cpcore.menu_VerifyDynamicMenu(Menu)
+        '            '
+        '            ' Open the Menu
+        '            '
+        '            CS = cpcore.csOpen("Dynamic Menus", MenuID)
+        '            If Not cpcore.db.cs_ok(CS) Then
+        '                '
+        '                ' ID was given, but no found in Db
+        '                '
+        '                Call cpcore.db.cs_Close(CS)
+        '                CS = cpcore.csOpen("Dynamic Menus", cpcore.menu_VerifyDynamicMenu("Default"))
+        '            End If
+        '            If cpcore.db.cs_ok(CS) Then
+        '                '
+        '                ' setup arguments from Content
+        '                '
+        '                EditLink = cpcore.cs_cs_getRecordEditLink(CS)
+        '                MenuName = cpcore.db.cs_getText(CS, "Name")
+        '                MenuDepth = cpcore.db.cs_getInteger(CS, "Depth")
+        '                MenuStylePrefix = cpcore.db.cs_getText(CS, "StylePrefix")
+        '                MenuDelimiter = cpcore.db.cs_getText(CS, "Delimiter")
+        '                FlyoutOnHover = cpcore.db.cs_getBoolean(CS, "FlyoutOnHover").ToString
+        '                ' LookupList should return the text for the value saved - to be compatible with the old hardcoded text
+        '                FlyoutDirection = cpcore.db.cs_get(CS, "FlyoutDirection")
+        '                Layout = cpcore.db.cs_get(CS, "Layout")
+        '                MenuStyle = 0
+        '                '
+        '                ' Add exclusive styles
+        '                '
+        '                If True Then
+        '                    StylesFilename = cpcore.db.cs_getText(CS, "StylesFilename")
+        '                    If StylesFilename <> "" Then
+        '                        If genericController.vbLCase(Right(StylesFilename, 4)) <> ".css" Then
+        '                            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError15("Dynamic Menu [" & MenuName & "] StylesFilename is not a '.css' file, and will not display correct. Check that the field is setup as a CSSFile.", "main_GetDynamicMenu")
+        '                        Else
+        '                            Call cpcore.htmlDoc.main_AddStylesheetLink2(cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.requestDomain & cpcore.csv_getVirtualFileLink(cpcore.serverConfig.appConfig.cdnFilesNetprefix, StylesFilename), "dynamic menu")
+        '                        End If
+        '                    End If
+        '                End If
+        '            End If
+        '            Call cpcore.db.cs_Close(CS)
+        '        Else
+        '            '
+        '            ' Old style menu - main_Get arguments from AC tag
+        '            '   MenuName="" is legacy mode (all sections show)
+        '            '
+        '            IsOldMenu = True
+        '            MenuName = ""
+        '            '
+        '            MenuDepth = genericController.EncodeInteger(cpcore.main_GetAddonOption("DEPTH", addonOption_String))
+        '            MenuStylePrefix = Trim(cpcore.main_GetAddonOption("STYLEPREFIX", addonOption_String))
+        '            MenuDelimiter = cpcore.main_GetAddonOption("DELIMITER", addonOption_String)
+        '            FlyoutOnHover = cpcore.main_GetAddonOption("FlyoutOnHover", addonOption_String)
+        '            FlyoutDirection = cpcore.main_GetAddonOption("FlyoutDirection", addonOption_String)
+        '            Layout = cpcore.main_GetAddonOption("Layout", addonOption_String)
+        '            '
+        '            ' really old value
+        '            '
+        '            MenuStyle = genericController.EncodeInteger(cpcore.main_GetAddonOption("FORMAT", addonOption_String))
+        '        End If
+        '        '
+        '        ' Check values
+        '        '
+        '        If MenuStylePrefix = "" Then
+        '            MenuStylePrefix = "ccFlyout"
+        '        End If
+        '        '
+        '        ' determine MenuStyle from input
+        '        '
+        '        If MenuStyle = 0 Then
+        '            If genericController.EncodeBoolean(FlyoutOnHover) Then
+        '                MenuStyle = 8
+        '            Else
+        '                MenuStyle = 4
+        '            End If
+        '            Select Case genericController.vbUCase(FlyoutDirection)
+        '                Case "RIGHT"
+        '                    MenuStyle = MenuStyle + 1
+        '                Case "UP"
+        '                    MenuStyle = MenuStyle + 2
+        '                Case "LEFT"
+        '                    MenuStyle = MenuStyle + 3
+        '            End Select
+        '        End If
+        '        result = pageManager_GetSectionMenu(MenuDepth, MenuStyle, MenuStylePrefix, DefaultTemplateLink, MenuID, MenuName, UseContentWatchLink)
+        '        '
+        '        ' Now adjust results using arguments
+        '        '
+        '        If genericController.vbUCase(Layout) = "VERTICAL" Then
+        '            '
+        '            ' vertical menu: Set dislay block
+        '            '
+        '            result = genericController.vbReplace(result, "class=""" & MenuStylePrefix & "Button""", "style=""display:block;"" class=""" & MenuStylePrefix & "Button""")
+        '            '
+        '            PreButton = "<div style=""WHITE-SPACE: nowrap;"">"
+        '            PostButton = "</div>"
+        '            '
+        '            If MenuDelimiter <> "" Then
+        '                MenuDelimiter = "<div style=""WHITE-SPACE: nowrap;"" class=""" & MenuStylePrefix & "Delimiter"">" & MenuDelimiter & "</div>"
+        '            End If
+        '        Else
+        '            '
+        '            ' horizontal menu: Set dislay inline
+        '            '
+        '            result = genericController.vbReplace(result, "class=""" & MenuStylePrefix & "Button""", "style=""display:inline;"" class=""" & MenuStylePrefix & "Button""")
+        '            '
+        '            If CompatibilitySpanAroundButton Then
+        '                PreButton = "<span style=""WHITE-SPACE: nowrap"">"
+        '                PostButton = "</span>"
+        '            End If
+        '            '
+        '            If MenuDelimiter <> "" Then
+        '                MenuDelimiter = "<span style=""WHITE-SPACE: nowrap;"" class=""" & MenuStylePrefix & "Delimiter"">" & MenuDelimiter & "</span>"
+        '            End If
+        '        End If
+        '        result = PreButton & genericController.vbReplace(result, vbCrLf, PostButton & MenuDelimiter & PreButton) & PostButton
+        '        If cpcore.authContext.isAdvancedEditing(cpcore, "") Then
+        '            result = "<div style=""border-bottom:1px dashed #404040; padding:5px;margin-bottom:5px;"">Dynamic Menu [" & MenuName & "]" & EditLink & "</div><div>" & result & "</div>"
+        '        End If
+
+        '    Catch ex As Exception
+        '        cpcore.handleExceptionAndContinue(ex)
+        '    End Try
+        '    Return result
+        'End Function
         '
         '
         '
@@ -7854,5 +7737,51 @@ ErrorTrap:
         Public Function getContentWatchLinkByID(ByVal ContentID As Integer, ByVal RecordID As Integer, Optional ByVal DefaultLink As String = "", Optional ByVal IncrementClicks As Boolean = True) As String
             getContentWatchLinkByID = getContentWatchLinkByKey(genericController.encodeText(ContentID) & "." & genericController.encodeText(RecordID), DefaultLink, IncrementClicks)
         End Function
+        '
+        '=============================================================================
+        '
+        Public Sub verifyRegistrationFormPage(cpcore As coreClass)
+            Try
+                '
+                Dim CS As Integer
+                Dim GroupNameList As String
+                Dim Copy As String
+                '
+                Call cpcore.db.deleteContentRecords("Form Pages", "name=" & cpcore.db.encodeSQLText("Registration Form"))
+                CS = cpcore.db.cs_open("Form Pages", "name=" & cpcore.db.encodeSQLText("Registration Form"))
+                If Not cpcore.db.cs_ok(CS) Then
+                    '
+                    ' create Version 1 template - just to main_Get it started
+                    '
+                    Call cpcore.db.cs_Close(CS)
+                    GroupNameList = "Registered"
+                    CS = cpcore.db.cs_insertRecord("Form Pages")
+                    If cpcore.db.cs_ok(CS) Then
+                        Call cpcore.db.cs_set(CS, "name", "Registration Form")
+                        Copy = "" _
+                        & vbCrLf & "<table border=""0"" cellpadding=""2"" cellspacing=""0"" width=""100%"">" _
+                        & vbCrLf & "{{REPEATSTART}}<tr><td align=right style=""height:22px;"">{{CAPTION}}&nbsp;</td><td align=left>{{FIELD}}</td></tr>{{REPEATEND}}" _
+                        & vbCrLf & "<tr><td align=right><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=135 height=1></td><td width=""100%"">&nbsp;</td></tr>" _
+                        & vbCrLf & "<tr><td colspan=2>&nbsp;<br>" & cpcore.main_GetPanelButtons(ButtonRegister, "Button") & "</td></tr>" _
+                        & vbCrLf & "</table>"
+                        Call cpcore.db.cs_set(CS, "Body", Copy)
+                        Copy = "" _
+                        & "1" _
+                        & vbCrLf & GroupNameList _
+                        & vbCrLf & "true" _
+                        & vbCrLf & "1,First Name,true,FirstName" _
+                        & vbCrLf & "1,Last Name,true,LastName" _
+                        & vbCrLf & "1,Email Address,true,Email" _
+                        & vbCrLf & "1,Phone,true,Phone" _
+                        & vbCrLf & "2,Please keep me informed of news and events,false,Subscribers" _
+                        & ""
+                        Call cpcore.db.cs_set(CS, "Instructions", Copy)
+                    End If
+                End If
+                Call cpcore.db.cs_Close(CS)
+            Catch ex As Exception
+                cpcore.handleExceptionAndContinue(ex)
+            End Try
+        End Sub
     End Class
 End Namespace

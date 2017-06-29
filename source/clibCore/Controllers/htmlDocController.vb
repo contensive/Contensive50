@@ -55,7 +55,7 @@ Namespace Contensive.Core.Controllers
         Public Const htmlDoc_OutStreamStandard = 0
         Public Const htmlDoc_OutStreamJavaScript = 1
         '
-        Public htmlDoc_RefreshQueryString As String = ""      ' the querystring required to return to the current state (perform a refresh)
+        Public refreshQueryString As String = ""      ' the querystring required to return to the current state (perform a refresh)
         Public pageManager_RedirectContentID As Integer = 0
         Public pageManager_RedirectRecordID As Integer = 0
         Public htmlDoc_JavaStreamHolder() As String
@@ -1954,7 +1954,7 @@ ErrorTrap:
                 If cpCore.authContext.isAuthenticatedContentManager(cpCore) Then
                     main_GetLoginLink = main_GetLoginLink & "<a href=""" & html_EncodeHTML(cpCore.siteProperties.adminURL) & """ target=""_blank"">"
                 Else
-                    Link = cpCore.webServer.webServerIO_requestPage & "?" & cpCore.web_RefreshQueryString
+                    Link = cpCore.webServer.webServerIO_requestPage & "?" & cpCore.htmlDoc.refreshQueryString
                     Link = genericController.modifyLinkQuery(Link, RequestNameHardCodedPage, HardCodedPageLogin, True)
                     'Link = genericController.modifyLinkQuery(Link, RequestNameInterceptpage, LegacyInterceptPageSNLogin, True)
                     main_GetLoginLink = main_GetLoginLink & "<a href=""" & html_EncodeHTML(Link) & """ >"
@@ -2083,9 +2083,9 @@ ErrorTrap:
                 '
                 If (InStr(1, Name, "=") > 0) Then
                     temp = Split(Name, "=")
-                    htmlDoc_RefreshQueryString = genericController.ModifyQueryString(htmlDoc_RefreshQueryString, temp(0), temp(1), True)
+                    refreshQueryString = genericController.ModifyQueryString(refreshQueryString, temp(0), temp(1), True)
                 Else
-                    htmlDoc_RefreshQueryString = genericController.ModifyQueryString(htmlDoc_RefreshQueryString, Name, Value, True)
+                    refreshQueryString = genericController.ModifyQueryString(refreshQueryString, Name, Value, True)
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
@@ -2125,7 +2125,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_GetLegacySiteStyles")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_GetLegacySiteStyles")
         End Function
         '
         '===================================================================================================
@@ -2152,7 +2152,7 @@ ErrorTrap:
 
             Exit Function
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetAdminHintWrapper")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetAdminHintWrapper")
         End Function
         '
         '
@@ -2184,7 +2184,7 @@ ErrorTrap:
         Public Function html_GetUploadFormStart(Optional ByVal ActionQueryString As String = Nothing) As String
 
             If ActionQueryString Is Nothing Then
-                ActionQueryString = htmlDoc_RefreshQueryString
+                ActionQueryString = refreshQueryString
             End If
             On Error GoTo ErrorTrap
             '
@@ -2196,7 +2196,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetUploadFormStart")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetUploadFormStart")
         End Function
         '
         '========================================================================
@@ -2232,7 +2232,7 @@ ErrorTrap:
             MethodName = "main_GetFormStart3"
             '
             If ActionQueryString Is Nothing Then
-                ActionQS = cpCore.web_RefreshQueryString
+                ActionQS = cpCore.htmlDoc.refreshQueryString
             Else
                 ActionQS = ActionQueryString
             End If
@@ -2277,7 +2277,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -2346,7 +2346,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetFormInputText2")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetFormInputText2")
         End Function
         '
         '========================================================================
@@ -2507,7 +2507,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -2566,7 +2566,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -2603,7 +2603,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetFormInputCheckBox2")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetFormInputCheckBox2")
         End Function
         '
         '========================================================================
@@ -2720,7 +2720,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -2986,7 +2986,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -3022,7 +3022,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetFormInputHidden")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetFormInputHidden")
         End Function
         '
         Public Function html_GetFormInputHidden(ByVal TagName As String, ByVal TagValue As Boolean, Optional ByVal htmlId As String = "") As String
@@ -3081,7 +3081,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -3127,7 +3127,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -3171,7 +3171,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("AddEvent")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("AddEvent")
         End Sub
         '
         '
@@ -3738,7 +3738,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError11("main_GetEditorAddonListJSON, hint=[" & hint & "]", "trap")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError11("main_GetEditorAddonListJSON, hint=[" & hint & "]", "trap")
         End Function
         '
         '========================================================================
@@ -3992,44 +3992,41 @@ ErrorTrap:
                 '
                 If EncodeEditIcons Then
                     '
-                    ' replace {{content}} with <AC contentbox>
-                    ' replace {{DYNAMICMENU?menu=menu Name}} with <ac dynamic menu>
-                    '
                     IconIDControlString = "AC," & ACTypeTemplateContent & "," & NotUsedID & "," & ACName & ","
                     IconImg = genericController.GetAddonIconImg(AdminURL, 52, 64, 0, False, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as [Template Page Content]", "", 0)
                     workingContent = genericController.vbReplace(workingContent, "{{content}}", IconImg, 1, 99, vbTextCompare)
                     'WorkingContent = genericController.vbReplace(WorkingContent, "{{content}}", "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Page Content"" id=""AC," & ACTypeTemplateContent & "," & NotUsedID & "," & ACName & ","" src=""/ccLib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>", 1, -1, vbTextCompare)
-                    '
-                    ' replace all other {{...}}
-                    '
-                    LoopPtr = 0
-                    Pos = 1
-                    Do While Pos > 0 And LoopPtr < 100
-                        Pos = genericController.vbInstr(Pos, workingContent, "{{" & ACTypeDynamicMenu, vbTextCompare)
-                        If Pos > 0 Then
-                            addonOptionString = ""
-                            PosStart = Pos
-                            If PosStart <> 0 Then
-                                'PosStart = PosStart + 2 + Len(ACTypeDynamicMenu)
-                                PosEnd = genericController.vbInstr(PosStart, workingContent, "}}", vbTextCompare)
-                                If PosEnd <> 0 Then
-                                    Cmd = Mid(workingContent, PosStart + 2, PosEnd - PosStart - 2)
-                                    Pos = genericController.vbInstr(1, Cmd, "?")
-                                    If Pos <> 0 Then
-                                        addonOptionString = genericController.decodeHtml(Mid(Cmd, Pos + 1))
-                                    End If
-                                    TextName = cpCore.csv_GetAddonOptionStringValue("menu", addonOptionString)
-                                    '
-                                    addonOptionString = "Menu=" & TextName & "[" & cpCore.csv_GetDynamicMenuACSelect() & "]&NewMenu="
-                                    AddonOptionStringHTMLEncoded = html_EncodeHTML("Menu=" & TextName & "[" & cpCore.csv_GetDynamicMenuACSelect() & "]&NewMenu=")
-                                    '
-                                    IconIDControlString = "AC," & ACTypeDynamicMenu & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
-                                    IconImg = genericController.GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as [Dynamic Menu]", "", 0)
-                                    workingContent = Mid(workingContent, 1, PosStart - 1) & IconImg & Mid(workingContent, PosEnd + 2)
-                                End If
-                            End If
-                        End If
-                    Loop
+                    ''
+                    '' replace all other {{...}}
+                    ''
+                    'LoopPtr = 0
+                    'Pos = 1
+                    'Do While Pos > 0 And LoopPtr < 100
+                    '    Pos = genericController.vbInstr(Pos, workingContent, "{{" & ACTypeDynamicMenu, vbTextCompare)
+                    '    If Pos > 0 Then
+                    '        addonOptionString = ""
+                    '        PosStart = Pos
+                    '        If PosStart <> 0 Then
+                    '            'PosStart = PosStart + 2 + Len(ACTypeDynamicMenu)
+                    '            PosEnd = genericController.vbInstr(PosStart, workingContent, "}}", vbTextCompare)
+                    '            If PosEnd <> 0 Then
+                    '                Cmd = Mid(workingContent, PosStart + 2, PosEnd - PosStart - 2)
+                    '                Pos = genericController.vbInstr(1, Cmd, "?")
+                    '                If Pos <> 0 Then
+                    '                    addonOptionString = genericController.decodeHtml(Mid(Cmd, Pos + 1))
+                    '                End If
+                    '                TextName = cpCore.csv_GetAddonOptionStringValue("menu", addonOptionString)
+                    '                '
+                    '                addonOptionString = "Menu=" & TextName & "[" & cpCore.csv_GetDynamicMenuACSelect() & "]&NewMenu="
+                    '                AddonOptionStringHTMLEncoded = html_EncodeHTML("Menu=" & TextName & "[" & cpCore.csv_GetDynamicMenuACSelect() & "]&NewMenu=")
+                    '                '
+                    '                IconIDControlString = "AC," & ACTypeDynamicMenu & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
+                    '                IconImg = genericController.GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as [Dynamic Menu]", "", 0)
+                    '                workingContent = Mid(workingContent, 1, PosStart - 1) & IconImg & Mid(workingContent, PosEnd + 2)
+                    '            End If
+                    '        End If
+                    '    End If
+                    'Loop
                 End If
                 '
                 ' Test early if this needs to run at all
@@ -4734,57 +4731,57 @@ ErrorTrap:
                                                     ' ***** can not add it here, if a web hit, it must be encoded from the web client for aggr objects
                                                     'Copy = csv_GetContentCopy(TextName, "Copy Content", "", personalizationpeopleId)
                                                 End If
-                                            Case ACTypeDynamicMenu
-                                                '
-                                                ' ----- Create Template Menu
-                                                '
-                                                'ACName = KmaHTML.ElementAttribute(ElementPointer, "NAME")
-                                                AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING")
-                                                addonOptionString = genericController.decodeHtml(AddonOptionStringHTMLEncoded)
-                                                '
-                                                ' test for illegal characters (temporary patch to get around not addonencoding during the addon replacement
-                                                '
-                                                Pos = genericController.vbInstr(1, addonOptionString, "menunew=", vbTextCompare)
-                                                If Pos > 0 Then
-                                                    NewName = Mid(addonOptionString, Pos + 8)
-                                                    Dim IsOK As Boolean
-                                                    IsOK = (NewName = genericController.encodeNvaArgument(NewName))
-                                                    If Not IsOK Then
-                                                        addonOptionString = Left(addonOptionString, Pos - 1) & "MenuNew=" & genericController.encodeNvaArgument(NewName)
-                                                    End If
-                                                End If
-                                                NotUsedID = 0
-                                                If EncodeEditIcons Then
-                                                    If genericController.vbInstr(1, AddonOptionStringHTMLEncoded, "menu=", vbTextCompare) <> 0 Then
-                                                        '
-                                                        ' Dynamic Menu
-                                                        '
-                                                        '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                                                        ' test - encoding changed
-                                                        TextName = cpCore.csv_GetAddonOptionStringValue("menu", addonOptionString)
-                                                        'TextName = cpcore.csv_GetAddonOption("Menu", AddonOptionString)
-                                                        '
-                                                        IconIDControlString = "AC," & ACType & "," & NotUsedID & "," & ACName & ",Menu=" & TextName & "[" & cpCore.csv_GetDynamicMenuACSelect() & "]&NewMenu="
-                                                        IconImg = genericController.GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as a Dynamic Menu", ACInstanceID, 0)
-                                                        Copy = IconImg
-                                                        '
-                                                        'Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as a Dynamic Menu"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & ",Menu=" & TextName & "[" & csv_GetDynamicMenuACSelect & "]&NewMenu="" src=""/ccLib/images/ACDynamicMenuIcon.gif"" WIDTH=52 HEIGHT=52>"
-                                                    Else
-                                                        '
-                                                        ' Old Dynamic Menu - values are stored in the icon
-                                                        '
-                                                        IconIDControlString = "AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
-                                                        IconImg = genericController.GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as a Dynamic Menu", ACInstanceID, 0)
-                                                        Copy = IconImg
-                                                        '
-                                                        'Copy = "<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as a Dynamic Menu"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/ccLib/images/ACDynamicMenuIcon.gif"" WIDTH=52 HEIGHT=52>"
-                                                    End If
-                                                ElseIf EncodeNonCachableTags Then
-                                                    '
-                                                    ' Add in the Content Pag
-                                                    '
-                                                    Copy = "{{" & ACTypeDynamicMenu & "?" & addonOptionString & "}}"
-                                                End If
+                                            'Case ACTypeDynamicMenu
+                                            '    '
+                                            '    ' ----- Create Template Menu
+                                            '    '
+                                            '    'ACName = KmaHTML.ElementAttribute(ElementPointer, "NAME")
+                                            '    AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING")
+                                            '    addonOptionString = genericController.decodeHtml(AddonOptionStringHTMLEncoded)
+                                            '    '
+                                            '    ' test for illegal characters (temporary patch to get around not addonencoding during the addon replacement
+                                            '    '
+                                            '    Pos = genericController.vbInstr(1, addonOptionString, "menunew=", vbTextCompare)
+                                            '    If Pos > 0 Then
+                                            '        NewName = Mid(addonOptionString, Pos + 8)
+                                            '        Dim IsOK As Boolean
+                                            '        IsOK = (NewName = genericController.encodeNvaArgument(NewName))
+                                            '        If Not IsOK Then
+                                            '            addonOptionString = Left(addonOptionString, Pos - 1) & "MenuNew=" & genericController.encodeNvaArgument(NewName)
+                                            '        End If
+                                            '    End If
+                                            '    NotUsedID = 0
+                                            '    If EncodeEditIcons Then
+                                            '        If genericController.vbInstr(1, AddonOptionStringHTMLEncoded, "menu=", vbTextCompare) <> 0 Then
+                                            '            '
+                                            '            ' Dynamic Menu
+                                            '            '
+                                            '            '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                                            '            ' test - encoding changed
+                                            '            TextName = cpCore.csv_GetAddonOptionStringValue("menu", addonOptionString)
+                                            '            'TextName = cpcore.csv_GetAddonOption("Menu", AddonOptionString)
+                                            '            '
+                                            '            IconIDControlString = "AC," & ACType & "," & NotUsedID & "," & ACName & ",Menu=" & TextName & "[" & cpCore.csv_GetDynamicMenuACSelect() & "]&NewMenu="
+                                            '            IconImg = genericController.GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as a Dynamic Menu", ACInstanceID, 0)
+                                            '            Copy = IconImg
+                                            '            '
+                                            '            'Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as a Dynamic Menu"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & ",Menu=" & TextName & "[" & csv_GetDynamicMenuACSelect & "]&NewMenu="" src=""/ccLib/images/ACDynamicMenuIcon.gif"" WIDTH=52 HEIGHT=52>"
+                                            '        Else
+                                            '            '
+                                            '            ' Old Dynamic Menu - values are stored in the icon
+                                            '            '
+                                            '            IconIDControlString = "AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
+                                            '            IconImg = genericController.GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as a Dynamic Menu", ACInstanceID, 0)
+                                            '            Copy = IconImg
+                                            '            '
+                                            '            'Copy = "<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as a Dynamic Menu"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/ccLib/images/ACDynamicMenuIcon.gif"" WIDTH=52 HEIGHT=52>"
+                                            '        End If
+                                            '    ElseIf EncodeNonCachableTags Then
+                                            '        '
+                                            '        ' Add in the Content Pag
+                                            '        '
+                                            '        Copy = "{{" & ACTypeDynamicMenu & "?" & addonOptionString & "}}"
+                                            '    End If
                                             Case ACTypeWatchList
                                                 '
                                                 ' ----- Formatting Tag
@@ -5180,50 +5177,50 @@ ErrorTrap:
 
                                                                 End If
                                                                 ElementText = "<AC type=""" & ACType & """ name=""" & ACInstanceName & """ ACInstanceID=""" & ACInstanceID & """ querystring=""" & QueryString & """>"
-                                                            Case ACTypeDynamicMenu
-                                                                '
-                                                                ' Dynamic Menu - if they added a new menu with MenuNew, create it, and remove it from tag
-                                                                '
-                                                                QueryString = ""
-                                                                If ImageIDArrayCount > 4 Then
-                                                                    QueryString = genericController.encodeText(ImageIDArray(4))
-                                                                    QueryString = genericController.decodeHtml(QueryString)
-                                                                    QueryString = html_DecodeActiveContent_ProcessDynamicMenu(QueryString)
-                                                                    QSSplit = Split(QueryString, "&")
-                                                                    For QSPtr = 0 To UBound(QSSplit)
-                                                                        QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
-                                                                    Next
-                                                                    QueryString = Join(QSSplit, "&")
-                                                                End If
-                                                                If True Then
-                                                                    '
-                                                                    ' convert to new menu type
-                                                                    '
-                                                                    Pos = genericController.vbInstr(1, QueryString, "[")
-                                                                    If Pos > 0 Then
-                                                                        QueryString = Mid(QueryString, 1, Pos - 1)
-                                                                    End If
+                                                            'Case ACTypeDynamicMenu
+                                                            '    '
+                                                            '    ' Dynamic Menu - if they added a new menu with MenuNew, create it, and remove it from tag
+                                                            '    '
+                                                            '    QueryString = ""
+                                                            '    If ImageIDArrayCount > 4 Then
+                                                            '        QueryString = genericController.encodeText(ImageIDArray(4))
+                                                            '        QueryString = genericController.decodeHtml(QueryString)
+                                                            '        QueryString = html_DecodeActiveContent_ProcessDynamicMenu(QueryString)
+                                                            '        QSSplit = Split(QueryString, "&")
+                                                            '        For QSPtr = 0 To UBound(QSSplit)
+                                                            '            QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
+                                                            '        Next
+                                                            '        QueryString = Join(QSSplit, "&")
+                                                            '    End If
+                                                            '    If True Then
+                                                            '        '
+                                                            '        ' convert to new menu type
+                                                            '        '
+                                                            '        Pos = genericController.vbInstr(1, QueryString, "[")
+                                                            '        If Pos > 0 Then
+                                                            '            QueryString = Mid(QueryString, 1, Pos - 1)
+                                                            '        End If
 
-                                                                    QueryString = genericController.vbReplace(QueryString, "menu=", "Menu Name=", 1, 99, vbTextCompare) & "&Create New Menu="
-                                                                    ElementText = "<AC type=""" & ACTypeAggregateFunction & """ name=""Dynamic Menu"" ACInstanceID=""" & ACInstanceID & """ querystring=""" & QueryString & """ guid=""" & ACGuid & """>"
-                                                                Else
-                                                                    ElementText = "<AC type=""" & ACType & """ name=""" & ACInstanceName & """ ACInstanceID=""" & ACInstanceID & """ querystring=""" & QueryString & """>"
-                                                                End If
-                                                            Case ACTypeDynamicForm
-                                                                '
-                                                                ' Dynamic Form
-                                                                '
-                                                                QueryString = ""
-                                                                If ImageIDArrayCount > 4 Then
-                                                                    QueryString = genericController.encodeText(ImageIDArray(4))
-                                                                    QueryString = genericController.decodeHtml(QueryString)
-                                                                    QSSplit = Split(QueryString, "&")
-                                                                    For QSPtr = 0 To UBound(QSSplit)
-                                                                        QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
-                                                                    Next
-                                                                    QueryString = Join(QSSplit, "&")
-                                                                End If
-                                                                ElementText = "<AC type=""" & ACType & """ name=""" & ACInstanceName & """ ACInstanceID=""" & ACInstanceID & """ querystring=""" & QueryString & """>"
+                                                            '        QueryString = genericController.vbReplace(QueryString, "menu=", "Menu Name=", 1, 99, vbTextCompare) & "&Create New Menu="
+                                                            '        ElementText = "<AC type=""" & ACTypeAggregateFunction & """ name=""Dynamic Menu"" ACInstanceID=""" & ACInstanceID & """ querystring=""" & QueryString & """ guid=""" & ACGuid & """>"
+                                                            '    Else
+                                                            '        ElementText = "<AC type=""" & ACType & """ name=""" & ACInstanceName & """ ACInstanceID=""" & ACInstanceID & """ querystring=""" & QueryString & """>"
+                                                            '    End If
+                                                            'Case ACTypeDynamicForm
+                                                            '    '
+                                                            '    ' Dynamic Form
+                                                            '    '
+                                                            '    QueryString = ""
+                                                            '    If ImageIDArrayCount > 4 Then
+                                                            '        QueryString = genericController.encodeText(ImageIDArray(4))
+                                                            '        QueryString = genericController.decodeHtml(QueryString)
+                                                            '        QSSplit = Split(QueryString, "&")
+                                                            '        For QSPtr = 0 To UBound(QSSplit)
+                                                            '            QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
+                                                            '        Next
+                                                            '        QueryString = Join(QSSplit, "&")
+                                                            '    End If
+                                                            '    ElementText = "<AC type=""" & ACType & """ name=""" & ACInstanceName & """ ACInstanceID=""" & ACInstanceID & """ querystring=""" & QueryString & """>"
                                                             Case ACTypeWatchList
                                                                 '
                                                                 ' Watch List
@@ -5495,7 +5492,7 @@ ErrorTrap:
                                                                                                     '
                                                                                                     ' image load failed, use raw filename
                                                                                                     '
-                                                                                                    throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "Error while loading image to resize, [" & RecordVirtualFilename & "]", "dll", "cpCoreClass", "DecodeAciveContent", Err.Number, Err.Source, Err.Description, False, True, "")
+                                                                                                    Throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "Error while loading image to resize, [" & RecordVirtualFilename & "]", "dll", "cpCoreClass", "DecodeAciveContent", Err.Number, Err.Source, Err.Description, False, True, "")
                                                                                                     Err.Clear()
                                                                                                     NewImageFilename = ImageFilename
                                                                                                 Else
@@ -5594,7 +5591,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_DecodeActiveContent", True)
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_DecodeActiveContent", True)
         End Function
         '
         '========================================================================
@@ -5616,7 +5613,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_DecodeContent", True)
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_DecodeContent", True)
         End Function
         '
         '========================================================================
@@ -5642,7 +5639,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_EncodeCRLF")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_EncodeCRLF")
         End Function
         '
         '========================================================================
@@ -5662,7 +5659,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("EncodeHTML")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("EncodeHTML")
         End Function
         '
         '========================================================================
@@ -5683,7 +5680,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_ConvertText2HTML")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_ConvertText2HTML")
         End Function
         '
         '========================================================================
@@ -5715,7 +5712,7 @@ ErrorTrap:
             '
 ErrorTrap:
             'Set Decoder = Nothing
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_DecodeHTML")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_DecodeHTML")
         End Function
         '
         '========================================================================
@@ -5727,7 +5724,7 @@ ErrorTrap:
                 Dim Decoder As New htmlToTextControllers(cpCore)
                 Return Decoder.convert(Source)
             Catch ex As Exception
-                throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_ConvertHTML2Text")
+                Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_ConvertHTML2Text")
             End Try
         End Function
         '
@@ -5745,7 +5742,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_EncodeRequestVariable")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_EncodeRequestVariable")
         End Function
         '
         '========================================================================
@@ -5763,7 +5760,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_EncodeURL")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_EncodeURL")
         End Function
         '
         '========================================================================
@@ -5779,72 +5776,72 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("DecodeUrl")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("DecodeUrl")
         End Function
-        '
-        '
-        '
-        Private Function html_DecodeActiveContent_ProcessDynamicMenu(ByVal QueryString As String) As String
-            On Error GoTo ErrorTrap 'Const Tn = "csv_DecodeActiveContent_ProcessDynamicMenu" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim EditTabCaption As String
-            Dim ACTags() As String
-            Dim TagPtr As Integer
-            Dim QSPos As Integer
-            Dim QSPosEnd As Integer
-            Dim QS As String
-            Dim MenuName As String
-            Dim StylePrefix As String
-            Dim CS As Integer
-            Dim IsFound As Boolean
-            Dim StyleSheet As String
-            'Dim DefaultStyles As String
-            'Dim DynamicStyles As String
-            'Dim AddStyles As String
-            'Dim StyleSplit() As String
-            'Dim StylePtr as integer
-            'Dim StyleLine As String
-            Dim Filename As String
-            'Dim NewStyleLine As String
-            Dim Menu As String
-            Dim MenuNew As String
-            '
-            QS = QueryString
-            If True Then
-                If genericController.vbInstr(1, QS, "Menu=", vbTextCompare) <> 0 Then
-                    '
-                    ' New menu
-                    '
-                    Menu = cpCore.csv_GetAddonOption("Menu", QS)
-                    MenuNew = cpCore.csv_GetAddonOption("NewMenu", QS)
-                    If MenuNew <> "" Then
-                        '
-                        ' Add a new Menu
-                        '
-                        Menu = MenuNew
-                        Call cpCore.csv_VerifyDynamicMenu(Menu)
-                    End If
-                    '
-                    ' fixup the tag so next encode it pulls a new list of Dynamic Menus
-                    '
-                    QS = "Menu=" & Menu
-                ElseIf genericController.vbInstr(1, QS, "MenuName=", vbTextCompare) <> 0 Then
-                    '
-                    ' Old Style Menu Icon
-                    '
-                    MenuName = cpCore.csv_GetAddonOption("MenuName", QS)
-                    Call cpCore.csv_VerifyDynamicMenu(MenuName)
-                End If
-            End If
-            html_DecodeActiveContent_ProcessDynamicMenu = QS
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_DecodeActiveContent_ProcessDynamicMenu", True, True)
-        End Function
+        '        '
+        '        '
+        '        '
+        '        Private Function html_DecodeActiveContent_ProcessDynamicMenu(ByVal QueryString As String) As String
+        '            On Error GoTo ErrorTrap 'Const Tn = "csv_DecodeActiveContent_ProcessDynamicMenu" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
+        '            '
+        '            Dim EditTabCaption As String
+        '            Dim ACTags() As String
+        '            Dim TagPtr As Integer
+        '            Dim QSPos As Integer
+        '            Dim QSPosEnd As Integer
+        '            Dim QS As String
+        '            Dim MenuName As String
+        '            Dim StylePrefix As String
+        '            Dim CS As Integer
+        '            Dim IsFound As Boolean
+        '            Dim StyleSheet As String
+        '            'Dim DefaultStyles As String
+        '            'Dim DynamicStyles As String
+        '            'Dim AddStyles As String
+        '            'Dim StyleSplit() As String
+        '            'Dim StylePtr as integer
+        '            'Dim StyleLine As String
+        '            Dim Filename As String
+        '            'Dim NewStyleLine As String
+        '            Dim Menu As String
+        '            Dim MenuNew As String
+        '            '
+        '            QS = QueryString
+        '            If True Then
+        '                If genericController.vbInstr(1, QS, "Menu=", vbTextCompare) <> 0 Then
+        '                    '
+        '                    ' New menu
+        '                    '
+        '                    Menu = cpCore.csv_GetAddonOption("Menu", QS)
+        '                    MenuNew = cpCore.csv_GetAddonOption("NewMenu", QS)
+        '                    If MenuNew <> "" Then
+        '                        '
+        '                        ' Add a new Menu
+        '                        '
+        '                        Menu = MenuNew
+        '                        Call cpCore.csv_VerifyDynamicMenu(Menu)
+        '                    End If
+        '                    '
+        '                    ' fixup the tag so next encode it pulls a new list of Dynamic Menus
+        '                    '
+        '                    QS = "Menu=" & Menu
+        '                ElseIf genericController.vbInstr(1, QS, "MenuName=", vbTextCompare) <> 0 Then
+        '                    '
+        '                    ' Old Style Menu Icon
+        '                    '
+        '                    MenuName = cpCore.csv_GetAddonOption("MenuName", QS)
+        '                    Call cpCore.csv_VerifyDynamicMenu(MenuName)
+        '                End If
+        '            End If
+        '            html_DecodeActiveContent_ProcessDynamicMenu = QS
+        '            '
+        '            Exit Function
+        '            '
+        '            ' ----- Error Trap
+        '            '
+        'ErrorTrap:
+        '            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_DecodeActiveContent_ProcessDynamicMenu", True, True)
+        '        End Function
         '
         '=======================================================================================================
         '   return the entire stylesheet for the given templateID and/or EmailID
@@ -6040,7 +6037,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_getStyleSheet2", True, False)
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_getStyleSheet2", True, False)
         End Function
         '
         '
@@ -6063,7 +6060,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_getStyleSheetDefault", True, False)
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_getStyleSheetDefault", True, False)
         End Function
         ''
         '
@@ -6481,7 +6478,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Sub
         '
@@ -6869,7 +6866,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Sub
         '
@@ -6917,7 +6914,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Sub
         '
@@ -6941,7 +6938,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_EncodeContent9")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_EncodeContent9")
         End Function
         ''
         '' To support the special case when the template calls this to encode itself, and the page content has already been rendered.
@@ -7028,7 +7025,7 @@ ErrorTrap:
             '
 ErrorTrap:
             'Set main_DecodeHTML = Nothing
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_DecodeContent")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_DecodeContent")
         End Function
         '
         '==========================================================================================================================================
@@ -7047,7 +7044,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("EncodeContentForWeb")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("EncodeContentForWeb")
         End Function
         '
         '========================================================================
@@ -7461,7 +7458,7 @@ ErrorTrap:
                 main_GetFormInputCheckListCategories = main_GetFormInputCheckListCategories_Content(TagName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectCriteria, CaptionFieldName, readOnlyField, False, "")
             Else
                 IsAuthoringMode = True
-                LinkBase = cpCore.web_RefreshQueryString
+                LinkBase = cpCore.htmlDoc.refreshQueryString
                 BakeName = "ContentFolderNav"
                 If Not IsAuthoringMode Then
                     '          main_GetFormInputCheckListCategories = cache.cache_readBake(BakeName)
@@ -7471,7 +7468,7 @@ ErrorTrap:
 
                 If main_GetFormInputCheckListCategories = "" Then
                     EmptyDivID = TagName & ".empty"
-                    SQL = cpCore.GetSQLSelect("", "ccContentCategories", "ID,ContentCategoryID,Name", , "Name")
+                    SQL = cpCore.db.GetSQLSelect("", "ccContentCategories", "ID,ContentCategoryID,Name", , "Name")
                     CS = cpCore.db.cs_openSql(SQL)
                     Do While cpCore.db.cs_ok(CS)
                         Caption = cpCore.db.cs_getText(CS, "name")
@@ -7511,7 +7508,7 @@ ErrorTrap:
                     ' + Add Category
                     '
                     If cpCore.authContext.isAuthenticatedContentManager(cpCore, "Content Categories") Then
-                        LeftPane = LeftPane & cr & "<div class=""caption""><a href=""" & cpCore.siteProperties.adminURL & "?editreferer=" & genericController.EncodeRequestVariable("?" & cpCore.web_RefreshQueryString) & "&cid=" & cpCore.main_GetContentID("Content Categories") & "&af=4&aa=2"">+&nbsp;Add&nbsp;Category</a></div>"
+                        LeftPane = LeftPane & cr & "<div class=""caption""><a href=""" & cpCore.siteProperties.adminURL & "?editreferer=" & genericController.EncodeRequestVariable("?" & cpCore.htmlDoc.refreshQueryString) & "&cid=" & cpCore.main_GetContentID("Content Categories") & "&af=4&aa=2"">+&nbsp;Add&nbsp;Category</a></div>"
                     End If
                     '
                     LeftPane = cr & "<div class=""ccCategoryListCon"">" & genericController.kmaIndent(LeftPane) & cr & "</div>"
@@ -7547,7 +7544,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetFormInputCheckListCategories")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetFormInputCheckListCategories")
         End Function
         '
         '=========================================================================================================
@@ -7581,7 +7578,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddOnLoadJavascript2")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddOnLoadJavascript2")
         End Sub
         '
         '=========================================================================================================
@@ -7613,7 +7610,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddEndOfBodyJavascript2")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddEndOfBodyJavascript2")
         End Sub
         '
         '=========================================================================================================
@@ -7691,7 +7688,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddHeadScriptCode")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddHeadScriptCode")
         End Sub
         '
         '
@@ -7715,7 +7712,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddHeadScriptLink")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddHeadScriptLink")
         End Sub
         '
         '=========================================================================================================
@@ -7744,7 +7741,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddPagetitle")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddPagetitle")
         End Sub
         '
         '=========================================================================================================
@@ -7772,7 +7769,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_addMetaDescription2")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_addMetaDescription2")
         End Sub
         '
         '=========================================================================================================
@@ -7806,7 +7803,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddStylesheetLink2")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddStylesheetLink2")
         End Sub
         '
         '=========================================================================================================
@@ -7831,7 +7828,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddSharedStyleID2")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddSharedStyleID2")
         End Sub
         '
         '=========================================================================================================
@@ -7859,7 +7856,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_addMetaKeywordList2")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_addMetaKeywordList2")
         End Sub
         '
         '=========================================================================================================
@@ -7887,7 +7884,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddHeadTag")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddHeadTag")
         End Sub
         '
         '
@@ -7958,7 +7955,7 @@ ErrorTrap:
 
             Exit Function
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetEditWrapper")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetEditWrapper")
         End Function
         '
         ' To support the special case when the template calls this to encode itself, and the page content has already been rendered.
@@ -8143,12 +8140,12 @@ ErrorTrap:
                                                 End If
                                             End If
                                             returnValue = returnValue & html_GetContentCopy(CopyName, "", iPersonalizationPeopleId, False, personalizationIsAuthenticated)
-                                        Case ACTypeDynamicMenu
-                                            '
-                                            ' Dynamic Menu
-                                            '
-                                            'hint = hint & ",320"
-                                            returnValue = returnValue & cpCore.pages.pageManager_GetDynamicMenu(addonOptionString, cpCore.siteProperties.useContentWatchLink)
+                                        'Case ACTypeDynamicMenu
+                                        '    '
+                                        '    ' Dynamic Menu
+                                        '    '
+                                        '    'hint = hint & ",320"
+                                        '    returnValue = returnValue & cpCore.pages.pageManager_GetDynamicMenu(addonOptionString, cpCore.siteProperties.useContentWatchLink)
                                         Case ACTypeWatchList
                                             '
                                             ' Watch List
@@ -8277,14 +8274,14 @@ ErrorTrap:
                     'hint = hint & ",500, Adding edit wrappers"
                     If isEditingAnything Then
                         If (InStr(1, returnValue, "<!-- AFScript -->", vbTextCompare) <> 0) Then
-                            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError7("returnValue", "AFScript Style edit wrappers are not supported")
+                            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError7("returnValue", "AFScript Style edit wrappers are not supported")
                             Copy = main_GetEditWrapper("Aggregate Script", "##MARKER##")
                             Wrapper = Split(Copy, "##MARKER##")
                             returnValue = genericController.vbReplace(returnValue, "<!-- AFScript -->", Wrapper(0), 1, 99, vbTextCompare)
                             returnValue = genericController.vbReplace(returnValue, "<!-- /AFScript -->", Wrapper(1), 1, 99, vbTextCompare)
                         End If
                         If (InStr(1, returnValue, "<!-- AFReplacement -->", vbTextCompare) <> 0) Then
-                            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError7("returnValue", "AFReplacement Style edit wrappers are not supported")
+                            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError7("returnValue", "AFReplacement Style edit wrappers are not supported")
                             Copy = main_GetEditWrapper("Aggregate Replacement", "##MARKER##")
                             Wrapper = Split(Copy, "##MARKER##")
                             returnValue = genericController.vbReplace(returnValue, "<!-- AFReplacement -->", Wrapper(0), 1, 99, vbTextCompare)
@@ -8356,9 +8353,9 @@ ErrorTrap:
             '
 ErrorTrap:
             If hint <> "" Then
-                throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError7("csv_EncodeContent9-" & hint, "Unexpected Trap Error")
+                Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError7("csv_EncodeContent9-" & hint, "Unexpected Trap Error")
             Else
-                throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError7("csv_EncodeContent9", "Unexpected Trap Error")
+                Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError7("csv_EncodeContent9", "Unexpected Trap Error")
             End If
         End Function
         '
@@ -9007,7 +9004,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddTabEntry")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddTabEntry")
         End Sub
         '        '
         '        '
@@ -9040,7 +9037,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddLiveTabEntry")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddLiveTabEntry")
         End Sub
         '
         '
@@ -9057,7 +9054,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetLiveTabs")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetLiveTabs")
         End Function
         '
         '
@@ -9074,7 +9071,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddComboTabEntry")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_AddComboTabEntry")
         End Sub
         '
         '
@@ -9091,7 +9088,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetComboTabs")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetComboTabs")
         End Function
         '
         '========================================================================
@@ -9127,9 +9124,9 @@ ErrorTrap:
                         Else
                             returnREsult = cpCore.authContext.authenticateById(cpCore, LocalMemberID, cpCore.authContext)
                             If returnREsult Then
-                                Call cpCore.log_LogActivity2("successful username/password login", cpCore.authContext.user.ID, cpCore.authContext.user.OrganizationID)
+                                Call logController.logActivity2(cpCore, "successful username/password login", cpCore.authContext.user.ID, cpCore.authContext.user.OrganizationID)
                             Else
-                                Call cpCore.log_LogActivity2("bad username/password login", cpCore.authContext.user.ID, cpCore.authContext.user.OrganizationID)
+                                Call logController.logActivity2(cpCore, "bad username/password login", cpCore.authContext.user.ID, cpCore.authContext.user.OrganizationID)
                             End If
                         End If
                     End If
@@ -9253,7 +9250,7 @@ ErrorTrap:
                 '
                 Call cpCore.main_SetMetaContent(0, 0)
                 Call cpCore.htmlDoc.main_AddPagetitle2("Login", "loginPage")
-                head = cpCore.webServer.webServerIO_GetHTMLInternalHead(False)
+                head = cpCore.webServer.getHTMLInternalHead(False)
                 If cpCore.pages.templateBodyTag <> "" Then
                     bodyTag = cpCore.pages.templateBodyTag
                 Else
@@ -9441,11 +9438,11 @@ ErrorTrap:
                         '
                         ' login successful, redirect back to this page (without a method)
                         '
-                        QS = cpCore.web_RefreshQueryString
+                        QS = cpCore.htmlDoc.refreshQueryString
                         QS = genericController.ModifyQueryString(QS, "method", "")
                         QS = genericController.ModifyQueryString(QS, "RequestBinary", "")
                         '
-                        Call cpCore.webServer.webServerIO_Redirect2("?" & QS, "Login form success", False)
+                        Call cpCore.webServer.redirect("?" & QS, "Login form success", False)
                     End If
                 End If
                 If loginAddonID = 0 Then
@@ -9507,7 +9504,7 @@ ErrorTrap:
                         End With
                     Next
                     '
-                    QueryString = cpCore.web_RefreshQueryString
+                    QueryString = cpCore.htmlDoc.refreshQueryString
                     QueryString = genericController.ModifyQueryString(QueryString, "S", "")
                     QueryString = genericController.ModifyQueryString(QueryString, "ccIPage", "")
                     returnResult = "" _

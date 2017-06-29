@@ -345,7 +345,7 @@ leak200:
                             '
                             ' return to the page it came from
                             '
-                            Call cpCore.webServer.webServerIO_Redirect2(EditReferer, "Admin Edit page returning to the EditReferer setting", False)
+                            Call cpCore.webServer.redirect(EditReferer, "Admin Edit page returning to the EditReferer setting", False)
                             Exit Function
                         Else
                             '
@@ -474,7 +474,7 @@ leak200:
                         Case AdminFormDownloads
                             ContentCell = (GetForm_Downloads())
                         Case AdminformRSSControl
-                            Call cpCore.webServer.webServerIO_Redirect2("?cid=" & cpCore.main_GetContentID("RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.", False)
+                            Call cpCore.webServer.redirect("?cid=" & cpCore.main_GetContentID("RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.", False)
                         Case AdminFormImportWizard
                             ContentCell = cpCore.addon.execute_legacy4(ImportWizardGuid, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
                         Case AdminFormCustomReports
@@ -3471,12 +3471,12 @@ ErrorTrap:
                                         End If
                                         Call cpCore.db.cs_Close(CS)
                                     End If
-                                    Call cpCore.log_LogActivity2("modifying field " & FieldName, editRecord.id, ActivityLogOrganizationID)
+                                    logController.logActivity2(cpCore, "modifying field " & FieldName, editRecord.id, ActivityLogOrganizationID)
                                 Case "organizations"
                                     '
                                     ' Log organization
                                     '
-                                    Call cpCore.log_LogActivity2("modifying field " & FieldName, 0, editRecord.id)
+                                    Call logController.logActivity2(cpCore, "modifying field " & FieldName, 0, editRecord.id)
                                 Case "cclibraryfiles"
                                     '
                                     ' if new upload to files, clear AltSizeList
@@ -4490,39 +4490,39 @@ ErrorTrap:
                             Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
                         End If
                         Call Stream.Add(EditSectionButtonBar)
-                    Case "CCSECTIONS"
-                        '
-                        ' Site Sections
-                        '
-                        EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, (Not IsLandingSection) And AllowDelete, allowSave, AllowAdd)
-                        EditSectionButtonBar = genericController.vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
-                        Call Stream.Add(EditSectionButtonBar)
-                        Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
-                        Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, IsLandingSection, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
-                        Call Stream.Add(GetForm_Edit_AddTab("Select Menus", GetForm_Edit_SectionDynamicMenuRules(adminContent, editRecord), allowAdminTabs))
-                        Call Stream.Add(GetForm_Edit_AddTab("Section Blocking", GetForm_Edit_SectionBlockRules(adminContent, editRecord), allowAdminTabs))
-                        Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
-                        If allowAdminTabs Then
-                            Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
-                            'Call Stream.Add("<div class=""ccPanelBackground"">" & cpCore.main_GetComboTabs() & "</div>")
-                        End If
-                        Call Stream.Add(EditSectionButtonBar)
-                    Case "CCDYNAMICMENUS"
-                        '
-                        ' Edit Dynamic Sections
-                        '
-                        EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, AllowDelete, allowSave, AllowAdd)
-                        EditSectionButtonBar = genericController.vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
-                        Call Stream.Add(EditSectionButtonBar)
-                        Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
-                        Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
-                        Call Stream.Add(GetForm_Edit_AddTab("Select Sections", GetForm_Edit_DynamicMenuSectionRules(adminContent, editRecord), allowAdminTabs))
-                        Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
-                        If allowAdminTabs Then
-                            Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
-                            'Call Stream.Add("<div class=""ccPanelBackground"">" & cpCore.main_GetComboTabs() & "</div>")
-                        End If
-                        Call Stream.Add(EditSectionButtonBar)
+                    'Case "CCSECTIONS"
+                    '    '
+                    '    ' Site Sections
+                    '    '
+                    '    EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, (Not IsLandingSection) And AllowDelete, allowSave, AllowAdd)
+                    '    EditSectionButtonBar = genericController.vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
+                    '    Call Stream.Add(EditSectionButtonBar)
+                    '    Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
+                    '    Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, IsLandingSection, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
+                    '    Call Stream.Add(GetForm_Edit_AddTab("Select Menus", GetForm_Edit_SectionDynamicMenuRules(adminContent, editRecord), allowAdminTabs))
+                    '    Call Stream.Add(GetForm_Edit_AddTab("Section Blocking", GetForm_Edit_SectionBlockRules(adminContent, editRecord), allowAdminTabs))
+                    '    Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
+                    '    If allowAdminTabs Then
+                    '        Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
+                    '        'Call Stream.Add("<div class=""ccPanelBackground"">" & cpCore.main_GetComboTabs() & "</div>")
+                    '    End If
+                    '    Call Stream.Add(EditSectionButtonBar)
+                    'Case "CCDYNAMICMENUS"
+                    '    '
+                    '    ' Edit Dynamic Sections
+                    '    '
+                    '    EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, AllowDelete, allowSave, AllowAdd)
+                    '    EditSectionButtonBar = genericController.vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
+                    '    Call Stream.Add(EditSectionButtonBar)
+                    '    Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
+                    '    Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
+                    '    Call Stream.Add(GetForm_Edit_AddTab("Select Sections", GetForm_Edit_DynamicMenuSectionRules(adminContent, editRecord), allowAdminTabs))
+                    '    Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
+                    '    If allowAdminTabs Then
+                    '        Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
+                    '        'Call Stream.Add("<div class=""ccPanelBackground"">" & cpCore.main_GetComboTabs() & "</div>")
+                    '    End If
+                    '    Call Stream.Add(EditSectionButtonBar)
                     Case "CCLIBRARYFOLDERS"
                         '
                         ' Library Folders
@@ -4692,7 +4692,7 @@ ErrorTrap:
                 '
                 '
                 '
-                Call cpCore.webServer.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "StaticPublishControl, Cancel Button Pressed", False)
+                Call cpCore.webServer.redirect(cpCore.siteProperties.adminURL, "StaticPublishControl, Cancel Button Pressed", False)
             ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 '
@@ -4784,7 +4784,7 @@ ErrorTrap:
                 ' ----- Bad Links
                 '
                 Copy = "n/a"
-                QueryString = genericController.ModifyQueryString(cpCore.web_RefreshQueryString, RequestNameAdminForm, AdminFormReports, True)
+                QueryString = genericController.ModifyQueryString(cpCore.htmlDoc.refreshQueryString, RequestNameAdminForm, AdminFormReports, True)
                 QueryString = genericController.ModifyQueryString(QueryString, RequestNameReportForm, ReportFormEDGDocErrors, True)
                 SQL = "SELECT Count(ccEDGPublishDocs.ID) AS PagesFound FROM ccEDGPublishDocs where (UpToDate=1) And (LinkAlias Is Not null) And ((HTTPResponse Is null) Or ((Not (HTTPResponse Like '% 200 %'))and (not (HTTPResponse like '% 302 %'))));"
                 CSPointer = cpCore.db.cs_openCsSql_rev("Default", SQL)
@@ -4939,7 +4939,7 @@ ErrorTrap:
                 '
                 '
                 '
-                Call cpCore.webServer.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "Admin Publish, Cancel Button Pressed", False)
+                Call cpCore.webServer.redirect(cpCore.siteProperties.adminURL, "Admin Publish, Cancel Button Pressed", False)
             ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 '
@@ -7533,7 +7533,7 @@ ErrorTrap:
             '
             ' Link Alias value from the admin data
             '
-            TabDescription = "Link Aliases are URLs used for this content that are more friendly to users and search engines. If you set the Link Alias field, this name will be used on the URL for this page. If you leave the Link Alias blank, the page name will be used. Below is a list of names that have been used previously and are still active. All of these entries when used in the URL will resolve to this page. The first entry in this list will be used to create dynamic menus on the site. To move an entry to the top, type it into the Link Alias field and save."
+            TabDescription = "Link Aliases are URLs used for this content that are more friendly to users and search engines. If you set the Link Alias field, this name will be used on the URL for this page. If you leave the Link Alias blank, the page name will be used. Below is a list of names that have been used previously and are still active. All of these entries when used in the URL will resolve to this page. The first entry in this list will be used to create menus on the site. To move an entry to the top, type it into the Link Alias field and save."
             If Not cpCore.siteProperties.allowLinkAlias Then
                 '
                 ' Disabled
@@ -8247,182 +8247,182 @@ ErrorTrap:
 ErrorTrap:
             Call handleLegacyClassError3("GetForm_Edit_LibraryFolderRules")
         End Function
-        '
-        '========================================================================
-        '
-        '========================================================================
-        '
-        Private Function GetForm_Edit_SectionDynamicMenuRules(adminContent As cdefModel, editRecord As editRecordClass) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_SectionDynamicMenuRules")
-            '
-            Dim f As New stringBuilderLegacyController
-            Dim DynamicMenuList As String
-            Dim DynamicMenuSplit() As String
-            Dim Ptr As Integer
-            Dim IDPtr As Integer
-            Dim IDEndPtr As Integer
-            Dim DynamicMenuID As Integer
-            Dim ReportLink As String
-            Dim WCPtr As Integer
-            Dim Adminui As New adminUIController(cpCore)
-            Dim ForcedMenuID As Integer
-            '
-            ' Determine the forced Menu ID (in the URL as MenuID=99)
-            '
-            If WherePairCount > 0 Then
-                For WCPtr = 0 To WherePairCount - 1
-                    If genericController.vbUCase(WherePair(0, WCPtr)) = "MENUID" Then
-                        ForcedMenuID = genericController.EncodeInteger(WherePair(1, WCPtr))
-                        Exit For
-                    End If
-                Next
-            End If
-            '
-            ' If ForceMenuID=0 then force the default menu
-            '
-            ' this is causing more problems then it solves
-            '
-            '    If ForcedMenuID = 0 Then
-            '        ForcedMenuID = cpCore.main_GetRecordID("Dynamic Menus", "Default")
-            '    End If
-            'Call cpCore.main_VerifyDynamicMenu("Default")
-            DynamicMenuList = cpCore.htmlDoc.main_GetFormInputCheckList("SectionDynamicMenuRules", "Site Sections", editRecord.id, "Dynamic Menus", "Dynamic Menu Section Rules", "SectionID", "DynamicMenuID", , , False)
-            DynamicMenuSplit = Split(DynamicMenuList, "<br >", , vbTextCompare)
-            For Ptr = 0 To UBound(DynamicMenuSplit)
-                DynamicMenuID = -1
-                IDPtr = genericController.vbInstr(1, DynamicMenuSplit(Ptr), "value=", vbTextCompare)
-                If IDPtr > 0 Then
-                    IDEndPtr = genericController.vbInstr(IDPtr, DynamicMenuSplit(Ptr), ">")
-                    If IDEndPtr > 0 Then
-                        DynamicMenuID = genericController.EncodeInteger(Mid(DynamicMenuSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
-                    End If
-                End If
-                If ForcedMenuID = DynamicMenuID Then
-                    DynamicMenuSplit(Ptr) = genericController.vbReplace(DynamicMenuSplit(Ptr), "type=checkbox ", "type=checkbox checked ", 1, 99, vbTextCompare)
-                End If
-                'If WherePairCount > 0 Then
-                '    For WCPtr = 0 To WherePairCount - 1
-                '        If genericController.vbUCase(WherePair(0, WCPtr)) = "MENUID" Then
-                '            If WherePair(1, WCPtr) = CStr(DynamicMenuID) Then
-                '                DynamicMenuSplit(Ptr) = genericController.vbReplace(DynamicMenuSplit(Ptr), "<input ", "<input checked ", 1, 1, vbTextCompare)
-                '            End If
-                '            Exit For
-                '        End If
-                '    Next
-                'End If
-                'If DynamicMenuID > 0 Then
-                '    ReportLink = "<a href=""?" & RequestNameAdminForm & "=12&rid=35&recordid=" & DynamicMenuID & """ target=_blank>DynamicMenu&nbsp;Report</a>"
-                'Else
-                ReportLink = "&nbsp;"
-                'End If
-                f.Add("<tr>" _
-                    & "<td>&nbsp;</td>" _
-                    & "<td class=""ccAdminEditField"" align=left>" & SpanClassAdminNormal & DynamicMenuSplit(Ptr) & "</span></td>" _
-                    & "<td class=""ccAdminEditField"" align=center>" & ReportLink & "</td>" _
-                    & "</tr>")
-            Next
-            GetForm_Edit_SectionDynamicMenuRules = Adminui.GetEditPanel((Not allowAdminTabs), "Dynamic Sections", "Select Dynamic Menus that include this Site Section", Adminui.EditTableOpen & f.Text & Adminui.EditTableClose)
-            EditSectionPanelCount = EditSectionPanelCount + 1
-            Exit Function
-            '
-ErrorTrap:
-            Call handleLegacyClassError3("GetForm_Edit_SectionDynamicMenuRules")
-        End Function
-        '
-        '========================================================================
-        '
-        '========================================================================
-        '
-        Private Function GetForm_Edit_DynamicMenuSectionRules(adminContent As cdefModel, editRecord As editRecordClass) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_DynamicMenuSectionRules")
-            '
-            Dim f As New stringBuilderLegacyController
-            Dim SectionList As String
-            Dim SectionSplit() As String
-            Dim Ptr As Integer
-            Dim IDPtr As Integer
-            Dim IDEndPtr As Integer
-            Dim SectionID As Integer
-            Dim ReportLink As String
-            Dim Adminui As New adminUIController(cpCore)
-            '
-            'Call cpCore.main_VerifyDynamicMenu("Default")
-            SectionList = cpCore.htmlDoc.main_GetFormInputCheckList("DynamicMenuSectionRules", "Dynamic Menus", editRecord.id, "Site Sections", "Dynamic Menu Section Rules", "DynamicMenuID", "SectionID", , , False)
-            SectionSplit = Split(SectionList, "<br >", , vbTextCompare)
-            For Ptr = 0 To UBound(SectionSplit)
-                SectionID = 0
-                IDPtr = genericController.vbInstr(1, SectionSplit(Ptr), "value=", vbTextCompare)
-                If IDPtr > 0 Then
-                    IDEndPtr = genericController.vbInstr(IDPtr, SectionSplit(Ptr), ">")
-                    If IDEndPtr > 0 Then
-                        SectionID = genericController.EncodeInteger(Mid(SectionSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
-                    End If
-                End If
-                'If SectionID > 0 Then
-                '    ReportLink = "<a href=""?" & RequestNameAdminForm & "=12&rid=35&recordid=" & SectionID & """ target=_blank>DynamicMenu&nbsp;Report</a>"
-                'Else
-                ReportLink = "&nbsp;"
-                'End If
-                f.Add("<tr>" _
-                    & "<td>&nbsp;</td>" _
-                    & "<td class=""ccAdminEditField"" align=left>" & SpanClassAdminNormal & SectionSplit(Ptr) & "</span></td>" _
-                    & "<td class=""ccAdminEditField"" align=center>" & ReportLink & "</td>" _
-                    & "</tr>")
-            Next
-            GetForm_Edit_DynamicMenuSectionRules = Adminui.GetEditPanel((Not allowAdminTabs), "Site Sections", "Select Site Sections to be included in this Dynamic Menu.", Adminui.EditTableOpen & f.Text & Adminui.EditTableClose)
-            EditSectionPanelCount = EditSectionPanelCount + 1
-            Exit Function
-            '
-ErrorTrap:
-            Call handleLegacyClassError3("GetForm_Edit_DynamicMenuSectionRules")
-        End Function
-        '
-        '========================================================================
-        '   Print the path Rules section of the path edit form
-        '========================================================================
-        '
-        Private Function GetForm_Edit_SectionBlockRules(adminContent As cdefModel, editRecord As editRecordClass) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_SectionBlockRules")
-            '
-            Dim f As New stringBuilderLegacyController
-            Dim GroupList As String
-            Dim GroupSplit() As String
-            Dim Ptr As Integer
-            Dim IDPtr As Integer
-            Dim IDEndPtr As Integer
-            Dim GroupID As Integer
-            Dim ReportLink As String
-            Dim Adminui As New adminUIController(cpCore)
-            '
-            GroupList = cpCore.htmlDoc.main_GetFormInputCheckList("SectionBlockRules", adminContent.Name, editRecord.id, "Groups", "Section Block Rules", "SectionID", "GroupID", , "Caption", False)
-            GroupSplit = Split(GroupList, "<br >", , vbTextCompare)
-            For Ptr = 0 To UBound(GroupSplit)
-                GroupID = 0
-                IDPtr = genericController.vbInstr(1, GroupSplit(Ptr), "value=", vbTextCompare)
-                If IDPtr > 0 Then
-                    IDEndPtr = genericController.vbInstr(IDPtr, GroupSplit(Ptr), ">")
-                    If IDEndPtr > 0 Then
-                        GroupID = genericController.EncodeInteger(Mid(GroupSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
-                    End If
-                End If
-                If GroupID > 0 Then
-                    ReportLink = "[<a href=""?" & RequestNameAdminForm & "=12&rid=35&recordid=" & GroupID & """ target=_blank>Group&nbsp;Report</a>]"
-                Else
-                    ReportLink = "&nbsp;"
-                End If
-                f.Add("<tr>" _
-                    & "<td>&nbsp;</td>" _
-                    & "<td class=""ccAdminEditField"" align=left>" & SpanClassAdminNormal & GroupSplit(Ptr) & "</span></td>" _
-                    & "<td class=""ccAdminEditField"" align=center>" & ReportLink & "</td>" _
-                    & "</tr>")
-            Next
-            GetForm_Edit_SectionBlockRules = Adminui.GetEditPanel((Not allowAdminTabs), "Group Permissions", "If this section is marked 'Blocked from Users' on the details tab, select groups that have access to this section and its navigation", Adminui.EditTableOpen & f.Text & Adminui.EditTableClose)
-            EditSectionPanelCount = EditSectionPanelCount + 1
-            Exit Function
-            '
-ErrorTrap:
-            Call handleLegacyClassError3("GetForm_Edit_SectionBlockRules")
-        End Function
+        '        '
+        '        '========================================================================
+        '        '
+        '        '========================================================================
+        '        '
+        '        Private Function GetForm_Edit_SectionDynamicMenuRules(adminContent As cdefModel, editRecord As editRecordClass) As String
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_SectionDynamicMenuRules")
+        '            '
+        '            Dim f As New stringBuilderLegacyController
+        '            Dim DynamicMenuList As String
+        '            Dim DynamicMenuSplit() As String
+        '            Dim Ptr As Integer
+        '            Dim IDPtr As Integer
+        '            Dim IDEndPtr As Integer
+        '            Dim DynamicMenuID As Integer
+        '            Dim ReportLink As String
+        '            Dim WCPtr As Integer
+        '            Dim Adminui As New adminUIController(cpCore)
+        '            Dim ForcedMenuID As Integer
+        '            '
+        '            ' Determine the forced Menu ID (in the URL as MenuID=99)
+        '            '
+        '            If WherePairCount > 0 Then
+        '                For WCPtr = 0 To WherePairCount - 1
+        '                    If genericController.vbUCase(WherePair(0, WCPtr)) = "MENUID" Then
+        '                        ForcedMenuID = genericController.EncodeInteger(WherePair(1, WCPtr))
+        '                        Exit For
+        '                    End If
+        '                Next
+        '            End If
+        '            '
+        '            ' If ForceMenuID=0 then force the default menu
+        '            '
+        '            ' this is causing more problems then it solves
+        '            '
+        '            '    If ForcedMenuID = 0 Then
+        '            '        ForcedMenuID = cpCore.main_GetRecordID("Dynamic Menus", "Default")
+        '            '    End If
+        '            'Call cpCore.main_VerifyDynamicMenu("Default")
+        '            DynamicMenuList = cpCore.htmlDoc.main_GetFormInputCheckList("SectionDynamicMenuRules", "Site Sections", editRecord.id, "Dynamic Menus", "Dynamic Menu Section Rules", "SectionID", "DynamicMenuID", , , False)
+        '            DynamicMenuSplit = Split(DynamicMenuList, "<br >", , vbTextCompare)
+        '            For Ptr = 0 To UBound(DynamicMenuSplit)
+        '                DynamicMenuID = -1
+        '                IDPtr = genericController.vbInstr(1, DynamicMenuSplit(Ptr), "value=", vbTextCompare)
+        '                If IDPtr > 0 Then
+        '                    IDEndPtr = genericController.vbInstr(IDPtr, DynamicMenuSplit(Ptr), ">")
+        '                    If IDEndPtr > 0 Then
+        '                        DynamicMenuID = genericController.EncodeInteger(Mid(DynamicMenuSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
+        '                    End If
+        '                End If
+        '                If ForcedMenuID = DynamicMenuID Then
+        '                    DynamicMenuSplit(Ptr) = genericController.vbReplace(DynamicMenuSplit(Ptr), "type=checkbox ", "type=checkbox checked ", 1, 99, vbTextCompare)
+        '                End If
+        '                'If WherePairCount > 0 Then
+        '                '    For WCPtr = 0 To WherePairCount - 1
+        '                '        If genericController.vbUCase(WherePair(0, WCPtr)) = "MENUID" Then
+        '                '            If WherePair(1, WCPtr) = CStr(DynamicMenuID) Then
+        '                '                DynamicMenuSplit(Ptr) = genericController.vbReplace(DynamicMenuSplit(Ptr), "<input ", "<input checked ", 1, 1, vbTextCompare)
+        '                '            End If
+        '                '            Exit For
+        '                '        End If
+        '                '    Next
+        '                'End If
+        '                'If DynamicMenuID > 0 Then
+        '                '    ReportLink = "<a href=""?" & RequestNameAdminForm & "=12&rid=35&recordid=" & DynamicMenuID & """ target=_blank>DynamicMenu&nbsp;Report</a>"
+        '                'Else
+        '                ReportLink = "&nbsp;"
+        '                'End If
+        '                f.Add("<tr>" _
+        '                    & "<td>&nbsp;</td>" _
+        '                    & "<td class=""ccAdminEditField"" align=left>" & SpanClassAdminNormal & DynamicMenuSplit(Ptr) & "</span></td>" _
+        '                    & "<td class=""ccAdminEditField"" align=center>" & ReportLink & "</td>" _
+        '                    & "</tr>")
+        '            Next
+        '            GetForm_Edit_SectionDynamicMenuRules = Adminui.GetEditPanel((Not allowAdminTabs), "Dynamic Sections", "Select Dynamic Menus that include this Site Section", Adminui.EditTableOpen & f.Text & Adminui.EditTableClose)
+        '            EditSectionPanelCount = EditSectionPanelCount + 1
+        '            Exit Function
+        '            '
+        'ErrorTrap:
+        '            Call handleLegacyClassError3("GetForm_Edit_SectionDynamicMenuRules")
+        '        End Function
+        '        '
+        '        '========================================================================
+        '        '
+        '        '========================================================================
+        '        '
+        '        Private Function GetForm_Edit_DynamicMenuSectionRules(adminContent As cdefModel, editRecord As editRecordClass) As String
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_DynamicMenuSectionRules")
+        '            '
+        '            Dim f As New stringBuilderLegacyController
+        '            Dim SectionList As String
+        '            Dim SectionSplit() As String
+        '            Dim Ptr As Integer
+        '            Dim IDPtr As Integer
+        '            Dim IDEndPtr As Integer
+        '            Dim SectionID As Integer
+        '            Dim ReportLink As String
+        '            Dim Adminui As New adminUIController(cpCore)
+        '            '
+        '            'Call cpCore.main_VerifyDynamicMenu("Default")
+        '            SectionList = cpCore.htmlDoc.main_GetFormInputCheckList("DynamicMenuSectionRules", "Dynamic Menus", editRecord.id, "Site Sections", "Dynamic Menu Section Rules", "DynamicMenuID", "SectionID", , , False)
+        '            SectionSplit = Split(SectionList, "<br >", , vbTextCompare)
+        '            For Ptr = 0 To UBound(SectionSplit)
+        '                SectionID = 0
+        '                IDPtr = genericController.vbInstr(1, SectionSplit(Ptr), "value=", vbTextCompare)
+        '                If IDPtr > 0 Then
+        '                    IDEndPtr = genericController.vbInstr(IDPtr, SectionSplit(Ptr), ">")
+        '                    If IDEndPtr > 0 Then
+        '                        SectionID = genericController.EncodeInteger(Mid(SectionSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
+        '                    End If
+        '                End If
+        '                'If SectionID > 0 Then
+        '                '    ReportLink = "<a href=""?" & RequestNameAdminForm & "=12&rid=35&recordid=" & SectionID & """ target=_blank>DynamicMenu&nbsp;Report</a>"
+        '                'Else
+        '                ReportLink = "&nbsp;"
+        '                'End If
+        '                f.Add("<tr>" _
+        '                    & "<td>&nbsp;</td>" _
+        '                    & "<td class=""ccAdminEditField"" align=left>" & SpanClassAdminNormal & SectionSplit(Ptr) & "</span></td>" _
+        '                    & "<td class=""ccAdminEditField"" align=center>" & ReportLink & "</td>" _
+        '                    & "</tr>")
+        '            Next
+        '            GetForm_Edit_DynamicMenuSectionRules = Adminui.GetEditPanel((Not allowAdminTabs), "Site Sections", "Select Site Sections to be included in this Dynamic Menu.", Adminui.EditTableOpen & f.Text & Adminui.EditTableClose)
+        '            EditSectionPanelCount = EditSectionPanelCount + 1
+        '            Exit Function
+        '            '
+        'ErrorTrap:
+        '            Call handleLegacyClassError3("GetForm_Edit_DynamicMenuSectionRules")
+        '        End Function
+        '        '
+        '        '========================================================================
+        '        '   Print the path Rules section of the path edit form
+        '        '========================================================================
+        '        '
+        '        Private Function GetForm_Edit_SectionBlockRules(adminContent As cdefModel, editRecord As editRecordClass) As String
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetForm_Edit_SectionBlockRules")
+        '            '
+        '            Dim f As New stringBuilderLegacyController
+        '            Dim GroupList As String
+        '            Dim GroupSplit() As String
+        '            Dim Ptr As Integer
+        '            Dim IDPtr As Integer
+        '            Dim IDEndPtr As Integer
+        '            Dim GroupID As Integer
+        '            Dim ReportLink As String
+        '            Dim Adminui As New adminUIController(cpCore)
+        '            '
+        '            GroupList = cpCore.htmlDoc.main_GetFormInputCheckList("SectionBlockRules", adminContent.Name, editRecord.id, "Groups", "Section Block Rules", "SectionID", "GroupID", , "Caption", False)
+        '            GroupSplit = Split(GroupList, "<br >", , vbTextCompare)
+        '            For Ptr = 0 To UBound(GroupSplit)
+        '                GroupID = 0
+        '                IDPtr = genericController.vbInstr(1, GroupSplit(Ptr), "value=", vbTextCompare)
+        '                If IDPtr > 0 Then
+        '                    IDEndPtr = genericController.vbInstr(IDPtr, GroupSplit(Ptr), ">")
+        '                    If IDEndPtr > 0 Then
+        '                        GroupID = genericController.EncodeInteger(Mid(GroupSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
+        '                    End If
+        '                End If
+        '                If GroupID > 0 Then
+        '                    ReportLink = "[<a href=""?" & RequestNameAdminForm & "=12&rid=35&recordid=" & GroupID & """ target=_blank>Group&nbsp;Report</a>]"
+        '                Else
+        '                    ReportLink = "&nbsp;"
+        '                End If
+        '                f.Add("<tr>" _
+        '                    & "<td>&nbsp;</td>" _
+        '                    & "<td class=""ccAdminEditField"" align=left>" & SpanClassAdminNormal & GroupSplit(Ptr) & "</span></td>" _
+        '                    & "<td class=""ccAdminEditField"" align=center>" & ReportLink & "</td>" _
+        '                    & "</tr>")
+        '            Next
+        '            GetForm_Edit_SectionBlockRules = Adminui.GetEditPanel((Not allowAdminTabs), "Group Permissions", "If this section is marked 'Blocked from Users' on the details tab, select groups that have access to this section and its navigation", Adminui.EditTableOpen & f.Text & Adminui.EditTableClose)
+        '            EditSectionPanelCount = EditSectionPanelCount + 1
+        '            Exit Function
+        '            '
+        'ErrorTrap:
+        '            Call handleLegacyClassError3("GetForm_Edit_SectionBlockRules")
+        '        End Function
         '
         '========================================================================
         ' Print the Group Rules section for Content Edit form
@@ -9103,7 +9103,7 @@ ErrorTrap:
                 '
                 ' AdminTabs
                 '
-                QS = cpCore.web_RefreshQueryString
+                QS = cpCore.htmlDoc.refreshQueryString
                 If allowAdminTabs Then
                     QS = genericController.ModifyQueryString(QS, "tabs", "0", True)
                     RightSide = RightSide & GetActiveImage(cpCore.serverConfig.appConfig.adminRoute & "?" & QS, "Disable Tabs", "LibButtonNoTabs.GIF", "LibButtonNoTabsRev.GIF", "Disable Tabs", "16", "16", "", "", "")
@@ -9114,7 +9114,7 @@ ErrorTrap:
                 '
                 ' Menu Mode
                 '
-                QS = cpCore.web_RefreshQueryString
+                QS = cpCore.htmlDoc.refreshQueryString
                 If MenuDepth = 0 Then
                     RightSide = RightSide & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""16"" >"
                     If AdminMenuModeID = AdminMenuModeTop Then
@@ -9129,7 +9129,7 @@ ErrorTrap:
                 ' Refresh Button
                 '
                 RightSide = RightSide & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""16"" >"
-                RightSide = RightSide & GetActiveImage(cpCore.serverConfig.appConfig.adminRoute & "?" & cpCore.web_RefreshQueryString, "Refresh", "LibButtonRefresh.GIF", "LibButtonRefreshOver.GIF", "Refresh", "16", "16", "", "", "")
+                RightSide = RightSide & GetActiveImage(cpCore.serverConfig.appConfig.adminRoute & "?" & cpCore.htmlDoc.refreshQueryString, "Refresh", "LibButtonRefresh.GIF", "LibButtonRefreshOver.GIF", "Refresh", "16", "16", "", "", "")
                 '
                 ' Assemble header
                 '
@@ -10017,32 +10017,32 @@ ErrorTrap:
                             Call SaveLinkAlias(adminContent, editRecord)
                             'Call SaveTopicRules
                             Call SaveContentTracking(adminContent, editRecord)
-                        Case "CCSECTIONS"
-                            '
-                            '
-                            '
-                            Call SaveEditRecord(adminContent, editRecord)
-                            Call LoadContentTrackingDataBase(adminContent, editRecord)
-                            Call LoadContentTrackingResponse(adminContent, editRecord)
-                            'Call LoadAndSaveCalendarEvents
-                            Call LoadAndSaveMetaContent()
-                            Call cpCore.main_ProcessCheckList("SectionBlockRules", adminContent.Name, genericController.encodeText(editRecord.id), "Groups", "Section Block Rules", "SectionID", "GroupID")
-                            Call cpCore.main_ProcessCheckList("SectionDynamicMenuRules", adminContent.Name, genericController.encodeText(editRecord.id), "Dynamic Menus", "Dynamic Menu Section Rules", "SectionID", "DynamicMenuID")
-                            'call SaveTopicRules
-                            Call SaveContentTracking(adminContent, editRecord)
-                        Case "CCDYNAMICMENUS"
-                            '
-                            '
-                            '
-                            Call SaveEditRecord(adminContent, editRecord)
-                            Call cpCore.main_ProcessCheckList("DynamicMenuSectionRules", adminContent.Name, genericController.encodeText(editRecord.id), "Site Sections", "Dynamic Menu Section Rules", "DynamicMenuID", "SectionID")
-                            'call SaveTopicRules
-                            Call SaveContentTracking(adminContent, editRecord)
-                            '
-                            ' Verify the stylesheetPrefix exists in the Dynamic Styles
-                            '
-                            'Call VerifyDynamicMenuStyleSheet(EditRecord.ID)
-                            'Call cpCore.main_VerifyDynamicMenu("Default")
+                        'Case "CCSECTIONS"
+                        '    '
+                        '    '
+                        '    '
+                        '    Call SaveEditRecord(adminContent, editRecord)
+                        '    Call LoadContentTrackingDataBase(adminContent, editRecord)
+                        '    Call LoadContentTrackingResponse(adminContent, editRecord)
+                        '    'Call LoadAndSaveCalendarEvents
+                        '    Call LoadAndSaveMetaContent()
+                        '    Call cpCore.main_ProcessCheckList("SectionBlockRules", adminContent.Name, genericController.encodeText(editRecord.id), "Groups", "Section Block Rules", "SectionID", "GroupID")
+                        '    Call cpCore.main_ProcessCheckList("SectionDynamicMenuRules", adminContent.Name, genericController.encodeText(editRecord.id), "Dynamic Menus", "Dynamic Menu Section Rules", "SectionID", "DynamicMenuID")
+                        '    'call SaveTopicRules
+                        '    Call SaveContentTracking(adminContent, editRecord)
+                        'Case "CCDYNAMICMENUS"
+                        '    '
+                        '    '
+                        '    '
+                        '    Call SaveEditRecord(adminContent, editRecord)
+                        '    Call cpCore.main_ProcessCheckList("DynamicMenuSectionRules", adminContent.Name, genericController.encodeText(editRecord.id), "Site Sections", "Dynamic Menu Section Rules", "DynamicMenuID", "SectionID")
+                        '    'call SaveTopicRules
+                        '    Call SaveContentTracking(adminContent, editRecord)
+                        '    '
+                        '    ' Verify the stylesheetPrefix exists in the Dynamic Styles
+                        '    '
+                        '    'Call VerifyDynamicMenuStyleSheet(EditRecord.ID)
+                        '    'Call cpCore.main_VerifyDynamicMenu("Default")
                         Case "CCLIBRARYFOLDERS"
                             '
                             '
@@ -10579,7 +10579,7 @@ ErrorTrap:
                 '
                 '
                 '
-                Call cpCore.webServer.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "GetContentChildTool, Cancel Button Pressed", False)
+                Call cpCore.webServer.redirect(cpCore.siteProperties.adminURL, "GetContentChildTool, Cancel Button Pressed", False)
             ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 '
@@ -10896,7 +10896,7 @@ ErrorTrap:
                 '
                 '
                 '
-                Call cpCore.webServer.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "HouseKeepingControl, Cancel Button Pressed", False)
+                Call cpCore.webServer.redirect(cpCore.siteProperties.adminURL, "HouseKeepingControl, Cancel Button Pressed", False)
             ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 '
@@ -10931,7 +10931,7 @@ ErrorTrap:
                 End Select
                 '
                 If Button = ButtonOK Then
-                    Call cpCore.webServer.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "StaticPublishControl, OK Button Pressed", False)
+                    Call cpCore.webServer.redirect(cpCore.siteProperties.adminURL, "StaticPublishControl, OK Button Pressed", False)
                 End If
                 '
                 ' ----- Status
@@ -10953,7 +10953,7 @@ ErrorTrap:
                 '
                 Copy = "unknown"
                 AgeInDays = "unknown"
-                SQL = cpCore.GetSQLSelect("default", "ccVisits", "DateAdded", , "ID", , 1)
+                SQL = cpCore.db.GetSQLSelect("default", "ccVisits", "DateAdded", , "ID", , 1)
                 CSServers = cpCore.db.cs_openCsSql_rev("Default", SQL)
                 'SQL = "SELECT Top 1 DateAdded FROM ccVisits order by ID;"
                 'CSServers = cpCore.app_openCsSql_Rev_Internal("Default", SQL)
@@ -11104,7 +11104,7 @@ ErrorTrap:
                 '
                 '
                 '
-                Call cpCore.webServer.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "StyleEditor, Cancel Button Pressed", False)
+                Call cpCore.webServer.redirect(cpCore.siteProperties.adminURL, "StyleEditor, Cancel Button Pressed", False)
             ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                 '
                 '
@@ -11462,7 +11462,7 @@ ErrorTrap:
             '
             Button = cpCore.docProperties.getText(RequestNameButton)
             If Button = ButtonCancel Then
-                Call cpCore.webServer.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "Downloads, Cancel Button Pressed", False)
+                Call cpCore.webServer.redirect(cpCore.siteProperties.adminURL, "Downloads, Cancel Button Pressed", False)
             End If
             '
             If Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
@@ -11574,7 +11574,7 @@ ErrorTrap:
                 '
                 'Tab0.Add( "<p>The following is a list of available downloads</p>")
                 ''
-                RQS = cpCore.web_RefreshQueryString
+                RQS = cpCore.htmlDoc.refreshQueryString
                 PageSize = cpCore.docProperties.getInteger(RequestNamePageSize)
                 If PageSize = 0 Then
                     PageSize = 50
@@ -12153,7 +12153,7 @@ ErrorTrap:
                 If Button <> "" Then
                     Select Case Button
                         Case ButtonCancel
-                            Call cpCore.webServer.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "CustomReports, Cancel Button Pressed", False)
+                            Call cpCore.webServer.redirect(cpCore.siteProperties.adminURL, "CustomReports, Cancel Button Pressed", False)
                             'Call cpCore.main_Redirect2(encodeAppRootPath(cpCore.main_GetSiteProperty2("AdminURL"), cpCore.main_ServerVirtualPath, cpCore.app.RootPath, cpCore.main_ServerHost))
                         Case ButtonDelete
                             RowCnt = cpCore.docProperties.getInteger("RowCnt")
@@ -12218,7 +12218,7 @@ ErrorTrap:
                 '
                 Tab0.Add("<p>The following is a list of available custom reports.</p>")
                 '
-                RQS = cpCore.web_RefreshQueryString
+                RQS = cpCore.htmlDoc.refreshQueryString
                 PageSize = cpCore.docProperties.getInteger(RequestNamePageSize)
                 If PageSize = 0 Then
                     PageSize = 50
@@ -12320,7 +12320,7 @@ ErrorTrap:
                 '
             End If
             '
-            GetForm_CustomReports = cpCore.admin_GetAdminFormBody(Caption, ButtonListLeft, ButtonListRight, True, True, Description, ContentSummary, ContentPadding, Content)
+            GetForm_CustomReports = admin_GetAdminFormBody(Caption, ButtonListLeft, ButtonListRight, True, True, Description, ContentSummary, ContentPadding, Content)
             '
             Call cpCore.htmlDoc.main_AddPagetitle("Custom Reports")
             Exit Function
@@ -12795,7 +12795,7 @@ ErrorTrap:
                                         & vbCrLf & "<div id=""IndexFilterContentClosed"" class=""closed"">" & FilterClosedLabel & "</div>" _
                                         & vbCrLf & "<div id=""IndexFilterContentMinWidth"" style=""display:none;""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""200"" height=""1"" style=""clear:both""></div>" _
                                         & vbCrLf & "</div>"
-                                    AjaxQS = cpCore.web_RefreshQueryString
+                                    AjaxQS = cpCore.htmlDoc.refreshQueryString
                                     AjaxQS = genericController.ModifyQueryString(AjaxQS, RequestNameAjaxFunction, AjaxOpenIndexFilterGetContent)
                                     IndexFilterJS = "" _
                                         & vbCrLf & "<script Language=""JavaScript"" type=""text/javascript"">" _
@@ -13363,7 +13363,7 @@ ErrorTrap:
                     SubFilterList = ""
                     TagName = "AdminList"
                     EmptyDivID = TagName & ".empty"
-                    SQL = cpCore.GetSQLSelect("default", "ccContentCategories", "ID,ContentCategoryID,Name", , "Name")
+                    SQL = cpCore.db.GetSQLSelect("default", "ccContentCategories", "ID,ContentCategoryID,Name", , "Name")
                     CS = cpCore.db.cs_openCsSql_rev("default", SQL)
                     Dim lis As String
                     lis = ""
@@ -13461,7 +13461,7 @@ ErrorTrap:
                     TableName = cpCore.GetContentTablename(ContentName)
                     SubFilterList = ""
                     If genericController.vbLCase(TableName) = genericController.vbLCase("ccMembers") Then
-                        SQL = cpCore.GetSQLSelect("default", "ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name")
+                        SQL = cpCore.db.GetSQLSelect("default", "ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name")
                         CS = cpCore.db.cs_openCsSql_rev("default", SQL)
                         Do While cpCore.db.cs_ok(CS)
                             Name = cpCore.db.cs_getText(CS, "Name")
@@ -14571,7 +14571,7 @@ ErrorTrap:
                     End If
                     IndexConfig = LoadIndexConfig(adminContent)
                     Button = "CriteriaSelect"
-                    RQS = cpCore.web_RefreshQueryString
+                    RQS = cpCore.htmlDoc.refreshQueryString
                     '
                     ' ----- ButtonBar
                     '
@@ -15038,7 +15038,7 @@ ErrorTrap:
                 '
                 ' Cancel out to the main page
                 '
-                Call cpCore.webServer.webServerIO_Redirect2("?", "CancelAll button pressed on Index Export", False)
+                Call cpCore.webServer.redirect("?", "CancelAll button pressed on Index Export", False)
             ElseIf Button <> ButtonCancel Then
                 '
                 ' get content access rights
@@ -15663,7 +15663,7 @@ ErrorTrap:
                                     Caption = Caption & "*"
                                     InheritedFieldCount = InheritedFieldCount + 1
                                 End If
-                                AStart = "<a href=""?" & cpCore.web_RefreshQueryString & "&FieldName=" & cpCore.htmlDoc.html_EncodeHTML(.nameLc) & "&fi=" & fieldId & "&dtcn=" & ColumnPtr & "&" & RequestNameAdminSubForm & "=" & AdminFormIndex_SubFormSetColumns
+                                AStart = "<a href=""?" & cpCore.htmlDoc.refreshQueryString & "&FieldName=" & cpCore.htmlDoc.html_EncodeHTML(.nameLc) & "&fi=" & fieldId & "&dtcn=" & ColumnPtr & "&" & RequestNameAdminSubForm & "=" & AdminFormIndex_SubFormSetColumns
                                 Call Stream.Add("<td width=""" & ColumnWidth & "%"" valign=""top"" align=""left"">" & SpanClassAdminNormal & Caption & "<br >")
                                 Call Stream.Add("<img src=""/ccLib/images/black.GIF"" width=""100%"" height=""1"" >")
                                 Call Stream.Add(AStart & "&dta=" & ToolsActionRemoveField & """><img src=""/ccLib/images/LibButtonDeleteUp.gif"" width=""50"" height=""15"" border=""0"" ></A><BR >")
@@ -15766,7 +15766,7 @@ ErrorTrap:
                                     '
                                     ' can be used as column header
                                     '
-                                    Stream.Add("<a href=""?" & cpCore.web_RefreshQueryString & "&fi=" & .id & "&dta=" & ToolsActionAddField & "&" & RequestNameAddFieldID & "=" & .id & "&" & RequestNameAdminSubForm & "=" & AdminFormIndex_SubFormSetColumns & """><img src=""/ccLib/images/LibButtonAddUp.gif"" width=""50"" height=""15"" border=""0"" ></A> " & .caption & "<br>")
+                                    Stream.Add("<a href=""?" & cpCore.htmlDoc.refreshQueryString & "&fi=" & .id & "&dta=" & ToolsActionAddField & "&" & RequestNameAddFieldID & "=" & .id & "&" & RequestNameAdminSubForm & "=" & AdminFormIndex_SubFormSetColumns & """><img src=""/ccLib/images/LibButtonAddUp.gif"" width=""50"" height=""15"" border=""0"" ></A> " & .caption & "<br>")
                                 End If
                             End If
                         End With
@@ -17955,5 +17955,13 @@ ErrorTrap:
         Private AllowAdminFieldCheck_LocalLoaded As Boolean
         '
         Private Const AddonGuidPreferences = "{D9C2D64E-9004-4DBE-806F-60635B9F52C8}"
+        '
+        '========================================================================
+        '
+        '========================================================================
+        '
+        Public Function admin_GetAdminFormBody(Caption As String, ButtonListLeft As String, ButtonListRight As String, AllowAdd As Boolean, AllowDelete As Boolean, Description As String, ContentSummary As String, ContentPadding As Integer, Content As String) As String
+            Return New adminUIController(cpCore).GetBody(Caption, ButtonListLeft, ButtonListRight, AllowAdd, AllowDelete, Description, ContentSummary, ContentPadding, Content)
+        End Function
     End Class
 End Namespace

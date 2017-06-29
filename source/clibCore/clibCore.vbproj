@@ -401,6 +401,7 @@
     <Compile Include="constants.vb" />
     <Compile Include="Controllers\logController.vb" />
     <Compile Include="Controllers\emailController.vb" />
+    <Compile Include="Controllers\exportAsciiController.vb" />
     <Compile Include="Controllers\_blankStaticController.vb" />
     <Compile Include="Controllers\csController.vb" />
     <Compile Include="Controllers\dbEngineController.vb" />
@@ -519,7 +520,7 @@
     <Compile Include="addon_tools\coreToolsClass.vb" />
     <Compile Include="Controllers\uploadFileController.vb" />
     <Compile Include="Controllers\xmlController.vb" />
-    <Compile Include="Views\genericLegacyView.vb" />
+    <Compile Include="Interfaces\genericLegacyView.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">

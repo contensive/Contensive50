@@ -57,7 +57,7 @@ Namespace Contensive.Core
             End Get
             Set(ByVal value As String)
                 If True Then
-                    Call cpCore.webServer.webServerIO_setResponseContentType(value)
+                    Call cpCore.webServer.setResponseContentType(value)
                 End If
             End Set
         End Property
@@ -100,13 +100,13 @@ Namespace Contensive.Core
 
         Public Overrides Sub AddHeader(ByVal HeaderName As String, ByVal HeaderValue As String) 'Inherits BaseClasses.CPResponseBaseClass.AddHeader
             If True Then
-                Call cpCore.webServer.web_addResponseHeader(HeaderName, HeaderValue)
+                Call cpCore.webServer.addResponseHeader(HeaderName, HeaderValue)
             End If
         End Sub
 
         Public Overrides Sub Flush()
             If True Then
-                Call cpCore.webServer.webServerIO_FlushStream()
+                Call cpCore.webServer.flushStream()
             End If
         End Sub
         Public Overrides Sub Redirect(ByVal Link As String)
@@ -123,7 +123,7 @@ Namespace Contensive.Core
 
         Public Overrides Sub SetStatus(ByVal status As String) 'Inherits BaseClasses.CPResponseBaseClass.SetStatus
             If True Then
-                Call cpCore.webServer.web_setResponseStatus(status)
+                Call cpCore.webServer.setResponseStatus(status)
             End If
         End Sub
 
@@ -135,7 +135,7 @@ Namespace Contensive.Core
 
         Public Overrides Sub SetType(ByVal ContentType As String) 'Inherits BaseClasses.CPResponseBaseClass.SetType
             If True Then
-                Call cpCore.webServer.webServerIO_setResponseContentType(ContentType)
+                Call cpCore.webServer.setResponseContentType(ContentType)
             End If
         End Sub
 

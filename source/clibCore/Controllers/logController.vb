@@ -202,6 +202,37 @@ Namespace Contensive.Core.Controllers
         Public Shared Function getDateString(sourceDate As Date) As String
             Return sourceDate.Year & sourceDate.Month.ToString.PadLeft(2, CChar("0")) & sourceDate.Day.ToString.PadLeft(2, CChar("0"))
         End Function
+        '
+        '=====================================================================================================
+        '   Insert into the ActivityLog
+        '=====================================================================================================
+        '
+        Public Shared Sub logActivity(cpcore As coreClass, ByVal Message As String, ByVal ByMemberID As Integer, ByVal SubjectMemberID As Integer, ByVal SubjectOrganizationID As Integer, Optional ByVal Link As String = "", Optional ByVal VisitorID As Integer = 0, Optional ByVal VisitID As Integer = 0)
+            On Error GoTo ErrorTrap 'Const Tn = "LogActivity2" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
+            '
+            Dim CS As Integer
+            '
+            CS = cpcore.db.cs_insertRecord("Activity Log", ByMemberID)
+            If cpcore.db.cs_ok(CS) Then
+                Call cpcore.db.cs_set(CS, "MemberID", SubjectMemberID)
+                Call cpcore.db.cs_set(CS, "OrganizationID", SubjectOrganizationID)
+                Call cpcore.db.cs_set(CS, "Message", Message)
+                Call cpcore.db.cs_set(CS, "Link", Link)
+                Call cpcore.db.cs_set(CS, "VisitorID", VisitorID)
+                Call cpcore.db.cs_set(CS, "VisitID", VisitID)
+            End If
+            Call cpcore.db.cs_Close(CS)
+            '
+            Exit Sub
+            '
+ErrorTrap:
+            Throw (New Exception("Unexpected exception"))
+        End Sub
+        '
+        '
+        Public Shared Sub logActivity2(cpcore As coreClass, Message As String, SubjectMemberID As Integer, SubjectOrganizationID As Integer)
+            Call logActivity(cpcore, Message, cpcore.authContext.user.ID, SubjectMemberID, SubjectOrganizationID, cpcore.webServer.webServerIO_ServerLink, cpcore.authContext.visitor.ID, cpcore.authContext.visit.ID)
+        End Sub
     End Class
     '
 End Namespace

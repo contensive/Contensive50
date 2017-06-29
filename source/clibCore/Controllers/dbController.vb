@@ -5307,7 +5307,6 @@ Namespace Contensive.Core.Controllers
             End Try
         End Sub
 
-
 #Region " IDisposable Support "
         Protected disposed As Boolean = False
         '
@@ -5394,7 +5393,6 @@ Namespace Contensive.Core.Controllers
                 Return _sqlList.Count
             End Get
         End Property
-
     End Class
 End Namespace
 

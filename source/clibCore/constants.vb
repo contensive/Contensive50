@@ -222,7 +222,7 @@ Namespace Contensive.Core
         Public Const ACTypeEnd = "END"
         Public Const ACTypeTemplateContent = "CONTENT"
         Public Const ACTypeTemplateText = "TEXT"
-        Public Const ACTypeDynamicMenu = "DYNAMICMENU"
+        'Public Const ACTypeDynamicMenu = "DYNAMICMENU"
         Public Const ACTypeWatchList = "WATCHLIST"
         Public Const ACTypeRSSLink = "RSSLINK"
         Public Const ACTypePersonalization = "PERSONALIZATION"
@@ -1170,8 +1170,8 @@ Namespace Contensive.Core
             & vbCrLf & vbTab & "<!--" _
             & vbCrLf & vbTab & "Default Template - edit this Page Template, or select a different template for your page or section" _
             & vbCrLf & vbTab & "-->" _
-            & vbCrLf & vbTab & "<ac type=""AGGREGATEFUNCTION"" name=""Dynamic Menu"" querystring=""Menu Name=Default"" acinstanceid=""{6CBADABB-5B0D-43E1-B3CA-46A3D60DA3E1}"" >" _
-            & vbCrLf & vbTab & "<ac type=""AGGREGATEFUNCTION"" name=""Content Box"" acinstanceid=""{49E0D0C0-D323-49B6-B211-B9599673A265}"" >"
+            & vbCrLf & vbTab & "{% {""addon"":{""addon"":""menu"",""menu"":""Default""}} %}" _
+            & vbCrLf & vbTab & "{% ""content box"" %}"
         Public Const TemplateDefaultBodyTag = "<body class=""ccBodyWeb"">"
         '
         '=======================================================================

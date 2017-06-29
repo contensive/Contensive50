@@ -158,10 +158,14 @@ Namespace Contensive.Core
                 Do
                     Try
                         '
-                        ' pause for a second between fetches to pace the server (<10 hits in 10 seconds)
-                        '
+                        ' -- pause for a second between fetches to pace the server (<10 hits in 10 seconds)
                         Threading.Thread.Sleep(downloadDelay)
-                        responseStream = cpCore.common_getHttpRequest(URL)
+                        '
+                        ' -- download file
+                        Dim rq As System.Net.WebRequest = System.Net.WebRequest.Create(URL)
+                        rq.Timeout = 60000
+                        Dim response As System.Net.WebResponse = rq.GetResponse()
+                        responseStream = response.GetResponseStream()
                         reader = New XmlTextReader(responseStream)
                         Doc.Load(reader)
                         Exit Do
@@ -4491,18 +4495,18 @@ Namespace Contensive.Core
                                                 .Style = GetXMLAttribute(Found, CDef_Node, "style", "")
                                             End With
                                         End With
-                                    Case "sitesection"
-                                        '
-                                        '-------------------------------------------------------------------------------------------------
-                                        ' Site Sections
-                                        '-------------------------------------------------------------------------------------------------
-                                        '
-                                    Case "dynamicmenu"
-                                        '
-                                        '-------------------------------------------------------------------------------------------------
-                                        ' Dynamic Menus
-                                        '-------------------------------------------------------------------------------------------------
-                                        '
+                                    'Case "sitesection"
+                                    '    '
+                                    '    '-------------------------------------------------------------------------------------------------
+                                    '    ' Site Sections
+                                    '    '-------------------------------------------------------------------------------------------------
+                                    '    '
+                                    'Case "dynamicmenu"
+                                    '    '
+                                    '    '-------------------------------------------------------------------------------------------------
+                                    '    ' Dynamic Menus
+                                    '    '-------------------------------------------------------------------------------------------------
+                                    '    '
                                     Case "pagecontent"
                                         '
                                         '-------------------------------------------------------------------------------------------------

@@ -461,7 +461,7 @@ Namespace Contensive.Core
                     '
                     Call cpCore.htmlDoc.enableOutputBuffer(True)
                     cpCore.docOpen = True
-                    Call webServerIO_setResponseContentType("text/html")
+                    Call setResponseContentType("text/html")
                     '
                     '--------------------------------------------------------------------------
                     ' ----- Process QueryString to cpcore.doc.main_InStreamArray
@@ -501,7 +501,7 @@ Namespace Contensive.Core
                         '
                         webServerIO_BlockClosePageCopyright = True
                         webServerIO_OutStreamDevice = htmlDocController.htmlDoc_OutStreamJavaScript ' refactor - these should just be setContentType as a string so developers can set whatever
-                        Call webServerIO_setResponseContentType("application/javascript") ' refactor -- this should be setContentType
+                        Call setResponseContentType("application/javascript") ' refactor -- this should be setContentType
                         '
                         ' Add the cpcore.main_ServerReferrer QS to the cpcore.doc.main_InStreamArray()
                         '
@@ -706,7 +706,7 @@ Namespace Contensive.Core
                             If genericController.vbInstr(1, cpCore.domains.domainDetails.forwardUrl, "://") = 0 Then
                                 cpCore.domains.domainDetails.forwardUrl = "http://" & cpCore.domains.domainDetails.forwardUrl
                             End If
-                            Call webServerIO_Redirect2(cpCore.domains.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domains.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this URL", False)
+                            Call redirect(cpCore.domains.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domains.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this URL", False)
                             Return cpCore.docOpen
                         ElseIf (cpCore.domains.domainDetails.typeId = 3) And (cpCore.domains.domainDetails.forwardDomainId <> 0) And (cpCore.domains.domainDetails.forwardDomainId <> cpCore.domains.domainDetails.id) Then
                             '
@@ -721,7 +721,7 @@ Namespace Contensive.Core
                                     '
                                     cpCore.domains.domainDetails.forwardUrl = Mid(requestLinkSource, 1, pos - 1) & forwardDomain & Mid(requestLinkSource, pos + Len(requestDomain))
                                     'main_domainForwardUrl = genericController.vbReplace(main_ServerLinkSource, cpcore.main_ServerHost, forwardDomain)
-                                    Call webServerIO_Redirect2(cpCore.domains.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domains.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this replacement domain", False)
+                                    Call redirect(cpCore.domains.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domains.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this replacement domain", False)
                                     Return cpCore.docOpen
                                 End If
                                 '                                cpcore.main_domainForwardUrl = "http://"
@@ -881,9 +881,9 @@ Namespace Contensive.Core
                         '
                         Copy = "Redirecting to domain [" & webServerIO_requestDomain & "] because this site is configured to run on the current domain [" & requestDomain & "]"
                         If requestQueryString <> "" Then
-                            Call webServerIO_Redirect2(webServerIO_requestProtocol & webServerIO_requestDomain & webServerIO_requestPath & webServerIO_requestPage & "?" & requestQueryString, Copy, False)
+                            Call redirect(webServerIO_requestProtocol & webServerIO_requestDomain & webServerIO_requestPath & webServerIO_requestPage & "?" & requestQueryString, Copy, False)
                         Else
-                            Call webServerIO_Redirect2(webServerIO_requestProtocol & webServerIO_requestDomain & webServerIO_requestPath & webServerIO_requestPage, Copy, False)
+                            Call redirect(webServerIO_requestProtocol & webServerIO_requestDomain & webServerIO_requestPath & webServerIO_requestPage, Copy, False)
                         End If
                         cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
                         Return cpCore.docOpen
@@ -930,7 +930,7 @@ Namespace Contensive.Core
                         '
                         'Call AppendLog("main_init(), 2510 - exit for redirect")
                         '
-                        Call webServerIO_Redirect2(RedirectLink, RedirectReason, IsPageNotFound)
+                        Call redirect(RedirectLink, RedirectReason, IsPageNotFound)
                         cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
                         Return cpCore.docOpen
                     End If
@@ -1167,19 +1167,19 @@ Namespace Contensive.Core
         '
         '
         '
-        Public Sub web_setResponseStatus(status As String)
+        Public Sub setResponseStatus(status As String)
             webServerIO_bufferResponseStatus = status
         End Sub
         '
         '
         '
-        Public Sub webServerIO_setResponseContentType(ContentType As Object)
+        Public Sub setResponseContentType(ContentType As Object)
             webServerIO_bufferContentType = CStr(ContentType)
         End Sub
         '
         '
         '
-        Public Sub web_addResponseHeader(HeaderName As Object, HeaderValue As Object)
+        Public Sub addResponseHeader(HeaderName As Object, HeaderValue As Object)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SetStreamHeader")
             '
             If cpCore.docOpen Then
@@ -1196,7 +1196,7 @@ Namespace Contensive.Core
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_SetStreamHeader")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_SetStreamHeader")
             '
         End Sub
         '
@@ -1207,7 +1207,7 @@ ErrorTrap:
         ''' <param name="NonEncodedLink"></param>
         ''' <param name="RedirectReason"></param>
         ''' <param name="IsPageNotFound"></param>
-        Public Sub webServerIO_Redirect2(ByVal NonEncodedLink As String, ByVal RedirectReason As String, ByVal IsPageNotFound As Boolean)
+        Public Sub redirect(ByVal NonEncodedLink As String, ByVal RedirectReason As String, ByVal IsPageNotFound As Boolean)
             Try
                 Const rnRedirectCycleFlag = "cycleFlag"
                 Dim EncodedLink As String
@@ -1260,7 +1260,7 @@ ErrorTrap:
                             ' -- Verbose - do not redirect, just print the link
                             EncodedLink = NonEncodedLink
                         Else
-                            Call web_setResponseStatus("404 Not Found")
+                            Call setResponseStatus("404 Not Found")
                         End If
                     Else
 
@@ -1300,7 +1300,7 @@ ErrorTrap:
         End Sub
         '
         '
-        Public Sub webServerIO_FlushStream()
+        Public Sub flushStream()
             If (iisContext IsNot Nothing) Then
                 iisContext.Response.Flush()
             End If
@@ -1309,7 +1309,7 @@ ErrorTrap:
 
         ' main_Get the Head innerHTML for any page
         '
-        Public Function webServerIO_GetHTMLInternalHead(ByVal main_IsAdminSite As Boolean) As String
+        Public Function getHTMLInternalHead(ByVal main_IsAdminSite As Boolean) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetHTMLInternalHead")
             '
             'If Not (true) Then Exit Function
@@ -1331,7 +1331,7 @@ ErrorTrap:
             Dim VirtualFilename As String
             Dim Ext As String
             '
-            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<!-- main_GetHTMLInternalHead called out of order. It must follow a content call, such as pageManager_GetHtmlBody, main_GetSectionPage, and main_GetContentPage -->"
+            getHTMLInternalHead = getHTMLInternalHead & cr & "<!-- main_GetHTMLInternalHead called out of order. It must follow a content call, such as pageManager_GetHtmlBody, main_GetSectionPage, and main_GetContentPage -->"
             '
             ' stylesheets first -- for performance
             ' put stylesheets inline without processing
@@ -1340,14 +1340,14 @@ ErrorTrap:
                 '
                 ' reset styles
                 '
-                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & webServerIO_requestDomain & "/ccLib/styles/ccreset.css"" >"
+                getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & webServerIO_requestDomain & "/ccLib/styles/ccreset.css"" >"
             End If
-            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""/ccLib/Styles/" & defaultStyleFilename & """>"
+            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""/ccLib/Styles/" & defaultStyleFilename & """>"
             If Not main_IsAdminSite Then
                 '
                 ' site styles
                 '
-                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, "templates/styles.css") & """ >"
+                getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, "templates/styles.css") & """ >"
             End If
             '
             ' Template shared styles
@@ -1361,11 +1361,11 @@ ErrorTrap:
                     If Files(Ptr) <> "" Then
                         Parts = Split(Files(Ptr) & "<<", "<")
                         If Parts(1) <> "" Then
-                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & genericController.decodeHtml(Parts(1))
+                            getHTMLInternalHead = getHTMLInternalHead & cr & genericController.decodeHtml(Parts(1))
                         End If
-                        webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, Parts(0)) & """ >"
+                        getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, Parts(0)) & """ >"
                         If Parts(2) <> "" Then
-                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & genericController.decodeHtml(Parts(2))
+                            getHTMLInternalHead = getHTMLInternalHead & cr & genericController.decodeHtml(Parts(2))
                         End If
                         'End If
                     End If
@@ -1375,13 +1375,13 @@ ErrorTrap:
             ' Template exclusive styles
             '
             If cpCore.htmlDoc.main_MetaContent_TemplateStyleSheetTag <> "" Then
-                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cpCore.htmlDoc.main_MetaContent_TemplateStyleSheetTag
+                getHTMLInternalHead = getHTMLInternalHead & cpCore.htmlDoc.main_MetaContent_TemplateStyleSheetTag
             End If
             '
             ' Page Styles
             '
             If cpCore.htmlDoc.main_MetaContent_StyleSheetTags <> "" Then
-                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cpCore.htmlDoc.main_MetaContent_StyleSheetTags
+                getHTMLInternalHead = getHTMLInternalHead & cpCore.htmlDoc.main_MetaContent_StyleSheetTags
                 cpCore.htmlDoc.main_MetaContent_StyleSheetTags = ""
             End If
             '
@@ -1396,17 +1396,17 @@ ErrorTrap:
             '
             Copy = cpCore.main_GetLastMetaTitle()
             If Copy <> "" Then
-                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<title>" & Copy & "</title>"
+                getHTMLInternalHead = getHTMLInternalHead & cr & "<title>" & Copy & "</title>"
             End If
             '
             Copy = cpCore.main_GetLastMetaKeywordList()
             If Copy <> "" Then
-                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<meta name=""keywords"" content=""" & Copy & """ >"
+                getHTMLInternalHead = getHTMLInternalHead & cr & "<meta name=""keywords"" content=""" & Copy & """ >"
             End If
             '
             Copy = cpCore.main_GetLastMetaDescription()
             If Copy <> "" Then
-                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<meta name=""description"" content=""" & Copy & """ >"
+                getHTMLInternalHead = getHTMLInternalHead & cr & "<meta name=""description"" content=""" & Copy & """ >"
             End If
             '
             ' favicon
@@ -1418,13 +1418,13 @@ ErrorTrap:
                     Ext = genericController.vbLCase(Mid(VirtualFilename, Pos))
                     Select Case Ext
                         Case ".ico"
-                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/vnd.microsoft.icon"" href=""" & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
+                            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""icon"" type=""image/vnd.microsoft.icon"" href=""" & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
                         Case ".png"
-                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/png"" href=""" & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
+                            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""icon"" type=""image/png"" href=""" & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
                         Case ".gif"
-                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/gif"" href=""" & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
+                            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""icon"" type=""image/gif"" href=""" & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
                         Case ".jpg"
-                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/jpg"" href=""" & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
+                            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""icon"" type=""image/jpg"" href=""" & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
                     End Select
                 End If
             End If
@@ -1433,7 +1433,7 @@ ErrorTrap:
             '
             Dim encoding As String
             encoding = cpCore.htmlDoc.html_EncodeHTML(cpCore.siteProperties.getText("Site Character Encoding", "utf-8"))
-            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead _
+            getHTMLInternalHead = getHTMLInternalHead _
                 & OtherHeadTags _
                 & cr & "<meta http-equiv=""content-type"" content=""text/html; charset=" & encoding & """ >" _
                 & cr & "<meta http-equiv=""content-language"" content=""en-us"" >" _
@@ -1446,7 +1446,7 @@ ErrorTrap:
             ' no-follow
             '
             If webServerIO_response_NoFollow Then
-                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead _
+                getHTMLInternalHead = getHTMLInternalHead _
                     & cr & "<meta name=""robots"" content=""nofollow"" >" _
                     & cr & "<meta name=""mssmarttagspreventparsing"" content=""true"" >"
             End If
@@ -1459,27 +1459,27 @@ ErrorTrap:
                 ' no base in admin site
                 '
             ElseIf BaseHref <> "" Then
-                If cpCore.web_RefreshQueryString <> "" Then
-                    BaseHref = BaseHref & "?" & cpCore.web_RefreshQueryString
+                If cpCore.htmlDoc.refreshQueryString <> "" Then
+                    BaseHref = BaseHref & "?" & cpCore.htmlDoc.refreshQueryString
                 End If
-                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<base href=""" & BaseHref & """ >"
+                getHTMLInternalHead = getHTMLInternalHead & cr & "<base href=""" & BaseHref & """ >"
             End If
             '
             ' Head Javascript -- (should be) last for performance
             '
-            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead _
+            getHTMLInternalHead = getHTMLInternalHead _
                 & cr & "<script language=""JavaScript"" type=""text/javascript""  src=""" & webServerIO_requestProtocol & webServerIO_requestDomain & "/ccLib/ClientSide/Core.js""></script>" _
                 & ""
             If cpCore.htmlDoc.main_HeadScriptCnt > 0 Then
                 For Ptr = 0 To cpCore.htmlDoc.main_HeadScriptCnt - 1
                     With cpCore.htmlDoc.main_HeadScripts(Ptr)
                         If (.addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
-                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<!-- from " & .addedByMessage & " -->"
+                            getHTMLInternalHead = getHTMLInternalHead & cr & "<!-- from " & .addedByMessage & " -->"
                         End If
                         If Not .IsLink Then
-                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<script Language=""JavaScript"" type=""text/javascript"">" & .Text & cr & "</script>"
+                            getHTMLInternalHead = getHTMLInternalHead & cr & "<script Language=""JavaScript"" type=""text/javascript"">" & .Text & cr & "</script>"
                         Else
-                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<script type=""text/javascript"" src=""" & .Text & """></script>"
+                            getHTMLInternalHead = getHTMLInternalHead & cr & "<script type=""text/javascript"" src=""" & .Text & """></script>"
                         End If
                     End With
                 Next
@@ -1493,7 +1493,7 @@ ErrorTrap:
                 If Left(OtherHeadTags, 2) <> vbCrLf Then
                     OtherHeadTags = vbCrLf & OtherHeadTags
                 End If
-                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & genericController.vbReplace(OtherHeadTags, vbCrLf, cr)
+                getHTMLInternalHead = getHTMLInternalHead & genericController.vbReplace(OtherHeadTags, vbCrLf, cr)
             End If
             '
             Exit Function
