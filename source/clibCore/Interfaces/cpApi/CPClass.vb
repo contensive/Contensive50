@@ -150,7 +150,7 @@ Namespace Contensive.Core
         Public Function executeAddon(addonNameOrGuid As String, Optional addonContext As Contensive.BaseClasses.CPUtilsBaseClass.addonContext = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple) As String
             Dim result As String = ""
             Try
-                result = core.addon.execute_legacy4(addonNameOrGuid, core.getLegacyOptionStringFromVar(), addonContext, Nothing)
+                result = core.addon.execute_legacy4(addonNameOrGuid, core.docProperties.getLegacyOptionStringFromVar(), addonContext, Nothing)
             Catch ex As Exception
                 Site.ErrorReport(ex, "Unexpected error in cp.executeRoute()")
             End Try

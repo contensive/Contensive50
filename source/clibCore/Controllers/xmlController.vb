@@ -849,7 +849,7 @@ ErrorTrap:
             ' ****************************** if cdef not loaded, this fails
             '
             appName = cpCore.serverConfig.appConfig.name
-            MenuContentID = cpCore.GetRecordID("Content", "Navigator Entries")
+            MenuContentID = cpCore.db.getRecordID("Content", "Navigator Entries")
             dt = cpCore.db.executeSql("select * from ccMenuEntries where (contentcontrolid=" & MenuContentID & ")and(name<>'')")
             If dt.Rows.Count > 0 Then
                 NavIconType = 0
@@ -924,7 +924,7 @@ ErrorTrap:
             '
             ' ****************************** if cdef not loaded, this fails
             '
-            MenuContentID = cpCore.GetRecordID("Content", "Menu Entries")
+            MenuContentID = cpCore.db.getRecordID("Content", "Menu Entries")
             rs = cpCore.db.executeSql("select * from ccMenuEntries where (contentcontrolid=" & MenuContentID & ")and(name<>'')")
             If (isDataTableOk(rs)) Then
                 If True Then

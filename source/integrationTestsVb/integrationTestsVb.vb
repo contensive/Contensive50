@@ -448,16 +448,16 @@ Namespace integrationTests
             ' arrange
             ' act
             ' assert
-            Assert.AreEqual("", coreClass.encodeSqlTableName(""))
-            Assert.AreEqual("", coreClass.encodeSqlTableName("-----"))
-            Assert.AreEqual("", coreClass.encodeSqlTableName("01234567879"))
-            Assert.AreEqual("a", coreClass.encodeSqlTableName("a"))
-            Assert.AreEqual("aa", coreClass.encodeSqlTableName("a a"))
-            Assert.AreEqual("aA", coreClass.encodeSqlTableName(" aA"))
-            Assert.AreEqual("aA", coreClass.encodeSqlTableName(" aA "))
-            Assert.AreEqual("aA", coreClass.encodeSqlTableName("aA "))
-            Assert.AreEqual("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", coreClass.encodeSqlTableName("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"))
-            Assert.AreEqual("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@#", coreClass.encodeSqlTableName("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@#"))
+            Assert.AreEqual("", dbController.encodeSqlTableName(""))
+            Assert.AreEqual("", dbController.encodeSqlTableName("-----"))
+            Assert.AreEqual("", dbController.encodeSqlTableName("01234567879"))
+            Assert.AreEqual("a", dbController.encodeSqlTableName("a"))
+            Assert.AreEqual("aa", dbController.encodeSqlTableName("a a"))
+            Assert.AreEqual("aA", dbController.encodeSqlTableName(" aA"))
+            Assert.AreEqual("aA", dbController.encodeSqlTableName(" aA "))
+            Assert.AreEqual("aA", dbController.encodeSqlTableName("aA "))
+            Assert.AreEqual("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", dbController.encodeSqlTableName("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+            Assert.AreEqual("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@#", dbController.encodeSqlTableName("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@#"))
             '
         End Sub
     End Class

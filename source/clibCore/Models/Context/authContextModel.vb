@@ -100,7 +100,7 @@ Namespace Contensive.Core.Models.Context
                         Dim user_changes As Boolean = False
                         Dim main_appNameCookiePrefix As String
                         '
-                        main_appNameCookiePrefix = genericController.vbLCase(cpCore.main_encodeCookieName(cpCore.serverConfig.appConfig.name))
+                        main_appNameCookiePrefix = genericController.vbLCase(genericController.main_encodeCookieName(cpCore.serverConfig.appConfig.name))
                         '
                         resultAuthContext = New authContextModel
                         'resultAuthContext.visit = New Models.Entity.visitModel
@@ -955,7 +955,7 @@ Namespace Contensive.Core.Models.Context
                         '
                         ' Authenticated and not admin or developer
                         '
-                        ContentID = cpCore.main_GetContentID(ContentName)
+                        ContentID = cpCore.metaData.getContentId(ContentName)
                         Call getContentAccessRights_NonAdminByContentId(cpCore, ContentID, returnAllowEdit, returnAllowAdd, returnAllowDelete, "")
                     End If
                 End If
@@ -1216,7 +1216,7 @@ Namespace Contensive.Core.Models.Context
         Public Function isAuthenticatedMember(cpCore As coreClass) As Boolean
             Dim result As Boolean = False
             Try
-                result = visit.VisitAuthenticated And (cpCore.IsWithinContent(user.ContentControlID, cpCore.main_GetContentID("members")))
+                result = visit.VisitAuthenticated And (cpCore.IsWithinContent(user.ContentControlID, cpCore.metaData.getContentId("members")))
                 'If (Not property_user_isMember_isLoaded) And (visit_initialized) Then
                 '    property_user_isMember = isAuthenticated() And cpCore.IsWithinContent(user.ContentControlID, cpCore.main_GetContentID("members"))
                 '    property_user_isMember_isLoaded = True

@@ -17,7 +17,7 @@ Namespace Contensive.Core.Controllers
     ''' when cleared, loads on demand
     '''  combines a key ptr index and a value store, referenced by ptr
     ''' </summary>
-    Public Class cacheKeyPtrController
+    Public Class keyPtrIndexController
         '
         ' ----- objects passed in constructor, do not dispose
         '

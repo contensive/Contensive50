@@ -35,7 +35,7 @@ Namespace Contensive.Core
         ' -- application storage
         '
         Friend deleteOnDisposeFileList As New List(Of String)               ' tmp file list of files that need to be deleted during dispose
-        Friend exceptionList As List(Of String)                             ' exceptions collected during document construction
+        Friend errList As List(Of String)                                   ' exceptions collected during document construction
         '
         ' -- state, authentication, authorization
         ' -- these are set id=0 at construction, then initialize if authentication used
@@ -45,456 +45,68 @@ Namespace Contensive.Core
         ' -- Debugging
         '
         Private appStopWatch As Stopwatch = Stopwatch.StartNew()
-        Public app_startTime As Date                                   ' set in constructor
-        Public app_startTickCount As Integer = 0
-        Public debug_allowDebugLog As Boolean = False                             ' turn on in script -- use to write /debug.log in content files for whatever is needed
-        Public blockExceptionReporting As Boolean = False                   ' used so error reporting can not call itself
-        Public app_errorCount As Integer = 0
-        Public debug_iUserError As String = ""                              ' User Error String
-        Public html_PageErrorWithoutCsv As Boolean = False  ' if true, the error occurred before Csv was available and main_TrapLogMessage needs to be saved and popedup
-        Public main_TrapLogMessage As String = ""        ' The content of the current traplog (keep for popups if no Csv)
-        Public main_ClosePageCounter As Integer = 0
-        Public html_BlockClosePageLink As Boolean = False      ' if true,block the href to contensive
-        Public main_testPointMessage As String = ""          '
-        Public testPointPrinting As Boolean = False    ' if true, send main_TestPoint messages to the stream
-        '
-        Public docOpen As Boolean = False                                   ' when false, routines should not add to the output and immediately exit
-        '
+        Public Property app_startTime As Date                                        ' set in constructor
+        Public Property app_startTickCount As Integer = 0
+        Public Property debug_allowDebugLog As Boolean = False                       ' turn on in script -- use to write /debug.log in content files for whatever is needed
+        Public Property blockExceptionReporting As Boolean = False                   ' used so error reporting can not call itself
+        Public Property app_errorCount As Integer = 0
+        Public Property debug_iUserError As String = ""                              ' User Error String
+        Public Property html_PageErrorWithoutCsv As Boolean = False                  ' if true, the error occurred before Csv was available and main_TrapLogMessage needs to be saved and popedup
+        Public Property main_TrapLogMessage As String = ""                           ' The content of the current traplog (keep for popups if no Csv)
+        Public Property main_ClosePageCounter As Integer = 0
+        Public Property html_BlockClosePageLink As Boolean = False                   ' if true,block the href to contensive
+        Public Property main_testPointMessage As String = ""                         '
+        Public Property testPointPrinting As Boolean = False                         ' if true, send main_TestPoint messages to the stream
+        Public Property docOpen As Boolean = False                                   ' when false, routines should not add to the output and immediately exit
         Public Const cache_linkAlias_cacheName = "cache_linkAlias"
-        Public cache_linkAlias As String(,)
-        Public cache_linkAliasCnt As Integer = 0
-        Public cache_linkAlias_NameIndex As keyPtrController
-        Public cache_linkAlias_PageIdQSSIndex As keyPtrController
-        '-
-        '-----------------------------------------------------------------------
-        '-----------------------------------------------------------------------
-        '-----------------------------------------------------------------------
-        '-----------------------------------------------------------------------
+        Public Property cache_linkAlias As String(,)
+        Public Property cache_linkAliasCnt As Integer = 0
+        Public Property cache_linkAlias_NameIndex As keyPtrController
+        Public Property cache_linkAlias_PageIdQSSIndex As keyPtrController
         '
         '========================================================================================================================
         '   Internal cache (for content used to run the system)
-        '========================================================================================================================
         '
-        ' ----- cache styleAddonRules
-        '
-        'Public cache_addonStyleRules As coreCacheKeyPtrClass
-        'Public Class styleAddonRuleClass
-        '    Public addonId As Integer
-        '    Public styleId As Integer
-        'End Class
-        'Public Class cache_sharedStylesAddonRulesClass
-        '    Public rule As List(Of styleAddonRuleClass)
-        '    Public addonIdIndex As keyPtrIndexClass
-        'End Class
-        'Private cache_styleAddonRules As New cache_sharedStylesAddonRulesClass
-        '
-        ' ----- addonIncludeRules
-        '
-        <Serializable()>
-        Public Class addonIncludeRulesClass
-            Public item As String(,)
-            Public itemCnt As Integer = 0
-            Public addonIdIndex As keyPtrController
-        End Class
-        Public cache_addonIncludeRules As addonIncludeRulesClass
-        '
-        ' ----- libraryFiles
-        '
-        Public cache_libraryFiles As String(,)
-        Public cache_libraryFilesCnt As Integer = 0
-        Public cache_libraryFilesIdIndex As keyPtrController
-        '
-        ' ----- linkForwward
-        '
-        Public cache_linkForward As String = ""
-        '
-        '
-        ' should have been userTypeEnum
-        ' only for main_GetFormInputWysiwig - to be deprecated anyway
-        Private Enum main_EditorUserScopeEnum
-            ' should have been userTypeAdministrator, etc
-            Administrator = 1
-            ContentManager = 2
-            PublicUser = 3
-        End Enum
-        '
-        ' should have been contentTypeEnum
-        Private Enum main_EditorContentScopeEnum
-            ' should have been contentTypePage
-            Page = 1
-            pagetemplate = 2
-            Email = 3
-            EmailTemplate = 4
-        End Enum
-        '
-        Private main_PleaseWaitStarted As Boolean = False
-        ''
-        '' file systems
-        ''
-        'Public Property serverFiles As coreFileSystemClass           ' files written directly to the local server
-        ''Public Property appRootFiles As coreFileSystemClass         ' wwwRoot path for the app server, both local and scale modes
-        'Public Property privateFiles As coreFileSystemClass         ' path not available to web interface, local: physcial storage location, scale mode mirror location
-        'Public Property cdnFiles As coreFileSystemClass             ' file uploads etc. Local mode this should point to appRoot folder (or a virtual folder in appRoot). Scale mode it goes to an s3 mirror
-        '
-        ' SF Resize Algorithms
-        '
-        Public Enum csv_SfImageResizeAlgorithms
-            Box = 0
-            Triangle = 1
-            Hermite = 2
-            Bell = 3
-            BSpline = 4
-            Lanczos3 = 5
-            Mitchell = 6
-            Stretch = 7
-        End Enum
-        '
-        '
-        Private csv_DynamicMenuACSelect As String = ""
-        Private csv_DynamicFormACSelect As String = ""
-        ''
-        ''------------------------------------------------------------------------
-        ''   SQL Timeouts
-        ''------------------------------------------------------------------------
-        ''
-        'Private csv_SQLTimeout As Integer
-        'Private csv_SlowSQLThreshholdMSec As Integer
-        ''
-        ''------------------------------------------------------------------------
-        '' ----- Table Schema caching to speed up update
-        ''------------------------------------------------------------------------
-        ''
-        'Private Structure app.tableSchemaClass
-        '    Dim TableName As String
-        '    Dim Dirty As Boolean
-        '    Dim ColumnCount As Integer
-        '    Dim ColumnName() As String
-        '    Dim IndexCount As Integer
-        '    Dim IndexName() As String
-        '    Dim IndexFieldName() As String
-        'End Structure
-        'Private app.tableSchemaCount As Integer
-        'Private app.tableSchema() As app.tableSchemaClass
+        Public Property upgradeInProgress() As Boolean
+        Private Property main_PleaseWaitStarted As Boolean = False
         '
         '------------------------------------------------------------------------
         ' ----- Debugging
-        '------------------------------------------------------------------------
         '
-        ' ##### this was removed, but I put it back because we -forgot- that csv_ClearBake was required, and we spent too
-        '       much time figuring out why a change to a record did not clear the bake. An argument was added to
-        '       app.csv_SaveCSRecord to block the csv_ClearBake. If someone needs to prevent the clearing, this needs to be set
-        'Private Const app.csv_AllowAutocsv_ClearContentTimeStamp = True    ' Trial removal - put back
-
-        '
-        Public csv_ConnectionHandleLocal As Integer = 0              ' Local storage for connection handle established when appServices opened
-        Public csv_ConnectionID As Integer = 0                     ' Random number (semi) unique to this hit
-        '
-        '
-        '================================================================================
-        '   (NOT thread safe)
-        '   a list of addons that have already been executed during this csv-lifetime.
-        '   - used to prevent javascript and styles from being added to cpCoreClass twice
-        '================================================================================
-        '
-        Friend addonsRunOnThisPageIdList As New List(Of Integer)
-        'Private csv_addon.addon_execute_AddonsRunOnThisPageIdList As String = ""
-        '
-        '================================================================================
-        '   (NOT thread safe)
-        '   a list of addons currently running.
-        '       - appended each time an addon is run
-        '       - append removed when the addon exits
-        '================================================================================
-        '
-        Friend addonsCurrentlyRunningIdList As New List(Of Integer)
-        'Private csv_addon.addon_execute_AddonsCurrentlyRunningIdList As String = ""
-        ''
-        '' deprecated - here for compatibiity
-        ''
-        'Structure csv_DataSourceConnType
-        '    Dim Conn As Connection
-        '    Dim IsOpen As Boolean
-        '    Dim Type As Integer
-        'End Structure
-        ''
-        ''------------------------------------------------------------------------
-        '' ----- app.csv_ContentSet Storage
-        ''------------------------------------------------------------------------
-        ''
-        ''Const csv_DefaultPageSize = 9999
-        '''
-        'Private app.csv_ContentSet() As ContentSetType2
-        'Public app.csv_ContentSetCount As Integer       ' The number of elements being used
-        'Public app.csv_ContentSetSize As Integer        ' The number of current elements in the array
-        'Const app.csv_ContentSetChunk = 50              ' How many are added at a time
-        ''
-        '' when true, all app.csOpen, etc, will be setup, but not return any data (app.csv_IsCSOK false)
-        '' this is used to generate the app.csv_ContentSet.Source so we can run a app.csv_GetContentRows without first opening a recordset
-        ''
-        'Private csv_OpenCSWithoutRecords As Boolean
-        '
-        '------------------------------------------------------------------------
-        ' ----- Build Version
-        '------------------------------------------------------------------------
-        '
-        '  Private csv_Private_DataBuildVersion As String = ""          ' From ccSetup, set to ccLib version strin. If not matched, randomize BuildKey
-        '
-        '------------------------------------------------------------------------
-        ' ----- Style Sheets
-        '------------------------------------------------------------------------
-        '
+        Public Property csv_ConnectionID As Integer = 0                     ' Random number (semi) unique to this hit
+        Friend Property addonsRunOnThisPageIdList As New List(Of Integer)
+        Friend Property addonsCurrentlyRunningIdList As New List(Of Integer)
         Public Structure csv_stylesheetCacheType
             Dim templateId As Integer
             Dim EmailID As Integer
             Dim StyleSheet As String
         End Structure
-        Public csv_stylesheetCache() As csv_stylesheetCacheType
-        Public csv_stylesheetCacheCnt As Integer
-        'Private Private_StyleSheet_Loaded As Boolean
-        'Private Private_StyleSheet As String
-        '
-        'Private Private_StyleSheetProcessed_Loaded As Boolean
-        'Private Private_StyleSheetProcessed As String
-        '
-        '------------------------------------------------------------------------
-        ' ----- Database Upgrade Flag
-        '       (mimicked as Public Property)
-        '------------------------------------------------------------------------
-        '
-        'Private csv_UpgradeInProgressLocal As Boolean    ' When true, currently upgrading (concurancy issue)
-        'Private new_loadCdefCache_loadContentEngineContentEngineInProcess As Boolean
-        '
-        '------------------------------------------------------------------------
-        '   Sort Method temp storage
-        '------------------------------------------------------------------------
-        '
-        'Private structure csv_SortMethodsType
-        '    Id as integer
-        '    Method As String
-        'end  structure
-        ''
-
-        ''
-        ''------------------------------------------------------------------------
-        '' ----- Stream
-        ''       This storage controls the csv_WriteStream method
-        ''------------------------------------------------------------------------
-        ''
-        'Private csv_StreamListSize As Integer          ' size of csv_StreamList()
-        'Private web_StreamListCount As Integer         ' valid entries in csv_StreamList
-        'Private web_StreamList() As String        ' Set with csv_OpenStream/csv_CloseStream - if non-empty, writes stream appends here
-        '
-        ' ----- ContentField Type
-        '       Stores information about fields in a content set
-        '
-        Private Structure ContentSetWriteCacheType
-            Dim Name As String
-            Dim Caption As String
-            Dim ValueVariant As Object
-            Dim fieldType As Integer
-            Dim Changed As Boolean                  ' If true, the next app.csv_SaveCSRecord will save this field
-        End Structure
-
-        '
-        ' ----- app.csv_ContentSet Type
-        '       Stores pointers to open recordsets of content being used by the page
-        '
-        Private Structure ContentSetType2
-            Dim IsOpen As Boolean                   ' If true, it is in use
-            Dim LastUsed As Date                    ' The date/time this app.csv_ContentSet was last used
-            Dim Updateable As Boolean               ' Can not update an app.csv_OpenCSSQL because Fields are not accessable
-            Dim NewRecord As Boolean                ' true if it was created here
-            'ContentPointer as integer              ' Pointer to the content for this Set
-            Dim ContentName As String
-            Dim CDef As cdefModel
-            Dim OwnerMemberID As Integer               ' ID of the member who opened the app.csv_ContentSet
-            '
-            ' Workflow editing modes
-            '
-            Dim WorkflowAuthoringMode As Boolean    ' if true, these records came from the AuthoringTable, else ContentTable
-            Dim WorkflowEditingRequested As Boolean ' if true, the CS was opened requesting WorkflowEditingMode
-            Dim WorkflowEditingMode As Boolean      ' if true, the current record can be edited, else just rendered (effects EditBlank and app.csv_SaveCSRecord)
-            '
-            ' ----- Write Cache
-            '
-            Dim writeCacheChanged As Boolean          ' if true, writeCache contains changes
-            Dim writeCache() As ContentSetWriteCacheType ' array of fields buffered for this set
-            Dim writeCacheSize As Integer                ' the total number of fields in the row
-            Dim writeCacheCount As Integer               ' the number of field() values to write
-            Dim IsModified As Boolean               ' Set when CS is opened and if a save happens
-            '
-            ' ----- Recordset used to retrieve the results
-            '
-            'dim dt as datatable                        ' The Recordset
-            'RSOpen As Boolean                   ' true if the recordset is open
-            'EOF As Boolean                      ' if true, Row is empty and at end of records
-            ' ##### new way 4/19/2004
-            '   readCache stores only the current row
-            '   RS holds all other rows
-            '   app.csv_cs_getRow returns the readCache
-            '   app.csv_NextCSRecord saves the difference between the readCache and the writeCache, and movesnext, inc ResultachePointer
-            '   csv_LoadreadCache stores the current RS row to the readCache
-            '
-            '
-            ' ##### old way
-            ' Storage for the RecordSet results (future)
-            '       Result - refers to the entire set of rows the the SQL (Source) returns
-            '       readCache - the block of records currently stored in member (readCacheTop to readCacheTop+PageSize-1)
-            '       readCache is initially loaded with PageSize records, starting on page PageNumber
-            '       app.csv_NextCSRecord increments readCacheRowPtr
-            '           If readCacheRowPtr > readCacheRowCnt-1 then csv_LoadreadCache
-            '       EOF true if ( readCacheRowPtr > readCacheRowCnt-1 ) and ( readCacheRowCnt < PageSize )
-            '
-            Dim Source As String                    ' Holds the SQL that created the result set
-            Dim DataSource As String                ' The Datasource of the SQL that created the result set
-            Dim PageSize As Integer                    ' Number of records in a cache page
-            Dim PageNumber As Integer                  ' The Page that this result starts with
-            '
-            ' ----- Read Cache
-            '
-            Dim fieldNames() As String       ' 1-D array of the result field names
-            Dim ResultColumnCount As Integer           ' number of columns in the fieldNames and readCache
-            'deprecated, but leave here for the test - useMultiRowCache
-            Dim ResultEOF As Boolean                ' readCache is at the last record
-            '
-            ' ----- Read Cache
-            '
-            Dim readCache As String(,)            ' 2-D array of the result rows/columns
-            Dim readCacheRowCnt As Integer         ' number of rows in the readCache
-            Dim readCacheRowPtr As Integer         ' Pointer to the current result row, first row is 0, BOF is -1
-            '
-            ' converted array to dictionary - Dim FieldPointer As Integer                ' Used for GetFirstField, GetNextField, etc
-            '
-            Dim SelectTableFieldList As String      ' comma delimited list of all fields selected, in the form table.field
-            'Rows as object                     ' getRows read during csv_InitContentSetResult
-        End Structure
-        ''
-        '' $$$$$ remove this after testing - just for binary compatibility
-        ''
-        'public structure app.csv_ContentSetType
-        '    IsOpen As Boolean                   ' If true, it is in use
-        '    LastUsed As Date = New Date().MinValue                    ' The date/time this app.csv_ContentSet was last used
-        '    Updateable As Boolean               ' Can not update an app.csv_OpenCSSQL because Fields are not accessable
-        '    NewRecord As Boolean                ' true if it was created here
-        '    'ContentPointer as integer              ' Pointer to the content for this Set
-        '    ContentName As String
-        '    CDef As CDefType
-        '    OwnerMemberID as integer               ' ID of the member who opened the app.csv_ContentSet
-        '    '
-        '    ' Workflow editing modes
-        '    '
-        '    WorkflowAuthoringMode As Boolean    ' if true, these records came from the AuthoringTable, else ContentTable
-        '    WorkflowEditingRequested As Boolean ' if true, the CS was opened requesting WorkflowEditingMode
-        '    WorkflowEditingMode As Boolean      ' if true, the current record can be edited, else just rendered (effects EditBlank and app.csv_SaveCSRecord)
-        '    '
-        '    ' ----- Write Cache
-        '    '
-        '    RowCacheChanged As Boolean          ' if true, RowCache contains changes
-        '    RowCache() As app.csv_ContentSetRowCacheType ' array of fields buffered for this set
-        '    RowCacheSize as integer                ' the total number of fields in the row
-        '    RowCacheCount as integer               ' the number of field() values to write
-        '    IsModified As Boolean               ' Set when CS is opened and if a save happens
-        '    '
-        '    ' ----- Recordset used to retrieve the results
-        '    '
-        '    RS as datatable                        ' The Recordset
-        '    'RSOpen As Boolean                   ' true if the recordset is open
-        '    'EOF As Boolean                      ' if true, Row is empty and at end of records
-        '    ' ##### new way 4/19/2004
-        '    '   ResultCache stores only the current row
-        '    '   RS holds all other rows
-        '    '   app.csv_cs_getRow returns the ResultCache
-        '    '   app.csv_NextCSRecord saves the difference between the ResultCache and the RowCache, and movesnext, inc ResultachePointer
-        '    '   csv_LoadResultCache stores the current RS row to the ResultCache
-        '    '
-        '    '
-        '    ' ##### old way
-        '    ' Storage for the RecordSet results (future)
-        '    '       Result - refers to the entire set of rows the the SQL (Source) returns
-        '    '       ResultCache - the block of records currently stored in member (ResultCacheTop to ResultCacheTop+PageSize-1)
-        '    '       ResultCache is initially loaded with PageSize records, starting on page PageNumber
-        '    '       app.csv_NextCSRecord increments ResultCachePointer
-        '    '           If ResultCachePointer > ResultCacheRowCount-1 then csv_LoadResultCache
-        '    '       EOF true if ( ResultCachePointer > ResultCacheRowCount-1 ) and ( ResultCacheRowCount < PageSize )
-        '    '
-        '    Source As String                    ' Holds the SQL that created the result set
-        '    DataSource As String                ' The Datasource of the SQL that created the result set
-        '    PageSize as integer                    ' Number of records in a cache page
-        '    PageNumber as integer                  ' The Page that this result starts with
-        '    '
-        '    ' ----- Read Cache
-        '    '
-        '    fieldNames() As String       ' 1-D array of the result field names
-        '    ResultColumnCount as integer           ' number of columns in the fieldNames and ResultCacheValues
-        '    ResultEOF As Boolean                ' Resultcache is at the last record
-        '    ResultCacheValues() as object      ' 2-D array of the result rows/columns
-        '    ResultCacheRowCount as integer         ' number of rows in the ResultCacheValues
-        '    ResultCachePointer as integer          ' Pointer to the current result row, if 0, this is BOF
-        '    '
-        '    FieldPointer as integer                ' Used for GetFirstField, GetNextField, etc
-        '    '
-        '    SelectTableFieldList As String      ' comma delimited list of all fields selected, in the form table.field
-        'end  structure
-        '
-        ' Cache for csv_CreateSQLTable, to keep one instance of CS from creating the same table many times
-        '
-        Private csv_CreateSQLTable_CreatedList As String = ""
-        '
-        ' Storage for csv_GetDefaultValue() and \cclib\Config\DefaultValues.txt file
-        '
-        Private DefaultValues As String = ""
-        Private DefaultValueArray() As String
-        Private DefaultValueArrayCnt As Integer
-        '
-        ' Attributes collected while composing content -
-        '   These need to be added to the page or email after the content is complete.
-        '   pages - after each encode content call, get these and add them into the page
-        '   email - after the email is encoded, add these in
-        '
-
-        Private web_EncodeContent_JavascriptOnLoad_Cnt As Integer
-        Private web_EncodeContent_JavascriptOnLoad() As String
-        '
-        Private web_EncodeContent_JSFilename_Cnt As Integer
-        Private web_EncodeContent_JSFilename() As String
-        '
-        Friend web_EncodeContent_JavascriptBodyEnd_cnt As Integer
-        Friend web_EncodeContent_JavascriptBodyEnd() As String
-        '
-        Friend web_EncodeContent_StyleFilenames_Cnt As Integer
-        Friend web_EncodeContent_StyleFilenames() As String
-        '
-        Friend web_EncodeContent_HeadTags As String = ""
-        '
-        ' storage moved here from main - if addon move to csv is successful, this will stay
-        '
-        Public pageManager_PageAddonCnt As Integer = 0
+        Public Property csv_stylesheetCache As csv_stylesheetCacheType()
+        Public Property csv_stylesheetCacheCnt As Integer
+        Private Property web_EncodeContent_JavascriptOnLoad_Cnt As Integer
+        Private Property web_EncodeContent_JavascriptOnLoad As String()
+        Private Property web_EncodeContent_JSFilename_Cnt As Integer
+        Private Property web_EncodeContent_JSFilename As String()
+        Friend Property web_EncodeContent_JavascriptBodyEnd_cnt As Integer
+        Friend Property web_EncodeContent_JavascriptBodyEnd As String()
+        Friend Property web_EncodeContent_StyleFilenames_Cnt As Integer
+        Friend Property web_EncodeContent_StyleFilenames As String()
+        Friend Property web_EncodeContent_HeadTags As String = ""
+        Public Property pageManager_PageAddonCnt As Integer = 0
         '
         '===================================================================================================
-        ''' <summary>
-        ''' addonCache object
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public ReadOnly Property cache_addonStyleRules() As cacheKeyPtrController
+        Public ReadOnly Property addonStyleRulesIndex() As keyPtrIndexController
             Get
                 If (_cache_addonStyleRules Is Nothing) Then
-                    _cache_addonStyleRules = New cacheKeyPtrController(Me, cacheNameAddonStyleRules, sqlAddonStyles, "shared style add-on rules,add-ons,shared styles")
+                    _cache_addonStyleRules = New keyPtrIndexController(Me, cacheNameAddonStyleRules, sqlAddonStyles, "shared style add-on rules,add-ons,shared styles")
                 End If
                 Return _cache_addonStyleRules
             End Get
         End Property
-        Private _cache_addonStyleRules As cacheKeyPtrController = Nothing
+        Private _cache_addonStyleRules As keyPtrIndexController = Nothing
         '
         '===================================================================================================
-        ''' <summary>
-        ''' addonCache object
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public ReadOnly Property dataSources() As Dictionary(Of String, Models.Entity.dataSourceModel)
+        Public ReadOnly Property dataSourceDictionary() As Dictionary(Of String, Models.Entity.dataSourceModel)
             Get
                 If (_dataSources Is Nothing) Then
                     _dataSources = Models.Entity.dataSourceModel.getNameDict(Me)
@@ -505,12 +117,6 @@ Namespace Contensive.Core
         Private _dataSources As Dictionary(Of String, Models.Entity.dataSourceModel) = Nothing
         '
         '===================================================================================================
-        ''' <summary>
-        ''' email controller
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
         Public ReadOnly Property email As emailController
             Get
                 If (_email Is Nothing) Then
@@ -522,12 +128,6 @@ Namespace Contensive.Core
         Private _email As emailController
         '
         '===================================================================================================
-        ''' <summary>
-        ''' pageManager - too many page link tie-ins to make it a real addon. Code internal to handle models, then call it with an addon
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
         Public ReadOnly Property pages As pagesController
             Get
                 If (_pages Is Nothing) Then
@@ -539,12 +139,6 @@ Namespace Contensive.Core
         Private _pages As pagesController
         '
         '===================================================================================================
-        ''' <summary>
-        ''' menuFlyout
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
         Public ReadOnly Property menuTab As menuTabController
             Get
                 If (_menuTab Is Nothing) Then
@@ -556,12 +150,6 @@ Namespace Contensive.Core
         Private _menuTab As menuTabController
         '
         '===================================================================================================
-        ''' <summary>
-        ''' menuFlyout
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
         Public ReadOnly Property htmlDoc As Controllers.htmlDocController
             Get
                 If (_htmlDoc Is Nothing) Then
@@ -573,12 +161,6 @@ Namespace Contensive.Core
         Private _htmlDoc As Controllers.htmlDocController
         '
         '===================================================================================================
-        ''' <summary>
-        ''' menuFlyout
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
         Public ReadOnly Property addon As Controllers.addonController
             Get
                 If (_addon Is Nothing) Then
@@ -590,12 +172,6 @@ Namespace Contensive.Core
         Private _addon As Controllers.addonController
         '
         '===================================================================================================
-        ''' <summary>
-        ''' menuFlyout
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
         Public ReadOnly Property menuFlyout As menuFlyoutController
             Get
                 If (_menuFlyout Is Nothing) Then
@@ -607,12 +183,6 @@ Namespace Contensive.Core
         Private _menuFlyout As menuFlyoutController
         '
         '===================================================================================================
-        ''' <summary>
-        ''' userProperty
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
         Public ReadOnly Property userProperty As propertyModelClass
             Get
                 If (_userProperty Is Nothing) Then
@@ -624,12 +194,6 @@ Namespace Contensive.Core
         Private _userProperty As propertyModelClass
         '
         '===================================================================================================
-        ''' <summary>
-        ''' visitorProperty
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
         Public ReadOnly Property visitorProperty As propertyModelClass
             Get
                 If (_visitorProperty Is Nothing) Then
@@ -641,12 +205,6 @@ Namespace Contensive.Core
         Private _visitorProperty As propertyModelClass
         '
         '===================================================================================================
-        ''' <summary>
-        ''' visitProperty
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
         Public ReadOnly Property visitProperty As propertyModelClass
             Get
                 If (_visitProperty Is Nothing) Then
@@ -658,46 +216,6 @@ Namespace Contensive.Core
         Private _visitProperty As propertyModelClass
         '
         '===================================================================================================
-        ''' <summary>
-        ''' webServer
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public ReadOnly Property webServer As webServerController
-            Get
-                If (_webServer Is Nothing) Then
-                    _webServer = New webServerController(Me)
-                End If
-                Return _webServer
-            End Get
-        End Property
-        Private _webServer As webServerController
-        '
-        '===================================================================================================
-        ''' <summary>
-        ''' security object
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public ReadOnly Property security() As securityController
-            Get
-                If (_security Is Nothing) Then
-                    _security = New securityController(Me, serverConfig.appConfig.privateKey)
-                End If
-                Return _security
-            End Get
-        End Property
-        Private _security As securityController = Nothing
-        '
-        '===================================================================================================
-        ''' <summary>
-        ''' docProperties object
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
         Public ReadOnly Property docProperties() As docPropertyController
             Get
                 If (_doc Is Nothing) Then
@@ -710,11 +228,44 @@ Namespace Contensive.Core
         '
         '===================================================================================================
         ''' <summary>
-        ''' appRootFiles object
+        ''' siteProperties object
         ''' </summary>
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
+        Public ReadOnly Property siteProperties() As Models.Context.siteContextModel
+            Get
+                If (_siteProperties Is Nothing) Then
+                    _siteProperties = New Models.Context.siteContextModel(Me)
+                End If
+                Return _siteProperties
+            End Get
+        End Property
+        Private _siteProperties As Models.Context.siteContextModel = Nothing
+        '
+        '===================================================================================================
+        Public ReadOnly Property webServer As webServerController
+            Get
+                If (_webServer Is Nothing) Then
+                    _webServer = New webServerController(Me)
+                End If
+                Return _webServer
+            End Get
+        End Property
+        Private _webServer As webServerController
+        '
+        '===================================================================================================
+        Public ReadOnly Property security() As securityController
+            Get
+                If (_security Is Nothing) Then
+                    _security = New securityController(Me, serverConfig.appConfig.privateKey)
+                End If
+                Return _security
+            End Get
+        End Property
+        Private _security As securityController = Nothing
+        '
+        '===================================================================================================
         Public ReadOnly Property appRootFiles() As fileController
             Get
                 If (_appRootFiles Is Nothing) Then
@@ -738,12 +289,6 @@ Namespace Contensive.Core
         Private _appRootFiles As fileController = Nothing
         '
         '===================================================================================================
-        ''' <summary>
-        ''' serverFiles object
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
         Public ReadOnly Property serverFiles() As fileController
             Get
                 If (_serverFiles Is Nothing) Then
@@ -763,12 +308,6 @@ Namespace Contensive.Core
         Private _serverFiles As fileController = Nothing
         '
         '===================================================================================================
-        ''' <summary>
-        ''' privateFiles object
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
         Public ReadOnly Property privateFiles() As fileController
             Get
                 If (_privateFiles Is Nothing) Then
@@ -792,12 +331,6 @@ Namespace Contensive.Core
         Private _privateFiles As fileController = Nothing
         '
         '===================================================================================================
-        ''' <summary>
-        ''' privateFiles object
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
         Public ReadOnly Property programDataFiles() As fileController
             Get
                 If (_programDataFiles Is Nothing) Then
@@ -812,12 +345,6 @@ Namespace Contensive.Core
         Private _programDataFiles As fileController = Nothing
         '
         '===================================================================================================
-        ''' <summary>
-        ''' privateFiles object
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
         Public ReadOnly Property programFiles() As fileController
             Get
                 If (_programFiles Is Nothing) Then
@@ -831,12 +358,6 @@ Namespace Contensive.Core
         Private _programFiles As fileController = Nothing
         '
         '===================================================================================================
-        ''' <summary>
-        ''' cdnFiles object
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
         Public ReadOnly Property cdnFiles() As fileController
             Get
                 If (_cdnFiles Is Nothing) Then
@@ -860,13 +381,7 @@ Namespace Contensive.Core
         Private _cdnFiles As fileController = Nothing
         '
         '===================================================================================================
-        ''' <summary>
-        ''' addonCache object
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public ReadOnly Property addonCache() As Models.Entity.addonLegacyModel
+        Public ReadOnly Property addonLegacyCache() As Models.Entity.addonLegacyModel
             Get
                 If (_addonCache Is Nothing) Then
                     _addonCache = New Models.Entity.addonLegacyModel(Me)
@@ -883,7 +398,7 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property domains() As Models.Entity.domainLegacyModel
+        Public ReadOnly Property domainLegacyCache() As Models.Entity.domainLegacyModel
             Get
                 If (_domains Is Nothing) Then
                     _domains = New Models.Entity.domainLegacyModel(Me)
@@ -894,12 +409,6 @@ Namespace Contensive.Core
         Private _domains As Models.Entity.domainLegacyModel = Nothing
         '
         '===================================================================================================
-        ''' <summary>
-        ''' JSON serialize/deserialize client
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
         Public ReadOnly Property json() As System.Web.Script.Serialization.JavaScriptSerializer
             Get
                 If (_json Is Nothing) Then
@@ -911,29 +420,6 @@ Namespace Contensive.Core
         Private _json As System.Web.Script.Serialization.JavaScriptSerializer
         '
         '===================================================================================================
-        ''' <summary>
-        ''' siteProperties object
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public ReadOnly Property siteProperties() As Models.Context.siteContextModel
-            Get
-                If (_siteProperties Is Nothing) Then
-                    _siteProperties = New Models.Context.siteContextModel(Me)
-                End If
-                Return _siteProperties
-            End Get
-        End Property
-        Private _siteProperties As Models.Context.siteContextModel = Nothing
-        '
-        '===================================================================================================
-        ''' <summary>
-        ''' returns the cache object.
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
         Public ReadOnly Property workflow() As workflowController
             Get
                 If (_workflow Is Nothing) Then
@@ -945,12 +431,6 @@ Namespace Contensive.Core
         Private _workflow As workflowController = Nothing
         '
         '===================================================================================================
-        ''' <summary>
-        ''' returns the cache object.
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
         Public ReadOnly Property cache() As Controllers.cacheController
             Get
                 If (_cache Is Nothing) Then
@@ -961,23 +441,18 @@ Namespace Contensive.Core
         End Property
         Private _cache As Controllers.cacheController = Nothing
         '
-        Public ReadOnly Property metaData As cdefController
+        '===================================================================================================
+        Public ReadOnly Property metaData As metaDataController
             Get
                 If _metaData Is Nothing Then
-                    _metaData = New cdefController(Me)
+                    _metaData = New metaDataController(Me)
                 End If
                 Return _metaData
             End Get
         End Property
-        Private _metaData As cdefController = Nothing
+        Private _metaData As metaDataController = Nothing
         '
         '===================================================================================================
-        ''' <summary>
-        ''' a lazy constructed instance of the application db controller -- use to access the application's database
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks>_app created duirng init(), after cp.context() is loaded</remarks>
         Public ReadOnly Property db As dbController
             Get
                 If (_db Is Nothing) Then
@@ -989,12 +464,6 @@ Namespace Contensive.Core
         Private _db As dbController
         '
         '===================================================================================================
-        ''' <summary>
-        ''' a lazy constructed instance of the db server controller -- used by the application dbs, and to create new catalogs
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks>_app created duirng init(), after cp.context() is loaded</remarks>
         Public ReadOnly Property dbServer As dbEngineController
             Get
                 If (_dbEngine Is Nothing) Then
@@ -1167,17 +636,17 @@ Namespace Contensive.Core
                         ' if route is a remote method, use it
                         '
                         routeTest = workingRoute
-                        Dim addonPtr As Integer = addonCache.getPtr(routeTest)
+                        Dim addonPtr As Integer = addonLegacyCache.getPtr(routeTest)
                         If addonPtr >= 0 Then
-                            If addonCache.addonCache.addonList(addonPtr.ToString).remoteMethod Then
+                            If addonLegacyCache.addonCache.addonList(addonPtr.ToString).remoteMethod Then
                                 addonRoute = routeTest
                             End If
                         Else
                             If (InStr(routeTest, "/", CompareMethod.Text) = 1) Then
                                 routeTest = routeTest.Substring(1)
-                                addonPtr = addonCache.getPtr(routeTest)
+                                addonPtr = addonLegacyCache.getPtr(routeTest)
                                 If addonPtr >= 0 Then
-                                    If addonCache.addonCache.addonList(addonPtr.ToString).remoteMethod Then
+                                    If addonLegacyCache.addonCache.addonList(addonPtr.ToString).remoteMethod Then
                                         addonRoute = routeTest
                                     End If
                                 End If
@@ -1431,7 +900,7 @@ Namespace Contensive.Core
                                             End If
                                             Call visitProperty.setProperty(PropertyName, PropertyValue)
                                         Next
-                                        returnResult = main_FormatRemoteQueryOutput(gd, RemoteFormatEnum.RemoteFormatJsonNameValue)
+                                        returnResult = remoteQueryController.main_FormatRemoteQueryOutput(Me, gd, RemoteFormatEnum.RemoteFormatJsonNameValue)
                                         returnResult = htmlDoc.main_encodeHTML(returnResult)
                                         Call htmlDoc.writeAltBuffer(returnResult)
                                     Case AjaxGetVisitProperty
@@ -1458,14 +927,14 @@ Namespace Contensive.Core
                                             End If
                                             gd.row(0).Cell(Ptr).v = visitProperty.getText(PropertyName, PropertyValue)
                                         Next
-                                        returnResult = main_FormatRemoteQueryOutput(gd, RemoteFormatEnum.RemoteFormatJsonNameValue)
+                                        returnResult = remoteQueryController.main_FormatRemoteQueryOutput(Me, gd, RemoteFormatEnum.RemoteFormatJsonNameValue)
                                         returnResult = htmlDoc.main_encodeHTML(returnResult)
                                         Call htmlDoc.writeAltBuffer(returnResult)
                                     Case AjaxData
                                         '
                                         ' 7/7/2009 - Moved from HardCodedPages - Run remote query from cj.remote object call, and return results html encoded in a <result></result> block
                                         ' 20050427 - not used
-                                        Call htmlDoc.writeAltBuffer(init_ProcessAjaxData())
+                                        Call htmlDoc.writeAltBuffer(executeRoute_ProcessAjaxData())
                                     Case AjaxPing
                                         '
                                         ' returns OK if the server is alive
@@ -1707,7 +1176,7 @@ Namespace Contensive.Core
                                         '
                                         ' ----- Active Editor
                                         '
-                                        Call main_ProcessActiveEditor()
+                                        Call editorController.processActiveEditor(Me)
                                 End Select
                             End If
                         End If
@@ -1783,670 +1252,378 @@ Namespace Contensive.Core
                     End If
                 End If
             Catch ex As Exception
-                handleExceptionLegacyRow2(ex, "cpCoreClass", System.Reflection.MethodInfo.GetCurrentMethod.Name, "Unexpected Exception")
+                Call handleExceptionAndContinue(ex)
             End Try
             Return returnResult
         End Function
-        ''
-        '' ----- Get a DataSource ID from its Name
-        ''       If it is not found, -1 is returned (for system datasource)
-        ''
-        'Public Function csv_GetDataSourceID(ByVal DataSourceName As String) As Integer
-        '    Return app.csv_GetDataSourceID(DataSourceName)
-        'End Function
-        ''
-        '' ----- Get a DataSource type (SQL Server, etc) from its Name
-        ''
-        'Public Function app.csv_GetDataSourceType(ByVal DataSourceName As String) As Integer
-        '    Return app.csv_GetDataSourceType(DataSourceName)
-        'End Function
-        '    On Error GoTo ErrorTrap: 'Const Tn = "MethodName-026": 'Dim th as integer: th = profileLogMethodEnter(Tn)
-        '    '
-        '    Dim DataSourcePointer as integer
-        '    '
-        '            DataSourcePointer = app.csv_GetDataSourcePointer(DataSourceName)
-        '    If app.dataSources.length > 0 Then
-        '                If Not app.DataSourceConnectionObjs(DataSourcePointer).IsOpen Then
-        '                    Call app.csv_OpenDataSource(DataSourceName, 30)
-        '                End If
-        '                csv_GetDataSourceType = app.DataSourceConnectionObjs(DataSourcePointer).Type
-        '    End If
-        '    '
-        '    Exit Function
-        '    '
-        '    ' ----- Error Trap
-        '    '
-        'ErrorTrap:
-        '    Call csv_HandleClassTrapError(Err.Number, Err.Source, Err.Description, "csv_GetDataSourceType", True)
-        'End Function
-        ''
-        '' ----- Get a DataSource default cursor location
-        ''
-        'Private Function csv_GetDataSourceDefaultCursorLocation(DataSourceName As String) as integer
-        '    On Error GoTo ErrorTrap: 'Const Tn = "GetDataSourceDefaultCursorLocation": 'Dim th as integer: th = profileLogMethodEnter(Tn)
-        '    '
-        '    Dim DataSourcePointer as integer
-        '    '
-        '            DataSourcePointer = app.csv_GetDataSourcePointer(DataSourceName)
-        '    If app.dataSources.length > 0 Then
-        '                If Not app.DataSourceConnectionObjs(DataSourcePointer).IsOpen Then
-        '                    Call app.csv_OpenDataSource(DataSourceName, 30)
-        '                End If
-        '                csv_GetDataSourceDefaultCursorLocation = app.DataSourceConnectionObjs(DataSourcePointer).DefaultCursorLocation
-        '    End If
-        '    '
-        '    Exit Function
-        '    '
-        '    ' ----- Error Trap
-        '    '
-        'ErrorTrap:
-        '    Call csv_HandleClassTrapError(Err.Number, Err.Source, Err.Description, "csv_GetDataSourceDefaultCursorLocation", True)
-        'End Function
-
         '
-        '========================================================================
-        ' Get a tables first ContentID from Tablename
-        '========================================================================
-        '
-        Public Function GetContentIDByTablename(TableName As String) As Integer
-            On Error GoTo ErrorTrap 'Const Tn = "MethodName-028" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim MethodName As String
-            Dim SQL As String
-            Dim CS As Integer
-            '
-            MethodName = "csv_GetContentIDByTablename"
-            '
-            GetContentIDByTablename = -1
-            If TableName <> "" Then
-                SQL = "select ContentControlID from " & TableName & " where contentcontrolid is not null order by contentcontrolid;"
-                CS = db.cs_openCsSql_rev("Default", SQL, 1, 1)
-                If db.cs_ok(CS) Then
-                    GetContentIDByTablename = db.cs_getInteger(CS, "ContentControlID")
+        '==========================================================================================
+        ''' <summary>
+        ''' Generic handle exception. Determines method name and class of caller from stack. 
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="ex"></param>
+        ''' <param name="cause"></param>
+        ''' <param name="stackPtr">How far down in the stack to look for the method error. Pass 1 if the method calling has the error, 2 if there is an intermediate routine.</param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Sub handleException(ByVal ex As Exception, ByVal cause As String, stackPtr As Integer)
+            If (Not _handlingExceptionRecursionBlock) Then
+                _handlingExceptionRecursionBlock = True
+                Dim frame As StackFrame = New StackFrame(stackPtr)
+                Dim method As System.Reflection.MethodBase = frame.GetMethod()
+                Dim type As System.Type = method.DeclaringType()
+                Dim methodName As String = method.Name
+                Dim errMsg As String = type.Name & "." & methodName & ", cause=[" & cause & "], ex=[" & ex.ToString & "]"
+                '
+                ' append to application event log
+                '
+                Dim sSource As String = "Contensive"
+                Dim sLog As String = "Application"
+                Dim eventId As Integer = 1001
+                Try
+                    '
+                    ' if command line has been run on this server, this will work. Otherwise skip
+                    '
+                    EventLog.WriteEntry(sSource, errMsg, EventLogEntryType.Error, eventId)
+                Catch exEvent As Exception
+                    ' ignore error. Can be caused if source has not been created. It is created automatically in command line installation util.
+                End Try
+                '
+                ' append to daily trace log
+                '
+                logController.appendLog(Me, errMsg)
+                '
+                ' add to doc exception list to display at top of webpage
+                '
+                If errList Is Nothing Then
+                    errList = New List(Of String)
                 End If
-                Call db.cs_Close(CS)
+                If errList.Count = 10 Then
+                    errList.Add("Exception limit exceeded")
+                ElseIf errList.Count < 10 Then
+                    errList.Add(errMsg)
+                End If
+                '
+                ' write consol for debugging
+                '
+                Console.WriteLine(errMsg)
+                '
+                _handlingExceptionRecursionBlock = False
             End If
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            handleExceptionAndContinue(New ApplicationException("Unexpected exception")) : Throw New ApplicationException("Unexpected exception")
-        End Function
+        End Sub
+        Private _handlingExceptionRecursionBlock As Boolean = False
         '
-        '========================================================================
-        ' app.csv_DeleteTableRecord
-        '========================================================================
-        '
-        Public Sub DeleteTableRecordChunks(ByVal DataSourceName As String, ByVal TableName As String, ByVal Criteria As String, Optional ByVal ChunkSize As Integer = 1000, Optional ByVal MaxChunkCount As Integer = 1000)
-            On Error GoTo ErrorTrap 'Const Tn = "MethodName-029" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim PreviousCount As Integer
-            Dim CurrentCount As Integer
-            Dim LoopCount As Integer
-            Dim SQL As String
-            Dim iChunkSize As Integer
-            Dim iChunkCount As Integer
-            'dim dt as datatable
-            Dim DataSourceType As Integer
-            '
-            DataSourceType = db.getDataSourceType(DataSourceName)
-            If (DataSourceType <> DataSourceTypeODBCSQLServer) And (DataSourceType <> DataSourceTypeODBCAccess) Then
-                '
-                ' If not SQL server, just delete them
-                '
-                Call db.DeleteTableRecords(TableName, Criteria, DataSourceName)
-            Else
-                '
-                ' ----- Clear up to date for the properties
-                '
-                iChunkSize = ChunkSize
-                If iChunkSize = 0 Then
-                    iChunkSize = 1000
-                End If
-                iChunkCount = MaxChunkCount
-                If iChunkCount = 0 Then
-                    iChunkCount = 1000
-                End If
-                '
-                ' Get an initial count and allow for timeout
-                '
-                PreviousCount = -1
-                LoopCount = 0
-                CurrentCount = 0
-                SQL = "select count(*) as RecordCount from " & TableName & " where " & Criteria
-                Dim dt As DataTable
-                dt = db.executeSql(SQL)
-                If dt.Rows.Count > 0 Then
-                    CurrentCount = genericController.EncodeInteger(dt.Rows(0).Item(0))
-                End If
-                Do While (CurrentCount <> 0) And (PreviousCount <> CurrentCount) And (LoopCount < iChunkCount)
-                    If db.getDataSourceType(DataSourceName) = DataSourceTypeODBCMySQL Then
-                        SQL = "delete from " & TableName & " where id in (select ID from " & TableName & " where " & Criteria & " limit " & iChunkSize & ")"
-                    Else
-                        SQL = "delete from " & TableName & " where id in (select top " & iChunkSize & " ID from " & TableName & " where " & Criteria & ")"
-                    End If
-                    Call db.executeSql(SQL, DataSourceName)
-                    PreviousCount = CurrentCount
-                    SQL = "select count(*) as RecordCount from " & TableName & " where " & Criteria
-                    dt = db.executeSql(SQL)
-                    If dt.Rows.Count > 0 Then
-                        CurrentCount = genericController.EncodeInteger(dt.Rows(0).Item(0))
-                    End If
-                    LoopCount = LoopCount + 1
-                Loop
-                If (CurrentCount <> 0) And (PreviousCount = CurrentCount) Then
-                    '
-                    ' records did not delete
-                    '
-                    Call Err.Raise(ignoreInteger, "dll", "Error deleting record chunks. No records were deleted and the process was not complete.")
-                ElseIf (LoopCount >= iChunkCount) Then
-                    '
-                    ' records did not delete
-                    '
-                    Call Err.Raise(ignoreInteger, "dll", "Error deleting record chunks. The maximum chunk count was exceeded while deleting records.")
-                End If
-            End If
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError4(Err.Number, Err.Source, Err.Description, "app.csv_DeleteTableRecordChunks", True)
+        Public Sub handleExceptionAndContinue(ByVal ex As Exception, ByVal cause As String)
+            Call handleException(ex, cause, 2)
         End Sub
         '
-        '========================================================================
-        ' Get a string that can be used in the where criteria of a SQL statement
-        ' opening the content pointed to by the content pointer. This criteria
-        ' will include both the content, and its child contents.
-        '========================================================================
+        Public Sub handleExceptionAndContinue(ByVal ex As Exception)
+            Call handleException(ex, "n/a", 2)
+        End Sub
         '
-        Public Function content_getContentControlCriteria(ByVal ContentName As String) As String
-            On Error GoTo ErrorTrap 'Const Tn = "MethodName-032" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim MethodName As String
-            Dim CDef As cdefModel
-            '
-            MethodName = "csv_GetContentControlCriteria"
-            '
-            CDef = metaData.getCdef(ContentName)
-            content_getContentControlCriteria = CDef.ContentControlCriteria
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            handleExceptionAndContinue(New ApplicationException("Unexpected exception")) : Throw New ApplicationException("Unexpected exception") ' handleLegacyError4(Err.Number, Err.Source, Err.Description, MethodName, True)
-        End Function
-        '
-        '=============================================================================
-        '   Update the content fields for all definitions that match this table
-        '=============================================================================
-        '
-        Public Sub content_CreateContentFieldsFromSQLTable(ByVal DataSourceName As String, ByVal TableName As String)
-            On Error GoTo ErrorTrap 'Const Tn = "MethodName-036" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            'Dim RSTargetTable as datatable
-            ''Dim RSContent as datatable
-            'Dim RSContentField as datatable
-            '
-            Dim SQL As String
-            Dim DateAdded As Date = Date.MinValue
-            Dim CreateKey As Integer
-            ' converted array to dictionary - Dim FieldPointer As Integer
-            Dim ContentID As Integer
-            Dim BlankRecordID As Integer
-            Dim MethodName As String
-            Dim ContentName As String
-            Dim TableFieldName As String
-            ' Dim StateOfAllowContentAutoLoad As Boolean
-            '
-            MethodName = "csv_CreateContentFieldsFromSQLTable"
-            '
-            'StateOfAllowContentAutoLoad = app.AllowContentAutoLoad
-            'app.AllowContentAutoLoad = False
-            '
-            ' ----- Get the content definition (must already be created)
-            '
-            SQL = "SELECT ccContent.Name AS ContentName, ccTables.Name AS TableName, ccContent.ID AS ContentID" _
-                & " FROM ccContent LEFT JOIN ccTables ON ccContent.ContentTableID = ccTables.ID" _
-                & " WHERE ccTables.Name=" & db.encodeSQLText(TableName) & ";"
-            Const dtColumnContentName As Integer = 0
-            Const dtColumnTableName As Integer = 1
-            Const dtColumnContentId As Integer = 2
-            '
-            Dim dt As DataTable
-            dt = db.executeSql(SQL)
-            If dt.Rows.Count = 0 Then
-                Throw (New ApplicationException("No Content Definition could be found for records in table [" & TableName & "]")) ' handleLegacyError25(MethodName, (""))
-            Else
+        '====================================================================================================
+        ''' <summary>
+        ''' cpCoreClass constructor common tasks.
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <remarks></remarks>
+        Private Sub constructorInitialize()
+            Try
                 '
-                '----------------------------------------------------------------
-                ' Read in a record from the table to get fields
-                '----------------------------------------------------------------
+                app_startTickCount = GetTickCount
+                CPTickCountBase = GetTickCount
+                main_ClosePageCounter = 0
+                debug_allowDebugLog = True
+                app_startTime = DateTime.Now()
+                testPointPrinting = True
                 '
-                SQL = db.GetSQLSelect("default", TableName, , , , , 1)
-                'If csv_GetDataSourceType(DataSourceName) = DataSourceTypeODBCMySQL Then
-                '    SQL = "select * from " & TableName & " limit 1"
-                'Else
-                '    SQL = "select top 1 * from " & TableName & ";"
-                'End If
-                Dim dtTargetTable As DataTable = db.executeSql(SQL, DataSourceName)
-                If dtTargetTable.Rows.Count = 0 Then
-                    '
-                    ' --- no records were found, add a blank if we can
-                    '
-                    DateAdded = DateTime.Now()
-                    CreateKey = genericController.getRandomLong()
-                    SQL = "INSERT INTO " & TableName & " (CreateKey,DateAdded" _
-                        & ")VALUES(" _
-                        & " " & db.encodeSQLNumber(CreateKey) _
-                        & "," & db.encodeSQLDate(DateAdded) _
-                        & ");"
-                    Call db.executeSql(SQL, DataSourceName)
-                    SQL = db.GetSQLSelect("default", TableName, "ID", "DateAdded=" & db.encodeSQLDate(DateAdded) & " AND CreateKey=" & db.encodeSQLNumber(CreateKey))
-                    dtTargetTable = db.executeSql(SQL, DataSourceName)
-                    If dtTargetTable.Rows.Count = 0 Then
-                        Throw (New ApplicationException("Could not locate a new re   cord added to table [" & TableName & "]")) ' handleLegacyError25(MethodName, (""))
-                    Else
-                        BlankRecordID = genericController.EncodeInteger(dtTargetTable.Rows(0).Item("id"))
-                    End If
-                    SQL = db.GetSQLSelect("default", TableName, , , , , 1)
-                    dtTargetTable = db.executeSql(SQL, DataSourceName)
-                    If dtTargetTable.Rows.Count = 0 Then
-                        Throw (New ApplicationException("Could not open a record to table [" & TableName & "].")) ' handleLegacyError25(MethodName, (""))
-                    End If
+                ' -- attempt auth load
+                If (serverConfig.appConfig Is Nothing) Then
+                    authContext = Models.Context.authContextModel.create(Me, False)
                 Else
+                    authContext = Models.Context.authContextModel.create(Me, siteProperties.allowVisitTracking)
                     '
-                    '-----------------------------------------------------------
-                    ' --- Create the ccFields record for each content
-                    '-----------------------------------------------------------
-                    '
-                    For Each dr As DataRow In dtTargetTable.Rows
-                        'dr.Columns("")
-                        ContentName = genericController.encodeText(dt(dtColumnContentName))
-                        ContentID = genericController.EncodeInteger(dt(dtColumnContentId))
-                        For Each dc As DataColumn In dtTargetTable.Rows
-                            TableFieldName = dc.ColumnName
-                            SQL = "SELECT * FROM ccFields where (ContentID=" & ContentID & ")and(name=" & db.encodeSQLText(TableFieldName) & ")"
-                            Dim dtField As DataTable = db.executeSql(SQL, "Default")
-                            If dtField.Rows.Count = 0 Then
-                                Call db.createContentFieldFromTableField(ContentName, dc.ColumnName, genericController.EncodeInteger(dc.DataType))
-                                'Call CreateContentFieldFromTableField(ContentName, dc.ColumnName, genericController.EncodeInteger(dc.DataType))
-                            End If
-                        Next
-                    Next
+                    ' debug printed defaults on, so if not on, set it off and clear what was collected
+                    If Not visitProperty.getBoolean("AllowDebugging") Then
+                        testPointPrinting = False
+                        main_testPointMessage = ""
+                    End If
                 End If
+            Catch ex As Exception
+                Throw (ex)
+            End Try
+        End Sub
+        '
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' version for cpCore assembly
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Function codeVersion() As String
+            Dim myType As Type = GetType(coreClass)
+            Dim myAssembly As Assembly = Assembly.GetAssembly(myType)
+            Dim myAssemblyname As AssemblyName = myAssembly.GetName()
+            Dim myVersion As Version = myAssemblyname.Version
+            Return Format(myVersion.Major, "0") & "." & Format(myVersion.Minor, "00") & "." & Format(myVersion.Build, "00000000")
+        End Function
+
+        '
+        '==========================================================================================
+        ''' <summary>
+        ''' return an html ul list of each eception produced during this document.
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function getDocExceptionHtmlList() As String
+            Dim returnHtmlList As String = ""
+            Try
+                If Not errList Is Nothing Then
+                    If errList.Count > 0 Then
+                        For Each exMsg As String In errList
+                            returnHtmlList &= cr2 & "<li class=""ccExceptionListRow"">" & cr3 & htmlDoc.html_convertText2HTML(exMsg) & cr2 & "</li>"
+                        Next
+                        returnHtmlList = cr & "<ul class=""ccExceptionList"">" & returnHtmlList & cr & "</ul>"
+                    End If
+                End If
+            Catch ex As Exception
+                Throw (ex)
+            End Try
+            Return returnHtmlList
+        End Function
+
+
+
+
+
+        '
+        '====================================================================================================
+#Region " IDisposable Support "
+        '
+        ' this class must implement System.IDisposable
+        ' never throw an exception in dispose
+        ' Do not change or add Overridable to these methods.
+        ' Put cleanup code in Dispose(ByVal disposing As Boolean).
+        '====================================================================================================
+        '
+        Protected disposed As Boolean = False
+        '
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+            ' do not add code here. Use the Dispose(disposing) overload
+            Dispose(True)
+            GC.SuppressFinalize(Me)
+        End Sub
+        '
+        Protected Overrides Sub Finalize()
+            ' do not add code here. Use the Dispose(disposing) overload
+            Dispose(False)
+            MyBase.Finalize()
+        End Sub
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' dispose.
+        ''' </summary>
+        ''' <param name="disposing"></param>
+        Protected Overridable Overloads Sub Dispose(ByVal disposing As Boolean)
+            'Exit Sub
+
+            Dim SQL As String
+            Dim ViewingName As String
+            Dim CSMax As Integer
+            Dim PageID As Integer
+            Dim FieldNames As String
+            Dim Form As String
+            '
+            If Not Me.disposed Then
+                Me.disposed = True
+                If disposing Then
+                    '
+                    ' call .dispose for managed objects
+                    ' delete tmp files
+                    '
+                    If deleteOnDisposeFileList.Count > 0 Then
+                        For Each filename As String In deleteOnDisposeFileList
+                            privateFiles.deleteFile(filename)
+                        Next
+                    End If
+                    '
+                    ' ----- Block all output from underlying routines
+                    '
+                    blockExceptionReporting = True
+                    'docOpen = False
+                    Call doc_close()
+                    '
+                    ' content server object is valid
+                    '
+                    If (serverConfig.appConfig IsNot Nothing) Then
+                        If siteProperties.allowVisitTracking Then
+                            '
+                            ' If visit tracking, save the viewing record
+                            '
+                            ViewingName = Left(authContext.visit.ID & "." & authContext.visit.PageVisits, 10)
+                            PageID = pages.currentPageID
+                            FieldNames = "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,ContentControlID,pagetime,Active,CreateKey,RecordID"
+                            FieldNames = FieldNames & ",ExcludeFromAnalytics"
+                            FieldNames = FieldNames & ",pagetitle"
+                            SQL = "INSERT INTO ccViewings (" _
+                                & FieldNames _
+                                & ")VALUES(" _
+                                & " " & db.encodeSQLText(ViewingName) _
+                                & "," & db.encodeSQLNumber(authContext.visit.ID) _
+                                & "," & db.encodeSQLNumber(authContext.user.ID) _
+                                & "," & db.encodeSQLText(webServer.requestDomain) _
+                                & "," & db.encodeSQLText(webServer.webServerIO_requestPath) _
+                                & "," & db.encodeSQLText(webServer.webServerIO_requestPage) _
+                                & "," & db.encodeSQLText(Left(webServer.requestQueryString, 255)) _
+                                & "," & db.encodeSQLText(Left(Form, 255)) _
+                                & "," & db.encodeSQLText(Left(webServer.requestReferrer, 255)) _
+                                & "," & db.encodeSQLDate(app_startTime) _
+                                & "," & db.encodeSQLBoolean(authContext.visit_stateOK) _
+                                & "," & db.encodeSQLNumber(metaData.getContentId("Viewings")) _
+                                & "," & db.encodeSQLNumber(appStopWatch.ElapsedMilliseconds) _
+                                & ",1" _
+                                & "," & db.encodeSQLNumber(CSMax) _
+                                & "," & db.encodeSQLNumber(PageID)
+                            SQL &= "," & db.encodeSQLBoolean(webServer.webServerIO_PageExcludeFromAnalytics)
+                            SQL &= "," & db.encodeSQLText(htmlDoc.main_MetaContent_Title)
+                            SQL &= ");"
+                            Call db.executeSql(SQL)
+                            'Call db.executeSqlAsync(SQL)
+                        End If
+                    End If
+                    '
+                    ' ----- dispose objects created here
+                    '
+                    If Not (_addonCache Is Nothing) Then
+                        ' no dispose
+                        'Call _addonCache.Dispose()
+                        _addonCache = Nothing
+                    End If
+                    '
+                    If Not (_addon Is Nothing) Then
+                        Call _addon.Dispose()
+                        _addon = Nothing
+                    End If
+                    '
+                    If Not (_db Is Nothing) Then
+                        Call _db.Dispose()
+                        _db = Nothing
+                    End If
+                    '
+                    If Not (_metaData Is Nothing) Then
+                        Call _metaData.Dispose()
+                        _metaData = Nothing
+                    End If
+                    '
+                    If Not (_cache Is Nothing) Then
+                        Call _cache.Dispose()
+                        _cache = Nothing
+                    End If
+                    '
+                    If Not (_workflow Is Nothing) Then
+                        Call _workflow.Dispose()
+                        _workflow = Nothing
+                    End If
+                    '
+                    If Not (_siteProperties Is Nothing) Then
+                        ' no dispose
+                        'Call _siteProperties.Dispose()
+                        _siteProperties = Nothing
+                    End If
+                    '
+                    If Not (_json Is Nothing) Then
+                        ' no dispose
+                        'Call _json.Dispose()
+                        _json = Nothing
+                    End If
+                    ''
+                    'If Not (_user Is Nothing) Then
+                    '    ' no dispose
+                    '    'Call _user.Dispose()
+                    '    _user = Nothing
+                    'End If
+                    '
+                    If Not (_domains Is Nothing) Then
+                        ' no dispose
+                        'Call _domains.Dispose()
+                        _domains = Nothing
+                    End If
+                    '
+                    If Not (_doc Is Nothing) Then
+                        ' no dispose
+                        'Call _doc.Dispose()
+                        _doc = Nothing
+                    End If
+                    '
+                    If Not (_security Is Nothing) Then
+                        ' no dispose
+                        'Call _security.Dispose()
+                        _security = Nothing
+                    End If
+                    '
+                    If Not (_webServer Is Nothing) Then
+                        ' no dispose
+                        'Call _webServer.Dispose()
+                        _webServer = Nothing
+                    End If
+                    '
+                    If Not (_menuFlyout Is Nothing) Then
+                        ' no dispose
+                        'Call _menuFlyout.Dispose()
+                        _menuFlyout = Nothing
+                    End If
+                    '
+                    If Not (_visitProperty Is Nothing) Then
+                        ' no dispose
+                        'Call _visitProperty.Dispose()
+                        _visitProperty = Nothing
+                    End If
+                    '
+                    If Not (_visitorProperty Is Nothing) Then
+                        ' no dispose
+                        'Call _visitorProperty.Dispose()
+                        _visitorProperty = Nothing
+                    End If
+                    '
+                    If Not (_userProperty Is Nothing) Then
+                        ' no dispose
+                        'Call _userProperty.Dispose()
+                        _userProperty = Nothing
+                    End If
+                    '
+                    If Not (_db Is Nothing) Then
+                        Call _db.Dispose()
+                        _db = Nothing
+                    End If
+                    '
+                    If Not (_metaData Is Nothing) Then
+                        _metaData.Dispose()
+                        _metaData = Nothing
+                    End If
+                End If
+                '
+                ' cleanup non-managed objects
+                '
             End If
-            '
-            ' ----- Load CDef
-            '
-            If (Not upgradeInProgress) Then
-                cache.invalidateAll()
-                metaData.clear()
-            End If
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError4(Err.Number, Err.Source, Err.Description, MethodName, True)
         End Sub
-
-        '
-        '========================================================================
-        '   Get Content Definitions in XML format
-        '========================================================================
-        '
-        Public Function GetXMLContentDefinition3(Optional ByVal ContentName As String = "", Optional ByVal IncludeBaseFields As Boolean = False) As String
-            On Error GoTo ErrorTrap 'Const Tn = "MethodName-046" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim MethodName As String
-            Dim XML As xmlController
-            '
-            MethodName = "csv_GetXMLContentDefinition3"
-            '
-            XML = New xmlController(Me)
-            GetXMLContentDefinition3 = XML.GetXMLContentDefinition3(ContentName, IncludeBaseFields)
-            XML = Nothing
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            XML = Nothing
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError4(Err.Number, Err.Source, Err.Description, MethodName, True)
-        End Function
+#End Region        '
 
 
-        '
-        '========================================================================
-        ' ----- Get FieldDescritor from FieldType
-        '========================================================================
-        '
-        Public Function GetSQLAlterColumnType(ByVal DataSourceName As String, ByVal fieldType As Integer) As String
-            Return db.getSQLAlterColumnType(DataSourceName, fieldType)
-        End Function
-        '        '
-        '========================================================================
-        ' ----- Get FieldType from ADO Field Type
-        '========================================================================
-        '
-        Private Function GetFieldTypeByADOType(ByVal ADOFieldType As Integer) As Integer
-            Return db.getFieldTypeIdByADOType(ADOFieldType)
-        End Function
-        '
-        '========================================================================
-        ' Check for a table in a datasource
-        '   if the table is missing, create the table and the core fields
-        '       if NoAutoIncrement is false or missing, the ID field is created as an auto incremenet
-        '       if NoAutoIncrement is true, ID is created an an long
-        '   if the table is present, check all core fields
-        '========================================================================
-        '
-        Public Sub CreateSQLTable(ByVal DataSourceName As String, ByVal TableName As String, Optional ByVal AllowAutoIncrement As Boolean = True)
-            Call db.createSQLTable(DataSourceName, TableName, AllowAutoIncrement)
-        End Sub
-
-        '
-        '========================================================================
-        '   Delete a table field from a table
-        '======================================================================
-        Public Sub DeleteTable(ByVal DataSourceName As String, ByVal TableName As String)
-            db.deleteTable(DataSourceName, TableName)
-        End Sub
-        '
-        '========================================================================
-        '   Delete a table field from a table
-        '========================================================================
-        '
-        Public Sub DeleteTableField(ByVal DataSourceName As String, ByVal TableName As String, ByVal FieldName As String)
-            Call db.deleteTableField(DataSourceName, TableName, FieldName)
-        End Sub
-        '
-        '========================================================================
-        ' Create an index on a table
-        '
-        '   Fieldnames is  a comma delimited list of fields
-        '========================================================================
-        '
-        Public Sub CreateSQLIndex(ByVal DataSourceName As String, ByVal TableName As String, ByVal IndexName As String, ByVal FieldNames As String)
-            Call db.createSQLIndex(DataSourceName, TableName, IndexName, FieldNames)
-        End Sub
-        '
-        '======================================================================================
-        '   Mimicks a local
-        '======================================================================================
-        '
-        Public Property upgradeInProgress() As Boolean
-            Get
-                Return _upgradeInProgress
-            End Get
-            Set(ByVal value As Boolean)
-                _upgradeInProgress = value
-            End Set
-        End Property
-        Private _upgradeInProgress As Boolean             ' Block content autoload when upgrading
-        '
-        '==================================================================================================
-        ' ----- Remove this record from all watch lists
-        '       Mark permanent if the content is being deleted. non-permanent otherwise
-        '==================================================================================================
-        '
-        Public Sub csv_DeleteContentTracking(ByVal ContentName As String, ByVal RecordID As Integer, ByVal Permanent As Boolean)
-            On Error GoTo ErrorTrap 'Const Tn = "MethodName-098" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim ContentID As Integer
-            '
-            ' ----- remove all ContentWatchListRules (uncheck the watch lists in admin)
-            '
-            ContentID = metaData.getContentId(ContentName)
-            Call db.deleteContentRules(ContentID, RecordID)
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_DeleteContentTracking", True)
-        End Sub
-        '        '
-        '        '========================================================================
-        '        '   Returns an application link correctly filtered for the Siteproperty Domain
-        '        '========================================================================
-        '        '
-        '        Public Function filterDomainName(ByVal Link As String) As String
-        '            On Error GoTo ErrorTrap 'Const Tn = "MethodName-102" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-        '            '
-        '            Dim EndPosition As Integer
-        '            Dim linkprotocol As String = ""
-        '            Dim LinkHost As String = ""
-        '            Dim LinkPath As String = ""
-        '            Dim LinkPage As String = ""
-        '            Dim LinkQueryString As String = ""
-        '            Dim MethodName As String = "csv_FilterDomainName"
-        '            Dim csv_DomainName As String
-        '            '
-        '            'MethodName = "csv_FilterDomainName"
-        '            '
-        '            filterDomainName = Link
-        '            csv_DomainName = serverconfig.appConfig.domainList(0)
-        '            If genericController.vbInstr(1, csv_DomainName, ",") <> 0 Then
-        '                csv_DomainName = Mid(csv_DomainName, 1, genericController.vbInstr(1, csv_DomainName, ",") - 1)
-        '            End If
-        '            '
-        '            ' ----- set the Links Host to the Site Property Domain for consistancy with Spider
-        '            '
-        '            Call SeparateURL(Link, linkprotocol, LinkHost, LinkPath, LinkPage, LinkQueryString)
-        '            '
-        '            filterDomainName = linkprotocol & csv_DomainName & LinkPath & LinkPage & LinkQueryString
-        '            '
-        '            Exit Function
-        '            '
-        'ErrorTrap:
-        '            throw New ApplicationException("Unexpected exception") ' handleLegacyError4(Err.Number, Err.Source, Err.Description, MethodName, True)
-        '        End Function
-        '        '
-        '        '========================================================================
-        '        '
-        '        '========================================================================
-        '        '
-        '        Public Sub web_OpenStream(ByVal Filename As String)
-        '            On Error GoTo ErrorTrap 'Const Tn = "csv_OpenStream" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-        '            '
-        '            Dim MethodName As String
-        '            '
-        '            MethodName = "csv_OpenStream"
-        '            '
-        '            If web_StreamListCount >= csv_StreamListSize Then
-        '                csv_StreamListSize = csv_StreamListSize + 1
-        '                ReDim Preserve web_StreamList(csv_StreamListSize)
-        '            End If
-        '            web_StreamList(web_StreamListCount) = Filename
-        '            web_StreamListCount = web_StreamListCount + 1
-        '            '
-        '            Exit Sub
-        '            '
-        '            ' ----- Error Trap
-        '            '
-        'ErrorTrap:
-        '            throw New ApplicationException("Unexpected exception") ' handleLegacyError4(Err.Number, Err.Source, Err.Description, MethodName, True)
-        '        End Sub
-        '        '
-        '        '========================================================================
-        '        '
-        '        '========================================================================
-        '        '
-        '        Public Sub web_CloseStream()
-        '            On Error GoTo ErrorTrap 'Const Tn = "MethodName-130" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-        '            '
-        '            Dim MethodName As String
-        '            '
-        '            MethodName = "csv_CloseStream"
-        '            '
-        '            If web_StreamListCount > 0 Then
-        '                web_StreamListCount = web_StreamListCount - 1
-        '            End If
-        '            Exit Sub
-        '            '
-        '            ' ----- Error Trap
-        '            '
-        'ErrorTrap:
-        '            throw New ApplicationException("Unexpected exception") ' handleLegacyError4(Err.Number, Err.Source, Err.Description, MethodName, True)
-        '        End Sub
-        '        '
-        '        '========================================================================
-        '        '
-        '        '========================================================================
-        '        '
-        '        Public Sub log_TestPoint2(ByVal Message As String)
-        '            On Error GoTo ErrorTrap 'Const Tn = "MethodName-132" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-        '            '
-        '            Dim ElapsedTime As Double
-        '            Dim MethodName As String
-        '            'Dim iMessage As String
-        '            '
-        '            MethodName = "csv_TestPoint"
-        '            '
-        '            '
-        '            ' ----- If not Pagecsv_TestPointLogging, exit right away
-        '            '
-        '            If web_StreamListCount > 0 Then
-        '                ElapsedTime = (GetTickCount) / 1000
-        '                Message = Format((ElapsedTime), "0000000.000") & " - " & Message
-        '            End If
-        '            '
-        '            Exit Sub
-        '            '
-        '            ' ----- Error Trap
-        '            '
-        'ErrorTrap:
-        '            throw New ApplicationException("Unexpected exception") ' handleLegacyError4(Err.Number, Err.Source, Err.Description, MethodName, True)
-        '        End Sub
-        '
-        ' Get the applications root path (ServerAppcsv_RootPath to WebClient)
-        '
-        Public ReadOnly Property app_rootWebPath() As String
-            Get
-                app_rootWebPath = requestAppRootPath
-            End Get
-        End Property
-        '
-        '   Get the Initialized Domain Name
-        '
-        Public ReadOnly Property app_domainList() As String
-            Get
-                app_domainList = serverConfig.appConfig.domainList(0)
-            End Get
 
 
-        End Property
-        '
-        '========================================================================
-        '   Returns true if the field exists in the table
-        '========================================================================
-        '
-        Public Function IsSQLTableField(ByVal DataSourceName As String, ByVal TableName As String, ByVal FieldName As String) As Boolean
-            Return db.isSQLTableField(DataSourceName, TableName, FieldName)
-        End Function
-        '
-        '========================================================================
-        '   Returns true if the table exists
-        '========================================================================
-        '
-        Public Function IsSQLTable(ByVal DataSourceName As String, ByVal TableName As String) As Boolean
-            Return db.isSQLTable(DataSourceName, TableName)
-        End Function
 
 
-        ''=================================================================================
-        '' Returns a pointer into the app.tableSchema() array for the table that matches
-        ''=================================================================================
-        ''
-        'Public Function GetConnectionString(ByVal DataSourceName As String) As String
-        '    GetConnectionString = ""
-        '    Try
-        '        Dim Pointer As Integer
-        '        '
-        '        If Not (_db Is Nothing) Then
-        '            If genericController.vbUCase(DataSourceName) = "DEFAULT" Then
-        '                GetConnectionString = db.DefaultConnectionString
-        '            Else
-        '                Pointer = db.GetDataSourcePointer(DataSourceName)
-        '                If Pointer >= 0 Then
-        '                    GetConnectionString = db.dataSources(Pointer).odbcConnectionString
-        '                End If
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        Call throw (ex)
-        '    End Try
-        'End Function
 
-        '
-        '=============================================================================
-        '   Verify an Admin Menu Entry
-        '       Entries are unique by their name
-        '=============================================================================
-        '
-        Public Sub admin_VerifyAdminMenu(ByVal ParentName As String, ByVal EntryName As String, ByVal ContentName As String, ByVal LinkPage As String, ByVal SortOrder As String, Optional ByVal AdminOnly As Boolean = False, Optional ByVal DeveloperOnly As Boolean = False, Optional ByVal NewWindow As Boolean = False, Optional ByVal Active As Boolean = True)
-            Call Controllers.appBuilderController.admin_VerifyMenuEntry(Me, ParentName, EntryName, ContentName, LinkPage, SortOrder, AdminOnly, DeveloperOnly, NewWindow, Active, "Menu Entries", "")
-        End Sub
-        '
-        '=============================================================
-        '
-        '=============================================================
-        '
-        Public Function GetRecordID(ByVal ContentName As String, ByVal RecordName As String) As Integer
-            Return db.getRecordID(ContentName, RecordName)
-        End Function
-        '
-        '=============================================================
-        '
-        '=============================================================
-        '
-        Public Function GetRecordName(ByVal ContentName As String, ByVal RecordID As Integer) As String
-            Return db.getRecordName(ContentName, RecordID)
-        End Function
-        '
-        '=============================================================
-        '
-        '=============================================================
-        '
-        Public Function metaData_IsContentFieldSupported(ByVal ContentName As String, ByVal FieldName As String) As Boolean
-            Return metaData.isContentFieldSupported(ContentName, FieldName)
-        End Function
-        '
-        '
-        '
-        Public Sub tasks_RequestTask(ByVal Command As String, ByVal SQL As String, ByVal ExportName As String, ByVal Filename As String, ByVal RequestedByMemberID As Integer)
-            On Error GoTo ErrorTrap 'Const Tn = "RequestTask" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim CS As Integer
-            Dim TaskName As String
 
-            '
-            If ExportName = "" Then
-                TaskName = CStr(Now()) & " snapshot of unnamed data"
-            Else
-                TaskName = CStr(Now()) & " snapshot of " & genericController.vbLCase(ExportName)
-            End If
-            CS = db.cs_insertRecord("Tasks", RequestedByMemberID)
-            If db.cs_ok(CS) Then
-                Call db.cs_getFilename(CS, "Filename", Filename)
-                Call db.cs_set(CS, "Name", TaskName)
-                Call db.cs_set(CS, "Command", Command)
-                Call db.cs_set(CS, "SQLQuery", SQL)
-            End If
-            Call db.cs_Close(CS)
-            '
-            Exit Sub
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_RequestTask", True)
-        End Sub
+
+
+
+
+
+
+
         '
         '========================================================================
         '   Open a content set with the current whats new list
@@ -2515,249 +1692,6 @@ ErrorTrap:
 ErrorTrap:
             Throw New ApplicationException("Unexpected exception") ' handleLegacyError4(Err.Number, Err.Source, Err.Description, "csOpenWatchList", True)
         End Function
-        '        '
-        '        '=============================================================================
-        '        '   Return just the copy from a content page
-        '        '=============================================================================
-        '        '
-        '        Public Function csv_TextDeScramble(ByVal Copy As String) As String
-        '            On Error GoTo ErrorTrap : 'Const Tn = "TextDeScramble" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-        '            '
-        '            Dim CS As Integer
-        '            Dim CPtr As Integer
-        '            Dim C As String
-        '            Dim CValue As Integer
-        '            Dim crc As Integer
-        '            Dim ModAnswer As String
-        '            Dim Source As String
-        '            Dim Base As Integer
-        '            Const CMin = 32
-        '            Const CMax = 126
-        '            '
-        '            ' assume this one is not converted
-        '            '
-        '            Source = Copy
-        '            Base = 50
-        '            '
-        '            ' First characger must be _
-        '            ' Second character is the scramble version 'a' is the starting system
-        '            '
-        '            If Mid(Source, 1, 2) <> "_a" Then
-        '                csv_TextDeScramble = Copy
-        '            Else
-        '                Source = Mid(Source, 3)
-        '                '
-        '                ' cycle through all characters
-        '                '
-        '                For CPtr = Len(Source) - 1 To 1 Step -1
-        '                    C = Mid(Source, CPtr, 1)
-        '                    CValue = Asc(C)
-        '                    crc = crc + CValue
-        '                    If (CValue < CMin) Or (CValue > CMax) Then
-        '                        '
-        '                        ' if out of ascii bounds, just leave it in place
-        '                        '
-        '                    Else
-        '                        CValue = CValue - Base
-        '                        If CValue < CMin Then
-        '                            CValue = CValue + CMax - CMin + 1
-        '                        End If
-        '                    End If
-        '                    csv_TextDeScramble = csv_TextDeScramble & chr(CValue)
-        '                Next
-        '                '
-        '                ' Test mod
-        '                '
-        '                If CStr(crc Mod 9) <> Mid(Source, Len(Source), 1) Then
-        '                    '
-        '                    ' Nope - set it back to the input
-        '                    '
-        '                    csv_TextDeScramble = Copy
-        '                End If
-        '            End If
-        '            '
-        '            'csv_TextDeScramble = Mid(Source, 2)
-        '            '
-        '            Exit Function
-        'ErrorTrap:
-        '            Call csv_HandleClassTrapError(Err.Number, Err.Source, Err.Description, "csv_TextDeScramble", True)
-        '        End Function
-
-        '        '
-        '        '=============================================================================
-        '        '   Return just the copy from a content page
-        '        '=============================================================================
-        '        '
-        '        Public Function csv_TextScramble(ByVal Copy As String) As String
-        '            On Error GoTo ErrorTrap : 'Const Tn = "TextScramble" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-        '            '
-        '            Dim CS As Integer
-        '            Dim CPtr As Integer
-        '            Dim C As String
-        '            Dim CValue As Integer
-        '            Dim crc As Integer
-        '            Dim Base As Integer
-        '            Const CMin = 32
-        '            Const CMax = 126
-        '            '
-        '            ' scrambled starts with _
-        '            '
-        '            Base = 50
-        '            For CPtr = 1 To Len(Copy)
-        '                C = Mid(Copy, CPtr, 1)
-        '                CValue = Asc(C)
-        '                If (CValue < CMin) Or (CValue > CMax) Then
-        '                    '
-        '                    ' if out of ascii bounds, just leave it in place
-        '                    '
-        '                Else
-        '                    CValue = CValue + Base
-        '                    If CValue > CMax Then
-        '                        CValue = CValue - CMax + CMin - 1
-        '                    End If
-        '                End If
-        '                '
-        '                ' CRC is addition of all scrambled characters
-        '                '
-        '                crc = crc + CValue
-        '                '
-        '                ' put together backwards
-        '                '
-        '                csv_TextScramble = chr(CValue) & csv_TextScramble
-        '            Next
-        '            '
-        '            ' Ends with the mod of the CRC and 13
-        '            '
-        '            csv_TextScramble = "_a" & csv_TextScramble & CStr(crc Mod 9)
-        '            '
-        '            '
-        '            Exit Function
-        'ErrorTrap:
-        '            Call csv_HandleClassTrapError(Err.Number, Err.Source, Err.Description, "csv_TextScramble", True)
-        '        End Function
-        '        '
-        '        '===========================================================================================
-        '        '   Verify the Menu record is there, add it if not
-        '        '   If it is default, add all existing sections to it
-        '        '   If this version is too old, it returns 0
-        '        '===========================================================================================
-        '        '
-        '        Public Function csv_VerifyDynamicMenu(ByVal MenuName As String) As Integer
-        '            On Error GoTo ErrorTrap 'Const Tn = "VerifyDynamicMenu" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-        '            '
-        '            Dim CS As Integer
-        '            Dim CSRule As Integer
-        '            Dim DefaultFound As Boolean
-        '            Dim iMenuName As String
-        '            '
-        '            If True Then
-        '                '
-        '                iMenuName = MenuName
-        '                If iMenuName = "" Then
-        '                    iMenuName = "Default"
-        '                End If
-        '                '
-        '                CS = db.cs_openCsSql_rev("default", "select ID from ccDynamicMenus where name=" & db.encodeSQLText(iMenuName))
-        '                If db.cs_ok(CS) Then
-        '                    csv_VerifyDynamicMenu = db.cs_getInteger(CS, "ID")
-        '                End If
-        '                Call db.cs_Close(CS)
-        '                '
-        '                If csv_VerifyDynamicMenu = 0 Then
-        '                    '
-        '                    ' Add the Menu
-        '                    '
-        '                    CS = db.cs_insertRecord("Dynamic Menus", SystemMemberID)
-        '                    If db.cs_ok(CS) Then
-        '                        csv_VerifyDynamicMenu = db.cs_getInteger(CS, "ID")
-        '                        Call db.cs_set(CS, "name", iMenuName)
-        '                        If True Then
-        '                            Call db.cs_set(CS, "ccGuid", DefaultDynamicMenuGuid)
-        '                        End If
-        '                    End If
-        '                    Call db.cs_Close(CS)
-        '                    '
-        '                    If genericController.vbUCase(iMenuName) = "DEFAULT" Then
-        '                        '
-        '                        ' Adding the Default menu - put all sections into this when it is created
-        '                        '
-        '                        CS = db.cs_open("Site Sections")
-        '                        Do While db.cs_ok(CS)
-        '                            CSRule = db.cs_insertRecord("Dynamic Menu Section Rules", SystemMemberID)
-        '                            If db.cs_ok(CSRule) Then
-        '                                Call db.cs_set(CSRule, "DynamicMenuID", csv_VerifyDynamicMenu)
-        '                                Call db.cs_set(CSRule, "SectionID", db.cs_getInteger(CS, "ID"))
-        '                            End If
-        '                            Call db.cs_Close(CSRule)
-        '                            db.cs_goNext(CS)
-        '                        Loop
-        '                        Call db.cs_Close(CS)
-        '                    End If
-        '                End If
-        '            End If
-        '            '
-        '            Exit Function
-        '            '
-        '            ' ----- Error Trap
-        '            '
-        'ErrorTrap:
-        '            Throw New ApplicationException("Unexpected exception") ' handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_VerifyDynamicMenu", True, True)
-        '        End Function
-        '        '
-        '        '===========================================================================================
-        '        '   Verify the Menu record is there, add it if not
-        '        '   If it is default, add all existing sections to it
-        '        '===========================================================================================
-        '        '
-        '        Public Function csv_GetDynamicMenuACSelect() As String
-        '            On Error GoTo ErrorTrap 'Const Tn = "cs_getv_DynamicMenuACSelect" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-        '            '
-        '            Dim CS As Integer
-        '            '
-        '            If True Then
-        '                '
-        '                If csv_DynamicMenuACSelect = "" Then
-        '                    CS = db.cs_open("Dynamic Menus", , "Name", , , , , "Name")
-        '                    If Not db.cs_ok(CS) Then
-        '                        Call db.cs_Close(CS)
-        '                        Call csv_VerifyDynamicMenu("Default")
-        '                        CS = db.cs_open("Dynamic Menus", , "Name", , , , , "Name")
-        '                    End If
-        '                    Do While db.cs_ok(CS)
-        '                        If csv_DynamicMenuACSelect <> "" Then
-        '                            csv_DynamicMenuACSelect = csv_DynamicMenuACSelect & "|"
-        '                        End If
-        '                        csv_DynamicMenuACSelect = csv_DynamicMenuACSelect & db.cs_getText(CS, "name")
-        '                        db.cs_goNext(CS)
-        '                    Loop
-        '                    Call db.cs_Close(CS)
-        '                End If
-        '                csv_GetDynamicMenuACSelect = csv_DynamicMenuACSelect
-        '            End If
-        '            '
-        '            Exit Function
-        '            '
-        '            ' ----- Error Trap
-        '            '
-        'ErrorTrap:
-        '            Throw New ApplicationException("Unexpected exception") ' handleLegacyError4(Err.Number, Err.Source, Err.Description, "VerifyDefaultDynamicMenu", True, True)
-        '        End Function
-        ''
-        ''
-        ''
-        'Public Property app.config.urlencoder() As String
-        '    Get
-        '        Return app.config.urlencoderLocal
-
-        '    End Get
-        '    Set(ByVal value As String)
-        '        app.config.urlencoderLocal = value
-
-        '    End Set
-        'End Property
-        '
-        '
-        '
         '
         '=================================================================================================================
         '   csv_GetAddonOption
@@ -2919,107 +1853,8 @@ ErrorTrap:
             web_EncodeContent_HeadTags = ""
             '
         End Function
-        ''
-        '' ----- temp solution to convert error reporting without spending the time right now
-        ''
-        'Friend Sub handleLegacyError25(MethodName As String, ErrDescription As String)
-        '    Throw New ApplicationException(MethodName & ", " & ErrDescription)
-        'End Sub
-        '
-        '
-        '
-        Public Sub image_ResizeImage2(SrcFilename As String, DstFilename As String, Width As Integer, Height As Integer, Algorithm As csv_SfImageResizeAlgorithms)
-            On Error GoTo ErrorTrap 'Const Tn = "ResizeImage2": 'Dim th as integer: th = profileLogMethodEnter(Tn)
-            '
-            Dim sf As New imageEditController
-            '
-            If Width = 0 And Height = 0 Then
-                '
-                ' error, do nothing but log
-                '
-                handleExceptionAndContinue(New ApplicationException("Attempt to resize an image to 0,0. This is not allowed.")) ' handleLegacyError3(serverConfig.appConfig.name, "", "dll", "cpCoreClass", "csv_ResizeImage2", ignoreInteger, "", "", False, True, "")
-            Else
-                If sf.load(SrcFilename) Then
-                    If Width = 0 Then
-                        sf.width = CInt(Int((sf.width * sf.height) / Height))
-                        sf.height = Height
-                    ElseIf Height = 0 Then
-                        sf.height = CInt(Int((sf.height * sf.width) / Width))
-                        sf.width = Width
-                    Else
-                        sf.height = Height
-                        sf.width = Width
-                    End If
-                    Call sf.save(DstFilename)
-                End If
-            End If
-            '
-            Exit Sub
-ErrorTrap:
-            Throw (New Exception("Unexpected exception"))
-        End Sub
-        '
-        '
-        '
-        Public Sub image_ResizeImage(SrcFilename As String, DstFilename As String, Width As Integer, Height As Integer)
-            Try
-                Dim Algorithm As Integer
-                '
-                Algorithm = genericController.EncodeInteger(siteProperties.getText("ImageResizeSFAlgorithm", "5"))
-                Call image_ResizeImage2(SrcFilename, DstFilename, Width, Height, DirectCast(Algorithm, csv_SfImageResizeAlgorithms))
-            Catch ex As Exception
-                Throw (ex)
-            End Try
-        End Sub
-        ''
-        ''====================================================================================================
-        '''' <summary>
-        '''' Serialize an object into a JSON string
-        '''' </summary>
-        '''' <param name="source"></param>
-        '''' <returns></returns>
-        'Public Function common_jsonSerialize(source As Object) As String
-        '    Try
-        '        Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
-        '        Return json.Serialize(source)
-        '    Catch ex As Exception
-        '        throw (ex)
-        '        Return ""
-        '    End Try
-        'End Function
-        ''
-        ''====================================================================================================
-        '''' <summary>
-        '''' Deserialize as JSON string into a generic object
-        '''' </summary>
-        '''' <param name="Source"></param>
-        '''' <returns></returns>
-        'Public Function common_jsonDeserialize(Source As String) As Object
-        '    Dim returnObj As Object = Nothing
-        '    Try
-        '        Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
-        '        returnObj = json.Deserialize(Of Object)(Source)
-        '    Catch ex As Exception
-        '        throw (ex)
-        '    End Try
-        '    Return returnObj
-        'End Function
-        '
-        '================================================================================================
-        '   deprecated, use csv_getStyleSheet2
-        '================================================================================================
-        '
-        Public Function csv_getStyleSheetProcessed() As String
-            csv_getStyleSheetProcessed = htmlDoc.html_getStyleSheet2(0, 0)
-        End Function
-        '
-        '================================================================================================
-        '   deprecated, feature not supported
-        '================================================================================================
-        '
-        Public Function csv_ProcessStyleSheet(Source As String) As String
-            csv_ProcessStyleSheet = Source
-        End Function
+
+
         ''
         ''------------------------------------------------------------------------------------------------------------
         ''   encode an argument to be used in an addonOptionString
@@ -3202,7 +2037,7 @@ ErrorTrap:
         '
         ' +++++ 9/8/2011 4.1.482, added csv_addLinkAlias to csv and changed main to call
         '
-        Public Sub app_addLinkAlias2(linkAlias As String, PageID As Integer, QueryStringSuffix As String, OverRideDuplicate As Boolean, DupCausesWarning As Boolean, ByRef return_WarningMessage As String)
+        Public Sub app_addLinkAlias2(linkAlias As String, PageID As Integer, QueryStringSuffix As String, Optional OverRideDuplicate As Boolean = False, Optional DupCausesWarning As Boolean = False, Optional ByRef return_WarningMessage As String = "")
             On Error GoTo ErrorTrap
             '
             Const SafeString = "0123456789abcdefghijklmnopqrstuvwxyz-_/."
@@ -3447,7 +2282,7 @@ ErrorTrap:
         '       else (if it start with a file or a path), add the serverFilePath
         '========================================================================
         '
-        Public Function csv_getVirtualFileLink(ByVal serverFilePath As String, ByVal virtualFile As String) As String
+        Public Function getCdnFileLink(ByVal virtualFile As String) As String
             Dim returnLink As String
             '
             returnLink = virtualFile
@@ -3464,9 +2299,9 @@ ErrorTrap:
                 '
                 ' icon is a virtual file, add the serverfilepath
                 '
-                returnLink = serverFilePath & returnLink
+                returnLink = serverConfig.appConfig.cdnFilesNetprefix & returnLink
             End If
-            csv_getVirtualFileLink = returnLink
+            getCdnFileLink = returnLink
         End Function
         '
         '========================================================================
@@ -3529,7 +2364,7 @@ ErrorTrap:
             Button = docProperties.getText("Button")
             If (Button = ButtonSave) Then
                 AllowChange = True
-                PeopleCID = main_GetContentID("People")
+                PeopleCID = metaData.getContentId("People")
                 Newusername = docProperties.getText("username")
                 NewPassword = docProperties.getText("password")
                 If Newusername = "" Then
@@ -4593,7 +3428,7 @@ ErrorTrap:
                                     '
                                     ' Path is blocked
                                     '
-                                    Tag = htmlDoc.html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & webServer.webServerIO_requestPath & "] [<a href=""" & htmlDoc.html_EncodeHTML(siteProperties.adminURL & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & main_GetContentID("paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
+                                    Tag = htmlDoc.html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & webServer.webServerIO_requestPath & "] [<a href=""" & htmlDoc.html_EncodeHTML(siteProperties.adminURL & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & metaData.getContentId("paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
                                 Else
                                     '
                                     ' Path is not blocked
@@ -5752,39 +4587,6 @@ ErrorTrap:
             Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
             '
         End Sub
-        '        '
-        '        '=============================================================================
-        '        '   main_Get the Admin Form
-        '        '=============================================================================
-        '        '
-        '        Public Function main_GetAdminForm(Optional ByVal Content As String = "") As String
-        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetAdminForm")
-        '            '
-        '            'If Not (true) Then Exit Function
-        '            '
-        '            Dim admin As New Contensive.Addons.adminClass()
-        '            '
-        '            ' main_GetClose page was removed from AdminClass so main_GetAdminPage can call it after main_GetHTMLHead (in main_GetAdminStart)
-        '            '
-        '            'Call AppendLog("call main_getEndOfBody, from main_getAdminForm,")
-        '            main_GetAdminForm = "" _
-        '                & Admin.execute_getContent(Content) _
-        '                & main_GetEndOfBody(True, True, False, True)
-        '            '
-        '            Exit Function
-        '            '
-        'ErrorTrap:
-        '            Admin = Nothing
-        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetAdminForm")
-        '        End Function
-        ''
-        ''=============================================================================
-        ''   Legacy
-        ''=============================================================================
-        ''
-        'Public Function main_GetAdminPage(Optional ByVal Content As String = "") As String
-        '    main_GetAdminPage = addonToBe_admin(Content)
-        'End Function
         '
         '=============================================================================
         ' Print the admin developer tools page
@@ -6406,57 +5208,6 @@ ErrorTrap:
 ErrorTrap:
             Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetVirtualFolderList")
         End Function
-        '
-        '========================================================================
-        ' main_Get a Contents ID from the ContentName
-        '========================================================================
-        '
-        Public Function main_GetContentID(ByVal ContentName As String) As Integer
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetContentID")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim MethodName As String
-            '
-            MethodName = "main_GetContentID"
-            '
-            main_GetContentID = metaData.getContentId(genericController.encodeText(ContentName))
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
-            '
-        End Function
-        ''
-        ''========================================================================
-        '' main_Get a Contents Name from the ContentID
-        ''========================================================================
-        ''
-        'Public Function metaData.getContentNameByID(ByVal ContentID As Integer) As String
-        '    Return metaData.getContentNameByID(ContentID)
-        'End Function
-        '
-        ' ----- main_Get a DataSource Name from its ContentName
-        '
-        Public Function main_GetContentDataSource(ByVal ContentName As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetContentDataSource")
-            '
-            'If Not (true) Then Exit Function
-            Dim MethodName As String
-            '
-            MethodName = "main_GetContentDataSource"
-            '
-            main_GetContentDataSource = metaData.getContentDataSource(genericController.encodeText(ContentName))
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
-            '
-        End Function
 
         '
         '========================================================================
@@ -6700,7 +5451,7 @@ ErrorTrap:
                         '
                         ' Edit link, main_Get the CID
                         '
-                        ContentID = main_GetContentID(iContentName)
+                        ContentID = metaData.getContentId(iContentName)
                         '
                         main_GetRecordEditLink2 = main_GetRecordEditLink2 _
                             & "<a" _
@@ -6886,7 +5637,7 @@ ErrorTrap:
                 If iContentName = "" Then
                     Throw (New ApplicationException("Method called with blank ContentName")) ' handleLegacyError14(MethodName, "")
                 Else
-                    iContentID = main_GetContentID(iContentName)
+                    iContentID = metaData.getContentId(iContentName)
                     csChildContent = db.cs_open("Content", "ParentID=" & iContentID, , , , , , "id")
                     useFlyout = db.cs_ok(csChildContent)
                     Call db.cs_Close(csChildContent)
@@ -7130,7 +5881,7 @@ ErrorTrap:
                             ' ----- No entry found, this member does not have access, just main_Get ContentID
                             '
                             ContentRecordFound = True
-                            ContentID = main_GetContentID(ContentName)
+                            ContentID = metaData.getContentId(ContentName)
                             ContentAllowAdd = False
                             GroupRulesAllowAdd = False
                             MemberRulesAllow = False
@@ -7264,22 +6015,7 @@ ErrorTrap:
         '==================================================================================================
         '
         Public Sub metaData_DeleteContentTracking(ContentName As String, RecordID As Integer, Permanent As Object)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("DeleteContentTracking")
-            '
-            'If Not (true) Then Exit Sub
-            '
-            Dim MethodName As String
-            '
-            MethodName = "main_DeleteContentTracking( " & ContentName & ", " & RecordID & " )"
-            '
-            Call csv_DeleteContentTracking(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), genericController.EncodeBoolean(Permanent))
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
-            '
+            db.deleteContentRules(metaData.getContentId(ContentName), RecordID)
         End Sub
         '
         '=================================================================================
@@ -7350,10 +6086,10 @@ ErrorTrap:
             Call main_SetMetaContent(0, 0)
             '
             admin_GetPageStart2 = "" _
-                & main_DocTypeAdmin _
+                & siteProperties.docTypeDeclarationAdmin _
                 & vbCrLf & "<html>" _
                 & vbCrLf & "<head>" _
-                & webServer.getHTMLInternalHead(True) _
+                & htmlDoc.getHTMLInternalHead(True) _
                 & vbCrLf & "</head>" _
                 & vbCrLf & "<body class=""ccBodyAdmin ccCon"">"
             '
@@ -8803,7 +7539,7 @@ ErrorTrap:
                     ' No template Specified, Generate something to host the content
                     '
                     main_GetAutoSite_Template = "" _
-                        & vbCrLf & main_docType _
+                        & vbCrLf & siteProperties.docTypeDeclaration() _
                         & vbCrLf & "<html>" _
                         & cr & "<head>" _
                         & cr2 & "<STYLE type=text/css></STYLE>" _
@@ -9113,7 +7849,7 @@ ErrorTrap:
         ' main_Get the Head innerHTML for public pages
         '
         Public Function main_GetHTMLHead() As String
-            main_GetHTMLHead = webServer.getHTMLInternalHead(False)
+            main_GetHTMLHead = htmlDoc.getHTMLInternalHead(False)
         End Function
         '
         '
@@ -9125,7 +7861,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetRecordID_Internal")
             '
             If True Then
-                main_GetRecordID_Internal = GetRecordID(genericController.encodeText(ContentName), genericController.encodeText(RecordName))
+                main_GetRecordID_Internal = db.getRecordID(genericController.encodeText(ContentName), genericController.encodeText(RecordName))
             End If
 
             Exit Function
@@ -9154,7 +7890,7 @@ ErrorTrap:
         Public Function content_GetRecordName(ByVal ContentName As String, ByVal RecordID As Integer) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00414")
             '
-            content_GetRecordName = GetRecordName(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID))
+            content_GetRecordName = db.getRecordName(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID))
 
             Exit Function
 ErrorTrap:
@@ -9174,229 +7910,7 @@ ErrorTrap:
         '    End Get
         'End Property
         '
-        '---------------------------------------------------------------------------
-        '   Create the default landing page if it is missing
-        '---------------------------------------------------------------------------
         '
-        Public Function main_CreatePageGetID(ByVal PageName As String, ByVal ContentName As String, ByVal CreatedBy As Integer, ByVal pageGuid As String) As Integer
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("CreatePageGetID")
-            '
-            Dim CS As Integer
-            Dim Id As Integer
-            '
-            CS = db.cs_insertRecord(ContentName, CreatedBy)
-            If db.cs_ok(CS) Then
-                Id = db.cs_getInteger(CS, "ID")
-                Call db.cs_set(CS, "name", PageName)
-                Call db.cs_set(CS, "active", "1")
-                If True Then
-                    Call db.cs_set(CS, "ccGuid", pageGuid)
-                End If
-                Call db.cs_save2(CS)
-                Call workflow.publishEdit("Page Content", Id)
-            End If
-            Call db.cs_Close(CS)
-            '
-            main_CreatePageGetID = Id
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_CreatePageGetID")
-        End Function
-        '
-        '
-        '
-        Public Property main_MetaContentNoFollow() As Boolean
-            Get
-                Return webServer.webServerIO_response_NoFollow
-            End Get
-            Set(ByVal value As Boolean)
-                webServer.webServerIO_response_NoFollow = value
-            End Set
-        End Property
-
-        '        '
-        '        '
-        '        '
-        '        Public Function main_isSectionBlocked(ByVal SectionID As Integer, ByVal AllowSectionBlocking As Boolean) As Boolean
-        '            On Error GoTo ErrorTrap 'Const Tn = "isSectionBlocked" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-        '            '
-        '            Dim CS As Integer
-        '            Dim SQL As String
-        '            Dim SQLWhere As String
-        '            '
-        '            main_isSectionBlocked = False
-        '            If AllowSectionBlocking Then
-        '                main_isSectionBlocked = True
-        '                If authContext.isAuthenticatedAdmin(Me) Then
-        '                    '
-        '                    ' Admin always main_Gets in
-        '                    '
-        '                    main_isSectionBlocked = False
-        '                ElseIf Not authContext.isAuthenticated() Then
-        '                    '
-        '                    ' not authenticated never main_Gets in
-        '                    '
-        '                Else
-        '                    '
-        '                    ' check if this member is in one of the SectionRule groups
-        '                    '
-        '                    SQLWhere = "" _
-        '                        & " M.MemberID=" & authContext.user.ID _
-        '                        & " and R.SectionID=" & SectionID _
-        '                        & " and M.GroupID=R.GroupID" _
-        '                        & " and R.Active<>0" _
-        '                        & " and M.Active<>0" _
-        '                        & " and ((M.DateExpires is null)or(M.DateExpires>" & db.encodeSQLDate(app_startTime) & "))"
-        '                    SQL = db.GetSQLSelect("", "ccmemberRules M,ccSectionBlockRules R", "M.ID", SQLWhere, , , 1)
-        '                    CS = db.cs_openSql(SQL)
-        '                    'SQL = "select ID" _
-        '                    '    & " from ccMemberRules M,ccSectionBlockRules R" _
-        '                    '    & " where M.MemberID=" & memberID _
-        '                    '    & " and R.SectionID=" & SectionID _
-        '                    '    & " and M.GroupID=R.GroupID" _
-        '                    '    & " and R.Active<>0" _
-        '                    '    & " and M.Active<>0" _
-        '                    '    & " and ((M.DateExpires is null)or(M.DateExpires>" & main_SQlPageStartTime & "))"
-        '                    'CS = app.openCsSql_rev("default", SQL, 1, 1)
-        '                    'SQL = "select top 1 *" _
-        '                    '    & " from ccMemberRules M,ccSectionBlockRules R" _
-        '                    '    & " where M.MemberID=" & memberID _
-        '                    '    & " and R.SectionID=" & SectionID _
-        '                    '    & " and M.GroupID=R.GroupID" _
-        '                    '    & " and R.Active<>0" _
-        '                    '    & " and M.Active<>0" _
-        '                    '    & " and ((M.DateExpires is null)or(M.DateExpires>" & main_SQlPageStartTime & "))"
-        '                    'CS = app.openCsSql(SQL)
-        '                    main_isSectionBlocked = Not (db.cs_ok(CS))
-        '                    Call db.cs_Close(CS)
-        '                End If
-        '            End If
-
-        '            '
-        '            Exit Function
-        'ErrorTrap:
-        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_isSectionBlocked")
-        '        End Function
-        '
-        '
-        '
-        Public Sub main_RequestTask(ByVal Command As String, ByVal SQL As String, ByVal ExportName As String, ByVal Filename As String)
-            On Error GoTo ErrorTrap 'Const Tn = "RequestTask" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Call tasks_RequestTask(genericController.encodeText(Command), genericController.encodeText(SQL), genericController.encodeText(ExportName), genericController.encodeText(Filename), genericController.EncodeInteger(authContext.user.ID))
-            '
-            Exit Sub
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_RequestTask")
-        End Sub
-        '
-        '=============================================================================
-        '   Returns the link to the page that contains the record designated by the ContentRecordKey
-        '       Returns DefaultLink if it can not be determined
-        '=============================================================================
-        '
-        Public Function main_GetLinkByContentRecordKey(ByVal ContentRecordKey As String, Optional ByVal DefaultLink As String = "") As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetLinkByContentRecordKey")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim CSPointer As Integer
-            Dim KeySplit() As String
-            Dim ContentID As Integer
-            Dim RecordID As Integer
-            Dim ContentName As String
-            Dim templateId As Integer
-            Dim ParentID As Integer
-            Dim DefaultTemplateLink As String
-            Dim TableName As String
-            Dim DataSource As String
-            Dim ParentContentID As Integer
-            Dim recordfound As Boolean
-            '
-            If ContentRecordKey <> "" Then
-                '
-                ' First try main_ContentWatch table for a link
-                '
-                CSPointer = db.cs_open("Content Watch", "ContentRecordKey=" & db.encodeSQLText(ContentRecordKey), , , ,, , "Link,Clicks")
-                If db.cs_ok(CSPointer) Then
-                    main_GetLinkByContentRecordKey = db.cs_getText(CSPointer, "Link")
-                End If
-                Call db.cs_Close(CSPointer)
-                '
-                If main_GetLinkByContentRecordKey = "" Then
-                    '
-                    ' try template for this page
-                    '
-                    KeySplit = Split(ContentRecordKey, ".")
-                    If UBound(KeySplit) = 1 Then
-                        ContentID = genericController.EncodeInteger(KeySplit(0))
-                        If ContentID <> 0 Then
-                            ContentName = metaData.getContentNameByID(ContentID)
-                            RecordID = genericController.EncodeInteger(KeySplit(1))
-                            If ContentName <> "" And RecordID <> 0 Then
-                                If GetContentTablename(ContentName) = "ccPageContent" Then
-                                    CSPointer = csOpen(ContentName, RecordID, , , "TemplateID,ParentID")
-                                    If db.cs_ok(CSPointer) Then
-                                        recordfound = True
-                                        templateId = db.cs_getInteger(CSPointer, "TemplateID")
-                                        ParentID = db.cs_getInteger(CSPointer, "ParentID")
-                                    End If
-                                    Call db.cs_Close(CSPointer)
-                                    If Not recordfound Then
-                                        '
-                                        ' This content record does not exist - remove any records with this ContentRecordKey pointer
-                                        '
-                                        'Call app.DeleteContentRecords("Topic Rules", "ContentRecordKey=" & encodeSQLText(ContentRecordKey))
-                                        'Call app.DeleteContentRecords("Topic Habits", "ContentRecordKey=" & encodeSQLText(ContentRecordKey))
-                                        Call db.deleteContentRecords("Content Watch", "ContentRecordKey=" & db.encodeSQLText(ContentRecordKey))
-                                        Call metaData_DeleteContentTracking(ContentName, RecordID, True)
-                                    Else
-
-                                        If templateId <> 0 Then
-                                            CSPointer = csOpen("Page Templates", templateId, , , "Link")
-                                            If db.cs_ok(CSPointer) Then
-                                                main_GetLinkByContentRecordKey = db.cs_getText(CSPointer, "Link")
-                                            End If
-                                            Call db.cs_Close(CSPointer)
-                                        End If
-                                        If main_GetLinkByContentRecordKey = "" And ParentID <> 0 Then
-                                            TableName = GetContentTablename(ContentName)
-                                            DataSource = main_GetContentDataSource(ContentName)
-                                            CSPointer = db.cs_openCsSql_rev(DataSource, "Select ContentControlID from " & TableName & " where ID=" & RecordID)
-                                            If db.cs_ok(CSPointer) Then
-                                                ParentContentID = genericController.EncodeInteger(db.cs_getText(CSPointer, "ContentControlID"))
-                                            End If
-                                            Call db.cs_Close(CSPointer)
-                                            If ParentContentID <> 0 Then
-                                                main_GetLinkByContentRecordKey = main_GetLinkByContentRecordKey(CStr(ParentContentID & "." & ParentID), "")
-                                            End If
-                                        End If
-                                        If main_GetLinkByContentRecordKey = "" Then
-                                            DefaultTemplateLink = siteProperties.getText("SectionLandingLink", requestAppRootPath & siteProperties.serverPageDefault)
-                                        End If
-                                    End If
-                                End If
-                            End If
-                        End If
-                    End If
-                    If main_GetLinkByContentRecordKey <> "" Then
-                        main_GetLinkByContentRecordKey = genericController.modifyLinkQuery(main_GetLinkByContentRecordKey, "bid", CStr(RecordID), True)
-                    End If
-                End If
-            End If
-            '
-            If main_GetLinkByContentRecordKey = "" Then
-                main_GetLinkByContentRecordKey = DefaultLink
-            End If
-            '
-            main_GetLinkByContentRecordKey = genericController.EncodeAppRootPath(main_GetLinkByContentRecordKey, webServer.webServerIO_requestVirtualFilePath, requestAppRootPath, webServer.requestDomain)
-            '
-            Exit Function
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetLinkByContentRecordKey")
-        End Function
         '
         '============================================================================================================
         '   the content control Id for a record, all its edit and archive records, and all its child records
@@ -9431,7 +7945,7 @@ ErrorTrap:
                     '
                     '
                     '
-                    DataSourceName = main_GetContentDataSource(RecordContentName)
+                    DataSourceName = metaData.getContentDataSource(RecordContentName)
                     RecordTableName = GetContentTablename(RecordContentName)
                     '
                     ' either Workflow on non-workflow - it changes everything
@@ -9635,10 +8149,10 @@ ErrorTrap:
                     ' Save new public stylesheet
                     '
                     'Dim kmafs As New fileSystemClass
-                    Call cdnFiles.saveFile(genericController.convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), csv_getStyleSheetProcessed)
+                    Call cdnFiles.saveFile(genericController.convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), htmlDoc.html_getStyleSheet2(0, 0))
                     Call cdnFiles.saveFile(genericController.convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css"), htmlDoc.pageManager_GetStyleSheetDefault2)
                 End If
-                admin_GetStyleTagAdmin = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServer.webServerIO_requestProtocol & webServer.webServerIO_requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, "templates/Admin" & StyleSN & ".css") & """ >"
+                admin_GetStyleTagAdmin = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServer.webServerIO_requestProtocol & webServer.webServerIO_requestDomain & getCdnFileLink("templates/Admin" & StyleSN & ".css") & """ >"
             End If
         End Function
         '
@@ -9915,30 +8429,6 @@ ErrorTrap:
             main_GetAggrOption = main_GetAddonOption(Name, Option_String)
         End Function
         '
-        '=================================================================================
-        '   True if the table exists
-        '=================================================================================
-        '
-        Public Function main_IsSQLTable(DataSourceName As String, TableName As String) As Boolean
-            '
-            If (True) Then
-                main_IsSQLTable = IsSQLTable(DataSourceName, TableName)
-            End If
-            '
-        End Function
-        '
-        '=================================================================================
-        '   True if the table field exists
-        '=================================================================================
-        '
-        Public Function main_IsSQLTableField(DataSourceName As String, TableName As String, FieldName As String) As Boolean
-            '
-            If (True) Then
-                main_IsSQLTableField = IsSQLTableField(DataSourceName, TableName, FieldName)
-            End If
-            '
-        End Function
-        '
         '==========================================================================================================================================
         '   Input element for Style Sheets
         '
@@ -10093,7 +8583,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            main_IsContentFieldSupported = metaData_IsContentFieldSupported(ContentName, FieldName)
+            main_IsContentFieldSupported = metaData.isContentFieldSupported(ContentName, FieldName)
             '
             Exit Function
 ErrorTrap:
@@ -10216,7 +8706,7 @@ ErrorTrap:
             Dim hint As String
             '
             'hint = hint & ",000"
-            ContentID = main_GetContentID(ContentName)
+            ContentID = metaData.getContentId(ContentName)
             TableName = GetContentTablename(ContentName)
             Call db.markRecordReviewed(ContentName, RecordID)
             '
@@ -10319,8 +8809,8 @@ ErrorTrap:
                     '
                     'hint = hint & ",150"
                     Call pages.pageManager_cache_pageTemplate_clear()
-                    If Not IsNothing(cache_addonStyleRules) Then
-                        Call cache_addonStyleRules.clear()
+                    If Not IsNothing(addonStyleRulesIndex) Then
+                        Call addonStyleRulesIndex.clear()
                     End If
 
                 Case "ccsections"
@@ -10332,7 +8822,7 @@ ErrorTrap:
                     If db.cs_ok(CS) Then
                         PageContentID = db.cs_getInteger(CS, "ContentID")
                         If PageContentID = 0 Then
-                            PageContentID = main_GetContentID("Page Content")
+                            PageContentID = metaData.getContentId("Page Content")
                             Call db.cs_set(CS, "ContentID", PageContentID)
                         End If
                         rootPageId = db.cs_getInteger(CS, "RootPageID")
@@ -10345,7 +8835,7 @@ ErrorTrap:
                             If pageContentName = "" Then
                                 pageContentName = "Page Content"
                             End If
-                            Call db.cs_set(CS, "RootPageID", main_CreatePageGetID(PageName, "Page Content", authContext.user.ID, ""))
+                            Call db.cs_set(CS, "RootPageID", pages.main_CreatePageGetID(PageName, "Page Content", authContext.user.ID, ""))
                             Call pages.cache_pageContent_clear()
                         End If
                     End If
@@ -10356,22 +8846,20 @@ ErrorTrap:
                     ' Update wysiwyg addon menus
                     '
                     'hint = hint & ",170"
-                    Call addonCache.clear()
-                    If Not IsNothing(cache_addonStyleRules) Then
-                        Call cache_addonStyleRules.clear()
+                    Call addonLegacyCache.clear()
+                    If Not IsNothing(addonStyleRulesIndex) Then
+                        Call addonStyleRulesIndex.clear()
                     End If
-
-                    Call cache_addonIncludeRules_clear()
                 Case "ccsharedstylesaddonrules"
                     '
                     ' Update wysiwyg addon menus
                     '
                     'hint = hint & ",175"
-                    If Not IsNothing(cache_addonStyleRules) Then
-                        Call cache_addonStyleRules.clear()
+                    If Not IsNothing(addonStyleRulesIndex) Then
+                        Call addonStyleRulesIndex.clear()
                     End If
 
-                    Call addonCache.clear()
+                    Call addonLegacyCache.clear()
                 Case "cclibraryfiles"
                     '
                     ' if a AltSizeList is blank, make large,medium,small and thumbnails
@@ -10387,7 +8875,7 @@ ErrorTrap:
                                     FilePath = Mid(Filename, 1, Pos)
                                     Filename = Mid(Filename, Pos + 1)
                                 End If
-                                Call db.cs_set(CS, "filesize", main_GetFileSize(appRootFiles.rootLocalPath & FilePath & Filename))
+                                Call db.cs_set(CS, "filesize", appRootFiles.main_GetFileSize(FilePath & Filename))
                                 Pos = InStrRev(Filename, ".")
                                 If Pos > 0 Then
                                     FilenameExt = Mid(Filename, Pos + 1)
@@ -10504,7 +8992,6 @@ ErrorTrap:
                             Call db.cs_Close(CS)
                         End If
                     End If
-                    Call cache_libraryFiles_clear()
                 Case Else
                     '
                     '
@@ -10688,265 +9175,203 @@ ErrorTrap:
 ErrorTrap:
             Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetSharedStyleFileList")
         End Function
-        '
-        '========================================================================
-        '   Parse a list of html tags and produce a list of styles
-        '========================================================================
-        '
-        Private Function main_GetStyleListFromHTML(Doc As String, BasePath As String, SourceHost As String) As String
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetStyleListFromHTML")
-            '
-            '
-            Dim StyleTag As String
-            Dim LinkType As String
-            Dim Link As String
-            Dim ElementCount As Integer
-            Dim TagCount As Integer
-            Dim TagName As String
-            Dim kmaParse As htmlParserController
-            Dim ElementPointer As Integer
-            Dim Output As New stringBuilderLegacyController
-            Dim ElementText As String
-            Dim RootRelativeLink As String
-            Dim TagDone As Boolean
-            '
-            kmaParse = New htmlParserController(Me)
-            Call kmaParse.Load(Doc)
-            ElementPointer = 0
-            ElementCount = kmaParse.ElementCount
-            '
-            Do While ElementPointer < ElementCount
-                ElementText = kmaParse.Text(ElementPointer)
-                If kmaParse.IsTag(ElementPointer) Then
-                    TagCount = TagCount + 1
-                    TagName = kmaParse.TagName(ElementPointer)
-                    Select Case genericController.vbUCase(TagName)
-                        Case "LINK"
-                            '
-                            Link = kmaParse.ElementAttribute(ElementPointer, "HREF")
-                            LinkType = kmaParse.ElementAttribute(ElementPointer, "TYPE")
-                            If (genericController.IsLinkToThisHost(SourceHost, Link)) And (LCase(LinkType) = "text/css") Then
-                                RootRelativeLink = genericController.ConvertLinkToRootRelative(Link, BasePath)
-                                main_GetStyleListFromHTML = main_GetStyleListFromHTML & vbCrLf & main_GetStyleListFromLink(Link, BasePath, SourceHost, "")
-                            End If
-                        Case "STYLE"
-                            '
-                            ' Skip to the </Style> TAG, main_Get the stylesheet between for processing
-                            '
-                            TagDone = False
-                            Do While (Not TagDone) And (ElementPointer < ElementCount)
-                                '
-                                ' Process the next segment
-                                '
-                                ElementPointer = ElementPointer + 1
-                                ElementText = kmaParse.Text(ElementPointer)
-                                If kmaParse.IsTag(ElementPointer) Then
-                                    '
-                                    ' Process a tag (should just be </SCRIPT>, but go until it is
-                                    '
-                                    TagCount = TagCount + 1
-                                    TagDone = (kmaParse.TagName(ElementPointer) = "/" & TagName)
-                                End If
-                                If Not TagDone Then
-                                    StyleTag = StyleTag & ElementText
-                                End If
-                            Loop
-                            main_GetStyleListFromHTML = main_GetStyleListFromHTML & vbCrLf & main_GetStyleListFromStylesheet(StyleTag, BasePath, SourceHost, "")
-                    End Select
-                End If
-                'Output.Add( ElementText
-                ElementPointer = ElementPointer + 1
-            Loop
-            'main_GetStyleListFromHTML = Output.Text
-            '
-            kmaParse = Nothing
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(Err.Number, Err.Source, Err.Description, "main_GetStyleListFromHTML", True, False)
-        End Function
-        '
-        ' ================================================================================================
-        '   conversion pass 3
-        ' ================================================================================================
-        '
-        '
-        '
-        '
-        Private Function main_GetStyleListFromLink(Link As String, BasePath As String, SourceHost As String, BlockRootRelativeLinkList As String) As String
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetStyleListFromLink")
-            '
-            Dim Pos As Integer
-            Dim ImportedStyle As String
-            Dim HTTP As New httpRequestController()
-            Dim Filename As String
-            Dim RootRelativeLink As String
-            Dim ImportLink As String
-            Dim LinkPath As String
-            '
-            RootRelativeLink = genericController.ConvertLinkToRootRelative(Link, BasePath)
-            main_GetStyleListFromLink = ""
-            If genericController.vbInstr(1, BlockRootRelativeLinkList, RootRelativeLink, vbTextCompare) = 0 Then
-                ImportLink = SourceHost & RootRelativeLink
-                ImportedStyle = HTTP.getURL(ImportLink)
-                Dim HTTPStatus As String
-                HTTPStatus = genericController.getLine(HTTP.responseHeader)
-                If genericController.vbInstr(1, HTTPStatus, "200") = 0 Then
-                    main_GetStyleListFromLink = ""
-                Else
-                End If
+        '        '
+        '        '========================================================================
+        '        '   Parse a list of html tags and produce a list of styles
+        '        '========================================================================
+        '        '
+        '        Private Function main_GetStyleListFromHTML(Doc As String, BasePath As String, SourceHost As String) As String
+        '            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetStyleListFromHTML")
+        '            '
+        '            '
+        '            Dim StyleTag As String
+        '            Dim LinkType As String
+        '            Dim Link As String
+        '            Dim ElementCount As Integer
+        '            Dim TagCount As Integer
+        '            Dim TagName As String
+        '            Dim kmaParse As htmlParserController
+        '            Dim ElementPointer As Integer
+        '            Dim Output As New stringBuilderLegacyController
+        '            Dim ElementText As String
+        '            Dim RootRelativeLink As String
+        '            Dim TagDone As Boolean
+        '            '
+        '            kmaParse = New htmlParserController(Me)
+        '            Call kmaParse.Load(Doc)
+        '            ElementPointer = 0
+        '            ElementCount = kmaParse.ElementCount
+        '            '
+        '            Do While ElementPointer < ElementCount
+        '                ElementText = kmaParse.Text(ElementPointer)
+        '                If kmaParse.IsTag(ElementPointer) Then
+        '                    TagCount = TagCount + 1
+        '                    TagName = kmaParse.TagName(ElementPointer)
+        '                    Select Case genericController.vbUCase(TagName)
+        '                        Case "LINK"
+        '                            '
+        '                            Link = kmaParse.ElementAttribute(ElementPointer, "HREF")
+        '                            LinkType = kmaParse.ElementAttribute(ElementPointer, "TYPE")
+        '                            If (genericController.IsLinkToThisHost(SourceHost, Link)) And (LCase(LinkType) = "text/css") Then
+        '                                RootRelativeLink = genericController.ConvertLinkToRootRelative(Link, BasePath)
+        '                                main_GetStyleListFromHTML = main_GetStyleListFromHTML & vbCrLf & main_GetStyleListFromLink(Link, BasePath, SourceHost, "")
+        '                            End If
+        '                        Case "STYLE"
+        '                            '
+        '                            ' Skip to the </Style> TAG, main_Get the stylesheet between for processing
+        '                            '
+        '                            TagDone = False
+        '                            Do While (Not TagDone) And (ElementPointer < ElementCount)
+        '                                '
+        '                                ' Process the next segment
+        '                                '
+        '                                ElementPointer = ElementPointer + 1
+        '                                ElementText = kmaParse.Text(ElementPointer)
+        '                                If kmaParse.IsTag(ElementPointer) Then
+        '                                    '
+        '                                    ' Process a tag (should just be </SCRIPT>, but go until it is
+        '                                    '
+        '                                    TagCount = TagCount + 1
+        '                                    TagDone = (kmaParse.TagName(ElementPointer) = "/" & TagName)
+        '                                End If
+        '                                If Not TagDone Then
+        '                                    StyleTag = StyleTag & ElementText
+        '                                End If
+        '                            Loop
+        '                            main_GetStyleListFromHTML = main_GetStyleListFromHTML & vbCrLf & main_GetStyleListFromStylesheet(StyleTag, BasePath, SourceHost, "")
+        '                    End Select
+        '                End If
+        '                'Output.Add( ElementText
+        '                ElementPointer = ElementPointer + 1
+        '            Loop
+        '            'main_GetStyleListFromHTML = Output.Text
+        '            '
+        '            kmaParse = Nothing
+        '            Exit Function
+        '            '
+        '            ' ----- Error Trap
+        '            '
+        'ErrorTrap:
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(Err.Number, Err.Source, Err.Description, "main_GetStyleListFromHTML", True, False)
+        '        End Function
+        '        '
+        '        ' ================================================================================================
+        '        '   conversion pass 3
+        '        ' ================================================================================================
+        '        '
+        '        '
+        '        '
+        '        '
+        '        Private Function main_GetStyleListFromLink(Link As String, BasePath As String, SourceHost As String, BlockRootRelativeLinkList As String) As String
+        '            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetStyleListFromLink")
+        '            '
+        '            Dim Pos As Integer
+        '            Dim ImportedStyle As String
+        '            Dim HTTP As New httpRequestController()
+        '            Dim Filename As String
+        '            Dim RootRelativeLink As String
+        '            Dim ImportLink As String
+        '            Dim LinkPath As String
+        '            '
+        '            RootRelativeLink = genericController.ConvertLinkToRootRelative(Link, BasePath)
+        '            main_GetStyleListFromLink = ""
+        '            If genericController.vbInstr(1, BlockRootRelativeLinkList, RootRelativeLink, vbTextCompare) = 0 Then
+        '                ImportLink = SourceHost & RootRelativeLink
+        '                ImportedStyle = HTTP.getURL(ImportLink)
+        '                Dim HTTPStatus As String
+        '                HTTPStatus = genericController.getLine(HTTP.responseHeader)
+        '                If genericController.vbInstr(1, HTTPStatus, "200") = 0 Then
+        '                    main_GetStyleListFromLink = ""
+        '                Else
+        '                End If
 
-                Pos = InStrRev(RootRelativeLink, "/")
-                If Pos > 0 Then
-                    LinkPath = Mid(RootRelativeLink, 1, Pos)
-                End If
-                main_GetStyleListFromLink = main_GetStyleListFromStylesheet(ImportedStyle, LinkPath, SourceHost, BlockRootRelativeLinkList & "," & RootRelativeLink)
-            End If
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(Err.Number, Err.Source, Err.Description, "main_GetStyleListFromLink", True, False)
-        End Function
-        '
-        '
-        '
-        Private Function main_GetStyleListFromStylesheet(StyleSheet As String, BasePath As String, SourceHost As String, BlockRootRelativeLinkList As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetStyleListFromStylesheet")
-            '
-            Dim PosURLStart As Integer
-            Dim PosURLEnd As Integer
-            Dim URLCommand As String
-            Dim Value As String
-            Dim Loopcnt2 As Integer
-            Dim Name As String
-            Dim NameValue As String
-            Dim PtrStart As Integer
-            Dim PtrEnd As Integer
-            Dim Line As String
-            Dim Lines() As String
-            Dim LineCnt As Integer
-            Dim LinePtr As Integer
-            Dim Ptr As Integer
-            Dim Pos As Integer
-            Dim PosStart As Integer
-            Dim PosEnd As Integer
-            Dim Link As String
-            Dim RootRelativeLink As String
-            Dim LoopCnt As Integer
-            Dim ImportedStyle As String
-            Dim HTTP As New httpRequestController()
-            Dim Output As String
-            '
-            Pos = 1
-            Output = StyleSheet
-            '
-            ' convert imports
-            '
-            Do While (Pos <> 0) And LoopCnt < 100
-                Pos = genericController.vbInstr(Pos, StyleSheet, "@import", vbTextCompare)
-                If Pos <> 0 Then
-                    '
-                    ' style includes an import -- convert filename and load the file
-                    '
-                    Pos = genericController.vbInstr(Pos, StyleSheet, "url", vbTextCompare)
-                    If Pos <> 0 Then
-                        PosStart = genericController.vbInstr(Pos, StyleSheet, "(", vbTextCompare)
-                        If PosStart <> 0 Then
-                            PosStart = PosStart + 1
-                            PosEnd = genericController.vbInstr(PosStart, StyleSheet, ")", vbTextCompare)
-                            If PosEnd <> 0 Then
-                                PosEnd = PosEnd - 1
-                                Link = Mid(StyleSheet, PosStart, PosEnd - PosStart + 1)
-                                Output = Output & vbCrLf & main_GetStyleListFromLink(Link, BasePath, SourceHost, BlockRootRelativeLinkList)
-                                Pos = PosStart
-                            End If
-                        End If
-                    End If
-                End If
-                LoopCnt = LoopCnt + 1
-            Loop
-            '
-            ' Done
-            '
-            main_GetStyleListFromStylesheet = Output
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(Err.Number, Err.Source, Err.Description, "main_GetStyleListFromStylesheet", True, False)
-        End Function
-        '
-        '=================================================================================================================================================
-        '   main_AddLinkAlias
-        '
-        '   Link Alias
-        '       A LinkAlias name is a unique string that identifies a page on the site.
-        '       A page on the site is generated from the PageID, and the QueryStringSuffix
-        '       PageID - obviously, this is the ID of the page
-        '       QueryStringSuffix - other things needed on the Query to display the correct content.
-        '           The Suffix is needed in cases like when an Add-on is embedded in a page. The URL to that content becomes the pages
-        '           Link, plus the suffix needed to find the content.
-        '
-        '       When you make the menus, look up the most recent Link Alias entry with the pageID, and a blank QueryStringSuffix
-        '
-        '   The Link Alias table no longer needs the Link field.
-        '
-        '=================================================================================================================================================
-        '
-        ' +++++ 9/8/2011 4.1.482, added main_AddLinkAlias to csv and changed main to call
-        '
-        Public Sub main_AddLinkAlias(ByVal linkAlias As String, ByVal PageID As Integer, ByVal QueryStringSuffix As String, Optional ByVal OverRideDuplicate As Boolean = False, Optional ByVal DupCausesWarning As Boolean = False)
-            Try
-                Dim warningMessage As String = ""
-                Call app_addLinkAlias2(linkAlias, PageID, QueryStringSuffix, OverRideDuplicate, DupCausesWarning, warningMessage)
-                If warningMessage <> "" Then
-                    Call error_AddUserError(warningMessage)
-                End If
-            Catch ex As Exception
-                Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(Err.Number, Err.Source, Err.Description, "main_AddLinkAlias", True, False)
-            End Try
-        End Sub
-        '
-        '   Used in reports
-        '
-        Public Function main_GetPleaseWaitStart() As String
-            '
-            main_GetPleaseWaitStart = programFiles.readFile("Resources\WaitPageOpen.htm")
-            '
-        End Function
-        '
-        '   Used in reports
-        '
-        Public Sub main_WritePleaseWaitStart()
-            '
-            If Not main_PleaseWaitStarted Then
-                main_PleaseWaitStarted = True
-                Call htmlDoc.writeAltBuffer(main_GetPleaseWaitStart)
-                Call webServer.flushStream()
-            End If
-            '
-        End Sub
-        '
-        '   Used in reports
-        '
-        Public Function main_GetPleaseWaitEnd() As String
-            Return programFiles.readFile("resources\WaitPageClose.htm")
-            'main_GetPleaseWaitEnd = cluster.localClusterFiles.readFile("ccLib\Popup\WaitPageClose.htm")
-        End Function
-        '
-        '   Used in reports
-        '
-        Public Sub main_WritePleaseWaitEnd()
-            If main_PleaseWaitStarted Then
-                Call htmlDoc.writeAltBuffer(main_GetPleaseWaitEnd)
-                Call webServer.flushStream()
-            End If
-        End Sub
+        '                Pos = InStrRev(RootRelativeLink, "/")
+        '                If Pos > 0 Then
+        '                    LinkPath = Mid(RootRelativeLink, 1, Pos)
+        '                End If
+        '                main_GetStyleListFromLink = main_GetStyleListFromStylesheet(ImportedStyle, LinkPath, SourceHost, BlockRootRelativeLinkList & "," & RootRelativeLink)
+        '            End If
+        '            Exit Function
+        '            '
+        '            ' ----- Error Trap
+        '            '
+        'ErrorTrap:
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(Err.Number, Err.Source, Err.Description, "main_GetStyleListFromLink", True, False)
+        '        End Function
+        '        '
+        '        '
+        '        '
+        '        Private Function main_GetStyleListFromStylesheet(StyleSheet As String, BasePath As String, SourceHost As String, BlockRootRelativeLinkList As String) As String
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetStyleListFromStylesheet")
+        '            '
+        '            Dim PosURLStart As Integer
+        '            Dim PosURLEnd As Integer
+        '            Dim URLCommand As String
+        '            Dim Value As String
+        '            Dim Loopcnt2 As Integer
+        '            Dim Name As String
+        '            Dim NameValue As String
+        '            Dim PtrStart As Integer
+        '            Dim PtrEnd As Integer
+        '            Dim Line As String
+        '            Dim Lines() As String
+        '            Dim LineCnt As Integer
+        '            Dim LinePtr As Integer
+        '            Dim Ptr As Integer
+        '            Dim Pos As Integer
+        '            Dim PosStart As Integer
+        '            Dim PosEnd As Integer
+        '            Dim Link As String
+        '            Dim RootRelativeLink As String
+        '            Dim LoopCnt As Integer
+        '            Dim ImportedStyle As String
+        '            Dim HTTP As New httpRequestController()
+        '            Dim Output As String
+        '            '
+        '            Pos = 1
+        '            Output = StyleSheet
+        '            '
+        '            ' convert imports
+        '            '
+        '            Do While (Pos <> 0) And LoopCnt < 100
+        '                Pos = genericController.vbInstr(Pos, StyleSheet, "@import", vbTextCompare)
+        '                If Pos <> 0 Then
+        '                    '
+        '                    ' style includes an import -- convert filename and load the file
+        '                    '
+        '                    Pos = genericController.vbInstr(Pos, StyleSheet, "url", vbTextCompare)
+        '                    If Pos <> 0 Then
+        '                        PosStart = genericController.vbInstr(Pos, StyleSheet, "(", vbTextCompare)
+        '                        If PosStart <> 0 Then
+        '                            PosStart = PosStart + 1
+        '                            PosEnd = genericController.vbInstr(PosStart, StyleSheet, ")", vbTextCompare)
+        '                            If PosEnd <> 0 Then
+        '                                PosEnd = PosEnd - 1
+        '                                Link = Mid(StyleSheet, PosStart, PosEnd - PosStart + 1)
+        '                                Output = Output & vbCrLf & main_GetStyleListFromLink(Link, BasePath, SourceHost, BlockRootRelativeLinkList)
+        '                                Pos = PosStart
+        '                            End If
+        '                        End If
+        '                    End If
+        '                End If
+        '                LoopCnt = LoopCnt + 1
+        '            Loop
+        '            '
+        '            ' Done
+        '            '
+        '            main_GetStyleListFromStylesheet = Output
+        '            Exit Function
+        '            '
+        '            ' ----- Error Trap
+        '            '
+        'ErrorTrap:
+        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(Err.Number, Err.Source, Err.Description, "main_GetStyleListFromStylesheet", True, False)
+        '        End Function
+
+
+
+
+
         '
         '=================================================================================================
         '   Run and return results from a remotequery call from cj.ajax.data(handler,key,args,pagesize,pagenumber)
@@ -10957,7 +9382,7 @@ ErrorTrap:
         '
         '=================================================================================================
         '
-        Private Function init_ProcessAjaxData() As String
+        Private Function executeRoute_ProcessAjaxData() As String
             Dim result As String = ""
             Try
                 Dim SetPairs() As String
@@ -11272,7 +9697,7 @@ ErrorTrap:
                         '
                         ' output
                         '
-                        Copy = main_FormatRemoteQueryOutput(gd, RemoteFormat)
+                        Copy = remoteQueryController.main_FormatRemoteQueryOutput(Me, gd, RemoteFormat)
                         Copy = htmlDoc.html_EncodeHTML(Copy)
                         result = "<data>" & Copy & "</data>"
                     End If
@@ -11282,275 +9707,12 @@ ErrorTrap:
             End Try
             Return result
         End Function
+
+
+
+
         '
         '
-        '
-        Public Function main_GetRemoteQueryKey(ByVal SQL As String, Optional ByVal DataSourceName As String = "", Optional ByVal maxRows As Integer = 1000) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetRemoteQueryKey")
-            '
-            Dim CS As Integer
-            Dim RemoteKey As String
-            Dim DataSourceID As Integer
-            'Dim GUIDGenerator As New guidClass
-            '
-            If maxRows = 0 Then
-                maxRows = 1000
-            End If
-            CS = InsertCSContent("Remote Queries")
-            If db.cs_ok(CS) Then
-                RemoteKey = Guid.NewGuid.ToString()
-                DataSourceID = main_GetRecordID("Data Sources", DataSourceName)
-                Call db.cs_set(CS, "remotekey", RemoteKey)
-                Call db.cs_set(CS, "datasourceid", DataSourceID)
-                Call db.cs_set(CS, "sqlquery", SQL)
-                Call db.cs_set(CS, "maxRows", maxRows)
-                Call db.cs_set(CS, "dateexpires", db.encodeSQLDate(app_startTime.AddDays(1)))
-                Call db.cs_set(CS, "QueryTypeID", QueryTypeSQL)
-                Call db.cs_set(CS, "VisitId", authContext.visit.ID)
-            End If
-            Call db.cs_Close(CS)
-            '
-            main_GetRemoteQueryKey = RemoteKey
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(Err.Number, Err.Source, Err.Description, "main_GetRemoteQueryKey", True, False)
-        End Function
-        '
-        '
-        '
-        Public Function main_FormatRemoteQueryOutput(gd As GoogleDataType, RemoteFormat As RemoteFormatEnum) As String
-            '
-            Dim s As stringBuilderLegacyController
-            Dim ColDelim As String
-            Dim RowDelim As String
-            Dim ColPtr As Integer
-            Dim RowPtr As Integer
-            '
-            ' Select output format
-            '
-            s = New stringBuilderLegacyController
-            Select Case RemoteFormat
-                Case RemoteFormatEnum.RemoteFormatJsonNameValue
-                    '
-                    '
-                    '
-                    Call s.Add("{")
-                    If Not gd.IsEmpty Then
-                        ColDelim = ""
-                        For ColPtr = 0 To UBound(gd.col)
-                            Call s.Add(ColDelim & gd.col(ColPtr).Id & ":'" & gd.row(0).Cell(ColPtr).v & "'")
-                            ColDelim = ","
-                        Next
-                    End If
-                    Call s.Add("}")
-                Case RemoteFormatEnum.RemoteFormatJsonNameArray
-                    '
-                    '
-                    '
-                    Call s.Add("{")
-                    If Not gd.IsEmpty Then
-                        ColDelim = ""
-                        For ColPtr = 0 To UBound(gd.col)
-                            Call s.Add(ColDelim & gd.col(ColPtr).Id & ":[")
-                            ColDelim = ","
-                            RowDelim = ""
-                            For RowPtr = 0 To UBound(gd.row)
-                                With gd.row(RowPtr).Cell(ColPtr)
-                                    s.Add(RowDelim & "'" & .v & "'")
-                                    RowDelim = ","
-                                End With
-                            Next
-                            Call s.Add("]")
-                        Next
-                    End If
-                    Call s.Add("}")
-                Case RemoteFormatEnum.RemoteFormatJsonTable
-                    '
-                    '
-                    '
-                    Call s.Add("{")
-                    If Not gd.IsEmpty Then
-                        Call s.Add("cols: [")
-                        ColDelim = ""
-                        For ColPtr = 0 To UBound(gd.col)
-                            With gd.col(ColPtr)
-                                Call s.Add(ColDelim & "{id: '" & genericController.EncodeJavascript(.Id) & "', label: '" & genericController.EncodeJavascript(.Label) & "', type: '" & genericController.EncodeJavascript(.Type) & "'}")
-                                ColDelim = ","
-                            End With
-                        Next
-                        Call s.Add("],rows:[")
-                        RowDelim = ""
-                        For RowPtr = 0 To UBound(gd.row)
-                            s.Add(RowDelim & "{c:[")
-                            RowDelim = ","
-                            ColDelim = ""
-                            For ColPtr = 0 To UBound(gd.col)
-                                With gd.row(RowPtr).Cell(ColPtr)
-                                    Call s.Add(ColDelim & "{v: '" & genericController.EncodeJavascript(.v) & "'}")
-                                    ColDelim = ","
-                                End With
-                            Next
-                            s.Add("]}")
-                        Next
-                        Call s.Add("]")
-                    End If
-                    Call s.Add("}")
-            End Select
-            main_FormatRemoteQueryOutput = s.Text
-            '
-        End Function
-        '
-        '
-        '
-        Friend Sub log_appendLogPageNotFound(PageNotFoundLink As String)
-            Try
-                Call logController.appendLog(Me, """" & FormatDateTime(app_startTime, vbGeneralDate) & """,""App=" & serverConfig.appConfig.name & """,""main_VisitId=" & authContext.visit.ID & """,""" & PageNotFoundLink & """,""Referrer=" & webServer.requestReferrer & """", "performance", "pagenotfound")
-            Catch ex As Exception
-                Throw (ex)
-            End Try
-        End Sub
-        '
-        '
-        '
-        Public ReadOnly Property main_docType() As String
-            Get
-                Return siteProperties.docTypeDeclaration()
-            End Get
-        End Property
-        '
-        '
-        '
-        Public ReadOnly Property main_DocTypeAdmin() As String
-            Get
-                Return siteProperties.docTypeDeclarationAdmin
-            End Get
-        End Property
-        '
-        '
-        '
-        'Private Sub main_ErrorTemplate(Argument as object)
-        '    On Error GoTo ErrorTrap: 'Dim th as integer: th = profileLogMethodEnter("Proc00313")
-        '    '
-        '    'If Not (true) Then Exit Sub
-        '    '
-        '    Dim iArgument As String
-        '    '
-        '    iArgument = genericController.encodeText(Argument)
-        '    '
-        '    Exit Sub
-        '    '
-        'ErrorTrap:
-        '    Call main_HandleClassErrorAndBubble_TrapPatch1("main_ErrorTemplate")
-        'End Sub
-        '
-        '
-        '
-        '========================================================================
-        ' ----- main_Get an XML nodes attribute based on its name
-        '========================================================================
-        '
-        Public Function main_GetXMLAttribute(ByVal Found As Boolean, ByVal Node As XmlNode, ByVal Name As String, ByVal DefaultIfNotFound As String) As String
-            On Error GoTo ErrorTrap
-            '
-            Dim NodeAttribute As XmlAttribute
-            Dim ResultNode As XmlNode
-            Dim UcaseName As String
-            '
-            Found = False
-            ResultNode = Node.Attributes.GetNamedItem(Name)
-            If (ResultNode Is Nothing) Then
-                UcaseName = genericController.vbUCase(Name)
-                For Each NodeAttribute In Node.Attributes
-                    If genericController.vbUCase(NodeAttribute.Name) = UcaseName Then
-                        main_GetXMLAttribute = NodeAttribute.Value
-                        Found = True
-                        Exit For
-                    End If
-                Next
-            Else
-                main_GetXMLAttribute = ResultNode.Value
-                Found = True
-            End If
-            If Not Found Then
-                main_GetXMLAttribute = DefaultIfNotFound
-            End If
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_GetXMLAttribute")
-        End Function
-        '        '
-        '        '=============================================================================================
-        '        '   Legacy
-        '        '=============================================================================================
-        '        '
-        '        Public Function main_GetStreamText2(ByVal RequestName As String) As String
-        '            On Error GoTo ErrorTrap
-        '            '
-        '            main_GetStreamText = main_GetStreamText2(genericController.encodeText(RequestName))
-        '            '
-        '            Exit Function
-        'ErrorTrap:
-        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetStreamText")
-        '        End Function
-        '
-        '=============================================================================================
-        '   Legacy
-        '=============================================================================================
-        '
-        Public Function main_GetStreamNumber(ByVal RequestName As String) As Double
-            On Error GoTo ErrorTrap
-            '
-            main_GetStreamNumber = genericController.EncodeNumber(docProperties.getText(genericController.encodeText(RequestName)))
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetStreamNumber")
-        End Function
-        '        '
-        '        '========================================================================
-        '        ' main_Get a Text string from request
-        '        '   if empty, returns null
-        '        '   if RequestBlock true, tries only querystring
-        '        '========================================================================
-        '        '
-        '        Public Function doc_getActiveContent(ByVal RequestName As String) As String
-        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetStreamActiveContent")
-        '            '
-        '            'Dim innovaEditor As New innovaEditorAddonClassFPO
-        '            '
-        '            If True Then
-        '                doc_getActiveContent = docProperties.getText(RequestName)
-        '                If doc_getActiveContent <> "" Then
-        '                    doc_getActiveContent = html_RenderActiveContent(genericController.encodeText(doc_getActiveContent))
-        '                End If
-        '            End If
-        '            '
-        '            Exit Function
-        'ErrorTrap:
-        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetStreamActiveContent")
-        '        End Function
-        '
-        '
-        '
-        '
-        '
-        Public Function main_IsViewingProperty(ByVal PropertyName As String) As Boolean
-            Return Not docProperties.containsKey(PropertyName)
-        End Function
-        '
-        '
-        '
-        Private Function main_GetFileSize(ByVal VirtualFilePathPage As String) As Integer
-            Dim files As IO.FileInfo() = appRootFiles.getFileList(VirtualFilePathPage)
-            Return CInt(files(0).Length)
-        End Function
         '
         '=========================================================================================
         '   In Init(), Print Hard Coded Pages
@@ -11686,7 +9848,7 @@ ErrorTrap:
                             Copy = main_GetResourceLibrary2("", True, EditorObjectName, LinkObjectName, True)
                             'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2b")
                             Copy = "" _
-                            & main_docType _
+                            & siteProperties.docTypeDeclaration() _
                             & "<html>" _
                             & cr & "<head>" _
                             & genericController.kmaIndent(main_GetHTMLHead()) _
@@ -11724,7 +9886,7 @@ ErrorTrap:
                             Copy = main_GetResourceLibrary2("", True, EditorObjectName, LinkObjectName, True)
                             'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2c")
                             Copy = "" _
-                            & main_docType _
+                            & siteProperties.docTypeDeclaration() _
                             & cr & "<html>" _
                             & cr & "<head>" _
                             & genericController.kmaIndent(main_GetHTMLHead()) _
@@ -11786,7 +9948,7 @@ ErrorTrap:
                             Call htmlDoc.main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Site Explorer")
                             'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2d")
                             Copy = "" _
-                            & main_docType _
+                            & siteProperties.docTypeDeclaration() _
                             & cr & "<html>" _
                             & cr & "<head>" _
                             & genericController.kmaIndent(main_GetHTMLHead()) _
@@ -11991,7 +10153,7 @@ ErrorTrap:
                                 Call db.cs_set(CS, "ShipState", docProperties.getText("address_state"))
                                 Call db.cs_set(CS, "ShipZip", docProperties.getText("address_zip"))
                                 Call db.cs_set(CS, "BilleMail", docProperties.getText("payer_email"))
-                                Call db.cs_set(CS, "ContentControlID", main_GetContentID("Orders Completed"))
+                                Call db.cs_set(CS, "ContentControlID", metaData.getContentId("Orders Completed"))
                                 Call db.cs_save2(CS)
                             End If
                             Call db.cs_Close(CS)
@@ -12027,131 +10189,6 @@ ErrorTrap:
             End Try
             Return result
         End Function
-        '
-        '========================================================================
-        ' Print the active editor form
-        '========================================================================
-        '
-        Public Function main_GetActiveEditor(ByVal ContentName As String, ByVal RecordID As Integer, ByVal FieldName As String, Optional ByVal FormElements As String = "") As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetActiveEditor")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim ContentID As Integer
-            Dim CSPointer As Integer
-            Dim Copy As String
-            Dim Filename As String
-            Dim Stream As String
-            Dim ButtonPanel As String
-            Dim EditorPanel As String
-            Dim PanelCopy As String
-            '
-            Dim intContentName As String
-            Dim intRecordId As Integer
-            Dim strFieldName As String
-            '
-            intContentName = genericController.encodeText(ContentName)
-            intRecordId = genericController.EncodeInteger(RecordID)
-            strFieldName = genericController.encodeText(FieldName)
-            '
-            EditorPanel = ""
-            ContentID = main_GetContentID(intContentName)
-            If (ContentID < 1) Or (intRecordId < 1) Or (strFieldName = "") Then
-                PanelCopy = SpanClassAdminNormal & "The information you have selected can not be accessed.</span>"
-                EditorPanel = EditorPanel & main_GetPanel(PanelCopy)
-            Else
-                intContentName = metaData.getContentNameByID(ContentID)
-                If intContentName <> "" Then
-                    CSPointer = db.cs_open(intContentName, "ID=" & intRecordId)
-                    If Not db.cs_ok(CSPointer) Then
-                        PanelCopy = SpanClassAdminNormal & "The information you have selected can not be accessed.</span>"
-                        EditorPanel = EditorPanel & main_GetPanel(PanelCopy)
-                    Else
-                        Copy = db.cs_get(CSPointer, strFieldName)
-                        EditorPanel = EditorPanel & htmlDoc.html_GetFormInputHidden("Type", FormTypeActiveEditor)
-                        EditorPanel = EditorPanel & htmlDoc.html_GetFormInputHidden("cid", ContentID)
-                        EditorPanel = EditorPanel & htmlDoc.html_GetFormInputHidden("ID", intRecordId)
-                        EditorPanel = EditorPanel & htmlDoc.html_GetFormInputHidden("fn", strFieldName)
-                        EditorPanel = EditorPanel & genericController.encodeText(FormElements)
-                        EditorPanel = EditorPanel & htmlDoc.html_GetFormInputHTML3("ContentCopy", Copy, "3", "45", False, True)
-                        'EditorPanel = EditorPanel & main_GetFormInputActiveContent( "ContentCopy", Copy, 3, 45)
-                        ButtonPanel = main_GetPanelButtons(ButtonCancel & "," & ButtonSave, "button")
-                        EditorPanel = EditorPanel & ButtonPanel
-                    End If
-                End If
-            End If
-            Stream = Stream & main_GetPanelHeader("Contensive Active Content Editor")
-            Stream = Stream & main_GetPanel(EditorPanel)
-            Stream = htmlDoc.html_GetFormStart() & Stream & htmlDoc.html_GetFormEnd()
-            main_GetActiveEditor = Stream
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError11("main_GetActiveEditor", "trap")
-        End Function
-        '
-        '========================================================================
-        ' ----- Process the active editor form
-        '========================================================================
-        '
-        Public Sub main_ProcessActiveEditor()
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("innovaEditorAddonClassFPO.ProcessActiveEditor")
-            '
-            Dim MethodName As String
-            Dim CS As Integer
-            Dim Button As String
-            Dim ContentID As Integer
-            Dim ContentName As String
-            Dim RecordID As Integer
-            Dim FieldName As String
-            Dim ContentCopy As String
-            Dim Filename As String
-            Dim TableName As String
-            '
-            MethodName = "main_ProcessActiveEditor()"
-            '
-            '
-            ' ----- Read in Button and process
-            '
-            Button = docProperties.getText("Button")
-            Select Case Button
-                Case ButtonCancel
-                    '
-                    ' ----- Do nothing, the form will reload with the previous contents
-                    '
-                Case ButtonSave
-                    '
-                    ' ----- read the form fields
-                    '
-                    ContentID = docProperties.getInteger("cid")
-                    RecordID = docProperties.getInteger("id")
-                    FieldName = docProperties.getText("fn")
-                    ContentCopy = docProperties.getText("ContentCopy")
-                    '
-                    ' ----- convert editor active edit icons
-                    '
-                    ContentCopy = htmlDoc.html_DecodeContent(ContentCopy)
-                    '
-                    ' ----- save the content
-                    '
-                    ContentName = metaData.getContentNameByID(ContentID)
-                    If ContentName <> "" Then
-                        CS = db.cs_open(ContentName, "ID=" & db.encodeSQLNumber(RecordID), , False)
-                        If db.cs_ok(CS) Then
-                            Call db.cs_set(CS, FieldName, ContentCopy)
-                        End If
-                        Call db.cs_Close(CS)
-                    End If
-            End Select
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError11("main_ProcessActiveEditor", "trap")
-        End Sub
         '
         '
         '
@@ -12262,15 +10299,6 @@ ErrorTrap:
 ErrorTrap:
             Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError11("main_GetDefaultAddonOption_String", "trap")
         End Function
-        ''
-        ''========================================================================
-        ''   Encode a string to be used as either a name or value in an optionstring (name=value&name=value&etc)
-        ''       use this to create a string by encoding the name and then adding to the string
-        ''========================================================================
-        ''
-        'Public Function encodeNvaArgument(ByVal argToEncode As String) As String
-        '    encodeNvaArgument = encodeNvaArgument(argToEncode)
-        'End Function
         '
         '========================================================================
         ' main_Get FieldEditorList
@@ -12316,1605 +10344,5 @@ ErrorTrap:
 ErrorTrap:
             Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError11("main_GetDefaultAddonOption_String", "trap")
         End Function
-        '
-        '------------------------------------------------------------------------------------------------------------
-        '   encode an argument to be used in a 'name=value&' string
-        '       - ohter characters are reserved to do further parsing, see EncodeNvaArgument
-        '------------------------------------------------------------------------------------------------------------
-        '
-        Public Function main_encodeNvaArgument(ByVal Arg As String) As String
-            main_encodeNvaArgument = genericController.encodeNvaArgument(Arg)
-        End Function
-        '
-        '------------------------------------------------------------------------------------------------------------
-        '   decode an argument that came from parsing a name or value from a 'name=value&' string
-        '       split on '&', then on '=', then decode each of the two arguments from either side
-        '       - other characters are reserved to do further parsing, see EncodeNvaArgument
-        '------------------------------------------------------------------------------------------------------------
-        '
-        Public Function main_decodeNvaArgument(ByVal EncodedArg As String) As String
-            main_decodeNvaArgument = genericController.decodeNvaArgument(EncodedArg)
-        End Function
-        '
-        '=================================================================================================================
-        '   main_GetNvaValue
-        '       main_Gets the value from a simple 'name=value&' list, assuming it was assembled using encodeNvaArgument
-        '=================================================================================================================
-        '
-        Public Function main_GetNvaValue(ByVal Name As String, ByVal nvaEncodedString As String) As String
-            On Error GoTo ErrorTrap
-            '
-            Dim s As String
-            Dim encodedName As String
-            '
-            encodedName = genericController.encodeNvaArgument(Name)
-            s = genericController.getSimpleNameValue(encodedName, nvaEncodedString, "", "&")
-            s = genericController.decodeNvaArgument(s)
-            main_GetNvaValue = Trim(s)
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError3(serverConfig.appConfig.name, "", "dll", "cpCoreClass", "main_GetNvaValue", Err.Number, Err.Source, Err.Description, True, False, "")
-        End Function
-        ''
-        ''===========================================================================================
-        '' main_ServerDomainCrossList
-        ''   comma delimited list of domains that should share in cross domain cookie save
-        ''===========================================================================================
-        ''
-        'Public ReadOnly Property main_ServerDomainCrossList() As String
-        '    Get
-        '        Dim SQL As String
-        '        'dim dt as datatable
-        '        '
-        '        Const cacheName = "Domain Content Cross List Cache"
-        '        '
-        '        If Not htmlDoc.html_ServerDomainCrossList_Loaded Then
-        '            htmlDoc.html_ServerDomainCrossList = genericController.encodeText(cache.getObject(Of String)(cacheName))
-        '            If True And (htmlDoc.html_ServerDomainCrossList = "") Then
-        '                htmlDoc.html_ServerDomainCrossList = ","
-        '                SQL = "select name from ccDomains where (typeId=1)and(allowCrossLogin<>0)"
-        '                Dim dt As DataTable = db.executeSql(SQL)
-        '                For Each dr As DataRow In dt.Rows
-        '                    htmlDoc.html_ServerDomainCrossList &= dr(0).ToString
-        '                Next
-        '                Call cache.setObject(cacheName, htmlDoc.html_ServerDomainCrossList, "domains")
-        '            End If
-        '            htmlDoc.html_ServerDomainCrossList_Loaded = True
-        '        End If
-        '        main_ServerDomainCrossList = serverConfig.appConfig.domainList(0) & htmlDoc.html_ServerDomainCrossList
-        '    End Get
-        'End Property
-
-        '        '
-        '
-        '
-        Private Function main_GetDefaultTemplateId() As Integer
-            On Error GoTo ErrorTrap
-            '
-            Dim CS As Integer
-            '
-            CS = db.cs_open("page templates", "name=" & db.encodeSQLText(TemplateDefaultName), "ID", , , , , "id")
-            If db.cs_ok(CS) Then
-                main_GetDefaultTemplateId = db.cs_getInteger(CS, "ID")
-            End If
-            Call db.cs_Close(CS)
-            '
-            ' ----- if default template not found, create a simple default template
-            '
-            If main_GetDefaultTemplateId = 0 Then
-                CS = db.cs_insertRecord("Page Templates")
-                If db.cs_ok(CS) Then
-                    main_GetDefaultTemplateId = db.cs_getInteger(CS, "ID")
-                    Call db.cs_set(CS, "name", TemplateDefaultName)
-                    Call db.cs_set(CS, "Link", "")
-                    If True Then
-                        Call db.cs_set(CS, "BodyHTML", pages.templateBody)
-                    End If
-                    If True Then
-                        Call db.cs_set(CS, "ccGuid", DefaultTemplateGuid)
-                    End If
-                    Call db.cs_Close(CS)
-                End If
-            End If
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError11("main_GetDefaultTemplateId", "trap")
-        End Function
-        '        '
-        '        '
-        '        '
-        '        Private Sub main_mergeInStream(ByVal LinkQueryString As String)
-        '            On Error GoTo ErrorTrap
-        '            '
-        '            Dim inStreamPtr As Integer
-        '            Dim ampSplit() As String
-        '            Dim ampSplitCount As Integer
-        '            Dim ampSplitPointer As Integer
-        '            Dim newNameValue As String
-        '            Dim equalPtr As Integer
-        '            Dim NewName As String
-        '            Dim NewValue As String
-        '            '
-        '            ' Merge the Link Querystring (QS in the Link from the Alias lookup)
-        '            ' into the QS originally to the right of a ? in the Alias itself (from custom programming)
-        '            ' If names match, use the custom programming main_version (originial QS, not the LinkQueryString)
-        '            '
-        '            ampSplit = Split(LinkQueryString, "&")
-        '            ampSplitCount = UBound(ampSplit) + 1
-        '            If ampSplitCount > 0 Then
-        '                For ampSplitPointer = 0 To ampSplitCount - 1
-        '                    newNameValue = ampSplit(ampSplitPointer)
-        '                    If newNameValue <> "" Then
-        '                        equalPtr = genericController.vbInstr(1, newNameValue, "=")
-        '                        If equalPtr > 0 Then
-        '                            NewName = main_DecodeUrl(Mid(newNameValue, 1, equalPtr - 1))
-        '                            NewValue = Mid(newNameValue, equalPtr + 1)
-        '                        Else
-        '                            NewValue = ""
-        '                            NewName = newNameValue
-        '                        End If
-        '                        If docPropertiesArrayCount > 0 Then
-        '                            For inStreamPtr = 0 To docPropertiesArrayCount - 1
-        '                                If genericController.vbLCase(NewName) = genericController.vbLCase(docPropertiesDict(inStreamPtr).Name) Then
-        '                                    '
-        '                                    ' Current entry found
-        '                                    '
-        '                                    Exit For
-        '                                End If
-        '                            Next
-        '                        End If
-        '                        If inStreamPtr = docPropertiesArrayCount Then
-        '                            '
-        '                            ' Add a new InStream entry
-        '                            '
-        '                            If docPropertiesArrayCount >= docPropertiesArraySize Then
-        '                                docPropertiesArraySize = docPropertiesArraySize + 10
-        '                                ReDim Preserve docPropertiesDict(docPropertiesArraySize)
-        '                            End If
-        '                            docPropertiesArrayCount = docPropertiesArrayCount + 1
-        '                            web.requestQueryString = genericController.ModifyQueryString(web.requestQueryString, NewName, NewValue)
-        '                        End If
-        '                        '
-        '                        ' Populate the entry at InStreamPtr
-        '                        '
-        '                        With docPropertiesDict(inStreamPtr)
-        '                            .NameValue = newNameValue
-        '                            .Name = NewName
-        '                            .Value = NewValue
-        '                            .FileContent = {}
-        '                            .IsFile = False
-        '                            .IsForm = False
-        '                        End With
-        '                    End If
-        '                Next
-        '            End If
-        '            '
-        '            Exit Sub
-        'ErrorTrap:
-        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError11("main_mergeInStream", "trap")
-        '        End Sub
-        '
-        '========================================================================
-        ' main_encodeCookieName
-        '   replace invalid cookie characters with %hex
-        '========================================================================
-        '
-        Public Function main_encodeCookieName(ByVal Source As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("main_encodeCookieName")
-            '
-            Dim SourcePointer As Integer
-            Dim Character As String
-            Dim localSource As String
-            '
-            If Source <> "" Then
-                localSource = Source
-                For SourcePointer = 1 To Len(localSource)
-                    Character = Mid(localSource, SourcePointer, 1)
-                    If genericController.vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_!*()", Character, vbTextCompare) <> 0 Then
-                        main_encodeCookieName = main_encodeCookieName & Character
-                    Else
-                        main_encodeCookieName = main_encodeCookieName & "%" & Hex(Asc(Character))
-                    End If
-                Next
-            End If
-            Exit Function
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_encodeCookieName")
-        End Function
-        ''
-        ''========================================================================
-        ''   legacy
-        ''========================================================================
-        ''
-        'Public Function main_SendMemberEmail(ByVal ToMemberID As Integer, ByVal From As String, ByVal subject As String, ByVal Body As String, ByVal Immediate As Boolean, ByVal HTML As Boolean) As String
-        '    main_SendMemberEmail = main_SendMemberEmail2(ToMemberID, From, subject, Body, Immediate, HTML, 0, "", False)
-        'End Function
-        '        '
-        '        '========================================================================
-        '        '   main_SendMemberEmail2( ToMemberID, From, Subject, Body, Immediate, HTML, emailIdForLog ) As String
-        '        '       Returns "" if send is OK, otherwise it returns an error message
-        '        '========================================================================
-        '        '
-        '        Public Function main_SendMemberEmail2(ByVal ToMemberID As Integer, ByVal From As String, ByVal subject As String, ByVal Body As String, ByVal Immediate As Boolean, ByVal HTML As Boolean, ByVal emailIdForLog As Integer, template As String, emailAllowLinkEID As Boolean) As String
-        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SendMemberEmail2")
-        '            '
-        '            'If Not (true) Then Exit Function
-        '            '
-        '            main_SendMemberEmail2 = csv_SendMemberEmail3(genericController.EncodeInteger(ToMemberID), genericController.encodeText(From), genericController.encodeText(subject), genericController.encodeText(Body), genericController.EncodeBoolean(Immediate), genericController.EncodeBoolean(HTML), emailIdForLog, "", False)
-        '            '
-        '            Exit Function
-        '            '
-        'ErrorTrap:
-        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_SendMemberEmail2")
-        '        End Function
-        ''
-        ''========================================================================
-        ''   Legacy
-        ''========================================================================
-        ''
-        'Public Function main_SendMemberEmail_Fast(ByVal ToMemberID As Integer, ByVal From As String, ByVal subject As String, ByVal Body As String, ByVal Immediate As Boolean, ByVal HTML As Boolean) As String
-        '    main_SendMemberEmail_Fast = csv_SendMemberEmail3(ToMemberID, From, subject, Body, Immediate, HTML, 0, "", False)
-        'End Function
-
-        '
-        '========================================================================
-        ' ----- Get an XML nodes attribute based on its name
-        '========================================================================
-        '
-        Public Function csv_GetXMLAttribute(ByVal Found As Boolean, ByVal Node As XmlNode, ByVal Name As String, ByVal DefaultIfNotFound As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("csv_GetXMLAttribute")
-            '
-            Dim NodeAttribute As XmlAttribute
-            Dim ResultNode As XmlNode
-            Dim UcaseName As String
-            '
-            Found = False
-            ResultNode = Node.Attributes.GetNamedItem(Name)
-            If (ResultNode Is Nothing) Then
-                UcaseName = genericController.vbUCase(Name)
-                For Each NodeAttribute In Node.Attributes
-                    If genericController.vbUCase(NodeAttribute.Name) = UcaseName Then
-                        csv_GetXMLAttribute = NodeAttribute.Value
-                        Found = True
-                        Exit For
-                    End If
-                Next
-            Else
-                csv_GetXMLAttribute = ResultNode.Value
-                Found = True
-            End If
-            If Not Found Then
-                csv_GetXMLAttribute = DefaultIfNotFound
-            End If
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError6("csv_GetXMLAttribute", "trap")
-        End Function
-        '
-        '   clear addonIncludeRules cache
-        '
-        Public Sub cache_addonIncludeRules_clear()
-            On Error GoTo ErrorTrap 'Const Tn = "cache_addonIncludeRules_clear": 'Dim th as integer: th = profileLogMethodEnter(Tn)
-            '
-            cache_addonIncludeRules = New addonIncludeRulesClass
-            'cache_addonIncludeRules.itemCnt = 0
-            'cache_addonIncludeRules.item = {}
-            Call cache.setObject(cache_addonIncludeRules_cacheName, cache_addonIncludeRules.item)
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError4(Err.Number, Err.Source, Err.Description, "cache_addonIncludeRules_clear", True)
-        End Sub
-        '
-        Public Sub cache_addonIncludeRules_save()
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("MainClass.cache_addonIncludeRules_save")
-            '
-            'Dim cacheArray As Object()
-            'ReDim cacheArray(1)
-            '
-            Call cache_addonIncludeRules.addonIdIndex.getPtr("test")
-            '
-            Call cache.setObject(cache_addonIncludeRules_cacheName, cache_addonIncludeRules)
-            'cacheArray(0) = cache_addonIncludeRules.item
-            'cacheArray(1) = cache_addonIncludeRules.addonIdIndex.exportPropertyBag
-            'Call cache.cache_save(cache_addonIncludeRules_cacheName, cacheArray)
-            '
-            Exit Sub
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("cache_addonIncludeRules_save")
-        End Sub
-        '
-        '   load addonIncludeRules cache
-        '
-        Private Sub cache_addonIncludeRules_load()
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("cache_addonIncludeRules_load")
-            '
-            'Dim cacheLoaded As Boolean
-            Dim bag As Object
-            Dim Ticks As Integer
-            Dim hint As String
-            Dim IDList As String
-            Dim CS As Integer
-            'dim dt as datatable
-            Dim Ptr As Integer
-            Dim SQL As String
-            Dim SelectList As String
-            Dim SupportMetaContentNoFollow As Boolean
-            Dim Criteria As String
-            'dim buildversion As String
-            Dim RecordAddonID As Integer
-            Dim RecordIncludedAddonID As Integer
-            Dim test As Object
-            Dim SaveHintToLog As Boolean
-            Dim cacheArray() As String
-            Dim cacheTest As Object
-            '
-            SaveHintToLog = True
-            'hint = "cache_addonIncludeRules_load, enter"
-            '
-            ' Load cached addonIncludeRulesCache
-            '
-            cache_addonIncludeRules = New addonIncludeRulesClass
-            cache_addonIncludeRules.addonIdIndex = New keyPtrController
-            cache_addonIncludeRules.itemCnt = 0
-            '
-            On Error Resume Next
-            If Not pages.pagemanager_IsWorkflowRendering() Then
-                cacheTest = cache.getObject(Of addonIncludeRulesClass)(cache_addonIncludeRules_cacheName)
-                If TypeOf cacheTest Is addonIncludeRulesClass Then
-                    cache_addonIncludeRules = DirectCast(cacheTest, addonIncludeRulesClass)
-                End If
-                'If TypeOf cacheTest Is String(,) Then
-                '    cache_addonIncludeRules.item = cacheTest(0)
-                '    If Not Isempty(cache_addonIncludeRules.item) Then
-                '        bag = cacheTest(1)
-                '        Call cache_addonIncludeRules.addonIdIndex.importPropertyBag(bag)
-                '        cache_addonIncludeRules.itemCnt = UBound(cache_addonIncludeRules.item, 2) + 1
-                '    End If
-                'End If
-
-                'If Not Isempty(cacheTest) Then
-                '    cacheArray = cacheTest
-                '    If Not Isempty(cacheArray) Then
-                '        cache_addonIncludeRules = cacheArray(0)
-                '        If Not Isempty(cache_addonIncludeRules) Then
-                '            bag = cacheArray(1)
-                '            If Err.Number = 0 Then
-                '                Call cache_addonIncludeRulesAddonIdIndex.importPropertyBag(bag)
-                '                If Err.Number = 0 Then
-                '                    cache_addonIncludeRulesCnt = UBound(cache_addonIncludeRules, 2) + 1
-                '                End If
-                '            End If
-                '        End If
-                '    End If
-                'End If
-            End If
-            Err.Clear()
-            On Error GoTo ErrorTrap
-            'hint = hint & ",check for empty"
-            If cache_addonIncludeRules.itemCnt = 0 Then
-                '
-                ' cache is empty, build it from scratch
-                '
-                'hint = hint & ",20 cnt=0 rebuild"
-                SQL = "select " & cache_addonIncludeRules_fieldList & " from ccaddonIncludeRules where (active<>0) order by id"
-                cache_addonIncludeRules.item = db.convertDataTabletoArray(db.executeSql(SQL))
-                'hint = hint & ",21"
-                If True Then
-                    'hint = hint & ",22"
-                    cache_addonIncludeRules.itemCnt = UBound(cache_addonIncludeRules.item, 2) + 1
-                    If cache_addonIncludeRules.itemCnt > 0 Then
-                        'hint = hint & ",23"
-                        cache_addonIncludeRules.addonIdIndex = New keyPtrController
-                        For Ptr = 0 To cache_addonIncludeRules.itemCnt - 1
-                            RecordAddonID = genericController.EncodeInteger(cache_addonIncludeRules.item(addonIncludeRulesCache_addonId, Ptr))
-                            'RecordIncludedAddonID = genericController.EncodeInteger(cache_addonIncludeRules(addonIncludeRulesCache_includedAddonId, Ptr))
-                            'hint = hint & ",24 set AddonIdIndex recordAddonId[" & RecordAddonID & "] to ptr[" & Ptr & "]"
-                            Call cache_addonIncludeRules.addonIdIndex.setPtr(genericController.encodeText(RecordAddonID), Ptr)
-                        Next
-                        Call cache_addonIncludeRules_save()
-                    End If
-                End If
-            End If
-            '
-            Exit Sub
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(Err.Number, Err.Source, Err.Description & " Hint=[" & hint & "]", "cache_addonIncludeRules_load", True, False)
-        End Sub
-        '
-        '   getPtr addonIncludeRules cache
-        '
-        Public Function cache_addonIncludeRules_getFirstPtr(addonId As Integer) As Integer
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("cache_addonIncludeRules_getFirstPtr")
-            '
-            Dim returnPtr As Integer
-            Dim CS As Integer
-            Dim sqlCriteria As String
-            Dim Ptr As Integer
-            Dim addonIncludeRulesId As Integer
-            Dim nameOrGuid As String
-            Dim hint As String
-            '
-            returnPtr = -1
-            'hint = hint & ",enter"
-            If cache_addonIncludeRules Is Nothing Then
-                Call cache_addonIncludeRules_load()
-            End If
-            'If cache_addonIncludeRules.itemCnt = 0 Then
-            '    'hint = hint & ",call load"
-            '    Call cache_addonIncludeRules_load()
-            'End If
-            If cache_addonIncludeRules.itemCnt <= 0 Then
-                '
-                'hint = hint & ",cnt<=0 exit"
-            ElseIf (cache_addonIncludeRules.addonIdIndex Is Nothing) Then
-                '
-                'hint = hint & ",index is nothing exit"
-            Else
-                returnPtr = cache_addonIncludeRules.addonIdIndex.getPtr(CStr(addonId))
-            End If
-            '
-            cache_addonIncludeRules_getFirstPtr = returnPtr
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(Err.Number, Err.Source, Err.Description, "cache_addonIncludeRules_getFirstPtr, hint=[" & hint & "]", True, False)
-        End Function
-        '
-        '=======================================================================================================================================
-        '   link forward cache - different
-        '       link forwards are only checked once
-        '       instead of a full cache, the load creates a comma delimited string, saved as persistent variant
-        '       if there is a hit, then go use the database.
-        '=======================================================================================================================================
-        '
-        Public Sub cache_linkForward_load()
-            On Error GoTo ErrorTrap
-            '
-            Dim RS As DataTable
-            Dim cacheValue As String
-            Dim bag As Object
-            '
-            ' Load cache
-            '
-            cacheValue = DirectCast(cache.getObject(Of String)(cache_linkForward_cacheName), String)
-            If cacheValue = "" Then
-                RS = db.executeSql("select sourceLink from ccLinkForwards where (sourceLink<>'')and(DestinationLink<>'')and(active<>0) order by id desc")
-                For Each dr As DataRow In RS.Rows
-                    cacheValue &= "," & dr.Item("sourceLink").ToString
-                Next
-                If cacheValue <> "" Then
-                    cacheValue = genericController.vbReplace(cacheValue, "\", "/")
-                    Call cache.setObject(cache_linkForward_cacheName, cacheValue)
-                    'Call cache.cache_savex("dummyValue", "dummyKey")
-                End If
-            End If
-            '
-            cache_linkForward = cacheValue
-            '
-            Exit Sub
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("cache_linkForward_load")
-        End Sub
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '
-        '   clear addonIncludeRules cache
-        '
-        Public Sub cache_libraryFiles_clear()
-            On Error GoTo ErrorTrap 'Const Tn = "cache_libraryFiles_clear": 'Dim th as integer: th = profileLogMethodEnter(Tn)
-            '
-            cache_libraryFilesCnt = 0
-            cache_libraryFiles = {}
-            Call cache.setObject(cache_LibraryFiles_cacheName, cache_libraryFiles)
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError4(Err.Number, Err.Source, Err.Description, "cache_libraryFiles_clear", True)
-        End Sub
-        '
-        '
-        '
-        Public Sub cache_libraryFiles_save()
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("MainClass.cache_libraryFiles_save")
-            '
-            Dim cacheArray As Object()
-            ReDim cacheArray(1)
-            '
-            Call cache_libraryFilesIdIndex.getPtr("test")
-            '
-            cacheArray(0) = cache_libraryFiles
-            cacheArray(1) = cache_libraryFilesIdIndex.exportPropertyBag
-            Call cache.setObject(cache_LibraryFiles_cacheName, cacheArray)
-            '
-            Exit Sub
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("cache_libraryFiles_save")
-        End Sub
-        '
-        '   load libraryFiles cache -- only if not loaded or cleared first
-        '
-        Public Sub cache_libraryFiles_loadIfNeeded()
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("cache_libraryFiles_loadIfNeeded")
-            '
-            ' Dim cacheLoaded As Boolean
-            Dim bag As String
-            Dim Ticks As Integer
-            Dim hint As String
-            Dim IDList As String
-            Dim CS As Integer
-            'dim dt as datatable
-            Dim Ptr As Integer
-            Dim SQL As String
-            Dim SelectList As String
-            Dim SupportMetaContentNoFollow As Boolean
-            Dim Criteria As String
-            'dim buildversion As String
-            Dim RecordID As Integer
-            Dim RecordIncludedAddonID As Integer
-            Dim test As Object
-            Dim SaveHintToLog As Boolean
-            Dim cacheArray() As Object
-            Dim cacheTest As Object
-            '
-            SaveHintToLog = True
-            'hint = "cache_libraryFiles_loadIfNeeded, enter"
-            '
-            If cache_libraryFilesCnt = 0 Then
-                '
-                ' Load cached libraryFilesCache
-                '
-                'hint = hint & ",cnt=0, not loaded or cleared"
-                cache_libraryFilesIdIndex = New keyPtrController
-                cache_libraryFilesCnt = 0
-                '
-                cacheTest = cache.getObject(Of Object())(cache_LibraryFiles_cacheName)
-                If Not IsNothing(cacheTest) Then
-                    cacheArray = DirectCast(cacheTest, Object())
-                    cache_libraryFiles = DirectCast(cacheArray(0), String(,))
-                    bag = genericController.encodeText(cacheArray(1))
-                    Call cache_libraryFilesIdIndex.importPropertyBag(bag)
-                    cache_libraryFilesCnt = UBound(cache_libraryFiles, 2) + 1
-                End If
-                'hint = hint & ",cache loaded cache_libraryFilesCnt=" & cache_libraryFilesCnt
-                If cache_libraryFilesCnt = 0 Then
-                    '
-                    ' cache is empty, build it from scratch
-                    '
-                    'hint = hint & ",cnt=0 rebuild"
-                    SQL = "select " & cache_LibraryFiles_fieldList & " from cclibraryFiles where (active<>0) order by id"
-                    cache_libraryFiles = db.convertDataTabletoArray(db.executeSql(SQL))
-                    '    RS = app.csv_OpenRSSQL_Internal("Default", SQL, 120, 1000, 1, False, CursorLocationEnum.adUseClient, LockTypeEnum.adLockOptimistic, CursorTypeEnum.adOpenForwardOnly)
-                    'cacheLoaded = False
-                    'If (isDataTableOk(rs)) Then
-                    '    If Not rs.rows.count=0 Then
-                    '        cache_libraryFiles = RS.GetRows
-                    '        cacheLoaded = True
-                    '    End If
-                    '    If (isDataTableOk(rs)) Then
-                    '        If false Then
-                    '            RS.Close
-                    '        End If
-                    '        'RS = Nothing
-                    '    End If
-                    'End If
-                    'hint = hint & ",21"
-                    If True Then
-                        'hint = hint & ",22"
-                        cache_libraryFilesCnt = UBound(cache_libraryFiles, 2) + 1
-                        If cache_libraryFilesCnt > 0 Then
-                            'hint = hint & ",reloaded cache_libraryFilesCnt=" & cache_libraryFilesCnt
-                            cache_libraryFilesIdIndex = New keyPtrController
-                            For Ptr = 0 To cache_libraryFilesCnt - 1
-                                RecordID = genericController.EncodeInteger(cache_libraryFiles(LibraryFilesCache_Id, Ptr))
-                                Call cache_libraryFilesIdIndex.setPtr(genericController.encodeText(RecordID), Ptr)
-                            Next
-                            Call cache_libraryFiles_save()
-                        End If
-                    End If
-                End If
-            End If
-            If SaveHintToLog Then
-                Call debug_testPoint(hint)
-            End If
-            '
-            Exit Sub
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(Err.Number, Err.Source, Err.Description & " Hint=[" & hint & "]", "cache_libraryFiles_loadIfNeeded", True, False)
-        End Sub
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' cpCoreClass constructor common tasks.
-        ''' </summary>
-        ''' <param name="cp"></param>
-        ''' <remarks></remarks>
-        Private Sub constructorInitialize()
-            Try
-                '
-                app_startTickCount = GetTickCount
-                CPTickCountBase = GetTickCount
-                main_ClosePageCounter = 0
-                debug_allowDebugLog = True
-                app_startTime = DateTime.Now()
-                testPointPrinting = True
-                '
-                ' -- attempt auth load
-                If (serverConfig.appConfig Is Nothing) Then
-                    authContext = Models.Context.authContextModel.create(Me, False)
-                Else
-                    authContext = Models.Context.authContextModel.create(Me, siteProperties.allowVisitTracking)
-                    '
-                    ' debug printed defaults on, so if not on, set it off and clear what was collected
-                    If Not visitProperty.getBoolean("AllowDebugging") Then
-                        testPointPrinting = False
-                        main_testPointMessage = ""
-                    End If
-                End If
-            Catch ex As Exception
-                Throw (ex)
-            End Try
-        End Sub
-        '
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' version for cpCore assembly
-        ''' </summary>
-        ''' <remarks></remarks>
-        Public Function codeVersion() As String
-            Dim myType As Type = GetType(coreClass)
-            Dim myAssembly As Assembly = Assembly.GetAssembly(myType)
-            Dim myAssemblyname As AssemblyName = myAssembly.GetName()
-            Dim myVersion As Version = myAssemblyname.Version
-            Return Format(myVersion.Major, "0") & "." & Format(myVersion.Minor, "00") & "." & Format(myVersion.Build, "00000000")
-        End Function
-
-        '
-        '==========================================================================================
-        ''' <summary>
-        ''' return an html ul list of each eception produced during this document.
-        ''' </summary>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Function getDocExceptionHtmlList() As String
-            Dim returnHtmlList As String = ""
-            Try
-                If Not exceptionList Is Nothing Then
-                    If exceptionList.Count > 0 Then
-                        For Each exMsg As String In exceptionList
-                            returnHtmlList &= cr2 & "<li class=""ccExceptionListRow"">" & cr3 & htmlDoc.html_convertText2HTML(exMsg) & cr2 & "</li>"
-                        Next
-                        returnHtmlList = cr & "<ul class=""ccExceptionList"">" & returnHtmlList & cr & "</ul>"
-                    End If
-                End If
-            Catch ex As Exception
-                Throw (ex)
-            End Try
-            Return returnHtmlList
-        End Function
-        '
-        '==========================================================================================
-        ''' <summary>
-        ''' Generic handle exception. Determines method name and class of caller from stack. 
-        ''' </summary>
-        ''' <param name="cp"></param>
-        ''' <param name="ex"></param>
-        ''' <param name="cause"></param>
-        ''' <param name="stackPtr">How far down in the stack to look for the method error. Pass 1 if the method calling has the error, 2 if there is an intermediate routine.</param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Sub handleException(ByVal ex As Exception, ByVal cause As String, stackPtr As Integer)
-            If (Not _handlingExceptionRecursionBlock) Then
-                _handlingExceptionRecursionBlock = True
-                Dim frame As StackFrame = New StackFrame(stackPtr)
-                Dim method As System.Reflection.MethodBase = frame.GetMethod()
-                Dim type As System.Type = method.DeclaringType()
-                Dim methodName As String = method.Name
-                Dim errMsg As String = type.Name & "." & methodName & ", cause=[" & cause & "], ex=[" & ex.ToString & "]"
-                '
-                ' append to application event log
-                '
-                Dim sSource As String = "Contensive"
-                Dim sLog As String = "Application"
-                Dim eventId As Integer = 1001
-                Try
-                    '
-                    ' if command line has been run on this server, this will work. Otherwise skip
-                    '
-                    EventLog.WriteEntry(sSource, errMsg, EventLogEntryType.Error, eventId)
-                Catch exEvent As Exception
-                    ' ignore error. Can be caused if source has not been created. It is created automatically in command line installation util.
-                End Try
-                '
-                ' append to daily trace log
-                '
-                logController.appendLog(Me, errMsg)
-                '
-                ' add to doc exception list to display at top of webpage
-                '
-                If exceptionList Is Nothing Then
-                    exceptionList = New List(Of String)
-                End If
-                If exceptionList.Count = 10 Then
-                    exceptionList.Add("Exception limit exceeded")
-                ElseIf exceptionList.Count < 10 Then
-                    exceptionList.Add(errMsg)
-                End If
-                '
-                ' write consol for debugging
-                '
-                Console.WriteLine(errMsg)
-                '
-                _handlingExceptionRecursionBlock = False
-            End If
-        End Sub
-        Private _handlingExceptionRecursionBlock As Boolean = False
-        ''
-        ''====================================================================================================
-        ''
-        'Public Sub throw (ByVal ex As Exception, ByVal cause As String)
-        '    Call handleException(ex, cause, 2)
-        '    Throw ex
-        'End Sub
-
-        '
-        Public Sub handleExceptionAndContinue(ByVal ex As Exception, ByVal cause As String)
-            Call handleException(ex, cause, 2)
-        End Sub
-        '
-        Public Sub handleExceptionAndContinue(ByVal ex As Exception)
-            Call handleException(ex, "n/a", 2)
-        End Sub
-        '
-        '========================================================================
-        ''' <summary>
-        ''' handle expection with legacy log line (v2)
-        ''' </summary>
-        ''' <param name="cpCore"></param>
-        ''' <param name="ex"></param>
-        ''' <param name="className"></param>
-        ''' <param name="methodName"></param>
-        ''' <param name="cause"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Function handleExceptionLegacyRow2(ByVal ex As Exception, ByVal className As String, ByVal methodName As String, ByVal cause As String) As String
-            Call handleException(ex, cause, 2)
-            'Try
-            '    Dim errMsg As String = className & "." & methodName & ", cause=[" & cause & "], ex=[" & ex.ToString & "]"
-            '    Console.WriteLine(errMsg)
-            '    appendLog(errMsg)
-            'Catch exIgnore As Exception
-            '    '
-            'End Try
-        End Function
-        ''
-        ''========================================================================
-        '''' <summary>
-        '''' handle legacy errors, v1
-        '''' </summary>
-        '''' <param name="cpCore"></param>
-        '''' <param name="ClassName"></param>
-        '''' <param name="MethodName"></param>
-        '''' <param name="ErrNumber"></param>
-        '''' <param name="ErrSource"></param>
-        '''' <param name="ErrDescription"></param>
-        '''' <param name="ErrorTrap"></param>
-        '''' <param name="ResumeNext"></param>
-        '''' <param name="URL"></param>
-        '''' <returns></returns>
-        '''' <remarks></remarks>
-        'Public Sub handleLegacyError(ByVal ClassName As String, ByVal MethodName As String, ByVal ErrNumber As Integer, ByVal ErrSource As String, ByVal ErrDescription As String, ByVal ErrorTrap As Boolean, ByVal ResumeNext As Boolean, Optional ByVal URL As String = "")
-        '    handleException(New Exception("Legacy error raised, className=[" & ClassName & "], methodName=[" & MethodName & "], url=[" & URL & "] [legacy error #" & ErrNumber & "," & ErrSource & "," & ErrDescription & "]"), "n/a", 2)
-        '    Throw New ApplicationException("handleLegacyError")
-        'End Sub
-        ''
-        ''========================================================================
-        '''' <summary>
-        '''' handle legacy errors, v2
-        '''' </summary>
-        '''' <param name="cpCore"></param>
-        '''' <param name="ClassName"></param>
-        '''' <param name="MethodName"></param>
-        '''' <param name="Description"></param>
-        '''' <param name="ErrorNumber"></param>
-        '''' <remarks></remarks>
-        'Public Sub handleLegacyError2(ByVal ClassName As String, ByVal MethodName As String, Optional ByVal Description As String = "", Optional ByVal ErrorNumber As Integer = 0)
-        '    handleException(New Exception("Legacy error, ClassName=[" & ClassName & "], MethodName=[" & MethodName & "], Description=[" & Description & "], [legacy error #" & ErrorNumber & "," & Description & "]"), "n/a", 2)
-        '    Throw New ApplicationException("handleLegacyError")
-        'End Sub
-        ''
-        ''========================================================================
-        '''' <summary>
-        '''' handle legacy errors, v3
-        '''' </summary>
-        '''' <param name="cpCore"></param>
-        '''' <param name="ContensiveAppName"></param>
-        '''' <param name="Context"></param>
-        '''' <param name="ProgramName"></param>
-        '''' <param name="ClassName"></param>
-        '''' <param name="MethodName"></param>
-        '''' <param name="ErrNumber"></param>
-        '''' <param name="ErrSource"></param>
-        '''' <param name="ErrDescription"></param>
-        '''' <param name="ErrorTrap"></param>
-        '''' <param name="ResumeNext"></param>
-        '''' <param name="URL"></param>
-        '''' <remarks></remarks>
-        'Public Sub handleLegacyError3(ByVal ContensiveAppName As String, ByVal Context As String, ByVal ProgramName As String, ByVal ClassName As String, ByVal MethodName As String, ByVal ErrNumber As Integer, ByVal ErrSource As String, ByVal ErrDescription As String, ByVal ErrorTrap As Boolean, ByVal ResumeNext As Boolean, ByVal URL As String)
-        '    handleException(New Exception("Legacy error, ContensiveAppName=[" & ContensiveAppName & "], Context=[" & Context & "], ProgramName=[" & ProgramName & "], ClassName=[" & ClassName & "], MethodName=[" & MethodName & "], [legacy error #" & ErrNumber & "," & ErrSource & "," & ErrDescription & "]"), Context, 2)
-        '    'Throw New ApplicationException("handleLegacyError")
-        'End Sub
-        ''
-        ''======================================================================
-        '''' <summary>
-        '''' handle legacy errors, v3
-        '''' </summary>
-        '''' <param name="ErrNumber"></param>
-        '''' <param name="ErrSource"></param>
-        '''' <param name="ErrDescription"></param>
-        '''' <param name="MethodName"></param>
-        '''' <param name="ErrorTrap"></param>
-        '''' <param name="ResumeNext"></param>
-        '''' <param name="Context"></param>
-        '''' <remarks></remarks>
-        'Friend Sub handleLegacyError4(ByVal ErrNumber As Integer, ByVal ErrSource As String, ByVal ErrDescription As String, ByVal MethodName As String, ByVal ErrorTrap As Boolean, Optional ByVal ignore As Boolean = False, Optional ByVal Context As String = "")
-        '    handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], Context=[" & Context & "] raised, [legacy error #" & ErrNumber & "," & ErrSource & "," & ErrDescription & "]"), Context, 2)
-        '    Throw New ApplicationException("handleLegacyError")
-        'End Sub
-        ''
-        ''======================================================================
-        '''' <summary>
-        '''' handle legacy errors, v5
-        '''' </summary>
-        '''' <param name="MethodName"></param>
-        '''' <param name="Cause"></param>
-        '''' <param name="Err_Number"></param>
-        '''' <param name="Err_Source"></param>
-        '''' <param name="Err_Description"></param>
-        '''' <param name="ResumeNext"></param>
-        '''' <remarks></remarks>
-        'Friend Sub handleLegacyError5(MethodName As String, Cause As String, Err_Number As Integer, Err_Source As String, Err_Description As String, ignore As Boolean)
-        '    handleException(New Exception("Legacy error raised, [legacy error #" & Err_Number & "," & Err_Source & "," & Err_Description & "]"), Cause, 2)
-        '    Throw New ApplicationException("handleLegacyError")
-        'End Sub
-        ''
-        ''======================================================================
-        '''' <summary>
-        '''' handle legacy errors, v6
-        '''' </summary>
-        '''' <param name="MethodName"></param>
-        '''' <param name="Cause"></param>
-        '''' <remarks></remarks>
-        'Friend Sub handleLegacyError6(MethodName As String, Cause As String)
-        '    handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
-        '    Throw New ApplicationException("handleLegacyError")
-        'End Sub
-        ''
-        ''======================================================================
-        '''' <summary>
-        '''' handle legacy errors, v7
-        '''' </summary>
-        '''' <param name="MethodName"></param>
-        '''' <param name="Cause"></param>
-        '''' <remarks></remarks>
-        'Friend Sub handleLegacyError7(MethodName As String, Cause As String)
-        '    handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
-        '    Throw New ApplicationException("handleLegacyError")
-        'End Sub
-        ''
-        ''======================================================================
-        '''' <summary>
-        '''' handle legacy errors, v8
-        '''' </summary>
-        '''' <param name="Cause"></param>
-        '''' <param name="Source"></param>
-        '''' <param name="ResumeNext"></param>
-        '''' <returns></returns>
-        '''' <remarks></remarks>
-        'Public Sub handleLegacyError8(ByVal Cause As String, Optional ByVal ignore As String = "", Optional ByVal ignore2 As Boolean = False)
-        '    handleException(New Exception("Legacy error, cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
-        '    Throw New ApplicationException("handleLegacyError")
-        'End Sub
-        ''
-        ''========================================================================
-        '''' <summary>
-        '''' handle legacy errors, v10
-        '''' </summary>
-        '''' <param name="Err_Number"></param>
-        '''' <param name="Err_Source"></param>
-        '''' <param name="Err_Description"></param>
-        '''' <param name="MethodName"></param>
-        '''' <param name="ErrorTrap"></param>
-        '''' <param name="ResumeNext"></param>
-        '''' <remarks></remarks>
-        'Friend Sub handleLegacyError10(ByVal Err_Number As Integer, ByVal Err_Source As String, ByVal Err_Description As String, ByVal MethodName As String, ByVal ErrorTrap As Boolean, ByVal ResumeNext As Boolean)
-        '    handleException(New Exception("Legacy error, MethodName=[" & MethodName & "] [legacy error #" & Err_Number & "," & Err_Source & "," & Err_Description & "]"), "n/a", 2)
-        '    Throw New ApplicationException("handleLegacyError")
-        'End Sub
-        ''
-        ''========================================================================
-        '''' <summary>
-        '''' handle legacy errors, v11
-        '''' </summary>
-        '''' <param name="MethodName"></param>
-        '''' <param name="Cause"></param>
-        '''' <remarks></remarks>
-        'Friend Sub handleLegacyError11(ByVal MethodName As String, ByVal Cause As String)
-        '    handleException(New Exception("Legacy error #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
-        '    Throw New ApplicationException("handleLegacyError")
-        'End Sub
-        ''
-        ''========================================================================
-        '''' <summary>
-        '''' handle legacy errors, v12
-        '''' </summary>
-        '''' <param name="MethodName"></param>
-        '''' <param name="Cause"></param>
-        '''' <remarks></remarks>
-        'Friend Sub handleLegacyError12(ByVal MethodName As String, ByVal Cause As String)
-        '    handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
-        '    Throw New ApplicationException("handleLegacyError")
-        'End Sub
-        ''
-        ''========================================================================
-        '''' <summary>
-        '''' handle legacy errors, v13
-        '''' </summary>
-        '''' <param name="MethodName"></param>
-        '''' <remarks></remarks>
-        'Friend Sub handleLegacyError13(ByVal MethodName As String)
-        '    handleException(New Exception("Legacy error, MethodName=[" & MethodName & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), "n/a", 2)
-        '    Throw New ApplicationException("handleLegacyError")
-        'End Sub
-        ''
-        ''========================================================================
-        '''' <summary>
-        '''' handle legacy errors, v14
-        '''' </summary>
-        '''' <param name="MethodName"></param>
-        '''' <param name="Cause"></param>
-        '''' <remarks></remarks>
-        'Friend Sub handleLegacyError14(ByVal MethodName As String, ByVal Cause As String)
-        '    handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
-        '    Throw New ApplicationException("handleLegacyError")
-        'End Sub
-        ''
-        ''========================================================================
-        '''' <summary>
-        '''' handle legacy errors, v15
-        '''' </summary>
-        '''' <param name="Cause"></param>
-        '''' <param name="MethodName"></param>
-        '''' <remarks></remarks>
-        'Friend Sub handleLegacyError15(ByVal Cause As String, ByVal MethodName As String)
-        '    handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
-        '    Throw New ApplicationException("handleLegacyError")
-        'End Sub
-        ''
-        ''========================================================================
-        '''' <summary>
-        '''' handle legacy errors, v16
-        '''' </summary>
-        '''' <param name="MethodName"></param>
-        '''' <param name="Cause"></param>
-        '''' <remarks></remarks>
-        'Public Sub handleLegacyError16(ByVal MethodName As String, ByVal Cause As String)
-        '    handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
-        '    Throw New ApplicationException("handleLegacyError")
-        'End Sub
-        ''
-        ''========================================================================
-        '''' <summary>
-        '''' handle legacy errors, v17
-        '''' </summary>
-        '''' <param name="MethodName"></param>
-        '''' <remarks></remarks>
-        'Public Sub handleLegacyError17(ByVal MethodName As String)
-        '    handleException(New Exception("Legacy error, MethodName=[" & MethodName & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), "n/a", 2)
-        'End Sub
-        ''
-        ''========================================================================
-        '''' <summary>
-        '''' handle legacy errors, v18
-        '''' </summary>
-        '''' <param name="MethodName"></param>
-        '''' <remarks></remarks>
-        'Public Sub handleLegacyError18(ByVal MethodName As String)
-        '    handleException(New Exception("Legacy error, MethodName=[" & MethodName & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), "n/a", 2)
-        '    Throw New ApplicationException("handleLegacyError")
-        'End Sub
-        ''
-        ''========================================================================
-        '''' <summary>
-        '''' handle legacy errors, v19
-        '''' </summary>
-        '''' <param name="MethodName"></param>
-        '''' <param name="Cause"></param>
-        '''' <param name="Err_Number"></param>
-        '''' <param name="Err_Source"></param>
-        '''' <param name="Err_Description"></param>
-        '''' <param name="ResumeNext"></param>
-        '''' <remarks></remarks>
-        'Friend Sub handleLegacyError19(ByVal MethodName As String, ByVal Cause As String, ByVal Err_Number As Integer, ByVal Err_Source As String, ByVal Err_Description As String, ByVal ResumeNext As Boolean)
-        '    handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err_Number & "," & Err_Source & "," & Err_Description & ""), Cause, 2)
-        '    Throw New ApplicationException("handleLegacyError")
-        'End Sub
-        ''
-        ''========================================================================
-        '''' <summary>
-        '''' handle legacy errors, v20
-        '''' </summary>
-        '''' <param name="appName"></param>
-        '''' <param name="ClassName"></param>
-        '''' <param name="MethodName"></param>
-        '''' <param name="Cause"></param>
-        '''' <param name="Err_Number"></param>
-        '''' <param name="Err_Source"></param>
-        '''' <param name="Err_Description"></param>
-        '''' <param name="WillResumeAfterLogging"></param>
-        '''' <remarks></remarks>
-        'Public Sub handleLegacyError20(ByVal appName As String, ByVal ClassName As String, ByVal MethodName As String, ByVal Cause As String, ByVal Err_Number As Integer, ByVal Err_Source As String, ByVal Err_Description As String, ByVal WillResumeAfterLogging As Boolean)
-        '    handleException(New Exception("Legacy error, app=[" & appName & "], classname=[" & ClassName & "], methodname=[" & MethodName & "], cause=[" & Cause & "] #" & Err_Number & "," & Err_Source & "," & Err_Description & ""), Cause, 2)
-        '    Throw New ApplicationException("handleLegacyError")
-        'End Sub
-        '''
-        '''========================================================================
-        ''''' <summary>
-        ''''' handle legacy errors, v21
-        ''''' </summary>
-        ''''' <param name="ErrorObject"></param>
-        ''''' <param name="Cause"></param>
-        ''''' <remarks></remarks>
-        ''Public Sub handleLegacyError21(ByVal ErrorObject As Object, ByVal Cause As String)
-        ''    handleException(New Exception("Legacy error, cause=[" & Cause & "] #" & ErrorObject.Number & "," & ErrorObject.Source & "," & ErrorObject.Description & ""), Cause, 2)
-        ''    Throw New ApplicationException("handleLegacyError")
-        ''End Sub
-        ''
-        ''========================================================================
-        '''' <summary>
-        '''' handle legacy errors, v22
-        '''' </summary>
-        '''' <param name="ErrorObject"></param>
-        '''' <param name="Cause"></param>
-        '''' <remarks></remarks>
-        'Friend Sub handleLegacyError22(ByVal ErrorObject As ErrObject, ByVal Cause As String)
-        '    handleException(New Exception("Legacy error, cause=[" & Cause & "] #" & ErrorObject.Number & "," & ErrorObject.Source & "," & ErrorObject.Description & ""), Cause, 2)
-        '    Throw New ApplicationException("handleLegacyError")
-        'End Sub
-        ''
-        ''========================================================================
-        '''' <summary>
-        '''' handle legacy errors, v23
-        '''' </summary>
-        '''' <param name="Cause"></param>
-        '''' <remarks></remarks>
-        'Public Sub handleLegacyError23(ByVal Cause As String)
-        '    handleException(New Exception("Legacy error, cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
-        '    Throw New ApplicationException("handleLegacyError")
-        'End Sub
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Create a group and return its Id. If the group already exists, the groups Id is returned. If the group cannot be added a 0 is returned.
-        ''' </summary>
-        ''' <param name="groupName"></param>
-        ''' <returns></returns>
-        Public Function group_add(ByVal groupName As String) As Integer
-            Dim returnGroupId As Integer = 0
-            Try
-                Dim dt As DataTable
-                Dim sql As String
-                Dim createkey As Integer
-                Dim cid As Integer
-                Dim sqlGroupName As String = db.encodeSQLText(groupName)
-                '
-                dt = db.executeSql("SELECT ID FROM CCGROUPS WHERE NAME=" & sqlGroupName & "")
-                If dt.Rows.Count > 0 Then
-                    returnGroupId = genericController.EncodeInteger(dt.Rows(0).Item("ID"))
-                Else
-                    cid = metaData.getContentId("groups")
-                    createkey = genericController.GetRandomInteger()
-                    sql = "insert into ccgroups (contentcontrolid,active,createkey,name,caption) values (" & cid & ",1," & createkey & "," & sqlGroupName & "," & sqlGroupName & ")"
-                    Call db.executeSql(sql)
-                    '
-                    sql = "select top 1 id from ccgroups where createkey=" & createkey & " order by id desc"
-                    dt = db.executeSql(sql)
-                    If dt.Rows.Count > 0 Then
-                        returnGroupId = genericController.EncodeInteger(dt.Rows(0).Item(0))
-                    End If
-                End If
-                dt.Dispose()
-            Catch ex As Exception
-                Throw (ex)
-            End Try
-            Return returnGroupId
-        End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Create a group and return its Id. If the group already exists, the groups Id is returned. If the group cannot be added a 0 is returned.
-        ''' </summary>
-        ''' <param name="GroupNameOrGuid"></param>
-        ''' <param name="groupCaption"></param>
-        ''' <returns></returns>
-        Public Function group_add2(ByVal GroupNameOrGuid As String, Optional ByVal groupCaption As String = "") As Integer
-            Dim returnGroupId As Integer = 0
-            Try
-                '
-                Dim cs As New csController(Me)
-                Dim IsAlreadyThere As Boolean = False
-                Dim sqlCriteria As String = db.getNameIdOrGuidSqlCriteria(GroupNameOrGuid)
-                Dim groupName As String
-                Dim groupGuid As String
-                '
-                If (GroupNameOrGuid = "") Then
-                    Throw (New ApplicationException("A group cannot be added with a blank name"))
-                Else
-                    cs.open("Groups", sqlCriteria, , False, "id")
-                    IsAlreadyThere = cs.ok
-                    Call cs.Close()
-                    If Not IsAlreadyThere Then
-                        Call cs.Insert("Groups")
-                        If Not cs.ok Then
-                            Throw (New ApplicationException("There was an error inserting a new group record"))
-                        Else
-                            returnGroupId = cs.getInteger("id")
-                            If genericController.isGuid(GroupNameOrGuid) Then
-                                groupName = "Group " & cs.getInteger("id")
-                                groupGuid = GroupNameOrGuid
-                            Else
-                                groupName = GroupNameOrGuid
-                                groupGuid = Guid.NewGuid().ToString()
-                            End If
-                            If groupCaption = "" Then
-                                groupCaption = groupName
-                            End If
-                            Call cs.setField("name", groupName)
-                            Call cs.setField("caption", groupCaption)
-                            Call cs.setField("ccGuid", groupGuid)
-                            Call cs.setField("active", "1")
-                        End If
-                        Call cs.Close()
-                    End If
-                End If
-            Catch ex As Exception
-                Throw New ApplicationException("Unexpected error in cp.group.add()", ex)
-            End Try
-            Return returnGroupId
-        End Function
-        '
-        '====================================================================================================
-        '
-        ' Add User
-        '
-        Public Sub group_addUser(ByVal groupId As Integer, Optional ByVal userid As Integer = 0, Optional ByVal dateExpires As Date = #12:00:00 AM#)
-            Try
-                '
-                Dim groupName As String
-                '
-                If True Then
-                    If (groupId < 1) Then
-                        Throw (New ApplicationException("Could not find or create the group with id [" & groupId & "]"))
-                    Else
-                        If userid = 0 Then
-                            userid = authContext.user.ID
-                        End If
-                        Using cs As New csController(Me)
-                            cs.open("Member Rules", "(MemberID=" & userid.ToString & ")and(GroupID=" & groupId.ToString & ")", , False)
-                            If Not cs.ok Then
-                                Call cs.Close()
-                                Call cs.Insert("Member Rules")
-                            End If
-                            If Not cs.ok Then
-                                groupName = GetRecordName("groups", groupId)
-                                Throw (New ApplicationException("Could not find or create the Member Rule to add this member [" & userid & "] to the Group [" & groupId & ", " & groupName & "]"))
-                            Else
-                                Call cs.setField("active", "1")
-                                Call cs.setField("memberid", userid.ToString)
-                                Call cs.setField("groupid", groupId.ToString)
-                                If dateExpires <> #12:00:00 AM# Then
-                                    Call cs.setField("DateExpires", dateExpires.ToString)
-                                Else
-                                    Call cs.setField("DateExpires", "")
-                                End If
-                            End If
-                            Call cs.Close()
-                        End Using
-                    End If
-                End If
-            Catch ex As Exception
-                Throw (ex)
-            End Try
-        End Sub
-        '
-        '====================================================================================================
-        '
-        Public Sub group_AddUser(ByVal groupNameOrGuid As String, Optional ByVal userid As Integer = 0, Optional ByVal dateExpires As Date = #12:00:00 AM#)
-            Try
-                '
-                Dim GroupID As Integer
-                '
-                If groupNameOrGuid <> "" Then
-                    GroupID = db.getRecordID("groups", groupNameOrGuid)
-                    If (GroupID < 1) Then
-                        Call group_add2(groupNameOrGuid)
-                        GroupID = db.getRecordID("groups", groupNameOrGuid)
-                    End If
-                    If (GroupID < 1) Then
-                        Throw (New ApplicationException("Could not find or create the group [" & groupNameOrGuid & "]"))
-                    Else
-                        If userid = 0 Then
-                            userid = authContext.user.ID
-                        End If
-                        Using cs As New csController(Me)
-                            cs.open("Member Rules", "(MemberID=" & userid.ToString & ")and(GroupID=" & GroupID.ToString & ")", , False)
-                            If Not cs.ok Then
-                                Call cs.Close()
-                                Call cs.Insert("Member Rules")
-                            End If
-                            If Not cs.ok Then
-                                Throw (New ApplicationException("Could not find or create the Member Rule to add this member [" & userid & "] to the Group [" & GroupID & ", " & groupNameOrGuid & "]"))
-                            Else
-                                Call cs.setField("active", "1")
-                                Call cs.setField("memberid", userid.ToString)
-                                Call cs.setField("groupid", GroupID.ToString)
-                                If dateExpires <> #12:00:00 AM# Then
-                                    Call cs.setField("DateExpires", dateExpires.ToString)
-                                Else
-                                    Call cs.setField("DateExpires", "")
-                                End If
-                            End If
-                            Call cs.Close()
-                        End Using
-                    End If
-                End If
-            Catch ex As Exception
-                Throw (ex)
-            End Try
-        End Sub
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Returns true if the argument is a string in guid compatible format
-        ''' </summary>
-        ''' <param name="guid"></param>
-        ''' <returns></returns>
-        Public Function common_isGuid(guid As String) As Boolean
-            Dim returnIsGuid As Boolean = False
-            Try
-                returnIsGuid = (Len(guid) = 38) And (Left(guid, 1) = "{") And (Right(guid, 1) = "}")
-            Catch ex As Exception
-                Throw (ex)
-            End Try
-            Return returnIsGuid
-        End Function
-        '
-        '============================================================================
-        '
-        Public Shared Function encodeSqlTableName(sourceName As String) As String
-            Dim returnName As String = ""
-            Const FirstCharSafeString As String = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            Const SafeString As String = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@#"
-            Try
-                Dim src As String
-                Dim TestChr As String
-                Dim Ptr As Integer = 0
-                '
-                ' remove nonsafe URL characters
-                '
-                src = sourceName
-                returnName = ""
-                ' first character
-                Do While Ptr < src.Length
-                    TestChr = src.Substring(Ptr, 1)
-                    Ptr += 1
-                    If FirstCharSafeString.IndexOf(TestChr) >= 0 Then
-                        returnName &= TestChr
-                        Exit Do
-                    End If
-                Loop
-                ' non-first character
-                Do While Ptr < src.Length
-                    TestChr = src.Substring(Ptr, 1)
-                    Ptr += 1
-                    If SafeString.IndexOf(TestChr) >= 0 Then
-                        returnName &= TestChr
-                    End If
-                Loop
-            Catch ex As Exception
-                ' shared method, rethrow error
-                Throw New ApplicationException("Exception in encodeSqlTableName(" & sourceName & ")", ex)
-            End Try
-            Return returnName
-        End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' return the docProperties collection as the legacy optionString
-        ''' </summary>
-        ''' <returns></returns>
-        Public Function getLegacyOptionStringFromVar() As String
-            Dim returnString As String = ""
-            Try
-                For Each key As String In docProperties.getKeyList
-                    With docProperties.getProperty(key)
-                        returnString &= "" & "&" & encodeLegacyAddonOptionArgument(key) & "=" & encodeLegacyAddonOptionArgument(.Value)
-                    End With
-                Next
-            Catch ex As Exception
-                Throw (ex)
-            End Try
-            Return returnString
-        End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Encodes an argument in an Addon OptionString (QueryString) for all non-allowed characters
-        ''' Arg0,Arg1,Arg2,Arg3,Name=Value&Name=VAlue[Option1|Option2]
-        ''' call this before parsing them together
-        ''' call decodeAddonOptionArgument after parsing them apart
-        ''' </summary>
-        ''' <param name="Arg"></param>
-        ''' <returns></returns>
-        '------------------------------------------------------------------------------------------------------------
-        '
-        Private Function encodeLegacyAddonOptionArgument(ByVal Arg As String) As String
-            Dim a As String = ""
-            If Not String.IsNullOrEmpty(Arg) Then
-                a = Arg
-                a = genericController.vbReplace(a, vbCrLf, "#0013#")
-                a = genericController.vbReplace(a, vbLf, "#0013#")
-                a = genericController.vbReplace(a, vbCr, "#0013#")
-                a = genericController.vbReplace(a, "&", "#0038#")
-                a = genericController.vbReplace(a, "=", "#0061#")
-                a = genericController.vbReplace(a, ",", "#0044#")
-                a = genericController.vbReplace(a, """", "#0034#")
-                a = genericController.vbReplace(a, "'", "#0039#")
-                a = genericController.vbReplace(a, "|", "#0124#")
-                a = genericController.vbReplace(a, "[", "#0091#")
-                a = genericController.vbReplace(a, "]", "#0093#")
-                a = genericController.vbReplace(a, ":", "#0058#")
-            End If
-            Return a
-        End Function
-        '
-        '====================================================================================================
-        '
-        Public Function createGuid() As String
-            Return "{" & Guid.NewGuid().ToString & "}"
-        End Function
-        '
-        '====================================================================================================
-#Region " IDisposable Support "
-        '
-        ' this class must implement System.IDisposable
-        ' never throw an exception in dispose
-        ' Do not change or add Overridable to these methods.
-        ' Put cleanup code in Dispose(ByVal disposing As Boolean).
-        '====================================================================================================
-        '
-        Protected disposed As Boolean = False
-        '
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
-            ' do not add code here. Use the Dispose(disposing) overload
-            Dispose(True)
-            GC.SuppressFinalize(Me)
-        End Sub
-        '
-        Protected Overrides Sub Finalize()
-            ' do not add code here. Use the Dispose(disposing) overload
-            Dispose(False)
-            MyBase.Finalize()
-        End Sub
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' dispose.
-        ''' </summary>
-        ''' <param name="disposing"></param>
-        Protected Overridable Overloads Sub Dispose(ByVal disposing As Boolean)
-            'Exit Sub
-
-            Dim SQL As String
-            Dim ViewingName As String
-            Dim CSMax As Integer
-            Dim PageID As Integer
-            Dim FieldNames As String
-            Dim Form As String
-            '
-            If Not Me.disposed Then
-                Me.disposed = True
-                If disposing Then
-                    '
-                    ' call .dispose for managed objects
-                    ' delete tmp files
-                    '
-                    If deleteOnDisposeFileList.Count > 0 Then
-                        For Each filename As String In deleteOnDisposeFileList
-                            privateFiles.deleteFile(filename)
-                        Next
-                    End If
-                    '
-                    ' ----- Block all output from underlying routines
-                    '
-                    blockExceptionReporting = True
-                    'docOpen = False
-                    Call doc_close()
-                    '
-                    ' content server object is valid
-                    '
-                    If (serverConfig.appConfig IsNot Nothing) Then
-                        If siteProperties.allowVisitTracking Then
-                            '
-                            ' If visit tracking, save the viewing record
-                            '
-                            ViewingName = Left(authContext.visit.ID & "." & authContext.visit.PageVisits, 10)
-                            PageID = pages.currentPageID
-                            FieldNames = "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,ContentControlID,pagetime,Active,CreateKey,RecordID"
-                            FieldNames = FieldNames & ",ExcludeFromAnalytics"
-                            FieldNames = FieldNames & ",pagetitle"
-                            SQL = "INSERT INTO ccViewings (" _
-                                & FieldNames _
-                                & ")VALUES(" _
-                                & " " & db.encodeSQLText(ViewingName) _
-                                & "," & db.encodeSQLNumber(authContext.visit.ID) _
-                                & "," & db.encodeSQLNumber(authContext.user.ID) _
-                                & "," & db.encodeSQLText(webServer.requestDomain) _
-                                & "," & db.encodeSQLText(webServer.webServerIO_requestPath) _
-                                & "," & db.encodeSQLText(webServer.webServerIO_requestPage) _
-                                & "," & db.encodeSQLText(Left(webServer.requestQueryString, 255)) _
-                                & "," & db.encodeSQLText(Left(Form, 255)) _
-                                & "," & db.encodeSQLText(Left(webServer.requestReferrer, 255)) _
-                                & "," & db.encodeSQLDate(app_startTime) _
-                                & "," & db.encodeSQLBoolean(authContext.visit_stateOK) _
-                                & "," & db.encodeSQLNumber(main_GetContentID("Viewings")) _
-                                & "," & db.encodeSQLNumber(appStopWatch.ElapsedMilliseconds) _
-                                & ",1" _
-                                & "," & db.encodeSQLNumber(CSMax) _
-                                & "," & db.encodeSQLNumber(PageID)
-                            SQL &= "," & db.encodeSQLBoolean(webServer.webServerIO_PageExcludeFromAnalytics)
-                            SQL &= "," & db.encodeSQLText(htmlDoc.main_MetaContent_Title)
-                            SQL &= ");"
-                            Call db.executeSql(SQL)
-                            'Call db.executeSqlAsync(SQL)
-                        End If
-                    End If
-                    '
-                    ' ----- dispose objects created here
-                    '
-                    If Not (_addonCache Is Nothing) Then
-                        ' no dispose
-                        'Call _addonCache.Dispose()
-                        _addonCache = Nothing
-                    End If
-                    '
-                    If Not (_addon Is Nothing) Then
-                        Call _addon.Dispose()
-                        _addon = Nothing
-                    End If
-                    '
-                    If Not (_db Is Nothing) Then
-                        Call _db.Dispose()
-                        _db = Nothing
-                    End If
-                    '
-                    If Not (_metaData Is Nothing) Then
-                        Call _metaData.Dispose()
-                        _metaData = Nothing
-                    End If
-                    '
-                    If Not (_cache Is Nothing) Then
-                        Call _cache.Dispose()
-                        _cache = Nothing
-                    End If
-                    '
-                    If Not (_workflow Is Nothing) Then
-                        Call _workflow.Dispose()
-                        _workflow = Nothing
-                    End If
-                    '
-                    If Not (_siteProperties Is Nothing) Then
-                        ' no dispose
-                        'Call _siteProperties.Dispose()
-                        _siteProperties = Nothing
-                    End If
-                    '
-                    If Not (_json Is Nothing) Then
-                        ' no dispose
-                        'Call _json.Dispose()
-                        _json = Nothing
-                    End If
-                    ''
-                    'If Not (_user Is Nothing) Then
-                    '    ' no dispose
-                    '    'Call _user.Dispose()
-                    '    _user = Nothing
-                    'End If
-                    '
-                    If Not (_domains Is Nothing) Then
-                        ' no dispose
-                        'Call _domains.Dispose()
-                        _domains = Nothing
-                    End If
-                    '
-                    If Not (_doc Is Nothing) Then
-                        ' no dispose
-                        'Call _doc.Dispose()
-                        _doc = Nothing
-                    End If
-                    '
-                    If Not (_security Is Nothing) Then
-                        ' no dispose
-                        'Call _security.Dispose()
-                        _security = Nothing
-                    End If
-                    '
-                    If Not (_webServer Is Nothing) Then
-                        ' no dispose
-                        'Call _webServer.Dispose()
-                        _webServer = Nothing
-                    End If
-                    '
-                    If Not (_menuFlyout Is Nothing) Then
-                        ' no dispose
-                        'Call _menuFlyout.Dispose()
-                        _menuFlyout = Nothing
-                    End If
-                    '
-                    If Not (_visitProperty Is Nothing) Then
-                        ' no dispose
-                        'Call _visitProperty.Dispose()
-                        _visitProperty = Nothing
-                    End If
-                    '
-                    If Not (_visitorProperty Is Nothing) Then
-                        ' no dispose
-                        'Call _visitorProperty.Dispose()
-                        _visitorProperty = Nothing
-                    End If
-                    '
-                    If Not (_userProperty Is Nothing) Then
-                        ' no dispose
-                        'Call _userProperty.Dispose()
-                        _userProperty = Nothing
-                    End If
-                    '
-                    If Not (_db Is Nothing) Then
-                        Call _db.Dispose()
-                        _db = Nothing
-                    End If
-                    '
-                    If Not (_metaData Is Nothing) Then
-                        _metaData.Dispose()
-                        _metaData = Nothing
-                    End If
-                End If
-                '
-                ' cleanup non-managed objects
-                '
-            End If
-        End Sub
-#End Region        '
     End Class
-
 End Namespace

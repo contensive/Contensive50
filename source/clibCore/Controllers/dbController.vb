@@ -176,14 +176,14 @@ Namespace Contensive.Core.Controllers
                 Else
                     '
                     ' -- custom datasource from Db in primary datasource
-                    If (Not cpCore.dataSources.ContainsKey(normalizedDataSourceName)) Then
+                    If (Not cpCore.dataSourceDictionary.ContainsKey(normalizedDataSourceName)) Then
                         '
                         ' -- not found, this is a hard error
                         Throw New ApplicationException("Datasource [" & normalizedDataSourceName & "] was not found.")
                     Else
                         '
                         ' -- found in local cache
-                        With cpCore.dataSources(normalizedDataSourceName)
+                        With cpCore.dataSourceDictionary(normalizedDataSourceName)
                             returnConnString = "" _
                                 & "server=" & .endPoint & ";" _
                                 & "User Id=" & .username & ";" _
@@ -238,14 +238,14 @@ Namespace Contensive.Core.Controllers
                 Else
                     '
                     ' -- custom datasource from Db in primary datasource
-                    If (Not cpCore.dataSources.ContainsKey(normalizedDataSourceName)) Then
+                    If (Not cpCore.dataSourceDictionary.ContainsKey(normalizedDataSourceName)) Then
                         '
                         ' -- not found, this is a hard error
                         Throw New ApplicationException("Datasource [" & normalizedDataSourceName & "] was not found.")
                     Else
                         '
                         ' -- found in local cache
-                        With cpCore.dataSources(normalizedDataSourceName)
+                        With cpCore.dataSourceDictionary(normalizedDataSourceName)
                             returnConnString &= "" _
                                 & "Provider=sqloledb;" _
                                 & "Data Source=" & .endPoint & ";" _
@@ -4852,7 +4852,7 @@ Namespace Contensive.Core.Controllers
             Try
                 If genericController.vbIsNumeric(nameIdOrGuid) Then
                     sqlCriteria = "id=" & encodeSQLNumber(CDbl(nameIdOrGuid))
-                ElseIf cpCore.common_isGuid(nameIdOrGuid) Then
+                ElseIf genericController.common_isGuid(nameIdOrGuid) Then
                     sqlCriteria = "ccGuid=" & encodeSQLText(nameIdOrGuid)
                 Else
                     sqlCriteria = "name=" & encodeSQLText(nameIdOrGuid)
@@ -5287,7 +5287,7 @@ Namespace Contensive.Core.Controllers
         Public Sub markRecordReviewed(ContentName As String, RecordID As Integer)
             Try
                 If cpCore.main_IsContentFieldSupported(ContentName, "DateReviewed") Then
-                    Dim DataSourceName As String = cpCore.main_GetContentDataSource(ContentName)
+                    Dim DataSourceName As String = cpCore.metaData.GetContentDataSource(ContentName)
                     Dim TableName As String = cpCore.GetContentTablename(ContentName)
                     Dim SQL As String = "update " & TableName & " set DateReviewed=" & cpCore.db.encodeSQLDate(cpCore.app_startTime)
                     If cpCore.main_IsContentFieldSupported(ContentName, "ReviewedBy") Then
@@ -5306,6 +5306,218 @@ Namespace Contensive.Core.Controllers
                 cpCore.handleExceptionAndContinue(ex)
             End Try
         End Sub
+        '
+        '========================================================================
+        ' app.csv_DeleteTableRecord
+        '========================================================================
+        '
+        Public Sub DeleteTableRecordChunks(ByVal DataSourceName As String, ByVal TableName As String, ByVal Criteria As String, Optional ByVal ChunkSize As Integer = 1000, Optional ByVal MaxChunkCount As Integer = 1000)
+            '
+            Dim PreviousCount As Integer
+            Dim CurrentCount As Integer
+            Dim LoopCount As Integer
+            Dim SQL As String
+            Dim iChunkSize As Integer
+            Dim iChunkCount As Integer
+            'dim dt as datatable
+            Dim DataSourceType As Integer
+            '
+            DataSourceType = getDataSourceType(DataSourceName)
+            If (DataSourceType <> DataSourceTypeODBCSQLServer) And (DataSourceType <> DataSourceTypeODBCAccess) Then
+                '
+                ' If not SQL server, just delete them
+                '
+                Call DeleteTableRecords(TableName, Criteria, DataSourceName)
+            Else
+                '
+                ' ----- Clear up to date for the properties
+                '
+                iChunkSize = ChunkSize
+                If iChunkSize = 0 Then
+                    iChunkSize = 1000
+                End If
+                iChunkCount = MaxChunkCount
+                If iChunkCount = 0 Then
+                    iChunkCount = 1000
+                End If
+                '
+                ' Get an initial count and allow for timeout
+                '
+                PreviousCount = -1
+                LoopCount = 0
+                CurrentCount = 0
+                SQL = "select count(*) as RecordCount from " & TableName & " where " & Criteria
+                Dim dt As DataTable
+                dt = executeSql(SQL)
+                If dt.Rows.Count > 0 Then
+                    CurrentCount = genericController.EncodeInteger(dt.Rows(0).Item(0))
+                End If
+                Do While (CurrentCount <> 0) And (PreviousCount <> CurrentCount) And (LoopCount < iChunkCount)
+                    If getDataSourceType(DataSourceName) = DataSourceTypeODBCMySQL Then
+                        SQL = "delete from " & TableName & " where id in (select ID from " & TableName & " where " & Criteria & " limit " & iChunkSize & ")"
+                    Else
+                        SQL = "delete from " & TableName & " where id in (select top " & iChunkSize & " ID from " & TableName & " where " & Criteria & ")"
+                    End If
+                    Call executeSql(SQL, DataSourceName)
+                    PreviousCount = CurrentCount
+                    SQL = "select count(*) as RecordCount from " & TableName & " where " & Criteria
+                    dt = executeSql(SQL)
+                    If dt.Rows.Count > 0 Then
+                        CurrentCount = genericController.EncodeInteger(dt.Rows(0).Item(0))
+                    End If
+                    LoopCount = LoopCount + 1
+                Loop
+                If (CurrentCount <> 0) And (PreviousCount = CurrentCount) Then
+                    '
+                    ' records did not delete
+                    '
+                    Call Err.Raise(ignoreInteger, "dll", "Error deleting record chunks. No records were deleted and the process was not complete.")
+                ElseIf (LoopCount >= iChunkCount) Then
+                    '
+                    ' records did not delete
+                    '
+                    Call Err.Raise(ignoreInteger, "dll", "Error deleting record chunks. The maximum chunk count was exceeded while deleting records.")
+                End If
+            End If
+        End Sub
+        '
+        '=============================================================================
+        '   Returns the link to the page that contains the record designated by the ContentRecordKey
+        '       Returns DefaultLink if it can not be determined
+        '=============================================================================
+        '
+        Public Function main_GetLinkByContentRecordKey(ByVal ContentRecordKey As String, Optional ByVal DefaultLink As String = "") As String
+            Dim CSPointer As Integer
+            Dim KeySplit() As String
+            Dim ContentID As Integer
+            Dim RecordID As Integer
+            Dim ContentName As String
+            Dim templateId As Integer
+            Dim ParentID As Integer
+            Dim DefaultTemplateLink As String
+            Dim TableName As String
+            Dim DataSource As String
+            Dim ParentContentID As Integer
+            Dim recordfound As Boolean
+            '
+            If ContentRecordKey <> "" Then
+                '
+                ' First try main_ContentWatch table for a link
+                '
+                CSPointer = cs_open("Content Watch", "ContentRecordKey=" & encodeSQLText(ContentRecordKey), , , ,, , "Link,Clicks")
+                If cs_ok(CSPointer) Then
+                    main_GetLinkByContentRecordKey = cpCore.db.cs_getText(CSPointer, "Link")
+                End If
+                Call cpCore.db.cs_Close(CSPointer)
+                '
+                If main_GetLinkByContentRecordKey = "" Then
+                    '
+                    ' try template for this page
+                    '
+                    KeySplit = Split(ContentRecordKey, ".")
+                    If UBound(KeySplit) = 1 Then
+                        ContentID = genericController.EncodeInteger(KeySplit(0))
+                        If ContentID <> 0 Then
+                            ContentName = cpCore.metaData.getContentNameByID(ContentID)
+                            RecordID = genericController.EncodeInteger(KeySplit(1))
+                            If ContentName <> "" And RecordID <> 0 Then
+                                If cpCore.GetContentTablename(ContentName) = "ccPageContent" Then
+                                    CSPointer = cpCore.csOpen(ContentName, RecordID, , , "TemplateID,ParentID")
+                                    If cs_ok(CSPointer) Then
+                                        recordfound = True
+                                        templateId = cs_getInteger(CSPointer, "TemplateID")
+                                        ParentID = cs_getInteger(CSPointer, "ParentID")
+                                    End If
+                                    Call cs_Close(CSPointer)
+                                    If Not recordfound Then
+                                        '
+                                        ' This content record does not exist - remove any records with this ContentRecordKey pointer
+                                        '
+                                        'Call app.DeleteContentRecords("Topic Rules", "ContentRecordKey=" & encodeSQLText(ContentRecordKey))
+                                        'Call app.DeleteContentRecords("Topic Habits", "ContentRecordKey=" & encodeSQLText(ContentRecordKey))
+                                        Call deleteContentRecords("Content Watch", "ContentRecordKey=" & encodeSQLText(ContentRecordKey))
+                                        Call cpCore.metaData_DeleteContentTracking(ContentName, RecordID, True)
+                                    Else
+
+                                        If templateId <> 0 Then
+                                            CSPointer = cpCore.csOpen("Page Templates", templateId, , , "Link")
+                                            If cs_ok(CSPointer) Then
+                                                main_GetLinkByContentRecordKey = cs_getText(CSPointer, "Link")
+                                            End If
+                                            Call cs_Close(CSPointer)
+                                        End If
+                                        If main_GetLinkByContentRecordKey = "" And ParentID <> 0 Then
+                                            TableName = cpCore.GetContentTablename(ContentName)
+                                            DataSource = cpCore.metaData.GetContentDataSource(ContentName)
+                                            CSPointer = cs_openCsSql_rev(DataSource, "Select ContentControlID from " & TableName & " where ID=" & RecordID)
+                                            If cs_ok(CSPointer) Then
+                                                ParentContentID = genericController.EncodeInteger(cs_getText(CSPointer, "ContentControlID"))
+                                            End If
+                                            Call cs_Close(CSPointer)
+                                            If ParentContentID <> 0 Then
+                                                main_GetLinkByContentRecordKey = main_GetLinkByContentRecordKey(CStr(ParentContentID & "." & ParentID), "")
+                                            End If
+                                        End If
+                                        If main_GetLinkByContentRecordKey = "" Then
+                                            DefaultTemplateLink = cpCore.siteProperties.getText("SectionLandingLink", requestAppRootPath & cpCore.siteProperties.serverPageDefault)
+                                        End If
+                                    End If
+                                End If
+                            End If
+                        End If
+                    End If
+                    If main_GetLinkByContentRecordKey <> "" Then
+                        main_GetLinkByContentRecordKey = genericController.modifyLinkQuery(main_GetLinkByContentRecordKey, "bid", CStr(RecordID), True)
+                    End If
+                End If
+            End If
+            '
+            If main_GetLinkByContentRecordKey = "" Then
+                main_GetLinkByContentRecordKey = DefaultLink
+            End If
+            '
+            main_GetLinkByContentRecordKey = genericController.EncodeAppRootPath(main_GetLinkByContentRecordKey, cpCore.webServer.webServerIO_requestVirtualFilePath, requestAppRootPath, cpCore.webServer.requestDomain)
+        End Function
+        '
+        '============================================================================
+        '
+        Public Shared Function encodeSqlTableName(sourceName As String) As String
+            Dim returnName As String = ""
+            Const FirstCharSafeString As String = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            Const SafeString As String = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@#"
+            Try
+                Dim src As String
+                Dim TestChr As String
+                Dim Ptr As Integer = 0
+                '
+                ' remove nonsafe URL characters
+                '
+                src = sourceName
+                returnName = ""
+                ' first character
+                Do While Ptr < src.Length
+                    TestChr = src.Substring(Ptr, 1)
+                    Ptr += 1
+                    If FirstCharSafeString.IndexOf(TestChr) >= 0 Then
+                        returnName &= TestChr
+                        Exit Do
+                    End If
+                Loop
+                ' non-first character
+                Do While Ptr < src.Length
+                    TestChr = src.Substring(Ptr, 1)
+                    Ptr += 1
+                    If SafeString.IndexOf(TestChr) >= 0 Then
+                        returnName &= TestChr
+                    End If
+                Loop
+            Catch ex As Exception
+                ' shared method, rethrow error
+                Throw New ApplicationException("Exception in encodeSqlTableName(" & sourceName & ")", ex)
+            End Try
+            Return returnName
+        End Function
+
 
 #Region " IDisposable Support "
         Protected disposed As Boolean = False

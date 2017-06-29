@@ -2027,4 +2027,18 @@ Namespace Contensive.Core
         Public FileSize As Integer
         Public fileType As String
     End Class
+    '
+    ' SF Resize Algorithms
+    '
+    Public Enum imageResizeAlgorithms
+        Box = 0
+        Triangle = 1
+        Hermite = 2
+        Bell = 3
+        BSpline = 4
+        Lanczos3 = 5
+        Mitchell = 6
+        Stretch = 7
+    End Enum
+
 End Namespace

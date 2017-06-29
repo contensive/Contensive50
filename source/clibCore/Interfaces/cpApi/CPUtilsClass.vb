@@ -88,17 +88,11 @@ Namespace Contensive.Core
         End Function
 
         Public Overrides Function CreateGuid() As String
-            Return CP.core.createGuid()
+            Return genericController.createGuid()
         End Function
 
         Public Overrides Function DecodeUrl(ByVal Url As String) As String
             Return genericController.DecodeURL(Url)
-            'return System.Web.HttpServerUtility.
-            'If true Then
-            '    DecodeUrl = cmc.main_DecodeUrl(Url)
-            'Else
-            '    DecodeUrl = ""
-            'End If
         End Function
 
         Public Overrides Function EncodeContentForWeb(ByVal Source As String, Optional ByVal ContextContentName As String = "", Optional ByVal ContextRecordID As Integer = 0, Optional ByVal WrapperID As Integer = 0) As String
@@ -138,7 +132,7 @@ Namespace Contensive.Core
 
         Public Overrides Function GetPleaseWaitEnd() As String
             If True Then
-                Return CP.core.main_GetPleaseWaitEnd
+                Return CP.core.programFiles.readFile("resources\WaitPageClose.htm")
             Else
                 Return ""
             End If
@@ -146,7 +140,7 @@ Namespace Contensive.Core
 
         Public Overrides Function GetPleaseWaitStart() As String
             If True Then
-                Return CP.core.main_GetPleaseWaitStart
+                Return CP.core.programFiles.readFile("Resources\WaitPageOpen.htm")
             Else
                 Return ""
             End If
@@ -246,23 +240,23 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Function ExecuteAddon(ByVal IdGuidOrName As String) As String
-            Return CP.core.addon.execute_legacy3(IdGuidOrName, CP.core.getLegacyOptionStringFromVar(), 0, Nothing)
+            Return CP.core.addon.execute_legacy3(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar(), 0, Nothing)
         End Function
         '
         '
         '
         Public Overrides Function ExecuteAddon(ByVal IdGuidOrName As String, ByVal WrapperId As Integer) As String
-            Return CP.core.addon.execute_legacy3(IdGuidOrName, CP.core.getLegacyOptionStringFromVar(), WrapperId, Nothing)
+            Return CP.core.addon.execute_legacy3(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar(), WrapperId, Nothing)
         End Function
         '
         '
         '
         Public Overrides Function ExecuteAddon(ByVal IdGuidOrName As String, ByVal context As addonContext) As String
-            Return CP.core.addon.execute_legacy4(IdGuidOrName, CP.core.getLegacyOptionStringFromVar(), context, Nothing)
+            Return CP.core.addon.execute_legacy4(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar(), context, Nothing)
         End Function
 
         Public Overrides Function ExecuteAddonAsProcess(ByVal IdGuidOrName As String) As String
-            Return CP.core.addon.executeAddonAsProcess(IdGuidOrName, CP.core.getLegacyOptionStringFromVar())
+            Return CP.core.addon.executeAddonAsProcess(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar())
         End Function
 
 
@@ -375,7 +369,7 @@ Namespace Contensive.Core
         End Function
         '
         Public Overrides Function isGuid(guid As String) As Boolean
-            Return CP.core.common_isGuid(guid)
+            Return genericController.common_isGuid(guid)
         End Function
         '
         '====================================================================================================

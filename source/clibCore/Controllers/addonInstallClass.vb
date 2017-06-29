@@ -35,7 +35,7 @@ Namespace Contensive.Core
                     '
                     ' Block entries to the root node - this is to block entries made for system collections I may have missed
                     '
-                    Throw (New Exception("Adding root navigator entry [" & EntryName & "] by collection [" & cpCore.GetRecordName("content", InstalledByCollectionID) & "]. This Is Not allowed."))
+                    Throw (New Exception("Adding root navigator entry [" & EntryName & "] by collection [" & cpCore.db.getRecordName("content", InstalledByCollectionID) & "]. This Is Not allowed."))
                 Else
                     result = GetNavigatorID(EntryName, ParentID, addonId, ContentID, NavIconType, NavIconTitle, DeveloperOnly, ignore, LinkPage, HelpCollectionID, HelpAddonID, InstalledByCollectionID, AdminOnly)
                 End If
@@ -779,7 +779,7 @@ Namespace Contensive.Core
                     '
                     ' move collection file to a temp directory
                     '
-                    Dim tmpInstallPath As String = "tmpInstallCollection" & cpCore.createGuid().Replace("{", "").Replace("}", "").Replace("-", "") & "\"
+                    Dim tmpInstallPath As String = "tmpInstallCollection" & genericController.createGuid().Replace("{", "").Replace("}", "").Replace("-", "") & "\"
                     cpCore.privateFiles.copyFile(collectionPathFilename, tmpInstallPath & collectionFilename)
                     If (collectionFilename.ToLower().Substring(collectionFilename.Length - 4) = ".zip") Then
                         Call cpCore.privateFiles.UnzipFile(tmpInstallPath & collectionFilename)
@@ -3104,7 +3104,7 @@ Namespace Contensive.Core
                                             '
                                             ' Bad field name - need to report it somehow
                                             '
-                                            Throw New ApplicationException("bad field found [" & FieldName & "], in addon node [" & addonName & "], of collection [" & cpCore.GetRecordName("add-on collections", CollectionID) & "]")
+                                            Throw New ApplicationException("bad field found [" & FieldName & "], in addon node [" & addonName & "], of collection [" & cpCore.db.getRecordName("add-on collections", CollectionID) & "]")
                                         Else
                                             Call cpCore.db.cs_set(CS, FieldName, FieldValue)
                                         End If

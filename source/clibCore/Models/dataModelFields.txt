@@ -5579,7 +5579,7 @@ instance.ScriptingModuleID = genericController.EncodeInteger(.fields("ScriptingM
 instance.SortOrder = genericController.EncodeText(.fields("SortOrder").defaultValue)
 
 ---------------------------------------------
-Add-onIncludeRuleModel
+AddonIncludeRuleModel
 
 public ID as Integer
 public Active as Boolean

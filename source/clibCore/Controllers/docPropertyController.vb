@@ -241,7 +241,25 @@ Namespace Contensive.Core.Controllers
                 cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
-
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' return the docProperties collection as the legacy optionString
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function getLegacyOptionStringFromVar() As String
+            Dim returnString As String = ""
+            Try
+                For Each key As String In getKeyList()
+                    With getProperty(key)
+                        returnString &= "" & "&" & genericController.encodeLegacyAddonOptionArgument(key) & "=" & encodeLegacyAddonOptionArgument(.Value)
+                    End With
+                Next
+            Catch ex As Exception
+                Throw (ex)
+            End Try
+            Return returnString
+        End Function
     End Class
 
 

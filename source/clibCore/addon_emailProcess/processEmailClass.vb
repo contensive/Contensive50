@@ -207,7 +207,7 @@ ErrorTrap:
                 SQLTableMemberRules = cpCore.metaData.getContentTablename("Member Rules")
                 SQLTableGroups = cpCore.metaData.getContentTablename("Groups")
                 BounceAddress = cpCore.siteProperties.getText("EmailBounceAddress", "")
-                siteStyles = cpCore.csv_getStyleSheetProcessed()
+                siteStyles = cpCore.htmlDoc.html_getStyleSheet2(0, 0)
                 '
                 Do While cpCore.db.cs_ok(CSEmail)
                     emailID = cpCore.db.cs_getInteger(CSEmail, "ID")
@@ -284,7 +284,7 @@ ErrorTrap:
                         PeopleID = cpCore.db.cs_getInteger(CSPeople, "MemberID")
                         Email = cpCore.db.cs_getText(CSPeople, "Email")
                         If (Email = LastEmail) Then
-                            PeopleName = cpCore.GetRecordName("people", PeopleID)
+                            PeopleName = cpCore.db.getRecordName("people", PeopleID)
                             If PeopleName = "" Then
                                 PeopleName = "user #" & PeopleID
                             End If
@@ -397,7 +397,7 @@ ErrorTrap:
             SQLTableMemberRules = cpCore.metaData.getContentTablename("Member Rules")
             SQLTableGroups = cpCore.metaData.getContentTablename("Groups")
             BounceAddress = cpCore.siteProperties.getText("EmailBounceAddress", "")
-            siteStyles = cpCore.csv_getStyleSheetProcessed()
+            siteStyles = cpCore.htmlDoc.html_getStyleSheet2(0, 0)
             '
             rightNow = DateTime.Now()
             rightNowDate = rightNow.Date
@@ -672,7 +672,7 @@ ErrorTrap:
                         ToAddress = cpCore.db.cs_get(CSPeople, "Email")
                         EmailToName = cpCore.db.cs_get(CSPeople, "Name")
                         ServerPageDefault = cpCore.siteProperties.getText(siteproperty_serverPageDefault_name, siteproperty_serverPageDefault_defaultValue)
-                        RootURL = PrimaryLink & cpCore.app_rootWebPath
+                        RootURL = PrimaryLink & requestAppRootPath
                         If EmailDropID <> 0 Then
                             Select Case (cpCore.siteProperties.getinteger("GroupEmailOpenTriggerMethod", 0))
                                 Case 1
@@ -886,7 +886,7 @@ ErrorTrap:
                     '
                     ConfirmBody = "<HTML><Head>" _
                     & "<Title>Email Confirmation</Title>" _
-                    & "<Base href=""http://" & GetPrimaryDomainName() & cpCore.app_rootWebPath & """>" _
+                    & "<Base href=""http://" & GetPrimaryDomainName() & requestAppRootPath & """>" _
                     & emailStyles _
                     & "</Head><BODY><div style=""padding:10px;"">" _
                     & "The follow email has been sent." & BR _

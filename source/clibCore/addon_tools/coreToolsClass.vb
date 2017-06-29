@@ -765,7 +765,7 @@ ErrorTrap:
                     Call cpCore.db.createContentFromSQLTable(datasource, TableName, ContentName)
                     cpCore.cache.invalidateAll()
                     cpCore.metaData.clear()
-                    ContentID = cpCore.main_GetContentID(ContentName)
+                    ContentID = cpCore.metaData.getContentID(ContentName)
                     ParentNavID = cpCore.main_GetRecordID("Navigator Entries", "Manage Site Content")
                     If ParentNavID <> 0 Then
                         CS = cpCore.db.cs_open("Navigator Entries", "(name=" & cpCore.db.encodeSQLText("Advanced") & ")and(parentid=" & ParentNavID & ")")
@@ -788,8 +788,8 @@ ErrorTrap:
                             Call cpCore.db.cs_Close(CS)
                         End If
                     End If
-                    Call cpCore.admin_VerifyAdminMenu("Site Content", ContentName, ContentName, "", "")
-                    ContentID = cpCore.main_GetContentID(ContentName)
+                    Call Controllers.appBuilderController.admin_VerifyAdminMenu(cpCore, "Site Content", ContentName, ContentName, "", "")
+                    ContentID = cpCore.metaData.getContentID(ContentName)
                     Call Stream.Add("<P>Content Definition was created. An admin menu entry for this definition has been added under 'Site Content', and will be visible on the next page view. Use the [<a href=""?af=105&ContentID=" & ContentID & """>Edit Content Definition Fields</a>] tool to review and edit this definition's fields.</P>")
                 Else
                     Stream.Add("<P>Error, a required field is missing. Content not created.</P>")
@@ -2094,9 +2094,9 @@ ErrorTrap:
                         End If
                         Call cpCore.db.cs_Close(CS)
                         If MenuName <> "" Then
-                            Call cpCore.admin_VerifyAdminMenu(MenuName, ChildContentName, ChildContentName, "", ChildContentName, AdminOnly, DeveloperOnly, False)
+                            Call Controllers.appBuilderController.admin_VerifyAdminMenu(cpCore, MenuName, ChildContentName, ChildContentName, "", ChildContentName, AdminOnly, DeveloperOnly, False)
                         Else
-                            Call cpCore.admin_VerifyAdminMenu("Site Content", ChildContentName, ChildContentName, "", "")
+                            Call Controllers.appBuilderController.admin_VerifyAdminMenu(cpCore, "Site Content", ChildContentName, ChildContentName, "", "")
                         End If
                     End If
                     Stream.Add("<br>Finished</P>")
@@ -3031,9 +3031,9 @@ ErrorTrap:
                                                         DataSourceTypeID = cpCore.db.getDataSourceType(DataSourceName)
                                                         Select Case DataSourceTypeID
                                                             Case DataSourceTypeODBCMySQL
-                                                                SQL = "alter table " & CDef.ContentTableName & " change " & .nameLc & " " & .nameLc & " " & cpCore.GetSQLAlterColumnType(DataSourceName, formFieldTypeId) & ";"
+                                                                SQL = "alter table " & CDef.ContentTableName & " change " & .nameLc & " " & .nameLc & " " & cpCore.db.getSQLAlterColumnType(DataSourceName, fieldType) & ";"
                                                             Case Else
-                                                                SQL = "alter table " & CDef.ContentTableName & " alter column " & .nameLc & " " & cpCore.GetSQLAlterColumnType(DataSourceName, formFieldTypeId) & ";"
+                                                                SQL = "alter table " & CDef.ContentTableName & " alter column " & .nameLc & " " & cpCore.db.getSQLAlterColumnType(DataSourceName, fieldType) & ";"
                                                         End Select
                                                         Call cpCore.db.executeSql(SQL, DataSourceName)
                                                     End If
@@ -3128,7 +3128,7 @@ ErrorTrap:
                 Else
                     Stream.Add("<div style=""width:45%;float:left;padding:10px;"">Related Tools:" _
                         & "<div style=""padding-left:20px;""><a href=""?af=104&ContentID=" & ContentID & """>Set Default Admin Listing page columns for '" & ContentName & "'</a></div>" _
-                        & "<div style=""padding-left:20px;""><a href=""?af=4&cid=" & cpCore.main_GetContentID("content") & "&id=" & ContentID & """>Edit '" & ContentName & "' Content Definition</a></div>" _
+                        & "<div style=""padding-left:20px;""><a href=""?af=4&cid=" & cpCore.metaData.getContentID("content") & "&id=" & ContentID & """>Edit '" & ContentName & "' Content Definition</a></div>" _
                         & "<div style=""padding-left:20px;""><a href=""?cid=" & ContentID & """>View records in '" & ContentName & "'</a></div>" _
                         & "</div>")
                 End If

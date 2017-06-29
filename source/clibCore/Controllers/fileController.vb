@@ -926,6 +926,12 @@ Namespace Contensive.Core.Controllers
             Return success
         End Function
         '
+        '
+        '
+        Public Function main_GetFileSize(ByVal VirtualFilePathPage As String) As Integer
+            Dim files As IO.FileInfo() = getFileList(VirtualFilePathPage)
+            Return CInt(files(0).Length)
+        End Function        '
         '====================================================================================================
         ' dispose
         '====================================================================================================

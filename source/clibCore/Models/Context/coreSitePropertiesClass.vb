@@ -42,7 +42,7 @@ Namespace Contensive.Core.Models.Context
         Friend ReadOnly Property sitePropertyContentId() As Integer
             Get
                 If _sitePropertyContentId Is Nothing Then
-                    _sitePropertyContentId = cpCore.main_GetContentID("site properties")
+                    _sitePropertyContentId = cpCore.metaData.getContentID("site properties")
                 End If
                 Return CInt(_sitePropertyContentId)
             End Get

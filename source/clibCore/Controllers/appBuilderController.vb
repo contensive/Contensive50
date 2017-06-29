@@ -2394,5 +2394,14 @@ Namespace Contensive.Core.Controllers
                 cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
         End Sub
+        '
+        '=============================================================================
+        '   Verify an Admin Menu Entry
+        '       Entries are unique by their name
+        '=============================================================================
+        '
+        Public Shared Sub admin_VerifyAdminMenu(cpCore As coreClass, ByVal ParentName As String, ByVal EntryName As String, ByVal ContentName As String, ByVal LinkPage As String, ByVal SortOrder As String, Optional ByVal AdminOnly As Boolean = False, Optional ByVal DeveloperOnly As Boolean = False, Optional ByVal NewWindow As Boolean = False, Optional ByVal Active As Boolean = True)
+            Call admin_VerifyMenuEntry(cpCore, ParentName, EntryName, ContentName, LinkPage, SortOrder, AdminOnly, DeveloperOnly, NewWindow, Active, "Menu Entries", "")
+        End Sub
     End Class
 End Namespace

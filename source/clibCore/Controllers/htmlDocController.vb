@@ -1100,7 +1100,7 @@ ErrorTrap:
                                 If Parts(1) <> "" Then
                                     headTags = headTags & cr & genericController.decodeHtml(Parts(1))
                                 End If
-                                headTags = headTags & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, Parts(0)) & """ >"
+                                headTags = headTags & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(Parts(0)) & """ >"
                                 If Parts(2) <> "" Then
                                     headTags = headTags & cr & genericController.decodeHtml(Parts(2))
                                 End If
@@ -1531,7 +1531,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError13(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13(MethodName)
         End Function
         '
         '========================================================================
@@ -1625,7 +1625,7 @@ ErrorTrap:
                 ' Test selection size
                 '
                 PeopleTableName = cpCore.GetContentTablename("people")
-                PeopleDataSource = cpCore.main_GetContentDataSource("People")
+                PeopleDataSource = cpCore.metaData.getContentDataSource("People")
                 MemberRulesTableName = cpCore.GetContentTablename("Member Rules")
                 '
                 RowMax = 0
@@ -1861,7 +1861,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError13(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13(MethodName)
         End Function
         '
         '========================================================================
@@ -1933,7 +1933,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_GetFormInputSelectList2")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_GetFormInputSelectList2")
         End Function
         '
         '========================================================================
@@ -1961,7 +1961,7 @@ ErrorTrap:
                 End If
                 IconFilename = cpCore.siteProperties.LoginIconFilename
                 If genericController.vbLCase(Mid(IconFilename, 1, 7)) <> "/ccLib/" Then
-                    IconFilename = cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, IconFilename)
+                    IconFilename = cpCore.getCdnFileLink(IconFilename)
                 End If
                 main_GetLoginLink = main_GetLoginLink & "<img alt=""Login"" src=""" & IconFilename & """ border=""0"" >"
                 main_GetLoginLink = main_GetLoginLink & "</A>"
@@ -1973,7 +1973,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetLoginLink")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetLoginLink")
         End Function
         '
         '========================================================================
@@ -2037,7 +2037,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("writeAltBuffer")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("writeAltBuffer")
         End Sub
 
         '
@@ -2054,7 +2054,7 @@ ErrorTrap:
             Exit Sub
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_JavaStream_Add")
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_JavaStream_Add")
         End Sub
         '
         '
@@ -2886,7 +2886,7 @@ ErrorTrap:
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
                                     Else
-                                        returnResult = "<img src=""" & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, FieldValueText) & """><BR >change: " & html_GetFormInputFile(FieldName, genericController.encodeText(FieldValueVariant))
+                                        returnResult = "<img src=""" & cpCore.getCdnFileLink(FieldValueText) & """><BR >change: " & html_GetFormInputFile(FieldName, genericController.encodeText(FieldValueVariant))
                                     End If
                                 '
                                 '
@@ -3247,7 +3247,7 @@ ErrorTrap:
                         Dim FieldValuefilename As String = ""
                         Dim FieldValuePath As String = ""
                         cpCore.privateFiles.splitPathFilename(HtmlValue, FieldValuePath, FieldValuefilename)
-                        html_GetFormInputField = html_GetFormInputField & "<a href=""http://" & genericController.EncodeURL(cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & FieldValuefilename & "]</A>"
+                        html_GetFormInputField = html_GetFormInputField & "<a href=""http://" & genericController.EncodeURL(cpCore.webServer.requestDomain & cpCore.getCdnFileLink(HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & FieldValuefilename & "]</A>"
                         html_GetFormInputField = html_GetFormInputField & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & html_GetFormInputCheckBox2(InputName & ".Delete", False)
                         html_GetFormInputField = html_GetFormInputField & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & html_GetFormInputFile2(InputName, HtmlId, HtmlClass)
                     End If
@@ -3272,7 +3272,7 @@ ErrorTrap:
                         Dim FieldValuefilename As String = ""
                         Dim FieldValuePath As String = ""
                         cpCore.privateFiles.splitPathFilename(HtmlValue, FieldValuePath, FieldValuefilename)
-                        html_GetFormInputField = html_GetFormInputField & "<a href=""http://" & genericController.EncodeURL(cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & FieldValuefilename & "]</A>"
+                        html_GetFormInputField = html_GetFormInputField & "<a href=""http://" & genericController.EncodeURL(cpCore.webServer.requestDomain & cpCore.getCdnFileLink(HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & FieldValuefilename & "]</A>"
                         html_GetFormInputField = html_GetFormInputField & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & html_GetFormInputCheckBox2(InputName & ".Delete", False)
                         html_GetFormInputField = html_GetFormInputField & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & html_GetFormInputFile2(InputName, HtmlId, HtmlClass)
                     End If
@@ -4559,83 +4559,64 @@ ErrorTrap:
                                                     ACAttrHSpace = genericController.EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "HSPACE"))
                                                     ACAttrAlign = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "ALIGN"))
                                                     '
-                                                    Dim Attr As String
-                                                    Dim lfPtr As Integer
-                                                    Dim lfFilename As String
-                                                    Dim lfWidth As Integer
-                                                    Dim lfHeight As Integer
-                                                    Call cpCore.cache_libraryFiles_loadIfNeeded()
-                                                    lfPtr = cpCore.cache_libraryFilesIdIndex.getPtr(CStr(ACAttrRecordID))
-                                                    If lfPtr >= 0 Then
-                                                        lfFilename = genericController.encodeText(cpCore.cache_libraryFiles(LibraryFilesCache_filename, lfPtr))
-                                                        lfWidth = genericController.EncodeInteger(cpCore.cache_libraryFiles(LibraryFilesCache_width, lfPtr))
-                                                        lfHeight = genericController.EncodeInteger(cpCore.cache_libraryFiles(LibraryFilesCache_height, lfPtr))
-                                                        'CS = app.csOpen("Library Files", "ID=" & encodeSQLNumber(ACAttrRecordID), , , , , , "Filename,AltText,Width,Height")
-                                                        'If app.csv_IsCSOK(CS) Then
-                                                        'Filename = app.csv_cs_getField(CS, "FileName")
-                                                        If Filename <> "" Then
-                                                            Filename = lfFilename
-                                                            'Filename = genericController.vbReplace(Filename, " ", "%20")
-                                                            Filename = genericController.vbReplace(Filename, "\", "/")
-                                                            Filename = genericController.EncodeURL(Filename)
-                                                            Copy = Copy & "<img ID=""AC,IMAGE,," & ACAttrRecordID & """ src=""" & cpCore.csv_getVirtualFileLink(serverFilePath, Filename) & """"
-                                                            '
-                                                            If ACAttrWidth = 0 Then
-                                                                ACAttrWidth = lfWidth
-                                                                'ACAttrWidth = app.csv_cs_getInteger(CS, "Width")
-                                                            End If
-                                                            If ACAttrWidth <> 0 Then
-                                                                Copy = Copy & " width=""" & ACAttrWidth & """"
-                                                            End If
-                                                            '
-                                                            If ACAttrHeight = 0 Then
-                                                                ACAttrHeight = lfHeight
-                                                                'ACAttrHeight = app.csv_cs_getInteger(CS, "Height")
-                                                            End If
-                                                            If ACAttrHeight <> 0 Then
-                                                                Copy = Copy & " height=""" & ACAttrHeight & """"
-                                                            End If
-                                                            '
-                                                            If ACAttrVSpace <> 0 Then
-                                                                Copy = Copy & " vspace=""" & ACAttrVSpace & """"
-                                                            End If
-                                                            '
-                                                            If ACAttrHSpace <> 0 Then
-                                                                Copy = Copy & " hspace=""" & ACAttrHSpace & """"
-                                                            End If
-                                                            '
-                                                            If ACAttrAlt <> "" Then
-                                                                Copy = Copy & " alt=""" & ACAttrAlt & """"
-                                                            End If
-                                                            '
-                                                            If ACAttrAlign <> "" Then
-                                                                Copy = Copy & " align=""" & ACAttrAlign & """"
-                                                            End If
-                                                            '
-                                                            ' no, 0 is an important value
-                                                            'If ACAttrBorder <> 0 Then
-                                                            Copy = Copy & " border=""" & ACAttrBorder & """"
-                                                            '    End If
-                                                            '
-                                                            If ACAttrLoop <> 0 Then
-                                                                Copy = Copy & " loop=""" & ACAttrLoop & """"
-                                                            End If
-                                                            '
-
-                                                            Attr = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "STYLE"))
-                                                            If Attr <> "" Then
-                                                                Copy = Copy & " style=""" & Attr & """"
-                                                            End If
-                                                            '
-                                                            Attr = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "CLASS"))
-                                                            If Attr <> "" Then
-                                                                Copy = Copy & " class=""" & Attr & """"
-                                                            End If
-                                                            '
-                                                            Copy = Copy & ">"
+                                                    Dim file As Models.Entity.libraryFilesModel = Models.Entity.libraryFilesModel.create(cpCore, ACAttrRecordID)
+                                                    If (file IsNot Nothing) Then
+                                                        Filename = file.Filename
+                                                        Filename = genericController.vbReplace(Filename, "\", "/")
+                                                        Filename = genericController.EncodeURL(Filename)
+                                                        Copy = Copy & "<img ID=""AC,IMAGE,," & ACAttrRecordID & """ src=""" & cpCore.getCdnFileLink(Filename) & """"
+                                                        '
+                                                        If ACAttrWidth = 0 Then
+                                                            ACAttrWidth = file.pxWidth
                                                         End If
-                                                        'End If
-                                                        'Call app.csv_CloseCS(CS)
+                                                        If ACAttrWidth <> 0 Then
+                                                            Copy = Copy & " width=""" & ACAttrWidth & """"
+                                                        End If
+                                                        '
+                                                        If ACAttrHeight = 0 Then
+                                                            ACAttrHeight = file.pxHeight
+                                                        End If
+                                                        If ACAttrHeight <> 0 Then
+                                                            Copy = Copy & " height=""" & ACAttrHeight & """"
+                                                        End If
+                                                        '
+                                                        If ACAttrVSpace <> 0 Then
+                                                            Copy = Copy & " vspace=""" & ACAttrVSpace & """"
+                                                        End If
+                                                        '
+                                                        If ACAttrHSpace <> 0 Then
+                                                            Copy = Copy & " hspace=""" & ACAttrHSpace & """"
+                                                        End If
+                                                        '
+                                                        If ACAttrAlt <> "" Then
+                                                            Copy = Copy & " alt=""" & ACAttrAlt & """"
+                                                        End If
+                                                        '
+                                                        If ACAttrAlign <> "" Then
+                                                            Copy = Copy & " align=""" & ACAttrAlign & """"
+                                                        End If
+                                                        '
+                                                        ' no, 0 is an important value
+                                                        'If ACAttrBorder <> 0 Then
+                                                        Copy = Copy & " border=""" & ACAttrBorder & """"
+                                                        '    End If
+                                                        '
+                                                        If ACAttrLoop <> 0 Then
+                                                            Copy = Copy & " loop=""" & ACAttrLoop & """"
+                                                        End If
+                                                        '
+                                                        Dim attr As String
+                                                        attr = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "STYLE"))
+                                                        If attr <> "" Then
+                                                            Copy = Copy & " style=""" & attr & """"
+                                                        End If
+                                                        '
+                                                        attr = genericController.encodeText(KmaHTML.ElementAttribute(ElementPointer, "CLASS"))
+                                                        If attr <> "" Then
+                                                            Copy = Copy & " class=""" & attr & """"
+                                                        End If
+                                                        '
+                                                        Copy = Copy & ">"
                                                     End If
                                                 End If
                                             '
@@ -4658,23 +4639,13 @@ ErrorTrap:
                                                     'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Renders as a download icon"" id=""AC," & ACTypeDownload & ",," & ACAttrRecordID & """ src=""/ccLib/images/IconDownload3.GIF"">"
                                                 ElseIf EncodeImages Then
                                                     '
-                                                    Dim libraryFilePtr As Integer
-                                                    If ACAttrAlt = "" Then
-                                                        Call cpCore.cache_libraryFiles_loadIfNeeded()
-                                                        libraryFilePtr = cpCore.cache_libraryFilesIdIndex.getPtr(CStr(ACAttrRecordID))
-                                                        If libraryFilePtr >= 0 Then
-                                                            ACAttrAlt = genericController.encodeText(cpCore.cache_libraryFiles(LibraryFilesCache_alttext, libraryFilePtr))
+                                                    Dim file As Models.Entity.libraryFilesModel = Models.Entity.libraryFilesModel.create(cpCore, ACAttrRecordID)
+                                                    If (file IsNot Nothing) Then
+                                                        If ACAttrAlt = "" Then
+                                                            ACAttrAlt = genericController.encodeText(file.AltText)
                                                         End If
+                                                        Copy = "<a href=""" & ProtocolHostString & requestAppRootPath & cpCore.siteProperties.serverPageDefault & "?" & RequestNameDownloadID & "=" & ACAttrRecordID & """ target=""_blank""><img src=""" & ProtocolHostString & "/ccLib/images/IconDownload3.gif"" width=""16"" height=""16"" border=""0"" alt=""" & ACAttrAlt & """></a>"
                                                     End If
-                                                    '                                        CS = app.csOpenRecord("Library Files", ACAttrRecordID, , , , "Filename,AltText")
-                                                    '                                        If app.csv_IsCSOK(CS) Then
-                                                    '                                            If ACAttrAlt = "" Then
-                                                    '                                                ACAttrAlt = genericController.encodeText(app.csv_cs_getText(CS, "AltText"))
-                                                    '                                            End If
-                                                    '                                        End If
-                                                    '                                        Call app.csv_CloseCS(CS)
-                                                    '
-                                                    Copy = "<a href=""" & ProtocolHostString & requestAppRootPath & cpCore.siteProperties.serverPageDefault & "?" & RequestNameDownloadID & "=" & ACAttrRecordID & """ target=""_blank""><img src=""" & ProtocolHostString & "/ccLib/images/IconDownload3.gif"" width=""16"" height=""16"" border=""0"" alt=""" & ACAttrAlt & """></a>"
                                                 End If
                                             Case ACTypeTemplateContent
                                                 '
@@ -4853,722 +4824,628 @@ ErrorTrap:
         '========================================================================
         '
         Public Function html_DecodeActiveContent(ByVal SourceCopy As String) As String
-            On Error GoTo ErrorTrap 'Const Tn = "MethodName-184" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim recordUpdateSql As String
-            Dim libraryFilePtr As Integer
-            Dim imageNewLink As String
-            Dim ACQueryString As String = ""
-            Dim ACGuid As String
-            Dim ACIdentifier As String
-            Dim RecordFilename As String
-            Dim RecordFilenameNoExt As String
-            Dim RecordFilenameExt As String
-            Dim Ptr As Integer
-            Dim ACInstanceID As String
-            'Dim GUIDGenerator As guidClass
-            Dim FieldSelected As String
-            Dim QSHTMLEncoded As String
-            Dim Pos As Integer
-            Dim ImageSrcOriginal As String
-            Dim VirtualFilePathBad As String
-            Dim AllowGroups As String
-            Dim Paths() As String
-            Dim ImageVirtualFilename As String
-            Dim ImageFilename As String
-            Dim ImageFilenameExt As String
-            Dim ImageFilenameNoExt As String
-            Dim ImageFilenameNoAltSizeNoExt As String
-            Dim ImageFilenameAltSize As String
-            Dim SizeTest() As String
-            Dim Styles() As String
-            Dim StyleName As String
-            Dim StyleValue As String
-            Dim StyleValueInt As Integer
-            Dim Style() As String
-            Dim ImageVirtualFilePath As String
-            Dim CS As Integer
-            Dim RecordVirtualFilename As String
-            Dim RecordWidth As Integer
-            Dim RecordHeight As Integer
-            Dim RecordAltSizeList As String
-            Dim ImageAltSize As String
-            Dim NewImageFilename As String
-            '
-            Dim MethodName As String
-            Dim DHTML As New htmlParserController(cpCore)
-            Dim ElementPointer As Integer
-            Dim ElementCount As Integer
-            Dim AttributeCount As Integer
-            Dim AttributePointer As Integer
-            Dim Id As String
-            Dim ACType As String
-            Dim ACSubType As String
-            Dim ACFieldName As String
-            Dim ACArgument0 As String
-            Dim ACInstanceName As String
-            Dim CursorPosition As Integer
-
-            Dim PositionTagStart As Integer
-            Dim PositionTagEnd As Integer
-            Dim PositionAltStart As Integer
-            Dim PositionAltEnd As Integer
-            '
-            'Dim AltText As String
-            Dim ImageLink As String
-            Dim RecordID As Integer
-            Dim RecordIDPosition As Integer
-            Dim ImageWidthText As String
-            Dim ImageHeightText As String
-            '
-            Dim ImageWidth As Integer
-            Dim ImageHeight As Integer
-            '
-            Dim ElementText As String
-            Dim ImageID As String
-            Dim ImageSrc As String
-            Dim ImageAlt As String
-            Dim ImageVSpace As Integer
-            Dim ImageHSpace As Integer
-            Dim ImageAlign As String
-            Dim ImageBorder As String
-            Dim ImageLoop As String
-            Dim ImageStyle As String
-            Dim IMageStyleArray As String()
-            Dim ImageStyleArrayCount As Integer
-            Dim ImageStyleArrayPointer As Integer
-            Dim ImageStylePair As String
-            Dim PositionColon As Integer
-            Dim ImageStylePairName As String
-            Dim ImageStylePairValue As String
-            Dim Stream As stringBuilderLegacyController
-            Dim ImageIDArray As String() = {}
-            Dim ImageIDArrayCount As Integer
-            Dim ImageIDArrayPointer As Integer
-            Dim QueryString As String
-            Dim QSSplit() As String
-            Dim QSPtr As Integer
-            Dim serverFilePath As String
-            Dim ImageAllowSFResize As Boolean
-            Dim sf As imageEditController
-            '
-            html_DecodeActiveContent = SourceCopy
-            If html_DecodeActiveContent <> "" Then
+            Dim result As String = ""
+            Try
+                Dim imageNewLink As String
+                Dim ACQueryString As String = ""
+                Dim ACGuid As String
+                Dim ACIdentifier As String
+                Dim RecordFilename As String
+                Dim RecordFilenameNoExt As String
+                Dim RecordFilenameExt As String
+                Dim Ptr As Integer
+                Dim ACInstanceID As String
+                Dim QSHTMLEncoded As String
+                Dim Pos As Integer
+                Dim ImageSrcOriginal As String
+                Dim VirtualFilePathBad As String
+                Dim Paths() As String
+                Dim ImageVirtualFilename As String
+                Dim ImageFilename As String
+                Dim ImageFilenameExt As String
+                Dim ImageFilenameNoExt As String
+                Dim SizeTest() As String
+                Dim Styles() As String
+                Dim StyleName As String
+                Dim StyleValue As String
+                Dim StyleValueInt As Integer
+                Dim Style() As String
+                Dim ImageVirtualFilePath As String
+                Dim CS As Integer
+                Dim RecordVirtualFilename As String
+                Dim RecordWidth As Integer
+                Dim RecordHeight As Integer
+                Dim RecordAltSizeList As String
+                Dim ImageAltSize As String
+                Dim NewImageFilename As String
+                Dim DHTML As New htmlParserController(cpCore)
+                Dim ElementPointer As Integer
+                Dim ElementCount As Integer
+                Dim AttributeCount As Integer
+                Dim ACType As String
+                Dim ACFieldName As String
+                Dim ACInstanceName As String
+                Dim RecordID As Integer
+                Dim ImageWidthText As String
+                Dim ImageHeightText As String
+                Dim ImageWidth As Integer
+                Dim ImageHeight As Integer
+                Dim ElementText As String
+                Dim ImageID As String
+                Dim ImageSrc As String
+                Dim ImageAlt As String
+                Dim ImageVSpace As Integer
+                Dim ImageHSpace As Integer
+                Dim ImageAlign As String
+                Dim ImageBorder As String
+                Dim ImageLoop As String
+                Dim ImageStyle As String
+                Dim IMageStyleArray As String()
+                Dim ImageStyleArrayCount As Integer
+                Dim ImageStyleArrayPointer As Integer
+                Dim ImageStylePair As String
+                Dim PositionColon As Integer
+                Dim ImageStylePairName As String
+                Dim ImageStylePairValue As String
+                Dim Stream As New stringBuilderLegacyController
+                Dim ImageIDArray As String() = {}
+                Dim ImageIDArrayCount As Integer
+                Dim QueryString As String
+                Dim QSSplit() As String
+                Dim QSPtr As Integer
+                Dim serverFilePath As String
+                Dim ImageAllowSFResize As Boolean
+                Dim sf As imageEditController
                 '
-                ' leave this in to make sure old <acform tags are converted back
-                ' new editor deals with <form, so no more converting
-                '
-                html_DecodeActiveContent = genericController.vbReplace(html_DecodeActiveContent, "<ACFORM>", "<FORM>")
-                html_DecodeActiveContent = genericController.vbReplace(html_DecodeActiveContent, "<ACFORM ", "<FORM ")
-                html_DecodeActiveContent = genericController.vbReplace(html_DecodeActiveContent, "</ACFORM>", "</form>")
-                html_DecodeActiveContent = genericController.vbReplace(html_DecodeActiveContent, "</ACFORM ", "</FORM ")
-                If DHTML.Load(html_DecodeActiveContent) Then
-                    html_DecodeActiveContent = ""
-                    ElementCount = DHTML.ElementCount
-                    If ElementCount > 0 Then
-                        '
-                        ' ----- Locate and replace IMG Edit icons with AC tags
-                        '
-                        Stream = New stringBuilderLegacyController
-                        For ElementPointer = 0 To ElementCount - 1
-                            ElementText = DHTML.Text(ElementPointer)
-                            If DHTML.IsTag(ElementPointer) Then
-                                Select Case genericController.vbUCase(DHTML.TagName(ElementPointer))
-                                    Case "FORM"
+                html_DecodeActiveContent = SourceCopy
+                If html_DecodeActiveContent <> "" Then
+                    '
+                    ' leave this in to make sure old <acform tags are converted back
+                    ' new editor deals with <form, so no more converting
+                    '
+                    html_DecodeActiveContent = genericController.vbReplace(html_DecodeActiveContent, "<ACFORM>", "<FORM>")
+                    html_DecodeActiveContent = genericController.vbReplace(html_DecodeActiveContent, "<ACFORM ", "<FORM ")
+                    html_DecodeActiveContent = genericController.vbReplace(html_DecodeActiveContent, "</ACFORM>", "</form>")
+                    html_DecodeActiveContent = genericController.vbReplace(html_DecodeActiveContent, "</ACFORM ", "</FORM ")
+                    If DHTML.Load(html_DecodeActiveContent) Then
+                        html_DecodeActiveContent = ""
+                        ElementCount = DHTML.ElementCount
+                        If ElementCount > 0 Then
+                            '
+                            ' ----- Locate and replace IMG Edit icons with AC tags
+                            '
+                            Stream = New stringBuilderLegacyController
+                            For ElementPointer = 0 To ElementCount - 1
+                                ElementText = DHTML.Text(ElementPointer)
+                                If DHTML.IsTag(ElementPointer) Then
+                                    Select Case genericController.vbUCase(DHTML.TagName(ElementPointer))
+                                        Case "FORM"
                                         '
                                         ' User created form - add the attribute "Contensive=1"
                                         '
                                         ' 5/14/2009 - DM said it is OK to remove UserResponseForm Processing
                                         'ElementText = genericController.vbReplace(ElementText, "<FORM", "<FORM ContensiveUserForm=1 ", vbTextCompare)
-                                    Case "IMG"
-                                        AttributeCount = DHTML.ElementAttributeCount(ElementPointer)
+                                        Case "IMG"
+                                            AttributeCount = DHTML.ElementAttributeCount(ElementPointer)
 
-                                        If AttributeCount > 0 Then
-                                            ImageID = DHTML.ElementAttribute(ElementPointer, "id")
-                                            ImageSrcOriginal = DHTML.ElementAttribute(ElementPointer, "src")
-                                            VirtualFilePathBad = cpCore.serverConfig.appConfig.name & "/files/"
-                                            serverFilePath = "/" & VirtualFilePathBad
-                                            If Left(LCase(ImageSrcOriginal), Len(VirtualFilePathBad)) = genericController.vbLCase(VirtualFilePathBad) Then
-                                                '
-                                                ' if the image is from the virtual file path, but the editor did not include the root path, add it
-                                                '
-                                                ElementText = genericController.vbReplace(ElementText, VirtualFilePathBad, "/" & VirtualFilePathBad, 1, 99, vbTextCompare)
-                                                ImageSrcOriginal = genericController.vbReplace(ImageSrcOriginal, VirtualFilePathBad, "/" & VirtualFilePathBad, 1, 99, vbTextCompare)
-                                            End If
-                                            ImageSrc = genericController.decodeHtml(ImageSrcOriginal)
-                                            ImageSrc = DecodeURL(ImageSrc)
-                                            '
-                                            ' problem with this case is if the addon icon image is from another site.
-                                            ' not sure how it happened, but I do not think the src of an addon edit icon
-                                            ' should be able to prevent the addon from executing.
-                                            '
-                                            ACIdentifier = ""
-                                            ACType = ""
-                                            ACFieldName = ""
-                                            ACInstanceName = ""
-                                            ACGuid = ""
-                                            ImageIDArrayCount = 0
-                                            If 0 <> genericController.vbInstr(1, ImageID, ",") Then
-                                                ImageIDArray = Split(ImageID, ",")
-                                                ImageIDArrayCount = UBound(ImageIDArray) + 1
-                                                If ImageIDArrayCount > 5 Then
-                                                    For Ptr = 5 To ImageIDArrayCount - 1
-                                                        ACGuid = ImageIDArray(Ptr)
-                                                        If (Left(ACGuid, 1) = "{") And (Right(ACGuid, 1) = "}") Then
-                                                            '
-                                                            ' this element is the guid, go with it
-                                                            '
-                                                            Exit For
-                                                        ElseIf (ACGuid = "") And (Ptr = (ImageIDArrayCount - 1)) Then
-                                                            '
-                                                            ' this is the last element, leave it as the guid
-                                                            '
-                                                            Exit For
-                                                        Else
-                                                            '
-                                                            ' not a valid guid, add it to element 4 and try the next
-                                                            '
-                                                            ImageIDArray(4) = ImageIDArray(4) & "," & ACGuid
-                                                            ACGuid = ""
-                                                        End If
-                                                    Next
+                                            If AttributeCount > 0 Then
+                                                ImageID = DHTML.ElementAttribute(ElementPointer, "id")
+                                                ImageSrcOriginal = DHTML.ElementAttribute(ElementPointer, "src")
+                                                VirtualFilePathBad = cpCore.serverConfig.appConfig.name & "/files/"
+                                                serverFilePath = "/" & VirtualFilePathBad
+                                                If Left(LCase(ImageSrcOriginal), Len(VirtualFilePathBad)) = genericController.vbLCase(VirtualFilePathBad) Then
+                                                    '
+                                                    ' if the image is from the virtual file path, but the editor did not include the root path, add it
+                                                    '
+                                                    ElementText = genericController.vbReplace(ElementText, VirtualFilePathBad, "/" & VirtualFilePathBad, 1, 99, vbTextCompare)
+                                                    ImageSrcOriginal = genericController.vbReplace(ImageSrcOriginal, VirtualFilePathBad, "/" & VirtualFilePathBad, 1, 99, vbTextCompare)
                                                 End If
-                                                If (ImageIDArrayCount > 1) Then
-                                                    ACIdentifier = genericController.vbUCase(ImageIDArray(0))
-                                                    ACType = ImageIDArray(1)
-                                                    If ImageIDArrayCount > 2 Then
-                                                        ACFieldName = ImageIDArray(2)
-                                                        If ImageIDArrayCount > 3 Then
-                                                            ACInstanceName = ImageIDArray(3)
-                                                            If ImageIDArrayCount > 4 Then
-                                                                ACQueryString = ImageIDArray(4)
-                                                                'If ImageIDArrayCount > 5 Then
-                                                                '    ACGuid = ImageIDArray(5)
-                                                                'End If
+                                                ImageSrc = genericController.decodeHtml(ImageSrcOriginal)
+                                                ImageSrc = DecodeURL(ImageSrc)
+                                                '
+                                                ' problem with this case is if the addon icon image is from another site.
+                                                ' not sure how it happened, but I do not think the src of an addon edit icon
+                                                ' should be able to prevent the addon from executing.
+                                                '
+                                                ACIdentifier = ""
+                                                ACType = ""
+                                                ACFieldName = ""
+                                                ACInstanceName = ""
+                                                ACGuid = ""
+                                                ImageIDArrayCount = 0
+                                                If 0 <> genericController.vbInstr(1, ImageID, ",") Then
+                                                    ImageIDArray = Split(ImageID, ",")
+                                                    ImageIDArrayCount = UBound(ImageIDArray) + 1
+                                                    If ImageIDArrayCount > 5 Then
+                                                        For Ptr = 5 To ImageIDArrayCount - 1
+                                                            ACGuid = ImageIDArray(Ptr)
+                                                            If (Left(ACGuid, 1) = "{") And (Right(ACGuid, 1) = "}") Then
+                                                                '
+                                                                ' this element is the guid, go with it
+                                                                '
+                                                                Exit For
+                                                            ElseIf (ACGuid = "") And (Ptr = (ImageIDArrayCount - 1)) Then
+                                                                '
+                                                                ' this is the last element, leave it as the guid
+                                                                '
+                                                                Exit For
+                                                            Else
+                                                                '
+                                                                ' not a valid guid, add it to element 4 and try the next
+                                                                '
+                                                                ImageIDArray(4) = ImageIDArray(4) & "," & ACGuid
+                                                                ACGuid = ""
+                                                            End If
+                                                        Next
+                                                    End If
+                                                    If (ImageIDArrayCount > 1) Then
+                                                        ACIdentifier = genericController.vbUCase(ImageIDArray(0))
+                                                        ACType = ImageIDArray(1)
+                                                        If ImageIDArrayCount > 2 Then
+                                                            ACFieldName = ImageIDArray(2)
+                                                            If ImageIDArrayCount > 3 Then
+                                                                ACInstanceName = ImageIDArray(3)
+                                                                If ImageIDArrayCount > 4 Then
+                                                                    ACQueryString = ImageIDArray(4)
+                                                                    'If ImageIDArrayCount > 5 Then
+                                                                    '    ACGuid = ImageIDArray(5)
+                                                                    'End If
+                                                                End If
                                                             End If
                                                         End If
                                                     End If
                                                 End If
-                                            End If
-                                            If ACIdentifier = "AC" Then
-                                                If True Then
+                                                If ACIdentifier = "AC" Then
                                                     If True Then
-                                                        '
-                                                        ' ----- Process AC Tag
-                                                        '
-                                                        ACInstanceID = DHTML.ElementAttribute(ElementPointer, "ACINSTANCEID")
-                                                        If ACInstanceID = "" Then
-                                                            'GUIDGenerator = New guidClass
-                                                            ACInstanceID = Guid.NewGuid().ToString
-                                                            'ACInstanceID = Guid.NewGuid.ToString()
-                                                        End If
-                                                        ElementText = ""
-                                                        '----------------------------- change to ACType
-                                                        Select Case genericController.vbUCase(ACType)
-                                                            Case "IMAGE"
-                                                                '
-                                                                ' ----- AC Image, Decode Active Images to Resource Library references
-                                                                '
-                                                                If ImageIDArrayCount >= 4 Then
-                                                                    RecordID = genericController.EncodeInteger(ACInstanceName)
-                                                                    ImageWidthText = DHTML.ElementAttribute(ElementPointer, "WIDTH")
-                                                                    ImageHeightText = DHTML.ElementAttribute(ElementPointer, "HEIGHT")
-                                                                    ImageAlt = html_EncodeHTML(DHTML.ElementAttribute(ElementPointer, "Alt"))
-                                                                    ImageVSpace = genericController.EncodeInteger(DHTML.ElementAttribute(ElementPointer, "vspace"))
-                                                                    ImageHSpace = genericController.EncodeInteger(DHTML.ElementAttribute(ElementPointer, "hspace"))
-                                                                    ImageAlign = DHTML.ElementAttribute(ElementPointer, "Align")
-                                                                    ImageBorder = DHTML.ElementAttribute(ElementPointer, "BORDER")
-                                                                    ImageLoop = DHTML.ElementAttribute(ElementPointer, "LOOP")
-                                                                    ImageStyle = DHTML.ElementAttribute(ElementPointer, "STYLE")
-
-                                                                    If ImageStyle <> "" Then
-                                                                        '
-                                                                        ' ----- Process styles, which override attributes
-                                                                        '
-                                                                        IMageStyleArray = Split(ImageStyle, ";")
-                                                                        ImageStyleArrayCount = UBound(IMageStyleArray) + 1
-                                                                        For ImageStyleArrayPointer = 0 To ImageStyleArrayCount - 1
-                                                                            ImageStylePair = Trim(IMageStyleArray(ImageStyleArrayPointer))
-                                                                            PositionColon = genericController.vbInstr(1, ImageStylePair, ":")
-                                                                            If PositionColon > 1 Then
-                                                                                ImageStylePairName = Trim(Mid(ImageStylePair, 1, PositionColon - 1))
-                                                                                ImageStylePairValue = Trim(Mid(ImageStylePair, PositionColon + 1))
-                                                                                Select Case genericController.vbUCase(ImageStylePairName)
-                                                                                    Case "WIDTH"
-                                                                                        ImageStylePairValue = genericController.vbReplace(ImageStylePairValue, "px", "")
-                                                                                        ImageWidthText = ImageStylePairValue
-                                                                                    Case "HEIGHT"
-                                                                                        ImageStylePairValue = genericController.vbReplace(ImageStylePairValue, "px", "")
-                                                                                        ImageHeightText = ImageStylePairValue
-                                                                                End Select
-                                                                                'If genericController.vbInstr(1, ImageStylePair, "WIDTH", vbTextCompare) = 1 Then
-                                                                                '    End If
-                                                                            End If
-                                                                        Next
-                                                                    End If
-                                                                    ElementText = "<AC type=""IMAGE"" ACInstanceID=""" & ACInstanceID & """ RecordID=""" & RecordID & """ Style=""" & ImageStyle & """ Width=""" & ImageWidthText & """ Height=""" & ImageHeightText & """ VSpace=""" & ImageVSpace & """ HSpace=""" & ImageHSpace & """ Alt=""" & ImageAlt & """ Align=""" & ImageAlign & """ Border=""" & ImageBorder & """ Loop=""" & ImageLoop & """>"
-                                                                End If
-                                                            Case ACTypeDownload
-                                                                '
-                                                                ' AC Download
-                                                                '
-                                                                If ImageIDArrayCount >= 4 Then
-                                                                    RecordID = genericController.EncodeInteger(ACInstanceName)
-                                                                    ElementText = "<AC type=""DOWNLOAD"" ACInstanceID=""" & ACInstanceID & """ RecordID=""" & RecordID & """>"
-                                                                End If
-                                                            Case ACTypeDate
-                                                                '
-                                                                ' Date
-                                                                '
-                                                                ElementText = "<AC type=""" & ACTypeDate & """>"
-                                                            Case ACTypeVisit, ACTypeVisitor, ACTypeMember, ACTypeOrganization, ACTypePersonalization
-                                                                '
-                                                                ' Visit, etc
-                                                                '
-                                                                ElementText = "<AC type=""" & ACType & """ ACInstanceID=""" & ACInstanceID & """ field=""" & ACFieldName & """>"
-                                                            Case ACTypeChildList, ACTypeLanguage
-                                                                '
-                                                                ' ChildList, Language
-                                                                '
-                                                                If ACInstanceName = "0" Then
-                                                                    ACInstanceName = genericController.getRandomLong().ToString()
-                                                                End If
-                                                                ElementText = "<AC type=""" & ACType & """ name=""" & ACInstanceName & """ ACInstanceID=""" & ACInstanceID & """>"
-                                                            Case ACTypeAggregateFunction
-                                                                '
-                                                                ' Function
-                                                                '
-                                                                QueryString = ""
-                                                                If ACQueryString <> "" Then
-                                                                    ' I added this because single stepping through it I found it split on the & in &amp;
-                                                                    ' I had added an Add-on and was saving
-                                                                    ' I find it VERY odd that this could be the case
+                                                        If True Then
+                                                            '
+                                                            ' ----- Process AC Tag
+                                                            '
+                                                            ACInstanceID = DHTML.ElementAttribute(ElementPointer, "ACINSTANCEID")
+                                                            If ACInstanceID = "" Then
+                                                                'GUIDGenerator = New guidClass
+                                                                ACInstanceID = Guid.NewGuid().ToString
+                                                                'ACInstanceID = Guid.NewGuid.ToString()
+                                                            End If
+                                                            ElementText = ""
+                                                            '----------------------------- change to ACType
+                                                            Select Case genericController.vbUCase(ACType)
+                                                                Case "IMAGE"
                                                                     '
-                                                                    QSHTMLEncoded = genericController.encodeText(ACQueryString)
-                                                                    QueryString = genericController.decodeHtml(QSHTMLEncoded)
-                                                                    QSSplit = Split(QueryString, "&")
-                                                                    For QSPtr = 0 To UBound(QSSplit)
-                                                                        Pos = genericController.vbInstr(1, QSSplit(QSPtr), "[")
-                                                                        If Pos > 0 Then
-                                                                            QSSplit(QSPtr) = Mid(QSSplit(QSPtr), 1, Pos - 1)
-                                                                        End If
-                                                                        QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
-                                                                    Next
-                                                                    QueryString = Join(QSSplit, "&")
-                                                                End If
-                                                                ElementText = "<AC type=""" & ACType & """ name=""" & ACInstanceName & """ ACInstanceID=""" & ACInstanceID & """ querystring=""" & QueryString & """ guid=""" & ACGuid & """>"
-                                                            Case ACTypeContact, ACTypeFeedback
-                                                                '
-                                                                ' Contact and Feedback
-                                                                '
-                                                                ElementText = "<AC type=""" & ACType & """ ACInstanceID=""" & ACInstanceID & """>"
-                                                            Case ACTypeTemplateContent, ACTypeTemplateText
-                                                                '
-                                                                '
-                                                                '
-                                                                QueryString = ""
-                                                                If ImageIDArrayCount > 4 Then
-                                                                    QueryString = genericController.encodeText(ImageIDArray(4))
-                                                                    QSSplit = Split(QueryString, "&")
-                                                                    For QSPtr = 0 To UBound(QSSplit)
-                                                                        QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
-                                                                    Next
-                                                                    QueryString = Join(QSSplit, "&")
+                                                                    ' ----- AC Image, Decode Active Images to Resource Library references
+                                                                    '
+                                                                    If ImageIDArrayCount >= 4 Then
+                                                                        RecordID = genericController.EncodeInteger(ACInstanceName)
+                                                                        ImageWidthText = DHTML.ElementAttribute(ElementPointer, "WIDTH")
+                                                                        ImageHeightText = DHTML.ElementAttribute(ElementPointer, "HEIGHT")
+                                                                        ImageAlt = html_EncodeHTML(DHTML.ElementAttribute(ElementPointer, "Alt"))
+                                                                        ImageVSpace = genericController.EncodeInteger(DHTML.ElementAttribute(ElementPointer, "vspace"))
+                                                                        ImageHSpace = genericController.EncodeInteger(DHTML.ElementAttribute(ElementPointer, "hspace"))
+                                                                        ImageAlign = DHTML.ElementAttribute(ElementPointer, "Align")
+                                                                        ImageBorder = DHTML.ElementAttribute(ElementPointer, "BORDER")
+                                                                        ImageLoop = DHTML.ElementAttribute(ElementPointer, "LOOP")
+                                                                        ImageStyle = DHTML.ElementAttribute(ElementPointer, "STYLE")
 
-                                                                End If
-                                                                ElementText = "<AC type=""" & ACType & """ name=""" & ACInstanceName & """ ACInstanceID=""" & ACInstanceID & """ querystring=""" & QueryString & """>"
-                                                            'Case ACTypeDynamicMenu
-                                                            '    '
-                                                            '    ' Dynamic Menu - if they added a new menu with MenuNew, create it, and remove it from tag
-                                                            '    '
-                                                            '    QueryString = ""
-                                                            '    If ImageIDArrayCount > 4 Then
-                                                            '        QueryString = genericController.encodeText(ImageIDArray(4))
-                                                            '        QueryString = genericController.decodeHtml(QueryString)
-                                                            '        QueryString = html_DecodeActiveContent_ProcessDynamicMenu(QueryString)
-                                                            '        QSSplit = Split(QueryString, "&")
-                                                            '        For QSPtr = 0 To UBound(QSSplit)
-                                                            '            QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
-                                                            '        Next
-                                                            '        QueryString = Join(QSSplit, "&")
-                                                            '    End If
-                                                            '    If True Then
-                                                            '        '
-                                                            '        ' convert to new menu type
-                                                            '        '
-                                                            '        Pos = genericController.vbInstr(1, QueryString, "[")
-                                                            '        If Pos > 0 Then
-                                                            '            QueryString = Mid(QueryString, 1, Pos - 1)
-                                                            '        End If
-
-                                                            '        QueryString = genericController.vbReplace(QueryString, "menu=", "Menu Name=", 1, 99, vbTextCompare) & "&Create New Menu="
-                                                            '        ElementText = "<AC type=""" & ACTypeAggregateFunction & """ name=""Dynamic Menu"" ACInstanceID=""" & ACInstanceID & """ querystring=""" & QueryString & """ guid=""" & ACGuid & """>"
-                                                            '    Else
-                                                            '        ElementText = "<AC type=""" & ACType & """ name=""" & ACInstanceName & """ ACInstanceID=""" & ACInstanceID & """ querystring=""" & QueryString & """>"
-                                                            '    End If
-                                                            'Case ACTypeDynamicForm
-                                                            '    '
-                                                            '    ' Dynamic Form
-                                                            '    '
-                                                            '    QueryString = ""
-                                                            '    If ImageIDArrayCount > 4 Then
-                                                            '        QueryString = genericController.encodeText(ImageIDArray(4))
-                                                            '        QueryString = genericController.decodeHtml(QueryString)
-                                                            '        QSSplit = Split(QueryString, "&")
-                                                            '        For QSPtr = 0 To UBound(QSSplit)
-                                                            '            QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
-                                                            '        Next
-                                                            '        QueryString = Join(QSSplit, "&")
-                                                            '    End If
-                                                            '    ElementText = "<AC type=""" & ACType & """ name=""" & ACInstanceName & """ ACInstanceID=""" & ACInstanceID & """ querystring=""" & QueryString & """>"
-                                                            Case ACTypeWatchList
-                                                                '
-                                                                ' Watch List
-                                                                '
-                                                                QueryString = ""
-                                                                If ImageIDArrayCount > 4 Then
-                                                                    QueryString = genericController.encodeText(ImageIDArray(4))
-                                                                    QueryString = genericController.decodeHtml(QueryString)
-                                                                    QSSplit = Split(QueryString, "&")
-                                                                    For QSPtr = 0 To UBound(QSSplit)
-                                                                        QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
-                                                                    Next
-                                                                    QueryString = Join(QSSplit, "&")
-                                                                End If
-                                                                ElementText = "<AC type=""" & ACType & """ name=""" & ACInstanceName & """ ACInstanceID=""" & ACInstanceID & """ querystring=""" & QueryString & """>"
-                                                            Case ACTypeRSSLink
-                                                                '
-                                                                ' RSS Link
-                                                                '
-                                                                QueryString = ""
-                                                                If ImageIDArrayCount > 4 Then
-                                                                    QueryString = genericController.encodeText(ImageIDArray(4))
-                                                                    QueryString = genericController.decodeHtml(QueryString)
-                                                                    QSSplit = Split(QueryString, "&")
-                                                                    For QSPtr = 0 To UBound(QSSplit)
-                                                                        QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
-                                                                    Next
-                                                                    QueryString = Join(QSSplit, "&")
-                                                                End If
-                                                                ElementText = "<AC type=""" & ACType & """ name=""" & ACInstanceName & """ ACInstanceID=""" & ACInstanceID & """ querystring=""" & QueryString & """>"
-                                                            Case Else
-                                                                '
-                                                                ' All others -- added querystring from element(4) to all others to cover the group access AC object
-                                                                '
-                                                                QueryString = ""
-                                                                If ImageIDArrayCount > 4 Then
-                                                                    QueryString = genericController.encodeText(ImageIDArray(4))
-                                                                    QueryString = genericController.decodeHtml(QueryString)
-                                                                    QSSplit = Split(QueryString, "&")
-                                                                    For QSPtr = 0 To UBound(QSSplit)
-                                                                        QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
-                                                                    Next
-                                                                    QueryString = Join(QSSplit, "&")
-                                                                End If
-                                                                ElementText = "<AC type=""" & ACType & """ name=""" & ACInstanceName & """ ACInstanceID=""" & ACInstanceID & """ field=""" & ACFieldName & """ querystring=""" & QueryString & """>"
-                                                        End Select
-                                                    End If
-                                                End If
-                                            ElseIf genericController.vbInstr(1, ImageSrc, "cclibraryfiles", vbTextCompare) <> 0 Then
-                                                ImageAllowSFResize = cpCore.siteProperties.getBoolean("ImageAllowSFResize", True)
-                                                If ImageAllowSFResize And True Then
-                                                    '
-                                                    ' if it is a real image, check for resize
-                                                    '
-                                                    Pos = genericController.vbInstr(1, ImageSrc, "cclibraryfiles", vbTextCompare)
-                                                    If Pos <> 0 Then
-                                                        ImageVirtualFilename = Mid(ImageSrc, Pos)
-                                                        Paths = Split(ImageVirtualFilename, "/")
-                                                        If UBound(Paths) > 2 Then
-                                                            If genericController.vbLCase(Paths(1)) = "filename" Then
-                                                                RecordID = genericController.EncodeInteger(Paths(2))
-                                                                If RecordID <> 0 Then
-                                                                    ImageFilename = Paths(3)
-                                                                    ImageVirtualFilePath = genericController.vbReplace(ImageVirtualFilename, ImageFilename, "")
-                                                                    Pos = InStrRev(ImageFilename, ".")
-                                                                    If Pos > 0 Then
-                                                                        ImageFilenameExt = Mid(ImageFilename, Pos + 1)
-                                                                        ImageFilenameNoExt = Mid(ImageFilename, 1, Pos - 1)
-                                                                        Pos = InStrRev(ImageFilenameNoExt, "-")
-                                                                        If Pos > 0 Then
+                                                                        If ImageStyle <> "" Then
                                                                             '
-                                                                            ' ImageAltSize should be set from the width and height of the img tag,
-                                                                            ' NOT from the actual width and height of the image file
-                                                                            ' NOT from the suffix of the image filename
-                                                                            ' ImageFilenameAltSize is used when the image has been resized, then 'reset' was hit
-                                                                            '  on the properties dialog before the save. The width and height come from this suffix
+                                                                            ' ----- Process styles, which override attributes
                                                                             '
-                                                                            ImageFilenameAltSize = Mid(ImageFilenameNoExt, Pos + 1)
-                                                                            SizeTest = Split(ImageFilenameAltSize, "x")
-                                                                            If UBound(SizeTest) <> 1 Then
-                                                                                ImageFilenameAltSize = ""
-                                                                            Else
-                                                                                If genericController.vbIsNumeric(SizeTest(0)) And genericController.vbIsNumeric(SizeTest(1)) Then
-                                                                                    ImageFilenameNoExt = Mid(ImageFilenameNoExt, 1, Pos - 1)
-                                                                                    'RecordVirtualFilenameNoExt = Mid(RecordVirtualFilename, 1, Pos - 1)
-                                                                                Else
-                                                                                    ImageFilenameAltSize = ""
+                                                                            IMageStyleArray = Split(ImageStyle, ";")
+                                                                            ImageStyleArrayCount = UBound(IMageStyleArray) + 1
+                                                                            For ImageStyleArrayPointer = 0 To ImageStyleArrayCount - 1
+                                                                                ImageStylePair = Trim(IMageStyleArray(ImageStyleArrayPointer))
+                                                                                PositionColon = genericController.vbInstr(1, ImageStylePair, ":")
+                                                                                If PositionColon > 1 Then
+                                                                                    ImageStylePairName = Trim(Mid(ImageStylePair, 1, PositionColon - 1))
+                                                                                    ImageStylePairValue = Trim(Mid(ImageStylePair, PositionColon + 1))
+                                                                                    Select Case genericController.vbUCase(ImageStylePairName)
+                                                                                        Case "WIDTH"
+                                                                                            ImageStylePairValue = genericController.vbReplace(ImageStylePairValue, "px", "")
+                                                                                            ImageWidthText = ImageStylePairValue
+                                                                                        Case "HEIGHT"
+                                                                                            ImageStylePairValue = genericController.vbReplace(ImageStylePairValue, "px", "")
+                                                                                            ImageHeightText = ImageStylePairValue
+                                                                                    End Select
+                                                                                    'If genericController.vbInstr(1, ImageStylePair, "WIDTH", vbTextCompare) = 1 Then
+                                                                                    '    End If
                                                                                 End If
-                                                                            End If
-                                                                            'ImageFilenameNoExt = Mid(ImageFilenameNoExt, 1, Pos - 1)
+                                                                            Next
                                                                         End If
-                                                                        If genericController.vbInstr(1, sfImageExtList, ImageFilenameExt, vbTextCompare) <> 0 Then
-                                                                            '
-                                                                            ' Determine ImageWidth and ImageHeight
-                                                                            '
-                                                                            ImageStyle = DHTML.ElementAttribute(ElementPointer, "style")
-                                                                            ImageWidth = genericController.EncodeInteger(DHTML.ElementAttribute(ElementPointer, "width"))
-                                                                            ImageHeight = genericController.EncodeInteger(DHTML.ElementAttribute(ElementPointer, "height"))
-                                                                            If ImageStyle <> "" Then
-                                                                                Styles = Split(ImageStyle, ";")
-                                                                                For Ptr = 0 To UBound(Styles)
-                                                                                    Style = Split(Styles(Ptr), ":")
-                                                                                    If UBound(Style) > 0 Then
-                                                                                        StyleName = genericController.vbLCase(Trim(Style(0)))
-                                                                                        If StyleName = "width" Then
-                                                                                            StyleValue = genericController.vbLCase(Trim(Style(1)))
-                                                                                            StyleValue = genericController.vbReplace(StyleValue, "px", "")
-                                                                                            StyleValueInt = genericController.EncodeInteger(StyleValue)
-                                                                                            If StyleValueInt > 0 Then
-                                                                                                ImageWidth = StyleValueInt
-                                                                                            End If
-                                                                                        ElseIf StyleName = "height" Then
-                                                                                            StyleValue = genericController.vbLCase(Trim(Style(1)))
-                                                                                            StyleValue = genericController.vbReplace(StyleValue, "px", "")
-                                                                                            StyleValueInt = genericController.EncodeInteger(StyleValue)
-                                                                                            If StyleValueInt > 0 Then
-                                                                                                ImageHeight = StyleValueInt
+                                                                        ElementText = "<AC type=""IMAGE"" ACInstanceID=""" & ACInstanceID & """ RecordID=""" & RecordID & """ Style=""" & ImageStyle & """ Width=""" & ImageWidthText & """ Height=""" & ImageHeightText & """ VSpace=""" & ImageVSpace & """ HSpace=""" & ImageHSpace & """ Alt=""" & ImageAlt & """ Align=""" & ImageAlign & """ Border=""" & ImageBorder & """ Loop=""" & ImageLoop & """>"
+                                                                    End If
+                                                                Case ACTypeDownload
+                                                                    '
+                                                                    ' AC Download
+                                                                    '
+                                                                    If ImageIDArrayCount >= 4 Then
+                                                                        RecordID = genericController.EncodeInteger(ACInstanceName)
+                                                                        ElementText = "<AC type=""DOWNLOAD"" ACInstanceID=""" & ACInstanceID & """ RecordID=""" & RecordID & """>"
+                                                                    End If
+                                                                Case ACTypeDate
+                                                                    '
+                                                                    ' Date
+                                                                    '
+                                                                    ElementText = "<AC type=""" & ACTypeDate & """>"
+                                                                Case ACTypeVisit, ACTypeVisitor, ACTypeMember, ACTypeOrganization, ACTypePersonalization
+                                                                    '
+                                                                    ' Visit, etc
+                                                                    '
+                                                                    ElementText = "<AC type=""" & ACType & """ ACInstanceID=""" & ACInstanceID & """ field=""" & ACFieldName & """>"
+                                                                Case ACTypeChildList, ACTypeLanguage
+                                                                    '
+                                                                    ' ChildList, Language
+                                                                    '
+                                                                    If ACInstanceName = "0" Then
+                                                                        ACInstanceName = genericController.getRandomLong().ToString()
+                                                                    End If
+                                                                    ElementText = "<AC type=""" & ACType & """ name=""" & ACInstanceName & """ ACInstanceID=""" & ACInstanceID & """>"
+                                                                Case ACTypeAggregateFunction
+                                                                    '
+                                                                    ' Function
+                                                                    '
+                                                                    QueryString = ""
+                                                                    If ACQueryString <> "" Then
+                                                                        ' I added this because single stepping through it I found it split on the & in &amp;
+                                                                        ' I had added an Add-on and was saving
+                                                                        ' I find it VERY odd that this could be the case
+                                                                        '
+                                                                        QSHTMLEncoded = genericController.encodeText(ACQueryString)
+                                                                        QueryString = genericController.decodeHtml(QSHTMLEncoded)
+                                                                        QSSplit = Split(QueryString, "&")
+                                                                        For QSPtr = 0 To UBound(QSSplit)
+                                                                            Pos = genericController.vbInstr(1, QSSplit(QSPtr), "[")
+                                                                            If Pos > 0 Then
+                                                                                QSSplit(QSPtr) = Mid(QSSplit(QSPtr), 1, Pos - 1)
+                                                                            End If
+                                                                            QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
+                                                                        Next
+                                                                        QueryString = Join(QSSplit, "&")
+                                                                    End If
+                                                                    ElementText = "<AC type=""" & ACType & """ name=""" & ACInstanceName & """ ACInstanceID=""" & ACInstanceID & """ querystring=""" & QueryString & """ guid=""" & ACGuid & """>"
+                                                                Case ACTypeContact, ACTypeFeedback
+                                                                    '
+                                                                    ' Contact and Feedback
+                                                                    '
+                                                                    ElementText = "<AC type=""" & ACType & """ ACInstanceID=""" & ACInstanceID & """>"
+                                                                Case ACTypeTemplateContent, ACTypeTemplateText
+                                                                    '
+                                                                    '
+                                                                    '
+                                                                    QueryString = ""
+                                                                    If ImageIDArrayCount > 4 Then
+                                                                        QueryString = genericController.encodeText(ImageIDArray(4))
+                                                                        QSSplit = Split(QueryString, "&")
+                                                                        For QSPtr = 0 To UBound(QSSplit)
+                                                                            QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
+                                                                        Next
+                                                                        QueryString = Join(QSSplit, "&")
+
+                                                                    End If
+                                                                    ElementText = "<AC type=""" & ACType & """ name=""" & ACInstanceName & """ ACInstanceID=""" & ACInstanceID & """ querystring=""" & QueryString & """>"
+                                                                Case ACTypeWatchList
+                                                                    '
+                                                                    ' Watch List
+                                                                    '
+                                                                    QueryString = ""
+                                                                    If ImageIDArrayCount > 4 Then
+                                                                        QueryString = genericController.encodeText(ImageIDArray(4))
+                                                                        QueryString = genericController.decodeHtml(QueryString)
+                                                                        QSSplit = Split(QueryString, "&")
+                                                                        For QSPtr = 0 To UBound(QSSplit)
+                                                                            QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
+                                                                        Next
+                                                                        QueryString = Join(QSSplit, "&")
+                                                                    End If
+                                                                    ElementText = "<AC type=""" & ACType & """ name=""" & ACInstanceName & """ ACInstanceID=""" & ACInstanceID & """ querystring=""" & QueryString & """>"
+                                                                Case ACTypeRSSLink
+                                                                    '
+                                                                    ' RSS Link
+                                                                    '
+                                                                    QueryString = ""
+                                                                    If ImageIDArrayCount > 4 Then
+                                                                        QueryString = genericController.encodeText(ImageIDArray(4))
+                                                                        QueryString = genericController.decodeHtml(QueryString)
+                                                                        QSSplit = Split(QueryString, "&")
+                                                                        For QSPtr = 0 To UBound(QSSplit)
+                                                                            QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
+                                                                        Next
+                                                                        QueryString = Join(QSSplit, "&")
+                                                                    End If
+                                                                    ElementText = "<AC type=""" & ACType & """ name=""" & ACInstanceName & """ ACInstanceID=""" & ACInstanceID & """ querystring=""" & QueryString & """>"
+                                                                Case Else
+                                                                    '
+                                                                    ' All others -- added querystring from element(4) to all others to cover the group access AC object
+                                                                    '
+                                                                    QueryString = ""
+                                                                    If ImageIDArrayCount > 4 Then
+                                                                        QueryString = genericController.encodeText(ImageIDArray(4))
+                                                                        QueryString = genericController.decodeHtml(QueryString)
+                                                                        QSSplit = Split(QueryString, "&")
+                                                                        For QSPtr = 0 To UBound(QSSplit)
+                                                                            QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
+                                                                        Next
+                                                                        QueryString = Join(QSSplit, "&")
+                                                                    End If
+                                                                    ElementText = "<AC type=""" & ACType & """ name=""" & ACInstanceName & """ ACInstanceID=""" & ACInstanceID & """ field=""" & ACFieldName & """ querystring=""" & QueryString & """>"
+                                                            End Select
+                                                        End If
+                                                    End If
+                                                ElseIf genericController.vbInstr(1, ImageSrc, "cclibraryfiles", vbTextCompare) <> 0 Then
+                                                    ImageAllowSFResize = cpCore.siteProperties.getBoolean("ImageAllowSFResize", True)
+                                                    If ImageAllowSFResize And True Then
+                                                        '
+                                                        ' if it is a real image, check for resize
+                                                        '
+                                                        Pos = genericController.vbInstr(1, ImageSrc, "cclibraryfiles", vbTextCompare)
+                                                        If Pos <> 0 Then
+                                                            ImageVirtualFilename = Mid(ImageSrc, Pos)
+                                                            Paths = Split(ImageVirtualFilename, "/")
+                                                            If UBound(Paths) > 2 Then
+                                                                If genericController.vbLCase(Paths(1)) = "filename" Then
+                                                                    RecordID = genericController.EncodeInteger(Paths(2))
+                                                                    If RecordID <> 0 Then
+                                                                        ImageFilename = Paths(3)
+                                                                        ImageVirtualFilePath = genericController.vbReplace(ImageVirtualFilename, ImageFilename, "")
+                                                                        Pos = InStrRev(ImageFilename, ".")
+                                                                        If Pos > 0 Then
+                                                                            Dim ImageFilenameAltSize As String = ""
+                                                                            ImageFilenameExt = Mid(ImageFilename, Pos + 1)
+                                                                            ImageFilenameNoExt = Mid(ImageFilename, 1, Pos - 1)
+                                                                            Pos = InStrRev(ImageFilenameNoExt, "-")
+                                                                            If Pos > 0 Then
+                                                                                '
+                                                                                ' ImageAltSize should be set from the width and height of the img tag,
+                                                                                ' NOT from the actual width and height of the image file
+                                                                                ' NOT from the suffix of the image filename
+                                                                                ' ImageFilenameAltSize is used when the image has been resized, then 'reset' was hit
+                                                                                '  on the properties dialog before the save. The width and height come from this suffix
+                                                                                '
+                                                                                ImageFilenameAltSize = Mid(ImageFilenameNoExt, Pos + 1)
+                                                                                SizeTest = Split(ImageFilenameAltSize, "x")
+                                                                                If UBound(SizeTest) <> 1 Then
+                                                                                    ImageFilenameAltSize = ""
+                                                                                Else
+                                                                                    If genericController.vbIsNumeric(SizeTest(0)) And genericController.vbIsNumeric(SizeTest(1)) Then
+                                                                                        ImageFilenameNoExt = Mid(ImageFilenameNoExt, 1, Pos - 1)
+                                                                                        'RecordVirtualFilenameNoExt = Mid(RecordVirtualFilename, 1, Pos - 1)
+                                                                                    Else
+                                                                                        ImageFilenameAltSize = ""
+                                                                                    End If
+                                                                                End If
+                                                                                'ImageFilenameNoExt = Mid(ImageFilenameNoExt, 1, Pos - 1)
+                                                                            End If
+                                                                            If genericController.vbInstr(1, sfImageExtList, ImageFilenameExt, vbTextCompare) <> 0 Then
+                                                                                '
+                                                                                ' Determine ImageWidth and ImageHeight
+                                                                                '
+                                                                                ImageStyle = DHTML.ElementAttribute(ElementPointer, "style")
+                                                                                ImageWidth = genericController.EncodeInteger(DHTML.ElementAttribute(ElementPointer, "width"))
+                                                                                ImageHeight = genericController.EncodeInteger(DHTML.ElementAttribute(ElementPointer, "height"))
+                                                                                If ImageStyle <> "" Then
+                                                                                    Styles = Split(ImageStyle, ";")
+                                                                                    For Ptr = 0 To UBound(Styles)
+                                                                                        Style = Split(Styles(Ptr), ":")
+                                                                                        If UBound(Style) > 0 Then
+                                                                                            StyleName = genericController.vbLCase(Trim(Style(0)))
+                                                                                            If StyleName = "width" Then
+                                                                                                StyleValue = genericController.vbLCase(Trim(Style(1)))
+                                                                                                StyleValue = genericController.vbReplace(StyleValue, "px", "")
+                                                                                                StyleValueInt = genericController.EncodeInteger(StyleValue)
+                                                                                                If StyleValueInt > 0 Then
+                                                                                                    ImageWidth = StyleValueInt
+                                                                                                End If
+                                                                                            ElseIf StyleName = "height" Then
+                                                                                                StyleValue = genericController.vbLCase(Trim(Style(1)))
+                                                                                                StyleValue = genericController.vbReplace(StyleValue, "px", "")
+                                                                                                StyleValueInt = genericController.EncodeInteger(StyleValue)
+                                                                                                If StyleValueInt > 0 Then
+                                                                                                    ImageHeight = StyleValueInt
+                                                                                                End If
                                                                                             End If
                                                                                         End If
+                                                                                    Next
+                                                                                End If
+                                                                                '
+                                                                                ' Get the record values
+                                                                                '
+                                                                                Dim file As Models.Entity.libraryFilesModel = Models.Entity.libraryFilesModel.create(cpCore, RecordID)
+                                                                                If (file IsNot Nothing) Then
+                                                                                    RecordVirtualFilename = file.Filename
+                                                                                    RecordWidth = file.pxWidth
+                                                                                    RecordHeight = file.pxHeight
+                                                                                    RecordAltSizeList = file.AltSizeList
+                                                                                    RecordFilename = RecordVirtualFilename
+                                                                                    Pos = InStrRev(RecordVirtualFilename, "/")
+                                                                                    If Pos > 0 Then
+                                                                                        RecordFilename = Mid(RecordVirtualFilename, Pos + 1)
                                                                                     End If
-                                                                                Next
-                                                                            End If
-                                                                            '
-                                                                            ' Get the record values
-                                                                            '
-                                                                            recordUpdateSql = ""
-                                                                            Call cpCore.cache_libraryFiles_loadIfNeeded()
-                                                                            libraryFilePtr = cpCore.cache_libraryFilesIdIndex.getPtr(CStr(RecordID))
-                                                                            'CS = app.csOpenRecord("Library Files", RecordID)
-                                                                            If libraryFilePtr < 0 Then
-                                                                                'If Not app.csv_IsCSOK(CS) Then
-                                                                                '
-                                                                                ' record is no longer available - remove the image as well
-                                                                                '
-                                                                                ElementText = ""
-                                                                            Else
-                                                                                RecordVirtualFilename = genericController.encodeText(cpCore.cache_libraryFiles(LibraryFilesCache_filename, libraryFilePtr))
-                                                                                'RecordVirtualFilename = app.csv_cs_get(CS, "filename")
-                                                                                RecordWidth = genericController.EncodeInteger(cpCore.cache_libraryFiles(LibraryFilesCache_width, libraryFilePtr))
-                                                                                'RecordWidth = app.csv_cs_getInteger(CS, "width")
-                                                                                RecordHeight = genericController.EncodeInteger(cpCore.cache_libraryFiles(LibraryFilesCache_height, libraryFilePtr))
-                                                                                'RecordHeight = app.csv_cs_getInteger(CS, "height")
-                                                                                RecordAltSizeList = genericController.encodeText(cpCore.cache_libraryFiles(LibraryFilesCache_altsizelist, libraryFilePtr))
-                                                                                'RecordAltSizeList = app.csv_cs_get(CS, "altsizelist")
-                                                                                RecordFilename = RecordVirtualFilename
-                                                                                Pos = InStrRev(RecordVirtualFilename, "/")
-                                                                                If Pos > 0 Then
-                                                                                    RecordFilename = Mid(RecordVirtualFilename, Pos + 1)
-                                                                                End If
-                                                                                RecordFilenameExt = ""
-                                                                                RecordFilenameNoExt = RecordFilename
-                                                                                Pos = InStrRev(RecordFilenameNoExt, ".")
-                                                                                If Pos > 0 Then
-                                                                                    RecordFilenameExt = Mid(RecordFilenameNoExt, Pos + 1)
-                                                                                    RecordFilenameNoExt = Mid(RecordFilenameNoExt, 1, Pos - 1)
-                                                                                End If
-                                                                                '
-                                                                                ' if recordwidth or height are missing, get them from the file
-                                                                                '
-                                                                                If RecordWidth = 0 Or RecordHeight = 0 Then
-                                                                                    sf = New imageEditController
-                                                                                    On Error Resume Next
-                                                                                    If sf.load(cpCore.csv_getPhysicalFilename(ImageVirtualFilename)) Then
-                                                                                        RecordWidth = sf.width
-                                                                                        RecordHeight = sf.height
-                                                                                        recordUpdateSql = recordUpdateSql & ",width=" & RecordWidth & ",height=" & RecordHeight
-                                                                                        cpCore.cache_libraryFiles(LibraryFilesCache_width, libraryFilePtr) = CStr(RecordWidth)
-                                                                                        cpCore.cache_libraryFiles(LibraryFilesCache_width, libraryFilePtr) = CStr(RecordHeight)
+                                                                                    RecordFilenameExt = ""
+                                                                                    RecordFilenameNoExt = RecordFilename
+                                                                                    Pos = InStrRev(RecordFilenameNoExt, ".")
+                                                                                    If Pos > 0 Then
+                                                                                        RecordFilenameExt = Mid(RecordFilenameNoExt, Pos + 1)
+                                                                                        RecordFilenameNoExt = Mid(RecordFilenameNoExt, 1, Pos - 1)
                                                                                     End If
-                                                                                    Call sf.Dispose()
-                                                                                    sf = Nothing
-                                                                                End If
-                                                                                '
-                                                                                ' continue only if we have record width and height
-                                                                                '
-                                                                                If RecordWidth <> 0 And RecordHeight <> 0 Then
                                                                                     '
-                                                                                    ' set ImageWidth and ImageHeight if one of them is missing
+                                                                                    ' if recordwidth or height are missing, get them from the file
                                                                                     '
-                                                                                    If (ImageWidth = RecordWidth) And (ImageHeight = 0) Then
-                                                                                        '
-                                                                                        ' Image only included width, set default height
-                                                                                        '
-                                                                                        ImageHeight = RecordHeight
-                                                                                    ElseIf (ImageHeight = RecordHeight) And (ImageWidth = 0) Then
-                                                                                        '
-                                                                                        ' Image only included height, set default width
-                                                                                        '
-                                                                                        ImageWidth = RecordWidth
-                                                                                    ElseIf (ImageHeight = 0) And (ImageWidth = 0) Then
-                                                                                        '
-                                                                                        ' Image has no width or height, default both
-                                                                                        ' This happens when you hit 'reset' on the image properties dialog
-                                                                                        '
-                                                                                        On Error Resume Next
+                                                                                    If RecordWidth = 0 Or RecordHeight = 0 Then
                                                                                         sf = New imageEditController
                                                                                         If sf.load(cpCore.csv_getPhysicalFilename(ImageVirtualFilename)) Then
-                                                                                            ImageWidth = sf.width
-                                                                                            ImageHeight = sf.height
+                                                                                            file.pxWidth = sf.width
+                                                                                            file.pxHeight = sf.height
+                                                                                            file.save(cpCore)
                                                                                         End If
                                                                                         Call sf.Dispose()
                                                                                         sf = Nothing
-                                                                                        On Error GoTo ErrorTrap
-                                                                                        If (ImageHeight = 0) And (ImageWidth = 0) Then
-                                                                                            Pos = genericController.vbInstr(1, ImageFilenameAltSize, "x")
-                                                                                            If Pos <> 0 Then
-                                                                                                ImageWidth = genericController.EncodeInteger(Mid(ImageFilenameAltSize, 1, Pos - 1))
-                                                                                                ImageHeight = genericController.EncodeInteger(Mid(ImageFilenameAltSize, Pos + 1))
-                                                                                            End If
-                                                                                        End If
-                                                                                        If ImageHeight = 0 And ImageWidth = 0 Then
-                                                                                            ImageHeight = RecordHeight
-                                                                                            ImageWidth = RecordWidth
-                                                                                        End If
                                                                                     End If
                                                                                     '
-                                                                                    ' Set the ImageAltSize to what was requested from the img tag
-                                                                                    ' if the actual image is a few rounding-error pixels off does not matter
-                                                                                    ' if either is 0, let altsize be 0, set real value for image height/width
+                                                                                    ' continue only if we have record width and height
                                                                                     '
-                                                                                    ImageAltSize = CStr(ImageWidth) & "x" & CStr(ImageHeight)
-                                                                                    '
-                                                                                    ' determine if we are OK, or need to rebuild
-                                                                                    '
-                                                                                    If (RecordVirtualFilename = (ImageVirtualFilePath & ImageFilename)) And ((RecordWidth = ImageWidth) Or (RecordHeight = ImageHeight)) Then
+                                                                                    If RecordWidth <> 0 And RecordHeight <> 0 Then
                                                                                         '
-                                                                                        ' OK
-                                                                                        ' this is the raw image
-                                                                                        ' image matches record, and the sizes are the same
+                                                                                        ' set ImageWidth and ImageHeight if one of them is missing
                                                                                         '
-                                                                                        RecordVirtualFilename = RecordVirtualFilename
-                                                                                    ElseIf (RecordVirtualFilename = ImageVirtualFilePath & ImageFilenameNoExt & "." & ImageFilenameExt) And (InStr(1, RecordAltSizeList, ImageAltSize, vbTextCompare) <> 0) Then
-                                                                                        '
-                                                                                        ' OK
-                                                                                        ' resized image, and altsize is in the list - go with resized image name
-                                                                                        '
-                                                                                        NewImageFilename = ImageFilenameNoExt & "-" & ImageAltSize & "." & ImageFilenameExt
-                                                                                        ' images included in email have spaces that must be converted to "%20" or they 404
-                                                                                        imageNewLink = genericController.EncodeURL(cpCore.csv_getVirtualFileLink(serverFilePath, ImageVirtualFilePath) & NewImageFilename)
-                                                                                        ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, html_EncodeHTML(imageNewLink))
-                                                                                    ElseIf (RecordWidth < ImageWidth) Or (RecordHeight < ImageHeight) Then
-                                                                                        '
-                                                                                        ' OK
-                                                                                        ' reize image larger then original - go with it as is
-                                                                                        '
-                                                                                        ' images included in email have spaces that must be converted to "%20" or they 404
-                                                                                        ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, html_EncodeHTML(genericController.EncodeURL(cpCore.csv_getVirtualFileLink(serverFilePath, RecordVirtualFilename))))
-                                                                                    Else
-                                                                                        '
-                                                                                        ' resized image - create NewImageFilename (and add new alt size to the record)
-                                                                                        '
-                                                                                        If RecordWidth = ImageWidth And RecordHeight = ImageHeight Then
+                                                                                        If (ImageWidth = RecordWidth) And (ImageHeight = 0) Then
                                                                                             '
-                                                                                            ' set back to Raw image untouched, use the record image filename
+                                                                                            ' Image only included width, set default height
                                                                                             '
-                                                                                            ElementText = ElementText
-                                                                                            'ElementText = genericController.vbReplace(ElementText, ImageVirtualFilename, RecordVirtualFilename)
+                                                                                            ImageHeight = RecordHeight
+                                                                                        ElseIf (ImageHeight = RecordHeight) And (ImageWidth = 0) Then
+                                                                                            '
+                                                                                            ' Image only included height, set default width
+                                                                                            '
+                                                                                            ImageWidth = RecordWidth
+                                                                                        ElseIf (ImageHeight = 0) And (ImageWidth = 0) Then
+                                                                                            '
+                                                                                            ' Image has no width or height, default both
+                                                                                            ' This happens when you hit 'reset' on the image properties dialog
+                                                                                            '
+                                                                                            sf = New imageEditController
+                                                                                            If sf.load(cpCore.csv_getPhysicalFilename(ImageVirtualFilename)) Then
+                                                                                                ImageWidth = sf.width
+                                                                                                ImageHeight = sf.height
+                                                                                            End If
+                                                                                            Call sf.Dispose()
+                                                                                            sf = Nothing
+                                                                                            If (ImageHeight = 0) And (ImageWidth = 0) And (Not String.IsNullOrEmpty(ImageFilenameAltSize)) Then
+                                                                                                Pos = genericController.vbInstr(1, ImageFilenameAltSize, "x")
+                                                                                                If Pos <> 0 Then
+                                                                                                    ImageWidth = genericController.EncodeInteger(Mid(ImageFilenameAltSize, 1, Pos - 1))
+                                                                                                    ImageHeight = genericController.EncodeInteger(Mid(ImageFilenameAltSize, Pos + 1))
+                                                                                                End If
+                                                                                            End If
+                                                                                            If ImageHeight = 0 And ImageWidth = 0 Then
+                                                                                                ImageHeight = RecordHeight
+                                                                                                ImageWidth = RecordWidth
+                                                                                            End If
+                                                                                        End If
+                                                                                        '
+                                                                                        ' Set the ImageAltSize to what was requested from the img tag
+                                                                                        ' if the actual image is a few rounding-error pixels off does not matter
+                                                                                        ' if either is 0, let altsize be 0, set real value for image height/width
+                                                                                        '
+                                                                                        ImageAltSize = CStr(ImageWidth) & "x" & CStr(ImageHeight)
+                                                                                        '
+                                                                                        ' determine if we are OK, or need to rebuild
+                                                                                        '
+                                                                                        If (RecordVirtualFilename = (ImageVirtualFilePath & ImageFilename)) And ((RecordWidth = ImageWidth) Or (RecordHeight = ImageHeight)) Then
+                                                                                            '
+                                                                                            ' OK
+                                                                                            ' this is the raw image
+                                                                                            ' image matches record, and the sizes are the same
+                                                                                            '
+                                                                                            RecordVirtualFilename = RecordVirtualFilename
+                                                                                        ElseIf (RecordVirtualFilename = ImageVirtualFilePath & ImageFilenameNoExt & "." & ImageFilenameExt) And (InStr(1, RecordAltSizeList, ImageAltSize, vbTextCompare) <> 0) Then
+                                                                                            '
+                                                                                            ' OK
+                                                                                            ' resized image, and altsize is in the list - go with resized image name
+                                                                                            '
+                                                                                            NewImageFilename = ImageFilenameNoExt & "-" & ImageAltSize & "." & ImageFilenameExt
+                                                                                            ' images included in email have spaces that must be converted to "%20" or they 404
+                                                                                            imageNewLink = genericController.EncodeURL(cpCore.getCdnFileLink(ImageVirtualFilePath) & NewImageFilename)
+                                                                                            ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, html_EncodeHTML(imageNewLink))
+                                                                                        ElseIf (RecordWidth < ImageWidth) Or (RecordHeight < ImageHeight) Then
+                                                                                            '
+                                                                                            ' OK
+                                                                                            ' reize image larger then original - go with it as is
+                                                                                            '
+                                                                                            ' images included in email have spaces that must be converted to "%20" or they 404
+                                                                                            ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, html_EncodeHTML(genericController.EncodeURL(cpCore.getCdnFileLink(RecordVirtualFilename))))
                                                                                         Else
                                                                                             '
-                                                                                            ' Raw image filename in content, but it is resized, switch to an alternate size
+                                                                                            ' resized image - create NewImageFilename (and add new alt size to the record)
                                                                                             '
-                                                                                            NewImageFilename = RecordFilename
-                                                                                            If (ImageWidth = 0) Or (ImageHeight = 0) Or (InStr(1, vbCrLf & RecordAltSizeList & vbCrLf, vbCrLf & ImageAltSize & vbCrLf) = 0) Then
+                                                                                            If RecordWidth = ImageWidth And RecordHeight = ImageHeight Then
                                                                                                 '
-                                                                                                ' Alt image has not been built
+                                                                                                ' set back to Raw image untouched, use the record image filename
                                                                                                 '
-                                                                                                sf = New imageEditController
-                                                                                                If Not sf.load(cpCore.csv_getPhysicalFilename(RecordVirtualFilename)) Then
+                                                                                                ElementText = ElementText
+                                                                                                'ElementText = genericController.vbReplace(ElementText, ImageVirtualFilename, RecordVirtualFilename)
+                                                                                            Else
+                                                                                                '
+                                                                                                ' Raw image filename in content, but it is resized, switch to an alternate size
+                                                                                                '
+                                                                                                NewImageFilename = RecordFilename
+                                                                                                If (ImageWidth = 0) Or (ImageHeight = 0) Or (InStr(1, vbCrLf & RecordAltSizeList & vbCrLf, vbCrLf & ImageAltSize & vbCrLf) = 0) Then
                                                                                                     '
-                                                                                                    ' image load failed, use raw filename
+                                                                                                    ' Alt image has not been built
                                                                                                     '
-                                                                                                    Throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "Error while loading image to resize, [" & RecordVirtualFilename & "]", "dll", "cpCoreClass", "DecodeAciveContent", Err.Number, Err.Source, Err.Description, False, True, "")
-                                                                                                    Err.Clear()
-                                                                                                    NewImageFilename = ImageFilename
-                                                                                                Else
-                                                                                                    '
-                                                                                                    '
-                                                                                                    '
-                                                                                                    RecordWidth = sf.width
-                                                                                                    RecordHeight = sf.height
-                                                                                                    If ImageWidth = 0 Then
+                                                                                                    sf = New imageEditController
+                                                                                                    If Not sf.load(cpCore.csv_getPhysicalFilename(RecordVirtualFilename)) Then
                                                                                                         '
+                                                                                                        ' image load failed, use raw filename
                                                                                                         '
-                                                                                                        '
-                                                                                                        sf.height = ImageHeight
-                                                                                                    ElseIf ImageHeight = 0 Then
-                                                                                                        '
-                                                                                                        '
-                                                                                                        '
-                                                                                                        sf.width = ImageWidth
-                                                                                                    ElseIf RecordHeight = ImageHeight Then
-                                                                                                        '
-                                                                                                        ' change the width
-                                                                                                        '
-                                                                                                        sf.width = ImageWidth
+                                                                                                        Throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, "Error while loading image to resize, [" & RecordVirtualFilename & "]", "dll", "cpCoreClass", "DecodeAciveContent", Err.Number, Err.Source, Err.Description, False, True, "")
+                                                                                                        Err.Clear()
+                                                                                                        NewImageFilename = ImageFilename
                                                                                                     Else
                                                                                                         '
-                                                                                                        ' change the height
                                                                                                         '
-                                                                                                        sf.height = ImageHeight
+                                                                                                        '
+                                                                                                        RecordWidth = sf.width
+                                                                                                        RecordHeight = sf.height
+                                                                                                        If ImageWidth = 0 Then
+                                                                                                            '
+                                                                                                            '
+                                                                                                            '
+                                                                                                            sf.height = ImageHeight
+                                                                                                        ElseIf ImageHeight = 0 Then
+                                                                                                            '
+                                                                                                            '
+                                                                                                            '
+                                                                                                            sf.width = ImageWidth
+                                                                                                        ElseIf RecordHeight = ImageHeight Then
+                                                                                                            '
+                                                                                                            ' change the width
+                                                                                                            '
+                                                                                                            sf.width = ImageWidth
+                                                                                                        Else
+                                                                                                            '
+                                                                                                            ' change the height
+                                                                                                            '
+                                                                                                            sf.height = ImageHeight
+                                                                                                        End If
+                                                                                                        '
+                                                                                                        ' if resized only width or height, set the other
+                                                                                                        '
+                                                                                                        If ImageWidth = 0 Then
+                                                                                                            ImageWidth = sf.width
+                                                                                                            ImageAltSize = CStr(ImageWidth) & "x" & CStr(ImageHeight)
+                                                                                                        End If
+                                                                                                        If ImageHeight = 0 Then
+                                                                                                            ImageHeight = sf.height
+                                                                                                            ImageAltSize = CStr(ImageWidth) & "x" & CStr(ImageHeight)
+                                                                                                        End If
+                                                                                                        '
+                                                                                                        ' set HTML attributes so image properties will display
+                                                                                                        '
+                                                                                                        If genericController.vbInstr(1, ElementText, "height=", vbTextCompare) = 0 Then
+                                                                                                            ElementText = genericController.vbReplace(ElementText, ">", " height=""" & ImageHeight & """>")
+                                                                                                        End If
+                                                                                                        If genericController.vbInstr(1, ElementText, "width=", vbTextCompare) = 0 Then
+                                                                                                            ElementText = genericController.vbReplace(ElementText, ">", " width=""" & ImageWidth & """>")
+                                                                                                        End If
+                                                                                                        '
+                                                                                                        ' Save new file
+                                                                                                        '
+                                                                                                        NewImageFilename = RecordFilenameNoExt & "-" & ImageAltSize & "." & RecordFilenameExt
+                                                                                                        Call sf.save(cpCore.csv_getPhysicalFilename(ImageVirtualFilePath & NewImageFilename))
+                                                                                                        '
+                                                                                                        ' Update image record
+                                                                                                        '
+                                                                                                        RecordAltSizeList = RecordAltSizeList & vbCrLf & ImageAltSize
                                                                                                     End If
-                                                                                                    '
-                                                                                                    ' if resized only width or height, set the other
-                                                                                                    '
-                                                                                                    If ImageWidth = 0 Then
-                                                                                                        ImageWidth = sf.width
-                                                                                                        ImageAltSize = CStr(ImageWidth) & "x" & CStr(ImageHeight)
-                                                                                                    End If
-                                                                                                    If ImageHeight = 0 Then
-                                                                                                        ImageHeight = sf.height
-                                                                                                        ImageAltSize = CStr(ImageWidth) & "x" & CStr(ImageHeight)
-                                                                                                    End If
-                                                                                                    '
-                                                                                                    ' set HTML attributes so image properties will display
-                                                                                                    '
-                                                                                                    If genericController.vbInstr(1, ElementText, "height=", vbTextCompare) = 0 Then
-                                                                                                        ElementText = genericController.vbReplace(ElementText, ">", " height=""" & ImageHeight & """>")
-                                                                                                    End If
-                                                                                                    If genericController.vbInstr(1, ElementText, "width=", vbTextCompare) = 0 Then
-                                                                                                        ElementText = genericController.vbReplace(ElementText, ">", " width=""" & ImageWidth & """>")
-                                                                                                    End If
-                                                                                                    '
-                                                                                                    ' Save new file
-                                                                                                    '
-                                                                                                    NewImageFilename = RecordFilenameNoExt & "-" & ImageAltSize & "." & RecordFilenameExt
-                                                                                                    Call sf.save(cpCore.csv_getPhysicalFilename(ImageVirtualFilePath & NewImageFilename))
-                                                                                                    '
-                                                                                                    ' Update image record
-                                                                                                    '
-                                                                                                    RecordAltSizeList = RecordAltSizeList & vbCrLf & ImageAltSize
-                                                                                                    recordUpdateSql = recordUpdateSql & ",altsizelist=" & cpCore.db.encodeSQLText(RecordAltSizeList)
-                                                                                                    'Call app.csv_SetCS(CS, "altsizelist", RecordAltSizeList)
                                                                                                 End If
                                                                                                 '
+                                                                                                ' Change the image src to the AltSize
+                                                                                                ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, html_EncodeHTML(genericController.EncodeURL(cpCore.getCdnFileLink(ImageVirtualFilePath) & NewImageFilename)))
                                                                                             End If
-                                                                                            '
-                                                                                            ' Change the image src to the AltSize
-                                                                                            '
-                                                                                            ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, html_EncodeHTML(genericController.EncodeURL(cpCore.csv_getVirtualFileLink(serverFilePath, ImageVirtualFilePath) & NewImageFilename)))
                                                                                         End If
                                                                                     End If
                                                                                 End If
+                                                                                file.save(cpCore)
                                                                             End If
-                                                                            If recordUpdateSql <> "" Then
-                                                                                recordUpdateSql = Mid(recordUpdateSql, 2)
-                                                                                Call cpCore.db.executeSql("update cclibraryfiles set " & recordUpdateSql & " where id=" & RecordID)
-                                                                            End If
-                                                                            'Call app.csv_CloseCS(CS)
                                                                         End If
                                                                     End If
                                                                 End If
@@ -5577,21 +5454,19 @@ ErrorTrap:
                                                     End If
                                                 End If
                                             End If
-                                        End If
-                                End Select
-                            End If
-                            Stream.Add(ElementText)
-                        Next
+                                    End Select
+                                End If
+                                Stream.Add(ElementText)
+                            Next
+                        End If
+                        html_DecodeActiveContent = Stream.Text
                     End If
-                    html_DecodeActiveContent = Stream.Text
                 End If
-            End If
-            Exit Function
+            Catch ex As Exception
+                cpCore.handleExceptionAndContinue(ex)
+            End Try
+            Return result
             '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_DecodeActiveContent", True)
         End Function
         '
         '========================================================================
@@ -6606,17 +6481,17 @@ ErrorTrap:
                 AddonName = FieldName
                 '????? test this
                 FoundAddon = False
-                addonPtr = cpCore.addonCache.getPtr(AddonName)
+                addonPtr = cpCore.addonLegacyCache.getPtr(AddonName)
                 If addonPtr >= 0 Then
                     FoundAddon = True
-                    AddonOptionConstructor = cpCore.addonCache.addonCache.addonList(addonPtr.ToString).ArgumentList
+                    AddonOptionConstructor = cpCore.addonLegacyCache.addonCache.addonList(addonPtr.ToString).ArgumentList
                     AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
                     AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbLf, vbCr)
                     AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
                     If AddonOptionConstructor <> "" Then
                         AddonOptionConstructor = AddonOptionConstructor & vbCrLf
                     End If
-                    If genericController.EncodeBoolean(cpCore.addonCache.addonCache.addonList(addonPtr.ToString).isInline) Then
+                    If genericController.EncodeBoolean(cpCore.addonLegacyCache.addonCache.addonList(addonPtr.ToString).isInline) Then
                         AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Inline
                     Else
                         AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Block
@@ -6750,17 +6625,17 @@ ErrorTrap:
                                     AddonName = Mid(Copy, PosNameStart, PosNameEnd - PosNameStart)
                                     '????? test this
                                     FoundAddon = False
-                                    addonPtr = cpCore.addonCache.getPtr(AddonName)
+                                    addonPtr = cpCore.addonLegacyCache.getPtr(AddonName)
                                     If addonPtr >= 0 Then
                                         FoundAddon = True
-                                        AddonOptionConstructor = genericController.encodeText(cpCore.addonCache.addonCache.addonList(addonPtr.ToString).ArgumentList)
+                                        AddonOptionConstructor = genericController.encodeText(cpCore.addonLegacyCache.addonCache.addonList(addonPtr.ToString).ArgumentList)
                                         AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
                                         AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbLf, vbCr)
                                         AddonOptionConstructor = genericController.vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
                                         If AddonOptionConstructor <> "" Then
                                             AddonOptionConstructor = AddonOptionConstructor & vbCrLf
                                         End If
-                                        If genericController.EncodeBoolean(cpCore.addonCache.addonCache.addonList(addonPtr.ToString).isInline) Then
+                                        If genericController.EncodeBoolean(cpCore.addonLegacyCache.addonCache.addonList(addonPtr.ToString).isInline) Then
                                             AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Inline
                                         Else
                                             AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Block
@@ -7152,7 +7027,7 @@ ErrorTrap:
                     '
                     ' ----- Gather all the SecondaryContent that associates to the PrimaryContent
                     '
-                    PrimaryContentID = cpCore.main_GetContentID(PrimaryContentName)
+                    PrimaryContentID = cpCore.metaData.getContentId(PrimaryContentName)
                     SecondaryCDef = cpCore.metaData.getCdef(SecondaryContentName)
                     SecondaryTablename = SecondaryCDef.ContentTableName
                     SecondaryContentID = SecondaryCDef.Id
@@ -7508,7 +7383,7 @@ ErrorTrap:
                     ' + Add Category
                     '
                     If cpCore.authContext.isAuthenticatedContentManager(cpCore, "Content Categories") Then
-                        LeftPane = LeftPane & cr & "<div class=""caption""><a href=""" & cpCore.siteProperties.adminURL & "?editreferer=" & genericController.EncodeRequestVariable("?" & cpCore.htmlDoc.refreshQueryString) & "&cid=" & cpCore.main_GetContentID("Content Categories") & "&af=4&aa=2"">+&nbsp;Add&nbsp;Category</a></div>"
+                        LeftPane = LeftPane & cr & "<div class=""caption""><a href=""" & cpCore.siteProperties.adminURL & "?editreferer=" & genericController.EncodeRequestVariable("?" & cpCore.htmlDoc.refreshQueryString) & "&cid=" & cpCore.metaData.getContentId("Content Categories") & "&af=4&aa=2"">+&nbsp;Add&nbsp;Category</a></div>"
                     End If
                     '
                     LeftPane = cr & "<div class=""ccCategoryListCon"">" & genericController.kmaIndent(LeftPane) & cr & "</div>"
@@ -8321,7 +8196,7 @@ ErrorTrap:
                         If genericController.vbInstr(1, Copy, "://") <> 0 Then
                         ElseIf Left(Copy, 1) = "/" Then
                         Else
-                            Copy = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, Copy)
+                            Copy = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(Copy)
                         End If
                         Call main_AddHeadScriptLink(Copy, "embedded content")
                         Copy = cpCore.csv_GetEncodeContent_JSFilename()
@@ -8338,7 +8213,7 @@ ErrorTrap:
                         If genericController.vbInstr(1, Copy, "://") <> 0 Then
                         ElseIf Left(Copy, 1) = "/" Then
                         Else
-                            Copy = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, Copy)
+                            Copy = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(Copy)
                         End If
                         Call main_AddStylesheetLink2(Copy, "")
                         Copy = cpCore.csv_GetEncodeContent_StyleFilenames()
@@ -8592,18 +8467,8 @@ ErrorTrap:
                             RecordID = genericController.EncodeInteger(TableSplit(2))
                             FilenameSegment = TableSplit(3)
                             If (LCase(TableName) = "cclibraryfiles") And (LCase(FieldName) = "filename") And (RecordID <> 0) Then
-                                Dim lfRecordId As Integer
-                                Dim lfPtr As Integer
-                                Dim lfFilename As String
-                                Dim lfAltSizeList As String
-                                Dim lfWidth As Integer
-                                Dim lfHeight As Integer
-                                '
-                                ''hint = hint & ",040"
-                                Call cpCore.cache_libraryFiles_loadIfNeeded()
-                                ''hint = hint & ",050"
-                                lfPtr = cpCore.cache_libraryFilesIdIndex.getPtr(CStr(RecordID))
-                                If (lfPtr >= 0) Then
+                                Dim file As Models.Entity.libraryFilesModel = Models.Entity.libraryFilesModel.create(cpCore, RecordID)
+                                If (file IsNot Nothing) Then
                                     ''hint = hint & ",060"
                                     FieldName = "filename"
                                     'SQL = "select filename,altsizelist from " & TableName & " where id=" & RecordID
@@ -8623,12 +8488,8 @@ ErrorTrap:
                                         ' odd cases:
                                         '   URL( /image.jpg) -
                                         '
-                                        ''hint = hint & ",070"
-                                        RecordVirtualFilename = genericController.encodeText(cpCore.cache_libraryFiles(LibraryFilesCache_filename, lfPtr))
-                                        ''hint = hint & ",071"
-                                        RecordAltSizeList = genericController.encodeText(cpCore.cache_libraryFiles(LibraryFilesCache_altsizelist, lfPtr))
-                                        'RecordVirtualFilename = app.csv_cs_get(CS, FieldName)
-                                        ''hint = hint & ",072"
+                                        RecordVirtualFilename = file.Filename
+                                        RecordAltSizeList = file.AltSizeList
                                         If RecordVirtualFilename = genericController.EncodeJavascript(RecordVirtualFilename) Then
                                             '
                                             ' The javascript version of the filename must match the filename, since we have no way
@@ -8657,38 +8518,22 @@ ErrorTrap:
                                             '
                                             ''hint = hint & ",080"
                                             Pos = InStrRev(RecordVirtualFilename, "/")
+                                            RecordFilename = ""
                                             If Pos > 0 Then
                                                 RecordVirtualPath = Mid(RecordVirtualFilename, 1, Pos)
                                                 RecordFilename = Mid(RecordVirtualFilename, Pos + 1)
                                             End If
                                             Pos = InStrRev(RecordFilename, ".")
+                                            RecordFilenameNoExt = ""
                                             If Pos > 0 Then
                                                 RecordFilenameExt = genericController.vbLCase(Mid(RecordFilename, Pos + 1))
                                                 RecordFilenameNoExt = genericController.vbLCase(Mid(RecordFilename, 1, Pos - 1))
                                             End If
-                                            'Pos = InStrRev(RecordFilenameNoExt, "-")
-                                            'If Pos > 0 Then
-                                            '    RecordFilenameAltSize = Mid(RecordFilenameNoExt, Pos + 1)
-                                            '    SizeTest = Split(RecordFilenameAltSize, "x")
-                                            '    If UBound(SizeTest) <> 1 Then
-                                            '        RecordFilenameAltSize = ""
-                                            '    Else
-                                            '        If genericController.vbIsNumeric(SizeTest(0)) And genericController.vbIsNumeric(SizeTest(1)) Then
-                                            '            RecordFilenameNoExt = Mid(RecordFilenameNoExt, 1, Pos - 1)
-                                            '            'RecordFilenameNoExt = Mid(RecordFilename, 1, Pos - 1)
-                                            '        Else
-                                            '            RecordFilenameAltSize = ""
-                                            '        End If
-                                            '    End If
-                                            'End If
-                                            'RecordAltSizeList = app.csv_cs_get(CS, "altsizelist")
                                             FilePrefixSegment = LinkSplit(LinkPtr - 1)
                                             If Len(FilePrefixSegment) > 1 Then
                                                 '
                                                 ' Look into FilePrefixSegment and see if we are in the querystring attribute of an <AC tag
                                                 '   if so, the filename may be AddonEncoded and delimited with & (so skip it)
-                                                '
-                                                ''hint = hint & ",090"
                                                 Pos = InStrRev(FilePrefixSegment, "<")
                                                 If Pos > 0 Then
                                                     If genericController.vbLCase(Mid(FilePrefixSegment, Pos + 1, 3)) <> "ac " Then
@@ -8718,34 +8563,12 @@ ErrorTrap:
                                                                     Else
                                                                         EndPos = 0
                                                                     End If
-                                                                    'If EndPos = 0 Then
-                                                                    '    ParseError = True
-                                                                    '    Exit For
-                                                                    'Else
-                                                                    '    TableSplit(0) = ""
-                                                                    '    TableSplit(1) = ""
-                                                                    '    TableSplit(2) = ""
-                                                                    '    TableSplit(3) = Mid(FilenameSegment, EndPos)
-                                                                    '    LinkSplit(LinkPtr) = encodeURL(RecordVirtualFilename) & Mid(Join(TableSplit, "/"), 4)
-                                                                    '    SaveChanges = True
-                                                                    'End If
                                                                     Exit For
                                                                 Case """"
                                                                     '
                                                                     ' Quoted, ends is '"'
                                                                     '
                                                                     EndPos = genericController.vbInstr(1, FilenameSegment, """")
-                                                                    'If EndPos <= 0 Then
-                                                                    '    ParseError = True
-                                                                    '    Exit For
-                                                                    'Else
-                                                                    '    TableSplit(0) = ""
-                                                                    '    TableSplit(1) = ""
-                                                                    '    TableSplit(2) = ""
-                                                                    '    TableSplit(3) = Mid(FilenameSegment, EndPos)
-                                                                    '    LinkSplit(LinkPtr) = encodeURL(RecordVirtualFilename) & Mid(Join(TableSplit, "/"), 4)
-                                                                    '    SaveChanges = True
-                                                                    'End If
                                                                     Exit For
                                                                 Case "("
                                                                     '
@@ -8760,34 +8583,12 @@ ErrorTrap:
                                                                     Else
                                                                         EndPos = genericController.vbInstr(1, FilenameSegment, ")")
                                                                     End If
-
-                                                                    'If EndPos <= 0 Then
-                                                                    '    ParseError = True
-                                                                    'Else
-                                                                    '    TableSplit(0) = ""
-                                                                    '    TableSplit(1) = ""
-                                                                    '    TableSplit(2) = ""
-                                                                    '    TableSplit(3) = Mid(FilenameSegment, EndPos)
-                                                                    '    LinkSplit(LinkPtr) = encodeURL(RecordVirtualFilename) & Mid(Join(TableSplit, "/"), 4)
-                                                                    '    SaveChanges = True
-                                                                    'End If
                                                                     Exit For
                                                                 Case "'"
                                                                     '
                                                                     ' Delimited within a javascript pair of apostophys
                                                                     '
                                                                     EndPos = genericController.vbInstr(1, FilenameSegment, "'")
-                                                                    'If EndPos <= 0 Then
-                                                                    '    ParseError = True
-                                                                    '    Exit For
-                                                                    'Else
-                                                                    '    TableSplit(0) = ""
-                                                                    '    TableSplit(1) = ""
-                                                                    '    TableSplit(2) = ""
-                                                                    '    TableSplit(3) = Mid(FilenameSegment, EndPos)
-                                                                    '    LinkSplit(LinkPtr) = encodeURL(RecordVirtualFilename) & Mid(Join(TableSplit, "/"), 4)
-                                                                    '    SaveChanges = True
-                                                                    'End If
                                                                     Exit For
                                                                 Case ">", "<"
                                                                     '
@@ -8800,11 +8601,8 @@ ErrorTrap:
                                                         '
                                                         ' check link
                                                         '
-                                                        ''hint = hint & ",100"
                                                         If EndPos = 0 Then
-                                                            ''hint = hint & ",110"
                                                             ParseError = True
-                                                            'Call app.csv_CloseCS(CS)
                                                             Exit For
                                                         Else
                                                             Dim ImageFilename As String
@@ -8891,8 +8689,6 @@ ErrorTrap:
                                             End If
                                         End If
                                     End If
-                                    'Call app.csv_CloseCS(CS)
-                                    ''hint = hint & ",900"
                                 End If
                             End If
                         End If
@@ -9250,14 +9046,14 @@ ErrorTrap:
                 '
                 Call cpCore.main_SetMetaContent(0, 0)
                 Call cpCore.htmlDoc.main_AddPagetitle2("Login", "loginPage")
-                head = cpCore.webServer.getHTMLInternalHead(False)
+                head = cpCore.htmlDoc.getHTMLInternalHead(False)
                 If cpCore.pages.templateBodyTag <> "" Then
                     bodyTag = cpCore.pages.templateBodyTag
                 Else
                     bodyTag = TemplateDefaultBodyTag
                 End If
                 'Call AppendLog("call main_getEndOfBody, from main_getLoginPage2 ")
-                returnREsult = cpCore.main_assembleHtmlDoc(cpCore.main_docType, head, bodyTag, Body & cpCore.htmlDoc.html_GetEndOfBody(False, False, False, False))
+                returnREsult = cpCore.main_assembleHtmlDoc(cpCore.siteProperties.docTypeDeclaration(), head, bodyTag, Body & cpCore.htmlDoc.html_GetEndOfBody(False, False, False, False))
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
@@ -9517,6 +9313,202 @@ ErrorTrap:
                 cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnResult
+        End Function
+
+
+        ' main_Get the Head innerHTML for any page
+        '
+        Public Function getHTMLInternalHead(ByVal main_IsAdminSite As Boolean) As String
+            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetHTMLInternalHead")
+            '
+            'If Not (true) Then Exit Function
+            '
+            Dim Parts() As String
+            Dim FileList As String
+            Dim Files() As String
+            Dim Ptr As Integer
+            Dim Pos As Integer
+            Dim BaseHref As String
+            Dim StyleTag As String
+            Dim IDList As String
+            Dim Cnt As Integer
+            Dim StyleSheetLink As String
+            Dim SQL As String
+            Dim CS As Integer
+            Dim OtherHeadTags As String
+            Dim Copy As String
+            Dim VirtualFilename As String
+            Dim Ext As String
+            '
+            getHTMLInternalHead = getHTMLInternalHead & cr & "<!-- main_GetHTMLInternalHead called out of order. It must follow a content call, such as pageManager_GetHtmlBody, main_GetSectionPage, and main_GetContentPage -->"
+            '
+            ' stylesheets first -- for performance
+            ' put stylesheets inline without processing
+            '
+            If cpCore.siteProperties.getBoolean("Allow CSS Reset") Then
+                '
+                ' reset styles
+                '
+                getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.webServerIO_requestDomain & "/ccLib/styles/ccreset.css"" >"
+            End If
+            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""/ccLib/Styles/" & defaultStyleFilename & """>"
+            If Not main_IsAdminSite Then
+                '
+                ' site styles
+                '
+                getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.getCdnFileLink("templates/styles.css") & """ >"
+            End If
+            '
+            ' Template shared styles
+            '
+            ' !!!!! dont know why this was blocked. Running add-ons with shared styles need this in the admin site.
+            FileList = cpCore.main_GetSharedStyleFileList(cpCore.htmlDoc.main_MetaContent_SharedStyleIDList, main_IsAdminSite)
+            cpCore.htmlDoc.main_MetaContent_SharedStyleIDList = ""
+            If FileList <> "" Then
+                Files = Split(FileList, vbCrLf)
+                For Ptr = 0 To UBound(Files)
+                    If Files(Ptr) <> "" Then
+                        Parts = Split(Files(Ptr) & "<<", "<")
+                        If Parts(1) <> "" Then
+                            getHTMLInternalHead = getHTMLInternalHead & cr & genericController.decodeHtml(Parts(1))
+                        End If
+                        getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(Parts(0)) & """ >"
+                        If Parts(2) <> "" Then
+                            getHTMLInternalHead = getHTMLInternalHead & cr & genericController.decodeHtml(Parts(2))
+                        End If
+                        'End If
+                    End If
+                Next
+            End If
+            '
+            ' Template exclusive styles
+            '
+            If cpCore.htmlDoc.main_MetaContent_TemplateStyleSheetTag <> "" Then
+                getHTMLInternalHead = getHTMLInternalHead & cpCore.htmlDoc.main_MetaContent_TemplateStyleSheetTag
+            End If
+            '
+            ' Page Styles
+            '
+            If cpCore.htmlDoc.main_MetaContent_StyleSheetTags <> "" Then
+                getHTMLInternalHead = getHTMLInternalHead & cpCore.htmlDoc.main_MetaContent_StyleSheetTags
+                cpCore.htmlDoc.main_MetaContent_StyleSheetTags = ""
+            End If
+            '
+            ' Member Styles
+            '
+            If cpCore.authContext.user.StyleFilename <> "" Then
+                Call cpCore.htmlDoc.main_AddStylesheetLink2(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(cpCore.authContext.user.StyleFilename), "member style")
+                cpCore.authContext.user.StyleFilename = ""
+            End If
+            '
+            ' meta content
+            '
+            Copy = cpCore.main_GetLastMetaTitle()
+            If Copy <> "" Then
+                getHTMLInternalHead = getHTMLInternalHead & cr & "<title>" & Copy & "</title>"
+            End If
+            '
+            Copy = cpCore.main_GetLastMetaKeywordList()
+            If Copy <> "" Then
+                getHTMLInternalHead = getHTMLInternalHead & cr & "<meta name=""keywords"" content=""" & Copy & """ >"
+            End If
+            '
+            Copy = cpCore.main_GetLastMetaDescription()
+            If Copy <> "" Then
+                getHTMLInternalHead = getHTMLInternalHead & cr & "<meta name=""description"" content=""" & Copy & """ >"
+            End If
+            '
+            ' favicon
+            '
+            VirtualFilename = cpCore.siteProperties.getText("faviconfilename")
+            If VirtualFilename <> "" Then
+                Pos = InStrRev(VirtualFilename, ".")
+                If Pos > 0 Then
+                    Ext = genericController.vbLCase(Mid(VirtualFilename, Pos))
+                    Select Case Ext
+                        Case ".ico"
+                            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""icon"" type=""image/vnd.microsoft.icon"" href=""" & cpCore.getCdnFileLink(VirtualFilename) & """ >"
+                        Case ".png"
+                            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""icon"" type=""image/png"" href=""" & cpCore.getCdnFileLink(VirtualFilename) & """ >"
+                        Case ".gif"
+                            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""icon"" type=""image/gif"" href=""" & cpCore.getCdnFileLink(VirtualFilename) & """ >"
+                        Case ".jpg"
+                            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""icon"" type=""image/jpg"" href=""" & cpCore.getCdnFileLink(VirtualFilename) & """ >"
+                    End Select
+                End If
+            End If
+            '
+            ' misc caching, etc
+            '
+            Dim encoding As String
+            encoding = cpCore.htmlDoc.html_EncodeHTML(cpCore.siteProperties.getText("Site Character Encoding", "utf-8"))
+            getHTMLInternalHead = getHTMLInternalHead _
+                & OtherHeadTags _
+                & cr & "<meta http-equiv=""content-type"" content=""text/html; charset=" & encoding & """ >" _
+                & cr & "<meta http-equiv=""content-language"" content=""en-us"" >" _
+                & cr & "<meta http-equiv=""cache-control"" content=""no-cache"" >" _
+                & cr & "<meta http-equiv=""expires"" content=""-1"" >" _
+                & cr & "<meta http-equiv=""pragma"" content=""no-cache"" >" _
+                & cr & "<meta name=""generator"" content=""Contensive"" >"
+            '& CR & "<meta http-equiv=""cache-control"" content=""no-store"" >"
+            '
+            ' no-follow
+            '
+            If cpCore.webServer.webServerIO_response_NoFollow Then
+                getHTMLInternalHead = getHTMLInternalHead _
+                    & cr & "<meta name=""robots"" content=""nofollow"" >" _
+                    & cr & "<meta name=""mssmarttagspreventparsing"" content=""true"" >"
+            End If
+            '
+            ' Base is needed for Link Alias case where a slash is in the URL (page named 1/2/3/4/5)
+            '
+            BaseHref = cpCore.webServer.webServerIO_ServerFormActionURL
+            If main_IsAdminSite Then
+                '
+                ' no base in admin site
+                '
+            ElseIf BaseHref <> "" Then
+                If cpCore.htmlDoc.refreshQueryString <> "" Then
+                    BaseHref = BaseHref & "?" & cpCore.htmlDoc.refreshQueryString
+                End If
+                getHTMLInternalHead = getHTMLInternalHead & cr & "<base href=""" & BaseHref & """ >"
+            End If
+            '
+            ' Head Javascript -- (should be) last for performance
+            '
+            getHTMLInternalHead = getHTMLInternalHead _
+                & cr & "<script language=""JavaScript"" type=""text/javascript""  src=""" & cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.webServerIO_requestDomain & "/ccLib/ClientSide/Core.js""></script>" _
+                & ""
+            If cpCore.htmlDoc.main_HeadScriptCnt > 0 Then
+                For Ptr = 0 To cpCore.htmlDoc.main_HeadScriptCnt - 1
+                    With cpCore.htmlDoc.main_HeadScripts(Ptr)
+                        If (.addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
+                            getHTMLInternalHead = getHTMLInternalHead & cr & "<!-- from " & .addedByMessage & " -->"
+                        End If
+                        If Not .IsLink Then
+                            getHTMLInternalHead = getHTMLInternalHead & cr & "<script Language=""JavaScript"" type=""text/javascript"">" & .Text & cr & "</script>"
+                        Else
+                            getHTMLInternalHead = getHTMLInternalHead & cr & "<script type=""text/javascript"" src=""" & .Text & """></script>"
+                        End If
+                    End With
+                Next
+                cpCore.htmlDoc.main_HeadScriptCnt = 0
+            End If
+            '
+            ' other head tags - always last
+            '
+            OtherHeadTags = cpCore.main_GetLastOtherHeadTags()
+            If OtherHeadTags <> "" Then
+                If Left(OtherHeadTags, 2) <> vbCrLf Then
+                    OtherHeadTags = vbCrLf & OtherHeadTags
+                End If
+                getHTMLInternalHead = getHTMLInternalHead & genericController.vbReplace(OtherHeadTags, vbCrLf, cr)
+            End If
+            '
+            Exit Function
+            '
+ErrorTrap:
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetHTMLInternalHead")
         End Function
 
 

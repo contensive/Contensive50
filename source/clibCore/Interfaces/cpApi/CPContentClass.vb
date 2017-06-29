@@ -78,7 +78,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetContentControlCriteria(ByVal ContentName As String) As String
-            Return cpCore.content_getContentControlCriteria(ContentName)
+            Return cpCore.metaData.content_getContentControlCriteria(ContentName)
         End Function
         '
         '====================================================================================================
@@ -130,13 +130,13 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetRecordID(ByVal ContentName As String, ByVal RecordName As String) As Integer
-            Return cpCore.GetRecordID(ContentName, RecordName)
+            Return cpCore.db.getRecordID(ContentName, RecordName)
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Function GetRecordName(ByVal ContentName As String, ByVal RecordID As Integer) As String
-            Return cpCore.GetRecordName(ContentName, RecordID)
+            Return cpCore.db.getRecordName(ContentName, RecordID)
         End Function
         '
         '====================================================================================================
@@ -154,7 +154,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function IsField(ByVal ContentName As String, ByVal FieldName As String) As Boolean
-            Return cpCore.metaData_IsContentFieldSupported(ContentName, FieldName)
+            Return cpCore.metaData.IsContentFieldSupported(ContentName, FieldName)
         End Function
         '
         '====================================================================================================

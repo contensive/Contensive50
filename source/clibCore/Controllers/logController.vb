@@ -233,6 +233,16 @@ ErrorTrap:
         Public Shared Sub logActivity2(cpcore As coreClass, Message As String, SubjectMemberID As Integer, SubjectOrganizationID As Integer)
             Call logActivity(cpcore, Message, cpcore.authContext.user.ID, SubjectMemberID, SubjectOrganizationID, cpcore.webServer.webServerIO_ServerLink, cpcore.authContext.visitor.ID, cpcore.authContext.visit.ID)
         End Sub
+        '
+        '
+        '
+        Friend Shared Sub log_appendLogPageNotFound(cpCore As coreClass, PageNotFoundLink As String)
+            Try
+                Call appendLog(cpCore, """" & FormatDateTime(cpCore.app_startTime, vbGeneralDate) & """,""App=" & cpCore.serverConfig.appConfig.name & """,""main_VisitId=" & cpCore.authContext.visit.ID & """,""" & PageNotFoundLink & """,""Referrer=" & cpCore.webServer.requestReferrer & """", "performance", "pagenotfound")
+            Catch ex As Exception
+                Throw (ex)
+            End Try
+        End Sub
     End Class
     '
 End Namespace

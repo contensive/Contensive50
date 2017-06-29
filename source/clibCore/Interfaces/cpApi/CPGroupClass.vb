@@ -55,7 +55,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub Add(ByVal GroupNameOrGuid As String, Optional ByVal groupCaption As String = "")
             Try
-                Call cpCore.group_add2(GroupNameOrGuid, groupCaption)
+                Call groupController.group_add2(cpCore, GroupNameOrGuid, groupCaption)
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex, "Unexpected error in cp.group.add()")
             End Try
@@ -65,7 +65,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub AddUser(ByVal GroupNameIdOrGuid As String, Optional ByVal UserId As Integer = 0, Optional ByVal DateExpires As Date = #12:00:00 AM#)
             Try
-                Call cpCore.group_AddUser(GroupNameIdOrGuid, UserId, DateExpires)
+                Call groupController.group_AddUser(cpCore, GroupNameIdOrGuid, UserId, DateExpires)
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex)
             End Try
@@ -86,7 +86,7 @@ Namespace Contensive.Core
         Public Overrides Function GetId(ByVal GroupNameIdOrGuid As String) As Integer
             Dim returnInteger As Integer = 0
             Try
-                returnInteger = cpCore.GetRecordID("groups", GroupNameIdOrGuid)
+                returnInteger = cpCore.db.getRecordID("groups", GroupNameIdOrGuid)
             Catch ex As Exception
 
             End Try
@@ -99,7 +99,7 @@ Namespace Contensive.Core
             Dim returnText As String = ""
             Try
                 If genericController.vbIsNumeric(GroupNameIdOrGuid) Then
-                    returnText = cpCore.GetRecordName("groups", genericController.EncodeInteger(GroupNameIdOrGuid))
+                    returnText = cpCore.db.getRecordName("groups", genericController.EncodeInteger(GroupNameIdOrGuid))
                 Else
                     Dim sqlCriteria As String = cpCore.db.getNameIdOrGuidSqlCriteria(GroupNameIdOrGuid)
                     Dim cs As CPCSClass = cp.CSNew()

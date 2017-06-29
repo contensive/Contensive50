@@ -225,7 +225,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' no page and no root page, redirect to landing page
                     '
-                    Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
+                    Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestLinkSource)
                     pageManager_RedirectBecausePageNotFound = True
                     pageManager_RedirectReason = "The page could not be determined from URL."
                     redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
@@ -241,7 +241,7 @@ Namespace Contensive.Core.Controllers
                     Else
                         iRootPageContentName = RootPageContentName
                     End If
-                    RootPageContentCID = cpcore.main_GetContentID(iRootPageContentName)
+                    RootPageContentCID = cpcore.metaData.getContentId(iRootPageContentName)
                     '
                     '---------------------------------------------------------------------------------
                     ' ----- Build Page if needed
@@ -723,7 +723,7 @@ Namespace Contensive.Core.Controllers
                         Call cpcore.htmlDoc.main_AddOnLoadJavascript2(JSOnLoad, "page content")
                         Call cpcore.htmlDoc.main_AddHeadScriptCode(JSHead, "page content")
                         If JSFilename <> "" Then
-                            Call cpcore.htmlDoc.main_AddHeadScriptLink(cpcore.csv_getVirtualFileLink(cpcore.serverConfig.appConfig.cdnFilesNetprefix, JSFilename), "page content")
+                            Call cpcore.htmlDoc.main_AddHeadScriptLink(cpcore.getCdnFileLink(JSFilename), "page content")
                         End If
                         Call cpcore.htmlDoc.main_AddEndOfBodyJavascript2(JSEndBody, "page content")
                         '
@@ -762,13 +762,13 @@ Namespace Contensive.Core.Controllers
                         '---------------------------------------------------------------------------------
                         '
                         bodyContent = returnHtml
-                        AddOnCnt = UBound(cpcore.addonCache.addonCache.onPageEndPtrs) + 1
+                        AddOnCnt = UBound(cpcore.addonLegacyCache.addonCache.onPageEndPtrs) + 1
                         For addonPtr = 0 To AddOnCnt - 1
-                            addonCachePtr = cpcore.addonCache.addonCache.onPageEndPtrs(addonPtr)
+                            addonCachePtr = cpcore.addonLegacyCache.addonCache.onPageEndPtrs(addonPtr)
                             If addonCachePtr > -1 Then
-                                addonId = cpcore.addonCache.addonCache.addonList(addonCachePtr.ToString).id
+                                addonId = cpcore.addonLegacyCache.addonCache.addonList(addonCachePtr.ToString).id
                                 If addonId > 0 Then
-                                    AddonName = cpcore.addonCache.addonCache.addonList(addonCachePtr.ToString).name
+                                    AddonName = cpcore.addonLegacyCache.addonCache.addonList(addonCachePtr.ToString).name
                                     AddonContent = cpcore.addon.execute_legacy5(addonId, AddonName, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
                                     bodyContent = bodyContent & AddonContent
                                 End If
@@ -875,7 +875,7 @@ Namespace Contensive.Core.Controllers
                             '
                             ' BID was not found, redirect to RootPage
                             '
-                            Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
+                            Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestLinkSource)
                             pageManager_RedirectBecausePageNotFound = True
                             pageManager_RedirectReason = "The page could not be found from its ID [" & PageID & "]. It may have been deleted or marked inactive. "
                             redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
@@ -884,7 +884,7 @@ Namespace Contensive.Core.Controllers
                             '
                             ' Root page was requested, but not found and could not be created, this is an error
                             '
-                            Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
+                            Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestLinkSource)
                             pageManager_RedirectBecausePageNotFound = True
                             pageManager_RedirectReason = "The page could not be found because it's ID could not be determined."
                             redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
@@ -936,7 +936,7 @@ Namespace Contensive.Core.Controllers
                                     ' page without section (root page name is the legacy section) not allowed
                                     '
                                     'hint = hint & ",130"
-                                    Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
+                                    Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestLinkSource)
                                     pageManager_RedirectBecausePageNotFound = True
                                     '????? test
                                     pageManager_RedirectReason = "The page you requested [" & PageID & "] could not be displayed because there is a problem with one of it's parent pages. All parent pages must be available to verify security permissions. A parent page may have been deleted or inactivated, or the page may have been requested from an incorrect location."
@@ -1477,7 +1477,7 @@ Namespace Contensive.Core.Controllers
                 '
                 SeeAlsoCount = 0
                 If iRecordID > 0 Then
-                    ContentID = Me.cpcore.main_GetContentID(iContentName)
+                    ContentID = Me.cpcore.metaData.getContentId(iContentName)
                     If (ContentID > 0) Then
                         '
                         ' ----- Set authoring only for valid ContentName
@@ -1487,7 +1487,7 @@ Namespace Contensive.Core.Controllers
                         '
                         ' ----- if iContentName was bad, maybe they put table in, no authoring
                         '
-                        ContentID = Me.cpcore.GetContentIDByTablename(iContentName)
+                        ContentID = Me.cpcore.metaData.GetContentIDByTablename(iContentName)
                     End If
                     If (ContentID > 0) Then
                         '
@@ -1776,7 +1776,7 @@ Namespace Contensive.Core.Controllers
                 CSPointer = main_OpenCSWhatsNew(cpcore, SortFieldList)
                 '
                 If Me.cpcore.db.cs_ok(CSPointer) Then
-                    ContentID = Me.cpcore.main_GetContentID("Content Watch")
+                    ContentID = Me.cpcore.metaData.getContentId("Content Watch")
                     Do While Me.cpcore.db.cs_ok(CSPointer)
                         Link = Me.cpcore.db.cs_getText(CSPointer, "link")
                         LinkLabel = Me.cpcore.db.cs_getText(CSPointer, "LinkLabel")
@@ -1873,7 +1873,7 @@ Namespace Contensive.Core.Controllers
                 End If
                 '
                 If Me.cpcore.db.cs_ok(CS) Then
-                    ContentID = Me.cpcore.main_GetContentID("Content Watch")
+                    ContentID = Me.cpcore.metaData.getContentId("Content Watch")
                     Do While Me.cpcore.db.cs_ok(CS)
                         Link = Me.cpcore.db.cs_getText(CS, "link")
                         LinkLabel = Me.cpcore.db.cs_getText(CS, "LinkLabel")
@@ -2478,7 +2478,7 @@ ErrorTrap:
                                 Call cpcore.db.cs_set(CSBlock, "name", RecordName)
                                 SaveButNoChanges = False
                             End If
-                            Call cpcore.main_AddLinkAlias(RecordName, RecordID, "")
+                            Call cpcore.app_addLinkAlias2(RecordName, RecordID, "")
                             If (cpcore.docProperties.getText("headline") <> cpcore.db.cs_get(CSBlock, "headline")) Then
                                 Call cpcore.db.cs_set(CSBlock, "headline", cpcore.docProperties.getText("headline"))
                                 SaveButNoChanges = False
@@ -3765,11 +3765,11 @@ ErrorTrap:
         '                    End If
         '                    MenuImage = cpcore.db.cs_getText(CSSections, "MenuImageFilename")
         '                    If MenuImage <> "" Then
-        '                        MenuImage = cpcore.csv_getVirtualFileLink(cpcore.serverConfig.appConfig.cdnFilesNetprefix, MenuImage)
+        '                        MenuImage = cpcore.getCdnFileLink( MenuImage)
         '                    End If
         '                    MenuImageOver = cpcore.db.cs_getText(CSSections, "MenuImageOverFilename")
         '                    If MenuImageOver <> "" Then
-        '                        MenuImageOver = cpcore.csv_getVirtualFileLink(cpcore.serverConfig.appConfig.cdnFilesNetprefix, MenuImageOver)
+        '                        MenuImageOver = cpcore.getCdnFileLink( MenuImageOver)
         '                    End If
         '                    '
         '                    ' main_Get Root Page for templateID
@@ -3942,7 +3942,7 @@ ErrorTrap:
                 '
                 ' no page and no root page, redirect to landing page
                 '
-                Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
+                Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestLinkSource)
                 pageManager_RedirectBecausePageNotFound = True
                 pageManager_RedirectReason = "The page could not be determined from URL. The PageID is [" & PageID & "], and the RootPageID is [" & rootPageId & "]."
                 redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
@@ -3950,7 +3950,7 @@ ErrorTrap:
                 '
                 ' no page, redirect to root page
                 '
-                Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
+                Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestLinkSource)
                 pageManager_RedirectBecausePageNotFound = True
                 pageManager_RedirectReason = "The page could not be determined from URL. The PageID is [" & PageID & "], and the RootPageID is [" & rootPageId & "]."
                 redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
@@ -3958,7 +3958,7 @@ ErrorTrap:
                 '
                 ' no rootpage id
                 '
-                Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
+                Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestLinkSource)
                 pageManager_RedirectBecausePageNotFound = True
                 pageManager_RedirectReason = "The page could not be determined from URL. The PageID is [" & PageID & "], and the RootPageID is [" & rootPageId & "]."
                 redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
@@ -4015,7 +4015,7 @@ ErrorTrap:
                                 '
                                 ' Root Page - redirect to the landing page with an admin message
                                 '
-                                Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
+                                Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestLinkSource)
                                 'Call main_LogPageNotFound(main_ServerLink)
                                 pageManager_RedirectBecausePageNotFound = True
                                 pageManager_RedirectReason = "The page requested [" & PageID & "] can not be displayed" & SubMessage & ". It is the root page of the section [" & SectionID & "]."
@@ -4025,7 +4025,7 @@ ErrorTrap:
                                 '
                                 ' non-Root Page - redirect to the root page with an admin message
                                 '
-                                Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
+                                Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestLinkSource)
                                 'Call main_LogPageNotFound(main_ServerLink)
                                 pageManager_RedirectBecausePageNotFound = True
                                 pageManager_RedirectReason = "The page requested [" & PageID & "] can not be displayed" & SubMessage & "."
@@ -4203,7 +4203,7 @@ ErrorTrap:
                 '
                 ' this page has been fetched before, end the branch here
                 '
-                Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
+                Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestLinkSource)
                 'Call main_LogPageNotFound(main_ServerLink)
                 pageManager_RedirectBecausePageNotFound = True
                 pageManager_RedirectReason = "The requested page could not be displayed because there is a circular reference within it's parent path. The page [" & PageID & "] was found two times in the parent pages [" & ParentIDPath & "," & PageID & "]."
@@ -4500,7 +4500,7 @@ ErrorTrap:
                         '
                         ' Error, current page is not the root page, but has no parent pages
                         '
-                        Call cpcore.log_appendLogPageNotFound(cpcore.webServer.requestLinkSource)
+                        Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestLinkSource)
                         pageManager_RedirectBecausePageNotFound = True
                         pageManager_RedirectReason = "The page could not be displayed for security reasons. All valid pages must either have a valid parent page, or be selected by a section as the section's root page. This page has neither a parent page or a section."
                         redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
@@ -6407,7 +6407,7 @@ ErrorTrap:
             '
             Dim ContentRecordKey As String
             '
-            ContentRecordKey = cpcore.main_GetContentID(genericController.encodeText(ContentName)) & "." & genericController.EncodeInteger(RecordID)
+            ContentRecordKey = cpcore.metaData.getContentId(genericController.encodeText(ContentName)) & "." & genericController.EncodeInteger(RecordID)
             getContentWatchLinkByName = getContentWatchLinkByKey(ContentRecordKey, DefaultLink, IncrementClicks)
             '
             Exit Function
@@ -6669,12 +6669,12 @@ ErrorTrap:
                     ' this template has no domain preference, use current domain
                     '
                     linkDomain = cpcore.webServer.requestDomain
-                ElseIf (cpcore.domains.domainDetails.id = 0) Then
+                ElseIf (cpcore.domainLegacyCache.domainDetails.id = 0) Then
                     '
                     ' the current domain is not recognized, or is default - use it
                     '
                     linkDomain = cpcore.webServer.requestDomain
-                ElseIf (InStr(1, "," & templatedomainIdList & ",", "," & cpcore.domains.domainDetails.id & ",") <> 0) Then
+                ElseIf (InStr(1, "," & templatedomainIdList & ",", "," & cpcore.domainLegacyCache.domainDetails.id & ",") <> 0) Then
                     '
                     ' current domain is in the allowed domain list
                     '
@@ -6849,17 +6849,17 @@ ErrorTrap:
                     '       if this operation fails, exit now -- do not continue and create new template
                     '
                     currentTemplateID = 0
-                    If cpcore.domains.domainDetails.defaultTemplateId <> 0 Then
+                    If cpcore.domainLegacyCache.domainDetails.defaultTemplateId <> 0 Then
                         '
                         ' ----- attempt to use the domain's default template
                         '
                         Call cpcore.db.cs_Close(CS)
-                        CS = cpcore.csOpenRecord(ContentName, cpcore.domains.domainDetails.defaultTemplateId, , , FieldList)
+                        CS = cpcore.csOpenRecord(ContentName, cpcore.domainLegacyCache.domainDetails.defaultTemplateId, , , FieldList)
                         If Not cpcore.db.cs_ok(CS) Then
                             '
                             ' the defaultemplateid in the domain is not valid
                             '
-                            Call cpcore.db.executeSql("update ccdomains set defaulttemplateid=0 where defaulttemplateid=" & cpcore.domains.domainDetails.defaultTemplateId)
+                            Call cpcore.db.executeSql("update ccdomains set defaulttemplateid=0 where defaulttemplateid=" & cpcore.domainLegacyCache.domainDetails.defaultTemplateId)
                             Call cpcore.cache.invalidateContent("domains")
                         End If
                     End If
@@ -7020,7 +7020,7 @@ ErrorTrap:
         '                        If genericController.vbLCase(Right(StylesFilename, 4)) <> ".css" Then
         '                            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError15("Dynamic Menu [" & MenuName & "] StylesFilename is not a '.css' file, and will not display correct. Check that the field is setup as a CSSFile.", "main_GetDynamicMenu")
         '                        Else
-        '                            Call cpcore.htmlDoc.main_AddStylesheetLink2(cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.requestDomain & cpcore.csv_getVirtualFileLink(cpcore.serverConfig.appConfig.cdnFilesNetprefix, StylesFilename), "dynamic menu")
+        '                            Call cpcore.htmlDoc.main_AddStylesheetLink2(cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.requestDomain & cpcore.getCdnFileLink( StylesFilename), "dynamic menu")
         '                        End If
         '                    End If
         '                End If
@@ -7187,7 +7187,7 @@ ErrorTrap:
                 ' Save new public stylesheet
                 '
                 'Dim kmafs As New fileSystemClass
-                Call cpcore.cdnFiles.saveFile(genericController.convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), cpcore.csv_getStyleSheetProcessed)
+                Call cpcore.cdnFiles.saveFile(genericController.convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), cpcore.htmlDoc.html_getStyleSheet2(0, 0))
                 Call cpcore.cdnFiles.saveFile(genericController.convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css"), cpcore.htmlDoc.pageManager_GetStyleSheetDefault2)
 
             End If
@@ -7205,7 +7205,7 @@ ErrorTrap:
                 '
                 ' cached stylesheet
                 '
-                pageManager_GetStyleTagPublic = pageManager_GetStyleTagPublic & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.webServerIO_requestDomain & cpcore.csv_getVirtualFileLink(cpcore.serverConfig.appConfig.cdnFilesNetprefix, "templates/Public" & StyleSN & ".css") & """ >"
+                pageManager_GetStyleTagPublic = pageManager_GetStyleTagPublic & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.webServerIO_requestDomain & cpcore.getCdnFileLink("templates/Public" & StyleSN & ".css") & """ >"
             End If
         End Function
         '
@@ -7236,7 +7236,7 @@ ErrorTrap:
         Public Function main_GetPageNotFoundPageId() As Integer
             Dim pageId As Integer
             Try
-                pageId = cpcore.domains.domainDetails.pageNotFoundPageId
+                pageId = cpcore.domainLegacyCache.domainDetails.pageNotFoundPageId
                 If pageId = 0 Then
                     '
                     ' no domain page not found, use site default
@@ -7783,5 +7783,64 @@ ErrorTrap:
                 cpcore.handleExceptionAndContinue(ex)
             End Try
         End Sub
+        '
+        '---------------------------------------------------------------------------
+        '   Create the default landing page if it is missing
+        '---------------------------------------------------------------------------
+        '
+        Public Function main_CreatePageGetID(ByVal PageName As String, ByVal ContentName As String, ByVal CreatedBy As Integer, ByVal pageGuid As String) As Integer
+            Dim Id As Integer = 0
+            '
+            Dim CS As Integer = cpcore.db.cs_insertRecord(ContentName, CreatedBy)
+            If cpcore.db.cs_ok(CS) Then
+                Id = cpcore.db.cs_getInteger(CS, "ID")
+                Call cpcore.db.cs_set(CS, "name", PageName)
+                Call cpcore.db.cs_set(CS, "active", "1")
+                If True Then
+                    Call cpcore.db.cs_set(CS, "ccGuid", pageGuid)
+                End If
+                Call cpcore.db.cs_save2(CS)
+                Call cpcore.workflow.publishEdit("Page Content", Id)
+            End If
+            Call cpcore.db.cs_Close(CS)
+            '
+            main_CreatePageGetID = Id
+        End Function
+        '
+        'Private Shared Function main_GetDefaultTemplateId(cpCore As coreClass) As Integer
+        '    Dim result As Integer = 0
+        '    Try
+        '        '
+        '        Dim CS As Integer
+        '        '
+        '        CS = cpCore.db.cs_open("page templates", "name=" & cpCore.db.encodeSQLText(TemplateDefaultName), "ID", , , , , "id")
+        '        If cpCore.db.cs_ok(CS) Then
+        '            result = cpCore.db.cs_getInteger(CS, "ID")
+        '        End If
+        '        Call cpCore.db.cs_Close(CS)
+        '        '
+        '        ' ----- if default template not found, create a simple default template
+        '        '
+        '        If result = 0 Then
+        '            CS = cpCore.db.cs_insertRecord("Page Templates")
+        '            If cpCore.db.cs_ok(CS) Then
+        '                result = cpCore.db.cs_getInteger(CS, "ID")
+        '                Call cpCore.db.cs_set(CS, "name", TemplateDefaultName)
+        '                Call cpCore.db.cs_set(CS, "Link", "")
+        '                If True Then
+        '                    Call cpCore.db.cs_set(CS, "BodyHTML", cpCore.pages.templateBody)
+        '                End If
+        '                If True Then
+        '                    Call cpCore.db.cs_set(CS, "ccGuid", DefaultTemplateGuid)
+        '                End If
+        '                Call cpCore.db.cs_Close(CS)
+        '            End If
+        '        End If
+        '    Catch ex As Exception
+        '        cpCore.handleExceptionAndContinue(ex)
+        '    End Try
+        '    Return result
+        'End Function
+
     End Class
 End Namespace

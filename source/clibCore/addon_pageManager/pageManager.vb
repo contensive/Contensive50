@@ -63,20 +63,20 @@ Namespace Contensive.Addons.PageManager
                 Dim addonId As Integer
                 Dim AddonName As String
                 '
-                Call cpCore.addonCache.load()
+                Call cpCore.addonLegacyCache.load()
                 returnBody = ""
                 '
                 ' ----- OnBodyStart add-ons
                 '
                 FilterStatusOK = False
-                Cnt = UBound(cpCore.addonCache.addonCache.onBodyStartPtrs) + 1
+                Cnt = UBound(cpCore.addonLegacyCache.addonCache.onBodyStartPtrs) + 1
                 For Ptr = 0 To Cnt - 1
-                    addonCachePtr = cpCore.addonCache.addonCache.onBodyStartPtrs(Ptr)
+                    addonCachePtr = cpCore.addonLegacyCache.addonCache.onBodyStartPtrs(Ptr)
                     If addonCachePtr > -1 Then
-                        addonId = cpCore.addonCache.addonCache.addonList(addonCachePtr.ToString).id
+                        addonId = cpCore.addonLegacyCache.addonCache.addonList(addonCachePtr.ToString).id
                         'hint = hint & ",addonId=" & addonId
                         If addonId > 0 Then
-                            AddonName = cpCore.addonCache.addonCache.addonList(addonCachePtr.ToString).name
+                            AddonName = cpCore.addonLegacyCache.addonCache.addonList(addonCachePtr.ToString).name
                             'hint = hint & ",AddonName=" & AddonName
                             returnBody = returnBody & cpCore.addon.execute_legacy2(addonId, "", "", CPUtilsBaseClass.addonContext.ContextOnBodyStart, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
                             If Not FilterStatusOK Then
@@ -160,16 +160,16 @@ Namespace Contensive.Addons.PageManager
                     '
                     'hint = hint & ",onBodyEnd"
                     FilterStatusOK = False
-                    Cnt = UBound(cpCore.addonCache.addonCache.onBodyEndPtrs) + 1
+                    Cnt = UBound(cpCore.addonLegacyCache.addonCache.onBodyEndPtrs) + 1
                     'hint = hint & ",cnt=" & Cnt
                     For Ptr = 0 To Cnt - 1
-                        addonCachePtr = cpCore.addonCache.addonCache.onBodyEndPtrs(Ptr)
+                        addonCachePtr = cpCore.addonLegacyCache.addonCache.onBodyEndPtrs(Ptr)
                         'hint = hint & ",ptr=" & Ptr & ",addonCachePtr=" & addonCachePtr
                         If addonCachePtr > -1 Then
-                            addonId = cpCore.addonCache.addonCache.addonList(addonCachePtr.ToString).id
+                            addonId = cpCore.addonLegacyCache.addonCache.addonList(addonCachePtr.ToString).id
                             'hint = hint & ",addonId=" & addonId
                             If addonId > 0 Then
-                                AddonName = cpCore.addonCache.addonCache.addonList(addonCachePtr.ToString).name
+                                AddonName = cpCore.addonLegacyCache.addonCache.addonList(addonCachePtr.ToString).name
                                 'hint = hint & ",AddonName=" & AddonName
                                 cpCore.htmlDoc.html_DocBodyFilter = returnBody
                                 AddonReturn = cpCore.addon.execute_legacy2(addonId, "", "", CPUtilsBaseClass.addonContext.ContextFilter, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
@@ -407,40 +407,33 @@ Namespace Contensive.Addons.PageManager
                     '
                     '--------------------------------------------------------------------------
                     ' ----- Active Download hook
-                    Dim libraryFilePtr As Integer
-                    Dim libraryFileClicks As Integer
-                    Dim link As String = ""
                     Dim RecordEID As String = cpCore.docProperties.getText(RequestNameLibraryFileID)
                     If (RecordEID <> "") Then
                         Dim tokenDate As Date
                         Call cpCore.security.decodeToken(RecordEID, downloadId, tokenDate)
                         If downloadId <> 0 Then
                             '
-                            ' ----- lookup record and set clicks
-                            '
-                            Call cpCore.cache_libraryFiles_loadIfNeeded()
-                            libraryFilePtr = cpCore.cache_libraryFilesIdIndex.getPtr(CStr(downloadId))
-                            If libraryFilePtr >= 0 Then
-                                libraryFileClicks = genericController.EncodeInteger(cpCore.cache_libraryFiles(LibraryFilesCache_clicks, libraryFilePtr))
-                                link = genericController.encodeText(cpCore.cache_libraryFiles(LibraryFilesCache_filename, libraryFilePtr))
-                                Call cpCore.db.executeSql("update cclibraryfiles set clicks=" & (libraryFileClicks + 1) & " where id=" & downloadId)
-                            End If
-                            If link <> "" Then
-                                '
-                                ' ----- create log entry
-                                '
-                                Dim CSPointer As Integer = cpCore.db.cs_insertRecord("Library File Log")
-                                If cpCore.db.cs_ok(CSPointer) Then
-                                    Call cpCore.db.cs_set(CSPointer, "FileID", downloadId)
-                                    Call cpCore.db.cs_set(CSPointer, "VisitId", cpCore.authContext.visit.ID)
-                                    Call cpCore.db.cs_set(CSPointer, "MemberID", cpCore.authContext.user.ID)
+                            ' -- lookup record and set clicks
+                            Dim file As Models.Entity.libraryFilesModel = Models.Entity.libraryFilesModel.create(cpCore, downloadId)
+                            If (file IsNot Nothing) Then
+                                file.Clicks += 1
+                                file.save(cpCore)
+                                If file.Filename <> "" Then
+                                    '
+                                    ' -- create log entry
+                                    Dim log As Models.Entity.libraryFileLogModel = Models.Entity.libraryFileLogModel.add(cpCore)
+                                    If (log IsNot Nothing) Then
+                                        log.FileID = file.id
+                                        log.VisitID = cpCore.authContext.visit.ID
+                                        log.MemberID = cpCore.authContext.user.ID
+                                    End If
+                                    '
+                                    ' -- and go
+                                    Dim link As String = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(link)
+                                    Call cpCore.webServer.redirect(link, "Redirecting because the active download request variable is set to a valid Library Files record. Library File Log has been appended.", False)
                                 End If
-                                Call cpCore.db.cs_Close(CSPointer)
-                                '
-                                ' ----- and go
-                                '
-                                Call cpCore.webServer.redirect(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, link), "Redirecting because the active download request variable is set to a valid Library Files record. Library File Log has been appended.", False)
                             End If
+                            '
                         End If
                     End If
                     '
@@ -670,66 +663,49 @@ Namespace Contensive.Addons.PageManager
                                 '   sample: http://www.a.com/kb/test
                                 '   LinkForwardCriteria = (Sourcelink='http://www.a.com/kb/test')or(Sourcelink='http://www.a.com/kb/test/')
                                 '
-                                Call cpCore.cache_linkForward_load()
-                                If cpCore.cache_linkForward <> "" Then
-                                    If 0 < genericController.vbInstr(1, cpCore.cache_linkForward, "," & cpCore.webServer.requestPathPage & ",", vbTextCompare) Then
-                                        isLinkForward = True
-                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & cpCore.db.encodeSQLText(cpCore.webServer.requestPathPage) & ")"
-                                    ElseIf 0 < genericController.vbInstr(1, cpCore.cache_linkForward, "," & cpCore.webServer.requestPathPage & "/,", vbTextCompare) Then
-                                        isLinkForward = True
-                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & cpCore.db.encodeSQLText(cpCore.webServer.requestPathPage & "/") & ")"
-                                    ElseIf 0 < genericController.vbInstr(1, cpCore.cache_linkForward, "," & LinkNoProtocol & ",", vbTextCompare) Then
-                                        isLinkForward = True
-                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & cpCore.db.encodeSQLText(LinkNoProtocol) & ")"
-                                    ElseIf 0 < genericController.vbInstr(1, cpCore.cache_linkForward, "," & LinkFullPath & ",", vbTextCompare) Then
-                                        isLinkForward = True
-                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & cpCore.db.encodeSQLText(LinkFullPath) & ")"
-                                    ElseIf 0 < genericController.vbInstr(1, cpCore.cache_linkForward, "," & LinkFullPathNoSlash & ",", vbTextCompare) Then
-                                        isLinkForward = True
-                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & cpCore.db.encodeSQLText(LinkFullPathNoSlash) & ")"
-                                    End If
-                                    If isLinkForward Then
+                                LinkForwardCriteria = "(active<>0)" _
+                                    & "and" _
+                                    & "(SourceLink=" & cpCore.db.encodeSQLText(cpCore.webServer.requestPathPage) & ")" _
+                                    & "or(SourceLink=" & cpCore.db.encodeSQLText(LinkNoProtocol) & ")" _
+                                    & "or(SourceLink=" & cpCore.db.encodeSQLText(LinkFullPath) & ")" _
+                                    & "or(SourceLink=" & cpCore.db.encodeSQLText(LinkFullPathNoSlash) & ")" _
+                                    & ")"
+                                isLinkForward = False
+                                Sql = cpCore.db.GetSQLSelect("", "ccLinkForwards", "ID,DestinationLink,Viewings,GroupID", LinkForwardCriteria, "ID", , 1)
+                                CSPointer = cpCore.db.cs_openSql(Sql)
+                                If cpCore.db.cs_ok(CSPointer) Then
+                                    '
+                                    ' Link Forward found - update count
+                                    '
+                                    Dim tmpLink As String
+                                    Dim GroupID As Integer
+                                    Dim groupName As String
+                                    '
+                                    IsInLinkForwardTable = True
+                                    Viewings = cpCore.db.cs_getInteger(CSPointer, "Viewings") + 1
+                                    Sql = "update ccLinkForwards set Viewings=" & Viewings & " where ID=" & cpCore.db.cs_getInteger(CSPointer, "ID")
+                                    Call cpCore.db.executeSql(Sql)
+                                    tmpLink = cpCore.db.cs_getText(CSPointer, "DestinationLink")
+                                    If tmpLink <> "" Then
                                         '
-                                        ' if match, go look it up and verify all OK
+                                        ' Valid Link Forward (without link it is just a record created by the autocreate function
                                         '
-                                        isLinkForward = False
-                                        Sql = cpCore.db.GetSQLSelect("", "ccLinkForwards", "ID,DestinationLink,Viewings,GroupID", LinkForwardCriteria, "ID", , 1)
-                                        CSPointer = cpCore.db.cs_openSql(Sql)
-                                        If cpCore.db.cs_ok(CSPointer) Then
-                                            '
-                                            ' Link Forward found - update count
-                                            '
-                                            Dim tmpLink As String
-                                            Dim GroupID As Integer
-                                            Dim groupName As String
-                                            '
-                                            IsInLinkForwardTable = True
-                                            Viewings = cpCore.db.cs_getInteger(CSPointer, "Viewings") + 1
-                                            Sql = "update ccLinkForwards set Viewings=" & Viewings & " where ID=" & cpCore.db.cs_getInteger(CSPointer, "ID")
-                                            Call cpCore.db.executeSql(Sql)
-                                            tmpLink = cpCore.db.cs_getText(CSPointer, "DestinationLink")
-                                            If tmpLink <> "" Then
-                                                '
-                                                ' Valid Link Forward (without link it is just a record created by the autocreate function
-                                                '
-                                                isLinkForward = True
-                                                tmpLink = cpCore.db.cs_getText(CSPointer, "DestinationLink")
-                                                GroupID = cpCore.db.cs_getInteger(CSPointer, "GroupID")
-                                                If GroupID <> 0 Then
-                                                    groupName = cpCore.group_GetGroupName(GroupID)
-                                                    If groupName <> "" Then
-                                                        Call cpCore.group_AddGroupMember(groupName)
-                                                    End If
-                                                End If
-                                                If tmpLink <> "" Then
-                                                    RedirectLink = tmpLink
-                                                    RedirectReason = "Redirecting because the URL is a valid Link Forward entry."
-                                                End If
+                                        isLinkForward = True
+                                        tmpLink = cpCore.db.cs_getText(CSPointer, "DestinationLink")
+                                        GroupID = cpCore.db.cs_getInteger(CSPointer, "GroupID")
+                                        If GroupID <> 0 Then
+                                            groupName = cpCore.group_GetGroupName(GroupID)
+                                            If groupName <> "" Then
+                                                Call cpCore.group_AddGroupMember(groupName)
                                             End If
                                         End If
-                                        Call cpCore.db.cs_Close(CSPointer)
+                                        If tmpLink <> "" Then
+                                            RedirectLink = tmpLink
+                                            RedirectReason = "Redirecting because the URL Is a valid Link Forward entry."
+                                        End If
                                     End If
                                 End If
+                                Call cpCore.db.cs_Close(CSPointer)
                                 '
                                 If (RedirectLink = "") And Not isLinkForward Then
                                     '
@@ -780,7 +756,7 @@ Namespace Contensive.Addons.PageManager
                                                 cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
                                                 Return cpCore.htmlDoc.docBuffer
                                             Else
-                                                Call cpCore.webServer.redirect(cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, Filename), "favicon request", False)
+                                                Call cpCore.webServer.redirect(cpCore.getCdnFileLink(Filename), "favicon request", False)
                                                 cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
                                                 Return cpCore.htmlDoc.docBuffer
                                             End If
@@ -803,7 +779,7 @@ Namespace Contensive.Addons.PageManager
                                                 Content = "User-agent: *" & vbCrLf & "Disallow: /admin/" & vbCrLf & "Disallow: /images/"
                                                 Call cpCore.appRootFiles.saveFile(Filename, Content)
                                             End If
-                                            Content = Content & cpCore.addonCache.addonCache.robotsTxt
+                                            Content = Content & cpCore.addonLegacyCache.addonCache.robotsTxt
                                             Call cpCore.webServer.setResponseContentType("text/plain")
                                             Call cpCore.htmlDoc.writeAltBuffer(Content)
                                             cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
@@ -829,7 +805,7 @@ Namespace Contensive.Addons.PageManager
                                         '
                                         IsPageNotFound = True
                                         PageNotFoundSource = cpCore.webServer.requestPathPage
-                                        PageNotFoundReason = "The page could not be displayed because the URL is not a valid page, Link Forward, Link Alias or RemoteMethod."
+                                        PageNotFoundReason = "The page could Not be displayed because the URL Is Not a valid page, Link Forward, Link Alias Or RemoteMethod."
                                     End If
                                 End If
                             End If
@@ -870,7 +846,7 @@ Namespace Contensive.Addons.PageManager
                                     ' -- already encoded
                                     'Copy = EncodeContentForWeb(Copy, "copy content", 0, "", 0)
                                     Copy = "" _
-                                            & cpCore.main_docType _
+                                            & cpCore.siteProperties.docTypeDeclaration() _
                                             & vbCrLf & "<html>" _
                                             & cr & "<head>" _
                                             & genericController.kmaIndent(cpCore.main_GetHTMLHead()) _
@@ -916,7 +892,7 @@ Namespace Contensive.Addons.PageManager
                         '
                         ' build doc
                         '
-                        returnHtml = cpCore.main_assembleHtmlDoc(cpCore.main_docType, htmlHead, bodyTag, cpCore.responseBuffer & htmlBody)
+                        returnHtml = cpCore.main_assembleHtmlDoc(cpCore.siteProperties.docTypeDeclaration(), htmlHead, bodyTag, cpCore.responseBuffer & htmlBody)
                     End If
                 End If
                 '
@@ -1018,7 +994,7 @@ Namespace Contensive.Addons.PageManager
                             '
                             ' new way -- if a (real) 404 page is received, just convert this hit to the page-not-found page, do not redirect to it
                             '
-                            Call cpCore.log_appendLogPageNotFound(cpCore.webServer.requestLinkSource)
+                            Call logController.log_appendLogPageNotFound(cpCore, cpCore.webServer.requestLinkSource)
                             Call cpCore.webServer.setResponseStatus("404 Not Found")
                             cpCore.docProperties.setProperty("bid", cpCore.pages.main_GetPageNotFoundPageId())
                             'Call main_mergeInStream("bid=" & main_GetPageNotFoundPageId())
@@ -1325,7 +1301,7 @@ Namespace Contensive.Addons.PageManager
                         Call cpCore.htmlDoc.main_AddEndOfBodyJavascript2(genericController.encodeText(cpCore.pages.cache_siteSection(SSC_JSEndBody, Ptr)), "site section")
                         JSFilename = genericController.encodeText(cpCore.pages.cache_siteSection(SSC_JSFilename, Ptr))
                         If JSFilename <> "" Then
-                            JSFilename = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
+                            JSFilename = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(JSFilename)
                             Call cpCore.htmlDoc.main_AddHeadScriptLink(JSFilename, "site section")
                         End If
                     End If
@@ -1343,7 +1319,7 @@ Namespace Contensive.Addons.PageManager
                         '
                         ' Section not found, assume Landing Page
                         '
-                        Call cpCore.log_appendLogPageNotFound(cpCore.webServer.requestLinkSource)
+                        Call logController.log_appendLogPageNotFound(cpCore, cpCore.webServer.requestLinkSource)
                         'Call main_LogPageNotFound(main_ServerLink)
                         cpCore.pages.pageManager_RedirectBecausePageNotFound = True
                         cpCore.pages.pageManager_RedirectReason = "The page could not be found because the section specified was not found. The section ID is [" & SectionID & "]. This section may have been deleted or marked inactive."
@@ -1361,7 +1337,7 @@ Namespace Contensive.Addons.PageManager
                         Call cpCore.htmlDoc.main_AddEndOfBodyJavascript2(genericController.encodeText(cpCore.pages.cache_siteSection(SSC_JSEndBody, Ptr)), "site section")
                         JSFilename = genericController.encodeText(cpCore.pages.cache_siteSection(SSC_JSFilename, Ptr))
                         If JSFilename <> "" Then
-                            JSFilename = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
+                            JSFilename = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(JSFilename)
                             Call cpCore.htmlDoc.main_AddHeadScriptLink(JSFilename, "site section")
                         End If
                     End If
@@ -1377,7 +1353,7 @@ Namespace Contensive.Addons.PageManager
                             ' Root Page needs to be auto created
                             ' OK to create page here because section has a good record with a 0 RootPageID (this is not AutoHomeCreate)
                             '
-                            rootPageId = cpCore.main_CreatePageGetID(SectionName, "Page Content", SystemMemberID, "")
+                            rootPageId = cpCore.pages.main_CreatePageGetID(SectionName, "Page Content", SystemMemberID, "")
                             Call cpCore.db.executeSql("update ccsections set RootPageID=" & rootPageId & " where id=" & SectionID)
                             Call cpCore.pages.pageManager_cache_siteSection_clear()
                             cpCore.htmlDoc.main_AdminWarning = "<p>This page was created automatically because the section [" & SectionName & "] was requested, and it did not reference a page. Use the links below to edit the new page.</p>"
@@ -1411,7 +1387,7 @@ Namespace Contensive.Addons.PageManager
                     '------------------------------------------------------------------------------------
                     '
                     Copy = "" _
-                    & cpCore.main_docType _
+                    & cpCore.siteProperties.docTypeDeclaration() _
                     & vbCrLf & "<html>" _
                     & cr & "<body>" _
                     & cr2 & "<p style=""text-align:center;margin-top:100px;"">The page you requested could not be found and no landing page is configured for this domain.</p>" _
@@ -1484,7 +1460,7 @@ Namespace Contensive.Addons.PageManager
                             Call cpCore.htmlDoc.main_AddEndOfBodyJavascript2(cpCore.db.cs_getText(CSSection, "JSEndBody"), "site section")
                             JSFilename = cpCore.db.cs_getText(CSSection, "JSFilename")
                             If JSFilename <> "" Then
-                                JSFilename = cpCore.webServer.webServerIO_requestPage & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
+                                JSFilename = cpCore.webServer.webServerIO_requestPage & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(JSFilename)
                                 Call cpCore.htmlDoc.main_AddHeadScriptLink(JSFilename, "site section")
                             End If
                         End If
@@ -1507,9 +1483,9 @@ Namespace Contensive.Addons.PageManager
                 'hint = "5"
                 If SectionContentID = 0 And RootPageContentName = "" Then
                     RootPageContentName = "Page Content"
-                    SectionContentID = cpCore.main_GetContentID(RootPageContentName)
+                    SectionContentID = cpCore.metaData.getContentId(RootPageContentName)
                 ElseIf SectionContentID = 0 Then
-                    SectionContentID = cpCore.main_GetContentID(RootPageContentName)
+                    SectionContentID = cpCore.metaData.getContentId(RootPageContentName)
                 Else
                     RootPageContentName = cpCore.metaData.getContentNameByID(SectionContentID)
                 End If
@@ -1552,7 +1528,7 @@ Namespace Contensive.Addons.PageManager
                             ' ----- Use the structure to Calculate the Template Link from the loaded content
                             '
                             If cpCore.pages.currentNavigationStructure = "" Then
-                                Call cpCore.log_appendLogPageNotFound(cpCore.webServer.requestLinkSource)
+                                Call logController.log_appendLogPageNotFound(cpCore, cpCore.webServer.requestLinkSource)
                                 cpCore.pages.pageManager_RedirectBecausePageNotFound = True
                                 cpCore.pages.pageManager_RedirectReason = "Redirecting because the page selected could not be found."
                                 cpCore.pages.redirectLink = cpCore.pages.main_ProcessPageNotFound_GetLink(cpCore.pages.pageManager_RedirectReason, , , PageID, SectionID)
@@ -1611,11 +1587,11 @@ Namespace Contensive.Addons.PageManager
                                         cpCore.pages.templateReason = "This template [" & cpCore.pages.currentTemplateName & "] was used because it is selected by the current section [" & cpCore.pages.currentSectionName & "]."
                                     End If
                                 End If
-                                If (templateId = 0) And (cpCore.domains.domainDetails.defaultTemplateId <> 0) Then
+                                If (templateId = 0) And (cpCore.domainLegacyCache.domainDetails.defaultTemplateId <> 0) Then
                                     '
                                     ' try domain's default template
                                     '
-                                    templateId = cpCore.domains.domainDetails.defaultTemplateId
+                                    templateId = cpCore.domainLegacyCache.domainDetails.defaultTemplateId
                                     TCPtr = cpCore.pages.pageManager_cache_pageTemplate_getPtr(templateId)
                                     If TCPtr < 0 Then
                                         templateId = 0
@@ -1676,7 +1652,7 @@ Namespace Contensive.Addons.PageManager
                                 cpCore.pages.templateBodyTag = genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_BodyTag, TCPtr))
                                 JSFilename = genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_JSInHeadFilename, TCPtr))
                                 If JSFilename <> "" Then
-                                    JSFilename = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
+                                    JSFilename = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(JSFilename)
                                     Call cpCore.htmlDoc.main_AddHeadScriptLink(JSFilename, "template")
                                 End If
                                 '
@@ -1686,7 +1662,7 @@ Namespace Contensive.Addons.PageManager
                                     If genericController.vbLCase(Right(StylesFilename, 4)) <> ".css" Then
                                         Throw New ApplicationException("Unexpected exception") ' throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError15("Template [" & pageManager_TemplateName & "] StylesFilename is not a '.css' file, and will not display correct. Check that the field is setup as a CSSFile.", "pageManager_GetHtmlBody_GetSection")
                                     Else
-                                        cpCore.htmlDoc.main_MetaContent_TemplateStyleSheetTag = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, StylesFilename) & """ >"
+                                        cpCore.htmlDoc.main_MetaContent_TemplateStyleSheetTag = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(StylesFilename) & """ >"
                                     End If
                                 End If
                                 '
@@ -1826,7 +1802,7 @@ Namespace Contensive.Addons.PageManager
                                     '
                                     If cpCore.pages.redirectLink = "" Then
                                         templatedomainIdList = genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_DomainIdList, TCPtr))
-                                        If (cpCore.domains.domainDetails.id = 0) Then
+                                        If (cpCore.domainLegacyCache.domainDetails.id = 0) Then
                                             '
                                             ' current domain not recognized or default, use current
                                             '
@@ -1834,7 +1810,7 @@ Namespace Contensive.Addons.PageManager
                                             '
                                             ' current template has no domain preference, use current
                                             '
-                                        ElseIf (InStr(1, "," & templatedomainIdList & ",", "," & cpCore.domains.domainDetails.id & ",") <> 0) Then
+                                        ElseIf (InStr(1, "," & templatedomainIdList & ",", "," & cpCore.domainLegacyCache.domainDetails.id & ",") <> 0) Then
                                             '
                                             ' current domain is in the allowed c.domains list for this template, use it
                                             '

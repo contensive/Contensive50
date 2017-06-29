@@ -474,7 +474,7 @@ leak200:
                         Case AdminFormDownloads
                             ContentCell = (GetForm_Downloads())
                         Case AdminformRSSControl
-                            Call cpCore.webServer.redirect("?cid=" & cpCore.main_GetContentID("RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.", False)
+                            Call cpCore.webServer.redirect("?cid=" & cpCore.metaData.getContentId("RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.", False)
                         Case AdminFormImportWizard
                             ContentCell = cpCore.addon.execute_legacy4(ImportWizardGuid, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
                         Case AdminFormCustomReports
@@ -995,7 +995,7 @@ ErrorTrap:
                                     Call cpCore.workflow.publishEdit(ContentName, RecordID)
                                     Call cpCore.main_ProcessSpecialCaseAfterSave(False, ContentName, RecordID, "", 0, UseContentWatchLink)
                                     Call cpCore.cache.invalidateObject(cacheController.getDbRecordCacheName(adminContent.ContentTableName, "id", RecordID.ToString()))
-                                    Call cpCore.db.executeSql("delete from ccAuthoringControls where recordid=" & RecordID & " and Contentid=" & cpCore.main_GetContentID(ContentName))
+                                    Call cpCore.db.executeSql("delete from ccAuthoringControls where recordid=" & RecordID & " and Contentid=" & cpCore.metaData.getContentId(ContentName))
                                 End If
                             Next
                         Case AdminActionWorkflowPublishApproved
@@ -1230,7 +1230,7 @@ ErrorTrap:
                                     Call cpCore.main_ProcessSpecialCaseAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                                 End If
                                 If Not cpCore.error_IsUserError Then
-                                    If Not cpCore.IsWithinContent(editRecord.contentControlId, cpCore.main_GetContentID("Group Email")) Then
+                                    If Not cpCore.IsWithinContent(editRecord.contentControlId, cpCore.metaData.getContentId("Group Email")) Then
                                         Call cpCore.error_AddUserError("The send action only supports Group Email.")
                                     Else
                                         CS = cpCore.csOpen("Group Email", editRecord.id)
@@ -1263,7 +1263,7 @@ ErrorTrap:
                                 ' no save, page was read only - Call ProcessActionSave
                                 Call LoadEditRecord(adminContent, editRecord)
                                 If Not cpCore.error_IsUserError Then
-                                    If Not cpCore.IsWithinContent(editRecord.contentControlId, cpCore.main_GetContentID("Conditional Email")) Then
+                                    If Not cpCore.IsWithinContent(editRecord.contentControlId, cpCore.metaData.getContentId("Conditional Email")) Then
                                         Call cpCore.error_AddUserError("The deactivate action only supports Conditional Email.")
                                     Else
                                         CS = cpCore.csOpen("Conditional Email", editRecord.id)
@@ -1291,7 +1291,7 @@ ErrorTrap:
                                     Call cpCore.main_ProcessSpecialCaseAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                                 End If
                                 If Not cpCore.error_IsUserError Then
-                                    If Not cpCore.IsWithinContent(editRecord.contentControlId, cpCore.main_GetContentID("Conditional Email")) Then
+                                    If Not cpCore.IsWithinContent(editRecord.contentControlId, cpCore.metaData.getContentId("Conditional Email")) Then
                                         Call cpCore.error_AddUserError("The activate action only supports Conditional Email.")
                                     Else
                                         CS = cpCore.csOpen("Conditional Email", editRecord.id)
@@ -2773,10 +2773,10 @@ ErrorTrap:
                                         ' new record
                                         '
                                         If AdminContentWorkflowAuthoring Then
-                                            SQLUnique = "SELECT ID,EditSourceID FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & cpCore.db.EncodeSQL(ResponseFieldValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.content_getContentControlCriteria(adminContent.Name) & ")"
+                                            SQLUnique = "SELECT ID,EditSourceID FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & cpCore.db.EncodeSQL(ResponseFieldValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.metaData.content_getContentControlCriteria(adminContent.Name) & ")"
                                             SQLUnique = SQLUnique & "And((EditArchive Is null)Or(EditArchive=0))"
                                         Else
-                                            SQLUnique = "SELECT ID,0 as editsourceid FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & cpCore.db.EncodeSQL(ResponseFieldValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.content_getContentControlCriteria(adminContent.Name) & ")"
+                                            SQLUnique = "SELECT ID,0 as editsourceid FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & cpCore.db.EncodeSQL(ResponseFieldValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.metaData.content_getContentControlCriteria(adminContent.Name) & ")"
                                         End If
                                     Else
                                         '
@@ -2786,10 +2786,10 @@ ErrorTrap:
                                             '
                                             ' check for another edit record that matches this record -or- a live record that matches it
                                             '
-                                            SQLUnique = "SELECT ID,EditSourceID FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & cpCore.db.EncodeSQL(ResponseFieldValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.content_getContentControlCriteria(adminContent.Name) & ")"
+                                            SQLUnique = "SELECT ID,EditSourceID FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & cpCore.db.EncodeSQL(ResponseFieldValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.metaData.content_getContentControlCriteria(adminContent.Name) & ")"
                                             SQLUnique = SQLUnique & "And( (EditSourceID Is null) Or ((EditSourceID<>" & editRecord.id & ")And((EditArchive Is null)Or(EditArchive=0))))"
                                         Else
-                                            SQLUnique = "SELECT ID,0 as editsourceid FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & cpCore.db.EncodeSQL(ResponseFieldValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.content_getContentControlCriteria(adminContent.Name) & ")"
+                                            SQLUnique = "SELECT ID,0 as editsourceid FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & cpCore.db.EncodeSQL(ResponseFieldValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.metaData.content_getContentControlCriteria(adminContent.Name) & ")"
                                         End If
                                         SQLUnique = SQLUnique & "And(ID<>" & editRecord.id & ")"
                                     End If
@@ -3108,7 +3108,7 @@ ErrorTrap:
                             '
                             ' Update the Link Aliases
                             '
-                            Call cpCore.main_AddLinkAlias(linkAlias, editRecord.id, "", OverRideDuplicate, DupCausesWarning)
+                            Call cpCore.app_addLinkAlias2(linkAlias, editRecord.id, "", OverRideDuplicate, DupCausesWarning)
                         End If
                     End If
                     'End If
@@ -3704,7 +3704,7 @@ ErrorTrap:
             Dim AllowMarkReviewed As Boolean
             '
             If Not AdminContentWorkflowAuthoring Then
-                IsPageContent = cpCore.IsWithinContent(adminContent.Id, cpCore.main_GetContentID("Page Content"))
+                IsPageContent = cpCore.IsWithinContent(adminContent.Id, cpCore.metaData.getContentId("Page Content"))
                 If cpCore.main_IsContentFieldSupported(adminContent.Name, "parentid") Then
                     CS = cpCore.db.cs_open(adminContent.Name, "parentid=" & editRecord.id, , , , , , "ID")
                     HasChildRecords = cpCore.db.cs_ok(CS)
@@ -3712,7 +3712,7 @@ ErrorTrap:
                 End If
             End If
             IncludeCDefReload = (LCase(adminContent.ContentTableName) = "cccontent") Or (LCase(adminContent.ContentTableName) = "ccdatasources") Or (LCase(adminContent.ContentTableName) = "cctables") Or (LCase(adminContent.ContentTableName) = "ccfields")
-            AllowMarkReviewed = cpCore.main_IsSQLTableField("default", adminContent.ContentTableName, "DateReviewed")
+            AllowMarkReviewed = cpCore.db.isSQLTableField("default", adminContent.ContentTableName, "DateReviewed")
             '
             GetForm_Edit_ButtonBar = Adminui.GetEditButtonBar2(MenuDepth, AllowDelete And editRecord.AllowDelete, editRecord.AllowCancel, (allowSave And editRecord.AllowSave), (SpellCheckSupported And (Not SpellCheckRequest)), editRecord.AllowPublish, editRecord.AllowAbort, editRecord.AllowSubmit, editRecord.AllowApprove, (AllowAdd And adminContent.AllowAdd And editRecord.AllowInsert), IncludeCDefReload, HasChildRecords, IsPageContent, AllowMarkReviewed, AllowRefresh, (allowSave And editRecord.AllowSave And (editRecord.id <> 0)))
             'GetForm_Edit_ButtonBar = AdminUI.GetEditButtonBar2( MenuDepth, iAllowDelete And EditRecord.AllowDelete, EditRecord.AllowCancel, (iAllowSave And EditRecord.AllowSave), (SpellCheckSupported And (Not SpellCheckRequest)), EditRecord.AllowPublish, EditRecord.AllowAbort, EditRecord.AllowSubmit, EditRecord.AllowApprove, (AdminContent.allowAdd And EditRecord.AllowInsert), IncludeCDefReload, HasChildRecords, IsPageContent, AllowMarkReviewed)
@@ -4000,7 +4000,7 @@ ErrorTrap:
                 ElseIf IsLandingPageParent Then
                     CustomDescription = "<div>This page is a parent of the default Landing Page for this website. It should not be deleted. You can not mark this record inactive, or use the Publish Date, Expire Date or Archive Date features.</div>"
                 ElseIf IsRootPage Then
-                    CustomDescription = "<div>This page is a Root Page. A Root Page is the primary page of a section. If you delete or inactivate this page, the section will create a new blank page in its place. If you need to hide or delete a section, <a href=""?af=4&cid=" & cpCore.main_GetContentID("site sections") & "&id=" & RootPageSectionID & """>edit</a> the section record. You can not use the Publish Date, Expire Date or Archive Date features on this page.</div>"
+                    CustomDescription = "<div>This page is a Root Page. A Root Page is the primary page of a section. If you delete or inactivate this page, the section will create a new blank page in its place. If you need to hide or delete a section, <a href=""?af=4&cid=" & cpCore.metaData.getContentId("site sections") & "&id=" & RootPageSectionID & """>edit</a> the section record. You can not use the Publish Date, Expire Date or Archive Date features on this page.</div>"
                 End If
                 '
                 ' ----- Determine TemplateIDForStyles
@@ -4283,8 +4283,8 @@ ErrorTrap:
                         '
                         ' ----- Email table
                         '
-                        SystemEmailCID = cpCore.main_GetContentID("System Email")
-                        ConditionalEmailCID = cpCore.main_GetContentID("Conditional Email")
+                        SystemEmailCID = cpCore.metaData.getContentId("System Email")
+                        ConditionalEmailCID = cpCore.metaData.getContentId("Conditional Email")
                         LastSendTestDate = Date.MinValue
                         If True Then ' 3.4.201" Then
                             AllowEmailSendWithoutTest = (cpCore.siteProperties.getBoolean("AllowEmailSendWithoutTest", False))
@@ -5596,7 +5596,7 @@ ErrorTrap:
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
                                             FieldValueText = genericController.encodeText(FieldValueObject)
-                                            NonEncodedLink = cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, FieldValueText)
+                                            NonEncodedLink = cpCore.webServer.requestDomain & cpCore.getCdnFileLink(FieldValueText)
                                             EncodedLink = genericController.EncodeURL(NonEncodedLink)
                                             EditorString &= (cpCore.htmlDoc.html_GetFormInputHidden(FormFieldLCaseName, ""))
                                             If FieldValueText = "" Then
@@ -5671,7 +5671,7 @@ ErrorTrap:
                                                 '    End If
                                                 'End If
                                                 'EditorString &=  ("&nbsp;[<a TabIndex=-1 href=""?cid=" & cpCore.main_GetContentID("groups") & """ target=""_blank"">" & SelectMessage & "</a>]")
-                                                EditorString &= ("&nbsp;[<a TabIndex=-1 href=""?af=4&cid=" & cpCore.main_GetContentID("people") & "&id=" & FieldValueObject.ToString & """ target=""_blank"">View details in new window</a>]")
+                                                EditorString &= ("&nbsp;[<a TabIndex=-1 href=""?af=4&cid=" & cpCore.metaData.getContentId("people") & "&id=" & FieldValueObject.ToString & """ target=""_blank"">View details in new window</a>]")
                                             End If
                                             EditorString &= WhyReadOnlyMsg
                                             '
@@ -5860,7 +5860,7 @@ ErrorTrap:
                                             If FieldValueText = "" Then
                                                 EditorString &= (cpCore.htmlDoc.html_GetFormInputFile2(FormFieldLCaseName, , "file"))
                                             Else
-                                                NonEncodedLink = cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, FieldValueText)
+                                                NonEncodedLink = cpCore.webServer.requestDomain & cpCore.getCdnFileLink(FieldValueText)
                                                 EncodedLink = genericController.EncodeURL(NonEncodedLink)
                                                 Dim filename As String = ""
                                                 Dim path As String = ""
@@ -5921,12 +5921,12 @@ ErrorTrap:
                                             If FieldValueInteger <> 0 Then
                                                 CSPointer = cpCore.csOpenRecord("people", FieldValueInteger, , , "ID")
                                                 If cpCore.db.cs_ok(CSPointer) Then
-                                                    EditorString &= ("&nbsp;[<a TabIndex=-1 href=""?" & RequestNameAdminForm & "=4&cid=" & cpCore.main_GetContentID("people") & "&id=" & FieldValueObject.ToString & """ target=""_blank"">Details</a>]")
+                                                    EditorString &= ("&nbsp;[<a TabIndex=-1 href=""?" & RequestNameAdminForm & "=4&cid=" & cpCore.metaData.getContentId("people") & "&id=" & FieldValueObject.ToString & """ target=""_blank"">Details</a>]")
                                                 End If
                                                 Call cpCore.db.cs_Close(CSPointer)
                                             End If
                                             GroupName = cpCore.content_GetRecordName("groups", .MemberSelectGroupID)
-                                            EditorString &= ("&nbsp;[<a TabIndex=-1 href=""?cid=" & cpCore.main_GetContentID("groups") & """ target=""_blank"">Select from members of " & GroupName & "</a>]")
+                                            EditorString &= ("&nbsp;[<a TabIndex=-1 href=""?cid=" & cpCore.metaData.getContentId("groups") & """ target=""_blank"">Select from members of " & GroupName & "</a>]")
                                             's.Add( "</span></nobr></td>")
                                             '
                                         Case FieldTypeIdManyToMany
@@ -7735,7 +7735,7 @@ ErrorTrap:
                 & "<td class=""ccAdminEditField"" colspan=2>" & SpanClassAdminNormal & s & "</span></td>" _
                 & "</tr><tr>" _
                 & "<td class=""ccAdminEditCaption"">&nbsp;</td>" _
-                & "<td class=""ccAdminEditField"" colspan=2>" & SpanClassAdminNormal & "[<a href=?cid=" & cpCore.main_GetContentID("Groups") & " target=_blank>Manage Groups</a>]</span></td>" _
+                & "<td class=""ccAdminEditField"" colspan=2>" & SpanClassAdminNormal & "[<a href=?cid=" & cpCore.metaData.getContentId("Groups") & " target=_blank>Manage Groups</a>]</span></td>" _
                 & "</tr>"
             s = Adminui.EditTableOpen & s & Adminui.EditTableClose
             s = Adminui.GetEditPanel((Not allowAdminTabs), "Email Rules", "Send email to people in these groups", s)
@@ -7777,7 +7777,7 @@ ErrorTrap:
             End If
             f.Add("<tr>")
             f.Add("<td class=""ccAdminEditCaption"">&nbsp;</td>")
-            f.Add("<td class=""ccAdminEditCaption"" colspan=2>" & SpanClassAdminNormal & "[<a href=?cid=" & cpCore.main_GetContentID("Groups") & " target=_blank>Manage Groups</a>]</span></td>")
+            f.Add("<td class=""ccAdminEditCaption"" colspan=2>" & SpanClassAdminNormal & "[<a href=?cid=" & cpCore.metaData.getContentId("Groups") & " target=_blank>Manage Groups</a>]</span></td>")
             f.Add("</tr>")
             GetForm_Edit_EmailRules = Adminui.GetEditPanel((Not allowAdminTabs), "Email Rules", "Send email to people in these groups", Adminui.EditTableOpen & f.Text & Adminui.EditTableClose)
             EditSectionPanelCount = EditSectionPanelCount + 1
@@ -7815,7 +7815,7 @@ ErrorTrap:
                 & "<td class=""ccAdminEditField"" colspan=2>" & SpanClassAdminNormal & s & "</span></td>" _
                 & "</tr><tr>" _
                 & "<td class=""ccAdminEditCaption"">&nbsp;</td>" _
-                & "<td class=""ccAdminEditField"" colspan=2>" & SpanClassAdminNormal & "[<a href=?cid=" & cpCore.main_GetContentID("Topics") & " target=_blank>Manage Topics</a>]</span></td>" _
+                & "<td class=""ccAdminEditField"" colspan=2>" & SpanClassAdminNormal & "[<a href=?cid=" & cpCore.metaData.getContentId("Topics") & " target=_blank>Manage Topics</a>]</span></td>" _
                 & "</tr>"
             s = Adminui.EditTableOpen & s & Adminui.EditTableClose
             s = Adminui.GetEditPanel((Not allowAdminTabs), "Email Rules", "Send email to people in these groups", s)
@@ -7943,8 +7943,8 @@ ErrorTrap:
             '
             ' ----- Gather all the SecondaryContent that associates to the PrimaryContent
             '
-            PeopleContentID = cpCore.main_GetContentID("People")
-            GroupContentID = cpCore.main_GetContentID("Groups")
+            PeopleContentID = cpCore.metaData.getContentId("People")
+            GroupContentID = cpCore.metaData.getContentId("Groups")
             '
             MembershipCount = 0
             MembershipSize = 0
@@ -8058,7 +8058,7 @@ ErrorTrap:
             End If
             f.Add("<tr>")
             f.Add("<td class=""ccAdminEditCaption"">&nbsp;</td>")
-            f.Add("<td class=""ccAdminEditField"">" & SpanClassAdminNormal & "[<a href=?cid=" & cpCore.main_GetContentID("Groups") & " target=_blank>Manage Groups</a>]</span></td>")
+            f.Add("<td class=""ccAdminEditField"">" & SpanClassAdminNormal & "[<a href=?cid=" & cpCore.metaData.getContentId("Groups") & " target=_blank>Manage Groups</a>]</span></td>")
             f.Add("</tr>")
 
             GetForm_Edit_MemberGroups = Adminui.GetEditPanel((Not allowAdminTabs), "Group Membership", "This person is a member of these groups", Adminui.EditTableOpen & f.Text & Adminui.EditTableClose)
@@ -9311,7 +9311,7 @@ ErrorTrap:
             Criteria = "(Active<>0)"
             If MenuContentName <> "" Then
                 'ContentControlCriteria = cpCore.csv_GetContentControlCriteria(MenuContentName)
-                Criteria = Criteria & "AND" & cpCore.content_getContentControlCriteria(MenuContentName)
+                Criteria = Criteria & "AND" & cpCore.metaData.content_getContentControlCriteria(MenuContentName)
             End If
             iParentCriteria = genericController.encodeEmptyText(ParentCriteria, "")
             If cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
@@ -10594,7 +10594,7 @@ ErrorTrap:
                     '
                     ParentContentID = cpCore.docProperties.getInteger("ParentContentID")
                     If ParentContentID = 0 Then
-                        ParentContentID = cpCore.main_GetContentID("Page Content")
+                        ParentContentID = cpCore.metaData.getContentId("Page Content")
                     End If
                     AddAdminMenuEntry = True
                     GroupID = 0
@@ -10620,7 +10620,7 @@ ErrorTrap:
                             & "<div>&nbsp;</div>" _
                             & "<div>Creating content [" & ChildContentName & "] from [" & ParentContentName & "]</div>"
                         Call cpCore.metaData_CreateContentChild(ChildContentName, ParentContentName)
-                        ChildContentID = cpCore.main_GetContentID(ChildContentName)
+                        ChildContentID = cpCore.metaData.getContentId(ChildContentName)
                         '
                         ' Create Group and Rule
                         '
@@ -10714,7 +10714,7 @@ ErrorTrap:
                                 If MenuName = "" Then
                                     MenuName = "Site Content"
                                 End If
-                                Call cpCore.admin_VerifyAdminMenu(MenuName, ChildContentName, ChildContentName, "", ChildContentName, AdminOnly, DeveloperOnly, False)
+                                Call Controllers.appBuilderController.admin_VerifyAdminMenu(cpCore, MenuName, ChildContentName, ChildContentName, "", ChildContentName, AdminOnly, DeveloperOnly, False)
                                 Description = Description _
                                     & "<div>Creating Legacy site menu for [" & ChildContentName & "] under entry [" & MenuName & "].</div>"
                                 cpCore.db.cs_goNext(CS)
@@ -11174,9 +11174,9 @@ ErrorTrap:
             Call cpCore.db.cs_Close(CS)
             '
             If RecordID <> 0 Then
-                EditIcon = "<a href=""?cid=" & cpCore.main_GetContentID(ContentName) & "&id=" & RecordID & "&" & RequestNameAdminForm & "=4"" target=_blank><img src=""/ccLib/images/IconContentEdit.gif"" border=0 alt=""Edit content"" valign=absmiddle></a>"
+                EditIcon = "<a href=""?cid=" & cpCore.metaData.getContentId(ContentName) & "&id=" & RecordID & "&" & RequestNameAdminForm & "=4"" target=_blank><img src=""/ccLib/images/IconContentEdit.gif"" border=0 alt=""Edit content"" valign=absmiddle></a>"
             Else
-                EditIcon = "<a href=""?cid=" & cpCore.main_GetContentID(ContentName) & "&" & RequestNameAdminForm & "=4&" & RequestNameAdminAction & "=2&ad=1&wc=" & genericController.EncodeURL("name=" & CopyName) & """ target=_blank><img src=""/ccLib/images/IconContentEdit.gif"" border=0 alt=""Edit content"" valign=absmiddle></a>"
+                EditIcon = "<a href=""?cid=" & cpCore.metaData.getContentId(ContentName) & "&" & RequestNameAdminForm & "=4&" & RequestNameAdminAction & "=2&ad=1&wc=" & genericController.EncodeURL("name=" & CopyName) & """ target=_blank><img src=""/ccLib/images/IconContentEdit.gif"" border=0 alt=""Edit content"" valign=absmiddle></a>"
             End If
             If Copy = "" Then
                 Copy = "&nbsp;"
@@ -11537,7 +11537,7 @@ ErrorTrap:
                                 If cpCore.db.cs_ok(CS) Then
                                     ContentName = cpCore.metaData.getContentNameByID(ContentID)
                                     TableName = cpCore.GetContentTablename(ContentName)
-                                    Criteria = cpCore.content_getContentControlCriteria(ContentName)
+                                    Criteria = cpCore.metaData.content_getContentControlCriteria(ContentName)
                                     Name = "CSV Download, " & ContentName
                                     Filename = genericController.vbReplace(ContentName, " ", "") & "_" & CStr(genericController.dateToSeconds(cpCore.app_startTime)) & CStr(genericController.GetRandomInteger()) & ".csv"
                                     Call cpCore.db.cs_set(CS, "Name", Name)
@@ -11554,7 +11554,7 @@ ErrorTrap:
                                 If cpCore.db.cs_ok(CS) Then
                                     ContentName = cpCore.metaData.getContentNameByID(ContentID)
                                     TableName = cpCore.GetContentTablename(ContentName)
-                                    Criteria = cpCore.content_getContentControlCriteria(ContentName)
+                                    Criteria = cpCore.metaData.content_getContentControlCriteria(ContentName)
                                     Name = "XML Download, " & ContentName
                                     Filename = genericController.vbReplace(ContentName, " ", "") & "_" & CStr(genericController.dateToSeconds(cpCore.app_startTime)) & CStr(genericController.GetRandomInteger()) & ".xml"
                                     Call cpCore.db.cs_set(CS, "Name", Name)
@@ -11640,7 +11640,7 @@ ErrorTrap:
                         Cells(RowPointer, 2) = cpCore.db.cs_getText(CS, "CreatedByName")
                         Cells(RowPointer, 3) = cpCore.db.cs_getDate(CS, "DateAdded").ToShortDateString
                         If DateCompleted = Date.MinValue Then
-                            RemoteKey = cpCore.main_GetRemoteQueryKey("select DateCompleted,filename,resultMessage from cctasks where id=" & RecordID, "default", 1)
+                            RemoteKey = remoteQueryController.main_GetRemoteQueryKey(cpCore, "select DateCompleted,filename,resultMessage from cctasks where id=" & RecordID, "default", 1)
                             Cell = ""
                             Cell = Cell & vbCrLf & "<div id=""pending" & RowPointer & """>Pending <img src=""/ccLib/images/ajax-loader-small.gif"" width=16 height=16></div>"
                             '
@@ -13432,7 +13432,7 @@ ErrorTrap:
                     ' Sub Content Definitions
                     '
                     SubFilterList = ""
-                    list = cpCore.content_getContentControlCriteria(ContentName)
+                    list = cpCore.metaData.content_getContentControlCriteria(ContentName)
                     If list <> "" Then
                         ListSplit = Split(list, "=")
                         Cnt = UBound(ListSplit) + 1
@@ -14886,7 +14886,7 @@ ErrorTrap:
                                 'Dim CurrentValue As String
                                 'If FieldLookupContentName(FieldPtr) <> "" Then
                                 '    ContentName = FieldLookupContentName(FieldPtr)
-                                '    DataSourceName = cpCore.main_GetContentDataSource(ContentName)
+                                '    DataSourceName = cpCore.metaData.GetContentDataSource(ContentName)
                                 '    TableName = cpCore.main_GetContentTablename(ContentName)
                                 '    SQL = "select distinct Name from " & TableName & " where (name is not null) order by name"
                                 '    CS = cpCore.app.openCsSql_rev(DataSourceName, SQL)
@@ -15132,9 +15132,9 @@ ErrorTrap:
                             '
                             Select Case ExportType
                                 Case 1
-                                    Call cpCore.main_RequestTask("BuildCSV", SQL, ExportName, "Export-" & CStr(cpCore.common_GetRandomLong) & ".csv")
+                                    Call taskSchedulerController.main_RequestTask(cpCore, "BuildCSV", SQL, ExportName, "Export-" & CStr(cpCore.common_GetRandomLong) & ".csv")
                                 Case Else
-                                    Call cpCore.main_RequestTask("BuildXML", SQL, ExportName, "Export-" & CStr(cpCore.common_GetRandomLong) & ".xml")
+                                    Call taskSchedulerController.main_RequestTask(cpCore, "BuildXML", SQL, ExportName, "Export-" & CStr(cpCore.common_GetRandomLong) & ".xml")
                             End Select
                             '
                             Content = "" _
@@ -15851,14 +15851,14 @@ ErrorTrap:
                         '
                         ' Add the link alias
                         '
-                        Call cpCore.main_AddLinkAlias(linkAlias, cpCore.db.cs_getInteger(CS, "ID"), "", False, True)
+                        Call cpCore.app_addLinkAlias2(linkAlias, cpCore.db.cs_getInteger(CS, "ID"), "", False, True)
                     Else
                         '
                         ' Add the name
                         '
                         linkAlias = cpCore.db.cs_getText(CS, "name")
                         If linkAlias <> "" Then
-                            Call cpCore.main_AddLinkAlias(linkAlias, cpCore.db.cs_getInteger(CS, "ID"), "", False, False)
+                            Call cpCore.app_addLinkAlias2(linkAlias, cpCore.db.cs_getInteger(CS, "ID"), "", False, False)
                         End If
                     End If
                     '
@@ -17089,7 +17089,7 @@ ErrorTrap:
                 With IndexConfig
                     If .SubCDefID > 0 Then
                         ContentName = cpCore.metaData.getContentNameByID(.SubCDefID)
-                        return_SQLWhere &= "AND(" & cpCore.content_getContentControlCriteria(ContentName) & ")"
+                        return_SQLWhere &= "AND(" & cpCore.metaData.content_getContentControlCriteria(ContentName) & ")"
                     End If
                 End With
                 '
@@ -17134,7 +17134,7 @@ ErrorTrap:
                     '
                     ' This person can see all the records
                     '
-                    return_SQLWhere &= "AND(" & cpCore.content_getContentControlCriteria(adminContent.Name) & ")"
+                    return_SQLWhere &= "AND(" & cpCore.metaData.content_getContentControlCriteria(adminContent.Name) & ")"
                 Else
                     '
                     ' Limit the Query to what they can see

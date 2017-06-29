@@ -5297,6 +5297,87 @@ ErrorTrap:
         Public Shared Function convertDateToDayPtr(srcDate As Date) As Integer
             Return CInt(DateDiff(DateInterval.Day, srcDate, Date.MinValue))
         End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Encodes an argument in an Addon OptionString (QueryString) for all non-allowed characters
+        ''' Arg0,Arg1,Arg2,Arg3,Name=Value&Name=VAlue[Option1|Option2]
+        ''' call this before parsing them together
+        ''' call decodeAddonOptionArgument after parsing them apart
+        ''' </summary>
+        ''' <param name="Arg"></param>
+        ''' <returns></returns>
+        '------------------------------------------------------------------------------------------------------------
+        '
+        Friend Shared Function encodeLegacyAddonOptionArgument(ByVal Arg As String) As String
+            Dim a As String = ""
+            If Not String.IsNullOrEmpty(Arg) Then
+                a = Arg
+                a = genericController.vbReplace(a, vbCrLf, "#0013#")
+                a = genericController.vbReplace(a, vbLf, "#0013#")
+                a = genericController.vbReplace(a, vbCr, "#0013#")
+                a = genericController.vbReplace(a, "&", "#0038#")
+                a = genericController.vbReplace(a, "=", "#0061#")
+                a = genericController.vbReplace(a, ",", "#0044#")
+                a = genericController.vbReplace(a, """", "#0034#")
+                a = genericController.vbReplace(a, "'", "#0039#")
+                a = genericController.vbReplace(a, "|", "#0124#")
+                a = genericController.vbReplace(a, "[", "#0091#")
+                a = genericController.vbReplace(a, "]", "#0093#")
+                a = genericController.vbReplace(a, ":", "#0058#")
+            End If
+            Return a
+        End Function
+        '
+        '====================================================================================================
+        '
+        Public Shared Function createGuid() As String
+            Return "{" & Guid.NewGuid().ToString & "}"
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Returns true if the argument is a string in guid compatible format
+        ''' </summary>
+        ''' <param name="guid"></param>
+        ''' <returns></returns>
+        Public Shared Function common_isGuid(guid As String) As Boolean
+            Dim returnIsGuid As Boolean = False
+            Try
+                returnIsGuid = (Len(guid) = 38) And (Left(guid, 1) = "{") And (Right(guid, 1) = "}")
+            Catch ex As Exception
+                Throw (ex)
+            End Try
+            Return returnIsGuid
+        End Function
+        '
+        '========================================================================
+        ' main_encodeCookieName
+        '   replace invalid cookie characters with %hex
+        '========================================================================
+        '
+        Public Shared Function main_encodeCookieName(ByVal Source As String) As String
+            Dim result As String = ""
+
+            Dim SourcePointer As Integer
+            Dim Character As String
+            Dim localSource As String
+            '
+            If Source <> "" Then
+                localSource = Source
+                For SourcePointer = 1 To Len(localSource)
+                    Character = Mid(localSource, SourcePointer, 1)
+                    If genericController.vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_!*()", Character, vbTextCompare) <> 0 Then
+                        result = result & Character
+                    Else
+                        result = result & "%" & Hex(Asc(Character))
+                    End If
+                Next
+            End If
+            '
+            Return result
+        End Function
+
     End Class
 
 End Namespace

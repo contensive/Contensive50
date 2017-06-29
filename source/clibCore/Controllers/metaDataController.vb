@@ -8,7 +8,7 @@ Imports Contensive.Core.Models.Entity
 Imports Contensive.Core.Controllers.genericController
 
 Namespace Contensive.Core.Controllers
-    Public Class cdefController
+    Public Class metaDataController
         Implements IDisposable
         '
         '------------------------------------------------------------------------------------------------------------------------
@@ -2230,6 +2230,32 @@ ErrorTrap:
                 cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnOk
+        End Function
+        '
+        '========================================================================
+        ' Get a tables first ContentID from Tablename
+        '========================================================================
+        '
+        Public Function GetContentIDByTablename(TableName As String) As Integer
+            '
+            Dim SQL As String
+            Dim CS As Integer
+            '
+            GetContentIDByTablename = -1
+            If TableName <> "" Then
+                SQL = "select ContentControlID from " & TableName & " where contentcontrolid is not null order by contentcontrolid;"
+                CS = cpCore.db.cs_openCsSql_rev("Default", SQL, 1, 1)
+                If cpCore.db.cs_ok(CS) Then
+                    GetContentIDByTablename = cpCore.db.cs_getInteger(CS, "ContentControlID")
+                End If
+                Call cpCore.db.cs_Close(CS)
+            End If
+        End Function
+        '
+        '========================================================================
+        '
+        Public Function content_getContentControlCriteria(ByVal ContentName As String) As String
+            Return getCdef(ContentName).ContentControlCriteria
         End Function
 
 

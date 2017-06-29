@@ -114,10 +114,7 @@ Namespace Contensive.Core
         '
         Public Overrides ReadOnly Property MultiDomainMode() As Boolean 'Inherits BaseClasses.CPSiteBaseClass.MultiDomainMode
             Get
-                MultiDomainMode = False
-                If genericController.vbInstr(1, "," & cpCore.app_domainList & ",", ",*,", vbTextCompare) <> 0 Then
-                    MultiDomainMode = True
-                End If
+                Return False
             End Get
         End Property
         '
@@ -206,7 +203,7 @@ Namespace Contensive.Core
         '
         Public Overrides ReadOnly Property DomainList() As String 'Inherits BaseClasses.CPSiteBaseClass.DomainList
             Get
-                Return cpCore.app_domainList
+                Return String.Join(",", cpCore.serverConfig.appConfig.domainList)
             End Get
         End Property
         '
@@ -295,11 +292,7 @@ Namespace Contensive.Core
         End Sub
 
         Public Overrides Sub RequestTask(ByVal Command As String, ByVal SQL As String, ByVal ExportName As String, ByVal Filename As String) 'Inherits BaseClasses.CPSiteBaseClass.RequestTask
-            If False Then
-                Call cpCore.tasks_RequestTask(Command, SQL, ExportName, Filename, 0)
-            Else
-                Call cpCore.main_RequestTask(Command, SQL, ExportName, Filename)
-            End If
+            Call taskSchedulerController.main_RequestTask(cpCore, Command, SQL, ExportName, Filename)
         End Sub
 
         Public Overrides Sub TestPoint(ByVal Message As String) 'Inherits BaseClasses.CPSiteBaseClass.TestPoint

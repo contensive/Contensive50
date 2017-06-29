@@ -401,7 +401,7 @@ Namespace Contensive.Core
                                 If parser.Files.Count > 0 Then
                                     Dim ptr As Integer = 0
                                     Dim ptrText As String
-                                    Dim instanceId As String = cpCore.createGuid().Replace("{", "").Replace("-", "").Replace("}", "")
+                                    Dim instanceId As String = genericController.createGuid().Replace("{", "").Replace("-", "").Replace("}", "")
                                     For Each file As HttpMultipartParser.FilePart In parser.Files
                                         If file.FileName.Length > 0 Then
                                             Dim prop As New docPropertiesClass
@@ -589,22 +589,22 @@ Namespace Contensive.Core
                     '
                     Dim updateDomainCache As Boolean = False
                     '
-                    cpCore.domains.domainDetails.name = requestDomain
-                    cpCore.domains.domainDetails.rootPageId = 0
-                    cpCore.domains.domainDetails.noFollow = False
-                    cpCore.domains.domainDetails.typeId = 1
-                    cpCore.domains.domainDetails.visited = False
-                    cpCore.domains.domainDetails.id = 0
-                    cpCore.domains.domainDetails.forwardUrl = ""
+                    cpCore.domainLegacyCache.domainDetails.name = requestDomain
+                    cpCore.domainLegacyCache.domainDetails.rootPageId = 0
+                    cpCore.domainLegacyCache.domainDetails.noFollow = False
+                    cpCore.domainLegacyCache.domainDetails.typeId = 1
+                    cpCore.domainLegacyCache.domainDetails.visited = False
+                    cpCore.domainLegacyCache.domainDetails.id = 0
+                    cpCore.domainLegacyCache.domainDetails.forwardUrl = ""
                     webServerIO_requestDomain = requestDomain
                     '
                     ' REFACTOR -- move to cpcore.domains class 
-                    cpCore.domains.domainDetailsList = cpCore.cache.getObject(Of Dictionary(Of String, Models.Entity.domainLegacyModel.domainDetailsClass))("domainContentList")
-                    If (cpCore.domains.domainDetailsList Is Nothing) Then
+                    cpCore.domainLegacyCache.domainDetailsList = cpCore.cache.getObject(Of Dictionary(Of String, Models.Entity.domainLegacyModel.domainDetailsClass))("domainContentList")
+                    If (cpCore.domainLegacyCache.domainDetailsList Is Nothing) Then
                         '
                         '  no cache found, build domainContentList from database
                         '
-                        cpCore.domains.domainDetailsList = New Dictionary(Of String, Models.Entity.domainLegacyModel.domainDetailsClass)
+                        cpCore.domainLegacyCache.domainDetailsList = New Dictionary(Of String, Models.Entity.domainLegacyModel.domainDetailsClass)
                         domainDetailsListText = vbCrLf
                         SQL = "select name,rootpageid,nofollow,typeid,visited,id,ForwardURL,DefaultTemplateId,PageNotFoundPageID,0 as ignoreAllowCrossLogin,ForwardDomainId from ccdomains where (active<>0)and(name is not null) order by id"
                         Dim dt As DataTable
@@ -615,7 +615,7 @@ Namespace Contensive.Core
                                 For Each row As DataRow In dt.Rows
                                     Dim domainNameNew As String = row.Item(0).ToString.Trim
                                     If Not String.IsNullOrEmpty(domainNameNew) Then
-                                        If Not cpCore.domains.domainDetailsList.ContainsKey(domainNameNew.ToLower) Then
+                                        If Not cpCore.domainLegacyCache.domainDetailsList.ContainsKey(domainNameNew.ToLower) Then
                                             Dim domainDetailsNew As New Models.Entity.domainLegacyModel.domainDetailsClass
                                             domainDetailsNew.name = domainNameNew
                                             domainDetailsNew.rootPageId = genericController.EncodeInteger(row.Item(1).ToString)
@@ -628,7 +628,7 @@ Namespace Contensive.Core
                                             domainDetailsNew.pageNotFoundPageId = genericController.EncodeInteger(row.Item(8).ToString)
                                             'domainDetailsNew.allowCrossLogin = genericController.EncodeBoolean(row.Item(9).ToString)
                                             domainDetailsNew.forwardDomainId = genericController.EncodeInteger(row.Item(10).ToString)
-                                            cpCore.domains.domainDetailsList.Add(domainNameNew.ToLower(), domainDetailsNew)
+                                            cpCore.domainLegacyCache.domainDetailsList.Add(domainNameNew.ToLower(), domainDetailsNew)
                                         End If
                                     End If
                                 Next
@@ -640,7 +640,7 @@ Namespace Contensive.Core
                     ' verify app config domainlist is in the domainlist cache
                     '
                     For Each domain As String In cpCore.serverConfig.appConfig.domainList
-                        If Not cpCore.domains.domainDetailsList.ContainsKey(domain.ToLower()) Then
+                        If Not cpCore.domainLegacyCache.domainDetailsList.ContainsKey(domain.ToLower()) Then
                             Dim domainDetailsNew As New Models.Entity.domainLegacyModel.domainDetailsClass
                             domainDetailsNew.name = domain
                             domainDetailsNew.rootPageId = 0
@@ -653,34 +653,34 @@ Namespace Contensive.Core
                             domainDetailsNew.pageNotFoundPageId = 0
                             'domainDetailsNew.allowCrossLogin = False
                             domainDetailsNew.forwardDomainId = 0
-                            cpCore.domains.domainDetailsList.Add(domain.ToLower(), domainDetailsNew)
+                            cpCore.domainLegacyCache.domainDetailsList.Add(domain.ToLower(), domainDetailsNew)
                         End If
                     Next
-                    If cpCore.domains.domainDetailsList.ContainsKey(requestDomain.ToLower()) Then
+                    If cpCore.domainLegacyCache.domainDetailsList.ContainsKey(requestDomain.ToLower()) Then
                         '
                         ' domain found
                         '
-                        cpCore.domains.domainDetails = cpCore.domains.domainDetailsList(requestDomain.ToLower())
-                        If (cpCore.domains.domainDetails.id = 0) Then
+                        cpCore.domainLegacyCache.domainDetails = cpCore.domainLegacyCache.domainDetailsList(requestDomain.ToLower())
+                        If (cpCore.domainLegacyCache.domainDetails.id = 0) Then
                             '
                             ' this is a default domain or a new domain -- add to the domain table
                             '
                             CS = cpCore.db.cs_insertRecord("domains")
                             If cpCore.db.cs_ok(CS) Then
-                                cpCore.domains.domainDetails.id = cpCore.db.cs_getInteger(CS, "id")
+                                cpCore.domainLegacyCache.domainDetails.id = cpCore.db.cs_getInteger(CS, "id")
                                 Call cpCore.db.cs_set(CS, "name", requestDomain)
                                 Call cpCore.db.cs_set(CS, "typeId", "1")
-                                Call cpCore.db.cs_set(CS, "RootPageId", cpCore.domains.domainDetails.rootPageId.ToString)
-                                Call cpCore.db.cs_set(CS, "ForwardUrl", cpCore.domains.domainDetails.forwardUrl)
-                                Call cpCore.db.cs_set(CS, "NoFollow", cpCore.domains.domainDetails.noFollow.ToString)
-                                Call cpCore.db.cs_set(CS, "Visited", cpCore.domains.domainDetails.visited.ToString)
-                                Call cpCore.db.cs_set(CS, "DefaultTemplateId", cpCore.domains.domainDetails.defaultTemplateId.ToString)
-                                Call cpCore.db.cs_set(CS, "PageNotFoundPageId", cpCore.domains.domainDetails.pageNotFoundPageId.ToString)
+                                Call cpCore.db.cs_set(CS, "RootPageId", cpCore.domainLegacyCache.domainDetails.rootPageId.ToString)
+                                Call cpCore.db.cs_set(CS, "ForwardUrl", cpCore.domainLegacyCache.domainDetails.forwardUrl)
+                                Call cpCore.db.cs_set(CS, "NoFollow", cpCore.domainLegacyCache.domainDetails.noFollow.ToString)
+                                Call cpCore.db.cs_set(CS, "Visited", cpCore.domainLegacyCache.domainDetails.visited.ToString)
+                                Call cpCore.db.cs_set(CS, "DefaultTemplateId", cpCore.domainLegacyCache.domainDetails.defaultTemplateId.ToString)
+                                Call cpCore.db.cs_set(CS, "PageNotFoundPageId", cpCore.domainLegacyCache.domainDetails.pageNotFoundPageId.ToString)
                                 'Call cpCore.db.cs_set(CS, "allowCrossLogin", cpCore.domains.domainDetails.allowCrossLogin.ToString)
                             End If
                             Call cpCore.db.cs_Close(CS)
                         End If
-                        If Not cpCore.domains.domainDetails.visited Then
+                        If Not cpCore.domainLegacyCache.domainDetails.visited Then
                             '
                             ' set visited true
                             '
@@ -688,7 +688,7 @@ Namespace Contensive.Core
                             Call cpCore.db.executeSql(SQL)
                             Call cpCore.cache.setObject("domainContentList", "", "domains")
                         End If
-                        If cpCore.domains.domainDetails.typeId = 1 Then
+                        If cpCore.domainLegacyCache.domainDetails.typeId = 1 Then
                             '
                             ' normal domain, leave it
                             '
@@ -696,32 +696,32 @@ Namespace Contensive.Core
                             '
                             ' forwarding does not work in the admin site
                             '
-                        ElseIf (cpCore.domains.domainDetails.typeId = 2) And (cpCore.domains.domainDetails.forwardUrl <> "") Then
+                        ElseIf (cpCore.domainLegacyCache.domainDetails.typeId = 2) And (cpCore.domainLegacyCache.domainDetails.forwardUrl <> "") Then
                             '
                             ' forward to a URL
                             '
                             '
                             'Call AppendLog("main_init(), 1710 - exit for domain forward")
                             '
-                            If genericController.vbInstr(1, cpCore.domains.domainDetails.forwardUrl, "://") = 0 Then
-                                cpCore.domains.domainDetails.forwardUrl = "http://" & cpCore.domains.domainDetails.forwardUrl
+                            If genericController.vbInstr(1, cpCore.domainLegacyCache.domainDetails.forwardUrl, "://") = 0 Then
+                                cpCore.domainLegacyCache.domainDetails.forwardUrl = "http://" & cpCore.domainLegacyCache.domainDetails.forwardUrl
                             End If
-                            Call redirect(cpCore.domains.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domains.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this URL", False)
+                            Call redirect(cpCore.domainLegacyCache.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domainLegacyCache.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this URL", False)
                             Return cpCore.docOpen
-                        ElseIf (cpCore.domains.domainDetails.typeId = 3) And (cpCore.domains.domainDetails.forwardDomainId <> 0) And (cpCore.domains.domainDetails.forwardDomainId <> cpCore.domains.domainDetails.id) Then
+                        ElseIf (cpCore.domainLegacyCache.domainDetails.typeId = 3) And (cpCore.domainLegacyCache.domainDetails.forwardDomainId <> 0) And (cpCore.domainLegacyCache.domainDetails.forwardDomainId <> cpCore.domainLegacyCache.domainDetails.id) Then
                             '
                             ' forward to a replacement domain
                             '
-                            forwardDomain = cpCore.content_GetRecordName("domains", cpCore.domains.domainDetails.forwardDomainId)
+                            forwardDomain = cpCore.content_GetRecordName("domains", cpCore.domainLegacyCache.domainDetails.forwardDomainId)
                             If forwardDomain <> "" Then
                                 pos = genericController.vbInstr(1, requestLinkSource, requestDomain, vbTextCompare)
                                 If (pos > 0) Then
                                     '
                                     'Call AppendLog("main_init(), 1720 - exit for forward domain")
                                     '
-                                    cpCore.domains.domainDetails.forwardUrl = Mid(requestLinkSource, 1, pos - 1) & forwardDomain & Mid(requestLinkSource, pos + Len(requestDomain))
+                                    cpCore.domainLegacyCache.domainDetails.forwardUrl = Mid(requestLinkSource, 1, pos - 1) & forwardDomain & Mid(requestLinkSource, pos + Len(requestDomain))
                                     'main_domainForwardUrl = genericController.vbReplace(main_ServerLinkSource, cpcore.main_ServerHost, forwardDomain)
-                                    Call redirect(cpCore.domains.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domains.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this replacement domain", False)
+                                    Call redirect(cpCore.domainLegacyCache.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domainLegacyCache.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this replacement domain", False)
                                     Return cpCore.docOpen
                                 End If
                                 '                                cpcore.main_domainForwardUrl = "http://"
@@ -735,7 +735,7 @@ Namespace Contensive.Core
                                 '                                Call cpcore.main_Redirect2(main_domainForwardUrl, "Forwarding to [" & cpcore.main_domainForwardUrl & "] because the current domain [" & cpcore.main_ServerHost & "] is in the domain content set to forward to this replacement domain", False)
                             End If
                         End If
-                        If cpCore.domains.domainDetails.noFollow Then
+                        If cpCore.domainLegacyCache.domainDetails.noFollow Then
                             webServerIO_response_NoFollow = True
                         End If
 
@@ -756,11 +756,11 @@ Namespace Contensive.Core
                         domainDetailsNew.pageNotFoundPageId = 0
                         'domainDetailsNew.allowCrossLogin = False
                         domainDetailsNew.forwardDomainId = 0
-                        cpCore.domains.domainDetailsList.Add(requestDomain.ToLower(), domainDetailsNew)
+                        cpCore.domainLegacyCache.domainDetailsList.Add(requestDomain.ToLower(), domainDetailsNew)
                         '
                         CS = cpCore.db.cs_insertRecord("domains")
                         If cpCore.db.cs_ok(CS) Then
-                            cpCore.domains.domainDetails.id = cpCore.db.cs_getInteger(CS, "id")
+                            cpCore.domainLegacyCache.domainDetails.id = cpCore.db.cs_getInteger(CS, "id")
                             Call cpCore.db.cs_set(CS, "name", requestDomain)
                             Call cpCore.db.cs_set(CS, "typeid", "1")
                         End If
@@ -772,7 +772,7 @@ Namespace Contensive.Core
                         '
                         ' if there was a change, update the cache
                         '
-                        Call cpCore.cache.setObject("domainContentList", cpCore.domains.domainDetailsList, "domains")
+                        Call cpCore.cache.setObject("domainContentList", cpCore.domainLegacyCache.domainDetailsList, "domains")
                         'domainDetailsListText = cpCore.json.Serialize(cpCore.domains.domainDetailsList)
                         'Call cpCore.cache.setObject("domainContentList", domainDetailsListText, "domains")
                     End If
@@ -1250,7 +1250,7 @@ ErrorTrap:
                         '
                         ' Do a PageNotFound then redirect
                         '
-                        Call cpCore.log_appendLogPageNotFound(requestLinkSource)
+                        Call logController.log_appendLogPageNotFound(cpCore, requestLinkSource)
                         If ShortLink <> "" Then
                             Call cpCore.db.executeSql("Update ccContentWatch set link=null where link=" & cpCore.db.encodeSQLText(ShortLink))
                         End If
@@ -1305,201 +1305,5 @@ ErrorTrap:
                 iisContext.Response.Flush()
             End If
         End Sub
-
-
-        ' main_Get the Head innerHTML for any page
-        '
-        Public Function getHTMLInternalHead(ByVal main_IsAdminSite As Boolean) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetHTMLInternalHead")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim Parts() As String
-            Dim FileList As String
-            Dim Files() As String
-            Dim Ptr As Integer
-            Dim Pos As Integer
-            Dim BaseHref As String
-            Dim StyleTag As String
-            Dim IDList As String
-            Dim Cnt As Integer
-            Dim StyleSheetLink As String
-            Dim SQL As String
-            Dim CS As Integer
-            Dim OtherHeadTags As String
-            Dim Copy As String
-            Dim VirtualFilename As String
-            Dim Ext As String
-            '
-            getHTMLInternalHead = getHTMLInternalHead & cr & "<!-- main_GetHTMLInternalHead called out of order. It must follow a content call, such as pageManager_GetHtmlBody, main_GetSectionPage, and main_GetContentPage -->"
-            '
-            ' stylesheets first -- for performance
-            ' put stylesheets inline without processing
-            '
-            If cpCore.siteProperties.getBoolean("Allow CSS Reset") Then
-                '
-                ' reset styles
-                '
-                getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & webServerIO_requestDomain & "/ccLib/styles/ccreset.css"" >"
-            End If
-            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""/ccLib/Styles/" & defaultStyleFilename & """>"
-            If Not main_IsAdminSite Then
-                '
-                ' site styles
-                '
-                getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, "templates/styles.css") & """ >"
-            End If
-            '
-            ' Template shared styles
-            '
-            ' !!!!! dont know why this was blocked. Running add-ons with shared styles need this in the admin site.
-            FileList = cpCore.main_GetSharedStyleFileList(cpCore.htmlDoc.main_MetaContent_SharedStyleIDList, main_IsAdminSite)
-            cpCore.htmlDoc.main_MetaContent_SharedStyleIDList = ""
-            If FileList <> "" Then
-                Files = Split(FileList, vbCrLf)
-                For Ptr = 0 To UBound(Files)
-                    If Files(Ptr) <> "" Then
-                        Parts = Split(Files(Ptr) & "<<", "<")
-                        If Parts(1) <> "" Then
-                            getHTMLInternalHead = getHTMLInternalHead & cr & genericController.decodeHtml(Parts(1))
-                        End If
-                        getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, Parts(0)) & """ >"
-                        If Parts(2) <> "" Then
-                            getHTMLInternalHead = getHTMLInternalHead & cr & genericController.decodeHtml(Parts(2))
-                        End If
-                        'End If
-                    End If
-                Next
-            End If
-            '
-            ' Template exclusive styles
-            '
-            If cpCore.htmlDoc.main_MetaContent_TemplateStyleSheetTag <> "" Then
-                getHTMLInternalHead = getHTMLInternalHead & cpCore.htmlDoc.main_MetaContent_TemplateStyleSheetTag
-            End If
-            '
-            ' Page Styles
-            '
-            If cpCore.htmlDoc.main_MetaContent_StyleSheetTags <> "" Then
-                getHTMLInternalHead = getHTMLInternalHead & cpCore.htmlDoc.main_MetaContent_StyleSheetTags
-                cpCore.htmlDoc.main_MetaContent_StyleSheetTags = ""
-            End If
-            '
-            ' Member Styles
-            '
-            If cpCore.authContext.user.StyleFilename <> "" Then
-                Call cpCore.htmlDoc.main_AddStylesheetLink2(webServerIO_requestProtocol & requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, cpCore.authContext.user.StyleFilename), "member style")
-                cpCore.authContext.user.StyleFilename = ""
-            End If
-            '
-            ' meta content
-            '
-            Copy = cpCore.main_GetLastMetaTitle()
-            If Copy <> "" Then
-                getHTMLInternalHead = getHTMLInternalHead & cr & "<title>" & Copy & "</title>"
-            End If
-            '
-            Copy = cpCore.main_GetLastMetaKeywordList()
-            If Copy <> "" Then
-                getHTMLInternalHead = getHTMLInternalHead & cr & "<meta name=""keywords"" content=""" & Copy & """ >"
-            End If
-            '
-            Copy = cpCore.main_GetLastMetaDescription()
-            If Copy <> "" Then
-                getHTMLInternalHead = getHTMLInternalHead & cr & "<meta name=""description"" content=""" & Copy & """ >"
-            End If
-            '
-            ' favicon
-            '
-            VirtualFilename = cpCore.siteProperties.getText("faviconfilename")
-            If VirtualFilename <> "" Then
-                Pos = InStrRev(VirtualFilename, ".")
-                If Pos > 0 Then
-                    Ext = genericController.vbLCase(Mid(VirtualFilename, Pos))
-                    Select Case Ext
-                        Case ".ico"
-                            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""icon"" type=""image/vnd.microsoft.icon"" href=""" & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
-                        Case ".png"
-                            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""icon"" type=""image/png"" href=""" & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
-                        Case ".gif"
-                            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""icon"" type=""image/gif"" href=""" & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
-                        Case ".jpg"
-                            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""icon"" type=""image/jpg"" href=""" & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
-                    End Select
-                End If
-            End If
-            '
-            ' misc caching, etc
-            '
-            Dim encoding As String
-            encoding = cpCore.htmlDoc.html_EncodeHTML(cpCore.siteProperties.getText("Site Character Encoding", "utf-8"))
-            getHTMLInternalHead = getHTMLInternalHead _
-                & OtherHeadTags _
-                & cr & "<meta http-equiv=""content-type"" content=""text/html; charset=" & encoding & """ >" _
-                & cr & "<meta http-equiv=""content-language"" content=""en-us"" >" _
-                & cr & "<meta http-equiv=""cache-control"" content=""no-cache"" >" _
-                & cr & "<meta http-equiv=""expires"" content=""-1"" >" _
-                & cr & "<meta http-equiv=""pragma"" content=""no-cache"" >" _
-                & cr & "<meta name=""generator"" content=""Contensive"" >"
-            '& CR & "<meta http-equiv=""cache-control"" content=""no-store"" >"
-            '
-            ' no-follow
-            '
-            If webServerIO_response_NoFollow Then
-                getHTMLInternalHead = getHTMLInternalHead _
-                    & cr & "<meta name=""robots"" content=""nofollow"" >" _
-                    & cr & "<meta name=""mssmarttagspreventparsing"" content=""true"" >"
-            End If
-            '
-            ' Base is needed for Link Alias case where a slash is in the URL (page named 1/2/3/4/5)
-            '
-            BaseHref = webServerIO_ServerFormActionURL
-            If main_IsAdminSite Then
-                '
-                ' no base in admin site
-                '
-            ElseIf BaseHref <> "" Then
-                If cpCore.htmlDoc.refreshQueryString <> "" Then
-                    BaseHref = BaseHref & "?" & cpCore.htmlDoc.refreshQueryString
-                End If
-                getHTMLInternalHead = getHTMLInternalHead & cr & "<base href=""" & BaseHref & """ >"
-            End If
-            '
-            ' Head Javascript -- (should be) last for performance
-            '
-            getHTMLInternalHead = getHTMLInternalHead _
-                & cr & "<script language=""JavaScript"" type=""text/javascript""  src=""" & webServerIO_requestProtocol & webServerIO_requestDomain & "/ccLib/ClientSide/Core.js""></script>" _
-                & ""
-            If cpCore.htmlDoc.main_HeadScriptCnt > 0 Then
-                For Ptr = 0 To cpCore.htmlDoc.main_HeadScriptCnt - 1
-                    With cpCore.htmlDoc.main_HeadScripts(Ptr)
-                        If (.addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
-                            getHTMLInternalHead = getHTMLInternalHead & cr & "<!-- from " & .addedByMessage & " -->"
-                        End If
-                        If Not .IsLink Then
-                            getHTMLInternalHead = getHTMLInternalHead & cr & "<script Language=""JavaScript"" type=""text/javascript"">" & .Text & cr & "</script>"
-                        Else
-                            getHTMLInternalHead = getHTMLInternalHead & cr & "<script type=""text/javascript"" src=""" & .Text & """></script>"
-                        End If
-                    End With
-                Next
-                cpCore.htmlDoc.main_HeadScriptCnt = 0
-            End If
-            '
-            ' other head tags - always last
-            '
-            OtherHeadTags = cpCore.main_GetLastOtherHeadTags()
-            If OtherHeadTags <> "" Then
-                If Left(OtherHeadTags, 2) <> vbCrLf Then
-                    OtherHeadTags = vbCrLf & OtherHeadTags
-                End If
-                getHTMLInternalHead = getHTMLInternalHead & genericController.vbReplace(OtherHeadTags, vbCrLf, cr)
-            End If
-            '
-            Exit Function
-            '
-ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetHTMLInternalHead")
-        End Function
     End Class
 End Namespace

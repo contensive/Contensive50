@@ -402,6 +402,9 @@
     <Compile Include="Controllers\logController.vb" />
     <Compile Include="Controllers\emailController.vb" />
     <Compile Include="Controllers\exportAsciiController.vb" />
+    <Compile Include="Controllers\groupController.vb" />
+    <Compile Include="Controllers\editorController.vb" />
+    <Compile Include="Controllers\remoteQueryController.vb" />
     <Compile Include="Controllers\_blankStaticController.vb" />
     <Compile Include="Controllers\csController.vb" />
     <Compile Include="Controllers\dbEngineController.vb" />
@@ -412,9 +415,13 @@
     <Compile Include="Controllers\cacheController.vb" />
     <Compile Include="Controllers\docPropertyController.vb" />
     <Compile Include="Models\Context\authContextModel.vb" />
+    <Compile Include="Models\Context\stylesheetContextModel.vb" />
     <Compile Include="Models\Context\_blankModel.vb" />
     <Compile Include="Models\Entity\addonModel.vb" />
     <Compile Include="Models\Entity\sortMethodModel.vb" />
+    <Compile Include="Models\Entity\libraryFilesModel.vb" />
+    <Compile Include="Models\Entity\libraryFileLogModel.vb" />
+    <Compile Include="Models\Entity\addonIncludeModel.vb" />
     <Compile Include="Models\Entity\_blankModel.vb" />
     <Compile Include="Models\Entity\tableModel.vb" />
     <Compile Include="Models\Entity\baseModel.vb" />
@@ -426,7 +433,7 @@
     <Compile Include="addon_tools\addon_toolConfigureEdit.vb" />
     <Compile Include="Models\Context\coreSitePropertiesClass.vb" />
     <Compile Include="Controllers\webServerIOController.vb" />
-    <Compile Include="Controllers\cdefController.vb" />
+    <Compile Include="Controllers\metaDataController.vb" />
     <Compile Include="Controllers\cacheKeyPtrController.vb" />
     <Compile Include="Controllers\securityController.vb" />
     <Compile Include="Controllers\addonInstallClass.vb" />

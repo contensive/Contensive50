@@ -90,7 +90,7 @@ Namespace Contensive.Core
         '====================================================================================================
         ' deprecated 
         '
-        <Obsolete("Use GetDataSourceType( dataSourceName )")>
+        <Obsolete("Use GetTableId instead.", True)>
         Public Overrides Function dbGetTableID(ByVal TableName As String) As Integer
             Return GetTableID(TableName)
         End Function
@@ -98,12 +98,13 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function IsTable(ByVal DataSourcename As String, ByVal TableName As String) As Boolean
-            Return cp.core.IsSQLTable(DataSourcename, TableName)
+            Return cp.core.db.isSQLTable(DataSourcename, TableName)
         End Function
         '
         '====================================================================================================
         ' deprecated
         '
+        <Obsolete("Use isTable instead", True)>
         Public Overrides Function DbIsTable(ByVal DataSourcename As String, ByVal TableName As String) As Boolean
             Return IsTable(DataSourcename, TableName)
         End Function
@@ -111,12 +112,13 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function IsTableField(ByVal DataSourcename As String, ByVal TableName As String, ByVal FieldName As String) As Boolean
-            Return cp.core.IsSQLTableField(DataSourcename, TableName, FieldName)
+            Return cp.core.db.isSQLTableField(DataSourcename, TableName, FieldName)
         End Function
         '
         '====================================================================================================
         ' deprecated 
         '
+        <Obsolete("Use isTableField instead", True)>
         Public Overrides Function DbIsTableField(ByVal DataSourcename As String, ByVal TableName As String, ByVal FieldName As String) As Boolean
             Return IsTableField(DataSourcename, TableName, FieldName)
         End Function

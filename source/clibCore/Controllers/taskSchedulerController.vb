@@ -356,6 +356,31 @@ Namespace Contensive.Core.Controllers
                 Console.WriteLine(logText)
             End If
         End Sub
+        '
+        '
+        '
+        Public Shared Sub tasks_RequestTask(cpCore As coreClass, ByVal Command As String, ByVal SQL As String, ByVal ExportName As String, ByVal Filename As String, ByVal RequestedByMemberID As Integer)
+            Dim CS As Integer
+            Dim TaskName As String
+            '
+            If ExportName = "" Then
+                TaskName = CStr(Now()) & " snapshot of unnamed data"
+            Else
+                TaskName = CStr(Now()) & " snapshot of " & genericController.vbLCase(ExportName)
+            End If
+            CS = cpCore.db.cs_insertRecord("Tasks", RequestedByMemberID)
+            If cpCore.db.cs_ok(CS) Then
+                Call cpCore.db.cs_getFilename(CS, "Filename", Filename)
+                Call cpCore.db.cs_set(CS, "Name", TaskName)
+                Call cpCore.db.cs_set(CS, "Command", Command)
+                Call cpCore.db.cs_set(CS, "SQLQuery", SQL)
+            End If
+            Call cpCore.db.cs_Close(CS)
+        End Sub
+        Public Shared Sub main_RequestTask(cpCore As coreClass, ByVal Command As String, ByVal SQL As String, ByVal ExportName As String, ByVal Filename As String)
+            Call tasks_RequestTask(cpCore, genericController.encodeText(Command), genericController.encodeText(SQL), genericController.encodeText(ExportName), genericController.encodeText(Filename), genericController.EncodeInteger(cpCore.authContext.user.ID))
+        End Sub
+
 #Region " IDisposable Support "
         ' Do not change or add Overridable to these methods.
         ' Put cleanup code in Dispose(ByVal disposing As Boolean).

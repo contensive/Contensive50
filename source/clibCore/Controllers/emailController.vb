@@ -35,8 +35,8 @@ Namespace Contensive.Core.Controllers
         ' Email Block List - these are people who have asked to not have email sent to them from this site
         '   Loaded ondemand by csv_GetEmailBlockList
         '
-        Private email_BlockList_Local As String = ""
-        Private email_BlockList_LocalLoaded As Boolean
+        Private Property email_BlockList_Local As String = ""
+        Private Property email_BlockList_LocalLoaded As Boolean
         '
         Private Function getBlockList() As String
             '

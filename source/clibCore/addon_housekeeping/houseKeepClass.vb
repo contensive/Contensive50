@@ -303,10 +303,7 @@ Namespace Contensive.Core
                                 '
                                 Call AddonInstall.installCollectionFromRemoteRepo(CoreCollectionGuid, ErrorMessage, "", False)
                                 '
-                                '
-                                '
-                                DomainNameList = cp.core.app_domainList
-                                DomainNamePrimary = DomainNameList
+                                DomainNamePrimary = cp.core.serverConfig.appConfig.domainList(0)
                                 Pos = genericController.vbInstr(1, DomainNamePrimary, ",")
                                 If Pos > 1 Then
                                     DomainNamePrimary = Mid(DomainNamePrimary, 1, Pos - 1)
@@ -868,23 +865,23 @@ ErrorTrap:
                 ' delete visits from the non-cookie visits
                 '
                 Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting visits with no cookie support older than Midnight, Two Days Ago")
-                Call cp.core.DeleteTableRecordChunks("default", "ccvisits", "(CookieSupport=0)and(LastVisitTime<" & SQLDateMidnightTwoDaysAgo & ")", 1000, 10000)
+                Call cp.core.db.DeleteTableRecordChunks("default", "ccvisits", "(CookieSupport=0)and(LastVisitTime<" & SQLDateMidnightTwoDaysAgo & ")", 1000, 10000)
             End If
             '
             ' Visits with no DateAdded
             '
             Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting visits with no DateAdded")
-            Call cp.core.DeleteTableRecordChunks("default", "ccvisits", "(DateAdded is null)or(DateAdded<=" & cp.core.db.encodeSQLDate(#1/1/1995#) & ")", 1000, 10000)
+            Call cp.core.db.DeleteTableRecordChunks("default", "ccvisits", "(DateAdded is null)or(DateAdded<=" & cp.core.db.encodeSQLDate(#1/1/1995#) & ")", 1000, 10000)
             '
             ' Visits with no visitor
             '
             Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting visits with no DateAdded")
-            Call cp.core.DeleteTableRecordChunks("default", "ccvisits", "(VisitorID is null)or(VisitorID=0)", 1000, 10000)
+            Call cp.core.db.DeleteTableRecordChunks("default", "ccvisits", "(VisitorID is null)or(VisitorID=0)", 1000, 10000)
             '
             ' viewings with no visit
             '
             Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting viewings with null or invalid VisitID")
-            Call cp.core.DeleteTableRecordChunks("default", "ccviewings", "(visitid=0 or visitid is null)", 1000, 10000)
+            Call cp.core.db.DeleteTableRecordChunks("default", "ccviewings", "(visitid=0 or visitid is null)", 1000, 10000)
             '
             ' Get Oldest Visit
             '
@@ -1714,12 +1711,12 @@ ErrorTrap:
                 ' Visits older then archive age
                 '
                 Call AppendClassLog(cp.core, cp.core.serverConfig.appConfig.name, "HouseKeep_App_Daily_RemoveVisitRecords(" & appName & ")", "Deleting visits before [" & DeleteBeforeDateSQL & "]")
-                Call cp.core.DeleteTableRecordChunks("default", "ccVisits", "(DateAdded<" & DeleteBeforeDateSQL & ")", 1000, 10000)
+                Call cp.core.db.DeleteTableRecordChunks("default", "ccVisits", "(DateAdded<" & DeleteBeforeDateSQL & ")", 1000, 10000)
                 '
                 ' Viewings with visits before the first
                 '
                 Call AppendClassLog(cp.core, appName, "HouseKeep_App_Daily_RemoveVisitRecords(" & appName & ")", "Deleting viewings with visitIDs lower then the lowest ccVisits.ID")
-                Call cp.core.DeleteTableRecordChunks("default", "ccviewings", "(visitid<(select min(ID) from ccvisits))", 1000, 10000)
+                Call cp.core.db.DeleteTableRecordChunks("default", "ccviewings", "(visitid<(select min(ID) from ccvisits))", 1000, 10000)
                 '
                 ' Visitors with no visits
                 '
@@ -1876,7 +1873,7 @@ ErrorTrap:
                     & " and(Visits=1)" _
                     & " and(Username is null)" _
                     & " and(email is null)"
-                Call cp.core.DeleteTableRecordChunks("default", "" & SQLTablePeople & "", SQLCriteria, 1000, 10000)
+                Call cp.core.db.DeleteTableRecordChunks("default", "" & SQLTablePeople & "", SQLCriteria, 1000, 10000)
                 '& "(" & SQLTablePeople & ".Name=" & encodeSQLText(DefaultName) & ")"
             End If
             '
@@ -2665,7 +2662,7 @@ ErrorTrap:
                                 Dim PageName As String
 
                                 If PageTitle = "" Then
-                                    PageName = cp.core.GetRecordName("page content", PageID)
+                                    PageName = cp.core.db.getRecordName("page content", PageID)
                                     Call cp.core.db.cs_set(CS, "name", HourDuration & " hr summary for " & Date.FromOADate(CDbl(DateNumber)) & " " & TimeNumber & ":00, " & PageName)
                                     Call cp.core.db.cs_set(CS, "PageTitle", PageName)
                                 Else

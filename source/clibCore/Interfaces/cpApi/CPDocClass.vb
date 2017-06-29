@@ -101,14 +101,14 @@ Namespace Contensive.Core
         Public Overrides Property noFollow() As Boolean
             Get
                 If True Then
-                    Return cpCore.main_MetaContentNoFollow
+                    Return cpCore.webServer.webServerIO_response_NoFollow
                 Else
                     Return False
                 End If
             End Get
             Set(ByVal value As Boolean)
                 If True Then
-                    cpCore.main_MetaContentNoFollow = value
+                    cpCore.webServer.webServerIO_response_NoFollow = value
                 End If
             End Set
         End Property
@@ -195,7 +195,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property type() As String
             Get
                 If True Then
-                    Return cpCore.main_docType
+                    Return cpCore.siteProperties.docTypeDeclaration()
                 Else
                     Return ""
                 End If
