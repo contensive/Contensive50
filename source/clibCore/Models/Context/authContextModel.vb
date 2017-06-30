@@ -763,20 +763,20 @@ Namespace Contensive.Core.Models.Context
                     ' ----- loginFieldValue blank, stop here
                     '
                     If allowEmailLogin Then
-                        Call cpCore.error_AddUserError("A valid login requires a non-blank username or email.")
+                        Call errorController.error_AddUserError(cpcore,"A valid login requires a non-blank username or email.")
                     Else
-                        Call cpCore.error_AddUserError("A valid login requires a non-blank username.")
+                        Call errorController.error_AddUserError(cpcore,"A valid login requires a non-blank username.")
                     End If
                 ElseIf (Not allowNoPasswordLogin) And (iPassword = "") Then
                     '
                     ' ----- password blank, stop here
                     '
-                    Call cpCore.error_AddUserError("A valid login requires a non-blank password.")
+                    Call errorController.error_AddUserError(cpcore,"A valid login requires a non-blank password.")
                 ElseIf (visit.LoginAttempts >= cpCore.siteProperties.maxVisitLoginAttempts) Then
                     '
                     ' ----- already tried 5 times
                     '
-                    Call cpCore.error_AddUserError(badLoginUserError)
+                    Call errorController.error_AddUserError(cpcore,badLoginUserError)
                 Else
                     If allowEmailLogin Then
                         '
@@ -797,12 +797,12 @@ Namespace Contensive.Core.Models.Context
                         '
                         ' ----- loginFieldValue not found, stop here
                         '
-                        Call cpCore.error_AddUserError(badLoginUserError)
+                        Call errorController.error_AddUserError(cpcore,badLoginUserError)
                     ElseIf (Not genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("AllowDuplicateUsernames", False))) And (cpCore.db.cs_getRowCount(CS) > 1) Then
                         '
                         ' ----- AllowDuplicates is false, and there are more then one record
                         '
-                        Call cpCore.error_AddUserError("This user account can not be used because the username is not unique on this website. Please contact the site administrator.")
+                        Call errorController.error_AddUserError(cpcore,"This user account can not be used because the username is not unique on this website. Please contact the site administrator.")
                     Else
                         '
                         ' ----- search all found records for the correct password
@@ -852,7 +852,7 @@ Namespace Contensive.Core.Models.Context
                             Call cpCore.db.cs_goNext(CS)
                         Loop
                         If returnUserId = 0 Then
-                            Call cpCore.error_AddUserError(badLoginUserError)
+                            Call errorController.error_AddUserError(cpcore,badLoginUserError)
                         End If
                     End If
                     Call cpCore.db.cs_Close(CS)
@@ -1491,7 +1491,7 @@ Namespace Contensive.Core.Models.Context
         Public Function main_IsLoginOK(cpcore As coreClass, ByVal Username As String, ByVal Password As String, Optional ByVal ErrorMessage As String = "", Optional ByVal ErrorCode As Integer = 0) As Boolean
             Dim result As Boolean = (authenticateGetId(cpcore, Username, Password) <> 0)
             If Not result Then
-                ErrorMessage = cpcore.error_GetUserError()
+                ErrorMessage = errorController.error_GetUserError(cpCore)
             End If
             Return result
         End Function

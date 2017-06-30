@@ -36,6 +36,7 @@ Namespace Contensive.Core
         '
         Friend deleteOnDisposeFileList As New List(Of String)               ' tmp file list of files that need to be deleted during dispose
         Friend errList As List(Of String)                                   ' exceptions collected during document construction
+        Friend userErrorList As List(Of String)                           ' user messages
         '
         ' -- state, authentication, authorization
         ' -- these are set id=0 at construction, then initialize if authentication used
@@ -968,7 +969,7 @@ Namespace Contensive.Core
                                 webServer.webServerIO_BlockClosePageCopyright = True
                                 html_BlockClosePageLink = True
                                 'Call AppendLog("call main_getEndOfBody, from main_initf")
-                                returnResult = returnResult & htmlDoc.html_GetEndOfBody(False, False, True, False)
+                                returnResult = returnResult & htmlDoc.getBeforeEndOfBodyHtml(False, False, True, False)
                                 Call htmlDoc.writeAltBuffer(returnResult)
                                 docOpen = False '--- should be disposed by caller --- Call dispose
                                 Return htmlDoc.docBuffer
@@ -1744,7 +1745,7 @@ Namespace Contensive.Core
                             & genericController.kmaIndent(Copy) _
                             & cr & "</td></tr>" _
                             & cr & "<tr><td>" _
-                            & genericController.kmaIndent(htmlDoc.html_GetEndOfBody(False, False, False, False)) _
+                            & genericController.kmaIndent(htmlDoc.getBeforeEndOfBodyHtml(False, False, False, False)) _
                             & cr & "</td></tr></table>" _
                             & cr & "<script language=javascript type=""text/javascript"">fixDialog();</script>" _
                             & cr & "</body>" _
@@ -1779,7 +1780,7 @@ Namespace Contensive.Core
                             & main_GetPanelHeader("Contensive Resource Library") _
                             & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td>" _
                             & Copy _
-                            & cr & "</td></tr><tr><td>" & htmlDoc.html_GetEndOfBody(False, False, False, False) & "</td></tr></table>" _
+                            & cr & "</td></tr><tr><td>" & htmlDoc.getBeforeEndOfBodyHtml(False, False, False, False) & "</td></tr></table>" _
                             & cr & "<script language=javascript type=text/javascript>fixDialog();</script>" _
                             & cr & "</body>" _
                             & vbCrLf & "</html>"
@@ -1841,7 +1842,7 @@ Namespace Contensive.Core
                             & genericController.kmaIndent(main_GetPanelHeader("Contensive Site Explorer")) _
                             & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td>" _
                             & genericController.kmaIndent(Copy) _
-                            & cr & "</td></tr><tr><td>" & htmlDoc.html_GetEndOfBody(False, False, False, False) & "</td></tr></table>" _
+                            & cr & "</td></tr><tr><td>" & htmlDoc.getBeforeEndOfBodyHtml(False, False, False, False) & "</td></tr></table>" _
                             & cr & "</body>" _
                             & cr & "</html>"
                             'Set Obj = Nothing
@@ -1888,7 +1889,7 @@ Namespace Contensive.Core
                         webServer.webServerIO_BlockClosePageCopyright = True
                         html_BlockClosePageLink = True
                         'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2f")
-                        Call htmlDoc.html_GetEndOfBody(False, False, False, False)
+                        Call htmlDoc.getBeforeEndOfBodyHtml(False, False, False, False)
                         result = True
                     Case HardCodedPageGetJSPage
                         '
@@ -1920,7 +1921,7 @@ Namespace Contensive.Core
                             End If
                             Copy = pages.getContentBox(PageID, rootPageId, "Page Content", "", True, True, False, 0, siteProperties.useContentWatchLink, allowPageWithoutSectionDisplay)
                             'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2g")
-                            Copy = Copy & htmlDoc.html_GetEndOfBody(False, True, False, False)
+                            Copy = Copy & htmlDoc.getBeforeEndOfBodyHtml(False, True, False, False)
                             Copy = genericController.vbReplace(Copy, "'", "'+""'""+'")
                             Copy = genericController.vbReplace(Copy, vbCr, "\n")
                             Copy = genericController.vbReplace(Copy, vbLf, " ")
@@ -1947,7 +1948,7 @@ Namespace Contensive.Core
                             Copy = Copy & "You are currently logged in as " & authContext.user.Name & ". To logout, click <a HREF=""" & webServer.webServerIO_ServerFormActionURL & "?Method=logout"" rel=""nofollow"">Here</A>."
                         End If
                         'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2h")
-                        Copy = Copy & htmlDoc.html_GetEndOfBody(True, True, False, False)
+                        Copy = Copy & htmlDoc.getBeforeEndOfBodyHtml(True, True, False, False)
                         Copy = Copy & "</CENTER></p>"
                         Copy = genericController.vbReplace(Copy, "'", "'+""'""+'")
                         Copy = genericController.vbReplace(Copy, vbCr, "")
@@ -3135,14 +3136,14 @@ ErrorTrap:
                     ' ----- username changed, check if change is allowed
                     '
                     If Not authContext.isNewLoginOK(Me, Newusername, NewPassword, ErrorMessage, ErrorCode) Then
-                        error_AddUserError(ErrorMessage)
+                        errorController.error_AddUserError(Me, ErrorMessage)
                         AllowChange = False
                     End If
                 End If
                 If AllowChange Then
                     CSMember = db.cs_open("people", "id=" & db.encodeSQLNumber(authContext.user.ID))
                     If Not db.cs_ok(CSMember) Then
-                        Call error_AddUserError("There was a problem locating your account record. No changes were saved.")
+                        Call errorController.error_AddUserError(Me, "There was a problem locating your account record. No changes were saved.")
                         ' if user error, it goes back to the hardcodedpage
                         'LegacyInterceptPageSN = LegacyInterceptPageSNMyProfile
                     Else
@@ -3151,7 +3152,7 @@ ErrorTrap:
                         '
                         ContentName = metaData.getContentNameByID(db.cs_getInteger(CSMember, "ContentControlID"))
                         If ContentName = "" Then
-                            Call error_AddUserError("There was a problem locating the information you requested.")
+                            Call errorController.error_AddUserError(Me, "There was a problem locating the information you requested.")
                         Else
                             CDef = metaData.getCdef(ContentName)
                             For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In CDef.fields
@@ -3162,7 +3163,7 @@ ErrorTrap:
                                     If FieldValue <> "" Then
                                         CSTest = db.cs_open(ContentName, "(" & FieldName & "=" & db.encodeSQLText(FieldValue) & ")and(ID<>" & authContext.user.ID & ")")
                                         If db.cs_ok(CSTest) Then
-                                            Call error_AddUserError("The field '" & FieldName & "' must be unique, and another account has already used '" & FieldValue & "'")
+                                            Call errorController.error_AddUserError(Me, "The field '" & FieldName & "' must be unique, and another account has already used '" & FieldValue & "'")
                                         End If
                                         Call db.cs_Close(CSTest)
                                     End If
@@ -3243,11 +3244,11 @@ ErrorTrap:
                             '
                             '
                             If app_errorCount > 0 Then
-                                Call error_AddUserError("An error occurred which prevented your information from being saved.")
+                                Call errorController.error_AddUserError(Me, "An error occurred which prevented your information from being saved.")
                                 'LegacyInterceptPageSN = LegacyInterceptPageSNMyProfile
                             Else
                                 If app_errorCount > 0 Then
-                                    Call error_AddUserError("An error occurred while saving your information.")
+                                    Call errorController.error_AddUserError(Me, "An error occurred while saving your information.")
                                     'LegacyInterceptPageSN = LegacyInterceptPageSNMyProfile
                                 End If
                             End If
@@ -3528,7 +3529,7 @@ ErrorTrap:
                                 '
                                 ' ----- if a content watch record is blocked, delete the content tracking
                                 '
-                                Call metaData_DeleteContentTracking(HostContentName, HostRecordID, False)
+                                Call db.deleteContentRules(metaData.getContentId(HostContentName), HostRecordID)
                             End If
                     End Select
                 End If
@@ -4617,7 +4618,7 @@ ErrorTrap:
         '            MethodName = "main_GetMyProfileForm"
         '            '
         '            If Not authcontext.user.user_isAuthenticated() Then
-        '                Call error_AddUserError("You can not edit your MyAccount page until you have logged in.")
+        '                Call errorController.error_AddUserError(me,"You can not edit your MyAccount page until you have logged in.")
         '            Else
         '                CSMember = main_OpenContent("People", "ID=" & app.EncodeSQLNumber(iPeopleID))
         '                If app.csOk(CSMember) Then
@@ -4792,7 +4793,7 @@ ErrorTrap:
         '            MethodName = "main_Get_old_MyProfileForm"
         '            '
         '            If Not authcontext.user.user_isAuthenticated() Then
-        '                Call error_AddUserError("You can not edit your MyAccount page until you have logged in.")
+        '                Call errorController.error_AddUserError(me,"You can not edit your MyAccount page until you have logged in.")
         '            Else
         '                CSMember = main_OpenContent("People", "ID=" & db.EncodeSQLNumber(iPeopleID))
         '                If db.csOk(CSMember) Then
@@ -6369,7 +6370,7 @@ ErrorTrap:
                             & "></a>"
                     Else
                         '
-                        MenuName = common_GetRandomLong_Internal().ToString
+                        MenuName = genericController.GetRandomInteger().ToString
                         Call htmlDoc.menu_AddEntry(MenuName, , "/ccLib/images/IconContentAdd.gif", , , , "stylesheet", "stylesheethover")
                         LowestRequiredMenuName = main_GetRecordAddLink_AddMenuEntry(iContentName, iPresetNameValueList, "", MenuName, MenuName)
                     End If
@@ -6482,21 +6483,14 @@ ErrorTrap:
         '========================================================================
         '
         Private Function main_GetRecordAddLink_AddMenuEntry(ByVal ContentName As String, ByVal PresetNameValueList As String, ByVal ContentNameList As String, ByVal MenuName As String, ByVal ParentMenuName As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetRecordAddLink_AddMenuEntry")
-            '
-            'If Not (true) Then Exit Function
-            '
+            Dim result As String = ""
             Dim Copy As String
-            Dim CID As Integer
             Dim CS As Integer
             Dim SQL As String
-            Dim LinkCount As Integer
             Dim csChildContent As Integer
             Dim ContentID As Integer
             Dim Link As String
             Dim MyContentNameList As String
-            Dim MethodName As String
-            Dim Label As String
             Dim ButtonCaption As String
             Dim ContentRecordFound As Boolean
             Dim ContentAllowAdd As Boolean
@@ -6507,15 +6501,13 @@ ErrorTrap:
             Dim ChildMenuName As String
             Dim ChildContentName As String
             '
-            MethodName = "main_GetRecordAddLink_AddMenuEntry"
-            '
             Link = ""
             MyContentNameList = ContentNameList
             If (ContentName = "") Then
                 Throw (New ApplicationException("main_GetRecordAddLink, ContentName is empty")) ' handleLegacyError14(MethodName, "")
             Else
                 If (InStr(1, MyContentNameList, "," & genericController.vbUCase(ContentName) & ",") >= 0) Then
-                    Throw (New ApplicationException("main_GetRecordAddLink_AddMenuEntry, Content Child [" & ContentName & "] is one of its own parents")) ' handleLegacyError14(MethodName, "")
+                    Throw (New ApplicationException("result , Content Child [" & ContentName & "] is one of its own parents")) ' handleLegacyError14(MethodName, "")
                 Else
                     MyContentNameList = MyContentNameList & "," & genericController.vbUCase(ContentName) & ","
                     '
@@ -6599,7 +6591,7 @@ ErrorTrap:
                         '
                         Link = ""
                         ButtonCaption = ContentName
-                        main_GetRecordAddLink_AddMenuEntry = MenuName
+                        result = MenuName
                         If ContentAllowAdd And GroupRulesAllowAdd And MemberRulesAllow Then
                             Link = siteProperties.adminURL & "?cid=" & ContentID & "&af=4&aa=2&ad=1"
                             If PresetNameValueList <> "" Then
@@ -6629,12 +6621,11 @@ ErrorTrap:
                             Do While db.cs_ok(csChildContent)
                                 ChildContentName = db.cs_getText(csChildContent, "name")
                                 Copy = main_GetRecordAddLink_AddMenuEntry(ChildContentName, PresetNameValueList, MyContentNameList, MenuName, ParentMenuName)
-                                'Copy = main_GetRecordAddLink_AddMenuEntry(ChildContentName, PresetNameValueList, MyContentNameList, MenuName, ChildMenuName)
                                 If Copy <> "" Then
                                     ChildMenuButtonCount = ChildMenuButtonCount + 1
                                 End If
-                                If (main_GetRecordAddLink_AddMenuEntry = "") And (Copy <> "") Then
-                                    main_GetRecordAddLink_AddMenuEntry = Copy
+                                If (result = "") And (Copy <> "") Then
+                                    result = Copy
                                 End If
                                 db.cs_goNext(csChildContent)
                             Loop
@@ -6642,223 +6633,27 @@ ErrorTrap:
                     End If
                 End If
                 Call db.cs_Close(csChildContent)
-                'main_GetRecordAddLink_AddMenuEntry = Link
             End If
-            '
-            'main_TestPointExit
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetRecordAddLink_AddMenuEntry")
+            Return result
         End Function
-        '
-        '========================================================================
-        ' Depricated - Use main_GetRecordEditLink and main_GetRecordAddLink
-        '========================================================================
-        '
-        Public Function main_GetRecordEditLinkByContent(ByVal ContentID As Integer, ByVal RecordIDVariant As Object, ByVal Criteria As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetRecordEditLinkByContent")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim MethodName As String
-            Dim ContentName As String
-            '
-            MethodName = "main_GetRecordEditLinkByContent"
-            '
-            ContentName = metaData.getContentNameByID(ContentID)
-            If ContentName <> "" Then
-                If Not genericController.IsNull(RecordIDVariant) Then
-                    main_GetRecordEditLinkByContent = main_GetRecordEditLink2(ContentName, genericController.EncodeInteger(RecordIDVariant), False, "", authContext.isEditing(Me, ContentName))
-                Else
-                    main_GetRecordEditLinkByContent = main_GetRecordAddLink(ContentName, Criteria)
-                End If
-            End If
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
-            '
-        End Function
+        ''
+        ''========================================================================
+        '' Depricated - Use main_GetRecordEditLink and main_GetRecordAddLink
+        ''========================================================================
+        ''
+        'Public Function main_GetRecordEditLinkByContent(ByVal ContentID As Integer, ByVal RecordIDVariant As Object, ByVal Criteria As String) As String
+        '    Dim ContentName As String = metaData.getContentNameByID(ContentID)
+        '    If ContentName <> "" Then
+        '        If Not genericController.IsNull(RecordIDVariant) Then
+        '            Return main_GetRecordEditLink2(ContentName, genericController.EncodeInteger(RecordIDVariant), False, "", authContext.isEditing(Me, ContentName))
+        '        Else
+        '            Return main_GetRecordAddLink(ContentName, Criteria)
+        '        End If
+        '    End If
+        '    Return ""
+        'End Function
 
-        '
-        '========================================================================
-        ' ----- Compatibility Only
-        '========================================================================
-        '
-        Public Function main_GetFormCSInput(ByVal CSPointer As Integer, ByVal FieldName As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetFormCSInput")
-            '
-            'If Not (true) Then Exit Function
-            '
-            If db.cs_ok(genericController.EncodeInteger(CSPointer)) Then
-                '
-                ' Just do a text box with the value
-                '
-                main_GetFormCSInput = htmlDoc.html_GetFormInputText2(FieldName, genericController.encodeText(db.cs_getField(CSPointer, FieldName)))
-            Else
-                '
-                ' Just do a text box with a blank
-                '
-                main_GetFormCSInput = htmlDoc.html_GetFormInputText2(genericController.encodeText(FieldName), "")
-            End If
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetFormCSInput")
-            '
-        End Function
-        '
-        '==================================================================================================
-        ' ----- Remove this record from all watch lists
-        '       Mark permanent if the content is being deleted. non-permanent otherwise
-        '==================================================================================================
-        '
-        Public Sub metaData_DeleteContentTracking(ContentName As String, RecordID As Integer, Permanent As Object)
-            db.deleteContentRules(metaData.getContentId(ContentName), RecordID)
-        End Sub
-        '
-        '=================================================================================
-        '   Public for main_GetRandomLong_Internal
-        '=================================================================================
-        '
-        Public Function common_GetRandomLong() As Integer
-            On Error GoTo ErrorTrap
-            '
-            common_GetRandomLong = common_GetRandomLong_Internal()
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetRandomLong")
-        End Function
-        '
-        '=================================================================================
-        '   main_Get a Random long value
-        '=================================================================================
-        '
-        Public Function common_GetRandomLong_Internal() As Integer
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetRandomLong_Internal")
-            '
-            Dim RandomLimit As Single
-            '
-            RandomLimit = ((2 ^ 30) - 1)
-            common_GetRandomLong_Internal = CInt(Rnd() * RandomLimit)
-            '
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_GetRandomLong_Internal")
-        End Function
-        '
-        '========================================================================
-        ' ----- Starts an HTML page (for an admin page -- not a public page)
-        '========================================================================
-        '
-        Public Function admin_GetPageStart(Optional ByVal Title As String = "", Optional ByVal PageMargin As Integer = 0) As String
-            admin_GetPageStart = admin_GetPageStart2(Title, PageMargin)
-        End Function
-        '
-        '========================================================================
-        ' ----- Starts an HTML page (for an admin page -- not a public page)
-        '========================================================================
-        '
-        Public Function admin_GetPageStart2(Optional ByVal Title As String = "", Optional ByVal PageMargin As Integer = 0) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetPageStartAdmin")
-            '
-            'If Not (true) Then Exit Function
-            '
-            If Title <> "" Then
-                Call htmlDoc.main_AddPagetitle(Title)
-            End If
-            If htmlDoc.main_MetaContent_Title = "" Then
-                Call htmlDoc.main_AddPagetitle("Admin-" & webServer.webServerIO_requestDomain)
-            End If
-            webServer.webServerIO_response_NoFollow = True
-            '
-            ' main_SetMetaContent - this is done by the 'content' contributer for the page
-            '
-            Call htmlDoc.main_SetMetaContent(0, 0)
-            '
-            admin_GetPageStart2 = "" _
-                & siteProperties.docTypeDeclarationAdmin _
-                & vbCrLf & "<html>" _
-                & vbCrLf & "<head>" _
-                & htmlDoc.getHTMLInternalHead(True) _
-                & vbCrLf & "</head>" _
-                & vbCrLf & "<body class=""ccBodyAdmin ccCon"">"
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetPageStartAdmin")
-        End Function
-        ''
-        ''==========================================================================
-        ''
-        'Public Property htmlDoc.refreshQueryString() As String
-        '    Get
-        '        htmlDoc.refreshQueryString = htmlDoc.refreshQueryString
-        '    End Get
-        '    Set(ByVal value As String)
-        '        htmlDoc.refreshQueryString = value
-        '    End Set
-        'End Property
-        '
-        '========================================================================
-        '
-        Public Function properties_user_getText(ByVal PropertyName As String, Optional ByVal DefaultValue As String = "", Optional ByVal TargetMemberID As Integer = SystemMemberID) As String
-            Dim returnProperty As String = DefaultValue
-            Try
-                If TargetMemberID = SystemMemberID Then
-                    returnProperty = userProperty.getText(PropertyName, DefaultValue, authContext.user.ID)
-                Else
-                    returnProperty = userProperty.getText(PropertyName, DefaultValue, TargetMemberID)
-                End If
-            Catch ex As Exception
-                Throw (ex)
-            End Try
-            Return returnProperty
-        End Function
-        '
-        '==========================================================================
-        '
-        Public Function properties_user_getInteger(ByVal PropertyName As String, Optional ByVal DefaultValue As Integer = 0, Optional ByVal TargetMemberID As Integer = SystemMemberID) As Integer
-            Return genericController.EncodeInteger(properties_user_getText(PropertyName, DefaultValue.ToString, TargetMemberID))
-        End Function
-        '
-        '==========================================================================
-        '   Add on to the common error message
-        '==========================================================================
-        '
-        Public Sub error_AddUserError(ByVal Message As String)
-            If (InStr(1, debug_iUserError, Message, vbTextCompare) = 0) Then
-                debug_iUserError = debug_iUserError & cr & "<li class=""ccError"">" & genericController.encodeText(Message) & "</LI>"
-            End If
-        End Sub
-        '
-        '==========================================================================
-        '   main_Get The user error messages
-        '       If there are none, return ""
-        '==========================================================================
-        '
-        Public Function error_GetUserError() As String
-            error_GetUserError = genericController.encodeText(debug_iUserError)
-            If error_GetUserError <> "" Then
-                error_GetUserError = "<ul class=""ccError"">" & genericController.kmaIndent(error_GetUserError) & cr & "</ul>"
-                error_GetUserError = UserErrorHeadline & "" & error_GetUserError
-                debug_iUserError = ""
-            End If
-        End Function
+
 
     End Class
 End Namespace

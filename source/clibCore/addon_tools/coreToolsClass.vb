@@ -672,7 +672,7 @@ ErrorTrap:
                 Dim SQLRows As Integer
                 SQLRows = cpCore.docProperties.getInteger("SQLRows")
                 If SQLRows = 0 Then
-                    SQLRows = cpCore.properties_user_getInteger("ManualQueryInputRows", 5)
+                    SQLRows = cpCore.userProperty.getInteger("ManualQueryInputRows", 5)
                 Else
                     Call cpCore.userProperty.setProperty("ManualQueryInputRows", CStr(SQLRows))
                 End If
@@ -4556,13 +4556,13 @@ ErrorTrap:
             '
             FindRows = cpCore.docProperties.getInteger("SQLRows")
             If FindRows = 0 Then
-                FindRows = cpCore.properties_user_getInteger("FindAndReplaceFindRows", 1)
+                FindRows = cpCore.userProperty.getInteger("FindAndReplaceFindRows", 1)
             Else
                 Call cpCore.userProperty.setProperty("FindAndReplaceFindRows", CStr(FindRows))
             End If
             ReplaceRows = cpCore.docProperties.getInteger("ReplaceRows")
             If ReplaceRows = 0 Then
-                ReplaceRows = cpCore.properties_user_getInteger("FindAndReplaceReplaceRows", 1)
+                ReplaceRows = cpCore.userProperty.getInteger("FindAndReplaceReplaceRows", 1)
             Else
                 Call cpCore.userProperty.setProperty("FindAndReplaceReplaceRows", CStr(ReplaceRows))
             End If

@@ -546,7 +546,7 @@ Namespace Contensive.Core.Controllers
                 Dim CreateKeyString As String
                 Dim DateAddedString As String
                 '
-                CreateKeyString = encodeSQLNumber(genericController.getRandomLong)
+                CreateKeyString = encodeSQLNumber(genericController.getRandomInteger)
                 DateAddedString = encodeSQLDate(Now)
                 '
                 sqlList.add("createkey", CreateKeyString)
@@ -2725,7 +2725,7 @@ Namespace Contensive.Core.Controllers
                                 Call sqlList.add("EDITBLANK", SQLFalse) ' ArrayPointer)
                             End If
                             '
-                            CreateKeyString = encodeSQLNumber(genericController.getRandomLong)
+                            CreateKeyString = encodeSQLNumber(genericController.getRandomInteger)
                             DateAddedString = encodeSQLDate(Now)
                             '
                             Call sqlList.add("CREATEKEY", CreateKeyString) ' ArrayPointer)
@@ -4947,7 +4947,7 @@ Namespace Contensive.Core.Controllers
                 '
                 'DataSourceID = cpCore.db.GetDataSourceID(DataSourceName)
                 DateAddedString = cpCore.db.encodeSQLDate(Now())
-                CreateKeyString = cpCore.db.encodeSQLNumber(genericController.getRandomLong)
+                CreateKeyString = cpCore.db.encodeSQLNumber(genericController.getRandomInteger)
                 '
                 '----------------------------------------------------------------
                 ' ----- Read in a record from the table to get fields
@@ -5433,10 +5433,8 @@ Namespace Contensive.Core.Controllers
                                         '
                                         ' This content record does not exist - remove any records with this ContentRecordKey pointer
                                         '
-                                        'Call app.DeleteContentRecords("Topic Rules", "ContentRecordKey=" & encodeSQLText(ContentRecordKey))
-                                        'Call app.DeleteContentRecords("Topic Habits", "ContentRecordKey=" & encodeSQLText(ContentRecordKey))
                                         Call deleteContentRecords("Content Watch", "ContentRecordKey=" & encodeSQLText(ContentRecordKey))
-                                        Call cpCore.metaData_DeleteContentTracking(ContentName, RecordID, True)
+                                        Call cpCore.db.deleteContentRules(cpCore.metaData.getContentId(ContentName), RecordID)
                                     Else
 
                                         If templateId <> 0 Then

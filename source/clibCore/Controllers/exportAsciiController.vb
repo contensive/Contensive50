@@ -41,7 +41,7 @@ Namespace Contensive.Core.Controllers
                 Dim sb As New System.Text.StringBuilder
                 Dim TestFilename As String
                 '
-                TestFilename = "AsciiExport" & cpCore.common_GetRandomLong_Internal() & ".txt"
+                TestFilename = "AsciiExport" & genericController.GetRandomInteger() & ".txt"
                 '
                 iContentName = genericController.encodeText(ContentName)
                 If PageSize = 0 Then

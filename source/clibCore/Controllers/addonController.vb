@@ -850,7 +850,7 @@ Namespace Contensive.Core.Controllers
                                         & "&remotemethodaddon=" & EncodeURL(AddonNameOrGuid_Local) _
                                         & "&optionstring=" & EncodeRequestVariable(WorkingOptionString) _
                                         & ""
-                                    FrameID = "frame" & getRandomLong()
+                                    FrameID = "frame" & GetRandomInteger()
                                     returnVal = "<iframe src=""" & Link & """ id=""" & FrameID & """ onload=""cj.setFrameHeight('" & FrameID & "');"" class=""ccAddonFrameCon"" frameborder=""0"" scrolling=""no"">This content is not visible because your browser does not support iframes</iframe>" _
                                         & cr & "<script language=javascript type=""text/javascript"">" _
                                         & cr & "// Safari and Opera need a kick-start." _
@@ -867,7 +867,7 @@ Namespace Contensive.Core.Controllers
                                 '-----------------------------------------------------------------
                                 '
                                 If isMainOk Then
-                                    AsAjaxID = "asajax" & getRandomLong()
+                                    AsAjaxID = "asajax" & GetRandomInteger()
                                     QS = "" _
                                         & RequestNameRemoteMethodAddon & "=" & EncodeRequestVariable(AddonNameOrGuid_Local) _
                                         & "&HostContentName=" & EncodeRequestVariable(HostContentName) _

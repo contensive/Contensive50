@@ -498,7 +498,7 @@ Namespace Contensive.Core
                         '            ' block the reset because we will loose the error message
                         '            '
                         '            IISResetRequired = False
-                        '            cpCore.error_AddUserError("This Add-on Collection did not install correctly, " & ErrorMessage)
+                        '            errorController.error_AddUserError(cpcore,"This Add-on Collection did not install correctly, " & ErrorMessage)
                         '        Else
                         '            '
                         '            ' Save the first collection as the installed collection
@@ -520,9 +520,9 @@ Namespace Contensive.Core
                                 UpgradeOK = addonInstall.InstallCollectionsFromPrivateFolder(privateFilesInstallPath, ErrorMessage, InstalledCollectionGuidList, False)
                                 If Not UpgradeOK Then
                                     If ErrorMessage = "" Then
-                                        cpCore.error_AddUserError("The Add-on Collection did not install correctly, but no detailed error message was given.")
+                                        errorController.error_AddUserError(cpCore, "The Add-on Collection did not install correctly, but no detailed error message was given.")
                                     Else
-                                        cpCore.error_AddUserError("The Add-on Collection did not install correctly, " & ErrorMessage)
+                                        errorController.error_AddUserError(cpCore, "The Add-on Collection did not install correctly, " & ErrorMessage)
                                     End If
                                 Else
                                     For Each installedCollectionGuid As String In InstalledCollectionGuidList
@@ -615,8 +615,8 @@ Namespace Contensive.Core
                                         UserError = "There was an error reading the Collection Library. The site may be unavailable."
                                         Call HandleClassAppendLog("AddonManager", UserError)
                                         status &= "<br>" & UserError
-                                        cpCore.error_AddUserError(UserError)
-                                        parseError = True
+                                    errorController.error_AddUserError(cpCore, UserError)
+                                    parseError = True
                                     End Try
                                     Ptr = 0
                                     If Not parseError Then
@@ -624,8 +624,8 @@ Namespace Contensive.Core
                                             UserError = "There was an error reading the Collection Library file. The '" & CollectionListRootNode & "' element was not found."
                                             Call HandleClassAppendLog("AddonManager", UserError)
                                             status &= "<br>" & UserError
-                                            cpCore.error_AddUserError(UserError)
-                                        Else
+                                        errorController.error_AddUserError(cpCore, UserError)
+                                    Else
                                             '
                                             ' Go through file to validate the XML, and build status message -- since service process can not communicate to user
                                             '

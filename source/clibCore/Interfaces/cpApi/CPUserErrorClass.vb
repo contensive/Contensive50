@@ -1,4 +1,6 @@
+
 Imports Contensive.BaseClasses
+Imports Contensive.Core.Controllers
 Imports System.Runtime.InteropServices
 
 Namespace Contensive.Core
@@ -47,13 +49,13 @@ Namespace Contensive.Core
         '
         Public Overrides Sub Add(ByVal Message As String) 'Inherits BaseClasses.CPUserErrorBaseClass.Add
             If True Then
-                Call cpCore.error_AddUserError(Message)
+                Call errorController.error_AddUserError(cpcore,Message)
             End If
         End Sub
 
         Public Overrides Function GetList() As String 'Inherits BaseClasses.CPUserErrorBaseClass.GetList
             If True Then
-                Return cpCore.error_GetUserError()
+                Return errorController.error_GetUserError(cpCore)
             Else
                 Return ""
             End If

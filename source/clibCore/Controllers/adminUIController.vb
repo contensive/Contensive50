@@ -57,7 +57,7 @@ Namespace Contensive.Core
             ' Add Errors
             '
             If (cpcore.debug_iUserError <> "") Then
-                Copy = Copy & "<div>" & cpCore.error_GetUserError & "</div>"
+                Copy = Copy & "<div>" & errorController.error_GetUserError(cpCore) & "</div>"
             End If
             '
             If Copy <> "" Then

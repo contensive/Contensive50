@@ -363,11 +363,11 @@ Namespace Contensive.Core
                     Dim inputStream As IO.Stream = iisContext.Request.InputStream
                 Catch ex As httpException
                     Call cpCore.handleExceptionAndContinue(ex) : Throw
-                    cpCore.error_AddUserError(ex.Message)
+                    errorController.error_AddUserError(cpcore,ex.Message)
                     postError = True
                 Catch ex As Exception
                     Call cpCore.handleExceptionAndContinue(ex) : Throw
-                    cpCore.error_AddUserError(ex.Message)
+                    errorController.error_AddUserError(cpcore,ex.Message)
                     postError = True
                 End Try
                 If Not postError Then

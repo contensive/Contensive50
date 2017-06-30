@@ -438,7 +438,7 @@ Namespace Contensive.Core.Controllers
                                 returnHtml = "" _
                                 & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td align=center>" _
                                 & "<div style=""width:400px;text-align:left;"">" _
-                                & cpcore.error_GetUserError() _
+                                & errorController.error_GetUserError(cpcore) _
                                 & BlockCopy _
                                 & BlockForm _
                                 & "</div></td></tr></table>"
@@ -496,7 +496,7 @@ Namespace Contensive.Core.Controllers
                                 returnHtml = "" _
                                 & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td align=center>" _
                                 & "<div style=""width:400px;text-align:left;"">" _
-                                & cpcore.error_GetUserError() _
+                                & errorController.error_GetUserError(cpcore) _
                                 & BlockCopy _
                                 & BlockForm _
                                 & "</div></td></tr></table>"
@@ -2100,10 +2100,10 @@ ErrorTrap:
             & cr2 & "<td colspan=2 class=""qeRow""><div class=""qeHeadCon"">" & OptionsPanelAuthoringStatus & "</div></td>" _
             & cr & "</tr>"
             End If
-            If (cpCore.debug_iUserError <> "") Then
+            If (cpcore.debug_iUserError <> "") Then
                 s = s & "" _
             & cr & "<tr>" _
-            & cr2 & "<td colspan=2 class=""qeRow""><div class=""qeHeadCon"">" & cpcore.error_GetUserError() & "</div></td>" _
+            & cr2 & "<td colspan=2 class=""qeRow""><div class=""qeHeadCon"">" & errorController.error_GetUserError(cpcore) & "</div></td>" _
             & cr & "</tr>"
             End If
             s = s _
@@ -2226,7 +2226,7 @@ ErrorTrap:
             '
             ' ----- Page Copy
             '
-            FieldRows = genericController.EncodeInteger(cpcore.properties_user_getText(ContentName & ".copyFilename.PixelHeight", "500"))
+            FieldRows = genericController.EncodeInteger(cpcore.userProperty.getText(ContentName & ".copyFilename.PixelHeight", "500"))
             If FieldRows < 50 Then
                 FieldRows = 50
                 Call cpcore.userProperty.setProperty(ContentName & ".copyFilename.PixelHeight", 50)
@@ -2462,7 +2462,7 @@ ErrorTrap:
                     SaveButNoChanges = True
                     RequestName = cpcore.docProperties.getText("name")
                     If Trim(RequestName) = "" Then
-                        Call cpcore.error_AddUserError("A name is required to save this page")
+                        Call errorController.error_AddUserError(cpcore, "A name is required to save this page")
                     Else
                         CSBlock = cpcore.db.cs_open2(ContentName, RecordID, True, True)
                         If cpcore.db.cs_ok(CSBlock) Then
@@ -2595,7 +2595,7 @@ ErrorTrap:
                     Call cpcore.workflow.main_SubmitEdit(ContentName, RecordID)
                     Call pageManager_SendPublishSubmitNotice(ContentName, RecordID, "")
                 End If
-                If (Not (cpCore.debug_iUserError <> "")) And ((Button = ButtonOK) Or (Button = ButtonCancel) Or (Button = ButtonPublish)) Then
+                If (Not (cpcore.debug_iUserError <> "")) And ((Button = ButtonOK) Or (Button = ButtonCancel) Or (Button = ButtonPublish)) Then
                     '
                     ' ----- Turn off Quick Editor if not save or add child
                     '
@@ -5206,7 +5206,7 @@ ErrorTrap:
         '            '
         '            Dim builder As New builderClass(me)
         '            '
-        '            Call app.publicFiles.SaveFile("Install/" & CStr(main_GetRandomLong_Internal()) & ".xml", CollectionFileData)
+        '            Call app.publicFiles.SaveFile("Install/" & CStr(main_getRandomInteger()) & ".xml", CollectionFileData)
         '            Call builder.InstallAddons(IsNewBuild)
         '            '
         '            Exit Function
@@ -6330,7 +6330,7 @@ ErrorTrap:
             End If
             '
             pageManager_GetFormPage = "" _
-            & cpcore.error_GetUserError() _
+            & errorController.error_GetUserError(cpcore) _
             & cpcore.htmlDoc.html_GetUploadFormStart() _
             & cpcore.htmlDoc.html_GetFormInputHidden("ContensiveFormPageID", FormPageID) _
             & cpcore.htmlDoc.html_GetFormInputHidden("SuccessID", cpcore.security.encodeToken(GroupIDToJoinOnSuccess, cpcore.app_startTime)) _
@@ -7110,25 +7110,6 @@ ErrorTrap:
                 landingLink = genericController.EncodeAppRootPath(landingLink, cpcore.webServer.webServerIO_requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain)
             End If
             pageManager_GetLandingLink = landingLink
-        End Function
-
-        '
-        '========================================================================
-        ' ----- Ends an HTML page
-        '========================================================================
-        '
-        Public Function pagemanager_GetPageEnd() As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetPageEnd")
-            '
-            'If Not (true) Then Exit Function
-            '
-            pagemanager_GetPageEnd = "" _
-                & cr & "</body>" _
-                & vbCrLf & "</html>"
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetPageEnd")
         End Function
         '
         '

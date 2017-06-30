@@ -615,7 +615,7 @@ ErrorTrap:
                 '
                 CS = cpcore.db.csOpen2("email", EmailID)
                 If Not cpcore.db.cs_ok(CS) Then
-                    Call cpcore.error_AddUserError("There was a problem sending the email confirmation. The email record could not be found.")
+                    Call errorController.error_AddUserError(cpcore,"There was a problem sending the email confirmation. The email record could not be found.")
                 Else
                     EmailSubject = cpcore.db.cs_get(CS, "Subject")
                     EmailBody = cpcore.db.cs_get(CS, "copyFilename")
@@ -653,7 +653,7 @@ ErrorTrap:
                     SQL = getGroupSql(EmailID)
                     CSPeople = cpcore.db.cs_openSql(SQL)
                     If Not cpcore.db.cs_ok(CSPeople) Then
-                        cpcore.error_AddUserError("There are no valid recipients of this email, other than the confirmation address. Either no groups or topics were selected, or those selections contain no people with both a valid email addresses and 'Allow Group Email' enabled.")
+                        errorController.error_AddUserError(cpcore,"There are no valid recipients of this email, other than the confirmation address. Either no groups or topics were selected, or those selections contain no people with both a valid email addresses and 'Allow Group Email' enabled.")
                     Else
                         'TotalList = TotalList & "--- all recipients ---" & BR
                         LastEmail = "empty"
@@ -699,26 +699,26 @@ ErrorTrap:
                     Call cpcore.db.cs_Close(CSPeople)
                     '
                     If DupCnt = 1 Then
-                        Call cpcore.error_AddUserError("There is 1 duplicate email address. See the test email for details.")
+                        Call errorController.error_AddUserError(cpcore,"There is 1 duplicate email address. See the test email for details.")
                         ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">WARNING: There is 1 duplicate email address. Only one email will be sent to each address. If the email includes personalization, or if you are using link authentication to automatically log in the user, you may want to correct duplicates to be sure the email is created correctly.<div style=""margin:20px;"">" & DupList & "</div></div>"
                     ElseIf DupCnt > 1 Then
-                        Call cpcore.error_AddUserError("There are " & DupCnt & " duplicate email addresses. See the test email for details")
+                        Call errorController.error_AddUserError(cpcore,"There are " & DupCnt & " duplicate email addresses. See the test email for details")
                         ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">WARNING: There are " & DupCnt & " duplicate email addresses. Only one email will be sent to each address. If the email includes personalization, or if you are using link authentication to automatically log in the user, you may want to correct duplicates to be sure the email is created correctly.<div style=""margin:20px;"">" & DupList & "</div></div>"
                     End If
                     '
                     If BadCnt = 1 Then
-                        Call cpcore.error_AddUserError("There is 1 invalid email address. See the test email for details.")
+                        Call errorController.error_AddUserError(cpcore,"There is 1 invalid email address. See the test email for details.")
                         ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">WARNING: There is 1 invalid email address<div style=""margin:20px;"">" & BadList & "</div></div>"
                     ElseIf BadCnt > 1 Then
-                        Call cpcore.error_AddUserError("There are " & BadCnt & " invalid email addresses. See the test email for details")
+                        Call errorController.error_AddUserError(cpcore,"There are " & BadCnt & " invalid email addresses. See the test email for details")
                         ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">WARNING: There are " & BadCnt & " invalid email addresses<div style=""margin:20px;"">" & BadList & "</div></div>"
                     End If
                     '
                     If BlankCnt = 1 Then
-                        Call cpcore.error_AddUserError("There is 1 blank email address. See the test email for details")
+                        Call errorController.error_AddUserError(cpcore,"There is 1 blank email address. See the test email for details")
                         ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">WARNING: There is 1 blank email address.</div>"
                     ElseIf BlankCnt > 1 Then
-                        Call cpcore.error_AddUserError("There are " & DupCnt & " blank email addresses. See the test email for details.")
+                        Call errorController.error_AddUserError(cpcore,"There are " & DupCnt & " blank email addresses. See the test email for details.")
                         ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">WARNING: There are " & BlankCnt & " blank email addresses.</div>"
                     End If
                     '
@@ -731,12 +731,12 @@ ErrorTrap:
                     End If
                     '
                     If ConfirmationMemberID = 0 Then
-                        cpcore.error_AddUserError("No confirmation email was send because a Confirmation member is not selected")
+                        errorController.error_AddUserError(cpcore,"No confirmation email was send because a Confirmation member is not selected")
                     Else
                         EmailBody = EmailBody & "<div style=""clear:both;padding:10px;margin:10px;border:1px dashed #888;"">Administrator<br><br>" & ConfirmFooter & "</div>"
                         EmailStatus = sendPerson(ConfirmationMemberID, cpcore.db.cs_getText(CS, "FromAddress"), EmailSubject, EmailBody, True, True, EmailID, EmailTemplate, False)
                         If EmailStatus <> "ok" Then
-                            cpcore.error_AddUserError(EmailStatus)
+                            errorController.error_AddUserError(cpcore,EmailStatus)
                         End If
                     End If
                 End If
@@ -913,7 +913,7 @@ ErrorTrap:
             '
             EmailStatus = sendSystem(genericController.encodeText(EMailName), genericController.encodeText(AdditionalCopy), genericController.EncodeInteger(AdditionalMemberID))
             If cpcore.authContext.isAuthenticatedAdmin(cpcore) And (EmailStatus <> "") Then
-                cpcore.error_AddUserError("Administrator: There was a problem sending the confirmation email, " & EmailStatus)
+                errorController.error_AddUserError(cpcore,"Administrator: There was a problem sending the confirmation email, " & EmailStatus)
             End If
             Exit Sub
         End Sub
@@ -965,7 +965,7 @@ ErrorTrap:
                 returnREsult = False
                 If workingEmail = "" Then
                     'hint = "110"
-                    cpcore.error_AddUserError("Please enter your email address before requesting your username and password.")
+                    errorController.error_AddUserError(cpcore,"Please enter your email address before requesting your username and password.")
                 Else
                     'hint = "120"
                     atPtr = genericController.vbInstr(1, workingEmail, "@")
@@ -974,7 +974,7 @@ ErrorTrap:
                         ' email not valid
                         '
                         'hint = "130"
-                        cpcore.error_AddUserError("Please enter a valid email address before requesting your username and password.")
+                        errorController.error_AddUserError(cpcore,"Please enter a valid email address before requesting your username and password.")
                     Else
                         'hint = "140"
                         EMailName = vbMid(workingEmail, 1, atPtr - 1)
@@ -1022,7 +1022,7 @@ ErrorTrap:
                                 Call cpcore.db.cs_save2(CS)
                             Else
                                 'hint = "155"
-                                cpcore.error_AddUserError("No current user was found matching this email address. Please try again. ")
+                                errorController.error_AddUserError(cpcore,"No current user was found matching this email address. Please try again. ")
                             End If
                         End If
                         If cpcore.db.cs_ok(CS) Then

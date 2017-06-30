@@ -898,7 +898,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Throw New applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Sub
         '
@@ -930,13 +930,13 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Throw New applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
+            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Function
         '
         '====================================================================================================
         '
-        Public Function html_GetEndOfBody(AllowLogin As Boolean, AllowTools As Boolean, BlockNonContentExtras As Boolean, main_IsAdminSite As Boolean) As String
+        Public Function getBeforeEndOfBodyHtml(AllowLogin As Boolean, AllowTools As Boolean, BlockNonContentExtras As Boolean, main_IsAdminSite As Boolean) As String
             Dim s As String = ""
             Try
                 Dim AllowPopupErrors As Boolean
@@ -1303,7 +1303,7 @@ ErrorTrap:
                     '
                     ' Selection is too big
                     '
-                    Call cpCore.error_AddUserError("The drop down list for " & ContentName & " called " & MenuName & " is too long to display. The site administrator has been notified and the problem will be resolved shortly. To fix this issue temporarily, go to the admin tab of the Preferences page and set the Select Field Limit larger than " & RowCnt & ".")
+                    Call errorController.error_AddUserError(cpCore, "The drop down list for " & ContentName & " called " & MenuName & " is too long to display. The site administrator has been notified and the problem will be resolved shortly. To fix this issue temporarily, go to the admin tab of the Preferences page and set the Select Field Limit larger than " & RowCnt & ".")
                     '                    cpcore.handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
 
                     cpCore.handleExceptionAndContinue(New Exception("Error creating select list from content [" & ContentName & "] called [" & MenuName & "]. Selection of [" & RowCnt & "] records exceeds [" & cpCore.siteProperties.selectFieldLimit & "], the current Site Property SelectFieldLimit."))
@@ -2007,7 +2007,7 @@ ErrorTrap:
         '
         Public Function main_GetClosePage3(AllowLogin As Boolean, AllowTools As Boolean, BlockNonContentExtras As Boolean, doNotDisposeOnExit As Boolean) As String
             Try
-                main_GetClosePage3 = html_GetEndOfBody(AllowLogin, AllowTools, BlockNonContentExtras, False)
+                main_GetClosePage3 = getBeforeEndOfBodyHtml(AllowLogin, AllowTools, BlockNonContentExtras, False)
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
@@ -5076,7 +5076,7 @@ ErrorTrap:
                                                                     ' ChildList, Language
                                                                     '
                                                                     If ACInstanceName = "0" Then
-                                                                        ACInstanceName = genericController.getRandomLong().ToString()
+                                                                        ACInstanceName = genericController.GetRandomInteger().ToString()
                                                                     End If
                                                                     ElementText = "<AC type=""" & ACType & """ name=""" & ACInstanceName & """ ACInstanceID=""" & ACInstanceID & """>"
                                                                 Case ACTypeAggregateFunction
@@ -8968,10 +8968,10 @@ ErrorTrap:
                 loginForm_Password = cpCore.docProperties.getText("password")
                 '
                 If Not genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("AllowMemberJoin", False)) Then
-                    cpCore.error_AddUserError("This site does not accept public main_MemberShip.")
+                    errorController.error_AddUserError(cpCore, "This site does not accept public main_MemberShip.")
                 Else
                     If Not cpCore.authContext.isNewLoginOK(cpCore, loginForm_Username, loginForm_Password, ErrorMessage, errorCode) Then
-                        Call cpCore.error_AddUserError(ErrorMessage)
+                        Call errorController.error_AddUserError(cpCore, ErrorMessage)
                     Else
                         If Not (cpCore.debug_iUserError <> "") Then
                             CS = cpCore.db.cs_open("people", "ID=" & cpCore.db.encodeSQLNumber(cpCore.authContext.user.ID))
@@ -9053,7 +9053,7 @@ ErrorTrap:
                     bodyTag = TemplateDefaultBodyTag
                 End If
                 'Call AppendLog("call main_getEndOfBody, from main_getLoginPage2 ")
-                returnREsult = main_assembleHtmlDoc(cpCore.siteProperties.docTypeDeclaration(), head, bodyTag, Body & cpCore.htmlDoc.html_GetEndOfBody(False, False, False, False))
+                returnREsult = main_assembleHtmlDoc(cpCore.siteProperties.docTypeDeclaration(), head, bodyTag, Body & cpCore.htmlDoc.getBeforeEndOfBodyHtml(False, False, False, False))
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
@@ -9173,7 +9173,7 @@ ErrorTrap:
                     '-------
 
                     Panel = "" _
-                        & cpCore.error_GetUserError() _
+                        & errorController.error_GetUserError(cpCore) _
                         & cr & "<p class=""ccAdminNormal"">" & usernameMsg _
                         & loginForm _
                         & ""
@@ -9890,5 +9890,41 @@ ErrorTrap:
                 Call cpCore.cache.invalidateContent(RulesContentName)
             End If
         End Sub
+        '
+        '========================================================================
+        ' ----- Starts an HTML page (for an admin page -- not a public page)
+        '========================================================================
+        '
+        Public Function getBeforeBodyHtml(Optional ByVal Title As String = "", Optional ByVal PageMargin As Integer = 0) As String
+            If Title <> "" Then
+                Call main_AddPagetitle(Title)
+            End If
+            If main_MetaContent_Title = "" Then
+                Call main_AddPagetitle("Admin-" & cpCore.webServer.webServerIO_requestDomain)
+            End If
+            cpCore.webServer.webServerIO_response_NoFollow = True
+            Call main_SetMetaContent(0, 0)
+            '
+            Return "" _
+                & cpCore.siteProperties.docTypeDeclarationAdmin _
+                & vbCrLf & "<html>" _
+                & vbCrLf & "<head>" _
+                & getHTMLInternalHead(True) _
+                & vbCrLf & "</head>" _
+                & vbCrLf & "<body class=""ccBodyAdmin ccCon"">"
+        End Function
+
+        '
+        '========================================================================
+        ' ----- Ends an HTML page
+        '========================================================================
+        '
+        Public Function getAfterBodyHtml() As String
+            Return "" _
+                & cr & "</body>" _
+                & vbCrLf & "</html>"
+        End Function
+
+
     End Class
 End Namespace

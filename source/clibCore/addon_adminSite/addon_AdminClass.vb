@@ -88,9 +88,9 @@ Namespace Contensive.Addons
                     'PageOpen = cpCore.admin_GetPageStart2()
                     '
                     returnHtml = "" _
-                    & cpCore.admin_GetPageStart2() _
+                    & cpCore.htmlDoc.getBeforeBodyHtml() _
                     & AdminContent _
-                    & cpCore.pages.pagemanager_GetPageEnd() _
+                    & cpCore.htmlDoc.getAfterBodyHtml() _
                     & ""
                 Else
                     '
@@ -100,10 +100,10 @@ Namespace Contensive.Addons
                     'PageOpen = cpCore.admin_GetPageStart2()
                     '
                     returnHtml = "" _
-                    & cpCore.admin_GetPageStart2() _
+                    & cpCore.htmlDoc.getBeforeBodyHtml() _
                     & AdminContent _
-                    & cpCore.htmlDoc.html_GetEndOfBody(True, True, False, True) _
-                    & cpCore.pages.pagemanager_GetPageEnd() _
+                    & cpCore.htmlDoc.getBeforeEndOfBodyHtml(True, True, False, True) _
+                    & cpCore.htmlDoc.getAfterBodyHtml() _
                     & ""
                 End If
                 '
@@ -501,7 +501,7 @@ leak200:
                             Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("addonid", CStr(addonId))
                             CS = cpCore.db.csOpen2(cnAddons, addonId)
                             If Not cpCore.db.cs_ok(CS) Then
-                                Call cpCore.error_AddUserError("The Add-on you requested could not be found by its id " & addonId)
+                                Call errorController.error_AddUserError(cpCore, "The Add-on you requested could not be found by its id " & addonId)
                             End If
                         ElseIf AddonGuid <> "" Then
                             Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("addonguid", AddonGuid)
@@ -512,13 +512,13 @@ leak200:
                                 CS = cpCore.db.cs_open(cnAddons, "aoguid=" & cpCore.db.encodeSQLText(AddonGuid))
                             End If
                             If Not cpCore.db.cs_ok(CS) Then
-                                Call cpCore.error_AddUserError("The Add-on you requested could not be found by its guid " & AddonGuid)
+                                Call errorController.error_AddUserError(cpCore, "The Add-on you requested could not be found by its guid " & AddonGuid)
                             End If
                         ElseIf AddonName <> "" Then
                             Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("addonname", AddonName)
                             CS = cpCore.db.cs_open(cnAddons, "name=" & cpCore.db.encodeSQLText(AddonName))
                             If Not cpCore.db.cs_ok(CS) Then
-                                Call cpCore.error_AddUserError("The Add-on you requested could not be found by its name " & AddonName)
+                                Call errorController.error_AddUserError(cpCore, "The Add-on you requested could not be found by its name " & AddonName)
                             End If
                         End If
                         If cpCore.db.cs_ok(CS) Then
@@ -555,7 +555,7 @@ leak200:
                 ' Pickup user errors
                 '
                 If (cpCore.debug_iUserError <> "") Then
-                    ContentCell = "<div class=""ccAdminMsg"">" & cpCore.error_GetUserError() & "</div>" & ContentCell
+                    ContentCell = "<div class=""ccAdminMsg"">" & errorController.error_GetUserError(cpCore) & "</div>" & ContentCell
                 End If
                 ''
                 '' If blank, must be an addon with a setting form that returned blank, do the dashboard again
@@ -655,7 +655,7 @@ ErrorTrap:
                 If adminContent Is Nothing Then
                     adminContent = New cdefModel
                     adminContent.Id = 0
-                    cpCore.error_AddUserError("There is no content with the requested id [" & requestedContentId & "]")
+                    errorController.error_AddUserError(cpCore, "There is no content with the requested id [" & requestedContentId & "]")
                     requestedContentId = 0
                 End If
             End If
@@ -1016,9 +1016,9 @@ ErrorTrap:
                             'AdminForm = AdminFormRoot
                         Case AdminActionPublishApprove
                             If (editRecord.Read_Only) Then
-                                Call cpCore.error_AddUserError("Your request was blocked because the record you specified is locked.")
+                                Call errorController.error_AddUserError(cpCore, "Your request was blocked because the record you specified is locked.")
                             ElseIf Not adminContent.AllowWorkflowAuthoring Then
-                                Call cpCore.error_AddUserError("Your request was blocked because content you selected does not support workflow authoring.")
+                                Call errorController.error_AddUserError(cpCore, "Your request was blocked because content you selected does not support workflow authoring.")
                             Else
                                 '
                                 Call LoadEditRecord(adminContent, editRecord)
@@ -1035,9 +1035,9 @@ ErrorTrap:
                             AdminAction = AdminActionNop ' convert so action can be used in as a refresh
                         Case AdminActionPublishSubmit
                             If (editRecord.Read_Only) Then
-                                Call cpCore.error_AddUserError("Your request was blocked because the record you specified is locked.")
+                                Call errorController.error_AddUserError(cpCore, "Your request was blocked because the record you specified is locked.")
                             ElseIf Not adminContent.AllowWorkflowAuthoring Then
-                                Call cpCore.error_AddUserError("Your request was blocked because content you selected does not support workflow authoring.")
+                                Call errorController.error_AddUserError(cpCore, "Your request was blocked because content you selected does not support workflow authoring.")
                             Else
                                 '
                                 Call LoadEditRecord(adminContent, editRecord)
@@ -1090,7 +1090,7 @@ ErrorTrap:
                             End If
                         Case AdminActionDelete
                             If (editRecord.Read_Only) Then
-                                Call cpCore.error_AddUserError("Your request was blocked because the record you specified is now locked by another authcontext.user.")
+                                Call errorController.error_AddUserError(cpCore, "Your request was blocked because the record you specified is now locked by another authcontext.user.")
                             Else
                                 Call LoadEditRecord(adminContent, editRecord)
                                 CSEditRecord = cpCore.db.cs_open2(adminContent.Name, editRecord.id, True, True)
@@ -1160,7 +1160,7 @@ ErrorTrap:
                             ' ----- Save Record
                             '
                             If (editRecord.Read_Only) Then
-                                Call cpCore.error_AddUserError("Your request was blocked because the record you specified is now locked by another authcontext.user.")
+                                Call errorController.error_AddUserError(cpCore, "Your request was blocked because the record you specified is now locked by another authcontext.user.")
                             Else
                                 Call LoadEditRecord(adminContent, editRecord)
                                 Call LoadEditResponse(adminContent, editRecord)
@@ -1176,7 +1176,7 @@ ErrorTrap:
                             ' ----- Save and add a new record
                             '
                             If (editRecord.Read_Only) Then
-                                Call cpCore.error_AddUserError("Your request was blocked because the record you specified is now locked by another authcontext.user.")
+                                Call errorController.error_AddUserError(cpCore, "Your request was blocked because the record you specified is now locked by another authcontext.user.")
                             Else
                                 Call LoadEditRecord(adminContent, editRecord)
                                 Call LoadEditResponse(adminContent, editRecord)
@@ -1199,7 +1199,7 @@ ErrorTrap:
                             '
                             If allowSaveBeforeDuplicate Then
                                 If (editRecord.Read_Only) Then
-                                    Call cpCore.error_AddUserError("Your request was blocked because the record you specified is now locked by another authcontext.user.")
+                                    Call errorController.error_AddUserError(cpCore, "Your request was blocked because the record you specified is now locked by another authcontext.user.")
                                 Else
                                     Call LoadEditRecord(adminContent, editRecord)
                                     Call LoadEditResponse(adminContent, editRecord)
@@ -1219,7 +1219,7 @@ ErrorTrap:
                             ' ----- Send (Group Email Only)
                             '
                             If (editRecord.Read_Only) Then
-                                Call cpCore.error_AddUserError("Your request was blocked because the record you specified is now locked by another authcontext.user.")
+                                Call errorController.error_AddUserError(cpCore, "Your request was blocked because the record you specified is now locked by another authcontext.user.")
                             Else
                                 Call LoadEditRecord(adminContent, editRecord)
                                 Call LoadEditResponse(adminContent, editRecord)
@@ -1229,15 +1229,15 @@ ErrorTrap:
                                 End If
                                 If Not (cpCore.debug_iUserError <> "") Then
                                     If Not cpCore.metaData.isWithinContent(editRecord.contentControlId, cpCore.metaData.getContentId("Group Email")) Then
-                                        Call cpCore.error_AddUserError("The send action only supports Group Email.")
+                                        Call errorController.error_AddUserError(cpCore, "The send action only supports Group Email.")
                                     Else
                                         CS = cpCore.db.csOpen2("Group Email", editRecord.id)
                                         If Not cpCore.db.cs_ok(CS) Then
                                             Throw New ApplicationException("Unexpected exception") ' throw new applicationException("Unexpected exception")'  cpCore.handleLegacyError23("Email ID [" & editRecord.id & "] could not be found in Group Email.")
                                         ElseIf cpCore.db.cs_get(CS, "FromAddress") = "" Then
-                                            Call cpCore.error_AddUserError("A 'From Address' is required before sending an email.")
+                                            Call errorController.error_AddUserError(cpCore, "A 'From Address' is required before sending an email.")
                                         ElseIf cpCore.db.cs_get(CS, "Subject") = "" Then
-                                            Call cpCore.error_AddUserError("A 'Subject' is required before sending an email.")
+                                            Call errorController.error_AddUserError(cpCore, "A 'Subject' is required before sending an email.")
                                         Else
                                             Call cpCore.db.cs_set(CS, "submitted", True)
                                             Call cpCore.db.cs_set(CS, "ConditionID", 0)
@@ -1256,13 +1256,13 @@ ErrorTrap:
                             ' ----- Deactivate (Conditional Email Only)
                             '
                             If (editRecord.Read_Only) Then
-                                Call cpCore.error_AddUserError("Your request was blocked because the record you specified is now locked by another authcontext.user.")
+                                Call errorController.error_AddUserError(cpCore, "Your request was blocked because the record you specified is now locked by another authcontext.user.")
                             Else
                                 ' no save, page was read only - Call ProcessActionSave
                                 Call LoadEditRecord(adminContent, editRecord)
                                 If Not (cpCore.debug_iUserError <> "") Then
                                     If Not cpCore.metaData.isWithinContent(editRecord.contentControlId, cpCore.metaData.getContentId("Conditional Email")) Then
-                                        Call cpCore.error_AddUserError("The deactivate action only supports Conditional Email.")
+                                        Call errorController.error_AddUserError(cpCore, "The deactivate action only supports Conditional Email.")
                                     Else
                                         CS = cpCore.db.csOpen2("Conditional Email", editRecord.id)
                                         If Not cpCore.db.cs_ok(CS) Then
@@ -1280,7 +1280,7 @@ ErrorTrap:
                             ' ----- Activate (Conditional Email Only)
                             '
                             If (editRecord.Read_Only) Then
-                                Call cpCore.error_AddUserError("Your request was blocked because the record you specified is now locked by another authcontext.user.")
+                                Call errorController.error_AddUserError(cpCore, "Your request was blocked because the record you specified is now locked by another authcontext.user.")
                             Else
                                 Call LoadEditRecord(adminContent, editRecord)
                                 Call LoadEditResponse(adminContent, editRecord)
@@ -1290,13 +1290,13 @@ ErrorTrap:
                                 End If
                                 If Not (cpCore.debug_iUserError <> "") Then
                                     If Not cpCore.metaData.isWithinContent(editRecord.contentControlId, cpCore.metaData.getContentId("Conditional Email")) Then
-                                        Call cpCore.error_AddUserError("The activate action only supports Conditional Email.")
+                                        Call errorController.error_AddUserError(cpCore, "The activate action only supports Conditional Email.")
                                     Else
                                         CS = cpCore.db.csOpen2("Conditional Email", editRecord.id)
                                         If Not cpCore.db.cs_ok(CS) Then
                                             Throw New ApplicationException("Unexpected exception") ' throw new applicationException("Unexpected exception")'  cpCore.handleLegacyError23("Email ID [" & editRecord.id & "] could not be opened.")
                                         ElseIf cpCore.db.cs_getInteger(CS, "ConditionID") = 0 Then
-                                            cpCore.error_AddUserError("A condition must be set.")
+                                            errorController.error_AddUserError(cpCore, "A condition must be set.")
                                         Else
                                             Call cpCore.db.cs_set(CS, "submitted", True)
                                             If cpCore.db.cs_getDate(CS, "ScheduleDate") = Date.MinValue Then
@@ -1310,7 +1310,7 @@ ErrorTrap:
                             AdminAction = AdminActionNop ' convert so action can be used in as a refresh
                         Case AdminActionSendEmailTest
                             If (editRecord.Read_Only) Then
-                                Call cpCore.error_AddUserError("Your request was blocked because the record you specified is now locked by another authcontext.user.")
+                                Call errorController.error_AddUserError(cpCore, "Your request was blocked because the record you specified is now locked by another authcontext.user.")
                             Else
                                 '
                                 Call LoadEditRecord(adminContent, editRecord)
@@ -1378,7 +1378,7 @@ ErrorTrap:
                             ' ccContent - save changes and reload content definitions
                             '
                             If (editRecord.Read_Only) Then
-                                Call cpCore.error_AddUserError("Your request was blocked because the record you specified Is now locked by another authcontext.user.")
+                                Call errorController.error_AddUserError(cpCore, "Your request was blocked because the record you specified Is now locked by another authcontext.user.")
                             Else
                                 Call LoadEditRecord(adminContent, editRecord)
                                 Call LoadEditResponse(adminContent, editRecord)
@@ -1401,7 +1401,7 @@ ErrorTrap:
             '
 ErrorTrap:
             Call handleLegacyClassError2("ProcessActions")
-            Call cpCore.error_AddUserError("There was an unknown error processing this page at " & cpCore.app_startTime & ". Please try again, Or report this error To the site administrator.")
+            Call errorController.error_AddUserError(cpCore, "There was an unknown error processing this page at " & cpCore.app_startTime & ". Please try again, Or report this error To the site administrator.")
         End Sub
         '
         '========================================================================
@@ -1751,7 +1751,7 @@ ErrorTrap:
                         If editRecord.fieldsLc.ContainsKey("developer") Then
                             If genericController.EncodeBoolean(editRecord.fieldsLc.Item("developer").value) Then
                                 editRecord.Read_Only = True
-                                cpCore.error_AddUserError("You Do Not have access rights To edit this record.")
+                                errorController.error_AddUserError(cpCore, "You Do Not have access rights To edit this record.")
                                 BlockEditForm = True
                             End If
                         End If
@@ -1995,21 +1995,21 @@ ErrorTrap:
                     ' ----- Error: no content ID
                     '
                     BlockEditForm = True
-                    Call cpCore.error_AddUserError("No content definition was found For Content ID [" & editrecord.id & "]. Please contact your application developer For more assistance.")
+                    Call errorController.error_AddUserError(cpCore, "No content definition was found For Content ID [" & editrecord.id & "]. Please contact your application developer For more assistance.")
                     Call handleLegacyClassError("AdminClass.LoadEditRecord_Dbase", "No content definition was found For Content ID [" & editrecord.id & "].")
                 ElseIf adminContent.Name = "" Then
                     '
                     ' ----- Error: no content name
                     '
                     BlockEditForm = True
-                    Call cpCore.error_AddUserError("No content definition could be found For ContentID [" & adminContent.Id & "]. This could be a menu Error. Please contact your application developer For more assistance.")
+                    Call errorController.error_AddUserError(cpCore, "No content definition could be found For ContentID [" & adminContent.Id & "]. This could be a menu Error. Please contact your application developer For more assistance.")
                     Call handleLegacyClassError("AdminClass.LoadEditRecord_Dbase", "No content definition For ContentID [" & adminContent.Id & "] could be found.")
                 ElseIf adminContent.ContentTableName = "" Then
                     '
                     ' ----- Error: no content table
                     '
                     BlockEditForm = True
-                    Call cpCore.error_AddUserError("The content definition [" & adminContent.Name & "] Is Not associated With a valid database table. Please contact your application developer For more assistance.")
+                    Call errorController.error_AddUserError(cpCore, "The content definition [" & adminContent.Name & "] Is Not associated With a valid database table. Please contact your application developer For more assistance.")
                     Call handleLegacyClassError("AdminClass.LoadEditRecord_Dbase", "No content definition For ContentID [" & adminContent.Id & "] could be found.")
                     '
                     ' move block to the edit and listing pages - to handle content editor cases - so they can edit 'pages', and just get the records they are allowed
@@ -2026,7 +2026,7 @@ ErrorTrap:
                     ' ----- Error: content definition is not complete
                     '
                     BlockEditForm = True
-                    Call cpCore.error_AddUserError("The content definition [" & adminContent.Name & "] has no field records defined. Please contact your application developer For more assistance.")
+                    Call errorController.error_AddUserError(cpCore, "The content definition [" & adminContent.Name & "] has no field records defined. Please contact your application developer For more assistance.")
                     Call handleLegacyClassError("AdminClass.LoadEditRecord_Dbase", "Content [" & adminContent.Name & "] has no fields defined.")
                 Else
                     '
@@ -2080,7 +2080,7 @@ ErrorTrap:
                         '   Live or Edit records were not found
                         '
                         BlockEditForm = True
-                        Call cpCore.error_AddUserError("The information you have requested could not be found. The record could have been deleted, Or there may be a system Error.")
+                        Call errorController.error_AddUserError(cpCore, "The information you have requested could not be found. The record could have been deleted, Or there may be a system Error.")
                         ' removed because it was throwing too many false positives (1/14/04 - tried to do it again)
                         ' If a CM hits the edit tag for a deleted record, this is hit. It should not cause the Developers to spend hours running down.
                         'Call HandleInternalError("AdminClass.LoadEditRecord_Dbase", "Content edit record For [" & AdminContent.Name & "." & EditRecord.ID & "] was Not found.")
@@ -2140,9 +2140,9 @@ ErrorTrap:
                                         ' default is null
                                         '
                                         If .editTabName = "" Then
-                                            Call cpCore.error_AddUserError("The value for [" & .caption & "] was empty but is required. This must be set before you can save this record.")
+                                            Call errorController.error_AddUserError(cpCore, "The value for [" & .caption & "] was empty but is required. This must be set before you can save this record.")
                                         Else
-                                            Call cpCore.error_AddUserError("The value for [" & .caption & "] in tab [" & .editTabName & "] was empty but is required. This must be set before you can save this record.")
+                                            Call errorController.error_AddUserError(cpCore, "The value for [" & .caption & "] in tab [" & .editTabName & "] was empty but is required. This must be set before you can save this record.")
                                         End If
                                     Else
                                         '
@@ -2150,9 +2150,9 @@ ErrorTrap:
                                         '
                                         DBValueVariant = .defaultValue
                                         If .editTabName = "" Then
-                                            Call cpCore.error_AddUserError("The value for [" & .caption & "] was null but is required. The default value Is shown, And will be saved if you save this record.")
+                                            Call errorController.error_AddUserError(cpCore, "The value for [" & .caption & "] was null but is required. The default value Is shown, And will be saved if you save this record.")
                                         Else
-                                            Call cpCore.error_AddUserError("The value for [" & .caption & "] in tab [" & .editTabName & "] was null but is required. The default value Is shown, And will be saved if you save this record.")
+                                            Call errorController.error_AddUserError(cpCore, "The value for [" & .caption & "] in tab [" & .editTabName & "] was null but is required. The default value Is shown, And will be saved if you save this record.")
                                         End If
                                     End If
                                 End If
@@ -2238,12 +2238,12 @@ ErrorTrap:
                 '
                 ' The field list was not returned
                 '
-                Call cpCore.error_AddUserError("There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [no field list].")
+                Call errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [no field list].")
             ElseIf AllowAdminFieldCheck() And (FormEmptyFieldList = "") Then
                 '
                 ' The field list was not returned
                 '
-                Call cpCore.error_AddUserError("There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [no empty field list].")
+                Call errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [no empty field list].")
             Else
                 '
                 ' fixup the string so it can be reduced by each field found, leaving and empty string if all correct
@@ -2258,7 +2258,7 @@ ErrorTrap:
                 ' If there are any form fields that were no loaded, flag the error now
                 '
                 If AllowAdminFieldCheck() And (FormFieldListToBeLoaded <> ",") Then
-                    Call cpCore.error_AddUserError("There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The following fields where Not found [" & Mid(FormFieldListToBeLoaded, 2, Len(FormFieldListToBeLoaded) - 2) & "].")
+                    Call errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The following fields where Not found [" & Mid(FormFieldListToBeLoaded, 2, Len(FormFieldListToBeLoaded) - 2) & "].")
                     Throw (New ApplicationException("Unexpected exception")) '  cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", There were fields In the fieldlist sent out To the browser that did Not Return, [" & Mid(FormFieldListToBeLoaded, 2, Len(FormFieldListToBeLoaded) - 2) & "]")
                 Else
                     '
@@ -2283,7 +2283,7 @@ ErrorTrap:
                             '
                             ' Do not reset the LandingPageID from here -- set another instead
                             '
-                            Call cpCore.error_AddUserError("This page was marked As the Landing Page For the website, And the checkbox has been cleared. This Is Not allowed. To remove this page As the Landing Page, locate a New landing page And Select it, Or go To Settings &gt; Page Settings And Select a New Landing Page.")
+                            Call errorController.error_AddUserError(cpCore, "This page was marked As the Landing Page For the website, And the checkbox has been cleared. This Is Not allowed. To remove this page As the Landing Page, locate a New landing page And Select it, Or go To Settings &gt; Page Settings And Select a New Landing Page.")
                         End If
                     End If
                 End If
@@ -2428,7 +2428,7 @@ ErrorTrap:
                                         '
                                         ' Add user error only for the first missing field
                                         '
-                                        Call cpCore.error_AddUserError("There has been an Error reading the response from your browser. Please Try again, taking care Not To submit the page until your browser has finished loading. If this Error occurs again, please report this problem To your site administrator. The first Error was [" & FieldName & " Not found]. There may have been others.")
+                                        Call errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try again, taking care Not To submit the page until your browser has finished loading. If this Error occurs again, please report this problem To your site administrator. The first Error was [" & FieldName & " Not found]. There may have been others.")
                                     End If
                                     Throw (New ApplicationException("Unexpected exception")) '  cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
                                     Exit Sub
@@ -2457,7 +2457,7 @@ ErrorTrap:
                             InResponse = cpCore.docProperties.containsKey(FieldName)
                             If AllowAdminFieldCheck() Then
                                 If (Not InResponse) And (Not InEmptyFieldList) Then
-                                    Call cpCore.error_AddUserError("There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [" & FieldName & " Not found].")
+                                    Call errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [" & FieldName & " Not found].")
                                     Throw (New ApplicationException("Unexpected exception")) '  cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
                                     Exit Sub
                                 End If
@@ -2484,7 +2484,7 @@ ErrorTrap:
                             InResponse = cpCore.docProperties.containsKey(FieldName)
                             If AllowAdminFieldCheck() Then
                                 If (Not InResponse) And (Not InEmptyFieldList) Then
-                                    Call cpCore.error_AddUserError("There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [" & FieldName & " Not found].")
+                                    Call errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [" & FieldName & " Not found].")
                                     Throw (New ApplicationException("Unexpected exception")) '  cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
                                     Exit Sub
                                 End If
@@ -2555,7 +2555,7 @@ ErrorTrap:
                                 '
                                 ' Was sent out non-blank, and no response back, flag error and leave the current value to a retry
                                 '
-                                Call cpCore.error_AddUserError("There has been an Error reading the response from your browser. The field [" & .caption & "]" & TabCopy & " was missing. Please Try your change again. If this Error happens repeatedly, please report this problem To your site administrator.")
+                                Call errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. The field [" & .caption & "]" & TabCopy & " was missing. Please Try your change again. If this Error happens repeatedly, please report this problem To your site administrator.")
                                 Throw (New ApplicationException("Unexpected exception")) '  cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
                                 ResponseFieldValueIsOKToSave = False
                             Else
@@ -2572,7 +2572,7 @@ ErrorTrap:
                                             If genericController.vbIsNumeric(ResponseFieldValueText) Then
                                                 'ResponseValueVariant = genericController.EncodeInteger(ResponseValueVariant)
                                             Else
-                                                cpCore.error_AddUserError("The record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be a numeric value.")
+                                                errorController.error_AddUserError(cpCore, "The record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be a numeric value.")
                                                 ResponseFieldValueIsOKToSave = False
                                             End If
                                         End If
@@ -2585,7 +2585,7 @@ ErrorTrap:
                                             If genericController.vbIsNumeric(ResponseFieldValueText) Then
                                                 'ResponseValueVariant = EncodeNumber(ResponseValueVariant)
                                             Else
-                                                cpCore.error_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be a numeric value.")
+                                                errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be a numeric value.")
                                                 ResponseFieldValueIsOKToSave = False
                                             End If
                                         End If
@@ -2598,7 +2598,7 @@ ErrorTrap:
                                             If genericController.vbIsNumeric(ResponseFieldValueText) Then
                                                 'ResponseValueVariant = genericController.EncodeInteger(ResponseValueVariant)
                                             Else
-                                                cpCore.error_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " had an invalid selection.")
+                                                errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " had an invalid selection.")
                                                 ResponseFieldValueIsOKToSave = False
                                             End If
                                         End If
@@ -2609,7 +2609,7 @@ ErrorTrap:
                                         ResponseFieldIsEmpty = ResponseFieldIsEmpty Or (ResponseFieldValueText = "")
                                         If Not ResponseFieldIsEmpty Then
                                             If Not IsDate(ResponseFieldValueText) Then
-                                                cpCore.error_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be a date And/Or time in the form mm/dd/yy 0000 AM(PM).")
+                                                errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be a date And/Or time in the form mm/dd/yy 0000 AM(PM).")
                                                 ResponseFieldValueIsOKToSave = False
                                             End If
                                         End If
@@ -2721,19 +2721,19 @@ ErrorTrap:
                                         '
                                         ' Too deep
                                         '
-                                        cpCore.error_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " creates a relationship between records that Is too large. Please limit the depth of this relationship to " & LoopPtrMax & " records.")
+                                        errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " creates a relationship between records that Is too large. Please limit the depth of this relationship to " & LoopPtrMax & " records.")
                                         ResponseFieldValueIsOKToSave = False
                                     ElseIf (editRecord.id <> 0) And (editRecord.id = ParentID) Then
                                         '
                                         ' Reference to iteslf
                                         '
-                                        cpCore.error_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " contains a circular reference. This record points back to itself. This Is Not allowed.")
+                                        errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " contains a circular reference. This record points back to itself. This Is Not allowed.")
                                         ResponseFieldValueIsOKToSave = False
                                     ElseIf ParentID <> 0 Then
                                         '
                                         ' Circular reference
                                         '
-                                        cpCore.error_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " contains a circular reference. This field either points to other records which then point back to this record. This Is Not allowed.")
+                                        errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " contains a circular reference. This field either points to other records which then point back to this record. This Is Not allowed.")
                                         ResponseFieldValueIsOKToSave = False
                                     End If
                                 End If
@@ -2747,7 +2747,7 @@ ErrorTrap:
                                     '
                                     ' field is required and is not given
                                     '
-                                    cpCore.error_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " Is required but has no value.")
+                                    errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " Is required but has no value.")
                                     ResponseFieldValueIsOKToSave = False
                                 End If
                                 '
@@ -2800,12 +2800,12 @@ ErrorTrap:
                                             '
                                             '
                                             '
-                                            cpCore.error_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record with [" & ResponseFieldValueText & "]. This must be unique because the preference Allow Duplicate Usernames Is Not checked.")
+                                            errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record with [" & ResponseFieldValueText & "]. This must be unique because the preference Allow Duplicate Usernames Is Not checked.")
                                         ElseIf blockDuplicateEmail Then
                                             '
                                             '
                                             '
-                                            cpCore.error_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record with [" & ResponseFieldValueText & "]. This must be unique because the preference Allow Email Login Is checked.")
+                                            errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record with [" & ResponseFieldValueText & "]. This must be unique because the preference Allow Email Login Is checked.")
                                         ElseIf AdminContentWorkflowAuthoring Then
                                             '
                                             ' Workflow
@@ -2814,18 +2814,18 @@ ErrorTrap:
                                                 '
                                                 ' there is a live record that matches
                                                 '
-                                                cpCore.error_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record with the value [" & ResponseFieldValueText & "].")
+                                                errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record with the value [" & ResponseFieldValueText & "].")
                                             Else
                                                 '
                                                 ' there is an edit record that matches
                                                 '
-                                                cpCore.error_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record whose current edits include the value [" & ResponseFieldValueText & "].")
+                                                errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record whose current edits include the value [" & ResponseFieldValueText & "].")
                                             End If
                                         Else
                                             '
                                             ' non-workflow
                                             '
-                                            cpCore.error_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record with [" & ResponseFieldValueText & "].")
+                                            errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record with [" & ResponseFieldValueText & "].")
                                         End If
                                         ResponseFieldValueIsOKToSave = False
                                     End If
@@ -3092,7 +3092,7 @@ ErrorTrap:
                             CS = cpCore.db.cs_open(adminContent.Name, "( linkalias=" & cpCore.db.encodeSQLText(linkAlias) & ")and(id<>" & editRecord.id & ")and(editsourceid is null)")
                             If cpCore.db.cs_ok(CS) Then
                                 isDupError = True
-                                Call cpCore.error_AddUserError("The Link Alias you entered can not be used because another record uses this value [" & linkAlias & "]. Enter a different Link Alias, or check the Override Duplicates checkbox in the Link Alias tab.")
+                                Call errorController.error_AddUserError(cpCore, "The Link Alias you entered can not be used because another record uses this value [" & linkAlias & "]. Enter a different Link Alias, or check the Override Duplicates checkbox in the Link Alias tab.")
                             End If
                             Call cpCore.db.cs_Close(CS)
                         End If
@@ -3810,7 +3810,7 @@ ErrorTrap:
                     '
                     ' Invalid Content
                     '
-                    Call cpCore.error_AddUserError("There was a problem identifying the content you requested. Please return to the previous form and verify your selection.")
+                    Call errorController.error_AddUserError(cpCore, "There was a problem identifying the content you requested. Please return to the previous form and verify your selection.")
                     Exit Function
                 ElseIf editRecord.Loaded And Not editRecord.Saved Then
                     '
@@ -3851,7 +3851,7 @@ ErrorTrap:
                             '
                             ' unknown error, set userError and return
                             '
-                            cpCore.error_AddUserError("There was an unknown error in your request for data. Please let the site administrator know.")
+                            errorController.error_AddUserError(cpCore, "There was an unknown error in your request for data. Please let the site administrator know.")
                         End If
                         Exit Function
                     End If
@@ -3871,7 +3871,7 @@ ErrorTrap:
                 ' Test if this editors has access to this record
                 '
                 If Not userHasContentAccess(editRecord.contentControlId) Then
-                    Call cpCore.error_AddUserError("Your account on this system does not have access rights to edit this content.")
+                    Call errorController.error_AddUserError(cpCore, "Your account on this system does not have access rights to edit this content.")
                     Exit Function
                 End If
                 If False Then
@@ -3879,10 +3879,10 @@ ErrorTrap:
                     ' Test for 100Mb available in Content Files drive
                     '
                     If cpCore.appRootFiles.getDriveFreeSpace() < 1.0E+8! Then
-                        Call cpCore.error_AddUserError("The server drive holding data for this site may not have enough free space to complete this edit operation. If you attempt to save, your data may be lost. Please contact the site administrator.")
+                        Call errorController.error_AddUserError(cpCore, "The server drive holding data for this site may not have enough free space to complete this edit operation. If you attempt to save, your data may be lost. Please contact the site administrator.")
                     End If
                     If cpCore.privateFiles.getDriveFreeSpace() < 1.0E+8! Then
-                        Call cpCore.error_AddUserError("The server drive holding data for this site may not have enough free space to complete this edit operation. If you attempt to save, your data may be lost. Please contact the site administrator.")
+                        Call errorController.error_AddUserError(cpCore, "The server drive holding data for this site may not have enough free space to complete this edit operation. If you attempt to save, your data may be lost. Please contact the site administrator.")
                     End If
                 End If
                 '
@@ -5734,7 +5734,7 @@ ErrorTrap:
                                                 FieldValueText = genericController.encodeText(FieldValueObject)
                                                 EditorString &= cpCore.htmlDoc.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText)
                                                 EditorStyleModifier = "textexpandable"
-                                                FieldRows = (cpCore.properties_user_getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
+                                                FieldRows = (cpCore.userProperty.getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
                                                 EditorString &= cpCore.htmlDoc.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, FieldRows, , FormFieldLCaseName, False, True)
                                             Else
                                                 '
@@ -5745,7 +5745,7 @@ ErrorTrap:
                                                 EditorString &= cpCore.htmlDoc.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText)
                                                 '
                                                 EditorStyleModifier = "text"
-                                                FieldRows = (cpCore.properties_user_getInteger(adminContent.Name & "." & FieldName & ".PixelHeight", 500))
+                                                FieldRows = (cpCore.userProperty.getInteger(adminContent.Name & "." & FieldName & ".PixelHeight", 500))
                                                 'EditorString &=  cpCore.main_GetFormInputHTML(FormFieldLCaseName, FieldValueText)
                                                 '
                                                 EditorString &= cpCore.htmlDoc.html_GetFormInputHTML3(FormFieldLCaseName, FieldValueText, "500", , True, True, editorAddonListJSON, styleList, styleOptionList)
@@ -5780,7 +5780,7 @@ ErrorTrap:
                                             FieldValueText = genericController.encodeText(FieldValueObject)
                                             EditorString &= cpCore.htmlDoc.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText)
                                             EditorStyleModifier = "textexpandable"
-                                            FieldRows = (cpCore.properties_user_getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
+                                            FieldRows = (cpCore.userProperty.getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
                                             EditorString &= cpCore.htmlDoc.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, FieldRows, , FormFieldLCaseName, False, True)
                                         Case Else
                                             '
@@ -5815,7 +5815,7 @@ ErrorTrap:
                                                 ' HTMLContent true, and prefered
                                                 '
                                                 EditorStyleModifier = "text"
-                                                FieldRows = (cpCore.properties_user_getInteger(adminContent.Name & "." & FieldName & ".PixelHeight", 500))
+                                                FieldRows = (cpCore.userProperty.getInteger(adminContent.Name & "." & FieldName & ".PixelHeight", 500))
                                                 EditorString &= cpCore.htmlDoc.html_GetFormInputHTML3(FormFieldLCaseName, FieldValueText, "500", , False, True, editorAddonListJSON, styleList, styleOptionList)
                                                 'innovaEditor = New innovaEditorAddonClassFPO
                                                 'EditorString &=  innovaEditor.getInnovaEditor( FormFieldLCaseName, EditorContext, FieldValueText, "", "", True, True, TemplateIDForStyles, emailIdForStyles)
@@ -5826,7 +5826,7 @@ ErrorTrap:
                                                 ' HTMLContent true, but text editor selected
                                                 '
                                                 EditorStyleModifier = "textexpandable"
-                                                FieldRows = (cpCore.properties_user_getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
+                                                FieldRows = (cpCore.userProperty.getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
                                                 EditorString &= cpCore.htmlDoc.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, FieldRows, , FormFieldLCaseName, False, True)
                                                 'EditorString = cpCore.main_GetFormInputTextExpandable(FormFieldLCaseName, encodeHTML(FieldValueText), FieldRows, "600px", FormFieldLCaseName, False)
                                             End If
@@ -6053,7 +6053,7 @@ ErrorTrap:
                                                     FieldValueText = HTMLEditorDefaultCopyNoCr
                                                 End If
                                                 EditorStyleModifier = "htmleditor"
-                                                FieldRows = (cpCore.properties_user_getInteger(adminContent.Name & "." & FieldName & ".PixelHeight", 500))
+                                                FieldRows = (cpCore.userProperty.getInteger(adminContent.Name & "." & FieldName & ".PixelHeight", 500))
                                                 EditorString &= cpCore.htmlDoc.html_GetFormInputHTML3(FormFieldLCaseName, FieldValueText, "500", , False, True, editorAddonListJSON, styleList, styleOptionList)
                                                 'innovaEditor = New innovaEditorAddonClassFPO
                                                 'EditorString = innovaEditor.getInnovaEditor( FormFieldLCaseName, EditorContext, FieldValueText, "", "", True, False, TemplateIDForStyles, emailIdForStyles)
@@ -6069,7 +6069,7 @@ ErrorTrap:
                                             FieldValueText = genericController.encodeText(FieldValueObject)
                                             '
                                             EditorStyleModifier = "textexpandable"
-                                            FieldRows = (cpCore.properties_user_getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
+                                            FieldRows = (cpCore.userProperty.getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
                                             EditorString = cpCore.htmlDoc.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, FieldRows, , FormFieldLCaseName, False, , "text")
                                             '
                                         Case FieldTypeIdFileCSS
@@ -6079,7 +6079,7 @@ ErrorTrap:
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
                                             FieldValueText = genericController.encodeText(FieldValueObject)
                                             EditorStyleModifier = "textexpandable"
-                                            FieldRows = (cpCore.properties_user_getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
+                                            FieldRows = (cpCore.userProperty.getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
                                             EditorString = main_GetFormInputStyles(cpCore, FormFieldLCaseName, FieldValueText, , "styles")
                                             '
                                         Case FieldTypeIdFileJavascript
@@ -6089,7 +6089,7 @@ ErrorTrap:
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
                                             FieldValueText = genericController.encodeText(FieldValueObject)
                                             EditorStyleModifier = "textexpandable"
-                                            FieldRows = (cpCore.properties_user_getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
+                                            FieldRows = (cpCore.userProperty.getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
                                             EditorString = cpCore.htmlDoc.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, FieldRows, , FormFieldLCaseName, False, , "text")
                                             '
                                         Case FieldTypeIdFileXML
@@ -6099,7 +6099,7 @@ ErrorTrap:
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
                                             FieldValueText = genericController.encodeText(FieldValueObject)
                                             EditorStyleModifier = "textexpandable"
-                                            FieldRows = (cpCore.properties_user_getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
+                                            FieldRows = (cpCore.userProperty.getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
                                             EditorString = cpCore.htmlDoc.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, FieldRows, , FormFieldLCaseName, False, , "text")
                                             '
                                         Case Else
@@ -6140,7 +6140,7 @@ ErrorTrap:
                                                     FieldValueText = HTMLEditorDefaultCopyNoCr
                                                 End If
                                                 EditorStyleModifier = "htmleditor"
-                                                FieldRows = (cpCore.properties_user_getInteger(adminContent.Name & "." & FieldName & ".PixelHeight", 500))
+                                                FieldRows = (cpCore.userProperty.getInteger(adminContent.Name & "." & FieldName & ".PixelHeight", 500))
                                                 EditorString &= cpCore.htmlDoc.html_GetFormInputHTML3(FormFieldLCaseName, FieldValueText, "500", , False, True, editorAddonListJSON, styleList, styleOptionList)
                                                 'innovaEditor = New innovaEditorAddonClassFPO
                                                 'EditorString = innovaEditor.getInnovaEditor( FormFieldLCaseName, EditorContext, FieldValueText, "", "", True, False, TemplateIDForStyles, emailIdForStyles)
@@ -6151,7 +6151,7 @@ ErrorTrap:
                                                 ' HTMLContent true, but text editor selected
                                                 '
                                                 EditorStyleModifier = "textexpandable"
-                                                FieldRows = (cpCore.properties_user_getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
+                                                FieldRows = (cpCore.userProperty.getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
                                                 EditorString = cpCore.htmlDoc.html_GetFormInputTextExpandable2(FormFieldLCaseName, cpCore.htmlDoc.html_EncodeHTML(FieldValueText), FieldRows, "600px", FormFieldLCaseName, False, , "text")
                                             End If
                                             's.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal & EditorString & "</span></nobr></td>")
@@ -7206,7 +7206,7 @@ ErrorTrap:
                     If (cpCore.debug_iUserError <> "") Then
                         returnHtml = returnHtml _
                         & "<div style=""clear:both;margin-top:20px;"">&nbsp;</div>" _
-                        & "<div style=""clear:both;margin-top:20px;"">" & cpCore.error_GetUserError() & "</div>"
+                        & "<div style=""clear:both;margin-top:20px;"">" & errorController.error_GetUserError(cpCore) & "</div>"
                     End If
                     returnHtml = returnHtml & cpCore.addon.execute_legacy4(CStr(addonId), "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
                 End If
@@ -7227,7 +7227,7 @@ ErrorTrap:
                     If (cpCore.debug_iUserError <> "") Then
                         returnHtml = returnHtml _
                         & "<div style=""clear:both;margin-top:20px;"">&nbsp;</div>" _
-                        & "<div style=""clear:both;margin-top:20px;"">" & cpCore.error_GetUserError() & "</div>"
+                        & "<div style=""clear:both;margin-top:20px;"">" & errorController.error_GetUserError(cpCore) & "</div>"
                     End If
                     '
                     returnHtml = returnHtml _
@@ -10065,7 +10065,7 @@ ErrorTrap:
                                         ' Must upgrade
                                         '
                                         Call cpCore.siteProperties.setProperty("AllowLinkAlias", "0")
-                                        Call cpCore.error_AddUserError("Link Alias entries for your pages can not be created because your site database needs to be upgraded.")
+                                        Call errorController.error_AddUserError(cpCore, "Link Alias entries for your pages can not be created because your site database needs to be upgraded.")
                                     Else
                                         '
                                         ' Verify all page content records have a link alias
@@ -10154,7 +10154,7 @@ ErrorTrap:
             '
 ErrorTrap:
             Call handleLegacyClassError2("ProcessActionSave")
-            Call cpCore.error_AddUserError("There was an unknown error saving the record at " & cpCore.app_startTime & ". Please try again, or report this error to the site administrator.")
+            Call errorController.error_AddUserError(cpCore, "There was an unknown error saving the record at " & cpCore.app_startTime & ". Please try again, or report this error to the site administrator.")
             '
         End Sub
         '
@@ -10524,8 +10524,8 @@ ErrorTrap:
                 Throw (New Exception("error [" & DeveloperError & "], user error [" & UserError & "]"))
             End If
             If UserError <> "" Then
-                Call cpCore.error_AddUserError(UserError)
-                GetForm_Error = AdminFormErrorOpen & cpCore.error_GetUserError & AdminFormErrorClose
+                Call errorController.error_AddUserError(cpCore, UserError)
+                GetForm_Error = AdminFormErrorOpen & errorController.error_GetUserError(cpCore) & AdminFormErrorClose
             End If
             '
             Exit Function
@@ -10609,7 +10609,7 @@ ErrorTrap:
                     NewGroupName = cpCore.docProperties.getText("NewGroupName")
                     '
                     If (ParentContentName = "") Or (ChildContentName = "") Then
-                        cpCore.error_AddUserError("You must select a parent and provide a child name.")
+                        errorController.error_AddUserError(cpCore, "You must select a parent and provide a child name.")
                     Else
                         '
                         ' Create Definition
@@ -12149,7 +12149,7 @@ ErrorTrap:
                             SQL = cpCore.docProperties.getText(SQLFieldName)
                             If Name <> "" Or SQL <> "" Then
                                 If (Name = "") Or (SQL = "") Then
-                                    cpCore.error_AddUserError("A name and SQL Query are required to save a new custom report.")
+                                    errorController.error_AddUserError(cpCore, "A name and SQL Query are required to save a new custom report.")
                                 Else
                                     CS = cpCore.db.cs_insertRecord("Custom Reports")
                                     If cpCore.db.cs_ok(CS) Then
@@ -12488,7 +12488,7 @@ ErrorTrap:
                             '
                             ' two conditions should be the same -- but not time to check - This user does not have access to this content
                             '
-                            Call cpCore.error_AddUserError("Your account does not have access to any records in '" & adminContent.Name & "'.")
+                            Call errorController.error_AddUserError(cpCore, "Your account does not have access to any records in '" & adminContent.Name & "'.")
                         Else
                             '
                             ' Get the total record count
@@ -15069,7 +15069,7 @@ ErrorTrap:
                         '
                         ' This should be caught with check earlier, but since I added this, and I never make mistakes, I will leave this in case there is a mistake in the earlier code
                         '
-                        Call cpCore.error_AddUserError("Your account does not have access to any records in '" & adminContent.Name & "'.")
+                        Call errorController.error_AddUserError(cpCore, "Your account does not have access to any records in '" & adminContent.Name & "'.")
                     Else
                         '
                         ' Get the total record count
@@ -15112,9 +15112,9 @@ ErrorTrap:
                             '
                             Select Case ExportType
                                 Case 1
-                                    Call taskSchedulerController.main_RequestTask(cpCore, "BuildCSV", SQL, ExportName, "Export-" & CStr(cpCore.common_GetRandomLong) & ".csv")
+                                    Call taskSchedulerController.main_RequestTask(cpCore, "BuildCSV", SQL, ExportName, "Export-" & CStr(genericController.GetRandomInteger) & ".csv")
                                 Case Else
-                                    Call taskSchedulerController.main_RequestTask(cpCore, "BuildXML", SQL, ExportName, "Export-" & CStr(cpCore.common_GetRandomLong) & ".xml")
+                                    Call taskSchedulerController.main_RequestTask(cpCore, "BuildXML", SQL, ExportName, "Export-" & CStr(genericController.GetRandomInteger) & ".xml")
                             End Select
                             '
                             Content = "" _
@@ -15819,7 +15819,7 @@ ErrorTrap:
             Dim linkAlias As String
             '
             If (cpCore.debug_iUserError <> "") Then
-                Call cpCore.error_AddUserError("Existing pages could not be checked for Link Alias names because there was another error on this page. Correct this error, and turn Link Alias on again to rerun the verification.")
+                Call errorController.error_AddUserError(cpCore, "Existing pages could not be checked for Link Alias names because there was another error on this page. Correct this error, and turn Link Alias on again to rerun the verification.")
             Else
                 CS = cpCore.db.cs_open("Page Content")
                 Do While cpCore.db.cs_ok(CS)
@@ -15849,9 +15849,9 @@ ErrorTrap:
                     '
                     ' Throw out all the details of what happened, and add one simple error
                     '
-                    ErrorList = cpCore.error_GetUserError
+                    ErrorList = errorController.error_GetUserError(cpCore)
                     ErrorList = genericController.vbReplace(ErrorList, UserErrorHeadline, "", 1, 99, vbTextCompare)
-                    Call cpCore.error_AddUserError("The following errors occurred while verifying Link Alias entries for your existing pages." & ErrorList)
+                    Call errorController.error_AddUserError(cpCore, "The following errors occurred while verifying Link Alias entries for your existing pages." & ErrorList)
                     'Call cpCore.htmldoc.main_AddUserError(ErrorList)
                 End If
             End If

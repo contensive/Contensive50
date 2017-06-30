@@ -4910,7 +4910,7 @@ ErrorTrap:
             '
             RecordIDString = CStr(RecordID)
             If RecordID = 0 Then
-                RecordIDString = CStr(getRandomLong())
+                RecordIDString = CStr(GetRandomInteger())
                 RecordIDString = New String("0"c, 12 - Len(RecordIDString)) & RecordIDString
             Else
                 RecordIDString = New String("0"c, 12 - Len(RecordIDString)) & RecordIDString
@@ -4933,63 +4933,6 @@ ErrorTrap:
                 End Select
             End If
         End Function
-        '
-        '=================================================================================
-        '   Get a Random Long Value
-        '=================================================================================
-        '
-        Public Shared Function getRandomLong() As Integer
-            '
-            Dim RandomBase As Integer
-            Dim RandomLimit As Integer
-            Dim MethodName As String
-            '
-            MethodName = "getRandomLong"
-            '
-            RandomBase = Threading.Thread.CurrentThread.ManagedThreadId
-            RandomBase = EncodeInteger(RandomBase + ((2 ^ 30) - 1))
-            RandomLimit = EncodeInteger((2 ^ 31) - RandomBase - 1)
-            Randomize()
-            getRandomLong = EncodeInteger(RandomBase + (Rnd() * RandomLimit))
-        End Function
-        ''
-        ''====================================================================================================
-        '' the root folder where all app data is stored.
-        ''   In local mode, this folder is the backup target
-        ''   -- path means no trailing slash
-        ''====================================================================================================
-        ''
-        'Public shared Function getProgramDataPath() As String
-        '    Return coreFileSystemClass.normalizePath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) & "clib\"
-        'End Function
-        ''
-        ''====================================================================================================
-        '' the the c:\program files x86) path 
-        ''   -- path means no trailing slash
-        ''====================================================================================================
-        ''
-        'Public shared Function getProgramFilesPath() As String
-        '    Dim returnPath As String = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath)
-        '    Dim ptr As Integer
-        '    '
-        '    ptr = vbInstr(1, returnPath, "\github\", vbTextCompare)
-        '    If ptr <> 0 Then
-        '        ' for ...\github\contensive4?\bin"
-        '        ptr = vbInstr(ptr + 8, returnPath, "\")
-        '        returnPath = Left(returnPath, ptr) & "bin\"
-        '    End If
-
-        '    Return returnPath
-        'End Function
-        ''
-        ''====================================================================================================
-        '' the the \cclib path 
-        ''   -- path means no trailing slash
-        ''====================================================================================================
-        ''
-        'Public shared Function getccLibPath() As String
-        '    Return getProgramFilesPath() & "ccLib\"
-        'End Function
         '
         '====================================================================================================
         ' the the name of the current executable
@@ -5385,5 +5328,4 @@ ErrorTrap:
             End If
         End Function
     End Class
-
 End Namespace

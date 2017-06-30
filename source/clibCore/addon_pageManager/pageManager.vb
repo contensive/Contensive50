@@ -467,35 +467,35 @@ Namespace Contensive.Addons.PageManager
                             ' state not working...
                         Else
                             If Not cpCore.authContext.isAuthenticatedContentManager(cpCore, ClipParentContentName) Then
-                                Call cpCore.error_AddUserError("The paste operation failed because you are not a content manager of the Clip Parent")
+                                Call errorController.error_AddUserError(cpCore, "The paste operation failed because you are not a content manager of the Clip Parent")
                             Else
                                 '
                                 ' Current identity is a content manager for this content
                                 '
                                 Dim Position As Integer = genericController.vbInstr(1, ClipBoard, ".")
                                 If Position = 0 Then
-                                    Call cpCore.error_AddUserError("The paste operation failed because the clipboard data is configured incorrectly.")
+                                    Call errorController.error_AddUserError(cpCore, "The paste operation failed because the clipboard data is configured incorrectly.")
                                 Else
                                     ClipBoardArray = Split(ClipBoard, ".")
                                     If UBound(ClipBoardArray) = 0 Then
-                                        Call cpCore.error_AddUserError("The paste operation failed because the clipboard data is configured incorrectly.")
+                                        Call errorController.error_AddUserError(cpCore, "The paste operation failed because the clipboard data is configured incorrectly.")
                                     Else
                                         ClipChildContentID = genericController.EncodeInteger(ClipBoardArray(0))
                                         ClipChildRecordID = genericController.EncodeInteger(ClipBoardArray(1))
                                         If Not cpCore.metaData.isWithinContent(ClipChildContentID, ClipParentContentID) Then
-                                            Call cpCore.error_AddUserError("The paste operation failed because the destination location is not compatible with the clipboard data.")
+                                            Call errorController.error_AddUserError(cpCore, "The paste operation failed because the destination location is not compatible with the clipboard data.")
                                         Else
                                             '
                                             ' the content definition relationship is OK between the child and parent record
                                             '
                                             ClipChildContentName = cpCore.metaData.getContentNameByID(ClipChildContentID)
                                             If Not ClipChildContentName <> "" Then
-                                                Call cpCore.error_AddUserError("The paste operation failed because the clipboard data content is undefined.")
+                                                Call errorController.error_AddUserError(cpCore, "The paste operation failed because the clipboard data content is undefined.")
                                             Else
                                                 If (ClipParentRecordID = 0) Then
-                                                    Call cpCore.error_AddUserError("The paste operation failed because the clipboard data record is undefined.")
+                                                    Call errorController.error_AddUserError(cpCore, "The paste operation failed because the clipboard data record is undefined.")
                                                 ElseIf cpCore.pages.main_IsChildRecord(ClipChildContentName, ClipParentRecordID, ClipChildRecordID) Then
-                                                    Call cpCore.error_AddUserError("The paste operation failed because the destination location is a child of the clipboard data record.")
+                                                    Call errorController.error_AddUserError(cpCore, "The paste operation failed because the destination location is a child of the clipboard data record.")
                                                 Else
                                                     '
                                                     ' the parent record is not a child of the child record (circular check)
@@ -503,7 +503,7 @@ Namespace Contensive.Addons.PageManager
                                                     ClipChildRecordName = "record " & ClipChildRecordID
                                                     CSClip = cpCore.db.cs_open2(ClipChildContentName, ClipChildRecordID, True, True)
                                                     If Not cpCore.db.cs_ok(CSClip) Then
-                                                        Call cpCore.error_AddUserError("The paste operation failed because the data record referenced by the clipboard could not found.")
+                                                        Call errorController.error_AddUserError(cpCore, "The paste operation failed because the data record referenced by the clipboard could not found.")
                                                     Else
                                                         '
                                                         ' Paste the edit record record
@@ -514,7 +514,7 @@ Namespace Contensive.Addons.PageManager
                                                             ' Legacy paste - go right to the parent id
                                                             '
                                                             If Not cpCore.db.cs_isFieldSupported(CSClip, "ParentID") Then
-                                                                Call cpCore.error_AddUserError("The paste operation failed because the record you are pasting does not   support the necessary parenting feature.")
+                                                                Call errorController.error_AddUserError(cpCore, "The paste operation failed because the record you are pasting does not   support the necessary parenting feature.")
                                                             Else
                                                                 Call cpCore.db.cs_set(CSClip, "ParentID", ClipParentRecordID)
                                                             End If
@@ -532,10 +532,10 @@ Namespace Contensive.Addons.PageManager
                                                                 End If
                                                                 NameValues = Split(Pair, "=")
                                                                 If UBound(NameValues) = 0 Then
-                                                                    Call cpCore.error_AddUserError("The paste operation failed because the clipboard data Field List is not configured correctly.")
+                                                                    Call errorController.error_AddUserError(cpCore, "The paste operation failed because the clipboard data Field List is not configured correctly.")
                                                                 Else
                                                                     If Not cpCore.db.cs_isFieldSupported(CSClip, CStr(NameValues(0))) Then
-                                                                        Call cpCore.error_AddUserError("The paste operation failed because the clipboard data Field [" & CStr(NameValues(0)) & "] is not supported by the location data.")
+                                                                        Call errorController.error_AddUserError(cpCore, "The paste operation failed because the clipboard data Field [" & CStr(NameValues(0)) & "] is not supported by the location data.")
                                                                     Else
                                                                         Call cpCore.db.cs_set(CSClip, CStr(NameValues(0)), CStr(NameValues(1)))
                                                                     End If
@@ -823,7 +823,7 @@ Namespace Contensive.Addons.PageManager
                                     'Call AppendLog("main_init(), 3410 - exit for login block")
                                     '
                                     Call cpCore.htmlDoc.main_SetMetaContent(0, 0)
-                                    Call cpCore.htmlDoc.writeAltBuffer(cpCore.htmlDoc.getLoginPage(False) & cpCore.htmlDoc.html_GetEndOfBody(False, False, False, False))
+                                    Call cpCore.htmlDoc.writeAltBuffer(cpCore.htmlDoc.getLoginPage(False) & cpCore.htmlDoc.getBeforeEndOfBodyHtml(False, False, False, False))
                                     cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
                                     Return cpCore.htmlDoc.docBuffer
                                 Case 2
@@ -847,7 +847,7 @@ Namespace Contensive.Addons.PageManager
                                             & cr & TemplateDefaultBodyTag _
                                             & genericController.kmaIndent(Copy) _
                                             & cr2 & "<div>" _
-                                            & cr3 & cpCore.htmlDoc.html_GetEndOfBody(True, True, False, False) _
+                                            & cr3 & cpCore.htmlDoc.getBeforeEndOfBodyHtml(True, True, False, False) _
                                             & cr2 & "</div>" _
                                             & cr & "</body>" _
                                             & vbCrLf & "</html>"
@@ -881,7 +881,7 @@ Namespace Contensive.Addons.PageManager
                         '
                         ' Add tools panel to body
                         '
-                        htmlBody = htmlBody & cr & "<div>" & genericController.kmaIndent(cpCore.htmlDoc.html_GetEndOfBody(True, True, False, False)) & cr & "</div>"
+                        htmlBody = htmlBody & cr & "<div>" & genericController.kmaIndent(cpCore.htmlDoc.getBeforeEndOfBodyHtml(True, True, False, False)) & cr & "</div>"
                         '
                         ' build doc
                         '
@@ -1079,12 +1079,12 @@ Namespace Contensive.Addons.PageManager
                                         End If
                                         Call cpcore.db.cs_Close(CS)
                                         If Not Success Then
-                                            cpcore.error_AddUserError("The field [" & .Caption & "] must be unique, and the value [" & cpcore.htmlDoc.html_EncodeHTML(FormValue) & "] has already been used.")
+                                            errorController.error_AddUserError(cpcore, "The field [" & .Caption & "] must be unique, and the value [" & cpcore.htmlDoc.html_EncodeHTML(FormValue) & "] has already been used.")
                                         End If
                                     End If
                                     If (.REquired Or genericController.EncodeBoolean(cpcore.metaData.GetContentFieldProperty("people", .PeopleField, "required"))) And FormValue = "" Then
                                         Success = False
-                                        cpcore.error_AddUserError("The field [" & cpcore.htmlDoc.html_EncodeHTML(.Caption) & "] is required.")
+                                        errorController.error_AddUserError(cpcore, "The field [" & cpcore.htmlDoc.html_EncodeHTML(.Caption) & "] is required.")
                                     Else
                                         If Not cpcore.db.cs_ok(CSPeople) Then
                                             CSPeople = cpcore.db.csOpen2("people", cpcore.authContext.user.ID)
@@ -1388,7 +1388,7 @@ Namespace Contensive.Addons.PageManager
                     & vbCrLf & "</html>" _
                     & ""
                     'Call AppendLog("call main_getEndOfBody, from pageManager_getsection")
-                    Call cpCore.htmlDoc.writeAltBuffer(Copy & cpCore.htmlDoc.html_GetEndOfBody(False, False, False, False))
+                    Call cpCore.htmlDoc.writeAltBuffer(Copy & cpCore.htmlDoc.getBeforeEndOfBodyHtml(False, False, False, False))
                     Throw New ApplicationException("Unexpected exception") ' throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError12("PagList_GetSection", "The page you requested could not be found and no landing page is configured for this domain [" & cpcore.webServer.webServerIO_requestDomain & "].")
                     '--- should be disposed by caller --- Call dispose
                     Exit Function
@@ -1838,7 +1838,7 @@ Namespace Contensive.Addons.PageManager
                         Dim addonListJSON As String
 
                         If cpCore.pages.redirectLink = "" And (InStr(1, returnHtml, html_quickEdit_fpo) <> 0) Then
-                            FieldRows = genericController.EncodeInteger(cpCore.properties_user_getText("Page Content.copyFilename.PixelHeight", "500"))
+                            FieldRows = genericController.EncodeInteger(cpCore.userProperty.getText("Page Content.copyFilename.PixelHeight", "500"))
                             If FieldRows < 50 Then
                                 FieldRows = 50
                                 Call cpCore.userProperty.setProperty("Page Content.copyFilename.PixelHeight", 50)
