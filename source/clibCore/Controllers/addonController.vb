@@ -995,7 +995,7 @@ Namespace Contensive.Core.Controllers
                                 ' moved to within the CP check bc this call includes CP which has not been created
                                 '-----------------------------------------------------------------
                                 '
-                                Dim addonIncludeRules As List(Of Models.Entity.addonIncludeRuleModel) = Models.Entity.addonIncludeRuleModel.createList(cpCore, "(addonid=" & addon.id & ")")
+                                Dim addonIncludeRules As List(Of Models.Entity.addonIncludeRuleModel) = Models.Entity.addonIncludeRuleModel.createList(cpCore, "(addonid=" & addonId & ")")
                                 Dim IncludeContent As String = ""
                                 '
                                 '-----------------------------------------------------------------

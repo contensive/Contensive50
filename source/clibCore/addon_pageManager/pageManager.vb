@@ -664,7 +664,7 @@ Namespace Contensive.Addons.PageManager
                                 '   LinkForwardCriteria = (Sourcelink='http://www.a.com/kb/test')or(Sourcelink='http://www.a.com/kb/test/')
                                 '
                                 LinkForwardCriteria = "(active<>0)" _
-                                    & "and" _
+                                    & "and(" _
                                     & "(SourceLink=" & cpCore.db.encodeSQLText(cpCore.webServer.requestPathPage) & ")" _
                                     & "or(SourceLink=" & cpCore.db.encodeSQLText(LinkNoProtocol) & ")" _
                                     & "or(SourceLink=" & cpCore.db.encodeSQLText(LinkFullPath) & ")" _

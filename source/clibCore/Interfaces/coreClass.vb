@@ -2672,25 +2672,6 @@ ErrorTrap:
         End Function
 
 
-        ''
-        ''------------------------------------------------------------------------------------------------------------
-        ''   encode an argument to be used in an addonOptionString
-        ''       optionstring is "name = value &"
-        ''       can be Arg0,Arg1,Arg2,Arg3,Name=Value&Name=Value[Option1|Option2]descriptor
-        ''------------------------------------------------------------------------------------------------------------
-        ''
-        'Public Function encodeNvaArgument(Arg As String) As String
-        '    encodeNvaArgument = encodeNvaArgument(Arg)
-        'End Function
-        ''
-        ''------------------------------------------------------------------------------------------------------------
-        ''   Decodes an argument parsed from an AddonOptionString for all non-allowed characters
-        ''       AddonOptionString is a & delimited string of name=value[selector]descriptor
-        ''------------------------------------------------------------------------------------------------------------
-        ''
-        'Public Function genericController.decodeNvaArgument(EncodedArg As String) As String
-        '    decodeNvaArgument = genericController.decodeNvaArgument(EncodedArg)
-        'End Function
         '
         '=================================================================================================================
         '   csv_GetAddonOptionStringValue
@@ -2798,35 +2779,6 @@ ErrorTrap:
             End If
             '
         End Function
-        '
-        '================================================================================================
-        '   csv_reportAlarm
-        '       Saves the error message in a file in the Alarms folder, which will set off the server alarm
-        '================================================================================================
-        '
-        Public Sub csv_reportAlarm(Cause As String)
-            Call logController.appendLog(Me, Cause, "Alarms", "alarm")
-        End Sub
-        ''
-        ''------------------------------------------------------------------------------------------------------------
-        ''   encode an argument to be used in a 'name=value&' string
-        ''       - ohter characters are reserved to do further parsing, see encodeNvaArgument
-        ''------------------------------------------------------------------------------------------------------------
-        ''
-        'Public Function encodeNvaArgument(Arg As String) As String
-        '    encodeNvaArgument = encodeNvaArgument(Arg)
-        'End Function
-        ''
-        ''------------------------------------------------------------------------------------------------------------
-        ''   decode an argument that came from parsing a name or value from a 'name=value&' string
-        ''       split on '&', then on '=', then decode each of the two arguments from either side
-        ''       - other characters are reserved to do further parsing, see encodeNvaArgument
-        ''------------------------------------------------------------------------------------------------------------
-        ''
-        'Public Function genericController.decodeNvaArgument(EncodedArg As String) As String
-        '    decodeNvaArgument = genericController.decodeNvaArgument(EncodedArg)
-        'End Function
-
         '
         '=================================================================================================================================================
         '   csv_addLinkAlias
@@ -3120,18 +3072,7 @@ ErrorTrap:
             End If
             getCdnFileLink = returnLink
         End Function
-        '
-        '========================================================================
-        '   convert a resource file into a filename that can be read with app.csv_ReadFile()
-        '       convert all / to \
-        '       if it includes "://", it is a root file
-        '       if it starts with "/", it is already root relative
-        '       else (if it start with a file or a path), add the serverFilePath
-        '========================================================================
-        '
-        Public Function csv_getPhysicalFilename(ByVal VirtualFilename As String) As String
-            Return genericController.convertCdnUrlToCdnPathFilename(VirtualFilename)
-        End Function
+
         '
         '========================================================================
         '   42private
@@ -3368,20 +3309,7 @@ ErrorTrap:
 ErrorTrap:
             Throw New ApplicationException("Unexpected exception") ' handleLegacyError13("main_ProcessFormMyProfile_UpdateFieldBoolean")
         End Sub
-        '
-        '===========================================================================================
-        '   42legacy
-        ' ----- main_RedirectHTTP
-        '   This is a compatibility call that requires the HTTP be included, or it will be added.
-        '   That means "www.contensive.com" will work, but "index.asp" will not
-        '===========================================================================================
-        '
-        Public Sub main_RedirectHTTP(ByVal Link As String)
-            If Not genericController.isInStr(1, Link, "://") Then
-                Link = webServer.webServerIO_requestProtocol & Link
-            End If
-            Call webServer.redirect(Link, "call to main_RedirectHTTP(" & genericController.encodeText(Link) & "), no reason given.", False)
-        End Sub
+
         '
         '===========================================================================================
         '   ----- Redirect without reason - compatibility only

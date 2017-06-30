@@ -451,8 +451,8 @@ Namespace Contensive.Core.Controllers
                         StyleSN = StyleSN + 1
                         Call cpcore.siteProperties.setProperty("StylesheetSerialNumber", CStr(StyleSN))
                         ' too lazy
-                        'Call cpcore.app.publicFiles.SaveFile(cpcore.app.csv_getPhysicalFilename("templates\Public" & StyleSN & ".css"), cpcore.app.csv_getStyleSheetProcessed)
-                        'Call cpcore.app.publicFiles.SaveFile(cpcore.app.csv_getPhysicalFilename("templates\Admin" & StyleSN & ".css", cpcore.app.csv_getStyleSheetDefault)
+                        'Call cpcore.app.publicFiles.SaveFile(cpcore.app.genericController.convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), cpcore.app.csv_getStyleSheetProcessed)
+                        'Call cpcore.app.publicFiles.SaveFile(cpcore.app.genericController.convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css", cpcore.app.csv_getStyleSheetDefault)
                     End If
                     '
                     ' clear all cache

@@ -5271,7 +5271,7 @@ ErrorTrap:
                                                                                     '
                                                                                     If RecordWidth = 0 Or RecordHeight = 0 Then
                                                                                         sf = New imageEditController
-                                                                                        If sf.load(cpCore.csv_getPhysicalFilename(ImageVirtualFilename)) Then
+                                                                                        If sf.load(genericController.convertCdnUrlToCdnPathFilename(ImageVirtualFilename)) Then
                                                                                             file.pxWidth = sf.width
                                                                                             file.pxHeight = sf.height
                                                                                             file.save(cpCore)
@@ -5302,7 +5302,7 @@ ErrorTrap:
                                                                                             ' This happens when you hit 'reset' on the image properties dialog
                                                                                             '
                                                                                             sf = New imageEditController
-                                                                                            If sf.load(cpCore.csv_getPhysicalFilename(ImageVirtualFilename)) Then
+                                                                                            If sf.load(genericController.convertCdnUrlToCdnPathFilename(ImageVirtualFilename)) Then
                                                                                                 ImageWidth = sf.width
                                                                                                 ImageHeight = sf.height
                                                                                             End If
@@ -5372,7 +5372,7 @@ ErrorTrap:
                                                                                                     ' Alt image has not been built
                                                                                                     '
                                                                                                     sf = New imageEditController
-                                                                                                    If Not sf.load(cpCore.csv_getPhysicalFilename(RecordVirtualFilename)) Then
+                                                                                                    If Not sf.load(genericController.convertCdnUrlToCdnPathFilename(RecordVirtualFilename)) Then
                                                                                                         '
                                                                                                         ' image load failed, use raw filename
                                                                                                         '
@@ -5430,7 +5430,7 @@ ErrorTrap:
                                                                                                         ' Save new file
                                                                                                         '
                                                                                                         NewImageFilename = RecordFilenameNoExt & "-" & ImageAltSize & "." & RecordFilenameExt
-                                                                                                        Call sf.save(cpCore.csv_getPhysicalFilename(ImageVirtualFilePath & NewImageFilename))
+                                                                                                        Call sf.save(genericController.convertCdnUrlToCdnPathFilename(ImageVirtualFilePath & NewImageFilename))
                                                                                                         '
                                                                                                         ' Update image record
                                                                                                         '

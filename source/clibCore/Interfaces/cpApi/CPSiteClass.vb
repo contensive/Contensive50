@@ -264,7 +264,7 @@ Namespace Contensive.Core
         '   This will set off the server monitor
         '
         Public Overrides Sub LogAlarm(ByVal cause As String)
-            Call cpCore.csv_reportAlarm(cause)
+            Call logController.appendLog(cpCore, cause, "Alarm")
         End Sub
         '
         ' Report an error message
