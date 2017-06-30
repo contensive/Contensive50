@@ -384,7 +384,7 @@ Namespace Contensive.Core.Controllers
                         If True Then
                             If BlockedPageRecordID <> 0 Then
                                 '$$$$$ cache this
-                                CS = cpcore.csOpen("Page Content", BlockedPageRecordID, , , "CustomBlockMessage,BlockSourceID,RegistrationGroupID,ContentPadding")
+                                CS = cpcore.db.csOpen2("Page Content", BlockedPageRecordID, , , "CustomBlockMessage,BlockSourceID,RegistrationGroupID,ContentPadding")
                                 If cpcore.db.cs_ok(CS) Then
                                     BlockSourceID = cpcore.db.cs_getInteger(CS, "BlockSourceID")
                                     ContentPadding = cpcore.db.cs_getInteger(CS, "ContentPadding")
@@ -649,7 +649,7 @@ Namespace Contensive.Core.Controllers
                                     ' Always
                                     '
                                     If SystemEMailID <> 0 Then
-                                        Call cpcore.email.sendSystem_Legacy(cpcore.content_GetRecordName("System Email", SystemEMailID), "", cpcore.authContext.user.ID)
+                                        Call cpcore.email.sendSystem_Legacy(cpcore.db.getRecordName("System Email", SystemEMailID), "", cpcore.authContext.user.ID)
                                     End If
                                     If main_AddGroupID <> 0 Then
                                         Call cpcore.group_AddGroupMember(cpcore.group_GetGroupName(main_AddGroupID))
@@ -664,7 +664,7 @@ Namespace Contensive.Core.Controllers
                                     If ConditionGroupID <> 0 Then
                                         If cpcore.authContext.IsMemberOfGroup2(cpcore, cpcore.group_GetGroupName(ConditionGroupID)) Then
                                             If SystemEMailID <> 0 Then
-                                                Call cpcore.email.sendSystem_Legacy(cpcore.content_GetRecordName("System Email", SystemEMailID), "", cpcore.authContext.user.ID)
+                                                Call cpcore.email.sendSystem_Legacy(cpcore.db.getRecordName("System Email", SystemEMailID), "", cpcore.authContext.user.ID)
                                             End If
                                             If main_AddGroupID <> 0 Then
                                                 Call cpcore.group_AddGroupMember(cpcore.group_GetGroupName(main_AddGroupID))
@@ -687,7 +687,7 @@ Namespace Contensive.Core.Controllers
                                                 Call cpcore.group_DeleteGroupMember(cpcore.group_GetGroupName(RemoveGroupID))
                                             End If
                                             If SystemEMailID <> 0 Then
-                                                Call cpcore.email.sendSystem_Legacy(cpcore.content_GetRecordName("System Email", SystemEMailID), "", cpcore.authContext.user.ID)
+                                                Call cpcore.email.sendSystem_Legacy(cpcore.db.getRecordName("System Email", SystemEMailID), "", cpcore.authContext.user.ID)
                                             End If
                                         End If
                                     End If
@@ -731,7 +731,7 @@ Namespace Contensive.Core.Controllers
                         ' Set the Meta Content flag
                         '---------------------------------------------------------------------------------
                         '
-                        Call cpcore.main_SetMetaContent(main_RenderCache_CurrentPage_ContentId, currentPageID)
+                        Call cpcore.htmlDoc.main_SetMetaContent(main_RenderCache_CurrentPage_ContentId, currentPageID)
                         '
                         '---------------------------------------------------------------------------------
                         ' ----- OnPageStartEvent
@@ -1390,7 +1390,7 @@ Namespace Contensive.Core.Controllers
                         If ModifiedBy = 0 Then
                             result = result & " (admin only: modified by unknown)"
                         Else
-                            Name = cpcore.content_GetRecordName("people", ModifiedBy)
+                            Name = cpcore.db.getRecordName("people", ModifiedBy)
                             If Name = "" Then
                                 result = result & " (admin only: modified by person with unnamed or deleted record #" & ReviewedBy & ")"
                             Else
@@ -1408,7 +1408,7 @@ Namespace Contensive.Core.Controllers
                         If ReviewedBy = 0 Then
                             result = result & " (by unknown)"
                         Else
-                            Name = cpcore.content_GetRecordName("people", ReviewedBy)
+                            Name = cpcore.db.getRecordName("people", ReviewedBy)
                             If Name = "" Then
                                 result = result & " (by person with unnamed or deleted record #" & ReviewedBy & ")"
                             Else
@@ -2042,8 +2042,8 @@ ErrorTrap:
             End If
             Call pageManager_GetAuthoringStatus(LiveRecordContentName, RecordID, IsSubmitted, IsApproved, SubmittedMemberName, ApprovedMemberName, IsInserted, IsDeleted, IsModified, ModifiedMemberName, ModifiedDate, SubmittedDate, ApprovedDate)
             Call pageManager_GetAuthoringPermissions(LiveRecordContentName, RecordID, AllowInsert, AllowCancel, allowSave, AllowDelete, AllowPublish, AllowAbort, AllowSubmit, AllowApprove, readOnlyField)
-            AllowMarkReviewed = cpcore.main_IsContentFieldSupported(Models.Entity.pageContentModel.contentName, "DateReviewed")
-            OptionsPanelAuthoringStatus = cpcore.main_GetAuthoringStatusMessage(CDef.AllowWorkflowAuthoring, IsEditLocked, main_EditLockMemberName, main_EditLockDateExpires, IsApproved, ApprovedMemberName, IsSubmitted, SubmittedMemberName, IsDeleted, IsInserted, IsModified, ModifiedMemberName)
+            AllowMarkReviewed = cpcore.metaData.isContentFieldSupported(Models.Entity.pageContentModel.contentName, "DateReviewed")
+            OptionsPanelAuthoringStatus = cpcore.authContext.main_GetAuthoringStatusMessage(cpcore, CDef.AllowWorkflowAuthoring, IsEditLocked, main_EditLockMemberName, main_EditLockDateExpires, IsApproved, ApprovedMemberName, IsSubmitted, SubmittedMemberName, IsDeleted, IsInserted, IsModified, ModifiedMemberName)
             IsRootPage = (ParentID = 0)
             If Not IsRootPage Then
                 IsRootPage = genericController.EncodeInteger(cache_siteSection_RootPageIDIndex.getPtr(CStr(RecordID))) <> -1
@@ -2100,7 +2100,7 @@ ErrorTrap:
             & cr2 & "<td colspan=2 class=""qeRow""><div class=""qeHeadCon"">" & OptionsPanelAuthoringStatus & "</div></td>" _
             & cr & "</tr>"
             End If
-            If cpcore.error_IsUserError() Then
+            If (cpCore.debug_iUserError <> "") Then
                 s = s & "" _
             & cr & "<tr>" _
             & cr2 & "<td colspan=2 class=""qeRow""><div class=""qeHeadCon"">" & cpcore.error_GetUserError() & "</div></td>" _
@@ -2464,7 +2464,7 @@ ErrorTrap:
                     If Trim(RequestName) = "" Then
                         Call cpcore.error_AddUserError("A name is required to save this page")
                     Else
-                        CSBlock = cpcore.csOpenRecord(ContentName, RecordID, True, True)
+                        CSBlock = cpcore.db.cs_open2(ContentName, RecordID, True, True)
                         If cpcore.db.cs_ok(CSBlock) Then
                             FieldName = "copyFilename"
                             Copy = cpcore.docProperties.getText(FieldName)
@@ -2490,7 +2490,7 @@ ErrorTrap:
                         Call cpcore.workflow.SetEditLock(ContentName, RecordID)
                         '
                         If Not SaveButNoChanges Then
-                            Call cpcore.main_ProcessSpecialCaseAfterSave(False, ContentName, RecordID, RecordName, RecordParentID, False)
+                            Call cpcore.db.main_ProcessSpecialCaseAfterSave(False, ContentName, RecordID, RecordName, RecordParentID, False)
                             Call cache_pageContent_clear()
                             Call cpcore.cache.invalidateContent(ContentName)
                         End If
@@ -2530,7 +2530,7 @@ ErrorTrap:
                     '
                     '
                     '
-                    CSBlock = cpcore.csOpen(ContentName, RecordID, , , "ParentID")
+                    CSBlock = cpcore.db.csOpen2(ContentName, RecordID, , , "ParentID")
                     If cpcore.db.cs_ok(CSBlock) Then
                         ParentID = cpcore.db.cs_getInteger(CSBlock, "ParentID")
                     End If
@@ -2564,14 +2564,14 @@ ErrorTrap:
                     Call cpcore.cache.invalidateContent(ContentName)
                 End If
                 If (Button = ButtonDelete) Then
-                    CSBlock = cpcore.csOpen(ContentName, RecordID)
+                    CSBlock = cpcore.db.csOpen2(ContentName, RecordID)
                     If cpcore.db.cs_ok(CSBlock) Then
                         ParentID = cpcore.db.cs_getInteger(CSBlock, "parentid")
                     End If
                     Call cpcore.db.cs_Close(CSBlock)
                     '
                     Call pageManager_DeleteChildRecords(ContentName, RecordID, False)
-                    Call cpcore.DeleteContentRecord(ContentName, RecordID)
+                    Call cpcore.db.deleteContentRecord(ContentName, RecordID)
                     '
                     If Not main_WorkflowSupport Then
                         'Call AppendLog("pageManager_ProcessFormQuickEditor, 9-call pageManager_cache_pageContent_clear")
@@ -2595,7 +2595,7 @@ ErrorTrap:
                     Call cpcore.workflow.main_SubmitEdit(ContentName, RecordID)
                     Call pageManager_SendPublishSubmitNotice(ContentName, RecordID, "")
                 End If
-                If (Not cpcore.error_IsUserError()) And ((Button = ButtonOK) Or (Button = ButtonCancel) Or (Button = ButtonPublish)) Then
+                If (Not (cpCore.debug_iUserError <> "")) And ((Button = ButtonOK) Or (Button = ButtonCancel) Or (Button = ButtonPublish)) Then
                     '
                     ' ----- Turn off Quick Editor if not save or add child
                     '
@@ -4349,7 +4349,7 @@ ErrorTrap:
                     childListSortMethodId = genericController.EncodeInteger(cache_pageContent(PCC_ChildListSortMethodID, main_RenderCache_CurrentPage_PCCPtr))
                     'childListSortMethodId = main_oldCacheArray_CurrentPage(main_oldCacheArray_CurrentPagePtr).childListSortMethodId
                     If childListSortMethodId <> 0 Then
-                        SQLOrderBy = cpcore.GetSortMethodByID(childListSortMethodId)
+                        SQLOrderBy = cpcore.metaData.GetSortMethodByID(childListSortMethodId)
                     End If
                 End If
                 '
@@ -4521,7 +4521,7 @@ ErrorTrap:
                     ' ----- load the child branch
                     '
                     childListSortMethodId = genericController.EncodeInteger(cache_pageContent(PCC_ChildListSortMethodID, main_RenderCache_CurrentPage_PCCPtr))
-                    SortOrder = cpcore.GetSortMethodByID(childListSortMethodId)
+                    SortOrder = cpcore.metaData.GetSortMethodByID(childListSortMethodId)
                     If SortOrder = "" Then
                         SortOrder = genericController.encodeText(OrderByClause)
                     End If
@@ -5795,7 +5795,7 @@ ErrorTrap:
                     SingleEntry = (IDCnt = 1)
                     QuickEditing = cpcore.authContext.isQuickEditing(cpcore, "page content")
                     For Ptr = 0 To IDCnt - 1
-                        Call cpcore.DeleteContentRecord("page content", genericController.EncodeInteger(IDs(Ptr)))
+                        Call cpcore.db.deleteContentRecord("page content", genericController.EncodeInteger(IDs(Ptr)))
                         Call cache_pageContent_removeRow(genericController.EncodeInteger(IDs(Ptr)), pagemanager_IsWorkflowRendering, QuickEditing)
                     Next
                 End If
@@ -6294,10 +6294,10 @@ ErrorTrap:
                                 CaptionSpan = "<span>"
                             End If
                             If Not cpcore.db.cs_ok(CSPeople) Then
-                                CSPeople = cpcore.csOpen("people", cpcore.authContext.user.ID)
+                                CSPeople = cpcore.db.csOpen2("people", cpcore.authContext.user.ID)
                             End If
                             Caption = .Caption
-                            If .REquired Or genericController.EncodeBoolean(cpcore.GetContentFieldProperty("People", .PeopleField, "Required")) Then
+                            If .REquired Or genericController.EncodeBoolean(cpcore.metaData.GetContentFieldProperty("People", .PeopleField, "Required")) Then
                                 Caption = "*" & Caption
                             End If
                             If cpcore.db.cs_ok(CSPeople) Then
@@ -6416,7 +6416,7 @@ ErrorTrap:
             Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetContentWatchLinkByName")
         End Function
         '
-        Public Sub pageManager_GetPageArgs(ByVal PageID As Integer, ByVal isWorkflowRendering As Boolean, ByVal isQuickEditing As Boolean, ByRef return_CCID As Integer, ByRef return_TemplateID As Integer, ByRef return_ParentID As Integer, ByRef return_MenuLinkOverRide As String, ByRef return_IsRootPage As Boolean, ByRef return_SectionID As Integer, ByRef return_PageIsSecure As Boolean, ByVal UsedIDList As String)
+        Public Sub getPageArgs(ByVal PageID As Integer, ByVal isWorkflowRendering As Boolean, ByVal isQuickEditing As Boolean, ByRef return_CCID As Integer, ByRef return_TemplateID As Integer, ByRef return_ParentID As Integer, ByRef return_MenuLinkOverRide As String, ByRef return_IsRootPage As Boolean, ByRef return_SectionID As Integer, ByRef return_PageIsSecure As Boolean, ByVal UsedIDList As String)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetPageArgs")
             '
             Dim TCPtr As Integer
@@ -6462,7 +6462,7 @@ ErrorTrap:
                     ' chase further
                     '
                     If Not genericController.IsInDelimitedString(UsedIDList, CStr(return_ParentID), ",") Then
-                        Call pageManager_GetPageArgs(return_ParentID, isWorkflowRendering, isQuickEditing, IgnoreInteger, return_TemplateID, IgnoreInteger, IgnoreString, IgnoreBoolean, return_SectionID, IgnoreBoolean, UsedIDList & "," & return_ParentID)
+                        Call getPageArgs(return_ParentID, isWorkflowRendering, isQuickEditing, IgnoreInteger, return_TemplateID, IgnoreInteger, IgnoreString, IgnoreBoolean, return_SectionID, IgnoreBoolean, UsedIDList & "," & return_ParentID)
                     End If
                 End If
                 If pagetemplateID <> 0 Then
@@ -6547,16 +6547,16 @@ ErrorTrap:
         '====================================================================================================
         '
         Public Function getPageLink4(ByVal PageID As Integer, ByVal QueryStringSuffix As String, ByVal AllowLinkAliasIfEnabled As Boolean, ByVal UseContentWatchNotDefaultPage As Boolean) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetPageLink")
+            Dim result As String = ""
             '
             Dim main_domainIds() As String
             Dim Ptr As Integer
             Dim setdomainId As Integer
-            Dim templatedomainIdList As String
+            Dim templatedomainIdList As String = ""
             Dim linkLong As String
             Dim linkprotocol As String
             Dim linkPathPage As String
-            Dim linkAlias As String
+            Dim linkAlias As String = ""
             Dim linkQS As String
             Dim linkDomain As String
             '
@@ -6572,13 +6572,13 @@ ErrorTrap:
             Dim PageIsSecure As Boolean
             Dim Pos As Integer
             '
-            Dim templateLink As String
+            Dim templateLink As String = ""
             Dim templateLinkIncludesProtocol As Boolean
             Dim templateSecure As Boolean
             Dim templateId As Integer
-            Dim templateDomain As String
+            Dim templateDomain As String = ""
             '
-            Call pageManager_GetPageArgs(PageID, pagemanager_IsWorkflowRendering, cpcore.authContext.isQuickEditing(cpcore, ""), ContentControlID, templateId, ParentID, MenuLinkOverRide, IsRootPage, SectionID, PageIsSecure, "")
+            Call getPageArgs(PageID, pagemanager_IsWorkflowRendering, cpcore.authContext.isQuickEditing(cpcore, ""), ContentControlID, templateId, ParentID, MenuLinkOverRide, IsRootPage, SectionID, PageIsSecure, "")
             '
             ' main_Get defaultpathpage
             '
@@ -6641,17 +6641,11 @@ ErrorTrap:
                 ' ----- templateLink is blank
                 '
                 If AllowLinkAliasIfEnabled And cpcore.siteProperties.allowLinkAlias Then
-                    If cpcore.cache_linkAliasCnt = 0 Then
-                        Call cpcore.cache_linkAlias_load()
-                    End If
-                    If cpcore.cache_linkAliasCnt > 0 Then
-                        Key = genericController.vbLCase(CStr(PageID) & QueryStringSuffix)
-                        Ptr = cpcore.cache_linkAlias_PageIdQSSIndex.getPtr(Key)
-                        If Ptr >= 0 Then
-                            linkAlias = genericController.encodeText(cpcore.cache_linkAlias(1, Ptr))
-                            If Mid(linkAlias, 1, 1) <> "/" Then
-                                linkAlias = "/" & linkAlias
-                            End If
+                    Dim linkAliasList As List(Of Models.Entity.linkAliasModel) = Models.Entity.linkAliasModel.createList(cpcore, "(PageID=" & PageID & ")and(QueryStringSuffix=" & cpcore.db.encodeSQLText(QueryStringSuffix) & ")", "id desc")
+                    If linkAliasList.Count > 0 Then
+                        linkAlias = linkAliasList.First.Link
+                        If Mid(linkAlias, 1, 1) <> "/" Then
+                            linkAlias = "/" & linkAlias
                         End If
                     End If
                 End If
@@ -6690,7 +6684,7 @@ ErrorTrap:
                             Exit For
                         End If
                     Next
-                    linkDomain = cpcore.content_GetRecordName("domains", setdomainId)
+                    linkDomain = cpcore.db.getRecordName("domains", setdomainId)
                     If linkDomain = "" Then
                         linkDomain = cpcore.webServer.requestDomain
                     End If
@@ -6735,15 +6729,11 @@ ErrorTrap:
             '
             ' assemble
             '
-            getPageLink4 = linkLong
+            result = linkLong
             If linkQS <> "" Then
-                getPageLink4 = getPageLink4 & "?" & linkQS
+                result = result & "?" & linkQS
             End If
-            '
-            Exit Function
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError13("main_GetPageLink4")
+            Return result
         End Function
         '
         '====================================================================================================
@@ -6841,7 +6831,7 @@ ErrorTrap:
                 End If
                 CS = -1
                 If templateId <> 0 Then
-                    CS = cpcore.csOpenRecord(ContentName, templateId, , , FieldList)
+                    CS = cpcore.db.cs_open2(ContentName, templateId, , , FieldList)
                 End If
                 If (templateId = 0) Or (Not cpcore.db.cs_ok(CS)) Then
                     '
@@ -6854,7 +6844,7 @@ ErrorTrap:
                         ' ----- attempt to use the domain's default template
                         '
                         Call cpcore.db.cs_Close(CS)
-                        CS = cpcore.csOpenRecord(ContentName, cpcore.domainLegacyCache.domainDetails.defaultTemplateId, , , FieldList)
+                        CS = cpcore.db.cs_open2(ContentName, cpcore.domainLegacyCache.domainDetails.defaultTemplateId, , , FieldList)
                         If Not cpcore.db.cs_ok(CS) Then
                             '
                             ' the defaultemplateid in the domain is not valid
@@ -6964,7 +6954,7 @@ ErrorTrap:
         '        ' Check for MenuID - if present, arguments are in the Dynamic Menu content - else it is old, and they are in the addonOption_String
         '        '
         '        If True And genericController.vbInstr(1, addonOption_String, "menu=", vbTextCompare) <> 0 Then
-        '            MenuNew = cpcore.main_GetAddonOption("menunew", addonOption_String)
+        '            MenuNew = cpcore.getAddonOption("menunew", addonOption_String)
         '            'MenuNew = Trim( genericController.DecodeResponseVariable(main_GetArgument("menunew", addonOption_String, "", "&")))
         '            If MenuNew <> "" Then
         '                '
@@ -6976,7 +6966,7 @@ ErrorTrap:
         '                '
         '                ' No new menu, try a selected menu
         '                '
-        '                Menu = cpcore.main_GetAddonOption("menu", addonOption_String)
+        '                Menu = cpcore.getAddonOption("menu", addonOption_String)
         '                'Menu = Trim( genericController.DecodeResponseVariable(main_GetArgument("menu", addonOption_String, "", "&")))
         '                If Menu = "" Then
         '                    '
@@ -7034,16 +7024,16 @@ ErrorTrap:
         '            IsOldMenu = True
         '            MenuName = ""
         '            '
-        '            MenuDepth = genericController.EncodeInteger(cpcore.main_GetAddonOption("DEPTH", addonOption_String))
-        '            MenuStylePrefix = Trim(cpcore.main_GetAddonOption("STYLEPREFIX", addonOption_String))
-        '            MenuDelimiter = cpcore.main_GetAddonOption("DELIMITER", addonOption_String)
-        '            FlyoutOnHover = cpcore.main_GetAddonOption("FlyoutOnHover", addonOption_String)
-        '            FlyoutDirection = cpcore.main_GetAddonOption("FlyoutDirection", addonOption_String)
-        '            Layout = cpcore.main_GetAddonOption("Layout", addonOption_String)
+        '            MenuDepth = genericController.EncodeInteger(cpcore.getAddonOption("DEPTH", addonOption_String))
+        '            MenuStylePrefix = Trim(cpcore.getAddonOption("STYLEPREFIX", addonOption_String))
+        '            MenuDelimiter = cpcore.getAddonOption("DELIMITER", addonOption_String)
+        '            FlyoutOnHover = cpcore.getAddonOption("FlyoutOnHover", addonOption_String)
+        '            FlyoutDirection = cpcore.getAddonOption("FlyoutDirection", addonOption_String)
+        '            Layout = cpcore.getAddonOption("Layout", addonOption_String)
         '            '
         '            ' really old value
         '            '
-        '            MenuStyle = genericController.EncodeInteger(cpcore.main_GetAddonOption("FORMAT", addonOption_String))
+        '            MenuStyle = genericController.EncodeInteger(cpcore.getAddonOption("FORMAT", addonOption_String))
         '        End If
         '        '
         '        ' Check values
@@ -7585,7 +7575,7 @@ ErrorTrap:
             Dim templateId As Integer
             '
             '
-            CS = cpcore.csOpen("Page Content", PageID, , , "TemplateID,ParentID")
+            CS = cpcore.db.csOpen2("Page Content", PageID, , , "TemplateID,ParentID")
             If cpcore.db.cs_ok(CS) Then
                 templateId = cpcore.db.cs_getInteger(CS, "TemplateID")
                 ParentID = cpcore.db.cs_getInteger(CS, "ParentID")
@@ -7626,7 +7616,7 @@ ErrorTrap:
             Dim PCCPtr As Integer
             Dim PageIsSecure As Boolean
             '
-            Call pageManager_GetPageArgs(PageID, pagemanager_IsWorkflowRendering, cpcore.authContext.isQuickEditing(cpcore, ""), CCID, templateId, ParentID, MenuLinkOverRide, IsRootPage, SectionID, PageIsSecure, "")
+            Call getPageArgs(PageID, pagemanager_IsWorkflowRendering, cpcore.authContext.isQuickEditing(cpcore, ""), CCID, templateId, ParentID, MenuLinkOverRide, IsRootPage, SectionID, PageIsSecure, "")
             '    PCCPtr = pageManager_cache_pageContent_getPtr(PageID, main_IsWorkflowRendering, main_IsQuickEditing(""))
             '    If PCCPtr >= 0 Then
             '        PageFound = True
@@ -7788,7 +7778,7 @@ ErrorTrap:
         '   Create the default landing page if it is missing
         '---------------------------------------------------------------------------
         '
-        Public Function main_CreatePageGetID(ByVal PageName As String, ByVal ContentName As String, ByVal CreatedBy As Integer, ByVal pageGuid As String) As Integer
+        Public Function createPageGetID(ByVal PageName As String, ByVal ContentName As String, ByVal CreatedBy As Integer, ByVal pageGuid As String) As Integer
             Dim Id As Integer = 0
             '
             Dim CS As Integer = cpcore.db.cs_insertRecord(ContentName, CreatedBy)
@@ -7804,43 +7794,24 @@ ErrorTrap:
             End If
             Call cpcore.db.cs_Close(CS)
             '
-            main_CreatePageGetID = Id
+            createPageGetID = Id
         End Function
         '
-        'Private Shared Function main_GetDefaultTemplateId(cpCore As coreClass) As Integer
-        '    Dim result As Integer = 0
-        '    Try
-        '        '
-        '        Dim CS As Integer
-        '        '
-        '        CS = cpCore.db.cs_open("page templates", "name=" & cpCore.db.encodeSQLText(TemplateDefaultName), "ID", , , , , "id")
-        '        If cpCore.db.cs_ok(CS) Then
-        '            result = cpCore.db.cs_getInteger(CS, "ID")
-        '        End If
-        '        Call cpCore.db.cs_Close(CS)
-        '        '
-        '        ' ----- if default template not found, create a simple default template
-        '        '
-        '        If result = 0 Then
-        '            CS = cpCore.db.cs_insertRecord("Page Templates")
-        '            If cpCore.db.cs_ok(CS) Then
-        '                result = cpCore.db.cs_getInteger(CS, "ID")
-        '                Call cpCore.db.cs_set(CS, "name", TemplateDefaultName)
-        '                Call cpCore.db.cs_set(CS, "Link", "")
-        '                If True Then
-        '                    Call cpCore.db.cs_set(CS, "BodyHTML", cpCore.pages.templateBody)
-        '                End If
-        '                If True Then
-        '                    Call cpCore.db.cs_set(CS, "ccGuid", DefaultTemplateGuid)
-        '                End If
-        '                Call cpCore.db.cs_Close(CS)
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        cpCore.handleExceptionAndContinue(ex)
-        '    End Try
-        '    Return result
-        'End Function
-
+        '====================================================================================================
+        '   Returns the Alias link (SourceLink) from the actual link (DestinationLink)
+        '
+        '====================================================================================================
+        '
+        Public Shared Function getLinkAlias(cpcore As coreClass, PageID As Integer, QueryStringSuffix As String, DefaultLink As String) As String
+            Dim linkAlias As String = DefaultLink
+            Dim linkAliasList As List(Of Models.Entity.linkAliasModel) = Models.Entity.linkAliasModel.createList(cpcore, "(PageID=" & PageID & ")and(QueryStringSuffix=" & cpcore.db.encodeSQLText(QueryStringSuffix) & ")", "id desc")
+            If linkAliasList.Count > 0 Then
+                linkAlias = linkAliasList.First.Link
+                If Mid(linkAlias, 1, 1) <> "/" Then
+                    linkAlias = "/" & linkAlias
+                End If
+            End If
+            Return linkAlias
+        End Function
     End Class
 End Namespace

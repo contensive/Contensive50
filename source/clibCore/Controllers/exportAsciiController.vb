@@ -55,7 +55,7 @@ Namespace Contensive.Core.Controllers
                 '
                 Call cpCore.webServer.setResponseContentType("text/plain")
                 Call cpCore.htmlDoc.enableOutputBuffer(False)
-                TableName = genericController.GetDbObjectTableName(cpCore.GetContentTablename(iContentName))
+                TableName = genericController.GetDbObjectTableName(cpCore.metaData.getContentTablename(iContentName))
                 Select Case genericController.vbUCase(TableName)
                     Case "CCMEMBERS"
                         '
@@ -146,7 +146,7 @@ Namespace Contensive.Core.Controllers
                                 Do While (FieldNameVariant <> "")
                                     Select Case cpCore.db.cs_getFieldTypeId(CSPointer, genericController.encodeText(FieldNameVariant))
                                         Case FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdFileHTMLPrivate
-                                            Copy = cpCore.main_cs_getEncodedField(CSPointer, genericController.encodeText(FieldNameVariant))
+                                            Copy = csController.main_cs_getEncodedField(cpCore, CSPointer, genericController.encodeText(FieldNameVariant))
                                         Case FieldTypeIdLookup
                                             Copy = cpCore.db.cs_getLookup(CSPointer, genericController.encodeText(FieldNameVariant))
                                         Case FieldTypeIdRedirect, FieldTypeIdManyToMany

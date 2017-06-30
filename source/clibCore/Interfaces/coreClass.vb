@@ -58,11 +58,11 @@ Namespace Contensive.Core
         Public Property main_testPointMessage As String = ""                         '
         Public Property testPointPrinting As Boolean = False                         ' if true, send main_TestPoint messages to the stream
         Public Property docOpen As Boolean = False                                   ' when false, routines should not add to the output and immediately exit
-        Public Const cache_linkAlias_cacheName = "cache_linkAlias"
-        Public Property cache_linkAlias As String(,)
-        Public Property cache_linkAliasCnt As Integer = 0
-        Public Property cache_linkAlias_NameIndex As keyPtrController
-        Public Property cache_linkAlias_PageIdQSSIndex As keyPtrController
+        'Public Const cache_linkAlias_cacheName = "cache_linkAlias"
+        'Public Property cache_linkAlias As String(,)
+        'Public Property cache_linkAliasCnt As Integer = 0
+        'Public Property cache_linkAlias_NameIndex As keyPtrController
+        'Public Property cache_linkAlias_PageIdQSSIndex As keyPtrController
         '
         '========================================================================================================================
         '   Internal cache (for content used to run the system)
@@ -686,7 +686,7 @@ Namespace Contensive.Core
                                         ' Not from this site
                                         '
                                         If siteProperties.getBoolean("AllowAggregateAccessBlocking") Then
-                                            cs = db.cs_open("Aggregate Access", "Link=" & EncodeSQLText(refHost), , False, , , , "active")
+                                            cs = db.cs_open("Aggregate Access", "Link=" & db.encodeSQLText(refHost), , False, , , , "active")
                                             If Not db.cs_ok(cs) Then
                                                 '
                                                 ' no record, add an inactive record and throw error
@@ -880,7 +880,7 @@ Namespace Contensive.Core
                                         If db.cs_ok(CS) Then
                                             addonArgumentList = db.cs_getText(CS, "argumentlist")
                                             addonIsInline = db.cs_getBoolean(CS, "IsInline")
-                                            returnResult = main_GetDefaultAddonOption_String(addonArgumentList, AddonGuid, addonIsInline)
+                                            returnResult = addonController.main_GetDefaultAddonOption_String(Me, addonArgumentList, AddonGuid, addonIsInline)
                                         End If
                                         Call db.cs_Close(CS)
                                     Case AjaxSetVisitProperty
@@ -1077,7 +1077,7 @@ Namespace Contensive.Core
                                 '
                                 ' set the meta content flag to show it is not needed for the head tag
                                 '
-                                Call main_SetMetaContent(0, 0)
+                                Call htmlDoc.main_SetMetaContent(0, 0)
                                 Select Case formType
                                     Case FormTypeSiteStyleEditor
                                         If authContext.isAuthenticated() And authContext.isAuthenticatedAdmin(Me) Then
@@ -1116,7 +1116,7 @@ Namespace Contensive.Core
                                             Dim nothingObject As Object = Nothing
                                             Dim cs As Integer
                                             addonId = docProperties.getInteger("AddonID")
-                                            cs = csOpen(cnAddons, addonId)
+                                            cs = db.csOpen2(cnAddons, addonId)
                                             If db.cs_ok(cs) Then
                                                 Call db.cs_set(cs, "CustomStylesFilename", docProperties.getText("CustomStyles"))
                                             End If
@@ -1130,7 +1130,7 @@ Namespace Contensive.Core
                                             'Call cache.invalidateObjectList("")
                                             If contentName <> "" Then
                                                 Call cache.invalidateContent(contentName)
-                                                tableName = GetContentTablename(contentName)
+                                                tableName = metaData.getContentTablename(contentName)
                                                 If genericController.vbLCase(tableName) = "cctemplates" Then
                                                     Call cache.setObject(pagesController.cache_pageTemplate_cacheName, nothingObject)
                                                     Call pages.pageManager_cache_pageTemplate_load()
@@ -1255,6 +1255,823 @@ Namespace Contensive.Core
                 Call handleExceptionAndContinue(ex)
             End Try
             Return returnResult
+        End Function
+        '
+        '=================================================================================================
+        '   Run and return results from a remotequery call from cj.ajax.data(handler,key,args,pagesize,pagenumber)
+        '
+        '   This routine builds an xml object inside a <result></result> node.
+        '       Right now, the response is in JSON format, and conforms to the google data visualization spec 0.5
+        '
+        '
+        '=================================================================================================
+        '
+        Private Function executeRoute_ProcessAjaxData() As String
+            Dim result As String = ""
+            Try
+                Dim SetPairs() As String
+                Dim Pos As Integer
+                Dim FieldValue As String
+                Dim SetPairString As String
+                Dim ArgCnt As Integer
+                Dim s As New stringBuilderLegacyController
+                Dim FieldName As String
+                Dim Copy As String
+                Dim PageSize As Integer
+                Dim ArgArray() As String
+                Dim RemoteKey As String
+                Dim EncodedArgs As String
+                Dim Args As String
+                Dim PageNumber As Integer
+                Dim CS As Integer
+                Dim SQLQuery As String
+                Dim maxRows As Integer
+                Dim ArgName() As String
+                Dim ArgValue() As String
+                Dim Ptr As Integer
+                Dim QueryType As Integer
+                Dim ContentName As String = ""
+                Dim Criteria As String
+                Dim SortFieldList As String = ""
+                Dim AllowInactiveRecords2 As Boolean
+                Dim SelectFieldList As String = ""
+                Dim gd As New GoogleDataType
+                Dim gv As New GoogleVisualizationType
+                Dim RemoteFormat As RemoteFormatEnum
+                'Dim DataSource As Models.Entity.dataSourceModel
+                '
+                gv.status = GoogleVisualizationStatusEnum.OK
+                gd.IsEmpty = True
+                '
+                RemoteKey = docProperties.getText("key")
+                EncodedArgs = docProperties.getText("args")
+
+                PageSize = docProperties.getInteger("pagesize")
+                PageNumber = docProperties.getInteger("pagenumber")
+                Select Case genericController.vbLCase(docProperties.getText("responseformat"))
+                    Case "jsonnamevalue"
+                        RemoteFormat = RemoteFormatEnum.RemoteFormatJsonNameValue
+                    Case "jsonnamearray"
+                        RemoteFormat = RemoteFormatEnum.RemoteFormatJsonNameArray
+                    Case Else 'jsontable
+                        RemoteFormat = RemoteFormatEnum.RemoteFormatJsonTable
+                End Select
+                '
+                ' Handle common work
+                '
+                If PageNumber = 0 Then
+                    PageNumber = 1
+                End If
+                If PageSize = 0 Then
+                    PageSize = 100
+                End If
+                If maxRows <> 0 And PageSize > maxRows Then
+                    PageSize = maxRows
+                End If
+                '
+                If EncodedArgs <> "" Then
+                    Args = EncodedArgs
+                    ArgArray = Split(Args, "&")
+                    ArgCnt = UBound(ArgArray) + 1
+                    ReDim ArgName(ArgCnt)
+                    ReDim ArgValue(ArgCnt)
+                    For Ptr = 0 To ArgCnt - 1
+                        Pos = genericController.vbInstr(1, ArgArray(Ptr), "=")
+                        If Pos > 0 Then
+                            ArgName(Ptr) = genericController.DecodeResponseVariable(Mid(ArgArray(Ptr), 1, Pos - 1))
+                            ArgValue(Ptr) = genericController.DecodeResponseVariable(Mid(ArgArray(Ptr), Pos + 1))
+                        End If
+                    Next
+                End If
+                '
+                ' main_Get values out of the remote query record
+                '
+                If gv.status = GoogleVisualizationStatusEnum.OK Then
+                    CS = db.cs_open("Remote Queries", "((VisitId=" & authContext.visit.ID & ")and(remotekey=" & db.encodeSQLText(RemoteKey) & "))")
+                    If db.cs_ok(CS) Then
+                        '
+                        ' Use user definied query
+                        '
+                        SQLQuery = db.cs_getText(CS, "sqlquery")
+                        'DataSource = Models.Entity.dataSourceModel.create(Me, db.cs_getInteger(CS, "datasourceid"), New List(Of String))
+                        maxRows = db.cs_getInteger(CS, "maxrows")
+                        QueryType = db.cs_getInteger(CS, "QueryTypeID")
+                        ContentName = db.cs_get(CS, "ContentID")
+                        Criteria = db.cs_getText(CS, "Criteria")
+                        SortFieldList = db.cs_getText(CS, "SortFieldList")
+                        AllowInactiveRecords2 = db.cs_getBoolean(CS, "AllowInactiveRecords")
+                        SelectFieldList = db.cs_getText(CS, "SelectFieldList")
+                        SetPairString = ""
+                    Else
+                        '
+                        ' Try Hardcoded queries
+                        '
+                        Select Case genericController.vbLCase(RemoteKey)
+                            Case "ccfieldhelpupdate"
+                                '
+                                ' developers editing field help
+                                '
+                                If Not authContext.user.Developer Then
+                                    gv.status = GoogleVisualizationStatusEnum.ErrorStatus
+                                    If IsArray(gv.errors) Then
+                                        Ptr = 0
+                                    Else
+                                        Ptr = UBound(gv.errors) + 1
+                                    End If
+                                    ReDim gv.errors(Ptr)
+                                    gv.errors(Ptr) = "permission error"
+                                Else
+                                    QueryType = QueryTypeUpdateContent
+                                    ContentName = "Content Field Help"
+                                    Criteria = ""
+                                    AllowInactiveRecords2 = False
+                                End If
+                                'Case Else
+                                '    '
+                                '    ' query not found
+                                '    '
+                                '    gv.status = GoogleVisualizationStatusEnum.ErrorStatus
+                                '    If IsArray(gv.errors) Then
+                                '        Ptr = 0
+                                '    Else
+                                '        Ptr = UBound(gv.errors) + 1
+                                '    End If
+                                '    ReDim gv.errors(Ptr)
+                                '    gv.errors(Ptr) = "query not found"
+                        End Select
+                    End If
+                    Call db.cs_Close(CS)
+                    '
+                    If gv.status = GoogleVisualizationStatusEnum.OK Then
+                        Select Case QueryType
+                        'Case QueryTypeSQL
+                        '    '
+                        '    ' ----- Run a SQL
+                        '    '
+                        '    If SQLQuery <> "" Then
+                        '        For Ptr = 0 To ArgCnt - 1
+                        '            SQLQuery = genericController.vbReplace(SQLQuery, ArgName(Ptr), ArgValue(Ptr), vbTextCompare)
+                        '            'Criteria = genericController.vbReplace(Criteria, ArgName(Ptr), ArgValue(Ptr), vbTextCompare)
+                        '        Next
+                        '        On Error Resume Next
+                        '        RS = main_ExecuteSQLCommand(DataSource, SQLQuery, 30, PageSize, PageNumber)
+                        '        ErrorNumber = Err.Number
+                        '        ErrorDescription = Err.Description
+                        '        Err.Clear()
+                        '        On Error GoTo ErrorTrap
+                        '        If ErrorNumber <> 0 Then
+                        '            '
+                        '            ' ----- Error
+                        '            '
+                        '            gv.status = GoogleVisualizationStatusEnum.ErrorStatus
+                        '            Ptr = UBound(gv.errors) + 1
+                        '            ReDim gv.errors(Ptr)
+                        '            gv.errors(Ptr) = "Error: " & Err.Description
+                        '        ElseIf (Not isDataTableOk(rs)) Then
+                        '            '
+                        '            ' ----- no result
+                        '            '
+                        '        ElseIf (RS.State <> 1) Then
+                        '            '
+                        '            ' ----- no result
+                        '            '
+                        '        ElseIf (rs.rows.count = 0) Then
+                        '            '
+                        '            ' ----- no result
+                        '            '
+                        '        Else
+                        '            PageSize = RS.PageSize
+                        '            Cells = RS.GetRows(PageSize)
+                        '            '
+                        '            gd.IsEmpty = False
+                        '            RowMax = UBound(Cells, 2)
+                        '            ColMax = UBound(Cells, 1)
+                        '            '
+                        '            ' Build headers
+                        '            '
+                        '            ReDim gd.col(ColMax)
+                        '            For ColPtr = 0 To ColMax
+                        '                RecordField = RS.Fields.Item(ColPtr)
+                        '                gd.col(ColPtr).Id = RecordField.Name
+                        '                gd.col(ColPtr).Label = RecordField.Name
+                        '                gd.col(ColPtr).Type = ConvertRSTypeToGoogleType(RecordField.Type)
+                        '            Next
+                        '            'RS.Close()
+                        '            'RS = Nothing
+                        '            '
+                        '            ' Build output table
+                        '            '
+                        '            ReDim gd.row(RowMax)
+                        '            For RowPtr = 0 To RowMax
+                        '                With gd.row(RowPtr)
+                        '                    ReDim .Cell(ColMax)
+                        '                    For ColPtr = 0 To ColMax
+                        '                        .Cell(ColPtr).v = genericController.encodeText(Cells(ColPtr, RowPtr))
+                        '                    Next
+                        '                End With
+                        '            Next
+                        '        End If
+                        '        If (isDataTableOk(rs)) Then
+                        '            If False Then
+                        '                'RS.Close()
+                        '            End If
+                        '            'RS = Nothing
+                        '        End If
+                        '    End If
+                        'Case QueryTypeOpenContent
+                        '    '
+                        '    ' Contensive Content Select, args are criteria replacements
+                        '    '
+
+                        '    CDef = app.getCdef(ContentName)
+                        '    CS = app.csOpen(ContentName, Criteria, SortFieldList, AllowInactiveRecords, , , SelectFieldList)
+                        '    Cells = app.csv_cs_getRows(CS)
+                        '    FieldList = app.cs_getSelectFieldList(CS)
+                        '    '
+                        '    RowMax = UBound(Cells, 2)
+                        '    ColMax = UBound(Cells, 1)
+                        '    If RowMax = 0 And ColMax = 0 Then
+                        '        '
+                        '        ' Single result, display with no table
+                        '        '
+                        '        Copy = genericController.encodeText(Cells(0, 0))
+                        '    Else
+                        '        '
+                        '        ' Build headers
+                        '        '
+                        '        gd.IsEmpty = False
+                        '        RowMax = UBound(Cells, 2)
+                        '        ColMax = UBound(Cells, 1)
+                        '        '
+                        '        ' Build headers
+                        '        '
+                        '        ReDim gd.col(ColMax)
+                        '        For ColPtr = 0 To ColMax
+                        '            RecordField = RS.Fields.Item(RowPtr)
+                        '            gd.col(ColPtr).Id = RecordField.Name
+                        '            gd.col(ColPtr).Label = RecordField.Name
+                        '            gd.col(ColPtr).Type = ConvertRSTypeToGoogleType(RecordField.Type)
+                        '        Next
+                        '        '
+                        '        ' Build output table
+                        '        '
+                        '        'RowStart = vbCrLf & "<Row>"
+                        '        'Rowend = "</Row>"
+                        '        For RowPtr = 0 To RowMax
+                        '            With gd.row(RowPtr)
+                        '                For ColPtr = 0 To ColMax
+                        '                    .Cell(ColPtr).v = Cells(ColPtr, RowPtr)
+                        '                Next
+                        '            End With
+                        '        Next
+                        '    End If
+                            Case QueryTypeUpdateContent
+                                '
+                                ' Contensive Content Update, args are field=value updates
+                                ' !!!! only allow inbound hits with a referrer from this site - later use the aggregate access table
+                                '
+                                '
+                                ' Go though args and main_Get Set and Criteria
+                                '
+                                SetPairString = ""
+                                Criteria = ""
+                                For Ptr = 0 To ArgCnt - 1
+                                    If genericController.vbLCase(ArgName(Ptr)) = "setpairs" Then
+                                        SetPairString = ArgValue(Ptr)
+                                    ElseIf genericController.vbLCase(ArgName(Ptr)) = "criteria" Then
+                                        Criteria = ArgValue(Ptr)
+                                    End If
+                                Next
+                                '
+                                ' Open the content and cycle through each setPair
+                                '
+                                CS = db.cs_open(ContentName, Criteria, SortFieldList, AllowInactiveRecords2, , ,, SelectFieldList)
+                                If db.cs_ok(CS) Then
+                                    '
+                                    ' update by looping through the args and setting name=values
+                                    '
+                                    SetPairs = Split(SetPairString, "&")
+                                    For Ptr = 0 To UBound(SetPairs)
+                                        If SetPairs(Ptr) <> "" Then
+                                            Pos = genericController.vbInstr(1, SetPairs(Ptr), "=")
+                                            If Pos > 0 Then
+                                                FieldValue = genericController.DecodeResponseVariable(Mid(SetPairs(Ptr), Pos + 1))
+                                                FieldName = genericController.DecodeResponseVariable(Mid(SetPairs(Ptr), 1, Pos - 1))
+                                                If Not metaData.isContentFieldSupported(ContentName, FieldName) Then
+                                                    Dim errorMessage As String = "result, QueryTypeUpdateContent, key [" & RemoteKey & "], bad field [" & FieldName & "] skipped"
+                                                    Throw (New ApplicationException(errorMessage))
+                                                Else
+                                                    Call db.cs_set(CS, FieldName, FieldValue)
+                                                End If
+                                            End If
+                                        End If
+                                    Next
+                                End If
+                                Call db.cs_Close(CS)
+                                'Case QueryTypeInsertContent
+                                '    '
+                                '    ' !!!! only allow inbound hits with a referrer from this site - later use the aggregate access table
+                                '    '
+                                '    '
+                                '    ' Contensive Content Insert, args are field=value
+                                '    '
+                                '    'CS = main_InsertCSContent(ContentName)
+                            Case Else
+                        End Select
+                        '
+                        ' output
+                        '
+                        Copy = remoteQueryController.main_FormatRemoteQueryOutput(Me, gd, RemoteFormat)
+                        Copy = htmlDoc.html_EncodeHTML(Copy)
+                        result = "<data>" & Copy & "</data>"
+                    End If
+                End If
+            Catch ex As Exception
+                Throw (ex)
+            End Try
+            Return result
+        End Function
+
+
+
+
+        '
+        '
+        '
+        '=========================================================================================
+        '   In Init(), Print Hard Coded Pages
+        '       A Hard coded page replaces the entire output with an HTML compatible page
+        '=========================================================================================
+        '
+        Private Function executeRoute_hardCodedPage(ByVal HardCodedPage As String) As Boolean
+            Dim result As Boolean = False
+            Try
+                Dim allowPageWithoutSectionDisplay As Boolean
+                Dim InsertTestOK As Boolean
+                Dim ConfirmOrderID As Integer
+                Dim PageSize As Integer
+                Dim PageNumber As Integer
+                Dim ContentName As String
+                Dim MsgLabel As String
+                Dim PageID As Integer
+                Dim rootPageId As Integer
+                Dim Pos As Integer
+                Dim TrapID As Integer
+                Dim CS As Integer
+                Dim Name As String
+                Dim Copy As String
+                Dim Recipient As String
+                Dim Sender As String
+                Dim subject As String
+                Dim Message As String
+                Dim Emailtext As String
+                Dim LinkObjectName As String
+                Dim EditorObjectName As String
+                '
+                Select Case genericController.vbLCase(HardCodedPage)
+                    Case HardCodedPageSendPassword
+                        '
+                        ' send password to the email address in the querystring
+                        '
+                        Emailtext = docProperties.getText("email")
+                        If Emailtext <> "" Then
+                            Call email.sendPassword(Emailtext)
+                            Copy = "" _
+                            & "<div style=""width:300px;margin:100px auto 0 auto;"">" _
+                            & "<p>An attempt to send login information for email address '" & Emailtext & "' has been made.</p>" _
+                            & "<p><a href=""?" & htmlDoc.refreshQueryString & """>Return to the Site.</a></p>" _
+                            & "</div>"
+                            Call htmlDoc.writeAltBuffer(Copy)
+                            result = True
+                        Else
+                            result = False
+                        End If
+                'Case HardCodedPagePrinterVersion
+                '    '
+                '    ' ----- Page Content Printer main_version
+                '    '
+                '    Call htmlDoc.webServerIO_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPagePrinterVersion)
+                '    htmlDoc.pageManager_printVersion = True
+                '    autoPrintText = docProperties.getText("AutoPrint")
+                '    '
+                '    If ContentName = "" Then
+                '        ContentName = "Page Content"
+                '    End If
+                '    If autoPrintText = "" Then
+                '        autoPrintText = siteProperties.getText("AllowAutoPrintDialog", "1")
+                '    End If
+                '    If RootPageName = "" Then
+                '        blockSiteWithLogin = False
+                '        PageCopy = pages.pageManager_GetHtmlBody_GetSection(AllowChildPage, False, False, blockSiteWithLogin)
+                '        'PageCopy = main_GetSectionPage(AllowChildPage, False)
+                '    Else
+                '        OrderByClause = docProperties.getText(RequestNameOrderByClause)
+                '        PageID = docProperties.getInteger("bid")
+                '        '
+                '        ' 5/12/2008 - converted to RootPageID call because we do not use RootPageName anymore
+                '        '
+                '        allowPageWithoutSectionDisplay = siteProperties.getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default)
+                '        If Not allowPageWithoutSectionDisplay Then
+                '            allowPageWithoutSectionDisplay = authContext.isAuthenticatedContentManager(Me, ContentName)
+                '        End If
+                '        PageCopy = pages.pageManager_GetHtmlBody_GetSection_GetContent(PageID, rootPageId, ContentName, OrderByClause, False, False, False, 0, siteProperties.useContentWatchLink, allowPageWithoutSectionDisplay)
+                '        If pages.redirectLink <> "" Then
+                '            Call webServer.webServerIO_Redirect2(pages.redirectLink, pages.pageManager_RedirectReason, False)
+                '        End If
+                '        'PageCopy = main_GetContentPage(RootPageName, ContentName, OrderByClause, AllowChildPage, False, PageID)
+                '    End If
+                '    '
+                '    If genericController.EncodeBoolean(autoPrintText) Then
+                '        Call htmlDoc.main_AddOnLoadJavascript2("window.print(); window.close()", "Print Page")
+                '    End If
+                '    BodyOpen = "<body class=""ccBodyPrint"">"
+
+                '    'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage")
+                '    Call htmlDoc.writeAltBuffer("" _
+                '        & main_docType _
+                '        & vbCrLf & "<html>" _
+                '        & cr & "<head>" & htmlDoc.getHTMLInternalHead(False) _
+                '        & cr & "</head>" _
+                '        & vbCrLf & BodyOpen _
+                '        & cr & "<div align=""left"">" _
+                '        & cr2 & "<table border=""0"" cellpadding=""20"" cellspacing=""0"" width=""100%""><tr><td width=""100%"">" _
+                '        & cr3 & "<p>" _
+                '        & genericController.kmaIndent(PageCopy) _
+                '        & cr3 & "</p>" _
+                '        & cr2 & "</td></tr></table>" _
+                '        & cr & "</div>" _
+                '        & genericController.kmaIndent(htmlDoc.html_GetEndOfBody(False, False, False, False)) _
+                '        & cr & "</body>" _
+                '        & vbCrLf & "</html>" _
+                '        & "")
+
+                '    result = True
+                ''Case HardCodedPageMyProfile
+                ''    '
+                ''    ' Print a User Profile page with the current member
+                ''    '
+                ''    Call web_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageMyProfile)
+                ''    Call writeAltBuffer(main_GetMyProfilePage())
+                ''    result = True
+                    Case HardCodedPageResourceLibrary
+                        '
+                        ' main_Get FormIndex (the index to the InsertImage# function called on selection)
+                        '
+                        Call htmlDoc.webServerIO_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageResourceLibrary)
+                        EditorObjectName = docProperties.getText("EditorObjectName")
+                        LinkObjectName = docProperties.getText("LinkObjectName")
+                        If EditorObjectName <> "" Then
+                            '
+                            ' Open a page compatible with a dialog
+                            '
+                            Call htmlDoc.webServerIO_addRefreshQueryString("EditorObjectName", EditorObjectName)
+                            Call htmlDoc.main_AddHeadScriptLink("/ccLib/ClientSide/dialogs.js", "Resource Library")
+                            'Call AddHeadScript("<script type=""text/javascript"" src=""/ccLib/ClientSide/dialogs.js""></script>")
+                            Call htmlDoc.main_SetMetaContent(0, 0)
+                            Call htmlDoc.main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Resource Library")
+                            Copy = htmlDoc.main_GetResourceLibrary2("", True, EditorObjectName, LinkObjectName, True)
+                            'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2b")
+                            Copy = "" _
+                            & siteProperties.docTypeDeclaration() _
+                            & "<html>" _
+                            & cr & "<head>" _
+                            & genericController.kmaIndent(htmlDoc.getHTMLInternalHead(False)) _
+                            & cr & "</head>" _
+                            & cr & "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">" _
+                            & genericController.kmaIndent(main_GetPanelHeader("Contensive Resource Library")) _
+                            & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td>" _
+                            & cr2 & "<div style=""border-top:1px solid white;border-bottom:1px solid black;height:2px""><img alt=""spacer"" src=""/ccLib/images/spacer.gif"" width=1 height=1></div>" _
+                            & genericController.kmaIndent(Copy) _
+                            & cr & "</td></tr>" _
+                            & cr & "<tr><td>" _
+                            & genericController.kmaIndent(htmlDoc.html_GetEndOfBody(False, False, False, False)) _
+                            & cr & "</td></tr></table>" _
+                            & cr & "<script language=javascript type=""text/javascript"">fixDialog();</script>" _
+                            & cr & "</body>" _
+                            & "</html>"
+                            Call htmlDoc.writeAltBuffer(Copy)
+                            result = True
+                            'Call main_GetEndOfBody(False, False)
+                            ''--- should be disposed by caller --- Call dispose
+                            'Call main_CloseStream
+                            'true = False
+                            'Set main_cmc = Nothing
+                            'Exit Sub
+                            'Call main_CloseStream
+                        ElseIf LinkObjectName <> "" Then
+                            '
+                            ' Open a page compatible with a dialog
+                            '
+                            Call htmlDoc.webServerIO_addRefreshQueryString("LinkObjectName", LinkObjectName)
+                            Call htmlDoc.main_AddHeadScriptLink("/ccLib/ClientSide/dialogs.js", "Resource Library")
+                            'Call AddHeadScript("<script type=""text/javascript"" src=""/ccLib/ClientSide/dialogs.js""></script>")
+                            Call htmlDoc.main_SetMetaContent(0, 0)
+                            Call htmlDoc.main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Resource Library")
+                            Copy = htmlDoc.main_GetResourceLibrary2("", True, EditorObjectName, LinkObjectName, True)
+                            'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2c")
+                            Copy = "" _
+                            & siteProperties.docTypeDeclaration() _
+                            & cr & "<html>" _
+                            & cr & "<head>" _
+                            & genericController.kmaIndent(htmlDoc.getHTMLInternalHead(False)) _
+                            & cr & "</head>" _
+                            & cr & "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">" _
+                            & main_GetPanelHeader("Contensive Resource Library") _
+                            & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td>" _
+                            & Copy _
+                            & cr & "</td></tr><tr><td>" & htmlDoc.html_GetEndOfBody(False, False, False, False) & "</td></tr></table>" _
+                            & cr & "<script language=javascript type=text/javascript>fixDialog();</script>" _
+                            & cr & "</body>" _
+                            & vbCrLf & "</html>"
+                            Call htmlDoc.writeAltBuffer(Copy)
+                            result = True
+                        End If
+                    Case HardCodedPageLoginDefault
+                        '
+                        ' 9/4/2012 added to prevent lockout if login addon fails
+                        htmlDoc.refreshQueryString = webServer.requestQueryString
+                        'Call main_AddRefreshQueryString("method", "")
+                        Call htmlDoc.writeAltBuffer(htmlDoc.getLoginPage(True))
+                        result = True
+                    Case HardCodedPageLogin, HardCodedPageLogoutLogin
+                        '
+                        ' 7/8/9 - Moved from intercept pages
+                        '
+                        ' Print the Login form as an intercept page
+                        ' Special case - set the current URL to the Refresh Query String
+                        ' Because you want the form created to save the refresh values
+                        '
+                        If genericController.vbUCase(HardCodedPage) = "LOGOUTLOGIN" Then
+                            Call authContext.logout(Me)
+                        End If
+                        htmlDoc.refreshQueryString = webServer.requestQueryString
+                        'Call main_AddRefreshQueryString("method", "")
+                        Call htmlDoc.writeAltBuffer(htmlDoc.getLoginPage(False))
+                        'Call writeAltBuffer(main_GetLoginPage2(false) & main_GetEndOfBody(False, False, False))
+                        result = True
+                    Case HardCodedPageLogout
+                        '
+                        ' ----- logout the current member
+                        '
+                        Call authContext.logout(Me)
+                        result = False
+                    Case HardCodedPageSiteExplorer
+                        '
+                        ' 7/8/9 - Moved from intercept pages
+                        '
+                        Call htmlDoc.webServerIO_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageSiteExplorer)
+                        LinkObjectName = docProperties.getText("LinkObjectName")
+                        If LinkObjectName <> "" Then
+                            '
+                            ' Open a page compatible with a dialog
+                            '
+                            Call htmlDoc.webServerIO_addRefreshQueryString("LinkObjectName", LinkObjectName)
+                            Call htmlDoc.main_AddPagetitle("Site Explorer")
+                            Call htmlDoc.main_SetMetaContent(0, 0)
+                            Copy = addon.execute_legacy5(0, "Site Explorer", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", 0)
+                            Call htmlDoc.main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Site Explorer")
+                            'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2d")
+                            Copy = "" _
+                            & siteProperties.docTypeDeclaration() _
+                            & cr & "<html>" _
+                            & cr & "<head>" _
+                            & genericController.kmaIndent(htmlDoc.getHTMLInternalHead(False)) _
+                            & cr & "</head>" _
+                            & cr & "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">" _
+                            & genericController.kmaIndent(main_GetPanelHeader("Contensive Site Explorer")) _
+                            & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td>" _
+                            & genericController.kmaIndent(Copy) _
+                            & cr & "</td></tr><tr><td>" & htmlDoc.html_GetEndOfBody(False, False, False, False) & "</td></tr></table>" _
+                            & cr & "</body>" _
+                            & cr & "</html>"
+                            'Set Obj = Nothing
+                            Call htmlDoc.writeAltBuffer(Copy)
+                            result = True
+                        End If
+                    Case HardCodedPageStatus
+                        '
+                        ' Status call
+                        '
+                        webServer.webServerIO_BlockClosePageCopyright = True
+                        '
+                        ' test default data connection
+                        '
+                        InsertTestOK = False
+                        CS = db.cs_insertRecord("Trap Log")
+                        If Not db.cs_ok(CS) Then
+                            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was not OK.", "Init", False, True)
+                        Else
+                            InsertTestOK = True
+                            TrapID = db.cs_getInteger(CS, "ID")
+                        End If
+                        Call db.cs_Close(CS)
+                        If InsertTestOK Then
+                            If TrapID = 0 Then
+                                Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was OK, but ID=0.", "Init", False, True)
+                            Else
+                                Call db.deleteContentRecord("Trap Log", TrapID)
+                            End If
+                        End If
+                        If Err.Number <> 0 Then
+                            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(ignoreInteger, "dll", "Error during Status. After traplog insert, " & genericController.GetErrString(Err), "Init", False, True)
+                            Err.Clear()
+                        End If
+                        '
+                        ' Close page
+                        '
+                        Call main_ClearStream()
+                        If app_errorCount = 0 Then
+                            Call htmlDoc.writeAltBuffer("Contensive OK")
+                        Else
+                            Call htmlDoc.writeAltBuffer("Contensive Error Count = " & app_errorCount)
+                        End If
+                        webServer.webServerIO_BlockClosePageCopyright = True
+                        html_BlockClosePageLink = True
+                        'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2f")
+                        Call htmlDoc.html_GetEndOfBody(False, False, False, False)
+                        result = True
+                    Case HardCodedPageGetJSPage
+                        '
+                        ' ----- Create a Javascript page that outputs a page content record
+                        '
+                        Name = docProperties.getText("name")
+                        If Name <> "" Then
+                            webServer.webServerIO_BlockClosePageCopyright = True
+                            '
+                            ' Determine bid (PageID) from referer querystring
+                            '
+                            Copy = webServer.requestReferrer
+                            Pos = genericController.vbInstr(1, Copy, "bid=")
+                            If Pos <> 0 Then
+                                Copy = Trim(Mid(Copy, Pos + 4))
+                                Pos = genericController.vbInstr(1, Copy, "&")
+                                If Pos <> 0 Then
+                                    Copy = Trim(Mid(Copy, 1, Pos))
+                                End If
+                                PageID = genericController.EncodeInteger(Copy)
+                            End If
+                            '
+                            ' main_Get the page
+                            '
+                            rootPageId = db.getRecordID("Page Content", Name)
+                            allowPageWithoutSectionDisplay = siteProperties.getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default)
+                            If Not allowPageWithoutSectionDisplay Then
+                                allowPageWithoutSectionDisplay = authContext.isAuthenticatedContentManager(Me, ContentName)
+                            End If
+                            Copy = pages.getContentBox(PageID, rootPageId, "Page Content", "", True, True, False, 0, siteProperties.useContentWatchLink, allowPageWithoutSectionDisplay)
+                            'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2g")
+                            Copy = Copy & htmlDoc.html_GetEndOfBody(False, True, False, False)
+                            Copy = genericController.vbReplace(Copy, "'", "'+""'""+'")
+                            Copy = genericController.vbReplace(Copy, vbCr, "\n")
+                            Copy = genericController.vbReplace(Copy, vbLf, " ")
+                            '
+                            ' Write the page to the stream, with a javascript wrapper
+                            '
+                            MsgLabel = "Msg" & genericController.encodeText(genericController.GetRandomInteger)
+                            Call webServer.setResponseContentType("text/plain")
+                            Call htmlDoc.writeAltBuffer("var " & MsgLabel & " = '" & Copy & "'; " & vbCrLf)
+                            Call htmlDoc.writeAltBuffer("document.write( " & MsgLabel & " ); " & vbCrLf)
+                        End If
+                        result = True
+                    Case HardCodedPageGetJSLogin
+                        '
+                        ' ----- Create a Javascript login page
+                        '
+                        webServer.webServerIO_BlockClosePageCopyright = True
+                        Copy = Copy & "<p align=""center""><CENTER>"
+                        If Not authContext.isAuthenticated() Then
+                            Copy = Copy & htmlDoc.getLoginPanel()
+                        ElseIf authContext.isAuthenticatedContentManager(Me, "Page Content") Then
+                            'Copy = Copy & main_GetToolsPanel
+                        Else
+                            Copy = Copy & "You are currently logged in as " & authContext.user.Name & ". To logout, click <a HREF=""" & webServer.webServerIO_ServerFormActionURL & "?Method=logout"" rel=""nofollow"">Here</A>."
+                        End If
+                        'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2h")
+                        Copy = Copy & htmlDoc.html_GetEndOfBody(True, True, False, False)
+                        Copy = Copy & "</CENTER></p>"
+                        Copy = genericController.vbReplace(Copy, "'", "'+""'""+'")
+                        Copy = genericController.vbReplace(Copy, vbCr, "")
+                        Copy = genericController.vbReplace(Copy, vbLf, "")
+                        'Copy = "<b>login Page</b>"
+                        '
+                        ' Write the page to the stream, with a javascript wrapper
+                        '
+                        MsgLabel = "Msg" & genericController.encodeText(genericController.GetRandomInteger)
+                        Call webServer.setResponseContentType("text/plain")
+                        Call htmlDoc.writeAltBuffer("var " & MsgLabel & " = '" & Copy & "'; " & vbCrLf)
+                        Call htmlDoc.writeAltBuffer("document.write( " & MsgLabel & " ); " & vbCrLf)
+                        result = True
+                    Case HardCodedPageRedirect
+                        '
+                        ' ----- Redirect with RC and RI
+                        '
+                        htmlDoc.pageManager_RedirectContentID = docProperties.getInteger(rnRedirectContentId)
+                        htmlDoc.pageManager_RedirectRecordID = docProperties.getInteger(rnRedirectRecordId)
+                        If htmlDoc.pageManager_RedirectContentID <> 0 And htmlDoc.pageManager_RedirectRecordID <> 0 Then
+                            ContentName = metaData.getContentNameByID(htmlDoc.pageManager_RedirectContentID)
+                            If ContentName <> "" Then
+                                Call main_RedirectByRecord_ReturnStatus(ContentName, htmlDoc.pageManager_RedirectRecordID)
+                            End If
+                        End If
+                        webServer.webServerIO_BlockClosePageCopyright = True
+                        html_BlockClosePageLink = True
+                        result = False '--- should be disposed by caller --- Call dispose
+                        result = True
+                    Case HardCodedPageExportAscii
+                        '
+                        '----------------------------------------------------
+                        '   Should be a remote method in commerce
+                        '----------------------------------------------------
+                        '
+                        If Not authContext.isAuthenticatedAdmin(Me) Then
+                            '
+                            ' Administrator required
+                            '
+                            Call htmlDoc.writeAltBuffer("Error: You must be an administrator to use the ExportAscii method")
+                        Else
+                            webServer.webServerIO_BlockClosePageCopyright = True
+                            ContentName = docProperties.getText("content")
+                            PageSize = docProperties.getInteger("PageSize")
+                            If PageSize = 0 Then
+                                PageSize = 20
+                            End If
+                            PageNumber = docProperties.getInteger("PageNumber")
+                            If PageNumber = 0 Then
+                                PageNumber = 1
+                            End If
+                            If (ContentName = "") Then
+                                Call htmlDoc.writeAltBuffer("Error: ExportAscii method requires ContentName")
+                            Else
+                                Call htmlDoc.writeAltBuffer(Controllers.exportAsciiController.exportAscii_GetAsciiExport(Me, ContentName, PageSize, PageNumber))
+                            End If
+                        End If
+                        result = True
+                        webServer.webServerIO_BlockClosePageCopyright = True
+                        html_BlockClosePageLink = True
+                        result = False '--- should be disposed by caller --- Call dispose
+                        result = True
+                    Case HardCodedPagePayPalConfirm
+                        '
+                        '
+                        '----------------------------------------------------
+                        '   Should be a remote method in commerce
+                        '----------------------------------------------------
+                        '
+                        '
+                        ConfirmOrderID = docProperties.getInteger("item_name")
+                        If ConfirmOrderID <> 0 Then
+                            '
+                            ' Confirm the order
+                            '
+                            CS = db.cs_open("Orders", "(ID=" & ConfirmOrderID & ") and ((OrderCompleted=0)or(OrderCompleted is Null))")
+                            If db.cs_ok(CS) Then
+                                Call db.cs_set(CS, "OrderCompleted", True)
+                                Call db.cs_set(CS, "DateCompleted", app_startTime)
+                                Call db.cs_set(CS, "ccAuthCode", docProperties.getText("txn_id"))
+                                Call db.cs_set(CS, "ccActionCode", docProperties.getText("payment_status"))
+                                Call db.cs_set(CS, "ccRefCode", docProperties.getText("pending_reason"))
+                                Call db.cs_set(CS, "PayMethod", "PayPal " & docProperties.getText("payment_type"))
+                                Call db.cs_set(CS, "ShipName", docProperties.getText("first_name") & " " & docProperties.getText("last_name"))
+                                Call db.cs_set(CS, "ShipAddress", docProperties.getText("address_street"))
+                                Call db.cs_set(CS, "ShipCity", docProperties.getText("address_city"))
+                                Call db.cs_set(CS, "ShipState", docProperties.getText("address_state"))
+                                Call db.cs_set(CS, "ShipZip", docProperties.getText("address_zip"))
+                                Call db.cs_set(CS, "BilleMail", docProperties.getText("payer_email"))
+                                Call db.cs_set(CS, "ContentControlID", metaData.getContentId("Orders Completed"))
+                                Call db.cs_save2(CS)
+                            End If
+                            Call db.cs_Close(CS)
+                            '
+                            ' Empty the cart
+                            '
+                            CS = db.cs_open("Visitors", "OrderID=" & ConfirmOrderID)
+                            If db.cs_ok(CS) Then
+                                Call db.cs_set(CS, "OrderID", 0)
+                                Call db.cs_save2(CS)
+                            End If
+                            Call db.cs_Close(CS)
+                            '
+                            ' TEmp fix until HardCodedPage is complete
+                            '
+                            Recipient = siteProperties.getText("EmailOrderNotifyAddress", siteProperties.emailAdmin)
+                            If genericController.vbInstr(genericController.encodeText(Recipient), "@") = 0 Then
+                                Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError12("Init", "PayPal confirmation Order Process Notification email was not sent because EmailOrderNotifyAddress SiteProperty is not valid")
+                            Else
+                                Sender = siteProperties.getText("EmailOrderFromAddress")
+                                subject = webServer.webServerIO_requestDomain & " Online Order Pending, #" & ConfirmOrderID
+                                Message = "<p>An order confirmation has been recieved from PayPal for " & webServer.webServerIO_requestDomain & "</p>"
+                                Call email.send_Legacy(Recipient, Sender, subject, Message, , False, True)
+                            End If
+                        End If
+                        webServer.webServerIO_BlockClosePageCopyright = True
+                        html_BlockClosePageLink = True
+                        result = False '--- should be disposed by caller --- Call dispose
+                        result = True
+                End Select
+            Catch ex As Exception
+                handleExceptionAndContinue(ex)
+            End Try
+            Return result
         End Function
         '
         '==========================================================================================
@@ -1707,7 +2524,7 @@ ErrorTrap:
         '       AddonOptionExpandedConstructor
         '=================================================================================================================
         '
-        Public Function csv_GetAddonOption(OptionName As String, OptionString As String) As String
+        Public Function getAddonOption(OptionName As String, OptionString As String) As String
             On Error GoTo ErrorTrap 'Const Tn = "GetAddonOption": 'Dim th as integer: th = profileLogMethodEnter(Tn)
             '
             Dim WorkingString As String
@@ -1724,7 +2541,7 @@ ErrorTrap:
             Dim TargetName As String
             '
             WorkingString = OptionString
-            csv_GetAddonOption = ""
+            getAddonOption = ""
             If WorkingString <> "" Then
                 TargetName = genericController.vbLCase(OptionName)
                 'targetName = genericController.vbLCase(encodeNvaArgument(OptionName))
@@ -1741,7 +2558,7 @@ ErrorTrap:
                             TestName = Trim(Mid(TestName, 1, Len(TestName) - 1))
                         Loop
                         If TestName = TargetName Then
-                            csv_GetAddonOption = genericController.decodeNvaArgument(Trim(Mid(Options(Ptr), Pos + 1)))
+                            getAddonOption = genericController.decodeNvaArgument(Trim(Mid(Options(Ptr), Pos + 1)))
                             'csv_GetAddonOption = Trim(Mid(Options(Ptr), Pos + 1))
                             Exit For
                         End If
@@ -2216,7 +3033,7 @@ ErrorTrap:
                                 End If
                             End If
                             Call db.cs_Close(CS)
-                            Call cache_linkAlias_clear()
+                            'Call cache_linkAlias_clear()
                         End If
                     End If
                 End If
@@ -2411,7 +3228,7 @@ ErrorTrap:
                                 End If
                             Next
                         End If
-                        If error_IsUserError() Then
+                        If (debug_iUserError <> "") Then
                             ' goes to hardcodedpage on user error
                             'LegacyInterceptPageSN = LegacyInterceptPageSNMyProfile
                         Else
@@ -2476,11 +3293,11 @@ ErrorTrap:
                             '
                             ' --- update Topic records
                             '
-                            Call main_ProcessCheckList(rnMyProfileTopics, "people", "memberid", "topics", "member topic rules", "memberid", "topicid")
+                            Call htmlDoc.main_ProcessCheckList(rnMyProfileTopics, "people", "memberid", "topics", "member topic rules", "memberid", "topicid")
                             '
                             ' --- Update Group Records
                             '
-                            Call main_ProcessCheckList("MemberRules", "Members", genericController.encodeText(authContext.user.ID), "Groups", "Member Rules", "MemberID", "GroupID")
+                            Call htmlDoc.main_ProcessCheckList("MemberRules", "Members", genericController.encodeText(authContext.user.ID), "Groups", "Member Rules", "MemberID", "GroupID")
                             '
                             '
                             '
@@ -4416,9 +5233,9 @@ ErrorTrap:
                 '
                 ' ----- main_Get the Group name
                 '
-                CS = csOpenRecord("Groups", iGroupID)
+                CS = db.cs_open2("Groups", iGroupID)
                 If db.cs_ok(CS) Then
-                    group_GetGroupName = genericController.encodeText(cs_GetField(CS, "Name"))
+                    group_GetGroupName = genericController.encodeText(db.cs_getField(CS, "Name"))
                 End If
                 Call db.cs_Close(CS)
             End If
@@ -4627,7 +5444,7 @@ ErrorTrap:
             Else
                 iCopyName = genericController.encodeText(CopyName)
                 iContent = genericController.encodeText(Content)
-                CS = db.cs_open(ContentName, "name=" & EncodeSQLText(iCopyName))
+                CS = db.cs_open(ContentName, "name=" & db.encodeSQLText(iCopyName))
                 If Not db.cs_ok(CS) Then
                     Call db.cs_Close(CS)
                     CS = db.cs_insertRecord(ContentName)
@@ -4676,7 +5493,7 @@ ErrorTrap:
         '            iContentName = genericController.encodeEmptyText(ContentName, "Page Content")
         '            iRootPageName = Trim(genericController.encodeText(RootPageName))
         '            If iRootPageName <> "" Then
-        '                rootPageId = main_GetRecordID(iContentName, iRootPageName)
+        '                rootPageId = main_GetRecordID_Internal(iContentName, iRootPageName)
         '            End If
         '            iOrderByClause = genericController.encodeText(OrderByClause)
         '            If (Bid = 0) Then
@@ -4740,7 +5557,7 @@ ErrorTrap:
         '            iContentName = genericController.encodeEmptyText(ContentName, "Page Content")
         '            PageRecordID = docProperties.getInteger("bid")
         '            If iRootPageName <> "" Then
-        '                rootPageId = main_GetRecordID(iContentName, iRootPageName)
+        '                rootPageId = main_GetRecordID_Internal(iContentName, iRootPageName)
         '            End If
         '            '
         '            main_GetContentPageArchive = pageManager_GetHtmlBody_GetSection_GetContent(PageRecordID, rootPageId, iContentName, genericController.encodeText(OrderByClause), True, True, True, 0, siteProperties.useContentWatchLink, False)
@@ -5211,46 +6028,6 @@ ErrorTrap:
 
         '
         '========================================================================
-        ' main_DeleteContentRecord by content name
-        '
-        '   To be compatible with a previous release, if the RecordID is not an integer,
-        '   call main_DeleteContentRecords.
-        '========================================================================
-        '
-        Public Sub DeleteContentRecord(ByVal ContentName As String, ByVal RecordID As Integer)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("DeleteContentRecord")
-            '
-            'If Not (true) Then Exit Sub
-            '
-            Dim MethodName As String
-            Dim iRecordID As Integer
-            Dim iContentName As String
-            '
-            iRecordID = genericController.EncodeInteger(RecordID)
-            iContentName = genericController.encodeText(ContentName)
-            '
-            MethodName = "main_DeleteContentRecord"
-            '
-            If (iContentName = "") Or (iRecordID = 0) Then
-                If (genericController.encodeText(RecordID) <> "") And (genericController.encodeText(RecordID) <> "0") Then
-                    Call db.deleteContentRecord(ContentName, RecordID)
-                Else
-                    Throw (New Exception("Invalid ContentName [" & iContentName & "] or RecordID [" & genericController.encodeText(RecordID) & "]"))
-                End If
-            Else
-                Call db.deleteContentRecord(iContentName, iRecordID, authContext.user.ID)
-            End If
-            Call main_ProcessSpecialCaseAfterSave(True, iContentName, iRecordID, "", 0, False)
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
-            '
-        End Sub
-        '
-        '========================================================================
         ' main_DeleteCSRecord
         '========================================================================
         '
@@ -5681,7 +6458,7 @@ ErrorTrap:
                                     ClipboardContentID = genericController.EncodeInteger(ClipBoardArray(0))
                                     ClipChildRecordID = genericController.EncodeInteger(ClipBoardArray(1))
                                     'iContentID = main_GetContentID(iContentName)
-                                    If IsWithinContent(ClipboardContentID, iContentID) Then
+                                    If metaData.isWithinContent(ClipboardContentID, iContentID) Then
                                         If genericController.vbInstr(1, iPresetNameValueList, "PARENTID=", vbTextCompare) <> 0 Then
                                             '
                                             ' must test for main_IsChildRecord
@@ -6083,7 +6860,7 @@ ErrorTrap:
             '
             ' main_SetMetaContent - this is done by the 'content' contributer for the page
             '
-            Call main_SetMetaContent(0, 0)
+            Call htmlDoc.main_SetMetaContent(0, 0)
             '
             admin_GetPageStart2 = "" _
                 & siteProperties.docTypeDeclarationAdmin _
@@ -6154,4195 +6931,6 @@ ErrorTrap:
                 debug_iUserError = ""
             End If
         End Function
-        '
-        '==========================================================================
-        '   main_IsUserError
-        '       Returns true if there is a user error
-        '==========================================================================
-        '
-        Public Function error_IsUserError() As Boolean
-            Return (debug_iUserError <> "")
-        End Function
 
-        '
-        '==========================================================================
-        '   Copy the records from one CS to another
-        '==========================================================================
-        '
-        Public Sub cs_CopyRecord(ByVal CSSource As Object, ByVal CSDestination As Object)
-            Call db.cs_copyRecord(genericController.EncodeInteger(CSSource), genericController.EncodeInteger(CSDestination))
-        End Sub
-        '
-        '========================================================================
-        '
-        '========================================================================
-        '
-        Public Function GetContentProperty(ByVal ContentName As String, ByVal PropertyName As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetContentProperty")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim MethodName As String
-            Dim Contentdefinition As cdefModel
-            '
-            MethodName = "main_GetContentProperty"
-            '
-            Contentdefinition = metaData.getCdef(genericController.encodeText(ContentName))
-            Select Case genericController.vbUCase(genericController.encodeText(PropertyName))
-                Case "CONTENTCONTROLCRITERIA"
-                    GetContentProperty = Contentdefinition.ContentControlCriteria
-                Case "ACTIVEONLY"
-                    GetContentProperty = Contentdefinition.ActiveOnly.ToString
-                Case "ADMINONLY"
-                    GetContentProperty = Contentdefinition.AdminOnly.ToString
-                Case "ALIASID"
-                    GetContentProperty = Contentdefinition.AliasID
-                Case "ALIASNAME"
-                    GetContentProperty = Contentdefinition.AliasName
-                Case "ALLOWADD"
-                    GetContentProperty = Contentdefinition.AllowAdd.ToString
-                Case "ALLOWDELETE"
-                    GetContentProperty = Contentdefinition.AllowDelete.ToString
-                'Case "CHILDIDLIST"
-                '    main_GetContentProperty = Contentdefinition.ChildIDList
-                Case "DATASOURCEID"
-                    GetContentProperty = Contentdefinition.dataSourceId.ToString
-                Case "DEFAULTSORTMETHOD"
-                    GetContentProperty = Contentdefinition.DefaultSortMethod
-                Case "DEVELOPERONLY"
-                    GetContentProperty = Contentdefinition.DeveloperOnly.ToString
-                Case "FIELDCOUNT"
-                    GetContentProperty = Contentdefinition.fields.Count.ToString
-                'Case "FIELDPOINTER"
-                '    main_GetContentProperty = Contentdefinition.FieldPointer
-                Case "ID"
-                    GetContentProperty = Contentdefinition.Id.ToString
-                Case "IGNORECONTENTCONTROL"
-                    GetContentProperty = Contentdefinition.IgnoreContentControl.ToString
-                Case "NAME"
-                    GetContentProperty = Contentdefinition.Name
-                Case "PARENTID"
-                    GetContentProperty = Contentdefinition.parentID.ToString
-                'Case "SINGLERECORD"
-                '    main_GetContentProperty = Contentdefinition.SingleRecord
-                Case "CONTENTTABLENAME"
-                    GetContentProperty = Contentdefinition.ContentTableName
-                Case "CONTENTDATASOURCENAME"
-                    GetContentProperty = Contentdefinition.ContentDataSourceName
-                Case "AUTHORINGTABLENAME"
-                    GetContentProperty = Contentdefinition.AuthoringTableName
-                Case "AUTHORINGDATASOURCENAME"
-                    GetContentProperty = Contentdefinition.AuthoringDataSourceName
-                Case "WHERECLAUSE"
-                    GetContentProperty = Contentdefinition.WhereClause
-                Case "ALLOWWORKFLOWAUTHORING"
-                    GetContentProperty = Contentdefinition.AllowWorkflowAuthoring.ToString
-                Case "DROPDOWNFIELDLIST"
-                    GetContentProperty = Contentdefinition.DropDownFieldList
-                Case "SELECTFIELDLIST"
-                    GetContentProperty = Contentdefinition.SelectCommaList
-                Case Else
-                    Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError14(MethodName, "Content Property [" & genericController.encodeText(PropertyName) & "] was not found in content [" & genericController.encodeText(ContentName) & "]")
-            End Select
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
-            '
-        End Function
-        '
-        '========================================================================
-        '
-        '========================================================================
-        '
-        Public Function GetContentFieldProperty(ByVal ContentName As String, ByVal FieldName As String, ByVal PropertyName As String) As Object
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00230")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim MethodName As String
-            Dim Contentdefinition As cdefModel
-            ' converted array to dictionary - Dim FieldPointer As Integer
-            Dim UcaseFieldName As String
-            '
-            MethodName = "main_GetContentFieldProperty"
-            '
-            GetContentFieldProperty = ""
-            If True Then
-                UcaseFieldName = genericController.vbUCase(genericController.encodeText(FieldName))
-                Contentdefinition = metaData.getCdef(genericController.encodeText(ContentName))
-                If (UcaseFieldName = "") Or (Contentdefinition.fields.Count < 1) Then
-                    Throw (New ApplicationException("Content Name [" & genericController.encodeText(ContentName) & "] or FieldName [" & genericController.encodeText(FieldName) & "] was not valid")) ' handleLegacyError14(MethodName, "")
-                Else
-                    For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In Contentdefinition.fields
-                        Dim field As CDefFieldModel = keyValuePair.Value
-                        With field
-                            If UcaseFieldName = genericController.vbUCase(.nameLc) Then
-                                Select Case genericController.vbUCase(genericController.encodeText(PropertyName))
-                                    Case "FIELDTYPE", "TYPE"
-                                        GetContentFieldProperty = .fieldTypeId
-                                    Case "HTMLCONTENT"
-                                        GetContentFieldProperty = .htmlContent
-                                    Case "ADMINONLY"
-                                        GetContentFieldProperty = .adminOnly
-                                    Case "AUTHORABLE"
-                                        GetContentFieldProperty = .authorable
-                                    Case "CAPTION"
-                                        GetContentFieldProperty = .caption
-                                    Case "REQUIRED"
-                                        GetContentFieldProperty = .Required
-                                    Case "UNIQUENAME"
-                                        GetContentFieldProperty = .UniqueName
-                                    Case "UNIQUE"
-                                        '
-                                        ' fix for the uniquename screwup - it is not unique name, it is unique value
-                                        '
-                                        GetContentFieldProperty = .UniqueName
-                                    Case "DEFAULT"
-                                        GetContentFieldProperty = genericController.encodeText(.defaultValue)
-                                    Case "MEMBERSELECTGROUPID"
-                                        GetContentFieldProperty = genericController.encodeText(.MemberSelectGroupID)
-                                    Case Else
-                                        Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError14(MethodName, "Content Property [" & genericController.encodeText(PropertyName) & "] was not found in content [" & genericController.encodeText(ContentName) & "]")
-                                End Select
-                                Exit For
-                            End If
-                        End With
-                    Next
-                End If
-            End If
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
-            '
-        End Function
-        '
-        '========================================================================
-        ' main_Get a boolean from request
-        '   if empty, returns null
-        '   if RequestBlock true, tries only querystring
-        '   if "ON", "YES", "TRUE" or non-0 number returns true, otherwise false
-        '========================================================================
-        '
-        Public Function web_ReadStreamBoolean(ByVal Key As String) As Boolean
-            Dim returnTrue As Boolean = False
-            Try
-                Dim ExpressionString As String = web_ReadStreamText(Key)
-                If Not genericController.IsNull(ExpressionString) Then
-                    If ExpressionString <> "" Then
-                        If genericController.vbIsNumeric(ExpressionString) Then
-                            If ExpressionString <> "0" Then
-                                returnTrue = True
-                            Else
-                                returnTrue = False
-                            End If
-                        ElseIf genericController.vbUCase(ExpressionString) = "ON" Then
-                            returnTrue = True
-                        ElseIf genericController.vbUCase(ExpressionString) = "YES" Then
-                            returnTrue = True
-                        ElseIf genericController.vbUCase(ExpressionString) = "TRUE" Then
-                            returnTrue = True
-                        Else
-                            returnTrue = False
-                        End If
-                    End If
-                End If
-            Catch ex As Exception
-                Throw (ex)
-            End Try
-            Return returnTrue
-        End Function
-        '
-        '========================================================================
-        ' main_Get a Date from request
-        '   if empty, returns null
-        '   if not a date, returns null
-        '   if RequestBlock true, tries only querystring
-        '========================================================================
-        '
-        Public Function web_ReadStreamDate(ByVal Key As String) As Date
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00233")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim MethodName As String
-            Dim testDate As String
-            '
-            MethodName = "main_ReadStreamDate"
-            '
-            testDate = web_ReadStreamText(Key)
-            If Not genericController.IsNull(testDate) Then
-                If Not IsDate(testDate) Then
-                    web_ReadStreamDate = Nothing
-                Else
-                    web_ReadStreamDate = CDate(testDate)
-                End If
-            End If
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
-            '
-        End Function
-        '
-        '========================================================================
-        ' main_Get a number from request
-        '   if empty, returns null
-        '   if not a value, returns null
-        '   if RequestBlock true, tries only querystring
-        '========================================================================
-        '
-        Public Function web_ReadStreamNumber(ByVal Key As String) As Double
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00234")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim MethodName As String
-            Dim testResults As String
-            '
-            MethodName = "main_ReadStreamNumber"
-            '
-            testResults = web_ReadStreamText(Key)
-            If Not genericController.IsNull(web_ReadStreamNumber) Then
-                If genericController.vbIsNumeric(testResults) Then
-                    web_ReadStreamNumber = CDbl(testResults)
-                Else
-                    web_ReadStreamNumber = 0
-                End If
-            End If
-            '
-            debug_testPoint("main_ReadStreamNumber( " & genericController.encodeText(Key) & " )  = " & web_ReadStreamNumber)
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
-            '
-        End Function
-        '
-        '========================================================================
-        ' main_Get a Text string from request
-        '   if empty, returns null
-        '   if RequestBlock true, tries only querystring
-        '========================================================================
-        '
-        Public Function web_ReadStreamText(ByVal Key As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00235")
-            '
-            'If Not (true) Then Exit Function
-            '
-            web_ReadStreamText = docProperties.getText(Key)
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_ReadStreamText")
-            '
-        End Function
-        '
-        ' ----- 2.1 compatibility
-        '
-        Public Function GetContentTablename(ByVal ContentName As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetContentTablename")
-            '
-            'If Not (true) Then Exit Function
-            '
-            GetContentTablename = genericController.encodeText(GetContentProperty(genericController.encodeText(ContentName), "ContentTableName"))
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetContentTablename")
-        End Function
-
-        '
-        '========================================================================
-        ' Opens a Content Definition into a ContentSEt
-        '   Returns and integer that points into the ContentSet array
-        '   If there was a problem, it returns -1
-        '
-        '   If authoring mode, as group of records are returned.
-        '       The first is the current edit record
-        '       The rest are the archive records.
-        '========================================================================
-        '
-        Public Function csOpenRecord(ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal WorkflowAuthoringMode As Boolean = False, Optional ByVal WorkflowEditingMode As Boolean = False, Optional ByVal SelectFieldList As String = "") As Integer
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("OpenCSContentRecord_Internal")
-            '
-            'If Not (true) Then Exit Function
-            '
-            csOpenRecord = db.cs_open(ContentName, "(ID=" & db.encodeSQLNumber(RecordID) & ")", , False, authContext.user.ID, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_OpenCSContentRecord_Internal")
-        End Function
-        '
-        '========================================================================
-        ' Opens a Content Definition into a ContentSEt
-        '   Returns and integer that points into the ContentSet array
-        '   If there was a problem, it returns -1
-        '
-        '   If authoring mode, as group of records are returned.
-        '       The first is the current edit record
-        '       The rest are the archive records.
-        '========================================================================
-        '
-        Public Function csOpen(ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal WorkflowAuthoringMode As Boolean = False, Optional ByVal WorkflowEditingMode As Boolean = False, Optional ByVal SelectFieldList As String = "") As Integer
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("OpenCSContentRecord")
-            '
-            'If Not (true) Then Exit Function
-            '
-            csOpen = db.cs_open(genericController.encodeText(ContentName), "(ID=" & db.encodeSQLNumber(RecordID) & ")", , False, authContext.user.ID, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_OpenCSContentRecord")
-        End Function
-        '
-        '========================================================================
-        '   main_IsWithinContent( ChildContentID, ParentContentID )
-        '
-        '       Returns true if ChildContentID is in ParentContentID
-        '========================================================================
-        '
-        Public Function IsWithinContent(ByVal ChildContentID As Integer, ByVal ParentContentID As Integer) As Boolean
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("IsWithinContent")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim MethodName As String
-            '
-            MethodName = "IsWithinContent"
-            '
-            IsWithinContent = metaData.isWithinContent(genericController.EncodeInteger(ChildContentID), genericController.EncodeInteger(ParentContentID))
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
-            '
-        End Function
-        '
-        '
-        '
-        Public Sub IncrementContentField(ByVal ContentName As String, ByVal RecordID As Integer, ByVal FieldName As String)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00252")
-            '
-            'If Not (true) Then Exit Sub
-            '
-            Dim MethodName As String
-            Dim iContentName As String
-            Dim iRecordID As Integer
-            Dim iFieldName As String
-            '
-            iContentName = genericController.encodeText(ContentName)
-            iRecordID = genericController.EncodeInteger(RecordID)
-            iFieldName = genericController.encodeText(FieldName)
-            '
-            MethodName = "main_IncrementContentField( " & iContentName & "," & genericController.encodeText(iRecordID) & "," & iFieldName & " )"
-            '
-            Call IncrementContentField_Internal(iContentName, iRecordID, iFieldName)
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
-            '
-        End Sub
-        '
-        '
-        '
-        Public Sub IncrementContentField_Internal(ByVal ContentName As String, ByVal RecordID As Integer, ByVal FieldName As String)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00253")
-            '
-            'If Not (true) Then Exit Sub
-            '
-            Dim SQL As String
-            Dim CDef As cdefModel
-            '
-            CDef = metaData.getCdef(ContentName)
-            Call main_IncrementTableField(CDef.ContentTableName, RecordID, FieldName, CDef.ContentDataSourceName)
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_IncrementContentField_Internal")
-        End Sub
-        '
-        '
-        '
-        Public Function EncodeSQLText(ByVal SourceText As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00254")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim MethodName As String
-            Dim iSourceText As String
-            '
-            iSourceText = genericController.encodeText(SourceText)
-            '
-            MethodName = "main_EncodeSQLText( " & iSourceText & " )"
-            '
-            EncodeSQLText = db.encodeSQLText(iSourceText)
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
-            '
-        End Function
-
-        '
-        '========================================================================
-        '   main_cs_getField - Fast
-        '       CSv is not checked
-        '       All arguments typed
-        '========================================================================
-        '
-        Public Function cs_GetField(ByVal CSPointer As Integer, ByVal FieldName As String) As Object
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("cs_getField_Internal")
-            '
-            'If Not (true) Then Exit Function
-            '
-            cs_GetField = db.cs_getField(CSPointer, FieldName)
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_cs_getField_Internal")
-            '
-        End Function
-        '
-        '
-        '
-        Public Function GetTableID(ByVal TableName As String) As Integer
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00273")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim MethodName As String
-            Dim CS As Integer
-            '
-            MethodName = "main_GetTableID"
-            '
-            GetTableID = -1
-            CS = db.cs_openSql("Select ID from ccTables where name=" & db.encodeSQLText(TableName), , 1)
-            If db.cs_ok(CS) Then
-                GetTableID = db.cs_getInteger(CS, "ID")
-            End If
-            Call db.cs_Close(CS)
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
-            '
-        End Function
-        '
-        ' ================================================================================================
-        '   conversion pass 2
-        ' ================================================================================================
-        '
-        '
-        '
-        '
-        Public Function main_GetAuthoringStatusMessage(ByVal IsContentWorkflowAuthoring As Boolean, ByVal RecordEditLocked As Boolean, ByVal main_EditLockName As String, ByVal main_EditLockExpires As Date, ByVal RecordApproved As Boolean, ByVal ApprovedBy As String, ByVal RecordSubmitted As Boolean, ByVal SubmittedBy As String, ByVal RecordDeleted As Boolean, ByVal RecordInserted As Boolean, ByVal RecordModified As Boolean, ByVal ModifiedBy As String) As String
-            main_GetAuthoringStatusMessage = ""
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00274")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim MethodName As String
-            Dim Copy As String
-            Dim Delimiter As String = ""
-            Dim main_EditLockExpiresMinutes As Integer
-            '
-            MethodName = "main_GetAuthoringStatusMessage"
-            '
-            main_EditLockExpiresMinutes = CInt((main_EditLockExpires - app_startTime).TotalMinutes)
-            If Not siteProperties.allowWorkflowAuthoring Then
-                '
-                ' ----- site does not support workflow authoring
-                '
-                If RecordEditLocked Then
-                    Copy = genericController.vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
-                    Copy = genericController.vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
-                    Copy = genericController.vbReplace(Copy, "<EDITEXPIRESMINUTES>", genericController.encodeText(main_EditLockExpiresMinutes))
-                    main_GetAuthoringStatusMessage &= Delimiter & Copy
-                    Delimiter = "<BR >"
-                End If
-                main_GetAuthoringStatusMessage &= Delimiter & Msg_WorkflowDisabled
-                Delimiter = "<BR >"
-            ElseIf Not IsContentWorkflowAuthoring Then
-                '
-                ' ----- content does not support workflow authoring
-                '
-                If RecordEditLocked Then
-                    Copy = genericController.vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
-                    Copy = genericController.vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
-                    Copy = genericController.vbReplace(Copy, "<EDITEXPIRESMINUTES>", genericController.encodeText(main_EditLockExpiresMinutes))
-                    main_GetAuthoringStatusMessage &= Delimiter & Copy
-                    Delimiter = "<BR >"
-                End If
-                main_GetAuthoringStatusMessage &= Delimiter & Msg_ContentWorkflowDisabled
-                Delimiter = "<BR >"
-            Else
-                '
-                ' ----- Workflow Authoring is supported, check deleted, inserted or modified
-                '
-                If RecordApproved Then
-                    '
-                    ' Approved
-                    '
-                    If authContext.isAuthenticatedAdmin(Me) Then
-                        Copy = genericController.vbReplace(Msg_AuthoringApprovedAdmin, "<EDITNAME>", ApprovedBy)
-                        main_GetAuthoringStatusMessage &= Delimiter & Copy
-                        Delimiter = "<BR >"
-                    Else
-                        Copy = genericController.vbReplace(Msg_AuthoringApproved, "<EDITNAME>", ApprovedBy)
-                        main_GetAuthoringStatusMessage &= Delimiter & Copy
-                        Delimiter = "<BR >"
-                    End If
-                ElseIf RecordSubmitted Then
-                    '
-                    ' Submitted
-                    '
-                    If authContext.isAuthenticatedAdmin(Me) Then
-                        Copy = genericController.vbReplace(Msg_AuthoringSubmittedAdmin, "<EDITNAME>", SubmittedBy)
-                        main_GetAuthoringStatusMessage &= Delimiter & Copy
-                        Delimiter = "<BR >"
-                    Else
-                        Copy = genericController.vbReplace(Msg_AuthoringSubmitted, "<EDITNAME>", SubmittedBy)
-                        main_GetAuthoringStatusMessage &= Delimiter & Copy
-                        Delimiter = "<BR >"
-                    End If
-                ElseIf RecordDeleted Then
-                    '
-                    ' deleted
-                    '
-                    main_GetAuthoringStatusMessage &= Delimiter & Msg_AuthoringDeleted
-                    Delimiter = "<BR >"
-                ElseIf RecordInserted Then
-                    '
-                    ' inserted
-                    '
-                    main_GetAuthoringStatusMessage &= Delimiter & Msg_AuthoringInserted
-                    Delimiter = "<BR >"
-                ElseIf RecordModified Then
-                    '
-                    ' modified, submitted or approved
-                    '
-                    If authContext.isAuthenticatedAdmin(Me) Then
-                        If RecordEditLocked Then
-                            Copy = genericController.vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
-                            Copy = genericController.vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
-                            Copy = genericController.vbReplace(Copy, "<EDITEXPIRESMINUTES>", genericController.encodeText(main_EditLockExpiresMinutes))
-                            main_GetAuthoringStatusMessage &= Delimiter & Copy
-                            Delimiter = "<BR >"
-                        End If
-                        Copy = genericController.vbReplace(Msg_AuthoringRecordModifedAdmin, "<EDITNAME>", ModifiedBy)
-                        main_GetAuthoringStatusMessage &= Delimiter & Copy
-                        'main_GetAuthoringStatusMessage &=  Delimiter & Msg_AuthoringRecordModifedAdmin
-                        Delimiter = "<BR >"
-                    Else
-                        If RecordEditLocked Then
-                            Copy = genericController.vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
-                            Copy = genericController.vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
-                            Copy = genericController.vbReplace(Copy, "<EDITEXPIRESMINUTES>", genericController.encodeText(main_EditLockExpiresMinutes))
-                            main_GetAuthoringStatusMessage &= Delimiter & Copy
-                            Delimiter = "<BR >"
-                        End If
-                        Copy = genericController.vbReplace(Msg_AuthoringRecordModifed, "<EDITNAME>", ModifiedBy)
-                        main_GetAuthoringStatusMessage &= Delimiter & Copy
-                        'main_GetAuthoringStatusMessage &=  Delimiter & Msg_AuthoringRecordModifed
-                        Delimiter = "<BR >"
-                    End If
-                End If
-                '
-                ' ----- Check for authoring status messages if it has been modified
-                '
-                If main_GetAuthoringStatusMessage = "" Then
-                    '
-                    ' no changes
-                    '
-                    If RecordEditLocked Then
-                        Copy = genericController.vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
-                        Copy = genericController.vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
-                        Copy = genericController.vbReplace(Copy, "<EDITEXPIRESMINUTES>", genericController.encodeText(main_EditLockExpiresMinutes))
-                        main_GetAuthoringStatusMessage &= Delimiter & Copy
-                        Delimiter = "<BR >"
-                    End If
-                    main_GetAuthoringStatusMessage &= Delimiter & Msg_AuthoringRecordNotModifed
-                    Delimiter = "<BR >"
-                End If
-            End If
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
-            '
-        End Function
-        '
-        '   Checks the username and password
-        '
-        Public Function main_IsLoginOK(ByVal Username As String, ByVal Password As String, Optional ByVal ErrorMessage As String = "", Optional ByVal ErrorCode As Integer = 0) As Boolean
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00275")
-            '
-            'If Not (true) Then Exit Function
-            '
-            main_IsLoginOK = (authContext.authenticateGetId(Me, Username, Password) <> 0)
-            If Not main_IsLoginOK Then
-                ErrorMessage = error_GetUserError()
-            End If
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_IsLoginOK")
-            '
-        End Function
-        '
-        '
-        '
-        Public Function main_GetResourceLibrary(Optional ByVal RootFolderName As String = "", Optional ByVal AllowSelectResource As Boolean = False, Optional ByVal SelectResourceEditorName As String = "") As String
-            main_GetResourceLibrary = main_GetResourceLibrary2(RootFolderName, AllowSelectResource, SelectResourceEditorName, "", True)
-        End Function
-        '
-        '
-        '
-        Public Function main_GetResourceLibrary2(ByVal RootFolderName As String, ByVal AllowSelectResource As Boolean, ByVal SelectResourceEditorName As String, ByVal SelectLinkObjectName As String, ByVal AllowGroupAdd As Boolean) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetResourceLibrary2")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim ResourceLibrary As Object
-            Dim Option_String As String
-            Dim addonId As Integer
-            '
-            Option_String = "" _
-                & "RootFolderName=" & RootFolderName _
-                & "&AllowSelectResource=" & AllowSelectResource _
-                & "&SelectResourceEditorName=" & SelectResourceEditorName _
-                & "&SelectLinkObjectName=" & SelectLinkObjectName _
-                & "&AllowGroupAdd=" & AllowGroupAdd _
-                & ""
-            main_GetResourceLibrary2 = addon.execute_legacy4("{564EF3F5-9673-4212-A692-0942DD51FF1A}", Option_String, CPUtilsBaseClass.addonContext.ContextAdmin)
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            ResourceLibrary = Nothing
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetResourceLibrary2")
-        End Function
-        '
-        '========================================================================
-        ' Read and save a main_GetFormInputCheckList
-        '   see main_GetFormInputCheckList for an explaination of the input
-        '========================================================================
-        '
-        Public Sub main_ProcessCheckList(ByVal TagName As String, ByVal PrimaryContentName As String, ByVal PrimaryRecordID As String, ByVal SecondaryContentName As String, ByVal RulesContentName As String, ByVal RulesPrimaryFieldname As String, ByVal RulesSecondaryFieldName As String)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("ProcessCheckList")
-            '
-            'If Not (true) Then Exit Sub
-            '
-            Dim rulesTablename As String
-            Dim SQL As String
-            'dim dt as datatable
-            Dim currentRules As DataTable
-            Dim currentRulesCnt As Integer
-            Dim RuleFound As Boolean
-            Dim RuleId As Integer
-            Dim Ptr As Integer
-            Dim TestRecordIDLast As Integer
-            Dim TestRecordID As Integer
-            Dim dupRuleIdList As String
-            Dim GroupCnt As Integer
-            Dim GroupPtr As Integer
-            Dim CSPointer As Integer
-            Dim MethodName As String
-            Dim SecondaryRecordID As Integer
-            Dim RuleNeeded As Boolean
-            Dim CSRule As Integer
-            Dim DateExpires As Date
-            Dim DateExpiresVariant As Object
-            Dim RuleContentChanged As Boolean
-            Dim SupportRuleCopy As Boolean
-            Dim RuleCopy As String
-            '
-            MethodName = "ProcessCheckList"
-            '
-            ' --- create Rule records for all selected
-            '
-            GroupCnt = docProperties.getInteger(TagName & ".RowCount")
-            If GroupCnt > 0 Then
-                '
-                ' Test if RuleCopy is supported
-                '
-                SupportRuleCopy = main_IsContentFieldSupported(RulesContentName, "RuleCopy")
-                If SupportRuleCopy Then
-                    SupportRuleCopy = SupportRuleCopy And main_IsContentFieldSupported(SecondaryContentName, "AllowRuleCopy")
-                    If SupportRuleCopy Then
-                        SupportRuleCopy = SupportRuleCopy And main_IsContentFieldSupported(SecondaryContentName, "RuleCopyCaption")
-                    End If
-                End If
-                '
-                ' Go through each checkbox and check for a rule
-                '
-                '
-                ' try
-                '
-                currentRulesCnt = 0
-                dupRuleIdList = ""
-                rulesTablename = GetContentTablename(RulesContentName)
-                SQL = "select " & RulesSecondaryFieldName & ",id from " & rulesTablename & " where (" & RulesPrimaryFieldname & "=" & PrimaryRecordID & ")and(active<>0) order by " & RulesSecondaryFieldName
-                currentRulesCnt = 0
-                currentRules = db.executeSql(SQL)
-                currentRulesCnt = currentRules.Rows.Count
-                For GroupPtr = 0 To GroupCnt - 1
-                    '
-                    ' ----- Read Response
-                    '
-                    SecondaryRecordID = docProperties.getInteger(TagName & "." & GroupPtr & ".ID")
-                    RuleCopy = docProperties.getText(TagName & "." & GroupPtr & ".RuleCopy")
-                    RuleNeeded = docProperties.getBoolean(TagName & "." & GroupPtr)
-                    '
-                    ' ----- Update Record
-                    '
-                    RuleFound = False
-                    RuleId = 0
-                    TestRecordIDLast = 0
-                    For Ptr = 0 To currentRulesCnt - 1
-                        TestRecordID = genericController.EncodeInteger(currentRules.Rows(Ptr).Item(0))
-                        If TestRecordID = 0 Then
-                            '
-                            ' skip
-                            '
-                        ElseIf TestRecordID = SecondaryRecordID Then
-                            '
-                            ' hit
-                            '
-                            RuleFound = True
-                            RuleId = genericController.EncodeInteger(currentRules.Rows(Ptr).Item(1))
-                            Exit For
-                        ElseIf TestRecordID = TestRecordIDLast Then
-                            '
-                            ' dup
-                            '
-                            dupRuleIdList = dupRuleIdList & "," & genericController.EncodeInteger(currentRules.Rows(Ptr).Item(1))
-                            currentRules.Rows(Ptr).Item(0) = 0
-                        End If
-                        TestRecordIDLast = TestRecordID
-                    Next
-                    If SupportRuleCopy And RuleNeeded And (RuleFound) Then
-                        '
-                        ' Record exists and is needed, update the rule copy
-                        '
-                        SQL = "update " & rulesTablename & " set rulecopy=" & db.encodeSQLText(RuleCopy) & " where id=" & RuleId
-                        Call db.executeSql(SQL)
-                    ElseIf RuleNeeded And (Not RuleFound) Then
-                        '
-                        ' No record exists, and one is needed
-                        '
-                        CSRule = db.cs_insertRecord(RulesContentName)
-                        If db.cs_ok(CSRule) Then
-                            Call db.cs_set(CSRule, "Active", RuleNeeded)
-                            Call db.cs_set(CSRule, RulesPrimaryFieldname, PrimaryRecordID)
-                            Call db.cs_set(CSRule, RulesSecondaryFieldName, SecondaryRecordID)
-                            If SupportRuleCopy Then
-                                Call db.cs_set(CSRule, "RuleCopy", RuleCopy)
-                            End If
-                        End If
-                        Call db.cs_Close(CSRule)
-                        RuleContentChanged = True
-                    ElseIf (Not RuleNeeded) And RuleFound Then
-                        '
-                        ' Record exists and it is not needed
-                        '
-                        SQL = "delete from " & rulesTablename & " where id=" & RuleId
-                        Call db.executeSql(SQL)
-                        RuleContentChanged = True
-                    End If
-                Next
-                '
-                ' delete dups
-                '
-                If dupRuleIdList <> "" Then
-                    SQL = "delete from " & rulesTablename & " where id in (" & Mid(dupRuleIdList, 2) & ")"
-                    Call db.executeSql(SQL)
-                    RuleContentChanged = True
-                End If
-                '        For GroupPtr = 0 To GroupCnt - 1
-                '            '
-                '            ' ----- Read Response
-                '            '
-                '            SecondaryRecordID = main_GetStreamInteger2(TagName & "." & GroupPtr & ".ID")
-                '            RuleCopy = main_GetStreamText2(TagName & "." & GroupPtr & ".RuleCopy")
-                '            RuleNeeded = main_GetStreamBoolean2(TagName & "." & GroupPtr)
-                '            '
-                '            ' ----- Update Record
-                '            '
-                '            CSRule = app.csOpen(RulesContentName, "(" & RulesPrimaryFieldname & "=" & PrimaryRecordID & ")and(" & RulesSecondaryFieldName & "=" & SecondaryRecordID & ")", , False)
-                '            If SupportRuleCopy And RuleNeeded And (app.csv_IsCSOK(CSRule)) Then
-                '                '
-                '                ' Record exists and is needed, update the rule copy
-                '                '
-                '                Call app.csv_SetCS(CSRule, "RuleCopy", RuleCopy)
-                '            ElseIf RuleNeeded And (Not app.csv_IsCSOK(CSRule)) Then
-                '                '
-                '                ' No record exists, and one is needed
-                '                '
-                '                Call app.closeCS(CSRule)
-                '                CSRule = app.InsertCSRecord(RulesContentName)
-                '                If app.csv_IsCSOK(CSRule) Then
-                '                    Call app.csv_SetCS(CSRule, "Active", RuleNeeded)
-                '                    Call app.csv_SetCS(CSRule, RulesPrimaryFieldname, PrimaryRecordID)
-                '                    Call app.csv_SetCS(CSRule, RulesSecondaryFieldName, SecondaryRecordID)
-                '                    If SupportRuleCopy Then
-                '                        Call app.csv_SetCS(CSRule, "RuleCopy", RuleCopy)
-                '                    End If
-                '                End If
-                '                RuleContentChanged = True
-                '            ElseIf (Not RuleNeeded) And app.csv_IsCSOK(CSRule) Then
-                '                '
-                '                ' Record exists and it is not needed
-                '                '
-                '                Call main_DeleteCSRecord(CSRule)
-                '                RuleContentChanged = True
-                '            End If
-                '            Call app.closeCS(CSRule)
-                '        Next
-            End If
-            If RuleContentChanged Then
-                Call cache.invalidateContent(RulesContentName)
-            End If
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
-            '
-        End Sub
-        '
-        '========================================================================
-        '   main_cs_get Field, translate all fields to their best text equivalent, and encode for display
-        '========================================================================
-        '
-        Public Function main_cs_getEncodedField(ByVal CSPointer As Integer, ByVal FieldName As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("cs_getEncodedField")
-            '
-            Dim ContentName As String
-            Dim RecordID As Integer
-            '
-            'If Not (true) Then Exit Function
-            '
-            If db.cs_isFieldSupported(CSPointer, "id") And db.cs_isFieldSupported(CSPointer, "contentcontrolId") Then
-                RecordID = db.cs_getInteger(CSPointer, "id")
-                ContentName = metaData.getContentNameByID(db.cs_getInteger(CSPointer, "contentcontrolId"))
-            End If
-            main_cs_getEncodedField = htmlDoc.html_encodeContent10(db.cs_get(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName)), authContext.user.ID, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, authContext.isAuthenticated, Nothing, authContext.isEditingAnything(Me))
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_cs_getEncodedField")
-        End Function
-        '
-        '=============================================================================================
-        '   main_cs_get calls
-        '=============================================================================================
-        '
-        '        Public Function db.cs_getText(ByVal CSPointer As Integer, ByVal FieldName As String) As String
-        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("cs_getText")
-        '            '
-        '            'If Not (true) Then Exit Function
-        '            '
-        '            main_cs_getText = db.cs_getText(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName))
-        '            'main_cs_getText = genericController.encodeText(main_cs_getField_Internal(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName)))
-        '            '
-        '            Exit Function
-        'ErrorTrap:
-        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_cs_getText")
-        '        End Function
-        '
-        '=============================================================================================
-        '   main_cs_get calls
-        '=============================================================================================
-        '
-        '        Public Function db.cs_getFilename(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal OriginalFilename As String, Optional ByVal ContentName As String = "") As String
-        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("cs_getFilename")
-        '            '
-        '            'If Not (true) Then Exit Function
-        '            '
-        '            db.cs_getFilename = db.cs_getFilename(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName), genericController.encodeText(OriginalFilename), genericController.encodeEmptyText(ContentName, ""))
-        '            '
-        '            Exit Function
-        'ErrorTrap:
-        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("db.cs_getFilename")
-        '        End Function
-        '        '
-        '        Public Function db.cs_getBoolean(ByVal CSPointer As Integer, ByVal FieldName As String) As Boolean
-        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("cs_getBoolean")
-        '            '
-        '            main_cs_getBoolean = db.cs_getBoolean((CSPointer), genericController.encodeText(FieldName))
-        '            '
-        '            Exit Function
-        'ErrorTrap:
-        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_cs_getBoolean")
-        '        End Function
-        '
-
-        ''
-        'Public Function db.cs_getNumber(ByVal CSPointer As Integer, ByVal FieldName As String) As Double
-        '    xxcs_getNumber = db.cs_getNumber(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName))
-        'End Function
-        ''
-        ''
-        ''
-        'Public Function db.cs_getLookup(ByVal CSPointer As Integer, ByVal FieldName As String) As String
-        '    xxcs_getLookup = db.cs_getLookup(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName))
-        'End Function
-        '
-        '
-        '
-        Public Function cs_getSource(ByVal CSPointer As Integer) As String
-            Dim iCS As Integer
-            '
-            iCS = genericController.EncodeInteger(CSPointer)
-            If Not db.cs_ok(iCS) Then
-                Call Err.Raise(ignoreInteger, "dll", "ContentSet is not main_CSOK")
-            Else
-                cs_getSource = db.cs_getSource(iCS)
-            End If
-        End Function
-        '        '
-        '        '========================================================================
-        '        '   Aborts any edits for this record
-        '        '========================================================================
-        '        '
-        '        Public Sub workflow.workflow_AbortEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("AbortEdit")
-        '            '
-        '            'If Not (true) Then Exit Sub
-        '            '
-        '            Call db.workflow.workflow_AbortEdit(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), authcontext.user.userid)
-        '            '
-        '            Exit Sub
-        '            '
-        '            ' ----- Error Trap
-        '            '
-        'ErrorTrap:
-        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_AbortEdit")
-        '        End Sub
-
-        '        '
-        '        '
-        '        '
-        '        Public Function db.cs_getRow(ByVal CSPointer As Integer) As Object
-        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("cs_getRow")
-        '            '
-        '            'If Not (true) Then Exit Function
-        '            '
-        '            main_cs_getRow = db.cs_getRow(genericController.EncodeInteger(CSPointer))
-        '            '
-        '            Exit Function
-        '            '
-        '            ' ----- Error Trap
-        '            '
-        'ErrorTrap:
-        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_cs_getRow")
-        '            '
-        '        End Function
-        ''
-        ''
-        ''
-        'Public Function db.cs_getRows(ByVal CSPointer As Integer) As Object
-        '    main_cs_getRows = db.cs_getRows(genericController.EncodeInteger(CSPointer))
-        'End Function
-        ''
-        ''
-        ''
-        'Public Function main_cs_getRowCount(ByVal CSPointer As Integer) As Integer
-        '    main_cs_getRowCount = db.cs_getRowCount(genericController.EncodeInteger(CSPointer))
-        'End Function
-        ''
-        ''   Leave interface
-        ''
-        'Public ReadOnly Property main_AllowencodeHTML() As Boolean
-        '    Get
-        '        Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("AllowEncodeHTML is not supported")
-        '    End Get
-        'End Property
-        ''
-        ''   Buffered Visit Property
-        ''
-        'Public ReadOnly Property visitProperty.getboolean("AllowHelpIcon")() As Boolean
-        '    Get
-        '        If authcontext.user.isAuthenticated() Then
-        '            If Not property_visit_allowHelpIcon_isLoaded Then
-        '                property_visit_allowHelpIcon_Local = genericController.EncodeBoolean(visitProperty.getBoolean("AllowHelpIcon")
-        '                property_visit_allowHelpIcon_isLoaded = True
-        '            End If
-        '        End If
-        '        visitProperty.getboolean("AllowHelpIcon") = property_visit_allowHelpIcon_Local
-
-        '    End Get
-        'End Property
-
-        ''
-        ''   Buffered Visit Property
-        ''
-        'Public ReadOnly Property visitProperty_AllowLinkAuthoring() As Boolean
-        '    Get
-        '        visitProperty_AllowLinkAuthoring = visitProperty.getBoolean("AllowEditing")
-
-        '    End Get
-        'End Property
-        ''
-        ''   Buffered Visit Property
-        ''
-        'Public ReadOnly Property visitProperty_AllowQuickEditor() As Boolean
-        '    Get
-        '        If authcontext.user.isAuthenticated() Then
-        '            If Not property_visit_allowQuickEditor_isLoaded Then
-        '                property_visit_allowQuickEditor = genericController.EncodeBoolean(
-        '                property_visit_allowQuickEditor_isLoaded = True
-        '            End If
-        '            visitProperty_AllowQuickEditor = property_visit_allowQuickEditor
-        '        End If
-        '        '
-
-        '    End Get
-        'End Property
-        ''
-        ''   Buffered Visit Property
-        ''
-        'Public ReadOnly Property visitProperty_AllowAdvancedEditor() As Boolean
-        '    Get
-        '        If authcontext.user.isAuthenticated() Then
-        '            If Not property_visit_allowAdvancedEditor_isLoaded Then
-        '                property_visit_allowAdvancedEditor = visitProperty.getBoolean("AllowAdvancedEditor")
-        '                property_visit_allowAdvancedEditor_isLoaded = True
-        '            End If
-        '            visitProperty_AllowAdvancedEditor = property_visit_allowAdvancedEditor
-        '        End If
-
-        '    End Get
-        'End Property
-        ''
-        ''   Buffered Visit Property
-        ''
-        'Public ReadOnly Property visitProperty_AllowPresentationAuthoring() As Boolean
-        '    Get
-        '        visitProperty_AllowPresentationAuthoring = visitProperty.getBoolean("AllowQuickEditor")
-
-        '    End Get
-        'End Property
-
-        ''
-        ''   Buffered Visit Property
-        ''
-        'Public ReadOnly Property visitProperty_AllowWorkflowRendering() As Boolean
-        '    Get
-        '        If authcontext.user.isAuthenticated() Then
-        '            If Not property_visit_allowWorkflowRendering_isLoaded Then
-        '                property_visit_allowWorkflowRendering = genericController.EncodeBoolean(
-        '                property_visit_allowWorkflowRendering_isLoaded = True
-        '            End If
-        '            visitProperty_AllowWorkflowRendering = property_visit_allowWorkflowRendering
-        '        End If
-
-        '    End Get
-        'End Property
-        ''
-        ''   Buffered Visit Property
-        ''
-        'Public ReadOnly Property visitProperty.getBoolean("AllowDebugging")() As Boolean
-        '    Get
-        '        visitProperty.getBoolean("AllowDebugging") = False
-        '        If authcontext.user.isAuthenticated() Then
-        '            If Not property_visit_allowDebugging_isLoaded Then
-        '                property_visit_allowDebugging_Local = genericController.EncodeBoolean(
-        '                property_visit_allowDebugging_isLoaded = True
-        '            End If
-        '            visitProperty.getBoolean("AllowDebugging") = property_visit_allowDebugging_Local
-        '        End If
-
-        '    End Get
-        'End Property
-        '
-        Public Function main_GetYesNo(ByVal InputValue As Boolean) As String
-            If InputValue Then
-                Return "Yes"
-            Else
-                Return "No"
-            End If
-        End Function
-        '        '
-        '        '========================================================================
-        '        '   Returns Content Page fields as strings
-        '        '========================================================================
-        '        '
-        '        Public Function main_GetContentPageField(ByVal FieldName As String) As String
-        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetContentPageField")
-        '            '
-        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError23("Deprecated Method: main_GetContentPageField")
-        '            'dim dt as datatable
-        '            Dim returnString As String
-        '            Dim rs As DataTable
-        '            '
-        '            returnString = ""
-        '            rs = db.executeSql("select " & genericController.encodeText(FieldName) & " from ccpagecontent where id=" & currentPageID)
-        '            If rs.Rows.Count > 0 Then
-        '                returnString = genericController.encodeText(rs.Rows(0).Item(0))
-        '            End If
-        '            '
-        '            main_GetContentPageField = returnString
-        '            '    '
-        '            '    Dim FieldCount as integer
-        '            '    ' converted array to dictionary - Dim FieldPointer As Integer
-        '            '    Dim UcaseFieldName As String
-        '            '    '
-        '            '    UcaseFieldName = genericController.vbUCase(genericController.encodeText(FieldName))
-        '            '    If Not IsEmpty(main_oldCacheRS_FieldValues) Then
-        '            '        FieldCount = UBound(main_oldCacheRS_FieldNames)
-        '            '        If FieldCount > 0 Then
-        '            '            For FieldPointer = 0 To FieldCount - 1
-        '            '                If UcaseFieldName = genericController.vbUCase(main_oldCacheRS_FieldNames(FieldPointer)) Then
-        '            '                    main_GetContentPageField = main_oldCacheRS_FieldValues(FieldPointer)
-        '            '                    Exit For
-        '            '                    End If
-        '            '                Next
-        '            '            End If
-        '            '        End If
-        '            '
-        '            Exit Function
-        'ErrorTrap:
-        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetContentPageField")
-        '        End Function
-        ''
-        ''========================================================================
-        ''   Preloads the ContentPage
-        ''       If PageContentCS app.csv_IsCSOK, then do nothing
-        ''       else,
-        ''========================================================================
-        ''
-        'Public Sub main_PreloadContentPage(ByVal RootPageName As String, Optional ByVal RootContentName As String = "")
-        '    Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError23("Deprecated Method: main_GetAutoSite")
-        'End Sub
-        '
-        '========================================================================
-        '   2.1 compatibility
-        ' ----- main_Get an Authoring Link Graphic
-        '========================================================================
-        '
-        Public Function web_GetAuthoringLink(ByVal Label As String, ByVal SideCaption As String, ByVal Link As String, ByVal NewWindow As Boolean, Optional ByVal ignore0 As Boolean = False, Optional ByVal Ignore1 As String = "") As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00340")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim ContentName As String
-            Dim MethodName As String
-            '
-            MethodName = "main_GetAuthoringLink"
-            '
-            ' Old style non-flyout Authoring Links
-            '
-            web_GetAuthoringLink = "<div align=""left""><table border=""0"" cellpadding=""1"" cellspacing=""0"" class=""ccAuthoringLink""><tr><td>"
-            web_GetAuthoringLink = web_GetAuthoringLink & "<table border=""0"" cellpadding=""1"" cellspacing=""0"" width=""31"" class=""ccAuthoringLink""><tr><td width=""30"" align=""center""><a href=""" & htmlDoc.html_EncodeHTML(Link) & """"
-            If NewWindow Then
-                web_GetAuthoringLink = web_GetAuthoringLink & " target=""_blank"""
-            End If
-            web_GetAuthoringLink = web_GetAuthoringLink & " class=""ccAuthoringLink""><span class=""ccAuthoringLink"">" & Label & "</span></a>"
-            web_GetAuthoringLink = web_GetAuthoringLink & "<br ><img alt=""space"" src=""/ccLib/image/spacer.gif"" width=""30"" height=""1""></td>"
-            If SideCaption <> "" Then
-                web_GetAuthoringLink = web_GetAuthoringLink & "<td align=""center"" bgcolor=""#FFFFFF"" width=""1""><nobr><span class=""ccAdminSmall""><font color=""#000000"">&nbsp;" & SideCaption & "&nbsp;</font></span></nobr></td>"
-            End If
-            web_GetAuthoringLink = web_GetAuthoringLink & "</tr></table></td></tr></table></div>"
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
-            '
-        End Function
-        '        '
-        '        '=============================================================================
-        '        ' Returns the connection string for a datasource
-        '        '=============================================================================
-        '        '
-        '        Public Function main_GetConnectionString(ByVal DataSourceName As String) As String
-        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00342")
-        '            '
-        '            'If Not (true) Then Exit Function
-        '            '
-        '            main_GetConnectionString = GetConnectionString(genericController.encodeText(DataSourceName))
-        '            '
-        '            Exit Function
-        '            '
-        '            ' ----- Error Trap
-        '            '
-        'ErrorTrap:
-        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetConnectionString")
-        'End Function
-        '
-        '
-        '
-        Public Function GetSortMethodByID(ByVal SortMethodID As Integer) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00352")
-            '
-            Dim CS As Integer
-            '
-            'If Not (true) Then Exit Function
-            '
-            If SortMethodID > 0 Then
-                CS = csOpenRecord("Sort Methods", SortMethodID)
-                If db.cs_ok(CS) Then
-                    GetSortMethodByID = db.cs_getText(CS, "OrderByClause")
-                End If
-                Call db.cs_Close(CS)
-            End If
-            '
-            Exit Function
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetSortMethodByID")
-        End Function
-
-        '
-        '=============================================================================
-        '   Report
-        '=============================================================================
-        '
-        Public Function main_GetReport(ByVal RowCount As Integer, ByVal ColCaption() As String, ByVal ColAlign() As String, ByVal ColWidth() As String, ByVal Cells As String(,), ByVal PageSize As Integer, ByVal PageNumber As Integer, ByVal PreTableCopy As String, ByVal PostTableCopy As String, ByVal DataRowCount As Integer, ByVal ClassStyle As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetReport")
-            '
-            Dim Adminui As New adminUIController(Me)
-            '
-            main_GetReport = Adminui.GetReport(RowCount, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, ClassStyle)
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_GetReport")
-        End Function
-        '
-        '
-        '
-        Public Function main_cs_get2Text(ByVal CSPointer As Integer, ByVal FieldName As String) As String
-            main_cs_get2Text = db.cs_get(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName))
-        End Function
-        '        '
-        '        '=============================================================================================
-        '        '   main_SetCS
-        '        '       Saves the value, encoded correctly for the field type
-        '        '=============================================================================================
-        '        '
-        '        Public Sub app.SetCS(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal FieldValue As String)
-        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SetCS")
-        '            '
-        '            'If Not (true) Then Exit Sub
-        '            '
-        '            Call app.SetCS(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName), FieldValue)
-        '            '
-        '            Exit Sub
-        'ErrorTrap:
-        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_SetCS")
-        '        End Sub
-        '
-        '=============================================================================================
-        '   main_GetAutoSite
-        '
-        '       Site created from BID
-        '           bid specifies the PageContent record
-        '           PageContent specifies the HTMLTemplate
-        '           HTMLTemplate has replacable elements for each content.
-        '               replacements are AC tags
-        '                   - images are already done out of Resources
-        '                   - Add-ons done
-        '                       - Add 'server-side' to Add-on so use the .execute function)
-        '=============================================================================================
-        '
-        Public Function main_GetAutoSite() As String
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError23("Deprecated Method: main_GetAutoSite")
-        End Function
-        '
-        '=============================================================================================
-        '   main_GetAutoSite_Template
-        '
-        '       Site created from BID
-        '           bid specifies the PageContent record
-        '           PageContent specifies the HTMLTemplate
-        '           HTMLTemplate has replacable elements for each content.
-        '               replacements are AC tags
-        '                   - images are already done out of Resources
-        '                   - Add-ons done
-        '                       - Add 'server-side' to Add-on so use the .execute function)
-        '=============================================================================================
-        '
-        Private Function main_GetAutoSite_Template(ByVal templateId As Integer) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00389")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim CS As Integer
-            Dim BakeName As String
-            Dim StyleSheetID As Integer
-            Dim StyleSheetCopy As String
-            '
-            BakeName = "AutoSiteTemplate" & templateId
-            main_GetAutoSite_Template = genericController.encodeText(cache.getObject(Of String)(BakeName))
-            If main_GetAutoSite_Template = "" Then
-                If templateId = 0 Then
-                    '
-                    ' No template Specified, Generate something to host the content
-                    '
-                    main_GetAutoSite_Template = "" _
-                        & vbCrLf & siteProperties.docTypeDeclaration() _
-                        & vbCrLf & "<html>" _
-                        & cr & "<head>" _
-                        & cr2 & "<STYLE type=text/css></STYLE>" _
-                        & cr & "</head>" _
-                        & cr & "<body>" _
-                        & vbCrLf & "<ac Type=""PageBody"">" _
-                        & cr & "</body>" _
-                        & vbCrLf & "</html>"
-                Else
-                    '
-                    ' Template Specified
-                    '
-                    CS = csOpen("AutoSite Templates", templateId, , , "Copy,StyleSheetID")
-                    If db.cs_ok(CS) Then
-                        main_GetAutoSite_Template = db.cs_get(CS, "Copy")
-                        StyleSheetID = genericController.EncodeInteger(db.cs_get(CS, "StyleSheetID"))
-                    End If
-                    Call db.cs_Close(CS)
-                    '
-                    ' StyleSheet Specified
-                    '
-                    If StyleSheetID <> 0 Then
-                        CS = csOpen("AutoSite Styles", StyleSheetID, , , "Copy")
-                        If db.cs_ok(CS) Then
-                            StyleSheetCopy = db.cs_get(CS, "Copy")
-                        End If
-                        Call db.cs_Close(CS)
-                    End If
-                    '
-                    ' Assemble Template
-                    '
-                End If
-                Call cache.setObject(BakeName, main_GetAutoSite_Template, "AutoSite Templates")
-            End If
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetAutoSite_Template")
-        End Function
-        '
-        '=============================================================================
-        '   Sets the MetaContent subsystem so the next call to main_GetLastMeta... returns the correct value
-        '       And neither takes much time
-        '=============================================================================
-        '
-        Public Sub main_SetMetaContent(ByVal ContentID As Integer, ByVal RecordID As Integer)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SetMetaContent")
-            '
-            Dim KeywordList As String
-            Dim CS As Integer
-            Dim Criteria As String
-            Dim SQL As String
-            Dim FieldList As String
-            Dim iContentID As Integer
-            Dim iRecordID As Integer
-            Dim MetaContentID As Integer
-            '
-            iContentID = genericController.EncodeInteger(ContentID)
-            iRecordID = genericController.EncodeInteger(RecordID)
-            If (iContentID <> 0) And (iRecordID <> 0) Then
-                '
-                ' main_Get ID, Description, Title
-                '
-                Criteria = "(ContentID=" & iContentID & ")and(RecordID=" & iRecordID & ")"
-                If False Then '.3.550" Then
-                    FieldList = "ID,Name,MetaDescription,'' as OtherHeadTags,'' as MetaKeywordList"
-                ElseIf False Then '.3.930" Then
-                    FieldList = "ID,Name,MetaDescription,OtherHeadTags,'' as MetaKeywordList"
-                Else
-                    FieldList = "ID,Name,MetaDescription,OtherHeadTags,MetaKeywordList"
-                End If
-                CS = db.cs_open("Meta Content", Criteria, , , , ,, FieldList)
-                If db.cs_ok(CS) Then
-                    MetaContentID = db.cs_getInteger(CS, "ID")
-                    Call htmlDoc.main_AddPagetitle2(htmlDoc.html_EncodeHTML(db.cs_getText(CS, "Name")), "page content")
-                    Call htmlDoc.main_addMetaDescription2(htmlDoc.html_EncodeHTML(db.cs_getText(CS, "MetaDescription")), "page content")
-                    Call htmlDoc.main_AddHeadTag2(db.cs_getText(CS, "OtherHeadTags"), "page content")
-                    If True Then
-                        KeywordList = genericController.vbReplace(db.cs_getText(CS, "MetaKeywordList"), vbCrLf, ",")
-                    End If
-                    'main_MetaContent_Title = encodeHTML(app.csv_cs_getText(CS, "Name"))
-                    'htmldoc.main_MetaContent_Description = encodeHTML(app.csv_cs_getText(CS, "MetaDescription"))
-                    'main_MetaContent_OtherHeadTags = app.csv_cs_getText(CS, "OtherHeadTags")
-                End If
-                Call db.cs_Close(CS)
-                '
-                ' main_Get Keyword List
-                '
-                SQL = "select ccMetaKeywords.Name" _
-                    & " From ccMetaKeywords" _
-                    & " LEFT JOIN ccMetaKeywordRules on ccMetaKeywordRules.MetaKeywordID=ccMetaKeywords.ID" _
-                    & " Where ccMetaKeywordRules.MetaContentID=" & MetaContentID
-                CS = db.cs_openSql(SQL)
-                Do While db.cs_ok(CS)
-                    KeywordList = KeywordList & "," & db.cs_getText(CS, "Name")
-                    Call db.cs_goNext(CS)
-                Loop
-                If KeywordList <> "" Then
-                    If Left(KeywordList, 1) = "," Then
-                        KeywordList = Mid(KeywordList, 2)
-                    End If
-                    'KeyWordList = Mid(KeyWordList, 2)
-                    KeywordList = htmlDoc.html_EncodeHTML(KeywordList)
-                    Call htmlDoc.main_addMetaKeywordList2(KeywordList, "page content")
-                End If
-                Call db.cs_Close(CS)
-                'htmldoc.main_MetaContent_KeyWordList = encodeHTML(KeyWordList)
-            End If
-
-            'MetaContentID = 0
-            'main_MetaContent_Title = ""
-            'htmldoc.main_MetaContent_Description = ""
-            'main_MetaContent_OtherHeadTags = ""
-            'htmldoc.main_MetaContent_KeyWordList = ""
-            '
-            Exit Sub
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_SetMetaContent")
-        End Sub
-        '
-        '=============================================================================
-        '   Returns Meta Data
-        '=============================================================================
-        '
-        Public Function main_GetLastMetaTitle() As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00392")
-            '
-            main_GetLastMetaTitle = htmlDoc.main_MetaContent_Title
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetLastMetaTitle")
-        End Function
-        '
-        '=============================================================================
-        '   Returns Meta Data
-        '=============================================================================
-        '
-        Public Function main_GetLastMetaDescription() As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetLastMetaDescription")
-            '
-            main_GetLastMetaDescription = htmlDoc.main_MetaContent_Description
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetLastMetaDescription")
-        End Function
-        '
-        '=============================================================================
-        '   Returns Meta Data
-        '=============================================================================
-        '
-        Public Function main_GetLastOtherHeadTags() As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetLastOtherHeadTags")
-            '
-            main_GetLastOtherHeadTags = htmlDoc.main_MetaContent_OtherHeadTags
-            htmlDoc.main_MetaContent_OtherHeadTags = ""
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetLastOtherHeadTags")
-        End Function
-        '
-        '=============================================================================
-        '   Returns Meta Data
-        '=============================================================================
-        '
-        Public Function main_GetLastMetaKeywordList() As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetLastMetaKeywordList")
-            '
-            main_GetLastMetaKeywordList = htmlDoc.main_MetaContent_KeyWordList
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetLastMetaKeywordList")
-        End Function
-        '
-        '
-        '
-        'Public Property main_SQLCommandTimeout() As Integer
-        '    Get
-        '        Return db.sqlCommandTimeout
-        '    End Get
-        '    Set(ByVal value As Integer)
-        '        db.sqlCommandTimeout = value
-        '    End Set
-        'End Property
-        '
-        '
-        '
-        Public ReadOnly Property responseRedirect() As String
-            Get
-                Return webServer.webServerIO_bufferRedirect
-            End Get
-        End Property
-        '
-        '
-        '
-        Public ReadOnly Property responseHeader() As String
-            Get
-                Return webServer.webServerIO_bufferResponseHeader
-            End Get
-        End Property
-        '
-        '
-        '
-        Public ReadOnly Property responseCookies() As String
-            Get
-                Return webServer.webServerIO_bufferCookies
-            End Get
-        End Property
-        '
-        '
-        '
-        Public ReadOnly Property responseContentType() As String
-            Get
-                Return webServer.webServerIO_bufferContentType
-            End Get
-        End Property
-        '
-        '
-        '
-        Public ReadOnly Property responseStatus() As String
-            Get
-                Return webServer.webServerIO_bufferResponseStatus
-            End Get
-        End Property
-        '
-        '
-        '
-        Public ReadOnly Property responseBuffer() As String
-            Get
-                Return htmlDoc.docBuffer
-            End Get
-        End Property
-
-        '
-        '
-        '
-        Sub main_EncodePage_SplitBody(ByVal PageSource As String, ByVal PageSourceBody As String, ByVal PageSourcePreBody As String, ByVal PageSourcePostBody As String)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00408")
-            '
-            'If Not (true) Then Exit Sub
-            '
-            Dim BodyStart As Integer
-            Dim BodyEnd As Integer
-            '
-            BodyStart = genericController.vbInstr(1, PageSource, "<body", vbTextCompare)
-            If BodyStart <> 0 Then
-                BodyStart = genericController.vbInstr(BodyStart, PageSource, ">", vbTextCompare)
-                If BodyStart <> 0 Then
-                    BodyStart = BodyStart + 1
-                    BodyEnd = genericController.vbInstr(BodyStart, PageSource, "</body", vbTextCompare)
-                    If BodyEnd <> 0 Then
-                        PageSourceBody = Mid(PageSource, BodyStart, BodyEnd - BodyStart)
-                        PageSourcePreBody = Left(PageSource, BodyStart - 1)
-                        PageSourcePostBody = Mid(PageSource, BodyEnd)
-                    End If
-                End If
-            End If
-            '
-            Exit Sub
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_EncodePage_SplitBody")
-        End Sub
-        '
-        '
-        '
-        Public Function main_GetBody(ByVal HTMLDoc As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00409")
-            '
-            Dim ignore0 As String
-            Dim Ignore1 As String
-            '
-            Call main_EncodePage_SplitBody(HTMLDoc, main_GetBody, ignore0, Ignore1)
-            '
-            Exit Function
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_EncodePage_SplitBody")
-        End Function
-        '
-        '
-        '
-        Public ReadOnly Property main_ServerStyleTag() As String
-            Get
-                Return pages.pageManager_GetStyleTagPublic()
-            End Get
-        End Property
-        '
-        ' assemble all the html parts
-        '
-        Public Function main_assembleHtmlDoc(ByVal docType As String, ByVal head As String, ByVal bodyTag As String, ByVal Body As String) As String
-            main_assembleHtmlDoc = "" _
-                & docType _
-                & vbCrLf & "<html>" _
-                & cr & "<head>" _
-                & genericController.kmaIndent(head) _
-                & cr & "</head>" _
-                & cr & bodyTag _
-                & genericController.kmaIndent(Body) _
-                & cr & "</body>" _
-                & vbCrLf & "</html>"
-        End Function
-        '
-        ' main_Get the Head innerHTML for public pages
-        '
-        Public Function main_GetHTMLHead() As String
-            main_GetHTMLHead = htmlDoc.getHTMLInternalHead(False)
-        End Function
-        '
-        '
-        '=============================================================
-        '
-        '=============================================================
-        '
-        Public Function main_GetRecordID_Internal(ByVal ContentName As String, ByVal RecordName As String) As Integer
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetRecordID_Internal")
-            '
-            If True Then
-                main_GetRecordID_Internal = db.getRecordID(genericController.encodeText(ContentName), genericController.encodeText(RecordName))
-            End If
-
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_GetRecordID_Internal")
-        End Function
-        '
-        '=============================================================
-        '
-        '=============================================================
-        '
-        Public Function main_GetRecordID(ByVal ContentName As String, ByVal RecordName As String) As Integer
-            On Error GoTo ErrorTrap
-            '
-            main_GetRecordID = main_GetRecordID_Internal(genericController.encodeText(ContentName), genericController.encodeText(RecordName))
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetRecordID")
-        End Function
-        '
-        '=============================================================
-        '
-        '=============================================================
-        '
-        Public Function content_GetRecordName(ByVal ContentName As String, ByVal RecordID As Integer) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00414")
-            '
-            content_GetRecordName = db.getRecordName(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID))
-
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetRecordName")
-        End Function
-        ''
-        ''   Buffered Site Property
-        ''
-        'Public ReadOnly Property app.dataBuildVersion() As String
-        '    Get
-
-        '        If Not app.dataBuildVersion_LocalLoaded Then
-        '            app.dataBuildVersion_Local = csv_GetSiteProperty("BuildVersion", "0")
-        '            app.dataBuildVersion_LocalLoaded = True
-        '        End If
-        '        app.dataBuildVersion = app.dataBuildVersion_Local
-        '    End Get
-        'End Property
-        '
-        '
-        '
-        '============================================================================================================
-        '   the content control Id for a record, all its edit and archive records, and all its child records
-        '   returns records affected
-        '   the contentname contains the record, but we do not know that this is the contentcontrol for the record,
-        '   read it first to main_Get the correct contentid
-        '============================================================================================================
-        '
-        Public Function content_SetContentControl(ByVal ContentID As Integer, ByVal RecordID As Integer, ByVal NewContentControlID As Integer, Optional ByVal UsedIDString As String = "") As Integer
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SetContentControl")
-            '
-            Dim SQL As String
-            Dim CS As Integer
-            Dim RecordTableName As String
-            Dim AuthoringTableName As String
-            Dim ContentName As String
-            Dim HasParentID As Boolean
-            Dim RecordContentID As Integer
-            Dim RecordContentName As String
-            Dim DataSourceName As String
-            '
-            If Not genericController.IsInDelimitedString(UsedIDString, CStr(RecordID), ",") Then
-                ContentName = metaData.getContentNameByID(ContentID)
-                CS = csOpen(ContentName, RecordID, False, False)
-                If db.cs_ok(CS) Then
-                    HasParentID = db.cs_isFieldSupported(CS, "ParentID")
-                    RecordContentID = db.cs_getInteger(CS, "ContentControlID")
-                    RecordContentName = metaData.getContentNameByID(RecordContentID)
-                End If
-                Call db.cs_Close(CS)
-                If RecordContentName <> "" Then
-                    '
-                    '
-                    '
-                    DataSourceName = metaData.getContentDataSource(RecordContentName)
-                    RecordTableName = GetContentTablename(RecordContentName)
-                    '
-                    ' either Workflow on non-workflow - it changes everything
-                    '
-                    SQL = "update " & RecordTableName & " set ContentControlID=" & NewContentControlID & " where ID=" & RecordID & " or EditSourceID=" & RecordID
-                    Call db.executeSql(SQL, DataSourceName)
-                    If HasParentID Then
-                        SQL = "select contentcontrolid,ID from " & RecordTableName & " where ParentID=" & RecordID
-                        CS = db.cs_openCsSql_rev(DataSourceName, SQL)
-                        Do While db.cs_ok(CS)
-                            Call content_SetContentControl(db.cs_getInteger(CS, "contentcontrolid"), db.cs_getInteger(CS, "ID"), NewContentControlID, UsedIDString & "," & RecordID)
-                            db.cs_goNext(CS)
-                        Loop
-                        Call db.cs_Close(CS)
-                    End If
-                    '
-                    ' fix content watch
-                    '
-                    SQL = "update ccContentWatch set ContentID=" & NewContentControlID & ", ContentRecordKey='" & NewContentControlID & "." & RecordID & "' where ContentID=" & ContentID & " and RecordID=" & RecordID
-                    Call db.executeSql(SQL)
-                    '            '
-                    '            ' fix Topic Rules
-                    '            '
-                    '            SQL = "update ccTopicRules set ContentID=" & NewContentControlID & ", ContentRecordKey='" & NewContentControlID & "." & RecordID & "' where ContentID=" & ContentID & " and RecordID=" & RecordID
-                    '            Call app.executeSql( SQL)
-                End If
-
-            End If
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_SetContentControl")
-        End Function
-        '        '
-        '        '========================================================================
-        '        '
-        '        '========================================================================
-        '        '
-        '        Public Function menu_VerifyDynamicMenu(ByVal MenuName As String) As Integer
-        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("VerifyDynamicMenu")
-        '            '
-        '            'If Not (true) Then Exit Function
-        '            '
-        '            menu_VerifyDynamicMenu = csv_VerifyDynamicMenu(genericController.encodeText(MenuName))
-        '            '
-        '            Exit Function
-        'ErrorTrap:
-        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_VerifyDynamicMenu")
-        '        End Function
-        '        '
-        '        '========================================================================
-        '        '
-        '        '========================================================================
-        '        '
-        '        Public Function menu_GetDynamicMenuACSelect() As String
-        '            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetDynamicMenuACSelect")
-        '            '
-        '            'If Not (true) Then Exit Function
-        '            '
-        '            menu_GetDynamicMenuACSelect = csv_GetDynamicMenuACSelect()
-        '            '
-        '            Exit Function
-        'ErrorTrap:
-        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetDynamicMenuACSelect")
-        '        End Function
-        '
-        ' converted to add-on
-        '
-        ''
-        ''========================================================================
-        ''
-        ''========================================================================
-        ''
-        'public Function main_GetDynamicFormACSelect() As String
-        '    On Error GoTo ErrorTrap: 'Dim th as integer: th = profileLogMethodEnter("GetDynamicFormACSelect")
-        '    '
-        '    'If Not (true) Then Exit Function
-        '    '
-        '    main_GetDynamicFormACSelect = csv_GetDynamicFormACSelect
-        '    '
-        '    Exit Function
-        'ErrorTrap:
-        '    Call main_HandleClassErrorAndResume_TrapPatch1("main_GetDynamicFormACSelect")
-        'End Function
-        ''
-        ''========================================================================
-        ''
-        ''========================================================================
-        ''
-        'public Function Mergetemplate(EncodedTemplateHTML As String, EncodedContentHTML As String) As String
-        '    On Error GoTo ErrorTrap: 'Dim th as integer: th = profileLogMethodEnter("Mergetemplate")
-        '    '
-        '    'If Not (true) Then Exit Function
-        '    '
-        '    Mergetemplate = csv_Mergetemplate(EncodedTemplateHTML, EncodedContentHTML, memberID)
-        '    '
-        '    Exit Function
-        'ErrorTrap:
-        '    Call main_HandleClassErrorAndResume_TrapPatch1("Mergetemplate")
-        'End Function
-        '
-        ' Verify Registration Form Page
-        '
-        '
-        ' Public Method to main_Get Contact Manager
-        '
-        Public Function contactManager_GetContactManager(Option_String As String) As String
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("main_GetContactManager")
-            '
-            contactManager_GetContactManager = addon.execute_legacy5(0, "Contact Manager", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", 0)
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_GetContactManager")
-        End Function
-        '
-        '
-        '
-        Public Sub cs_setFormInput(ByVal CSPointer As Integer, ByVal FieldName As String, Optional ByVal RequestName As String = "")
-            On Error GoTo ErrorTrap
-            '
-            Dim LocalRequestName As String
-            Dim Filename As String
-            Dim Path As String
-            '
-            'If Not (true) Then Exit Sub
-            '
-            If Not db.cs_ok(CSPointer) Then
-                Throw New ApplicationException("ContentSetPointer is invalid, empty, or end-of-file")
-            ElseIf Trim(FieldName) = "" Then
-                Throw New ApplicationException("FieldName is invalid or blank")
-            Else
-                LocalRequestName = RequestName
-                If LocalRequestName = "" Then
-                    LocalRequestName = FieldName
-                End If
-                Select Case db.cs_getFieldTypeId(CSPointer, FieldName)
-                    Case FieldTypeIdBoolean
-                        '
-                        ' Boolean
-                        '
-                        Call db.cs_set(CSPointer, FieldName, docProperties.getBoolean(LocalRequestName))
-                    Case FieldTypeIdCurrency, FieldTypeIdFloat, FieldTypeIdInteger, FieldTypeIdLookup, FieldTypeIdManyToMany
-                        '
-                        ' Numbers
-                        '
-                        Call db.cs_set(CSPointer, FieldName, docProperties.getNumber(LocalRequestName))
-                    Case FieldTypeIdDate
-                        '
-                        ' Date
-                        '
-                        Call db.cs_set(CSPointer, FieldName, docProperties.getDate(LocalRequestName))
-                    Case FieldTypeIdFile, FieldTypeIdFileImage
-                        '
-                        '
-                        '
-                        Filename = docProperties.getText(LocalRequestName)
-                        If Filename <> "" Then
-                            Path = db.cs_getFilename(CSPointer, FieldName, Filename)
-                            Call db.cs_set(CSPointer, FieldName, Path)
-                            Path = genericController.vbReplace(Path, "\", "/")
-                            Path = genericController.vbReplace(Path, "/" & Filename, "")
-                            Call appRootFiles.saveUpload(LocalRequestName, Path, Filename)
-                        End If
-                    Case Else
-                        '
-                        ' text files
-                        '
-                        Call db.cs_set(CSPointer, FieldName, docProperties.getText(LocalRequestName))
-                End Select
-            End If
-
-            '
-            Exit Sub
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_SetCSFormInput")
-        End Sub
-        '
-        '
-        '
-        Private Function admin_GetStyleTagAdmin() As String
-            Dim StyleSN As Integer
-            '
-            StyleSN = genericController.EncodeInteger(siteProperties.getText("StylesheetSerialNumber", "0"))
-            If StyleSN = 0 Then
-                admin_GetStyleTagAdmin = cr & StyleSheetStart & pages.pageManager_GetStyleSheetDefault() & cr & StyleSheetEnd
-            ElseIf (siteProperties.dataBuildVersion <> codeVersion()) Then
-                admin_GetStyleTagAdmin = cr & "<!-- styles forced inline because database upgrade needed -->" & StyleSheetStart & pages.pageManager_GetStyleSheetDefault() & cr & StyleSheetEnd
-            Else
-                If StyleSN < 0 Then
-                    '
-                    ' Linked Styles
-                    ' Bump the Style Serial Number so next fetch is not cached
-                    '
-                    StyleSN = 1
-                    Call siteProperties.setProperty("StylesheetSerialNumber", CStr(StyleSN))
-                    '
-                    ' Save new public stylesheet
-                    '
-                    'Dim kmafs As New fileSystemClass
-                    Call cdnFiles.saveFile(genericController.convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), htmlDoc.html_getStyleSheet2(0, 0))
-                    Call cdnFiles.saveFile(genericController.convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css"), htmlDoc.pageManager_GetStyleSheetDefault2)
-                End If
-                admin_GetStyleTagAdmin = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServer.webServerIO_requestProtocol & webServer.webServerIO_requestDomain & getCdnFileLink("templates/Admin" & StyleSN & ".css") & """ >"
-            End If
-        End Function
-        '
-        '=======================================================================================================================================
-        '   LinkAlias cache
-        '=======================================================================================================================================
-        '
-        Public Sub cache_linkAlias_load()
-            On Error GoTo ErrorTrap
-            '
-            Dim Key As String
-            Dim usedKeys As String = ""
-            Dim CS As Integer
-            'dim dt as datatable
-            Dim Ptr As Integer
-            Dim LinkAliasPageID As String
-            Dim LinkAliasName As String
-            Dim LinkAliasQueryStringSuffix As String
-            Dim cacheArray() As Object
-            ReDim cacheArray(2)
-            Dim cacheTest As Object
-            Dim bag As String
-            '
-            cache_linkAlias_PageIdQSSIndex = New keyPtrController
-            cache_linkAlias_NameIndex = New keyPtrController
-            cache_linkAliasCnt = 0
-            '
-            ' Load cache
-            '
-            On Error Resume Next
-            cacheTest = cache.getObject(Of Object())(cache_linkAlias_cacheName)
-            If Not pages.pagemanager_IsWorkflowRendering() Then
-                If Not IsNothing(cacheTest) Then
-                    cacheArray = DirectCast(cacheTest, Object())
-                    If Not IsNothing(cacheArray) Then
-                        cache_linkAlias = DirectCast(cacheArray(0), String(,))
-                        If Not IsNothing(cache_linkAlias) Then
-                            bag = DirectCast(cacheArray(1), String)
-                            If Err.Number = 0 Then
-                                Call cache_linkAlias_PageIdQSSIndex.importPropertyBag(bag)
-                                If Err.Number = 0 Then
-                                    bag = DirectCast(cacheArray(2), String)
-                                    If Err.Number = 0 Then
-                                        Call cache_linkAlias_NameIndex.importPropertyBag(bag)
-                                        If Err.Number = 0 Then
-                                            cache_linkAliasCnt = UBound(cache_linkAlias, 2) + 1
-                                        End If
-                                    End If
-                                End If
-                            End If
-                        End If
-                    End If
-                End If
-            End If
-            Err.Clear()
-            On Error GoTo ErrorTrap
-            If cache_linkAliasCnt = 0 Then
-                Dim rs As DataTable
-                rs = db.executeSql("select " & cache_linkAlias_fieldList & " from ccLinkAliases where (active<>0) order by id desc")
-                If rs.Rows.Count > 0 Then
-                    cache_linkAlias_NameIndex = New keyPtrController
-                    cache_linkAlias_PageIdQSSIndex = New keyPtrController
-                    ReDim cache_linkAlias(rs.Rows.Count, 4)
-                    For Each row As DataRow In rs.Rows
-                        cache_linkAlias(0, Ptr) = row(0).ToString
-                        cache_linkAlias(1, Ptr) = row(1).ToString
-                        cache_linkAlias(2, Ptr) = row(2).ToString
-                        cache_linkAlias(3, Ptr) = row(3).ToString
-                        cache_linkAlias(4, Ptr) = row(4).ToString
-                        '
-                        LinkAliasName = genericController.encodeText(cache_linkAlias(1, Ptr))
-                        LinkAliasPageID = genericController.encodeText(cache_linkAlias(3, Ptr))
-                        LinkAliasQueryStringSuffix = genericController.encodeText(cache_linkAlias(4, Ptr))
-                        Call cache_linkAlias_NameIndex.setPtr(LCase(LinkAliasName), Ptr)
-                        Key = genericController.vbLCase(LinkAliasPageID & LinkAliasQueryStringSuffix)
-                        If genericController.vbInstr(1, "," & usedKeys & ",", "," & Key & ",") = 0 Then
-                            usedKeys = usedKeys & "," & Key
-                            Call cache_linkAlias_PageIdQSSIndex.setPtr(Key, Ptr)
-                        End If
-                    Next
-                End If
-                '
-                ' Load Index
-                '
-                If cache_linkAliasCnt > 0 Then
-                    cache_linkAlias_NameIndex = New keyPtrController
-                    cache_linkAlias_PageIdQSSIndex = New keyPtrController
-                    For Ptr = 0 To cache_linkAliasCnt - 1
-                        LinkAliasName = genericController.encodeText(cache_linkAlias(1, Ptr))
-                        LinkAliasPageID = genericController.encodeText(cache_linkAlias(3, Ptr))
-                        LinkAliasQueryStringSuffix = genericController.encodeText(cache_linkAlias(4, Ptr))
-                        Call cache_linkAlias_NameIndex.setPtr(LCase(LinkAliasName), Ptr)
-                        Key = genericController.vbLCase(LinkAliasPageID & LinkAliasQueryStringSuffix)
-                        If genericController.vbInstr(1, "," & usedKeys & ",", "," & Key & ",") = 0 Then
-                            usedKeys = usedKeys & "," & Key
-                            Call cache_linkAlias_PageIdQSSIndex.setPtr(Key, Ptr)
-                        End If
-                    Next
-                End If
-                Call cache_linkAlias_save()
-            End If
-            '
-            Exit Sub
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("cache_linkAlias_load")
-        End Sub
-        '
-        '
-        '
-        Private Sub cache_linkAlias_save()
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("MainClass.cache_linkAlias_save")
-            '
-            Dim hint As String
-            Dim cacheArray() As Object
-            ReDim cacheArray(2)
-            '
-            Call cache_linkAlias_PageIdQSSIndex.getPtr("test")
-            Call cache_linkAlias_NameIndex.getPtr("test")
-            '
-            cacheArray(0) = cache_linkAlias
-            cacheArray(1) = cache_linkAlias_PageIdQSSIndex.exportPropertyBag
-            cacheArray(2) = cache_linkAlias_NameIndex.exportPropertyBag
-            Call cache.setObject(cache_linkAlias_cacheName, cacheArray, "link aliases")
-            '
-            Exit Sub
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("cache_linkAlias_save")
-        End Sub
-        '
-        '
-        '
-        Public Sub cache_linkAlias_clear()
-            On Error GoTo ErrorTrap 'Const Tn = "cache_linkAlias_clear": 'Dim th as integer: th = profileLogMethodEnter(Tn)
-            '
-            cache_linkAliasCnt = 0
-            cache_linkAlias = {}
-            Call cache.setObject(cache_linkAlias_cacheName, cache_linkAlias)
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError4(Err.Number, Err.Source, Err.Description, "cache_linkAlias_clear", True)
-        End Sub
-        '
-        '
-        '
-        Public Function cache_linkAlias_getPtrByPageIdQss(PageID As Integer, QueryStringSuffix As String) As Integer
-            On Error GoTo ErrorTrap 'Const Tn = "cache_linkAlias_getPtrByPageIdQss": 'Dim th as integer: th = profileLogMethodEnter(Tn)
-            '
-            Dim Key As String
-            '
-            cache_linkAlias_getPtrByPageIdQss = -1
-            If cache_linkAliasCnt = 0 Then
-                Call cache_linkAlias_load()
-            End If
-            If cache_linkAliasCnt > 0 Then
-                Key = genericController.vbLCase(CStr(PageID) & QueryStringSuffix)
-                cache_linkAlias_getPtrByPageIdQss = cache_linkAlias_PageIdQSSIndex.getPtr(Key)
-            End If
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError4(Err.Number, Err.Source, Err.Description, "cache_linkAlias_getPtrByPageIdQss", True)
-        End Function
-        '
-        '
-        '
-        Public Function cache_linkAlias_getPtrByName(aliasName As String) As Integer
-            On Error GoTo ErrorTrap 'Const Tn = "cache_linkAlias_getPtrByName": 'Dim th as integer: th = profileLogMethodEnter(Tn)
-            '
-            Dim Key As String
-            '
-            cache_linkAlias_getPtrByName = -1
-            If cache_linkAliasCnt = 0 Then
-                Call cache_linkAlias_load()
-            End If
-            If cache_linkAliasCnt > 0 Then
-                Key = genericController.vbLCase(aliasName)
-                cache_linkAlias_getPtrByName = cache_linkAlias_NameIndex.getPtr(Key)
-            End If
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError4(Err.Number, Err.Source, Err.Description, "cache_linkAlias_getPtrByName", True)
-        End Function
-        '
-        '====================================================================================================
-        '   Returns the Alias link (SourceLink) from the actual link (DestinationLink)
-        '
-        '====================================================================================================
-        '
-        Public Function main_GetLinkAliasByPageID(PageID As Integer, QueryStringSuffix As String, DefaultLink As String) As String
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetLinkAliasByPageID")
-            '
-            Dim CS As Integer
-            Dim Ptr As Integer
-            Dim Key As String
-            '
-            main_GetLinkAliasByPageID = DefaultLink
-            If siteProperties.allowLinkAlias Then
-                Ptr = cache_linkAlias_getPtrByPageIdQss(PageID, QueryStringSuffix)
-                If Ptr >= 0 Then
-                    main_GetLinkAliasByPageID = genericController.encodeText(cache_linkAlias(1, Ptr))
-                    If Mid(main_GetLinkAliasByPageID, 1, 1) <> "/" Then
-                        main_GetLinkAliasByPageID = "/" & main_GetLinkAliasByPageID
-                    End If
-                End If
-            End If
-            '
-            Exit Function
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_GetLinkAliasByPageID")
-        End Function
-        '
-        '====================================================================================================
-        '   returns the actual link (DestinationLink) from the alias link (SourceLink)
-        '
-        '====================================================================================================
-        '
-        Public Function main_GetURLRewriteLink(ByVal linkAlias As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetURLRewriteLink")
-            '
-            Dim Ptr As Integer
-            '
-            If (True) And (siteProperties.allowLinkAlias) Then
-                If cache_linkAliasCnt = 0 Then
-                    Call cache_linkAlias_load()
-                End If
-                If cache_linkAliasCnt > 0 Then
-                    Ptr = cache_linkAlias_NameIndex.getPtr(LCase(linkAlias))
-                    main_GetURLRewriteLink = genericController.encodeText(cache_linkAlias(2, Ptr))
-                End If
-            End If
-            '
-            Exit Function
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError13("main_GetURLRewriteLink")
-        End Function
-        ''
-        ''
-        ''
-        'public Function main_cs_getv() As ContentServerClass
-        '    On Error GoTo ErrorTrap: 'Dim th as integer: th = profileLogMethodEnter("cs_getv")
-        '    '
-        '    main_cs_getv = main_cmc
-        '    '
-        '    Exit Function
-        'ErrorTrap:
-        '    Call main_HandleClassErrorAndResume_TrapPatch1("main_cs_getv")
-        'End Function
-        '
-        '
-        '
-        '
-        '=================================================================================
-        '   Legacy
-        '       see main_executeAddon for explaination of string parsing
-        '
-        '       use main_GetAddonOption to main_Get a value from an AddonOptionList
-        '       use genericController.decodeNvaArgument( main_GetArgument( name, string, default, "&" )) for AddonOptionStrings
-        '=================================================================================
-        '
-        Public Function main_GetAggrOption(Name As String, Option_String As String) As String
-            main_GetAggrOption = main_GetAddonOption(Name, Option_String)
-        End Function
-        '
-        '==========================================================================================================================================
-        '   Input element for Style Sheets
-        '
-        '   Opens a temp file in the appcache folder with the styles copies in
-        '   click on one of the styles on the left, and main_Get the right pane with AJAX.
-        '   then on the next click, save the results in the right page back to the temp file.
-        '   on OK or save, first save the right pane results to the temp file, then copy the temp file to the real file
-        '   on cancel, just delete the temp file
-        '==========================================================================================================================================
-        '
-        Public Function main_GetFormInputStyles(ByVal TagName As String, ByVal StyleCopy As String, Optional ByVal HtmlId As String = "", Optional ByVal HtmlClass As String = "") As String
-            '
-            Dim FieldRows As String
-            Dim FieldOptionRow As String
-            Dim Copy As String
-            '
-            Copy = htmlDoc.html_EncodeHTML(StyleCopy)
-            main_GetFormInputStyles = htmlDoc.html_GetFormInputTextExpandable2(TagName, StyleCopy, 10, , HtmlId, , , HtmlClass)
-            'FieldRows = main_GetMemberProperty("StyleEditorRowHeight", 10)
-            'FieldOptionRow = "<input TYPE=""Text"" TabIndex=-1 NAME=""" & TagName & "Rows"" SIZE=""3"" VALUE=""" & FieldRows & """ ID=""""  onchange=""" & TagName & ".rows=" & TagName & "Rows.value; return true""> Rows"
-            'main_GetFormInputStyles = "<textarea NAME=""" & TagName & """ ROWS=""" & FieldRows & """ ID=""" & TagName & """ STYLE=""width: 600px;"">" & Copy & "</TEXTAREA>" & FieldOptionRow
-            Exit Function
-            '
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetFormInputStyles")
-            '
-            Dim JS As String
-            Dim LeftPane As String
-            Dim RightPane As String
-            Dim BakeName As String
-            Dim IsAuthoringMode As Boolean
-            Dim LinkBase As String
-            Dim RightSideHeader As String
-            Dim StyleFile As String
-            Dim TempFilename As String
-            Dim StyleLine As String
-            Dim StyleLines() As String
-            Dim StyleNameList As String
-            Dim Pos As Integer
-            Dim Ptr As Integer
-            Dim StyleName As String
-            Dim StyleDetails As String
-            Dim StyleCnt As Integer
-            '
-            RightSideHeader = "&nbsp;"
-            IsAuthoringMode = True
-            LinkBase = htmlDoc.refreshQueryString
-            LeftPane = "List of Styles"
-            RightPane = "Style Tag Editor"
-            TempFilename = "AppCache\StyleTemp" & genericController.GetRandomInteger() & ".css"
-            '
-            StyleFile = cdnFiles.readFile(TempFilename)
-            If StyleFile <> "" Then
-                Call appRootFiles.saveFile(TempFilename, StyleCopy)
-                'Call main_CopyVirtualFile(StylesFilename, TempFilename)
-                '
-                ' remove crlf
-                '
-                StyleFile = genericController.vbReplace(StyleFile, vbCrLf, vbLf)
-                Do
-                    Pos = genericController.vbInstr(1, StyleFile, vbLf)
-                    If Pos > 0 Then
-                        StyleFile = genericController.vbReplace(StyleFile, vbLf, " ")
-                    End If
-                Loop While Pos > 0
-                '
-                ' remove double spaces
-                '
-                Do
-                    Pos = genericController.vbInstr(1, StyleFile, "  ")
-                    If Pos > 0 Then
-                        StyleFile = genericController.vbReplace(StyleFile, "  ", " ")
-                    End If
-                Loop While Pos > 0
-                StyleLines = Split(StyleFile, "}")
-                StyleCnt = UBound(StyleLines) + 1
-                For Ptr = 0 To StyleCnt - 1
-                    StyleLine = StyleLines(Ptr)
-                    Pos = genericController.vbInstr(1, StyleLine, "{")
-                    If Pos > 0 Then
-                        StyleNameList = StyleNameList & vbCrLf & "<div>" & Mid(StyleLine, 1, Pos - 1) & "</div>"
-                    End If
-                Next
-            End If
-            Dim StyleEditorPtr As Integer
-            StyleNameList = StyleNameList & vbCrLf & "<div><a href=""#"" onClick=""AddStyle();return false;"">Add Style</a></div>"
-            StyleNameList = StyleNameList & vbCrLf & "<div>----- end of list</div>"
-            StyleNameList = vbCrLf & "<div ID=""StyleEditorListWrapper" & StyleEditorPtr & """>" & vbCrLf & StyleNameList & vbCrLf & "</div>"
-            JS = "" _
-                & vbCrLf & "<script Language=""JavaScript"" type=""text/javascript"">" _
-                & vbCrLf & "function AddStyle() {/* change add link into a text input and a save button */}" _
-                & vbCrLf & "function AddStyleSave() {/* send the new style back to the server and save it in the temp file. ON return, replace the text input with a new style. Add a new Add link to the list of styles */}" _
-                & vbCrLf & "</script>"
-
-            RightPane = RightPane & main_GetFormInputStyles_Editor(StyleName, StyleDetails)
-            '
-            main_GetFormInputStyles = JS _
-                & "<div style=""border:1px solid #A0A0A0;width:100%;"">" _
-                & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" style=""width:100%;"">" _
-                & "<tr>" _
-                & "<td class=""ccAdminTab"" style=""min-width:100px;padding:5px;text-align:left"">Styles<br ><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=90 height=1></td>" _
-                & "<td class=""ccAdminTab"" style=""width:1px;""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=1 height=1></td>" _
-                & "<td class=""ccAdminTab"" style=""padding:5px;text-align:left"" ID=""" & TagName & ".ContentCaption"">" & genericController.encodeEmptyText(RightSideHeader, "&nbsp;") & "</td>" _
-                & "</td></tr>" _
-                & "<tr>" _
-                & "<td style=""padding:10px;Background-color:white;border:0px solid #808080;vertical-align:top;text-align:left"">" & StyleNameList & "</td>" _
-                & "<td class=""ccAdminTab"" style=""width:1px;""></td>" _
-                & "<td style=""padding:10px;Background-color:white;border:0px solid #808080;vertical-align:top;text-align:left"">" & RightPane & "</td>" _
-                & "</td></tr>" _
-                & "</table>" _
-                & "</div>"
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetFormInputStyles")
-        End Function
-        '
-        '==========================================================================================================================================
-        '   main_Get the editor side of the FormInputStyles
-        '
-        '
-        '==========================================================================================================================================
-        '
-        Public Function main_GetFormInputStyles_Editor(StyleName As String, StyleDetails As String) As String
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetFormInputStyles_Editor")
-            '
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetFormInputStyles_Editor")
-        End Function
-        '
-        '
-        '
-        Public Function main_GetOnLoadJavascript() As String
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("main_GetOnLoadJavascript")
-            '
-            'If Not (true) Then Exit Function
-            '
-            'main_OnLoadJavascript_ToBeAdded = False
-            main_GetOnLoadJavascript = htmlDoc.main_OnLoadJavascript
-            htmlDoc.main_OnLoadJavascript = ""
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetOnLoadJavascript")
-        End Function
-        '
-        '
-        '
-        Public Function main_IsContentFieldSupported(ContentName As String, FieldName As String) As Boolean
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("IsContentFieldSupported")
-            '
-            'If Not (true) Then Exit Function
-            '
-            main_IsContentFieldSupported = metaData.isContentFieldSupported(ContentName, FieldName)
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_IsContentFieldSupported")
-        End Function
-        '
-        '
-        '
-        Public Function main_GetMobileBrowserList() As String
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetMobileBrowserList")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim Filename As String
-            Dim DefaultMobileBrowserList As String
-            Dim DateExpires As Date
-            Dim datetext As String
-            '
-            main_GetMobileBrowserList = genericController.encodeText(cache.getObject(Of String)("MobileBrowserList"))
-            If main_GetMobileBrowserList <> "" Then
-                datetext = genericController.getLine(main_GetMobileBrowserList)
-                If genericController.EncodeDate(datetext) < Now() Then
-                    main_GetMobileBrowserList = ""
-                End If
-            End If
-            If main_GetMobileBrowserList = "" Then
-                Filename = "config\MobileBrowserList.txt"
-                main_GetMobileBrowserList = privateFiles.readFile(Filename)
-                If main_GetMobileBrowserList = "" Then
-                    main_GetMobileBrowserList = "midp,j2me,avantg,docomo,novarra,palmos,palmsource,240x320,opwv,chtml,pda,windows ce,mmp/,blackberry,mib/,symbian,wireless,nokia,hand,mobi,phone,cdm,up.b,audio,SIE-,SEC-,samsung,HTC,mot-,mitsu,sagem,sony,alcatel,lg,erics,vx,NEC,philips,mmm,xx,panasonic,sharp,wap,sch,rover,pocket,benq,java,pt,pg,vox,amoi,bird,compal,kg,voda,sany,kdd,dbt,sendo,sgh,gradi,jb,moto"
-                    main_GetMobileBrowserList = genericController.vbReplace(main_GetMobileBrowserList, ",", vbCrLf)
-                    'Call app.publicFiles.SaveFile(Filename, main_GetMobileBrowserList)
-                End If
-                datetext = DateTime.Now.AddHours(1).ToString
-                Call cache.setObject("MobileBrowserList", datetext & vbCrLf & main_GetMobileBrowserList)
-            End If
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetMobileBrowserList")
-        End Function
-        '
-        '=================================================================================================================
-        '   main_GetAddonOption
-        '=================================================================================================================
-        '
-        Public Function main_GetAddonOption(OptionName As String, Option_String As String) As String
-            main_GetAddonOption = csv_GetAddonOption(OptionName, Option_String)
-        End Function
-        '
-        '=================================================================================================================
-        '   main_GetAddonOptionConstructorValue
-        '
-        '   I think this might be wrong.
-        '       If it decodes AddonOptions delimited by crlf, then it should not need DecodeAddonOptions, b/c this is for instance options
-        '
-        '
-        '   used internally for lists like:
-        '
-        '   name=value[otherstuff]
-        '   name2=value2
-        '
-        '   Just like main_GetAddonOption, except it trims off the selectors
-        '
-        '   Used internally to main_GetAddonOption for non-record based Add-ons that can not be called through main_GetAddonContent.
-        '   The important difference is this call Decodes Addon Arguments and removes the Selector
-        '
-        '=================================================================================================================
-        '
-        Public Function main_GetAddonOptionConstructorValue(OptionName As String, AddonOptionConstructorList As String) As String
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetAddonOptionConstructorValue")
-            '
-            Dim Pos As Integer
-            Dim s As String
-            '
-            s = main_GetAddonOption(OptionName, AddonOptionConstructorList)
-            Pos = genericController.vbInstr(1, s, "[")
-            If Pos > 0 Then
-                s = Left(s, Pos - 1)
-            End If
-            s = genericController.decodeNvaArgument(s)
-            '
-            main_GetAddonOptionConstructorValue = s
-            '
-            Exit Function
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetAddonOptionConstructorValue")
-        End Function
-        '
-        '========================================================================
-        '   Process manual changes needed for Page Content Special Cases
-        '       If workflow, only call this routine on a publish - it changes live records
-        '========================================================================
-        '
-        Public Sub main_ProcessSpecialCaseAfterSave(IsDelete As Boolean, ContentName As String, RecordID As Integer, RecordName As String, RecordParentID As Integer, UseContentWatchLink As Boolean)
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("ProcessSpecialCaseAfterSave")
-            '
-            Dim addonId As Integer
-            Dim Option_String As String
-            Dim Filename As String
-            Dim FilenameExt As String
-            Dim FilenameNoExt As String
-            Dim FilePath As String
-            Dim Pos As Integer
-            Dim AltSizeList As String
-            'Dim innovaEditor As innovaEditorAddonClassFPO
-            Dim sf As imageEditController
-            Dim RebuildSizes As Boolean
-            Dim AddonStatusOK As Boolean
-            Dim pageContentName As String
-            Dim PageContentID As Integer
-            Dim rootPageId As Integer
-            Dim Cmd As String
-            Dim CS As Integer
-            Dim TableName As String
-            Dim PageName As String
-            Dim ContentID As Integer
-            Dim ActivityLogOrganizationID As Integer
-            Dim ActivityLogName As String
-            Dim hint As String
-            '
-            'hint = hint & ",000"
-            ContentID = metaData.getContentId(ContentName)
-            TableName = GetContentTablename(ContentName)
-            Call db.markRecordReviewed(ContentName, RecordID)
-            '
-            ' Test for parentid=id loop
-            '
-            ' needs to be finished
-            '
-            '    If (RecordParentID <> 0) And main_IsContentFieldSupported(ContentName, "parentid") Then
-            '
-            '    End If
-            'hint = hint & ",100"
-            Select Case genericController.vbLCase(TableName)
-                Case "linkaliases"
-                    'Call cache_linkAlias_clear
-                Case "ccmembers"
-                    '
-                    ' Log Activity for changes to people and organizattions
-                    '
-                    'hint = hint & ",110"
-                    CS = csOpenRecord("people", RecordID, , , "Name,OrganizationID")
-                    If db.cs_ok(CS) Then
-                        ActivityLogOrganizationID = db.cs_getInteger(CS, "OrganizationID")
-                    End If
-                    Call db.cs_Close(CS)
-                    If IsDelete Then
-                        Call logController.logActivity2(Me, "deleting user #" & RecordID & " (" & RecordName & ")", RecordID, ActivityLogOrganizationID)
-                    Else
-                        Call logController.logActivity2(Me, "saving changes to user #" & RecordID & " (" & RecordName & ")", RecordID, ActivityLogOrganizationID)
-                    End If
-                Case "organizations"
-                    '
-                    ' Log Activity for changes to people and organizattions
-                    '
-                    'hint = hint & ",120"
-                    If IsDelete Then
-                        Call logController.logActivity2(Me, "deleting organization #" & RecordID & " (" & RecordName & ")", 0, RecordID)
-                    Else
-                        Call logController.logActivity2(Me, "saving changes to organization #" & RecordID & " (" & RecordName & ")", 0, RecordID)
-                    End If
-                Case "ccsetup"
-                    '
-                    ' Site Properties
-                    '
-                    'hint = hint & ",130"
-                    Select Case genericController.vbLCase(RecordName)
-                        Case "allowlinkalias"
-                            Call cache.invalidateContent("Page Content")
-                        Case "sectionlandinglink"
-                            Call cache.invalidateContent("Page Content")
-                        Case siteproperty_serverPageDefault_name
-                            Call cache.invalidateContent("Page Content")
-                    End Select
-                Case "ccpagecontent"
-                    '
-                    ' set ChildPagesFound true for parent page
-                    '
-                    'hint = hint & ",140"
-                    If RecordParentID > 0 Then
-                        Call pages.cache_pageContent_updateRow(RecordParentID, False, False)
-                        If Not IsDelete Then
-                            Call db.executeSql("update ccpagecontent set ChildPagesfound=1 where ID=" & RecordParentID)
-                        End If
-                    End If
-                    '
-                    ' Page Content special cases for delete
-                    '
-                    If IsDelete Then
-                        '
-                        ' If this was a section's root page, clear the rootpageid so a new page will be created
-                        '
-                        Call db.executeSql("update ccsections set RootPageID=0 where RootPageID=" & RecordID)
-                        Call pages.pageManager_cache_siteSection_clear()
-                        '
-                        ' Clear the Landing page and page not found site properties
-                        '
-
-                        If genericController.vbLCase(TableName) = "ccpagecontent" Then
-                            Call pages.cache_pageContent_removeRow(RecordID, pages.pagemanager_IsWorkflowRendering, False)
-                            If RecordID = genericController.EncodeInteger(siteProperties.getText("PageNotFoundPageID", "0")) Then
-                                Call siteProperties.setProperty("PageNotFoundPageID", "0")
-                            End If
-                            If RecordID = siteProperties.landingPageID Then
-                                siteProperties.setProperty("landingPageId", "0")
-                            End If
-                        End If
-                        '
-                        ' Delete Link Alias entries with this PageID
-                        '
-                        Call db.executeSql("delete from cclinkAliases where PageID=" & RecordID)
-                        Call cache_linkAlias_clear()
-                    Else
-                        '
-                        ' Attempt to update the PageContentCache (PCC) array stored in the PeristantVariants
-                        '
-                        Call pages.cache_pageContent_updateRow(RecordID, False, False)
-                    End If
-                Case "cctemplates", "ccsharedstyles"
-                    '
-                    ' Attempt to update the PageContentCache (PCC) array stored in the PeristantVariants
-                    '
-                    'hint = hint & ",150"
-                    Call pages.pageManager_cache_pageTemplate_clear()
-                    If Not IsNothing(addonStyleRulesIndex) Then
-                        Call addonStyleRulesIndex.clear()
-                    End If
-
-                Case "ccsections"
-                    '
-                    ' Attempt to update
-                    '
-                    'hint = hint & ",160"
-                    CS = csOpen("Site Sections", RecordID)
-                    If db.cs_ok(CS) Then
-                        PageContentID = db.cs_getInteger(CS, "ContentID")
-                        If PageContentID = 0 Then
-                            PageContentID = metaData.getContentId("Page Content")
-                            Call db.cs_set(CS, "ContentID", PageContentID)
-                        End If
-                        rootPageId = db.cs_getInteger(CS, "RootPageID")
-                        If rootPageId = 0 Then
-                            PageName = db.cs_getText(CS, "Name")
-                            If PageName = "" Then
-                                PageName = "Page " & db.cs_getInteger(CS, "ID")
-                            End If
-                            pageContentName = metaData.getContentNameByID(PageContentID)
-                            If pageContentName = "" Then
-                                pageContentName = "Page Content"
-                            End If
-                            Call db.cs_set(CS, "RootPageID", pages.main_CreatePageGetID(PageName, "Page Content", authContext.user.ID, ""))
-                            Call pages.cache_pageContent_clear()
-                        End If
-                    End If
-                    Call db.cs_Close(CS)
-                    Call pages.pageManager_cache_siteSection_clear()
-                Case "ccaggregatefunctions"
-                    '
-                    ' Update wysiwyg addon menus
-                    '
-                    'hint = hint & ",170"
-                    Call addonLegacyCache.clear()
-                    If Not IsNothing(addonStyleRulesIndex) Then
-                        Call addonStyleRulesIndex.clear()
-                    End If
-                Case "ccsharedstylesaddonrules"
-                    '
-                    ' Update wysiwyg addon menus
-                    '
-                    'hint = hint & ",175"
-                    If Not IsNothing(addonStyleRulesIndex) Then
-                        Call addonStyleRulesIndex.clear()
-                    End If
-
-                    Call addonLegacyCache.clear()
-                Case "cclibraryfiles"
-                    '
-                    ' if a AltSizeList is blank, make large,medium,small and thumbnails
-                    '
-                    'hint = hint & ",180"
-                    If (siteProperties.getBoolean("ImageAllowSFResize", True)) Then
-                        If Not IsDelete Then
-                            CS = csOpen("library files", RecordID)
-                            If db.cs_ok(CS) Then
-                                Filename = db.cs_get(CS, "filename")
-                                Pos = InStrRev(Filename, "/")
-                                If Pos > 0 Then
-                                    FilePath = Mid(Filename, 1, Pos)
-                                    Filename = Mid(Filename, Pos + 1)
-                                End If
-                                Call db.cs_set(CS, "filesize", appRootFiles.main_GetFileSize(FilePath & Filename))
-                                Pos = InStrRev(Filename, ".")
-                                If Pos > 0 Then
-                                    FilenameExt = Mid(Filename, Pos + 1)
-                                    FilenameNoExt = Mid(Filename, 1, Pos - 1)
-                                    If genericController.vbInstr(1, "jpg,gif,png", FilenameExt, vbTextCompare) <> 0 Then
-                                        sf = New imageEditController
-                                        If sf.load(appRootFiles.rootLocalPath & FilePath & Filename) Then
-                                            '
-                                            '
-                                            '
-                                            Call db.cs_set(CS, "height", sf.height)
-                                            Call db.cs_set(CS, "width", sf.width)
-                                            AltSizeList = db.cs_getText(CS, "AltSizeList")
-                                            RebuildSizes = (AltSizeList = "")
-                                            If RebuildSizes Then
-                                                AltSizeList = ""
-                                                '
-                                                ' Attempt to make 640x
-                                                '
-                                                If sf.width >= 640 Then
-                                                    sf.height = CInt(sf.height * (640 / sf.width))
-                                                    sf.width = 640
-                                                    Call sf.save(appRootFiles.rootLocalPath & FilePath & FilenameNoExt & "-640x" & sf.height & "." & FilenameExt)
-                                                    AltSizeList = AltSizeList & vbCrLf & "640x" & sf.height
-                                                End If
-                                                '
-                                                ' Attempt to make 320x
-                                                '
-                                                If sf.width >= 320 Then
-                                                    sf.height = CInt(sf.height * (320 / sf.width))
-                                                    sf.width = 320
-                                                    Call sf.save(appRootFiles.rootLocalPath & FilePath & FilenameNoExt & "-320x" & sf.height & "." & FilenameExt)
-
-                                                    AltSizeList = AltSizeList & vbCrLf & "320x" & sf.height
-                                                End If
-                                                '
-                                                ' Attempt to make 160x
-                                                '
-                                                If sf.width >= 160 Then
-                                                    sf.height = CInt(sf.height * (160 / sf.width))
-                                                    sf.width = 160
-                                                    Call sf.save(appRootFiles.rootLocalPath & FilePath & FilenameNoExt & "-160x" & sf.height & "." & FilenameExt)
-                                                    AltSizeList = AltSizeList & vbCrLf & "160x" & sf.height
-                                                End If
-                                                '
-                                                ' Attempt to make 80x
-                                                '
-                                                If sf.width >= 80 Then
-                                                    sf.height = CInt(sf.height * (80 / sf.width))
-                                                    sf.width = 80
-                                                    Call sf.save(appRootFiles.rootLocalPath & FilePath & FilenameNoExt & "-180x" & sf.height & "." & FilenameExt)
-                                                    AltSizeList = AltSizeList & vbCrLf & "80x" & sf.height
-                                                End If
-                                                Call db.cs_set(CS, "AltSizeList", AltSizeList)
-                                            End If
-                                            Call sf.Dispose()
-                                            sf = Nothing
-                                        End If
-                                        '                                sf.Algorithm = genericController.EncodeInteger(main_GetSiteProperty("ImageResizeSFAlgorithm", "5"))
-                                        '                                On Error Resume Next
-                                        '                                sf.LoadFromFile (app.publicFiles.rootFullPath & FilePath & Filename)
-                                        '                                If Err.Number = 0 Then
-                                        '                                    Call app.SetCS(CS, "height", sf.Height)
-                                        '                                    Call app.SetCS(CS, "width", sf.Width)
-                                        '                                Else
-                                        '                                    Err.Clear
-                                        '                                End If
-                                        '                                AltSizeList = db.cs_getText(CS, "AltSizeList")
-                                        '                                RebuildSizes = (AltSizeList = "")
-                                        '                                If RebuildSizes Then
-                                        '                                    AltSizeList = ""
-                                        '                                    '
-                                        '                                    ' Attempt to make 640x
-                                        '                                    '
-                                        '                                    If sf.Width >= 640 Then
-                                        '                                        sf.Width = 640
-                                        '                                        Call sf.DoResize
-                                        '                                        Call sf.SaveToFile(app.publicFiles.rootFullPath & FilePath & FilenameNoExt & "-640x" & sf.Height & "." & FilenameExt)
-                                        '                                        AltSizeList = AltSizeList & vbCrLf & "640x" & sf.Height
-                                        '                                    End If
-                                        '                                    '
-                                        '                                    ' Attempt to make 320x
-                                        '                                    '
-                                        '                                    If sf.Width >= 320 Then
-                                        '                                        sf.Width = 320
-                                        '                                        Call sf.DoResize
-                                        '                                        Call sf.SaveToFile(app.publicFiles.rootFullPath & FilePath & FilenameNoExt & "-320x" & sf.Height & "." & FilenameExt)
-                                        '                                        AltSizeList = AltSizeList & vbCrLf & "320x" & sf.Height
-                                        '                                    End If
-                                        '                                    '
-                                        '                                    ' Attempt to make 160x
-                                        '                                    '
-                                        '                                    If sf.Width >= 160 Then
-                                        '                                        sf.Width = 160
-                                        '                                        Call sf.DoResize
-                                        '                                        Call sf.SaveToFile(app.publicFiles.rootFullPath & FilePath & FilenameNoExt & "-160x" & sf.Height & "." & FilenameExt)
-                                        '                                        AltSizeList = AltSizeList & vbCrLf & "160x" & sf.Height
-                                        '                                    End If
-                                        '                                    '
-                                        '                                    ' Attempt to make 80x
-                                        '                                    '
-                                        '                                    If sf.Width >= 80 Then
-                                        '                                        sf.Width = 80
-                                        '                                        Call sf.DoResize
-                                        '                                        Call sf.SaveToFile(app.publicFiles.rootFullPath & FilePath & FilenameNoExt & "-80x" & sf.Height & "." & FilenameExt)
-                                        '                                        AltSizeList = AltSizeList & vbCrLf & "80x" & sf.Height
-                                        '                                    End If
-                                        '                                    Call app.SetCS(CS, "AltSizeList", AltSizeList)
-                                        '                                End If
-                                        '                                sf = Nothing
-                                    End If
-                                End If
-                            End If
-                            Call db.cs_Close(CS)
-                        End If
-                    End If
-                Case Else
-                    '
-                    '
-                    '
-            End Select
-            '
-            ' Process Addons marked to trigger a process call on content change
-            '
-            'hint = hint & ",190"
-            If True Then
-                'hint = hint & ",200 content=[" & ContentID & "]"
-                CS = db.cs_open("Add-on Content Trigger Rules", "ContentID=" & ContentID, , , , , , "addonid")
-                Option_String = "" _
-                    & vbCrLf & "action=contentchange" _
-                    & vbCrLf & "contentid=" & ContentID _
-                    & vbCrLf & "recordid=" & RecordID _
-                    & ""
-                Do While db.cs_ok(CS)
-                    addonId = db.cs_getInteger(CS, "Addonid")
-                    'hint = hint & ",210 addonid=[" & addonId & "]"
-                    Call addon.executeAddonAsProcess(CStr(addonId), Option_String)
-                    Call db.cs_goNext(CS)
-                Loop
-                Call db.cs_Close(CS)
-            End If
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_ProcessSpecialCaseAfterSave, Hint=" & hint)
-        End Sub
-        '
-        '================================================================================================================
-        '   main_Get SharedStyleFilelist
-        '
-        '   SharedStyleFilelist is a list of filenames (with conditional comments) that should be included on pages
-        '   that call out the SharedFileIDList
-        '
-        '   Suffix and Prefix are for Conditional Comments around the style tag
-        '
-        '   SharedStyleFileList is
-        '       crlf filename < Prefix< Suffix
-        '       crlf filename < Prefix< Suffix
-        '       ...
-        '       Prefix and Suffix are htmlencoded
-        '
-        '   SharedStyleMap file
-        '       crlf StyleID tab StyleFilename < Prefix < Suffix, IncludedStyleFilename < Prefix < Suffix, ...
-        '       crlf StyleID tab StyleFilename < Prefix < Suffix, IncludedStyleFilename < Prefix < Suffix, ...
-        '       ...
-        '       StyleID is 0 if Always include is set
-        '       The Prefix and Suffix have had crlf removed, and comma replaced with &#44;
-        '================================================================================================================
-        '
-        Friend Function main_GetSharedStyleFileList(SharedStyleIDList As String, main_IsAdminSite As Boolean) As String
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetSharedStyleFileList")
-            '
-            Dim Prefix As String
-            Dim Suffix As String
-            Dim Files() As String
-            Dim Pos As Integer
-            Dim SrcID As Integer
-            Dim Srcs() As String
-            Dim SrcCnt As Integer
-            Dim IncludedStyleFilename As String
-            Dim styleId As Integer
-            Dim LastStyleID As Integer
-            Dim CS As Integer
-            Dim Ptr As Integer
-            Dim MapList As String
-            Dim Map() As String
-            Dim MapCnt As Integer
-            Dim MapRow As Integer
-            Dim StyleSheetLink As String
-            Dim Filename As String
-            Dim FileList As String
-            Dim SQL As String
-            Dim BakeName As String
-            '
-            If main_IsAdminSite Then
-                BakeName = "SharedStyleMap-Admin"
-            Else
-                BakeName = "SharedStyleMap-Public"
-            End If
-            MapList = genericController.encodeText(cache.getObject(Of String)(BakeName))
-            If MapList = "" Then
-                '
-                ' BuildMap
-                '
-                MapList = ""
-                If True Then
-                    '
-                    ' add prefix and suffix conditional comments
-                    '
-                    SQL = "select s.ID,s.Stylefilename,s.Prefix,s.Suffix,i.StyleFilename as iStylefilename,s.AlwaysInclude,i.Prefix as iPrefix,i.Suffix as iSuffix" _
-                        & " from ((ccSharedStyles s" _
-                        & " left join ccSharedStylesIncludeRules r on r.StyleID=s.id)" _
-                        & " left join ccSharedStyles i on i.id=r.IncludedStyleID)" _
-                        & " where ( s.active<>0 )and((i.active is null)or(i.active<>0))"
-                End If
-                CS = db.cs_openSql(SQL)
-                LastStyleID = 0
-                Do While db.cs_ok(CS)
-                    styleId = db.cs_getInteger(CS, "ID")
-                    If styleId <> LastStyleID Then
-                        Filename = db.cs_get(CS, "StyleFilename")
-                        Prefix = genericController.vbReplace(htmlDoc.main_encodeHTML(db.cs_get(CS, "Prefix")), ",", "&#44;")
-                        Suffix = genericController.vbReplace(htmlDoc.main_encodeHTML(db.cs_get(CS, "Suffix")), ",", "&#44;")
-                        If (Not main_IsAdminSite) And db.cs_getBoolean(CS, "alwaysinclude") Then
-                            MapList = MapList & vbCrLf & "0" & vbTab & Filename & "<" & Prefix & "<" & Suffix
-                        Else
-                            MapList = MapList & vbCrLf & styleId & vbTab & Filename & "<" & Prefix & "<" & Suffix
-                        End If
-                    End If
-                    IncludedStyleFilename = db.cs_getText(CS, "iStylefilename")
-                    Prefix = htmlDoc.main_encodeHTML(db.cs_get(CS, "iPrefix"))
-                    Suffix = htmlDoc.main_encodeHTML(db.cs_get(CS, "iSuffix"))
-                    If IncludedStyleFilename <> "" Then
-                        MapList = MapList & "," & IncludedStyleFilename & "<" & Prefix & "<" & Suffix
-                    End If
-                    Call db.cs_goNext(CS)
-                Loop
-                If MapList = "" Then
-                    MapList = ","
-                End If
-                Call cache.setObject(BakeName, MapList, "Shared Styles")
-            End If
-            If (MapList <> "") And (MapList <> ",") Then
-                Srcs = Split(SharedStyleIDList, ",")
-                SrcCnt = UBound(Srcs) + 1
-                Map = Split(MapList, vbCrLf)
-                MapCnt = UBound(Map) + 1
-                '
-                ' Add stylesheets with AlwaysInclude set (ID is saved as 0 in Map)
-                '
-                FileList = ""
-                For MapRow = 0 To MapCnt - 1
-                    If genericController.vbInstr(1, Map(MapRow), "0" & vbTab) = 1 Then
-                        Pos = genericController.vbInstr(1, Map(MapRow), vbTab)
-                        If Pos > 0 Then
-                            FileList = FileList & "," & Mid(Map(MapRow), Pos + 1)
-                        End If
-                    End If
-                Next
-                '
-                ' create a filelist of everything that is needed, might be duplicates
-                '
-                For Ptr = 0 To SrcCnt - 1
-                    SrcID = genericController.EncodeInteger(Srcs(Ptr))
-                    If SrcID <> 0 Then
-                        For MapRow = 0 To MapCnt - 1
-                            If genericController.vbInstr(1, Map(MapRow), SrcID & vbTab) <> 0 Then
-                                Pos = genericController.vbInstr(1, Map(MapRow), vbTab)
-                                If Pos > 0 Then
-                                    FileList = FileList & "," & Mid(Map(MapRow), Pos + 1)
-                                End If
-                            End If
-                        Next
-                    End If
-                Next
-                '
-                ' dedup the filelist and convert it to crlf delimited
-                '
-                If FileList <> "" Then
-                    Files = Split(FileList, ",")
-                    For Ptr = 0 To UBound(Files)
-                        Filename = Files(Ptr)
-                        If genericController.vbInstr(1, main_GetSharedStyleFileList, Filename, vbTextCompare) = 0 Then
-                            main_GetSharedStyleFileList = main_GetSharedStyleFileList & vbCrLf & Filename
-                        End If
-                    Next
-                End If
-            End If
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18("main_GetSharedStyleFileList")
-        End Function
-        '        '
-        '        '========================================================================
-        '        '   Parse a list of html tags and produce a list of styles
-        '        '========================================================================
-        '        '
-        '        Private Function main_GetStyleListFromHTML(Doc As String, BasePath As String, SourceHost As String) As String
-        '            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetStyleListFromHTML")
-        '            '
-        '            '
-        '            Dim StyleTag As String
-        '            Dim LinkType As String
-        '            Dim Link As String
-        '            Dim ElementCount As Integer
-        '            Dim TagCount As Integer
-        '            Dim TagName As String
-        '            Dim kmaParse As htmlParserController
-        '            Dim ElementPointer As Integer
-        '            Dim Output As New stringBuilderLegacyController
-        '            Dim ElementText As String
-        '            Dim RootRelativeLink As String
-        '            Dim TagDone As Boolean
-        '            '
-        '            kmaParse = New htmlParserController(Me)
-        '            Call kmaParse.Load(Doc)
-        '            ElementPointer = 0
-        '            ElementCount = kmaParse.ElementCount
-        '            '
-        '            Do While ElementPointer < ElementCount
-        '                ElementText = kmaParse.Text(ElementPointer)
-        '                If kmaParse.IsTag(ElementPointer) Then
-        '                    TagCount = TagCount + 1
-        '                    TagName = kmaParse.TagName(ElementPointer)
-        '                    Select Case genericController.vbUCase(TagName)
-        '                        Case "LINK"
-        '                            '
-        '                            Link = kmaParse.ElementAttribute(ElementPointer, "HREF")
-        '                            LinkType = kmaParse.ElementAttribute(ElementPointer, "TYPE")
-        '                            If (genericController.IsLinkToThisHost(SourceHost, Link)) And (LCase(LinkType) = "text/css") Then
-        '                                RootRelativeLink = genericController.ConvertLinkToRootRelative(Link, BasePath)
-        '                                main_GetStyleListFromHTML = main_GetStyleListFromHTML & vbCrLf & main_GetStyleListFromLink(Link, BasePath, SourceHost, "")
-        '                            End If
-        '                        Case "STYLE"
-        '                            '
-        '                            ' Skip to the </Style> TAG, main_Get the stylesheet between for processing
-        '                            '
-        '                            TagDone = False
-        '                            Do While (Not TagDone) And (ElementPointer < ElementCount)
-        '                                '
-        '                                ' Process the next segment
-        '                                '
-        '                                ElementPointer = ElementPointer + 1
-        '                                ElementText = kmaParse.Text(ElementPointer)
-        '                                If kmaParse.IsTag(ElementPointer) Then
-        '                                    '
-        '                                    ' Process a tag (should just be </SCRIPT>, but go until it is
-        '                                    '
-        '                                    TagCount = TagCount + 1
-        '                                    TagDone = (kmaParse.TagName(ElementPointer) = "/" & TagName)
-        '                                End If
-        '                                If Not TagDone Then
-        '                                    StyleTag = StyleTag & ElementText
-        '                                End If
-        '                            Loop
-        '                            main_GetStyleListFromHTML = main_GetStyleListFromHTML & vbCrLf & main_GetStyleListFromStylesheet(StyleTag, BasePath, SourceHost, "")
-        '                    End Select
-        '                End If
-        '                'Output.Add( ElementText
-        '                ElementPointer = ElementPointer + 1
-        '            Loop
-        '            'main_GetStyleListFromHTML = Output.Text
-        '            '
-        '            kmaParse = Nothing
-        '            Exit Function
-        '            '
-        '            ' ----- Error Trap
-        '            '
-        'ErrorTrap:
-        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(Err.Number, Err.Source, Err.Description, "main_GetStyleListFromHTML", True, False)
-        '        End Function
-        '        '
-        '        ' ================================================================================================
-        '        '   conversion pass 3
-        '        ' ================================================================================================
-        '        '
-        '        '
-        '        '
-        '        '
-        '        Private Function main_GetStyleListFromLink(Link As String, BasePath As String, SourceHost As String, BlockRootRelativeLinkList As String) As String
-        '            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetStyleListFromLink")
-        '            '
-        '            Dim Pos As Integer
-        '            Dim ImportedStyle As String
-        '            Dim HTTP As New httpRequestController()
-        '            Dim Filename As String
-        '            Dim RootRelativeLink As String
-        '            Dim ImportLink As String
-        '            Dim LinkPath As String
-        '            '
-        '            RootRelativeLink = genericController.ConvertLinkToRootRelative(Link, BasePath)
-        '            main_GetStyleListFromLink = ""
-        '            If genericController.vbInstr(1, BlockRootRelativeLinkList, RootRelativeLink, vbTextCompare) = 0 Then
-        '                ImportLink = SourceHost & RootRelativeLink
-        '                ImportedStyle = HTTP.getURL(ImportLink)
-        '                Dim HTTPStatus As String
-        '                HTTPStatus = genericController.getLine(HTTP.responseHeader)
-        '                If genericController.vbInstr(1, HTTPStatus, "200") = 0 Then
-        '                    main_GetStyleListFromLink = ""
-        '                Else
-        '                End If
-
-        '                Pos = InStrRev(RootRelativeLink, "/")
-        '                If Pos > 0 Then
-        '                    LinkPath = Mid(RootRelativeLink, 1, Pos)
-        '                End If
-        '                main_GetStyleListFromLink = main_GetStyleListFromStylesheet(ImportedStyle, LinkPath, SourceHost, BlockRootRelativeLinkList & "," & RootRelativeLink)
-        '            End If
-        '            Exit Function
-        '            '
-        '            ' ----- Error Trap
-        '            '
-        'ErrorTrap:
-        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(Err.Number, Err.Source, Err.Description, "main_GetStyleListFromLink", True, False)
-        '        End Function
-        '        '
-        '        '
-        '        '
-        '        Private Function main_GetStyleListFromStylesheet(StyleSheet As String, BasePath As String, SourceHost As String, BlockRootRelativeLinkList As String) As String
-        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetStyleListFromStylesheet")
-        '            '
-        '            Dim PosURLStart As Integer
-        '            Dim PosURLEnd As Integer
-        '            Dim URLCommand As String
-        '            Dim Value As String
-        '            Dim Loopcnt2 As Integer
-        '            Dim Name As String
-        '            Dim NameValue As String
-        '            Dim PtrStart As Integer
-        '            Dim PtrEnd As Integer
-        '            Dim Line As String
-        '            Dim Lines() As String
-        '            Dim LineCnt As Integer
-        '            Dim LinePtr As Integer
-        '            Dim Ptr As Integer
-        '            Dim Pos As Integer
-        '            Dim PosStart As Integer
-        '            Dim PosEnd As Integer
-        '            Dim Link As String
-        '            Dim RootRelativeLink As String
-        '            Dim LoopCnt As Integer
-        '            Dim ImportedStyle As String
-        '            Dim HTTP As New httpRequestController()
-        '            Dim Output As String
-        '            '
-        '            Pos = 1
-        '            Output = StyleSheet
-        '            '
-        '            ' convert imports
-        '            '
-        '            Do While (Pos <> 0) And LoopCnt < 100
-        '                Pos = genericController.vbInstr(Pos, StyleSheet, "@import", vbTextCompare)
-        '                If Pos <> 0 Then
-        '                    '
-        '                    ' style includes an import -- convert filename and load the file
-        '                    '
-        '                    Pos = genericController.vbInstr(Pos, StyleSheet, "url", vbTextCompare)
-        '                    If Pos <> 0 Then
-        '                        PosStart = genericController.vbInstr(Pos, StyleSheet, "(", vbTextCompare)
-        '                        If PosStart <> 0 Then
-        '                            PosStart = PosStart + 1
-        '                            PosEnd = genericController.vbInstr(PosStart, StyleSheet, ")", vbTextCompare)
-        '                            If PosEnd <> 0 Then
-        '                                PosEnd = PosEnd - 1
-        '                                Link = Mid(StyleSheet, PosStart, PosEnd - PosStart + 1)
-        '                                Output = Output & vbCrLf & main_GetStyleListFromLink(Link, BasePath, SourceHost, BlockRootRelativeLinkList)
-        '                                Pos = PosStart
-        '                            End If
-        '                        End If
-        '                    End If
-        '                End If
-        '                LoopCnt = LoopCnt + 1
-        '            Loop
-        '            '
-        '            ' Done
-        '            '
-        '            main_GetStyleListFromStylesheet = Output
-        '            Exit Function
-        '            '
-        '            ' ----- Error Trap
-        '            '
-        'ErrorTrap:
-        '            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(Err.Number, Err.Source, Err.Description, "main_GetStyleListFromStylesheet", True, False)
-        '        End Function
-
-
-
-
-
-        '
-        '=================================================================================================
-        '   Run and return results from a remotequery call from cj.ajax.data(handler,key,args,pagesize,pagenumber)
-        '
-        '   This routine builds an xml object inside a <result></result> node.
-        '       Right now, the response is in JSON format, and conforms to the google data visualization spec 0.5
-        '
-        '
-        '=================================================================================================
-        '
-        Private Function executeRoute_ProcessAjaxData() As String
-            Dim result As String = ""
-            Try
-                Dim SetPairs() As String
-                Dim Pos As Integer
-                Dim FieldValue As String
-                Dim SetPairString As String
-                Dim ArgCnt As Integer
-                Dim s As New stringBuilderLegacyController
-                Dim FieldName As String
-                Dim Copy As String
-                Dim PageSize As Integer
-                Dim ArgArray() As String
-                Dim RemoteKey As String
-                Dim EncodedArgs As String
-                Dim Args As String
-                Dim PageNumber As Integer
-                Dim CS As Integer
-                Dim SQLQuery As String
-                Dim maxRows As Integer
-                Dim ArgName() As String
-                Dim ArgValue() As String
-                Dim Ptr As Integer
-                Dim QueryType As Integer
-                Dim ContentName As String = ""
-                Dim Criteria As String
-                Dim SortFieldList As String = ""
-                Dim AllowInactiveRecords2 As Boolean
-                Dim SelectFieldList As String = ""
-                Dim gd As New GoogleDataType
-                Dim gv As New GoogleVisualizationType
-                Dim RemoteFormat As RemoteFormatEnum
-                'Dim DataSource As Models.Entity.dataSourceModel
-                '
-                gv.status = GoogleVisualizationStatusEnum.OK
-                gd.IsEmpty = True
-                '
-                RemoteKey = docProperties.getText("key")
-                EncodedArgs = docProperties.getText("args")
-
-                PageSize = docProperties.getInteger("pagesize")
-                PageNumber = docProperties.getInteger("pagenumber")
-                Select Case genericController.vbLCase(docProperties.getText("responseformat"))
-                    Case "jsonnamevalue"
-                        RemoteFormat = RemoteFormatEnum.RemoteFormatJsonNameValue
-                    Case "jsonnamearray"
-                        RemoteFormat = RemoteFormatEnum.RemoteFormatJsonNameArray
-                    Case Else 'jsontable
-                        RemoteFormat = RemoteFormatEnum.RemoteFormatJsonTable
-                End Select
-                '
-                ' Handle common work
-                '
-                If PageNumber = 0 Then
-                    PageNumber = 1
-                End If
-                If PageSize = 0 Then
-                    PageSize = 100
-                End If
-                If maxRows <> 0 And PageSize > maxRows Then
-                    PageSize = maxRows
-                End If
-                '
-                If EncodedArgs <> "" Then
-                    Args = EncodedArgs
-                    ArgArray = Split(Args, "&")
-                    ArgCnt = UBound(ArgArray) + 1
-                    ReDim ArgName(ArgCnt)
-                    ReDim ArgValue(ArgCnt)
-                    For Ptr = 0 To ArgCnt - 1
-                        Pos = genericController.vbInstr(1, ArgArray(Ptr), "=")
-                        If Pos > 0 Then
-                            ArgName(Ptr) = genericController.DecodeResponseVariable(Mid(ArgArray(Ptr), 1, Pos - 1))
-                            ArgValue(Ptr) = genericController.DecodeResponseVariable(Mid(ArgArray(Ptr), Pos + 1))
-                        End If
-                    Next
-                End If
-                '
-                ' main_Get values out of the remote query record
-                '
-                If gv.status = GoogleVisualizationStatusEnum.OK Then
-                    CS = db.cs_open("Remote Queries", "((VisitId=" & authContext.visit.ID & ")and(remotekey=" & db.encodeSQLText(RemoteKey) & "))")
-                    If db.cs_ok(CS) Then
-                        '
-                        ' Use user definied query
-                        '
-                        SQLQuery = db.cs_getText(CS, "sqlquery")
-                        'DataSource = Models.Entity.dataSourceModel.create(Me, db.cs_getInteger(CS, "datasourceid"), New List(Of String))
-                        maxRows = db.cs_getInteger(CS, "maxrows")
-                        QueryType = db.cs_getInteger(CS, "QueryTypeID")
-                        ContentName = db.cs_get(CS, "ContentID")
-                        Criteria = db.cs_getText(CS, "Criteria")
-                        SortFieldList = db.cs_getText(CS, "SortFieldList")
-                        AllowInactiveRecords2 = db.cs_getBoolean(CS, "AllowInactiveRecords")
-                        SelectFieldList = db.cs_getText(CS, "SelectFieldList")
-                        SetPairString = ""
-                    Else
-                        '
-                        ' Try Hardcoded queries
-                        '
-                        Select Case genericController.vbLCase(RemoteKey)
-                            Case "ccfieldhelpupdate"
-                                '
-                                ' developers editing field help
-                                '
-                                If Not authContext.user.Developer Then
-                                    gv.status = GoogleVisualizationStatusEnum.ErrorStatus
-                                    If IsArray(gv.errors) Then
-                                        Ptr = 0
-                                    Else
-                                        Ptr = UBound(gv.errors) + 1
-                                    End If
-                                    ReDim gv.errors(Ptr)
-                                    gv.errors(Ptr) = "permission error"
-                                Else
-                                    QueryType = QueryTypeUpdateContent
-                                    ContentName = "Content Field Help"
-                                    Criteria = ""
-                                    AllowInactiveRecords2 = False
-                                End If
-                                'Case Else
-                                '    '
-                                '    ' query not found
-                                '    '
-                                '    gv.status = GoogleVisualizationStatusEnum.ErrorStatus
-                                '    If IsArray(gv.errors) Then
-                                '        Ptr = 0
-                                '    Else
-                                '        Ptr = UBound(gv.errors) + 1
-                                '    End If
-                                '    ReDim gv.errors(Ptr)
-                                '    gv.errors(Ptr) = "query not found"
-                        End Select
-                    End If
-                    Call db.cs_Close(CS)
-                    '
-                    If gv.status = GoogleVisualizationStatusEnum.OK Then
-                        Select Case QueryType
-                        'Case QueryTypeSQL
-                        '    '
-                        '    ' ----- Run a SQL
-                        '    '
-                        '    If SQLQuery <> "" Then
-                        '        For Ptr = 0 To ArgCnt - 1
-                        '            SQLQuery = genericController.vbReplace(SQLQuery, ArgName(Ptr), ArgValue(Ptr), vbTextCompare)
-                        '            'Criteria = genericController.vbReplace(Criteria, ArgName(Ptr), ArgValue(Ptr), vbTextCompare)
-                        '        Next
-                        '        On Error Resume Next
-                        '        RS = main_ExecuteSQLCommand(DataSource, SQLQuery, 30, PageSize, PageNumber)
-                        '        ErrorNumber = Err.Number
-                        '        ErrorDescription = Err.Description
-                        '        Err.Clear()
-                        '        On Error GoTo ErrorTrap
-                        '        If ErrorNumber <> 0 Then
-                        '            '
-                        '            ' ----- Error
-                        '            '
-                        '            gv.status = GoogleVisualizationStatusEnum.ErrorStatus
-                        '            Ptr = UBound(gv.errors) + 1
-                        '            ReDim gv.errors(Ptr)
-                        '            gv.errors(Ptr) = "Error: " & Err.Description
-                        '        ElseIf (Not isDataTableOk(rs)) Then
-                        '            '
-                        '            ' ----- no result
-                        '            '
-                        '        ElseIf (RS.State <> 1) Then
-                        '            '
-                        '            ' ----- no result
-                        '            '
-                        '        ElseIf (rs.rows.count = 0) Then
-                        '            '
-                        '            ' ----- no result
-                        '            '
-                        '        Else
-                        '            PageSize = RS.PageSize
-                        '            Cells = RS.GetRows(PageSize)
-                        '            '
-                        '            gd.IsEmpty = False
-                        '            RowMax = UBound(Cells, 2)
-                        '            ColMax = UBound(Cells, 1)
-                        '            '
-                        '            ' Build headers
-                        '            '
-                        '            ReDim gd.col(ColMax)
-                        '            For ColPtr = 0 To ColMax
-                        '                RecordField = RS.Fields.Item(ColPtr)
-                        '                gd.col(ColPtr).Id = RecordField.Name
-                        '                gd.col(ColPtr).Label = RecordField.Name
-                        '                gd.col(ColPtr).Type = ConvertRSTypeToGoogleType(RecordField.Type)
-                        '            Next
-                        '            'RS.Close()
-                        '            'RS = Nothing
-                        '            '
-                        '            ' Build output table
-                        '            '
-                        '            ReDim gd.row(RowMax)
-                        '            For RowPtr = 0 To RowMax
-                        '                With gd.row(RowPtr)
-                        '                    ReDim .Cell(ColMax)
-                        '                    For ColPtr = 0 To ColMax
-                        '                        .Cell(ColPtr).v = genericController.encodeText(Cells(ColPtr, RowPtr))
-                        '                    Next
-                        '                End With
-                        '            Next
-                        '        End If
-                        '        If (isDataTableOk(rs)) Then
-                        '            If False Then
-                        '                'RS.Close()
-                        '            End If
-                        '            'RS = Nothing
-                        '        End If
-                        '    End If
-                        'Case QueryTypeOpenContent
-                        '    '
-                        '    ' Contensive Content Select, args are criteria replacements
-                        '    '
-
-                        '    CDef = app.getCdef(ContentName)
-                        '    CS = app.csOpen(ContentName, Criteria, SortFieldList, AllowInactiveRecords, , , SelectFieldList)
-                        '    Cells = app.csv_cs_getRows(CS)
-                        '    FieldList = app.cs_getSelectFieldList(CS)
-                        '    '
-                        '    RowMax = UBound(Cells, 2)
-                        '    ColMax = UBound(Cells, 1)
-                        '    If RowMax = 0 And ColMax = 0 Then
-                        '        '
-                        '        ' Single result, display with no table
-                        '        '
-                        '        Copy = genericController.encodeText(Cells(0, 0))
-                        '    Else
-                        '        '
-                        '        ' Build headers
-                        '        '
-                        '        gd.IsEmpty = False
-                        '        RowMax = UBound(Cells, 2)
-                        '        ColMax = UBound(Cells, 1)
-                        '        '
-                        '        ' Build headers
-                        '        '
-                        '        ReDim gd.col(ColMax)
-                        '        For ColPtr = 0 To ColMax
-                        '            RecordField = RS.Fields.Item(RowPtr)
-                        '            gd.col(ColPtr).Id = RecordField.Name
-                        '            gd.col(ColPtr).Label = RecordField.Name
-                        '            gd.col(ColPtr).Type = ConvertRSTypeToGoogleType(RecordField.Type)
-                        '        Next
-                        '        '
-                        '        ' Build output table
-                        '        '
-                        '        'RowStart = vbCrLf & "<Row>"
-                        '        'Rowend = "</Row>"
-                        '        For RowPtr = 0 To RowMax
-                        '            With gd.row(RowPtr)
-                        '                For ColPtr = 0 To ColMax
-                        '                    .Cell(ColPtr).v = Cells(ColPtr, RowPtr)
-                        '                Next
-                        '            End With
-                        '        Next
-                        '    End If
-                            Case QueryTypeUpdateContent
-                                '
-                                ' Contensive Content Update, args are field=value updates
-                                ' !!!! only allow inbound hits with a referrer from this site - later use the aggregate access table
-                                '
-                                '
-                                ' Go though args and main_Get Set and Criteria
-                                '
-                                SetPairString = ""
-                                Criteria = ""
-                                For Ptr = 0 To ArgCnt - 1
-                                    If genericController.vbLCase(ArgName(Ptr)) = "setpairs" Then
-                                        SetPairString = ArgValue(Ptr)
-                                    ElseIf genericController.vbLCase(ArgName(Ptr)) = "criteria" Then
-                                        Criteria = ArgValue(Ptr)
-                                    End If
-                                Next
-                                '
-                                ' Open the content and cycle through each setPair
-                                '
-                                CS = db.cs_open(ContentName, Criteria, SortFieldList, AllowInactiveRecords2, , ,, SelectFieldList)
-                                If db.cs_ok(CS) Then
-                                    '
-                                    ' update by looping through the args and setting name=values
-                                    '
-                                    SetPairs = Split(SetPairString, "&")
-                                    For Ptr = 0 To UBound(SetPairs)
-                                        If SetPairs(Ptr) <> "" Then
-                                            Pos = genericController.vbInstr(1, SetPairs(Ptr), "=")
-                                            If Pos > 0 Then
-                                                FieldValue = genericController.DecodeResponseVariable(Mid(SetPairs(Ptr), Pos + 1))
-                                                FieldName = genericController.DecodeResponseVariable(Mid(SetPairs(Ptr), 1, Pos - 1))
-                                                If Not main_IsContentFieldSupported(ContentName, FieldName) Then
-                                                    Dim errorMessage As String = "result, QueryTypeUpdateContent, key [" & RemoteKey & "], bad field [" & FieldName & "] skipped"
-                                                    Throw (New ApplicationException(errorMessage))
-                                                Else
-                                                    Call db.cs_set(CS, FieldName, FieldValue)
-                                                End If
-                                            End If
-                                        End If
-                                    Next
-                                End If
-                                Call db.cs_Close(CS)
-                                'Case QueryTypeInsertContent
-                                '    '
-                                '    ' !!!! only allow inbound hits with a referrer from this site - later use the aggregate access table
-                                '    '
-                                '    '
-                                '    ' Contensive Content Insert, args are field=value
-                                '    '
-                                '    'CS = main_InsertCSContent(ContentName)
-                            Case Else
-                        End Select
-                        '
-                        ' output
-                        '
-                        Copy = remoteQueryController.main_FormatRemoteQueryOutput(Me, gd, RemoteFormat)
-                        Copy = htmlDoc.html_EncodeHTML(Copy)
-                        result = "<data>" & Copy & "</data>"
-                    End If
-                End If
-            Catch ex As Exception
-                Throw (ex)
-            End Try
-            Return result
-        End Function
-
-
-
-
-        '
-        '
-        '
-        '=========================================================================================
-        '   In Init(), Print Hard Coded Pages
-        '       A Hard coded page replaces the entire output with an HTML compatible page
-        '=========================================================================================
-        '
-        Private Function executeRoute_hardCodedPage(ByVal HardCodedPage As String) As Boolean
-            Dim result As Boolean = False
-            Try
-                Dim allowPageWithoutSectionDisplay As Boolean
-                Dim InsertTestOK As Boolean
-                Dim ConfirmOrderID As Integer
-                Dim PageSize As Integer
-                Dim PageNumber As Integer
-                Dim ContentName As String
-                Dim MsgLabel As String
-                Dim PageID As Integer
-                Dim rootPageId As Integer
-                Dim Pos As Integer
-                Dim TrapID As Integer
-                Dim CS As Integer
-                Dim Name As String
-                Dim Copy As String
-                Dim Recipient As String
-                Dim Sender As String
-                Dim subject As String
-                Dim Message As String
-                Dim Emailtext As String
-                Dim LinkObjectName As String
-                Dim EditorObjectName As String
-                '
-                Select Case genericController.vbLCase(HardCodedPage)
-                    Case HardCodedPageSendPassword
-                        '
-                        ' send password to the email address in the querystring
-                        '
-                        Emailtext = docProperties.getText("email")
-                        If Emailtext <> "" Then
-                            Call email.sendPassword(Emailtext)
-                            Copy = "" _
-                            & "<div style=""width:300px;margin:100px auto 0 auto;"">" _
-                            & "<p>An attempt to send login information for email address '" & Emailtext & "' has been made.</p>" _
-                            & "<p><a href=""?" & htmlDoc.refreshQueryString & """>Return to the Site.</a></p>" _
-                            & "</div>"
-                            Call htmlDoc.writeAltBuffer(Copy)
-                            result = True
-                        Else
-                            result = False
-                        End If
-                'Case HardCodedPagePrinterVersion
-                '    '
-                '    ' ----- Page Content Printer main_version
-                '    '
-                '    Call htmlDoc.webServerIO_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPagePrinterVersion)
-                '    htmlDoc.pageManager_printVersion = True
-                '    autoPrintText = docProperties.getText("AutoPrint")
-                '    '
-                '    If ContentName = "" Then
-                '        ContentName = "Page Content"
-                '    End If
-                '    If autoPrintText = "" Then
-                '        autoPrintText = siteProperties.getText("AllowAutoPrintDialog", "1")
-                '    End If
-                '    If RootPageName = "" Then
-                '        blockSiteWithLogin = False
-                '        PageCopy = pages.pageManager_GetHtmlBody_GetSection(AllowChildPage, False, False, blockSiteWithLogin)
-                '        'PageCopy = main_GetSectionPage(AllowChildPage, False)
-                '    Else
-                '        OrderByClause = docProperties.getText(RequestNameOrderByClause)
-                '        PageID = docProperties.getInteger("bid")
-                '        '
-                '        ' 5/12/2008 - converted to RootPageID call because we do not use RootPageName anymore
-                '        '
-                '        allowPageWithoutSectionDisplay = siteProperties.getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default)
-                '        If Not allowPageWithoutSectionDisplay Then
-                '            allowPageWithoutSectionDisplay = authContext.isAuthenticatedContentManager(Me, ContentName)
-                '        End If
-                '        PageCopy = pages.pageManager_GetHtmlBody_GetSection_GetContent(PageID, rootPageId, ContentName, OrderByClause, False, False, False, 0, siteProperties.useContentWatchLink, allowPageWithoutSectionDisplay)
-                '        If pages.redirectLink <> "" Then
-                '            Call webServer.webServerIO_Redirect2(pages.redirectLink, pages.pageManager_RedirectReason, False)
-                '        End If
-                '        'PageCopy = main_GetContentPage(RootPageName, ContentName, OrderByClause, AllowChildPage, False, PageID)
-                '    End If
-                '    '
-                '    If genericController.EncodeBoolean(autoPrintText) Then
-                '        Call htmlDoc.main_AddOnLoadJavascript2("window.print(); window.close()", "Print Page")
-                '    End If
-                '    BodyOpen = "<body class=""ccBodyPrint"">"
-
-                '    'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage")
-                '    Call htmlDoc.writeAltBuffer("" _
-                '        & main_docType _
-                '        & vbCrLf & "<html>" _
-                '        & cr & "<head>" & main_GetHTMLHead() _
-                '        & cr & "</head>" _
-                '        & vbCrLf & BodyOpen _
-                '        & cr & "<div align=""left"">" _
-                '        & cr2 & "<table border=""0"" cellpadding=""20"" cellspacing=""0"" width=""100%""><tr><td width=""100%"">" _
-                '        & cr3 & "<p>" _
-                '        & genericController.kmaIndent(PageCopy) _
-                '        & cr3 & "</p>" _
-                '        & cr2 & "</td></tr></table>" _
-                '        & cr & "</div>" _
-                '        & genericController.kmaIndent(htmlDoc.html_GetEndOfBody(False, False, False, False)) _
-                '        & cr & "</body>" _
-                '        & vbCrLf & "</html>" _
-                '        & "")
-
-                '    result = True
-                ''Case HardCodedPageMyProfile
-                ''    '
-                ''    ' Print a User Profile page with the current member
-                ''    '
-                ''    Call web_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageMyProfile)
-                ''    Call writeAltBuffer(main_GetMyProfilePage())
-                ''    result = True
-                    Case HardCodedPageResourceLibrary
-                        '
-                        ' main_Get FormIndex (the index to the InsertImage# function called on selection)
-                        '
-                        Call htmlDoc.webServerIO_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageResourceLibrary)
-                        EditorObjectName = docProperties.getText("EditorObjectName")
-                        LinkObjectName = docProperties.getText("LinkObjectName")
-                        If EditorObjectName <> "" Then
-                            '
-                            ' Open a page compatible with a dialog
-                            '
-                            Call htmlDoc.webServerIO_addRefreshQueryString("EditorObjectName", EditorObjectName)
-                            Call htmlDoc.main_AddHeadScriptLink("/ccLib/ClientSide/dialogs.js", "Resource Library")
-                            'Call AddHeadScript("<script type=""text/javascript"" src=""/ccLib/ClientSide/dialogs.js""></script>")
-                            Call main_SetMetaContent(0, 0)
-                            Call htmlDoc.main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Resource Library")
-                            Copy = main_GetResourceLibrary2("", True, EditorObjectName, LinkObjectName, True)
-                            'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2b")
-                            Copy = "" _
-                            & siteProperties.docTypeDeclaration() _
-                            & "<html>" _
-                            & cr & "<head>" _
-                            & genericController.kmaIndent(main_GetHTMLHead()) _
-                            & cr & "</head>" _
-                            & cr & "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">" _
-                            & genericController.kmaIndent(main_GetPanelHeader("Contensive Resource Library")) _
-                            & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td>" _
-                            & cr2 & "<div style=""border-top:1px solid white;border-bottom:1px solid black;height:2px""><img alt=""spacer"" src=""/ccLib/images/spacer.gif"" width=1 height=1></div>" _
-                            & genericController.kmaIndent(Copy) _
-                            & cr & "</td></tr>" _
-                            & cr & "<tr><td>" _
-                            & genericController.kmaIndent(htmlDoc.html_GetEndOfBody(False, False, False, False)) _
-                            & cr & "</td></tr></table>" _
-                            & cr & "<script language=javascript type=""text/javascript"">fixDialog();</script>" _
-                            & cr & "</body>" _
-                            & "</html>"
-                            Call htmlDoc.writeAltBuffer(Copy)
-                            result = True
-                            'Call main_GetEndOfBody(False, False)
-                            ''--- should be disposed by caller --- Call dispose
-                            'Call main_CloseStream
-                            'true = False
-                            'Set main_cmc = Nothing
-                            'Exit Sub
-                            'Call main_CloseStream
-                        ElseIf LinkObjectName <> "" Then
-                            '
-                            ' Open a page compatible with a dialog
-                            '
-                            Call htmlDoc.webServerIO_addRefreshQueryString("LinkObjectName", LinkObjectName)
-                            Call htmlDoc.main_AddHeadScriptLink("/ccLib/ClientSide/dialogs.js", "Resource Library")
-                            'Call AddHeadScript("<script type=""text/javascript"" src=""/ccLib/ClientSide/dialogs.js""></script>")
-                            Call main_SetMetaContent(0, 0)
-                            Call htmlDoc.main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Resource Library")
-                            Copy = main_GetResourceLibrary2("", True, EditorObjectName, LinkObjectName, True)
-                            'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2c")
-                            Copy = "" _
-                            & siteProperties.docTypeDeclaration() _
-                            & cr & "<html>" _
-                            & cr & "<head>" _
-                            & genericController.kmaIndent(main_GetHTMLHead()) _
-                            & cr & "</head>" _
-                            & cr & "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">" _
-                            & main_GetPanelHeader("Contensive Resource Library") _
-                            & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td>" _
-                            & Copy _
-                            & cr & "</td></tr><tr><td>" & htmlDoc.html_GetEndOfBody(False, False, False, False) & "</td></tr></table>" _
-                            & cr & "<script language=javascript type=text/javascript>fixDialog();</script>" _
-                            & cr & "</body>" _
-                            & vbCrLf & "</html>"
-                            Call htmlDoc.writeAltBuffer(Copy)
-                            result = True
-                        End If
-                    Case HardCodedPageLoginDefault
-                        '
-                        ' 9/4/2012 added to prevent lockout if login addon fails
-                        htmlDoc.refreshQueryString = webServer.requestQueryString
-                        'Call main_AddRefreshQueryString("method", "")
-                        Call htmlDoc.writeAltBuffer(htmlDoc.getLoginPage(True))
-                        result = True
-                    Case HardCodedPageLogin, HardCodedPageLogoutLogin
-                        '
-                        ' 7/8/9 - Moved from intercept pages
-                        '
-                        ' Print the Login form as an intercept page
-                        ' Special case - set the current URL to the Refresh Query String
-                        ' Because you want the form created to save the refresh values
-                        '
-                        If genericController.vbUCase(HardCodedPage) = "LOGOUTLOGIN" Then
-                            Call authContext.logout(Me)
-                        End If
-                        htmlDoc.refreshQueryString = webServer.requestQueryString
-                        'Call main_AddRefreshQueryString("method", "")
-                        Call htmlDoc.writeAltBuffer(htmlDoc.getLoginPage(False))
-                        'Call writeAltBuffer(main_GetLoginPage2(false) & main_GetEndOfBody(False, False, False))
-                        result = True
-                    Case HardCodedPageLogout
-                        '
-                        ' ----- logout the current member
-                        '
-                        Call authContext.logout(Me)
-                        result = False
-                    Case HardCodedPageSiteExplorer
-                        '
-                        ' 7/8/9 - Moved from intercept pages
-                        '
-                        Call htmlDoc.webServerIO_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageSiteExplorer)
-                        LinkObjectName = docProperties.getText("LinkObjectName")
-                        If LinkObjectName <> "" Then
-                            '
-                            ' Open a page compatible with a dialog
-                            '
-                            Call htmlDoc.webServerIO_addRefreshQueryString("LinkObjectName", LinkObjectName)
-                            Call htmlDoc.main_AddPagetitle("Site Explorer")
-                            Call main_SetMetaContent(0, 0)
-                            Copy = addon.execute_legacy5(0, "Site Explorer", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", 0)
-                            Call htmlDoc.main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Site Explorer")
-                            'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2d")
-                            Copy = "" _
-                            & siteProperties.docTypeDeclaration() _
-                            & cr & "<html>" _
-                            & cr & "<head>" _
-                            & genericController.kmaIndent(main_GetHTMLHead()) _
-                            & cr & "</head>" _
-                            & cr & "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">" _
-                            & genericController.kmaIndent(main_GetPanelHeader("Contensive Site Explorer")) _
-                            & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td>" _
-                            & genericController.kmaIndent(Copy) _
-                            & cr & "</td></tr><tr><td>" & htmlDoc.html_GetEndOfBody(False, False, False, False) & "</td></tr></table>" _
-                            & cr & "</body>" _
-                            & cr & "</html>"
-                            'Set Obj = Nothing
-                            Call htmlDoc.writeAltBuffer(Copy)
-                            result = True
-                        End If
-                    Case HardCodedPageStatus
-                        '
-                        ' Status call
-                        '
-                        webServer.webServerIO_BlockClosePageCopyright = True
-                        '
-                        ' test default data connection
-                        '
-                        InsertTestOK = False
-                        CS = db.cs_insertRecord("Trap Log")
-                        If Not db.cs_ok(CS) Then
-                            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was not OK.", "Init", False, True)
-                        Else
-                            InsertTestOK = True
-                            TrapID = db.cs_getInteger(CS, "ID")
-                        End If
-                        Call db.cs_Close(CS)
-                        If InsertTestOK Then
-                            If TrapID = 0 Then
-                                Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was OK, but ID=0.", "Init", False, True)
-                            Else
-                                Call DeleteContentRecord("Trap Log", TrapID)
-                            End If
-                        End If
-                        If Err.Number <> 0 Then
-                            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError10(ignoreInteger, "dll", "Error during Status. After traplog insert, " & genericController.GetErrString(Err), "Init", False, True)
-                            Err.Clear()
-                        End If
-                        '
-                        ' Close page
-                        '
-                        Call main_ClearStream()
-                        If app_errorCount = 0 Then
-                            Call htmlDoc.writeAltBuffer("Contensive OK")
-                        Else
-                            Call htmlDoc.writeAltBuffer("Contensive Error Count = " & app_errorCount)
-                        End If
-                        webServer.webServerIO_BlockClosePageCopyright = True
-                        html_BlockClosePageLink = True
-                        'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2f")
-                        Call htmlDoc.html_GetEndOfBody(False, False, False, False)
-                        result = True
-                    Case HardCodedPageGetJSPage
-                        '
-                        ' ----- Create a Javascript page that outputs a page content record
-                        '
-                        Name = docProperties.getText("name")
-                        If Name <> "" Then
-                            webServer.webServerIO_BlockClosePageCopyright = True
-                            '
-                            ' Determine bid (PageID) from referer querystring
-                            '
-                            Copy = webServer.requestReferrer
-                            Pos = genericController.vbInstr(1, Copy, "bid=")
-                            If Pos <> 0 Then
-                                Copy = Trim(Mid(Copy, Pos + 4))
-                                Pos = genericController.vbInstr(1, Copy, "&")
-                                If Pos <> 0 Then
-                                    Copy = Trim(Mid(Copy, 1, Pos))
-                                End If
-                                PageID = genericController.EncodeInteger(Copy)
-                            End If
-                            '
-                            ' main_Get the page
-                            '
-                            rootPageId = main_GetRecordID("Page Content", Name)
-                            allowPageWithoutSectionDisplay = siteProperties.getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default)
-                            If Not allowPageWithoutSectionDisplay Then
-                                allowPageWithoutSectionDisplay = authContext.isAuthenticatedContentManager(Me, ContentName)
-                            End If
-                            Copy = pages.getContentBox(PageID, rootPageId, "Page Content", "", True, True, False, 0, siteProperties.useContentWatchLink, allowPageWithoutSectionDisplay)
-                            'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2g")
-                            Copy = Copy & htmlDoc.html_GetEndOfBody(False, True, False, False)
-                            Copy = genericController.vbReplace(Copy, "'", "'+""'""+'")
-                            Copy = genericController.vbReplace(Copy, vbCr, "\n")
-                            Copy = genericController.vbReplace(Copy, vbLf, " ")
-                            '
-                            ' Write the page to the stream, with a javascript wrapper
-                            '
-                            MsgLabel = "Msg" & genericController.encodeText(genericController.GetRandomInteger)
-                            Call webServer.setResponseContentType("text/plain")
-                            Call htmlDoc.writeAltBuffer("var " & MsgLabel & " = '" & Copy & "'; " & vbCrLf)
-                            Call htmlDoc.writeAltBuffer("document.write( " & MsgLabel & " ); " & vbCrLf)
-                        End If
-                        result = True
-                    Case HardCodedPageGetJSLogin
-                        '
-                        ' ----- Create a Javascript login page
-                        '
-                        webServer.webServerIO_BlockClosePageCopyright = True
-                        Copy = Copy & "<p align=""center""><CENTER>"
-                        If Not authContext.isAuthenticated() Then
-                            Copy = Copy & htmlDoc.getLoginPanel()
-                        ElseIf authContext.isAuthenticatedContentManager(Me, "Page Content") Then
-                            'Copy = Copy & main_GetToolsPanel
-                        Else
-                            Copy = Copy & "You are currently logged in as " & authContext.user.Name & ". To logout, click <a HREF=""" & webServer.webServerIO_ServerFormActionURL & "?Method=logout"" rel=""nofollow"">Here</A>."
-                        End If
-                        'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2h")
-                        Copy = Copy & htmlDoc.html_GetEndOfBody(True, True, False, False)
-                        Copy = Copy & "</CENTER></p>"
-                        Copy = genericController.vbReplace(Copy, "'", "'+""'""+'")
-                        Copy = genericController.vbReplace(Copy, vbCr, "")
-                        Copy = genericController.vbReplace(Copy, vbLf, "")
-                        'Copy = "<b>login Page</b>"
-                        '
-                        ' Write the page to the stream, with a javascript wrapper
-                        '
-                        MsgLabel = "Msg" & genericController.encodeText(genericController.GetRandomInteger)
-                        Call webServer.setResponseContentType("text/plain")
-                        Call htmlDoc.writeAltBuffer("var " & MsgLabel & " = '" & Copy & "'; " & vbCrLf)
-                        Call htmlDoc.writeAltBuffer("document.write( " & MsgLabel & " ); " & vbCrLf)
-                        result = True
-                    Case HardCodedPageRedirect
-                        '
-                        ' ----- Redirect with RC and RI
-                        '
-                        htmlDoc.pageManager_RedirectContentID = docProperties.getInteger(rnRedirectContentId)
-                        htmlDoc.pageManager_RedirectRecordID = docProperties.getInteger(rnRedirectRecordId)
-                        If htmlDoc.pageManager_RedirectContentID <> 0 And htmlDoc.pageManager_RedirectRecordID <> 0 Then
-                            ContentName = metaData.getContentNameByID(htmlDoc.pageManager_RedirectContentID)
-                            If ContentName <> "" Then
-                                Call main_RedirectByRecord_ReturnStatus(ContentName, htmlDoc.pageManager_RedirectRecordID)
-                            End If
-                        End If
-                        webServer.webServerIO_BlockClosePageCopyright = True
-                        html_BlockClosePageLink = True
-                        result = False '--- should be disposed by caller --- Call dispose
-                        result = True
-                    Case HardCodedPageExportAscii
-                        '
-                        '----------------------------------------------------
-                        '   Should be a remote method in commerce
-                        '----------------------------------------------------
-                        '
-                        If Not authContext.isAuthenticatedAdmin(Me) Then
-                            '
-                            ' Administrator required
-                            '
-                            Call htmlDoc.writeAltBuffer("Error: You must be an administrator to use the ExportAscii method")
-                        Else
-                            webServer.webServerIO_BlockClosePageCopyright = True
-                            ContentName = docProperties.getText("content")
-                            PageSize = docProperties.getInteger("PageSize")
-                            If PageSize = 0 Then
-                                PageSize = 20
-                            End If
-                            PageNumber = docProperties.getInteger("PageNumber")
-                            If PageNumber = 0 Then
-                                PageNumber = 1
-                            End If
-                            If (ContentName = "") Then
-                                Call htmlDoc.writeAltBuffer("Error: ExportAscii method requires ContentName")
-                            Else
-                                Call htmlDoc.writeAltBuffer(Controllers.exportAsciiController.exportAscii_GetAsciiExport(Me, ContentName, PageSize, PageNumber))
-                            End If
-                        End If
-                        result = True
-                        webServer.webServerIO_BlockClosePageCopyright = True
-                        html_BlockClosePageLink = True
-                        result = False '--- should be disposed by caller --- Call dispose
-                        result = True
-                    Case HardCodedPagePayPalConfirm
-                        '
-                        '
-                        '----------------------------------------------------
-                        '   Should be a remote method in commerce
-                        '----------------------------------------------------
-                        '
-                        '
-                        ConfirmOrderID = docProperties.getInteger("item_name")
-                        If ConfirmOrderID <> 0 Then
-                            '
-                            ' Confirm the order
-                            '
-                            CS = db.cs_open("Orders", "(ID=" & ConfirmOrderID & ") and ((OrderCompleted=0)or(OrderCompleted is Null))")
-                            If db.cs_ok(CS) Then
-                                Call db.cs_set(CS, "OrderCompleted", True)
-                                Call db.cs_set(CS, "DateCompleted", app_startTime)
-                                Call db.cs_set(CS, "ccAuthCode", docProperties.getText("txn_id"))
-                                Call db.cs_set(CS, "ccActionCode", docProperties.getText("payment_status"))
-                                Call db.cs_set(CS, "ccRefCode", docProperties.getText("pending_reason"))
-                                Call db.cs_set(CS, "PayMethod", "PayPal " & docProperties.getText("payment_type"))
-                                Call db.cs_set(CS, "ShipName", docProperties.getText("first_name") & " " & docProperties.getText("last_name"))
-                                Call db.cs_set(CS, "ShipAddress", docProperties.getText("address_street"))
-                                Call db.cs_set(CS, "ShipCity", docProperties.getText("address_city"))
-                                Call db.cs_set(CS, "ShipState", docProperties.getText("address_state"))
-                                Call db.cs_set(CS, "ShipZip", docProperties.getText("address_zip"))
-                                Call db.cs_set(CS, "BilleMail", docProperties.getText("payer_email"))
-                                Call db.cs_set(CS, "ContentControlID", metaData.getContentId("Orders Completed"))
-                                Call db.cs_save2(CS)
-                            End If
-                            Call db.cs_Close(CS)
-                            '
-                            ' Empty the cart
-                            '
-                            CS = db.cs_open("Visitors", "OrderID=" & ConfirmOrderID)
-                            If db.cs_ok(CS) Then
-                                Call db.cs_set(CS, "OrderID", 0)
-                                Call db.cs_save2(CS)
-                            End If
-                            Call db.cs_Close(CS)
-                            '
-                            ' TEmp fix until HardCodedPage is complete
-                            '
-                            Recipient = siteProperties.getText("EmailOrderNotifyAddress", siteProperties.emailAdmin)
-                            If genericController.vbInstr(genericController.encodeText(Recipient), "@") = 0 Then
-                                Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError12("Init", "PayPal confirmation Order Process Notification email was not sent because EmailOrderNotifyAddress SiteProperty is not valid")
-                            Else
-                                Sender = siteProperties.getText("EmailOrderFromAddress")
-                                subject = webServer.webServerIO_requestDomain & " Online Order Pending, #" & ConfirmOrderID
-                                Message = "<p>An order confirmation has been recieved from PayPal for " & webServer.webServerIO_requestDomain & "</p>"
-                                Call email.send_Legacy(Recipient, Sender, subject, Message, , False, True)
-                            End If
-                        End If
-                        webServer.webServerIO_BlockClosePageCopyright = True
-                        html_BlockClosePageLink = True
-                        result = False '--- should be disposed by caller --- Call dispose
-                        result = True
-                End Select
-            Catch ex As Exception
-                handleExceptionAndContinue(ex)
-            End Try
-            Return result
-        End Function
-        '
-        '
-        '
-        Public Function main_GetDefaultAddonOption_String(ByVal ArgumentList As String, ByVal AddonGuid As String, ByVal IsInline As Boolean) As String
-            'public Function main_GetDefaultAddonOption_String(ArgumentList As String, AddonGuid As String, IsInline As Boolean, cmc As cpCoreClass) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("main_GetDefaultAddonOption_String")
-            '
-            Dim AddonName As String
-            Dim LastAddonName As String
-            Dim NameValuePair As String
-            Dim Pos As Integer
-            Dim OptionName As String
-            Dim OptionValue As String
-            Dim OptionSelector As String
-            Dim QuerySplit() As String
-            Dim NameValue As String
-            Dim Ptr As Integer
-            '
-            ArgumentList = genericController.vbReplace(ArgumentList, vbCrLf, vbCr)
-            ArgumentList = genericController.vbReplace(ArgumentList, vbLf, vbCr)
-            ArgumentList = genericController.vbReplace(ArgumentList, vbCr, vbCrLf)
-            If (InStr(1, ArgumentList, "wrapper", vbTextCompare) = 0) Then
-                '
-                ' Add in default constructors, like wrapper
-                '
-                If ArgumentList <> "" Then
-                    ArgumentList = ArgumentList & vbCrLf
-                End If
-                If genericController.vbLCase(AddonGuid) = genericController.vbLCase(ContentBoxGuid) Then
-                    ArgumentList = ArgumentList & AddonOptionConstructor_BlockNoAjax
-                ElseIf IsInline Then
-                    ArgumentList = ArgumentList & AddonOptionConstructor_Inline
-                Else
-                    ArgumentList = ArgumentList & AddonOptionConstructor_Block
-                End If
-            End If
-            If ArgumentList <> "" Then
-                '
-                ' Argument list is present, translate from AddonConstructor to AddonOption format (see main_executeAddon for details)
-                '
-                QuerySplit = genericController.SplitCRLF(ArgumentList)
-                main_GetDefaultAddonOption_String = ""
-                For Ptr = 0 To UBound(QuerySplit)
-                    NameValue = QuerySplit(Ptr)
-                    If NameValue <> "" Then
-                        '
-                        ' Execute list functions
-                        '
-                        OptionName = ""
-                        OptionValue = ""
-                        OptionSelector = ""
-                        '
-                        ' split on equal
-                        '
-                        NameValue = genericController.vbReplace(NameValue, "\=", vbCrLf)
-                        Pos = genericController.vbInstr(1, NameValue, "=")
-                        If Pos = 0 Then
-                            OptionName = NameValue
-                        Else
-                            OptionName = Mid(NameValue, 1, Pos - 1)
-                            OptionValue = Mid(NameValue, Pos + 1)
-                        End If
-                        OptionName = genericController.vbReplace(OptionName, vbCrLf, "\=")
-                        OptionValue = genericController.vbReplace(OptionValue, vbCrLf, "\=")
-                        '
-                        ' split optionvalue on [
-                        '
-                        OptionValue = genericController.vbReplace(OptionValue, "\[", vbCrLf)
-                        Pos = genericController.vbInstr(1, OptionValue, "[")
-                        If Pos <> 0 Then
-                            OptionSelector = Mid(OptionValue, Pos)
-                            OptionValue = Mid(OptionValue, 1, Pos - 1)
-                        End If
-                        OptionValue = genericController.vbReplace(OptionValue, vbCrLf, "\[")
-                        OptionSelector = genericController.vbReplace(OptionSelector, vbCrLf, "\[")
-                        '
-                        ' Decode AddonConstructor format
-                        '
-                        OptionName = genericController.DecodeAddonConstructorArgument(OptionName)
-                        OptionValue = genericController.DecodeAddonConstructorArgument(OptionValue)
-                        '
-                        ' Encode AddonOption format
-                        '
-                        'main_GetAddonSelector expects value to be encoded, but not name
-                        'OptionName = encodeNvaArgument(OptionName)
-                        OptionValue = genericController.encodeNvaArgument(OptionValue)
-                        '
-                        ' rejoin
-                        '
-                        NameValuePair = htmlDoc.pageManager_GetAddonSelector(OptionName, OptionValue, OptionSelector)
-                        NameValuePair = genericController.EncodeJavascript(NameValuePair)
-                        main_GetDefaultAddonOption_String = main_GetDefaultAddonOption_String & "&" & NameValuePair
-                        If genericController.vbInstr(1, NameValuePair, "=") = 0 Then
-                            main_GetDefaultAddonOption_String = main_GetDefaultAddonOption_String & "="
-                        End If
-                    End If
-                Next
-                If main_GetDefaultAddonOption_String <> "" Then
-                    ' remove leading "&"
-                    main_GetDefaultAddonOption_String = Mid(main_GetDefaultAddonOption_String, 2)
-                End If
-            End If
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError11("main_GetDefaultAddonOption_String", "trap")
-        End Function
-        '
-        '========================================================================
-        ' main_Get FieldEditorList
-        '
-        '   FieldEditorList is a comma delmited list of addonids, one for each fieldtype
-        '   to use it, split the list on comma and use the fieldtype as index
-        '========================================================================
-        '
-        Public Function getFieldTypeDefaultEditorAddonIdList() As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("main_GetDefaultAddonOption_String")
-            '
-            Dim editorAddonIds() As String
-            Dim SQL As String
-            Dim RS As DataTable
-            Dim fieldTypeID As Integer
-            '
-            If Not htmlDoc.html_Private_FieldEditorList_Loaded Then
-                '
-                ' load default editors into editors() - these are the editors used when there is no editorPreference
-                '   editors(fieldtypeid) = addonid
-                '
-                ReDim editorAddonIds(FieldTypeIdMax)
-                SQL = "select t.id,t.editorAddonId" _
-                    & " from ccFieldTypes t" _
-                    & " left join ccaggregatefunctions a on a.id=t.editorAddonId" _
-                    & " where (t.active<>0)and(a.active<>0) order by t.id"
-                RS = db.executeSql(SQL)
-                For Each dr As DataRow In RS.Rows
-                    fieldTypeID = genericController.EncodeInteger(dr("id"))
-                    If (fieldTypeID <= FieldTypeIdMax) Then
-                        editorAddonIds(fieldTypeID) = genericController.encodeText(dr("editorAddonId"))
-                    End If
-                Next
-                htmlDoc.html_Private_FieldEditorList = Join(editorAddonIds, ",")
-                htmlDoc.html_Private_FieldEditorList_Loaded = True
-            End If
-            getFieldTypeDefaultEditorAddonIdList = htmlDoc.html_Private_FieldEditorList
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError11("main_GetDefaultAddonOption_String", "trap")
-        End Function
     End Class
 End Namespace

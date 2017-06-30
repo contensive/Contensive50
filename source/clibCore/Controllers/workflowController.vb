@@ -119,7 +119,7 @@ Namespace Contensive.Core.Controllers
                 If main_EditLockStatus_Local Then
                     If main_EditLockMemberName_Local = "" Then
                         If main_EditLockMemberID_Local <> 0 Then
-                            CS = cpCore.csOpenRecord("people", main_EditLockMemberID_Local)
+                            CS = cpCore.db.cs_open2("people", main_EditLockMemberID_Local)
                             If cpCore.db.cs_ok(CS) Then
                                 main_EditLockMemberName_Local = cpCore.db.cs_getText(CS, "name")
                             End If
@@ -203,7 +203,7 @@ Namespace Contensive.Core.Controllers
         '=========================================================================================
         '
         Public Function isWorkflowAuthoringCompatible(ByVal ContentName As String) As Boolean
-            isWorkflowAuthoringCompatible = genericController.EncodeBoolean(cpCore.GetContentProperty(genericController.encodeText(ContentName), "ALLOWWORKFLOWAUTHORING"))
+            isWorkflowAuthoringCompatible = genericController.EncodeBoolean(cpCore.metaData.GetContentProperty(genericController.encodeText(ContentName), "ALLOWWORKFLOWAUTHORING"))
         End Function
         '
         '==========================================================================================

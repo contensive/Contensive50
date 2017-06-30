@@ -50,7 +50,7 @@ Namespace Contensive.Core
         Public Overrides Property ContentType() As String
             Get
                 If True Then
-                    Return cpCore.responseContentType
+                    Return cpCore.webServer.webServerIO_bufferContentType
                 Else
                     Return ""
                 End If
@@ -65,7 +65,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Cookies() As String
             Get
                 If True Then
-                    Return cpCore.responseCookies
+                    Return cpCore.webServer.webServerIO_bufferCookies
                 Else
                     Return ""
                 End If
@@ -75,7 +75,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Header() As String 'Inherits BaseClasses.CPResponseBaseClass.Header
             Get
                 If True Then
-                    Return cpCore.responseHeader
+                    Return cpCore.webServer.webServerIO_bufferResponseHeader
                 Else
                     Return ""
                 End If

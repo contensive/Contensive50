@@ -3,6 +3,7 @@ Option Explicit On
 Option Strict On
 
 Imports Contensive.BaseClasses
+Imports Contensive.Core.Controllers
 Imports System.Runtime.InteropServices
 
 Namespace Contensive.Core
@@ -364,8 +365,80 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         Public Sub SetFormInput(ByVal FieldName As String, Optional ByVal RequestName As String = "")
-            Call cpCore.cs_setFormInput(csPtr, FieldName, RequestName)
+            Call cs_setFormInput(cpCore, csPtr, FieldName, RequestName)
         End Sub
+        '
+        '
+        '
+        Public Shared Sub cs_setFormInput(cpcore As coreClass, ByVal CSPointer As Integer, ByVal FieldName As String, Optional ByVal RequestName As String = "")
+            Dim LocalRequestName As String
+            Dim Filename As String
+            Dim Path As String
+            '
+            'If Not (true) Then Exit Sub
+            '
+            If Not cpcore.db.cs_ok(CSPointer) Then
+                Throw New ApplicationException("ContentSetPointer is invalid, empty, or end-of-file")
+            ElseIf Trim(FieldName) = "" Then
+                Throw New ApplicationException("FieldName is invalid or blank")
+            Else
+                LocalRequestName = RequestName
+                If LocalRequestName = "" Then
+                    LocalRequestName = FieldName
+                End If
+                Select Case cpcore.db.cs_getFieldTypeId(CSPointer, FieldName)
+                    Case FieldTypeIdBoolean
+                        '
+                        ' Boolean
+                        '
+                        Call cpcore.db.cs_set(CSPointer, FieldName, cpcore.docProperties.getBoolean(LocalRequestName))
+                    Case FieldTypeIdCurrency, FieldTypeIdFloat, FieldTypeIdInteger, FieldTypeIdLookup, FieldTypeIdManyToMany
+                        '
+                        ' Numbers
+                        '
+                        Call cpcore.db.cs_set(CSPointer, FieldName, cpcore.docProperties.getNumber(LocalRequestName))
+                    Case FieldTypeIdDate
+                        '
+                        ' Date
+                        '
+                        Call cpcore.db.cs_set(CSPointer, FieldName, cpcore.docProperties.getDate(LocalRequestName))
+                    Case FieldTypeIdFile, FieldTypeIdFileImage
+                        '
+                        '
+                        '
+                        Filename = cpcore.docProperties.getText(LocalRequestName)
+                        If Filename <> "" Then
+                            Path = cpcore.db.cs_getFilename(CSPointer, FieldName, Filename)
+                            Call cpcore.db.cs_set(CSPointer, FieldName, Path)
+                            Path = genericController.vbReplace(Path, "\", "/")
+                            Path = genericController.vbReplace(Path, "/" & Filename, "")
+                            Call cpcore.appRootFiles.saveUpload(LocalRequestName, Path, Filename)
+                        End If
+                    Case Else
+                        '
+                        ' text files
+                        '
+                        Call cpcore.db.cs_set(CSPointer, FieldName, cpcore.docProperties.getText(LocalRequestName))
+                End Select
+            End If
+        End Sub
+        '
+        '========================================================================
+        '   main_cs_get Field, translate all fields to their best text equivalent, and encode for display
+        '========================================================================
+        '
+        Public Shared Function main_cs_getEncodedField(cpcore As coreClass, ByVal CSPointer As Integer, ByVal FieldName As String) As String
+            Dim result As String = ""
+            Dim ContentName As String
+            Dim RecordID As Integer
+            '
+            If cpcore.db.cs_isFieldSupported(CSPointer, "id") And cpcore.db.cs_isFieldSupported(CSPointer, "contentcontrolId") Then
+                RecordID = cpcore.db.cs_getInteger(CSPointer, "id")
+                ContentName = cpcore.metaData.getContentNameByID(cpcore.db.cs_getInteger(CSPointer, "contentcontrolId"))
+            End If
+            result = cpcore.htmlDoc.html_encodeContent10(cpcore.db.cs_get(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName)), cpcore.authContext.user.ID, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.isAuthenticated, Nothing, cpcore.authContext.isEditingAnything(cpcore))
+            Return result
+        End Function
         '
 #Region " IDisposable Support "
         ' Do not change or add Overridable to these methods.

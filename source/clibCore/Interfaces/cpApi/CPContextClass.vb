@@ -320,7 +320,7 @@ Namespace Contensive.Core
         '
         Public ReadOnly Property responseRedirect() As String
             Get
-                Return cp.core.responseRedirect
+                Return cp.core.webServer.webServerIO_bufferRedirect
             End Get
         End Property
         '
@@ -328,7 +328,7 @@ Namespace Contensive.Core
         '
         Public ReadOnly Property responseBuffer() As String
             Get
-                Return cp.core.responseBuffer
+                Return cp.core.htmlDoc.docBuffer
             End Get
         End Property
         '
@@ -336,7 +336,7 @@ Namespace Contensive.Core
         '
         Public ReadOnly Property responseContentType() As String
             Get
-                Return cp.core.responseContentType
+                Return cp.core.webServer.webServerIO_bufferContentType
             End Get
         End Property
         '
@@ -344,7 +344,7 @@ Namespace Contensive.Core
         '
         Public ReadOnly Property responseCookies() As String
             Get
-                Return cp.core.responseCookies
+                Return cp.core.webServer.webServerIO_bufferCookies
             End Get
         End Property
         '
@@ -352,7 +352,7 @@ Namespace Contensive.Core
         '
         Public ReadOnly Property responseHeaders() As String
             Get
-                Return cp.core.responseHeader
+                Return cp.core.webServer.webServerIO_bufferResponseHeader
             End Get
         End Property
         '
@@ -360,7 +360,7 @@ Namespace Contensive.Core
         '
         Public ReadOnly Property responseStatus() As String
             Get
-                Return cp.core.responseStatus
+                Return cp.core.webServer.webServerIO_bufferResponseStatus
             End Get
         End Property
         '

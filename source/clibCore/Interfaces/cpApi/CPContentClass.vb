@@ -84,7 +84,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetFieldProperty(ByVal ContentName As String, ByVal FieldName As String, ByVal PropertyName As String) As String
-            Return cpCore.GetContentFieldProperty(ContentName, FieldName, PropertyName)
+            Return cpCore.metaData.GetContentFieldProperty(ContentName, FieldName, PropertyName)
         End Function
         '
         '====================================================================================================
@@ -96,7 +96,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetProperty(ByVal ContentName As String, ByVal PropertyName As String) As String
-            Return cpCore.GetContentProperty(ContentName, PropertyName)
+            Return cpCore.metaData.GetContentProperty(ContentName, PropertyName)
         End Function
         '
         '====================================================================================================
@@ -118,7 +118,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetLinkAliasByPageID(ByVal PageID As Integer, ByVal QueryStringSuffix As String, ByVal DefaultLink As String) As String
-            Return cpCore.main_GetLinkAliasByPageID(PageID, QueryStringSuffix, DefaultLink)
+            Return pagesController.getLinkAlias(cpCore, PageID, QueryStringSuffix, DefaultLink)
         End Function
         '
         '====================================================================================================

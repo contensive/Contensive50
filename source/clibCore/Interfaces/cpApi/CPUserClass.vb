@@ -341,7 +341,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function LoginIsOK(ByVal UsernameOrEmail As String, ByVal Password As String) As Boolean 'Inherits BaseClasses.CPUserBaseClass.LoginIsOK
             If True Then
-                Return CP.core.main_IsLoginOK(UsernameOrEmail, Password)
+                Return CP.core.authContext.main_IsLoginOK(cpCore, UsernameOrEmail, Password)
             Else
                 Return False
             End If

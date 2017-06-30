@@ -523,7 +523,7 @@ Namespace Contensive.Core
         Public Overrides Sub SetFormInput(ByVal FieldName As String, Optional ByVal RequestName As String = "")
             Dim success As Boolean = False
             Try
-                Call cpCore.cs_setFormInput(CSPointer, FieldName, RequestName)
+                Call csController.cs_setFormInput(cpCore, CSPointer, FieldName, RequestName)
             Catch ex As Exception
                 Call cpCore.handleExceptionAndContinue(ex, "Unexpected error in cs.SetFormInput")
             End Try

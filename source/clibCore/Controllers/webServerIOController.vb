@@ -712,7 +712,7 @@ Namespace Contensive.Core
                             '
                             ' forward to a replacement domain
                             '
-                            forwardDomain = cpCore.content_GetRecordName("domains", cpCore.domainLegacyCache.domainDetails.forwardDomainId)
+                            forwardDomain = cpCore.db.getRecordName("domains", cpCore.domainLegacyCache.domainDetails.forwardDomainId)
                             If forwardDomain <> "" Then
                                 pos = genericController.vbInstr(1, requestLinkSource, requestDomain, vbTextCompare)
                                 If (pos > 0) Then

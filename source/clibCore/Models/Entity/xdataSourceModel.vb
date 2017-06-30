@@ -190,7 +190,7 @@
 '        ''' <param name="recordId"></param>record
 '        ''' <returns></returns>
 '        Public Shared Function getRecordName(cpcore As coreClass, recordId As Integer) As String
-'            Return cpcore.content_GetRecordName(primaryContentName, recordId)
+'            Return cpcore.db.getRecordName(primaryContentName, recordId)
 '        End Function
 '        '
 '        '====================================================================================================

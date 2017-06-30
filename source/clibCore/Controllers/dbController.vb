@@ -5286,20 +5286,20 @@ Namespace Contensive.Core.Controllers
         '
         Public Sub markRecordReviewed(ContentName As String, RecordID As Integer)
             Try
-                If cpCore.main_IsContentFieldSupported(ContentName, "DateReviewed") Then
-                    Dim DataSourceName As String = cpCore.metaData.GetContentDataSource(ContentName)
-                    Dim TableName As String = cpCore.GetContentTablename(ContentName)
+                If cpCore.metaData.isContentFieldSupported(ContentName, "DateReviewed") Then
+                    Dim DataSourceName As String = cpCore.metaData.getContentDataSource(ContentName)
+                    Dim TableName As String = cpCore.metaData.getContentTablename(ContentName)
                     Dim SQL As String = "update " & TableName & " set DateReviewed=" & cpCore.db.encodeSQLDate(cpCore.app_startTime)
-                    If cpCore.main_IsContentFieldSupported(ContentName, "ReviewedBy") Then
-                        Sql &= ",ReviewedBy=" & cpCore.authContext.user.ID
+                    If cpCore.metaData.isContentFieldSupported(ContentName, "ReviewedBy") Then
+                        SQL &= ",ReviewedBy=" & cpCore.authContext.user.ID
                     End If
                     '
                     ' -- Mark the live record
-                    Call cpCore.db.executeSql(Sql & " where id=" & RecordID, DataSourceName)
+                    Call cpCore.db.executeSql(SQL & " where id=" & RecordID, DataSourceName)
                     '
                     ' -- Mark the edit record if in workflow
-                    If cpCore.main_IsContentFieldSupported(ContentName, "editsourceid") Then
-                        Call cpCore.db.executeSql(Sql & " where (editsourceid=" & RecordID & ")and(editarchive=0)", DataSourceName)
+                    If cpCore.metaData.isContentFieldSupported(ContentName, "editsourceid") Then
+                        Call cpCore.db.executeSql(SQL & " where (editsourceid=" & RecordID & ")and(editarchive=0)", DataSourceName)
                     End If
                 End If
             Catch ex As Exception
@@ -5421,8 +5421,8 @@ Namespace Contensive.Core.Controllers
                             ContentName = cpCore.metaData.getContentNameByID(ContentID)
                             RecordID = genericController.EncodeInteger(KeySplit(1))
                             If ContentName <> "" And RecordID <> 0 Then
-                                If cpCore.GetContentTablename(ContentName) = "ccPageContent" Then
-                                    CSPointer = cpCore.csOpen(ContentName, RecordID, , , "TemplateID,ParentID")
+                                If cpCore.metaData.getContentTablename(ContentName) = "ccPageContent" Then
+                                    CSPointer = cpCore.db.csOpen2(ContentName, RecordID, , , "TemplateID,ParentID")
                                     If cs_ok(CSPointer) Then
                                         recordfound = True
                                         templateId = cs_getInteger(CSPointer, "TemplateID")
@@ -5440,15 +5440,15 @@ Namespace Contensive.Core.Controllers
                                     Else
 
                                         If templateId <> 0 Then
-                                            CSPointer = cpCore.csOpen("Page Templates", templateId, , , "Link")
+                                            CSPointer = cpCore.db.csOpen2("Page Templates", templateId, , , "Link")
                                             If cs_ok(CSPointer) Then
                                                 main_GetLinkByContentRecordKey = cs_getText(CSPointer, "Link")
                                             End If
                                             Call cs_Close(CSPointer)
                                         End If
                                         If main_GetLinkByContentRecordKey = "" And ParentID <> 0 Then
-                                            TableName = cpCore.GetContentTablename(ContentName)
-                                            DataSource = cpCore.metaData.GetContentDataSource(ContentName)
+                                            TableName = cpCore.metaData.getContentTablename(ContentName)
+                                            DataSource = cpCore.metaData.getContentDataSource(ContentName)
                                             CSPointer = cs_openCsSql_rev(DataSource, "Select ContentControlID from " & TableName & " where ID=" & RecordID)
                                             If cs_ok(CSPointer) Then
                                                 ParentContentID = genericController.EncodeInteger(cs_getText(CSPointer, "ContentControlID"))
@@ -5516,6 +5516,355 @@ Namespace Contensive.Core.Controllers
                 Throw New ApplicationException("Exception in encodeSqlTableName(" & sourceName & ")", ex)
             End Try
             Return returnName
+        End Function
+        '
+        '========================================================================
+        '   Process manual changes needed for Page Content Special Cases
+        '       If workflow, only call this routine on a publish - it changes live records
+        '========================================================================
+        '
+        Public Sub main_ProcessSpecialCaseAfterSave(IsDelete As Boolean, ContentName As String, RecordID As Integer, RecordName As String, RecordParentID As Integer, UseContentWatchLink As Boolean)
+            Dim addonId As Integer
+            Dim Option_String As String
+            Dim Filename As String
+            Dim FilenameExt As String
+            Dim FilenameNoExt As String
+            Dim FilePath As String
+            Dim Pos As Integer
+            Dim AltSizeList As String
+            'Dim innovaEditor As innovaEditorAddonClassFPO
+            Dim sf As imageEditController
+            Dim RebuildSizes As Boolean
+            Dim AddonStatusOK As Boolean
+            Dim pageContentName As String
+            Dim PageContentID As Integer
+            Dim rootPageId As Integer
+            Dim Cmd As String
+            Dim CS As Integer
+            Dim TableName As String
+            Dim PageName As String
+            Dim ContentID As Integer
+            Dim ActivityLogOrganizationID As Integer
+            Dim ActivityLogName As String
+            Dim hint As String
+            '
+            'hint = hint & ",000"
+            ContentID = cpCore.metaData.getContentId(ContentName)
+            TableName = cpCore.metaData.getContentTablename(ContentName)
+            Call markRecordReviewed(ContentName, RecordID)
+            '
+            ' Test for parentid=id loop
+            '
+            ' needs to be finished
+            '
+            '    If (RecordParentID <> 0) And metaData.IsContentFieldSupported(ContentName, "parentid") Then
+            '
+            '    End If
+            'hint = hint & ",100"
+            Select Case genericController.vbLCase(TableName)
+                Case "linkaliases"
+                    'Call cache_linkAlias_clear
+                Case "ccmembers"
+                    '
+                    ' Log Activity for changes to people and organizattions
+                    '
+                    'hint = hint & ",110"
+                    CS = cpCore.db.cs_open2("people", RecordID, , , "Name,OrganizationID")
+                    If cs_ok(CS) Then
+                        ActivityLogOrganizationID = cs_getInteger(CS, "OrganizationID")
+                    End If
+                    Call cs_Close(CS)
+                    If IsDelete Then
+                        Call logController.logActivity2(cpCore, "deleting user #" & RecordID & " (" & RecordName & ")", RecordID, ActivityLogOrganizationID)
+                    Else
+                        Call logController.logActivity2(cpCore, "saving changes to user #" & RecordID & " (" & RecordName & ")", RecordID, ActivityLogOrganizationID)
+                    End If
+                Case "organizations"
+                    '
+                    ' Log Activity for changes to people and organizattions
+                    '
+                    'hint = hint & ",120"
+                    If IsDelete Then
+                        Call logController.logActivity2(cpCore, "deleting organization #" & RecordID & " (" & RecordName & ")", 0, RecordID)
+                    Else
+                        Call logController.logActivity2(cpCore, "saving changes to organization #" & RecordID & " (" & RecordName & ")", 0, RecordID)
+                    End If
+                Case "ccsetup"
+                    '
+                    ' Site Properties
+                    '
+                    'hint = hint & ",130"
+                    Select Case genericController.vbLCase(RecordName)
+                        Case "allowlinkalias"
+                            Call cpCore.cache.invalidateContent("Page Content")
+                        Case "sectionlandinglink"
+                            Call cpCore.cache.invalidateContent("Page Content")
+                        Case siteproperty_serverPageDefault_name
+                            Call cpCore.cache.invalidateContent("Page Content")
+                    End Select
+                Case "ccpagecontent"
+                    '
+                    ' set ChildPagesFound true for parent page
+                    '
+                    'hint = hint & ",140"
+                    If RecordParentID > 0 Then
+                        Call cpCore.pages.cache_pageContent_updateRow(RecordParentID, False, False)
+                        If Not IsDelete Then
+                            Call executeSql("update ccpagecontent set ChildPagesfound=1 where ID=" & RecordParentID)
+                        End If
+                    End If
+                    '
+                    ' Page Content special cases for delete
+                    '
+                    If IsDelete Then
+                        '
+                        ' If this was a section's root page, clear the rootpageid so a new page will be created
+                        '
+                        Call executeSql("update ccsections set RootPageID=0 where RootPageID=" & RecordID)
+                        Call cpCore.pages.pageManager_cache_siteSection_clear()
+                        '
+                        ' Clear the Landing page and page not found site properties
+                        '
+
+                        If genericController.vbLCase(TableName) = "ccpagecontent" Then
+                            Call cpCore.pages.cache_pageContent_removeRow(RecordID, cpCore.pages.pagemanager_IsWorkflowRendering, False)
+                            If RecordID = genericController.EncodeInteger(cpCore.siteProperties.getText("PageNotFoundPageID", "0")) Then
+                                Call cpCore.siteProperties.setProperty("PageNotFoundPageID", "0")
+                            End If
+                            If RecordID = cpCore.siteProperties.landingPageID Then
+                                cpCore.siteProperties.setProperty("landingPageId", "0")
+                            End If
+                        End If
+                        '
+                        ' Delete Link Alias entries with this PageID
+                        '
+                        Call executeSql("delete from cclinkAliases where PageID=" & RecordID)
+                    Else
+                        '
+                        ' Attempt to update the PageContentCache (PCC) array stored in the PeristantVariants
+                        '
+                        Call cpCore.pages.cache_pageContent_updateRow(RecordID, False, False)
+                    End If
+                Case "cctemplates", "ccsharedstyles"
+                    '
+                    ' Attempt to update the PageContentCache (PCC) array stored in the PeristantVariants
+                    '
+                    'hint = hint & ",150"
+                    Call cpCore.pages.pageManager_cache_pageTemplate_clear()
+                    If Not IsNothing(cpCore.addonStyleRulesIndex) Then
+                        Call cpCore.addonStyleRulesIndex.clear()
+                    End If
+
+                Case "ccaggregatefunctions"
+                    '
+                    ' Update wysiwyg addon menus
+                    '
+                    'hint = hint & ",170"
+                    Call cpCore.addonLegacyCache.clear()
+                    If Not IsNothing(cpCore.addonStyleRulesIndex) Then
+                        Call cpCore.addonStyleRulesIndex.clear()
+                    End If
+                Case "ccsharedstylesaddonrules"
+                    '
+                    ' Update wysiwyg addon menus
+                    '
+                    'hint = hint & ",175"
+                    If Not IsNothing(cpCore.addonStyleRulesIndex) Then
+                        Call cpCore.addonStyleRulesIndex.clear()
+                    End If
+
+                    Call cpCore.addonLegacyCache.clear()
+                Case "cclibraryfiles"
+                    '
+                    ' if a AltSizeList is blank, make large,medium,small and thumbnails
+                    '
+                    'hint = hint & ",180"
+                    If (cpCore.siteProperties.getBoolean("ImageAllowSFResize", True)) Then
+                        If Not IsDelete Then
+                            CS = cpCore.db.csOpen2("library files", RecordID)
+                            If cs_ok(CS) Then
+                                Filename = cs_get(CS, "filename")
+                                Pos = InStrRev(Filename, "/")
+                                If Pos > 0 Then
+                                    FilePath = Mid(Filename, 1, Pos)
+                                    Filename = Mid(Filename, Pos + 1)
+                                End If
+                                Call cs_set(CS, "filesize", cpCore.appRootFiles.main_GetFileSize(FilePath & Filename))
+                                Pos = InStrRev(Filename, ".")
+                                If Pos > 0 Then
+                                    FilenameExt = Mid(Filename, Pos + 1)
+                                    FilenameNoExt = Mid(Filename, 1, Pos - 1)
+                                    If genericController.vbInstr(1, "jpg,gif,png", FilenameExt, vbTextCompare) <> 0 Then
+                                        sf = New imageEditController
+                                        If sf.load(cpCore.appRootFiles.rootLocalPath & FilePath & Filename) Then
+                                            '
+                                            '
+                                            '
+                                            Call cs_set(CS, "height", sf.height)
+                                            Call cs_set(CS, "width", sf.width)
+                                            AltSizeList = cs_getText(CS, "AltSizeList")
+                                            RebuildSizes = (AltSizeList = "")
+                                            If RebuildSizes Then
+                                                AltSizeList = ""
+                                                '
+                                                ' Attempt to make 640x
+                                                '
+                                                If sf.width >= 640 Then
+                                                    sf.height = CInt(sf.height * (640 / sf.width))
+                                                    sf.width = 640
+                                                    Call sf.save(cpCore.appRootFiles.rootLocalPath & FilePath & FilenameNoExt & "-640x" & sf.height & "." & FilenameExt)
+                                                    AltSizeList = AltSizeList & vbCrLf & "640x" & sf.height
+                                                End If
+                                                '
+                                                ' Attempt to make 320x
+                                                '
+                                                If sf.width >= 320 Then
+                                                    sf.height = CInt(sf.height * (320 / sf.width))
+                                                    sf.width = 320
+                                                    Call sf.save(cpCore.appRootFiles.rootLocalPath & FilePath & FilenameNoExt & "-320x" & sf.height & "." & FilenameExt)
+
+                                                    AltSizeList = AltSizeList & vbCrLf & "320x" & sf.height
+                                                End If
+                                                '
+                                                ' Attempt to make 160x
+                                                '
+                                                If sf.width >= 160 Then
+                                                    sf.height = CInt(sf.height * (160 / sf.width))
+                                                    sf.width = 160
+                                                    Call sf.save(cpCore.appRootFiles.rootLocalPath & FilePath & FilenameNoExt & "-160x" & sf.height & "." & FilenameExt)
+                                                    AltSizeList = AltSizeList & vbCrLf & "160x" & sf.height
+                                                End If
+                                                '
+                                                ' Attempt to make 80x
+                                                '
+                                                If sf.width >= 80 Then
+                                                    sf.height = CInt(sf.height * (80 / sf.width))
+                                                    sf.width = 80
+                                                    Call sf.save(cpCore.appRootFiles.rootLocalPath & FilePath & FilenameNoExt & "-180x" & sf.height & "." & FilenameExt)
+                                                    AltSizeList = AltSizeList & vbCrLf & "80x" & sf.height
+                                                End If
+                                                Call cs_set(CS, "AltSizeList", AltSizeList)
+                                            End If
+                                            Call sf.Dispose()
+                                            sf = Nothing
+                                        End If
+                                        '                                sf.Algorithm = genericController.EncodeInteger(main_GetSiteProperty("ImageResizeSFAlgorithm", "5"))
+                                        '                                On Error Resume Next
+                                        '                                sf.LoadFromFile (app.publicFiles.rootFullPath & FilePath & Filename)
+                                        '                                If Err.Number = 0 Then
+                                        '                                    Call app.SetCS(CS, "height", sf.Height)
+                                        '                                    Call app.SetCS(CS, "width", sf.Width)
+                                        '                                Else
+                                        '                                    Err.Clear
+                                        '                                End If
+                                        '                                AltSizeList = cs_getText(CS, "AltSizeList")
+                                        '                                RebuildSizes = (AltSizeList = "")
+                                        '                                If RebuildSizes Then
+                                        '                                    AltSizeList = ""
+                                        '                                    '
+                                        '                                    ' Attempt to make 640x
+                                        '                                    '
+                                        '                                    If sf.Width >= 640 Then
+                                        '                                        sf.Width = 640
+                                        '                                        Call sf.DoResize
+                                        '                                        Call sf.SaveToFile(app.publicFiles.rootFullPath & FilePath & FilenameNoExt & "-640x" & sf.Height & "." & FilenameExt)
+                                        '                                        AltSizeList = AltSizeList & vbCrLf & "640x" & sf.Height
+                                        '                                    End If
+                                        '                                    '
+                                        '                                    ' Attempt to make 320x
+                                        '                                    '
+                                        '                                    If sf.Width >= 320 Then
+                                        '                                        sf.Width = 320
+                                        '                                        Call sf.DoResize
+                                        '                                        Call sf.SaveToFile(app.publicFiles.rootFullPath & FilePath & FilenameNoExt & "-320x" & sf.Height & "." & FilenameExt)
+                                        '                                        AltSizeList = AltSizeList & vbCrLf & "320x" & sf.Height
+                                        '                                    End If
+                                        '                                    '
+                                        '                                    ' Attempt to make 160x
+                                        '                                    '
+                                        '                                    If sf.Width >= 160 Then
+                                        '                                        sf.Width = 160
+                                        '                                        Call sf.DoResize
+                                        '                                        Call sf.SaveToFile(app.publicFiles.rootFullPath & FilePath & FilenameNoExt & "-160x" & sf.Height & "." & FilenameExt)
+                                        '                                        AltSizeList = AltSizeList & vbCrLf & "160x" & sf.Height
+                                        '                                    End If
+                                        '                                    '
+                                        '                                    ' Attempt to make 80x
+                                        '                                    '
+                                        '                                    If sf.Width >= 80 Then
+                                        '                                        sf.Width = 80
+                                        '                                        Call sf.DoResize
+                                        '                                        Call sf.SaveToFile(app.publicFiles.rootFullPath & FilePath & FilenameNoExt & "-80x" & sf.Height & "." & FilenameExt)
+                                        '                                        AltSizeList = AltSizeList & vbCrLf & "80x" & sf.Height
+                                        '                                    End If
+                                        '                                    Call app.SetCS(CS, "AltSizeList", AltSizeList)
+                                        '                                End If
+                                        '                                sf = Nothing
+                                    End If
+                                End If
+                            End If
+                            Call cs_Close(CS)
+                        End If
+                    End If
+                Case Else
+                    '
+                    '
+                    '
+            End Select
+            '
+            ' Process Addons marked to trigger a process call on content change
+            '
+            'hint = hint & ",190"
+            If True Then
+                'hint = hint & ",200 content=[" & ContentID & "]"
+                CS = cs_open("Add-on Content Trigger Rules", "ContentID=" & ContentID, , , , , , "addonid")
+                Option_String = "" _
+                    & vbCrLf & "action=contentchange" _
+                    & vbCrLf & "contentid=" & ContentID _
+                    & vbCrLf & "recordid=" & RecordID _
+                    & ""
+                Do While cs_ok(CS)
+                    addonId = cs_getInteger(CS, "Addonid")
+                    'hint = hint & ",210 addonid=[" & addonId & "]"
+                    Call cpCore.addon.executeAddonAsProcess(CStr(addonId), Option_String)
+                    Call cs_goNext(CS)
+                Loop
+                Call cs_Close(CS)
+            End If
+        End Sub
+        '
+        '
+        '
+        Public Function GetTableID(ByVal TableName As String) As Integer
+            Dim result As Integer = 0
+            Dim CS As Integer
+            GetTableID = -1
+            CS = cpCore.db.cs_openSql("Select ID from ccTables where name=" & cpCore.db.encodeSQLText(TableName), , 1)
+            If cpCore.db.cs_ok(CS) Then
+                result = cpCore.db.cs_getInteger(CS, "ID")
+            End If
+            Call cpCore.db.cs_Close(CS)
+            Return result
+        End Function
+        '
+        '========================================================================
+        ' Opens a Content Definition into a ContentSEt
+        '   Returns and integer that points into the ContentSet array
+        '   If there was a problem, it returns -1
+        '
+        '   If authoring mode, as group of records are returned.
+        '       The first is the current edit record
+        '       The rest are the archive records.
+        '========================================================================
+        '
+        Public Function csOpen2(ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal WorkflowAuthoringMode As Boolean = False, Optional ByVal WorkflowEditingMode As Boolean = False, Optional ByVal SelectFieldList As String = "") As Integer
+            Return cs_open(genericController.encodeText(ContentName), "(ID=" & cpCore.db.encodeSQLNumber(RecordID) & ")", , False, cpCore.authContext.user.ID, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
+        End Function
+        '
+        '========================================================================
+        '
+        Public Function cs_open2(ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal WorkflowAuthoringMode As Boolean = False, Optional ByVal WorkflowEditingMode As Boolean = False, Optional ByVal SelectFieldList As String = "") As Integer
+            Return cs_open(ContentName, "(ID=" & cpCore.db.encodeSQLNumber(RecordID) & ")", , False, cpCore.authContext.user.ID, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
         End Function
 
 

@@ -28,7 +28,7 @@ Namespace Contensive.Core.Controllers
             CS = cpCore.InsertCSContent("Remote Queries")
             If cpCore.db.cs_ok(CS) Then
                 RemoteKey = Guid.NewGuid.ToString()
-                DataSourceID = cpCore.main_GetRecordID("Data Sources", DataSourceName)
+                DataSourceID = cpCore.db.getRecordID("Data Sources", DataSourceName)
                 Call cpCore.db.cs_set(CS, "remotekey", RemoteKey)
                 Call cpCore.db.cs_set(CS, "datasourceid", DataSourceID)
                 Call cpCore.db.cs_set(CS, "sqlquery", SQL)

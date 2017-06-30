@@ -236,7 +236,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub ProcessCheckList(ByVal HtmlName As String, ByVal PrimaryContentName As String, ByVal PrimaryRecordID As String, ByVal SecondaryContentName As String, ByVal RulesContentName As String, ByVal RulesPrimaryFieldname As String, ByVal RulesSecondaryFieldName As String) 'Inherits BaseClasses.CPHtmlBaseClass.ProcessCheckList
             If True Then
-                Call cpCore.main_ProcessCheckList(HtmlName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName)
+                Call cpCore.htmlDoc.main_ProcessCheckList(HtmlName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName)
             End If
         End Sub
         '

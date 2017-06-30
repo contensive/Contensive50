@@ -2257,6 +2257,198 @@ ErrorTrap:
         Public Function content_getContentControlCriteria(ByVal ContentName As String) As String
             Return getCdef(ContentName).ContentControlCriteria
         End Function
+        '
+        '============================================================================================================
+        '   the content control Id for a record, all its edit and archive records, and all its child records
+        '   returns records affected
+        '   the contentname contains the record, but we do not know that this is the contentcontrol for the record,
+        '   read it first to main_Get the correct contentid
+        '============================================================================================================
+        '
+        Public Sub content_SetContentControl(ByVal ContentID As Integer, ByVal RecordID As Integer, ByVal NewContentControlID As Integer, Optional ByVal UsedIDString As String = "")
+            Dim result As Integer = 0
+            Dim SQL As String
+            Dim CS As Integer
+            Dim RecordTableName As String
+            Dim ContentName As String
+            Dim HasParentID As Boolean
+            Dim RecordContentID As Integer
+            Dim RecordContentName As String = ""
+            Dim DataSourceName As String
+            '
+            If Not genericController.IsInDelimitedString(UsedIDString, CStr(RecordID), ",") Then
+                ContentName = getContentNameByID(ContentID)
+                CS = cpCore.db.csOpen2(ContentName, RecordID, False, False)
+                If cpCore.db.cs_ok(CS) Then
+                    HasParentID = cpCore.db.cs_isFieldSupported(CS, "ParentID")
+                    RecordContentID = cpCore.db.cs_getInteger(CS, "ContentControlID")
+                    RecordContentName = getContentNameByID(RecordContentID)
+                End If
+                Call cpCore.db.cs_Close(CS)
+                If RecordContentName <> "" Then
+                    '
+                    '
+                    '
+                    DataSourceName = getContentDataSource(RecordContentName)
+                    RecordTableName = cpCore.metaData.getContentTablename(RecordContentName)
+                    '
+                    ' either Workflow on non-workflow - it changes everything
+                    '
+                    SQL = "update " & RecordTableName & " set ContentControlID=" & NewContentControlID & " where ID=" & RecordID & " or EditSourceID=" & RecordID
+                    Call cpCore.db.executeSql(SQL, DataSourceName)
+                    If HasParentID Then
+                        SQL = "select contentcontrolid,ID from " & RecordTableName & " where ParentID=" & RecordID
+                        CS = cpCore.db.cs_openCsSql_rev(DataSourceName, SQL)
+                        Do While cpCore.db.cs_ok(CS)
+                            Call content_SetContentControl(cpCore.db.cs_getInteger(CS, "contentcontrolid"), cpCore.db.cs_getInteger(CS, "ID"), NewContentControlID, UsedIDString & "," & RecordID)
+                            cpCore.db.cs_goNext(CS)
+                        Loop
+                        Call cpCore.db.cs_Close(CS)
+                    End If
+                    '
+                    ' fix content watch
+                    '
+                    SQL = "update ccContentWatch set ContentID=" & NewContentControlID & ", ContentRecordKey='" & NewContentControlID & "." & RecordID & "' where ContentID=" & ContentID & " and RecordID=" & RecordID
+                    Call cpCore.db.executeSql(SQL)
+                End If
+            End If
+        End Sub
+        Public Function GetSortMethodByID(ByVal SortMethodID As Integer) As String
+            Dim result As String = ""
+            Dim CS As Integer
+            If SortMethodID > 0 Then
+                CS = cpCore.db.cs_open2("Sort Methods", SortMethodID)
+                If cpCore.db.cs_ok(CS) Then
+                    GetSortMethodByID = cpCore.db.cs_getText(CS, "OrderByClause")
+                End If
+                Call cpCore.db.cs_Close(CS)
+            End If
+            Return result
+        End Function
+        '
+        '========================================================================
+        '
+        '========================================================================
+        '
+        Public Function GetContentFieldProperty(ByVal ContentName As String, ByVal FieldName As String, ByVal PropertyName As String) As Object
+            Dim result As String = ""
+            Dim Contentdefinition As cdefModel
+            Dim UcaseFieldName As String
+            '
+            result = ""
+            If True Then
+                UcaseFieldName = genericController.vbUCase(genericController.encodeText(FieldName))
+                Contentdefinition = getCdef(genericController.encodeText(ContentName))
+                If (UcaseFieldName = "") Or (Contentdefinition.fields.Count < 1) Then
+                    Throw (New ApplicationException("Content Name [" & genericController.encodeText(ContentName) & "] or FieldName [" & genericController.encodeText(FieldName) & "] was not valid")) ' handleLegacyError14(MethodName, "")
+                Else
+                    For Each keyValuePair As KeyValuePair(Of String, CDefFieldModel) In Contentdefinition.fields
+                        Dim field As CDefFieldModel = keyValuePair.Value
+                        With field
+                            If UcaseFieldName = genericController.vbUCase(.nameLc) Then
+                                Select Case genericController.vbUCase(genericController.encodeText(PropertyName))
+                                    Case "FIELDTYPE", "TYPE"
+                                        result = .fieldTypeId.ToString()
+                                    Case "HTMLCONTENT"
+                                        result = .htmlContent.ToString()
+                                    Case "ADMINONLY"
+                                        result = .adminOnly.ToString()
+                                    Case "AUTHORABLE"
+                                        result = .authorable.ToString()
+                                    Case "CAPTION"
+                                        result = .caption
+                                    Case "REQUIRED"
+                                        result = .Required.ToString()
+                                    Case "UNIQUENAME"
+                                        result = .UniqueName.ToString()
+                                    Case "UNIQUE"
+                                        '
+                                        ' fix for the uniquename screwup - it is not unique name, it is unique value
+                                        '
+                                        result = .UniqueName.ToString()
+                                    Case "DEFAULT"
+                                        result = genericController.encodeText(.defaultValue)
+                                    Case "MEMBERSELECTGROUPID"
+                                        result = genericController.encodeText(.MemberSelectGroupID)
+                                    Case Else
+                                        Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError14(MethodName, "Content Property [" & genericController.encodeText(PropertyName) & "] was not found in content [" & genericController.encodeText(ContentName) & "]")
+                                End Select
+                                Exit For
+                            End If
+                        End With
+                    Next
+                End If
+            End If
+        End Function
+        '
+        '========================================================================
+        '
+        '========================================================================
+        '
+        Public Function GetContentProperty(ByVal ContentName As String, ByVal PropertyName As String) As String
+            Dim result As String = ""
+            Dim Contentdefinition As cdefModel
+            '
+            Contentdefinition = getCdef(genericController.encodeText(ContentName))
+            Select Case genericController.vbUCase(genericController.encodeText(PropertyName))
+                Case "CONTENTCONTROLCRITERIA"
+                    result = Contentdefinition.ContentControlCriteria
+                Case "ACTIVEONLY"
+                    result = Contentdefinition.ActiveOnly.ToString
+                Case "ADMINONLY"
+                    result = Contentdefinition.AdminOnly.ToString
+                Case "ALIASID"
+                    result = Contentdefinition.AliasID
+                Case "ALIASNAME"
+                    result = Contentdefinition.AliasName
+                Case "ALLOWADD"
+                    result = Contentdefinition.AllowAdd.ToString
+                Case "ALLOWDELETE"
+                    result = Contentdefinition.AllowDelete.ToString
+                'Case "CHILDIDLIST"
+                '    main_result = Contentdefinition.ChildIDList
+                Case "DATASOURCEID"
+                    result = Contentdefinition.dataSourceId.ToString
+                Case "DEFAULTSORTMETHOD"
+                    result = Contentdefinition.DefaultSortMethod
+                Case "DEVELOPERONLY"
+                    result = Contentdefinition.DeveloperOnly.ToString
+                Case "FIELDCOUNT"
+                    result = Contentdefinition.fields.Count.ToString
+                'Case "FIELDPOINTER"
+                '    main_result = Contentdefinition.FieldPointer
+                Case "ID"
+                    result = Contentdefinition.Id.ToString
+                Case "IGNORECONTENTCONTROL"
+                    result = Contentdefinition.IgnoreContentControl.ToString
+                Case "NAME"
+                    result = Contentdefinition.Name
+                Case "PARENTID"
+                    result = Contentdefinition.parentID.ToString
+                'Case "SINGLERECORD"
+                '    main_result = Contentdefinition.SingleRecord
+                Case "CONTENTTABLENAME"
+                    result = Contentdefinition.ContentTableName
+                Case "CONTENTDATASOURCENAME"
+                    result = Contentdefinition.ContentDataSourceName
+                Case "AUTHORINGTABLENAME"
+                    result = Contentdefinition.AuthoringTableName
+                Case "AUTHORINGDATASOURCENAME"
+                    result = Contentdefinition.AuthoringDataSourceName
+                Case "WHERECLAUSE"
+                    result = Contentdefinition.WhereClause
+                Case "ALLOWWORKFLOWAUTHORING"
+                    result = Contentdefinition.AllowWorkflowAuthoring.ToString
+                Case "DROPDOWNFIELDLIST"
+                    result = Contentdefinition.DropDownFieldList
+                Case "SELECTFIELDLIST"
+                    result = Contentdefinition.SelectCommaList
+                Case Else
+                    Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError14(MethodName, "Content Property [" & genericController.encodeText(PropertyName) & "] was not found in content [" & genericController.encodeText(ContentName) & "]")
+            End Select
+            Return result
+        End Function
+
 
 
 #Region " IDisposable Support "

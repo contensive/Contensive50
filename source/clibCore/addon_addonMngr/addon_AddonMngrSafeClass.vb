@@ -182,7 +182,7 @@ Namespace Contensive.Core
                                 For Ptr = 0 To Cnt - 1
                                     If cpCore.docProperties.getBoolean("ac" & Ptr) Then
                                         TargetCollectionID = cpCore.docProperties.getInteger("acID" & Ptr)
-                                        TargetCollectionName = cpCore.content_GetRecordName("Add-on Collections", TargetCollectionID)
+                                        TargetCollectionName = cpCore.db.getRecordName("Add-on Collections", TargetCollectionID)
                                         '
                                         ' Delete any addons from this collection
                                         '
@@ -430,7 +430,7 @@ Namespace Contensive.Core
                                             '
                                             ' Now delete the Collection record
                                             '
-                                            Call cpCore.DeleteContentRecord("Add-on Collections", TargetCollectionID)
+                                            Call cpCore.db.deleteContentRecord("Add-on Collections", TargetCollectionID)
                                             '
                                             ' Delete Navigator Entries set as installed by the collection (this may be all that is needed)
                                             '
@@ -448,7 +448,7 @@ Namespace Contensive.Core
                             If Cnt > 0 Then
                                 For Ptr = 0 To Cnt - 1
                                     If cpCore.docProperties.getBoolean("ao" & Ptr) Then
-                                        Call cpCore.DeleteContentRecord(cnAddons, cpCore.docProperties.getInteger("aoID" & Ptr))
+                                        Call cpCore.db.deleteContentRecord(cnAddons, cpCore.docProperties.getInteger("aoID" & Ptr))
                                     End If
                                 Next
                             End If
@@ -550,7 +550,7 @@ Namespace Contensive.Core
                         '   Forward to help page
                         ' --------------------------------------------------------------------------------
                         '
-                        If (InstalledCollectionIDList.Count > 0) And (Not cpCore.error_IsUserError) Then
+                        If (InstalledCollectionIDList.Count > 0) And (Not (cpcore.debug_iUserError <> "")) Then
                             Call cpCore.webServer.redirect(cpCore.siteProperties.adminURL & "?helpcollectionid=" & InstalledCollectionIDList(0).ToString(), "Redirecting to help page after collection installation", False)
                         End If
                         '
@@ -908,7 +908,7 @@ Namespace Contensive.Core
                     Call cpCore.db.cs_goNext(CS)
                 Loop
                 Call cpCore.db.cs_Close(CS)
-                Call cpCore.DeleteContentRecord("Navigator Entries", EntryID)
+                Call cpCore.db.deleteContentRecord("Navigator Entries", EntryID)
             End If
             '
             Exit Sub

@@ -766,7 +766,7 @@ ErrorTrap:
                     cpCore.cache.invalidateAll()
                     cpCore.metaData.clear()
                     ContentID = cpCore.metaData.getContentID(ContentName)
-                    ParentNavID = cpCore.main_GetRecordID("Navigator Entries", "Manage Site Content")
+                    ParentNavID = cpCore.db.getRecordID("Navigator Entries", "Manage Site Content")
                     If ParentNavID <> 0 Then
                         CS = cpCore.db.cs_open("Navigator Entries", "(name=" & cpCore.db.encodeSQLText("Advanced") & ")and(parentid=" & ParentNavID & ")")
                         ParentNavID = 0
@@ -951,7 +951,7 @@ ErrorTrap:
                                     If cpCore.db.cs_ok(CSSource) Then
                                         CSTarget = cpCore.db.cs_insertRecord("Content Fields")
                                         If cpCore.db.cs_ok(CSTarget) Then
-                                            Call cpCore.cs_CopyRecord(CSSource, CSTarget)
+                                            Call cpCore.db.cs_CopyRecord(CSSource, CSTarget)
                                             Call cpCore.db.cs_set(CSTarget, "ContentID", ContentID)
                                             ReloadCDef = True
                                         End If
@@ -977,7 +977,7 @@ ErrorTrap:
                             If cpCore.db.cs_ok(CSSource) Then
                                 CSTarget = cpCore.db.cs_insertRecord("Content Fields")
                                 If cpCore.db.cs_ok(CSTarget) Then
-                                    Call cpCore.cs_CopyRecord(CSSource, CSTarget)
+                                    Call cpCore.db.cs_CopyRecord(CSSource, CSTarget)
                                     Call cpCore.db.cs_set(CSTarget, "ContentID", ContentID)
                                     ReloadCDef = True
                                 End If
@@ -1006,14 +1006,14 @@ ErrorTrap:
                                     For Each keyValuePair In CDef.adminColumns
                                         Dim adminColumn As cdefModel.CDefAdminColumnClass = keyValuePair.Value
                                         Dim field As CDefFieldModel = CDef.fields(adminColumn.Name)
-                                        CSPointer = cpCore.csOpen("Content Fields", field.id)
+                                        CSPointer = cpCore.db.csOpen2("Content Fields", field.id)
                                         Call cpCore.db.cs_set(CSPointer, "IndexColumn", (columnPtr) * 10)
                                         Call cpCore.db.cs_set(CSPointer, "IndexWidth", Int((adminColumn.Width * 80) / ColumnWidthTotal))
                                         Call cpCore.db.cs_Close(CSPointer)
                                         columnPtr += 1
                                     Next
                                 End If
-                                CSPointer = cpCore.csOpen("Content Fields", FieldIDToAdd, False, False)
+                                CSPointer = cpCore.db.csOpen2("Content Fields", FieldIDToAdd, False, False)
                                 If cpCore.db.cs_ok(CSPointer) Then
                                     Call cpCore.db.cs_set(CSPointer, "IndexColumn", columnPtr * 10)
                                     Call cpCore.db.cs_set(CSPointer, "IndexWidth", 20)
@@ -1033,7 +1033,7 @@ ErrorTrap:
                                 For Each keyValuePair In CDef.adminColumns
                                     Dim adminColumn As cdefModel.CDefAdminColumnClass = keyValuePair.Value
                                     Dim field As CDefFieldModel = CDef.fields(adminColumn.Name)
-                                    CSPointer = cpCore.csOpen("Content Fields", field.id)
+                                    CSPointer = cpCore.db.csOpen2("Content Fields", field.id)
                                     If fieldId = TargetFieldID Then
                                         Call cpCore.db.cs_set(CSPointer, "IndexColumn", 0)
                                         Call cpCore.db.cs_set(CSPointer, "IndexWidth", 0)
@@ -1059,7 +1059,7 @@ ErrorTrap:
                                     Dim adminColumn As cdefModel.CDefAdminColumnClass = keyValuePair.Value
                                     Dim field As CDefFieldModel = CDef.fields(adminColumn.Name)
                                     FieldName = adminColumn.Name
-                                    CS1 = cpCore.csOpen("Content Fields", field.id)
+                                    CS1 = cpCore.db.csOpen2("Content Fields", field.id)
                                     If (CDef.fields(FieldName.ToLower()).id = TargetFieldID) And (columnPtr < CDef.adminColumns.Count) Then
                                         Call cpCore.db.cs_set(CS1, "IndexColumn", (columnPtr + 1) * 10)
                                         '
@@ -1095,7 +1095,7 @@ ErrorTrap:
                                     Dim adminColumn As cdefModel.CDefAdminColumnClass = keyValuePair.Value
                                     Dim field As CDefFieldModel = CDef.fields(adminColumn.Name)
                                     FieldName = adminColumn.Name
-                                    CS1 = cpCore.csOpen("Content Fields", field.id)
+                                    CS1 = cpCore.db.csOpen2("Content Fields", field.id)
                                     If (field.id = TargetFieldID) And (columnPtr < CDef.adminColumns.Count) Then
                                         Call cpCore.db.cs_set(CS1, "IndexColumn", (columnPtr - 1) * 10)
                                         '
@@ -1581,7 +1581,7 @@ ErrorTrap:
                             '
                             ContentName = DiagArgument(DiagAction, 1)
                             RecordID = genericController.EncodeInteger(DiagArgument(DiagAction, 2))
-                            Call cpCore.DeleteContentRecord(ContentName, RecordID)
+                            Call cpCore.db.deleteContentRecord(ContentName, RecordID)
                             'end case
                         Case DiagActionContentDeDupe
                             ContentName = DiagArgument(DiagAction, 1)
@@ -1839,7 +1839,7 @@ ErrorTrap:
                                     End If
                                     Call cpCore.db.cs_Close(CSFields)
                                     Call cpCore.db.cs_Close(CSTestRecord)
-                                    Call cpCore.DeleteContentRecord(ContentName, TestRecordID)
+                                    Call cpCore.db.deleteContentRecord(ContentName, TestRecordID)
                                 End If
                                 cpCore.db.cs_goNext(CSContent)
                             Loop
@@ -2977,7 +2977,7 @@ ErrorTrap:
                                                 If (cpCore.db.cs_ok(CSTarget)) Then
                                                     CSSource = cpCore.db.cs_openContentRecord("Content Fields", formFieldId)
                                                     If (cpCore.db.cs_ok(CSSource)) Then
-                                                        Call cpCore.cs_CopyRecord(CSSource, CSTarget)
+                                                        Call cpCore.db.cs_CopyRecord(CSSource, CSTarget)
                                                     End If
                                                     Call cpCore.db.cs_Close(CSSource)
                                                     formFieldId = cpCore.db.cs_getInteger(CSTarget, "ID")
@@ -2990,7 +2990,7 @@ ErrorTrap:
                                                 ' Was a field, make it inherit from it's parent
                                                 '
                                                 CSTarget = CSTarget
-                                                Call cpCore.DeleteContentRecord("Content Fields", formFieldId)
+                                                Call cpCore.db.deleteContentRecord("Content Fields", formFieldId)
                                                 ReloadCDef = True
                                             ElseIf (Not .inherited) And (Not formFieldInherited) Then
                                                 '
@@ -3026,7 +3026,7 @@ ErrorTrap:
                                                         '
                                                         ' Field Type changed, must be done manually
                                                         '
-                                                        ErrorMessage &= "<LI>Field [" & formFieldName & "] changed type from [" & cpCore.content_GetRecordName("content Field Types", .fieldTypeId) & "] to [" & cpCore.content_GetRecordName("content Field Types", formFieldTypeId) & "]. This may have caused a problem converting content.</LI>"
+                                                        ErrorMessage &= "<LI>Field [" & formFieldName & "] changed type from [" & cpCore.db.getRecordName("content Field Types", .fieldTypeId) & "] to [" & cpCore.db.getRecordName("content Field Types", formFieldTypeId) & "]. This may have caused a problem converting content.</LI>"
                                                         Dim DataSourceTypeID As Integer
                                                         DataSourceTypeID = cpCore.db.getDataSourceType(DataSourceName)
                                                         Select Case DataSourceTypeID
@@ -3331,7 +3331,7 @@ ErrorTrap:
                                 rowValid = rowValid And (.fieldTypeId > 0)
                                 streamRow.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
                                 If .inherited Then
-                                    CSPointer = cpCore.csOpen("Content Field Types", .fieldTypeId)
+                                    CSPointer = cpCore.db.csOpen2("Content Field Types", .fieldTypeId)
                                     If Not cpCore.db.cs_ok(CSPointer) Then
                                         Call streamRow.Add(SpanClassAdminSmall & "Unknown[" & .fieldTypeId & "]</SPAN>")
                                     Else
@@ -3339,7 +3339,7 @@ ErrorTrap:
                                     End If
                                     Call cpCore.db.cs_Close(CSPointer)
                                 ElseIf FieldLocked Then
-                                    Call streamRow.Add(cpCore.content_GetRecordName("content field types", .fieldTypeId) & cpCore.htmlDoc.html_GetFormInputHidden("dtfaType." & RecordCount, .fieldTypeId))
+                                    Call streamRow.Add(cpCore.db.getRecordName("content field types", .fieldTypeId) & cpCore.htmlDoc.html_GetFormInputHidden("dtfaType." & RecordCount, .fieldTypeId))
                                 Else
                                     TypeSelect = TypeSelectTemplate
                                     TypeSelect = genericController.vbReplace(TypeSelect, "menuname", "dtfaType." & RecordCount, 1, 99, vbTextCompare)
@@ -3508,7 +3508,7 @@ ErrorTrap:
             '
             ' Get Tablename and DataSource
             '
-            CS = cpCore.csOpen("Tables", TableID, , , "Name,DataSourceID")
+            CS = cpCore.db.csOpen2("Tables", TableID, , , "Name,DataSourceID")
             If cpCore.db.cs_ok(CS) Then
                 TableName = cpCore.db.cs_getText(CS, "name")
                 DataSource = cpCore.db.cs_getLookup(CS, "DataSourceID")
@@ -4103,7 +4103,7 @@ ErrorTrap:
                 ' Restart
                 '
                 Call Stream.Add("<br>Loading Templates...")
-                Call Stream.Add(ImportTemplates(cpCore.appRootFiles.rootLocalPath, "", AllowBodyHTML, AllowScriptLink, AllowImageImport, AllowStyleImport))
+                'Call Stream.Add(ImportTemplates(cpCore.appRootFiles.rootLocalPath, "", AllowBodyHTML, AllowScriptLink, AllowImageImport, AllowStyleImport))
                 Call Stream.Add("<br>Templates loaded")
             End If
             '
@@ -4128,138 +4128,138 @@ ErrorTrap:
 ErrorTrap:
             throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_LoadTemplates", "ErrorTrap")
         End Function
-        '
-        '=============================================================================
-        '   Import the htm and html files in the FileRootPath and below into Page Templates
-        '       FileRootPath is the path to the root of the site
-        '       AppPath is the path to the folder currently
-        '=============================================================================
-        '
-        Private Function ImportTemplates(ByVal FileRootPath As String, ByVal AppPath As String, ByVal AllowBodyHTML As Boolean, ByVal AllowScriptLink As Boolean, ByVal AllowImageImport As Boolean, ByVal AllowStyleImport As Boolean) As String
-            Dim result As String = ""
-            Try
-                '
-                Dim Stream As New stringBuilderLegacyController
-                Dim Folders() As String
-                Dim FolderList As String
-                Dim FolderDetailString As String
-                Dim FolderDetails() As String
-                Dim FolderName As String
-                Dim FileList As String
-                Dim Files() As String
-                Dim Ptr As Integer
-                Dim FileDetailString As String
-                Dim FileDetails() As String
-                Dim Filename As String
-                Dim PageSource As String
-                Dim CS As Integer
-                Dim Link As String
-                Dim TemplateName As String
-                Dim Copy As String
-                '
-                FileList = cpCore.appRootFiles.convertFileINfoArrayToParseString(cpCore.appRootFiles.getFileList(FileRootPath & AppPath))
-                Files = Split(FileList, vbCrLf)
-                For Ptr = 0 To UBound(Files)
-                    FileDetailString = Files(Ptr)
-                    FileDetails = Split(FileDetailString, ",")
-                    Filename = FileDetails(0)
-                    Link = genericController.vbReplace(AppPath & Filename, "\", "/")
-                    If AllowScriptLink And (InStr(1, Filename, ".asp", vbTextCompare) <> 0) And (Mid(Filename, 1, 1) <> "_") Then
-                        '
-                        result = result & "<br>Create Hard Template for script page [" & Link & "]"
-                        '
-                        Link = genericController.vbReplace(AppPath & Filename, "\", "/")
-                        TemplateName = genericController.vbReplace(Link, "/", "-")
-                        If genericController.vbInstr(1, TemplateName, ".") <> 0 Then
-                            TemplateName = Mid(TemplateName, 1, genericController.vbInstr(1, TemplateName, ".") - 1)
+        ''
+        ''=============================================================================
+        ''   Import the htm and html files in the FileRootPath and below into Page Templates
+        ''       FileRootPath is the path to the root of the site
+        ''       AppPath is the path to the folder currently
+        ''=============================================================================
+        ''
+        'Private Function ImportTemplates(ByVal FileRootPath As String, ByVal AppPath As String, ByVal AllowBodyHTML As Boolean, ByVal AllowScriptLink As Boolean, ByVal AllowImageImport As Boolean, ByVal AllowStyleImport As Boolean) As String
+        '    Dim result As String = ""
+        '    Try
+        '        '
+        '        Dim Stream As New stringBuilderLegacyController
+        '        Dim Folders() As String
+        '        Dim FolderList As String
+        '        Dim FolderDetailString As String
+        '        Dim FolderDetails() As String
+        '        Dim FolderName As String
+        '        Dim FileList As String
+        '        Dim Files() As String
+        '        Dim Ptr As Integer
+        '        Dim FileDetailString As String
+        '        Dim FileDetails() As String
+        '        Dim Filename As String
+        '        Dim PageSource As String
+        '        Dim CS As Integer
+        '        Dim Link As String
+        '        Dim TemplateName As String
+        '        Dim Copy As String
+        '        '
+        '        FileList = cpCore.appRootFiles.convertFileINfoArrayToParseString(cpCore.appRootFiles.getFileList(FileRootPath & AppPath))
+        '        Files = Split(FileList, vbCrLf)
+        '        For Ptr = 0 To UBound(Files)
+        '            FileDetailString = Files(Ptr)
+        '            FileDetails = Split(FileDetailString, ",")
+        '            Filename = FileDetails(0)
+        '            Link = genericController.vbReplace(AppPath & Filename, "\", "/")
+        '            If AllowScriptLink And (InStr(1, Filename, ".asp", vbTextCompare) <> 0) And (Mid(Filename, 1, 1) <> "_") Then
+        '                '
+        '                result = result & "<br>Create Hard Template for script page [" & Link & "]"
+        '                '
+        '                Link = genericController.vbReplace(AppPath & Filename, "\", "/")
+        '                TemplateName = genericController.vbReplace(Link, "/", "-")
+        '                If genericController.vbInstr(1, TemplateName, ".") <> 0 Then
+        '                    TemplateName = Mid(TemplateName, 1, genericController.vbInstr(1, TemplateName, ".") - 1)
 
-                        End If
-                        '
-                        CS = cpCore.db.cs_open("Page Templates", "Link=" & cpCore.db.encodeSQLText(Link))
-                        If Not cpCore.db.cs_ok(CS) Then
-                            Call cpCore.db.cs_Close(CS)
-                            CS = cpCore.db.cs_insertRecord("Page Templates")
-                            Call cpCore.db.cs_set(CS, "Link", Link)
-                        End If
-                        If cpCore.db.cs_ok(CS) Then
-                            Call cpCore.db.cs_set(CS, "name", TemplateName)
-                        End If
-                        Call cpCore.db.cs_Close(CS)
-                    ElseIf AllowBodyHTML And (InStr(1, Filename, ".htm", vbTextCompare) <> 0) And (Mid(Filename, 1, 1) <> "_") Then
-                        '
-                        ' HTML, import body
-                        '
-                        PageSource = cpCore.appRootFiles.readFile(Filename)
-                        PageSource = cpCore.main_GetBody(PageSource)
-                        Link = genericController.vbReplace(AppPath & Filename, "\", "/")
-                        TemplateName = genericController.vbReplace(Link, "/", "-")
-                        If genericController.vbInstr(1, TemplateName, ".") <> 0 Then
-                            TemplateName = Mid(TemplateName, 1, genericController.vbInstr(1, TemplateName, ".") - 1)
+        '                End If
+        '                '
+        '                CS = cpCore.db.cs_open("Page Templates", "Link=" & cpCore.db.encodeSQLText(Link))
+        '                If Not cpCore.db.cs_ok(CS) Then
+        '                    Call cpCore.db.cs_Close(CS)
+        '                    CS = cpCore.db.cs_insertRecord("Page Templates")
+        '                    Call cpCore.db.cs_set(CS, "Link", Link)
+        '                End If
+        '                If cpCore.db.cs_ok(CS) Then
+        '                    Call cpCore.db.cs_set(CS, "name", TemplateName)
+        '                End If
+        '                Call cpCore.db.cs_Close(CS)
+        '            ElseIf AllowBodyHTML And (InStr(1, Filename, ".htm", vbTextCompare) <> 0) And (Mid(Filename, 1, 1) <> "_") Then
+        '                '
+        '                ' HTML, import body
+        '                '
+        '                PageSource = cpCore.appRootFiles.readFile(Filename)
+        '                Call cpCore.main_EncodePage_SplitBody(PageSource, PageSource, "", "")
+        '                Link = genericController.vbReplace(AppPath & Filename, "\", "/")
+        '                TemplateName = genericController.vbReplace(Link, "/", "-")
+        '                If genericController.vbInstr(1, TemplateName, ".") <> 0 Then
+        '                    TemplateName = Mid(TemplateName, 1, genericController.vbInstr(1, TemplateName, ".") - 1)
 
-                        End If
-                        '
-                        result = result & "<br>Create Soft Template from source [" & Link & "]"
-                        '
-                        CS = cpCore.db.cs_open("Page Templates", "Source=" & cpCore.db.encodeSQLText(Link))
-                        If Not cpCore.db.cs_ok(CS) Then
-                            Call cpCore.db.cs_Close(CS)
-                            CS = cpCore.db.cs_insertRecord("Page Templates")
-                            Call cpCore.db.cs_set(CS, "Source", Link)
-                            Call cpCore.db.cs_set(CS, "name", TemplateName)
-                        End If
-                        If cpCore.db.cs_ok(CS) Then
-                            Call cpCore.db.cs_set(CS, "Link", "")
-                            Call cpCore.db.cs_set(CS, "bodyhtml", PageSource)
-                        End If
-                        Call cpCore.db.cs_Close(CS)
-                        '
-                    ElseIf AllowImageImport And (InStr(1, Filename, ".gif", vbTextCompare) <> 0) And (Mid(Filename, 1, 1) <> "_") Then
-                        '
-                        ' Import GIF images
-                        '
-                        result = result & "<br>Import Image Link to Resource Library [" & Link & "]"
-                        '
-                    ElseIf AllowStyleImport And (InStr(1, Filename, ".css", vbTextCompare) <> 0) And (Mid(Filename, 1, 1) <> "_") Then
-                        '
-                        ' Import CSS to Dynamic styles
-                        '
-                        result = result & "<br>Import style sheet to Dynamic Styles [" & Link & "]"
-                        '
-                        Dim DynamicFilename As String
-                        DynamicFilename = "templates\styles.css"
-                        Copy = cpCore.appRootFiles.readFile(DynamicFilename)
-                        Copy = RemoveStyleTags(Copy)
-                        Copy = Copy _
-                            & vbCrLf _
-                            & vbCrLf & "/* Import of " & FileRootPath & AppPath & Filename & "*/" _
-                            & vbCrLf _
-                            & vbCrLf
-                        Copy = Copy & RemoveStyleTags(cpCore.appRootFiles.readFile(Filename))
-                        Call cpCore.appRootFiles.saveFile(DynamicFilename, Copy)
-                    End If
-                Next
-                '
-                ' Now process all subfolders
-                '
-                FolderList = cpCore.getFolderNameList(FileRootPath & AppPath)
-                If FolderList <> "" Then
-                    Folders = Split(FolderList, vbCrLf)
-                    For Ptr = 0 To UBound(Folders)
-                        FolderDetailString = Folders(Ptr)
-                        If FolderDetailString <> "" Then
-                            FolderDetails = Split(FolderDetailString, ",")
-                            FolderName = FolderDetails(0)
-                            If Mid(FolderName, 1, 1) <> "_" Then
-                                result = result & ImportTemplates(FileRootPath, AppPath & FolderName & "\", AllowBodyHTML, AllowScriptLink, AllowImageImport, AllowStyleImport)
-                            End If
-                        End If
-                    Next
-                End If
-            Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
-            End Try
-            Return result
-        End Function
+        '                End If
+        '                '
+        '                result = result & "<br>Create Soft Template from source [" & Link & "]"
+        '                '
+        '                CS = cpCore.db.cs_open("Page Templates", "Source=" & cpCore.db.encodeSQLText(Link))
+        '                If Not cpCore.db.cs_ok(CS) Then
+        '                    Call cpCore.db.cs_Close(CS)
+        '                    CS = cpCore.db.cs_insertRecord("Page Templates")
+        '                    Call cpCore.db.cs_set(CS, "Source", Link)
+        '                    Call cpCore.db.cs_set(CS, "name", TemplateName)
+        '                End If
+        '                If cpCore.db.cs_ok(CS) Then
+        '                    Call cpCore.db.cs_set(CS, "Link", "")
+        '                    Call cpCore.db.cs_set(CS, "bodyhtml", PageSource)
+        '                End If
+        '                Call cpCore.db.cs_Close(CS)
+        '                '
+        '            ElseIf AllowImageImport And (InStr(1, Filename, ".gif", vbTextCompare) <> 0) And (Mid(Filename, 1, 1) <> "_") Then
+        '                '
+        '                ' Import GIF images
+        '                '
+        '                result = result & "<br>Import Image Link to Resource Library [" & Link & "]"
+        '                '
+        '            ElseIf AllowStyleImport And (InStr(1, Filename, ".css", vbTextCompare) <> 0) And (Mid(Filename, 1, 1) <> "_") Then
+        '                '
+        '                ' Import CSS to Dynamic styles
+        '                '
+        '                result = result & "<br>Import style sheet to Dynamic Styles [" & Link & "]"
+        '                '
+        '                Dim DynamicFilename As String
+        '                DynamicFilename = "templates\styles.css"
+        '                Copy = cpCore.appRootFiles.readFile(DynamicFilename)
+        '                Copy = RemoveStyleTags(Copy)
+        '                Copy = Copy _
+        '                    & vbCrLf _
+        '                    & vbCrLf & "/* Import of " & FileRootPath & AppPath & Filename & "*/" _
+        '                    & vbCrLf _
+        '                    & vbCrLf
+        '                Copy = Copy & RemoveStyleTags(cpCore.appRootFiles.readFile(Filename))
+        '                Call cpCore.appRootFiles.saveFile(DynamicFilename, Copy)
+        '            End If
+        '        Next
+        '        '
+        '        ' Now process all subfolders
+        '        '
+        '        FolderList = cpCore.getFolderNameList(FileRootPath & AppPath)
+        '        If FolderList <> "" Then
+        '            Folders = Split(FolderList, vbCrLf)
+        '            For Ptr = 0 To UBound(Folders)
+        '                FolderDetailString = Folders(Ptr)
+        '                If FolderDetailString <> "" Then
+        '                    FolderDetails = Split(FolderDetailString, ",")
+        '                    FolderName = FolderDetails(0)
+        '                    If Mid(FolderName, 1, 1) <> "_" Then
+        '                        result = result & ImportTemplates(FileRootPath, AppPath & FolderName & "\", AllowBodyHTML, AllowScriptLink, AllowImageImport, AllowStyleImport)
+        '                    End If
+        '                End If
+        '            Next
+        '        End If
+        '    Catch ex As Exception
+        '        cpCore.handleExceptionAndContinue(ex) : Throw
+        '    End Try
+        '    Return result
+        'End Function
         '        '
         '        '
         '        '

@@ -898,7 +898,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
+            Throw New applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Sub
         '
@@ -930,7 +930,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
+            Throw New applicationException("Unexpected exception") ' Call cpcore.handleLegacyError18(MethodName)
             '
         End Function
         '
@@ -995,7 +995,7 @@ ErrorTrap:
                 '
                 ' ----- Popup USER errors
                 '
-                If (Not BlockNonContentExtras) And cpCore.error_IsUserError() Then
+                If (Not BlockNonContentExtras) And (cpCore.debug_iUserError <> "") Then
                     AllowPopupErrors = cpCore.siteProperties.getBoolean("AllowPopupErrors", True)
                     If AllowPopupErrors Then
                         's = s & main_GetPopupMessage("<div style=""margin:20px;"">" & main_GetUserError() & "</div>", 300, 200, False)
@@ -1090,7 +1090,7 @@ ErrorTrap:
                 Dim Files() As String
                 Dim Parts() As String
                 If (main_MetaContent_SharedStyleIDList <> "") Then
-                    FileList = cpCore.main_GetSharedStyleFileList(main_MetaContent_SharedStyleIDList, main_IsAdminSite)
+                    FileList = cpCore.htmlDoc.main_GetSharedStyleFileList(cpCore, main_MetaContent_SharedStyleIDList, main_IsAdminSite)
                     main_MetaContent_SharedStyleIDList = ""
                     If FileList <> "" Then
                         Files = Split(FileList, vbCrLf)
@@ -1311,7 +1311,7 @@ ErrorTrap:
                     If CurrentValue = 0 Then
                         main_GetFormInputSelect2 = html_GetFormInputText2(MenuName, "0")
                     Else
-                        CSPointer = cpCore.csOpen(ContentName, CurrentValue)
+                        CSPointer = cpCore.db.csOpen2(ContentName, CurrentValue)
                         If cpCore.db.cs_ok(CSPointer) Then
                             main_GetFormInputSelect2 = cpCore.db.cs_getText(CSPointer, "name") & "&nbsp;"
                         End If
@@ -1624,9 +1624,9 @@ ErrorTrap:
                 ' Build the SelectRaw
                 ' Test selection size
                 '
-                PeopleTableName = cpCore.GetContentTablename("people")
+                PeopleTableName = cpCore.metaData.getContentTablename("people")
                 PeopleDataSource = cpCore.metaData.getContentDataSource("People")
-                MemberRulesTableName = cpCore.GetContentTablename("Member Rules")
+                MemberRulesTableName = cpCore.metaData.getContentTablename("Member Rules")
                 '
                 RowMax = 0
                 SQL = "select count(*) as cnt" _
@@ -1657,7 +1657,7 @@ ErrorTrap:
                     cpCore.handleExceptionAndContinue(New Exception("While building a group members list for group [" & cpCore.group_GetGroupName(GroupID) & "], too many rows were selected. [" & RowMax & "] records exceeds [" & cpCore.siteProperties.selectFieldLimit & "], the current Site Property app.SiteProperty_SelectFieldLimit."))
                     html_GetFormInputMemberSelect2 = html_GetFormInputMemberSelect2 & html_GetFormInputHidden(MenuNameFPO, iCurrentValue)
                     If iCurrentValue <> 0 Then
-                        CSPointer = cpCore.csOpen("people", iCurrentValue)
+                        CSPointer = cpCore.db.csOpen2("people", iCurrentValue)
                         If cpCore.db.cs_ok(CSPointer) Then
                             html_GetFormInputMemberSelect2 = cpCore.db.cs_getText(CSPointer, "name") & "&nbsp;"
                         End If
@@ -1668,7 +1668,7 @@ ErrorTrap:
                     '
                     ' ----- Generate Drop Down Field Names
                     '
-                    DropDownFieldList = cpCore.GetContentProperty("people", "DropDownFieldList")
+                    DropDownFieldList = cpCore.metaData.GetContentProperty("people", "DropDownFieldList")
                     If DropDownFieldList = "" Then
                         DropDownFieldList = "NAME"
                     End If
@@ -2778,7 +2778,7 @@ ErrorTrap:
                         ' main_Get the current value if the record was found
                         '
                         If cpCore.db.cs_ok(CSPointer) Then
-                            FieldValueVariant = cpCore.cs_GetField(CSPointer, FieldName)
+                            FieldValueVariant = cpCore.db.cs_getField(CSPointer, FieldName)
                         End If
                         '
                         If FieldPassword Then
@@ -2899,9 +2899,9 @@ ErrorTrap:
                                         ' Lookup into Content
                                         '
                                         If FieldReadOnly Then
-                                            CSPointer = cpCore.csOpenRecord(FieldLookupContentName, FieldValueInteger)
+                                            CSPointer = cpCore.db.cs_open2(FieldLookupContentName, FieldValueInteger)
                                             If cpCore.db.cs_ok(CSLookup) Then
-                                                returnResult = cpCore.main_cs_getEncodedField(CSLookup, "name")
+                                                returnResult = csController.main_cs_getEncodedField(cpCore, CSLookup, "name")
                                             End If
                                             Call cpCore.db.cs_Close(CSLookup)
                                         Else
@@ -3199,7 +3199,7 @@ ErrorTrap:
                 InputName = FieldName
             End If
             '
-            fieldType = genericController.EncodeInteger(cpCore.GetContentFieldProperty(ContentName, FieldName, "type"))
+            fieldType = genericController.EncodeInteger(cpCore.metaData.GetContentFieldProperty(ContentName, FieldName, "type"))
             Select Case fieldType
                 Case FieldTypeIdBoolean
                     '
@@ -3347,7 +3347,7 @@ ErrorTrap:
                     '
                     '
                     '
-                    GroupID = genericController.EncodeInteger(cpCore.GetContentFieldProperty(ContentName, FieldName, "memberselectgroupid"))
+                    GroupID = genericController.EncodeInteger(cpCore.metaData.GetContentFieldProperty(ContentName, FieldName, "memberselectgroupid"))
                     html_GetFormInputField = html_GetFormInputMemberSelect(InputName, genericController.EncodeInteger(HtmlValue), GroupID, , , HtmlId)
                     If HtmlClass <> "" Then
                         html_GetFormInputField = genericController.vbReplace(html_GetFormInputField, ">", " class=""" & HtmlClass & """>")
@@ -3553,7 +3553,7 @@ ErrorTrap:
                     '
                     ' Personalization Tag
                     '
-                    FieldList = cpCore.GetContentProperty("people", "SelectFieldList")
+                    FieldList = cpCore.metaData.GetContentProperty("people", "SelectFieldList")
                     FieldList = genericController.vbReplace(FieldList, ",", "|")
                     IconIDControlString = "AC,PERSONALIZATION,0,Personalization,field=[" & FieldList & "]"
                     IconImg = genericController.GetAddonIconImg(cpCore.siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", cpCore.serverConfig.appConfig.cdnFilesNetprefix, "Any Personalization Field", "Renders as any Personalization Field", "", 0)
@@ -3685,7 +3685,7 @@ ErrorTrap:
                                         DefaultAddonOption_String = ""
                                     Else
                                         ArgumentList = Trim(cpCore.db.cs_get(CSAddons, "ArgumentList"))
-                                        DefaultAddonOption_String = cpCore.main_GetDefaultAddonOption_String(ArgumentList, AddonGuid, IsInline)
+                                        DefaultAddonOption_String = addonController.main_GetDefaultAddonOption_String(cpCore, ArgumentList, AddonGuid, IsInline)
                                         DefaultAddonOption_String = main_encodeHTML(DefaultAddonOption_String)
                                     End If
                                     '
@@ -6209,7 +6209,7 @@ ErrorTrap:
                 Dim addonOption_String As String
                 Dim FieldTypeDefaultEditorAddonId As Integer
                 '
-                FieldTypeDefaultEditorAddonIdList = cpCore.getFieldTypeDefaultEditorAddonIdList()
+                FieldTypeDefaultEditorAddonIdList = editorController.getFieldTypeDefaultEditorAddonIdList(cpCore)
                 FieldTypeDefaultEditorAddonIds = Split(FieldTypeDefaultEditorAddonIdList, ",")
                 FieldTypeDefaultEditorAddonId = genericController.EncodeInteger(FieldTypeDefaultEditorAddonIds(FieldTypeIdHTML))
 
@@ -6275,7 +6275,7 @@ ErrorTrap:
             ' ----- Read in and save the Member profile values from the tools panel
             '
             If (cpCore.authContext.user.ID > 0) Then
-                If Not cpCore.error_IsUserError() Then
+                If Not (cpCore.debug_iUserError <> "") Then
                     Button = cpCore.docProperties.getText("mb")
                     Select Case Button
                         Case ButtonLogout
@@ -6341,7 +6341,7 @@ ErrorTrap:
                                     '
                                     ' path is blocked, but we do not want it blocked
                                     '
-                                    Call cpCore.DeleteContentRecord("Paths", PathID)
+                                    Call cpCore.db.deleteContentRecord("Paths", PathID)
                                 End If
                             End If
                     End Select
@@ -6414,7 +6414,7 @@ ErrorTrap:
                 ' ----- Page Content Child List Add-on
                 '
                 If (RecordID <> 0) And (True) Then
-                    CSAddon = cpCore.csOpen(cnAddons, cpCore.siteProperties.childListAddonID)
+                    CSAddon = cpCore.db.csOpen2(cnAddons, cpCore.siteProperties.childListAddonID)
                     FoundAddon = False
                     If cpCore.db.cs_ok(CSAddon) Then
                         FoundAddon = True
@@ -6572,7 +6572,7 @@ ErrorTrap:
                 '
                 ' ----- Normal Content Edit - find instance in the content
                 '
-                CS = cpCore.csOpen(ContentName, RecordID)
+                CS = cpCore.db.csOpen2(ContentName, RecordID)
                 If Not cpCore.db.cs_ok(CS) Then
                     cpCore.handleExceptionAndContinue(New Exception("No record found with content [" & ContentName & "] and RecordID [" & RecordID & "]"))
                 Else
@@ -6723,7 +6723,7 @@ ErrorTrap:
                 'Call cpCore.cache.invalidateObjectList("")
                 If ContentName <> "" Then
                     Call cpCore.cache.invalidateContent(ContentName)
-                    TableName = cpCore.GetContentTablename(ContentName)
+                    TableName = cpCore.metaData.getContentTablename(ContentName)
                     If genericController.vbLCase(TableName) = "cctemplates" Then
                         Call cpCore.cache.setObject(pagesController.cache_pageTemplate_cacheName, Nothing)
                         Call cpCore.pages.pageManager_cache_pageTemplate_load()
@@ -7003,17 +7003,17 @@ ErrorTrap:
                 '
                 IsContentCategoriesSupported = IncludeContentFolderDivs
                 If IsContentCategoriesSupported Then
-                    IsContentCategoriesSupported = cpCore.main_IsContentFieldSupported(SecondaryContentName, "ContentCategoryID")
+                    IsContentCategoriesSupported = cpCore.metaData.isContentFieldSupported(SecondaryContentName, "ContentCategoryID")
                 End If
                 '
                 ' IsRuleCopySupported - if true, the rule records include an allow button, and copy
                 '   This is for a checkbox like [ ] Other [enter other copy here]
                 '
-                IsRuleCopySupported = cpCore.main_IsContentFieldSupported(RulesContentName, "RuleCopy")
+                IsRuleCopySupported = cpCore.metaData.isContentFieldSupported(RulesContentName, "RuleCopy")
                 If IsRuleCopySupported Then
-                    IsRuleCopySupported = IsRuleCopySupported And cpCore.main_IsContentFieldSupported(SecondaryContentName, "AllowRuleCopy")
+                    IsRuleCopySupported = IsRuleCopySupported And cpCore.metaData.isContentFieldSupported(SecondaryContentName, "AllowRuleCopy")
                     If IsRuleCopySupported Then
-                        IsRuleCopySupported = IsRuleCopySupported And cpCore.main_IsContentFieldSupported(SecondaryContentName, "RuleCopyCaption")
+                        IsRuleCopySupported = IsRuleCopySupported And cpCore.metaData.isContentFieldSupported(SecondaryContentName, "RuleCopyCaption")
                     End If
                 End If
                 If CaptionFieldName = "" Then
@@ -7036,7 +7036,7 @@ ErrorTrap:
                     '
                     '
                     '
-                    rulesTablename = cpCore.GetContentTablename(RulesContentName)
+                    rulesTablename = cpCore.metaData.getContentTablename(RulesContentName)
                     SingularPrefixHtmlEncoded = html_EncodeHTML(genericController.GetSingular(SecondaryContentName)) & "&nbsp;"
                     '
                     main_MemberShipCount = 0
@@ -7241,7 +7241,7 @@ ErrorTrap:
                                                     End If
                                                 Next
                                             End If
-                                            returnHtml &= cpCore.main_GetYesNo(Found) & "&nbsp;-&nbsp;"
+                                            returnHtml &= genericController.main_GetYesNo(Found) & "&nbsp;-&nbsp;"
                                         Else
                                             Found = False
                                             If main_MemberShipCount <> 0 Then
@@ -7328,7 +7328,7 @@ ErrorTrap:
             Dim JSSwitchAll As String
             Dim IsContentCategoriesSupported As Boolean
             '
-            IsContentCategoriesSupported = cpCore.main_IsContentFieldSupported(SecondaryContentName, "ContentCategoryID")
+            IsContentCategoriesSupported = cpCore.metaData.isContentFieldSupported(SecondaryContentName, "ContentCategoryID")
             If Not IsContentCategoriesSupported Then
                 main_GetFormInputCheckListCategories = main_GetFormInputCheckListCategories_Content(TagName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectCriteria, CaptionFieldName, readOnlyField, False, "")
             Else
@@ -8001,15 +8001,15 @@ ErrorTrap:
                                             ' Child Page List
                                             '
                                             'hint = hint & ",320"
-                                            ListName = cpCore.csv_GetAddonOption("name", addonOptionString)
+                                            ListName = cpCore.getAddonOption("name", addonOptionString)
                                             returnValue = returnValue & cpCore.pages.pageManager_GetChildPageList(ListName, ContextContentName, ContextRecordID, True)
                                         Case ACTypeTemplateText
                                             '
                                             ' Text Box = copied here from gethtmlbody
                                             '
-                                            CopyName = cpCore.csv_GetAddonOption("new", addonOptionString)
+                                            CopyName = cpCore.getAddonOption("new", addonOptionString)
                                             If CopyName = "" Then
-                                                CopyName = cpCore.csv_GetAddonOption("name", addonOptionString)
+                                                CopyName = cpCore.getAddonOption("name", addonOptionString)
                                                 If CopyName = "" Then
                                                     CopyName = "Default"
                                                 End If
@@ -8026,9 +8026,9 @@ ErrorTrap:
                                             ' Watch List
                                             '
                                             'hint = hint & ",330"
-                                            ListName = cpCore.csv_GetAddonOption("LISTNAME", addonOptionString)
-                                            SortField = cpCore.csv_GetAddonOption("SORTFIELD", addonOptionString)
-                                            SortReverse = genericController.EncodeBoolean(cpCore.csv_GetAddonOption("SORTDIRECTION", addonOptionString))
+                                            ListName = cpCore.getAddonOption("LISTNAME", addonOptionString)
+                                            SortField = cpCore.getAddonOption("SORTFIELD", addonOptionString)
+                                            SortReverse = genericController.EncodeBoolean(cpCore.getAddonOption("SORTDIRECTION", addonOptionString))
                                             returnValue = returnValue & cpCore.pages.main_GetWatchList(cpCore, ListName, SortField, SortReverse)
                                         Case Else
                                             '
@@ -8973,7 +8973,7 @@ ErrorTrap:
                     If Not cpCore.authContext.isNewLoginOK(cpCore, loginForm_Username, loginForm_Password, ErrorMessage, errorCode) Then
                         Call cpCore.error_AddUserError(ErrorMessage)
                     Else
-                        If Not cpCore.error_IsUserError() Then
+                        If Not (cpCore.debug_iUserError <> "") Then
                             CS = cpCore.db.cs_open("people", "ID=" & cpCore.db.encodeSQLNumber(cpCore.authContext.user.ID))
                             If Not cpCore.db.cs_ok(CS) Then
                                 cpCore.handleExceptionAndContinue(New Exception("Could not open the current members account to set the username and password."))
@@ -9044,7 +9044,7 @@ ErrorTrap:
                     & kmaIndent(Body) _
                     & "</div>"
                 '
-                Call cpCore.main_SetMetaContent(0, 0)
+                Call cpCore.htmlDoc.main_SetMetaContent(0, 0)
                 Call cpCore.htmlDoc.main_AddPagetitle2("Login", "loginPage")
                 head = cpCore.htmlDoc.getHTMLInternalHead(False)
                 If cpCore.pages.templateBodyTag <> "" Then
@@ -9053,7 +9053,7 @@ ErrorTrap:
                     bodyTag = TemplateDefaultBodyTag
                 End If
                 'Call AppendLog("call main_getEndOfBody, from main_getLoginPage2 ")
-                returnREsult = cpCore.main_assembleHtmlDoc(cpCore.siteProperties.docTypeDeclaration(), head, bodyTag, Body & cpCore.htmlDoc.html_GetEndOfBody(False, False, False, False))
+                returnREsult = main_assembleHtmlDoc(cpCore.siteProperties.docTypeDeclaration(), head, bodyTag, Body & cpCore.htmlDoc.html_GetEndOfBody(False, False, False, False))
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
@@ -9362,7 +9362,7 @@ ErrorTrap:
             ' Template shared styles
             '
             ' !!!!! dont know why this was blocked. Running add-ons with shared styles need this in the admin site.
-            FileList = cpCore.main_GetSharedStyleFileList(cpCore.htmlDoc.main_MetaContent_SharedStyleIDList, main_IsAdminSite)
+            FileList = main_GetSharedStyleFileList(cpCore, cpCore.htmlDoc.main_MetaContent_SharedStyleIDList, main_IsAdminSite)
             cpCore.htmlDoc.main_MetaContent_SharedStyleIDList = ""
             If FileList <> "" Then
                 Files = Split(FileList, vbCrLf)
@@ -9403,17 +9403,17 @@ ErrorTrap:
             '
             ' meta content
             '
-            Copy = cpCore.main_GetLastMetaTitle()
+            Copy = cpCore.htmlDoc.main_MetaContent_Title
             If Copy <> "" Then
                 getHTMLInternalHead = getHTMLInternalHead & cr & "<title>" & Copy & "</title>"
             End If
             '
-            Copy = cpCore.main_GetLastMetaKeywordList()
+            Copy = cpCore.htmlDoc.main_MetaContent_KeyWordList
             If Copy <> "" Then
                 getHTMLInternalHead = getHTMLInternalHead & cr & "<meta name=""keywords"" content=""" & Copy & """ >"
             End If
             '
-            Copy = cpCore.main_GetLastMetaDescription()
+            Copy = cpCore.htmlDoc.main_MetaContent_Description
             If Copy <> "" Then
                 getHTMLInternalHead = getHTMLInternalHead & cr & "<meta name=""description"" content=""" & Copy & """ >"
             End If
@@ -9497,7 +9497,7 @@ ErrorTrap:
             '
             ' other head tags - always last
             '
-            OtherHeadTags = cpCore.main_GetLastOtherHeadTags()
+            OtherHeadTags = cpCore.htmlDoc.main_MetaContent_OtherHeadTags
             If OtherHeadTags <> "" Then
                 If Left(OtherHeadTags, 2) <> vbCrLf Then
                     OtherHeadTags = vbCrLf & OtherHeadTags
@@ -9510,7 +9510,385 @@ ErrorTrap:
 ErrorTrap:
             Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetHTMLInternalHead")
         End Function
+        '
+        '================================================================================================================
+        '   main_Get SharedStyleFilelist
+        '
+        '   SharedStyleFilelist is a list of filenames (with conditional comments) that should be included on pages
+        '   that call out the SharedFileIDList
+        '
+        '   Suffix and Prefix are for Conditional Comments around the style tag
+        '
+        '   SharedStyleFileList is
+        '       crlf filename < Prefix< Suffix
+        '       crlf filename < Prefix< Suffix
+        '       ...
+        '       Prefix and Suffix are htmlencoded
+        '
+        '   SharedStyleMap file
+        '       crlf StyleID tab StyleFilename < Prefix < Suffix, IncludedStyleFilename < Prefix < Suffix, ...
+        '       crlf StyleID tab StyleFilename < Prefix < Suffix, IncludedStyleFilename < Prefix < Suffix, ...
+        '       ...
+        '       StyleID is 0 if Always include is set
+        '       The Prefix and Suffix have had crlf removed, and comma replaced with &#44;
+        '================================================================================================================
+        '
+        Friend Shared Function main_GetSharedStyleFileList(cpCore As coreClass, SharedStyleIDList As String, main_IsAdminSite As Boolean) As String
+            Dim result As String = ""
+            '
+            Dim Prefix As String
+            Dim Suffix As String
+            Dim Files() As String
+            Dim Pos As Integer
+            Dim SrcID As Integer
+            Dim Srcs() As String
+            Dim SrcCnt As Integer
+            Dim IncludedStyleFilename As String
+            Dim styleId As Integer
+            Dim LastStyleID As Integer
+            Dim CS As Integer
+            Dim Ptr As Integer
+            Dim MapList As String
+            Dim Map() As String
+            Dim MapCnt As Integer
+            Dim MapRow As Integer
+            Dim StyleSheetLink As String
+            Dim Filename As String
+            Dim FileList As String
+            Dim SQL As String
+            Dim BakeName As String
+            '
+            If main_IsAdminSite Then
+                BakeName = "SharedStyleMap-Admin"
+            Else
+                BakeName = "SharedStyleMap-Public"
+            End If
+            MapList = genericController.encodeText(cpCore.cache.getObject(Of String)(BakeName))
+            If MapList = "" Then
+                '
+                ' BuildMap
+                '
+                MapList = ""
+                If True Then
+                    '
+                    ' add prefix and suffix conditional comments
+                    '
+                    SQL = "select s.ID,s.Stylefilename,s.Prefix,s.Suffix,i.StyleFilename as iStylefilename,s.AlwaysInclude,i.Prefix as iPrefix,i.Suffix as iSuffix" _
+                        & " from ((ccSharedStyles s" _
+                        & " left join ccSharedStylesIncludeRules r on r.StyleID=s.id)" _
+                        & " left join ccSharedStyles i on i.id=r.IncludedStyleID)" _
+                        & " where ( s.active<>0 )and((i.active is null)or(i.active<>0))"
+                End If
+                CS = cpCore.db.cs_openSql(SQL)
+                LastStyleID = 0
+                Do While cpCore.db.cs_ok(CS)
+                    styleId = cpCore.db.cs_getInteger(CS, "ID")
+                    If styleId <> LastStyleID Then
+                        Filename = cpCore.db.cs_get(CS, "StyleFilename")
+                        Prefix = genericController.vbReplace(cpCore.htmlDoc.main_encodeHTML(cpCore.db.cs_get(CS, "Prefix")), ",", "&#44;")
+                        Suffix = genericController.vbReplace(cpCore.htmlDoc.main_encodeHTML(cpCore.db.cs_get(CS, "Suffix")), ",", "&#44;")
+                        If (Not main_IsAdminSite) And cpCore.db.cs_getBoolean(CS, "alwaysinclude") Then
+                            MapList = MapList & vbCrLf & "0" & vbTab & Filename & "<" & Prefix & "<" & Suffix
+                        Else
+                            MapList = MapList & vbCrLf & styleId & vbTab & Filename & "<" & Prefix & "<" & Suffix
+                        End If
+                    End If
+                    IncludedStyleFilename = cpCore.db.cs_getText(CS, "iStylefilename")
+                    Prefix = cpCore.htmlDoc.main_encodeHTML(cpCore.db.cs_get(CS, "iPrefix"))
+                    Suffix = cpCore.htmlDoc.main_encodeHTML(cpCore.db.cs_get(CS, "iSuffix"))
+                    If IncludedStyleFilename <> "" Then
+                        MapList = MapList & "," & IncludedStyleFilename & "<" & Prefix & "<" & Suffix
+                    End If
+                    Call cpCore.db.cs_goNext(CS)
+                Loop
+                If MapList = "" Then
+                    MapList = ","
+                End If
+                Call cpCore.cache.setObject(BakeName, MapList, "Shared Styles")
+            End If
+            If (MapList <> "") And (MapList <> ",") Then
+                Srcs = Split(SharedStyleIDList, ",")
+                SrcCnt = UBound(Srcs) + 1
+                Map = Split(MapList, vbCrLf)
+                MapCnt = UBound(Map) + 1
+                '
+                ' Add stylesheets with AlwaysInclude set (ID is saved as 0 in Map)
+                '
+                FileList = ""
+                For MapRow = 0 To MapCnt - 1
+                    If genericController.vbInstr(1, Map(MapRow), "0" & vbTab) = 1 Then
+                        Pos = genericController.vbInstr(1, Map(MapRow), vbTab)
+                        If Pos > 0 Then
+                            FileList = FileList & "," & Mid(Map(MapRow), Pos + 1)
+                        End If
+                    End If
+                Next
+                '
+                ' create a filelist of everything that is needed, might be duplicates
+                '
+                For Ptr = 0 To SrcCnt - 1
+                    SrcID = genericController.EncodeInteger(Srcs(Ptr))
+                    If SrcID <> 0 Then
+                        For MapRow = 0 To MapCnt - 1
+                            If genericController.vbInstr(1, Map(MapRow), SrcID & vbTab) <> 0 Then
+                                Pos = genericController.vbInstr(1, Map(MapRow), vbTab)
+                                If Pos > 0 Then
+                                    FileList = FileList & "," & Mid(Map(MapRow), Pos + 1)
+                                End If
+                            End If
+                        Next
+                    End If
+                Next
+                '
+                ' dedup the filelist and convert it to crlf delimited
+                '
+                If FileList <> "" Then
+                    Files = Split(FileList, ",")
+                    For Ptr = 0 To UBound(Files)
+                        Filename = Files(Ptr)
+                        If genericController.vbInstr(1, result, Filename, vbTextCompare) = 0 Then
+                            result = result & vbCrLf & Filename
+                        End If
+                    Next
+                End If
+            End If
+            Return result
+        End Function
+        '
+        ' assemble all the html parts
+        '
+        Public Function main_assembleHtmlDoc(ByVal docType As String, ByVal head As String, ByVal bodyTag As String, ByVal Body As String) As String
+            main_assembleHtmlDoc = "" _
+                & docType _
+                & vbCrLf & "<html>" _
+                & cr & "<head>" _
+                & genericController.kmaIndent(head) _
+                & cr & "</head>" _
+                & cr & bodyTag _
+                & genericController.kmaIndent(Body) _
+                & cr & "</body>" _
+                & vbCrLf & "</html>"
+        End Function
+        '
+        '=============================================================================
+        '   Sets the MetaContent subsystem so the next call to main_GetLastMeta... returns the correct value
+        '       And neither takes much time
+        '=============================================================================
+        '
+        Public Sub main_SetMetaContent(ByVal ContentID As Integer, ByVal RecordID As Integer)
+            Dim KeywordList As String
+            Dim CS As Integer
+            Dim Criteria As String
+            Dim SQL As String
+            Dim FieldList As String
+            Dim iContentID As Integer
+            Dim iRecordID As Integer
+            Dim MetaContentID As Integer
+            '
+            iContentID = genericController.EncodeInteger(ContentID)
+            iRecordID = genericController.EncodeInteger(RecordID)
+            If (iContentID <> 0) And (iRecordID <> 0) Then
+                '
+                ' main_Get ID, Description, Title
+                '
+                Criteria = "(ContentID=" & iContentID & ")and(RecordID=" & iRecordID & ")"
+                If False Then '.3.550" Then
+                    FieldList = "ID,Name,MetaDescription,'' as OtherHeadTags,'' as MetaKeywordList"
+                ElseIf False Then '.3.930" Then
+                    FieldList = "ID,Name,MetaDescription,OtherHeadTags,'' as MetaKeywordList"
+                Else
+                    FieldList = "ID,Name,MetaDescription,OtherHeadTags,MetaKeywordList"
+                End If
+                CS = cpCore.db.cs_open("Meta Content", Criteria, , , , ,, FieldList)
+                If cpCore.db.cs_ok(CS) Then
+                    MetaContentID = cpCore.db.cs_getInteger(CS, "ID")
+                    Call cpCore.htmlDoc.main_AddPagetitle2(cpCore.htmlDoc.html_EncodeHTML(cpCore.db.cs_getText(CS, "Name")), "page content")
+                    Call cpCore.htmlDoc.main_addMetaDescription2(cpCore.htmlDoc.html_EncodeHTML(cpCore.db.cs_getText(CS, "MetaDescription")), "page content")
+                    Call cpCore.htmlDoc.main_AddHeadTag2(cpCore.db.cs_getText(CS, "OtherHeadTags"), "page content")
+                    If True Then
+                        KeywordList = genericController.vbReplace(cpCore.db.cs_getText(CS, "MetaKeywordList"), vbCrLf, ",")
+                    End If
+                    'main_MetaContent_Title = encodeHTML(app.csv_cs_getText(CS, "Name"))
+                    'htmldoc.main_MetaContent_Description = encodeHTML(app.csv_cs_getText(CS, "MetaDescription"))
+                    'main_MetaContent_OtherHeadTags = app.csv_cs_getText(CS, "OtherHeadTags")
+                End If
+                Call cpCore.db.cs_Close(CS)
+                '
+                ' main_Get Keyword List
+                '
+                SQL = "select ccMetaKeywords.Name" _
+                    & " From ccMetaKeywords" _
+                    & " LEFT JOIN ccMetaKeywordRules on ccMetaKeywordRules.MetaKeywordID=ccMetaKeywords.ID" _
+                    & " Where ccMetaKeywordRules.MetaContentID=" & MetaContentID
+                CS = cpCore.db.cs_openSql(SQL)
+                Do While cpCore.db.cs_ok(CS)
+                    KeywordList = KeywordList & "," & cpCore.db.cs_getText(CS, "Name")
+                    Call cpCore.db.cs_goNext(CS)
+                Loop
+                If KeywordList <> "" Then
+                    If Left(KeywordList, 1) = "," Then
+                        KeywordList = Mid(KeywordList, 2)
+                    End If
+                    'KeyWordList = Mid(KeyWordList, 2)
+                    KeywordList = cpCore.htmlDoc.html_EncodeHTML(KeywordList)
+                    Call cpCore.htmlDoc.main_addMetaKeywordList2(KeywordList, "page content")
+                End If
+                Call cpCore.db.cs_Close(CS)
+            End If
+        End Sub
 
-
+        '
+        '
+        '
+        Public Function main_GetResourceLibrary2(ByVal RootFolderName As String, ByVal AllowSelectResource As Boolean, ByVal SelectResourceEditorName As String, ByVal SelectLinkObjectName As String, ByVal AllowGroupAdd As Boolean) As String
+            Dim Option_String As String
+            '
+            Option_String = "" _
+                & "RootFolderName=" & RootFolderName _
+                & "&AllowSelectResource=" & AllowSelectResource _
+                & "&SelectResourceEditorName=" & SelectResourceEditorName _
+                & "&SelectLinkObjectName=" & SelectLinkObjectName _
+                & "&AllowGroupAdd=" & AllowGroupAdd _
+                & ""
+            Return cpCore.addon.execute_legacy4("{564EF3F5-9673-4212-A692-0942DD51FF1A}", Option_String, CPUtilsBaseClass.addonContext.ContextAdmin)
+        End Function
+        '
+        '========================================================================
+        ' Read and save a main_GetFormInputCheckList
+        '   see main_GetFormInputCheckList for an explaination of the input
+        '========================================================================
+        '
+        Public Sub main_ProcessCheckList(ByVal TagName As String, ByVal PrimaryContentName As String, ByVal PrimaryRecordID As String, ByVal SecondaryContentName As String, ByVal RulesContentName As String, ByVal RulesPrimaryFieldname As String, ByVal RulesSecondaryFieldName As String)
+            '
+            Dim rulesTablename As String
+            Dim SQL As String
+            Dim currentRules As DataTable
+            Dim currentRulesCnt As Integer
+            Dim RuleFound As Boolean
+            Dim RuleId As Integer
+            Dim Ptr As Integer
+            Dim TestRecordIDLast As Integer
+            Dim TestRecordID As Integer
+            Dim dupRuleIdList As String
+            Dim GroupCnt As Integer
+            Dim GroupPtr As Integer
+            Dim CSPointer As Integer
+            Dim MethodName As String
+            Dim SecondaryRecordID As Integer
+            Dim RuleNeeded As Boolean
+            Dim CSRule As Integer
+            Dim DateExpires As Date
+            Dim DateExpiresVariant As Object
+            Dim RuleContentChanged As Boolean
+            Dim SupportRuleCopy As Boolean
+            Dim RuleCopy As String
+            '
+            MethodName = "ProcessCheckList"
+            '
+            ' --- create Rule records for all selected
+            '
+            GroupCnt = cpCore.docProperties.getInteger(TagName & ".RowCount")
+            If GroupCnt > 0 Then
+                '
+                ' Test if RuleCopy is supported
+                '
+                SupportRuleCopy = cpCore.metaData.isContentFieldSupported(RulesContentName, "RuleCopy")
+                If SupportRuleCopy Then
+                    SupportRuleCopy = SupportRuleCopy And cpCore.metaData.isContentFieldSupported(SecondaryContentName, "AllowRuleCopy")
+                    If SupportRuleCopy Then
+                        SupportRuleCopy = SupportRuleCopy And cpCore.metaData.isContentFieldSupported(SecondaryContentName, "RuleCopyCaption")
+                    End If
+                End If
+                '
+                ' Go through each checkbox and check for a rule
+                '
+                '
+                ' try
+                '
+                currentRulesCnt = 0
+                dupRuleIdList = ""
+                rulesTablename = cpCore.metaData.getContentTablename(RulesContentName)
+                SQL = "select " & RulesSecondaryFieldName & ",id from " & rulesTablename & " where (" & RulesPrimaryFieldname & "=" & PrimaryRecordID & ")and(active<>0) order by " & RulesSecondaryFieldName
+                currentRulesCnt = 0
+                currentRules = cpCore.db.executeSql(SQL)
+                currentRulesCnt = currentRules.Rows.Count
+                For GroupPtr = 0 To GroupCnt - 1
+                    '
+                    ' ----- Read Response
+                    '
+                    SecondaryRecordID = cpCore.docProperties.getInteger(TagName & "." & GroupPtr & ".ID")
+                    RuleCopy = cpCore.docProperties.getText(TagName & "." & GroupPtr & ".RuleCopy")
+                    RuleNeeded = cpCore.docProperties.getBoolean(TagName & "." & GroupPtr)
+                    '
+                    ' ----- Update Record
+                    '
+                    RuleFound = False
+                    RuleId = 0
+                    TestRecordIDLast = 0
+                    For Ptr = 0 To currentRulesCnt - 1
+                        TestRecordID = genericController.EncodeInteger(currentRules.Rows(Ptr).Item(0))
+                        If TestRecordID = 0 Then
+                            '
+                            ' skip
+                            '
+                        ElseIf TestRecordID = SecondaryRecordID Then
+                            '
+                            ' hit
+                            '
+                            RuleFound = True
+                            RuleId = genericController.EncodeInteger(currentRules.Rows(Ptr).Item(1))
+                            Exit For
+                        ElseIf TestRecordID = TestRecordIDLast Then
+                            '
+                            ' dup
+                            '
+                            dupRuleIdList = dupRuleIdList & "," & genericController.EncodeInteger(currentRules.Rows(Ptr).Item(1))
+                            currentRules.Rows(Ptr).Item(0) = 0
+                        End If
+                        TestRecordIDLast = TestRecordID
+                    Next
+                    If SupportRuleCopy And RuleNeeded And (RuleFound) Then
+                        '
+                        ' Record exists and is needed, update the rule copy
+                        '
+                        SQL = "update " & rulesTablename & " set rulecopy=" & cpCore.db.encodeSQLText(RuleCopy) & " where id=" & RuleId
+                        Call cpCore.db.executeSql(SQL)
+                    ElseIf RuleNeeded And (Not RuleFound) Then
+                        '
+                        ' No record exists, and one is needed
+                        '
+                        CSRule = cpCore.db.cs_insertRecord(RulesContentName)
+                        If cpCore.db.cs_ok(CSRule) Then
+                            Call cpCore.db.cs_set(CSRule, "Active", RuleNeeded)
+                            Call cpCore.db.cs_set(CSRule, RulesPrimaryFieldname, PrimaryRecordID)
+                            Call cpCore.db.cs_set(CSRule, RulesSecondaryFieldName, SecondaryRecordID)
+                            If SupportRuleCopy Then
+                                Call cpCore.db.cs_set(CSRule, "RuleCopy", RuleCopy)
+                            End If
+                        End If
+                        Call cpCore.db.cs_Close(CSRule)
+                        RuleContentChanged = True
+                    ElseIf (Not RuleNeeded) And RuleFound Then
+                        '
+                        ' Record exists and it is not needed
+                        '
+                        SQL = "delete from " & rulesTablename & " where id=" & RuleId
+                        Call cpCore.db.executeSql(SQL)
+                        RuleContentChanged = True
+                    End If
+                Next
+                '
+                ' delete dups
+                '
+                If dupRuleIdList <> "" Then
+                    SQL = "delete from " & rulesTablename & " where id in (" & Mid(dupRuleIdList, 2) & ")"
+                    Call cpCore.db.executeSql(SQL)
+                    RuleContentChanged = True
+                End If
+            End If
+            If RuleContentChanged Then
+                Call cpCore.cache.invalidateContent(RulesContentName)
+            End If
+        End Sub
     End Class
 End Namespace

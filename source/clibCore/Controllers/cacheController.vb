@@ -626,7 +626,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="ContentName"></param>
         Public Sub invalidateContent(ByVal ContentName As String)
             Try
-                invalidateDbTable(cpCore.GetContentTablename(ContentName))
+                invalidateDbTable(cpCore.metaData.getContentTablename(ContentName))
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
             End Try

@@ -53,7 +53,7 @@ Namespace Contensive.Core.Controllers
         '   the input argument OptionString to executeAddon is encoded as "OptionString"
         '       delmited with "&" and all elements encoded with encodeNvaArgument
         '   the optionstring passed to addons is like OptionString encoding, except it is crlf delimited
-        '       only ever decode with cpcore.main_GetAddonOption( name, string )
+        '       only ever decode with cpcore.getAddonOption( name, string )
         '
         '
         '   OptionString
@@ -517,7 +517,7 @@ Namespace Contensive.Core.Controllers
                             OtherHeadTags = ""
                             AddonEditIcon = ""
                             IsInline = True
-                            GroupIDList = cpCore.csv_GetAddonOption("AllowGroups", WorkingOptionString)
+                            GroupIDList = cpCore.getAddonOption("AllowGroups", WorkingOptionString)
                             GroupIDList = Trim(GroupIDList)
                             ' not webonly anymore
                             If Not cpCore.authContext.isMemberOfGroupIdList(cpCore, personalizationPeopleId, personalizationIsAuthenticated, GroupIDList) Then
@@ -1353,12 +1353,12 @@ Namespace Contensive.Core.Controllers
                                     '   Framed in content, during the remote method call
                                     '   add in the rest of the html page
                                     '
-                                    Call cpCore.main_SetMetaContent(0, 0)
+                                    Call cpCore.htmlDoc.main_SetMetaContent(0, 0)
                                     returnVal = "" _
                                         & cpCore.siteProperties.docTypeDeclaration() _
                                         & vbCrLf & "<html>" _
                                         & cr & "<head>" _
-                                        & vbCrLf & kmaIndent(cpCore.main_GetHTMLHead()) _
+                                        & vbCrLf & kmaIndent(cpCore.htmlDoc.getHTMLInternalHead(False)) _
                                         & cr & "</head>" _
                                         & cr & TemplateDefaultBodyTag _
                                         & cr & "</body>" _
@@ -3187,7 +3187,7 @@ ErrorTrap:
             '
             If cpCore.authContext.isAuthenticated() And True Then
                 If cpCore.authContext.isEditingAnything(cpCore) Then
-                    CS = cpCore.csOpen(cnAddons, addonId)
+                    CS = cpCore.db.csOpen2(cnAddons, addonId)
                     If cpCore.db.cs_ok(CS) Then
                         AddonName = cpCore.db.cs_getText(CS, "name")
                         StyleSheet = cpCore.db.cs_get(CS, "CustomStylesFilename")
@@ -3310,7 +3310,7 @@ ErrorTrap:
                     End If
                     '
                     If CollectionID <> 0 Then
-                        CollectionCopy = cpCore.content_GetRecordName("Add-on Collections", CollectionID)
+                        CollectionCopy = cpCore.db.getRecordName("Add-on Collections", CollectionID)
                         If CollectionCopy <> "" Then
                             CollectionCopy = "This add-on is a member of the " & CollectionCopy & " collection."
                         Else
@@ -3938,7 +3938,7 @@ ErrorTrap:
                                                             FieldDescription = main_GetXMLAttribute(IsFound, TabNode, "description", "")
                                                             FieldHTML = genericController.EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "html", ""))
                                                             '
-                                                            CS = cpCore.db.cs_open("Copy Content", "Name=" & cpCore.EncodeSQLText(FieldName), "ID", , , , , "Copy")
+                                                            CS = cpCore.db.cs_open("Copy Content", "Name=" & cpCore.db.encodeSQLText(FieldName), "ID", , , , , "Copy")
                                                             If Not cpCore.db.cs_ok(CS) Then
                                                                 Call cpCore.db.cs_Close(CS)
                                                                 CS = cpCore.db.cs_insertRecord("Copy Content")
@@ -4533,7 +4533,7 @@ ErrorTrap:
             '
             s = Content
             SelectFieldList = "name,copytext,javascriptonload,javascriptbodyend,stylesfilename,otherheadtags,JSFilename,targetString"
-            CS = cpCore.csOpen("Wrappers", WrapperID, , , SelectFieldList)
+            CS = cpCore.db.csOpen2("Wrappers", WrapperID, , , SelectFieldList)
             If cpCore.db.cs_ok(CS) Then
                 Wrapper = cpCore.db.cs_getText(CS, "copytext")
                 wrapperName = cpCore.db.cs_getText(CS, "name")
@@ -4646,6 +4646,106 @@ ErrorTrap:
             If Not Found Then
                 main_GetXMLAttribute = DefaultIfNotFound
             End If
+        End Function
+        '
+        '
+        Public Shared Function main_GetDefaultAddonOption_String(cpCore As coreClass, ByVal ArgumentList As String, ByVal AddonGuid As String, ByVal IsInline As Boolean) As String
+            Dim result As String = ""
+            '
+            Dim NameValuePair As String
+            Dim Pos As Integer
+            Dim OptionName As String
+            Dim OptionValue As String
+            Dim OptionSelector As String
+            Dim QuerySplit() As String
+            Dim NameValue As String
+            Dim Ptr As Integer
+            '
+            ArgumentList = genericController.vbReplace(ArgumentList, vbCrLf, vbCr)
+            ArgumentList = genericController.vbReplace(ArgumentList, vbLf, vbCr)
+            ArgumentList = genericController.vbReplace(ArgumentList, vbCr, vbCrLf)
+            If (InStr(1, ArgumentList, "wrapper", vbTextCompare) = 0) Then
+                '
+                ' Add in default constructors, like wrapper
+                '
+                If ArgumentList <> "" Then
+                    ArgumentList = ArgumentList & vbCrLf
+                End If
+                If genericController.vbLCase(AddonGuid) = genericController.vbLCase(ContentBoxGuid) Then
+                    ArgumentList = ArgumentList & AddonOptionConstructor_BlockNoAjax
+                ElseIf IsInline Then
+                    ArgumentList = ArgumentList & AddonOptionConstructor_Inline
+                Else
+                    ArgumentList = ArgumentList & AddonOptionConstructor_Block
+                End If
+            End If
+            If ArgumentList <> "" Then
+                '
+                ' Argument list is present, translate from AddonConstructor to AddonOption format (see main_executeAddon for details)
+                '
+                QuerySplit = genericController.SplitCRLF(ArgumentList)
+                result = ""
+                For Ptr = 0 To UBound(QuerySplit)
+                    NameValue = QuerySplit(Ptr)
+                    If NameValue <> "" Then
+                        '
+                        ' Execute list functions
+                        '
+                        OptionName = ""
+                        OptionValue = ""
+                        OptionSelector = ""
+                        '
+                        ' split on equal
+                        '
+                        NameValue = genericController.vbReplace(NameValue, "\=", vbCrLf)
+                        Pos = genericController.vbInstr(1, NameValue, "=")
+                        If Pos = 0 Then
+                            OptionName = NameValue
+                        Else
+                            OptionName = Mid(NameValue, 1, Pos - 1)
+                            OptionValue = Mid(NameValue, Pos + 1)
+                        End If
+                        OptionName = genericController.vbReplace(OptionName, vbCrLf, "\=")
+                        OptionValue = genericController.vbReplace(OptionValue, vbCrLf, "\=")
+                        '
+                        ' split optionvalue on [
+                        '
+                        OptionValue = genericController.vbReplace(OptionValue, "\[", vbCrLf)
+                        Pos = genericController.vbInstr(1, OptionValue, "[")
+                        If Pos <> 0 Then
+                            OptionSelector = Mid(OptionValue, Pos)
+                            OptionValue = Mid(OptionValue, 1, Pos - 1)
+                        End If
+                        OptionValue = genericController.vbReplace(OptionValue, vbCrLf, "\[")
+                        OptionSelector = genericController.vbReplace(OptionSelector, vbCrLf, "\[")
+                        '
+                        ' Decode AddonConstructor format
+                        '
+                        OptionName = genericController.DecodeAddonConstructorArgument(OptionName)
+                        OptionValue = genericController.DecodeAddonConstructorArgument(OptionValue)
+                        '
+                        ' Encode AddonOption format
+                        '
+                        'main_GetAddonSelector expects value to be encoded, but not name
+                        'OptionName = encodeNvaArgument(OptionName)
+                        OptionValue = genericController.encodeNvaArgument(OptionValue)
+                        '
+                        ' rejoin
+                        '
+                        NameValuePair = cpCore.htmlDoc.pageManager_GetAddonSelector(OptionName, OptionValue, OptionSelector)
+                        NameValuePair = genericController.EncodeJavascript(NameValuePair)
+                        result = result & "&" & NameValuePair
+                        If genericController.vbInstr(1, NameValuePair, "=") = 0 Then
+                            result = result & "="
+                        End If
+                    End If
+                Next
+                If result <> "" Then
+                    ' remove leading "&"
+                    result = Mid(result, 2)
+                End If
+            End If
+            Return result
         End Function
 
         '====================================================================================================

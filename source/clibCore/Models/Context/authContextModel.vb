@@ -316,7 +316,7 @@ Namespace Contensive.Core.Models.Context
                                             '
                                             ' If useragent is in the list, set mobile true
                                             '
-                                            Dim UserAgentSubstrings As String = cpCore.main_GetMobileBrowserList()
+                                            Dim UserAgentSubstrings As String = main_GetMobileBrowserList(cpCore)
                                             Dim userAgentList As New List(Of String)
                                             If UserAgentSubstrings <> "" Then
                                                 UserAgentSubstrings = genericController.vbReplace(UserAgentSubstrings, vbCrLf, vbLf)
@@ -451,7 +451,7 @@ Namespace Contensive.Core.Models.Context
                                 If (LCase(Left(resultAuthContext.visit.Name, 5)) <> "visit") Then
                                     DefaultMemberName = resultAuthContext.visit.Name
                                 Else
-                                    DefaultMemberName = genericController.encodeText(cpCore.GetContentFieldProperty("people", "name", "default"))
+                                    DefaultMemberName = genericController.encodeText(cpCore.metaData.GetContentFieldProperty("people", "name", "default"))
                                 End If
                                 'resultAuthContext.isAuthenticatedAdmin_cache_isLoaded = False
                                 'resultAuthContext.property_user_isMember_isLoaded = False
@@ -1216,7 +1216,7 @@ Namespace Contensive.Core.Models.Context
         Public Function isAuthenticatedMember(cpCore As coreClass) As Boolean
             Dim result As Boolean = False
             Try
-                result = visit.VisitAuthenticated And (cpCore.IsWithinContent(user.ContentControlID, cpCore.metaData.getContentId("members")))
+                result = visit.VisitAuthenticated And (cpCore.metaData.isWithinContent(user.ContentControlID, cpCore.metaData.getContentId("members")))
                 'If (Not property_user_isMember_isLoaded) And (visit_initialized) Then
                 '    property_user_isMember = isAuthenticated() And cpCore.IsWithinContent(user.ContentControlID, cpCore.main_GetContentID("members"))
                 '    property_user_isMember_isLoaded = True
@@ -1456,6 +1456,179 @@ Namespace Contensive.Core.Models.Context
                 cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
             Return returnResult
+        End Function
+        '
+        '
+        '
+        Public Shared Function main_GetMobileBrowserList(cpCore As coreClass) As String
+            Dim result As String = ""
+            Dim Filename As String
+            Dim datetext As String
+            '
+            result = genericController.encodeText(cpCore.cache.getObject(Of String)("MobileBrowserList"))
+            If result <> "" Then
+                datetext = genericController.getLine(result)
+                If genericController.EncodeDate(datetext) < Now() Then
+                    result = ""
+                End If
+            End If
+            If result = "" Then
+                Filename = "config\MobileBrowserList.txt"
+                result = cpCore.privateFiles.readFile(Filename)
+                If result = "" Then
+                    result = "midp,j2me,avantg,docomo,novarra,palmos,palmsource,240x320,opwv,chtml,pda,windows ce,mmp/,blackberry,mib/,symbian,wireless,nokia,hand,mobi,phone,cdm,up.b,audio,SIE-,SEC-,samsung,HTC,mot-,mitsu,sagem,sony,alcatel,lg,erics,vx,NEC,philips,mmm,xx,panasonic,sharp,wap,sch,rover,pocket,benq,java,pt,pg,vox,amoi,bird,compal,kg,voda,sany,kdd,dbt,sendo,sgh,gradi,jb,moto"
+                    result = genericController.vbReplace(result, ",", vbCrLf)
+                    'Call app.publicFiles.SaveFile(Filename, result)
+                End If
+                datetext = DateTime.Now.AddHours(1).ToString
+                Call cpCore.cache.setObject("MobileBrowserList", datetext & vbCrLf & result)
+            End If
+            Return result
+        End Function
+        '
+        '   Checks the username and password
+        '
+        Public Function main_IsLoginOK(cpcore As coreClass, ByVal Username As String, ByVal Password As String, Optional ByVal ErrorMessage As String = "", Optional ByVal ErrorCode As Integer = 0) As Boolean
+            Dim result As Boolean = (authenticateGetId(cpcore, Username, Password) <> 0)
+            If Not result Then
+                ErrorMessage = cpcore.error_GetUserError()
+            End If
+            Return result
+        End Function
+        '
+        ' ================================================================================================
+        '   conversion pass 2
+        ' ================================================================================================
+        '
+        Public Function main_GetAuthoringStatusMessage(cpcore As coreClass, ByVal IsContentWorkflowAuthoring As Boolean, ByVal RecordEditLocked As Boolean, ByVal main_EditLockName As String, ByVal main_EditLockExpires As Date, ByVal RecordApproved As Boolean, ByVal ApprovedBy As String, ByVal RecordSubmitted As Boolean, ByVal SubmittedBy As String, ByVal RecordDeleted As Boolean, ByVal RecordInserted As Boolean, ByVal RecordModified As Boolean, ByVal ModifiedBy As String) As String
+            Dim result As String = ""
+            result = ""
+            '
+            Dim MethodName As String
+            Dim Copy As String
+            Dim Delimiter As String = ""
+            Dim main_EditLockExpiresMinutes As Integer
+            '
+            MethodName = "result"
+            '
+            main_EditLockExpiresMinutes = CInt((main_EditLockExpires - cpcore.app_startTime).TotalMinutes)
+            If Not cpcore.siteProperties.allowWorkflowAuthoring Then
+                '
+                ' ----- site does not support workflow authoring
+                '
+                If RecordEditLocked Then
+                    Copy = genericController.vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
+                    Copy = genericController.vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
+                    Copy = genericController.vbReplace(Copy, "<EDITEXPIRESMINUTES>", genericController.encodeText(main_EditLockExpiresMinutes))
+                    result &= Delimiter & Copy
+                    Delimiter = "<BR >"
+                End If
+                result &= Delimiter & Msg_WorkflowDisabled
+                Delimiter = "<BR >"
+            ElseIf Not IsContentWorkflowAuthoring Then
+                '
+                ' ----- content does not support workflow authoring
+                '
+                If RecordEditLocked Then
+                    Copy = genericController.vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
+                    Copy = genericController.vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
+                    Copy = genericController.vbReplace(Copy, "<EDITEXPIRESMINUTES>", genericController.encodeText(main_EditLockExpiresMinutes))
+                    result &= Delimiter & Copy
+                    Delimiter = "<BR >"
+                End If
+                result &= Delimiter & Msg_ContentWorkflowDisabled
+                Delimiter = "<BR >"
+            Else
+                '
+                ' ----- Workflow Authoring is supported, check deleted, inserted or modified
+                '
+                If RecordApproved Then
+                    '
+                    ' Approved
+                    '
+                    If isAuthenticatedAdmin(cpcore) Then
+                        Copy = genericController.vbReplace(Msg_AuthoringApprovedAdmin, "<EDITNAME>", ApprovedBy)
+                        result &= Delimiter & Copy
+                        Delimiter = "<BR >"
+                    Else
+                        Copy = genericController.vbReplace(Msg_AuthoringApproved, "<EDITNAME>", ApprovedBy)
+                        result &= Delimiter & Copy
+                        Delimiter = "<BR >"
+                    End If
+                ElseIf RecordSubmitted Then
+                    '
+                    ' Submitted
+                    '
+                    If isAuthenticatedAdmin(cpcore) Then
+                        Copy = genericController.vbReplace(Msg_AuthoringSubmittedAdmin, "<EDITNAME>", SubmittedBy)
+                        result &= Delimiter & Copy
+                        Delimiter = "<BR >"
+                    Else
+                        Copy = genericController.vbReplace(Msg_AuthoringSubmitted, "<EDITNAME>", SubmittedBy)
+                        result &= Delimiter & Copy
+                        Delimiter = "<BR >"
+                    End If
+                ElseIf RecordDeleted Then
+                    '
+                    ' deleted
+                    '
+                    result &= Delimiter & Msg_AuthoringDeleted
+                    Delimiter = "<BR >"
+                ElseIf RecordInserted Then
+                    '
+                    ' inserted
+                    '
+                    result &= Delimiter & Msg_AuthoringInserted
+                    Delimiter = "<BR >"
+                ElseIf RecordModified Then
+                    '
+                    ' modified, submitted or approved
+                    '
+                    If isAuthenticatedAdmin(cpcore) Then
+                        If RecordEditLocked Then
+                            Copy = genericController.vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
+                            Copy = genericController.vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
+                            Copy = genericController.vbReplace(Copy, "<EDITEXPIRESMINUTES>", genericController.encodeText(main_EditLockExpiresMinutes))
+                            result &= Delimiter & Copy
+                            Delimiter = "<BR >"
+                        End If
+                        Copy = genericController.vbReplace(Msg_AuthoringRecordModifedAdmin, "<EDITNAME>", ModifiedBy)
+                        result &= Delimiter & Copy
+                        'result &=  Delimiter & Msg_AuthoringRecordModifedAdmin
+                        Delimiter = "<BR >"
+                    Else
+                        If RecordEditLocked Then
+                            Copy = genericController.vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
+                            Copy = genericController.vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
+                            Copy = genericController.vbReplace(Copy, "<EDITEXPIRESMINUTES>", genericController.encodeText(main_EditLockExpiresMinutes))
+                            result &= Delimiter & Copy
+                            Delimiter = "<BR >"
+                        End If
+                        Copy = genericController.vbReplace(Msg_AuthoringRecordModifed, "<EDITNAME>", ModifiedBy)
+                        result &= Delimiter & Copy
+                        'result &=  Delimiter & Msg_AuthoringRecordModifed
+                        Delimiter = "<BR >"
+                    End If
+                End If
+                '
+                ' ----- Check for authoring status messages if it has been modified
+                '
+                If result = "" Then
+                    '
+                    ' no changes
+                    '
+                    If RecordEditLocked Then
+                        Copy = genericController.vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
+                        Copy = genericController.vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
+                        Copy = genericController.vbReplace(Copy, "<EDITEXPIRESMINUTES>", genericController.encodeText(main_EditLockExpiresMinutes))
+                        result &= Delimiter & Copy
+                        Delimiter = "<BR >"
+                    End If
+                    result &= Delimiter & Msg_AuthoringRecordNotModifed
+                    Delimiter = "<BR >"
+                End If
+            End If
+            Return result
         End Function
     End Class
 End Namespace

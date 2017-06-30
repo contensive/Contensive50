@@ -5377,7 +5377,13 @@ ErrorTrap:
             '
             Return result
         End Function
-
+        Public Shared Function main_GetYesNo(ByVal InputValue As Boolean) As String
+            If InputValue Then
+                Return "Yes"
+            Else
+                Return "No"
+            End If
+        End Function
     End Class
 
 End Namespace

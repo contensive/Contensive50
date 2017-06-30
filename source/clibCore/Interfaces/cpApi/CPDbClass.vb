@@ -84,7 +84,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetTableID(ByVal TableName As String) As Integer
-            Return cp.core.GetTableID(TableName)
+            Return cp.core.db.GetTableID(TableName)
         End Function
         '
         '====================================================================================================

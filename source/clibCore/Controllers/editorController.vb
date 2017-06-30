@@ -115,6 +115,43 @@ Namespace Contensive.Core.Controllers
             Return Stream
         End Function
         '
+        '========================================================================
+        ' main_Get FieldEditorList
+        '
+        '   FieldEditorList is a comma delmited list of addonids, one for each fieldtype
+        '   to use it, split the list on comma and use the fieldtype as index
+        '========================================================================
+        '
+        Public Shared Function getFieldTypeDefaultEditorAddonIdList(cpCore As coreClass) As String
+            '
+            Dim editorAddonIds() As String
+            Dim SQL As String
+            Dim RS As DataTable
+            Dim fieldTypeID As Integer
+            '
+            If Not cpCore.htmlDoc.html_Private_FieldEditorList_Loaded Then
+                '
+                ' load default editors into editors() - these are the editors used when there is no editorPreference
+                '   editors(fieldtypeid) = addonid
+                '
+                ReDim editorAddonIds(FieldTypeIdMax)
+                SQL = "select t.id,t.editorAddonId" _
+                    & " from ccFieldTypes t" _
+                    & " left join ccaggregatefunctions a on a.id=t.editorAddonId" _
+                    & " where (t.active<>0)and(a.active<>0) order by t.id"
+                RS = cpCore.db.executeSql(SQL)
+                For Each dr As DataRow In RS.Rows
+                    fieldTypeID = genericController.EncodeInteger(dr("id"))
+                    If (fieldTypeID <= FieldTypeIdMax) Then
+                        editorAddonIds(fieldTypeID) = genericController.encodeText(dr("editorAddonId"))
+                    End If
+                Next
+                cpCore.htmlDoc.html_Private_FieldEditorList = Join(editorAddonIds, ",")
+                cpCore.htmlDoc.html_Private_FieldEditorList_Loaded = True
+            End If
+            getFieldTypeDefaultEditorAddonIdList = cpCore.htmlDoc.html_Private_FieldEditorList
+        End Function
+        '
         '====================================================================================================
 #Region " IDisposable Support "
         '

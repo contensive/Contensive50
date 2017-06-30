@@ -482,7 +482,7 @@ Namespace Contensive.Addons.PageManager
                                     Else
                                         ClipChildContentID = genericController.EncodeInteger(ClipBoardArray(0))
                                         ClipChildRecordID = genericController.EncodeInteger(ClipBoardArray(1))
-                                        If Not cpCore.IsWithinContent(ClipChildContentID, ClipParentContentID) Then
+                                        If Not cpCore.metaData.isWithinContent(ClipChildContentID, ClipParentContentID) Then
                                             Call cpCore.error_AddUserError("The paste operation failed because the destination location is not compatible with the clipboard data.")
                                         Else
                                             '
@@ -501,7 +501,7 @@ Namespace Contensive.Addons.PageManager
                                                     ' the parent record is not a child of the child record (circular check)
                                                     '
                                                     ClipChildRecordName = "record " & ClipChildRecordID
-                                                    CSClip = cpCore.csOpenRecord(ClipChildContentName, ClipChildRecordID, True, True)
+                                                    CSClip = cpCore.db.cs_open2(ClipChildContentName, ClipChildRecordID, True, True)
                                                     If Not cpCore.db.cs_ok(CSClip) Then
                                                         Call cpCore.error_AddUserError("The paste operation failed because the data record referenced by the clipboard could not found.")
                                                     Else
@@ -554,7 +554,7 @@ Namespace Contensive.Addons.PageManager
                                                     '
                                                     ' Set Child Pages Found and clear caches
                                                     '
-                                                    CSClip = cpCore.csOpen(ClipParentContentName, ClipParentRecordID, , , "ChildPagesFound")
+                                                    CSClip = cpCore.db.csOpen2(ClipParentContentName, ClipParentRecordID, , , "ChildPagesFound")
                                                     If cpCore.db.cs_ok(CSClip) Then
                                                         Call cpCore.db.cs_set(CSClip, "ChildPagesFound", True.ToString)
                                                     End If
@@ -712,21 +712,14 @@ Namespace Contensive.Addons.PageManager
                                     ' Test for Link Alias
                                     '
                                     If (linkAliasTest1 & linkAliasTest2 <> "") Then
-                                        Dim Ptr As Integer = cpCore.cache_linkAlias_getPtrByName(linkAliasTest1)
-                                        If (Ptr < 0) Then
-                                            Ptr = cpCore.cache_linkAlias_getPtrByName(linkAliasTest2)
-                                        End If
-                                        If Ptr >= 0 Then
-                                            '
-                                            ' Link Alias Found
-                                            '
-                                            IsLinkAlias = True
-                                            '
-                                            ' New Way - use pageid and QueryStringSuffix
-                                            '
-                                            Dim LinkQueryString As String = "bid=" & cpCore.cache_linkAlias(linkAliasCache_pageId, Ptr) & "&" & cpCore.cache_linkAlias(linkAliasCache_queryStringSuffix, Ptr)
-                                            cpCore.docProperties.setProperty("bid", cpCore.cache_linkAlias(linkAliasCache_pageId, Ptr), False)
-                                            Dim nameValuePairs As String() = Split(cpCore.cache_linkAlias(linkAliasCache_queryStringSuffix, Ptr), "&")
+                                        Dim sqlCriteria As String = "(link=" & cpCore.db.encodeSQLText(linkAliasTest1) & ")or(link=" & cpCore.db.encodeSQLText(linkAliasTest2) & ")"
+                                        Dim linkAliasList As List(Of Models.Entity.linkAliasModel) = Models.Entity.linkAliasModel.createList(cpCore, sqlCriteria, "id desc")
+                                        If (linkAliasList.Count > 0) Then
+                                            Dim linkAlias As Models.Entity.linkAliasModel = linkAliasList.First
+                                            Dim LinkQueryString As String = "bid=" & linkAlias.PageID & "&" & linkAlias.QueryStringSuffix
+                                            cpCore.docProperties.setProperty("bid", linkAlias.PageID.ToString(), False)
+                                            Dim nameValuePairs As String() = Split(linkAlias.QueryStringSuffix, "&")
+                                            'Dim nameValuePairs As String() = Split(cpCore.cache_linkAlias(linkAliasCache_queryStringSuffix, Ptr), "&")
                                             For Each nameValuePair As String In nameValuePairs
                                                 Dim nameValueThing As String() = Split(nameValuePair, "=")
                                                 If (nameValueThing.GetUpperBound(0) = 0) Then
@@ -829,7 +822,7 @@ Namespace Contensive.Addons.PageManager
                                     '
                                     'Call AppendLog("main_init(), 3410 - exit for login block")
                                     '
-                                    Call cpCore.main_SetMetaContent(0, 0)
+                                    Call cpCore.htmlDoc.main_SetMetaContent(0, 0)
                                     Call cpCore.htmlDoc.writeAltBuffer(cpCore.htmlDoc.getLoginPage(False) & cpCore.htmlDoc.html_GetEndOfBody(False, False, False, False))
                                     cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
                                     Return cpCore.htmlDoc.docBuffer
@@ -840,7 +833,7 @@ Namespace Contensive.Addons.PageManager
                                     '
                                     'Call AppendLog("main_init(), 3420 - exit for custom content block")
                                     '
-                                    Call cpCore.main_SetMetaContent(0, 0)
+                                    Call cpCore.htmlDoc.main_SetMetaContent(0, 0)
                                     Call cpCore.htmlDoc.main_AddOnLoadJavascript2("document.body.style.overflow='scroll'", "Anonymous User Block")
                                     Dim Copy As String = cr & cpCore.htmlDoc.html_GetContentCopy("AnonymousUserResponseCopy", "<p style=""width:250px;margin:100px auto auto auto;"">The site is currently not available for anonymous access.</p>", cpCore.authContext.user.ID, True, cpCore.authContext.isAuthenticated)
                                     ' -- already encoded
@@ -849,7 +842,7 @@ Namespace Contensive.Addons.PageManager
                                             & cpCore.siteProperties.docTypeDeclaration() _
                                             & vbCrLf & "<html>" _
                                             & cr & "<head>" _
-                                            & genericController.kmaIndent(cpCore.main_GetHTMLHead()) _
+                                            & genericController.kmaIndent(cpCore.htmlDoc.getHTMLInternalHead(False)) _
                                             & cr & "</head>" _
                                             & cr & TemplateDefaultBodyTag _
                                             & genericController.kmaIndent(Copy) _
@@ -879,7 +872,7 @@ Namespace Contensive.Addons.PageManager
                         '
                         ' Build Body Tag
                         '
-                        htmlHead = cpCore.main_GetHTMLHead()
+                        htmlHead = cpCore.htmlDoc.getHTMLInternalHead(False)
                         If cpCore.pages.templateBodyTag <> "" Then
                             bodyTag = cpCore.pages.templateBodyTag
                         Else
@@ -892,7 +885,7 @@ Namespace Contensive.Addons.PageManager
                         '
                         ' build doc
                         '
-                        returnHtml = cpCore.main_assembleHtmlDoc(cpCore.siteProperties.docTypeDeclaration(), htmlHead, bodyTag, cpCore.responseBuffer & htmlBody)
+                        returnHtml = cpCore.htmlDoc.main_assembleHtmlDoc(cpCore.siteProperties.docTypeDeclaration(), htmlHead, bodyTag, cpCore.htmlDoc.docBuffer & htmlBody)
                     End If
                 End If
                 '
@@ -1051,7 +1044,7 @@ Namespace Contensive.Addons.PageManager
                 '
                 ' main_Get the instructions from the record
                 '
-                CS = cpcore.csOpen("Form Pages", FormPageID)
+                CS = cpcore.db.csOpen2("Form Pages", FormPageID)
                 If cpcore.db.cs_ok(CS) Then
                     Formhtml = cpcore.db.cs_getText(CS, "Body")
                     FormInstructions = cpcore.db.cs_getText(CS, "Instructions")
@@ -1078,7 +1071,7 @@ Namespace Contensive.Addons.PageManager
                                     ' People Record
                                     '
                                     FormValue = cpcore.docProperties.getText(.PeopleField)
-                                    If (FormValue <> "") And genericController.EncodeBoolean(cpcore.GetContentFieldProperty("people", .PeopleField, "uniquename")) Then
+                                    If (FormValue <> "") And genericController.EncodeBoolean(cpcore.metaData.GetContentFieldProperty("people", .PeopleField, "uniquename")) Then
                                         SQL = "select count(*) from ccMembers where " & .PeopleField & "=" & cpcore.db.encodeSQLText(FormValue)
                                         CS = cpcore.db.cs_openSql(SQL)
                                         If cpcore.db.cs_ok(CS) Then
@@ -1089,12 +1082,12 @@ Namespace Contensive.Addons.PageManager
                                             cpcore.error_AddUserError("The field [" & .Caption & "] must be unique, and the value [" & cpcore.htmlDoc.html_EncodeHTML(FormValue) & "] has already been used.")
                                         End If
                                     End If
-                                    If (.REquired Or genericController.EncodeBoolean(cpcore.GetContentFieldProperty("people", .PeopleField, "required"))) And FormValue = "" Then
+                                    If (.REquired Or genericController.EncodeBoolean(cpcore.metaData.GetContentFieldProperty("people", .PeopleField, "required"))) And FormValue = "" Then
                                         Success = False
                                         cpcore.error_AddUserError("The field [" & cpcore.htmlDoc.html_EncodeHTML(.Caption) & "] is required.")
                                     Else
                                         If Not cpcore.db.cs_ok(CSPeople) Then
-                                            CSPeople = cpcore.csOpen("people", cpcore.authContext.user.ID)
+                                            CSPeople = cpcore.db.csOpen2("people", cpcore.authContext.user.ID)
                                         End If
                                         If cpcore.db.cs_ok(CSPeople) Then
                                             Select Case genericController.vbUCase(.PeopleField)
@@ -1353,7 +1346,7 @@ Namespace Contensive.Addons.PageManager
                             ' Root Page needs to be auto created
                             ' OK to create page here because section has a good record with a 0 RootPageID (this is not AutoHomeCreate)
                             '
-                            rootPageId = cpCore.pages.main_CreatePageGetID(SectionName, "Page Content", SystemMemberID, "")
+                            rootPageId = cpCore.pages.createPageGetID(SectionName, "Page Content", SystemMemberID, "")
                             Call cpCore.db.executeSql("update ccsections set RootPageID=" & rootPageId & " where id=" & SectionID)
                             Call cpCore.pages.pageManager_cache_siteSection_clear()
                             cpCore.htmlDoc.main_AdminWarning = "<p>This page was created automatically because the section [" & SectionName & "] was requested, and it did not reference a page. Use the links below to edit the new page.</p>"
@@ -1825,7 +1818,7 @@ Namespace Contensive.Addons.PageManager
                                                     Exit For
                                                 End If
                                             Next
-                                            linkDomain = cpCore.content_GetRecordName("domains", setdomainId)
+                                            linkDomain = cpCore.db.getRecordName("domains", setdomainId)
                                             If linkDomain <> "" Then
                                                 cpCore.pages.redirectLink = genericController.vbReplace(cpCore.webServer.webServerIO_ServerLink, "://" & cpCore.webServer.requestDomain, "://" & linkDomain, 1, 99, vbTextCompare)
                                                 cpCore.pages.pageManager_RedirectBecausePageNotFound = False

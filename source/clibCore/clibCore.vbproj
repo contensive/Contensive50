@@ -422,6 +422,7 @@
     <Compile Include="Models\Entity\libraryFilesModel.vb" />
     <Compile Include="Models\Entity\libraryFileLogModel.vb" />
     <Compile Include="Models\Entity\addonIncludeModel.vb" />
+    <Compile Include="Models\Entity\linkAliasModel.vb" />
     <Compile Include="Models\Entity\_blankModel.vb" />
     <Compile Include="Models\Entity\tableModel.vb" />
     <Compile Include="Models\Entity\baseModel.vb" />

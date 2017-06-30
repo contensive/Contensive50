@@ -56,7 +56,7 @@ Namespace Contensive.Core
             '
             ' Add Errors
             '
-            If cpCore.error_IsUserError Then
+            If (cpcore.debug_iUserError <> "") Then
                 Copy = Copy & "<div>" & cpCore.error_GetUserError & "</div>"
             End If
             '

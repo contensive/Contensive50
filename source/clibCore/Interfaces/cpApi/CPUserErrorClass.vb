@@ -61,7 +61,7 @@ Namespace Contensive.Core
 
         Public Overrides Function OK() As Boolean 'Inherits BaseClasses.CPUserErrorBaseClass.OK
             If True Then
-                Return Not cpCore.error_IsUserError()
+                Return Not (cpCore.debug_iUserError <> "")
             Else
                 Return True
             End If
