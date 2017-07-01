@@ -225,7 +225,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' no page and no root page, redirect to landing page
                     '
-                    Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestLinkSource)
+                    Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestUrlSource)
                     pageManager_RedirectBecausePageNotFound = True
                     pageManager_RedirectReason = "The page could not be determined from URL."
                     redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
@@ -330,7 +330,7 @@ Namespace Contensive.Core.Controllers
                             & " FROM (ccPageContentBlockRules" _
                             & " LEFT JOIN ccgroups ON ccPageContentBlockRules.GroupID = ccgroups.ID)" _
                             & " LEFT JOIN ccMemberRules ON ccgroups.ID = ccMemberRules.GroupID" _
-                            & " WHERE (((ccMemberRules.MemberID)=" & cpcore.db.encodeSQLNumber(cpcore.authContext.user.ID) & ")" _
+                            & " WHERE (((ccMemberRules.MemberID)=" & cpcore.db.encodeSQLNumber(cpcore.authContext.user.id) & ")" _
                             & " AND ((ccPageContentBlockRules.RecordID) In (" & BlockedRecordIDList & "))" _
                             & " AND ((ccPageContentBlockRules.Active)<>0)" _
                             & " AND ((ccgroups.Active)<>0)" _
@@ -359,7 +359,7 @@ Namespace Contensive.Core.Controllers
                                 & " AND ((ManagementGroups.Active)<>0)" _
                                 & " AND ((ManagementMemberRules.Active)<>0)" _
                                 & " AND ((ManagementMemberRules.DateExpires) Is Null Or (ManagementMemberRules.DateExpires)>" & cpcore.db.encodeSQLDate(cpcore.app_startTime) & ")" _
-                                & " AND ((ManagementMemberRules.MemberID)=" & cpcore.authContext.user.ID & " ));"
+                                & " AND ((ManagementMemberRules.MemberID)=" & cpcore.authContext.user.id & " ));"
                                 CS = cpcore.db.cs_openSql(SQL)
                                 Do While cpcore.db.cs_ok(CS)
                                     BlockedRecordIDList = genericController.vbReplace(BlockedRecordIDList, "," & cpcore.db.cs_getText(CS, "RecordID"), "")
@@ -515,8 +515,8 @@ Namespace Contensive.Core.Controllers
                         '
                         ' Encode the copy
                         '
-                        returnHtml = cpcore.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.ID, cpcore.authContext.isAuthenticated, layoutError)
-                        returnHtml = cpcore.htmlDoc.html_encodeContent9(returnHtml, cpcore.authContext.user.ID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+                        returnHtml = cpcore.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.id, cpcore.authContext.isAuthenticated, layoutError)
+                        returnHtml = cpcore.htmlDoc.html_encodeContent9(returnHtml, cpcore.authContext.user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
                         'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, 0, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
                         RQS = cpcore.htmlDoc.refreshQueryString
                         If RQS <> "" Then
@@ -561,14 +561,14 @@ Namespace Contensive.Core.Controllers
                                 '
                                 ' Link authoring, workflow rendering -> do encoding, but no tracking
                                 '
-                                returnHtml = cpcore.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.ID, cpcore.authContext.isAuthenticated, layoutError)
-                                returnHtml = cpcore.htmlDoc.html_encodeContent9(returnHtml, cpcore.authContext.user.ID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+                                returnHtml = cpcore.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.id, cpcore.authContext.isAuthenticated, layoutError)
+                                returnHtml = cpcore.htmlDoc.html_encodeContent9(returnHtml, cpcore.authContext.user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
                             ElseIf cpcore.htmlDoc.pageManager_printVersion Then
                                 '
                                 ' Printer Version -> personalize and count viewings, no tracking
                                 '
-                                returnHtml = cpcore.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.ID, cpcore.authContext.isAuthenticated, layoutError)
-                                returnHtml = cpcore.htmlDoc.html_encodeContent9(returnHtml, cpcore.authContext.user.ID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+                                returnHtml = cpcore.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.id, cpcore.authContext.isAuthenticated, layoutError)
+                                returnHtml = cpcore.htmlDoc.html_encodeContent9(returnHtml, cpcore.authContext.user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
                                 'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
                                 Call cpcore.db.executeSql("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & currentPageID)
                                 'Call app.csv_SetCS(CS, "Viewings", app.csv_cs_getInteger(CS, "Viewings") + 1)
@@ -580,8 +580,8 @@ Namespace Contensive.Core.Controllers
                                 ' this should be done before the contentbox is added
                                 ' so a stray blocktext does not truncate the html
                                 '!!!!!!!!!!!!!!!!!!!!!!!!!
-                                returnHtml = cpcore.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.ID, cpcore.authContext.isAuthenticated, layoutError)
-                                returnHtml = cpcore.htmlDoc.html_encodeContent9(returnHtml, cpcore.authContext.user.ID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+                                returnHtml = cpcore.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.id, cpcore.authContext.isAuthenticated, layoutError)
+                                returnHtml = cpcore.htmlDoc.html_encodeContent9(returnHtml, cpcore.authContext.user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
                                 'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
                                 'Call main_TrackContent(main_RenderCache_CurrentPage_ContentName, currentPageID)
                                 'Call main_TrackContentSet(CS)
@@ -610,12 +610,12 @@ Namespace Contensive.Core.Controllers
                                     Body = Body & genericController.StartTable(4, 1, 1)
                                     Body = Body & "<tr><td align=""right"" width=""150"" Class=""ccPanelHeader"">Description<br><img alt=""image"" src=""http://" & cpcore.webServer.requestDomain & "/ccLib/images/spacer.gif"" width=""150"" height=""1""></td><td align=""left"" width=""100%"" Class=""ccPanelHeader"">Value</td></tr>"
                                     Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Domain", cpcore.webServer.webServerIO_requestDomain, True)
-                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Link", cpcore.webServer.webServerIO_ServerLink, False)
+                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Link", cpcore.webServer.requestUrl, False)
                                     Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Page Name", PageName, True)
                                     Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Member Name", cpcore.authContext.user.Name, False)
-                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Member #", CStr(cpcore.authContext.user.ID), True)
+                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Member #", CStr(cpcore.authContext.user.id), True)
                                     Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Start Time", CStr(cpcore.authContext.visit.StartTime), False)
-                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit #", CStr(cpcore.authContext.visit.ID), True)
+                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit #", CStr(cpcore.authContext.visit.id), True)
                                     Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit IP", cpcore.webServer.requestRemoteIP, False)
                                     Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Browser ", cpcore.webServer.requestBrowser, True)
                                     Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visitor #", CStr(cpcore.authContext.visitor.ID), False)
@@ -649,28 +649,28 @@ Namespace Contensive.Core.Controllers
                                     ' Always
                                     '
                                     If SystemEMailID <> 0 Then
-                                        Call cpcore.email.sendSystem_Legacy(cpcore.db.getRecordName("System Email", SystemEMailID), "", cpcore.authContext.user.ID)
+                                        Call cpcore.email.sendSystem_Legacy(cpcore.db.getRecordName("System Email", SystemEMailID), "", cpcore.authContext.user.id)
                                     End If
                                     If main_AddGroupID <> 0 Then
-                                        Call cpcore.group_AddGroupMember(cpcore.group_GetGroupName(main_AddGroupID))
+                                        Call groupController.group_AddGroupMember(cpcore, groupController.group_GetGroupName(cpcore, main_AddGroupID))
                                     End If
                                     If RemoveGroupID <> 0 Then
-                                        Call cpcore.group_DeleteGroupMember(cpcore.group_GetGroupName(RemoveGroupID))
+                                        Call groupController.group_DeleteGroupMember(cpcore, groupController.group_GetGroupName(cpcore, RemoveGroupID))
                                     End If
                                 Case 2
                                     '
                                     ' If in Condition Group
                                     '
                                     If ConditionGroupID <> 0 Then
-                                        If cpcore.authContext.IsMemberOfGroup2(cpcore, cpcore.group_GetGroupName(ConditionGroupID)) Then
+                                        If cpcore.authContext.IsMemberOfGroup2(cpcore, groupController.group_GetGroupName(cpcore, ConditionGroupID)) Then
                                             If SystemEMailID <> 0 Then
-                                                Call cpcore.email.sendSystem_Legacy(cpcore.db.getRecordName("System Email", SystemEMailID), "", cpcore.authContext.user.ID)
+                                                Call cpcore.email.sendSystem_Legacy(cpcore.db.getRecordName("System Email", SystemEMailID), "", cpcore.authContext.user.id)
                                             End If
                                             If main_AddGroupID <> 0 Then
-                                                Call cpcore.group_AddGroupMember(cpcore.group_GetGroupName(main_AddGroupID))
+                                                Call groupController.group_AddGroupMember(cpcore, groupController.group_GetGroupName(cpcore, main_AddGroupID))
                                             End If
                                             If RemoveGroupID <> 0 Then
-                                                Call cpcore.group_DeleteGroupMember(cpcore.group_GetGroupName(RemoveGroupID))
+                                                Call groupController.group_DeleteGroupMember(cpcore, groupController.group_GetGroupName(cpcore, RemoveGroupID))
                                             End If
                                         End If
                                     End If
@@ -679,15 +679,15 @@ Namespace Contensive.Core.Controllers
                                     ' If not in Condition Group
                                     '
                                     If ConditionGroupID <> 0 Then
-                                        If Not cpcore.authContext.IsMemberOfGroup2(cpcore, cpcore.group_GetGroupName(ConditionGroupID)) Then
+                                        If Not cpcore.authContext.IsMemberOfGroup2(cpcore, groupController.group_GetGroupName(cpcore, ConditionGroupID)) Then
                                             If main_AddGroupID <> 0 Then
-                                                Call cpcore.group_AddGroupMember(cpcore.group_GetGroupName(main_AddGroupID))
+                                                Call groupController.group_AddGroupMember(cpcore, groupController.group_GetGroupName(cpcore, main_AddGroupID))
                                             End If
                                             If RemoveGroupID <> 0 Then
-                                                Call cpcore.group_DeleteGroupMember(cpcore.group_GetGroupName(RemoveGroupID))
+                                                Call groupController.group_DeleteGroupMember(cpcore, groupController.group_GetGroupName(cpcore, RemoveGroupID))
                                             End If
                                             If SystemEMailID <> 0 Then
-                                                Call cpcore.email.sendSystem_Legacy(cpcore.db.getRecordName("System Email", SystemEMailID), "", cpcore.authContext.user.ID)
+                                                Call cpcore.email.sendSystem_Legacy(cpcore.db.getRecordName("System Email", SystemEMailID), "", cpcore.authContext.user.id)
                                             End If
                                         End If
                                     End If
@@ -723,7 +723,7 @@ Namespace Contensive.Core.Controllers
                         Call cpcore.htmlDoc.main_AddOnLoadJavascript2(JSOnLoad, "page content")
                         Call cpcore.htmlDoc.main_AddHeadScriptCode(JSHead, "page content")
                         If JSFilename <> "" Then
-                            Call cpcore.htmlDoc.main_AddHeadScriptLink(cpcore.getCdnFileLink(JSFilename), "page content")
+                            Call cpcore.htmlDoc.main_AddHeadScriptLink(genericController.getCdnFileLink(cpcore, JSFilename), "page content")
                         End If
                         Call cpcore.htmlDoc.main_AddEndOfBodyJavascript2(JSEndBody, "page content")
                         '
@@ -795,12 +795,12 @@ Namespace Contensive.Core.Controllers
                 If cpcore.htmlDoc.main_AdminWarning <> "" Then
                     '
                     If cpcore.htmlDoc.main_AdminWarningPageID <> 0 Then
-                        cpcore.htmlDoc.main_AdminWarning = cpcore.htmlDoc.main_AdminWarning & "</p>" & cpcore.main_GetRecordEditLink2("Page Content", cpcore.htmlDoc.main_AdminWarningPageID, True, "Page " & cpcore.htmlDoc.main_AdminWarningPageID, cpcore.authContext.isAuthenticatedAdmin(cpcore)) & "&nbsp;Edit the page<p>"
+                        cpcore.htmlDoc.main_AdminWarning = cpcore.htmlDoc.main_AdminWarning & "</p>" & cpcore.htmlDoc.main_GetRecordEditLink2("Page Content", cpcore.htmlDoc.main_AdminWarningPageID, True, "Page " & cpcore.htmlDoc.main_AdminWarningPageID, cpcore.authContext.isAuthenticatedAdmin(cpcore)) & "&nbsp;Edit the page<p>"
                         cpcore.htmlDoc.main_AdminWarningPageID = 0
                     End If
                     '
                     If cpcore.htmlDoc.main_AdminWarningSectionID <> 0 Then
-                        cpcore.htmlDoc.main_AdminWarning = cpcore.htmlDoc.main_AdminWarning & "</p>" & cpcore.main_GetRecordEditLink2("Site Sections", cpcore.htmlDoc.main_AdminWarningSectionID, True, "Section " & cpcore.htmlDoc.main_AdminWarningSectionID, cpcore.authContext.isAuthenticatedAdmin(cpcore)) & "&nbsp;Edit the section<p>"
+                        cpcore.htmlDoc.main_AdminWarning = cpcore.htmlDoc.main_AdminWarning & "</p>" & cpcore.htmlDoc.main_GetRecordEditLink2("Site Sections", cpcore.htmlDoc.main_AdminWarningSectionID, True, "Section " & cpcore.htmlDoc.main_AdminWarningSectionID, cpcore.authContext.isAuthenticatedAdmin(cpcore)) & "&nbsp;Edit the section<p>"
                         cpcore.htmlDoc.main_AdminWarningSectionID = 0
                     End If
 
@@ -858,7 +858,7 @@ Namespace Contensive.Core.Controllers
                 Dim PageLink As String
                 '
                 'hint = "pageManager_GetHtmlBody_GetSection_GetContentBox, enter"
-                If cpcore.docOpen Then
+                If cpcore.continueProcessing Then
                     '
                     ' ----- Load the content
                     '
@@ -875,7 +875,7 @@ Namespace Contensive.Core.Controllers
                             '
                             ' BID was not found, redirect to RootPage
                             '
-                            Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestLinkSource)
+                            Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestUrlSource)
                             pageManager_RedirectBecausePageNotFound = True
                             pageManager_RedirectReason = "The page could not be found from its ID [" & PageID & "]. It may have been deleted or marked inactive. "
                             redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
@@ -884,7 +884,7 @@ Namespace Contensive.Core.Controllers
                             '
                             ' Root page was requested, but not found and could not be created, this is an error
                             '
-                            Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestLinkSource)
+                            Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestUrlSource)
                             pageManager_RedirectBecausePageNotFound = True
                             pageManager_RedirectReason = "The page could not be found because it's ID could not be determined."
                             redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
@@ -936,7 +936,7 @@ Namespace Contensive.Core.Controllers
                                     ' page without section (root page name is the legacy section) not allowed
                                     '
                                     'hint = hint & ",130"
-                                    Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestLinkSource)
+                                    Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestUrlSource)
                                     pageManager_RedirectBecausePageNotFound = True
                                     '????? test
                                     pageManager_RedirectReason = "The page you requested [" & PageID & "] could not be displayed because there is a problem with one of it's parent pages. All parent pages must be available to verify security permissions. A parent page may have been deleted or inactivated, or the page may have been requested from an incorrect location."
@@ -998,11 +998,11 @@ Namespace Contensive.Core.Controllers
                         '
                         LiveBody = pageManager_GetHtmlBody_GetSection_GetContentBox_Live_Body(OrderByClause, AllowChildPageList, False, rootPageId, AllowReturnLink, RootPageContentName, ArchivePages)
                         If cpcore.authContext.isAdvancedEditing(cpcore, "") Then
-                            result = result & cpcore.main_GetRecordEditLink(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage)) & LiveBody
+                            result = result & cpcore.htmlDoc.main_GetRecordEditLink(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage)) & LiveBody
                         ElseIf iIsEditing Then
                             PageName = genericController.encodeText(cache_pageContent(PCC_Name, main_RenderCache_CurrentPage_PCCPtr))
-                            EditLink = cpcore.main_GetRecordEditLink2(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage), PageName, cpcore.authContext.isEditing(cpcore, ContentName))
-                            result = result & cpcore.htmlDoc.main_GetEditWrapper("", cpcore.main_GetRecordEditLink(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage)) & LiveBody)
+                            EditLink = cpcore.htmlDoc.main_GetRecordEditLink2(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage), PageName, cpcore.authContext.isEditing(cpcore, ContentName))
+                            result = result & cpcore.htmlDoc.main_GetEditWrapper("", cpcore.htmlDoc.main_GetRecordEditLink(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage)) & LiveBody)
                         Else
                             result = result & LiveBody
                         End If
@@ -1171,7 +1171,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
                 '
-                Call cpcore.debug_testPoint("pageManager_GetHtmlBody_GetSection_GetContentBox, hint=[" & hint & "]")
+                Call debugController.debug_testPoint(cpcore, "pageManager_GetHtmlBody_GetSection_GetContentBox, hint=[" & hint & "]")
             Catch ex As Exception
                 cpcore.handleExceptionAndContinue(ex)
             End Try
@@ -1500,7 +1500,7 @@ Namespace Contensive.Core.Controllers
                                     SeeAlsoLink = Me.cpcore.webServer.webServerIO_requestProtocol & SeeAlsoLink
                                 End If
                                 If IsEditingLocal Then
-                                    result = result & Me.cpcore.main_GetRecordEditLink2("See Also", (cpcore.db.cs_getInteger(CS, "ID")), False, "", Me.cpcore.authContext.isEditing(cpcore, "See Also"))
+                                    result = result & Me.cpcore.htmlDoc.main_GetRecordEditLink2("See Also", (cpcore.db.cs_getInteger(CS, "ID")), False, "", Me.cpcore.authContext.isEditing(cpcore, "See Also"))
                                 End If
                                 result = result & "<a href=""" & Me.cpcore.htmlDoc.html_EncodeHTML(SeeAlsoLink) & """ target=""_blank"">" & (cpcore.db.cs_getText(CS, "Name")) & "</A>"
                                 Copy = (cpcore.db.cs_getText(CS, "Brief"))
@@ -1516,7 +1516,7 @@ Namespace Contensive.Core.Controllers
                         '
                         If IsEditingLocal Then
                             SeeAlsoCount = SeeAlsoCount + 1
-                            result = result & cr & "<li class=""ccListItem"">" & Me.cpcore.main_GetRecordAddLink("See Also", "RecordID=" & iRecordID & ",ContentID=" & ContentID) & "</LI>"
+                            result = result & cr & "<li class=""ccListItem"">" & Me.cpcore.htmlDoc.main_GetRecordAddLink("See Also", "RecordID=" & iRecordID & ",ContentID=" & ContentID) & "</LI>"
                         End If
                     End If
                     '
@@ -1784,7 +1784,7 @@ Namespace Contensive.Core.Controllers
                         If (LinkLabel <> "") Then
                             result = result & cr & "<li class=""ccListItem"">"
                             If (Link <> "") Then
-                                result = result & Me.cpcore.csv_GetLinkedText("<a href=""" & Me.cpcore.htmlDoc.html_EncodeHTML(cpcore.webServer.webServerIO_requestPage & "?rc=" & ContentID & "&ri=" & RecordID) & """>", LinkLabel)
+                                result = result & genericController.csv_GetLinkedText("<a href=""" & Me.cpcore.htmlDoc.html_EncodeHTML(cpcore.webServer.webServerIO_requestPage & "?rc=" & ContentID & "&ri=" & RecordID) & """>", LinkLabel)
                             Else
                                 result = result & LinkLabel
                             End If
@@ -1890,7 +1890,7 @@ Namespace Contensive.Core.Controllers
                         Call Me.cpcore.db.cs_goNext(CS)
                     Loop
                     If result <> "" Then
-                        result = Me.cpcore.htmlDoc.html_GetContentCopy("Watch List Caption: " & ListName, ListName, Me.cpcore.authContext.user.ID, True, Me.cpcore.authContext.isAuthenticated) & cr & "<ul class=""ccWatchList"">" & kmaIndent(result) & cr & "</ul>"
+                        result = Me.cpcore.htmlDoc.html_GetContentCopy("Watch List Caption: " & ListName, ListName, Me.cpcore.authContext.user.id, True, Me.cpcore.authContext.isAuthenticated) & cr & "<ul class=""ccWatchList"">" & kmaIndent(result) & cr & "</ul>"
                     End If
                 End If
                 Call Me.cpcore.db.cs_Close(CS)
@@ -2092,7 +2092,7 @@ ErrorTrap:
             End If
             If ButtonList <> "" Then
                 ButtonList = Mid(ButtonList, 2)
-                ButtonList = cpcore.main_GetPanelButtons(ButtonList, "Button")
+                ButtonList = cpcore.htmlDoc.main_GetPanelButtons(ButtonList, "Button")
             End If
             If OptionsPanelAuthoringStatus <> "" Then
                 s = s & "" _
@@ -2172,7 +2172,7 @@ ErrorTrap:
             & ButtonList _
             & s _
             & ButtonList
-            s = cpcore.main_GetPanel(s)
+            s = cpcore.htmlDoc.main_GetPanel(s)
 
             '
             ' Form Wrapper
@@ -2182,7 +2182,7 @@ ErrorTrap:
             & cr & cpcore.htmlDoc.html_GetFormInputHidden("Type", FormTypePageAuthoring) _
             & cr & cpcore.htmlDoc.html_GetFormInputHidden("ID", RecordID) _
             & cr & cpcore.htmlDoc.html_GetFormInputHidden("ContentName", LiveRecordContentName) _
-            & cr & cpcore.main_GetPanelHeader("Contensive Quick Editor") _
+            & cr & cpcore.htmlDoc.main_GetPanelHeader("Contensive Quick Editor") _
             & cr & s _
             & cr & cpcore.htmlDoc.html_GetUploadFormEnd()
 
@@ -2478,7 +2478,7 @@ ErrorTrap:
                                 Call cpcore.db.cs_set(CSBlock, "name", RecordName)
                                 SaveButNoChanges = False
                             End If
-                            Call cpcore.app_addLinkAlias2(RecordName, RecordID, "")
+                            Call pagesController.app_addLinkAlias2(cpcore, RecordName, RecordID, "")
                             If (cpcore.docProperties.getText("headline") <> cpcore.db.cs_get(CSBlock, "headline")) Then
                                 Call cpcore.db.cs_set(CSBlock, "headline", cpcore.docProperties.getText("headline"))
                                 SaveButNoChanges = False
@@ -2504,7 +2504,7 @@ ErrorTrap:
                     If cpcore.db.cs_ok(CSBlock) Then
                         Call cpcore.db.cs_set(CSBlock, "active", True)
                         Call cpcore.db.cs_set(CSBlock, "ParentID", RecordID)
-                        Call cpcore.db.cs_set(CSBlock, "contactmemberid", cpcore.authContext.user.ID)
+                        Call cpcore.db.cs_set(CSBlock, "contactmemberid", cpcore.authContext.user.id)
                         Call cpcore.db.cs_set(CSBlock, "name", "New Page added " & cpcore.app_startTime & " by " & cpcore.authContext.user.Name)
                         Call cpcore.db.cs_set(CSBlock, "copyFilename", "")
                         RecordID = cpcore.db.cs_getInteger(CSBlock, "ID")
@@ -2540,7 +2540,7 @@ ErrorTrap:
                         If cpcore.db.cs_ok(CSBlock) Then
                             Call cpcore.db.cs_set(CSBlock, "active", True)
                             Call cpcore.db.cs_set(CSBlock, "ParentID", ParentID)
-                            Call cpcore.db.cs_set(CSBlock, "contactmemberid", cpcore.authContext.user.ID)
+                            Call cpcore.db.cs_set(CSBlock, "contactmemberid", cpcore.authContext.user.id)
                             Call cpcore.db.cs_set(CSBlock, "name", "New Page added " & cpcore.app_startTime & " by " & cpcore.authContext.user.Name)
                             Call cpcore.db.cs_set(CSBlock, "copyFilename", "")
                             RecordID = cpcore.db.cs_getInteger(CSBlock, "ID")
@@ -2589,7 +2589,7 @@ ErrorTrap:
                 End If
                 '
                 If (Button = ButtonAbortEdit) Then
-                    Call cpcore.workflow.abortEdit2(ContentName, RecordID, cpcore.authContext.user.ID)
+                    Call cpcore.workflow.abortEdit2(ContentName, RecordID, cpcore.authContext.user.id)
                 End If
                 If (Button = ButtonPublishSubmit) Then
                     Call cpcore.workflow.main_SubmitEdit(ContentName, RecordID)
@@ -3426,7 +3426,7 @@ ErrorTrap:
                 pageParentListName = genericController.encodeText(cache_pageContent(PCC_ParentListName, PCCPtr))
                 pageEditLink = ""
                 If cpcore.authContext.isEditing(cpcore, ContentName) Then
-                    pageEditLink = cpcore.main_GetRecordEditLink2(ContentName, PageID, True, PageName, True)
+                    pageEditLink = cpcore.htmlDoc.main_GetRecordEditLink2(ContentName, PageID, True, PageName, True)
                 End If
                 pageAllowInChildLists = genericController.EncodeBoolean(cache_pageContent(PCC_AllowInChildLists, PCCPtr))
                 pageActive = genericController.EncodeBoolean(cache_pageContent(PCC_Active, PCCPtr))
@@ -3445,7 +3445,7 @@ ErrorTrap:
                 Else
                     BlockContentComposite = False
                 End If
-                LinkedText = cpcore.csv_GetLinkedText("<a href=""" & cpcore.htmlDoc.html_EncodeHTML(Link) & """>", pageMenuHeadline)
+                LinkedText = genericController.csv_GetLinkedText("<a href=""" & cpcore.htmlDoc.html_EncodeHTML(Link) & """>", pageMenuHeadline)
                 If (UcaseRequestedListName = "") And (pageParentListName <> "") And (Not main_RenderCache_CurrentPage_IsAuthoring) Then
                     '
                     ' ----- Requested orphan list, and this record is in a named list, and not editing, do not display
@@ -3551,7 +3551,7 @@ ErrorTrap:
                 If ChildContent = "" Then
                     ChildContent = "Page Content"
                 End If
-                AddLink = cpcore.main_GetRecordAddLink(ChildContent, "parentid=" & parentPageID & ",ParentListName=" & UcaseRequestedListName, True)
+                AddLink = cpcore.htmlDoc.main_GetRecordAddLink(ChildContent, "parentid=" & parentPageID & ",ParentListName=" & UcaseRequestedListName, True)
                 If AddLink <> "" Then
                     InactiveList = InactiveList & cr & "<li class=""ccListItem"">" & AddLink & "</LI>"
                 End If
@@ -3765,11 +3765,11 @@ ErrorTrap:
         '                    End If
         '                    MenuImage = cpcore.db.cs_getText(CSSections, "MenuImageFilename")
         '                    If MenuImage <> "" Then
-        '                        MenuImage = cpcore.getCdnFileLink( MenuImage)
+        '                        MenuImage = genericcontroller.getCdnFileLink(cpcore, MenuImage)
         '                    End If
         '                    MenuImageOver = cpcore.db.cs_getText(CSSections, "MenuImageOverFilename")
         '                    If MenuImageOver <> "" Then
-        '                        MenuImageOver = cpcore.getCdnFileLink( MenuImageOver)
+        '                        MenuImageOver = genericcontroller.getCdnFileLink(cpcore, MenuImageOver)
         '                    End If
         '                    '
         '                    ' main_Get Root Page for templateID
@@ -3834,7 +3834,7 @@ ErrorTrap:
         '                        If Link = "" Then
         '                            Link = DefaultTemplateLink
         '                        End If
-        '                        AuthoringTag = cpcore.main_GetRecordEditLink2("Site Sections", SectionID, False, SectionName, cpcore.authContext.isEditing(cpcore, "Site Sections"))
+        '                        AuthoringTag = cpcore.htmldoc.main_GetRecordEditLink2("Site Sections", SectionID, False, SectionName, cpcore.authContext.isEditing(cpcore, "Site Sections"))
         '                        Link = genericController.modifyLinkQuery(Link, "sid", CStr(SectionID), True)
         '                        '
         '                        ' main_Get Menu, remove crlf, and parse the line with crlf
@@ -3853,7 +3853,7 @@ ErrorTrap:
         '                End If
         '                Call cpcore.db.cs_goNext(CSSections)
         '            Loop
-        '            AuthoringTag = cpcore.main_GetRecordAddLink("Site Sections", "MenuID=" & MenuID)
+        '            AuthoringTag = cpcore.htmldoc.main_GetRecordAddLink("Site Sections", "MenuID=" & MenuID)
         '            If AuthoringTag <> "" Then
         '                pageManager_GetSectionMenu = pageManager_GetSectionMenu & AuthoringTag
         '            End If
@@ -3891,7 +3891,7 @@ ErrorTrap:
                     & " AND ((ccgroups.Active)<>0)" _
                     & " AND ((ccMemberRules.Active)<>0)" _
                     & " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" & cpcore.db.encodeSQLDate(cpcore.app_startTime) & ")" _
-                    & " AND ((ccMemberRules.MemberID)=" & cpcore.authContext.user.ID & "));"
+                    & " AND ((ccMemberRules.MemberID)=" & cpcore.authContext.user.id & "));"
                 CS = cpcore.db.cs_openSql(SQL)
                 pageManager_BypassContentBlock = cpcore.db.cs_ok(CS)
                 Call cpcore.db.cs_Close(CS)
@@ -3942,7 +3942,7 @@ ErrorTrap:
                 '
                 ' no page and no root page, redirect to landing page
                 '
-                Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestLinkSource)
+                Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestUrlSource)
                 pageManager_RedirectBecausePageNotFound = True
                 pageManager_RedirectReason = "The page could not be determined from URL. The PageID is [" & PageID & "], and the RootPageID is [" & rootPageId & "]."
                 redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
@@ -3950,7 +3950,7 @@ ErrorTrap:
                 '
                 ' no page, redirect to root page
                 '
-                Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestLinkSource)
+                Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestUrlSource)
                 pageManager_RedirectBecausePageNotFound = True
                 pageManager_RedirectReason = "The page could not be determined from URL. The PageID is [" & PageID & "], and the RootPageID is [" & rootPageId & "]."
                 redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
@@ -3958,7 +3958,7 @@ ErrorTrap:
                 '
                 ' no rootpage id
                 '
-                Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestLinkSource)
+                Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestUrlSource)
                 pageManager_RedirectBecausePageNotFound = True
                 pageManager_RedirectReason = "The page could not be determined from URL. The PageID is [" & PageID & "], and the RootPageID is [" & rootPageId & "]."
                 redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
@@ -4015,7 +4015,7 @@ ErrorTrap:
                                 '
                                 ' Root Page - redirect to the landing page with an admin message
                                 '
-                                Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestLinkSource)
+                                Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestUrlSource)
                                 'Call main_LogPageNotFound(main_ServerLink)
                                 pageManager_RedirectBecausePageNotFound = True
                                 pageManager_RedirectReason = "The page requested [" & PageID & "] can not be displayed" & SubMessage & ". It is the root page of the section [" & SectionID & "]."
@@ -4025,7 +4025,7 @@ ErrorTrap:
                                 '
                                 ' non-Root Page - redirect to the root page with an admin message
                                 '
-                                Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestLinkSource)
+                                Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestUrlSource)
                                 'Call main_LogPageNotFound(main_ServerLink)
                                 pageManager_RedirectBecausePageNotFound = True
                                 pageManager_RedirectReason = "The page requested [" & PageID & "] can not be displayed" & SubMessage & "."
@@ -4203,7 +4203,7 @@ ErrorTrap:
                 '
                 ' this page has been fetched before, end the branch here
                 '
-                Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestLinkSource)
+                Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestUrlSource)
                 'Call main_LogPageNotFound(main_ServerLink)
                 pageManager_RedirectBecausePageNotFound = True
                 pageManager_RedirectReason = "The requested page could not be displayed because there is a circular reference within it's parent path. The page [" & PageID & "] was found two times in the parent pages [" & ParentIDPath & "," & PageID & "]."
@@ -4295,7 +4295,7 @@ ErrorTrap:
                     End If
                 End If
             End If
-            Call cpcore.debug_testPoint(hint)
+            Call debugController.debug_testPoint(cpcore, hint)
             '
             Exit Sub
 ErrorTrap:
@@ -4500,7 +4500,7 @@ ErrorTrap:
                         '
                         ' Error, current page is not the root page, but has no parent pages
                         '
-                        Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestLinkSource)
+                        Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestUrlSource)
                         pageManager_RedirectBecausePageNotFound = True
                         pageManager_RedirectReason = "The page could not be displayed for security reasons. All valid pages must either have a valid parent page, or be selected by a section as the section's root page. This page has neither a parent page or a section."
                         redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
@@ -4622,7 +4622,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap
             If cache_pageContent_rows = 0 Then
                 '
-                Call cpcore.debug_testPoint("pageManager_cache_pageContent_load, main_PCCCnt = 0, rebuild cache")
+                Call debugController.debug_testPoint(cpcore, "pageManager_cache_pageContent_load, main_PCCCnt = 0, rebuild cache")
                 '
                 SelectList = pageManager_cache_pageContent_fieldList
                 Criteria = ""
@@ -4665,7 +4665,7 @@ ErrorTrap:
                     End If
                 End If
                 '
-                Call cpcore.debug_testPoint("pageManager_cache_pageContent_load, building took [" & (GetTickCount - Ticks) & " msec]")
+                Call debugController.debug_testPoint(cpcore, "pageManager_cache_pageContent_load, building took [" & (GetTickCount - Ticks) & " msec]")
                 '
             End If
             '
@@ -6294,7 +6294,7 @@ ErrorTrap:
                                 CaptionSpan = "<span>"
                             End If
                             If Not cpcore.db.cs_ok(CSPeople) Then
-                                CSPeople = cpcore.db.csOpen2("people", cpcore.authContext.user.ID)
+                                CSPeople = cpcore.db.csOpen2("people", cpcore.authContext.user.id)
                             End If
                             Caption = .Caption
                             If .REquired Or genericController.EncodeBoolean(cpcore.metaData.GetContentFieldProperty("People", .PeopleField, "Required")) Then
@@ -7010,7 +7010,7 @@ ErrorTrap:
         '                        If genericController.vbLCase(Right(StylesFilename, 4)) <> ".css" Then
         '                            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError15("Dynamic Menu [" & MenuName & "] StylesFilename is not a '.css' file, and will not display correct. Check that the field is setup as a CSSFile.", "main_GetDynamicMenu")
         '                        Else
-        '                            Call cpcore.htmlDoc.main_AddStylesheetLink2(cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.requestDomain & cpcore.getCdnFileLink( StylesFilename), "dynamic menu")
+        '                            Call cpcore.htmlDoc.main_AddStylesheetLink2(cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.requestDomain & genericcontroller.getCdnFileLink(cpcore, StylesFilename), "dynamic menu")
         '                        End If
         '                    End If
         '                End If
@@ -7176,7 +7176,7 @@ ErrorTrap:
                 '
                 ' cached stylesheet
                 '
-                pageManager_GetStyleTagPublic = pageManager_GetStyleTagPublic & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.webServerIO_requestDomain & cpcore.getCdnFileLink("templates/Public" & StyleSN & ".css") & """ >"
+                pageManager_GetStyleTagPublic = pageManager_GetStyleTagPublic & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.webServerIO_requestDomain & genericController.getCdnFileLink(cpcore, "templates/Public" & StyleSN & ".css") & """ >"
             End If
         End Function
         '
@@ -7331,7 +7331,7 @@ ErrorTrap:
             '
             If cpcore.authContext.isAuthenticatedAdmin(cpcore) Then
                 If PageNotFoundLink = "" Then
-                    PageNotFoundLink = cpcore.webServer.webServerIO_ServerLink
+                    PageNotFoundLink = cpcore.webServer.requestUrl
                 End If
                 '
                 ' Add the Link to the Admin Msg
@@ -7733,7 +7733,7 @@ ErrorTrap:
                         & vbCrLf & "<table border=""0"" cellpadding=""2"" cellspacing=""0"" width=""100%"">" _
                         & vbCrLf & "{{REPEATSTART}}<tr><td align=right style=""height:22px;"">{{CAPTION}}&nbsp;</td><td align=left>{{FIELD}}</td></tr>{{REPEATEND}}" _
                         & vbCrLf & "<tr><td align=right><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=135 height=1></td><td width=""100%"">&nbsp;</td></tr>" _
-                        & vbCrLf & "<tr><td colspan=2>&nbsp;<br>" & cpcore.main_GetPanelButtons(ButtonRegister, "Button") & "</td></tr>" _
+                        & vbCrLf & "<tr><td colspan=2>&nbsp;<br>" & cpcore.htmlDoc.main_GetPanelButtons(ButtonRegister, "Button") & "</td></tr>" _
                         & vbCrLf & "</table>"
                         Call cpcore.db.cs_set(CS, "Body", Copy)
                         Copy = "" _
@@ -7794,5 +7794,214 @@ ErrorTrap:
             End If
             Return linkAlias
         End Function
+        '
+        '=================================================================================================================================================
+        '   csv_addLinkAlias
+        '
+        '   Link Alias
+        '       A LinkAlias name is a unique string that identifies a page on the site.
+        '       A page on the site is generated from the PageID, and the QueryStringSuffix
+        '       PageID - obviously, this is the ID of the page
+        '       QueryStringSuffix - other things needed on the Query to display the correct content.
+        '           The Suffix is needed in cases like when an Add-on is embedded in a page. The URL to that content becomes the pages
+        '           Link, plus the suffix needed to find the content.
+        '
+        '       When you make the menus, look up the most recent Link Alias entry with the pageID, and a blank QueryStringSuffix
+        '
+        '   The Link Alias table no longer needs the Link field.
+        '
+        '=================================================================================================================================================
+        '
+        ' +++++ 9/8/2011 4.1.482, added csv_addLinkAlias to csv and changed main to call
+        '
+        Public Shared Sub app_addLinkAlias(cpcore As coreClass, linkAlias As String, PageID As Integer, QueryStringSuffix As String)
+            Dim return_ignoreError As String = ""
+            Call app_addLinkAlias2(cpcore, linkAlias, PageID, QueryStringSuffix, True, False, return_ignoreError)
+        End Sub
+        '
+        ' +++++ 9/8/2011 4.1.482, added csv_addLinkAlias to csv and changed main to call
+        '
+        Public Shared Sub app_addLinkAlias2(cpcore As coreClass, linkAlias As String, PageID As Integer, QueryStringSuffix As String, Optional OverRideDuplicate As Boolean = False, Optional DupCausesWarning As Boolean = False, Optional ByRef return_WarningMessage As String = "")
+            Const SafeString = "0123456789abcdefghijklmnopqrstuvwxyz-_/."
+            Dim Ptr As Integer
+            Dim TestChr As String
+            Dim Src As String
+            Dim FieldList As String
+            Dim LinkAliasPageID As Integer
+            Dim PageContentCID As Integer
+            Dim WorkingLinkAlias As String
+            Dim CS As Integer
+            Dim LoopCnt As Integer
+            'Dim fs As New fileSystemClass
+            Dim FolderCheck As String
+            Dim SQL As String
+            Dim AllowLinkAlias As Boolean
+            'dim buildversion As String
+            '
+            If (True) Then
+                AllowLinkAlias = cpcore.siteProperties.getBoolean("allowLinkAlias", False)
+                WorkingLinkAlias = linkAlias
+                If (WorkingLinkAlias <> "") Then
+                    '
+                    ' remove nonsafe URL characters
+                    '
+                    Src = WorkingLinkAlias
+                    Src = genericController.vbReplace(Src, "’", "'")
+                    Src = genericController.vbReplace(Src, vbTab, " ")
+                    WorkingLinkAlias = ""
+                    For Ptr = 1 To Len(Src) + 1
+                        TestChr = Mid(Src, Ptr, 1)
+                        If genericController.vbInstr(1, SafeString, TestChr, vbTextCompare) <> 0 Then
+                        Else
+                            TestChr = vbTab
+                        End If
+                        WorkingLinkAlias = WorkingLinkAlias & TestChr
+                    Next
+                    Ptr = 0
+                    Do While genericController.vbInstr(1, WorkingLinkAlias, vbTab & vbTab) <> 0 And (Ptr < 100)
+                        WorkingLinkAlias = genericController.vbReplace(WorkingLinkAlias, vbTab & vbTab, vbTab)
+                        Ptr = Ptr + 1
+                    Loop
+                    If Right(WorkingLinkAlias, 1) = vbTab Then
+                        WorkingLinkAlias = Mid(WorkingLinkAlias, 1, Len(WorkingLinkAlias) - 1)
+                    End If
+                    If Left(WorkingLinkAlias, 1) = vbTab Then
+                        WorkingLinkAlias = Mid(WorkingLinkAlias, 2)
+                    End If
+                    WorkingLinkAlias = genericController.vbReplace(WorkingLinkAlias, vbTab, "-")
+                    If (WorkingLinkAlias <> "") Then
+                        '
+                        ' Make sure there is not a folder or page in the wwwroot that matches this Alias
+                        '
+                        If Left(WorkingLinkAlias, 1) <> "/" Then
+                            WorkingLinkAlias = "/" & WorkingLinkAlias
+                        End If
+                        '
+                        If genericController.vbLCase(WorkingLinkAlias) = genericController.vbLCase("/" & cpcore.serverConfig.appConfig.name) Then
+                            '
+                            ' This alias points to the cclib folder
+                            '
+                            If AllowLinkAlias Then
+                                return_WarningMessage = "" _
+                                    & "The Link Alias being created (" & WorkingLinkAlias & ") can not be used because there is a virtual directory in your website directory that already uses this name." _
+                                    & " Please change it to ensure the Link Alias is unique. To set or change the Link Alias, use the Link Alias tab and select a name not used by another page."
+                            End If
+                        ElseIf genericController.vbLCase(WorkingLinkAlias) = "/cclib" Then
+                            '
+                            ' This alias points to the cclib folder
+                            '
+                            If AllowLinkAlias Then
+                                return_WarningMessage = "" _
+                                    & "The Link Alias being created (" & WorkingLinkAlias & ") can not be used because there is a virtual directory in your website directory that already uses this name." _
+                                    & " Please change it to ensure the Link Alias is unique. To set or change the Link Alias, use the Link Alias tab and select a name not used by another page."
+                            End If
+                        ElseIf cpcore.appRootFiles.pathExists(cpcore.serverConfig.appConfig.appRootFilesPath & "\" & Mid(WorkingLinkAlias, 2)) Then
+                            'ElseIf appRootFiles.pathExists(serverConfig.clusterPath & serverconfig.appConfig.appRootFilesPath & "\" & Mid(WorkingLinkAlias, 2)) Then
+                            '
+                            ' This alias points to a different link, call it an error
+                            '
+                            If AllowLinkAlias Then
+                                return_WarningMessage = "" _
+                                    & "The Link Alias being created (" & WorkingLinkAlias & ") can not be used because there is a folder in your website directory that already uses this name." _
+                                    & " Please change it to ensure the Link Alias is unique. To set or change the Link Alias, use the Link Alias tab and select a name not used by another page."
+                            End If
+                        Else
+                            '
+                            ' Make sure there is one here for this
+                            '
+                            If True Then
+                                FieldList = "Name,PageID,QueryStringSuffix"
+                            Else
+                                '
+                                ' must be > 33914 to run this routine
+                                '
+                                FieldList = "Name,PageID,'' as QueryStringSuffix"
+                            End If
+                            CS = cpcore.db.cs_open("Link Aliases", "name=" & cpcore.db.encodeSQLText(WorkingLinkAlias), , , , , , FieldList)
+                            If Not cpcore.db.cs_ok(CS) Then
+                                '
+                                ' Alias not found, create a Link Aliases
+                                '
+                                Call cpcore.db.cs_Close(CS)
+                                CS = cpcore.db.cs_insertRecord("Link Aliases", 0)
+                                If cpcore.db.cs_ok(CS) Then
+                                    Call cpcore.db.cs_set(CS, "Name", WorkingLinkAlias)
+                                    'Call app.csv_SetCS(CS, "Link", Link)
+                                    Call cpcore.db.cs_set(CS, "Pageid", PageID)
+                                    If True Then
+                                        Call cpcore.db.cs_set(CS, "QueryStringSuffix", QueryStringSuffix)
+                                    End If
+                                End If
+                            Else
+                                '
+                                ' Alias found, verify the pageid & QueryStringSuffix
+                                '
+                                Dim CurrentLinkAliasID As Integer
+                                Dim resaveLinkAlias As Boolean
+                                Dim CS2 As Integer
+                                LinkAliasPageID = cpcore.db.cs_getInteger(CS, "pageID")
+                                If (cpcore.db.cs_getText(CS, "QueryStringSuffix").ToLower = QueryStringSuffix.ToLower) And (PageID = LinkAliasPageID) Then
+                                    '
+                                    ' it maches a current entry for this link alias, if the current entry is not the highest number id,
+                                    '   remove it and add this one
+                                    '
+                                    CurrentLinkAliasID = cpcore.db.cs_getInteger(CS, "id")
+                                    CS2 = cpcore.db.cs_openCsSql_rev("default", "select top 1 id from ccLinkAliases where pageid=" & LinkAliasPageID & " order by id desc")
+                                    If cpcore.db.cs_ok(CS2) Then
+                                        resaveLinkAlias = (CurrentLinkAliasID <> cpcore.db.cs_getInteger(CS2, "id"))
+                                    End If
+                                    Call cpcore.db.cs_Close(CS2)
+                                    If resaveLinkAlias Then
+                                        Call cpcore.db.executeSql("delete from ccLinkAliases where id=" & CurrentLinkAliasID)
+                                        Call cpcore.db.cs_Close(CS)
+                                        CS = cpcore.db.cs_insertRecord("Link Aliases", 0)
+                                        If cpcore.db.cs_ok(CS) Then
+                                            Call cpcore.db.cs_set(CS, "Name", WorkingLinkAlias)
+                                            Call cpcore.db.cs_set(CS, "Pageid", PageID)
+                                            If True Then
+                                                Call cpcore.db.cs_set(CS, "QueryStringSuffix", QueryStringSuffix)
+                                            End If
+                                        End If
+                                    End If
+                                Else
+                                    '
+                                    ' Does not match, this is either a change, or a duplicate that needs to be blocked
+                                    '
+                                    If OverRideDuplicate Then
+                                        '
+                                        ' change the Link Alias to the new link
+                                        '
+                                        'Call app.csv_SetCS(CS, "Link", Link)
+                                        Call cpcore.db.cs_set(CS, "Pageid", PageID)
+                                        If True Then
+                                            Call cpcore.db.cs_set(CS, "QueryStringSuffix", QueryStringSuffix)
+                                        End If
+                                    ElseIf AllowLinkAlias Then
+                                        '
+                                        ' This alias points to a different link, and link aliasing is in use, call it an error (but save record anyway)
+                                        '
+                                        If DupCausesWarning Then
+                                            If LinkAliasPageID = 0 Then '
+                                                PageContentCID = cpcore.metaData.getContentId("Page Content")
+                                                return_WarningMessage = "" _
+                                                    & "This page has been saved, but the Link Alias could not be created (" & WorkingLinkAlias & ") because it is already in use for another page." _
+                                                    & " To use Link Aliasing (friendly page names) for this page, the Link Alias value must be unique on this site. To set or change the Link Alias, clicke the Link Alias tab and select a name not used by another page or a folder in your website."
+                                            Else
+                                                PageContentCID = cpcore.metaData.getContentId("Page Content")
+                                                return_WarningMessage = "" _
+                                                    & "This page has been saved, but the Link Alias could not be created (" & WorkingLinkAlias & ") because it is already in use for another page (<a href=""?af=4&cid=" & PageContentCID & "&id=" & LinkAliasPageID & """>edit</a>)." _
+                                                    & " To use Link Aliasing (friendly page names) for this page, the Link Alias value must be unique. To set or change the Link Alias, click the Link Alias tab and select a name not used by another page or a folder in your website."
+                                            End If
+                                        End If
+                                    End If
+                                End If
+                            End If
+                            Call cpcore.db.cs_Close(CS)
+                        End If
+                    End If
+                End If
+            End If
+        End Sub
+
     End Class
 End Namespace

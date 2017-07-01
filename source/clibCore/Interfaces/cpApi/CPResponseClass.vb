@@ -86,16 +86,14 @@ Namespace Contensive.Core
         '
         Public Overrides Sub Clear() 'Inherits BaseClasses.CPResponseBaseClass.Clear
             If True Then
-                Call cpCore.main_ClearStream()
+                Call cpCore.htmlDoc.main_ClearStream()
             End If
         End Sub
         '
         '
         '
         Public Overrides Sub Close() 'Inherits BaseClasses.CPResponseBaseClass.Close
-            If True Then
-                Call cpCore.doc_close()
-            End If
+            cpCore.continueProcessing = False
         End Sub
 
         Public Overrides Sub AddHeader(ByVal HeaderName As String, ByVal HeaderValue As String) 'Inherits BaseClasses.CPResponseBaseClass.AddHeader
@@ -111,7 +109,7 @@ Namespace Contensive.Core
         End Sub
         Public Overrides Sub Redirect(ByVal Link As String)
             If True Then
-                Call cpCore.main_Redirect(Link)
+                Call cpCore.webServer.redirect(Link)
             End If
         End Sub
 
@@ -156,7 +154,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property isOpen() As Boolean
             Get
                 If True Then
-                    Return cpCore.docOpen
+                    Return cpCore.continueProcessing
                 Else
                     Return False
                 End If

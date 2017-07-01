@@ -42,6 +42,30 @@ Namespace Contensive.Core.Controllers
         End Function
 
         '
+        '==========================================================================================
+        ''' <summary>
+        ''' return an html ul list of each eception produced during this document.
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Shared Function getDocExceptionHtmlList(cpcore As coreClass) As String
+            Dim returnHtmlList As String = ""
+            Try
+                If Not cpcore.errList Is Nothing Then
+                    If cpcore.errList.Count > 0 Then
+                        For Each exMsg As String In cpcore.errList
+                            returnHtmlList &= cr2 & "<li class=""ccExceptionListRow"">" & cr3 & cpcore.htmlDoc.html_convertText2HTML(exMsg) & cr2 & "</li>"
+                        Next
+                        returnHtmlList = cr & "<ul class=""ccExceptionList"">" & returnHtmlList & cr & "</ul>"
+                    End If
+                End If
+            Catch ex As Exception
+                Throw (ex)
+            End Try
+            Return returnHtmlList
+        End Function
+
+        '
         '====================================================================================================
 #Region " IDisposable Support "
         '

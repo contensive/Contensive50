@@ -406,6 +406,7 @@
     <Compile Include="Controllers\editorController.vb" />
     <Compile Include="Controllers\remoteQueryController.vb" />
     <Compile Include="Controllers\errorController.vb" />
+    <Compile Include="Controllers\debugController.vb" />
     <Compile Include="Controllers\_blankStaticController.vb" />
     <Compile Include="Controllers\csController.vb" />
     <Compile Include="Controllers\dbEngineController.vb" />

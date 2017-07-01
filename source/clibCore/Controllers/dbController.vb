@@ -1697,7 +1697,7 @@ Namespace Contensive.Core.Controllers
         Public Function cs_openSql(ByVal SQL As String, Optional ByVal DataSourceName As String = "", Optional ByVal PageSize As Integer = 9999, Optional ByVal PageNumber As Integer = 1) As Integer
             Dim returnCs As Integer = -1
             Try
-                returnCs = cs_init(cpCore.authContext.user.ID)
+                returnCs = cs_init(cpCore.authContext.user.id)
                 With contentSetStore(returnCs)
                     .Updateable = False
                     .ContentName = ""
@@ -2618,7 +2618,7 @@ Namespace Contensive.Core.Controllers
                         Throw New ApplicationException("content [" & ContentName & "] could Not be found.")
                     Else
                         If MemberID = -1 Then
-                            MemberID = cpCore.authContext.user.ID
+                            MemberID = cpCore.authContext.user.id
                         End If
                         With CDef
                             WorkflowAuthoringMode = .AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring
@@ -4959,7 +4959,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' --- no records were found, add a blank if we can
                     '
-                    dt = cpCore.db.insertTableRecordGetDataTable(DataSource.Name, TableName, cpCore.authContext.user.ID)
+                    dt = cpCore.db.insertTableRecordGetDataTable(DataSource.Name, TableName, cpCore.authContext.user.id)
                     If dt.Rows.Count > 0 Then
                         RecordID = genericController.EncodeInteger(dt.Rows(0).Item("ID"))
                         Call cpCore.db.executeSql("Update " & TableName & " Set active=0 where id=" & RecordID & ";", DataSource.Name)
@@ -5291,7 +5291,7 @@ Namespace Contensive.Core.Controllers
                     Dim TableName As String = cpCore.metaData.getContentTablename(ContentName)
                     Dim SQL As String = "update " & TableName & " set DateReviewed=" & cpCore.db.encodeSQLDate(cpCore.app_startTime)
                     If cpCore.metaData.isContentFieldSupported(ContentName, "ReviewedBy") Then
-                        SQL &= ",ReviewedBy=" & cpCore.authContext.user.ID
+                        SQL &= ",ReviewedBy=" & cpCore.authContext.user.id
                     End If
                     '
                     ' -- Mark the live record
@@ -5856,14 +5856,111 @@ Namespace Contensive.Core.Controllers
         '========================================================================
         '
         Public Function csOpen2(ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal WorkflowAuthoringMode As Boolean = False, Optional ByVal WorkflowEditingMode As Boolean = False, Optional ByVal SelectFieldList As String = "") As Integer
-            Return cs_open(genericController.encodeText(ContentName), "(ID=" & cpCore.db.encodeSQLNumber(RecordID) & ")", , False, cpCore.authContext.user.ID, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
+            Return cs_open(genericController.encodeText(ContentName), "(ID=" & cpCore.db.encodeSQLNumber(RecordID) & ")", , False, cpCore.authContext.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
         End Function
         '
         '========================================================================
         '
         Public Function cs_open2(ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal WorkflowAuthoringMode As Boolean = False, Optional ByVal WorkflowEditingMode As Boolean = False, Optional ByVal SelectFieldList As String = "") As Integer
-            Return cs_open(ContentName, "(ID=" & cpCore.db.encodeSQLNumber(RecordID) & ")", , False, cpCore.authContext.user.ID, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
+            Return cs_open(ContentName, "(ID=" & cpCore.db.encodeSQLNumber(RecordID) & ")", , False, cpCore.authContext.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
         End Function
+        '========================================================================
+        '   Determine the current persons Language
+        '
+        '   Return the ID in the Languages content
+        '========================================================================
+        '
+        Public Function web_GetBrowserLanguageID() As Integer
+            Dim LanguageID As Integer = 0
+            Dim LanguageName As String = ""
+            Call web_GetBrowserLanguage(LanguageID, LanguageName)
+            web_GetBrowserLanguageID = LanguageID
+        End Function
+        '
+        '========================================================================
+        '   Determine the current persons Language
+        '
+        '   Return the ID in the Languages content
+        '========================================================================
+        '
+        Public Sub web_GetBrowserLanguage(ByRef LanguageID As Integer, ByRef LanguageName As String)
+            '
+            Dim MethodName As String
+            Dim CS As Integer
+            Dim CommaPosition As Integer
+            Dim DashPosition As Integer
+            Dim AcceptLanguageString As String
+            Dim AcceptLanguage As String
+            '
+            MethodName = "main_GetBrowserLanguage"
+            LanguageID = 0
+            LanguageName = ""
+            '
+            ' ----- Determine Language by browser
+            '
+            AcceptLanguageString = genericController.encodeText(cpCore.webServer.RequestLanguage) & ","
+            CommaPosition = genericController.vbInstr(1, AcceptLanguageString, ",")
+            Do While CommaPosition <> 0 And LanguageID = 0
+                AcceptLanguage = Trim(Mid(AcceptLanguageString, 1, CommaPosition - 1))
+                AcceptLanguageString = Mid(AcceptLanguageString, CommaPosition + 1)
+                If Len(AcceptLanguage) > 0 Then
+                    DashPosition = genericController.vbInstr(1, AcceptLanguage, "-")
+                    If DashPosition > 1 Then
+                        AcceptLanguage = Mid(AcceptLanguage, 1, DashPosition - 1)
+                    End If
+                    DashPosition = genericController.vbInstr(1, AcceptLanguage, ";")
+                    If DashPosition > 1 Then
+                        AcceptLanguage = Mid(AcceptLanguage, 1, DashPosition - 1)
+                    End If
+                    If Len(AcceptLanguage) > 0 Then
+                        CS = cs_open("languages", "HTTP_Accept_LANGUAGE=" & encodeSQLText(AcceptLanguage), , , , , , "ID", 1)
+                        If cs_ok(CS) Then
+                            LanguageID = cs_getInteger(CS, "ID")
+                            LanguageName = cs_getText(CS, "Name")
+                        End If
+                        Call cs_Close(CS)
+                    End If
+                End If
+                CommaPosition = genericController.vbInstr(1, AcceptLanguageString, ",")
+            Loop
+            '
+            If LanguageID = 0 Then
+                '
+                ' ----- no matching browser language, use site default
+                '
+                CS = cs_open("languages", "name=" & encodeSQLText(cpCore.siteProperties.language), , , , , , "ID", 1)
+                If cs_ok(CS) Then
+                    LanguageID = cs_getInteger(CS, "ID")
+                    LanguageName = cs_getText(CS, "Name")
+                End If
+                Call cs_Close(CS)
+            End If
+        End Sub
+        Public Sub content_SetContentCopy(ByVal CopyName As String, ByVal Content As String)
+            '
+            Dim CS As Integer
+            Dim iCopyName As String
+            Dim iContent As String
+            Const ContentName = "Copy Content"
+            '
+            '  BuildVersion = app.dataBuildVersion
+            If False Then '.3.210" Then
+                Throw (New Exception("Contensive database was created with version " & cpCore.siteProperties.dataBuildVersion & ". main_SetContentCopy requires an builder."))
+            Else
+                iCopyName = genericController.encodeText(CopyName)
+                iContent = genericController.encodeText(Content)
+                CS = cs_open(ContentName, "name=" & encodeSQLText(iCopyName))
+                If Not cs_ok(CS) Then
+                    Call cs_Close(CS)
+                    CS = cs_insertRecord(ContentName)
+                End If
+                If cs_ok(CS) Then
+                    Call cs_set(CS, "name", iCopyName)
+                    Call cs_set(CS, "Copy", iContent)
+                End If
+                Call cs_Close(CS)
+            End If
+        End Sub
 
 
 #Region " IDisposable Support "

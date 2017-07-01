@@ -12,11 +12,16 @@ Imports Contensive.Core.Models.Entity
 Namespace Contensive.Core.Controllers
     Public Class htmlDocController
         '
-        ' -- properties and methods to create an html doc
-        ' -- used in admin and pageManager
-        ' -- if an entity is only needed in admin or pagemanger, it goes there. if shared it goes here.
-        '
         Private cpCore As coreClass
+        '
+        Friend Property web_EncodeContent_StyleFilenames_Cnt As Integer
+        Friend Property web_EncodeContent_StyleFilenames As String()
+        Private Property web_EncodeContent_JavascriptOnLoad_Cnt As Integer
+        Private Property web_EncodeContent_JavascriptOnLoad As String()
+        Private Property web_EncodeContent_JSFilename_Cnt As Integer
+        Private Property web_EncodeContent_JSFilename As String()
+        Friend Property web_EncodeContent_JavascriptBodyEnd_cnt As Integer
+        Friend Property web_EncodeContent_JavascriptBodyEnd As String()
         '
         Public html_quickEdit_copy As String = ""
         '
@@ -936,7 +941,7 @@ ErrorTrap:
         '
         '====================================================================================================
         '
-        Public Function getBeforeEndOfBodyHtml(AllowLogin As Boolean, AllowTools As Boolean, BlockNonContentExtras As Boolean, main_IsAdminSite As Boolean) As String
+        Public Function getHtmlDoc_beforeEndOfBodyHtml(AllowLogin As Boolean, AllowTools As Boolean, BlockNonContentExtras As Boolean, main_IsAdminSite As Boolean) As String
             Dim s As String = ""
             Try
                 Dim AllowPopupErrors As Boolean
@@ -978,7 +983,7 @@ ErrorTrap:
                 If (Not BlockNonContentExtras) And (Not pageManager_printVersion) Then
                     If cpCore.authContext.isAuthenticatedContentManager(cpCore) And cpCore.authContext.user.AllowToolsPanel Then
                         If AllowTools Then
-                            s = s & cpCore.main_GetToolsPanel()
+                            s = s & cpCore.htmlDoc.main_GetToolsPanel()
                         End If
                     Else
                         If AllowLogin Then
@@ -1090,7 +1095,7 @@ ErrorTrap:
                 Dim Files() As String
                 Dim Parts() As String
                 If (main_MetaContent_SharedStyleIDList <> "") Then
-                    FileList = cpCore.htmlDoc.main_GetSharedStyleFileList(cpCore, main_MetaContent_SharedStyleIDList, main_IsAdminSite)
+                    FileList = htmlDocController.main_GetSharedStyleFileList(cpCore, main_MetaContent_SharedStyleIDList, main_IsAdminSite)
                     main_MetaContent_SharedStyleIDList = ""
                     If FileList <> "" Then
                         Files = Split(FileList, vbCrLf)
@@ -1100,7 +1105,7 @@ ErrorTrap:
                                 If Parts(1) <> "" Then
                                     headTags = headTags & cr & genericController.decodeHtml(Parts(1))
                                 End If
-                                headTags = headTags & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(Parts(0)) & """ >"
+                                headTags = headTags & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, Parts(0)) & """ >"
                                 If Parts(2) <> "" Then
                                     headTags = headTags & cr & genericController.decodeHtml(Parts(2))
                                 End If
@@ -1404,17 +1409,17 @@ ErrorTrap:
                         '
                         CSPointer = cpCore.db.cs_open(ContentName, Criteria, SortFieldList, , , , , SelectFields)
                         If cpCore.db.cs_ok(CSPointer) Then
-                            Call cpCore.debug_testPoint("main_GetFormInputSelect2, 10 ContentName=[" & ContentName & "] Criteria=[" & Criteria & "] ")
+                            Call debugController.debug_testPoint(cpCore, "main_GetFormInputSelect2, 10 ContentName=[" & ContentName & "] Criteria=[" & Criteria & "] ")
                             RowsArray = cpCore.db.cs_getRows(CSPointer)
-                            Call cpCore.debug_testPoint("main_GetFormInputSelect2, 20")
+                            Call debugController.debug_testPoint(cpCore, "main_GetFormInputSelect2, 20")
                             'RowFieldArray = app.csv_cs_getRowFields(CSPointer)
                             RowFieldArray = Split(cpCore.db.cs_getSelectFieldList(CSPointer), ",")
-                            Call cpCore.debug_testPoint("main_GetFormInputSelect2, 30")
+                            Call debugController.debug_testPoint(cpCore, "main_GetFormInputSelect2, 30")
                             ColumnMax = UBound(RowsArray, 1)
-                            Call cpCore.debug_testPoint("main_GetFormInputSelect2, 40")
+                            Call debugController.debug_testPoint(cpCore, "main_GetFormInputSelect2, 40")
 
                             RowMax = UBound(RowsArray, 2)
-                            Call cpCore.debug_testPoint("main_GetFormInputSelect2, 50")
+                            Call debugController.debug_testPoint(cpCore, "main_GetFormInputSelect2, 50")
                             '
                             ' setup IDFieldPointer
                             '
@@ -1470,17 +1475,17 @@ ErrorTrap:
                                 Criteria = Criteria & "(id=" & genericController.EncodeInteger(CurrentValue) & ")"
                                 CSPointer = cpCore.db.cs_open(ContentName, Criteria, SortFieldList, False, , , , SelectFields)
                                 If cpCore.db.cs_ok(CSPointer) Then
-                                    Call cpCore.debug_testPoint("main_GetFormInputSelect2, 110")
+                                    Call debugController.debug_testPoint(cpCore, "main_GetFormInputSelect2, 110")
                                     RowsArray = cpCore.db.cs_getRows(CSPointer)
-                                    Call cpCore.debug_testPoint("main_GetFormInputSelect2, 120")
+                                    Call debugController.debug_testPoint(cpCore, "main_GetFormInputSelect2, 120")
                                     RowFieldArray = Split(cpCore.db.cs_getSelectFieldList(CSPointer), ",")
-                                    Call cpCore.debug_testPoint("main_GetFormInputSelect2, 130")
+                                    Call debugController.debug_testPoint(cpCore, "main_GetFormInputSelect2, 130")
                                     RowMax = UBound(RowsArray, 2)
-                                    Call cpCore.debug_testPoint("main_GetFormInputSelect2, 140")
+                                    Call debugController.debug_testPoint(cpCore, "main_GetFormInputSelect2, 140")
                                     ColumnMax = UBound(RowsArray, 1)
-                                    Call cpCore.debug_testPoint("main_GetFormInputSelect2, 150")
+                                    Call debugController.debug_testPoint(cpCore, "main_GetFormInputSelect2, 150")
                                     RecordID = genericController.EncodeInteger(RowsArray(IDFieldPointer, 0))
-                                    Call cpCore.debug_testPoint("main_GetFormInputSelect2, 160")
+                                    Call debugController.debug_testPoint(cpCore, "main_GetFormInputSelect2, 160")
                                     Copy = DropDownPreField
                                     For FieldPointer = 0 To DropDownFieldCount - 1
                                         Copy = Copy & RowsArray(DropDownFieldPointer(FieldPointer), 0) & DropDownDelimiter(FieldPointer)
@@ -1654,7 +1659,7 @@ ErrorTrap:
                     '
                     ' Selection is too big
                     '
-                    cpCore.handleExceptionAndContinue(New Exception("While building a group members list for group [" & cpCore.group_GetGroupName(GroupID) & "], too many rows were selected. [" & RowMax & "] records exceeds [" & cpCore.siteProperties.selectFieldLimit & "], the current Site Property app.SiteProperty_SelectFieldLimit."))
+                    cpCore.handleExceptionAndContinue(New Exception("While building a group members list for group [" & groupController.group_GetGroupName(cpCore, GroupID) & "], too many rows were selected. [" & RowMax & "] records exceeds [" & cpCore.siteProperties.selectFieldLimit & "], the current Site Property app.SiteProperty_SelectFieldLimit."))
                     html_GetFormInputMemberSelect2 = html_GetFormInputMemberSelect2 & html_GetFormInputHidden(MenuNameFPO, iCurrentValue)
                     If iCurrentValue <> 0 Then
                         CSPointer = cpCore.db.csOpen2("people", iCurrentValue)
@@ -1961,7 +1966,7 @@ ErrorTrap:
                 End If
                 IconFilename = cpCore.siteProperties.LoginIconFilename
                 If genericController.vbLCase(Mid(IconFilename, 1, 7)) <> "/ccLib/" Then
-                    IconFilename = cpCore.getCdnFileLink(IconFilename)
+                    IconFilename = genericController.getCdnFileLink(cpCore, IconFilename)
                 End If
                 main_GetLoginLink = main_GetLoginLink & "<img alt=""Login"" src=""" & IconFilename & """ border=""0"" >"
                 main_GetLoginLink = main_GetLoginLink & "</A>"
@@ -1975,43 +1980,43 @@ ErrorTrap:
 ErrorTrap:
             Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetLoginLink")
         End Function
-        '
-        '========================================================================
-        '   legacy
-        '========================================================================
-        '
-        Public Function main_GetClosePage(Optional ByVal AllowLogin As Boolean = True, Optional ByVal AllowTools As Boolean = True) As String
-            main_GetClosePage = main_GetClosePage3(AllowLogin, AllowTools, False, False)
-        End Function
-        '
-        '========================================================================
-        '   legacy
-        '========================================================================
-        '
-        Public Function main_GetClosePage2(AllowLogin As Boolean, AllowTools As Boolean, BlockNonContentExtras As Boolean) As String
-            Try
-                main_GetClosePage2 = main_GetClosePage3(AllowLogin, AllowTools, False, False)
-            Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
-            End Try
-        End Function
-        '
-        '========================================================================
-        '   main_GetClosePage3
-        '       Public interface to end the page call
-        '       Must be called last on every public page
-        '       internally, you can NOT writeAltBuffer( main_GetClosePage3 ) because the stream is closed
-        '       call main_GetEndOfBody - main_Gets toolspanel and all html,menuing,etc needed to finish page
-        '       optionally calls main_dispose
-        '========================================================================
-        '
-        Public Function main_GetClosePage3(AllowLogin As Boolean, AllowTools As Boolean, BlockNonContentExtras As Boolean, doNotDisposeOnExit As Boolean) As String
-            Try
-                main_GetClosePage3 = getBeforeEndOfBodyHtml(AllowLogin, AllowTools, BlockNonContentExtras, False)
-            Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
-            End Try
-        End Function
+        ''
+        ''========================================================================
+        ''   legacy
+        ''========================================================================
+        ''
+        'Public Function main_GetClosePage(Optional ByVal AllowLogin As Boolean = True, Optional ByVal AllowTools As Boolean = True) As String
+        '    main_GetClosePage = main_GetClosePage3(AllowLogin, AllowTools, False, False)
+        'End Function
+        ''
+        ''========================================================================
+        ''   legacy
+        ''========================================================================
+        ''
+        'Public Function main_GetClosePage2(AllowLogin As Boolean, AllowTools As Boolean, BlockNonContentExtras As Boolean) As String
+        '    Try
+        '        main_GetClosePage2 = main_GetClosePage3(AllowLogin, AllowTools, False, False)
+        '    Catch ex As Exception
+        '        cpCore.handleExceptionAndContinue(ex) : Throw
+        '    End Try
+        'End Function
+        ''
+        ''========================================================================
+        ''   main_GetClosePage3
+        ''       Public interface to end the page call
+        ''       Must be called last on every public page
+        ''       internally, you can NOT writeAltBuffer( main_GetClosePage3 ) because the stream is closed
+        ''       call main_GetEndOfBody - main_Gets toolspanel and all html,menuing,etc needed to finish page
+        ''       optionally calls main_dispose
+        ''========================================================================
+        ''
+        'Public Function main_GetClosePage3(AllowLogin As Boolean, AllowTools As Boolean, BlockNonContentExtras As Boolean, doNotDisposeOnExit As Boolean) As String
+        '    Try
+        '        Return getBeforeEndOfBodyHtml(AllowLogin, AllowTools, BlockNonContentExtras, False)
+        '    Catch ex As Exception
+        '        cpCore.handleExceptionAndContinue(ex) : Throw
+        '    End Try
+        'End Function
         '
         '========================================================================
         '   Write to the HTML stream
@@ -2020,7 +2025,7 @@ ErrorTrap:
         Public Sub writeAltBuffer(ByVal Message As Object)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("WriteStream")
             '
-            If cpCore.docOpen Then
+            If cpCore.continueProcessing Then
                 Select Case cpCore.webServer.webServerIO_OutStreamDevice
                     Case htmlDoc_OutStreamJavaScript
                         Call webServerIO_JavaStream_Add(genericController.encodeText(Message))
@@ -2886,7 +2891,7 @@ ErrorTrap:
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
                                     Else
-                                        returnResult = "<img src=""" & cpCore.getCdnFileLink(FieldValueText) & """><BR >change: " & html_GetFormInputFile(FieldName, genericController.encodeText(FieldValueVariant))
+                                        returnResult = "<img src=""" & genericController.getCdnFileLink(cpCore, FieldValueText) & """><BR >change: " & html_GetFormInputFile(FieldName, genericController.encodeText(FieldValueVariant))
                                     End If
                                 '
                                 '
@@ -3247,7 +3252,7 @@ ErrorTrap:
                         Dim FieldValuefilename As String = ""
                         Dim FieldValuePath As String = ""
                         cpCore.privateFiles.splitPathFilename(HtmlValue, FieldValuePath, FieldValuefilename)
-                        html_GetFormInputField = html_GetFormInputField & "<a href=""http://" & genericController.EncodeURL(cpCore.webServer.requestDomain & cpCore.getCdnFileLink(HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & FieldValuefilename & "]</A>"
+                        html_GetFormInputField = html_GetFormInputField & "<a href=""http://" & genericController.EncodeURL(cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & FieldValuefilename & "]</A>"
                         html_GetFormInputField = html_GetFormInputField & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & html_GetFormInputCheckBox2(InputName & ".Delete", False)
                         html_GetFormInputField = html_GetFormInputField & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & html_GetFormInputFile2(InputName, HtmlId, HtmlClass)
                     End If
@@ -3272,7 +3277,7 @@ ErrorTrap:
                         Dim FieldValuefilename As String = ""
                         Dim FieldValuePath As String = ""
                         cpCore.privateFiles.splitPathFilename(HtmlValue, FieldValuePath, FieldValuefilename)
-                        html_GetFormInputField = html_GetFormInputField & "<a href=""http://" & genericController.EncodeURL(cpCore.webServer.requestDomain & cpCore.getCdnFileLink(HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & FieldValuefilename & "]</A>"
+                        html_GetFormInputField = html_GetFormInputField & "<a href=""http://" & genericController.EncodeURL(cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & FieldValuefilename & "]</A>"
                         html_GetFormInputField = html_GetFormInputField & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & html_GetFormInputCheckBox2(InputName & ".Delete", False)
                         html_GetFormInputField = html_GetFormInputField & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & html_GetFormInputFile2(InputName, HtmlId, HtmlClass)
                     End If
@@ -4179,7 +4184,7 @@ ErrorTrap:
                                                 ACField = genericController.vbUCase(KmaHTML.ElementAttribute(ElementPointer, "FIELD"))
                                                 If ACField = "" Then
                                                     ' compatibility for old personalization type
-                                                    ACField = cpCore.csv_GetAddonOptionStringValue("FIELD", KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING"))
+                                                    ACField = htmlDocController.csv_GetAddonOptionStringValue("FIELD", KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING"))
                                                 End If
                                                 FieldName = genericController.EncodeInitialCaps(ACField)
                                                 If (FieldName = "") Then
@@ -4366,7 +4371,7 @@ ErrorTrap:
                                                                 ' This must be done out on the page because the csv does not know about authenticated
                                                                 '
                                                                 Copy = ""
-                                                                GroupIDList = cpCore.csv_GetAddonOptionStringValue("AllowGroups", addonOptionString)
+                                                                GroupIDList = htmlDocController.csv_GetAddonOptionStringValue("AllowGroups", addonOptionString)
                                                                 If (Not cpCore.authContext.isMemberOfGroupIdList(cpCore, personalizationPeopleId, True, GroupIDList, True)) Then
                                                                     '
                                                                     ' Block content if not allowed
@@ -4510,7 +4515,7 @@ ErrorTrap:
                                                                 ' all Src and Instance vars are already encoded correctly
                                                                 If SrcOptionName <> "" Then
                                                                     ' since AddonOptionString is encoded, InstanceOptionValue will be also
-                                                                    InstanceOptionValue = cpCore.csv_GetAddonOptionStringValue(SrcOptionName, addonOptionString)
+                                                                    InstanceOptionValue = htmlDocController.csv_GetAddonOptionStringValue(SrcOptionName, addonOptionString)
                                                                     'InstanceOptionValue = cpcore.csv_GetAddonOption(SrcOptionName, AddonOptionString)
                                                                     ResultOptionSelector = pageManager_GetAddonSelector(SrcOptionName, genericController.encodeNvaArgument(InstanceOptionValue), SrcOptionSelector)
                                                                     'ResultOptionSelector = csv_GetAddonSelector(SrcOptionName, InstanceOptionValue, SrcOptionValueSelector)
@@ -4564,7 +4569,7 @@ ErrorTrap:
                                                         Filename = file.Filename
                                                         Filename = genericController.vbReplace(Filename, "\", "/")
                                                         Filename = genericController.EncodeURL(Filename)
-                                                        Copy = Copy & "<img ID=""AC,IMAGE,," & ACAttrRecordID & """ src=""" & cpCore.getCdnFileLink(Filename) & """"
+                                                        Copy = Copy & "<img ID=""AC,IMAGE,," & ACAttrRecordID & """ src=""" & genericController.getCdnFileLink(cpCore, Filename) & """"
                                                         '
                                                         If ACAttrWidth = 0 Then
                                                             ACAttrWidth = file.pxWidth
@@ -4691,9 +4696,9 @@ ErrorTrap:
                                                     '
                                                     '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                                                     'test - encoding changed
-                                                    NewName = cpCore.csv_GetAddonOptionStringValue("new", addonOptionString)
+                                                    NewName = htmlDocController.csv_GetAddonOptionStringValue("new", addonOptionString)
                                                     'NewName =  genericController.DecodeResponseVariable(getSimpleNameValue("new", AddonOptionString, "", "&"))
-                                                    TextName = cpCore.csv_GetAddonOptionStringValue("name", addonOptionString)
+                                                    TextName = htmlDocController.csv_GetAddonOptionStringValue("name", addonOptionString)
                                                     'TextName = getSimpleNameValue("name", AddonOptionString)
                                                     If TextName = "" Then
                                                         TextName = "Default"
@@ -5343,7 +5348,7 @@ ErrorTrap:
                                                                                             '
                                                                                             NewImageFilename = ImageFilenameNoExt & "-" & ImageAltSize & "." & ImageFilenameExt
                                                                                             ' images included in email have spaces that must be converted to "%20" or they 404
-                                                                                            imageNewLink = genericController.EncodeURL(cpCore.getCdnFileLink(ImageVirtualFilePath) & NewImageFilename)
+                                                                                            imageNewLink = genericController.EncodeURL(genericController.getCdnFileLink(cpCore, ImageVirtualFilePath) & NewImageFilename)
                                                                                             ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, html_EncodeHTML(imageNewLink))
                                                                                         ElseIf (RecordWidth < ImageWidth) Or (RecordHeight < ImageHeight) Then
                                                                                             '
@@ -5351,7 +5356,7 @@ ErrorTrap:
                                                                                             ' reize image larger then original - go with it as is
                                                                                             '
                                                                                             ' images included in email have spaces that must be converted to "%20" or they 404
-                                                                                            ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, html_EncodeHTML(genericController.EncodeURL(cpCore.getCdnFileLink(RecordVirtualFilename))))
+                                                                                            ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, html_EncodeHTML(genericController.EncodeURL(genericController.getCdnFileLink(cpCore, RecordVirtualFilename))))
                                                                                         Else
                                                                                             '
                                                                                             ' resized image - create NewImageFilename (and add new alt size to the record)
@@ -5439,7 +5444,7 @@ ErrorTrap:
                                                                                                 End If
                                                                                                 '
                                                                                                 ' Change the image src to the AltSize
-                                                                                                ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, html_EncodeHTML(genericController.EncodeURL(cpCore.getCdnFileLink(ImageVirtualFilePath) & NewImageFilename)))
+                                                                                                ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, html_EncodeHTML(genericController.EncodeURL(genericController.getCdnFileLink(cpCore, ImageVirtualFilePath) & NewImageFilename)))
                                                                                             End If
                                                                                         End If
                                                                                     End If
@@ -6274,7 +6279,7 @@ ErrorTrap:
             '
             ' ----- Read in and save the Member profile values from the tools panel
             '
-            If (cpCore.authContext.user.ID > 0) Then
+            If (cpCore.authContext.user.id > 0) Then
                 If Not (cpCore.debug_iUserError <> "") Then
                     Button = cpCore.docProperties.getText("mb")
                     Select Case Button
@@ -6915,7 +6920,7 @@ ErrorTrap:
         Public Function html_encodeContentForWeb(Source As String, ContextContentName As String, ContextRecordID As Integer, Ignore_BasePath As String, WrapperID As Integer) As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("EncodeContentForWeb")
             '
-            html_encodeContentForWeb = html_encodeContent9(Source, cpCore.authContext.user.ID, ContextContentName, ContextRecordID, 0, False, False, True, True, False, True, "", "", False, WrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+            html_encodeContentForWeb = html_encodeContent9(Source, cpCore.authContext.user.id, ContextContentName, ContextRecordID, 0, False, False, True, True, False, True, "", "", False, WrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
             '
             Exit Function
 ErrorTrap:
@@ -7899,7 +7904,7 @@ ErrorTrap:
             Dim iPersonalizationPeopleId As Integer
             iPersonalizationPeopleId = personalizationPeopleId
             If iPersonalizationPeopleId = 0 Then
-                iPersonalizationPeopleId = cpCore.authContext.user.ID
+                iPersonalizationPeopleId = cpCore.authContext.user.id
             End If
             '
             returnValue = Source
@@ -8001,15 +8006,15 @@ ErrorTrap:
                                             ' Child Page List
                                             '
                                             'hint = hint & ",320"
-                                            ListName = cpCore.getAddonOption("name", addonOptionString)
+                                            ListName = addonController.getAddonOption("name", addonOptionString)
                                             returnValue = returnValue & cpCore.pages.pageManager_GetChildPageList(ListName, ContextContentName, ContextRecordID, True)
                                         Case ACTypeTemplateText
                                             '
                                             ' Text Box = copied here from gethtmlbody
                                             '
-                                            CopyName = cpCore.getAddonOption("new", addonOptionString)
+                                            CopyName = addonController.getAddonOption("new", addonOptionString)
                                             If CopyName = "" Then
-                                                CopyName = cpCore.getAddonOption("name", addonOptionString)
+                                                CopyName = addonController.getAddonOption("name", addonOptionString)
                                                 If CopyName = "" Then
                                                     CopyName = "Default"
                                                 End If
@@ -8026,9 +8031,9 @@ ErrorTrap:
                                             ' Watch List
                                             '
                                             'hint = hint & ",330"
-                                            ListName = cpCore.getAddonOption("LISTNAME", addonOptionString)
-                                            SortField = cpCore.getAddonOption("SORTFIELD", addonOptionString)
-                                            SortReverse = genericController.EncodeBoolean(cpCore.getAddonOption("SORTDIRECTION", addonOptionString))
+                                            ListName = addonController.getAddonOption("LISTNAME", addonOptionString)
+                                            SortField = addonController.getAddonOption("SORTFIELD", addonOptionString)
+                                            SortReverse = genericController.EncodeBoolean(addonController.getAddonOption("SORTDIRECTION", addonOptionString))
                                             returnValue = returnValue & cpCore.pages.main_GetWatchList(cpCore, ListName, SortField, SortReverse)
                                         Case Else
                                             '
@@ -8173,7 +8178,7 @@ ErrorTrap:
                     '
                     ' if call from webpage, push addon js and css out to cpCoreClass
                     '
-                    Copy = cpCore.web_GetEncodeContent_HeadTags()
+                    Copy = cpCore.web_EncodeContent_HeadTags
                     If Copy <> "" Then
                         '
                         ' headtags generated from csv_EncodeContent
@@ -8183,40 +8188,40 @@ ErrorTrap:
                     '
                     ' If any javascript or styles were added during encode, pick them up now
                     '
-                    Copy = cpCore.csv_GetEncodeContent_JavascriptBodyEnd()
+                    Copy = cpCore.htmlDoc.csv_GetEncodeContent_JavascriptBodyEnd()
                     Do While Copy <> ""
                         Call main_AddEndOfBodyJavascript2(Copy, "embedded content")
-                        Copy = cpCore.csv_GetEncodeContent_JavascriptBodyEnd()
+                        Copy = cpCore.htmlDoc.csv_GetEncodeContent_JavascriptBodyEnd()
                     Loop
                     '
                     ' current
                     '
-                    Copy = cpCore.csv_GetEncodeContent_JSFilename()
+                    Copy = cpCore.htmlDoc.csv_GetEncodeContent_JSFilename()
                     Do While Copy <> ""
                         If genericController.vbInstr(1, Copy, "://") <> 0 Then
                         ElseIf Left(Copy, 1) = "/" Then
                         Else
-                            Copy = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(Copy)
+                            Copy = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, Copy)
                         End If
                         Call main_AddHeadScriptLink(Copy, "embedded content")
-                        Copy = cpCore.csv_GetEncodeContent_JSFilename()
+                        Copy = cpCore.htmlDoc.csv_GetEncodeContent_JSFilename()
                     Loop
                     '
-                    Copy = cpCore.csv_GetEncodeContent_JavascriptOnLoad()
+                    Copy = cpCore.htmlDoc.csv_GetEncodeContent_JavascriptOnLoad()
                     Do While Copy <> ""
                         Call main_AddOnLoadJavascript2(Copy, "")
-                        Copy = cpCore.csv_GetEncodeContent_JavascriptOnLoad()
+                        Copy = cpCore.htmlDoc.csv_GetEncodeContent_JavascriptOnLoad()
                     Loop
                     '
-                    Copy = cpCore.csv_GetEncodeContent_StyleFilenames()
+                    Copy = cpCore.htmlDoc.csv_GetEncodeContent_StyleFilenames()
                     Do While Copy <> ""
                         If genericController.vbInstr(1, Copy, "://") <> 0 Then
                         ElseIf Left(Copy, 1) = "/" Then
                         Else
-                            Copy = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(Copy)
+                            Copy = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, Copy)
                         End If
                         Call main_AddStylesheetLink2(Copy, "")
-                        Copy = cpCore.csv_GetEncodeContent_StyleFilenames()
+                        Copy = cpCore.htmlDoc.csv_GetEncodeContent_StyleFilenames()
                     Loop
                 End If
             End If
@@ -8773,7 +8778,7 @@ ErrorTrap:
                     '
                     If True Then
                         If cpCore.authContext.isEditingAnything(cpCore) Then
-                            returnCopy = cpCore.cs_cs_getRecordEditLink(CS, False) & returnCopy
+                            returnCopy = cs_cs_getRecordEditLink(CS, False) & returnCopy
                             If AllowEditWrapper Then
                                 returnCopy = main_GetEditWrapper("copy content", returnCopy)
                             End If
@@ -8920,9 +8925,9 @@ ErrorTrap:
                         Else
                             returnREsult = cpCore.authContext.authenticateById(cpCore, LocalMemberID, cpCore.authContext)
                             If returnREsult Then
-                                Call logController.logActivity2(cpCore, "successful username/password login", cpCore.authContext.user.ID, cpCore.authContext.user.OrganizationID)
+                                Call logController.logActivity2(cpCore, "successful username/password login", cpCore.authContext.user.id, cpCore.authContext.user.OrganizationID)
                             Else
-                                Call logController.logActivity2(cpCore, "bad username/password login", cpCore.authContext.user.ID, cpCore.authContext.user.OrganizationID)
+                                Call logController.logActivity2(cpCore, "bad username/password login", cpCore.authContext.user.id, cpCore.authContext.user.OrganizationID)
                             End If
                         End If
                     End If
@@ -8974,7 +8979,7 @@ ErrorTrap:
                         Call errorController.error_AddUserError(cpCore, ErrorMessage)
                     Else
                         If Not (cpCore.debug_iUserError <> "") Then
-                            CS = cpCore.db.cs_open("people", "ID=" & cpCore.db.encodeSQLNumber(cpCore.authContext.user.ID))
+                            CS = cpCore.db.cs_open("people", "ID=" & cpCore.db.encodeSQLNumber(cpCore.authContext.user.id))
                             If Not cpCore.db.cs_ok(CS) Then
                                 cpCore.handleExceptionAndContinue(New Exception("Could not open the current members account to set the username and password."))
                             Else
@@ -8993,7 +8998,7 @@ ErrorTrap:
                                 Call cpCore.db.cs_set(CS, "Name", FullName)
                                 Call cpCore.db.cs_set(CS, "username", loginForm_Username)
                                 Call cpCore.db.cs_set(CS, "password", loginForm_Password)
-                                Call cpCore.authContext.authenticateById(cpCore, cpCore.authContext.user.ID, cpCore.authContext)
+                                Call cpCore.authContext.authenticateById(cpCore, cpCore.authContext.user.id, cpCore.authContext)
                             End If
                             Call cpCore.db.cs_Close(CS)
                         End If
@@ -9029,7 +9034,7 @@ ErrorTrap:
                     & ""
                 '
                 Body = "" _
-                    & cpCore.main_GetPanel(Body, "ccPanel", "ccPanelHilite", "ccPanelShadow", "400", 15) _
+                    & cpCore.htmlDoc.main_GetPanel(Body, "ccPanel", "ccPanelHilite", "ccPanelShadow", "400", 15) _
                     & cr & "<p>&nbsp;</p>" _
                     & cr & "<p>&nbsp;</p>" _
                     & cr & "<p style=""text-align:center""><a href=""http://www.Contensive.com"" target=""_blank""><img src=""/ccLib/images/ccLibLogin.GIF"" width=""80"" height=""33"" border=""0"" alt=""Contensive Content Control"" ></A></p>" _
@@ -9040,7 +9045,7 @@ ErrorTrap:
                 '
                 Body = "" _
                     & cr & "<div class=""ccCon"" style=""width:400px;margin:100px auto 0 auto;"">" _
-                    & kmaIndent(cpCore.main_GetPanelHeader("Login")) _
+                    & kmaIndent(cpCore.htmlDoc.main_GetPanelHeader("Login")) _
                     & kmaIndent(Body) _
                     & "</div>"
                 '
@@ -9053,7 +9058,7 @@ ErrorTrap:
                     bodyTag = TemplateDefaultBodyTag
                 End If
                 'Call AppendLog("call main_getEndOfBody, from main_getLoginPage2 ")
-                returnREsult = main_assembleHtmlDoc(cpCore.siteProperties.docTypeDeclaration(), head, bodyTag, Body & cpCore.htmlDoc.getBeforeEndOfBodyHtml(False, False, False, False))
+                returnREsult = main_assembleHtmlDoc(cpCore.siteProperties.docTypeDeclaration(), head, bodyTag, Body & cpCore.htmlDoc.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False))
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
@@ -9162,7 +9167,7 @@ ErrorTrap:
                     loginForm = loginForm _
                         & cpCore.htmlDoc.html_GetFormInputHidden("Type", FormTypeLogin) _
                         & cpCore.htmlDoc.html_GetFormInputHidden("email", cpCore.authContext.user.Email) _
-                        & cpCore.main_GetPanelButtons(ButtonLogin, "Button") _
+                        & cpCore.htmlDoc.main_GetPanelButtons(ButtonLogin, "Button") _
                         & ""
                     loginForm = "" _
                         & cpCore.htmlDoc.html_GetFormStart(QueryString) _
@@ -9275,7 +9280,7 @@ ErrorTrap:
                     & cr2 & "</tr>" _
                     & cr2 & "<tr>" _
                     & cr3 & "<td colspan=""2"">" _
-                    & kmaIndent(kmaIndent(cpCore.main_GetPanelButtons(ButtonSendPassword, "Button"))) _
+                    & kmaIndent(kmaIndent(cpCore.htmlDoc.main_GetPanelButtons(ButtonSendPassword, "Button"))) _
                     & cr3 & "</td>" _
                     & cr2 & "</tr>" _
                     & cr & "</table>" _
@@ -9356,7 +9361,7 @@ ErrorTrap:
                 '
                 ' site styles
                 '
-                getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.getCdnFileLink("templates/styles.css") & """ >"
+                getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & genericController.getCdnFileLink(cpCore, "templates/styles.css") & """ >"
             End If
             '
             ' Template shared styles
@@ -9372,7 +9377,7 @@ ErrorTrap:
                         If Parts(1) <> "" Then
                             getHTMLInternalHead = getHTMLInternalHead & cr & genericController.decodeHtml(Parts(1))
                         End If
-                        getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(Parts(0)) & """ >"
+                        getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, Parts(0)) & """ >"
                         If Parts(2) <> "" Then
                             getHTMLInternalHead = getHTMLInternalHead & cr & genericController.decodeHtml(Parts(2))
                         End If
@@ -9397,7 +9402,7 @@ ErrorTrap:
             ' Member Styles
             '
             If cpCore.authContext.user.StyleFilename <> "" Then
-                Call cpCore.htmlDoc.main_AddStylesheetLink2(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(cpCore.authContext.user.StyleFilename), "member style")
+                Call cpCore.htmlDoc.main_AddStylesheetLink2(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, cpCore.authContext.user.StyleFilename), "member style")
                 cpCore.authContext.user.StyleFilename = ""
             End If
             '
@@ -9427,13 +9432,13 @@ ErrorTrap:
                     Ext = genericController.vbLCase(Mid(VirtualFilename, Pos))
                     Select Case Ext
                         Case ".ico"
-                            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""icon"" type=""image/vnd.microsoft.icon"" href=""" & cpCore.getCdnFileLink(VirtualFilename) & """ >"
+                            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""icon"" type=""image/vnd.microsoft.icon"" href=""" & genericController.getCdnFileLink(cpCore, VirtualFilename) & """ >"
                         Case ".png"
-                            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""icon"" type=""image/png"" href=""" & cpCore.getCdnFileLink(VirtualFilename) & """ >"
+                            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""icon"" type=""image/png"" href=""" & genericController.getCdnFileLink(cpCore, VirtualFilename) & """ >"
                         Case ".gif"
-                            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""icon"" type=""image/gif"" href=""" & cpCore.getCdnFileLink(VirtualFilename) & """ >"
+                            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""icon"" type=""image/gif"" href=""" & genericController.getCdnFileLink(cpCore, VirtualFilename) & """ >"
                         Case ".jpg"
-                            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""icon"" type=""image/jpg"" href=""" & cpCore.getCdnFileLink(VirtualFilename) & """ >"
+                            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""icon"" type=""image/jpg"" href=""" & genericController.getCdnFileLink(cpCore, VirtualFilename) & """ >"
                     End Select
                 End If
             End If
@@ -9653,21 +9658,6 @@ ErrorTrap:
                 End If
             End If
             Return result
-        End Function
-        '
-        ' assemble all the html parts
-        '
-        Public Function main_assembleHtmlDoc(ByVal docType As String, ByVal head As String, ByVal bodyTag As String, ByVal Body As String) As String
-            main_assembleHtmlDoc = "" _
-                & docType _
-                & vbCrLf & "<html>" _
-                & cr & "<head>" _
-                & genericController.kmaIndent(head) _
-                & cr & "</head>" _
-                & cr & bodyTag _
-                & genericController.kmaIndent(Body) _
-                & cr & "</body>" _
-                & vbCrLf & "</html>"
         End Function
         '
         '=============================================================================
@@ -9890,41 +9880,1358 @@ ErrorTrap:
                 Call cpCore.cache.invalidateContent(RulesContentName)
             End If
         End Sub
+
+        ''
+        ''========================================================================
+        '' ----- Ends an HTML page
+        ''========================================================================
+        ''
+        'Public Function getHtmlDoc_afterBodyHtml() As String
+        '    Return "" _
+        '        & cr & "</body>" _
+        '        & vbCrLf & "</html>"
+        'End Function
         '
         '========================================================================
-        ' ----- Starts an HTML page (for an admin page -- not a public page)
+        ' main_GetRecordEditLink( iContentName, iRecordID )
+        '
+        '   iContentName The content for this link
+        '   iRecordID    The ID of the record in the Table
         '========================================================================
         '
-        Public Function getBeforeBodyHtml(Optional ByVal Title As String = "", Optional ByVal PageMargin As Integer = 0) As String
-            If Title <> "" Then
-                Call main_AddPagetitle(Title)
-            End If
-            If main_MetaContent_Title = "" Then
-                Call main_AddPagetitle("Admin-" & cpCore.webServer.webServerIO_requestDomain)
-            End If
-            cpCore.webServer.webServerIO_response_NoFollow = True
-            Call main_SetMetaContent(0, 0)
+        Public Function main_GetRecordEditLink(ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal AllowCut As Boolean = False) As String
+            main_GetRecordEditLink = main_GetRecordEditLink2(ContentName, RecordID, genericController.EncodeBoolean(AllowCut), "", cpCore.authContext.isEditing(cpCore, ContentName))
+        End Function
+        '
+        '========================================================================
+        ' main_GetRecordEditLink2( iContentName, iRecordID, AllowCut, RecordName )
+        '
+        '   ContentName The content for this link
+        '   RecordID    The ID of the record in the Table
+        '   AllowCut
+        '   RecordName
+        '   IsEditing
+        '========================================================================
+        '
+        Public Function main_GetRecordEditLink2(ByVal ContentName As String, ByVal RecordID As Integer, ByVal AllowCut As Boolean, ByVal RecordName As String, ByVal IsEditing As Boolean) As String
+            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetRecordEditLink2")
             '
-            Return "" _
-                & cpCore.siteProperties.docTypeDeclarationAdmin _
-                & vbCrLf & "<html>" _
-                & vbCrLf & "<head>" _
-                & getHTMLInternalHead(True) _
-                & vbCrLf & "</head>" _
-                & vbCrLf & "<body class=""ccBodyAdmin ccCon"">"
+            'If Not (true) Then Exit Function
+            '
+            Dim CS As Integer
+            Dim SQL As String
+            Dim ContentID As Integer
+            Dim Link As String
+            Dim MethodName As String
+            Dim iContentName As String
+            Dim iRecordID As Integer
+            Dim RootEntryName As String
+            Dim ClipBoard As String
+            Dim WorkingLink As String
+            Dim iAllowCut As Boolean
+            Dim Icon As String
+            Dim ContentCaption As String
+            '
+            iContentName = genericController.encodeText(ContentName)
+            iRecordID = genericController.EncodeInteger(RecordID)
+            iAllowCut = genericController.EncodeBoolean(AllowCut)
+            ContentCaption = cpCore.htmlDoc.html_EncodeHTML(iContentName)
+            If genericController.vbLCase(ContentCaption) = "aggregate functions" Then
+                ContentCaption = "Add-on"
+            End If
+            If genericController.vbLCase(ContentCaption) = "aggregate function objects" Then
+                ContentCaption = "Add-on"
+            End If
+            ContentCaption = ContentCaption & " record"
+            If RecordName <> "" Then
+                ContentCaption = ContentCaption & ", named '" & RecordName & "'"
+            End If
+            '
+            MethodName = "main_GetRecordEditLink2"
+            '
+            main_GetRecordEditLink2 = ""
+            If (iContentName = "") Then
+                Throw (New ApplicationException("ContentName [" & ContentName & "] is invalid")) ' handleLegacyError14(MethodName, "")
+            Else
+                If (iRecordID < 1) Then
+                    Throw (New ApplicationException("RecordID [" & RecordID & "] is invalid")) ' handleLegacyError14(MethodName, "")
+                Else
+                    If IsEditing Then
+                        '
+                        ' Edit link, main_Get the CID
+                        '
+                        ContentID = cpCore.metaData.getContentId(iContentName)
+                        '
+                        main_GetRecordEditLink2 = main_GetRecordEditLink2 _
+                            & "<a" _
+                            & " class=""ccRecordEditLink"" " _
+                            & " TabIndex=-1" _
+                            & " href=""" & cpCore.htmlDoc.html_EncodeHTML(cpCore.siteProperties.adminURL & "?cid=" & ContentID & "&id=" & iRecordID & "&af=4&aa=2&ad=1") & """"
+                        If Not cpCore.htmlDoc.main_ReturnAfterEdit Then
+                            main_GetRecordEditLink2 = main_GetRecordEditLink2 & " target=""_blank"""
+                        End If
+                        main_GetRecordEditLink2 = main_GetRecordEditLink2 _
+                            & "><img" _
+                            & " src=""/ccLib/images/IconContentEdit.gif""" _
+                            & " border=""0""" _
+                            & " alt=""Edit this " & cpCore.htmlDoc.html_EncodeHTML(ContentCaption) & """" _
+                            & " title=""Edit this " & cpCore.htmlDoc.html_EncodeHTML(ContentCaption) & """" _
+                            & " align=""absmiddle""" _
+                            & "></a>"
+                        '
+                        ' Cut Link if enabled
+                        '
+                        If iAllowCut Then
+                            WorkingLink = genericController.modifyLinkQuery(cpCore.webServer.webServerIO_requestPage & "?" & cpCore.htmlDoc.refreshQueryString, RequestNameCut, genericController.encodeText(ContentID) & "." & genericController.encodeText(RecordID), True)
+                            main_GetRecordEditLink2 = "" _
+                                & main_GetRecordEditLink2 _
+                                & "<a class=""ccRecordCutLink"" TabIndex=""-1"" href=""" & cpCore.htmlDoc.html_EncodeHTML(WorkingLink) & """><img src=""/ccLib/images/Contentcut.gif"" border=""0"" alt=""Cut this " & ContentCaption & " to clipboard"" title=""Cut this " & ContentCaption & " to clipboard"" align=""absmiddle""></a>"
+                        End If
+                        '
+                        ' Help link if enabled
+                        '
+                        Dim helpLink As String
+                        helpLink = ""
+                        'helpLink = main_GetHelpLink(5, "Editing " & ContentCaption, "Turn on Edit icons by checking 'Edit' in the tools panel, and click apply.<br><br><img src=""/ccLib/images/IconContentEdit.gif"" style=""vertical-align:middle""> Edit-Content icon<br><br>Edit-Content icons appear in your content. Click them to edit your content.")
+                        main_GetRecordEditLink2 = "" _
+                            & main_GetRecordEditLink2 _
+                            & helpLink
+                        '
+                        main_GetRecordEditLink2 = "<span class=""ccRecordLinkCon"" style=""white-space:nowrap;"">" & main_GetRecordEditLink2 & "</span>"
+                        ''
+                        'main_GetRecordEditLink2 = "" _
+                        '    & cr & "<div style=""position:absolute;"">" _
+                        '    & genericController.kmaIndent(main_GetRecordEditLink2) _
+                        '    & cr & "</div>"
+                        '
+                        'main_GetRecordEditLink2 = "" _
+                        '    & cr & "<div style=""position:relative;display:inline;"">" _
+                        '    & genericController.kmaIndent(main_GetRecordEditLink2) _
+                        '    & cr & "</div>"
+                    End If
+
+                End If
+            End If
+            '
+            Exit Function
+            '
+            ' ----- Error Trap
+            '
+ErrorTrap:
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
+            '
+        End Function
+        '
+        '========================================================================
+        ' Print an add link for the current ContentSet
+        '   iCSPointer is the content set to be added to
+        '   PresetNameValueList is a name=value pair to force in the added record
+        '========================================================================
+        '
+        Public Function main_cs_getRecordAddLink(ByVal CSPointer As Integer, Optional ByVal PresetNameValueList As String = "", Optional ByVal AllowPaste As Boolean = False) As String
+            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("cs_getRecordAddLink")
+            '
+            'If Not (true) Then Exit Function
+            '
+            Dim ContentName As String
+            Dim iPresetNameValueList As String
+            Dim MethodName As String
+            Dim iCSPointer As Integer
+            '
+            iCSPointer = genericController.EncodeInteger(CSPointer)
+            iPresetNameValueList = genericController.encodeEmptyText(PresetNameValueList, "")
+            '
+            MethodName = "main_cs_getRecordAddLink"
+            '
+            If iCSPointer < 0 Then
+                Throw (New ApplicationException("invalid ContentSet pointer [" & iCSPointer & "]")) ' handleLegacyError14(MethodName, "main_cs_getRecordAddLink was called with ")
+            Else
+                '
+                ' Print an add tag to the iCSPointers Content
+                '
+                ContentName = cpCore.db.cs_getContentName(iCSPointer)
+                If ContentName = "" Then
+                    Throw (New ApplicationException("main_cs_getRecordAddLink was called with a ContentSet that was created with an SQL statement. The function requires a ContentSet opened with an OpenCSContent.")) ' handleLegacyError14(MethodName, "")
+                Else
+                    main_cs_getRecordAddLink = main_GetRecordAddLink(ContentName, iPresetNameValueList, AllowPaste)
+                End If
+            End If
+            Exit Function
+            '
+            ' ----- Error Trap
+            '
+ErrorTrap:
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
+            '
+        End Function
+        '
+        '========================================================================
+        ' main_GetRecordAddLink( iContentName, iPresetNameValueList )
+        '
+        '   Returns a string of add tags for the Content Definition included, and all
+        '   child contents of that area.
+        '
+        '   iContentName The content for this link
+        '   iPresetNameValueList The sql equivalent used to select the record.
+        '           translates to name0=value0,name1=value1.. pairs separated by ,
+        '
+        '   LowestRootMenu - The Menu in the flyout structure that is the furthest down
+        '   in the chain that the user has content access to. This is so a content manager
+        '   does not have to navigate deep into a structure to main_Get to content he can
+        '   edit.
+        '   Basically, the entire menu is created down from the MenuName, and populated
+        '   with all the entiries this user has access to. The LowestRequiredMenuName is
+        '   is returned from the _branch routine, and that is to root on-which the
+        '   main_GetMenu uses
+        '========================================================================
+        '
+        Public Function main_GetRecordAddLink(ByVal ContentName As String, ByVal PresetNameValueList As String, Optional ByVal AllowPaste As Boolean = False) As String
+            main_GetRecordAddLink = main_GetRecordAddLink2(genericController.encodeText(ContentName), genericController.encodeText(PresetNameValueList), AllowPaste, cpCore.authContext.isEditing(cpCore, ContentName))
+        End Function
+        '
+        '========================================================================
+        ' main_GetRecordAddLink2
+        '
+        '   Returns a string of add tags for the Content Definition included, and all
+        '   child contents of that area.
+        '
+        '   iContentName The content for this link
+        '   iPresetNameValueList The sql equivalent used to select the record.
+        '           translates to name0=value0,name1=value1.. pairs separated by ,
+        '
+        '   LowestRootMenu - The Menu in the flyout structure that is the furthest down
+        '   in the chain that the user has content access to. This is so a content manager
+        '   does not have to navigate deep into a structure to main_Get to content he can
+        '   edit.
+        '   Basically, the entire menu is created down from the MenuName, and populated
+        '   with all the entiries this user has access to. The LowestRequiredMenuName is
+        '   is returned from the _branch routine, and that is to root on-which the
+        '   main_GetMenu uses
+        '========================================================================
+        '
+        Public Function main_GetRecordAddLink2(ByVal ContentName As String, ByVal PresetNameValueList As String, ByVal AllowPaste As Boolean, ByVal IsEditing As Boolean) As String
+            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetRecordAddLink")
+            '
+            'If Not (true) Then Exit Function
+            '
+            Dim ParentID As Integer
+            Dim BufferString As String
+            Dim MethodName As String
+            Dim iContentName As String
+            Dim iContentID As Integer
+            Dim iPresetNameValueList As String
+            Dim MenuName As String
+            Dim MenuHasBranches As Boolean
+            Dim LowestRequiredMenuName As String
+            Dim ClipBoard As String
+            Dim PasteLink As String
+            Dim Position As Integer
+            Dim ClipBoardArray As String()
+            Dim ClipboardContentID As Integer
+            Dim ClipChildRecordID As Integer
+            Dim iAllowPaste As Boolean
+            Dim useFlyout As Boolean
+            Dim csChildContent As Integer
+            Dim Link As String
+            '
+            MethodName = "main_GetRecordAddLink"
+            '
+            main_GetRecordAddLink2 = ""
+            If IsEditing Then
+                iContentName = genericController.encodeText(ContentName)
+                iPresetNameValueList = genericController.encodeText(PresetNameValueList)
+                iPresetNameValueList = genericController.vbReplace(iPresetNameValueList, "&", ",")
+                iAllowPaste = genericController.EncodeBoolean(AllowPaste)
+
+                If iContentName = "" Then
+                    Throw (New ApplicationException("Method called with blank ContentName")) ' handleLegacyError14(MethodName, "")
+                Else
+                    iContentID = cpCore.metaData.getContentId(iContentName)
+                    csChildContent = cpCore.db.cs_open("Content", "ParentID=" & iContentID, , , , , , "id")
+                    useFlyout = cpCore.db.cs_ok(csChildContent)
+                    Call cpCore.db.cs_Close(csChildContent)
+                    '
+                    If Not useFlyout Then
+                        Link = cpCore.siteProperties.adminURL & "?cid=" & iContentID & "&af=4&aa=2&ad=1"
+                        If PresetNameValueList <> "" Then
+                            Link = Link & "&wc=" & cpCore.htmlDoc.main_EncodeRequestVariable(PresetNameValueList)
+                        End If
+                        main_GetRecordAddLink2 = main_GetRecordAddLink2 _
+                            & "<a" _
+                            & " TabIndex=-1" _
+                            & " href=""" & cpCore.htmlDoc.html_EncodeHTML(Link) & """"
+                        If Not cpCore.htmlDoc.main_ReturnAfterEdit Then
+                            main_GetRecordAddLink2 = main_GetRecordAddLink2 & " target=""_blank"""
+                        End If
+                        main_GetRecordAddLink2 = main_GetRecordAddLink2 _
+                            & "><img" _
+                            & " src=""/ccLib/images/IconContentAdd.gif""" _
+                            & " border=""0""" _
+                            & " alt=""Add record""" _
+                            & " title=""Add record""" _
+                            & " align=""absmiddle""" _
+                            & "></a>"
+                    Else
+                        '
+                        MenuName = genericController.GetRandomInteger().ToString
+                        Call cpCore.htmlDoc.menu_AddEntry(MenuName, , "/ccLib/images/IconContentAdd.gif", , , , "stylesheet", "stylesheethover")
+                        LowestRequiredMenuName = main_GetRecordAddLink_AddMenuEntry(iContentName, iPresetNameValueList, "", MenuName, MenuName)
+                    End If
+                    '
+                    ' Add in the paste entry, if needed
+                    '
+                    If iAllowPaste Then
+                        ClipBoard = cpCore.visitProperty.getText("Clipboard", "")
+                        If ClipBoard <> "" Then
+                            Position = genericController.vbInstr(1, ClipBoard, ".")
+                            If Position <> 0 Then
+                                ClipBoardArray = Split(ClipBoard, ".")
+                                If UBound(ClipBoardArray) > 0 Then
+                                    ClipboardContentID = genericController.EncodeInteger(ClipBoardArray(0))
+                                    ClipChildRecordID = genericController.EncodeInteger(ClipBoardArray(1))
+                                    'iContentID = main_GetContentID(iContentName)
+                                    If cpCore.metaData.isWithinContent(ClipboardContentID, iContentID) Then
+                                        If genericController.vbInstr(1, iPresetNameValueList, "PARENTID=", vbTextCompare) <> 0 Then
+                                            '
+                                            ' must test for main_IsChildRecord
+                                            '
+                                            BufferString = iPresetNameValueList
+                                            BufferString = genericController.vbReplace(BufferString, "(", "")
+                                            BufferString = genericController.vbReplace(BufferString, ")", "")
+                                            BufferString = genericController.vbReplace(BufferString, ",", "&")
+                                            ParentID = genericController.EncodeInteger(genericController.main_GetNameValue_Internal(cpCore, BufferString, "Parentid"))
+                                        End If
+
+
+                                        If (ParentID <> 0) And (Not cpCore.pages.main_IsChildRecord(iContentName, ParentID, ClipChildRecordID)) Then
+                                            '
+                                            ' Can not paste as child of itself
+                                            '
+                                            PasteLink = cpCore.webServer.webServerIO_requestPage & "?" & cpCore.htmlDoc.refreshQueryString
+                                            PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePaste, "1", True)
+                                            PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteParentContentID, CStr(iContentID), True)
+                                            PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteParentRecordID, CStr(ParentID), True)
+                                            PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteFieldList, iPresetNameValueList, True)
+                                            main_GetRecordAddLink2 = main_GetRecordAddLink2 _
+                                                & "<a class=""ccRecordCutLink"" TabIndex=""-1"" href=""" & cpCore.htmlDoc.html_EncodeHTML(PasteLink) & """><img src=""/ccLib/images/ContentPaste.gif"" border=""0"" alt=""Paste record in clipboard here"" title=""Paste record in clipboard here"" align=""absmiddle""></a>"
+                                        End If
+                                    End If
+                                End If
+                            End If
+                        End If
+                    End If
+                    '
+                    ' Add in the available flyout menu entries
+                    '
+                    If LowestRequiredMenuName <> "" Then
+                        main_GetRecordAddLink2 = main_GetRecordAddLink2 & cpCore.menuFlyout.getMenu(LowestRequiredMenuName, 0)
+                        main_GetRecordAddLink2 = genericController.vbReplace(main_GetRecordAddLink2, "class=""ccFlyoutButton"" ", "", 1, 99, vbTextCompare)
+                        If PasteLink <> "" Then
+                            main_GetRecordAddLink2 = main_GetRecordAddLink2 & "<a TabIndex=-1 href=""" & cpCore.htmlDoc.html_EncodeHTML(PasteLink) & """><img src=""/ccLib/images/ContentPaste.gif"" border=""0"" alt=""Paste content from clipboard"" align=""absmiddle""></a>"
+                        End If
+                    End If
+                    '
+                    ' Help link if enabled
+                    '
+                    Dim helpLink As String
+                    helpLink = ""
+                    'helpLink = main_GetHelpLink(6, "Adding " & iContentName, "Turn on Edit icons by checking 'Edit' in the tools panel, and click apply.<br><br><img src=""/ccLib/images/IconContentAdd.gif"" " & IconWidthHeight & " style=""vertical-align:middle""> Add-Content icon<br><br>Add-Content icons appear in your content. Click them to add content.")
+                    main_GetRecordAddLink2 = main_GetRecordAddLink2 & helpLink                '
+                    If main_GetRecordAddLink2 <> "" Then
+                        main_GetRecordAddLink2 = "" _
+                            & vbCrLf & vbTab & "<div style=""display:inline;"">" _
+                            & genericController.kmaIndent(main_GetRecordAddLink2) _
+                            & vbCrLf & vbTab & "</div>"
+                    End If
+                    '
+                    ' ----- Add the flyout panels to the content to return
+                    '       This must be here so if the call is made after main_ClosePage, the panels will still deliver
+                    '
+                    If LowestRequiredMenuName <> "" Then
+                        main_GetRecordAddLink2 = main_GetRecordAddLink2 & cpCore.htmlDoc.menu_GetClose()
+                        If genericController.vbInstr(1, main_GetRecordAddLink2, "IconContentAdd.gif", vbTextCompare) <> 0 Then
+                            main_GetRecordAddLink2 = genericController.vbReplace(main_GetRecordAddLink2, "IconContentAdd.gif"" ", "IconContentAdd.gif"" align=""absmiddle"" ")
+                        End If
+                    End If
+                    If cpCore.htmlDoc.main_ReturnAfterEdit Then
+                        main_GetRecordAddLink2 = genericController.vbReplace(main_GetRecordAddLink2, "target=", "xtarget=", 1, 99, vbTextCompare)
+                    End If
+                    'End If
+                End If
+            End If
+            '
+            Exit Function
+            '
+            ' ----- Error Trap
+            '
+ErrorTrap:
+            Throw New ApplicationException("Unexpected exception") ' todo - remove this - handleLegacyError18(MethodName)
+            '
+        End Function
+        '
+        '========================================================================
+        ' main_GetRecordAddLink_AddMenuEntry( ContentName, PresetNameValueList, ContentNameList, MenuName )
+        '
+        '   adds an add entry for the content name, and all the child content
+        '   returns the MenuName of the lowest branch that has valid
+        '   menu entries.
+        '
+        '   ContentName The content for this link
+        '   PresetNameValueList The sql equivalent used to select the record.
+        '           translates to (name0=value0)&(name1=value1).. pairs separated by &
+        '   ContentNameList is a comma separated list of names of the content included so far
+        '   MenuName is the name of the root branch, for flyout menu
+        '
+        '   IsMember(), main_IsAuthenticated() And Member_AllowLinkAuthoring must already be checked
+        '========================================================================
+        '
+        Private Function main_GetRecordAddLink_AddMenuEntry(ByVal ContentName As String, ByVal PresetNameValueList As String, ByVal ContentNameList As String, ByVal MenuName As String, ByVal ParentMenuName As String) As String
+            Dim result As String = ""
+            Dim Copy As String
+            Dim CS As Integer
+            Dim SQL As String
+            Dim csChildContent As Integer
+            Dim ContentID As Integer
+            Dim Link As String
+            Dim MyContentNameList As String
+            Dim ButtonCaption As String
+            Dim ContentRecordFound As Boolean
+            Dim ContentAllowAdd As Boolean
+            Dim GroupRulesAllowAdd As Boolean
+            Dim MemberRulesDateExpires As Date
+            Dim MemberRulesAllow As Boolean
+            Dim ChildMenuButtonCount As Integer
+            Dim ChildMenuName As String
+            Dim ChildContentName As String
+            '
+            Link = ""
+            MyContentNameList = ContentNameList
+            If (ContentName = "") Then
+                Throw (New ApplicationException("main_GetRecordAddLink, ContentName is empty")) ' handleLegacyError14(MethodName, "")
+            Else
+                If (InStr(1, MyContentNameList, "," & genericController.vbUCase(ContentName) & ",") >= 0) Then
+                    Throw (New ApplicationException("result , Content Child [" & ContentName & "] is one of its own parents")) ' handleLegacyError14(MethodName, "")
+                Else
+                    MyContentNameList = MyContentNameList & "," & genericController.vbUCase(ContentName) & ","
+                    '
+                    ' ----- Select the Content Record for the Menu Entry selected
+                    '
+                    ContentRecordFound = False
+                    If cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
+                        '
+                        ' ----- admin member, they have access, main_Get ContentID and set markers true
+                        '
+                        SQL = "SELECT ID as ContentID, AllowAdd as ContentAllowAdd, 1 as GroupRulesAllowAdd, null as MemberRulesDateExpires" _
+                            & " FROM ccContent" _
+                            & " WHERE (" _
+                            & " (ccContent.Name=" & cpCore.db.encodeSQLText(ContentName) & ")" _
+                            & " AND(ccContent.active<>0)" _
+                            & " );"
+                        CS = cpCore.db.cs_openSql(SQL)
+                        If cpCore.db.cs_ok(CS) Then
+                            '
+                            ' Entry was found
+                            '
+                            ContentRecordFound = True
+                            ContentID = cpCore.db.cs_getInteger(CS, "ContentID")
+                            ContentAllowAdd = cpCore.db.cs_getBoolean(CS, "ContentAllowAdd")
+                            GroupRulesAllowAdd = True
+                            MemberRulesDateExpires = Date.MinValue
+                            MemberRulesAllow = True
+                        End If
+                        Call cpCore.db.cs_Close(CS)
+                    Else
+                        '
+                        ' non-admin member, first check if they have access and main_Get true markers
+                        '
+                        SQL = "SELECT ccContent.ID as ContentID, ccContent.AllowAdd as ContentAllowAdd, ccGroupRules.AllowAdd as GroupRulesAllowAdd, ccMemberRules.DateExpires as MemberRulesDateExpires" _
+                            & " FROM (((ccContent" _
+                                & " LEFT JOIN ccGroupRules ON ccGroupRules.ContentID=ccContent.ID)" _
+                                & " LEFT JOIN ccgroups ON ccGroupRules.GroupID=ccgroups.ID)" _
+                                & " LEFT JOIN ccMemberRules ON ccgroups.ID=ccMemberRules.GroupID)" _
+                                & " LEFT JOIN ccMembers ON ccMemberRules.MemberID=ccMembers.ID" _
+                            & " WHERE (" _
+                            & " (ccContent.Name=" & cpCore.db.encodeSQLText(ContentName) & ")" _
+                            & " AND(ccContent.active<>0)" _
+                            & " AND(ccGroupRules.active<>0)" _
+                            & " AND(ccMemberRules.active<>0)" _
+                            & " AND((ccMemberRules.DateExpires is Null)or(ccMemberRules.DateExpires>" & cpCore.db.encodeSQLDate(cpCore.app_startTime) & "))" _
+                            & " AND(ccgroups.active<>0)" _
+                            & " AND(ccMembers.active<>0)" _
+                            & " AND(ccMembers.ID=" & cpCore.authContext.user.id & ")" _
+                            & " );"
+                        CS = cpCore.db.cs_openSql(SQL)
+                        If cpCore.db.cs_ok(CS) Then
+                            '
+                            ' ----- Entry was found, member has some kind of access
+                            '
+                            ContentRecordFound = True
+                            ContentID = cpCore.db.cs_getInteger(CS, "ContentID")
+                            ContentAllowAdd = cpCore.db.cs_getBoolean(CS, "ContentAllowAdd")
+                            GroupRulesAllowAdd = cpCore.db.cs_getBoolean(CS, "GroupRulesAllowAdd")
+                            MemberRulesDateExpires = cpCore.db.cs_getDate(CS, "MemberRulesDateExpires")
+                            MemberRulesAllow = False
+                            If MemberRulesDateExpires = Date.MinValue Then
+                                MemberRulesAllow = True
+                            ElseIf (MemberRulesDateExpires > cpCore.app_startTime) Then
+                                MemberRulesAllow = True
+                            End If
+                        Else
+                            '
+                            ' ----- No entry found, this member does not have access, just main_Get ContentID
+                            '
+                            ContentRecordFound = True
+                            ContentID = cpCore.metaData.getContentId(ContentName)
+                            ContentAllowAdd = False
+                            GroupRulesAllowAdd = False
+                            MemberRulesAllow = False
+                        End If
+                        Call cpCore.db.cs_Close(CS)
+                    End If
+                    If ContentRecordFound Then
+                        '
+                        ' Add the Menu Entry* to the current menu (MenuName)
+                        '
+                        Link = ""
+                        ButtonCaption = ContentName
+                        result = MenuName
+                        If ContentAllowAdd And GroupRulesAllowAdd And MemberRulesAllow Then
+                            Link = cpCore.siteProperties.adminURL & "?cid=" & ContentID & "&af=4&aa=2&ad=1"
+                            If PresetNameValueList <> "" Then
+                                Dim NameValueList As String
+                                NameValueList = PresetNameValueList
+                                Link = Link & "&wc=" & cpCore.htmlDoc.main_EncodeRequestVariable(PresetNameValueList)
+                            End If
+                        End If
+                        Call cpCore.htmlDoc.menu_AddEntry(MenuName & ":" & ContentName, ParentMenuName, , , Link, ButtonCaption, "", "", True)
+                        '
+                        ' Create child submenu if Child Entries found
+                        '
+                        csChildContent = cpCore.db.cs_open("Content", "ParentID=" & ContentID, , , , , , "name")
+                        If Not cpCore.db.cs_ok(csChildContent) Then
+                            '
+                            ' No child menu
+                            '
+                        Else
+                            '
+                            ' Add the child menu
+                            '
+                            ChildMenuName = MenuName & ":" & ContentName
+                            ChildMenuButtonCount = 0
+                            '
+                            ' ----- Create the ChildPanel with all Children found
+                            '
+                            Do While cpCore.db.cs_ok(csChildContent)
+                                ChildContentName = cpCore.db.cs_getText(csChildContent, "name")
+                                Copy = main_GetRecordAddLink_AddMenuEntry(ChildContentName, PresetNameValueList, MyContentNameList, MenuName, ParentMenuName)
+                                If Copy <> "" Then
+                                    ChildMenuButtonCount = ChildMenuButtonCount + 1
+                                End If
+                                If (result = "") And (Copy <> "") Then
+                                    result = Copy
+                                End If
+                                cpCore.db.cs_goNext(csChildContent)
+                            Loop
+                        End If
+                    End If
+                End If
+                Call cpCore.db.cs_Close(csChildContent)
+            End If
+            Return result
+        End Function
+        Public Sub main_ClearStream()
+            docBuffer = ""
+            cpCore.webServer.webServerIO_bufferRedirect = ""
+            cpCore.webServer.webServerIO_bufferResponseHeader = ""
+        End Sub
+        Public Function cs_cs_getRecordEditLink(ByVal CSPointer As Integer, Optional ByVal AllowCut As Object = False) As String
+            Dim result As String = ""
+
+            Dim RecordName As String
+            Dim ContentName As String
+            Dim RecordID As Integer
+            Dim ContentControlID As Integer
+            Dim iCSPointer As Integer
+            '
+            iCSPointer = genericController.EncodeInteger(CSPointer)
+            If iCSPointer = -1 Then
+                Throw (New ApplicationException("main_cs_getRecordEditLink called with invalid iCSPointer")) ' handleLegacyError14(MethodName, "")
+            Else
+                If Not cpCore.db.cs_ok(iCSPointer) Then
+                    Throw (New ApplicationException("main_cs_getRecordEditLink called with Not main_CSOK")) ' handleLegacyError14(MethodName, "")
+                Else
+                    '
+                    ' Print an edit link for the records Content (may not be iCSPointer content)
+                    '
+                    RecordID = (cpCore.db.cs_getInteger(iCSPointer, "ID"))
+                    RecordName = cpCore.db.cs_getText(iCSPointer, "Name")
+                    ContentControlID = (cpCore.db.cs_getInteger(iCSPointer, "contentcontrolid"))
+                    ContentName = cpCore.metaData.getContentNameByID(ContentControlID)
+                    If ContentName <> "" Then
+                        result = cpCore.htmlDoc.main_GetRecordEditLink2(ContentName, RecordID, genericController.EncodeBoolean(AllowCut), RecordName, cpCore.authContext.isEditing(cpCore, ContentName))
+                    End If
+                End If
+            End If
+            Return result
+        End Function
+        '
+        '========================================================================
+        '   main_GetPanel( Panel, Optional StylePanel, Optional StyleHilite, Optional StyleShadow, Optional Width, Optional Padding, Optional HeightMin) As String
+        ' Return a panel with the input as center
+        '========================================================================
+        '
+        Public Function main_GetPanel(ByVal Panel As String, Optional ByVal StylePanel As String = "", Optional ByVal StyleHilite As String = "ccPanelHilite", Optional ByVal StyleShadow As String = "ccPanelShadow", Optional ByVal Width As String = "100%", Optional ByVal Padding As Integer = 5, Optional ByVal HeightMin As Integer = 1) As String
+            Dim ContentPanelWidth As String
+            Dim MethodName As String
+            Dim MyStylePanel As String
+            Dim MyStyleHilite As String
+            Dim MyStyleShadow As String
+            Dim MyWidth As String
+            Dim MyPadding As String
+            Dim MyHeightMin As String
+            Dim s As String
+            Dim s0 As String
+            Dim s1 As String
+            Dim s2 As String
+            Dim s3 As String
+            Dim s4 As String
+            Dim contentPanelWidthStyle As String
+            '
+            MethodName = "main_GetPanelTop"
+            '
+            MyStylePanel = genericController.encodeEmptyText(StylePanel, "ccPanel")
+            MyStyleHilite = genericController.encodeEmptyText(StyleHilite, "ccPanelHilite")
+            MyStyleShadow = genericController.encodeEmptyText(StyleShadow, "ccPanelShadow")
+            MyWidth = genericController.encodeEmptyText(Width, "100%")
+            MyPadding = Padding.ToString
+            MyHeightMin = HeightMin.ToString
+            '
+            If genericController.vbIsNumeric(MyWidth) Then
+                ContentPanelWidth = (CInt(MyWidth) - 2).ToString
+                contentPanelWidthStyle = ContentPanelWidth & "px"
+            Else
+                ContentPanelWidth = "100%"
+                contentPanelWidthStyle = ContentPanelWidth
+            End If
+            '
+            '
+            '
+            s0 = "" _
+                & cr & "<td style=""padding:" & MyPadding & "px;vertical-align:top"" class=""" & MyStylePanel & """>" _
+                & genericController.kmaIndent(genericController.encodeText(Panel)) _
+                & cr & "</td>" _
+                & ""
+            '
+            s1 = "" _
+                & cr & "<tr>" _
+                & genericController.kmaIndent(s0) _
+                & cr & "</tr>" _
+                & ""
+            s2 = "" _
+                & cr & "<table style=""width:" & contentPanelWidthStyle & ";border:0px;"" class=""" & MyStylePanel & """ cellspacing=""0"">" _
+                & genericController.kmaIndent(s1) _
+                & cr & "</table>" _
+                & ""
+            s3 = "" _
+                & cr & "<td width=""1"" height=""" & MyHeightMin & """ class=""" & MyStyleHilite & """><img alt=""space"" src=""/ccLib/images/spacer.gif"" height=""" & MyHeightMin & """ width=""1"" ></td>" _
+                & cr & "<td width=""" & ContentPanelWidth & """ valign=""top"" align=""left"" class=""" & MyStylePanel & """>" _
+                & genericController.kmaIndent(s2) _
+                & cr & "</td>" _
+                & cr & "<td width=""1"" class=""" & MyStyleShadow & """><img alt=""space"" src=""/ccLib/images/spacer.gif"" height=""1"" width=""1"" ></td>" _
+                & ""
+            s4 = "" _
+                & cr & "<tr>" _
+                & cr2 & "<td colspan=""3"" class=""" & MyStyleHilite & """><img alt=""space"" src=""/ccLib/images/spacer.gif"" height=""1"" width=""" & MyWidth & """ ></td>" _
+                & cr & "</tr>" _
+                & cr & "<tr>" _
+                & genericController.kmaIndent(s3) _
+                & cr & "</tr>" _
+                & cr & "<tr>" _
+                & cr2 & "<td colspan=""3"" class=""" & MyStyleShadow & """><img alt=""space"" src=""/ccLib/images/spacer.gif"" height=""1"" width=""" & MyWidth & """ ></td>" _
+                & cr & "</tr>" _
+                & ""
+            main_GetPanel = "" _
+                & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""" & MyWidth & """ class=""" & MyStylePanel & """>" _
+                & genericController.kmaIndent(s4) _
+                & cr & "</table>" _
+                & ""
+        End Function
+        '
+        '========================================================================
+        '   main_GetPanel( Panel, Optional StylePanel, Optional StyleHilite, Optional StyleShadow, Optional Width, Optional Padding, Optional HeightMin) As String
+        ' Return a panel with the input as center
+        '========================================================================
+        '
+        Public Function main_GetReversePanel(ByVal Panel As String, Optional ByVal StylePanel As String = "", Optional ByVal StyleHilite As String = "ccPanelShadow", Optional ByVal StyleShadow As String = "ccPanelHilite", Optional ByVal Width As String = "", Optional ByVal Padding As String = "", Optional ByVal HeightMin As String = "") As String
+            Dim MyStyleHilite As String
+            Dim MyStyleShadow As String
+            '
+            MyStyleHilite = genericController.encodeEmptyText(StyleHilite, "ccPanelShadow")
+            MyStyleShadow = genericController.encodeEmptyText(StyleShadow, "ccPanelHilite")
+
+            main_GetReversePanel = main_GetPanelTop(StylePanel, MyStyleHilite, MyStyleShadow, Width, Padding, HeightMin) _
+                & genericController.encodeText(Panel) _
+                & main_GetPanelBottom(StylePanel, MyStyleHilite, MyStyleShadow, Width, Padding)
+        End Function
+        '
+        '========================================================================
+        ' Return a panel header with the header message reversed out of the left
+        '========================================================================
+        '
+        Public Function main_GetPanelHeader(ByVal HeaderMessage As String, Optional ByVal RightSideMessage As String = "") As String
+            Dim iHeaderMessage As String
+            Dim iRightSideMessage As String
+            Dim Adminui As New adminUIController(cpCore)
+            '
+            'If Not (true) Then Exit Function
+            '
+            iHeaderMessage = genericController.encodeText(HeaderMessage)
+            iRightSideMessage = genericController.encodeEmptyText(RightSideMessage, FormatDateTime(cpCore.app_startTime))
+            main_GetPanelHeader = Adminui.GetHeader(iHeaderMessage, iRightSideMessage)
         End Function
 
         '
         '========================================================================
-        ' ----- Ends an HTML page
+        ' Prints the top of display panel
+        '   Must be closed with PrintPanelBottom
         '========================================================================
         '
-        Public Function getAfterBodyHtml() As String
-            Return "" _
+        Public Function main_GetPanelTop(Optional ByVal StylePanel As String = "", Optional ByVal StyleHilite As String = "", Optional ByVal StyleShadow As String = "", Optional ByVal Width As String = "", Optional ByVal Padding As String = "", Optional ByVal HeightMin As String = "") As String
+            Dim ContentPanelWidth As String
+            Dim MethodName As String
+            Dim MyStylePanel As String
+            Dim MyStyleHilite As String
+            Dim MyStyleShadow As String
+            Dim MyWidth As String
+            Dim MyPadding As String
+            Dim MyHeightMin As String
+            '
+            main_GetPanelTop = ""
+            MyStylePanel = genericController.encodeEmptyText(StylePanel, "ccPanel")
+            MyStyleHilite = genericController.encodeEmptyText(StyleHilite, "ccPanelHilite")
+            MyStyleShadow = genericController.encodeEmptyText(StyleShadow, "ccPanelShadow")
+            MyWidth = genericController.encodeEmptyText(Width, "100%")
+            MyPadding = genericController.encodeEmptyText(Padding, "5")
+            MyHeightMin = genericController.encodeEmptyText(HeightMin, "1")
+            MethodName = "main_GetPanelTop"
+            If genericController.vbIsNumeric(MyWidth) Then
+                ContentPanelWidth = (CInt(MyWidth) - 2).ToString
+            Else
+                ContentPanelWidth = "100%"
+            End If
+            main_GetPanelTop = main_GetPanelTop _
+                & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""" & MyWidth & """ class=""" & MyStylePanel & """>"
+            '
+            ' --- top hilite row
+            '
+            main_GetPanelTop = main_GetPanelTop _
+                & cr2 & "<tr>" _
+                & cr3 & "<td colspan=""3"" class=""" & MyStyleHilite & """><img alt=""space"" src=""/ccLib/images/spacer.gif"" height=""1"" width=""" & MyWidth & """ ></td>" _
+                & cr2 & "</tr>"
+            '
+            ' --- center row with Panel
+            '
+            main_GetPanelTop = main_GetPanelTop _
+                & cr2 & "<tr>" _
+                & cr3 & "<td width=""1"" height=""" & MyHeightMin & """ class=""" & MyStyleHilite & """><img alt=""space"" src=""/ccLib/images/spacer.gif"" height=""" & MyHeightMin & """ width=""1"" ></td>" _
+                & cr3 & "<td width=""" & ContentPanelWidth & """ valign=""top"" align=""left"" class=""" & MyStylePanel & """>" _
+                & cr4 & "<table border=""0"" cellpadding=""" & MyPadding & """ cellspacing=""0"" width=""" & ContentPanelWidth & """ class=""" & MyStylePanel & """>" _
+                & cr5 & "<tr>" _
+                & cr6 & "<td valign=""top"" class=""" & MyStylePanel & """><Span class=""" & MyStylePanel & """>"
+        End Function
+        '
+        '========================================================================
+        ' Return a panel with the input as center
+        '========================================================================
+        '
+        Public Function main_GetPanelBottom(Optional ByVal StylePanel As String = "", Optional ByVal StyleHilite As String = "", Optional ByVal StyleShadow As String = "", Optional ByVal Width As String = "", Optional ByVal Padding As String = "") As String
+            Dim MethodName As String
+            Dim MyStylePanel As String
+            Dim MyStyleHilite As String
+            Dim MyStyleShadow As String
+            Dim MyWidth As String
+            Dim MyPadding As String
+            '
+            MyStylePanel = genericController.encodeEmptyText(StylePanel, "ccPanel")
+            MyStyleHilite = genericController.encodeEmptyText(StyleHilite, "ccPanelHilite")
+            MyStyleShadow = genericController.encodeEmptyText(StyleShadow, "ccPanelShadow")
+            MyWidth = genericController.encodeEmptyText(Width, "100%")
+            MyPadding = genericController.encodeEmptyText(Padding, "5")
+            MethodName = "main_GetPanelBottom"
+            '
+            main_GetPanelBottom = main_GetPanelBottom _
+                & cr6 & "</span></td>" _
+                & cr5 & "</tr>" _
+                & cr4 & "</table>" _
+                & cr3 & "</td>" _
+                & cr3 & "<td width=""1"" class=""" & MyStyleShadow & """><img alt=""space"" src=""/ccLib/images/spacer.gif"" height=""1"" width=""1"" ></td>" _
+                & cr2 & "</tr>" _
+                & cr2 & "<tr>" _
+                & cr3 & "<td colspan=""3"" class=""" & MyStyleShadow & """><img alt=""space"" src=""/ccLib/images/spacer.gif"" height=""1"" width=""" & MyWidth & """ ></td>" _
+                & cr2 & "</tr>" _
+                & cr & "</table>"
+        End Function
+        '
+        '========================================================================
+        '
+        '========================================================================
+        '
+        Public Function main_GetPanelButtons(ByVal ButtonValueList As String, ByVal ButtonName As String, Optional ByVal PanelWidth As String = "", Optional ByVal PanelHeightMin As String = "") As String
+            Dim Adminui As New adminUIController(cpCore)
+            main_GetPanelButtons = Adminui.GetButtonBar(Adminui.GetButtonsFromList(ButtonValueList, True, True, ButtonName), "")
+        End Function
+        '
+        '
+        '
+        Public Function main_GetPanelRev(ByVal PanelContent As String, Optional ByVal PanelWidth As String = "", Optional ByVal PanelHeightMin As String = "") As String
+            main_GetPanelRev = main_GetPanel(PanelContent, "ccPanel", "ccPanelShadow", "ccPanelHilite", PanelWidth, 2, genericController.EncodeInteger(PanelHeightMin))
+        End Function
+        '
+        '
+        '
+        Public Function main_GetPanelInput(ByVal PanelContent As String, Optional ByVal PanelWidth As String = "", Optional ByVal PanelHeightMin As String = "1") As String
+            main_GetPanelInput = main_GetPanel(PanelContent, "ccPanelInput", "ccPanelShadow", "ccPanelHilite", PanelWidth, 2, genericController.EncodeInteger(PanelHeightMin))
+        End Function
+        '
+        '========================================================================
+        ' Print the tools panel at the bottom of the page
+        '========================================================================
+        '
+        Public Function main_GetToolsPanel() As String
+            Dim copyNameValue As String
+            Dim CopyName As String
+            Dim copyValue As String
+            Dim copyNameValueSplit() As String
+            Dim VisitMin As Integer
+            Dim VisitHrs As Integer
+            Dim VisitSec As Integer
+            Dim DebugPanel As String
+            Dim Copy As String
+            Dim CopySplit() As String
+            Dim Ptr As Integer
+            Dim EditTagID As String
+            Dim QuickEditTagID As String
+            Dim AdvancedEditTagID As String
+            Dim WorkflowTagID As String
+            Dim Tag As String
+            Dim PathID As Integer
+            Dim CS As Integer
+            Dim PathsContentID As Integer
+            Dim MethodName As String
+            Dim TagID As String
+            Dim ButtonPanel As String
+            Dim ToolsPanel As stringBuilderLegacyController
+            Dim OptionsPanel As String
+            Dim LinkPanel As stringBuilderLegacyController
+            Dim LoginPanel As String
+            Dim iValueBoolean As Boolean
+            Dim WorkingQueryString As String
+            Dim ActionURL As String
+            Dim BubbleCopy As String
+            Dim AnotherPanel As stringBuilderLegacyController
+            Dim ClipBoard As String
+            Dim RenderTimeString As String
+            Dim Adminui As New adminUIController(cpCore)
+            Dim ToolsPanelAddonID As Integer
+            Dim ShowLegacyToolsPanel As Boolean
+            Dim QS As String
+            '
+            MethodName = "main_GetToolsPanel"
+            '
+            If cpCore.authContext.user.AllowToolsPanel Then
+                ShowLegacyToolsPanel = cpCore.siteProperties.getBoolean("AllowLegacyToolsPanel", True)
+                '
+                ' --- Link Panel - used for both Legacy Tools Panel, and without it
+                '
+                LinkPanel = New stringBuilderLegacyController
+                LinkPanel.Add(SpanClassAdminSmall)
+                LinkPanel.Add("Contensive " & cpCore.codeVersion() & " | ")
+                LinkPanel.Add(FormatDateTime(cpCore.app_startTime) & " | ")
+                LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""http://support.Contensive.com/"">Support</A> | ")
+                LinkPanel.Add("<a class=""ccAdminLink"" href=""" & cpCore.htmlDoc.html_EncodeHTML(cpCore.siteProperties.adminURL) & """>Admin Home</A> | ")
+                LinkPanel.Add("<a class=""ccAdminLink"" href=""" & cpCore.htmlDoc.html_EncodeHTML("http://" & cpCore.webServer.webServerIO_requestDomain) & """>Public Home</A> | ")
+                LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & cpCore.htmlDoc.html_EncodeHTML(cpCore.siteProperties.adminURL & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
+                If cpCore.siteProperties.getBoolean("AllowMobileTemplates", False) Then
+                    If cpCore.authContext.visit.Mobile Then
+                        QS = cpCore.htmlDoc.refreshQueryString
+                        QS = genericController.ModifyQueryString(QS, "method", "forcenonmobile")
+                        LinkPanel.Add("<a class=""ccAdminLink"" href=""?" & QS & """>Non-Mobile Version</A> | ")
+                    Else
+                        QS = cpCore.htmlDoc.refreshQueryString
+                        QS = genericController.ModifyQueryString(QS, "method", "forcemobile")
+                        LinkPanel.Add("<a class=""ccAdminLink"" href=""?" & QS & """>Mobile Version</A> | ")
+                    End If
+                End If
+                LinkPanel.Add("</span>")
+                '
+                If ShowLegacyToolsPanel Then
+                    ToolsPanel = New stringBuilderLegacyController
+                    WorkingQueryString = genericController.ModifyQueryString(cpCore.htmlDoc.refreshQueryString, "ma", "", False)
+                    '
+                    ' ----- Tools Panel Caption
+                    '
+                    Dim helpLink As String
+                    helpLink = ""
+                    'helpLink = main_GetHelpLink("2", "Contensive Tools Panel", BubbleCopy)
+                    BubbleCopy = "Use the Tools Panel to enable features such as editing and debugging tools. It also includes links to the admin site, the support site and the My Profile page."
+                    main_GetToolsPanel = main_GetToolsPanel & main_GetPanelHeader("Contensive Tools Panel" & helpLink)
+                    '
+                    ToolsPanel.Add(cpCore.htmlDoc.html_GetFormStart(WorkingQueryString))
+                    ToolsPanel.Add(cpCore.htmlDoc.html_GetFormInputHidden("Type", FormTypeToolsPanel))
+                    '
+                    If True Then
+                        '
+                        ' ----- Create the Options Panel
+                        '
+                        'PathsContentID = main_GetContentID("Paths")
+                        '                '
+                        '                ' Allow Help Links
+                        '                '
+                        '                iValueBoolean = visitProperty.getboolean("AllowHelpIcon")
+                        '                TagID =  "AllowHelpIcon"
+                        '                OptionsPanel = OptionsPanel & "" _
+                        '                    & CR & "<div class=""ccAdminSmall"">" _
+                        '                    & cr2 & "<LABEL for=""" & TagID & """>" & main_GetFormInputCheckBox2(TagID, iValueBoolean, TagID) & "&nbsp;Help</LABEL>" _
+                        '                    & CR & "</div>"
+                        '
+                        EditTagID = "AllowEditing"
+                        QuickEditTagID = "AllowQuickEditor"
+                        AdvancedEditTagID = "AllowAdvancedEditor"
+                        WorkflowTagID = "AllowWorkflowRendering"
+                        '
+                        ' Edit
+                        '
+                        helpLink = ""
+                        'helpLink = main_GetHelpLink(7, "Enable Editing", "Display the edit tools for basic content, such as pages, copy and sections. ")
+                        iValueBoolean = cpCore.visitProperty.getBoolean("AllowEditing")
+                        Tag = cpCore.htmlDoc.html_GetFormInputCheckBox2(EditTagID, iValueBoolean, EditTagID)
+                        Tag = genericController.vbReplace(Tag, ">", " onClick=""document.getElementById('" & QuickEditTagID & "').checked=false;document.getElementById('" & AdvancedEditTagID & "').checked=false;"">")
+                        OptionsPanel = OptionsPanel _
+                            & cr & "<div class=""ccAdminSmall"">" _
+                            & cr2 & "<LABEL for=""" & EditTagID & """>" & Tag & "&nbsp;Edit</LABEL>" & helpLink _
+                            & cr & "</div>"
+                        '
+                        ' Quick Edit
+                        '
+                        helpLink = ""
+                        'helpLink = main_GetHelpLink(8, "Enable Quick Edit", "Display the quick editor to edit the main page content.")
+                        iValueBoolean = cpCore.visitProperty.getBoolean("AllowQuickEditor")
+                        Tag = cpCore.htmlDoc.html_GetFormInputCheckBox2(QuickEditTagID, iValueBoolean, QuickEditTagID)
+                        Tag = genericController.vbReplace(Tag, ">", " onClick=""document.getElementById('" & EditTagID & "').checked=false;document.getElementById('" & AdvancedEditTagID & "').checked=false;"">")
+                        OptionsPanel = OptionsPanel _
+                            & cr & "<div class=""ccAdminSmall"">" _
+                            & cr2 & "<LABEL for=""" & QuickEditTagID & """>" & Tag & "&nbsp;Quick Edit</LABEL>" & helpLink _
+                            & cr & "</div>"
+                        '
+                        ' Advanced Edit
+                        '
+                        helpLink = ""
+                        'helpLink = main_GetHelpLink(0, "Enable Advanced Edit", "Display the edit tools for advanced content, such as templates and add-ons. Basic content edit tools are also displayed.")
+                        iValueBoolean = cpCore.visitProperty.getBoolean("AllowAdvancedEditor")
+                        Tag = cpCore.htmlDoc.html_GetFormInputCheckBox2(AdvancedEditTagID, iValueBoolean, AdvancedEditTagID)
+                        Tag = genericController.vbReplace(Tag, ">", " onClick=""document.getElementById('" & QuickEditTagID & "').checked=false;document.getElementById('" & EditTagID & "').checked=false;"">")
+                        OptionsPanel = OptionsPanel _
+                            & cr & "<div class=""ccAdminSmall"">" _
+                            & cr2 & "<LABEL for=""" & AdvancedEditTagID & """>" & Tag & "&nbsp;Advanced Edit</LABEL>" & helpLink _
+                            & cr & "</div>"
+                        '
+                        ' Workflow Authoring Render Mode
+                        '
+                        helpLink = ""
+                        'helpLink = main_GetHelpLink(9, "Enable Workflow Rendering", "Control the display of workflow rendering. With workflow rendering enabled, any changes saved to content records that have not been published will be visible for your review.")
+                        If cpCore.siteProperties.allowWorkflowAuthoring Then
+                            iValueBoolean = cpCore.visitProperty.getBoolean("AllowWorkflowRendering")
+                            Tag = cpCore.htmlDoc.html_GetFormInputCheckBox2(WorkflowTagID, iValueBoolean, WorkflowTagID)
+                            OptionsPanel = OptionsPanel _
+                                & cr & "<div class=""ccAdminSmall"">" _
+                                & cr2 & "<LABEL for=""" & WorkflowTagID & """>" & Tag & "&nbsp;Render Workflow Authoring Changes</LABEL>" & helpLink _
+                                & cr & "</div>"
+                        End If
+                        helpLink = ""
+                        iValueBoolean = cpCore.visitProperty.getBoolean("AllowDebugging")
+                        TagID = "AllowDebugging"
+                        Tag = cpCore.htmlDoc.html_GetFormInputCheckBox2(TagID, iValueBoolean, TagID)
+                        OptionsPanel = OptionsPanel _
+                            & cr & "<div class=""ccAdminSmall"">" _
+                            & cr2 & "<LABEL for=""" & TagID & """>" & Tag & "&nbsp;Debug</LABEL>" & helpLink _
+                            & cr & "</div>"
+                        '
+                        ' Create Path Block Row
+                        '
+                        If cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
+                            TagID = "CreatePathBlock"
+                            If cpCore.siteProperties.allowPathBlocking Then
+                                '
+                                ' Path blocking allowed
+                                '
+                                'OptionsPanel = OptionsPanel & SpanClassAdminSmall & "<LABEL for=""" & TagID & """>"
+                                CS = cpCore.db.cs_open("Paths", "name=" & cpCore.db.encodeSQLText(cpCore.webServer.webServerIO_requestPath), , , , , , "ID")
+                                If cpCore.db.cs_ok(CS) Then
+                                    PathID = (cpCore.db.cs_getInteger(CS, "ID"))
+                                End If
+                                Call cpCore.db.cs_Close(CS)
+                                If PathID <> 0 Then
+                                    '
+                                    ' Path is blocked
+                                    '
+                                    Tag = cpCore.htmlDoc.html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & cpCore.webServer.webServerIO_requestPath & "] [<a href=""" & cpCore.htmlDoc.html_EncodeHTML(cpCore.siteProperties.adminURL & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & cpCore.metaData.getContentId("paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
+                                Else
+                                    '
+                                    ' Path is not blocked
+                                    '
+                                    Tag = cpCore.htmlDoc.html_GetFormInputCheckBox2(TagID, False, TagID) & "&nbsp;Block this path [" & cpCore.webServer.webServerIO_requestPath & "]</LABEL>"
+                                End If
+                                helpLink = ""
+                                'helpLink = main_GetHelpLink(10, "Enable Debugging", "Debugging is a developer only debugging tool. With Debugging enabled, ccLib.TestPoints(...) will print, ErrorTrapping will be displayed, redirections are blocked, and more.")
+                                OptionsPanel = OptionsPanel _
+                                    & cr & "<div class=""ccAdminSmall"">" _
+                                    & cr2 & "<LABEL for=""" & TagID & """>" & Tag & "</LABEL>" & helpLink _
+                                    & cr & "</div>"
+                            End If
+                        End If
+                        '
+                        ' Buttons
+                        '
+                        OptionsPanel = OptionsPanel & "" _
+                            & cr & "<div class=""ccButtonCon"">" _
+                            & cr2 & "<input type=submit name=" & "mb value=""" & ButtonApply & """>" _
+                            & cr & "</div>" _
+                            & ""
+                    End If
+                    '
+                    ' ----- Create the Login Panel
+                    '
+                    If Trim(cpCore.authContext.user.Name) = "" Then
+                        Copy = "You are logged in as member #" & cpCore.authContext.user.id & "."
+                    Else
+                        Copy = "You are logged in as " & cpCore.authContext.user.Name & "."
+                    End If
+                    LoginPanel = LoginPanel & "" _
+                        & cr & "<div class=""ccAdminSmall"">" _
+                        & cr2 & Copy & "" _
+                        & cr & "</div>"
+                    '
+                    ' Username
+                    '
+                    Dim Caption As String
+                    If cpCore.siteProperties.getBoolean("allowEmailLogin", False) Then
+                        Caption = "Username&nbsp;or&nbsp;Email"
+                    Else
+                        Caption = "Username"
+                    End If
+                    TagID = "Username"
+                    LoginPanel = LoginPanel & "" _
+                        & cr & "<div class=""ccAdminSmall"">" _
+                        & cr2 & "<LABEL for=""" & TagID & """>" & cpCore.htmlDoc.html_GetFormInputText2(TagID, "", 1, 30, TagID, False) & "&nbsp;" & Caption & "</LABEL>" _
+                        & cr & "</div>"
+                    '
+                    ' Username
+                    '
+                    If cpCore.siteProperties.getBoolean("allownopasswordLogin", False) Then
+                        Caption = "Password&nbsp;(optional)"
+                    Else
+                        Caption = "Password"
+                    End If
+                    TagID = "Password"
+                    LoginPanel = LoginPanel & "" _
+                        & cr & "<div class=""ccAdminSmall"">" _
+                        & cr2 & "<LABEL for=""" & TagID & """>" & cpCore.htmlDoc.html_GetFormInputText2(TagID, "", 1, 30, TagID, True) & "&nbsp;" & Caption & "</LABEL>" _
+                        & cr & "</div>"
+                    '
+                    ' Autologin checkbox
+                    '
+                    If cpCore.siteProperties.getBoolean("AllowAutoLogin", False) Then
+                        If cpCore.authContext.visit.CookieSupport Then
+                            TagID = "autologin"
+                            LoginPanel = LoginPanel & "" _
+                                & cr & "<div class=""ccAdminSmall"">" _
+                                & cr2 & "<LABEL for=""" & TagID & """>" & cpCore.htmlDoc.html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Login automatically from this computer</LABEL>" _
+                                & cr & "</div>"
+                        End If
+                    End If
+                    '
+                    ' Buttons
+                    '
+                    LoginPanel = LoginPanel & Adminui.GetButtonBar(Adminui.GetButtonsFromList(ButtonLogin & "," & ButtonLogout, True, True, "mb"), "")
+                    '
+                    ' ----- assemble tools panel
+                    '
+                    Copy = "" _
+                        & cr & "<td width=""50%"" class=""ccPanelInput"" style=""vertical-align:bottom;"">" _
+                        & genericController.kmaIndent(LoginPanel) _
+                        & cr & "</td>" _
+                        & cr & "<td width=""50%"" class=""ccPanelInput"" style=""vertical-align:bottom;"">" _
+                        & genericController.kmaIndent(OptionsPanel) _
+                        & cr & "</td>"
+                    Copy = "" _
+                        & cr & "<tr>" _
+                        & genericController.kmaIndent(Copy) _
+                        & cr & "</tr>" _
+                        & ""
+                    Copy = "" _
+                        & cr & "<table border=""0"" cellpadding=""3"" cellspacing=""0"" width=""100%"">" _
+                        & genericController.kmaIndent(Copy) _
+                        & cr & "</table>"
+                    ToolsPanel.Add(main_GetPanelInput(Copy))
+                    ToolsPanel.Add(cpCore.htmlDoc.html_GetFormEnd)
+                    main_GetToolsPanel = main_GetToolsPanel & main_GetPanel(ToolsPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5)
+                    '
+                    main_GetToolsPanel = main_GetToolsPanel & main_GetPanel(LinkPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5)
+                    '
+                    LinkPanel = Nothing
+                    ToolsPanel = Nothing
+                    AnotherPanel = Nothing
+                End If
+                '
+                ' --- Developer Debug Panel
+                '
+                If cpCore.visitProperty.getBoolean("AllowDebugging") Then
+                    '
+                    ' --- Debug Panel Header
+                    '
+                    LinkPanel = New stringBuilderLegacyController
+                    LinkPanel.Add(SpanClassAdminSmall)
+                    'LinkPanel.Add( "WebClient " & main_WebClientVersion & " | "
+                    LinkPanel.Add("Contensive " & cpCore.codeVersion() & " | ")
+                    LinkPanel.Add(FormatDateTime(cpCore.app_startTime) & " | ")
+                    LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""http: //support.Contensive.com/"">Support</A> | ")
+                    LinkPanel.Add("<a class=""ccAdminLink"" href=""" & cpCore.htmlDoc.html_EncodeHTML(cpCore.siteProperties.adminURL) & """>Admin Home</A> | ")
+                    LinkPanel.Add("<a class=""ccAdminLink"" href=""" & cpCore.htmlDoc.html_EncodeHTML("http://" & cpCore.webServer.webServerIO_requestDomain) & """>Public Home</A> | ")
+                    LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & cpCore.htmlDoc.html_EncodeHTML(cpCore.siteProperties.adminURL & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
+                    LinkPanel.Add("</span>")
+                    '
+                    '
+                    '
+                    'DebugPanel = DebugPanel & main_GetPanel(LinkPanel.Text, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", "5")
+                    '
+                    DebugPanel = DebugPanel _
+                        & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"">" _
+                        & cr2 & "<tr>" _
+                        & cr3 & "<td width=""100"" class=""ccPanel""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""100"" height=""1"" ></td>" _
+                        & cr3 & "<td width=""100%"" class=""ccPanel""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""1"" ></td>" _
+                        & cr2 & "</tr>"
+                    '
+                    DebugPanel = DebugPanel & main_DebugPanelRow("DOM", "<a class=""ccAdminLink"" href=""/ccLib/clientside/DOMViewer.htm"" target=""_blank"">Click</A>")
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Trap Errors", cpCore.htmlDoc.html_EncodeHTML(cpCore.siteProperties.trapErrors.ToString))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Trap Email", cpCore.htmlDoc.html_EncodeHTML(cpCore.siteProperties.getText("TrapEmail")))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerLink", cpCore.htmlDoc.html_EncodeHTML(cpCore.webServer.requestUrl))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerDomain", cpCore.htmlDoc.html_EncodeHTML(cpCore.webServer.webServerIO_requestDomain))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerProtocol", cpCore.htmlDoc.html_EncodeHTML(cpCore.webServer.webServerIO_requestProtocol))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerHost", cpCore.htmlDoc.html_EncodeHTML(cpCore.webServer.requestDomain))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerPath", cpCore.htmlDoc.html_EncodeHTML(cpCore.webServer.webServerIO_requestPath))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerPage", cpCore.htmlDoc.html_EncodeHTML(cpCore.webServer.webServerIO_requestPage))
+                    Copy = ""
+                    If cpCore.webServer.requestQueryString <> "" Then
+                        CopySplit = Split(cpCore.webServer.requestQueryString, "&")
+                        For Ptr = 0 To UBound(CopySplit)
+                            copyNameValue = CopySplit(Ptr)
+                            If copyNameValue <> "" Then
+                                copyNameValueSplit = Split(copyNameValue, "=")
+                                CopyName = genericController.DecodeResponseVariable(copyNameValueSplit(0))
+                                copyValue = ""
+                                If UBound(copyNameValueSplit) > 0 Then
+                                    copyValue = genericController.DecodeResponseVariable(copyNameValueSplit(1))
+                                End If
+                                Copy = Copy & cr & "<br>" & cpCore.htmlDoc.html_EncodeHTML(CopyName & "=" & copyValue)
+                            End If
+                        Next
+                        Copy = Mid(Copy, 8)
+                    End If
+                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerQueryString", Copy)
+                    Copy = ""
+                    For Each key As String In cpCore.docProperties.getKeyList()
+                        Dim docProperty As docPropertiesClass = cpCore.docProperties.getProperty(key)
+                        If docProperty.IsForm Then
+                            Copy = Copy & cr & "<br>" & cpCore.htmlDoc.html_EncodeHTML(docProperty.NameValue)
+                        End If
+                    Next
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Render Time &gt;= ", Format((GetTickCount - cpCore.app_startTickCount) / 1000, "0.000") & " sec")
+                    If True Then
+                        VisitHrs = CInt(cpCore.authContext.visit.TimeToLastHit / 3600)
+                        VisitMin = CInt(cpCore.authContext.visit.TimeToLastHit / 60) - (60 * VisitHrs)
+                        VisitSec = cpCore.authContext.visit.TimeToLastHit Mod 60
+                        DebugPanel = DebugPanel & main_DebugPanelRow("Visit Length", CStr(cpCore.authContext.visit.TimeToLastHit) & " sec, (" & VisitHrs & " hrs " & VisitMin & " mins " & VisitSec & " secs)")
+                        'DebugPanel = DebugPanel & main_DebugPanelRow("Visit Length", CStr(main_VisitTimeToLastHit) & " sec, (" & Int(main_VisitTimeToLastHit / 60) & " min " & (main_VisitTimeToLastHit Mod 60) & " sec)")
+                    End If
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Addon Profile", "<hr><ul class=""ccPanel"">" & "<li>tbd</li>" & cr & "</ul>")
+                    '
+                    DebugPanel = DebugPanel & "</table>"
+                    '
+                    If ShowLegacyToolsPanel Then
+                        '
+                        ' Debug Panel as part of legacy tools panel
+                        '
+                        main_GetToolsPanel = main_GetToolsPanel _
+                            & main_GetPanel(DebugPanel, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5)
+                    Else
+                        '
+                        ' Debug Panel without Legacy Tools panel
+                        '
+                        main_GetToolsPanel = main_GetToolsPanel _
+                            & main_GetPanelHeader("Debug Panel") _
+                            & main_GetPanel(LinkPanel.Text) _
+                            & main_GetPanel(DebugPanel, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5)
+                    End If
+                End If
+                main_GetToolsPanel = cr & "<div class=""ccCon"">" & genericController.kmaIndent(main_GetToolsPanel) & cr & "</div>"
+            End If
+        End Function
+        '
+        '
+        '
+        Private Function main_DebugPanelRow(Label As String, Value As String) As String
+            Return cr2 & "<tr><td valign=""top"" class=""ccPanel ccAdminSmall"">" & Label & "</td><td valign=""top"" class=""ccPanel ccAdminSmall"">" & Value & "</td></tr>"
+        End Function
+
+        '
+        '=================================================================================================================
+        '   csv_GetAddonOptionStringValue
+        '
+        '   gets the value from a list matching the name
+        '
+        '   InstanceOptionstring is an "AddonEncoded" name=AddonEncodedValue[selector]descriptor&name=value string
+        '=================================================================================================================
+        '
+        Public Shared Function csv_GetAddonOptionStringValue(OptionName As String, addonOptionString As String) As String
+            Dim Pos As Integer
+            Dim s As String
+            '
+            s = genericController.getSimpleNameValue(OptionName, addonOptionString, "", "&")
+            Pos = genericController.vbInstr(1, s, "[")
+            If Pos > 0 Then
+                s = Left(s, Pos - 1)
+            End If
+            s = genericController.decodeNvaArgument(s)
+            '
+            csv_GetAddonOptionStringValue = Trim(s)
+        End Function
+        '
+        '   Returns the next entry in the array, empty when there are no more
+        '
+        Public Function csv_GetEncodeContent_JavascriptOnLoad() As String
+            Dim result As String = ""
+            Dim Ptr As Integer
+            If web_EncodeContent_JavascriptOnLoad_Cnt >= 0 Then
+                For Ptr = 0 To web_EncodeContent_JavascriptOnLoad_Cnt - 1
+                    If web_EncodeContent_JavascriptOnLoad(Ptr) <> "" Then
+                        result = web_EncodeContent_JavascriptOnLoad(Ptr)
+                        web_EncodeContent_JavascriptOnLoad(Ptr) = ""
+                        Exit For
+                    End If
+                Next
+            End If
+            Return result
+        End Function
+        '
+        '   Returns the next entry in the array, empty when there are no more
+        '
+        Public Function csv_GetEncodeContent_JavascriptBodyEnd() As String
+            Dim result As String = ""
+            Dim Ptr As Integer
+            If web_EncodeContent_JavascriptBodyEnd_cnt >= 0 Then
+                For Ptr = 0 To web_EncodeContent_JavascriptBodyEnd_cnt - 1
+                    If web_EncodeContent_JavascriptBodyEnd(Ptr) <> "" Then
+                        result = web_EncodeContent_JavascriptBodyEnd(Ptr)
+                        web_EncodeContent_JavascriptBodyEnd(Ptr) = ""
+                        Exit For
+                    End If
+                Next
+            End If
+            Return result
+        End Function
+        '
+        '   Returns the next entry in the array, empty when there are no more
+        '
+        Public Function csv_GetEncodeContent_JSFilename() As String
+            Dim result As String = ""
+            Dim Ptr As Integer
+            If web_EncodeContent_JSFilename_Cnt >= 0 Then
+                For Ptr = 0 To web_EncodeContent_JSFilename_Cnt - 1
+                    If web_EncodeContent_JSFilename(Ptr) <> "" Then
+                        result = web_EncodeContent_JSFilename(Ptr)
+                        web_EncodeContent_JSFilename(Ptr) = ""
+                        Exit For
+                    End If
+                Next
+            End If
+            Return result
+        End Function
+        '
+        '   Returns the next entry in the array, empty when there are no more
+        '
+        Public Function csv_GetEncodeContent_StyleFilenames() As String
+            Dim result As String = ""
+            Dim Ptr As Integer
+            If web_EncodeContent_StyleFilenames_Cnt >= 0 Then
+                For Ptr = 0 To web_EncodeContent_StyleFilenames_Cnt - 1
+                    If web_EncodeContent_StyleFilenames(Ptr) <> "" Then
+                        result = web_EncodeContent_StyleFilenames(Ptr)
+                        web_EncodeContent_StyleFilenames(Ptr) = ""
+                        Exit For
+                    End If
+                Next
+            End If
+            Return result
+        End Function
+        '
+        '====================================================================================================
+        Public Function getHtmlDoc(cpcore As coreClass, htmlBody As String, Optional allowLogin As Boolean = True, Optional allowTools As Boolean = True, Optional blockNonContentExtras As Boolean = False, Optional isAdminSite As Boolean = True) As String
+            Dim result As String = ""
+            Try
+                result = "" _
+                    & cpcore.siteProperties.docTypeDeclarationAdmin _
+                    & vbCrLf & "<html>" _
+                    & vbCrLf & "<head>" _
+                    & getHTMLInternalHead(True) _
+                    & vbCrLf & "</head>" _
+                    & vbCrLf & "<body class=""ccBodyAdmin ccCon"">" _
+                    & htmlBody _
+                    & getHtmlDoc_beforeEndOfBodyHtml(allowLogin, allowTools, blockNonContentExtras, isAdminSite) _
+                    & vbCrLf & "</body>" _
+                    & vbCrLf & "</html>" _
+                    & ""
+            Catch ex As Exception
+                cpcore.handleExceptionAndContinue(ex)
+            End Try
+            Return result
+        End Function
+        '
+        ' assemble all the html parts
+        '
+        Public Function main_assembleHtmlDoc(ByVal docType As String, ByVal head As String, ByVal bodyTag As String, ByVal Body As String) As String
+            main_assembleHtmlDoc = "" _
+                & docType _
+                & vbCrLf & "<html>" _
+                & cr & "<head>" _
+                & genericController.kmaIndent(head) _
+                & cr & "</head>" _
+                & cr & bodyTag _
+                & genericController.kmaIndent(Body) _
                 & cr & "</body>" _
                 & vbCrLf & "</html>"
         End Function
-
-
+        ''
+        ''========================================================================
+        '' ----- Starts an HTML page (for an admin page -- not a public page)
+        ''========================================================================
+        ''
+        'Public Function getHtmlDoc_beforeBodyHtml(Optional ByVal Title As String = "", Optional ByVal PageMargin As Integer = 0) As String
+        '    If Title <> "" Then
+        '        Call main_AddPagetitle(Title)
+        '    End If
+        '    If main_MetaContent_Title = "" Then
+        '        Call main_AddPagetitle("Admin-" & cpCore.webServer.webServerIO_requestDomain)
+        '    End If
+        '    cpCore.webServer.webServerIO_response_NoFollow = True
+        '    Call main_SetMetaContent(0, 0)
+        '    '
+        '    Return "" _
+        '        & cpCore.siteProperties.docTypeDeclarationAdmin _
+        '        & vbCrLf & "<html>" _
+        '        & vbCrLf & "<head>" _
+        '        & getHTMLInternalHead(True) _
+        '        & vbCrLf & "</head>" _
+        '        & vbCrLf & "<body class=""ccBodyAdmin ccCon"">"
+        'End Function
     End Class
 End Namespace

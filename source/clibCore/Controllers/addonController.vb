@@ -336,7 +336,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' just in case - during transition from cpCoreClass to csv, in case a call is missing.
                     '
-                    personalizationPeopleId = cpCore.authContext.user.ID
+                    personalizationPeopleId = cpCore.authContext.user.id
                     personalizationIsAuthenticated = cpCore.authContext.isAuthenticated()
                 End If
                 '
@@ -425,7 +425,7 @@ Namespace Contensive.Core.Controllers
                     OtherHeadTags = genericController.encodeText(addonCache.OtherHeadTags)
                     JSFilename = genericController.encodeText(addonCache.JSFilename)
                     If JSFilename <> "" Then
-                        JSFilename = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(JSFilename)
+                        JSFilename = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, JSFilename)
                     End If
                 End If
                 If Not String.IsNullOrEmpty(ProgramID) Then
@@ -517,7 +517,7 @@ Namespace Contensive.Core.Controllers
                             OtherHeadTags = ""
                             AddonEditIcon = ""
                             IsInline = True
-                            GroupIDList = cpCore.getAddonOption("AllowGroups", WorkingOptionString)
+                            GroupIDList = addonController.getAddonOption("AllowGroups", WorkingOptionString)
                             GroupIDList = Trim(GroupIDList)
                             ' not webonly anymore
                             If Not cpCore.authContext.isMemberOfGroupIdList(cpCore, personalizationPeopleId, personalizationIsAuthenticated, GroupIDList) Then
@@ -582,7 +582,7 @@ Namespace Contensive.Core.Controllers
                                 AddonName = "Addon #" & addonId
                             End If
                             If Context = CPUtilsBaseClass.addonContext.ContextAdmin Then
-                                returnVal = "The Add-on '" & AddonName & "' could not be found. It may have been deleted or marked inactive. If you are receiving this message after clicking an Add-on from the Navigator, their may be a problem with this Add-on. If you are receiving this message from the main admin page, your Dashboard Add-on may be set incorrectly. Use the Admin tab under Preferences to select the Dashboard, or <a href=""?" & RequestNameDashboardReset & "=" & cpCore.authContext.visit.ID & """>click here</a> to automatically reset the dashboard."
+                                returnVal = "The Add-on '" & AddonName & "' could not be found. It may have been deleted or marked inactive. If you are receiving this message after clicking an Add-on from the Navigator, their may be a problem with this Add-on. If you are receiving this message from the main admin page, your Dashboard Add-on may be set incorrectly. Use the Admin tab under Preferences to select the Dashboard, or <a href=""?" & RequestNameDashboardReset & "=" & cpCore.authContext.visit.id & """>click here</a> to automatically reset the dashboard."
                             Else
                                 returnVal = "The Add-on '" & AddonName & "' could not be found. It may have been deleted or marked inactive. Please use the Add-on Manager to replace it, or edit this page and remove it."
                             End If
@@ -921,10 +921,10 @@ Namespace Contensive.Core.Controllers
                                         Call cpCore.htmlDoc.main_AddEndOfBodyJavascript2(JSBodyEnd, AddedByName)
                                         Call cpCore.htmlDoc.main_AddHeadScriptLink(JSFilename, AddedByName)
                                         If DefaultStylesFilename <> "" Then
-                                            Call cpCore.htmlDoc.main_AddStylesheetLink2(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(DefaultStylesFilename), AddonName & " default")
+                                            Call cpCore.htmlDoc.main_AddStylesheetLink2(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, DefaultStylesFilename), AddonName & " default")
                                         End If
                                         If CustomStylesFilename <> "" Then
-                                            Call cpCore.htmlDoc.main_AddStylesheetLink2(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(CustomStylesFilename), AddonName & " custom")
+                                            Call cpCore.htmlDoc.main_AddStylesheetLink2(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, CustomStylesFilename), AddonName & " custom")
                                         End If
                                     End If
                                 End If
@@ -1226,10 +1226,10 @@ Namespace Contensive.Core.Controllers
                                         Call cpCore.htmlDoc.main_AddEndOfBodyJavascript2(JSBodyEnd, AddedByName)
                                         Call cpCore.htmlDoc.main_AddHeadScriptLink(JSFilename, AddedByName)
                                         If DefaultStylesFilename <> "" Then
-                                            Call cpCore.htmlDoc.main_AddStylesheetLink2(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(DefaultStylesFilename), AddonName & " default")
+                                            Call cpCore.htmlDoc.main_AddStylesheetLink2(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, DefaultStylesFilename), AddonName & " default")
                                         End If
                                         If CustomStylesFilename <> "" Then
-                                            Call cpCore.htmlDoc.main_AddStylesheetLink2(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(CustomStylesFilename), AddonName & " custom")
+                                            Call cpCore.htmlDoc.main_AddStylesheetLink2(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, CustomStylesFilename), AddonName & " custom")
                                         End If
                                     End If
                                 End If
@@ -1672,7 +1672,7 @@ Namespace Contensive.Core.Controllers
                                                                 CS = cpCore.db.cs_open("Copy Content", "name=" & cpCore.db.encodeSQLText(FieldName), "ID")
                                                                 If Not cpCore.db.cs_ok(CS) Then
                                                                     Call cpCore.db.cs_Close(CS)
-                                                                    CS = cpCore.db.cs_insertRecord("Copy Content", cpCore.authContext.user.ID)
+                                                                    CS = cpCore.db.cs_insertRecord("Copy Content", cpCore.authContext.user.id)
                                                                 End If
                                                                 If cpCore.db.cs_ok(CS) Then
                                                                     Call cpCore.db.cs_set(CS, "name", FieldName)
@@ -1817,7 +1817,7 @@ Namespace Contensive.Core.Controllers
                                                                             If FieldValue = "" Then
                                                                                 Copy = cpCore.htmlDoc.html_GetFormInputFile(FieldName)
                                                                             Else
-                                                                                NonEncodedLink = cpCore.webServer.requestDomain & cpCore.getCdnFileLink(FieldValue)
+                                                                                NonEncodedLink = cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, FieldValue)
                                                                                 EncodedLink = EncodeURL(NonEncodedLink)
                                                                                 Dim FieldValuefilename As String = ""
                                                                                 Dim FieldValuePath As String = ""
@@ -1908,7 +1908,7 @@ Namespace Contensive.Core.Controllers
                                                             CS = cpCore.db.cs_open("Copy Content", "Name=" & cpCore.db.encodeSQLText(FieldName), "ID", , , , , "id,name,Copy")
                                                             If Not cpCore.db.cs_ok(CS) Then
                                                                 Call cpCore.db.cs_Close(CS)
-                                                                CS = cpCore.db.cs_insertRecord("Copy Content", cpCore.authContext.user.ID)
+                                                                CS = cpCore.db.cs_insertRecord("Copy Content", cpCore.authContext.user.id)
                                                                 If cpCore.db.cs_ok(CS) Then
                                                                     RecordID = cpCore.db.cs_getInteger(CS, "ID")
                                                                     Call cpCore.db.cs_set(CS, "name", FieldName)
@@ -2883,7 +2883,7 @@ ErrorTrap:
         '=============================================================================================================
         '
         Public Function execute_legacy2(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal Option_String As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal IsIncludeAddon As Boolean, ByVal DefaultWrapperID As Integer, ByVal ignore_TemplateCaseOnly_PageContent As String, ByRef return_StatusOK As Boolean, ByVal nothingObject As Object, Optional ByVal AddonInUseIdList As String = "") As String
-            execute_legacy2 = execute(addonId, AddonNameOrGuid, Option_String, Context, HostContentName, HostRecordID, HostFieldName, ACInstanceID, IsIncludeAddon, DefaultWrapperID, ignore_TemplateCaseOnly_PageContent, return_StatusOK, nothingObject, AddonInUseIdList, Nothing, cpCore.htmlDoc.main_page_IncludedAddonIDList, cpCore.authContext.user.ID, cpCore.authContext.isAuthenticated)
+            execute_legacy2 = execute(addonId, AddonNameOrGuid, Option_String, Context, HostContentName, HostRecordID, HostFieldName, ACInstanceID, IsIncludeAddon, DefaultWrapperID, ignore_TemplateCaseOnly_PageContent, return_StatusOK, nothingObject, AddonInUseIdList, Nothing, cpCore.htmlDoc.main_page_IncludedAddonIDList, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated)
         End Function
         '
         '===============================================================================================================================================
@@ -3716,7 +3716,7 @@ ErrorTrap:
                                                                     '
                                                                     Call cpCore.db.cs_goNext(CS)
                                                                     Do While cpCore.db.cs_ok(CS)
-                                                                        Call cpCore.DeleteCSRecord(CS)
+                                                                        Call cpCore.db.cs_deleteRecord(CS)
                                                                         Call cpCore.db.cs_goNext(CS)
                                                                     Loop
                                                                 End If
@@ -3852,7 +3852,7 @@ ErrorTrap:
                                                                             If FieldValue = "" Then
                                                                                 Copy = cpCore.htmlDoc.html_GetFormInputFile(FieldName)
                                                                             Else
-                                                                                NonEncodedLink = cpCore.webServer.requestDomain & cpCore.getCdnFileLink(FieldValue)
+                                                                                NonEncodedLink = cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, FieldValue)
                                                                                 EncodedLink = EncodeURL(NonEncodedLink)
                                                                                 Dim FieldValuefilename As String = ""
                                                                                 Dim FieldValuePath As String = ""
@@ -4549,7 +4549,7 @@ ErrorTrap:
                 '
                 JSFilename = cpCore.db.cs_getText(CS, "jsfilename")
                 If JSFilename <> "" Then
-                    JSFilename = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(JSFilename)
+                    JSFilename = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, JSFilename)
                     Call cpCore.htmlDoc.main_AddHeadScriptLink(JSFilename, SourceComment)
                 End If
                 Copy = cpCore.db.cs_getText(CS, "stylesfilename")
@@ -4557,7 +4557,7 @@ ErrorTrap:
                     If genericController.vbInstr(1, Copy, "://") <> 0 Then
                     ElseIf Left(Copy, 1) = "/" Then
                     Else
-                        Copy = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(Copy)
+                        Copy = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, Copy)
                     End If
                     Call cpCore.htmlDoc.main_AddStylesheetLink2(Copy, SourceComment)
                 End If
@@ -4744,6 +4744,54 @@ ErrorTrap:
                     ' remove leading "&"
                     result = Mid(result, 2)
                 End If
+            End If
+            Return result
+        End Function
+        '
+        '=================================================================================================================
+        '   csv_GetAddonOption
+        '
+        '   returns the value matching a given name in an AddonOptionConstructor
+        '
+        '   AddonOptionConstructor is a crlf delimited name=value[selector]descriptor list
+        '
+        '   See cpCoreClass.ExecuteAddon for a full description of:
+        '       AddonOptionString
+        '       AddonOptionConstructor
+        '       AddonOptionNameValueList
+        '       AddonOptionExpandedConstructor
+        '=================================================================================================================
+        '
+        Public Shared Function getAddonOption(OptionName As String, OptionString As String) As String
+            Dim result As String = ""
+            Dim WorkingString As String
+            Dim Options() As String
+            Dim Ptr As Integer
+            Dim Pos As Integer
+            Dim TestName As String
+            Dim TargetName As String
+            '
+            WorkingString = OptionString
+            result = ""
+            If WorkingString <> "" Then
+                TargetName = genericController.vbLCase(OptionName)
+                Options = Split(OptionString, "&")
+                For Ptr = 0 To UBound(Options)
+                    Pos = genericController.vbInstr(1, Options(Ptr), "=")
+                    If Pos > 0 Then
+                        TestName = genericController.vbLCase(Trim(Left(Options(Ptr), Pos - 1)))
+                        Do While (TestName <> "") And (Left(TestName, 1) = vbTab)
+                            TestName = Trim(Mid(TestName, 2))
+                        Loop
+                        Do While (TestName <> "") And (Right(TestName, 1) = vbTab)
+                            TestName = Trim(Mid(TestName, 1, Len(TestName) - 1))
+                        Loop
+                        If TestName = TargetName Then
+                            result = genericController.decodeNvaArgument(Trim(Mid(Options(Ptr), Pos + 1)))
+                            Exit For
+                        End If
+                    End If
+                Next
             End If
             Return result
         End Function

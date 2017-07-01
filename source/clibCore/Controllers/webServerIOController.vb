@@ -45,7 +45,7 @@ Namespace Contensive.Core
         'Public requestCookieString As String = ""          ' Set in InitASPEnvironment, the full cookie string
         Public requestSpaceAsUnderscore As Boolean = False  ' when true, is it assumed that dots in request variable names will convert
         Public requestDotAsUnderscore As Boolean = False    ' (php converts spaces and dots to underscores)
-        Public requestLinkSource As String = ""
+        Public requestUrlSource As String = ""
         '
         Public webServerIO_LinkForwardSource As String = ""          ' main_ServerPathPage -- set during init
         Public webServerIO_LinkForwardError As String = ""           ' always 404
@@ -62,7 +62,7 @@ Namespace Contensive.Core
         Public webServerIO_ServerFormActionURL As String = ""        ' The Action for all internal forms, if not set, default
         Public webServerIO_requestContentWatchPrefix As String = ""   ' The different between the URL and the main_ContentWatch Pathpage
         Public webServerIO_requestProtocol As String = ""             ' Set in InitASPEnvironment, http or https
-        Public webServerIO_ServerLink As String = ""                 ' The current URL, from protocol to end of quesrystring
+        Public requestUrl As String = ""                 ' The current URL, from protocol to end of quesrystring
         Public webServerIO_requestVirtualFilePath As String = ""          ' The Virtual path for the site (host+main_ServerVirtualPath+"/" is site URI)
         Public webServerIO_requestDomain As String = ""               ' This is the proper domain for the site (may not always match the current SERVER_NAME
         Public webServerIO_requestPath As String = ""                 ' The path part of the current URI
@@ -460,7 +460,7 @@ Namespace Contensive.Core
                     webServerIO_InitCounter += 1
                     '
                     Call cpCore.htmlDoc.enableOutputBuffer(True)
-                    cpCore.docOpen = True
+                    cpCore.continueProcessing = True
                     Call setResponseContentType("text/html")
                     '
                     '--------------------------------------------------------------------------
@@ -473,13 +473,13 @@ Namespace Contensive.Core
                     '
                     ' start with the best guess for the source url, then improve the guess based on what iis might have done
                     '
-                    requestLinkSource = "http://"
+                    requestUrlSource = "http://"
                     If requestSecure Then
-                        requestLinkSource = "https://"
+                        requestUrlSource = "https://"
                     End If
-                    requestLinkSource = requestLinkSource & requestDomain & requestPathPage
+                    requestUrlSource = requestUrlSource & requestDomain & requestPathPage
                     If requestQueryString <> "" Then
-                        requestLinkSource = requestLinkSource & "?" & requestQueryString
+                        requestUrlSource = requestUrlSource & "?" & requestQueryString
                     End If
                     If requestQueryString <> "" Then
                         '
@@ -578,8 +578,8 @@ Namespace Contensive.Core
                         'CookieDetectVisitId = cpCore.main_DecodeKeyNumber(CookieDetectKey)
                         If CookieDetectVisitId <> 0 Then
                             Call cpCore.db.executeSql("update ccvisits set CookieSupport=1 where id=" & CookieDetectVisitId)
-                            cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
-                            Return cpCore.docOpen
+                            cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
+                            Return cpCore.continueProcessing
                         End If
                     End If
                     '
@@ -707,22 +707,22 @@ Namespace Contensive.Core
                                 cpCore.domainLegacyCache.domainDetails.forwardUrl = "http://" & cpCore.domainLegacyCache.domainDetails.forwardUrl
                             End If
                             Call redirect(cpCore.domainLegacyCache.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domainLegacyCache.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this URL", False)
-                            Return cpCore.docOpen
+                            Return cpCore.continueProcessing
                         ElseIf (cpCore.domainLegacyCache.domainDetails.typeId = 3) And (cpCore.domainLegacyCache.domainDetails.forwardDomainId <> 0) And (cpCore.domainLegacyCache.domainDetails.forwardDomainId <> cpCore.domainLegacyCache.domainDetails.id) Then
                             '
                             ' forward to a replacement domain
                             '
                             forwardDomain = cpCore.db.getRecordName("domains", cpCore.domainLegacyCache.domainDetails.forwardDomainId)
                             If forwardDomain <> "" Then
-                                pos = genericController.vbInstr(1, requestLinkSource, requestDomain, vbTextCompare)
+                                pos = genericController.vbInstr(1, requestUrlSource, requestDomain, vbTextCompare)
                                 If (pos > 0) Then
                                     '
                                     'Call AppendLog("main_init(), 1720 - exit for forward domain")
                                     '
-                                    cpCore.domainLegacyCache.domainDetails.forwardUrl = Mid(requestLinkSource, 1, pos - 1) & forwardDomain & Mid(requestLinkSource, pos + Len(requestDomain))
+                                    cpCore.domainLegacyCache.domainDetails.forwardUrl = Mid(requestUrlSource, 1, pos - 1) & forwardDomain & Mid(requestUrlSource, pos + Len(requestDomain))
                                     'main_domainForwardUrl = genericController.vbReplace(main_ServerLinkSource, cpcore.main_ServerHost, forwardDomain)
                                     Call redirect(cpCore.domainLegacyCache.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domainLegacyCache.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this replacement domain", False)
-                                    Return cpCore.docOpen
+                                    Return cpCore.continueProcessing
                                 End If
                                 '                                cpcore.main_domainForwardUrl = "http://"
                                 '                                If cpcore.main_ServerPageSecure Then
@@ -833,12 +833,12 @@ Namespace Contensive.Core
                     '
                     ' ----- Create Server Link property
                     '
-                    webServerIO_ServerLink = webServerIO_requestProtocol & requestDomain & requestAppRootPath & webServerIO_requestPath & webServerIO_requestPage
+                    requestUrl = webServerIO_requestProtocol & requestDomain & requestAppRootPath & webServerIO_requestPath & webServerIO_requestPage
                     If requestQueryString <> "" Then
-                        webServerIO_ServerLink = webServerIO_ServerLink & "?" & requestQueryString
+                        requestUrl = requestUrl & "?" & requestQueryString
                     End If
-                    If requestLinkSource = "" Then
-                        requestLinkSource = webServerIO_ServerLink
+                    If requestUrlSource = "" Then
+                        requestUrlSource = requestUrl
                     End If
                     '
                     ' ----- File storage
@@ -863,9 +863,9 @@ Namespace Contensive.Core
                     ' ----- Create Server Link property
                     '--------------------------------------------------------------------------
                     '
-                    webServerIO_ServerLink = webServerIO_requestProtocol & requestDomain & requestAppRootPath & webServerIO_requestPath & webServerIO_requestPage
+                    requestUrl = webServerIO_requestProtocol & requestDomain & requestAppRootPath & webServerIO_requestPath & webServerIO_requestPage
                     If requestQueryString <> "" Then
-                        webServerIO_ServerLink = webServerIO_ServerLink & "?" & requestQueryString
+                        requestUrl = requestUrl & "?" & requestQueryString
                     End If
                     '
                     '--------------------------------------------------------------------------
@@ -885,8 +885,8 @@ Namespace Contensive.Core
                         Else
                             Call redirect(webServerIO_requestProtocol & webServerIO_requestDomain & webServerIO_requestPath & webServerIO_requestPage, Copy, False)
                         End If
-                        cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
-                        Return cpCore.docOpen
+                        cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
+                        Return cpCore.continueProcessing
                     End If
                     '
                     ' -- this is to prevent an html page from coming out of the virtual path. (there should not be a link to it.)
@@ -931,8 +931,8 @@ Namespace Contensive.Core
                         'Call AppendLog("main_init(), 2510 - exit for redirect")
                         '
                         Call redirect(RedirectLink, RedirectReason, IsPageNotFound)
-                        cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
-                        Return cpCore.docOpen
+                        cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
+                        Return cpCore.continueProcessing
                     End If
 
                 End If
@@ -945,7 +945,7 @@ Namespace Contensive.Core
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
-            Return cpCore.docOpen
+            Return cpCore.continueProcessing
         End Function
         '
         '========================================================================
@@ -1012,7 +1012,7 @@ Namespace Contensive.Core
                 '
                 MethodName = "main_addResponseCookie"
                 '
-                If cpCore.docOpen And cpCore.htmlDoc.outputBufferEnabled Then
+                If cpCore.continueProcessing And cpCore.htmlDoc.outputBufferEnabled Then
                     If (False) Then
                         ''
                         '' no domain provided, new mode
@@ -1182,7 +1182,7 @@ Namespace Contensive.Core
         Public Sub addResponseHeader(HeaderName As Object, HeaderValue As Object)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SetStreamHeader")
             '
-            If cpCore.docOpen Then
+            If cpCore.continueProcessing Then
                 If webServerIO_bufferResponseHeader <> "" Then
                     webServerIO_bufferResponseHeader = webServerIO_bufferResponseHeader & vbCrLf
                 End If
@@ -1207,7 +1207,7 @@ ErrorTrap:
         ''' <param name="NonEncodedLink"></param>
         ''' <param name="RedirectReason"></param>
         ''' <param name="IsPageNotFound"></param>
-        Public Sub redirect(ByVal NonEncodedLink As String, ByVal RedirectReason As String, ByVal IsPageNotFound As Boolean)
+        Public Sub redirect(ByVal NonEncodedLink As String, Optional ByVal RedirectReason As String = "No explaination provided", Optional ByVal IsPageNotFound As Boolean = False)
             Try
                 Const rnRedirectCycleFlag = "cycleFlag"
                 Dim EncodedLink As String
@@ -1216,7 +1216,7 @@ ErrorTrap:
                 Dim FullLink As String
                 Dim redirectCycles As Integer
                 '
-                If cpCore.docOpen Then
+                If cpCore.continueProcessing Then
                     redirectCycles = cpCore.docProperties.getInteger(rnRedirectCycleFlag)
                     '
                     ' convert link to a long link on this domain
@@ -1240,17 +1240,17 @@ ErrorTrap:
                         ' the same as the destination of the link forward, this throws an error and does not forward. the only case where main_ServerLinksource is different
                         ' then main_ServerLink is the linkfforward/linkalias case.
                         '
-                    ElseIf (requestFormString = "") And (requestLinkSource = FullLink) Then
+                    ElseIf (requestFormString = "") And (requestUrlSource = FullLink) Then
                         '
                         ' Loop redirect error, throw trap and block redirect to prevent loop
                         '
-                        Call Err.Raise(ignoreInteger, "dll", "Redirect was called to the same URL, main_ServerLink is [" & webServerIO_ServerLink & "], main_ServerLinkSource is [" & requestLinkSource & "]. This redirect is only allowed if either the form or querystring has change to prevent cyclic redirects. Redirect Reason [" & RedirectReason & "]")
+                        Call Err.Raise(ignoreInteger, "dll", "Redirect was called to the same URL, main_ServerLink is [" & requestUrl & "], main_ServerLinkSource is [" & requestUrlSource & "]. This redirect is only allowed if either the form or querystring has change to prevent cyclic redirects. Redirect Reason [" & RedirectReason & "]")
                         Exit Sub
                     ElseIf IsPageNotFound Then
                         '
                         ' Do a PageNotFound then redirect
                         '
-                        Call logController.log_appendLogPageNotFound(cpCore, requestLinkSource)
+                        Call logController.log_appendLogPageNotFound(cpCore, requestUrlSource)
                         If ShortLink <> "" Then
                             Call cpCore.db.executeSql("Update ccContentWatch set link=null where link=" & cpCore.db.encodeSQLText(ShortLink))
                         End If
@@ -1267,7 +1267,7 @@ ErrorTrap:
                         '
                         ' Go ahead and redirect
                         '
-                        Copy = """" & FormatDateTime(cpCore.app_startTime, vbGeneralDate) & """,""" & requestDomain & """,""" & requestLinkSource & """,""" & NonEncodedLink & """,""" & RedirectReason & """"
+                        Copy = """" & FormatDateTime(cpCore.app_startTime, vbGeneralDate) & """,""" & requestDomain & """,""" & requestUrlSource & """,""" & NonEncodedLink & """,""" & RedirectReason & """"
                         logController.appendLog(cpCore, Copy, "performance", "redirects")
                         '
                         If cpCore.testPointPrinting Then
@@ -1278,7 +1278,7 @@ ErrorTrap:
                         Else
                             '
                             ' -- Redirect now
-                            Call cpCore.main_ClearStream()
+                            Call cpCore.htmlDoc.main_ClearStream()
                             EncodedLink = genericController.EncodeURL(NonEncodedLink)
                             If (Not iisContext Is Nothing) Then
                                 '
@@ -1292,7 +1292,7 @@ ErrorTrap:
                     End If
                     '
                     ' -- close the output stream
-                    Call cpCore.doc_close()
+                    cpCore.continueProcessing = False
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex)

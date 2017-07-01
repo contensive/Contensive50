@@ -257,7 +257,7 @@ Namespace Contensive.Core
         '   This will set off the server monitor
         '
         Public Overrides Sub LogWarning(ByVal name As String, ByVal description As String, ByVal typeOfWarningKey As String, ByVal instanceKey As String)
-            Call cpCore.csv_reportWarning(name, description, typeOfWarningKey, instanceKey)
+            Call logController.csv_reportWarning(cpCore, name, description, "", 0, description, typeOfWarningKey, instanceKey)
         End Sub
         '
         ' Report an alarm
@@ -301,7 +301,7 @@ Namespace Contensive.Core
                 '
                 '
             Else
-                Call cpCore.debug_testPoint(Message)
+                Call debugController.debug_testPoint(cpCore, Message)
             End If
         End Sub
 
@@ -312,7 +312,7 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Sub addLinkAlias(ByVal linkAlias As String, ByVal pageId As Integer, Optional ByVal queryStringSuffix As String = "")
-            Call cpCore.app_addLinkAlias(linkAlias, pageId, queryStringSuffix)
+            Call pagesController.app_addLinkAlias(cpCore, linkAlias, pageId, queryStringSuffix)
         End Sub
         '
         '

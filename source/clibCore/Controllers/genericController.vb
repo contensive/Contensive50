@@ -5327,5 +5327,164 @@ ErrorTrap:
                 Return "No"
             End If
         End Function
+        '
+        '
+        '=============================================================================
+        ' ----- Return the value associated with the name given
+        '   NameValueString is a string of Name=Value pairs, separated by spaces or "&"
+        '   If Name is not given, returns ""
+        '   If Name present but no value, returns true (as if Name=true)
+        '   If Name = Value, it returns value
+        '=============================================================================
+        '
+        Public Shared Function main_GetNameValue_Internal(cpcore As coreClass, NameValueString As String, Name As String) As String
+            Dim result As String = ""
+            '
+            Dim NameValueStringWorking As String = NameValueString
+            Dim UcaseNameValueStringWorking As String = NameValueString.ToUpper()
+            Dim pairs() As String
+            Dim PairCount As Integer
+            Dim PairPointer As Integer
+            Dim PairSplit() As String
+            '
+            If ((NameValueString <> "") And (Name <> "")) Then
+                Do While genericController.vbInstr(1, NameValueStringWorking, " =") <> 0
+                    NameValueStringWorking = genericController.vbReplace(NameValueStringWorking, " =", "=")
+                Loop
+                Do While genericController.vbInstr(1, NameValueStringWorking, "= ") <> 0
+                    NameValueStringWorking = genericController.vbReplace(NameValueStringWorking, "= ", "=")
+                Loop
+                Do While genericController.vbInstr(1, NameValueStringWorking, "& ") <> 0
+                    NameValueStringWorking = genericController.vbReplace(NameValueStringWorking, "& ", "&")
+                Loop
+                Do While genericController.vbInstr(1, NameValueStringWorking, " &") <> 0
+                    NameValueStringWorking = genericController.vbReplace(NameValueStringWorking, " &", "&")
+                Loop
+                NameValueStringWorking = NameValueString & "&"
+                UcaseNameValueStringWorking = genericController.vbUCase(NameValueStringWorking)
+                '
+                result = ""
+                If NameValueStringWorking <> "" Then
+                    pairs = Split(NameValueStringWorking, "&")
+                    PairCount = UBound(pairs) + 1
+                    For PairPointer = 0 To PairCount - 1
+                        PairSplit = Split(pairs(PairPointer), "=")
+                        If genericController.vbUCase(PairSplit(0)) = genericController.vbUCase(Name) Then
+                            If UBound(PairSplit) > 0 Then
+                                result = PairSplit(1)
+                            End If
+                            Exit For
+                        End If
+                    Next
+                End If
+            End If
+            Return result
+        End Function
+        '
+        '=============================================================================
+        ' Cleans a text file of control characters, allowing only vblf
+        '=============================================================================
+        '
+        Public Shared Function main_RemoveControlCharacters(ByVal DirtyText As String) As String
+            Dim result As String = DirtyText
+            Dim Pointer As Integer
+            Dim ChrTest As Integer
+            Dim iDirtyText As String
+            '
+            iDirtyText = encodeText(DirtyText)
+            result = ""
+            If (iDirtyText <> "") Then
+                result = ""
+                For Pointer = 1 To Len(iDirtyText)
+                    ChrTest = Asc(Mid(iDirtyText, Pointer, 1))
+                    If ChrTest >= 32 And ChrTest < 128 Then
+                        result = result & Chr(ChrTest)
+                    Else
+                        Select Case ChrTest
+                            Case 9
+                                result = result & " "
+                            Case 10
+                                result = result & vbLf
+                        End Select
+                    End If
+                Next
+                '
+                ' limit CRLF to 2
+                '
+                Do While vbInstr(result, vbLf & vbLf & vbLf) <> 0
+                    result = vbReplace(result, vbLf & vbLf & vbLf, vbLf & vbLf)
+                Loop
+                '
+                ' limit spaces to 1
+                '
+                Do While vbInstr(result, "  ") <> 0
+                    result = vbReplace(result, "  ", " ")
+                Loop
+            End If
+            Return result
+        End Function
+        '
+        '========================================================================
+        '   convert a virtual file into a Link usable on the website:
+        '       convert all \ to /
+        '       if it includes "://", leave it along
+        '       if it starts with "/", it is already root relative, leave it alone
+        '       else (if it start with a file or a path), add the serverFilePath
+        '========================================================================
+        '
+        Public Shared Function getCdnFileLink(cpcore As coreClass, ByVal virtualFile As String) As String
+            Dim returnLink As String
+            '
+            returnLink = virtualFile
+            returnLink = genericController.vbReplace(returnLink, "\", "/")
+            If genericController.vbInstr(1, returnLink, "://") <> 0 Then
+                '
+                ' icon is an Absolute URL - leave it
+                '
+                Return returnLink
+            ElseIf Left(returnLink, 1) = "/" Then
+                '
+                ' icon is Root Relative, leave it
+                '
+                Return returnLink
+            Else
+                '
+                ' icon is a virtual file, add the serverfilepath
+                '
+                Return cpcore.serverConfig.appConfig.cdnFilesNetprefix & returnLink
+            End If
+        End Function
+        '
+        '
+        '
+        Public Shared Function csv_GetLinkedText(ByVal AnchorTag As String, ByVal AnchorText As String) As String
+            Dim result As String = ""
+            Dim UcaseAnchorText As String
+            Dim LinkPosition As Integer
+            Dim iAnchorTag As String
+            Dim iAnchorText As String
+            '
+            iAnchorTag = genericController.encodeText(AnchorTag)
+            iAnchorText = genericController.encodeText(AnchorText)
+            UcaseAnchorText = genericController.vbUCase(iAnchorText)
+            If (iAnchorTag <> "") And (iAnchorText <> "") Then
+                LinkPosition = InStrRev(UcaseAnchorText, "<LINK>", -1)
+                If LinkPosition = 0 Then
+                    result = iAnchorTag & iAnchorText & "</a>"
+                Else
+                    result = iAnchorText
+                    LinkPosition = InStrRev(UcaseAnchorText, "</LINK>", -1)
+                    Do While LinkPosition > 1
+                        result = Mid(result, 1, LinkPosition - 1) & "</a>" & Mid(result, LinkPosition + 7)
+                        LinkPosition = InStrRev(UcaseAnchorText, "<LINK>", LinkPosition - 1)
+                        If LinkPosition <> 0 Then
+                            result = Mid(result, 1, LinkPosition - 1) & iAnchorTag & Mid(result, LinkPosition + 6)
+                        End If
+                        LinkPosition = InStrRev(UcaseAnchorText, "</LINK>", LinkPosition)
+                    Loop
+                End If
+            End If
+            Return result
+        End Function
     End Class
 End Namespace

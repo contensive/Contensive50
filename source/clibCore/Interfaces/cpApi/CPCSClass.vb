@@ -279,7 +279,7 @@ Namespace Contensive.Core
             Dim result As Object
             '
             Try
-                result = cpCore.main_cs_getRecordAddLink(CSPointer, PresetNameValueList, AllowPaste)
+                result = cpCore.htmlDoc.main_cs_getRecordAddLink(CSPointer, PresetNameValueList, AllowPaste)
                 If result Is Nothing Then
                     result = String.Empty
                 End If
@@ -319,7 +319,7 @@ Namespace Contensive.Core
         Public Overrides Function GetEditLink(Optional ByVal AllowCut As Boolean = False) As String
             Dim result As Object
             Try
-                result = cpCore.cs_cs_getRecordEditLink(CSPointer, AllowCut)
+                result = cpCore.htmlDoc.cs_cs_getRecordEditLink(CSPointer, AllowCut)
                 If result Is Nothing Then
                     result = String.Empty
                 End If

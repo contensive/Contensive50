@@ -1946,7 +1946,7 @@ Namespace Contensive.Core.Controllers
                 '
                 Call appendUpgradeLogAddStep(cpCore, cpCore.serverConfig.appConfig.name, "VerifyDefaultGroups", "Verify Default Groups")
                 '
-                GroupID = cpCore.group_add("Content Editors")
+                GroupID = groupController.group_add(cpCore, "Content Editors")
                 SQL = "Update ccContent Set EditorGroupID=" & cpCore.db.encodeSQLNumber(GroupID) & " where EditorGroupID is null;"
                 Call cpCore.db.executeSql(SQL)
             Catch ex As Exception

@@ -253,7 +253,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Link() As String 'Inherits BaseClasses.CPRequestBaseClass.Link
             Get
                 If True Then
-                    Return cpCore.webServer.webServerIO_ServerLink
+                    Return cpCore.webServer.requestUrl
                 Else
                     Return ""
                 End If
@@ -273,7 +273,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property LinkSource() As String 'Inherits BaseClasses.CPRequestBaseClass.LinkSource
             Get
                 If True Then
-                    Return cpCore.webServer.requestLinkSource
+                    Return cpCore.webServer.requestUrlSource
                 Else
                     Return ""
                 End If

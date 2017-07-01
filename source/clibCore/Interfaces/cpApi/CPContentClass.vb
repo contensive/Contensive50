@@ -66,13 +66,13 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Sub SetCopy(ByVal CopyName As String, ByVal Content As String)
-            Call cpCore.content_SetContentCopy(CopyName, Content)
+            Call cpCore.db.content_SetContentCopy(CopyName, Content)
         End Sub
         '
         '====================================================================================================
         '
         Public Overrides Function GetAddLink(ByVal ContentName As String, ByVal PresetNameValueList As String, ByVal AllowPaste As Boolean, ByVal IsEditing As Boolean) As String
-            Return cpCore.main_GetRecordAddLink2(ContentName, PresetNameValueList, AllowPaste, IsEditing)
+            Return cpCore.htmlDoc.main_GetRecordAddLink2(ContentName, PresetNameValueList, AllowPaste, IsEditing)
         End Function
         '
         '====================================================================================================
@@ -109,7 +109,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function GetEditLink(ByVal ContentName As String, ByVal RecordID As String, ByVal AllowCut As Boolean, ByVal RecordName As String, ByVal IsEditing As Boolean) As String
             If True Then
-                Return cpCore.main_GetRecordEditLink2(ContentName, RecordID, AllowCut, RecordName, IsEditing)
+                Return cpCore.htmlDoc.main_GetRecordEditLink2(ContentName, RecordID, AllowCut, RecordName, IsEditing)
             Else
                 Return ""
             End If

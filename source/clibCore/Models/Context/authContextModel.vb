@@ -208,7 +208,7 @@ Namespace Contensive.Core.Models.Context
                                     End If
                                 End With
                             End If
-                            If (resultAuthContext.visit.ID = 0) Then
+                            If (resultAuthContext.visit.id = 0) Then
                                 '
                                 ' -- create new visit record
                                 resultAuthContext.visit = Models.Entity.visitModel.add(cpCore, New List(Of String))
@@ -277,11 +277,11 @@ Namespace Contensive.Core.Models.Context
                                         If (cpCore.siteProperties.AllowAutoLogin And resultAuthContext.user.AutoLogin And resultAuthContext.visit.CookieSupport) Then
                                             '
                                             ' -- they allow it, now Check if they were logged in on their last visit
-                                            Dim lastVisit As Models.Entity.visitModel = Models.Entity.visitModel.getLastVisitByVisitor(cpCore, resultAuthContext.visit.ID, resultAuthContext.visitor.ID)
+                                            Dim lastVisit As Models.Entity.visitModel = Models.Entity.visitModel.getLastVisitByVisitor(cpCore, resultAuthContext.visit.id, resultAuthContext.visitor.ID)
                                             If (lastVisit IsNot Nothing) Then
-                                                If (lastVisit.VisitAuthenticated And (lastVisit.MemberID = resultAuthContext.visit.ID)) Then
-                                                    If resultAuthContext.authenticateById(cpCore, resultAuthContext.user.ID, resultAuthContext) Then
-                                                        Call logController.logActivity2(cpCore, "autologin", resultAuthContext.user.ID, resultAuthContext.user.OrganizationID)
+                                                If (lastVisit.VisitAuthenticated And (lastVisit.MemberID = resultAuthContext.visit.id)) Then
+                                                    If resultAuthContext.authenticateById(cpCore, resultAuthContext.user.id, resultAuthContext) Then
+                                                        Call logController.logActivity2(cpCore, "autologin", resultAuthContext.user.id, resultAuthContext.user.OrganizationID)
                                                         visitor_changes = True
                                                         user_changes = True
                                                     End If
@@ -290,7 +290,7 @@ Namespace Contensive.Core.Models.Context
                                         Else
                                             '
                                             ' -- Recognized, not auto login
-                                            Call logController.logActivity2(cpCore, "recognized", resultAuthContext.user.ID, resultAuthContext.user.OrganizationID)
+                                            Call logController.logActivity2(cpCore, "recognized", resultAuthContext.user.id, resultAuthContext.user.OrganizationID)
                                         End If
                                     End If
                                 End If
@@ -435,17 +435,17 @@ Namespace Contensive.Core.Models.Context
                                 '
                                 ' -- Link Login
                                 If resultAuthContext.authenticateById(cpCore, MemberLinkLoginID, resultAuthContext) Then
-                                    Call logController.logActivity2(cpCore, "link login with eid " & MemberLinkinEID, resultAuthContext.user.ID, resultAuthContext.user.OrganizationID)
+                                    Call logController.logActivity2(cpCore, "link login with eid " & MemberLinkinEID, resultAuthContext.user.id, resultAuthContext.user.OrganizationID)
                                 End If
                             ElseIf (MemberLinkRecognizeID <> 0) Then
                                 '
                                 ' -- Link Recognize
                                 Call resultAuthContext.recognizeById(cpCore, MemberLinkRecognizeID, resultAuthContext)
-                                Call logController.logActivity2(cpCore, "link recognize with eid " & MemberLinkinEID, resultAuthContext.user.ID, resultAuthContext.user.OrganizationID)
+                                Call logController.logActivity2(cpCore, "link recognize with eid " & MemberLinkinEID, resultAuthContext.user.id, resultAuthContext.user.OrganizationID)
                             End If
                             '
                             ' -- create guest identity if no identity
-                            If (resultAuthContext.user.ID < 1) Then
+                            If (resultAuthContext.user.id < 1) Then
                                 '
                                 ' -- No user created
                                 If (LCase(Left(resultAuthContext.visit.Name, 5)) <> "visit") Then
@@ -475,7 +475,7 @@ Namespace Contensive.Core.Models.Context
                                         ' -- cookies supported, not first hit and not spider
                                         resultAuthContext.user = Models.Entity.personModel.add(cpCore, New List(Of String))
                                         user_changes = True
-                                        resultAuthContext.visitor.MemberID = resultAuthContext.user.ID
+                                        resultAuthContext.visitor.MemberID = resultAuthContext.user.id
                                         visitor_changes = True
                                         resultAuthContext.visit.VisitAuthenticated = False
                                         visit_changes = True
@@ -500,13 +500,13 @@ Namespace Contensive.Core.Models.Context
                             End If
                             '
                             ' -- establish language for the member, if they do not have one
-                            If (resultAuthContext.visit.PageVisits = 0) And (resultAuthContext.user.ID > 0) Then
+                            If (resultAuthContext.visit.PageVisits = 0) And (resultAuthContext.user.id > 0) Then
                                 '
                                 ' -- First page of this visit, verify the member language
                                 If (resultAuthContext.user.LanguageID < 1) Then
                                     '
                                     ' -- No member language, set member language from browser language
-                                    Call cpCore.web_GetBrowserLanguage(resultAuthContext.user.LanguageID, resultAuthContext.user.language)
+                                    Call cpCore.db.web_GetBrowserLanguage(resultAuthContext.user.LanguageID, resultAuthContext.user.language)
                                     If resultAuthContext.user.LanguageID > 0 Then
                                         '
                                         ' -- Browser Language worked
@@ -549,12 +549,12 @@ Namespace Contensive.Core.Models.Context
                             End If
                             '
                             ' -- check for changes in interrelationships
-                            If (resultAuthContext.visitor.MemberID <> resultAuthContext.user.ID) Then
-                                resultAuthContext.visitor.MemberID = resultAuthContext.user.ID
+                            If (resultAuthContext.visitor.MemberID <> resultAuthContext.user.id) Then
+                                resultAuthContext.visitor.MemberID = resultAuthContext.user.id
                                 visitor_changes = True
                             End If
-                            If (resultAuthContext.visit.MemberID <> resultAuthContext.user.ID) Then
-                                resultAuthContext.visit.MemberID = resultAuthContext.user.ID
+                            If (resultAuthContext.visit.MemberID <> resultAuthContext.user.id) Then
+                                resultAuthContext.visit.MemberID = resultAuthContext.user.id
                                 visit_changes = True
                             End If
                             If (resultAuthContext.visit.VisitorID <> resultAuthContext.visitor.ID) Then
@@ -572,7 +572,7 @@ Namespace Contensive.Core.Models.Context
                             If visit_changes Then resultAuthContext.visit.saveObject(cpCore)
                             If visitor_changes Then Call resultAuthContext.visitor.saveObject(cpCore)
                             If user_changes Then Call resultAuthContext.user.saveObject(cpCore)
-                            visitCookieNew = cpCore.security.encodeToken(resultAuthContext.visit.ID, resultAuthContext.visit.LastVisitTime)
+                            visitCookieNew = cpCore.security.encodeToken(resultAuthContext.visit.id, resultAuthContext.visit.LastVisitTime)
                             If visitInit_allowVisitTracking And (visitCookie <> visitCookieNew) Then
                                 visitCookie = visitCookieNew
                                 visitCookie_changes = True
@@ -586,7 +586,7 @@ Namespace Contensive.Core.Models.Context
                         End If
                         '
                         ' -- Write Visit Cookie
-                        visitCookie = cpCore.security.encodeToken(resultAuthContext.visit.ID, cpCore.app_startTime)
+                        visitCookie = cpCore.security.encodeToken(resultAuthContext.visit.id, cpCore.app_startTime)
                         Call cpCore.webServer.addResponseCookie(main_appNameCookiePrefix & constants.main_cookieNameVisit, visitCookie, , , requestAppRootPath, False)
                     End If
                 End If
@@ -669,11 +669,11 @@ Namespace Contensive.Core.Models.Context
                             '
                             ' Is a CM for any content def
                             '
-                            If (Not _isAuthenticatedContentManagerAnything_loaded) Or (_isAuthenticatedContentManagerAnything_userId <> user.ID) Then
+                            If (Not _isAuthenticatedContentManagerAnything_loaded) Or (_isAuthenticatedContentManagerAnything_userId <> user.id) Then
                                 SQL = "SELECT ccGroupRules.ContentID" _
                                     & " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID" _
                                     & " WHERE (" _
-                                        & "(ccMemberRules.MemberID=" & cpCore.db.encodeSQLNumber(user.ID) & ")" _
+                                        & "(ccMemberRules.MemberID=" & cpCore.db.encodeSQLNumber(user.id) & ")" _
                                         & " AND(ccMemberRules.active<>0)" _
                                         & " AND(ccGroupRules.active<>0)" _
                                         & " AND(ccGroupRules.ContentID Is not Null)" _
@@ -683,7 +683,7 @@ Namespace Contensive.Core.Models.Context
                                 _isAuthenticatedContentManagerAnything = cpCore.db.cs_ok(CS)
                                 cpCore.db.cs_Close(CS)
                                 '
-                                _isAuthenticatedContentManagerAnything_userId = user.ID
+                                _isAuthenticatedContentManagerAnything_userId = user.id
                                 _isAuthenticatedContentManagerAnything_loaded = True
                             End If
                             returnIsContentManager = _isAuthenticatedContentManagerAnything
@@ -711,7 +711,7 @@ Namespace Contensive.Core.Models.Context
         '
         Public Sub logout(cpCore As coreClass)
             Try
-                Call logController.logActivity2(cpCore, "logout", user.ID, user.OrganizationID)
+                Call logController.logActivity2(cpCore, "logout", user.id, user.OrganizationID)
                 '
                 ' Clear MemberID for this page
                 '
@@ -720,7 +720,7 @@ Namespace Contensive.Core.Models.Context
                 visit.VisitAuthenticated = False
                 visit.saveObject(cpCore)
                 '
-                visitor.MemberID = user.ID
+                visitor.MemberID = user.id
                 visitor.saveObject(cpCore)
                 '
                 'isAuthenticatedAdmin_cache_isLoaded = False
@@ -1009,7 +1009,7 @@ Namespace Contensive.Core.Models.Context
                     SQL = "SELECT ccGroupRules.ContentID,allowAdd,allowDelete" _
                     & " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID" _
                     & " WHERE (" _
-                        & " (ccMemberRules.MemberID=" & cpCore.db.encodeSQLNumber(user.ID) & ")" _
+                        & " (ccMemberRules.MemberID=" & cpCore.db.encodeSQLNumber(user.id) & ")" _
                         & " AND(ccMemberRules.active<>0)" _
                         & " AND(ccGroupRules.active<>0)" _
                         & " AND(ccGroupRules.ContentID=" & ContentID & ")" _
@@ -1075,11 +1075,11 @@ Namespace Contensive.Core.Models.Context
                 If LocalMemberID <> 0 Then
                     returnREsult = authenticateById(cpCore, LocalMemberID, Me)
                     If returnREsult Then
-                        Call logController.logActivity2(cpCore, "successful password login", user.ID, user.OrganizationID)
+                        Call logController.logActivity2(cpCore, "successful password login", user.id, user.OrganizationID)
                         'isAuthenticatedAdmin_cache_isLoaded = False
                         'property_user_isMember_isLoaded = False
                     Else
-                        Call logController.logActivity2(cpCore, "unsuccessful login (loginField:" & loginFieldValue & "/password:" & password & ")", user.ID, user.OrganizationID)
+                        Call logController.logActivity2(cpCore, "unsuccessful login (loginField:" & loginFieldValue & "/password:" & password & ")", user.id, user.OrganizationID)
                     End If
                 End If
             Catch ex As Exception
@@ -1125,12 +1125,12 @@ Namespace Contensive.Core.Models.Context
                 If authContext.visitor.ID = 0 Then
                     authContext.visitor = Models.Entity.visitorModel.add(cpCore, New List(Of String))
                 End If
-                If authContext.visit.ID = 0 Then
+                If authContext.visit.id = 0 Then
                     authContext.visit = Models.Entity.visitModel.add(cpCore, New List(Of String))
                 End If
                 authContext.user = Models.Entity.personModel.create(cpCore, userId, New List(Of String))
-                authContext.visitor.MemberID = authContext.user.ID
-                authContext.visit.MemberID = authContext.user.ID
+                authContext.visitor.MemberID = authContext.user.id
+                authContext.visit.MemberID = authContext.user.id
                 authContext.visit.VisitAuthenticated = False
                 authContext.visit.VisitorID = authContext.visitor.ID
                 authContext.visit.LoginAttempts = 0                '
@@ -1162,9 +1162,9 @@ Namespace Contensive.Core.Models.Context
                 Dim iMemberID As Integer
                 iMemberID = genericController.EncodeInteger(checkMemberID)
                 If iMemberID = 0 Then
-                    iMemberID = user.ID
+                    iMemberID = user.id
                 End If
-                returnREsult = isMemberOfGroupList(cpCore, "," & cpCore.group_GetGroupID(genericController.encodeText(GroupName)), iMemberID, True)
+                returnREsult = isMemberOfGroupList(cpCore, "," & groupController.group_GetGroupID(cpCore, genericController.encodeText(GroupName)), iMemberID, True)
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
@@ -1181,9 +1181,9 @@ Namespace Contensive.Core.Models.Context
                 Dim iMemberID As Integer
                 iMemberID = checkMemberID
                 If iMemberID = 0 Then
-                    iMemberID = user.ID
+                    iMemberID = user.id
                 End If
-                returnREsult = isMemberOfGroupList(cpCore, "," & cpCore.group_GetGroupID(genericController.encodeText(GroupName)), iMemberID, adminReturnsTrue)
+                returnREsult = isMemberOfGroupList(cpCore, "," & groupController.group_GetGroupID(cpCore, genericController.encodeText(GroupName)), iMemberID, adminReturnsTrue)
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
@@ -1199,7 +1199,7 @@ Namespace Contensive.Core.Models.Context
             Dim returnREsult As Boolean = False
             Try
                 If checkMemberID = 0 Then
-                    checkMemberID = user.ID
+                    checkMemberID = user.id
                 End If
                 returnREsult = isMemberOfGroupIdList(cpCore, checkMemberID, isAuthenticated(), GroupIDList, adminReturnsTrue)
             Catch ex As Exception
@@ -1388,10 +1388,10 @@ Namespace Contensive.Core.Models.Context
                 End If
                 cacheTestName = genericController.vbLCase(cacheTestName)
                 If genericController.IsInDelimitedString(main_IsEditingContentList, cacheTestName, ",") Then
-                    Call cpCore.debug_testPoint("...is in main_IsEditingContentList")
+                    Call debugController.debug_testPoint(cpCore, "...is in main_IsEditingContentList")
                     returnResult = True
                 ElseIf genericController.IsInDelimitedString(main_IsNotEditingContentList, cacheTestName, ",") Then
-                    Call cpCore.debug_testPoint("...is in main_IsNotEditingContentList")
+                    Call debugController.debug_testPoint(cpCore, "...is in main_IsNotEditingContentList")
                 Else
                     If isAuthenticated() Then
                         If Not cpCore.htmlDoc.pageManager_printVersion Then

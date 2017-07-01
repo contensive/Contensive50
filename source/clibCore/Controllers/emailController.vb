@@ -430,7 +430,7 @@ ErrorTrap:
                     ' This field is default true, and non-authorable
                     ' It will be true in all cases, except a possible unforseen exception
                     '
-                    EmailTemplateSource = EmailTemplateSource & "<div style=""clear: both;padding:10px;"">" & cpcore.csv_GetLinkedText("<a href=""" & cpcore.htmlDoc.html_EncodeHTML("http://" & cpcore.serverConfig.appConfig.domainList(0) & "/" & cpcore.siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", cpcore.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
+                    EmailTemplateSource = EmailTemplateSource & "<div style=""clear: both;padding:10px;"">" & genericController.csv_GetLinkedText("<a href=""" & cpcore.htmlDoc.html_EncodeHTML("http://" & cpcore.serverConfig.appConfig.domainList(0) & "/" & cpcore.siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", cpcore.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
                 End If
                 '
                 ' --- Send message to the additional member
@@ -644,7 +644,7 @@ ErrorTrap:
                         ' This field is default true, and non-authorable
                         ' It will be true in all cases, except a possible unforseen exception
                         '
-                        EmailBody = EmailBody & "<div style=""clear:both;padding:10px;"">" & cpcore.csv_GetLinkedText("<a href=""" & cpcore.htmlDoc.html_EncodeHTML(cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.requestDomain & requestAppRootPath & cpcore.siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", cpcore.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
+                        EmailBody = EmailBody & "<div style=""clear:both;padding:10px;"">" & genericController.csv_GetLinkedText("<a href=""" & cpcore.htmlDoc.html_EncodeHTML(cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.requestDomain & requestAppRootPath & cpcore.siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", cpcore.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
                         EmailBody = genericController.vbReplace(EmailBody, "#member_email#", "UserEmailAddress")
                     End If
                     '
@@ -979,7 +979,7 @@ ErrorTrap:
                         'hint = "140"
                         EMailName = vbMid(workingEmail, 1, atPtr - 1)
                         '
-                        Call logController.logActivity2(cpcore, "password request for email " & workingEmail, cpcore.authContext.user.ID, cpcore.authContext.user.OrganizationID)
+                        Call logController.logActivity2(cpcore, "password request for email " & workingEmail, cpcore.authContext.user.id, cpcore.authContext.user.OrganizationID)
                         '
                         allowEmailLogin = cpcore.siteProperties.getBoolean("allowEmailLogin", False)
                         recordCnt = 0

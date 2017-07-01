@@ -197,5 +197,109 @@ Namespace Contensive.Core.Controllers
                 cpCore.handleExceptionAndContinue(ex, "verifyWebsite_VirtualDirectory")
             End Try
         End Sub
+        '========================================================================
+        ' main_RedirectByRecord( iContentName, iRecordID )
+        '   looks up the record
+        '   increments the 'clicks' field and redirects to the 'link' field
+        '   returns true if the redirect happened OK
+        '========================================================================
+        '
+        Public Shared Function main_RedirectByRecord_ReturnStatus(cpcore As coreClass, ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal FieldName As String = "") As Boolean
+            Dim Link As String
+            Dim CSPointer As Integer
+            Dim MethodName As String
+            Dim ContentID As Integer
+            Dim CSHost As Integer
+            Dim HostContentName As String
+            Dim HostRecordID As Integer
+            Dim BlockRedirect As Boolean
+            Dim iContentName As String
+            Dim iRecordID As Integer
+            Dim iFieldName As String
+            Dim LinkPrefix As String
+            Dim EncodedLink As String
+            Dim NonEncodedLink As String = ""
+            Dim RecordActive As Boolean
+            '
+            iContentName = genericController.encodeText(ContentName)
+            iRecordID = genericController.EncodeInteger(RecordID)
+            iFieldName = genericController.encodeEmptyText(FieldName, "link")
+            '
+            MethodName = "main_RedirectByRecord_ReturnStatus( " & iContentName & ", " & iRecordID & ", " & genericController.encodeEmptyText(FieldName, "(fieldname empty)") & ")"
+            '
+            main_RedirectByRecord_ReturnStatus = False
+            BlockRedirect = False
+            CSPointer = cpcore.db.cs_open(iContentName, "ID=" & iRecordID)
+            If cpcore.db.cs_ok(CSPointer) Then
+                ' 2/18/2008 - EncodeLink change
+                '
+                ' Assume all Link fields are already encoded -- as this is how they would appear if the admin cut and pasted
+                '
+                EncodedLink = Trim(cpcore.db.cs_getText(CSPointer, iFieldName))
+                If EncodedLink = "" Then
+                    BlockRedirect = True
+                Else
+                    '
+                    ' ----- handle content special cases (prevent redirect to deleted records)
+                    '
+                    NonEncodedLink = cpcore.htmlDoc.main_DecodeUrl(EncodedLink)
+                    Select Case genericController.vbUCase(iContentName)
+                        Case "CONTENT WATCH"
+                            '
+                            ' ----- special case
+                            '       if this is a content watch record, check the underlying content for
+                            '       inactive or expired before redirecting
+                            '
+                            LinkPrefix = cpcore.webServer.webServerIO_requestContentWatchPrefix
+                            ContentID = (cpcore.db.cs_getInteger(CSPointer, "ContentID"))
+                            HostContentName = cpcore.metaData.getContentNameByID(ContentID)
+                            If (HostContentName = "") Then
+                                '
+                                ' ----- Content Watch with a bad ContentID, mark inactive
+                                '
+                                BlockRedirect = True
+                                Call cpcore.db.cs_set(CSPointer, "active", 0)
+                            Else
+                                HostRecordID = (cpcore.db.cs_getInteger(CSPointer, "RecordID"))
+                                If HostRecordID = 0 Then
+                                    '
+                                    ' ----- Content Watch with a bad iRecordID, mark inactive
+                                    '
+                                    BlockRedirect = True
+                                    Call cpcore.db.cs_set(CSPointer, "active", 0)
+                                Else
+                                    CSHost = cpcore.db.cs_open(HostContentName, "ID=" & HostRecordID)
+                                    If Not cpcore.db.cs_ok(CSHost) Then
+                                        '
+                                        ' ----- Content Watch host record not found, mark inactive
+                                        '
+                                        BlockRedirect = True
+                                        Call cpcore.db.cs_set(CSPointer, "active", 0)
+                                    End If
+                                End If
+                                Call cpcore.db.cs_Close(CSHost)
+                            End If
+                            If BlockRedirect Then
+                                '
+                                ' ----- if a content watch record is blocked, delete the content tracking
+                                '
+                                Call cpcore.db.deleteContentRules(cpcore.metaData.getContentId(HostContentName), HostRecordID)
+                            End If
+                    End Select
+                End If
+                If Not BlockRedirect Then
+                    '
+                    ' If link incorrectly includes the LinkPrefix, take it off first, then add it back
+                    '
+                    NonEncodedLink = genericController.ConvertShortLinkToLink(NonEncodedLink, LinkPrefix)
+                    If cpcore.db.cs_isFieldSupported(CSPointer, "Clicks") Then
+                        Call cpcore.db.cs_set(CSPointer, "Clicks", (cpcore.db.cs_getNumber(CSPointer, "Clicks")) + 1)
+                    End If
+                    Call cpcore.webServer.redirect(LinkPrefix & NonEncodedLink, "Call to " & MethodName & ", no reason given.", False)
+                    main_RedirectByRecord_ReturnStatus = True
+                End If
+            End If
+            Call cpcore.db.cs_Close(CSPointer)
+        End Function
     End Class
 End Namespace

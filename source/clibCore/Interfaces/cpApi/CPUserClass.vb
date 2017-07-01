@@ -83,7 +83,7 @@ Namespace Contensive.Core
                 Dim localId As Integer = 0
                 '
                 If True Then
-                    localId = CP.core.authContext.user.ID
+                    localId = CP.core.authContext.user.id
                     If (localId = 0) Then
                         localId = CP.core.db.metaData_InsertContentRecordGetID("people", 0)
                         Call CP.core.authContext.recognizeById(cpCore, localId, CP.core.authContext)

@@ -1,5 +1,6 @@
 
 Imports Contensive.BaseClasses
+Imports Contensive.Core.Controllers
 Imports System.Runtime.InteropServices
 
 Namespace Contensive.Core
@@ -62,7 +63,7 @@ Namespace Contensive.Core
         ''' <returns></returns>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Function getVirtualFileLink(virtualFilename As String) As String
-            Return cpCore.getCdnFileLink(virtualFilename)
+            Return genericcontroller.getCdnFileLink(cpCore, virtualFilename)
         End Function
         '
         '==========================================================================================

@@ -231,18 +231,88 @@ ErrorTrap:
         '
         '
         Public Shared Sub logActivity2(cpcore As coreClass, Message As String, SubjectMemberID As Integer, SubjectOrganizationID As Integer)
-            Call logActivity(cpcore, Message, cpcore.authContext.user.ID, SubjectMemberID, SubjectOrganizationID, cpcore.webServer.webServerIO_ServerLink, cpcore.authContext.visitor.ID, cpcore.authContext.visit.ID)
+            Call logActivity(cpcore, Message, cpcore.authContext.user.id, SubjectMemberID, SubjectOrganizationID, cpcore.webServer.requestUrl, cpcore.authContext.visitor.ID, cpcore.authContext.visit.id)
         End Sub
         '
         '
         '
         Friend Shared Sub log_appendLogPageNotFound(cpCore As coreClass, PageNotFoundLink As String)
             Try
-                Call appendLog(cpCore, """" & FormatDateTime(cpCore.app_startTime, vbGeneralDate) & """,""App=" & cpCore.serverConfig.appConfig.name & """,""main_VisitId=" & cpCore.authContext.visit.ID & """,""" & PageNotFoundLink & """,""Referrer=" & cpCore.webServer.requestReferrer & """", "performance", "pagenotfound")
+                Call appendLog(cpCore, """" & FormatDateTime(cpCore.app_startTime, vbGeneralDate) & """,""App=" & cpCore.serverConfig.appConfig.name & """,""main_VisitId=" & cpCore.authContext.visit.id & """,""" & PageNotFoundLink & """,""Referrer=" & cpCore.webServer.requestReferrer & """", "performance", "pagenotfound")
             Catch ex As Exception
                 Throw (ex)
             End Try
         End Sub
+        '
+        '================================================================================================
+        '   Report Warning
+        '       A warning is logged in the site warnings log
+        '           name - a generic description of the warning
+        '               "bad link found on page"
+        '           short description - a <255 character cause
+        '               "bad link http://thisisabadlink.com"
+        '           location - the URL, service or process that caused the problem
+        '               "http://goodpageThankHasBadLink.com"
+        '           pageid - the record id of the bad page.
+        '               "http://goodpageThankHasBadLink.com"
+        '           description - a specific description
+        '               "link to http://www.this.com/pagename was found on http://www.this.com/About-us"
+        '           generalKey - a generic string that describes the warning. the warning report
+        '               will display one line for each generalKey (name matches guid)
+        '               like "bad link"
+        '           specificKey - a string created by the addon logging so it does not continue to log exactly the
+        '               same warning over and over. If there are 100 different link not found warnings,
+        '               there should be 100 entires with the same guid and name, but 100 different keys. If the
+        '               an identical key is found the count increments.
+        '               specifickey is like "link to http://www.this.com/pagename was found on http://www.this.com/About-us"
+        '           count - the number of times the key was attempted to add. "This error was reported 100 times"
+        '================================================================================================
+        '
+        Public Shared Sub csv_reportWarning(cpcore As coreClass, Name As String, shortDescription As String, location As String, PageID As Integer, Description As String, generalKey As String, specificKey As String)
+            Dim SQL As String
+            Dim warningId As Integer
+            Dim CS As Integer
+            '
+            warningId = 0
+            SQL = "select top 1 ID from ccSiteWarnings" _
+                & " where (generalKey=" & cpcore.db.encodeSQLText(generalKey) & ")" _
+                & " and(specificKey=" & cpcore.db.encodeSQLText(specificKey) & ")" _
+                & ""
+            Dim dt As DataTable
+            dt = cpcore.db.executeSql(SQL)
+            If dt.Rows.Count > 0 Then
+                warningId = genericController.EncodeInteger(dt.Rows(0).Item("id"))
+            End If
+            '
+            If warningId <> 0 Then
+                '
+                ' increment count for matching warning
+                '
+                SQL = "update ccsitewarnings set count=count+1,DateLastReported=" & cpcore.db.encodeSQLDate(Now()) & " where id=" & warningId
+                Call cpcore.db.executeSql(SQL)
+            Else
+                '
+                ' insert new record
+                '
+                CS = cpcore.db.cs_insertRecord("Site Warnings", 0)
+                If cpcore.db.cs_ok(CS) Then
+                    Call cpcore.db.cs_set(CS, "name", Name)
+                    Call cpcore.db.cs_set(CS, "description", Description)
+                    Call cpcore.db.cs_set(CS, "generalKey", generalKey)
+                    Call cpcore.db.cs_set(CS, "specificKey", specificKey)
+                    Call cpcore.db.cs_set(CS, "count", 1)
+                    Call cpcore.db.cs_set(CS, "DateLastReported", Now())
+                    If True Then
+                        Call cpcore.db.cs_set(CS, "shortDescription", shortDescription)
+                        Call cpcore.db.cs_set(CS, "location", location)
+                        Call cpcore.db.cs_set(CS, "pageId", PageID)
+                    End If
+                End If
+                Call cpcore.db.cs_Close(CS)
+            End If
+            '
+        End Sub
+
     End Class
     '
 End Namespace

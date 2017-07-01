@@ -86,14 +86,14 @@ Namespace Contensive.Core.Controllers
             ContentID = cpcore.metaData.getContentId(intContentName)
             If (ContentID < 1) Or (intRecordId < 1) Or (strFieldName = "") Then
                 PanelCopy = SpanClassAdminNormal & "The information you have selected can not be accessed.</span>"
-                EditorPanel = EditorPanel & cpcore.main_GetPanel(PanelCopy)
+                EditorPanel = EditorPanel & cpcore.htmlDoc.main_GetPanel(PanelCopy)
             Else
                 intContentName = cpcore.metaData.getContentNameByID(ContentID)
                 If intContentName <> "" Then
                     CSPointer = cpcore.db.cs_open(intContentName, "ID=" & intRecordId)
                     If Not cpcore.db.cs_ok(CSPointer) Then
                         PanelCopy = SpanClassAdminNormal & "The information you have selected can not be accessed.</span>"
-                        EditorPanel = EditorPanel & cpcore.main_GetPanel(PanelCopy)
+                        EditorPanel = EditorPanel & cpcore.htmlDoc.main_GetPanel(PanelCopy)
                     Else
                         Copy = cpcore.db.cs_get(CSPointer, strFieldName)
                         EditorPanel = EditorPanel & cpcore.htmlDoc.html_GetFormInputHidden("Type", FormTypeActiveEditor)
@@ -103,14 +103,14 @@ Namespace Contensive.Core.Controllers
                         EditorPanel = EditorPanel & genericController.encodeText(FormElements)
                         EditorPanel = EditorPanel & cpcore.htmlDoc.html_GetFormInputHTML3("ContentCopy", Copy, "3", "45", False, True)
                         'EditorPanel = EditorPanel & main_GetFormInputActiveContent( "ContentCopy", Copy, 3, 45)
-                        ButtonPanel = cpcore.main_GetPanelButtons(ButtonCancel & "," & ButtonSave, "button")
+                        ButtonPanel = cpcore.htmlDoc.main_GetPanelButtons(ButtonCancel & "," & ButtonSave, "button")
                         EditorPanel = EditorPanel & ButtonPanel
                     End If
                     cpcore.db.cs_Close(CSPointer)
                 End If
             End If
-            Stream = Stream & cpcore.main_GetPanelHeader("Contensive Active Content Editor")
-            Stream = Stream & cpcore.main_GetPanel(EditorPanel)
+            Stream = Stream & cpcore.htmlDoc.main_GetPanelHeader("Contensive Active Content Editor")
+            Stream = Stream & cpcore.htmlDoc.main_GetPanel(EditorPanel)
             Stream = cpcore.htmlDoc.html_GetFormStart() & Stream & cpcore.htmlDoc.html_GetFormEnd()
             Return Stream
         End Function

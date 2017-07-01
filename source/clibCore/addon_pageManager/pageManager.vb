@@ -100,7 +100,7 @@ Namespace Contensive.Addons.PageManager
                         & genericController.kmaIndent(PageContent) _
                         & cr & "</div>" _
                         & ""
-                ElseIf Not cpCore.docOpen Then
+                ElseIf Not cpCore.continueProcessing Then
                     '
                     ' exit if stream closed during main_GetSectionpage
                     '
@@ -128,8 +128,8 @@ Namespace Contensive.Addons.PageManager
                     ' ----- Encode Template
                     '
                     If Not cpCore.htmlDoc.pageManager_printVersion Then
-                        LocalTemplateBody = cpCore.htmlDoc.html_executeContentCommands(Nothing, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, cpCore.authContext.user.ID, cpCore.authContext.isAuthenticated, layoutError)
-                        returnBody = returnBody & cpCore.htmlDoc.html_encodeContent9(LocalTemplateBody, cpCore.authContext.user.ID, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain, False, cpCore.siteProperties.defaultWrapperID, PageContent, CPUtilsBaseClass.addonContext.ContextTemplate)
+                        LocalTemplateBody = cpCore.htmlDoc.html_executeContentCommands(Nothing, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated, layoutError)
+                        returnBody = returnBody & cpCore.htmlDoc.html_encodeContent9(LocalTemplateBody, cpCore.authContext.user.id, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain, False, cpCore.siteProperties.defaultWrapperID, PageContent, CPUtilsBaseClass.addonContext.ContextTemplate)
                         'returnHtmlBody = returnHtmlBody & EncodeContent8(LocalTemplateBody, memberID, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", main_ServerProtocol, False, app.SiteProperty_DefaultWrapperID, PageContent, ContextTemplate)
                     End If
                     '
@@ -152,7 +152,7 @@ Namespace Contensive.Addons.PageManager
                         ' Add template editing
                         '
                         If cpCore.visitProperty.getBoolean("AllowAdvancedEditor") And cpCore.authContext.isEditing(cpCore, "Page Templates") Then
-                            returnBody = cpCore.htmlDoc.main_GetEditWrapper("Page Template [" & LocalTemplateName & "]", cpCore.main_GetRecordEditLink2("Page Templates", LocalTemplateID, False, LocalTemplateName, cpCore.authContext.isEditing(cpCore, "Page Templates")) & returnBody)
+                            returnBody = cpCore.htmlDoc.main_GetEditWrapper("Page Template [" & LocalTemplateName & "]", cpCore.htmlDoc.main_GetRecordEditLink2("Page Templates", LocalTemplateID, False, LocalTemplateName, cpCore.authContext.isEditing(cpCore, "Page Templates")) & returnBody)
                         End If
                     End If
                     '
@@ -332,7 +332,7 @@ Namespace Contensive.Addons.PageManager
                 Dim PageNotFoundSource As String = ""
                 Dim IsPageNotFound As Boolean = False
                 '
-                If cpCore.docOpen Then
+                If cpCore.continueProcessing Then
                     cpCore.htmlDoc.main_AdminWarning = cpCore.docProperties.getText("main_AdminWarningMsg")
                     cpCore.htmlDoc.main_AdminWarningPageID = cpCore.docProperties.getInteger("main_AdminWarningPageID")
                     cpCore.htmlDoc.main_AdminWarningSectionID = cpCore.docProperties.getInteger("main_AdminWarningSectionID")
@@ -342,7 +342,7 @@ Namespace Contensive.Addons.PageManager
                     Dim AllowCookieTest As Boolean
                     AllowCookieTest = cpCore.siteProperties.allowVisitTracking And (cpCore.authContext.visit.PageVisits = 1)
                     If AllowCookieTest Then
-                        Call cpCore.htmlDoc.main_AddOnLoadJavascript2("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" & cpCore.security.encodeToken(cpCore.authContext.visit.ID, cpCore.app_startTime) & "')};", "Cookie Test")
+                        Call cpCore.htmlDoc.main_AddOnLoadJavascript2("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" & cpCore.security.encodeToken(cpCore.authContext.visit.id, cpCore.app_startTime) & "')};", "Cookie Test")
                     End If
                     '
                     '--------------------------------------------------------------------------
@@ -365,7 +365,7 @@ Namespace Contensive.Addons.PageManager
                                 End If
                             Next
                             Call cpCore.db.cs_set(cs, "copy", Copy)
-                            Call cpCore.db.cs_set(cs, "VisitId", cpCore.authContext.visit.ID)
+                            Call cpCore.db.cs_set(cs, "VisitId", cpCore.authContext.visit.id)
                         End If
                         Call cpCore.db.cs_Close(cs)
                     End If
@@ -391,11 +391,11 @@ Namespace Contensive.Addons.PageManager
                         If (cpCore.htmlDoc.pageManager_RedirectRecordID <> 0) Then
                             Dim contentName As String = cpCore.metaData.getContentNameByID(cpCore.htmlDoc.pageManager_RedirectContentID)
                             If contentName <> "" Then
-                                If cpCore.main_RedirectByRecord_ReturnStatus(contentName, cpCore.htmlDoc.pageManager_RedirectRecordID) Then
+                                If iisController.main_RedirectByRecord_ReturnStatus(cpCore, contentName, cpCore.htmlDoc.pageManager_RedirectRecordID) Then
                                     '
                                     'Call AppendLog("main_init(), 3210 - exit for rc/ri redirect ")
                                     '
-                                    cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
+                                    cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
                                     Return cpCore.htmlDoc.docBuffer
                                 Else
                                     cpCore.htmlDoc.main_AdminWarning = "<p>The site attempted to automatically jump to another page, but there was a problem with the page that included the link.<p>"
@@ -424,12 +424,12 @@ Namespace Contensive.Addons.PageManager
                                     Dim log As Models.Entity.libraryFileLogModel = Models.Entity.libraryFileLogModel.add(cpCore)
                                     If (log IsNot Nothing) Then
                                         log.FileID = file.id
-                                        log.VisitID = cpCore.authContext.visit.ID
-                                        log.MemberID = cpCore.authContext.user.ID
+                                        log.VisitID = cpCore.authContext.visit.id
+                                        log.MemberID = cpCore.authContext.user.id
                                     End If
                                     '
                                     ' -- and go
-                                    Dim link As String = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(link)
+                                    Dim link As String = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, link)
                                     Call cpCore.webServer.redirect(link, "Redirecting because the active download request variable is set to a valid Library Files record. Library File Log has been appended.", False)
                                 End If
                             End If
@@ -694,9 +694,9 @@ Namespace Contensive.Addons.PageManager
                                         tmpLink = cpCore.db.cs_getText(CSPointer, "DestinationLink")
                                         GroupID = cpCore.db.cs_getInteger(CSPointer, "GroupID")
                                         If GroupID <> 0 Then
-                                            groupName = cpCore.group_GetGroupName(GroupID)
+                                            groupName = groupController.group_GetGroupName(cpCore, GroupID)
                                             If groupName <> "" Then
-                                                Call cpCore.group_AddGroupMember(groupName)
+                                                Call groupController.group_AddGroupMember(cpCore, groupName)
                                             End If
                                         End If
                                         If tmpLink <> "" Then
@@ -746,11 +746,11 @@ Namespace Contensive.Addons.PageManager
                                                 '
                                                 Call cpCore.webServer.setResponseStatus("404 Not Found")
                                                 Call cpCore.webServer.setResponseContentType("image/gif")
-                                                cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
+                                                cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
                                                 Return cpCore.htmlDoc.docBuffer
                                             Else
-                                                Call cpCore.webServer.redirect(cpCore.getCdnFileLink(Filename), "favicon request", False)
-                                                cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
+                                                Call cpCore.webServer.redirect(genericController.getCdnFileLink(cpCore, Filename), "favicon request", False)
+                                                cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
                                                 Return cpCore.htmlDoc.docBuffer
                                             End If
                                         End If
@@ -775,7 +775,7 @@ Namespace Contensive.Addons.PageManager
                                             Content = Content & cpCore.addonLegacyCache.addonCache.robotsTxt
                                             Call cpCore.webServer.setResponseContentType("text/plain")
                                             Call cpCore.htmlDoc.writeAltBuffer(Content)
-                                            cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
+                                            cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
                                             Return cpCore.htmlDoc.docBuffer
                                         End If
                                         '
@@ -785,7 +785,7 @@ Namespace Contensive.Addons.PageManager
                                             '
                                             ' Add a new Link Forward entry
                                             '
-                                            CSPointer = cpCore.InsertCSContent("Link Forwards")
+                                            CSPointer = cpCore.db.cs_insertRecord("Link Forwards")
                                             If cpCore.db.cs_ok(CSPointer) Then
                                                 Call cpCore.db.cs_set(CSPointer, "Name", cpCore.webServer.requestPathPage)
                                                 Call cpCore.db.cs_set(CSPointer, "sourcelink", cpCore.webServer.requestPathPage)
@@ -823,8 +823,8 @@ Namespace Contensive.Addons.PageManager
                                     'Call AppendLog("main_init(), 3410 - exit for login block")
                                     '
                                     Call cpCore.htmlDoc.main_SetMetaContent(0, 0)
-                                    Call cpCore.htmlDoc.writeAltBuffer(cpCore.htmlDoc.getLoginPage(False) & cpCore.htmlDoc.getBeforeEndOfBodyHtml(False, False, False, False))
-                                    cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
+                                    Call cpCore.htmlDoc.writeAltBuffer(cpCore.htmlDoc.getLoginPage(False) & cpCore.htmlDoc.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False))
+                                    cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
                                     Return cpCore.htmlDoc.docBuffer
                                 Case 2
                                     '
@@ -835,7 +835,7 @@ Namespace Contensive.Addons.PageManager
                                     '
                                     Call cpCore.htmlDoc.main_SetMetaContent(0, 0)
                                     Call cpCore.htmlDoc.main_AddOnLoadJavascript2("document.body.style.overflow='scroll'", "Anonymous User Block")
-                                    Dim Copy As String = cr & cpCore.htmlDoc.html_GetContentCopy("AnonymousUserResponseCopy", "<p style=""width:250px;margin:100px auto auto auto;"">The site is currently not available for anonymous access.</p>", cpCore.authContext.user.ID, True, cpCore.authContext.isAuthenticated)
+                                    Dim Copy As String = cr & cpCore.htmlDoc.html_GetContentCopy("AnonymousUserResponseCopy", "<p style=""width:250px;margin:100px auto auto auto;"">The site is currently not available for anonymous access.</p>", cpCore.authContext.user.id, True, cpCore.authContext.isAuthenticated)
                                     ' -- already encoded
                                     'Copy = EncodeContentForWeb(Copy, "copy content", 0, "", 0)
                                     Copy = "" _
@@ -847,13 +847,13 @@ Namespace Contensive.Addons.PageManager
                                             & cr & TemplateDefaultBodyTag _
                                             & genericController.kmaIndent(Copy) _
                                             & cr2 & "<div>" _
-                                            & cr3 & cpCore.htmlDoc.getBeforeEndOfBodyHtml(True, True, False, False) _
+                                            & cr3 & cpCore.htmlDoc.getHtmlDoc_beforeEndOfBodyHtml(True, True, False, False) _
                                             & cr2 & "</div>" _
                                             & cr & "</body>" _
                                             & vbCrLf & "</html>"
                                     '& "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">"
                                     Call cpCore.htmlDoc.writeAltBuffer(Copy)
-                                    cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
+                                    cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
                                     Return cpCore.htmlDoc.docBuffer
                             End Select
                         End If
@@ -864,11 +864,11 @@ Namespace Contensive.Addons.PageManager
                     '
                     bodyAddonId = genericController.EncodeInteger(cpCore.siteProperties.getText("Html Body AddonId", "0"))
                     If bodyAddonId <> 0 Then
-                        htmlBody = cpCore.addon.execute(bodyAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", bodyAddonStatusOK, Nothing, "", Nothing, "", cpCore.authContext.user.ID, cpCore.authContext.isAuthenticated)
+                        htmlBody = cpCore.addon.execute(bodyAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", bodyAddonStatusOK, Nothing, "", Nothing, "", cpCore.authContext.user.id, cpCore.authContext.isAuthenticated)
                     Else
                         htmlBody = getBody(cpCore)
                     End If
-                    If cpCore.docOpen Then
+                    If cpCore.continueProcessing Then
                         '
                         ' Build Body Tag
                         '
@@ -881,7 +881,7 @@ Namespace Contensive.Addons.PageManager
                         '
                         ' Add tools panel to body
                         '
-                        htmlBody = htmlBody & cr & "<div>" & genericController.kmaIndent(cpCore.htmlDoc.getBeforeEndOfBodyHtml(True, True, False, False)) & cr & "</div>"
+                        htmlBody = htmlBody & cr & "<div>" & genericController.kmaIndent(cpCore.htmlDoc.getHtmlDoc_beforeEndOfBodyHtml(True, True, False, False)) & cr & "</div>"
                         '
                         ' build doc
                         '
@@ -972,7 +972,7 @@ Namespace Contensive.Addons.PageManager
                                 End If
                             End If
                             Call cpCore.webServer.redirect(linkDst, Copy, False)
-                            cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
+                            cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
                         End If
                     End If
                 End If
@@ -987,7 +987,7 @@ Namespace Contensive.Addons.PageManager
                             '
                             ' new way -- if a (real) 404 page is received, just convert this hit to the page-not-found page, do not redirect to it
                             '
-                            Call logController.log_appendLogPageNotFound(cpCore, cpCore.webServer.requestLinkSource)
+                            Call logController.log_appendLogPageNotFound(cpCore, cpCore.webServer.requestUrlSource)
                             Call cpCore.webServer.setResponseStatus("404 Not Found")
                             cpCore.docProperties.setProperty("bid", cpCore.pages.main_GetPageNotFoundPageId())
                             'Call main_mergeInStream("bid=" & main_GetPageNotFoundPageId())
@@ -1008,7 +1008,7 @@ Namespace Contensive.Addons.PageManager
                 '
                 ' add exception list header
                 '
-                returnHtml = cpCore.getDocExceptionHtmlList() & returnHtml
+                returnHtml = errorController.getDocExceptionHtmlList(cpCore) & returnHtml
                 '
             Catch ex As Exception
                 Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError18("main_GetHTMLDoc2")
@@ -1087,7 +1087,7 @@ Namespace Contensive.Addons.PageManager
                                         errorController.error_AddUserError(cpcore, "The field [" & cpcore.htmlDoc.html_EncodeHTML(.Caption) & "] is required.")
                                     Else
                                         If Not cpcore.db.cs_ok(CSPeople) Then
-                                            CSPeople = cpcore.db.csOpen2("people", cpcore.authContext.user.ID)
+                                            CSPeople = cpcore.db.csOpen2("people", cpcore.authContext.user.id)
                                         End If
                                         If cpcore.db.cs_ok(CSPeople) Then
                                             Select Case genericController.vbUCase(.PeopleField)
@@ -1121,9 +1121,9 @@ Namespace Contensive.Addons.PageManager
                                     IsInGroup = cpcore.docProperties.getBoolean("Group" & .GroupName)
                                     WasInGroup = cpcore.authContext.IsMemberOfGroup2(cpcore, .GroupName)
                                     If WasInGroup And Not IsInGroup Then
-                                        cpcore.group_DeleteGroupMember(.GroupName)
+                                        groupController.group_DeleteGroupMember(cpcore, .GroupName)
                                     ElseIf IsInGroup And Not WasInGroup Then
-                                        cpcore.group_AddGroupMember(.GroupName)
+                                        groupController.group_AddGroupMember(cpcore, .GroupName)
                                     End If
                             End Select
                         End With
@@ -1145,7 +1145,7 @@ Namespace Contensive.Addons.PageManager
                         ' Authenticate
                         '
                         If f.AuthenticateOnFormProcess Then
-                            Call cpcore.authContext.authenticateById(cpcore, cpcore.authContext.user.ID, cpcore.authContext)
+                            Call cpcore.authContext.authenticateById(cpcore, cpcore.authContext.user.id, cpcore.authContext)
                         End If
                         '
                         ' Join Group requested by page that created form
@@ -1154,7 +1154,7 @@ Namespace Contensive.Addons.PageManager
                         Call cpcore.security.decodeToken(cpcore.docProperties.getText("SuccessID"), GroupIDToJoinOnSuccess, tokenDate)
                         'GroupIDToJoinOnSuccess = main_DecodeKeyNumber(main_GetStreamText2("SuccessID"))
                         If GroupIDToJoinOnSuccess <> 0 Then
-                            Call cpcore.group_AddGroupMember(cpcore.group_GetGroupName(GroupIDToJoinOnSuccess))
+                            Call groupController.group_AddGroupMember(cpcore, groupController.group_GetGroupName(cpcore, GroupIDToJoinOnSuccess))
                         End If
                         '
                         ' Join Groups requested by pageform
@@ -1164,7 +1164,7 @@ Namespace Contensive.Addons.PageManager
                             For Ptr = 0 To UBound(Groups)
                                 GroupName = Trim(Groups(Ptr))
                                 If GroupName <> "" Then
-                                    Call cpcore.group_AddGroupMember(GroupName)
+                                    Call groupController.group_AddGroupMember(cpcore, GroupName)
                                 End If
                             Next
                         End If
@@ -1294,7 +1294,7 @@ Namespace Contensive.Addons.PageManager
                         Call cpCore.htmlDoc.main_AddEndOfBodyJavascript2(genericController.encodeText(cpCore.pages.cache_siteSection(SSC_JSEndBody, Ptr)), "site section")
                         JSFilename = genericController.encodeText(cpCore.pages.cache_siteSection(SSC_JSFilename, Ptr))
                         If JSFilename <> "" Then
-                            JSFilename = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(JSFilename)
+                            JSFilename = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, JSFilename)
                             Call cpCore.htmlDoc.main_AddHeadScriptLink(JSFilename, "site section")
                         End If
                     End If
@@ -1312,7 +1312,7 @@ Namespace Contensive.Addons.PageManager
                         '
                         ' Section not found, assume Landing Page
                         '
-                        Call logController.log_appendLogPageNotFound(cpCore, cpCore.webServer.requestLinkSource)
+                        Call logController.log_appendLogPageNotFound(cpCore, cpCore.webServer.requestUrlSource)
                         'Call main_LogPageNotFound(main_ServerLink)
                         cpCore.pages.pageManager_RedirectBecausePageNotFound = True
                         cpCore.pages.pageManager_RedirectReason = "The page could not be found because the section specified was not found. The section ID is [" & SectionID & "]. This section may have been deleted or marked inactive."
@@ -1330,7 +1330,7 @@ Namespace Contensive.Addons.PageManager
                         Call cpCore.htmlDoc.main_AddEndOfBodyJavascript2(genericController.encodeText(cpCore.pages.cache_siteSection(SSC_JSEndBody, Ptr)), "site section")
                         JSFilename = genericController.encodeText(cpCore.pages.cache_siteSection(SSC_JSFilename, Ptr))
                         If JSFilename <> "" Then
-                            JSFilename = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(JSFilename)
+                            JSFilename = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, JSFilename)
                             Call cpCore.htmlDoc.main_AddHeadScriptLink(JSFilename, "site section")
                         End If
                     End If
@@ -1388,7 +1388,7 @@ Namespace Contensive.Addons.PageManager
                     & vbCrLf & "</html>" _
                     & ""
                     'Call AppendLog("call main_getEndOfBody, from pageManager_getsection")
-                    Call cpCore.htmlDoc.writeAltBuffer(Copy & cpCore.htmlDoc.getBeforeEndOfBodyHtml(False, False, False, False))
+                    Call cpCore.htmlDoc.writeAltBuffer(Copy & cpCore.htmlDoc.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False))
                     Throw New ApplicationException("Unexpected exception") ' throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError12("PagList_GetSection", "The page you requested could not be found and no landing page is configured for this domain [" & cpcore.webServer.webServerIO_requestDomain & "].")
                     '--- should be disposed by caller --- Call dispose
                     Exit Function
@@ -1453,7 +1453,7 @@ Namespace Contensive.Addons.PageManager
                             Call cpCore.htmlDoc.main_AddEndOfBodyJavascript2(cpCore.db.cs_getText(CSSection, "JSEndBody"), "site section")
                             JSFilename = cpCore.db.cs_getText(CSSection, "JSFilename")
                             If JSFilename <> "" Then
-                                JSFilename = cpCore.webServer.webServerIO_requestPage & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(JSFilename)
+                                JSFilename = cpCore.webServer.webServerIO_requestPage & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, JSFilename)
                                 Call cpCore.htmlDoc.main_AddHeadScriptLink(JSFilename, "site section")
                             End If
                         End If
@@ -1521,7 +1521,7 @@ Namespace Contensive.Addons.PageManager
                             ' ----- Use the structure to Calculate the Template Link from the loaded content
                             '
                             If cpCore.pages.currentNavigationStructure = "" Then
-                                Call logController.log_appendLogPageNotFound(cpCore, cpCore.webServer.requestLinkSource)
+                                Call logController.log_appendLogPageNotFound(cpCore, cpCore.webServer.requestUrlSource)
                                 cpCore.pages.pageManager_RedirectBecausePageNotFound = True
                                 cpCore.pages.pageManager_RedirectReason = "Redirecting because the page selected could not be found."
                                 cpCore.pages.redirectLink = cpCore.pages.main_ProcessPageNotFound_GetLink(cpCore.pages.pageManager_RedirectReason, , , PageID, SectionID)
@@ -1645,7 +1645,7 @@ Namespace Contensive.Addons.PageManager
                                 cpCore.pages.templateBodyTag = genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_BodyTag, TCPtr))
                                 JSFilename = genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_JSInHeadFilename, TCPtr))
                                 If JSFilename <> "" Then
-                                    JSFilename = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(JSFilename)
+                                    JSFilename = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, JSFilename)
                                     Call cpCore.htmlDoc.main_AddHeadScriptLink(JSFilename, "template")
                                 End If
                                 '
@@ -1655,7 +1655,7 @@ Namespace Contensive.Addons.PageManager
                                     If genericController.vbLCase(Right(StylesFilename, 4)) <> ".css" Then
                                         Throw New ApplicationException("Unexpected exception") ' throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError15("Template [" & pageManager_TemplateName & "] StylesFilename is not a '.css' file, and will not display correct. Check that the field is setup as a CSSFile.", "pageManager_GetHtmlBody_GetSection")
                                     Else
-                                        cpCore.htmlDoc.main_MetaContent_TemplateStyleSheetTag = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & cpCore.getCdnFileLink(StylesFilename) & """ >"
+                                        cpCore.htmlDoc.main_MetaContent_TemplateStyleSheetTag = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, StylesFilename) & """ >"
                                     End If
                                 End If
                                 '
@@ -1682,7 +1682,7 @@ Namespace Contensive.Addons.PageManager
                                 If (TCPtr >= 0) And (cpCore.siteProperties.allowTemplateLinkVerification) Then
                                     PCCPtr = cpCore.pages.cache_pageContent_getPtr(cpCore.pages.currentPageID, cpCore.pages.pagemanager_IsWorkflowRendering, cpCore.authContext.isQuickEditing(cpCore, ""))
                                     '$$$$$ must check for PPtr<0
-                                    SecureLink_CurrentURL = (Left(LCase(cpCore.webServer.webServerIO_ServerLink), 8) = "https://")
+                                    SecureLink_CurrentURL = (Left(LCase(cpCore.webServer.requestUrl), 8) = "https://")
                                     SecureLink_Template_Required = genericController.EncodeBoolean(cpCore.pages.cache_pageTemplate(TC_IsSecure, TCPtr))
                                     SecureLink_Page_Required = genericController.EncodeBoolean(cpCore.pages.cache_pageContent(PCC_IsSecure, PCCPtr))
                                     SecureLink_Required = SecureLink_Template_Required Or SecureLink_Page_Required
@@ -1696,10 +1696,10 @@ Namespace Contensive.Addons.PageManager
                                             ' redirect because protocol is wrong
                                             '
                                             If SecureLink_CurrentURL Then
-                                                cpCore.pages.redirectLink = genericController.vbReplace(cpCore.webServer.webServerIO_ServerLink, "https://", "http://")
+                                                cpCore.pages.redirectLink = genericController.vbReplace(cpCore.webServer.requestUrl, "https://", "http://")
                                                 cpCore.pages.pageManager_RedirectReason = "Redirecting because neither the page or the template requires a secure link."
                                             Else
-                                                cpCore.pages.redirectLink = genericController.vbReplace(cpCore.webServer.webServerIO_ServerLink, "http://", "https://")
+                                                cpCore.pages.redirectLink = genericController.vbReplace(cpCore.webServer.requestUrl, "http://", "https://")
                                                 If SecureLink_Page_Required Then
                                                     cpCore.pages.pageManager_RedirectReason = "Redirecting because this page [" & cpCore.pages.currentPageName & "] requires a secure link."
                                                 Else
@@ -1711,7 +1711,7 @@ Namespace Contensive.Addons.PageManager
                                         '
                                         ' ----- TemplateLink given
                                         '
-                                        CurrentLink = cpCore.webServer.webServerIO_ServerLink
+                                        CurrentLink = cpCore.webServer.requestUrl
                                         If genericController.vbInstr(1, templateLink, "://", vbTextCompare) <> 0 Then
                                             '
                                             ' ----- TemplateLink is full
@@ -1820,7 +1820,7 @@ Namespace Contensive.Addons.PageManager
                                             Next
                                             linkDomain = cpCore.db.getRecordName("domains", setdomainId)
                                             If linkDomain <> "" Then
-                                                cpCore.pages.redirectLink = genericController.vbReplace(cpCore.webServer.webServerIO_ServerLink, "://" & cpCore.webServer.requestDomain, "://" & linkDomain, 1, 99, vbTextCompare)
+                                                cpCore.pages.redirectLink = genericController.vbReplace(cpCore.webServer.requestUrl, "://" & cpCore.webServer.requestDomain, "://" & linkDomain, 1, 99, vbTextCompare)
                                                 cpCore.pages.pageManager_RedirectBecausePageNotFound = False
                                                 cpCore.pages.pageManager_RedirectReason = "Redirecting because this template [" & cpCore.pages.currentTemplateName & "] requires a different domain [" & linkDomain & "]." & cpCore.pages.templateReason
                                             End If
@@ -1861,12 +1861,12 @@ Namespace Contensive.Addons.PageManager
                     ' Display Admin Warnings with Edits for record errors
                     '
                     If cpCore.htmlDoc.main_AdminWarningPageID <> 0 Then
-                        cpCore.htmlDoc.main_AdminWarning = cpCore.htmlDoc.main_AdminWarning & "</p>" & cpCore.main_GetRecordEditLink2("Page Content", cpCore.htmlDoc.main_AdminWarningPageID, True, "Page " & cpCore.htmlDoc.main_AdminWarningPageID, cpCore.authContext.isAuthenticatedAdmin(cpCore)) & "&nbsp;Edit the page<p>"
+                        cpCore.htmlDoc.main_AdminWarning = cpCore.htmlDoc.main_AdminWarning & "</p>" & cpCore.htmlDoc.main_GetRecordEditLink2("Page Content", cpCore.htmlDoc.main_AdminWarningPageID, True, "Page " & cpCore.htmlDoc.main_AdminWarningPageID, cpCore.authContext.isAuthenticatedAdmin(cpCore)) & "&nbsp;Edit the page<p>"
                         cpCore.htmlDoc.main_AdminWarningPageID = 0
                     End If
                     '
                     If cpCore.htmlDoc.main_AdminWarningSectionID <> 0 Then
-                        cpCore.htmlDoc.main_AdminWarning = cpCore.htmlDoc.main_AdminWarning & "</p>" & cpCore.main_GetRecordEditLink2("Site Sections", cpCore.htmlDoc.main_AdminWarningSectionID, True, "Section " & cpCore.htmlDoc.main_AdminWarningSectionID, cpCore.authContext.isAuthenticatedAdmin(cpCore)) & "&nbsp;Edit the section<p>"
+                        cpCore.htmlDoc.main_AdminWarning = cpCore.htmlDoc.main_AdminWarning & "</p>" & cpCore.htmlDoc.main_GetRecordEditLink2("Site Sections", cpCore.htmlDoc.main_AdminWarningSectionID, True, "Section " & cpCore.htmlDoc.main_AdminWarningSectionID, cpCore.authContext.isAuthenticatedAdmin(cpCore)) & "&nbsp;Edit the section<p>"
                         cpCore.htmlDoc.main_AdminWarningSectionID = 0
                     End If
                     returnHtml = "" _

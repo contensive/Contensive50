@@ -75,7 +75,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Id() As Integer
             Get
                 If True Then
-                    Return cpCore.authContext.visit.Id
+                    Return cpCore.authContext.visit.id
                 Else
                     Return 0
                 End If

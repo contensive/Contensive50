@@ -117,7 +117,7 @@ Namespace Contensive.Core.Models.Entity
         Public Shared Function add(cpCore As coreClass, ByRef callersCacheNameList As List(Of String)) As pageContentModel
             Dim result As pageContentModel = Nothing
             Try
-                result = create(cpCore, cpCore.db.metaData_InsertContentRecordGetID(contentName, cpCore.authContext.user.ID), callersCacheNameList)
+                result = create(cpCore, cpCore.db.metaData_InsertContentRecordGetID(contentName, cpCore.authContext.user.id), callersCacheNameList)
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
                 Throw

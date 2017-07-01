@@ -25,7 +25,7 @@ Namespace Contensive.Core.Controllers
             If maxRows = 0 Then
                 maxRows = 1000
             End If
-            CS = cpCore.InsertCSContent("Remote Queries")
+            CS = cpCore.db.cs_insertRecord("Remote Queries")
             If cpCore.db.cs_ok(CS) Then
                 RemoteKey = Guid.NewGuid.ToString()
                 DataSourceID = cpCore.db.getRecordID("Data Sources", DataSourceName)
@@ -35,7 +35,7 @@ Namespace Contensive.Core.Controllers
                 Call cpCore.db.cs_set(CS, "maxRows", maxRows)
                 Call cpCore.db.cs_set(CS, "dateexpires", cpCore.db.encodeSQLDate(cpCore.app_startTime.AddDays(1)))
                 Call cpCore.db.cs_set(CS, "QueryTypeID", QueryTypeSQL)
-                Call cpCore.db.cs_set(CS, "VisitId", cpCore.authContext.visit.ID)
+                Call cpCore.db.cs_set(CS, "VisitId", cpCore.authContext.visit.id)
             End If
             Call cpCore.db.cs_Close(CS)
             '

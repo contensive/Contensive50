@@ -130,7 +130,7 @@ Namespace Contensive.Core.Controllers
                         Throw (New ApplicationException("Could not find or create the group with id [" & groupId & "]"))
                     Else
                         If userid = 0 Then
-                            userid = cpCore.authContext.user.ID
+                            userid = cpCore.authContext.user.id
                         End If
                         Using cs As New csController(cpCore)
                             cs.open("Member Rules", "(MemberID=" & userid.ToString & ")and(GroupID=" & groupId.ToString & ")", , False)
@@ -177,7 +177,7 @@ Namespace Contensive.Core.Controllers
                         Throw (New ApplicationException("Could not find or create the group [" & groupNameOrGuid & "]"))
                     Else
                         If userid = 0 Then
-                            userid = cpCore.authContext.user.ID
+                            userid = cpCore.authContext.user.id
                         End If
                         Using cs As New csController(cpCore)
                             cs.open("Member Rules", "(MemberID=" & userid.ToString & ")and(GroupID=" & GroupID.ToString & ")", , False)
@@ -204,6 +204,171 @@ Namespace Contensive.Core.Controllers
             Catch ex As Exception
                 Throw (ex)
             End Try
+        End Sub
+        '
+        '=============================================================================
+        ' main_Get the GroupID from iGroupName
+        '=============================================================================
+        '
+        Public Shared Function group_GetGroupID(cpcore As coreClass, ByVal GroupName As String) As Integer
+            Dim dt As DataTable
+            Dim MethodName As String
+            Dim iGroupName As String
+            '
+            iGroupName = genericController.encodeText(GroupName)
+            '
+            MethodName = "main_GetGroupID"
+            '
+            group_GetGroupID = 0
+            If (iGroupName <> "") Then
+                '
+                ' ----- main_Get the Group ID
+                '
+                dt = cpcore.db.executeSql("select top 1 id from ccGroups where name=" & cpcore.db.encodeSQLText(iGroupName))
+                If dt.Rows.Count > 0 Then
+                    group_GetGroupID = genericController.EncodeInteger(dt.Rows(0).Item(0))
+                End If
+            End If
+        End Function
+        '
+        '=============================================================================
+        ' main_Get the GroupName from iGroupID
+        '=============================================================================
+        '
+        Public Shared Function group_GetGroupName(cpcore As coreClass, GroupID As Integer) As String
+            '
+            Dim CS As Integer
+            Dim MethodName As String
+            Dim iGroupID As Integer
+            '
+            iGroupID = genericController.EncodeInteger(GroupID)
+            '
+            MethodName = "main_GetGroupByID"
+            '
+            group_GetGroupName = ""
+            If (iGroupID > 0) Then
+                '
+                ' ----- main_Get the Group name
+                '
+                CS = cpcore.db.cs_open2("Groups", iGroupID)
+                If cpcore.db.cs_ok(CS) Then
+                    group_GetGroupName = genericController.encodeText(cpcore.db.cs_getField(CS, "Name"))
+                End If
+                Call cpcore.db.cs_Close(CS)
+            End If
+        End Function
+        '
+        '=============================================================================
+        ' Add a new group, return its GroupID
+        '=============================================================================
+        '
+        Public Shared Function group_Add(cpcore As coreClass, ByVal GroupName As String, Optional ByVal GroupCaption As String = "") As Integer
+            Dim CS As Integer
+            Dim MethodName As String
+            Dim iGroupName As String
+            Dim iGroupCaption As String
+            '
+            MethodName = "main_AddGroup"
+            '
+            iGroupName = genericController.encodeText(GroupName)
+            iGroupCaption = genericController.encodeEmptyText(GroupCaption, iGroupName)
+            '
+            group_Add = -1
+            Dim dt As DataTable
+            dt = cpcore.db.executeSql("SELECT ID FROM ccgroups WHERE NAME=" & cpcore.db.encodeSQLText(iGroupName))
+            If dt.Rows.Count > 0 Then
+                group_Add = genericController.EncodeInteger(dt.Rows(0).Item(0))
+            Else
+                CS = cpcore.db.cs_insertRecord("Groups", SystemMemberID)
+                If cpcore.db.cs_ok(CS) Then
+                    group_Add = genericController.EncodeInteger(cpcore.db.cs_getField(CS, "ID"))
+                    Call cpcore.db.cs_set(CS, "name", iGroupName)
+                    Call cpcore.db.cs_set(CS, "caption", iGroupCaption)
+                    Call cpcore.db.cs_set(CS, "active", True)
+                End If
+                Call cpcore.db.cs_Close(CS)
+            End If
+        End Function
+
+        '
+        '=============================================================================
+        ' Add a new group, return its GroupID
+        '=============================================================================
+        '
+        Public Shared Sub group_DeleteGroup(cpcore As coreClass, ByVal GroupName As String)
+            Call cpcore.db.deleteContentRecords("Groups", "name=" & cpcore.db.encodeSQLText(GroupName))
+        End Sub
+        '
+        '=============================================================================
+        ' Add a member to a group
+        '=============================================================================
+        '
+        Public Shared Sub group_AddGroupMember(cpcore As coreClass, ByVal GroupName As String, Optional ByVal NewMemberID As Integer = SystemMemberID, Optional ByVal DateExpires As Date = Nothing)
+            '
+            Dim CS As Integer
+            Dim GroupID As Integer
+            Dim MethodName As String
+            Dim iGroupName As String
+            Dim iDateExpires As Date
+            '
+            MethodName = "main_AddGroupMember"
+            '
+            iGroupName = genericController.encodeText(GroupName)
+            iDateExpires = DateExpires 'encodeMissingDate(DateExpires, Date.MinValue)
+            '
+            If iGroupName <> "" Then
+                GroupID = group_GetGroupID(cpcore, iGroupName)
+                If (GroupID < 1) Then
+                    GroupID = group_Add(cpcore, GroupName, GroupName)
+                End If
+                If (GroupID < 1) Then
+                    Throw (New ApplicationException("main_AddGroupMember could not find or add Group [" & GroupName & "]")) ' handleLegacyError14(MethodName, "")
+                Else
+                    CS = cpcore.db.cs_open("Member Rules", "(MemberID=" & cpcore.db.encodeSQLNumber(NewMemberID) & ")and(GroupID=" & cpcore.db.encodeSQLNumber(GroupID) & ")", , False)
+                    If Not cpcore.db.cs_ok(CS) Then
+                        Call cpcore.db.cs_Close(CS)
+                        CS = cpcore.db.cs_insertRecord("Member Rules")
+                    End If
+                    If Not cpcore.db.cs_ok(CS) Then
+                        Throw (New ApplicationException("main_AddGroupMember could not add this member to the Group [" & GroupName & "]")) ' handleLegacyError14(MethodName, "")
+                    Else
+                        Call cpcore.db.cs_set(CS, "active", True)
+                        Call cpcore.db.cs_set(CS, "memberid", NewMemberID)
+                        Call cpcore.db.cs_set(CS, "groupid", GroupID)
+                        If iDateExpires <> Date.MinValue Then
+                            Call cpcore.db.cs_set(CS, "DateExpires", iDateExpires)
+                        Else
+                            Call cpcore.db.cs_set(CS, "DateExpires", "")
+                        End If
+                    End If
+                    Call cpcore.db.cs_Close(CS)
+                End If
+            End If
+        End Sub
+        '
+        '=============================================================================
+        ' Delete a member from a group
+        '=============================================================================
+        '
+        Public Shared Sub group_DeleteGroupMember(cpcore As coreClass, ByVal GroupName As String, Optional ByVal NewMemberID As Integer = SystemMemberID)
+            '
+            Dim GroupID As Integer
+            Dim MethodName As String
+            Dim iGroupName As String
+            '
+            iGroupName = genericController.encodeText(GroupName)
+            '
+            MethodName = "main_DeleteGroupMember"
+            '
+            If iGroupName <> "" Then
+                GroupID = group_GetGroupID(cpcore, iGroupName)
+                If (GroupID < 1) Then
+                ElseIf (NewMemberID < 1) Then
+                    Throw (New ApplicationException("Member ID is invalid")) ' handleLegacyError14(MethodName, "")
+                Else
+                    Call cpcore.db.deleteContentRecords("Member Rules", "(MemberID=" & cpcore.db.encodeSQLNumber(NewMemberID) & ")AND(groupid=" & cpcore.db.encodeSQLNumber(GroupID) & ")")
+                End If
+            End If
         End Sub
 
         '

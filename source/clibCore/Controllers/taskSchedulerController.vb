@@ -378,7 +378,7 @@ Namespace Contensive.Core.Controllers
             Call cpCore.db.cs_Close(CS)
         End Sub
         Public Shared Sub main_RequestTask(cpCore As coreClass, ByVal Command As String, ByVal SQL As String, ByVal ExportName As String, ByVal Filename As String)
-            Call tasks_RequestTask(cpCore, genericController.encodeText(Command), genericController.encodeText(SQL), genericController.encodeText(ExportName), genericController.encodeText(Filename), genericController.EncodeInteger(cpCore.authContext.user.ID))
+            Call tasks_RequestTask(cpCore, genericController.encodeText(Command), genericController.encodeText(SQL), genericController.encodeText(ExportName), genericController.encodeText(Filename), genericController.EncodeInteger(cpCore.authContext.user.id))
         End Sub
 
 #Region " IDisposable Support "

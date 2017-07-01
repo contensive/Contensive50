@@ -17,7 +17,7 @@ Namespace Contensive.Core.Models.Entity
         Private Const primaryContentDataSource As String = "default" '<----- set to datasource if not default
         '
         ' -- instance properties
-        Public ID As Integer
+        Public id As Integer
         Public Active As Boolean
         Public Bot As Boolean
         Public Browser As String
@@ -149,7 +149,7 @@ Namespace Contensive.Core.Models.Entity
                     With result
                         '
                         ' -- populate result model
-                        .ID = cs.getInteger("ID")
+                        .id = cs.getInteger("ID")
                         .Active = cs.getBoolean("Active")
                         .Bot = cs.getBoolean("Bot")
                         .Browser = cs.getText("Browser")
@@ -194,7 +194,7 @@ Namespace Contensive.Core.Models.Entity
                         '
                         ' -- set primary and secondary caches
                         ' -- add all cachenames to the injected cachenamelist
-                        Dim cacheName0 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", result.ID.ToString())
+                        Dim cacheName0 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", result.id.ToString())
                         cacheNameList.Add(cacheName0)
                         cpCore.cache.setObject(cacheName0, result)
                         '
@@ -234,12 +234,12 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
                 If cs.ok() Then
-                    ID = cs.getInteger("id")
+                    id = cs.getInteger("id")
                     If (String.IsNullOrEmpty(ccGuid)) Then
                         ccGuid = Controllers.genericController.getGUID()
                     End If
                     If (String.IsNullOrEmpty(Name)) Then
-                        Name = "Visit " & ID.ToString()
+                        Name = "Visit " & id.ToString()
                     End If
                     cs.setField("Active", Active.ToString())
                     cs.SetField("Bot", Bot.ToString())
@@ -283,7 +283,7 @@ Namespace Contensive.Core.Models.Entity
                 Call cs.Close()
                 '
                 ' -- object is here, but the cache was invalidated, setting
-                cpCore.cache.setObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", Me.ID.ToString()), Me)
+                cpCore.cache.setObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", Me.id.ToString()), Me)
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
                 Throw

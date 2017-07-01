@@ -93,7 +93,7 @@ Namespace Contensive.Core.Controllers
                 main_EditLockStatus_Local = False
                 '
                 main_EditLockStatus_Local = getEditLock(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), ReturnMemberID, ReturnDateExpires)
-                If main_EditLockStatus_Local And (ReturnMemberID <> cpCore.authContext.user.ID) Then
+                If main_EditLockStatus_Local And (ReturnMemberID <> cpCore.authContext.user.id) Then
                     main_EditLockStatus_Local = True
                     main_EditLockDateExpires_Local = ReturnDateExpires
                     main_EditLockMemberID_Local = ReturnMemberID
@@ -161,7 +161,7 @@ Namespace Contensive.Core.Controllers
         '========================================================================
         '
         Public Sub SetEditLock(ByVal ContentName As String, ByVal RecordID As Integer)
-            Call setEditLock(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.authContext.user.ID)
+            Call setEditLock(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.authContext.user.id)
         End Sub
         '
         '========================================================================
@@ -169,7 +169,7 @@ Namespace Contensive.Core.Controllers
         '========================================================================
         '
         Public Sub ClearEditLock(ByVal ContentName As String, ByVal RecordID As Integer)
-            Call clearEditLock(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.authContext.user.ID)
+            Call clearEditLock(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.authContext.user.id)
         End Sub
         '
         '========================================================================
@@ -177,7 +177,7 @@ Namespace Contensive.Core.Controllers
         '========================================================================
         '
         Public Sub publishEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-            Call publishEdit(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.authContext.user.ID)
+            Call publishEdit(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.authContext.user.id)
         End Sub
         '
         '========================================================================
@@ -185,7 +185,7 @@ Namespace Contensive.Core.Controllers
         '========================================================================
         '
         Public Sub approveEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-            Call approveEdit(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.authContext.user.ID)
+            Call approveEdit(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.authContext.user.id)
         End Sub
         '
         '========================================================================
@@ -193,7 +193,7 @@ Namespace Contensive.Core.Controllers
         '========================================================================
         '
         Public Sub main_SubmitEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-            Call submitEdit2(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.authContext.user.ID)
+            Call submitEdit2(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), cpCore.authContext.user.id)
         End Sub
         '
         '=========================================================================================

@@ -178,7 +178,7 @@ Namespace Contensive.Core
                 '
                 ' Cancel to the admin site
                 '
-                Call cpCore.main_Redirect(cpCore.siteProperties.getText("AdminURL", "/admin/"))
+                Call cpCore.webServer.redirect(cpCore.siteProperties.getText("AdminURL", "/admin/"))
             End If
             '
             ' ----- Check permissions
@@ -214,10 +214,10 @@ Namespace Contensive.Core
                 'Call cpCore.main_AddRefreshQueryString("Button=" & Button)
                 'Call cpCore.main_AddRefreshQueryString("af=" & AdminFormTool)
                 '
-                cpCore.debug_testPoint("Button = " & Button)
-                cpCore.debug_testPoint("ToolsQuery = " & ToolsQuery)
-                cpCore.debug_testPoint("ToolsDataSource = " & ToolsDataSource)
-                cpCore.debug_testPoint("AdminFormTool = " & AdminFormTool)
+                debugController.debug_testPoint(cpCore, "Button = " & Button)
+                debugController.debug_testPoint(cpCore, "ToolsQuery = " & ToolsQuery)
+                debugController.debug_testPoint(cpCore, "ToolsDataSource = " & ToolsDataSource)
+                debugController.debug_testPoint(cpCore, "AdminFormTool = " & AdminFormTool)
                 '
                 '
                 '
@@ -225,7 +225,7 @@ Namespace Contensive.Core
                     '
                     ' Cancel
                     '
-                    Call cpCore.main_Redirect(cpCore.siteProperties.getText("AdminURL", "/admin/"))
+                    Call cpCore.webServer.redirect(cpCore.siteProperties.getText("AdminURL", "/admin/"))
                     'If AdminFormTool = AdminFormToolRoot Then
                     '    '
                     '    ' Cancel to the admin site
@@ -313,7 +313,7 @@ Namespace Contensive.Core
                             Call Stream.Add(GetForm_CreateGUID())
                         Case Else
                             '
-                            cpCore.debug_testPoint("Taking AdminFormToolRoot case")
+                            debugController.debug_testPoint(cpCore, "Taking AdminFormToolRoot case")
                             Call Stream.Add(GetForm_Root)
                     End Select
                 End If
@@ -545,7 +545,7 @@ ErrorTrap:
                 '
                 SQLFilename = cpCore.userProperty.getText("SQLArchive")
                 If SQLFilename = "" Then
-                    SQLFilename = "SQLArchive" & Format(cpCore.authContext.user.ID, "000000000") & ".txt"
+                    SQLFilename = "SQLArchive" & Format(cpCore.authContext.user.id, "000000000") & ".txt"
                     Call cpCore.userProperty.setProperty("SQLArchive", SQLFilename)
                 End If
                 SQLArchive = cpCore.cdnFiles.readFile(SQLFilename)
@@ -1271,7 +1271,7 @@ ErrorTrap:
                 If (Button = ButtonSaveandInvalidateCache) Then
                     cpCore.cache.invalidateAll()
                     cpCore.metaData.clear()
-                    Call cpCore.main_Redirect("?af=" & AdminFormToolConfigureListing & "&ContentID=" & ContentID)
+                    Call cpCore.webServer.redirect("?af=" & AdminFormToolConfigureListing & "&ContentID=" & ContentID)
                 End If
                 '
                 '--------------------------------------------------------------------------------
@@ -1458,7 +1458,7 @@ ErrorTrap:
             FormPanel = FormPanel & SpanClassAdminNormal & "Select a Content Definition to Configure its Listing Page<br>"
             'FormPanel = FormPanel & cpCore.main_GetFormInputHidden("af", AdminFormToolConfigureListing)
             FormPanel = FormPanel & cpCore.htmlDoc.main_GetFormInputSelect("ContentID", ContentID, "Content")
-            Call Stream.Add(cpCore.main_GetPanel(FormPanel))
+            Call Stream.Add(cpCore.htmlDoc.main_GetPanel(FormPanel))
             '
             Call cpCore.siteProperties.setProperty("AllowContentAutoLoad", AllowContentAutoLoad)
             Stream.Add(cpCore.htmlDoc.html_GetFormInputHidden("ReloadCDef", ReloadCDef))
@@ -2076,7 +2076,7 @@ ErrorTrap:
                     ' Create Definition
                     '
                     Stream.Add("<P>Creating content [" & ChildContentName & "] from [" & ParentContentName & "]")
-                    Call cpCore.metaData_CreateContentChild(ChildContentName, ParentContentName)
+                    Call cpCore.metaData.createContentChild(ChildContentName, ParentContentName, cpCore.authContext.user.id)
                     '
                     Stream.Add("<br>Reloading Content Definitions...")
                     cpCore.cache.invalidateAll()
@@ -2263,7 +2263,7 @@ ErrorTrap:
             Panel = Panel & "</TABLE>"
             DiagActionCount = DiagActionCount + 1
             '
-            GetDiagError = cpCore.main_GetPanel(Panel)
+            GetDiagError = cpCore.htmlDoc.main_GetPanel(Panel)
             Exit Function
             '
             ' ----- Error Trap
@@ -2275,7 +2275,7 @@ ErrorTrap:
         '
         '
         Private Function GetDiagHeader(ByVal Copy As String) As String
-            GetDiagHeader = cpCore.main_GetPanel("<B>" & SpanClassAdminNormal & Copy & "</SPAN><B>")
+            GetDiagHeader = cpCore.htmlDoc.main_GetPanel("<B>" & SpanClassAdminNormal & Copy & "</SPAN><B>")
         End Function
         '
         '
@@ -3075,11 +3075,11 @@ ErrorTrap:
                         cpCore.metaData.clear()
                     End If
                     If (ToolButton = ButtonAdd) Then
-                        cpCore.debug_testPoint("ConfigureEdit, Process Add Button")
+                        debugController.debug_testPoint(cpCore, "ConfigureEdit, Process Add Button")
                         '
                         ' ----- Insert a blank Field
                         '
-                        CSPointer = cpCore.InsertCSContent("Content Fields")
+                        CSPointer = cpCore.db.cs_insertRecord("Content Fields")
                         If cpCore.db.cs_ok(CSPointer) Then
                             Call cpCore.db.cs_set(CSPointer, "name", "unnamedField" & cpCore.db.cs_getInteger(CSPointer, "id").ToString())
                             Call cpCore.db.cs_set(CSPointer, "ContentID", ContentID)
@@ -3108,7 +3108,7 @@ ErrorTrap:
                         '
                         ' ----- Exit back to menu
                         '
-                        Call cpCore.main_Redirect(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.webServerIO_requestDomain & cpCore.webServer.webServerIO_requestPath & cpCore.webServer.webServerIO_requestPage & "?af=" & AdminFormTools)
+                        Call cpCore.webServer.redirect(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.webServerIO_requestDomain & cpCore.webServer.webServerIO_requestPath & cpCore.webServer.webServerIO_requestPage & "?af=" & AdminFormTools)
                     End If
                 End If
                 '
@@ -3151,7 +3151,7 @@ ErrorTrap:
                     ' print the Configure edit form
                     '--------------------------------------------------------------------------------
                     '
-                    Call Stream.Add(cpCore.main_GetPanelTop())
+                    Call Stream.Add(cpCore.htmlDoc.main_GetPanelTop())
                     ContentName = Local_GetContentNameByID(ContentID)
                     ButtonList = ButtonCancel & "," & ButtonSave & "," & ButtonOK & "," & ButtonAdd '  & "," & ButtonReloadCDef
                     '
@@ -3422,9 +3422,9 @@ ErrorTrap:
                         Call Stream.Add(cpCore.htmlDoc.html_GetFormInputHidden("dtfaRecordCount", RecordCount))
                     End If
                     Stream.Add("</table>")
-                    'Stream.Add( cpCore.main_GetPanelButtons(ButtonList, "Button"))
+                    'Stream.Add( cpcore.htmldoc.main_GetPanelButtons(ButtonList, "Button"))
                     '
-                    Call Stream.Add(cpCore.main_GetPanelBottom())
+                    Call Stream.Add(cpCore.htmlDoc.main_GetPanelBottom())
                     'Call Stream.Add(cpCore.main_GetFormEnd())
                     If NeedFootNote1 Then
                         Call Stream.Add("<br>*Field Inheritance is not allowed because this Content Definition has no parent.")
@@ -3433,7 +3433,7 @@ ErrorTrap:
                         Call Stream.Add("<br>**This field can not be inherited because the Parent Content Definition does not have a field with the same name.")
                     End If
                 End If
-                cpCore.debug_testPoint("ConfigureEdit, Form Done")
+                debugController.debug_testPoint(cpCore, "ConfigureEdit, Form Done")
                 If ContentID <> 0 Then
                     '
                     ' Save the content selection
@@ -3447,7 +3447,7 @@ ErrorTrap:
                     FormPanel = FormPanel & "<br>"
                     FormPanel = FormPanel & cpCore.htmlDoc.main_GetFormInputSelect(RequestNameToolContentID, ContentID, "Content")
                     FormPanel = FormPanel & "</SPAN>"
-                    Call Stream.Add(cpCore.main_GetPanel(FormPanel))
+                    Call Stream.Add(cpCore.htmlDoc.main_GetPanel(FormPanel))
                 End If
                 '
                 Call Stream.Add(cpCore.htmlDoc.html_GetFormInputHidden("ReloadCDef", ReloadCDef))
@@ -3813,11 +3813,9 @@ ErrorTrap:
                 '
                 ' Return the content of the file
                 '
-
                 Call cpCore.webServer.setResponseContentType("text/text")
                 Call cpCore.htmlDoc.writeAltBuffer(cpCore.appRootFiles.readFile(cpCore.docProperties.getText("SourceFile")))
-                Call cpCore.doc_close()
-                'GetForm_LogFiles_Details = cpCore.app.publicFiles.ReadFile(cpCore.main_GetStreamText2("SourceFile"))
+                cpCore.continueProcessing = False
             Else
                 GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetTableStart
                 '
@@ -3832,7 +3830,7 @@ ErrorTrap:
                 ' Sub-Folders
                 '
 
-                SourceFolders = cpCore.getFolderNameList(StartPath & CurrentPath)
+                SourceFolders = cpCore.appRootFiles.getFolderNameList(StartPath & CurrentPath)
                 If SourceFolders <> "" Then
                     FolderSplit = Split(SourceFolders, vbCrLf)
                     FolderCount = UBound(FolderSplit) + 1
@@ -3979,9 +3977,9 @@ ErrorTrap:
                 '
                 ' Restart
                 '
-                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " & cpCore.authContext.user.Name & " (" & cpCore.authContext.user.ID & ") restarted using the Restart tool", False, True, cpCore.webServer.webServerIO_ServerLink, "", "")
+                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " & cpCore.authContext.user.Name & " (" & cpCore.authContext.user.id & ") restarted using the Restart tool", False, True, cpCore.webServer.requestUrl, "", "")
                 'runAtServer = New runAtServerClass(cpCore)
-                Call cpCore.main_Redirect("/ccLib/Popup/WaitForIISReset.htm")
+                Call cpCore.webServer.redirect("/ccLib/Popup/WaitForIISReset.htm")
                 Call Threading.Thread.Sleep(2000)
                 '
                 '
@@ -4025,7 +4023,7 @@ ErrorTrap:
 
         'Function CloseFormTable(ByVal ButtonList As String) As String
         '    If ButtonList <> "" Then
-        '        CloseFormTable = "</td></tr></TABLE>" & cpCore.main_GetPanelButtons(ButtonList, "Button") & "</form>"
+        '        CloseFormTable = "</td></tr></TABLE>" & cpcore.htmldoc.main_GetPanelButtons(ButtonList, "Button") & "</form>"
         '    Else
         '        CloseFormTable = "</td></tr></TABLE></form>"
         '    End If
@@ -4038,7 +4036,7 @@ ErrorTrap:
         '    Try
         '        OpenFormTable = cpCore.htmldoc.html_GetFormStart()
         '        If ButtonList <> "" Then
-        '            OpenFormTable = OpenFormTable & cpCore.main_GetPanelButtons(ButtonList, "Button")
+        '            OpenFormTable = OpenFormTable & cpcore.htmldoc.main_GetPanelButtons(ButtonList, "Button")
         '        End If
         '        OpenFormTable = OpenFormTable & "<table border=""0"" cellpadding=""10"" cellspacing=""0"" width=""100%""><tr><TD>"
         '    Catch ex As Exception
@@ -4627,9 +4625,9 @@ ErrorTrap:
                 '
                 '
                 '
-                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " & cpCore.authContext.user.Name & " (" & cpCore.authContext.user.ID & ") executed an IISReset using the IISReset tool", False, True, cpCore.webServer.webServerIO_ServerLink, "", "")
+                logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " & cpCore.authContext.user.Name & " (" & cpCore.authContext.user.id & ") executed an IISReset using the IISReset tool", False, True, cpCore.webServer.requestUrl, "", "")
                 'runAtServer = New runAtServerClass(cpCore)
-                Call cpCore.main_Redirect("/ccLib/Popup/WaitForIISReset.htm")
+                Call cpCore.webServer.redirect("/ccLib/Popup/WaitForIISReset.htm")
                 Call Threading.Thread.Sleep(2000)
 
 

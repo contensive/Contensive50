@@ -419,7 +419,7 @@ ErrorTrap:
             If ContentSummary <> "" Then
                 CellContentSummary = "" _
                     & cr & "<div class=""ccPanelBackground"" style=""padding:10px;"">" _
-                    & kmaIndent(cpCore.main_GetPanel(ContentSummary, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)) _
+                    & kmaIndent(cpCore.htmlDoc.main_GetPanel(ContentSummary, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)) _
                     & cr & "</div>"
             End If
             '

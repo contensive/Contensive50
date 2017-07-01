@@ -17,7 +17,7 @@ Namespace Contensive.Core.Models.Entity
         Private Const primaryContentDataSource As String = "default" '<----- set to datasource if not default
         '
         ' -- instance properties
-        Public ID As Integer
+        Public id As Integer
         Public Active As Boolean
         Public Address As String
         Public Address2 As String
@@ -181,7 +181,7 @@ Namespace Contensive.Core.Models.Entity
                     With result
                         '
                         ' -- populate result model
-                        .ID = cs.getInteger("ID")
+                        .id = cs.getInteger("ID")
                         .Active = cs.getBoolean("Active")
                         .Address = cs.getText("Address")
                         .Address2 = cs.getText("Address2")
@@ -258,7 +258,7 @@ Namespace Contensive.Core.Models.Entity
                         '
                         ' -- set primary and secondary caches
                         ' -- add all cachenames to the injected cachenamelist
-                        Dim cacheName0 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", result.ID.ToString())
+                        Dim cacheName0 As String = Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", result.id.ToString())
                         cacheNameList.Add(cacheName0)
                         cpCore.cache.setObject(cacheName0, result)
                         '
@@ -383,7 +383,7 @@ Namespace Contensive.Core.Models.Entity
                 'cpCore.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"ccguid", ccguid))
                 '
                 ' -- object is here, but the cache was invalidated, setting
-                cpCore.cache.setObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", Me.ID.ToString()), Me)
+                cpCore.cache.setObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", Me.id.ToString()), Me)
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
                 Throw
