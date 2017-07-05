@@ -1883,49 +1883,49 @@ Namespace Contensive.Core
                         'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2f")
                         Call htmlDoc.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False)
                         result = True
-                    Case HardCodedPageGetJSPage
-                        '
-                        ' ----- Create a Javascript page that outputs a page content record
-                        '
-                        Name = docProperties.getText("name")
-                        If Name <> "" Then
-                            webServer.webServerIO_BlockClosePageCopyright = True
-                            '
-                            ' Determine bid (PageID) from referer querystring
-                            '
-                            Copy = webServer.requestReferrer
-                            Pos = genericController.vbInstr(1, Copy, "bid=")
-                            If Pos <> 0 Then
-                                Copy = Trim(Mid(Copy, Pos + 4))
-                                Pos = genericController.vbInstr(1, Copy, "&")
-                                If Pos <> 0 Then
-                                    Copy = Trim(Mid(Copy, 1, Pos))
-                                End If
-                                PageID = genericController.EncodeInteger(Copy)
-                            End If
-                            '
-                            ' main_Get the page
-                            '
-                            rootPageId = db.getRecordID("Page Content", Name)
-                            allowPageWithoutSectionDisplay = siteProperties.getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default)
-                            If Not allowPageWithoutSectionDisplay Then
-                                allowPageWithoutSectionDisplay = authContext.isAuthenticatedContentManager(Me, ContentName)
-                            End If
-                            Copy = pages.getContentBox(PageID, rootPageId, "Page Content", "", True, True, False, 0, siteProperties.useContentWatchLink, allowPageWithoutSectionDisplay)
-                            'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2g")
-                            Copy = Copy & htmlDoc.getHtmlDoc_beforeEndOfBodyHtml(False, True, False, False)
-                            Copy = genericController.vbReplace(Copy, "'", "'+""'""+'")
-                            Copy = genericController.vbReplace(Copy, vbCr, "\n")
-                            Copy = genericController.vbReplace(Copy, vbLf, " ")
-                            '
-                            ' Write the page to the stream, with a javascript wrapper
-                            '
-                            MsgLabel = "Msg" & genericController.encodeText(genericController.GetRandomInteger)
-                            Call webServer.setResponseContentType("text/plain")
-                            Call htmlDoc.writeAltBuffer("var " & MsgLabel & " = '" & Copy & "'; " & vbCrLf)
-                            Call htmlDoc.writeAltBuffer("document.write( " & MsgLabel & " ); " & vbCrLf)
-                        End If
-                        result = True
+                    'Case HardCodedPageGetJSPage
+                    '    '
+                    '    ' ----- Create a Javascript page that outputs a page content record
+                    '    '
+                    '    Name = docProperties.getText("name")
+                    '    If Name <> "" Then
+                    '        webServer.webServerIO_BlockClosePageCopyright = True
+                    '        '
+                    '        ' Determine bid (PageID) from referer querystring
+                    '        '
+                    '        Copy = webServer.requestReferrer
+                    '        Pos = genericController.vbInstr(1, Copy, "bid=")
+                    '        If Pos <> 0 Then
+                    '            Copy = Trim(Mid(Copy, Pos + 4))
+                    '            Pos = genericController.vbInstr(1, Copy, "&")
+                    '            If Pos <> 0 Then
+                    '                Copy = Trim(Mid(Copy, 1, Pos))
+                    '            End If
+                    '            PageID = genericController.EncodeInteger(Copy)
+                    '        End If
+                    '        '
+                    '        ' main_Get the page
+                    '        '
+                    '        rootPageId = db.getRecordID("Page Content", Name)
+                    '        allowPageWithoutSectionDisplay = siteProperties.getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default)
+                    '        If Not allowPageWithoutSectionDisplay Then
+                    '            allowPageWithoutSectionDisplay = authContext.isAuthenticatedContentManager(Me, ContentName)
+                    '        End If
+                    '        Copy = pages.getContentBox(PageID, rootPageId, "Page Content", "", True, True, False, 0, siteProperties.useContentWatchLink, allowPageWithoutSectionDisplay)
+                    '        'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2g")
+                    '        Copy = Copy & htmlDoc.getHtmlDoc_beforeEndOfBodyHtml(False, True, False, False)
+                    '        Copy = genericController.vbReplace(Copy, "'", "'+""'""+'")
+                    '        Copy = genericController.vbReplace(Copy, vbCr, "\n")
+                    '        Copy = genericController.vbReplace(Copy, vbLf, " ")
+                    '        '
+                    '        ' Write the page to the stream, with a javascript wrapper
+                    '        '
+                    '        MsgLabel = "Msg" & genericController.encodeText(genericController.GetRandomInteger)
+                    '        Call webServer.setResponseContentType("text/plain")
+                    '        Call htmlDoc.writeAltBuffer("var " & MsgLabel & " = '" & Copy & "'; " & vbCrLf)
+                    '        Call htmlDoc.writeAltBuffer("document.write( " & MsgLabel & " ); " & vbCrLf)
+                    '    End If
+                    '    result = True
                     Case HardCodedPageGetJSLogin
                         '
                         ' ----- Create a Javascript login page

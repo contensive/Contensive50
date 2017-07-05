@@ -429,7 +429,7 @@ Namespace Contensive.Core
         'Public Const HardCodedPageForceNonMobile = "forcenonmobile"
         Public Const HardCodedPageNewOrder = "neworderpage"
         Public Const HardCodedPageStatus = "status"
-        Public Const HardCodedPageGetJSPage = "getjspage"
+        'Public Const HardCodedPageGetJSPage = "getjspage"
         Public Const HardCodedPageGetJSLogin = "getjslogin"
         Public Const HardCodedPageRedirect = "redirect"
         Public Const HardCodedPageExportAscii = "exportascii"

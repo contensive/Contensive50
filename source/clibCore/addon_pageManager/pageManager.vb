@@ -184,109 +184,7 @@ Namespace Contensive.Addons.PageManager
                     '
                     ' Make it pretty for those who care
                     '
-                    If cpCore.siteProperties.getBoolean("AutoHTMLFormatting") Then
-                        IndentCnt = 0
-                        Parse = New htmlParserController(cpCore)
-                        Call Parse.Load(returnBody)
-                        If Parse.ElementCount > 0 Then
-                            For Ptr = 0 To Parse.ElementCount - 1
-                                If Not Parse.IsTag(Ptr) Then
-                                    Content = Parse.Text(Ptr)
-                                    If BlockFormatting Then
-                                        Result.Add(Content)
-                                    Else
-                                        If Content <> "" Then
-                                            If Trim(Content) <> "" Then
-                                                Result.Add(ContentIndent)
-                                                ContentIndent = ""
-                                            End If
-                                            Content = genericController.vbReplace(Content, vbCrLf, " ")
-                                            Content = genericController.vbReplace(Content, vbTab, " ")
-                                            Content = genericController.vbReplace(Content, vbCr, " ")
-                                            Content = genericController.vbReplace(Content, vbLf, " ")
-                                            Result.Add(Content)
-                                            ContentCnt = ContentCnt + 1
-                                        End If
-                                    End If
-                                Else
-                                    Select Case genericController.vbLCase(Parse.TagName(Ptr))
-                                        Case "pre", "script"
-                                            '
-                                            ' End block formating
-                                            '
-                                            Result.Add(vbCrLf & Parse.Text(Ptr))
-                                            BlockFormatting = True
-                                        Case "/pre", "/script"
-                                            '
-                                            ' end block formating
-                                            '
-                                            Result.Add(Parse.Text(Ptr) & vbCrLf)
-                                            BlockFormatting = False
-                                        Case Else
-                                            If BlockFormatting Then
-                                                '
-                                                ' formatting is blocked
-                                                '
-                                                Result.Add(Parse.Text(Ptr))
-                                            Else
-                                                '
-                                                ' format the tag
-                                                '
-                                                Select Case genericController.vbLCase(Parse.TagName(Ptr))
-                                                    Case "p", "h1", "h2", "h3", "h4", "h5", "h6", "li", "br"
-                                                        '
-                                                        ' new line
-                                                        '
-                                                        Result.Add(vbCrLf & New String(CChar(vbTab), IndentCnt) & Parse.Text(Ptr))
-                                                    Case "div", "td", "table", "tr", "tbody", "ol", "ul", "form"
-                                                        '
-                                                        ' new line and +indent
-                                                        '
-                                                        Result.Add(vbCrLf & New String(CChar(vbTab), IndentCnt) & Parse.Text(Ptr))
-                                                        IndentCnt = IndentCnt + 1
-                                                        ContentIndent = vbCrLf & New String(CChar(vbTab), IndentCnt)
-                                                        ContentCnt = 0
-                                                    Case "/div", "/td", "/table", "/tr", "/tbody", "/ol", "/ul", "/form"
-                                                        '
-                                                        ' new line and -indent
-                                                        '
-                                                        IndentCnt = IndentCnt - 1
-                                                        If IndentCnt < 0 Then
-                                                            IndentCnt = 0
-                                                            '
-                                                            ' Add to 'Asset Errors' Table - a merge with Spider Doc Errors
-                                                            '
-                                                        End If
-                                                        If ContentCnt = 0 Then
-                                                            Result.Add(Parse.Text(Ptr))
-                                                        Else
-                                                            Result.Add(vbCrLf & New String(CChar(vbTab), IndentCnt) & Parse.Text(Ptr))
-                                                        End If
-                                                        ContentCnt = ContentCnt + 1
-                                                    Case Else
-                                                        '
-                                                        ' tag that acts like content
-                                                        '
-                                                        Content = Parse.Text(Ptr)
-                                                        If Content <> "" Then
-                                                            Result.Add(ContentIndent & Content)
-                                                            ContentIndent = ""
-                                                        End If
-                                                        ContentCnt = ContentCnt + 1
-                                                End Select
-                                            End If
-                                    End Select
-                                End If
-                            Next
-                            If IndentCnt <> 0 Then
-                                '
-                                ' Add to 'Asset Errors' Table - a merge with Spider Doc Errors
-                                '
-                                'Call main_AppendClassErrorLog("cpCoreClass(" & appEnvironment.name & ").GetHTMLBody AutoIndent error. At the end of the document, the last tag was still indented (more start tags than end tags). Link=[" & genericController.decodeHtml(main_ServerLink) & "], ")
-                            End If
-                            returnBody = Result.Text
-                        End If
-                    End If
+                    returnBody = htmlReflowController.reflow(cpCore, returnBody)
                 End If
                 '
             Catch ex As Exception
@@ -1199,10 +1097,10 @@ Namespace Contensive.Addons.PageManager
                 Dim SecureLink_Template_Required As Boolean         ' the template record has 'secure' checked
                 Dim SecureLink_Page_Required As Boolean             ' teh page record has 'secure' checked
                 Dim SecureLink_Required As Boolean                  ' either the template or the page have secure checked
-                Dim templateLink As String                          ' the template record 'link' field
-                Dim TCPtr As Integer
-                Dim JSFilename As String
-                Dim StylesFilename As String
+                'Dim templateLink As String                          ' the template record 'link' field
+                '   Dim TCPtr As Integer
+                ' Dim templateJSFilename As String
+                'Dim templateStylesFilename As String
                 Dim SharedStylesIDList As String
                 Dim ListSplit() As String
                 Dim styleId As Integer
@@ -1211,644 +1109,342 @@ Namespace Contensive.Addons.PageManager
                 Dim CurrentLinkNoQuery As String
                 Dim LinkSplit() As String
                 Dim LandingLink As String
-                Dim CSSection As Integer
+                'Dim CSSection As Integer
                 Dim rootPageId As Integer
                 Dim RootPageName As String
                 Dim RootPageContentName As String
-                Dim SectionContentID As Integer
-                Dim SectionTemplateID As Integer
+                'Dim SectionContentID As Integer
+                'Dim SectionTemplateID As Integer
                 Dim SectionBlock As Boolean
                 Dim PageRow() As String
                 Dim PageRowCnt As Integer
                 Dim Ptr As Integer
                 Dim navStruc() As String
-                Dim SectionFieldList As String
-                Dim SectionCriteria As String
-                Dim SectionName As String
-                Dim IsSectionRootPageIDMode As Boolean
+                'Dim SectionFieldList As String
+                'Dim SectionCriteria As String
+                'Dim SectionName As String
+                'Dim IsSectionRootPageIDMode As Boolean
                 Dim PageID As Integer
-                Dim SectionID As Integer
+                'Dim SectionID As Integer
                 Dim UseContentWatchLink As Boolean = cpCore.siteProperties.useContentWatchLink
                 '
-                ' ----- Determine LandingLink
+                RootPageContentName = "Page Content"
                 '
-                LandingLink = cpCore.pages.pageManager_GetLandingLink()
-                IsSectionRootPageIDMode = True
-                SectionFieldList = "ID,Name,ContentID,TemplateID,BlockSection,RootPageID,JSOnLoad,JSHead,JSEndBody,JSFilename"
-                '
-                ' -- get page and section requests
+                ' -- get pageid
                 PageID = cpCore.docProperties.getInteger("bid")
-                If PageID <> 0 Then
-                    Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("bid", CStr(PageID))
-                End If
-                '
-                ' Handle Section ID Request Variable
-                '
-                SectionID = cpCore.docProperties.getInteger("sid")
-                If SectionID <> 0 Then
-                    Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("sid", CStr(SectionID))
-                End If
-                '
-                '------------------------------------------------------------------------------------
-                '   Determine RootPageID, SectionID, SectionContentID, SectionTemplateID
-                '       SectionID=0 means deliver the landing page section
-                '------------------------------------------------------------------------------------
-                '
-                If (PageID = 0) And (SectionID = 0) Then
-                    'hint = "2"
+                If (PageID = 0) Then
                     '
-                    ' Nothing specified, use the Landing Page
-                    '
+                    ' -- Nothing specified, use the Landing Page
                     PageID = cpCore.pages.main_GetLandingPageID()
                     If PageID = 0 Then
                         '
-                        ' landing page is not valid -- display error
-                        '
+                        ' -- landing page is not valid -- display error
+                        Call logController.log_appendLogPageNotFound(cpCore, cpCore.webServer.requestUrlSource)
+                        cpCore.pages.pageManager_RedirectBecausePageNotFound = True
+                        cpCore.pages.pageManager_RedirectReason = "Redirecting because the page selected could not be found."
+                        cpCore.pages.redirectLink = cpCore.pages.main_ProcessPageNotFound_GetLink(cpCore.pages.pageManager_RedirectReason, , , PageID, SectionID)
+
                         cpCore.handleExceptionAndContinue(New ApplicationException("Page could not be determined. Error message displayed."))
                         Return "<div style=""width:300px; margin: 100px auto auto auto;text-align:center;"">This page is not valid.</div>"
                     End If
                 End If
-                If (PageID <> 0) Then
-                    'hint = "3"
-                    '
-                    ' ----- PageID Given, determine the section from the pageid
-                    '
-                    If cpCore.pages.cache_siteSection_rows = 0 Then
-                        Call cpCore.pages.pageManager_cache_siteSection_load()
-                    End If
-                    rootPageId = cpCore.pages.pageManager_GetHtmlBody_GetSection_GetRootPageId(PageID)
-                    Ptr = cpCore.pages.cache_siteSection_RootPageIDIndex.getPtr(CStr(rootPageId))
-                    '
-                    ' Open Section Record
-                    '
-                    If Ptr < 0 Then
-                        SectionID = 0
-                    Else
-                        SectionID = genericController.EncodeInteger(cpCore.pages.cache_siteSection(SSC_ID, Ptr))
-                        SectionName = genericController.encodeText(cpCore.pages.cache_siteSection(SSC_Name, Ptr))
-                        SectionTemplateID = genericController.EncodeInteger(cpCore.pages.cache_siteSection(SSC_TemplateID, Ptr))
-                        SectionContentID = genericController.EncodeInteger(cpCore.pages.cache_siteSection(SSC_ContentID, Ptr))
-                        SectionBlock = genericController.EncodeBoolean(cpCore.pages.cache_siteSection(SSC_BlockSection, Ptr))
-                        Call cpCore.htmlDoc.main_AddOnLoadJavascript2(genericController.encodeText(cpCore.pages.cache_siteSection(SSC_JSOnLoad, Ptr)), "site section")
-                        Call cpCore.htmlDoc.main_AddHeadScriptCode(genericController.encodeText(cpCore.pages.cache_siteSection(SSC_JSHead, Ptr)), "site section")
-                        Call cpCore.htmlDoc.main_AddEndOfBodyJavascript2(genericController.encodeText(cpCore.pages.cache_siteSection(SSC_JSEndBody, Ptr)), "site section")
-                        JSFilename = genericController.encodeText(cpCore.pages.cache_siteSection(SSC_JSFilename, Ptr))
-                        If JSFilename <> "" Then
-                            JSFilename = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, JSFilename)
-                            Call cpCore.htmlDoc.main_AddHeadScriptLink(JSFilename, "site section")
-                        End If
-                    End If
-                ElseIf (SectionID <> 0) Then
-                    'hint = "4"
-                    '
-                    ' ----- pageid=0, sectionid OK -- determine the page from the sectionid
-                    '           main_Get SectionLink -> compare to actual Link -> redirect if mismatch
-                    '
-                    If cpCore.pages.cache_siteSection_rows = 0 Then
-                        Call cpCore.pages.pageManager_cache_siteSection_load()
-                    End If
-                    Ptr = cpCore.pages.cache_siteSection_IDIndex.getPtr(CStr(SectionID))
-                    If Ptr < 0 Then
-                        '
-                        ' Section not found, assume Landing Page
-                        '
-                        Call logController.log_appendLogPageNotFound(cpCore, cpCore.webServer.requestUrlSource)
-                        'Call main_LogPageNotFound(main_ServerLink)
-                        cpCore.pages.pageManager_RedirectBecausePageNotFound = True
-                        cpCore.pages.pageManager_RedirectReason = "The page could not be found because the section specified was not found. The section ID is [" & SectionID & "]. This section may have been deleted or marked inactive."
-                        cpCore.pages.redirectLink = cpCore.pages.main_ProcessPageNotFound_GetLink(cpCore.pages.pageManager_RedirectReason, , , PageID, SectionID)
-                        Exit Function
-                        'SectionID = 0
-                    Else
-                        SectionName = genericController.encodeText(cpCore.pages.cache_siteSection(SSC_Name, Ptr))
-                        rootPageId = genericController.EncodeInteger(cpCore.pages.cache_siteSection(SSC_RootPageID, Ptr))
-                        SectionTemplateID = genericController.EncodeInteger(cpCore.pages.cache_siteSection(SSC_TemplateID, Ptr))
-                        SectionContentID = genericController.EncodeInteger(cpCore.pages.cache_siteSection(SSC_ContentID, Ptr))
-                        SectionBlock = genericController.EncodeBoolean(cpCore.pages.cache_siteSection(SSC_BlockSection, Ptr))
-                        Call cpCore.htmlDoc.main_AddOnLoadJavascript2(genericController.encodeText(cpCore.pages.cache_siteSection(SSC_JSOnLoad, Ptr)), "site section")
-                        Call cpCore.htmlDoc.main_AddHeadScriptCode(genericController.encodeText(cpCore.pages.cache_siteSection(SSC_JSHead, Ptr)), "site section")
-                        Call cpCore.htmlDoc.main_AddEndOfBodyJavascript2(genericController.encodeText(cpCore.pages.cache_siteSection(SSC_JSEndBody, Ptr)), "site section")
-                        JSFilename = genericController.encodeText(cpCore.pages.cache_siteSection(SSC_JSFilename, Ptr))
-                        If JSFilename <> "" Then
-                            JSFilename = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, JSFilename)
-                            Call cpCore.htmlDoc.main_AddHeadScriptLink(JSFilename, "site section")
-                        End If
-                    End If
-                    '
-                    ' Test for new section that needs a new blank page
-                    '
-                    If (cpCore.pages.redirectLink = "") And (SectionID <> 0) Then
-                        '
-                        ' RootPageID Mode
-                        '
-                        If (rootPageId = 0) And (cpCore.app_errorCount = 0) Then
-                            '
-                            ' Root Page needs to be auto created
-                            ' OK to create page here because section has a good record with a 0 RootPageID (this is not AutoHomeCreate)
-                            '
-                            rootPageId = cpCore.pages.createPageGetID(SectionName, "Page Content", SystemMemberID, "")
-                            Call cpCore.db.executeSql("update ccsections set RootPageID=" & rootPageId & " where id=" & SectionID)
-                            Call cpCore.pages.pageManager_cache_siteSection_clear()
-                            cpCore.htmlDoc.main_AdminWarning = "<p>This page was created automatically because the section [" & SectionName & "] was requested, and it did not reference a page. Use the links below to edit the new page.</p>"
-                            cpCore.htmlDoc.main_AdminWarningPageID = rootPageId
-                            cpCore.htmlDoc.main_AdminWarningSectionID = SectionID
-                            'Call app.csv_SetCS(CSSection, "RootPageID", RootPageID)
-                        End If
-                    End If
-                    If (cpCore.pages.redirectLink = "") And (PageID = 0) And (rootPageId <> 0) Then
-                        '
-                        ' if no page, set page to the root of the section
-                        '
-                        PageID = rootPageId
-                    End If
-                End If
+                Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("bid", CStr(PageID))
+                cpCore.pages.templateReason = "The reason this template was selected could not be determined."
                 '
-                If PageID = 0 Then
-                    '
-                    '------------------------------------------------------------------------------------
-                    ' Problem -- Page could not be determined
-                    '   2011/06/15 - changes
-                    '   this should not be a valid case because if the pageid is either given, set by section or set to landingpageid
-                    '
-                    '   allow a page that has no section -- so you can preview it, and so you can view any page in the page content
-                    '       - just display it with the default content
-                    '       - big change is that we now assume the parent + section was not blocked, before we assumed it was blocked
-                    '
-                    '   if pageid=0 at this point then the landing page could not be determined - put up an error message is all you can do
-                    '
-                    '   if pageid<>0 and sectionid=0 then the site will just display the default template
-                    '------------------------------------------------------------------------------------
-                    '
-                    Copy = "" _
-                    & cpCore.siteProperties.docTypeDeclaration() _
-                    & vbCrLf & "<html>" _
-                    & cr & "<body>" _
-                    & cr2 & "<p style=""text-align:center;margin-top:100px;"">The page you requested could not be found and no landing page is configured for this domain.</p>" _
-                    & cr & "</body>" _
-                    & vbCrLf & "</html>" _
-                    & ""
-                    'Call AppendLog("call main_getEndOfBody, from pageManager_getsection")
-                    Call cpCore.htmlDoc.writeAltBuffer(Copy & cpCore.htmlDoc.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False))
-                    Throw New ApplicationException("Unexpected exception") ' throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError12("PagList_GetSection", "The page you requested could not be found and no landing page is configured for this domain [" & cpcore.webServer.webServerIO_requestDomain & "].")
-                    '--- should be disposed by caller --- Call dispose
-                    Exit Function
-                End If
-                '
-                If SectionID = 0 Then
-                    '
-                    ' Orphan Page -- Section could not be determined
-                    '
-                    allowPageWithoutSectionDislay = cpCore.siteProperties.getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default)
-                    allowPageWithoutSectionDislay = True
-                    Call logController.appendLog(cpCore, "hardcoded allowPageWithoutSectionDislay in getHtmlBody_getSection")
-                    If Not allowPageWithoutSectionDislay Then
-                        '
-                        ' the rootPageid is used to represent the section record's selection, and is used in main_GetPageRaw to check if the
-                        '   pagelist is structured correction
-                        '
-                        rootPageId = -1
+                ' -- build parentpageList (first = current page, last = root)
+                ' -- add a 0, then repeat until another 0 is found, or there is a repeat
+                cpCore.pages.pageToRootList = New List(Of Models.Entity.pageContentModel)()
+                Dim usedPageIdList As New List(Of Integer)()
+                Dim targetPageId = PageID
+                usedPageIdList.Add(0)
+                Do While (Not usedPageIdList.Contains(targetPageId))
+                    usedPageIdList.Add(targetPageId)
+                    Dim targetpage As Models.Entity.pageContentModel = Models.Entity.pageContentModel.create(cpCore, targetPageId, New List(Of String))
+                    If (targetpage Is Nothing) Then
+                        Exit Do
+                    Else
+                        cpCore.pages.pageToRootList.Add(targetpage)
+                        targetPageId = targetpage.ID
                     End If
-                    If False Then
-                        'hint = "5"
-                        '
-                        ' No section specified, use LandingSection
-                        '
-                        rootPageId = cpCore.pages.main_GetLandingPageID()
-                        RootPageName = cpCore.pages.main_GetLandingPageName(rootPageId)
-                        If True Then
-                            'If IsSectionRootPageIDMode Then
-                            '
-                            ' Page linked by PageID
-                            '
-                            SectionName = DefaultLandingSectionName
-                            SectionCriteria = "RootPageID=" & rootPageId
-                        Else
-                            '
-                            ' Legacy - Page linked by PageName
-                            '
-                            SectionName = LegacyLandingPageName
-                            SectionCriteria = "Name = " & cpCore.db.encodeSQLText(SectionName)
-                        End If
-                        '
-                        ' main_Get Landing Section
-                        '
-                        CSSection = cpCore.db.cs_open("Site Sections", SectionCriteria, "ID", , ,, , SectionFieldList)
-                        '
-                        ' try something new - if no landing section, use a "dummy" section with no blocking, etc.
-                        '
-                        If Not cpCore.db.cs_ok(CSSection) Then
-                            SectionID = 0
-                            SectionName = ""
-                            SectionTemplateID = 0
-                            SectionContentID = 0
-                            SectionBlock = False
-                        Else
-                            SectionID = cpCore.db.cs_getInteger(CSSection, "ID")
-                            SectionName = cpCore.db.cs_getText(CSSection, "name")
-                            SectionTemplateID = cpCore.db.cs_getInteger(CSSection, "TemplateID")
-                            SectionContentID = cpCore.db.cs_getInteger(CSSection, "ContentID")
-                            SectionBlock = cpCore.db.cs_getBoolean(CSSection, "BlockSection")
-                            Call cpCore.htmlDoc.main_AddOnLoadJavascript2(cpCore.db.cs_getText(CSSection, "JSOnLoad"), "site section")
-                            Call cpCore.htmlDoc.main_AddHeadScriptCode(cpCore.db.cs_getText(CSSection, "JSHead"), "site section")
-                            Call cpCore.htmlDoc.main_AddEndOfBodyJavascript2(cpCore.db.cs_getText(CSSection, "JSEndBody"), "site section")
-                            JSFilename = cpCore.db.cs_getText(CSSection, "JSFilename")
-                            If JSFilename <> "" Then
-                                JSFilename = cpCore.webServer.webServerIO_requestPage & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, JSFilename)
-                                Call cpCore.htmlDoc.main_AddHeadScriptLink(JSFilename, "site section")
+                Loop
+                If (cpCore.pages.pageToRootList.Count = 0) Then
+                    '
+                    ' -- page is not valid -- display error
+                    cpCore.handleExceptionAndContinue(New ApplicationException("Page could not be determined. Error message displayed."))
+                    Return "<div style=""width:300px; margin: 100px auto auto auto;text-align:center;"">This page is not valid.</div>"
+                End If
+                cpCore.pages.currentPage = cpCore.pages.pageToRootList.First
+                '
+                ' -- get contentBox
+                Dim contentBoxHtml As String = cpCore.pages.getContentBox(cpCore.pages.pageToRootList, Models.Entity.pageContentModel.contentName, "", AllowChildPageList, AllowReturnLink, False, SectionID, UseContentWatchLink, allowPageWithoutSectionDislay)
+                '
+                ' -- get template from pages
+                Dim template As Models.Entity.pageTemplateModel = Nothing
+                For Each page As Models.Entity.pageContentModel In cpCore.pages.pageToRootList
+                    If page.TemplateID > 0 Then
+                        template = Models.Entity.pageTemplateModel.create(cpCore, page.TemplateID, New List(Of String))
+                        If (template IsNot Nothing) Then
+                            If (page Is cpCore.pages.currentPage) Then
+                                cpCore.pages.templateReason = "This template was used because it is selected by the current page."
+                            Else
+                                cpCore.pages.templateReason = "This template was used because it is selected one of this page's parents [" & page.Name & "]."
                             End If
+                            Exit For
                         End If
-                        Call cpCore.db.cs_Close(CSSection)
+                    End If
+                Next
+                '
+                If (template Is Nothing) Then
+                    '
+                    ' -- get template from domain
+                    Dim domain As Models.Entity.domainModel = Models.Entity.domainModel.createByName(cpCore, cpCore.webServer.requestDomain, New List(Of String)))
+                    If (domain IsNot Nothing) Then
+                        template = Models.Entity.pageTemplateModel.create(cpCore, domain.DefaultTemplateId, New List(Of String))
+                    End If
+                    If (template Is Nothing) Then
                         '
-                        ' ????? if no landing section, lets try a dummy section
-                        '
+                        ' -- get template named Default
+                        template = Models.Entity.pageTemplateModel.createByName(cpCore, "default", New List(Of String))
                     End If
                 End If
                 '
-                ' Save the SectionID publically to Add-ons can use it (dynamic menuing)
+                ' -- get contentbox
+                returnHtml = cpCore.pages.getContentBox(cpCore.pages.pageToRootList, RootPageContentName, "", AllowChildPageList, AllowReturnLink, False, SectionID, UseContentWatchLink, allowPageWithoutSectionDislay)
                 '
-                cpCore.pages.currentSectionID = SectionID
-                cpCore.pages.currentSectionName = SectionName
-                '
-                '------------------------------------------------------------------------------------
-                ' Determine RootPageContentName from SectionContentID
-                '------------------------------------------------------------------------------------
-                '
-                'hint = "5"
-                If SectionContentID = 0 And RootPageContentName = "" Then
-                    RootPageContentName = "Page Content"
-                    SectionContentID = cpCore.metaData.getContentId(RootPageContentName)
-                ElseIf SectionContentID = 0 Then
-                    SectionContentID = cpCore.metaData.getContentId(RootPageContentName)
-                Else
-                    RootPageContentName = cpCore.metaData.getContentNameByID(SectionContentID)
+                ' -- add template details to document
+                Call cpCore.htmlDoc.main_AddOnLoadJavascript2(cpCore.pages.template.JSOnLoad, "template")
+                Call cpCore.htmlDoc.main_AddHeadScriptCode(cpCore.pages.template.JSHead, "template")
+                Call cpCore.htmlDoc.main_AddEndOfBodyJavascript2(cpCore.pages.template.JSEndBody, "template")
+                Call cpCore.htmlDoc.main_AddHeadTag2(cpCore.pages.template.OtherHeadTags, "template")
+                If cpCore.pages.template.StylesFilename <> "" Then
+                    cpCore.htmlDoc.main_MetaContent_TemplateStyleSheetTag = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, templateStylesFilename) & """ >"
                 End If
                 '
-                '------------------------------------------------------------------------------------
-                '   main_RefreshQueryString before main_Getting content
-                '------------------------------------------------------------------------------------
+                ' -- add shared styles
+                Dim sql As String = "(templateId=" & template.ID & ")"
+                Dim styleList As List(Of Models.Entity.SharedStylesTemplateRuleModel) = Models.Entity.SharedStylesTemplateRuleModel.createList(cpCore, sql, "sortOrder,id")
+                For Each rule As SharedStylesTemplateRuleModel In styleList
+                    Call cpCore.htmlDoc.main_AddSharedStyleID2(rule.StyleID, "template")
+                Next
+
+
+
+
+
+
+
+
+                asdfasdfasdfasdfasdf
+
+
                 '
-                '
-                ' =========================== PageId, rootPageId, and sectionId are GOOD from this point forward ==========================
-                '
-                'hint = "6"
-                If PageID <> 0 Then
-                    cpCore.htmlDoc.refreshQueryString = genericController.ModifyQueryString(cpCore.htmlDoc.refreshQueryString, "bid", CStr(PageID), True)
-                    cpCore.htmlDoc.refreshQueryString = genericController.ModifyQueryString(cpCore.htmlDoc.refreshQueryString, "sid", "")
-                ElseIf SectionID <> 0 Then
-                    cpCore.htmlDoc.refreshQueryString = genericController.ModifyQueryString(cpCore.htmlDoc.refreshQueryString, "bid", "")
-                    cpCore.htmlDoc.refreshQueryString = genericController.ModifyQueryString(cpCore.htmlDoc.refreshQueryString, "sid", CStr(SectionID), True)
-                Else
-                    cpCore.htmlDoc.refreshQueryString = genericController.ModifyQueryString(cpCore.htmlDoc.refreshQueryString, "bid", "")
-                    cpCore.htmlDoc.refreshQueryString = genericController.ModifyQueryString(cpCore.htmlDoc.refreshQueryString, "sid", "")
-                End If
-                '
-                '------------------------------------------------------------------------------------
-                '   main_Get the Content and Template
-                '   main_Get the TemplateID (link,body) from the currentNavigationStructure (already loaded)
-                '------------------------------------------------------------------------------------
-                '
-                'hint = "7"
-                '
-                ' ????? if no section, allow a dummy section with id=0
-                '
+                ' -- get contentbox
                 If cpCore.pages.redirectLink = "" Then
                     If True Then
                         '
-                        returnHtml = cpCore.pages.getContentBox(PageID, rootPageId, RootPageContentName, "", AllowChildPageList, AllowReturnLink, False, SectionID, UseContentWatchLink, allowPageWithoutSectionDislay)
-                        cpCore.pages.templateReason = "The reason this template was selected could not be determined."
+                        ' -- get contentbox
+                        '               returnHtml = cpCore.pages.getContentBox(pageToRootList, RootPageContentName, "", AllowChildPageList, AllowReturnLink, False, SectionID, UseContentWatchLink, allowPageWithoutSectionDislay)
+                        '
+                        ' Set the Template buffers
+                        '
+                        If TCPtr >= 0 Then
+                            If cpCore.authContext.visit.Mobile Then
+                                If cpCore.siteProperties.getBoolean("AllowMobileTemplates") Then
+                                    '
+                                    ' set Mobile Template
+                                    '
+                                    cpCore.pages.templateBody = genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_MobileBodyHTML, TCPtr))
+                                    If cpCore.pages.templateBody <> "" Then
+                                        templateStylesFilename = genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_MobileStylesFilename, TCPtr))
+                                    End If
+                                End If
+                            End If
+                            If cpCore.pages.templateBody = "" Then
+                                '
+                                ' set web template if no other template sets it
+                                '
+                                cpCore.pages.templateBody = genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_BodyHTML, TCPtr))
+                                templateStylesFilename = genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_StylesFilename, TCPtr))
+                            End If
+                            cpCore.pages.templateLink = genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_Link, TCPtr))
+                            cpCore.pages.templateName = genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_Name, TCPtr))
+                        End If
+                        ' (*B)
+                        templateLink = cpCore.pages.templateLink
+                        '
+                        ' Verify Template Link matches the current page
+                        '
                         If cpCore.pages.redirectLink = "" Then
-                            '
-                            ' ----- Use the structure to Calculate the Template Link from the loaded content
-                            '
-                            If cpCore.pages.currentNavigationStructure = "" Then
-                                Call logController.log_appendLogPageNotFound(cpCore, cpCore.webServer.requestUrlSource)
-                                cpCore.pages.pageManager_RedirectBecausePageNotFound = True
-                                cpCore.pages.pageManager_RedirectReason = "Redirecting because the page selected could not be found."
-                                cpCore.pages.redirectLink = cpCore.pages.main_ProcessPageNotFound_GetLink(cpCore.pages.pageManager_RedirectReason, , , PageID, SectionID)
-                                Exit Function
-                            Else
-                                test = cpCore.pages.currentNavigationStructure
-                                If Left(test, 2) = vbCrLf Then
-                                    test = Mid(test, 3)
-                                End If
-                                If Right(test, 2) = vbCrLf Then
-                                    test = Mid(test, 1, Len(test) - 2)
-                                End If
-                                PageRow = genericController.SplitCRLF(test)
-                                PageRowCnt = UBound(PageRow) + 1
-                                For Ptr = PageRowCnt - 1 To 0 Step -1
-                                    navStruc = Split(PageRow(Ptr), vbTab)
-                                    If UBound(navStruc) > 6 Then
-                                        If genericController.EncodeInteger(navStruc(cpCore.pages.navStruc_Descriptor)) < cpCore.pages.navStruc_Descriptor_ChildPage Then
-                                            If navStruc(cpCore.pages.navStruc_TemplateId) <> "0" Then
-                                                templateId = genericController.EncodeInteger(navStruc(cpCore.pages.navStruc_TemplateId))
-                                                If genericController.EncodeInteger(navStruc(cpCore.pages.navStruc_Descriptor)) = cpCore.pages.navStruc_Descriptor_CurrentPage Then
-                                                    cpCore.pages.templateReason = "This template was used because it is selected by the current page."
-                                                Else
-                                                    cpCore.pages.templateReason = "This template was used because it is selected one of this page's parents."
-                                                End If
-                                                Exit For
-                                            End If
-                                        End If
-                                    End If
-                                Next
-                            End If
-                            If templateId <> 0 Then
-                                '
-                                ' check for valid template, if the template record has been deleted, it needs to be forgotten
-                                '
-                                TCPtr = cpCore.pages.pageManager_cache_pageTemplate_getPtr(templateId)
-                                If TCPtr < 0 Then
-                                    templateId = 0
-                                Else
-                                    cpCore.pages.currentTemplateID = genericController.EncodeInteger(cpCore.pages.cache_pageTemplate(TC_ID, TCPtr))
-                                    cpCore.pages.currentTemplateName = genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_Name, TCPtr))
-                                End If
-                            End If
-                            If templateId = 0 Then
-                                '
-                                ' try section template
-                                '
-                                templateId = SectionTemplateID
-                                If templateId <> 0 Then
-                                    TCPtr = cpCore.pages.pageManager_cache_pageTemplate_getPtr(templateId)
-                                    If TCPtr < 0 Then
-                                        templateId = 0
-                                    Else
-                                        cpCore.pages.currentTemplateID = genericController.EncodeInteger(cpCore.pages.cache_pageTemplate(TC_ID, TCPtr))
-                                        cpCore.pages.currentTemplateName = genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_Name, TCPtr))
-                                        cpCore.pages.templateReason = "This template [" & cpCore.pages.currentTemplateName & "] was used because it is selected by the current section [" & cpCore.pages.currentSectionName & "]."
-                                    End If
-                                End If
-                                If (templateId = 0) And (cpCore.domainLegacyCache.domainDetails.defaultTemplateId <> 0) Then
+                            If (TCPtr >= 0) And (cpCore.siteProperties.allowTemplateLinkVerification) Then
+                                PCCPtr = cpCore.pages.cache_pageContent_getPtr(cpCore.pages.currentPageID, cpCore.pages.pagemanager_IsWorkflowRendering, cpCore.authContext.isQuickEditing(cpCore, ""))
+                                '$$$$$ must check for PPtr<0
+                                SecureLink_CurrentURL = (Left(LCase(cpCore.webServer.requestUrl), 8) = "https://")
+                                SecureLink_Template_Required = genericController.EncodeBoolean(cpCore.pages.cache_pageTemplate(TC_IsSecure, TCPtr))
+                                SecureLink_Page_Required = genericController.EncodeBoolean(cpCore.pages.cache_pageContent(PCC_IsSecure, PCCPtr))
+                                SecureLink_Required = SecureLink_Template_Required Or SecureLink_Page_Required
+                                If (templateLink = "") Then
                                     '
-                                    ' try domain's default template
+                                    ' ----- no TemplateLink
+                                    '       test that current secure settings match the templates secure sectting
                                     '
-                                    templateId = cpCore.domainLegacyCache.domainDetails.defaultTemplateId
-                                    TCPtr = cpCore.pages.pageManager_cache_pageTemplate_getPtr(templateId)
-                                    If TCPtr < 0 Then
-                                        templateId = 0
-                                    Else
-                                        cpCore.pages.currentTemplateID = genericController.EncodeInteger(cpCore.pages.cache_pageTemplate(TC_ID, TCPtr))
-                                        cpCore.pages.currentTemplateName = genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_Name, TCPtr))
-                                        cpCore.pages.templateReason = "This template [" & cpCore.pages.currentTemplateName & "] was used because it is selected as the default template for the current domain [" & cpCore.webServer.webServerIO_requestDomain & "]."
-                                    End If
-                                End If
-                                If templateId = 0 Then
-                                    '
-                                    ' try the template named 'default'
-                                    '
-                                    Call cpCore.pages.pageManager_cache_pageTemplate_load()
-                                    For TCPtr = 0 To cpCore.pages.cache_pageTemplate_rows - 1
-                                        If genericController.vbLCase(genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_Name, TCPtr))) = "default" Then
-                                            templateId = genericController.EncodeInteger(cpCore.pages.cache_pageTemplate(TC_ID, TCPtr))
-                                            Exit For
-                                        End If
-                                    Next
-                                    If TCPtr >= cpCore.pages.cache_pageTemplate_rows Then
-                                        TCPtr = -1
-                                    Else
-                                        cpCore.pages.currentTemplateID = genericController.EncodeInteger(cpCore.pages.cache_pageTemplate(TC_ID, TCPtr))
-                                        cpCore.pages.currentTemplateName = genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_Name, TCPtr))
-                                        cpCore.pages.templateReason = "This template was used because it is the default template for the site and no other template was selected [" & cpCore.pages.currentTemplateName & "]."
-                                    End If
-                                End If
-                            End If
-                            '
-                            ' Set the Template buffers
-                            '
-                            If TCPtr >= 0 Then
-                                If cpCore.authContext.visit.Mobile Then
-                                    If cpCore.siteProperties.getBoolean("AllowMobileTemplates") Then
+                                    If (SecureLink_CurrentURL <> SecureLink_Required) Then
                                         '
-                                        ' set Mobile Template
+                                        ' redirect because protocol is wrong
                                         '
-                                        cpCore.pages.templateBody = genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_MobileBodyHTML, TCPtr))
-                                        If cpCore.pages.templateBody <> "" Then
-                                            StylesFilename = genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_MobileStylesFilename, TCPtr))
-                                        End If
-                                    End If
-                                End If
-                                If cpCore.pages.templateBody = "" Then
-                                    '
-                                    ' set web template if no other template sets it
-                                    '
-                                    cpCore.pages.templateBody = genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_BodyHTML, TCPtr))
-                                    StylesFilename = genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_StylesFilename, TCPtr))
-                                End If
-                                cpCore.pages.templateLink = genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_Link, TCPtr))
-                                cpCore.pages.templateName = genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_Name, TCPtr))
-                                Call cpCore.htmlDoc.main_AddOnLoadJavascript2(genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_JSOnLoad, TCPtr)), "template")
-                                Call cpCore.htmlDoc.main_AddHeadScriptCode(genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_JSInHeadLegacy, TCPtr)), "template")
-                                Call cpCore.htmlDoc.main_AddEndOfBodyJavascript2(genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_JSEndBody, TCPtr)), "template")
-                                Call cpCore.htmlDoc.main_AddHeadTag2(genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_OtherHeadTags, TCPtr)), "template")
-                                cpCore.pages.templateBodyTag = genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_BodyTag, TCPtr))
-                                JSFilename = genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_JSInHeadFilename, TCPtr))
-                                If JSFilename <> "" Then
-                                    JSFilename = cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, JSFilename)
-                                    Call cpCore.htmlDoc.main_AddHeadScriptLink(JSFilename, "template")
-                                End If
-                                '
-                                ' Add exclusive styles
-                                '
-                                If StylesFilename <> "" Then
-                                    If genericController.vbLCase(Right(StylesFilename, 4)) <> ".css" Then
-                                        Throw New ApplicationException("Unexpected exception") ' throw new applicationException("Unexpected exception") ' Call cpcore.handleLegacyError15("Template [" & pageManager_TemplateName & "] StylesFilename is not a '.css' file, and will not display correct. Check that the field is setup as a CSSFile.", "pageManager_GetHtmlBody_GetSection")
-                                    Else
-                                        cpCore.htmlDoc.main_MetaContent_TemplateStyleSheetTag = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, StylesFilename) & """ >"
-                                    End If
-                                End If
-                                '
-                                ' Add shared styles
-                                '
-
-                                SharedStylesIDList = genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_SharedStylesIDList, TCPtr))
-                                If SharedStylesIDList <> "" Then
-                                    ListSplit = Split(SharedStylesIDList, ",")
-                                    For Ptr = 0 To UBound(ListSplit)
-                                        styleId = genericController.EncodeInteger(ListSplit(Ptr))
-                                        If styleId <> 0 Then
-                                            Call cpCore.htmlDoc.main_AddSharedStyleID2(genericController.EncodeInteger(ListSplit(Ptr)), "template")
-                                        End If
-                                    Next
-                                End If
-                            End If
-                            ' (*B)
-                            templateLink = cpCore.pages.templateLink
-                            '
-                            ' Verify Template Link matches the current page
-                            '
-                            If cpCore.pages.redirectLink = "" Then
-                                If (TCPtr >= 0) And (cpCore.siteProperties.allowTemplateLinkVerification) Then
-                                    PCCPtr = cpCore.pages.cache_pageContent_getPtr(cpCore.pages.currentPageID, cpCore.pages.pagemanager_IsWorkflowRendering, cpCore.authContext.isQuickEditing(cpCore, ""))
-                                    '$$$$$ must check for PPtr<0
-                                    SecureLink_CurrentURL = (Left(LCase(cpCore.webServer.requestUrl), 8) = "https://")
-                                    SecureLink_Template_Required = genericController.EncodeBoolean(cpCore.pages.cache_pageTemplate(TC_IsSecure, TCPtr))
-                                    SecureLink_Page_Required = genericController.EncodeBoolean(cpCore.pages.cache_pageContent(PCC_IsSecure, PCCPtr))
-                                    SecureLink_Required = SecureLink_Template_Required Or SecureLink_Page_Required
-                                    If (templateLink = "") Then
-                                        '
-                                        ' ----- no TemplateLink
-                                        '       test that current secure settings match the templates secure sectting
-                                        '
-                                        If (SecureLink_CurrentURL <> SecureLink_Required) Then
-                                            '
-                                            ' redirect because protocol is wrong
-                                            '
-                                            If SecureLink_CurrentURL Then
-                                                cpCore.pages.redirectLink = genericController.vbReplace(cpCore.webServer.requestUrl, "https://", "http://")
-                                                cpCore.pages.pageManager_RedirectReason = "Redirecting because neither the page or the template requires a secure link."
-                                            Else
-                                                cpCore.pages.redirectLink = genericController.vbReplace(cpCore.webServer.requestUrl, "http://", "https://")
-                                                If SecureLink_Page_Required Then
-                                                    cpCore.pages.pageManager_RedirectReason = "Redirecting because this page [" & cpCore.pages.currentPageName & "] requires a secure link."
-                                                Else
-                                                    cpCore.pages.pageManager_RedirectReason = "Redirecting because this template [" & cpCore.pages.currentTemplateName & "] requires a secure link."
-                                                End If
-                                            End If
-                                        End If
-                                    Else
-                                        '
-                                        ' ----- TemplateLink given
-                                        '
-                                        CurrentLink = cpCore.webServer.requestUrl
-                                        If genericController.vbInstr(1, templateLink, "://", vbTextCompare) <> 0 Then
-                                            '
-                                            ' ----- TemplateLink is full
-                                            '       this includes a short template with the secure checked case
-                                            '       ignore TC_IsSecure, use the link's protocol
-                                            '
-                                            LinkSplit = Split(CurrentLink, "?")
-                                            CurrentLinkNoQuery = LinkSplit(0)
-                                            If (UCase(templateLink) <> genericController.vbUCase(CurrentLinkNoQuery)) Then
-                                                '
-                                                ' redirect to template link
-                                                '
-                                                cpCore.pages.redirectLink = cpCore.pages.pageManager_GetSectionLink(templateLink, PageID, SectionID)
-                                                If PageID <> 0 Then
-                                                    cpCore.pages.pageManager_RedirectBecausePageNotFound = False
-                                                    cpCore.pages.pageManager_RedirectReason = "Redirecting because this template [" & cpCore.pages.currentTemplateName & "] is configured to use the link [" & templateLink & "]. This is may be a normal condition." & cpCore.pages.templateReason
-                                                ElseIf SectionID <> 0 Then
-                                                    cpCore.pages.pageManager_RedirectBecausePageNotFound = False
-                                                    cpCore.pages.pageManager_RedirectReason = "Redirecting because this template [" & cpCore.pages.currentTemplateName & "] is configured to use the link [" & templateLink & "]. This is may be a normal condition." & cpCore.pages.templateReason
-                                                Else
-                                                    cpCore.pages.pageManager_RedirectBecausePageNotFound = False
-                                                    cpCore.pages.pageManager_RedirectReason = "Redirecting because this template [" & cpCore.pages.currentTemplateName & "] is configured to use the link [" & templateLink & "]. This is may be a normal condition." & cpCore.pages.templateReason
-                                                End If
-                                            End If
+                                        If SecureLink_CurrentURL Then
+                                            cpCore.pages.redirectLink = genericController.vbReplace(cpCore.webServer.requestUrl, "https://", "http://")
+                                            cpCore.pages.pageManager_RedirectReason = "Redirecting because neither the page or the template requires a secure link."
                                         Else
+                                            cpCore.pages.redirectLink = genericController.vbReplace(cpCore.webServer.requestUrl, "http://", "https://")
+                                            If SecureLink_Page_Required Then
+                                                cpCore.pages.pageManager_RedirectReason = "Redirecting because this page [" & cpCore.pages.currentPageName & "] requires a secure link."
+                                            Else
+                                                cpCore.pages.pageManager_RedirectReason = "Redirecting because this template [" & cpCore.pages.currentTemplateName & "] requires a secure link."
+                                            End If
+                                        End If
+                                    End If
+                                Else
+                                    '
+                                    ' ----- TemplateLink given
+                                    '
+                                    CurrentLink = cpCore.webServer.requestUrl
+                                    If genericController.vbInstr(1, templateLink, "://", vbTextCompare) <> 0 Then
+                                        '
+                                        ' ----- TemplateLink is full
+                                        '       this includes a short template with the secure checked case
+                                        '       ignore TC_IsSecure, use the link's protocol
+                                        '
+                                        LinkSplit = Split(CurrentLink, "?")
+                                        CurrentLinkNoQuery = LinkSplit(0)
+                                        If (UCase(templateLink) <> genericController.vbUCase(CurrentLinkNoQuery)) Then
                                             '
-                                            ' ----- TemplateLink is short
-                                            '       test current short link vs template short link, and protocols
+                                            ' redirect to template link
                                             '
-                                            CurrentLink = genericController.vbReplace(CurrentLink, "https://", "http://", 1, 99, vbTextCompare)
-                                            CurrentLink = genericController.ConvertLinkToShortLink(CurrentLink, cpCore.webServer.requestDomain, cpCore.webServer.webServerIO_requestVirtualFilePath)
-                                            CurrentLink = genericController.EncodeAppRootPath(CurrentLink, cpCore.webServer.webServerIO_requestVirtualFilePath, requestAppRootPath, cpCore.webServer.requestDomain)
-                                            LinkSplit = Split(CurrentLink, "?")
-                                            CurrentLinkNoQuery = LinkSplit(0)
-                                            If (SecureLink_CurrentURL <> SecureLink_Required) Or (UCase(templateLink) <> genericController.vbUCase(CurrentLinkNoQuery)) Then
-                                                '
-                                                ' This is not the correct page for this content, redirect
-                                                ' This is NOT a pagenotfound - but a correctable condition that can not be avoided
-                                                ' The pageid has as hard tamplate that must be redirected
-                                                '
-                                                cpCore.pages.redirectLink = cpCore.pages.getPageLink4(PageID, "", True, False)
-                                                If SecureLink_Required Then
-                                                    '
-                                                    ' Redirect to Secure
-                                                    '
-                                                    If genericController.vbInstr(1, cpCore.pages.redirectLink, "http", vbTextCompare) = 1 Then
-                                                        '
-                                                        ' link is full
-                                                        '
-                                                        cpCore.pages.redirectLink = genericController.vbReplace(cpCore.pages.redirectLink, "http://", "https://", 1, 99, vbTextCompare)
-                                                    Else
-                                                        '
-                                                        ' link is root relative
-                                                        '
-                                                        cpCore.pages.redirectLink = "https://" & cpCore.webServer.requestDomain & cpCore.pages.redirectLink
-                                                    End If
-                                                Else
-                                                    '
-                                                    ' Redirect to non-Secure
-                                                    '
-                                                    If genericController.vbInstr(1, cpCore.pages.redirectLink, "http", vbTextCompare) = 1 Then
-                                                        '
-                                                        ' link is full
-                                                        '
-                                                        cpCore.pages.redirectLink = genericController.vbReplace(cpCore.pages.redirectLink, "https://", "http://", 1, 99, vbTextCompare)
-                                                    Else
-                                                        '
-                                                        ' link is root relative
-                                                        '
-                                                        cpCore.pages.redirectLink = "http://" & cpCore.webServer.requestDomain & cpCore.pages.redirectLink
-                                                    End If
-                                                End If
-                                                'pageManager_RedirectLink = pageManager_GetSectionLink(TemplateLink, PageID, SectionID)
+                                            cpCore.pages.redirectLink = cpCore.pages.pageManager_GetSectionLink(templateLink, PageID, SectionID)
+                                            If PageID <> 0 Then
+                                                cpCore.pages.pageManager_RedirectBecausePageNotFound = False
+                                                cpCore.pages.pageManager_RedirectReason = "Redirecting because this template [" & cpCore.pages.currentTemplateName & "] is configured to use the link [" & templateLink & "]. This is may be a normal condition." & cpCore.pages.templateReason
+                                            ElseIf SectionID <> 0 Then
+                                                cpCore.pages.pageManager_RedirectBecausePageNotFound = False
+                                                cpCore.pages.pageManager_RedirectReason = "Redirecting because this template [" & cpCore.pages.currentTemplateName & "] is configured to use the link [" & templateLink & "]. This is may be a normal condition." & cpCore.pages.templateReason
+                                            Else
                                                 cpCore.pages.pageManager_RedirectBecausePageNotFound = False
                                                 cpCore.pages.pageManager_RedirectReason = "Redirecting because this template [" & cpCore.pages.currentTemplateName & "] is configured to use the link [" & templateLink & "]. This is may be a normal condition." & cpCore.pages.templateReason
                                             End If
                                         End If
-                                    End If
-                                    '
-                                    ' check template domain requirements
-                                    '
-                                    If cpCore.pages.redirectLink = "" Then
-                                        templatedomainIdList = genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_DomainIdList, TCPtr))
-                                        If (cpCore.domainLegacyCache.domainDetails.id = 0) Then
+                                    Else
+                                        '
+                                        ' ----- TemplateLink is short
+                                        '       test current short link vs template short link, and protocols
+                                        '
+                                        CurrentLink = genericController.vbReplace(CurrentLink, "https://", "http://", 1, 99, vbTextCompare)
+                                        CurrentLink = genericController.ConvertLinkToShortLink(CurrentLink, cpCore.webServer.requestDomain, cpCore.webServer.webServerIO_requestVirtualFilePath)
+                                        CurrentLink = genericController.EncodeAppRootPath(CurrentLink, cpCore.webServer.webServerIO_requestVirtualFilePath, requestAppRootPath, cpCore.webServer.requestDomain)
+                                        LinkSplit = Split(CurrentLink, "?")
+                                        CurrentLinkNoQuery = LinkSplit(0)
+                                        If (SecureLink_CurrentURL <> SecureLink_Required) Or (UCase(templateLink) <> genericController.vbUCase(CurrentLinkNoQuery)) Then
                                             '
-                                            ' current domain not recognized or default, use current
+                                            ' This is not the correct page for this content, redirect
+                                            ' This is NOT a pagenotfound - but a correctable condition that can not be avoided
+                                            ' The pageid has as hard tamplate that must be redirected
                                             '
-                                        ElseIf (templatedomainIdList = "") Then
-                                            '
-                                            ' current template has no domain preference, use current
-                                            '
-                                        ElseIf (InStr(1, "," & templatedomainIdList & ",", "," & cpCore.domainLegacyCache.domainDetails.id & ",") <> 0) Then
-                                            '
-                                            ' current domain is in the allowed c.domains list for this template, use it
-                                            '
-                                        Else
-                                            '
-                                            ' must redirect to a new template
-                                            '
-                                            domainIds = Split(templatedomainIdList, ",")
-                                            For Ptr = 0 To UBound(domainIds)
-                                                setdomainId = genericController.EncodeInteger(domainIds(Ptr))
-                                                If setdomainId <> 0 Then
-                                                    Exit For
+                                            cpCore.pages.redirectLink = cpCore.pages.getPageLink4(PageID, "", True, False)
+                                            If SecureLink_Required Then
+                                                '
+                                                ' Redirect to Secure
+                                                '
+                                                If genericController.vbInstr(1, cpCore.pages.redirectLink, "http", vbTextCompare) = 1 Then
+                                                    '
+                                                    ' link is full
+                                                    '
+                                                    cpCore.pages.redirectLink = genericController.vbReplace(cpCore.pages.redirectLink, "http://", "https://", 1, 99, vbTextCompare)
+                                                Else
+                                                    '
+                                                    ' link is root relative
+                                                    '
+                                                    cpCore.pages.redirectLink = "https://" & cpCore.webServer.requestDomain & cpCore.pages.redirectLink
                                                 End If
-                                            Next
-                                            linkDomain = cpCore.db.getRecordName("domains", setdomainId)
-                                            If linkDomain <> "" Then
-                                                cpCore.pages.redirectLink = genericController.vbReplace(cpCore.webServer.requestUrl, "://" & cpCore.webServer.requestDomain, "://" & linkDomain, 1, 99, vbTextCompare)
-                                                cpCore.pages.pageManager_RedirectBecausePageNotFound = False
-                                                cpCore.pages.pageManager_RedirectReason = "Redirecting because this template [" & cpCore.pages.currentTemplateName & "] requires a different domain [" & linkDomain & "]." & cpCore.pages.templateReason
+                                            Else
+                                                '
+                                                ' Redirect to non-Secure
+                                                '
+                                                If genericController.vbInstr(1, cpCore.pages.redirectLink, "http", vbTextCompare) = 1 Then
+                                                    '
+                                                    ' link is full
+                                                    '
+                                                    cpCore.pages.redirectLink = genericController.vbReplace(cpCore.pages.redirectLink, "https://", "http://", 1, 99, vbTextCompare)
+                                                Else
+                                                    '
+                                                    ' link is root relative
+                                                    '
+                                                    cpCore.pages.redirectLink = "http://" & cpCore.webServer.requestDomain & cpCore.pages.redirectLink
+                                                End If
                                             End If
+                                            'pageManager_RedirectLink = pageManager_GetSectionLink(TemplateLink, PageID, SectionID)
+                                            cpCore.pages.pageManager_RedirectBecausePageNotFound = False
+                                            cpCore.pages.pageManager_RedirectReason = "Redirecting because this template [" & cpCore.pages.currentTemplateName & "] is configured to use the link [" & templateLink & "]. This is may be a normal condition." & cpCore.pages.templateReason
+                                        End If
+                                    End If
+                                End If
+                                '
+                                ' check template domain requirements
+                                '
+                                If cpCore.pages.redirectLink = "" Then
+                                    templatedomainIdList = genericController.encodeText(cpCore.pages.cache_pageTemplate(TC_DomainIdList, TCPtr))
+                                    If (cpCore.domainLegacyCache.domainDetails.id = 0) Then
+                                        '
+                                        ' current domain not recognized or default, use current
+                                        '
+                                    ElseIf (templatedomainIdList = "") Then
+                                        '
+                                        ' current template has no domain preference, use current
+                                        '
+                                    ElseIf (InStr(1, "," & templatedomainIdList & ",", "," & cpCore.domainLegacyCache.domainDetails.id & ",") <> 0) Then
+                                        '
+                                        ' current domain is in the allowed c.domains list for this template, use it
+                                        '
+                                    Else
+                                        '
+                                        ' must redirect to a new template
+                                        '
+                                        domainIds = Split(templatedomainIdList, ",")
+                                        For Ptr = 0 To UBound(domainIds)
+                                            setdomainId = genericController.EncodeInteger(domainIds(Ptr))
+                                            If setdomainId <> 0 Then
+                                                Exit For
+                                            End If
+                                        Next
+                                        linkDomain = cpCore.db.getRecordName("domains", setdomainId)
+                                        If linkDomain <> "" Then
+                                            cpCore.pages.redirectLink = genericController.vbReplace(cpCore.webServer.requestUrl, "://" & cpCore.webServer.requestDomain, "://" & linkDomain, 1, 99, vbTextCompare)
+                                            cpCore.pages.pageManager_RedirectBecausePageNotFound = False
+                                            cpCore.pages.pageManager_RedirectReason = "Redirecting because this template [" & cpCore.pages.currentTemplateName & "] requires a different domain [" & linkDomain & "]." & cpCore.pages.templateReason
                                         End If
                                     End If
                                 End If
                             End If
                         End If
-                        '
-                        ' if fpo_QuickEdit it there, replace it out
-                        '
-                        Dim Editor As String
-                        Dim styleList As String
-                        Dim styleOptionList As String
-                        Dim addonListJSON As String
-
-                        If cpCore.pages.redirectLink = "" And (InStr(1, returnHtml, html_quickEdit_fpo) <> 0) Then
-                            FieldRows = genericController.EncodeInteger(cpCore.userProperty.getText("Page Content.copyFilename.PixelHeight", "500"))
-                            If FieldRows < 50 Then
-                                FieldRows = 50
-                                Call cpCore.userProperty.setProperty("Page Content.copyFilename.PixelHeight", 50)
-                            End If
-                            styleList = cpCore.htmlDoc.main_GetStyleSheet2(csv_contentTypeEnum.contentTypeWeb, templateId, 0)
-                            addonListJSON = cpCore.htmlDoc.main_GetEditorAddonListJSON(csv_contentTypeEnum.contentTypeWeb)
-                            Editor = cpCore.htmlDoc.html_GetFormInputHTML3("copyFilename", cpCore.htmlDoc.html_quickEdit_copy, CStr(FieldRows), "100%", False, True, addonListJSON, styleList, styleOptionList)
-                            returnHtml = genericController.vbReplace(returnHtml, html_quickEdit_fpo, Editor)
-                        End If
                     End If
+                    '
+                    ' if fpo_QuickEdit it there, replace it out
+                    '
+                    Dim Editor As String
+                    Dim styleList As String
+                    Dim styleOptionList As String
+                    Dim addonListJSON As String
+
+                    If cpCore.pages.redirectLink = "" And (InStr(1, returnHtml, html_quickEdit_fpo) <> 0) Then
+                        FieldRows = genericController.EncodeInteger(cpCore.userProperty.getText("Page Content.copyFilename.PixelHeight", "500"))
+                        If FieldRows < 50 Then
+                            FieldRows = 50
+                            Call cpCore.userProperty.setProperty("Page Content.copyFilename.PixelHeight", 50)
+                        End If
+                        styleList = cpCore.htmlDoc.main_GetStyleSheet2(csv_contentTypeEnum.contentTypeWeb, templateId, 0)
+                        addonListJSON = cpCore.htmlDoc.main_GetEditorAddonListJSON(csv_contentTypeEnum.contentTypeWeb)
+                        Editor = cpCore.htmlDoc.html_GetFormInputHTML3("copyFilename", cpCore.htmlDoc.html_quickEdit_copy, CStr(FieldRows), "100%", False, True, addonListJSON, styleList, styleOptionList)
+                        returnHtml = genericController.vbReplace(returnHtml, html_quickEdit_fpo, Editor)
+                    End If
+                End If
                 End If
                 '
                 '------------------------------------------------------------------------------------

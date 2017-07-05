@@ -15,6 +15,11 @@ Namespace Contensive.Core.Controllers
         ' -- not sure if this is the best plan, buts lets try this and see if we can get out of it later (to make this an addon) 
         Private cpcore As coreClass
         '
+        Public currentPage As Models.Entity.pageContentModel
+        Public pageToRootList As List(Of Models.Entity.pageContentModel)
+        Public template As Models.Entity.pageTemplateModel
+        Public templateReason As String = ""                           ' a message that explains why this template was selected
+        '
         Public siteStructure As String = ""
         Public siteStructure_LocalLoaded As Boolean = False
         Public Const navStruc_Descriptor = 1           ' Descriptors:0 = RootPage, 1 = Parent Page, 2 = Current Page, 3 = Child Page
@@ -27,11 +32,10 @@ Namespace Contensive.Core.Controllers
         Public landingPageID_Loaded As Boolean = False                   '   true when pageManager_LandingPageID is loaded
         Public landingPageName As String = ""                          ' Set from pageManager_LandingPageID (use main_GetLandingPageName)
         Public landingLink As String = ""                              ' Default Landing page - managed through main_GetLandingLink()
-        Public templateReason As String = ""                           ' a message that explains why this template was selected
-        Public templateName As String = ""                             ' Name of the template
-        Public templateLink As String = ""                             ' Link this template requires - redirect caused if this is not the current link
-        Public templateBody As String = ""                             ' Body field of the TemplateID
-        Public templateBodyTag As String = ""                          ' BodyTag - from Template record, if blank, use TemplateDefaultBodyTag
+        'Public templateName As String = ""                             ' Name of the template
+        'Public templateLink As String = ""                             ' Link this template requires - redirect caused if this is not the current link
+        'Public templateBody As String = ""                             ' Body field of the TemplateID
+        'Public templateBodyTag As String = ""                          ' BodyTag - from Template record, if blank, use TemplateDefaultBodyTag
         Public sectionMenuLinkDefault As String = ""
         Public Const blockMessageDefault = "<p>The content on this page has restricted access. If you have a username and password for this system, <a href=""?method=login"" rel=""nofollow"">Click Here</a>. For more information, please contact the administrator.</p>"
         Public redirectLink As String = ""                             ' If there is a problem, a redirect is forced
@@ -39,14 +43,14 @@ Namespace Contensive.Core.Controllers
         Public pageManager_RedirectBecausePageNotFound As Boolean = False            ' if true, redirect will go through a 404 so bots will not follow
         Public pageManager_RedirectSourcePageID As Integer = 0                       ' the pageid of the page with this issue, 0 if not a page problem
         '
-        Public currentPageID As Integer = 0                   ' The current page's id
-        Public currentPageName As String = ""               ' The current page's name
-        Public currentSectionID As Integer = 0                ' The current page's section id
-        Public currentSectionName As String = ""            ' The current Section's name
-        Public currentTemplateID As Integer = 0               ' The current template's Id
-        Public currentTemplateName As String = ""           ' The current template's name
+        'Public currentPageID As Integer = 0                   ' The current page's id
+        'Public currentPageName As String = ""               ' The current page's name
+        'Public currentSectionID As Integer = 0                ' The current page's section id
+        'Public currentSectionName As String = ""            ' The current Section's name
+        'Public currentTemplateID As Integer = 0               ' The current template's Id
+        'Public currentTemplateName As String = ""           ' The current template's name
         Public currentNavigationStructure As String = ""    ' Public string describing the current page
-        Public currentParentID As Integer = 0               '
+        'Public currentParentID As Integer = 0               '
         Public main_RenderCache_Loaded As Boolean = False                               ' true after main_loadRenderCache
         Public main_RenderCache_CurrentPage_PCCPtr As Integer = 0
         Public main_RenderCache_CurrentPage_ContentId As Integer = 0                        '
@@ -134,7 +138,7 @@ Namespace Contensive.Core.Controllers
         '   RootPageID has to be the ID of the root page for PageID
         '=============================================================================
         '
-        Public Function getContentBox(PageID As Integer, rootPageId As Integer, RootPageContentName As String, OrderByClause As String, AllowChildPageList As Boolean, AllowReturnLink As Boolean, ArchivePages As Boolean, SectionID As Integer, UseContentWatchLink As Boolean, allowPageWithoutSectionDisplay As Boolean) As String
+        Public Function getContentBox(pageToRootList As List(Of Models.Entity.pageContentModel), RootPageContentName As String, OrderByClause As String, AllowChildPageList As Boolean, AllowReturnLink As Boolean, ArchivePages As Boolean, SectionID As Integer, UseContentWatchLink As Boolean, allowPageWithoutSectionDisplay As Boolean) As String
             Dim returnHtml As String = ""
             Try
                 '
