@@ -179,11 +179,12 @@ Namespace Contensive.Core
         ''' <returns></returns>
         Public Overrides ReadOnly Property templateId() As Integer
             Get
-                If True Then
-                    Return cpCore.pages.currentTemplateID
-                Else
-                    Return 0
+                If (cpCore.pages IsNot Nothing) Then
+                    If (cpCore.pages.template IsNot Nothing) Then
+                        Return cpCore.pages.template.ID
+                    End If
                 End If
+                Return 0
             End Get
         End Property
         '

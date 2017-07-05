@@ -15,7 +15,8 @@ Namespace Contensive.Core.Controllers
         ' -- not sure if this is the best plan, buts lets try this and see if we can get out of it later (to make this an addon) 
         Private cpcore As coreClass
         '
-        Public currentPage As Models.Entity.pageContentModel
+        Public domain As Models.Entity.domainModel
+        Public page As Models.Entity.pageContentModel
         Public pageToRootList As List(Of Models.Entity.pageContentModel)
         Public template As Models.Entity.pageTemplateModel
         Public templateReason As String = ""                           ' a message that explains why this template was selected
@@ -93,33 +94,33 @@ Namespace Contensive.Core.Controllers
             Dim AuthenticateOnFormProcess As Boolean
             Dim Inst() As main_FormPagetype_InstType
         End Structure
-        '
-        ' ----------------------------------------------------------------------------------------
-        '   values collected from add-ons as the page progresses
-        ' ----------------------------------------------------------------------------------------
-        '
-        ' ----- Site Section Cache
-        '
-        Public Const cache_siteSection_cacheName = "cache_siteSection"
-        Public cache_siteSection As String(,)
-        Public cache_siteSection_rows As Integer = 0
-        Public cache_siteSection_IDIndex As keyPtrController
-        Public cache_siteSection_RootPageIDIndex As keyPtrController
-        Public cache_siteSection_NameIndex As keyPtrController
-        '
-        ' ----- Template Content store
-        '
-        Public Const cache_pageTemplate_cacheName = "cache_pageTemplate"
-        Public cache_pageTemplate As String(,)
-        Public cache_pageTemplate_rows As Integer = 0
-        Public cache_pageTemplate_contentIdindex As keyPtrController
-        '
-        ' -- Page Content store (old names for compatibility)
-        Public cache_pageContent_rows As Integer = 0
-        Public cache_pageContent As String(,)
-        Public cache_pageContent_idIndex As keyPtrController
-        Public cache_pageContent_parentIdIndex As keyPtrController
-        Public cache_pageContent_nameIndex As keyPtrController
+        ''
+        '' ----------------------------------------------------------------------------------------
+        ''   values collected from add-ons as the page progresses
+        '' ----------------------------------------------------------------------------------------
+        ''
+        '' ----- Site Section Cache
+        ''
+        'Public Const cache_siteSection_cacheName = "cache_siteSection"
+        'Public cache_siteSection As String(,)
+        'Public cache_siteSection_rows As Integer = 0
+        'Public cache_siteSection_IDIndex As keyPtrController
+        'Public cache_siteSection_RootPageIDIndex As keyPtrController
+        'Public cache_siteSection_NameIndex As keyPtrController
+        ''
+        '' ----- Template Content store
+        ''
+        'Public Const cache_pageTemplate_cacheName = "cache_pageTemplate"
+        'Public cache_pageTemplate As String(,)
+        'Public cache_pageTemplate_rows As Integer = 0
+        'Public cache_pageTemplate_contentIdindex As keyPtrController
+        ''
+        '' -- Page Content store (old names for compatibility)
+        'Public cache_pageContent_rows As Integer = 0
+        'Public cache_pageContent As String(,)
+        'Public cache_pageContent_idIndex As keyPtrController
+        'Public cache_pageContent_parentIdIndex As keyPtrController
+        'Public cache_pageContent_nameIndex As keyPtrController
         '
         '====================================================================================================
         ''' <summary>
@@ -138,12 +139,10 @@ Namespace Contensive.Core.Controllers
         '   RootPageID has to be the ID of the root page for PageID
         '=============================================================================
         '
-        Public Function getContentBox(pageToRootList As List(Of Models.Entity.pageContentModel), RootPageContentName As String, OrderByClause As String, AllowChildPageList As Boolean, AllowReturnLink As Boolean, ArchivePages As Boolean, SectionID As Integer, UseContentWatchLink As Boolean, allowPageWithoutSectionDisplay As Boolean) As String
+        Public Function getContentBox(OrderByClause As String, AllowChildPageList As Boolean, AllowReturnLink As Boolean, ArchivePages As Boolean, ignoreme As Integer, UseContentWatchLink As Boolean, allowPageWithoutSectionDisplay As Boolean) As String
             Dim returnHtml As String = ""
             Try
-                '
                 Dim ParentPtr As Integer
-
                 Dim AddonName As String
                 Dim addonCachePtr As Integer
                 Dim addonPtr As Integer
@@ -151,57 +150,25 @@ Namespace Contensive.Core.Controllers
                 Dim layoutError As String
                 Dim addonId As Integer
                 Dim AddonContent As String
-                Dim Err_Number As Integer
-                Dim Err_Source As String
-                Dim Err_Description As String
                 Dim DateModified As Date
-                Dim ErrString As String
                 Dim JSOnLoad As String
                 Dim JSHead As String
                 Dim JSFilename As String
-                Dim JSCopy As String
                 Dim JSEndBody As String
                 Dim PageRecordID As Integer
                 Dim ContentPadding As Integer
-                Dim Copy As String
                 Dim RQS As String
                 Dim Body As String
                 Dim PageName As String
                 Dim AllowHitNotification As Boolean
-                'Dim cacheName As String
                 Dim RootPageContentCID As Integer
-                Dim PageContentCID As Integer
-                Dim DateExpires As Date
-                Dim dateArchive As Date
-                Dim BakeExpires As Date
                 Dim iRootPageContentName As String
-                Dim PubDate As Date
-                Dim PagePointer As Integer
                 Dim CS As Integer
-                Dim LineBuffer As String
-                Dim LineSplit() As String
-                'Dim RecordID as integer
-                'Dim ContentID as integer
-                'Dim ContentName As String
                 Dim BlockedRecordIDList As String
-                Dim Pointer As Integer
                 Dim SQL As String
                 Dim ContentBlocked As Boolean
-                Dim RecordCount As Integer
-                Dim RecordSplit() As String
-                Dim BakeHeader As String
-                Dim Delimiter As String
-                Dim BakedStructure As String
-                'Dim AuthoringMode As Boolean
                 Dim NewPageCreated As Boolean
-                Dim LineLeft As String
-                Dim LineRight As String
-                Dim LinePosition As Integer
-                Dim SelectFieldList As String
-                'dim buildversion As String
                 Dim contactMemberID As Integer
-                Dim BakeVersion As String
-                'Dim AllowPageBaking As Boolean
                 Dim SystemEMailID As Integer
                 Dim ConditionID As Integer
                 Dim ConditionGroupID As Integer
@@ -217,120 +184,95 @@ Namespace Contensive.Core.Controllers
                 Dim PCCPtr As Integer
                 Dim pageViewings As Integer
                 '
-                ' BuildVersion = app.dataBuildVersion
+                Call cpcore.htmlDoc.main_AddHeadTag2("<meta name=""contentId"" content=""" & cpcore.pages.page.ID & """ >", "page content")
                 '
-                ' If no PageRecordID, use the RootPage
+                iRootPageContentName = "Page Content"
+                RootPageContentCID = cpcore.metaData.getContentId(iRootPageContentName)
                 '
-                PageRecordID = PageID
-                If PageRecordID = 0 Then
-                    PageRecordID = rootPageId
+                '---------------------------------------------------------------------------------
+                ' ----- Build Page if needed
+                '---------------------------------------------------------------------------------
+                '
+                returnHtml = getContentBox_content(OrderByClause, AllowChildPageList, AllowReturnLink, ArchivePages, ignoreme, UseContentWatchLink, allowPageWithoutSectionDisplay)
+                If (returnHtml <> "") And (redirectLink = "") Then
+                    '
+                    ' This page is correct, main_Get the RecordID for later
+                    '
+                    NewPageCreated = True
+                    BlockedRecordIDList = ""
+                    If main_RenderCache_CurrentPage_PCCPtr >= 0 Then
+                        '
+                        ' Build the BlockedRecordIDList
+                        '
+                        PCCPtr = main_RenderCache_CurrentPage_PCCPtr
+                        If genericController.EncodeBoolean(cache_pageContent(PCC_BlockContent, PCCPtr)) Or genericController.EncodeBoolean(cache_pageContent(PCC_BlockPage, PCCPtr)) Then
+                            BlockedRecordIDList = BlockedRecordIDList & "," & genericController.encodeText(cache_pageContent(PCC_ID, PCCPtr))
+                        End If
+                        If main_RenderCache_ParentBranch_PCCPtrCnt > 0 Then
+                            For ParentPtr = 0 To main_RenderCache_ParentBranch_PCCPtrCnt - 1
+                                PCCPtr = genericController.EncodeInteger(main_RenderCache_ParentBranch_PCCPtrs(ParentPtr))
+                                If genericController.EncodeBoolean(cache_pageContent(PCC_BlockContent, PCCPtr)) Or genericController.EncodeBoolean(cache_pageContent(PCC_BlockPage, PCCPtr)) Then
+                                    BlockedRecordIDList = BlockedRecordIDList & "," & genericController.encodeText(cache_pageContent(PCC_ID, PCCPtr))
+                                End If
+                            Next
+                        End If
+                        If BlockedRecordIDList <> "" Then
+                            BlockedRecordIDList = Mid(BlockedRecordIDList, 2)
+                        End If
+                    End If
                 End If
-                If PageRecordID = 0 Then
-                    '
-                    ' no page and no root page, redirect to landing page
-                    '
-                    Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestUrlSource)
-                    pageManager_RedirectBecausePageNotFound = True
-                    pageManager_RedirectReason = "The page could not be determined from URL."
-                    redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
-                Else
-                    '
-                    ' PageRecordID and RootPageID are good
-                    '
-                    Call cpcore.htmlDoc.main_AddHeadTag2("<meta name=""contentId"" content=""" & PageRecordID & """ >", "page content")
-                    '
-                    'main_oldCacheArray_CurrentPagePtr = -1
-                    If RootPageContentName = "" Then
-                        iRootPageContentName = "Page Content"
+                '
+                JSOnLoad = genericController.encodeText(cache_pageContent(PCC_JSOnLoad, main_RenderCache_CurrentPage_PCCPtr))
+                JSHead = genericController.encodeText(cache_pageContent(PCC_JSHead, main_RenderCache_CurrentPage_PCCPtr))
+                JSFilename = genericController.encodeText(cache_pageContent(PCC_JSFilename, main_RenderCache_CurrentPage_PCCPtr))
+                JSEndBody = genericController.encodeText(cache_pageContent(PCC_JSEndBody, main_RenderCache_CurrentPage_PCCPtr))
+                DateModified = genericController.EncodeDate(cache_pageContent(PCC_ModifiedDate, main_RenderCache_CurrentPage_PCCPtr))
+                '
+                ' Save currentNavigationStructure in the Legacy Name
+                '
+                'pageManager_ContentPageStructure = currentNavigationStructure
+                '
+                '---------------------------------------------------------------------------------
+                ' ----- If Link field populated, do redirect
+                '---------------------------------------------------------------------------------
+                '
+                Dim Link As String
+                If (redirectLink = "") Then
+                    Link = genericController.encodeText(cache_pageContent(PCC_Link, main_RenderCache_CurrentPage_PCCPtr))
+                    If (Link <> "") Then
+                        Call cpcore.db.executeSql("update ccpagecontent set clicks=clicks+1 where id=" & cpcore.pages.page.ID)
+                        redirectLink = Link
+                        pageManager_RedirectReason = "Redirect required because this page (PageRecordID=" & cpcore.pages.page.ID & ") has a Link Override [" & redirectLink & "]."
+                    End If
+                End If
+                '
+                '---------------------------------------------------------------------------------
+                ' ----- If Redirect, exit now
+                '---------------------------------------------------------------------------------
+                '
+                If redirectLink <> "" Then
+                    Exit Function
+                End If
+                '
+                '---------------------------------------------------------------------------------
+                ' ----- Content Blocking
+                '---------------------------------------------------------------------------------
+                '
+                If (BlockedRecordIDList <> "") Then
+                    If cpcore.authContext.isAuthenticatedAdmin(cpcore) Then
+                        '
+                        ' Administrators are never blocked
+                        '
+                    ElseIf (Not cpcore.authContext.isAuthenticated()) Then
+                        '
+                        ' non-authenticated are always blocked
+                        '
+                        ContentBlocked = True
                     Else
-                        iRootPageContentName = RootPageContentName
-                    End If
-                    RootPageContentCID = cpcore.metaData.getContentId(iRootPageContentName)
-                    '
-                    '---------------------------------------------------------------------------------
-                    ' ----- Build Page if needed
-                    '---------------------------------------------------------------------------------
-                    '
-                    returnHtml = getContentBox_content(PageRecordID, rootPageId, iRootPageContentName, OrderByClause, AllowChildPageList, AllowReturnLink, ArchivePages, SectionID, UseContentWatchLink, allowPageWithoutSectionDisplay)
-                    If (returnHtml <> "") And (redirectLink = "") Then
                         '
-                        ' This page is correct, main_Get the RecordID for later
+                        ' Check Access Groups, if in access groups, remove group from BlockedRecordIDList
                         '
-                        NewPageCreated = True
-                        BlockedRecordIDList = ""
-                        If main_RenderCache_CurrentPage_PCCPtr >= 0 Then
-                            '
-                            ' Build the BlockedRecordIDList
-                            '
-                            PCCPtr = main_RenderCache_CurrentPage_PCCPtr
-                            If genericController.EncodeBoolean(cache_pageContent(PCC_BlockContent, PCCPtr)) Or genericController.EncodeBoolean(cache_pageContent(PCC_BlockPage, PCCPtr)) Then
-                                BlockedRecordIDList = BlockedRecordIDList & "," & genericController.encodeText(cache_pageContent(PCC_ID, PCCPtr))
-                            End If
-                            If main_RenderCache_ParentBranch_PCCPtrCnt > 0 Then
-                                For ParentPtr = 0 To main_RenderCache_ParentBranch_PCCPtrCnt - 1
-                                    PCCPtr = genericController.EncodeInteger(main_RenderCache_ParentBranch_PCCPtrs(ParentPtr))
-                                    If genericController.EncodeBoolean(cache_pageContent(PCC_BlockContent, PCCPtr)) Or genericController.EncodeBoolean(cache_pageContent(PCC_BlockPage, PCCPtr)) Then
-                                        BlockedRecordIDList = BlockedRecordIDList & "," & genericController.encodeText(cache_pageContent(PCC_ID, PCCPtr))
-                                    End If
-                                Next
-                            End If
-                            If BlockedRecordIDList <> "" Then
-                                BlockedRecordIDList = Mid(BlockedRecordIDList, 2)
-                            End If
-                        End If
-                    End If
-                    '
-                    JSOnLoad = genericController.encodeText(cache_pageContent(PCC_JSOnLoad, main_RenderCache_CurrentPage_PCCPtr))
-                    JSHead = genericController.encodeText(cache_pageContent(PCC_JSHead, main_RenderCache_CurrentPage_PCCPtr))
-                    JSFilename = genericController.encodeText(cache_pageContent(PCC_JSFilename, main_RenderCache_CurrentPage_PCCPtr))
-                    JSEndBody = genericController.encodeText(cache_pageContent(PCC_JSEndBody, main_RenderCache_CurrentPage_PCCPtr))
-                    DateModified = genericController.EncodeDate(cache_pageContent(PCC_ModifiedDate, main_RenderCache_CurrentPage_PCCPtr))
-                    '
-                    ' Save currentNavigationStructure in the Legacy Name
-                    '
-                    'pageManager_ContentPageStructure = currentNavigationStructure
-                    '
-                    '---------------------------------------------------------------------------------
-                    ' ----- If Link field populated, do redirect
-                    '---------------------------------------------------------------------------------
-                    '
-                    Dim Link As String
-                    If (redirectLink = "") Then
-                        Link = genericController.encodeText(cache_pageContent(PCC_Link, main_RenderCache_CurrentPage_PCCPtr))
-                        If (Link <> "") Then
-                            Call cpcore.db.executeSql("update ccpagecontent set clicks=clicks+1 where id=" & currentPageID)
-                            redirectLink = Link
-                            pageManager_RedirectReason = "Redirect required because this page (PageRecordID=" & currentPageID & ") has a Link Override [" & redirectLink & "]."
-                        End If
-                    End If
-                    '
-                    '---------------------------------------------------------------------------------
-                    ' ----- If Redirect, exit now
-                    '---------------------------------------------------------------------------------
-                    '
-                    If redirectLink <> "" Then
-                        Exit Function
-                    End If
-                    '
-                    '---------------------------------------------------------------------------------
-                    ' ----- Content Blocking
-                    '---------------------------------------------------------------------------------
-                    '
-                    If (BlockedRecordIDList <> "") Then
-                        If cpcore.authContext.isAuthenticatedAdmin(cpcore) Then
-                            '
-                            ' Administrators are never blocked
-                            '
-                        ElseIf (Not cpcore.authContext.isAuthenticated()) Then
-                            '
-                            ' non-authenticated are always blocked
-                            '
-                            ContentBlocked = True
-                        Else
-                            '
-                            ' Check Access Groups, if in access groups, remove group from BlockedRecordIDList
-                            '
-                            SQL = "SELECT DISTINCT ccPageContentBlockRules.RecordID" _
+                        SQL = "SELECT DISTINCT ccPageContentBlockRules.RecordID" _
                             & " FROM (ccPageContentBlockRules" _
                             & " LEFT JOIN ccgroups ON ccPageContentBlockRules.GroupID = ccgroups.ID)" _
                             & " LEFT JOIN ccMemberRules ON ccgroups.ID = ccMemberRules.GroupID" _
@@ -340,20 +282,20 @@ Namespace Contensive.Core.Controllers
                             & " AND ((ccgroups.Active)<>0)" _
                             & " AND ((ccMemberRules.Active)<>0)" _
                             & " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" & cpcore.db.encodeSQLDate(cpcore.app_startTime) & "));"
-                            CS = cpcore.db.cs_openSql(SQL)
-                            BlockedRecordIDList = "," & BlockedRecordIDList
-                            Do While cpcore.db.cs_ok(CS)
-                                BlockedRecordIDList = genericController.vbReplace(BlockedRecordIDList, "," & cpcore.db.cs_getText(CS, "RecordID"), "")
-                                cpcore.db.cs_goNext(CS)
-                            Loop
-                            Call cpcore.db.cs_Close(CS)
-                            If BlockedRecordIDList <> "" Then
-                                '
-                                ' ##### remove the leading comma
-                                BlockedRecordIDList = Mid(BlockedRecordIDList, 2)
-                                ' Check the remaining blocked records against the members Content Management
-                                ' ##### removed hardcoded mistakes from the sql
-                                SQL = "SELECT DISTINCT ccPageContent.ID as RecordID" _
+                        CS = cpcore.db.cs_openSql(SQL)
+                        BlockedRecordIDList = "," & BlockedRecordIDList
+                        Do While cpcore.db.cs_ok(CS)
+                            BlockedRecordIDList = genericController.vbReplace(BlockedRecordIDList, "," & cpcore.db.cs_getText(CS, "RecordID"), "")
+                            cpcore.db.cs_goNext(CS)
+                        Loop
+                        Call cpcore.db.cs_Close(CS)
+                        If BlockedRecordIDList <> "" Then
+                            '
+                            ' ##### remove the leading comma
+                            BlockedRecordIDList = Mid(BlockedRecordIDList, 2)
+                            ' Check the remaining blocked records against the members Content Management
+                            ' ##### removed hardcoded mistakes from the sql
+                            SQL = "SELECT DISTINCT ccPageContent.ID as RecordID" _
                                 & " FROM ((ccPageContent" _
                                 & " LEFT JOIN ccGroupRules ON ccPageContent.ContentControlID = ccGroupRules.ContentID)" _
                                 & " LEFT JOIN ccgroups AS ManagementGroups ON ccGroupRules.GroupID = ManagementGroups.ID)" _
@@ -364,435 +306,433 @@ Namespace Contensive.Core.Controllers
                                 & " AND ((ManagementMemberRules.Active)<>0)" _
                                 & " AND ((ManagementMemberRules.DateExpires) Is Null Or (ManagementMemberRules.DateExpires)>" & cpcore.db.encodeSQLDate(cpcore.app_startTime) & ")" _
                                 & " AND ((ManagementMemberRules.MemberID)=" & cpcore.authContext.user.id & " ));"
-                                CS = cpcore.db.cs_openSql(SQL)
-                                Do While cpcore.db.cs_ok(CS)
-                                    BlockedRecordIDList = genericController.vbReplace(BlockedRecordIDList, "," & cpcore.db.cs_getText(CS, "RecordID"), "")
-                                    cpcore.db.cs_goNext(CS)
-                                Loop
-                                Call cpcore.db.cs_Close(CS)
-                            End If
-                            If BlockedRecordIDList <> "" Then
-                                ContentBlocked = True
+                            CS = cpcore.db.cs_openSql(SQL)
+                            Do While cpcore.db.cs_ok(CS)
+                                BlockedRecordIDList = genericController.vbReplace(BlockedRecordIDList, "," & cpcore.db.cs_getText(CS, "RecordID"), "")
+                                cpcore.db.cs_goNext(CS)
+                            Loop
+                            Call cpcore.db.cs_Close(CS)
+                        End If
+                        If BlockedRecordIDList <> "" Then
+                            ContentBlocked = True
+                        End If
+                        Call cpcore.db.cs_Close(CS)
+                    End If
+                End If
+                '
+                '
+                '
+                If ContentBlocked Then
+                    BlockSourceID = main_BlockSourceDefaultMessage
+                    ContentPadding = 20
+                    BlockedPages = Split(BlockedRecordIDList, ",")
+                    BlockedPageRecordID = genericController.EncodeInteger(BlockedPages(UBound(BlockedPages)))
+                    If True Then
+                        If BlockedPageRecordID <> 0 Then
+                            '$$$$$ cache this
+                            CS = cpcore.db.csOpen2("Page Content", BlockedPageRecordID, , , "CustomBlockMessage,BlockSourceID,RegistrationGroupID,ContentPadding")
+                            If cpcore.db.cs_ok(CS) Then
+                                BlockSourceID = cpcore.db.cs_getInteger(CS, "BlockSourceID")
+                                ContentPadding = cpcore.db.cs_getInteger(CS, "ContentPadding")
+                                CustomBlockMessageFilename = cpcore.db.cs_getText(CS, "CustomBlockMessage")
+                                RegistrationGroupID = cpcore.db.cs_getInteger(CS, "RegistrationGroupID")
                             End If
                             Call cpcore.db.cs_Close(CS)
                         End If
                     End If
                     '
+                    ' Block Appropriately
                     '
-                    '
-                    If ContentBlocked Then
-                        BlockSourceID = main_BlockSourceDefaultMessage
-                        ContentPadding = 20
-                        BlockedPages = Split(BlockedRecordIDList, ",")
-                        BlockedPageRecordID = genericController.EncodeInteger(BlockedPages(UBound(BlockedPages)))
-                        If True Then
-                            If BlockedPageRecordID <> 0 Then
-                                '$$$$$ cache this
-                                CS = cpcore.db.csOpen2("Page Content", BlockedPageRecordID, , , "CustomBlockMessage,BlockSourceID,RegistrationGroupID,ContentPadding")
-                                If cpcore.db.cs_ok(CS) Then
-                                    BlockSourceID = cpcore.db.cs_getInteger(CS, "BlockSourceID")
-                                    ContentPadding = cpcore.db.cs_getInteger(CS, "ContentPadding")
-                                    CustomBlockMessageFilename = cpcore.db.cs_getText(CS, "CustomBlockMessage")
-                                    RegistrationGroupID = cpcore.db.cs_getInteger(CS, "RegistrationGroupID")
-                                End If
-                                Call cpcore.db.cs_Close(CS)
-                            End If
-                        End If
-                        '
-                        ' Block Appropriately
-                        '
-                        Select Case BlockSourceID
-                            Case main_BlockSourceCustomMessage
-                                '
-                                ' ----- Custom Message
-                                '
-                                returnHtml = cpcore.cdnFiles.readFile(CustomBlockMessageFilename)
-                            Case main_BlockSourceLogin
-                                '
-                                ' ----- Login page
-                                '
-                                If Not cpcore.authContext.isAuthenticated() Then
-                                    If Not cpcore.authContext.isRecognized(cpcore) Then
-                                        '
-                                        ' not recognized
-                                        '
-                                        BlockCopy = "" _
-                                        & "<p>This content has limited access. If you have an account, please login using this form.</p>" _
-                                        & ""
-                                        BlockForm = cpcore.htmlDoc.getLoginForm()
-                                    Else
-                                        '
-                                        ' recognized, not authenticated
-                                        '
-                                        BlockCopy = "" _
-                                        & "<p>This content has limited access. You were recognized as ""<b>" & cpcore.authContext.user.Name & "</b>"", but you need to login to continue. To login to this account or another, please use this form.</p>" _
-                                        & ""
-                                        BlockForm = cpcore.htmlDoc.getLoginForm()
-                                    End If
-                                Else
+                    Select Case BlockSourceID
+                        Case main_BlockSourceCustomMessage
+                            '
+                            ' ----- Custom Message
+                            '
+                            returnHtml = cpcore.cdnFiles.readFile(CustomBlockMessageFilename)
+                        Case main_BlockSourceLogin
+                            '
+                            ' ----- Login page
+                            '
+                            If Not cpcore.authContext.isAuthenticated() Then
+                                If Not cpcore.authContext.isRecognized(cpcore) Then
                                     '
-                                    ' authenticated
+                                    ' not recognized
                                     '
                                     BlockCopy = "" _
+                                        & "<p>This content has limited access. If you have an account, please login using this form.</p>" _
+                                        & ""
+                                    BlockForm = cpcore.htmlDoc.getLoginForm()
+                                Else
+                                    '
+                                    ' recognized, not authenticated
+                                    '
+                                    BlockCopy = "" _
+                                        & "<p>This content has limited access. You were recognized as ""<b>" & cpcore.authContext.user.Name & "</b>"", but you need to login to continue. To login to this account or another, please use this form.</p>" _
+                                        & ""
+                                    BlockForm = cpcore.htmlDoc.getLoginForm()
+                                End If
+                            Else
+                                '
+                                ' authenticated
+                                '
+                                BlockCopy = "" _
                                     & "<p>You are currently logged in as ""<b>" & cpcore.authContext.user.Name & "</b>"". If this is not you, please <a href=""?" & cpcore.htmlDoc.refreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
                                     & "<p>This account does not have access to this content. If you want to login with a different account, please use this form.</p>" _
                                     & ""
-                                    BlockForm = cpcore.htmlDoc.getLoginForm()
-                                End If
-                                returnHtml = "" _
+                                BlockForm = cpcore.htmlDoc.getLoginForm()
+                            End If
+                            returnHtml = "" _
                                 & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td align=center>" _
                                 & "<div style=""width:400px;text-align:left;"">" _
                                 & errorController.error_GetUserError(cpcore) _
                                 & BlockCopy _
                                 & BlockForm _
                                 & "</div></td></tr></table>"
-                            Case main_BlockSourceRegistration
+                        Case main_BlockSourceRegistration
+                            '
+                            ' ----- Registration
+                            '
+                            If cpcore.docProperties.getInteger("subform") = main_BlockSourceLogin Then
                                 '
-                                ' ----- Registration
+                                ' login subform form
                                 '
-                                If cpcore.docProperties.getInteger("subform") = main_BlockSourceLogin Then
-                                    '
-                                    ' login subform form
-                                    '
-                                    BlockForm = cpcore.htmlDoc.getLoginForm()
-                                    BlockCopy = "" _
+                                BlockForm = cpcore.htmlDoc.getLoginForm()
+                                BlockCopy = "" _
                                     & "<p>This content has limited access. If you have an account, please login using this form.</p>" _
                                     & "<p>If you do not have an account, <a href=?" & cpcore.htmlDoc.refreshQueryString & "&subform=0>click here to register</a>.</p>" _
                                     & ""
-                                Else
+                            Else
+                                '
+                                ' Register Form
+                                '
+                                If Not cpcore.authContext.isAuthenticated() And cpcore.authContext.isRecognized(cpcore) Then
                                     '
-                                    ' Register Form
+                                    ' Can not take the chance, if you go to a registration page, and you are recognized but not auth -- logout first
                                     '
-                                    If Not cpcore.authContext.isAuthenticated() And cpcore.authContext.isRecognized(cpcore) Then
-                                        '
-                                        ' Can not take the chance, if you go to a registration page, and you are recognized but not auth -- logout first
-                                        '
-                                        Call cpcore.authContext.logout(cpcore)
-                                    End If
-                                    If Not cpcore.authContext.isAuthenticated() Then
-                                        '
-                                        ' Not Authenticated
-                                        '
-                                        BlockCopy = "" _
+                                    Call cpcore.authContext.logout(cpcore)
+                                End If
+                                If Not cpcore.authContext.isAuthenticated() Then
+                                    '
+                                    ' Not Authenticated
+                                    '
+                                    BlockCopy = "" _
                                         & "<p>This content has limited access. If you have an account, <a href=?" & cpcore.htmlDoc.refreshQueryString & "&subform=" & main_BlockSourceLogin & ">Click Here to login</a>.</p>" _
                                         & "<p>To view this content, please complete this form.</p>" _
                                         & ""
-                                    Else
-                                        BlockCopy = "" _
+                                Else
+                                    BlockCopy = "" _
                                         & "<p>You are currently logged in as ""<b>" & cpcore.authContext.user.Name & "</b>"". If this is not you, please <a href=""?" & cpcore.htmlDoc.refreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
                                         & "<p>This account does not have access to this content. To view this content, please complete this form.</p>" _
                                         & ""
-                                    End If
-                                    '
-                                    If False Then '.3.551" Then
-                                        '
-                                        ' Old Db - use Joinform
-                                        '
-                                        'BlockForm = main_GetJoinForm()
-                                    Else
-                                        '
-                                        ' Use Registration FormPage
-                                        '
-                                        Call verifyRegistrationFormPage(cpcore)
-                                        BlockForm = pageManager_GetFormPage("Registration Form", RegistrationGroupID)
-                                    End If
                                 End If
-                                returnHtml = "" _
+                                '
+                                If False Then '.3.551" Then
+                                    '
+                                    ' Old Db - use Joinform
+                                    '
+                                    'BlockForm = main_GetJoinForm()
+                                Else
+                                    '
+                                    ' Use Registration FormPage
+                                    '
+                                    Call verifyRegistrationFormPage(cpcore)
+                                    BlockForm = pageManager_GetFormPage("Registration Form", RegistrationGroupID)
+                                End If
+                            End If
+                            returnHtml = "" _
                                 & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td align=center>" _
                                 & "<div style=""width:400px;text-align:left;"">" _
                                 & errorController.error_GetUserError(cpcore) _
                                 & BlockCopy _
                                 & BlockForm _
                                 & "</div></td></tr></table>"
-                            Case Else
-                                '
-                                ' ----- Content as blocked - convert from site property to content page
-                                '
-                                returnHtml = pageManager_GetDefaultBlockMessage(UseContentWatchLink)
-                        End Select
-                        '
-                        ' If the output is blank, put default message in
-                        '
-                        If returnHtml = "" Then
+                        Case Else
+                            '
+                            ' ----- Content as blocked - convert from site property to content page
+                            '
                             returnHtml = pageManager_GetDefaultBlockMessage(UseContentWatchLink)
+                    End Select
+                    '
+                    ' If the output is blank, put default message in
+                    '
+                    If returnHtml = "" Then
+                        returnHtml = pageManager_GetDefaultBlockMessage(UseContentWatchLink)
+                    End If
+                    '
+                    ' Encode the copy
+                    '
+                    returnHtml = cpcore.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.id, cpcore.authContext.isAuthenticated, layoutError)
+                    returnHtml = cpcore.htmlDoc.html_encodeContent9(returnHtml, cpcore.authContext.user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+                    'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, 0, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
+                    RQS = cpcore.htmlDoc.refreshQueryString
+                    If RQS <> "" Then
+                        returnHtml = genericController.vbReplace(returnHtml, "?method=login", "?method=Login&" & RQS, 1, 99, vbTextCompare)
+                    End If
+                    '
+                    ' Add in content padding required for integration with the template
+                    '
+                    returnHtml = pageManager_GetContentBoxWrapper(returnHtml, ContentPadding)
+                End If
+                '
+                '---------------------------------------------------------------------------------
+                ' ----- Encoding, Tracking and Triggers
+                '---------------------------------------------------------------------------------
+                '
+                '????? test triggers and trackcontentset
+                If Not ContentBlocked Then
+                    'IsPrinterversion = main_GetStreamText2(RequestNameInterceptpage) = LegacyInterceptPageSNPrinterversion)
+                    If cpcore.visitProperty.getBoolean("AllowQuickEditor") Then
+                        '
+                        ' Quick Editor, no encoding or tracking
+                        '
+                    Else
+                        ' $$$$$ convert to pcc cache
+                        'SelectFieldList = "ID,Viewings,ContentControlID,ContactMemberID,AllowHitNotification,TriggerSendSystemEmailID,TriggerConditionID,TriggerConditionGroupID,TriggerAddGroupID,TriggerRemoveGroupID"
+                        '                If (cpcore.pages.page.id <> 0) And (main_RenderCache_CurrentPage_ContentId <> 0) Then
+                        '                    'pageManager_ContentName = metaData.getContentNameByID(main_RenderCache_CurrentPage_ContentId)
+                        '                    If main_RenderCache_CurrentPage_ContentName = "" Then
+                        '                        main_RenderCache_CurrentPage_ContentName = iRootPageContentName
+                        '                    End If
+                        '                    If main_RenderCache_CurrentPage_ContentName <> "" Then
+                        '                        CS = main_OpenCSContentRecord_Internal(main_RenderCache_CurrentPage_ContentName, cpcore.pages.page.id, , , SelectFieldList)
+                        '                    End If
+                        '                ElseIf (main_RenderCache_CurrentPage_ContentName <> "") Then
+                        '                    CS = main_OpenCSContentRecord_Internal(main_RenderCache_CurrentPage_ContentName, PageRecordID, , , SelectFieldList)
+                        '                End If
+                        'If app.csv_IsCSOK(CS) Then
+                        contactMemberID = genericController.EncodeInteger(cache_pageContent(PCC_ContactMemberID, main_RenderCache_CurrentPage_PCCPtr))
+                        pageViewings = genericController.EncodeInteger(cache_pageContent(PCC_Viewings, main_RenderCache_CurrentPage_PCCPtr))
+                        'contactMemberID = app.csv_cs_getInteger(CS, "ContactMemberID")
+                        If cpcore.authContext.isEditing(cpcore, main_RenderCache_CurrentPage_ContentName) Or cpcore.visitProperty.getBoolean("AllowWorkflowRendering") Then
+                            '
+                            ' Link authoring, workflow rendering -> do encoding, but no tracking
+                            '
+                            returnHtml = cpcore.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.id, cpcore.authContext.isAuthenticated, layoutError)
+                            returnHtml = cpcore.htmlDoc.html_encodeContent9(returnHtml, cpcore.authContext.user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+                        ElseIf cpcore.htmlDoc.pageManager_printVersion Then
+                            '
+                            ' Printer Version -> personalize and count viewings, no tracking
+                            '
+                            returnHtml = cpcore.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.id, cpcore.authContext.isAuthenticated, layoutError)
+                            returnHtml = cpcore.htmlDoc.html_encodeContent9(returnHtml, cpcore.authContext.user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+                            'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
+                            Call cpcore.db.executeSql("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & cpcore.pages.page.ID)
+                            'Call app.csv_SetCS(CS, "Viewings", app.csv_cs_getInteger(CS, "Viewings") + 1)
+                        Else
+                            '
+                            ' Live content
+                            '
+                            '!!!!!!!!!!!!!!!!!!!!!!!!
+                            ' this should be done before the contentbox is added
+                            ' so a stray blocktext does not truncate the html
+                            '!!!!!!!!!!!!!!!!!!!!!!!!!
+                            returnHtml = cpcore.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.id, cpcore.authContext.isAuthenticated, layoutError)
+                            returnHtml = cpcore.htmlDoc.html_encodeContent9(returnHtml, cpcore.authContext.user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
+                            'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
+                            'Call main_TrackContent(main_RenderCache_CurrentPage_ContentName, cpcore.pages.page.id)
+                            'Call main_TrackContentSet(CS)
+                            Call cpcore.db.executeSql("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & cpcore.pages.page.ID)
+                            'Call app.csv_SetCS(CS, "Viewings", app.csv_cs_getInteger(CS, "Viewings") + 1)
                         End If
                         '
-                        ' Encode the copy
+                        ' Page Hit Notification
                         '
-                        returnHtml = cpcore.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.id, cpcore.authContext.isAuthenticated, layoutError)
-                        returnHtml = cpcore.htmlDoc.html_encodeContent9(returnHtml, cpcore.authContext.user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
-                        'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, 0, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
-                        RQS = cpcore.htmlDoc.refreshQueryString
-                        If RQS <> "" Then
-                            returnHtml = genericController.vbReplace(returnHtml, "?method=login", "?method=Login&" & RQS, 1, 99, vbTextCompare)
+                        If (Not cpcore.authContext.visit.ExcludeFromAnalytics) And (contactMemberID <> 0) And (InStr(1, cpcore.webServer.requestBrowser, "kmahttp", vbTextCompare) = 0) Then
+                            AllowHitNotification = genericController.EncodeBoolean(cache_pageContent(PCC_AllowHitNotification, main_RenderCache_CurrentPage_PCCPtr))
+                            'AllowHitNotification = app.csv_cs_getBoolean(CS, "AllowHitNotification")
+                            If AllowHitNotification Then
+                                PageName = genericController.encodeText(cache_pageContent(PCC_Name, main_RenderCache_CurrentPage_PCCPtr))
+                                If PageName = "" Then
+                                    PageName = genericController.encodeText(cache_pageContent(PCC_MenuHeadline, main_RenderCache_CurrentPage_PCCPtr))
+                                    If PageName = "" Then
+                                        PageName = genericController.encodeText(cache_pageContent(PCC_Headline, main_RenderCache_CurrentPage_PCCPtr))
+                                        If PageName = "" Then
+                                            PageName = "[no name]"
+                                        End If
+                                    End If
+                                End If
+                                Body = Body & "<p><b>Page Hit Notification.</b></p>"
+                                Body = Body & "<p>This email was sent to you by the Contensive Server as a notification of the following content viewing details.</p>"
+                                Body = Body & genericController.StartTable(4, 1, 1)
+                                Body = Body & "<tr><td align=""right"" width=""150"" Class=""ccPanelHeader"">Description<br><img alt=""image"" src=""http://" & cpcore.webServer.requestDomain & "/ccLib/images/spacer.gif"" width=""150"" height=""1""></td><td align=""left"" width=""100%"" Class=""ccPanelHeader"">Value</td></tr>"
+                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Domain", cpcore.webServer.webServerIO_requestDomain, True)
+                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Link", cpcore.webServer.requestUrl, False)
+                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Page Name", PageName, True)
+                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Member Name", cpcore.authContext.user.Name, False)
+                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Member #", CStr(cpcore.authContext.user.id), True)
+                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Start Time", CStr(cpcore.authContext.visit.StartTime), False)
+                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit #", CStr(cpcore.authContext.visit.id), True)
+                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit IP", cpcore.webServer.requestRemoteIP, False)
+                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Browser ", cpcore.webServer.requestBrowser, True)
+                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visitor #", CStr(cpcore.authContext.visitor.ID), False)
+                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Authenticated", CStr(cpcore.authContext.visit.VisitAuthenticated), True)
+                                Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Referrer", cpcore.authContext.visit.HTTP_REFERER, False)
+                                Body = Body & kmaEndTable
+                                Call cpcore.email.sendPerson(contactMemberID, cpcore.siteProperties.getText("EmailFromAddress", "info@" & cpcore.webServer.webServerIO_requestDomain), "Page Hit Notification", Body, False, True, 0, "", False)
+                            End If
                         End If
                         '
-                        ' Add in content padding required for integration with the template
+                        ' Process Trigger Conditions
                         '
+                        '   1) If Condition w/ Trigger Group
+                        '   2) Then Send Email
+                        '   3) Then Add to Group
+                        '   4) Then Remove From Group
+                        '
+                        ConditionID = genericController.EncodeInteger(cache_pageContent(PCC_TriggerConditionID, main_RenderCache_CurrentPage_PCCPtr))
+                        'ConditionID = app.csv_cs_getInteger(CS, "TriggerConditionID")
+                        ConditionGroupID = genericController.EncodeInteger(cache_pageContent(PCC_TriggerConditionGroupID, main_RenderCache_CurrentPage_PCCPtr))
+                        'ConditionGroupID = app.csv_cs_getInteger(CS, "TriggerConditionGroupID")
+                        main_AddGroupID = genericController.EncodeInteger(cache_pageContent(PCC_TriggerAddGroupID, main_RenderCache_CurrentPage_PCCPtr))
+                        'main_AddGroupID = app.csv_cs_getInteger(CS, "TriggerAddGroupID")
+                        RemoveGroupID = genericController.EncodeInteger(cache_pageContent(PCC_TriggerRemoveGroupID, main_RenderCache_CurrentPage_PCCPtr))
+                        'RemoveGroupID = app.csv_cs_getInteger(CS, "TriggerRemoveGroupID")
+                        SystemEMailID = genericController.EncodeInteger(cache_pageContent(PCC_TriggerSendSystemEmailID, main_RenderCache_CurrentPage_PCCPtr))
+                        'SystemEMailID = app.csv_cs_getInteger(CS, "TriggerSendSystemEmailID")
+                        Select Case ConditionID
+                            Case 1
+                                '
+                                ' Always
+                                '
+                                If SystemEMailID <> 0 Then
+                                    Call cpcore.email.sendSystem_Legacy(cpcore.db.getRecordName("System Email", SystemEMailID), "", cpcore.authContext.user.id)
+                                End If
+                                If main_AddGroupID <> 0 Then
+                                    Call groupController.group_AddGroupMember(cpcore, groupController.group_GetGroupName(cpcore, main_AddGroupID))
+                                End If
+                                If RemoveGroupID <> 0 Then
+                                    Call groupController.group_DeleteGroupMember(cpcore, groupController.group_GetGroupName(cpcore, RemoveGroupID))
+                                End If
+                            Case 2
+                                '
+                                ' If in Condition Group
+                                '
+                                If ConditionGroupID <> 0 Then
+                                    If cpcore.authContext.IsMemberOfGroup2(cpcore, groupController.group_GetGroupName(cpcore, ConditionGroupID)) Then
+                                        If SystemEMailID <> 0 Then
+                                            Call cpcore.email.sendSystem_Legacy(cpcore.db.getRecordName("System Email", SystemEMailID), "", cpcore.authContext.user.id)
+                                        End If
+                                        If main_AddGroupID <> 0 Then
+                                            Call groupController.group_AddGroupMember(cpcore, groupController.group_GetGroupName(cpcore, main_AddGroupID))
+                                        End If
+                                        If RemoveGroupID <> 0 Then
+                                            Call groupController.group_DeleteGroupMember(cpcore, groupController.group_GetGroupName(cpcore, RemoveGroupID))
+                                        End If
+                                    End If
+                                End If
+                            Case 3
+                                '
+                                ' If not in Condition Group
+                                '
+                                If ConditionGroupID <> 0 Then
+                                    If Not cpcore.authContext.IsMemberOfGroup2(cpcore, groupController.group_GetGroupName(cpcore, ConditionGroupID)) Then
+                                        If main_AddGroupID <> 0 Then
+                                            Call groupController.group_AddGroupMember(cpcore, groupController.group_GetGroupName(cpcore, main_AddGroupID))
+                                        End If
+                                        If RemoveGroupID <> 0 Then
+                                            Call groupController.group_DeleteGroupMember(cpcore, groupController.group_GetGroupName(cpcore, RemoveGroupID))
+                                        End If
+                                        If SystemEMailID <> 0 Then
+                                            Call cpcore.email.sendSystem_Legacy(cpcore.db.getRecordName("System Email", SystemEMailID), "", cpcore.authContext.user.id)
+                                        End If
+                                    End If
+                                End If
+                        End Select
+                        'End If
+                        'Call app.closeCS(CS)
+                    End If
+                    '
+                    '---------------------------------------------------------------------------------
+                    ' ----- Add in ContentPadding (a table around content with the appropriate padding added)
+                    '---------------------------------------------------------------------------------
+                    '
+                    If True And (returnHtml <> "") Then
+                        ContentPadding = genericController.EncodeInteger(cache_pageContent(PCC_ContentPadding, main_RenderCache_CurrentPage_PCCPtr))
                         returnHtml = pageManager_GetContentBoxWrapper(returnHtml, ContentPadding)
                     End If
-                    '
-                    '---------------------------------------------------------------------------------
-                    ' ----- Encoding, Tracking and Triggers
-                    '---------------------------------------------------------------------------------
-                    '
-                    '????? test triggers and trackcontentset
-                    If Not ContentBlocked Then
-                        'IsPrinterversion = main_GetStreamText2(RequestNameInterceptpage) = LegacyInterceptPageSNPrinterversion)
-                        If cpcore.visitProperty.getBoolean("AllowQuickEditor") Then
-                            '
-                            ' Quick Editor, no encoding or tracking
-                            '
-                        Else
-                            ' $$$$$ convert to pcc cache
-                            'SelectFieldList = "ID,Viewings,ContentControlID,ContactMemberID,AllowHitNotification,TriggerSendSystemEmailID,TriggerConditionID,TriggerConditionGroupID,TriggerAddGroupID,TriggerRemoveGroupID"
-                            '                If (currentPageID <> 0) And (main_RenderCache_CurrentPage_ContentId <> 0) Then
-                            '                    'pageManager_ContentName = metaData.getContentNameByID(main_RenderCache_CurrentPage_ContentId)
-                            '                    If main_RenderCache_CurrentPage_ContentName = "" Then
-                            '                        main_RenderCache_CurrentPage_ContentName = iRootPageContentName
-                            '                    End If
-                            '                    If main_RenderCache_CurrentPage_ContentName <> "" Then
-                            '                        CS = main_OpenCSContentRecord_Internal(main_RenderCache_CurrentPage_ContentName, currentPageID, , , SelectFieldList)
-                            '                    End If
-                            '                ElseIf (main_RenderCache_CurrentPage_ContentName <> "") Then
-                            '                    CS = main_OpenCSContentRecord_Internal(main_RenderCache_CurrentPage_ContentName, PageRecordID, , , SelectFieldList)
-                            '                End If
-                            'If app.csv_IsCSOK(CS) Then
-                            contactMemberID = genericController.EncodeInteger(cache_pageContent(PCC_ContactMemberID, main_RenderCache_CurrentPage_PCCPtr))
-                            pageViewings = genericController.EncodeInteger(cache_pageContent(PCC_Viewings, main_RenderCache_CurrentPage_PCCPtr))
-                            'contactMemberID = app.csv_cs_getInteger(CS, "ContactMemberID")
-                            If cpcore.authContext.isEditing(cpcore, main_RenderCache_CurrentPage_ContentName) Or cpcore.visitProperty.getBoolean("AllowWorkflowRendering") Then
-                                '
-                                ' Link authoring, workflow rendering -> do encoding, but no tracking
-                                '
-                                returnHtml = cpcore.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.id, cpcore.authContext.isAuthenticated, layoutError)
-                                returnHtml = cpcore.htmlDoc.html_encodeContent9(returnHtml, cpcore.authContext.user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
-                            ElseIf cpcore.htmlDoc.pageManager_printVersion Then
-                                '
-                                ' Printer Version -> personalize and count viewings, no tracking
-                                '
-                                returnHtml = cpcore.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.id, cpcore.authContext.isAuthenticated, layoutError)
-                                returnHtml = cpcore.htmlDoc.html_encodeContent9(returnHtml, cpcore.authContext.user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
-                                'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
-                                Call cpcore.db.executeSql("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & currentPageID)
-                                'Call app.csv_SetCS(CS, "Viewings", app.csv_cs_getInteger(CS, "Viewings") + 1)
-                            Else
-                                '
-                                ' Live content
-                                '
-                                '!!!!!!!!!!!!!!!!!!!!!!!!
-                                ' this should be done before the contentbox is added
-                                ' so a stray blocktext does not truncate the html
-                                '!!!!!!!!!!!!!!!!!!!!!!!!!
-                                returnHtml = cpcore.htmlDoc.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.id, cpcore.authContext.isAuthenticated, layoutError)
-                                returnHtml = cpcore.htmlDoc.html_encodeContent9(returnHtml, cpcore.authContext.user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
-                                'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
-                                'Call main_TrackContent(main_RenderCache_CurrentPage_ContentName, currentPageID)
-                                'Call main_TrackContentSet(CS)
-                                Call cpcore.db.executeSql("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & currentPageID)
-                                'Call app.csv_SetCS(CS, "Viewings", app.csv_cs_getInteger(CS, "Viewings") + 1)
-                            End If
-                            '
-                            ' Page Hit Notification
-                            '
-                            If (Not cpcore.authContext.visit.ExcludeFromAnalytics) And (contactMemberID <> 0) And (InStr(1, cpcore.webServer.requestBrowser, "kmahttp", vbTextCompare) = 0) Then
-                                AllowHitNotification = genericController.EncodeBoolean(cache_pageContent(PCC_AllowHitNotification, main_RenderCache_CurrentPage_PCCPtr))
-                                'AllowHitNotification = app.csv_cs_getBoolean(CS, "AllowHitNotification")
-                                If AllowHitNotification Then
-                                    PageName = genericController.encodeText(cache_pageContent(PCC_Name, main_RenderCache_CurrentPage_PCCPtr))
-                                    If PageName = "" Then
-                                        PageName = genericController.encodeText(cache_pageContent(PCC_MenuHeadline, main_RenderCache_CurrentPage_PCCPtr))
-                                        If PageName = "" Then
-                                            PageName = genericController.encodeText(cache_pageContent(PCC_Headline, main_RenderCache_CurrentPage_PCCPtr))
-                                            If PageName = "" Then
-                                                PageName = "[no name]"
-                                            End If
-                                        End If
-                                    End If
-                                    Body = Body & "<p><b>Page Hit Notification.</b></p>"
-                                    Body = Body & "<p>This email was sent to you by the Contensive Server as a notification of the following content viewing details.</p>"
-                                    Body = Body & genericController.StartTable(4, 1, 1)
-                                    Body = Body & "<tr><td align=""right"" width=""150"" Class=""ccPanelHeader"">Description<br><img alt=""image"" src=""http://" & cpcore.webServer.requestDomain & "/ccLib/images/spacer.gif"" width=""150"" height=""1""></td><td align=""left"" width=""100%"" Class=""ccPanelHeader"">Value</td></tr>"
-                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Domain", cpcore.webServer.webServerIO_requestDomain, True)
-                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Link", cpcore.webServer.requestUrl, False)
-                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Page Name", PageName, True)
-                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Member Name", cpcore.authContext.user.Name, False)
-                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Member #", CStr(cpcore.authContext.user.id), True)
-                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Start Time", CStr(cpcore.authContext.visit.StartTime), False)
-                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit #", CStr(cpcore.authContext.visit.id), True)
-                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit IP", cpcore.webServer.requestRemoteIP, False)
-                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Browser ", cpcore.webServer.requestBrowser, True)
-                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visitor #", CStr(cpcore.authContext.visitor.ID), False)
-                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Authenticated", CStr(cpcore.authContext.visit.VisitAuthenticated), True)
-                                    Body = Body & pageManager_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Referrer", cpcore.authContext.visit.HTTP_REFERER, False)
-                                    Body = Body & kmaEndTable
-                                    Call cpcore.email.sendPerson(contactMemberID, cpcore.siteProperties.getText("EmailFromAddress", "info@" & cpcore.webServer.webServerIO_requestDomain), "Page Hit Notification", Body, False, True, 0, "", False)
-                                End If
-                            End If
-                            '
-                            ' Process Trigger Conditions
-                            '
-                            '   1) If Condition w/ Trigger Group
-                            '   2) Then Send Email
-                            '   3) Then Add to Group
-                            '   4) Then Remove From Group
-                            '
-                            ConditionID = genericController.EncodeInteger(cache_pageContent(PCC_TriggerConditionID, main_RenderCache_CurrentPage_PCCPtr))
-                            'ConditionID = app.csv_cs_getInteger(CS, "TriggerConditionID")
-                            ConditionGroupID = genericController.EncodeInteger(cache_pageContent(PCC_TriggerConditionGroupID, main_RenderCache_CurrentPage_PCCPtr))
-                            'ConditionGroupID = app.csv_cs_getInteger(CS, "TriggerConditionGroupID")
-                            main_AddGroupID = genericController.EncodeInteger(cache_pageContent(PCC_TriggerAddGroupID, main_RenderCache_CurrentPage_PCCPtr))
-                            'main_AddGroupID = app.csv_cs_getInteger(CS, "TriggerAddGroupID")
-                            RemoveGroupID = genericController.EncodeInteger(cache_pageContent(PCC_TriggerRemoveGroupID, main_RenderCache_CurrentPage_PCCPtr))
-                            'RemoveGroupID = app.csv_cs_getInteger(CS, "TriggerRemoveGroupID")
-                            SystemEMailID = genericController.EncodeInteger(cache_pageContent(PCC_TriggerSendSystemEmailID, main_RenderCache_CurrentPage_PCCPtr))
-                            'SystemEMailID = app.csv_cs_getInteger(CS, "TriggerSendSystemEmailID")
-                            Select Case ConditionID
-                                Case 1
-                                    '
-                                    ' Always
-                                    '
-                                    If SystemEMailID <> 0 Then
-                                        Call cpcore.email.sendSystem_Legacy(cpcore.db.getRecordName("System Email", SystemEMailID), "", cpcore.authContext.user.id)
-                                    End If
-                                    If main_AddGroupID <> 0 Then
-                                        Call groupController.group_AddGroupMember(cpcore, groupController.group_GetGroupName(cpcore, main_AddGroupID))
-                                    End If
-                                    If RemoveGroupID <> 0 Then
-                                        Call groupController.group_DeleteGroupMember(cpcore, groupController.group_GetGroupName(cpcore, RemoveGroupID))
-                                    End If
-                                Case 2
-                                    '
-                                    ' If in Condition Group
-                                    '
-                                    If ConditionGroupID <> 0 Then
-                                        If cpcore.authContext.IsMemberOfGroup2(cpcore, groupController.group_GetGroupName(cpcore, ConditionGroupID)) Then
-                                            If SystemEMailID <> 0 Then
-                                                Call cpcore.email.sendSystem_Legacy(cpcore.db.getRecordName("System Email", SystemEMailID), "", cpcore.authContext.user.id)
-                                            End If
-                                            If main_AddGroupID <> 0 Then
-                                                Call groupController.group_AddGroupMember(cpcore, groupController.group_GetGroupName(cpcore, main_AddGroupID))
-                                            End If
-                                            If RemoveGroupID <> 0 Then
-                                                Call groupController.group_DeleteGroupMember(cpcore, groupController.group_GetGroupName(cpcore, RemoveGroupID))
-                                            End If
-                                        End If
-                                    End If
-                                Case 3
-                                    '
-                                    ' If not in Condition Group
-                                    '
-                                    If ConditionGroupID <> 0 Then
-                                        If Not cpcore.authContext.IsMemberOfGroup2(cpcore, groupController.group_GetGroupName(cpcore, ConditionGroupID)) Then
-                                            If main_AddGroupID <> 0 Then
-                                                Call groupController.group_AddGroupMember(cpcore, groupController.group_GetGroupName(cpcore, main_AddGroupID))
-                                            End If
-                                            If RemoveGroupID <> 0 Then
-                                                Call groupController.group_DeleteGroupMember(cpcore, groupController.group_GetGroupName(cpcore, RemoveGroupID))
-                                            End If
-                                            If SystemEMailID <> 0 Then
-                                                Call cpcore.email.sendSystem_Legacy(cpcore.db.getRecordName("System Email", SystemEMailID), "", cpcore.authContext.user.id)
-                                            End If
-                                        End If
-                                    End If
-                            End Select
-                            'End If
-                            'Call app.closeCS(CS)
-                        End If
-                        '
-                        '---------------------------------------------------------------------------------
-                        ' ----- Add in ContentPadding (a table around content with the appropriate padding added)
-                        '---------------------------------------------------------------------------------
-                        '
-                        If True And (returnHtml <> "") Then
-                            ContentPadding = genericController.EncodeInteger(cache_pageContent(PCC_ContentPadding, main_RenderCache_CurrentPage_PCCPtr))
-                            returnHtml = pageManager_GetContentBoxWrapper(returnHtml, ContentPadding)
-                        End If
 
 
-                        '
-                        '---------------------------------------------------------------------------------
-                        ' ----- Set Headers
-                        '---------------------------------------------------------------------------------
-                        '
-                        If DateModified <> Date.MinValue Then
-                            Call cpcore.webServer.addResponseHeader("LAST-MODIFIED", genericController.GetGMTFromDate(DateModified))
-                            'Date: Sun, 07 Dec 2008 21:06:14 GMT
-                        End If
-                        '
-                        '---------------------------------------------------------------------------------
-                        ' ----- Store page javascript
-                        '---------------------------------------------------------------------------------
-                        '
-                        Call cpcore.htmlDoc.main_AddOnLoadJavascript2(JSOnLoad, "page content")
-                        Call cpcore.htmlDoc.main_AddHeadScriptCode(JSHead, "page content")
-                        If JSFilename <> "" Then
-                            Call cpcore.htmlDoc.main_AddHeadScriptLink(genericController.getCdnFileLink(cpcore, JSFilename), "page content")
-                        End If
-                        Call cpcore.htmlDoc.main_AddEndOfBodyJavascript2(JSEndBody, "page content")
-                        '
-                        '---------------------------------------------------------------------------------
-                        ' Set the Meta Content flag
-                        '---------------------------------------------------------------------------------
-                        '
-                        Call cpcore.htmlDoc.main_SetMetaContent(main_RenderCache_CurrentPage_ContentId, currentPageID)
-                        '
-                        '---------------------------------------------------------------------------------
-                        ' ----- OnPageStartEvent
-                        '---------------------------------------------------------------------------------
-                        '
-                        bodyContent = returnHtml
-                        Dim addonList As List(Of addonModel) = Models.Entity.addonModel.createList_OnPageStartEvent(cpcore, New List(Of String))
-                        For Each addon As Models.Entity.addonModel In addonList
-                            AddonContent = cpcore.addon.execute_legacy5(addon.id, addon.name, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
-                            bodyContent = AddonContent & bodyContent
-                        Next
-                        'AddOnCnt = UBound(cpcore.addonCache.addonCache.onPageStartPtrs) + 1
-                        'For addonPtr = 0 To AddOnCnt - 1
-                        '    addonCachePtr = cpcore.addonCache.addonCache.onPageStartPtrs(addonPtr)
-                        '    If addonCachePtr > -1 Then
-                        '        addonId = cpcore.addonCache.addonCache.addonList(addonCachePtr.ToString).id
-                        '        If addonId > 0 Then
-                        '            AddonName = cpcore.addonCache.addonCache.addonList(addonCachePtr.ToString).name
-                        '            AddonContent = cpcore.addon.execute_legacy5(addonId, AddonName, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
-                        '            bodyContent = AddonContent & bodyContent
-                        '        End If
-                        '    End If
-                        'Next
-                        returnHtml = bodyContent
-                        '
-                        '---------------------------------------------------------------------------------
-                        ' ----- OnPageEndEvent
-                        '---------------------------------------------------------------------------------
-                        '
-                        bodyContent = returnHtml
-                        AddOnCnt = UBound(cpcore.addonLegacyCache.addonCache.onPageEndPtrs) + 1
-                        For addonPtr = 0 To AddOnCnt - 1
-                            addonCachePtr = cpcore.addonLegacyCache.addonCache.onPageEndPtrs(addonPtr)
-                            If addonCachePtr > -1 Then
-                                addonId = cpcore.addonLegacyCache.addonCache.addonList(addonCachePtr.ToString).id
-                                If addonId > 0 Then
-                                    AddonName = cpcore.addonLegacyCache.addonCache.addonList(addonCachePtr.ToString).name
-                                    AddonContent = cpcore.addon.execute_legacy5(addonId, AddonName, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
-                                    bodyContent = bodyContent & AddonContent
-                                End If
+                    '
+                    '---------------------------------------------------------------------------------
+                    ' ----- Set Headers
+                    '---------------------------------------------------------------------------------
+                    '
+                    If DateModified <> Date.MinValue Then
+                        Call cpcore.webServer.addResponseHeader("LAST-MODIFIED", genericController.GetGMTFromDate(DateModified))
+                        'Date: Sun, 07 Dec 2008 21:06:14 GMT
+                    End If
+                    '
+                    '---------------------------------------------------------------------------------
+                    ' ----- Store page javascript
+                    '---------------------------------------------------------------------------------
+                    '
+                    Call cpcore.htmlDoc.main_AddOnLoadJavascript2(JSOnLoad, "page content")
+                    Call cpcore.htmlDoc.main_AddHeadScriptCode(JSHead, "page content")
+                    If JSFilename <> "" Then
+                        Call cpcore.htmlDoc.main_AddHeadScriptLink(genericController.getCdnFileLink(cpcore, JSFilename), "page content")
+                    End If
+                    Call cpcore.htmlDoc.main_AddEndOfBodyJavascript2(JSEndBody, "page content")
+                    '
+                    '---------------------------------------------------------------------------------
+                    ' Set the Meta Content flag
+                    '---------------------------------------------------------------------------------
+                    '
+                    Call cpcore.htmlDoc.main_SetMetaContent(main_RenderCache_CurrentPage_ContentId, cpcore.pages.page.ID)
+                    '
+                    '---------------------------------------------------------------------------------
+                    ' ----- OnPageStartEvent
+                    '---------------------------------------------------------------------------------
+                    '
+                    bodyContent = returnHtml
+                    Dim addonList As List(Of addonModel) = Models.Entity.addonModel.createList_OnPageStartEvent(cpcore, New List(Of String))
+                    For Each addon As Models.Entity.addonModel In addonList
+                        AddonContent = cpcore.addon.execute_legacy5(addon.id, addon.name, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
+                        bodyContent = AddonContent & bodyContent
+                    Next
+                    'AddOnCnt = UBound(cpcore.addonCache.addonCache.onPageStartPtrs) + 1
+                    'For addonPtr = 0 To AddOnCnt - 1
+                    '    addonCachePtr = cpcore.addonCache.addonCache.onPageStartPtrs(addonPtr)
+                    '    If addonCachePtr > -1 Then
+                    '        addonId = cpcore.addonCache.addonCache.addonList(addonCachePtr.ToString).id
+                    '        If addonId > 0 Then
+                    '            AddonName = cpcore.addonCache.addonCache.addonList(addonCachePtr.ToString).name
+                    '            AddonContent = cpcore.addon.execute_legacy5(addonId, AddonName, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
+                    '            bodyContent = AddonContent & bodyContent
+                    '        End If
+                    '    End If
+                    'Next
+                    returnHtml = bodyContent
+                    '
+                    '---------------------------------------------------------------------------------
+                    ' ----- OnPageEndEvent
+                    '---------------------------------------------------------------------------------
+                    '
+                    bodyContent = returnHtml
+                    AddOnCnt = UBound(cpcore.addonLegacyCache.addonCache.onPageEndPtrs) + 1
+                    For addonPtr = 0 To AddOnCnt - 1
+                        addonCachePtr = cpcore.addonLegacyCache.addonCache.onPageEndPtrs(addonPtr)
+                        If addonCachePtr > -1 Then
+                            addonId = cpcore.addonLegacyCache.addonCache.addonList(addonCachePtr.ToString).id
+                            If addonId > 0 Then
+                                AddonName = cpcore.addonLegacyCache.addonCache.addonList(addonCachePtr.ToString).name
+                                AddonContent = cpcore.addon.execute_legacy5(addonId, AddonName, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
+                                bodyContent = bodyContent & AddonContent
                             End If
-                        Next
-                        returnHtml = bodyContent
-                        '
-                    End If
-                    If cpcore.htmlDoc.main_MetaContent_Title = "" Then
-                        '
-                        ' Set default page title
-                        '
-                        cpcore.htmlDoc.main_MetaContent_Title = currentPageName
-                    End If
+                        End If
+                    Next
+                    returnHtml = bodyContent
                     '
-                    ' add contentid and sectionid
-                    '
-                    Call cpcore.htmlDoc.main_AddHeadTag2("<meta name=""contentId"" content=""" & currentPageID & """ >", "page content")
-                    Call cpcore.htmlDoc.main_AddHeadTag2("<meta name=""sectionId"" content=""" & currentSectionID & """ >", "page content")
                 End If
+                If cpcore.htmlDoc.main_MetaContent_Title = "" Then
+                    '
+                    ' Set default page title
+                    '
+                    cpcore.htmlDoc.main_MetaContent_Title = cpcore.pages.page.Name
+                End If
+                '
+                ' add contentid and sectionid
+                '
+                Call cpcore.htmlDoc.main_AddHeadTag2("<meta name=""contentId"" content=""" & cpcore.pages.page.ID & """ >", "page content")
                 '
                 ' Display Admin Warnings with Edits for record errors
                 '
@@ -802,12 +742,6 @@ Namespace Contensive.Core.Controllers
                         cpcore.htmlDoc.main_AdminWarning = cpcore.htmlDoc.main_AdminWarning & "</p>" & cpcore.htmlDoc.main_GetRecordEditLink2("Page Content", cpcore.htmlDoc.main_AdminWarningPageID, True, "Page " & cpcore.htmlDoc.main_AdminWarningPageID, cpcore.authContext.isAuthenticatedAdmin(cpcore)) & "&nbsp;Edit the page<p>"
                         cpcore.htmlDoc.main_AdminWarningPageID = 0
                     End If
-                    '
-                    If cpcore.htmlDoc.main_AdminWarningSectionID <> 0 Then
-                        cpcore.htmlDoc.main_AdminWarning = cpcore.htmlDoc.main_AdminWarning & "</p>" & cpcore.htmlDoc.main_GetRecordEditLink2("Site Sections", cpcore.htmlDoc.main_AdminWarningSectionID, True, "Section " & cpcore.htmlDoc.main_AdminWarningSectionID, cpcore.authContext.isAuthenticatedAdmin(cpcore)) & "&nbsp;Edit the section<p>"
-                        cpcore.htmlDoc.main_AdminWarningSectionID = 0
-                    End If
-
                     returnHtml = "" _
                     & cpcore.htmlDoc.html_GetAdminHintWrapper(cpcore.htmlDoc.main_AdminWarning) _
                     & returnHtml _
@@ -831,12 +765,12 @@ Namespace Contensive.Core.Controllers
         ''' <param name="AllowChildPageList"></param>
         ''' <param name="AllowReturnLink"></param>
         ''' <param name="ArchivePages"></param>
-        ''' <param name="SectionID"></param>
+        ''' <param name="ignoreMe"></param>
         ''' <param name="UseContentWatchLink"></param>
         ''' <param name="allowPageWithoutSectionDisplay"></param>
         ''' <returns></returns>
         '
-        Friend Function getContentBox_content(PageID As Integer, rootPageId As Integer, RootPageContentName As String, OrderByClause As String, AllowChildPageList As Boolean, AllowReturnLink As Boolean, ArchivePages As Boolean, SectionID As Integer, UseContentWatchLink As Boolean, allowPageWithoutSectionDisplay As Boolean) As String
+        Friend Function getContentBox_content(OrderByClause As String, AllowChildPageList As Boolean, AllowReturnLink As Boolean, ArchivePages As Boolean, ignoreMe As Integer, UseContentWatchLink As Boolean, allowPageWithoutSectionDisplay As Boolean) As String
             Dim result As String = ""
             Try
                 Dim iIsEditing As Boolean
@@ -867,7 +801,7 @@ Namespace Contensive.Core.Controllers
                     ' ----- Load the content
                     '
                     'hint = hint & ",10"
-                    Call main_LoadRenderCache(PageID, rootPageId, RootPageContentName, OrderByClause, AllowChildPageList, AllowReturnLink, ArchivePages, SectionID, UseContentWatchLink)
+                    Call main_LoadRenderCache(PageID, rootPageId, RootPageContentName, OrderByClause, AllowChildPageList, AllowReturnLink, ArchivePages, ignoreMe, UseContentWatchLink)
                     '
                     ' ----- Verify a valid current page was found
                     '
@@ -882,7 +816,7 @@ Namespace Contensive.Core.Controllers
                             Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestUrlSource)
                             pageManager_RedirectBecausePageNotFound = True
                             pageManager_RedirectReason = "The page could not be found from its ID [" & PageID & "]. It may have been deleted or marked inactive. "
-                            redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
+                            redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, ignoreMe)
                             Exit Function
                         Else
                             '
@@ -891,7 +825,7 @@ Namespace Contensive.Core.Controllers
                             Call logController.log_appendLogPageNotFound(cpcore, cpcore.webServer.requestUrlSource)
                             pageManager_RedirectBecausePageNotFound = True
                             pageManager_RedirectReason = "The page could not be found because it's ID could not be determined."
-                            redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
+                            redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, ignoreMe)
                             Exit Function
                         End If
                     End If
@@ -944,7 +878,7 @@ Namespace Contensive.Core.Controllers
                                     pageManager_RedirectBecausePageNotFound = True
                                     '????? test
                                     pageManager_RedirectReason = "The page you requested [" & PageID & "] could not be displayed because there is a problem with one of it's parent pages. All parent pages must be available to verify security permissions. A parent page may have been deleted or inactivated, or the page may have been requested from an incorrect location."
-                                    redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, SectionID)
+                                    redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, ignoreMe)
                                     Exit Function
                                 End If
                             End If

@@ -85,7 +85,7 @@ Namespace Contensive.Core.Controllers
         '
         Public main_AdminWarning As String = ""                                      ' Message - when set displays in an admin hint box in the page
         Public main_AdminWarningPageID As Integer = 0                                  ' PageID that goes with the warning
-        Public main_AdminWarningSectionID As Integer = 0                               ' PageID that goes with the warning
+        'Public main_AdminWarningSectionID As Integer = 0                               ' PageID that goes with the warning
         '
         Public main_CheckListCnt As Integer = 0                    ' cnt of the main_GetFormInputCheckList calls - used for javascript
         '
@@ -9052,8 +9052,8 @@ ErrorTrap:
                 Call cpCore.htmlDoc.main_SetMetaContent(0, 0)
                 Call cpCore.htmlDoc.main_AddPagetitle2("Login", "loginPage")
                 head = cpCore.htmlDoc.getHTMLInternalHead(False)
-                If cpCore.pages.templateBodyTag <> "" Then
-                    bodyTag = cpCore.pages.templateBodyTag
+                If cpCore.pages.template.BodyTag <> "" Then
+                    bodyTag = cpCore.pages.template.BodyTag
                 Else
                     bodyTag = TemplateDefaultBodyTag
                 End If

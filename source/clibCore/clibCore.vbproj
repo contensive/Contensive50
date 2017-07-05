@@ -428,6 +428,7 @@
     <Compile Include="Models\Entity\linkAliasModel.vb" />
     <Compile Include="Models\Entity\SharedStylesIncludeRuleModel.vb" />
     <Compile Include="Models\Entity\SharedStylesTemplateRuleModel.vb" />
+    <Compile Include="Models\Entity\TemplateDomainRuleModel.vb" />
     <Compile Include="Models\Entity\_blankModel.vb" />
     <Compile Include="Models\Entity\tableModel.vb" />
     <Compile Include="Models\Entity\baseModel.vb" />
