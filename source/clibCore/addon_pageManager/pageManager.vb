@@ -107,14 +107,7 @@ Namespace Contensive.Addons.PageManager
                     returnBody = ""
                 Else
                     '
-                    ' no section block, continue
-                    '
-                    'PageContent = CR & "<!-- Page Content -->" & genericController.kmaIndent(pageManager_GetHtmlBody_GetSection(True, True, False)) & CR & "<!-- /Page Content -->"
-
-                    Call cpCore.pages.pageManager_LoadTemplateGetID(cpCore.pages.template.ID)
-                    '
-                    ' ----- main_Get Template
-                    '
+                    ' -- no section block, continue
                     LocalTemplateID = cpCore.pages.template.ID
                     LocalTemplateBody = cpCore.pages.template.BodyHTML
                     If LocalTemplateBody = "" Then
@@ -451,12 +444,12 @@ Namespace Contensive.Addons.PageManager
                                                     '
                                                     ' Set Child Pages Found and clear caches
                                                     '
-                                                    CSClip = cpCore.db.csOpen2(ClipParentContentName, ClipParentRecordID, , , "ChildPagesFound")
+                                                    CSClip = cpCore.db.csOpenRecord(ClipParentContentName, ClipParentRecordID, , , "ChildPagesFound")
                                                     If cpCore.db.cs_ok(CSClip) Then
                                                         Call cpCore.db.cs_set(CSClip, "ChildPagesFound", True.ToString)
                                                     End If
                                                     Call cpCore.db.cs_Close(CSClip)
-                                                    Call cpCore.pages.cache_pageContent_clear()
+                                                    'Call cpCore.pages.cache_pageContent_clear()
                                                     If (cpCore.siteProperties.allowWorkflowAuthoring And cpCore.workflow.isWorkflowAuthoringCompatible(ClipChildContentName)) Then
                                                         '
                                                         ' Workflow editing
@@ -467,7 +460,7 @@ Namespace Contensive.Addons.PageManager
                                                         '
                                                         Call cpCore.cache.invalidateContent(ClipChildContentName)
                                                         Call cpCore.cache.invalidateContent(ClipParentContentName)
-                                                        Call cpCore.pages.cache_pageContent_clear()
+                                                        'Call cpCore.pages.cache_pageContent_clear()
                                                     End If
                                                 End If
                                             End If
@@ -940,7 +933,7 @@ Namespace Contensive.Addons.PageManager
                 '
                 ' main_Get the instructions from the record
                 '
-                CS = cpcore.db.csOpen2("Form Pages", FormPageID)
+                CS = cpcore.db.csOpenRecord("Form Pages", FormPageID)
                 If cpcore.db.cs_ok(CS) Then
                     Formhtml = cpcore.db.cs_getText(CS, "Body")
                     FormInstructions = cpcore.db.cs_getText(CS, "Instructions")
@@ -983,7 +976,7 @@ Namespace Contensive.Addons.PageManager
                                         errorController.error_AddUserError(cpcore, "The field [" & cpcore.htmlDoc.html_EncodeHTML(.Caption) & "] is required.")
                                     Else
                                         If Not cpcore.db.cs_ok(CSPeople) Then
-                                            CSPeople = cpcore.db.csOpen2("people", cpcore.authContext.user.id)
+                                            CSPeople = cpcore.db.csOpenRecord("people", cpcore.authContext.user.id)
                                         End If
                                         If cpcore.db.cs_ok(CSPeople) Then
                                             Select Case genericController.vbUCase(.PeopleField)

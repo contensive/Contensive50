@@ -498,7 +498,7 @@ leak200:
                     Else
                         If addonId <> 0 Then
                             Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("addonid", CStr(addonId))
-                            CS = cpCore.db.csOpen2(cnAddons, addonId)
+                            CS = cpCore.db.csOpenRecord(cnAddons, addonId)
                             If Not cpCore.db.cs_ok(CS) Then
                                 Call errorController.error_AddUserError(cpCore, "The Add-on you requested could not be found by its id " & addonId)
                             End If
@@ -680,7 +680,7 @@ ErrorTrap:
                 '
                 ' set AdminContent to the content definition of the requested record
                 '
-                CS = cpCore.db.csOpen2(adminContent.Name, requestedRecordId, , , "ContentControlID")
+                CS = cpCore.db.csOpenRecord(adminContent.Name, requestedRecordId, , , "ContentControlID")
                 If cpCore.db.cs_ok(CS) Then
                     editRecord.id = requestedRecordId
                     adminContent.Id = cpCore.db.cs_getInteger(CS, "ContentControlID")
@@ -1061,7 +1061,7 @@ ErrorTrap:
                             Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
                             If Not (cpCore.debug_iUserError <> "") Then
                                 Call cpCore.workflow.publishEdit(adminContent.Name, editRecord.id)
-                                CS = cpCore.db.csOpen2(adminContent.Name, editRecord.id)
+                                CS = cpCore.db.csOpenRecord(adminContent.Name, editRecord.id)
                                 Dim IsDeleted As Boolean
                                 IsDeleted = Not cpCore.db.cs_ok(CS)
                                 Call cpCore.db.cs_Close(CS)
@@ -1230,7 +1230,7 @@ ErrorTrap:
                                     If Not cpCore.metaData.isWithinContent(editRecord.contentControlId, cpCore.metaData.getContentId("Group Email")) Then
                                         Call errorController.error_AddUserError(cpCore, "The send action only supports Group Email.")
                                     Else
-                                        CS = cpCore.db.csOpen2("Group Email", editRecord.id)
+                                        CS = cpCore.db.csOpenRecord("Group Email", editRecord.id)
                                         If Not cpCore.db.cs_ok(CS) Then
                                             Throw New ApplicationException("Unexpected exception") ' throw new applicationException("Unexpected exception")'  cpCore.handleLegacyError23("Email ID [" & editRecord.id & "] could not be found in Group Email.")
                                         ElseIf cpCore.db.cs_get(CS, "FromAddress") = "" Then
@@ -1263,7 +1263,7 @@ ErrorTrap:
                                     If Not cpCore.metaData.isWithinContent(editRecord.contentControlId, cpCore.metaData.getContentId("Conditional Email")) Then
                                         Call errorController.error_AddUserError(cpCore, "The deactivate action only supports Conditional Email.")
                                     Else
-                                        CS = cpCore.db.csOpen2("Conditional Email", editRecord.id)
+                                        CS = cpCore.db.csOpenRecord("Conditional Email", editRecord.id)
                                         If Not cpCore.db.cs_ok(CS) Then
                                             Throw New ApplicationException("Unexpected exception") ' throw new applicationException("Unexpected exception")'  cpCore.handleLegacyError23("Email ID [" & editRecord.id & "] could not be opened.")
                                         Else
@@ -1291,7 +1291,7 @@ ErrorTrap:
                                     If Not cpCore.metaData.isWithinContent(editRecord.contentControlId, cpCore.metaData.getContentId("Conditional Email")) Then
                                         Call errorController.error_AddUserError(cpCore, "The activate action only supports Conditional Email.")
                                     Else
-                                        CS = cpCore.db.csOpen2("Conditional Email", editRecord.id)
+                                        CS = cpCore.db.csOpenRecord("Conditional Email", editRecord.id)
                                         If Not cpCore.db.cs_ok(CS) Then
                                             Throw New ApplicationException("Unexpected exception") ' throw new applicationException("Unexpected exception")'  cpCore.handleLegacyError23("Email ID [" & editRecord.id & "] could not be opened.")
                                         ElseIf cpCore.db.cs_getInteger(CS, "ConditionID") = 0 Then
@@ -1359,7 +1359,7 @@ ErrorTrap:
                                             ' Page Content special cases
                                             '
                                             If genericController.vbLCase(adminContent.ContentTableName) = "ccpagecontent" Then
-                                                Call cpCore.pages.cache_pageContent_removeRow(RecordID, False, False)
+                                                'Call cpCore.pages.cache_pageContent_removeRow(RecordID, False, False)
                                                 If RecordID = (cpCore.siteProperties.getinteger("PageNotFoundPageID", 0)) Then
                                                     Call cpCore.siteProperties.getText("PageNotFoundPageID", "0")
                                                 End If
@@ -3009,7 +3009,7 @@ ErrorTrap:
                 '
                 ' ----- Load from Response
                 '
-                CS = cpCore.db.csOpen2("Meta Content", MetaContentID)
+                CS = cpCore.db.csOpenRecord("Meta Content", MetaContentID)
                 If cpCore.db.cs_ok(CS) Then
                     Call cpCore.db.cs_set(CS, "Name", cpCore.docProperties.getText("MetaContent.PageTitle"))
                     Call cpCore.db.cs_set(CS, "MetaDescription", cpCore.docProperties.getText("MetaContent.MetaDescription"))
@@ -3861,11 +3861,6 @@ ErrorTrap:
                 ' you need editrecords, but the cache for PCC gets loaded during the GetLandingPageID call.
                 '
                 AdminContentWorkflowAuthoring = AdminContentWorkflowAuthoring
-                'IsWorkflowMode = cpCore.app.SiteProperty_AllowWorkflowAuthoring And AdminContent.AllowWorkflowAuthoring
-                If cpCore.pages.cache_pageContent_rows = 0 Then
-                    Call cpCore.pages.cache_pageContent_load(AdminContentWorkflowAuthoring, False)
-                End If
-                'Ptr = cpCore.pageManager.pageManager_cache_pageContent_getPtr(0, AdminContentWorkflowAuthoring, False)
                 '
                 ' Test if this editors has access to this record
                 '
@@ -3965,25 +3960,22 @@ ErrorTrap:
                 End If
                 '
                 If (Not IsLandingPage) And (IsPageContentTable Or IsSectionTable) Then
-                    '
-                    ' ----- special case, Is this page a LandingPageParent (Parent of the landing page), or is this section the landing page section
-                    '
-                    PCC = cpCore.pages.cache_pageContent_get(False, False)
-                    If Not IsNothing(PCC) Then
-                        TestPageID = cpCore.siteProperties.landingPageID
-                        Do While LoopPtr < 20 And (TestPageID <> 0)
-                            IsLandingPageParent = IsPageContentTable And (editRecord.id = TestPageID)
-                            IsLandingSection = IsSectionTable And (EditRecordRootPageID = TestPageID)
-                            If IsLandingPageParent Or IsLandingSection Then
-                                Exit Do
-                            End If
-                            PCCPtr = cpCore.pages.cache_pageContent_getPtr(TestPageID, False, False)
-                            If PCCPtr >= 0 Then
-                                TestPageID = genericController.EncodeInteger(PCC(PCC_ParentID, PCCPtr))
-                            End If
-                            LoopPtr = LoopPtr + 1
-                        Loop
-                    End If
+                    ''
+                    '' ----- special case, Is this page a LandingPageParent (Parent of the landing page), or is this section the landing page section
+                    ''
+                    'TestPageID = cpCore.siteProperties.landingPageID
+                    'Do While LoopPtr < 20 And (TestPageID <> 0)
+                    '    IsLandingPageParent = IsPageContentTable And (editRecord.id = TestPageID)
+                    '    IsLandingSection = IsSectionTable And (EditRecordRootPageID = TestPageID)
+                    '    If IsLandingPageParent Or IsLandingSection Then
+                    '        Exit Do
+                    '    End If
+                    '    PCCPtr = cpCore.pages.cache_pageContent_getPtr(TestPageID, False, False)
+                    '    If PCCPtr >= 0 Then
+                    '        TestPageID = genericController.EncodeInteger(PCC(PCC_ParentID, PCCPtr))
+                    '    End If
+                    '    LoopPtr = LoopPtr + 1
+                    'Loop
                 End If
                 '
                 ' ----- special case messages
@@ -4005,7 +3997,7 @@ ErrorTrap:
                 If IsTemplateTable Then
                     TemplateIDForStyles = editRecord.id
                 ElseIf IsPageContentTable Then
-                    Call cpCore.pages.getPageArgs(editRecord.id, AdminContentWorkflowAuthoring, False, IgnoreInteger, TemplateIDForStyles, IgnoreInteger, IgnoreString, IgnoreBoolean, IgnoreInteger, IgnoreBoolean, "")
+                    'Call cpCore.pages.getPageArgs(editRecord.id, AdminContentWorkflowAuthoring, False, IgnoreInteger, TemplateIDForStyles, IgnoreInteger, IgnoreString, IgnoreBoolean, IgnoreInteger, IgnoreBoolean, "")
                 End If
                 '
                 ' ----- create page headers
@@ -5026,7 +5018,7 @@ ErrorTrap:
                                     FieldList = "ID,Name,Name as Headline,Name as MenuHeadline"
                                     'SQL = "SELECT ID,Name,Name as Headline,Name as MenuHeadline from " & TableName & " WHERE ID=" & RecordID
                                 End If
-                                CSAuthoringRecord = cpCore.db.csOpen2(ContentName, RecordID, True, True, FieldList)
+                                CSAuthoringRecord = cpCore.db.csOpenRecord(ContentName, RecordID, True, True, FieldList)
                                 'CSAuthoringRecord = cpCore.app_openCsSql_Rev_Internal("Default", SQL, 1)
                                 If Not cpCore.db.cs_ok(CSAuthoringRecord) Then
                                     '
@@ -6796,7 +6788,7 @@ ErrorTrap:
                             ParentID = 0
                             ContentSupportsParentID = False
                             If editRecord.id > 0 Then
-                                CS = cpCore.db.csOpen2(RecordContentName, editRecord.id)
+                                CS = cpCore.db.csOpenRecord(RecordContentName, editRecord.id)
                                 If cpCore.db.cs_ok(CS) Then
                                     ContentSupportsParentID = cpCore.db.cs_isFieldSupported(CS, "ParentID")
                                     If ContentSupportsParentID Then
@@ -6815,7 +6807,7 @@ ErrorTrap:
                                     '
                                     ' This record has a parent, set LimitContentSelectToThisID to the parent's CID
                                     '
-                                    CSPointer = cpCore.db.csOpen2(RecordContentName, ParentID, , , "ContentControlID")
+                                    CSPointer = cpCore.db.csOpenRecord(RecordContentName, ParentID, , , "ContentControlID")
                                     If cpCore.db.cs_ok(CSPointer) Then
                                         LimitContentSelectToThisID = cpCore.db.cs_getInteger(CSPointer, "ContentControlID")
                                     End If
@@ -7175,7 +7167,7 @@ ErrorTrap:
                         '
                         ' Verify it so there is no error when it runs
                         '
-                        CS = cpCore.db.csOpen2(cnAddons, addonId)
+                        CS = cpCore.db.csOpenRecord(cnAddons, addonId)
                         If Not cpCore.db.cs_ok(CS) Then
                             '
                             ' it was set, but the add-on is not available, auto set to dashboard
@@ -11483,7 +11475,7 @@ ErrorTrap:
                                         Dim CSSrc As Integer
                                         Dim CSDst As Integer
 
-                                        CSSrc = cpCore.db.csOpen2("Tasks", cpCore.docProperties.getInteger("RowID" & RowPtr))
+                                        CSSrc = cpCore.db.csOpenRecord("Tasks", cpCore.docProperties.getInteger("RowID" & RowPtr))
                                         If cpCore.db.cs_ok(CSSrc) Then
                                             CSDst = cpCore.db.cs_insertRecord("Tasks")
                                             If cpCore.db.cs_ok(CSDst) Then
@@ -12164,7 +12156,7 @@ ErrorTrap:
                                 For RowPtr = 0 To RowCnt - 1
                                     If cpCore.docProperties.getBoolean("Row" & RowPtr) Then
                                         RecordID = cpCore.docProperties.getInteger("RowID" & RowPtr)
-                                        CS = cpCore.db.csOpen2("Custom Reports", RecordID)
+                                        CS = cpCore.db.csOpenRecord("Custom Reports", RecordID)
                                         If cpCore.db.cs_ok(CS) Then
                                             SQL = cpCore.db.cs_getText(CS, SQLFieldName)
                                             Name = cpCore.db.cs_getText(CS, "Name")
@@ -15404,7 +15396,7 @@ ErrorTrap:
                                     column.Width = CInt((column.Width * 80) / ColumnWidthTotal)
                                 Next
                                 column = New indexConfigColumnClass
-                                CSPointer = cpCore.db.csOpen2("Content Fields", FieldIDToAdd, False, False)
+                                CSPointer = cpCore.db.csOpenRecord("Content Fields", FieldIDToAdd, False, False)
                                 If cpCore.db.cs_ok(CSPointer) Then
                                     column.Name = cpCore.db.cs_get(CSPointer, "name")
                                     column.Width = 20
@@ -16740,7 +16732,7 @@ ErrorTrap:
                 Dim FoundAddon As Boolean
                 '
                 If genericController.vbInstr(1, "," & UsedIDString & ",", "," & CStr(HelpAddonID) & ",") = 0 Then
-                    CS = cpCore.db.csOpen2(cnAddons, HelpAddonID)
+                    CS = cpCore.db.csOpenRecord(cnAddons, HelpAddonID)
                     If cpCore.db.cs_ok(CS) Then
                         FoundAddon = True
                         AddonName = cpCore.db.cs_get(CS, "Name")
@@ -16819,7 +16811,7 @@ ErrorTrap:
                 Dim addonId As Integer
                 '
                 If genericController.vbInstr(1, "," & UsedIDString & ",", "," & CStr(HelpCollectionID) & ",") = 0 Then
-                    CS = cpCore.db.csOpen2("Add-on Collections", HelpCollectionID)
+                    CS = cpCore.db.csOpenRecord("Add-on Collections", HelpCollectionID)
                     If cpCore.db.cs_ok(CS) Then
                         Collectionname = cpCore.db.cs_get(CS, "Name")
                         CollectionHelpCopy = cpCore.db.cs_get(CS, "help")

@@ -1316,7 +1316,7 @@ ErrorTrap:
                     If CurrentValue = 0 Then
                         main_GetFormInputSelect2 = html_GetFormInputText2(MenuName, "0")
                     Else
-                        CSPointer = cpCore.db.csOpen2(ContentName, CurrentValue)
+                        CSPointer = cpCore.db.csOpenRecord(ContentName, CurrentValue)
                         If cpCore.db.cs_ok(CSPointer) Then
                             main_GetFormInputSelect2 = cpCore.db.cs_getText(CSPointer, "name") & "&nbsp;"
                         End If
@@ -1662,7 +1662,7 @@ ErrorTrap:
                     cpCore.handleExceptionAndContinue(New Exception("While building a group members list for group [" & groupController.group_GetGroupName(cpCore, GroupID) & "], too many rows were selected. [" & RowMax & "] records exceeds [" & cpCore.siteProperties.selectFieldLimit & "], the current Site Property app.SiteProperty_SelectFieldLimit."))
                     html_GetFormInputMemberSelect2 = html_GetFormInputMemberSelect2 & html_GetFormInputHidden(MenuNameFPO, iCurrentValue)
                     If iCurrentValue <> 0 Then
-                        CSPointer = cpCore.db.csOpen2("people", iCurrentValue)
+                        CSPointer = cpCore.db.csOpenRecord("people", iCurrentValue)
                         If cpCore.db.cs_ok(CSPointer) Then
                             html_GetFormInputMemberSelect2 = cpCore.db.cs_getText(CSPointer, "name") & "&nbsp;"
                         End If
@@ -6419,7 +6419,7 @@ ErrorTrap:
                 ' ----- Page Content Child List Add-on
                 '
                 If (RecordID <> 0) And (True) Then
-                    CSAddon = cpCore.db.csOpen2(cnAddons, cpCore.siteProperties.childListAddonID)
+                    CSAddon = cpCore.db.csOpenRecord(cnAddons, cpCore.siteProperties.childListAddonID)
                     FoundAddon = False
                     If cpCore.db.cs_ok(CSAddon) Then
                         FoundAddon = True
@@ -6577,7 +6577,7 @@ ErrorTrap:
                 '
                 ' ----- Normal Content Edit - find instance in the content
                 '
-                CS = cpCore.db.csOpen2(ContentName, RecordID)
+                CS = cpCore.db.csOpenRecord(ContentName, RecordID)
                 If Not cpCore.db.cs_ok(CS) Then
                     cpCore.handleExceptionAndContinue(New Exception("No record found with content [" & ContentName & "] and RecordID [" & RecordID & "]"))
                 Else
@@ -6722,19 +6722,19 @@ ErrorTrap:
                 '
                 ' Clear Caches
                 '
-                Call cpCore.pages.cache_pageContent_clear()
-                Call cpCore.pages.pageManager_cache_pageTemplate_clear()
-                Call cpCore.pages.pageManager_cache_siteSection_clear()
+                'Call cpCore.pages.cache_pageContent_clear()
+                'Call cpCore.pages.pageManager_cache_pageTemplate_clear()
+                'Call cpCore.pages.pageManager_cache_siteSection_clear()
                 'Call cpCore.cache.invalidateObjectList("")
                 If ContentName <> "" Then
                     Call cpCore.cache.invalidateContent(ContentName)
                     TableName = cpCore.metaData.getContentTablename(ContentName)
                     If genericController.vbLCase(TableName) = "cctemplates" Then
-                        Call cpCore.cache.setObject(pagesController.cache_pageTemplate_cacheName, Nothing)
-                        Call cpCore.pages.pageManager_cache_pageTemplate_load()
+                        'Call cpCore.cache.setObject(pagesController.cache_pageTemplate_cacheName, Nothing)
+                        'Call cpCore.pages.pageManager_cache_pageTemplate_load()
                     End If
                     If genericController.vbLCase(TableName) = "ccpagecontent" Then
-                        Call cpCore.pages.cache_pageContent_updateRow(RecordID, cpCore.pages.pagemanager_IsWorkflowRendering, cpCore.pages.main_RenderCache_CurrentPage_IsQuickEditing)
+                        'Call cpCore.pages.cache_pageContent_updateRow(RecordID, cpCore.pages.pagemanager_IsWorkflowRendering, cpCore.pages.main_RenderCache_CurrentPage_IsQuickEditing)
                     End If
                 End If
             End If

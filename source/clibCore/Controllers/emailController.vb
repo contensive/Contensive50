@@ -613,7 +613,7 @@ ErrorTrap:
                 Dim emailstyles As String
                 Dim layoutError As String
                 '
-                CS = cpcore.db.csOpen2("email", EmailID)
+                CS = cpcore.db.csOpenRecord("email", EmailID)
                 If Not cpcore.db.cs_ok(CS) Then
                     Call errorController.error_AddUserError(cpcore,"There was a problem sending the email confirmation. The email record could not be found.")
                 Else
@@ -625,7 +625,7 @@ ErrorTrap:
                     EmailTemplate = ""
                     EMailTemplateID = cpcore.db.cs_getInteger(CS, "EmailTemplateID")
                     If EMailTemplateID <> 0 Then
-                        CSTemplate = cpcore.db.csOpen2("Email Templates", EMailTemplateID, , , "BodyHTML")
+                        CSTemplate = cpcore.db.csOpenRecord("Email Templates", EMailTemplateID, , , "BodyHTML")
                         If cpcore.db.cs_ok(CSTemplate) Then
                             EmailTemplate = cpcore.db.cs_get(CSTemplate, "BodyHTML")
                         End If

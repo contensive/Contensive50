@@ -5422,7 +5422,7 @@ Namespace Contensive.Core.Controllers
                             RecordID = genericController.EncodeInteger(KeySplit(1))
                             If ContentName <> "" And RecordID <> 0 Then
                                 If cpCore.metaData.getContentTablename(ContentName) = "ccPageContent" Then
-                                    CSPointer = cpCore.db.csOpen2(ContentName, RecordID, , , "TemplateID,ParentID")
+                                    CSPointer = cpCore.db.csOpenRecord(ContentName, RecordID, , , "TemplateID,ParentID")
                                     If cs_ok(CSPointer) Then
                                         recordfound = True
                                         templateId = cs_getInteger(CSPointer, "TemplateID")
@@ -5438,7 +5438,7 @@ Namespace Contensive.Core.Controllers
                                     Else
 
                                         If templateId <> 0 Then
-                                            CSPointer = cpCore.db.csOpen2("Page Templates", templateId, , , "Link")
+                                            CSPointer = cpCore.db.csOpenRecord("Page Templates", templateId, , , "Link")
                                             If cs_ok(CSPointer) Then
                                                 main_GetLinkByContentRecordKey = cs_getText(CSPointer, "Link")
                                             End If
@@ -5606,7 +5606,6 @@ Namespace Contensive.Core.Controllers
                     '
                     'hint = hint & ",140"
                     If RecordParentID > 0 Then
-                        Call cpCore.pages.cache_pageContent_updateRow(RecordParentID, False, False)
                         If Not IsDelete Then
                             Call executeSql("update ccpagecontent set ChildPagesfound=1 where ID=" & RecordParentID)
                         End If
@@ -5616,39 +5615,24 @@ Namespace Contensive.Core.Controllers
                     '
                     If IsDelete Then
                         '
-                        ' If this was a section's root page, clear the rootpageid so a new page will be created
-                        '
-                        Call executeSql("update ccsections set RootPageID=0 where RootPageID=" & RecordID)
-                        Call cpCore.pages.pageManager_cache_siteSection_clear()
-                        '
                         ' Clear the Landing page and page not found site properties
                         '
-
-                        If genericController.vbLCase(TableName) = "ccpagecontent" Then
-                            Call cpCore.pages.cache_pageContent_removeRow(RecordID, cpCore.pages.pagemanager_IsWorkflowRendering, False)
-                            If RecordID = genericController.EncodeInteger(cpCore.siteProperties.getText("PageNotFoundPageID", "0")) Then
-                                Call cpCore.siteProperties.setProperty("PageNotFoundPageID", "0")
-                            End If
-                            If RecordID = cpCore.siteProperties.landingPageID Then
-                                cpCore.siteProperties.setProperty("landingPageId", "0")
-                            End If
+                        If RecordID = genericController.EncodeInteger(cpCore.siteProperties.getText("PageNotFoundPageID", "0")) Then
+                            Call cpCore.siteProperties.setProperty("PageNotFoundPageID", "0")
+                        End If
+                        If RecordID = cpCore.siteProperties.landingPageID Then
+                            cpCore.siteProperties.setProperty("landingPageId", "0")
                         End If
                         '
                         ' Delete Link Alias entries with this PageID
                         '
                         Call executeSql("delete from cclinkAliases where PageID=" & RecordID)
-                    Else
-                        '
-                        ' Attempt to update the PageContentCache (PCC) array stored in the PeristantVariants
-                        '
-                        Call cpCore.pages.cache_pageContent_updateRow(RecordID, False, False)
                     End If
                 Case "cctemplates", "ccsharedstyles"
                     '
                     ' Attempt to update the PageContentCache (PCC) array stored in the PeristantVariants
                     '
                     'hint = hint & ",150"
-                    Call cpCore.pages.pageManager_cache_pageTemplate_clear()
                     If Not IsNothing(cpCore.addonStyleRulesIndex) Then
                         Call cpCore.addonStyleRulesIndex.clear()
                     End If
@@ -5679,7 +5663,7 @@ Namespace Contensive.Core.Controllers
                     'hint = hint & ",180"
                     If (cpCore.siteProperties.getBoolean("ImageAllowSFResize", True)) Then
                         If Not IsDelete Then
-                            CS = cpCore.db.csOpen2("library files", RecordID)
+                            CS = cpCore.db.csOpenRecord("library files", RecordID)
                             If cs_ok(CS) Then
                                 Filename = cs_get(CS, "filename")
                                 Pos = InStrRev(Filename, "/")
@@ -5855,7 +5839,7 @@ Namespace Contensive.Core.Controllers
         '       The rest are the archive records.
         '========================================================================
         '
-        Public Function csOpen2(ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal WorkflowAuthoringMode As Boolean = False, Optional ByVal WorkflowEditingMode As Boolean = False, Optional ByVal SelectFieldList As String = "") As Integer
+        Public Function csOpenRecord(ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal WorkflowAuthoringMode As Boolean = False, Optional ByVal WorkflowEditingMode As Boolean = False, Optional ByVal SelectFieldList As String = "") As Integer
             Return cs_open(genericController.encodeText(ContentName), "(ID=" & cpCore.db.encodeSQLNumber(RecordID) & ")", , False, cpCore.authContext.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
         End Function
         '

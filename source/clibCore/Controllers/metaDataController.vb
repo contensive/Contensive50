@@ -2278,7 +2278,7 @@ ErrorTrap:
             '
             If Not genericController.IsInDelimitedString(UsedIDString, CStr(RecordID), ",") Then
                 ContentName = getContentNameByID(ContentID)
-                CS = cpCore.db.csOpen2(ContentName, RecordID, False, False)
+                CS = cpCore.db.csOpenRecord(ContentName, RecordID, False, False)
                 If cpCore.db.cs_ok(CS) Then
                     HasParentID = cpCore.db.cs_isFieldSupported(CS, "ParentID")
                     RecordContentID = cpCore.db.cs_getInteger(CS, "ContentControlID")

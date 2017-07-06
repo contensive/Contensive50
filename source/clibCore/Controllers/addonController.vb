@@ -3187,7 +3187,7 @@ ErrorTrap:
             '
             If cpCore.authContext.isAuthenticated() And True Then
                 If cpCore.authContext.isEditingAnything(cpCore) Then
-                    CS = cpCore.db.csOpen2(cnAddons, addonId)
+                    CS = cpCore.db.csOpenRecord(cnAddons, addonId)
                     If cpCore.db.cs_ok(CS) Then
                         AddonName = cpCore.db.cs_getText(CS, "name")
                         StyleSheet = cpCore.db.cs_get(CS, "CustomStylesFilename")
@@ -4533,7 +4533,7 @@ ErrorTrap:
             '
             s = Content
             SelectFieldList = "name,copytext,javascriptonload,javascriptbodyend,stylesfilename,otherheadtags,JSFilename,targetString"
-            CS = cpCore.db.csOpen2("Wrappers", WrapperID, , , SelectFieldList)
+            CS = cpCore.db.csOpenRecord("Wrappers", WrapperID, , , SelectFieldList)
             If cpCore.db.cs_ok(CS) Then
                 Wrapper = cpCore.db.cs_getText(CS, "copytext")
                 wrapperName = cpCore.db.cs_getText(CS, "name")

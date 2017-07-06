@@ -86,7 +86,7 @@ Namespace Contensive.Core
         <Obsolete("Use addon navigation.", True)> Public Overrides ReadOnly Property navigationStructure() As String
             Get
                 If True Then
-                    Return cpCore.pages.currentNavigationStructure
+                    Return ""
                 Else
                     Return ""
                 End If
@@ -120,7 +120,11 @@ Namespace Contensive.Core
         ''' <returns></returns>
         Public Overrides ReadOnly Property pageId() As Integer
             Get
-                Return cpCore.pages.currentPageID
+                If (cpCore.pages.page IsNot Nothing) Then
+                    Return 0
+                Else
+                    Return cpCore.pages.page.id
+                End If
             End Get
         End Property
         '
@@ -131,7 +135,11 @@ Namespace Contensive.Core
         ''' <returns></returns>
         Public Overrides ReadOnly Property pageName() As String
             Get
-                Return cpCore.pages.currentPageName
+                If (cpCore.pages.page IsNot Nothing) Then
+                    Return ""
+                Else
+                    Return cpCore.pages.page.name
+                End If
             End Get
         End Property
         '
@@ -150,10 +158,11 @@ Namespace Contensive.Core
         ''' <summary>
         ''' Returns the value of sectionId as set by pageManager
         ''' </summary>
-        ''' <returns></returns>
+
+        <Obsolete("Section is no longer supported", True)>
         Public Overrides ReadOnly Property sectionId() As Integer
             Get
-                Return cpCore.pages.currentSectionID
+                Return 0
             End Get
         End Property
         '

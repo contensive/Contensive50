@@ -1109,7 +1109,7 @@ Namespace Contensive.Core
                                             Dim nothingObject As Object = Nothing
                                             Dim cs As Integer
                                             addonId = docProperties.getInteger("AddonID")
-                                            cs = db.csOpen2(cnAddons, addonId)
+                                            cs = db.csOpenRecord(cnAddons, addonId)
                                             If db.cs_ok(cs) Then
                                                 Call db.cs_set(cs, "CustomStylesFilename", docProperties.getText("CustomStyles"))
                                             End If
@@ -1117,16 +1117,16 @@ Namespace Contensive.Core
                                             '
                                             ' Clear Caches
                                             '
-                                            Call pages.cache_pageContent_clear()
-                                            Call pages.pageManager_cache_pageTemplate_clear()
-                                            Call pages.pageManager_cache_siteSection_clear()
+                                            'Call pages.cache_pageContent_clear()
+                                            'Call pages.pageManager_cache_pageTemplate_clear()
+                                            'Call pages.pageManager_cache_siteSection_clear()
                                             'Call cache.invalidateObjectList("")
                                             If contentName <> "" Then
                                                 Call cache.invalidateContent(contentName)
                                                 tableName = metaData.getContentTablename(contentName)
                                                 If genericController.vbLCase(tableName) = "cctemplates" Then
-                                                    Call cache.setObject(pagesController.cache_pageTemplate_cacheName, nothingObject)
-                                                    Call pages.pageManager_cache_pageTemplate_load()
+                                                    'Call cache.setObject(pagesController.cache_pageTemplate_cacheName, nothingObject)
+                                                    'Call pages.pageManager_cache_pageTemplate_load()
                                                 End If
                                             End If
                                         End If
@@ -2243,7 +2243,10 @@ Namespace Contensive.Core
                             ' If visit tracking, save the viewing record
                             '
                             ViewingName = Left(authContext.visit.id & "." & authContext.visit.PageVisits, 10)
-                            PageID = pages.currentPageID
+                            PageID = 0
+                            If (pages.page IsNot Nothing) Then
+                                PageID = pages.page.id
+                            End If
                             FieldNames = "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,ContentControlID,pagetime,Active,CreateKey,RecordID"
                             FieldNames = FieldNames & ",ExcludeFromAnalytics"
                             FieldNames = FieldNames & ",pagetitle"

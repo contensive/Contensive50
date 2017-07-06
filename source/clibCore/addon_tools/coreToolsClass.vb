@@ -1006,14 +1006,14 @@ ErrorTrap:
                                     For Each keyValuePair In CDef.adminColumns
                                         Dim adminColumn As cdefModel.CDefAdminColumnClass = keyValuePair.Value
                                         Dim field As CDefFieldModel = CDef.fields(adminColumn.Name)
-                                        CSPointer = cpCore.db.csOpen2("Content Fields", field.id)
+                                        CSPointer = cpCore.db.csOpenRecord("Content Fields", field.id)
                                         Call cpCore.db.cs_set(CSPointer, "IndexColumn", (columnPtr) * 10)
                                         Call cpCore.db.cs_set(CSPointer, "IndexWidth", Int((adminColumn.Width * 80) / ColumnWidthTotal))
                                         Call cpCore.db.cs_Close(CSPointer)
                                         columnPtr += 1
                                     Next
                                 End If
-                                CSPointer = cpCore.db.csOpen2("Content Fields", FieldIDToAdd, False, False)
+                                CSPointer = cpCore.db.csOpenRecord("Content Fields", FieldIDToAdd, False, False)
                                 If cpCore.db.cs_ok(CSPointer) Then
                                     Call cpCore.db.cs_set(CSPointer, "IndexColumn", columnPtr * 10)
                                     Call cpCore.db.cs_set(CSPointer, "IndexWidth", 20)
@@ -1033,7 +1033,7 @@ ErrorTrap:
                                 For Each keyValuePair In CDef.adminColumns
                                     Dim adminColumn As cdefModel.CDefAdminColumnClass = keyValuePair.Value
                                     Dim field As CDefFieldModel = CDef.fields(adminColumn.Name)
-                                    CSPointer = cpCore.db.csOpen2("Content Fields", field.id)
+                                    CSPointer = cpCore.db.csOpenRecord("Content Fields", field.id)
                                     If fieldId = TargetFieldID Then
                                         Call cpCore.db.cs_set(CSPointer, "IndexColumn", 0)
                                         Call cpCore.db.cs_set(CSPointer, "IndexWidth", 0)
@@ -1059,7 +1059,7 @@ ErrorTrap:
                                     Dim adminColumn As cdefModel.CDefAdminColumnClass = keyValuePair.Value
                                     Dim field As CDefFieldModel = CDef.fields(adminColumn.Name)
                                     FieldName = adminColumn.Name
-                                    CS1 = cpCore.db.csOpen2("Content Fields", field.id)
+                                    CS1 = cpCore.db.csOpenRecord("Content Fields", field.id)
                                     If (CDef.fields(FieldName.ToLower()).id = TargetFieldID) And (columnPtr < CDef.adminColumns.Count) Then
                                         Call cpCore.db.cs_set(CS1, "IndexColumn", (columnPtr + 1) * 10)
                                         '
@@ -1095,7 +1095,7 @@ ErrorTrap:
                                     Dim adminColumn As cdefModel.CDefAdminColumnClass = keyValuePair.Value
                                     Dim field As CDefFieldModel = CDef.fields(adminColumn.Name)
                                     FieldName = adminColumn.Name
-                                    CS1 = cpCore.db.csOpen2("Content Fields", field.id)
+                                    CS1 = cpCore.db.csOpenRecord("Content Fields", field.id)
                                     If (field.id = TargetFieldID) And (columnPtr < CDef.adminColumns.Count) Then
                                         Call cpCore.db.cs_set(CS1, "IndexColumn", (columnPtr - 1) * 10)
                                         '
@@ -3331,7 +3331,7 @@ ErrorTrap:
                                 rowValid = rowValid And (.fieldTypeId > 0)
                                 streamRow.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
                                 If .inherited Then
-                                    CSPointer = cpCore.db.csOpen2("Content Field Types", .fieldTypeId)
+                                    CSPointer = cpCore.db.csOpenRecord("Content Field Types", .fieldTypeId)
                                     If Not cpCore.db.cs_ok(CSPointer) Then
                                         Call streamRow.Add(SpanClassAdminSmall & "Unknown[" & .fieldTypeId & "]</SPAN>")
                                     Else
@@ -3508,7 +3508,7 @@ ErrorTrap:
             '
             ' Get Tablename and DataSource
             '
-            CS = cpCore.db.csOpen2("Tables", TableID, , , "Name,DataSourceID")
+            CS = cpCore.db.csOpenRecord("Tables", TableID, , , "Name,DataSourceID")
             If cpCore.db.cs_ok(CS) Then
                 TableName = cpCore.db.cs_getText(CS, "name")
                 DataSource = cpCore.db.cs_getLookup(CS, "DataSourceID")
