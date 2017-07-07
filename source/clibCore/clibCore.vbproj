@@ -429,7 +429,7 @@
     <Compile Include="Models\Entity\SharedStylesIncludeRuleModel.vb" />
     <Compile Include="Models\Entity\SharedStylesTemplateRuleModel.vb" />
     <Compile Include="Models\Entity\TemplateDomainRuleModel.vb" />
-    <Compile Include="Models\Entity\pageContentModel2.vb" />
+    <Compile Include="Models\Entity\pageContentModel.vb" />
     <Compile Include="Models\Entity\_blankModel.vb" />
     <Compile Include="Models\Entity\tableModel.vb" />
     <Compile Include="Models\Entity\baseModel.vb" />
@@ -513,7 +513,6 @@
     <Compile Include="Models\Entity\contentModel.vb" />
     <Compile Include="Models\Entity\miniCollectionModel.vb" />
     <Compile Include="Models\Entity\domainModel.vb" />
-    <Compile Include="Models\Entity\pageContentModel.vb" />
     <Compile Include="Models\Entity\pageTemplateModel.vb" />
     <Compile Include="Models\Entity\_oldBaseModel.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />

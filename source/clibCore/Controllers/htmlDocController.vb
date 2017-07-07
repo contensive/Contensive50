@@ -2425,8 +2425,8 @@ ErrorTrap:
             '
             html_GetFormInputTextExpandable2 = "" _
                 & "<div class=""" & HtmlClass & """>" _
-                & genericController.kmaIndent(EditorClosed) _
-                & genericController.kmaIndent(EditorOpened) _
+                & genericController.htmlIndent(EditorClosed) _
+                & genericController.htmlIndent(EditorOpened) _
                 & "</div>"
             main_FormInputTextCnt = main_FormInputTextCnt + 1
             Exit Function
@@ -7370,7 +7370,7 @@ ErrorTrap:
                         Call cpCore.db.cs_goNext(CS)
                     Loop
                     Call cpCore.db.cs_Close(CS)
-                    LeftPane = cr & "<ul>" & genericController.kmaIndent(s) & cr & "</ul>"
+                    LeftPane = cr & "<ul>" & genericController.htmlIndent(s) & cr & "</ul>"
                     'LeftPane = Tree.GetTree(CStr(0), OpenMenuName)
                     '
                     ' Add the top 'All' node
@@ -7391,7 +7391,7 @@ ErrorTrap:
                         LeftPane = LeftPane & cr & "<div class=""caption""><a href=""" & cpCore.siteProperties.adminURL & "?editreferer=" & genericController.EncodeRequestVariable("?" & cpCore.htmlDoc.refreshQueryString) & "&cid=" & cpCore.metaData.getContentId("Content Categories") & "&af=4&aa=2"">+&nbsp;Add&nbsp;Category</a></div>"
                     End If
                     '
-                    LeftPane = cr & "<div class=""ccCategoryListCon"">" & genericController.kmaIndent(LeftPane) & cr & "</div>"
+                    LeftPane = cr & "<div class=""ccCategoryListCon"">" & genericController.htmlIndent(LeftPane) & cr & "</div>"
                     '
                     ' open the current node
                     '
@@ -9045,20 +9045,20 @@ ErrorTrap:
                 '
                 Body = "" _
                     & cr & "<div class=""ccCon"" style=""width:400px;margin:100px auto 0 auto;"">" _
-                    & kmaIndent(cpCore.htmlDoc.main_GetPanelHeader("Login")) _
-                    & kmaIndent(Body) _
+                    & htmlIndent(cpCore.htmlDoc.main_GetPanelHeader("Login")) _
+                    & htmlIndent(Body) _
                     & "</div>"
                 '
                 Call cpCore.htmlDoc.main_SetMetaContent(0, 0)
                 Call cpCore.htmlDoc.main_AddPagetitle2("Login", "loginPage")
-                head = cpCore.htmlDoc.getHTMLInternalHead(False)
+                head = cpCore.htmlDoc.getHtmlDocHead(False)
                 If cpCore.pages.template.BodyTag <> "" Then
                     bodyTag = cpCore.pages.template.BodyTag
                 Else
                     bodyTag = TemplateDefaultBodyTag
                 End If
                 'Call AppendLog("call main_getEndOfBody, from main_getLoginPage2 ")
-                returnREsult = main_assembleHtmlDoc(cpCore.siteProperties.docTypeDeclaration(), head, bodyTag, Body & cpCore.htmlDoc.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False))
+                returnREsult = assembleHtmlDoc(cpCore.siteProperties.docTypeDeclaration(), head, bodyTag, Body & cpCore.htmlDoc.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False))
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
@@ -9161,7 +9161,7 @@ ErrorTrap:
                         & ""
                     loginForm = "" _
                         & cr & "<table border=""0"" cellpadding=""5"" cellspacing=""0"" width=""100%"">" _
-                        & kmaIndent(loginForm) _
+                        & htmlIndent(loginForm) _
                         & cr & "</table>" _
                         & ""
                     loginForm = loginForm _
@@ -9171,7 +9171,7 @@ ErrorTrap:
                         & ""
                     loginForm = "" _
                         & cpCore.htmlDoc.html_GetFormStart(QueryString) _
-                        & kmaIndent(loginForm) _
+                        & htmlIndent(loginForm) _
                         & cr & "</form>" _
                         & ""
 
@@ -9196,7 +9196,7 @@ ErrorTrap:
                     '
                     returnHtml = "" _
                         & cr & "<div class=""ccLoginFormCon"">" _
-                        & kmaIndent(Panel) _
+                        & htmlIndent(Panel) _
                         & cr & "</div>" _
                         & ""
                 End If
@@ -9280,7 +9280,7 @@ ErrorTrap:
                     & cr2 & "</tr>" _
                     & cr2 & "<tr>" _
                     & cr3 & "<td colspan=""2"">" _
-                    & kmaIndent(kmaIndent(cpCore.htmlDoc.main_GetPanelButtons(ButtonSendPassword, "Button"))) _
+                    & htmlIndent(htmlIndent(cpCore.htmlDoc.main_GetPanelButtons(ButtonSendPassword, "Button"))) _
                     & cr3 & "</td>" _
                     & cr2 & "</tr>" _
                     & cr & "</table>" _
@@ -9310,7 +9310,7 @@ ErrorTrap:
                     QueryString = genericController.ModifyQueryString(QueryString, "ccIPage", "")
                     returnResult = "" _
                     & cpCore.htmlDoc.html_GetFormStart(QueryString) _
-                    & kmaIndent(returnResult) _
+                    & htmlIndent(returnResult) _
                     & cr & "</form>" _
                     & ""
                 End If
@@ -9323,7 +9323,7 @@ ErrorTrap:
 
         ' main_Get the Head innerHTML for any page
         '
-        Public Function getHTMLInternalHead(ByVal main_IsAdminSite As Boolean) As String
+        Public Function getHtmlDocHead(ByVal main_IsAdminSite As Boolean) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetHTMLInternalHead")
             '
             'If Not (true) Then Exit Function
@@ -9345,7 +9345,7 @@ ErrorTrap:
             Dim VirtualFilename As String
             Dim Ext As String
             '
-            getHTMLInternalHead = getHTMLInternalHead & cr & "<!-- main_GetHTMLInternalHead called out of order. It must follow a content call, such as pageManager_GetHtmlBody, main_GetSectionPage, and main_GetContentPage -->"
+            getHtmlDocHead = getHtmlDocHead & cr & "<!-- main_GetHTMLInternalHead called out of order. It must follow a content call, such as pageManager_GetHtmlBody, main_GetSectionPage, and main_GetContentPage -->"
             '
             ' stylesheets first -- for performance
             ' put stylesheets inline without processing
@@ -9354,14 +9354,14 @@ ErrorTrap:
                 '
                 ' reset styles
                 '
-                getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.webServerIO_requestDomain & "/ccLib/styles/ccreset.css"" >"
+                getHtmlDocHead = getHtmlDocHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.webServerIO_requestDomain & "/ccLib/styles/ccreset.css"" >"
             End If
-            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""/ccLib/Styles/" & defaultStyleFilename & """>"
+            getHtmlDocHead = getHtmlDocHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""/ccLib/Styles/" & defaultStyleFilename & """>"
             If Not main_IsAdminSite Then
                 '
                 ' site styles
                 '
-                getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & genericController.getCdnFileLink(cpCore, "templates/styles.css") & """ >"
+                getHtmlDocHead = getHtmlDocHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & genericController.getCdnFileLink(cpCore, "templates/styles.css") & """ >"
             End If
             '
             ' Template shared styles
@@ -9375,11 +9375,11 @@ ErrorTrap:
                     If Files(Ptr) <> "" Then
                         Parts = Split(Files(Ptr) & "<<", "<")
                         If Parts(1) <> "" Then
-                            getHTMLInternalHead = getHTMLInternalHead & cr & genericController.decodeHtml(Parts(1))
+                            getHtmlDocHead = getHtmlDocHead & cr & genericController.decodeHtml(Parts(1))
                         End If
-                        getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, Parts(0)) & """ >"
+                        getHtmlDocHead = getHtmlDocHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, Parts(0)) & """ >"
                         If Parts(2) <> "" Then
-                            getHTMLInternalHead = getHTMLInternalHead & cr & genericController.decodeHtml(Parts(2))
+                            getHtmlDocHead = getHtmlDocHead & cr & genericController.decodeHtml(Parts(2))
                         End If
                         'End If
                     End If
@@ -9389,13 +9389,13 @@ ErrorTrap:
             ' Template exclusive styles
             '
             If cpCore.htmlDoc.main_MetaContent_TemplateStyleSheetTag <> "" Then
-                getHTMLInternalHead = getHTMLInternalHead & cpCore.htmlDoc.main_MetaContent_TemplateStyleSheetTag
+                getHtmlDocHead = getHtmlDocHead & cpCore.htmlDoc.main_MetaContent_TemplateStyleSheetTag
             End If
             '
             ' Page Styles
             '
             If cpCore.htmlDoc.main_MetaContent_StyleSheetTags <> "" Then
-                getHTMLInternalHead = getHTMLInternalHead & cpCore.htmlDoc.main_MetaContent_StyleSheetTags
+                getHtmlDocHead = getHtmlDocHead & cpCore.htmlDoc.main_MetaContent_StyleSheetTags
                 cpCore.htmlDoc.main_MetaContent_StyleSheetTags = ""
             End If
             '
@@ -9410,17 +9410,17 @@ ErrorTrap:
             '
             Copy = cpCore.htmlDoc.main_MetaContent_Title
             If Copy <> "" Then
-                getHTMLInternalHead = getHTMLInternalHead & cr & "<title>" & Copy & "</title>"
+                getHtmlDocHead = getHtmlDocHead & cr & "<title>" & Copy & "</title>"
             End If
             '
             Copy = cpCore.htmlDoc.main_MetaContent_KeyWordList
             If Copy <> "" Then
-                getHTMLInternalHead = getHTMLInternalHead & cr & "<meta name=""keywords"" content=""" & Copy & """ >"
+                getHtmlDocHead = getHtmlDocHead & cr & "<meta name=""keywords"" content=""" & Copy & """ >"
             End If
             '
             Copy = cpCore.htmlDoc.main_MetaContent_Description
             If Copy <> "" Then
-                getHTMLInternalHead = getHTMLInternalHead & cr & "<meta name=""description"" content=""" & Copy & """ >"
+                getHtmlDocHead = getHtmlDocHead & cr & "<meta name=""description"" content=""" & Copy & """ >"
             End If
             '
             ' favicon
@@ -9432,13 +9432,13 @@ ErrorTrap:
                     Ext = genericController.vbLCase(Mid(VirtualFilename, Pos))
                     Select Case Ext
                         Case ".ico"
-                            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""icon"" type=""image/vnd.microsoft.icon"" href=""" & genericController.getCdnFileLink(cpCore, VirtualFilename) & """ >"
+                            getHtmlDocHead = getHtmlDocHead & cr & "<link rel=""icon"" type=""image/vnd.microsoft.icon"" href=""" & genericController.getCdnFileLink(cpCore, VirtualFilename) & """ >"
                         Case ".png"
-                            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""icon"" type=""image/png"" href=""" & genericController.getCdnFileLink(cpCore, VirtualFilename) & """ >"
+                            getHtmlDocHead = getHtmlDocHead & cr & "<link rel=""icon"" type=""image/png"" href=""" & genericController.getCdnFileLink(cpCore, VirtualFilename) & """ >"
                         Case ".gif"
-                            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""icon"" type=""image/gif"" href=""" & genericController.getCdnFileLink(cpCore, VirtualFilename) & """ >"
+                            getHtmlDocHead = getHtmlDocHead & cr & "<link rel=""icon"" type=""image/gif"" href=""" & genericController.getCdnFileLink(cpCore, VirtualFilename) & """ >"
                         Case ".jpg"
-                            getHTMLInternalHead = getHTMLInternalHead & cr & "<link rel=""icon"" type=""image/jpg"" href=""" & genericController.getCdnFileLink(cpCore, VirtualFilename) & """ >"
+                            getHtmlDocHead = getHtmlDocHead & cr & "<link rel=""icon"" type=""image/jpg"" href=""" & genericController.getCdnFileLink(cpCore, VirtualFilename) & """ >"
                     End Select
                 End If
             End If
@@ -9447,7 +9447,7 @@ ErrorTrap:
             '
             Dim encoding As String
             encoding = cpCore.htmlDoc.html_EncodeHTML(cpCore.siteProperties.getText("Site Character Encoding", "utf-8"))
-            getHTMLInternalHead = getHTMLInternalHead _
+            getHtmlDocHead = getHtmlDocHead _
                 & OtherHeadTags _
                 & cr & "<meta http-equiv=""content-type"" content=""text/html; charset=" & encoding & """ >" _
                 & cr & "<meta http-equiv=""content-language"" content=""en-us"" >" _
@@ -9460,7 +9460,7 @@ ErrorTrap:
             ' no-follow
             '
             If cpCore.webServer.webServerIO_response_NoFollow Then
-                getHTMLInternalHead = getHTMLInternalHead _
+                getHtmlDocHead = getHtmlDocHead _
                     & cr & "<meta name=""robots"" content=""nofollow"" >" _
                     & cr & "<meta name=""mssmarttagspreventparsing"" content=""true"" >"
             End If
@@ -9476,24 +9476,24 @@ ErrorTrap:
                 If cpCore.htmlDoc.refreshQueryString <> "" Then
                     BaseHref = BaseHref & "?" & cpCore.htmlDoc.refreshQueryString
                 End If
-                getHTMLInternalHead = getHTMLInternalHead & cr & "<base href=""" & BaseHref & """ >"
+                getHtmlDocHead = getHtmlDocHead & cr & "<base href=""" & BaseHref & """ >"
             End If
             '
             ' Head Javascript -- (should be) last for performance
             '
-            getHTMLInternalHead = getHTMLInternalHead _
+            getHtmlDocHead = getHtmlDocHead _
                 & cr & "<script language=""JavaScript"" type=""text/javascript""  src=""" & cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.webServerIO_requestDomain & "/ccLib/ClientSide/Core.js""></script>" _
                 & ""
             If cpCore.htmlDoc.main_HeadScriptCnt > 0 Then
                 For Ptr = 0 To cpCore.htmlDoc.main_HeadScriptCnt - 1
                     With cpCore.htmlDoc.main_HeadScripts(Ptr)
                         If (.addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
-                            getHTMLInternalHead = getHTMLInternalHead & cr & "<!-- from " & .addedByMessage & " -->"
+                            getHtmlDocHead = getHtmlDocHead & cr & "<!-- from " & .addedByMessage & " -->"
                         End If
                         If Not .IsLink Then
-                            getHTMLInternalHead = getHTMLInternalHead & cr & "<script Language=""JavaScript"" type=""text/javascript"">" & .Text & cr & "</script>"
+                            getHtmlDocHead = getHtmlDocHead & cr & "<script Language=""JavaScript"" type=""text/javascript"">" & .Text & cr & "</script>"
                         Else
-                            getHTMLInternalHead = getHTMLInternalHead & cr & "<script type=""text/javascript"" src=""" & .Text & """></script>"
+                            getHtmlDocHead = getHtmlDocHead & cr & "<script type=""text/javascript"" src=""" & .Text & """></script>"
                         End If
                     End With
                 Next
@@ -9507,7 +9507,7 @@ ErrorTrap:
                 If Left(OtherHeadTags, 2) <> vbCrLf Then
                     OtherHeadTags = vbCrLf & OtherHeadTags
                 End If
-                getHTMLInternalHead = getHTMLInternalHead & genericController.vbReplace(OtherHeadTags, vbCrLf, cr)
+                getHtmlDocHead = getHtmlDocHead & genericController.vbReplace(OtherHeadTags, vbCrLf, cr)
             End If
             '
             Exit Function
@@ -10240,7 +10240,7 @@ ErrorTrap:
                     If main_GetRecordAddLink2 <> "" Then
                         main_GetRecordAddLink2 = "" _
                             & vbCrLf & vbTab & "<div style=""display:inline;"">" _
-                            & genericController.kmaIndent(main_GetRecordAddLink2) _
+                            & genericController.htmlIndent(main_GetRecordAddLink2) _
                             & vbCrLf & vbTab & "</div>"
                     End If
                     '
@@ -10518,24 +10518,24 @@ ErrorTrap:
             '
             s0 = "" _
                 & cr & "<td style=""padding:" & MyPadding & "px;vertical-align:top"" class=""" & MyStylePanel & """>" _
-                & genericController.kmaIndent(genericController.encodeText(Panel)) _
+                & genericController.htmlIndent(genericController.encodeText(Panel)) _
                 & cr & "</td>" _
                 & ""
             '
             s1 = "" _
                 & cr & "<tr>" _
-                & genericController.kmaIndent(s0) _
+                & genericController.htmlIndent(s0) _
                 & cr & "</tr>" _
                 & ""
             s2 = "" _
                 & cr & "<table style=""width:" & contentPanelWidthStyle & ";border:0px;"" class=""" & MyStylePanel & """ cellspacing=""0"">" _
-                & genericController.kmaIndent(s1) _
+                & genericController.htmlIndent(s1) _
                 & cr & "</table>" _
                 & ""
             s3 = "" _
                 & cr & "<td width=""1"" height=""" & MyHeightMin & """ class=""" & MyStyleHilite & """><img alt=""space"" src=""/ccLib/images/spacer.gif"" height=""" & MyHeightMin & """ width=""1"" ></td>" _
                 & cr & "<td width=""" & ContentPanelWidth & """ valign=""top"" align=""left"" class=""" & MyStylePanel & """>" _
-                & genericController.kmaIndent(s2) _
+                & genericController.htmlIndent(s2) _
                 & cr & "</td>" _
                 & cr & "<td width=""1"" class=""" & MyStyleShadow & """><img alt=""space"" src=""/ccLib/images/spacer.gif"" height=""1"" width=""1"" ></td>" _
                 & ""
@@ -10544,7 +10544,7 @@ ErrorTrap:
                 & cr2 & "<td colspan=""3"" class=""" & MyStyleHilite & """><img alt=""space"" src=""/ccLib/images/spacer.gif"" height=""1"" width=""" & MyWidth & """ ></td>" _
                 & cr & "</tr>" _
                 & cr & "<tr>" _
-                & genericController.kmaIndent(s3) _
+                & genericController.htmlIndent(s3) _
                 & cr & "</tr>" _
                 & cr & "<tr>" _
                 & cr2 & "<td colspan=""3"" class=""" & MyStyleShadow & """><img alt=""space"" src=""/ccLib/images/spacer.gif"" height=""1"" width=""" & MyWidth & """ ></td>" _
@@ -10552,7 +10552,7 @@ ErrorTrap:
                 & ""
             main_GetPanel = "" _
                 & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""" & MyWidth & """ class=""" & MyStylePanel & """>" _
-                & genericController.kmaIndent(s4) _
+                & genericController.htmlIndent(s4) _
                 & cr & "</table>" _
                 & ""
         End Function
@@ -10958,19 +10958,19 @@ ErrorTrap:
                     '
                     Copy = "" _
                         & cr & "<td width=""50%"" class=""ccPanelInput"" style=""vertical-align:bottom;"">" _
-                        & genericController.kmaIndent(LoginPanel) _
+                        & genericController.htmlIndent(LoginPanel) _
                         & cr & "</td>" _
                         & cr & "<td width=""50%"" class=""ccPanelInput"" style=""vertical-align:bottom;"">" _
-                        & genericController.kmaIndent(OptionsPanel) _
+                        & genericController.htmlIndent(OptionsPanel) _
                         & cr & "</td>"
                     Copy = "" _
                         & cr & "<tr>" _
-                        & genericController.kmaIndent(Copy) _
+                        & genericController.htmlIndent(Copy) _
                         & cr & "</tr>" _
                         & ""
                     Copy = "" _
                         & cr & "<table border=""0"" cellpadding=""3"" cellspacing=""0"" width=""100%"">" _
-                        & genericController.kmaIndent(Copy) _
+                        & genericController.htmlIndent(Copy) _
                         & cr & "</table>"
                     ToolsPanel.Add(main_GetPanelInput(Copy))
                     ToolsPanel.Add(cpCore.htmlDoc.html_GetFormEnd)
@@ -11073,7 +11073,7 @@ ErrorTrap:
                             & main_GetPanel(DebugPanel, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5)
                     End If
                 End If
-                main_GetToolsPanel = cr & "<div class=""ccCon"">" & genericController.kmaIndent(main_GetToolsPanel) & cr & "</div>"
+                main_GetToolsPanel = cr & "<div class=""ccCon"">" & genericController.htmlIndent(main_GetToolsPanel) & cr & "</div>"
             End If
         End Function
         '
@@ -11182,7 +11182,7 @@ ErrorTrap:
                     & cpcore.siteProperties.docTypeDeclarationAdmin _
                     & vbCrLf & "<html>" _
                     & vbCrLf & "<head>" _
-                    & getHTMLInternalHead(True) _
+                    & getHtmlDocHead(True) _
                     & vbCrLf & "</head>" _
                     & vbCrLf & "<body class=""ccBodyAdmin ccCon"">" _
                     & htmlBody _
@@ -11198,17 +11198,17 @@ ErrorTrap:
         '
         ' assemble all the html parts
         '
-        Public Function main_assembleHtmlDoc(ByVal docType As String, ByVal head As String, ByVal bodyTag As String, ByVal Body As String) As String
-            main_assembleHtmlDoc = "" _
+        Public Function assembleHtmlDoc(ByVal docType As String, ByVal head As String, ByVal bodyTag As String, ByVal Body As String) As String
+            Return "" _
                 & docType _
-                & vbCrLf & "<html>" _
-                & cr & "<head>" _
-                & genericController.kmaIndent(head) _
-                & cr & "</head>" _
-                & cr & bodyTag _
-                & genericController.kmaIndent(Body) _
-                & cr & "</body>" _
-                & vbCrLf & "</html>"
+                & cr & "<html>" _
+                & cr2 & "<head>" _
+                & genericController.htmlIndent(head) _
+                & cr2 & "</head>" _
+                & cr2 & bodyTag _
+                & genericController.htmlIndent(Body) _
+                & cr2 & "</body>" _
+                & cr & "</html>"
         End Function
         ''
         ''========================================================================

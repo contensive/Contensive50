@@ -822,9 +822,9 @@ Namespace Contensive.Core
                     '
                     ' ----- cpcore.main_RefreshQueryString
                     '
-                    Id = cpCore.docProperties.getInteger("bid")
+                    Id = cpCore.docProperties.getInteger(rnPageId)
                     If Id <> 0 Then
-                        Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("bid", Id.ToString)
+                        Call cpCore.htmlDoc.webServerIO_addRefreshQueryString(rnPageId, Id.ToString)
                     End If
                     Id = cpCore.docProperties.getInteger("sid")
                     If Id <> 0 Then

@@ -13,7 +13,7 @@ Namespace integrationTests
         '
         Const layoutContent As String = "content"
         Const layoutA As String = "<div id=""aid"" class=""aclass"">" & layoutContent & "</div>"
-        Const layoutB As String = "<div id=""bid"" class=""bclass"">" & layoutA & "</div>"
+        Const layoutB As String = "<div id=""" & rnPageId & """ class=""bclass"">" & layoutA & "</div>"
         Const layoutC As String = "<div id=""cid"" class=""cclass"">" & layoutB & "</div>"
         Const templateHeadTag As String = "<meta http-equiv=""content-type"" content=""text/html; charset=utf-8"" >"
         Const templateA As String = "<html><head>" & templateHeadTag & "</head><body>" & layoutC & "</body></html>"

@@ -264,7 +264,7 @@ leak200:
                     & ""
                 Call Stream.Add("" _
                     & cr & "<div style=""display:table;margin:100px auto auto auto;"">" _
-                    & genericController.kmaIndent(s) _
+                    & genericController.htmlIndent(s) _
                     & cr & "</div>" _
                     & "")
             Else
@@ -575,7 +575,7 @@ leak200:
                     Call Stream.Add(ContentCell)
                 Else
                     Call Stream.Add(cr & GetForm_Top(MenuEntryContentName))
-                    Call Stream.Add(genericController.kmaIndent(ContentCell))
+                    Call Stream.Add(genericController.htmlIndent(ContentCell))
                     Call Stream.Add(cr & AdminFormBottom)
                 End If
                 Call Stream.Add(cr & "<script language=""javascript1.2"" type=""text/javascript"">" & JavaScriptString)
@@ -9164,7 +9164,7 @@ ErrorTrap:
                     Stream.Add("" _
                         & cr & "<table border=0 cellpadding=0 cellspacing=0><tr>" _
                         & cr & "<td class=""ccToolsCon"" valign=top>" _
-                        & genericController.kmaIndent(AdminNavFull) _
+                        & genericController.htmlIndent(AdminNavFull) _
                         & cr & "</td>" _
                         & cr & "<td id=""desktop"" class=""ccContentCon"" valign=top>")
                     AdminFormBottom = AdminFormBottom & "</td></tr></table>"
@@ -13363,7 +13363,7 @@ ErrorTrap:
                     End If
                     returnContent &= "<div class=""ccFilterSubHead"">Content&nbsp;Categories</div>"
                     If FirstCaption <> "" Then
-                        returnContent &= cr & "<ul class=""ccFilterList"">" & genericController.kmaIndent(lis) & cr & "</ul>"
+                        returnContent &= cr & "<ul class=""ccFilterList"">" & genericController.htmlIndent(lis) & cr & "</ul>"
                         'S &="<div class=""ccFilterIndent"">" & Tree.GetTree(CStr(0), OpenMenuName) & "</div>"
                     Else
                         returnContent &= "<div class=""ccFilterIndent ccFilterList"">not defined</div>"
@@ -15149,7 +15149,7 @@ ErrorTrap:
                             '
                             Content = "" _
                                 & cr & "<table>" _
-                                & genericController.kmaIndent(Content) _
+                                & genericController.htmlIndent(Content) _
                                 & cr & "</table>" _
                                 & ""
                             '
@@ -16028,8 +16028,8 @@ ErrorTrap:
                             & vbCrLf & "<div>" & cpCore.htmlDoc.html_GetFormInputText2("editorbackgroundcolor", cpCore.siteProperties.getText("Editor Background Color", "white")) & "</div>" _
                             & vbCrLf & "<div>&nbsp;</div>" _
                             & vbCrLf & "<div><b>Toolbar features available</b></div>" _
-                            & vbCrLf & "<table border=""0"" cellpadding=""4"" cellspacing=""0"" width=""500px"" align=left>" & genericController.kmaIndent(Copy) & vbCrLf & kmaEndTable
-                        Copy = vbCrLf & genericController.StartTable(20, 0, 0) & "<tr><td>" & genericController.kmaIndent(Copy) & "</td></tr>" & vbCrLf & kmaEndTable
+                            & vbCrLf & "<table border=""0"" cellpadding=""4"" cellspacing=""0"" width=""500px"" align=left>" & genericController.htmlIndent(Copy) & vbCrLf & kmaEndTable
+                        Copy = vbCrLf & genericController.StartTable(20, 0, 0) & "<tr><td>" & genericController.htmlIndent(Copy) & "</td></tr>" & vbCrLf & kmaEndTable
                         Content.Add(Copy)
                         ButtonList = ButtonCancel & "," & ButtonRefresh & "," & ButtonSave & "," & ButtonOK
                         Content.Add(cpCore.htmlDoc.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormEditorConfig))

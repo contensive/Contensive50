@@ -35,7 +35,7 @@ Namespace Contensive.Core.Controllers
         Public Shared Function error_GetUserError(cpcore As coreClass) As String
             error_GetUserError = genericController.encodeText(cpcore.debug_iUserError)
             If error_GetUserError <> "" Then
-                error_GetUserError = "<ul class=""ccError"">" & genericController.kmaIndent(error_GetUserError) & cr & "</ul>"
+                error_GetUserError = "<ul class=""ccError"">" & genericController.htmlIndent(error_GetUserError) & cr & "</ul>"
                 error_GetUserError = UserErrorHeadline & "" & error_GetUserError
                 cpcore.debug_iUserError = ""
             End If

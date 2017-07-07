@@ -1334,7 +1334,7 @@ Namespace Contensive.Core.Controllers
                                     If IsInline Then
                                         returnVal = cr & "<div id=""" & ContainerCssID & """ class=""" & ContainerCssClass & """ style=""display:inline;"">" & returnVal & "</div>"
                                     Else
-                                        returnVal = cr & "<div id=""" & ContainerCssID & """ class=""" & ContainerCssClass & """>" & kmaIndent(returnVal) & cr & "</div>"
+                                        returnVal = cr & "<div id=""" & ContainerCssID & """ class=""" & ContainerCssClass & """>" & htmlIndent(returnVal) & cr & "</div>"
                                     End If
                                 End If
                             End If
@@ -1358,7 +1358,7 @@ Namespace Contensive.Core.Controllers
                                         & cpCore.siteProperties.docTypeDeclaration() _
                                         & vbCrLf & "<html>" _
                                         & cr & "<head>" _
-                                        & vbCrLf & kmaIndent(cpCore.htmlDoc.getHTMLInternalHead(False)) _
+                                        & vbCrLf & htmlIndent(cpCore.htmlDoc.getHtmlDocHead(False)) _
                                         & cr & "</head>" _
                                         & cr & TemplateDefaultBodyTag _
                                         & cr & "</body>" _
@@ -1424,7 +1424,7 @@ Namespace Contensive.Core.Controllers
                                             Else
                                                 returnVal = "" _
                                                     & cr & "<!-- Add-on " & AddonCommentName & " -->" _
-                                                    & kmaIndent(returnVal) _
+                                                    & htmlIndent(returnVal) _
                                                     & cr & "<!-- /Add-on " & AddonCommentName & " -->"
                                             End If
                                         End If

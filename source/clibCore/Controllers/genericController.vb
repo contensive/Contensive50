@@ -1263,7 +1263,7 @@ Namespace Contensive.Core.Controllers
         '    '
         '    '   Indent every line by 1 tab
         '    '
-        Public Shared Function kmaIndent(ByVal Source As String) As String
+        Public Shared Function htmlIndent(ByVal Source As String, Optional depth As Integer = 1) As String
             Dim posStart As Integer
             Dim posEnd As Integer
             Dim pre As String
@@ -1280,7 +1280,8 @@ Namespace Contensive.Core.Controllers
                     '
                     ' no textarea
                     '
-                    kmaIndent = vbReplace(Source, vbCrLf & vbTab, vbCrLf & vbTab & vbTab)
+                    Dim replaceText As String = vbCrLf & New String(CChar(vbTab), (depth + 1))
+                    htmlIndent = vbReplace(Source, vbCrLf & vbTab, replaceText)
                 Else
                     '
                     ' text area found, isolate it and indent before and after
@@ -1294,7 +1295,7 @@ Namespace Contensive.Core.Controllers
                         target = Mid(Source, posStart, posEnd - posStart + Len("</textarea>"))
                         post = Mid(Source, posEnd + Len("</textarea>"))
                     End If
-                    kmaIndent = kmaIndent(pre) & target & kmaIndent(post)
+                    htmlIndent = htmlIndent(pre) & target & htmlIndent(post)
                 End If
             Else
                 '
@@ -1309,7 +1310,7 @@ Namespace Contensive.Core.Controllers
                     target = Mid(Source, posStart, posEnd - posStart + Len("]]>"))
                     post = Mid(Source, posEnd + 3)
                 End If
-                kmaIndent = kmaIndent(pre) & target & kmaIndent(post)
+                htmlIndent = htmlIndent(pre) & target & htmlIndent(post)
             End If
             '    kmaIndent = Source
             '    If vbInstr(1, kmaIndent, "<textarea", vbTextCompare) = 0 Then

@@ -120,7 +120,7 @@ Namespace Contensive.Core
         ''' <returns></returns>
         Public Overrides ReadOnly Property pageId() As Integer
             Get
-                If (cpCore.pages.page IsNot Nothing) Then
+                If (cpCore.pages.page Is Nothing) Then
                     Return 0
                 Else
                     Return cpCore.pages.page.id
@@ -135,7 +135,7 @@ Namespace Contensive.Core
         ''' <returns></returns>
         Public Overrides ReadOnly Property pageName() As String
             Get
-                If (cpCore.pages.page IsNot Nothing) Then
+                If (cpCore.pages.page Is Nothing) Then
                     Return ""
                 Else
                     Return cpCore.pages.page.name

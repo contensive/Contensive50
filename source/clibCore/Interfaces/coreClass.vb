@@ -124,7 +124,7 @@ Namespace Contensive.Core
         Public ReadOnly Property pages As pagesController
             Get
                 If (_pages Is Nothing) Then
-                    _pages = New pagesController(Me)
+                    _pages = New pagesController(Me, docProperties.getInteger(rnPageId))
                 End If
                 Return _pages
             End Get
@@ -1659,7 +1659,7 @@ Namespace Contensive.Core
                 '        'PageCopy = main_GetSectionPage(AllowChildPage, False)
                 '    Else
                 '        OrderByClause = docProperties.getText(RequestNameOrderByClause)
-                '        PageID = docProperties.getInteger("bid")
+                '        PageID = docProperties.getInteger(rnPageId)
                 '        '
                 '        ' 5/12/2008 - converted to RootPageID call because we do not use RootPageName anymore
                 '        '
@@ -1728,16 +1728,16 @@ Namespace Contensive.Core
                             & siteProperties.docTypeDeclaration() _
                             & "<html>" _
                             & cr & "<head>" _
-                            & genericController.kmaIndent(htmlDoc.getHTMLInternalHead(False)) _
+                            & genericController.htmlIndent(htmlDoc.getHtmlDocHead(False)) _
                             & cr & "</head>" _
                             & cr & "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">" _
-                            & genericController.kmaIndent(htmlDoc.main_GetPanelHeader("Contensive Resource Library")) _
+                            & genericController.htmlIndent(htmlDoc.main_GetPanelHeader("Contensive Resource Library")) _
                             & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td>" _
                             & cr2 & "<div style=""border-top:1px solid white;border-bottom:1px solid black;height:2px""><img alt=""spacer"" src=""/ccLib/images/spacer.gif"" width=1 height=1></div>" _
-                            & genericController.kmaIndent(Copy) _
+                            & genericController.htmlIndent(Copy) _
                             & cr & "</td></tr>" _
                             & cr & "<tr><td>" _
-                            & genericController.kmaIndent(htmlDoc.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False)) _
+                            & genericController.htmlIndent(htmlDoc.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False)) _
                             & cr & "</td></tr></table>" _
                             & cr & "<script language=javascript type=""text/javascript"">fixDialog();</script>" _
                             & cr & "</body>" _
@@ -1766,7 +1766,7 @@ Namespace Contensive.Core
                             & siteProperties.docTypeDeclaration() _
                             & cr & "<html>" _
                             & cr & "<head>" _
-                            & genericController.kmaIndent(htmlDoc.getHTMLInternalHead(False)) _
+                            & genericController.htmlIndent(htmlDoc.getHtmlDocHead(False)) _
                             & cr & "</head>" _
                             & cr & "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">" _
                             & htmlDoc.main_GetPanelHeader("Contensive Resource Library") _
@@ -1828,12 +1828,12 @@ Namespace Contensive.Core
                             & siteProperties.docTypeDeclaration() _
                             & cr & "<html>" _
                             & cr & "<head>" _
-                            & genericController.kmaIndent(htmlDoc.getHTMLInternalHead(False)) _
+                            & genericController.htmlIndent(htmlDoc.getHtmlDocHead(False)) _
                             & cr & "</head>" _
                             & cr & "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">" _
-                            & genericController.kmaIndent(htmlDoc.main_GetPanelHeader("Contensive Site Explorer")) _
+                            & genericController.htmlIndent(htmlDoc.main_GetPanelHeader("Contensive Site Explorer")) _
                             & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td>" _
-                            & genericController.kmaIndent(Copy) _
+                            & genericController.htmlIndent(Copy) _
                             & cr & "</td></tr><tr><td>" & htmlDoc.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False) & "</td></tr></table>" _
                             & cr & "</body>" _
                             & cr & "</html>"
@@ -1894,7 +1894,7 @@ Namespace Contensive.Core
                     '        ' Determine bid (PageID) from referer querystring
                     '        '
                     '        Copy = webServer.requestReferrer
-                    '        Pos = genericController.vbInstr(1, Copy, "bid=")
+                    '        Pos = genericController.vbInstr(1, Copy, rnPageId & "=")
                     '        If Pos <> 0 Then
                     '            Copy = Trim(Mid(Copy, Pos + 4))
                     '            Pos = genericController.vbInstr(1, Copy, "&")

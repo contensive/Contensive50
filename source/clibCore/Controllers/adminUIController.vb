@@ -188,7 +188,7 @@ ErrorTrap:
             GetEditButtonBar2 = "" _
                 & vbCrLf & vbTab & GetHTMLComment("ButtonBar") _
                 & vbCrLf & vbTab & "<div class=""ccButtonCon"">" _
-                & kmaIndent(GetEditButtonBar2) _
+                & htmlIndent(GetEditButtonBar2) _
                 & vbCrLf & vbTab & "</div><!-- ButtonBar End -->" _
                 & ""
             Exit Function
@@ -216,10 +216,10 @@ ErrorTrap:
             If isInStr(1, HeaderMessage & RightSideMessage, vbCrLf) Then
                 s = "" _
                     & cr & "<td width=""50%"" valign=Middle class=""cchLeft"">" _
-                    & kmaIndent(HeaderMessage) _
+                    & htmlIndent(HeaderMessage) _
                     & cr & "</td>" _
                     & cr & "<td width=""50%"" valign=Middle class=""cchRight"">" _
-                    & kmaIndent(RightSideMessage) _
+                    & htmlIndent(RightSideMessage) _
                     & cr & "</td>"
             Else
                 s = "" _
@@ -228,12 +228,12 @@ ErrorTrap:
             End If
             s = "" _
                 & cr & "<table border=0 cellpadding=0 cellspacing=0 width=""100%""><tr>" _
-                & kmaIndent(s) _
+                & htmlIndent(s) _
                 & cr & "</tr></table>" _
                 & ""
             s = "" _
                 & cr & "<div class=""ccHeaderCon"">" _
-                & kmaIndent(s) _
+                & htmlIndent(s) _
                 & cr & "</div>" _
                 & ""
             GetHeader = s
@@ -419,7 +419,7 @@ ErrorTrap:
             If ContentSummary <> "" Then
                 CellContentSummary = "" _
                     & cr & "<div class=""ccPanelBackground"" style=""padding:10px;"">" _
-                    & kmaIndent(cpCore.htmlDoc.main_GetPanel(ContentSummary, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)) _
+                    & htmlIndent(cpCore.htmlDoc.main_GetPanel(ContentSummary, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)) _
                     & cr & "</div>"
             End If
             '
@@ -445,19 +445,19 @@ ErrorTrap:
             '
             ContentCell = "" _
                 & cr & "<div style=""padding:" & ContentPadding & "px;"">" _
-                & kmaIndent(Content) _
+                & htmlIndent(Content) _
                 & cr & "</div>"
             GetBody = GetBody _
-                & kmaIndent(ButtonBar) _
-                & kmaIndent(GetTitleBar(Caption, Description)) _
-                & kmaIndent(CellContentSummary) _
-                & kmaIndent(ContentCell) _
-                & kmaIndent(ButtonBar) _
+                & htmlIndent(ButtonBar) _
+                & htmlIndent(GetTitleBar(Caption, Description)) _
+                & htmlIndent(CellContentSummary) _
+                & htmlIndent(ContentCell) _
+                & htmlIndent(ButtonBar) _
                 & ""
 
             GetBody = "" _
                 & cr & cpCore.htmlDoc.html_GetUploadFormStart() _
-                & kmaIndent(GetBody) _
+                & htmlIndent(GetBody) _
                 & cr & cpCore.htmlDoc.html_GetUploadFormEnd
             '
             Exit Function

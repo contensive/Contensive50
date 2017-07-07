@@ -69,6 +69,34 @@ Namespace Contensive.Core.Models.Entity
         'Public Const contentDataSource As String = "" '<----- set to datasource if not default
         '
         '====================================================================================================
+        '-- field types
+        '
+        Public Class fieldTypeTextFile
+
+            Public Property filename As String
+            Public Property copy As String
+            '    Get
+            '        If (_copy Is Nothing) Then
+            '            _copy = ""
+            '            If (filename IsNot Nothing) Then
+            '                _copy = cpCore.privateFiles.readFile(filename)
+            '                _copyUpdate = False
+            '            End If
+            '        End If
+            '        Return _copy
+            '    End Get
+            '    Set(value As String)
+            '        If (Not _copy.Equals(value)) Then
+            '            _copy = value
+            '            _copyUpdate = True
+            '        End If
+            '    End Set
+            'End Property
+            'Private _copy As String = Nothing
+            'Private _copyUpdate As Boolean = False
+        End Class
+        '
+        '====================================================================================================
         ' -- instance properties
         Public Property id As Integer
         Public Property name As String
@@ -206,7 +234,7 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleExceptionAndContinue(ex)
                 Throw
             End Try
             Return result
@@ -310,21 +338,37 @@ Namespace Contensive.Core.Models.Entity
                     Dim instanceType As Type = GetType(T)
                     Dim tableName As String = derivedContentTableName(instanceType)
                     instance = DirectCast(Activator.CreateInstance(instanceType), T)
-                    For Each resultProperty As PropertyInfo In instance.GetType().GetProperties(BindingFlags.Instance Or BindingFlags.Public)
-                        Select Case resultProperty.Name.ToLower()
+                    For Each instanceProperty As PropertyInfo In instance.GetType().GetProperties(BindingFlags.Instance Or BindingFlags.Public)
+                        Select Case instanceProperty.Name.ToLower()
                             Case "specialcasefield"
                             Case Else
-                                Select Case resultProperty.PropertyType.Name
+                                Select Case instanceProperty.PropertyType.Name
                                     Case "Int32"
-                                        resultProperty.SetValue(instance, cs.getInteger(resultProperty.Name), Nothing)
+                                        instanceProperty.SetValue(instance, cs.getInteger(instanceProperty.Name), Nothing)
                                     Case "Boolean"
-                                        resultProperty.SetValue(instance, cs.getBoolean(resultProperty.Name), Nothing)
+                                        instanceProperty.SetValue(instance, cs.getBoolean(instanceProperty.Name), Nothing)
                                     Case "DateTime"
-                                        resultProperty.SetValue(instance, cs.getDate(resultProperty.Name), Nothing)
+                                        instanceProperty.SetValue(instance, cs.getDate(instanceProperty.Name), Nothing)
                                     Case "Double"
-                                        resultProperty.SetValue(instance, cs.getNumber(resultProperty.Name), Nothing)
+                                        instanceProperty.SetValue(instance, cs.getNumber(instanceProperty.Name), Nothing)
+                                    Case "String"
+                                        instanceProperty.SetValue(instance, cs.getText(instanceProperty.Name), Nothing)
+                                    Case "fieldTypeTextFile"
+                                        Dim copy As String = ""
+                                        copy = cs.getTextFile(instanceProperty.Name)
+                                        Dim filename As String = cs.getText(instanceProperty.Name) ' = DirectCast(filenameProperty.GetValue(propertyInstance), String)
+                                        Dim propertyInstance As fieldTypeTextFile = DirectCast(instanceProperty.GetValue(instance), fieldTypeTextFile)
+                                        Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("copy")
+                                        If (Not String.IsNullOrEmpty(filename)) Then
+                                            copy = cpCore.privateFiles.readFile(filename)
+                                            If (String.IsNullOrEmpty(copy)) Then
+                                                cpCore.programDataFiles.deleteFile(filename)
+                                                cs.setField(instanceProperty.Name, "")
+                                            End If
+                                        End If
+                                        copyProperty.SetValue(propertyInstance, copy)
                                     Case Else
-                                        resultProperty.SetValue(instance, cs.getText(resultProperty.Name), Nothing)
+                                        instanceProperty.SetValue(instance, cs.getText(instanceProperty.Name), Nothing)
                                 End Select
                         End Select
                     Next
@@ -387,8 +431,8 @@ Namespace Contensive.Core.Models.Entity
                             Throw New ApplicationException("Unable to insert record in content [" & contentName & "]")
                         End If
                     End If
-                    For Each resultProperty As PropertyInfo In Me.GetType().GetProperties(BindingFlags.Instance Or BindingFlags.Public)
-                        Select Case resultProperty.Name.ToLower()
+                    For Each instanceProperty As PropertyInfo In Me.GetType().GetProperties(BindingFlags.Instance Or BindingFlags.Public)
+                        Select Case instanceProperty.Name.ToLower()
                             Case "id"
                                 id = cs.getInteger("id")
                             Case "ccguid"
@@ -396,30 +440,47 @@ Namespace Contensive.Core.Models.Entity
                                     ccguid = Controllers.genericController.getGUID()
                                 End If
                                 Dim value As String
-                                value = resultProperty.GetValue(Me, Nothing).ToString()
-                                cs.setField(resultProperty.Name, value)
+                                value = instanceProperty.GetValue(Me, Nothing).ToString()
+                                cs.setField(instanceProperty.Name, value)
                             Case Else
-                                Select Case resultProperty.PropertyType.Name
+                                Select Case instanceProperty.PropertyType.Name
                                     Case "Int32"
                                         Dim value As Integer
-                                        Integer.TryParse(resultProperty.GetValue(Me, Nothing).ToString(), value)
-                                        cs.setField(resultProperty.Name, value)
+                                        Integer.TryParse(instanceProperty.GetValue(Me, Nothing).ToString(), value)
+                                        cs.setField(instanceProperty.Name, value)
                                     Case "Boolean"
                                         Dim value As Boolean
-                                        Boolean.TryParse(resultProperty.GetValue(Me, Nothing).ToString(), value)
-                                        cs.setField(resultProperty.Name, value)
+                                        Boolean.TryParse(instanceProperty.GetValue(Me, Nothing).ToString(), value)
+                                        cs.setField(instanceProperty.Name, value)
                                     Case "DateTime"
                                         Dim value As Date
-                                        Date.TryParse(resultProperty.GetValue(Me, Nothing).ToString(), value)
-                                        cs.setField(resultProperty.Name, value)
+                                        Date.TryParse(instanceProperty.GetValue(Me, Nothing).ToString(), value)
+                                        cs.setField(instanceProperty.Name, value)
                                     Case "Double"
                                         Dim value As Double
-                                        Double.TryParse(resultProperty.GetValue(Me, Nothing).ToString(), value)
-                                        cs.setField(resultProperty.Name, value)
+                                        Double.TryParse(instanceProperty.GetValue(Me, Nothing).ToString(), value)
+                                        cs.setField(instanceProperty.Name, value)
+                                    Case "fieldTypeTextFile"
+                                        Dim propertyInstance As fieldTypeTextFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeTextFile)
+                                        Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("copy")
+                                        Dim copy As String = DirectCast(copyProperty.GetValue(propertyInstance), String)
+                                        If (String.IsNullOrEmpty(copy)) Then
+                                            '
+                                            ' -- empty copy
+                                            Dim filename As String = cs.getText(instanceProperty.Name) ' = DirectCast(filenameProperty.GetValue(propertyInstance), String)
+                                            If (Not String.IsNullOrEmpty(filename)) Then
+                                                cs.setField(instanceProperty.Name, "")
+                                                cpCore.privateFiles.deleteFile(filename)
+                                            End If
+                                        Else
+                                            '
+                                            ' -- save copy
+                                            cs.setFile(instanceProperty.Name, copy, contentName)
+                                        End If
                                     Case Else
                                         Dim value As String
-                                        value = resultProperty.GetValue(Me, Nothing).ToString()
-                                        cs.setField(resultProperty.Name, value)
+                                        value = instanceProperty.GetValue(Me, Nothing).ToString()
+                                        cs.setField(instanceProperty.Name, value)
                                 End Select
                         End Select
                     Next

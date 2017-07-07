@@ -280,6 +280,12 @@ Namespace Contensive.Core
         End Function
         '
         '====================================================================================================
+        ''' <summary>
+        ''' returns the text value stored in the field. For Lookup fields, this method returns the name of the foreign key record.
+        ''' For textFile fields, this method returns the filename.
+        ''' </summary>
+        ''' <param name="FieldName"></param>
+        ''' <returns></returns>
         Public Function getText(ByVal FieldName As String) As String
             Dim result As String = String.Empty
             Try
@@ -300,6 +306,11 @@ Namespace Contensive.Core
         End Function
         '
         '====================================================================================================
+        ''' <summary>
+        ''' returns the text stored in a textfile type field instead of the filename.
+        ''' </summary>
+        ''' <param name="FieldName"></param>
+        ''' <returns></returns>
         Public Function getTextFile(ByVal FieldName As String) As String
             Dim result As String = String.Empty
             Try

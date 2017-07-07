@@ -113,6 +113,7 @@ Namespace Contensive.Core
         Public Const DefaultLandingSectionName = "Home"
         '
         Public Const defaultLandingPageHtml = ""
+        Public Const defaultTemplateName = "Default"
         Public Const defaultTemplateHtml = "{% {""addon"":{""addon"":""menu"",""name"":""Default""}} %}{% ""Content Box"" %}"
         '
         '
@@ -281,6 +282,7 @@ Namespace Contensive.Core
         '
         Public Const rnRedirectContentId As String = "rc"
         Public Const rnRedirectRecordId As String = "ri"
+        Public Const rnPageId As String = "bid"
         '
         '-----------------------------------------------------------------------
         '   Form Contension Strategy

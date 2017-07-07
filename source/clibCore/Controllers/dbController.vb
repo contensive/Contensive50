@@ -5465,7 +5465,7 @@ Namespace Contensive.Core.Controllers
                         End If
                     End If
                     If main_GetLinkByContentRecordKey <> "" Then
-                        main_GetLinkByContentRecordKey = genericController.modifyLinkQuery(main_GetLinkByContentRecordKey, "bid", CStr(RecordID), True)
+                        main_GetLinkByContentRecordKey = genericController.modifyLinkQuery(main_GetLinkByContentRecordKey, rnPageId, CStr(RecordID), True)
                     End If
                 End If
             End If

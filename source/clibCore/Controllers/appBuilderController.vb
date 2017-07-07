@@ -502,7 +502,7 @@ Namespace Contensive.Core.Controllers
                             domain.save(cpcore)
                             '
                             landingPage.TemplateID = defaultTemplate.ID
-                            landingPage.Copyfilename = constants.defaultLandingPageHtml
+                            landingPage.Copyfilename.copy = constants.defaultLandingPageHtml
                             landingPage.save(cpcore)
                             '
                             landingSection.Caption = "Default Section"
