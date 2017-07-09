@@ -16,6 +16,99 @@ Namespace Contensive.Core.Controllers
         ''' </summary>
         ' -- not sure if this is the best plan, buts lets try this and see if we can get out of it later (to make this an addon) 
         Private cpcore As coreClass
+        '
+        ' Public view bubble editors
+        '
+        'Public Property html_HelpViewerButtonID As String = ""
+        Public Property html_EditWrapperCnt As Integer = 0
+        '
+        Public Property html_DocBodyFilter As String = ""
+        '
+        '
+        Public Property html_LegacySiteStyles_Loaded As Boolean = False
+        '
+        Public Property menu_MenuSystemCloseCount As Integer = 0
+        '
+        ' -- Help Subsystem
+        Friend Property htmlDoc_HelpCodeCount As Integer = 0
+        Friend Property htmlDoc_HelpCodeSize As Integer = 0
+        Friend Property htmlDoc_HelpCodes As String()
+        Friend Property htmlDoc_HelpCaptions As String()
+        Friend Property htmlDoc_HelpDialogCnt As Integer = 0
+        '
+        Public Property htmlForEndOfBody As String = ""             ' Anything that needs to be written to the Page during main_GetClosePage
+        '
+        Public Property pageManager_printVersion As Boolean = False
+        '
+        Public Const htmlDoc_JavaStreamChunk = 100
+        Public Const htmlDoc_OutStreamStandard = 0
+        Public Const htmlDoc_OutStreamJavaScript = 1
+        '
+        Public Property refreshQueryString As String = ""      ' the querystring required to return to the current state (perform a refresh)
+        Public Property pageManager_RedirectContentID As Integer = 0
+        Public Property pageManager_RedirectRecordID As Integer = 0
+        Public Property htmlDoc_JavaStreamHolder As String()
+        Public Property htmlDoc_JavaStreamSize As Integer = 0
+        Public Property htmlDoc_JavaStreamCount As Integer = 0
+        Public Property htmlDoc_IsStreamWritten As Boolean = False       ' true when anything has been writeAltBuffered.
+        '
+        Public Property outputBufferEnabled As Boolean = True          ' when true (default), stream is buffered until page is done
+        Public Property docBuffer As String = ""                   ' if any method calls writeAltBuffer, string concatinates here. If this is not empty at exit, it is used instead of returned string
+        '
+        Public Property main_MetaContent_Title As String = ""
+        Public Property main_MetaContent_Description As String = ""
+        Public Property main_MetaContent_OtherHeadTags As String = ""
+        Public Property main_MetaContent_KeyWordList As String = ""
+        Public Property main_MetaContent_StyleSheetTags As String = ""
+        Public Property main_MetaContent_TemplateStyleSheetTag As String = ""
+        Public Property main_MetaContent_SharedStyleIDList As String = ""
+        '
+        Public Property main_TabObject As menuTabController
+        Public Property html_ComboTabObject As menuComboTabController
+        Public Property main_LiveTabObject As menuLiveTabController
+        '
+        Public Property main_AdminWarning As String = ""                                      ' Message - when set displays in an admin hint box in the page
+        Public Property main_AdminWarningPageID As Integer = 0                                  ' PageID that goes with the warning
+        'Public main_AdminWarningSectionID As Integer = 0                               ' PageID that goes with the warning
+        '
+        Public Property main_CheckListCnt As Integer = 0                    ' cnt of the main_GetFormInputCheckList calls - used for javascript
+        '
+        Public Property main_page_IncludedAddonIDList As String = ""
+        '
+        Public Property main_OnLoadJavascript As String = ""
+        Public Property main_endOfBodyJavascript As String = ""           ' javascript that goes at the end of the close page
+        Public Property main_endOfBodyString As String = ""
+        '
+        ' block of js code that goes into a script tag
+        '
+        Public Structure main_HeadScriptType
+            Dim IsLink As Boolean
+            Dim Text As String
+            Dim addedByMessage As String
+        End Structure
+        Public Property main_HeadScriptCnt As Integer = 0
+        Public Property main_HeadScripts As main_HeadScriptType()
+        '
+        ' Page Bake Header
+        '
+        Public Const main_BakeHeadDelimiter = "#####MultilineFlag#####"
+        '
+        ' Count of how many main_GetFormInputDate calendars have been placed
+        '
+        Public Property main_InputDateCnt As Integer = 0
+        '
+        ' Cache the input selects (admin uses the same ones over and over)
+        '
+        Public Structure main_InputSelectCacheType
+            Dim SelectRaw As String
+            Dim ContentName As String
+            Dim Criteria As String
+            Dim CurrentValue As String
+        End Structure
+        Public Property main_InputSelectCacheCnt As Integer = 0
+        Public Property main_InputSelectCache As main_InputSelectCacheType()
+        '
+        Public Property main_FormInputTextCnt As Integer = 0
         Public Property docQuickEditCopy As String = ""
         Private Property docJavascriptOnLoad_Cnt As Integer
         Private Property docJavascriptOnLoad As String()
@@ -32,28 +125,28 @@ Namespace Contensive.Core.Controllers
         Public template As Models.Entity.pageTemplateModel
         Public templateReason As String = ""                           ' a message that explains why this template was selected
         '
-        Public siteStructure As String = ""
-        Public siteStructure_LocalLoaded As Boolean = False
+        Public Property siteStructure As String = ""
+        Public Property siteStructure_LocalLoaded As Boolean = False
         Public Const navStruc_Descriptor = 1           ' Descriptors:0 = RootPage, 1 = Parent Page, 2 = Current Page, 3 = Child Page
         Public Const navStruc_Descriptor_CurrentPage = 2
         Public Const navStruc_Descriptor_ChildPage = 3
         Public Const navStruc_TemplateId = 7
-        Public bodyContent As String = ""                    ' The page's content at the OnPageEndEvent - used to let OnPageStart and OnPageEnd Add-ons change the content
+        Public Property bodyContent As String = ""                    ' The page's content at the OnPageEndEvent - used to let OnPageStart and OnPageEnd Add-ons change the content
         'Public pageManager_ContentPageStructure As String = ""           ' deprecated name for currentNavigationStructure
-        Public landingPageID As Integer = 0                              ' Set from Site Property (use main_GetLandingPageID)
-        Public landingPageID_Loaded As Boolean = False                   '   true when pageManager_LandingPageID is loaded
-        Public landingPageName As String = ""                          ' Set from pageManager_LandingPageID (use main_GetLandingPageName)
-        Public landingLink As String = ""                              ' Default Landing page - managed through main_GetLandingLink()
+        Public Property landingPageID As Integer = 0                              ' Set from Site Property (use main_GetLandingPageID)
+        Public Property landingPageID_Loaded As Boolean = False                   '   true when pageManager_LandingPageID is loaded
+        Public Property landingPageName As String = ""                          ' Set from pageManager_LandingPageID (use main_GetLandingPageName)
+        Public Property landingLink As String = ""                              ' Default Landing page - managed through main_GetLandingLink()
         'Public templateName As String = ""                             ' Name of the template
         'Public templateLink As String = ""                             ' Link this template requires - redirect caused if this is not the current link
         'Public templateBody As String = ""                             ' Body field of the TemplateID
         'Public templateBodyTag As String = ""                          ' BodyTag - from Template record, if blank, use TemplateDefaultBodyTag
-        Public sectionMenuLinkDefault As String = ""
+        Public Property sectionMenuLinkDefault As String = ""
         Public Const blockMessageDefault = "<p>The content on this page has restricted access. If you have a username and password for this system, <a href=""?method=login"" rel=""nofollow"">Click Here</a>. For more information, please contact the administrator.</p>"
-        Public redirectLink As String = ""                             ' If there is a problem, a redirect is forced
-        Public pageManager_RedirectReason As String = ""                           ' reason for redirect
-        Public pageManager_RedirectBecausePageNotFound As Boolean = False            ' if true, redirect will go through a 404 so bots will not follow
-        Public pageManager_RedirectSourcePageID As Integer = 0                       ' the pageid of the page with this issue, 0 if not a page problem
+        Public Property redirectLink As String = ""                             ' If there is a problem, a redirect is forced
+        Public Property pageManager_RedirectReason As String = ""                           ' reason for redirect
+        Public Property pageManager_RedirectBecausePageNotFound As Boolean = False            ' if true, redirect will go through a 404 so bots will not follow
+        Public Property pageManager_RedirectSourcePageID As Integer = 0                       ' the pageid of the page with this issue, 0 if not a page problem
         '
         'Public currentPageID As Integer = 0                   ' The current page's id
         'Public currentPageName As String = ""               ' The current page's name
@@ -301,7 +394,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' ----- Encode Template
                     '
-                    If Not cpCore.html.pageManager_printVersion Then
+                    If Not cpCore.doc.pageManager_printVersion Then
                         LocalTemplateBody = cpCore.html.html_executeContentCommands(Nothing, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated, layoutError)
                         returnBody = returnBody & cpCore.html.html_encodeContent9(LocalTemplateBody, cpCore.authContext.user.id, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain, False, cpCore.siteProperties.defaultWrapperID, PageContent, CPUtilsBaseClass.addonContext.ContextTemplate)
                         'returnHtmlBody = returnHtmlBody & EncodeContent8(LocalTemplateBody, memberID, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", main_ServerProtocol, False, app.SiteProperty_DefaultWrapperID, PageContent, ContextTemplate)
@@ -345,9 +438,9 @@ Namespace Contensive.Core.Controllers
                             If addonId > 0 Then
                                 AddonName = cpCore.addonLegacyCache.addonCache.addonList(addonCachePtr.ToString).name
                                 'hint = hint & ",AddonName=" & AddonName
-                                cpCore.html.html_DocBodyFilter = returnBody
+                                cpCore.doc.html_DocBodyFilter = returnBody
                                 AddonReturn = cpCore.addon.execute_legacy2(addonId, "", "", CPUtilsBaseClass.addonContext.ContextFilter, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
-                                returnBody = cpCore.html.html_DocBodyFilter & AddonReturn
+                                returnBody = cpCore.doc.html_DocBodyFilter & AddonReturn
                                 If Not FilterStatusOK Then
                                     Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError12("pageManager_GetHtmlBody", "There was an error processing OnBodyEnd for [" & AddonName & "]. Filtering was aborted.")
                                     Exit For
@@ -405,8 +498,8 @@ Namespace Contensive.Core.Controllers
                 Dim IsPageNotFound As Boolean = False
                 '
                 If cpCore.continueProcessing Then
-                    cpCore.html.main_AdminWarning = cpCore.docProperties.getText("main_AdminWarningMsg")
-                    cpCore.html.main_AdminWarningPageID = cpCore.docProperties.getInteger("main_AdminWarningPageID")
+                    cpCore.doc.main_AdminWarning = cpCore.docProperties.getText("main_AdminWarningMsg")
+                    cpCore.doc.main_AdminWarningPageID = cpCore.docProperties.getInteger("main_AdminWarningPageID")
                     '
                     ' todo move cookie test to htmlDoc controller
                     ' -- Add cookie test
@@ -456,21 +549,21 @@ Namespace Contensive.Core.Controllers
                     '       ri = redirect content recordid
                     '--------------------------------------------------------------------------
                     '
-                    cpCore.html.pageManager_RedirectContentID = (cpCore.docProperties.getInteger(rnRedirectContentId))
-                    If (cpCore.html.pageManager_RedirectContentID <> 0) Then
-                        cpCore.html.pageManager_RedirectRecordID = (cpCore.docProperties.getInteger(rnRedirectRecordId))
-                        If (cpCore.html.pageManager_RedirectRecordID <> 0) Then
-                            Dim contentName As String = cpCore.metaData.getContentNameByID(cpCore.html.pageManager_RedirectContentID)
+                    cpCore.doc.pageManager_RedirectContentID = (cpCore.docProperties.getInteger(rnRedirectContentId))
+                    If (cpCore.doc.pageManager_RedirectContentID <> 0) Then
+                        cpCore.doc.pageManager_RedirectRecordID = (cpCore.docProperties.getInteger(rnRedirectRecordId))
+                        If (cpCore.doc.pageManager_RedirectRecordID <> 0) Then
+                            Dim contentName As String = cpCore.metaData.getContentNameByID(cpCore.doc.pageManager_RedirectContentID)
                             If contentName <> "" Then
-                                If iisController.main_RedirectByRecord_ReturnStatus(cpCore, contentName, cpCore.html.pageManager_RedirectRecordID) Then
+                                If iisController.main_RedirectByRecord_ReturnStatus(cpCore, contentName, cpCore.doc.pageManager_RedirectRecordID) Then
                                     '
                                     'Call AppendLog("main_init(), 3210 - exit for rc/ri redirect ")
                                     '
                                     cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
-                                    Return cpCore.html.docBuffer
+                                    Return cpCore.doc.docBuffer
                                 Else
-                                    cpCore.html.main_AdminWarning = "<p>The site attempted to automatically jump to another page, but there was a problem with the page that included the link.<p>"
-                                    cpCore.html.main_AdminWarningPageID = cpCore.html.pageManager_RedirectRecordID
+                                    cpCore.doc.main_AdminWarning = "<p>The site attempted to automatically jump to another page, but there was a problem with the page that included the link.<p>"
+                                    cpCore.doc.main_AdminWarningPageID = cpCore.doc.pageManager_RedirectRecordID
                                 End If
                             End If
                         End If
@@ -518,7 +611,7 @@ Namespace Contensive.Core.Controllers
                         ' if a cut, load the clipboard
                         '
                         Call cpCore.visitProperty.setProperty("Clipboard", Clip)
-                        Call genericController.modifyLinkQuery(cpCore.html.refreshQueryString, RequestNameCut, "")
+                        Call genericController.modifyLinkQuery(cpCore.doc.refreshQueryString, RequestNameCut, "")
                     End If
                     ClipParentContentID = cpCore.docProperties.getInteger(RequestNamePasteParentContentID)
                     ClipParentRecordID = cpCore.docProperties.getInteger(RequestNamePasteParentRecordID)
@@ -529,8 +622,8 @@ Namespace Contensive.Core.Controllers
                         '
                         ClipBoard = cpCore.visitProperty.getText("Clipboard", "")
                         Call cpCore.visitProperty.setProperty("Clipboard", "")
-                        Call genericController.ModifyQueryString(cpCore.html.refreshQueryString, RequestNamePasteParentContentID, "")
-                        Call genericController.ModifyQueryString(cpCore.html.refreshQueryString, RequestNamePasteParentRecordID, "")
+                        Call genericController.ModifyQueryString(cpCore.doc.refreshQueryString, RequestNamePasteParentContentID, "")
+                        Call genericController.ModifyQueryString(cpCore.doc.refreshQueryString, RequestNamePasteParentRecordID, "")
                         ClipParentContentName = cpCore.metaData.getContentNameByID(ClipParentContentID)
                         If (ClipParentContentName = "") Then
                             ' state not working...
@@ -658,7 +751,7 @@ Namespace Contensive.Core.Controllers
                         '
                         Call cpCore.visitProperty.setProperty("Clipboard", "")
                         Clip = cpCore.visitProperty.getText("Clipboard", "")
-                        Call genericController.modifyLinkQuery(cpCore.html.refreshQueryString, RequestNameCutClear, "")
+                        Call genericController.modifyLinkQuery(cpCore.doc.refreshQueryString, RequestNameCutClear, "")
                     End If
                     '
                     ' link alias and link forward
@@ -814,11 +907,11 @@ Namespace Contensive.Core.Controllers
                                         Call cpCore.webServer.setResponseStatus("404 Not Found")
                                         Call cpCore.webServer.setResponseContentType("image/gif")
                                         cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
-                                        Return cpCore.html.docBuffer
+                                        Return cpCore.doc.docBuffer
                                     Else
                                         Call cpCore.webServer.redirect(genericController.getCdnFileLink(cpCore, Filename), "favicon request", False)
                                         cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
-                                        Return cpCore.html.docBuffer
+                                        Return cpCore.doc.docBuffer
                                     End If
                                 End If
                                 '
@@ -843,7 +936,7 @@ Namespace Contensive.Core.Controllers
                                     Call cpCore.webServer.setResponseContentType("text/plain")
                                     Call cpCore.html.writeAltBuffer(Content)
                                     cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
-                                    Return cpCore.html.docBuffer
+                                    Return cpCore.doc.docBuffer
                                 End If
                                 '
                                 ' No Link Forward, no Link Alias, no RemoteMethodFromPage, not Robots.txt
@@ -890,7 +983,7 @@ Namespace Contensive.Core.Controllers
                                     Call cpCore.html.main_SetMetaContent(0, 0)
                                     Call cpCore.html.writeAltBuffer(cpCore.html.getLoginPage(False) & cpCore.html.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False))
                                     cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
-                                    Return cpCore.html.docBuffer
+                                    Return cpCore.doc.docBuffer
                                 Case 2
                                     '
                                     ' block with custom content
@@ -919,7 +1012,7 @@ Namespace Contensive.Core.Controllers
                                     '& "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">"
                                     Call cpCore.html.writeAltBuffer(Copy)
                                     cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
-                                    Return cpCore.html.docBuffer
+                                    Return cpCore.doc.docBuffer
                             End Select
                         End If
                     End If
@@ -939,7 +1032,7 @@ Namespace Contensive.Core.Controllers
                     Call cpCore.html.main_AddEndOfBodyJavascript2(template.JSEndBody, "template")
                     Call cpCore.html.main_AddHeadTag2(template.OtherHeadTags, "template")
                     If template.StylesFilename <> "" Then
-                        cpCore.html.main_MetaContent_TemplateStyleSheetTag = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, template.StylesFilename) & """ >"
+                        cpCore.doc.main_MetaContent_TemplateStyleSheetTag = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, template.StylesFilename) & """ >"
                     End If
                     '
                     ' -- add shared styles
@@ -1021,7 +1114,7 @@ Namespace Contensive.Core.Controllers
                         '
                         ' build doc
                         '
-                        returnHtml = cpCore.html.assembleHtmlDoc(cpCore.siteProperties.docTypeDeclaration(), htmlDocHead, bodyTag, cpCore.html.docBuffer & htmlDocBody)
+                        returnHtml = cpCore.html.assembleHtmlDoc(cpCore.siteProperties.docTypeDeclaration(), htmlDocHead, bodyTag, cpCore.doc.docBuffer & htmlDocBody)
                     End If
                 End If
                 '
@@ -1128,8 +1221,8 @@ Namespace Contensive.Core.Controllers
                             cpCore.docProperties.setProperty(rnPageId, main_GetPageNotFoundPageId())
                             'Call main_mergeInStream(rnPageId & "=" & main_GetPageNotFoundPageId())
                             If cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
-                                cpCore.html.main_AdminWarning = PageNotFoundReason
-                                cpCore.html.main_AdminWarningPageID = 0
+                                cpCore.doc.main_AdminWarning = PageNotFoundReason
+                                cpCore.doc.main_AdminWarningPageID = 0
                             End If
                         Else
                             '
@@ -1448,20 +1541,20 @@ Namespace Contensive.Core.Controllers
                 End If
                 '
                 ' -- Add admin warning to the top of the content
-                If cpCore.authContext.isAuthenticatedAdmin(cpCore) And cpCore.html.main_AdminWarning <> "" Then
+                If cpCore.authContext.isAuthenticatedAdmin(cpCore) And cpCore.doc.main_AdminWarning <> "" Then
                     '
                     ' Display Admin Warnings with Edits for record errors
                     '
-                    If cpCore.html.main_AdminWarningPageID <> 0 Then
-                        cpCore.html.main_AdminWarning = cpCore.html.main_AdminWarning & "</p>" & cpCore.html.main_GetRecordEditLink2("Page Content", cpCore.html.main_AdminWarningPageID, True, "Page " & cpCore.html.main_AdminWarningPageID, cpCore.authContext.isAuthenticatedAdmin(cpCore)) & "&nbsp;Edit the page<p>"
-                        cpCore.html.main_AdminWarningPageID = 0
+                    If cpCore.doc.main_AdminWarningPageID <> 0 Then
+                        cpCore.doc.main_AdminWarning = cpCore.doc.main_AdminWarning & "</p>" & cpCore.html.main_GetRecordEditLink2("Page Content", cpCore.doc.main_AdminWarningPageID, True, "Page " & cpCore.doc.main_AdminWarningPageID, cpCore.authContext.isAuthenticatedAdmin(cpCore)) & "&nbsp;Edit the page<p>"
+                        cpCore.doc.main_AdminWarningPageID = 0
                     End If
                     '
                     returnHtml = "" _
-                    & cpCore.html.html_GetAdminHintWrapper(cpCore.html.main_AdminWarning) _
+                    & cpCore.html.html_GetAdminHintWrapper(cpCore.doc.main_AdminWarning) _
                     & returnHtml _
                     & ""
-                    cpCore.html.main_AdminWarning = ""
+                    cpCore.doc.main_AdminWarning = ""
                 End If
                 '
                 ' -- handle redirect and edit wrapper
@@ -1661,7 +1754,7 @@ Namespace Contensive.Core.Controllers
                                 ' authenticated
                                 '
                                 BlockCopy = "" _
-                                    & "<p>You are currently logged in as ""<b>" & cpcore.authContext.user.Name & "</b>"". If this is not you, please <a href=""?" & cpcore.html.refreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
+                                    & "<p>You are currently logged in as ""<b>" & cpcore.authContext.user.Name & "</b>"". If this is not you, please <a href=""?" & cpcore.doc.refreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
                                     & "<p>This account does not have access to this content. If you want to login with a different account, please use this form.</p>" _
                                     & ""
                                 BlockForm = cpcore.html.getLoginForm()
@@ -1685,7 +1778,7 @@ Namespace Contensive.Core.Controllers
                                 BlockForm = cpcore.html.getLoginForm()
                                 BlockCopy = "" _
                                     & "<p>This content has limited access. If you have an account, please login using this form.</p>" _
-                                    & "<p>If you do not have an account, <a href=?" & cpcore.html.refreshQueryString & "&subform=0>click here to register</a>.</p>" _
+                                    & "<p>If you do not have an account, <a href=?" & cpcore.doc.refreshQueryString & "&subform=0>click here to register</a>.</p>" _
                                     & ""
                             Else
                                 '
@@ -1702,12 +1795,12 @@ Namespace Contensive.Core.Controllers
                                     ' Not Authenticated
                                     '
                                     BlockCopy = "" _
-                                        & "<p>This content has limited access. If you have an account, <a href=?" & cpcore.html.refreshQueryString & "&subform=" & main_BlockSourceLogin & ">Click Here to login</a>.</p>" _
+                                        & "<p>This content has limited access. If you have an account, <a href=?" & cpcore.doc.refreshQueryString & "&subform=" & main_BlockSourceLogin & ">Click Here to login</a>.</p>" _
                                         & "<p>To view this content, please complete this form.</p>" _
                                         & ""
                                 Else
                                     BlockCopy = "" _
-                                        & "<p>You are currently logged in as ""<b>" & cpcore.authContext.user.Name & "</b>"". If this is not you, please <a href=""?" & cpcore.html.refreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
+                                        & "<p>You are currently logged in as ""<b>" & cpcore.authContext.user.Name & "</b>"". If this is not you, please <a href=""?" & cpcore.doc.refreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
                                         & "<p>This account does not have access to this content. To view this content, please complete this form.</p>" _
                                         & ""
                                 End If
@@ -1749,8 +1842,8 @@ Namespace Contensive.Core.Controllers
                     '
                     returnHtml = cpcore.html.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.id, cpcore.authContext.isAuthenticated, layoutError)
                     returnHtml = cpcore.html.html_encodeContent9(returnHtml, cpcore.authContext.user.id, pageContentModel.contentName, PageRecordID, page.ContactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
-                    If cpcore.html.refreshQueryString <> "" Then
-                        returnHtml = genericController.vbReplace(returnHtml, "?method=login", "?method=Login&" & cpcore.html.refreshQueryString, 1, 99, vbTextCompare)
+                    If cpcore.doc.refreshQueryString <> "" Then
+                        returnHtml = genericController.vbReplace(returnHtml, "?method=login", "?method=Login&" & cpcore.doc.refreshQueryString, 1, 99, vbTextCompare)
                     End If
                     '
                     ' Add in content padding required for integration with the template
@@ -1771,7 +1864,7 @@ Namespace Contensive.Core.Controllers
                             '
                             returnHtml = cpcore.html.html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.user.id, cpcore.authContext.isAuthenticated, layoutError)
                             returnHtml = cpcore.html.html_encodeContent9(returnHtml, cpcore.authContext.user.id, pageContentModel.contentName, PageRecordID, page.ContactMemberID, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, cpcore.siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
-                        ElseIf cpcore.html.pageManager_printVersion Then
+                        ElseIf cpcore.doc.pageManager_printVersion Then
                             '
                             ' Printer Version -> personalize and count viewings, no tracking
                             '
@@ -1941,11 +2034,11 @@ Namespace Contensive.Core.Controllers
                     returnHtml = bodyContent
                     '
                 End If
-                If cpcore.html.main_MetaContent_Title = "" Then
+                If cpcore.doc.main_MetaContent_Title = "" Then
                     '
                     ' Set default page title
                     '
-                    cpcore.html.main_MetaContent_Title = page.name
+                    cpcore.doc.main_MetaContent_Title = page.name
                 End If
                 '
                 ' add contentid and sectionid
@@ -1954,17 +2047,17 @@ Namespace Contensive.Core.Controllers
                 '
                 ' Display Admin Warnings with Edits for record errors
                 '
-                If cpcore.html.main_AdminWarning <> "" Then
+                If cpcore.doc.main_AdminWarning <> "" Then
                     '
-                    If cpcore.html.main_AdminWarningPageID <> 0 Then
-                        cpcore.html.main_AdminWarning = cpcore.html.main_AdminWarning & "</p>" & cpcore.html.main_GetRecordEditLink2("Page Content", cpcore.html.main_AdminWarningPageID, True, "Page " & cpcore.html.main_AdminWarningPageID, cpcore.authContext.isAuthenticatedAdmin(cpcore)) & "&nbsp;Edit the page<p>"
-                        cpcore.html.main_AdminWarningPageID = 0
+                    If cpcore.doc.main_AdminWarningPageID <> 0 Then
+                        cpcore.doc.main_AdminWarning = cpcore.doc.main_AdminWarning & "</p>" & cpcore.html.main_GetRecordEditLink2("Page Content", cpcore.doc.main_AdminWarningPageID, True, "Page " & cpcore.doc.main_AdminWarningPageID, cpcore.authContext.isAuthenticatedAdmin(cpcore)) & "&nbsp;Edit the page<p>"
+                        cpcore.doc.main_AdminWarningPageID = 0
                     End If
                     returnHtml = "" _
-                    & cpcore.html.html_GetAdminHintWrapper(cpcore.html.main_AdminWarning) _
+                    & cpcore.html.html_GetAdminHintWrapper(cpcore.doc.main_AdminWarning) _
                     & returnHtml _
                     & ""
-                    cpcore.html.main_AdminWarning = ""
+                    cpcore.doc.main_AdminWarning = ""
                 End If
             Catch ex As Exception
                 cpcore.handleExceptionAndContinue(ex)
@@ -2084,7 +2177,7 @@ Namespace Contensive.Core.Controllers
                 Dim BreadCrumbPrefix As String
                 Dim isRootPage As Boolean = pageToRootList.Count.Equals(1)
                 '
-                If allowReturnLinkComposite And (Not isRootPage) And (Not cpcore.html.pageManager_printVersion) Then
+                If allowReturnLinkComposite And (Not isRootPage) And (Not cpcore.doc.pageManager_printVersion) Then
                     '
                     ' ----- Print Heading if not at root Page
                     '
@@ -2097,14 +2190,14 @@ Namespace Contensive.Core.Controllers
                 End If
                 result = result & breadCrumb
                 '
-                If (Not cpcore.html.pageManager_printVersion) Then
+                If (Not cpcore.doc.pageManager_printVersion) Then
                     Dim IconRow As String = ""
                     If (Not cpcore.authContext.visit.Bot) And (page.AllowPrinterVersion Or page.AllowEmailPage) Then
                         '
                         ' not a bot, and either print or email allowed
                         '
                         If page.AllowPrinterVersion Then
-                            Dim QueryString As String = cpcore.html.refreshQueryString
+                            Dim QueryString As String = cpcore.doc.refreshQueryString
                             QueryString = genericController.ModifyQueryString(QueryString, rnPageId, genericController.encodeText(page.id), True)
                             QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, HardCodedPagePrinterVersion, True)
                             Dim Caption As String = cpcore.siteProperties.getText("PagePrinterVersionCaption", "Printer Version")
@@ -2112,7 +2205,7 @@ Namespace Contensive.Core.Controllers
                             IconRow = IconRow & cr & "&nbsp;&nbsp;<a href=""" & cpcore.html.html_EncodeHTML(cpcore.webServer.webServerIO_requestPage & "?" & QueryString) & """ target=""_blank""><img alt=""image"" src=""/ccLib/images/IconSmallPrinter.gif"" width=""13"" height=""13"" border=""0"" align=""absmiddle""></a>&nbsp<a href=""" & cpcore.html.html_EncodeHTML(cpcore.webServer.webServerIO_requestPage & "?" & QueryString) & """ target=""_blank"" style=""text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;"">" & Caption & "</a>"
                         End If
                         If page.AllowEmailPage Then
-                            Dim QueryString As String = cpcore.html.refreshQueryString
+                            Dim QueryString As String = cpcore.doc.refreshQueryString
                             If QueryString <> "" Then
                                 QueryString = "?" & QueryString
                             End If
@@ -2194,7 +2287,7 @@ Namespace Contensive.Core.Controllers
                 End If
                 '
                 ' ----- Feedback
-                If (Not cpcore.html.pageManager_printVersion) And (page.ContactMemberID <> 0) And page.AllowFeedback Then
+                If (Not cpcore.doc.pageManager_printVersion) And (page.ContactMemberID <> 0) And page.AllowFeedback Then
                     result = result & cr & "<ac TYPE=""" & ACTypeFeedback & """>"
                 End If
                 '
@@ -2440,7 +2533,7 @@ Namespace Contensive.Core.Controllers
                         '
                         ' ----- print the feedback submit form
                         '
-                        Panel = "<form Action=""" & Me.cpcore.webServer.webServerIO_ServerFormActionURL & "?" & Me.cpcore.html.refreshQueryString & """ Method=""post"">"
+                        Panel = "<form Action=""" & Me.cpcore.webServer.webServerIO_ServerFormActionURL & "?" & Me.cpcore.doc.refreshQueryString & """ Method=""post"">"
                         Panel = Panel & "<table border=""0"" cellpadding=""4"" cellspacing=""0"" width=""100%"">"
                         Panel = Panel & "<tr>"
                         Panel = Panel & "<td colspan=""2""><p>Your feedback is welcome</p></td>"
@@ -7308,8 +7401,8 @@ ErrorTrap:
             Dim NVSplit() As String
             '
             pageManager_GetSectionLink = ShortLink
-            If cpcore.html.refreshQueryString <> "" Then
-                QSplit = Split(cpcore.html.refreshQueryString, "&")
+            If cpcore.doc.refreshQueryString <> "" Then
+                QSplit = Split(cpcore.doc.refreshQueryString, "&")
                 QSPlitCount = UBound(QSplit) + 1
                 For QSplitPointer = 0 To QSPlitCount - 1
                     NVSplit = Split(QSplit(QSplitPointer), "=")

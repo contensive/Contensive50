@@ -150,7 +150,7 @@ Namespace Contensive.Core
         ''' <returns></returns>
         Public Overrides ReadOnly Property refreshQueryString() As String
             Get
-                Return cpCore.html.refreshQueryString
+                Return cpcore.doc.refreshQueryString
             End Get
         End Property
         '

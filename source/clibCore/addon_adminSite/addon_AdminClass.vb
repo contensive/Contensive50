@@ -568,7 +568,7 @@ leak200:
                 '    'ContentCell = "<div class=""ccAdminMsg"">The form you requested did not return a valid response.</div>"
                 'End If
                 '
-                If cpCore.html.pageManager_printVersion Then
+                If cpcore.doc.pageManager_printVersion Then
                     '
                     ' For print version, just add content
                     '
@@ -4773,7 +4773,7 @@ ErrorTrap:
                 ' ----- Bad Links
                 '
                 Copy = "n/a"
-                QueryString = genericController.ModifyQueryString(cpCore.html.refreshQueryString, RequestNameAdminForm, AdminFormReports, True)
+                QueryString = genericController.ModifyQueryString(cpcore.doc.refreshQueryString, RequestNameAdminForm, AdminFormReports, True)
                 QueryString = genericController.ModifyQueryString(QueryString, RequestNameReportForm, ReportFormEDGDocErrors, True)
                 SQL = "SELECT Count(ccEDGPublishDocs.ID) AS PagesFound FROM ccEDGPublishDocs where (UpToDate=1) And (LinkAlias Is Not null) And ((HTTPResponse Is null) Or ((Not (HTTPResponse Like '% 200 %'))and (not (HTTPResponse like '% 302 %'))));"
                 CSPointer = cpCore.db.cs_openCsSql_rev("Default", SQL)
@@ -9092,7 +9092,7 @@ ErrorTrap:
                 '
                 ' AdminTabs
                 '
-                QS = cpCore.html.refreshQueryString
+                QS = cpcore.doc.refreshQueryString
                 If allowAdminTabs Then
                     QS = genericController.ModifyQueryString(QS, "tabs", "0", True)
                     RightSide = RightSide & GetActiveImage(cpCore.serverConfig.appConfig.adminRoute & "?" & QS, "Disable Tabs", "LibButtonNoTabs.GIF", "LibButtonNoTabsRev.GIF", "Disable Tabs", "16", "16", "", "", "")
@@ -9103,7 +9103,7 @@ ErrorTrap:
                 '
                 ' Menu Mode
                 '
-                QS = cpCore.html.refreshQueryString
+                QS = cpcore.doc.refreshQueryString
                 If MenuDepth = 0 Then
                     RightSide = RightSide & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""16"" >"
                     If AdminMenuModeID = AdminMenuModeTop Then
@@ -9118,7 +9118,7 @@ ErrorTrap:
                 ' Refresh Button
                 '
                 RightSide = RightSide & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""16"" >"
-                RightSide = RightSide & GetActiveImage(cpCore.serverConfig.appConfig.adminRoute & "?" & cpCore.html.refreshQueryString, "Refresh", "LibButtonRefresh.GIF", "LibButtonRefreshOver.GIF", "Refresh", "16", "16", "", "", "")
+                RightSide = RightSide & GetActiveImage(cpCore.serverConfig.appConfig.adminRoute & "?" & cpcore.doc.refreshQueryString, "Refresh", "LibButtonRefresh.GIF", "LibButtonRefreshOver.GIF", "Refresh", "16", "16", "", "", "")
                 '
                 ' Assemble header
                 '
@@ -11544,7 +11544,7 @@ ErrorTrap:
                 '
                 'Tab0.Add( "<p>The following is a list of available downloads</p>")
                 ''
-                RQS = cpCore.html.refreshQueryString
+                RQS = cpcore.doc.refreshQueryString
                 PageSize = cpCore.docProperties.getInteger(RequestNamePageSize)
                 If PageSize = 0 Then
                     PageSize = 50
@@ -12188,7 +12188,7 @@ ErrorTrap:
                 '
                 Tab0.Add("<p>The following is a list of available custom reports.</p>")
                 '
-                RQS = cpCore.html.refreshQueryString
+                RQS = cpcore.doc.refreshQueryString
                 PageSize = cpCore.docProperties.getInteger(RequestNamePageSize)
                 If PageSize = 0 Then
                     PageSize = 50
@@ -12766,7 +12766,7 @@ ErrorTrap:
                                         & vbCrLf & "<div id=""IndexFilterContentClosed"" class=""closed"">" & FilterClosedLabel & "</div>" _
                                         & vbCrLf & "<div id=""IndexFilterContentMinWidth"" style=""display:none;""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""200"" height=""1"" style=""clear:both""></div>" _
                                         & vbCrLf & "</div>"
-                                    AjaxQS = cpCore.html.refreshQueryString
+                                    AjaxQS = cpcore.doc.refreshQueryString
                                     AjaxQS = genericController.ModifyQueryString(AjaxQS, RequestNameAjaxFunction, AjaxOpenIndexFilterGetContent)
                                     IndexFilterJS = "" _
                                         & vbCrLf & "<script Language=""JavaScript"" type=""text/javascript"">" _
@@ -14542,7 +14542,7 @@ ErrorTrap:
                     End If
                     IndexConfig = LoadIndexConfig(adminContent)
                     Button = "CriteriaSelect"
-                    RQS = cpCore.html.refreshQueryString
+                    RQS = cpcore.doc.refreshQueryString
                     '
                     ' ----- ButtonBar
                     '
@@ -15634,7 +15634,7 @@ ErrorTrap:
                                     Caption = Caption & "*"
                                     InheritedFieldCount = InheritedFieldCount + 1
                                 End If
-                                AStart = "<a href=""?" & cpCore.html.refreshQueryString & "&FieldName=" & cpCore.html.html_EncodeHTML(.nameLc) & "&fi=" & fieldId & "&dtcn=" & ColumnPtr & "&" & RequestNameAdminSubForm & "=" & AdminFormIndex_SubFormSetColumns
+                                AStart = "<a href=""?" & cpcore.doc.refreshQueryString & "&FieldName=" & cpCore.html.html_EncodeHTML(.nameLc) & "&fi=" & fieldId & "&dtcn=" & ColumnPtr & "&" & RequestNameAdminSubForm & "=" & AdminFormIndex_SubFormSetColumns
                                 Call Stream.Add("<td width=""" & ColumnWidth & "%"" valign=""top"" align=""left"">" & SpanClassAdminNormal & Caption & "<br >")
                                 Call Stream.Add("<img src=""/ccLib/images/black.GIF"" width=""100%"" height=""1"" >")
                                 Call Stream.Add(AStart & "&dta=" & ToolsActionRemoveField & """><img src=""/ccLib/images/LibButtonDeleteUp.gif"" width=""50"" height=""15"" border=""0"" ></A><BR >")
@@ -15737,7 +15737,7 @@ ErrorTrap:
                                     '
                                     ' can be used as column header
                                     '
-                                    Stream.Add("<a href=""?" & cpCore.html.refreshQueryString & "&fi=" & .id & "&dta=" & ToolsActionAddField & "&" & RequestNameAddFieldID & "=" & .id & "&" & RequestNameAdminSubForm & "=" & AdminFormIndex_SubFormSetColumns & """><img src=""/ccLib/images/LibButtonAddUp.gif"" width=""50"" height=""15"" border=""0"" ></A> " & .caption & "<br>")
+                                    Stream.Add("<a href=""?" & cpcore.doc.refreshQueryString & "&fi=" & .id & "&dta=" & ToolsActionAddField & "&" & RequestNameAddFieldID & "=" & .id & "&" & RequestNameAdminSubForm & "=" & AdminFormIndex_SubFormSetColumns & """><img src=""/ccLib/images/LibButtonAddUp.gif"" width=""50"" height=""15"" border=""0"" ></A> " & .caption & "<br>")
                                 End If
                             End If
                         End With

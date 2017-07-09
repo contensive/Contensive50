@@ -849,7 +849,7 @@ ErrorTrap:
             'If IsArray(Cells) Then
             ColumnCount = UBound(Cells, 2)
             'End If
-            RQS = cpCore.html.refreshQueryString
+            RQS = cpcore.doc.refreshQueryString
             '
             SortColPtr = GetReportSortColumnPtr(DefaultSortColumnPtr)
             SortColType = GetReportSortType()
@@ -934,11 +934,11 @@ ErrorTrap:
                 If PageCount > 1 Then
                     GetReport2 = GetReport2 & "<br>Go to Page "
                     If PagePointer <> 1 Then
-                        WorkingQS = cpCore.html.refreshQueryString
+                        WorkingQS = cpcore.doc.refreshQueryString
                         WorkingQS = genericController.ModifyQueryString(WorkingQS, "GotoPage", "1", True)
                         GetReport2 = GetReport2 & "<a href=""" & cpCore.webServer.webServerIO_requestPage & "?" & WorkingQS & """>1</A>...&nbsp;"
                     End If
-                    WorkingQS = cpCore.html.refreshQueryString
+                    WorkingQS = cpcore.doc.refreshQueryString
                     WorkingQS = genericController.ModifyQueryString(WorkingQS, RequestNamePageSize, CStr(ReportPageSize), True)
                     Do While (PagePointer <= PageCount) And (LinkCount < 20)
                         If PagePointer = ReportPageNumber Then

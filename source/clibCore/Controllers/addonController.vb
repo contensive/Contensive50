@@ -872,7 +872,7 @@ Namespace Contensive.Core.Controllers
                                         & RequestNameRemoteMethodAddon & "=" & EncodeRequestVariable(AddonNameOrGuid_Local) _
                                         & "&HostContentName=" & EncodeRequestVariable(HostContentName) _
                                         & "&HostRecordID=" & HostRecordID _
-                                        & "&HostRQS=" & EncodeRequestVariable(cpCore.html.refreshQueryString) _
+                                        & "&HostRQS=" & EncodeRequestVariable(cpcore.doc.refreshQueryString) _
                                         & "&HostQS=" & EncodeRequestVariable(cpCore.webServer.requestQueryString) _
                                         & "&HostForm=" & EncodeRequestVariable(cpCore.webServer.requestFormString) _
                                         & "&optionstring=" & EncodeRequestVariable(WorkingOptionString) _
@@ -1401,7 +1401,7 @@ Namespace Contensive.Core.Controllers
                                                 AddonEditIcon = "<a href=""" & cpCore.siteProperties.adminURL & "?cid=" & cpCore.metaData.getContentId(cnAddons) & "&id=" & addonId & "&af=4&aa=2&ad=1"" tabindex=""-1"">" & AddonEditIcon & "</a>"
                                                 InstanceSettingsEditIcon = getInstanceBubble(AddonName, AddonOptionExpandedConstructor, HostContentName, HostRecordID, HostFieldName, ACInstanceID, Context, DialogList)
                                                 AddonStylesEditIcon = getAddonStylesBubble(addonId, DialogList)
-                                                HTMLViewerEditIcon = getHTMLViewerBubble(addonId, "editWrapper" & cpCore.html.html_EditWrapperCnt, DialogList)
+                                                HTMLViewerEditIcon = getHTMLViewerBubble(addonId, "editWrapper" & cpCore.doc.html_EditWrapperCnt, DialogList)
                                                 HelpIcon = getHelpBubble(addonId, helpCopy, addonCollectionId, DialogList)
                                                 ToolBar = InstanceSettingsEditIcon & AddonEditIcon & AddonStylesEditIcon & SiteStylesEditIcon & HTMLViewerEditIcon & HelpIcon
                                                 ToolBar = genericController.vbReplace(ToolBar, "&nbsp;", "", 1, 99, vbTextCompare)
@@ -2883,7 +2883,7 @@ ErrorTrap:
         '=============================================================================================================
         '
         Public Function execute_legacy2(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal Option_String As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal IsIncludeAddon As Boolean, ByVal DefaultWrapperID As Integer, ByVal ignore_TemplateCaseOnly_PageContent As String, ByRef return_StatusOK As Boolean, ByVal nothingObject As Object, Optional ByVal AddonInUseIdList As String = "") As String
-            execute_legacy2 = execute(addonId, AddonNameOrGuid, Option_String, Context, HostContentName, HostRecordID, HostFieldName, ACInstanceID, IsIncludeAddon, DefaultWrapperID, ignore_TemplateCaseOnly_PageContent, return_StatusOK, nothingObject, AddonInUseIdList, Nothing, cpCore.html.main_page_IncludedAddonIDList, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated)
+            execute_legacy2 = execute(addonId, AddonNameOrGuid, Option_String, Context, HostContentName, HostRecordID, HostFieldName, ACInstanceID, IsIncludeAddon, DefaultWrapperID, ignore_TemplateCaseOnly_PageContent, return_StatusOK, nothingObject, AddonInUseIdList, Nothing, cpCore.doc.main_page_IncludedAddonIDList, cpCore.authContext.user.id, cpCore.authContext.isAuthenticated)
         End Function
         '
         '===============================================================================================================================================
@@ -2925,7 +2925,7 @@ ErrorTrap:
                         & "<table border=0 cellpadding=0 cellspacing=0 width=""100%"">" _
                         & "<tr>" _
                         & "<td align=left class=""bbLeft"">Options for this instance of " & AddonName & "</td>" _
-                        & "<td align=right class=""bbRight""><a href=""#"" onClick=""HelpBubbleOff('HelpBubble" & cpCore.html.htmlDoc_HelpCodeCount & "');return false;""><img alt=""close"" src=""/ccLib/images/ClosexRev1313.gif"" width=13 height=13 border=0></a></td>" _
+                        & "<td align=right class=""bbRight""><a href=""#"" onClick=""HelpBubbleOff('HelpBubble" & cpCore.doc.htmlDoc_HelpCodeCount & "');return false;""><img alt=""close"" src=""/ccLib/images/ClosexRev1313.gif"" width=13 height=13 border=0></a></td>" _
                         & "</tr>" _
                         & "</table>" _
                         & "</div>"
@@ -3112,14 +3112,14 @@ ErrorTrap:
                             & cpCore.html.html_GetFormInputHidden("ACInstanceID", ACInstanceID)
                     End If
                     '
-                    BubbleJS = " onClick=""HelpBubbleOn( 'HelpBubble" & cpCore.html.htmlDoc_HelpCodeCount & "',this);return false;"""
-                    QueryString = cpCore.html.refreshQueryString
+                    BubbleJS = " onClick=""HelpBubbleOn( 'HelpBubble" & cpCore.doc.htmlDoc_HelpCodeCount & "',this);return false;"""
+                    QueryString = cpCore.doc.refreshQueryString
                     QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
                     'QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                     return_DialogList = return_DialogList _
                         & "<div class=""ccCon helpDialogCon"">" _
                         & cpCore.html.html_GetUploadFormStart() _
-                        & "<table border=0 cellpadding=0 cellspacing=0 class=""ccBubbleCon"" id=""HelpBubble" & cpCore.html.htmlDoc_HelpCodeCount & """ style=""display:none;visibility:hidden;"">" _
+                        & "<table border=0 cellpadding=0 cellspacing=0 class=""ccBubbleCon"" id=""HelpBubble" & cpCore.doc.htmlDoc_HelpCodeCount & """ style=""display:none;visibility:hidden;"">" _
                         & "<tr><td class=""ccHeaderCon"">" & CopyHeader & "</td></tr>" _
                         & "<tr><td class=""ccButtonCon"">" & cpCore.html.html_GetFormButton("Update", "HelpBubbleButton") & "</td></tr>" _
                         & "<tr><td class=""ccContentCon"">" & CopyContent & "</td></tr>" _
@@ -3132,19 +3132,19 @@ ErrorTrap:
                         & "</a>" _
                         & "" _
                         & ""
-                    If cpCore.html.htmlDoc_HelpCodeCount >= cpCore.html.htmlDoc_HelpCodeSize Then
-                        cpCore.html.htmlDoc_HelpCodeSize = cpCore.html.htmlDoc_HelpCodeSize + 10
-                        ReDim Preserve cpCore.html.htmlDoc_HelpCodes(cpCore.html.htmlDoc_HelpCodeSize)
-                        ReDim Preserve cpCore.html.htmlDoc_HelpCaptions(cpCore.html.htmlDoc_HelpCodeSize)
+                    If cpCore.doc.htmlDoc_HelpCodeCount >= cpCore.doc.htmlDoc_HelpCodeSize Then
+                        cpCore.doc.htmlDoc_HelpCodeSize = cpCore.doc.htmlDoc_HelpCodeSize + 10
+                        ReDim Preserve cpCore.doc.htmlDoc_HelpCodes(cpCore.doc.htmlDoc_HelpCodeSize)
+                        ReDim Preserve cpCore.doc.htmlDoc_HelpCaptions(cpCore.doc.htmlDoc_HelpCodeSize)
                     End If
-                    cpCore.html.htmlDoc_HelpCodes(cpCore.html.htmlDoc_HelpCodeCount) = LocalCode
-                    cpCore.html.htmlDoc_HelpCaptions(cpCore.html.htmlDoc_HelpCodeCount) = AddonName
-                    cpCore.html.htmlDoc_HelpCodeCount = cpCore.html.htmlDoc_HelpCodeCount + 1
+                    cpCore.doc.htmlDoc_HelpCodes(cpCore.doc.htmlDoc_HelpCodeCount) = LocalCode
+                    cpCore.doc.htmlDoc_HelpCaptions(cpCore.doc.htmlDoc_HelpCodeCount) = AddonName
+                    cpCore.doc.htmlDoc_HelpCodeCount = cpCore.doc.htmlDoc_HelpCodeCount + 1
                     '
-                    If cpCore.html.htmlDoc_HelpDialogCnt = 0 Then
+                    If cpCore.doc.htmlDoc_HelpDialogCnt = 0 Then
                         Call cpCore.html.main_AddOnLoadJavascript2("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
                     End If
-                    cpCore.html.htmlDoc_HelpDialogCnt = cpCore.html.htmlDoc_HelpDialogCnt + 1
+                    cpCore.doc.htmlDoc_HelpDialogCnt = cpCore.doc.htmlDoc_HelpDialogCnt + 1
                 End If
             End If
             '
@@ -3200,7 +3200,7 @@ ErrorTrap:
                         & "<table border=0 cellpadding=0 cellspacing=0 width=""100%"">" _
                         & "<tr>" _
                         & "<td align=left class=""bbLeft"">Stylesheet for " & AddonName & "</td>" _
-                        & "<td align=right class=""bbRight""><a href=""#"" onClick=""HelpBubbleOff('HelpBubble" & cpCore.html.htmlDoc_HelpCodeCount & "');return false;""><img alt=""close"" src=""/ccLib/images/ClosexRev1313.gif"" width=13 height=13 border=0></a></td>" _
+                        & "<td align=right class=""bbRight""><a href=""#"" onClick=""HelpBubbleOff('HelpBubble" & cpCore.doc.htmlDoc_HelpCodeCount & "');return false;""><img alt=""close"" src=""/ccLib/images/ClosexRev1313.gif"" width=13 height=13 border=0></a></td>" _
                         & "</tr>" _
                         & "</table>" _
                         & "</div>"
@@ -3227,8 +3227,8 @@ ErrorTrap:
                         & cpCore.html.html_GetFormInputHidden("AddonID", addonId) _
                         & ""
                     '
-                    BubbleJS = " onClick=""HelpBubbleOn( 'HelpBubble" & cpCore.html.htmlDoc_HelpCodeCount & "',this);return false;"""
-                    QueryString = cpCore.html.refreshQueryString
+                    BubbleJS = " onClick=""HelpBubbleOn( 'HelpBubble" & cpCore.doc.htmlDoc_HelpCodeCount & "',this);return false;"""
+                    QueryString = cpCore.doc.refreshQueryString
                     QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
                     'QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                     Dim Dialog As String
@@ -3236,7 +3236,7 @@ ErrorTrap:
                     Dialog = Dialog _
                         & "<div class=""ccCon helpDialogCon"">" _
                         & cpCore.html.html_GetUploadFormStart() _
-                        & "<table border=0 cellpadding=0 cellspacing=0 class=""ccBubbleCon"" id=""HelpBubble" & cpCore.html.htmlDoc_HelpCodeCount & """ style=""display:none;visibility:hidden;"">" _
+                        & "<table border=0 cellpadding=0 cellspacing=0 class=""ccBubbleCon"" id=""HelpBubble" & cpCore.doc.htmlDoc_HelpCodeCount & """ style=""display:none;visibility:hidden;"">" _
                         & "<tr><td class=""ccHeaderCon"">" & CopyHeader & "</td></tr>" _
                         & "<tr><td class=""ccButtonCon"">" & cpCore.html.html_GetFormButton("Update", "HelpBubbleButton") & "</td></tr>" _
                         & "<tr><td class=""ccContentCon"">" & CopyContent & "</td></tr>" _
@@ -3248,14 +3248,14 @@ ErrorTrap:
                         & "&nbsp;<a href=""#"" tabindex=-1 target=""_blank""" & BubbleJS & ">" _
                         & GetIconSprite("", 0, "/ccLib/images/toolstyles.png", 22, 22, "Edit " & AddonName & " Stylesheets", "Edit " & AddonName & " Stylesheets", "", True, "") _
                         & "</a>"
-                    If cpCore.html.htmlDoc_HelpCodeCount >= cpCore.html.htmlDoc_HelpCodeSize Then
-                        cpCore.html.htmlDoc_HelpCodeSize = cpCore.html.htmlDoc_HelpCodeSize + 10
-                        ReDim Preserve cpCore.html.htmlDoc_HelpCodes(cpCore.html.htmlDoc_HelpCodeSize)
-                        ReDim Preserve cpCore.html.htmlDoc_HelpCaptions(cpCore.html.htmlDoc_HelpCodeSize)
+                    If cpCore.doc.htmlDoc_HelpCodeCount >= cpCore.doc.htmlDoc_HelpCodeSize Then
+                        cpCore.doc.htmlDoc_HelpCodeSize = cpCore.doc.htmlDoc_HelpCodeSize + 10
+                        ReDim Preserve cpCore.doc.htmlDoc_HelpCodes(cpCore.doc.htmlDoc_HelpCodeSize)
+                        ReDim Preserve cpCore.doc.htmlDoc_HelpCaptions(cpCore.doc.htmlDoc_HelpCodeSize)
                     End If
-                    cpCore.html.htmlDoc_HelpCodes(cpCore.html.htmlDoc_HelpCodeCount) = LocalCode
-                    cpCore.html.htmlDoc_HelpCaptions(cpCore.html.htmlDoc_HelpCodeCount) = AddonName
-                    cpCore.html.htmlDoc_HelpCodeCount = cpCore.html.htmlDoc_HelpCodeCount + 1
+                    cpCore.doc.htmlDoc_HelpCodes(cpCore.doc.htmlDoc_HelpCodeCount) = LocalCode
+                    cpCore.doc.htmlDoc_HelpCaptions(cpCore.doc.htmlDoc_HelpCodeCount) = AddonName
+                    cpCore.doc.htmlDoc_HelpCodeCount = cpCore.doc.htmlDoc_HelpCodeCount + 1
                 End If
             End If
             '
@@ -3283,7 +3283,7 @@ ErrorTrap:
             If cpCore.authContext.isAuthenticated() Then
                 If cpCore.authContext.isEditingAnything() Then
                     StyleSN = genericController.EncodeInteger(cpCore.siteProperties.getText("StylesheetSerialNumber", "0"))
-                    'cpCore.html.html_HelpViewerButtonID = "HelpBubble" & cpCore.html.htmlDoc_HelpCodeCount
+                    'cpCore.html.html_HelpViewerButtonID = "HelpBubble" & cpCore.doc.htmlDoc_HelpCodeCount
                     InnerCopy = helpCopy
                     If InnerCopy = "" Then
                         InnerCopy = "<p style=""text-align:center"">No help is available for this add-on.</p>"
@@ -3306,7 +3306,7 @@ ErrorTrap:
                         & "<table border=0 cellpadding=0 cellspacing=0 width=""100%"">" _
                         & "<tr>" _
                         & "<td align=left class=""bbLeft"">Help Viewer</td>" _
-                        & "<td align=right class=""bbRight""><a href=""#"" onClick=""HelpBubbleOff('HelpBubble" & cpCore.html.htmlDoc_HelpCodeCount & "');return false;""><img alt=""close"" src=""/ccLib/images/ClosexRev1313.gif"" width=13 height=13 border=0></a></td>" _
+                        & "<td align=right class=""bbRight""><a href=""#"" onClick=""HelpBubbleOff('HelpBubble" & cpCore.doc.htmlDoc_HelpCodeCount & "');return false;""><img alt=""close"" src=""/ccLib/images/ClosexRev1313.gif"" width=13 height=13 border=0></a></td>" _
                         & "</tr>" _
                         & "</table>" _
                         & "</div>"
@@ -3318,30 +3318,30 @@ ErrorTrap:
                         & "</table>" _
                         & ""
                     '
-                    QueryString = cpCore.html.refreshQueryString
+                    QueryString = cpCore.doc.refreshQueryString
                     QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
                     'QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                     return_DialogList = return_DialogList _
                         & "<div class=""ccCon helpDialogCon"">" _
-                        & "<table border=0 cellpadding=0 cellspacing=0 class=""ccBubbleCon"" id=""HelpBubble" & cpCore.html.htmlDoc_HelpCodeCount & """ style=""display:none;visibility:hidden;"">" _
+                        & "<table border=0 cellpadding=0 cellspacing=0 class=""ccBubbleCon"" id=""HelpBubble" & cpCore.doc.htmlDoc_HelpCodeCount & """ style=""display:none;visibility:hidden;"">" _
                         & "<tr><td class=""ccHeaderCon"">" & CopyHeader & "</td></tr>" _
                         & "<tr><td class=""ccContentCon"">" & CopyContent & "</td></tr>" _
                         & "</table>" _
                         & "</div>"
-                    BubbleJS = " onClick=""HelpBubbleOn( 'HelpBubble" & cpCore.html.htmlDoc_HelpCodeCount & "',this);return false;"""
-                    If cpCore.html.htmlDoc_HelpCodeCount >= cpCore.html.htmlDoc_HelpCodeSize Then
-                        cpCore.html.htmlDoc_HelpCodeSize = cpCore.html.htmlDoc_HelpCodeSize + 10
-                        ReDim Preserve cpCore.html.htmlDoc_HelpCodes(cpCore.html.htmlDoc_HelpCodeSize)
-                        ReDim Preserve cpCore.html.htmlDoc_HelpCaptions(cpCore.html.htmlDoc_HelpCodeSize)
+                    BubbleJS = " onClick=""HelpBubbleOn( 'HelpBubble" & cpCore.doc.htmlDoc_HelpCodeCount & "',this);return false;"""
+                    If cpCore.doc.htmlDoc_HelpCodeCount >= cpCore.doc.htmlDoc_HelpCodeSize Then
+                        cpCore.doc.htmlDoc_HelpCodeSize = cpCore.doc.htmlDoc_HelpCodeSize + 10
+                        ReDim Preserve cpCore.doc.htmlDoc_HelpCodes(cpCore.doc.htmlDoc_HelpCodeSize)
+                        ReDim Preserve cpCore.doc.htmlDoc_HelpCaptions(cpCore.doc.htmlDoc_HelpCodeSize)
                     End If
-                    cpCore.html.htmlDoc_HelpCodes(cpCore.html.htmlDoc_HelpCodeCount) = LocalCode
-                    cpCore.html.htmlDoc_HelpCaptions(cpCore.html.htmlDoc_HelpCodeCount) = AddonName
-                    cpCore.html.htmlDoc_HelpCodeCount = cpCore.html.htmlDoc_HelpCodeCount + 1
+                    cpCore.doc.htmlDoc_HelpCodes(cpCore.doc.htmlDoc_HelpCodeCount) = LocalCode
+                    cpCore.doc.htmlDoc_HelpCaptions(cpCore.doc.htmlDoc_HelpCodeCount) = AddonName
+                    cpCore.doc.htmlDoc_HelpCodeCount = cpCore.doc.htmlDoc_HelpCodeCount + 1
                     '
-                    If cpCore.html.htmlDoc_HelpDialogCnt = 0 Then
+                    If cpCore.doc.htmlDoc_HelpDialogCnt = 0 Then
                         Call cpCore.html.main_AddOnLoadJavascript2("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
                     End If
-                    cpCore.html.htmlDoc_HelpDialogCnt = cpCore.html.htmlDoc_HelpDialogCnt + 1
+                    cpCore.doc.htmlDoc_HelpDialogCnt = cpCore.doc.htmlDoc_HelpDialogCnt + 1
                     result = "" _
                         & "&nbsp;<a href=""#"" tabindex=-1 tarGet=""_blank""" & BubbleJS & " >" _
                         & GetIconSprite("", 0, "/ccLib/images/toolhelp.png", 22, 22, "View help resources for this Add-on", "View help resources for this Add-on", "", True, "") _
@@ -3388,7 +3388,7 @@ ErrorTrap:
             If cpCore.authContext.isAuthenticated() Then
                 If cpCore.authContext.isEditingAnything() Then
                     StyleSN = genericController.EncodeInteger(cpCore.siteProperties.getText("StylesheetSerialNumber", "0"))
-                    HTMLViewerBubbleID = "HelpBubble" & cpCore.html.htmlDoc_HelpCodeCount
+                    HTMLViewerBubbleID = "HelpBubble" & cpCore.doc.htmlDoc_HelpCodeCount
                     '
                     CopyHeader = CopyHeader _
                         & "<div class=""ccHeaderCon"">" _
@@ -3407,7 +3407,7 @@ ErrorTrap:
                         & "</table>" _
                         & ""
                     '
-                    QueryString = cpCore.html.refreshQueryString
+                    QueryString = cpCore.doc.refreshQueryString
                     QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
                     'QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                     return_DialogList = return_DialogList _
@@ -3418,20 +3418,20 @@ ErrorTrap:
                         & "</table>" _
                         & "</div>"
                     BubbleJS = " onClick=""var d=document.getElementById('" & HTMLViewerBubbleID & "_dst');if(d){var s=document.getElementById('" & HTMLSourceID & "');if(s){d.value=s.innerHTML;HelpBubbleOn( '" & HTMLViewerBubbleID & "',this)}};return false;"" "
-                    If cpCore.html.htmlDoc_HelpCodeCount >= cpCore.html.htmlDoc_HelpCodeSize Then
-                        cpCore.html.htmlDoc_HelpCodeSize = cpCore.html.htmlDoc_HelpCodeSize + 10
-                        ReDim Preserve cpCore.html.htmlDoc_HelpCodes(cpCore.html.htmlDoc_HelpCodeSize)
-                        ReDim Preserve cpCore.html.htmlDoc_HelpCaptions(cpCore.html.htmlDoc_HelpCodeSize)
+                    If cpCore.doc.htmlDoc_HelpCodeCount >= cpCore.doc.htmlDoc_HelpCodeSize Then
+                        cpCore.doc.htmlDoc_HelpCodeSize = cpCore.doc.htmlDoc_HelpCodeSize + 10
+                        ReDim Preserve cpCore.doc.htmlDoc_HelpCodes(cpCore.doc.htmlDoc_HelpCodeSize)
+                        ReDim Preserve cpCore.doc.htmlDoc_HelpCaptions(cpCore.doc.htmlDoc_HelpCodeSize)
                     End If
-                    cpCore.html.htmlDoc_HelpCodes(cpCore.html.htmlDoc_HelpCodeCount) = LocalCode
-                    cpCore.html.htmlDoc_HelpCaptions(cpCore.html.htmlDoc_HelpCodeCount) = AddonName
-                    cpCore.html.htmlDoc_HelpCodeCount = cpCore.html.htmlDoc_HelpCodeCount + 1
+                    cpCore.doc.htmlDoc_HelpCodes(cpCore.doc.htmlDoc_HelpCodeCount) = LocalCode
+                    cpCore.doc.htmlDoc_HelpCaptions(cpCore.doc.htmlDoc_HelpCodeCount) = AddonName
+                    cpCore.doc.htmlDoc_HelpCodeCount = cpCore.doc.htmlDoc_HelpCodeCount + 1
                     'SiteStylesBubbleCache = "x"
                     '
-                    If cpCore.html.htmlDoc_HelpDialogCnt = 0 Then
+                    If cpCore.doc.htmlDoc_HelpDialogCnt = 0 Then
                         Call cpCore.html.main_AddOnLoadJavascript2("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
                     End If
-                    cpCore.html.htmlDoc_HelpDialogCnt = cpCore.html.htmlDoc_HelpDialogCnt + 1
+                    cpCore.doc.htmlDoc_HelpDialogCnt = cpCore.doc.htmlDoc_HelpDialogCnt + 1
                     getHTMLViewerBubble = "" _
                         & "&nbsp;<a href=""#"" tabindex=-1 target=""_blank""" & BubbleJS & " >" _
                         & GetIconSprite("", 0, "/ccLib/images/toolhtml.png", 22, 22, "View the source HTML produced by this Add-on", "View the source HTML produced by this Add-on", "", True, "") _

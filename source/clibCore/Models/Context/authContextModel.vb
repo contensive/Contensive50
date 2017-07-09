@@ -1398,7 +1398,7 @@ Namespace Contensive.Core.Models.Context
                     Call debugController.debug_testPoint(cpCore, "...is in main_IsNotEditingContentList")
                 Else
                     If isAuthenticated() Then
-                        If Not cpCore.html.pageManager_printVersion Then
+                        If Not cpcore.doc.pageManager_printVersion Then
                             If (cpCore.visitProperty.getBoolean("AllowEditing") Or cpCore.visitProperty.getBoolean("AllowAdvancedEditor")) Then
                                 If localContentNameOrId <> "" Then
                                     If genericController.vbIsNumeric(localContentNameOrId) Then
@@ -1430,7 +1430,7 @@ Namespace Contensive.Core.Models.Context
         Public Function isQuickEditing(cpCore As coreClass, ByVal ContentName As String) As Boolean
             Dim returnResult As Boolean = False
             Try
-                If (Not cpCore.html.pageManager_printVersion) Then
+                If (Not cpcore.doc.pageManager_printVersion) Then
                     If isAuthenticatedContentManager(cpCore, ContentName) Then
                         returnResult = cpCore.visitProperty.getBoolean("AllowQuickEditor")
                     End If
@@ -1451,7 +1451,7 @@ Namespace Contensive.Core.Models.Context
         Public Function isAdvancedEditing(cpCore As coreClass, ByVal ContentName As String) As Boolean
             Dim returnResult As Boolean = False
             Try
-                If (Not cpCore.html.pageManager_printVersion) Then
+                If (Not cpcore.doc.pageManager_printVersion) Then
                     If isAuthenticatedContentManager(cpCore, ContentName) Then
                         returnResult = cpCore.visitProperty.getBoolean("AllowAdvancedEditor")
                     End If

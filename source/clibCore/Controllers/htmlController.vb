@@ -16,99 +16,6 @@ Namespace Contensive.Core.Controllers
         '
         Private cpCore As coreClass
         '
-        ' Public view bubble editors
-        '
-        'Public Property html_HelpViewerButtonID As String = ""
-        Public Property html_EditWrapperCnt As Integer = 0
-        '
-        Public Property html_DocBodyFilter As String = ""
-        '
-        '
-        Public Property html_LegacySiteStyles_Loaded As Boolean = False
-        '
-        Private Property menu_MenuSystemCloseCount As Integer = 0
-        '
-        ' -- Help Subsystem
-        Friend Property htmlDoc_HelpCodeCount As Integer = 0
-        Friend Property htmlDoc_HelpCodeSize As Integer = 0
-        Friend Property htmlDoc_HelpCodes As String()
-        Friend Property htmlDoc_HelpCaptions As String()
-        Friend Property htmlDoc_HelpDialogCnt As Integer = 0
-        '
-        Public Property htmlForEndOfBody As String = ""             ' Anything that needs to be written to the Page during main_GetClosePage
-        '
-        Public Property pageManager_printVersion As Boolean = False
-        '
-        Public Const htmlDoc_JavaStreamChunk = 100
-        Public Const htmlDoc_OutStreamStandard = 0
-        Public Const htmlDoc_OutStreamJavaScript = 1
-        '
-        Public Property refreshQueryString As String = ""      ' the querystring required to return to the current state (perform a refresh)
-        Public Property pageManager_RedirectContentID As Integer = 0
-        Public Property pageManager_RedirectRecordID As Integer = 0
-        Public Property htmlDoc_JavaStreamHolder As String()
-        Public Property htmlDoc_JavaStreamSize As Integer = 0
-        Public Property htmlDoc_JavaStreamCount As Integer = 0
-        Public Property htmlDoc_IsStreamWritten As Boolean = False       ' true when anything has been writeAltBuffered.
-        '
-        Public Property outputBufferEnabled As Boolean = True          ' when true (default), stream is buffered until page is done
-        Public Property docBuffer As String = ""                   ' if any method calls writeAltBuffer, string concatinates here. If this is not empty at exit, it is used instead of returned string
-        '
-        Public Property main_MetaContent_Title As String = ""
-        Public Property main_MetaContent_Description As String = ""
-        Public Property main_MetaContent_OtherHeadTags As String = ""
-        Public Property main_MetaContent_KeyWordList As String = ""
-        Public Property main_MetaContent_StyleSheetTags As String = ""
-        Public Property main_MetaContent_TemplateStyleSheetTag As String = ""
-        Public Property main_MetaContent_SharedStyleIDList As String = ""
-        '
-        Public Property main_TabObject As menuTabController
-        Public Property html_ComboTabObject As menuComboTabController
-        Public Property main_LiveTabObject As menuLiveTabController
-        '
-        Public Property main_AdminWarning As String = ""                                      ' Message - when set displays in an admin hint box in the page
-        Public Property main_AdminWarningPageID As Integer = 0                                  ' PageID that goes with the warning
-        'Public main_AdminWarningSectionID As Integer = 0                               ' PageID that goes with the warning
-        '
-        Public Property main_CheckListCnt As Integer = 0                    ' cnt of the main_GetFormInputCheckList calls - used for javascript
-        '
-        Public Property main_page_IncludedAddonIDList As String = ""
-        '
-        Public Property main_OnLoadJavascript As String = ""
-        Public Property main_endOfBodyJavascript As String = ""           ' javascript that goes at the end of the close page
-        Public Property main_endOfBodyString As String = ""
-        '
-        ' block of js code that goes into a script tag
-        '
-        Public Structure main_HeadScriptType
-            Dim IsLink As Boolean
-            Dim Text As String
-            Dim addedByMessage As String
-        End Structure
-        Public Property main_HeadScriptCnt As Integer = 0
-        Public Property main_HeadScripts As main_HeadScriptType()
-        '
-        ' Page Bake Header
-        '
-        Public Const main_BakeHeadDelimiter = "#####MultilineFlag#####"
-        '
-        ' Count of how many main_GetFormInputDate calendars have been placed
-        '
-        Public Property main_InputDateCnt As Integer = 0
-        '
-        ' Cache the input selects (admin uses the same ones over and over)
-        '
-        Public Structure main_InputSelectCacheType
-            Dim SelectRaw As String
-            Dim ContentName As String
-            Dim Criteria As String
-            Dim CurrentValue As String
-        End Structure
-        Public Property main_InputSelectCacheCnt As Integer = 0
-        Public Property main_InputSelectCache As main_InputSelectCacheType()
-        '
-        Public Property main_FormInputTextCnt As Integer = 0
-        '
         '====================================================================================================
         ''' <summary>
         ''' constructor
@@ -906,7 +813,7 @@ ErrorTrap:
             MethodName = "main_GetMenuClose()"
             '
             If Not (cpCore.menuFlyout Is Nothing) Then
-                menu_MenuSystemCloseCount = menu_MenuSystemCloseCount + 1
+                cpCore.doc.menu_MenuSystemCloseCount = cpCore.doc.menu_MenuSystemCloseCount + 1
                 menu_GetClose = menu_GetClose & cpCore.menuFlyout.GetMenuClose()
                 MenuFlyoutIcon = cpCore.siteProperties.getText("MenuFlyoutIcon", "&#187;")
                 If MenuFlyoutIcon <> "&#187;" Then
@@ -951,7 +858,7 @@ ErrorTrap:
                 '
                 ' ----- add window.print if this is the Printerversion
                 '
-                If pageManager_printVersion Then
+                If cpCore.doc.pageManager_printVersion Then
                     autoPrintText = cpCore.docProperties.getText("AutoPrint")
                     If autoPrintText = "" Then
                         autoPrintText = cpCore.siteProperties.getText("AllowAutoPrintDialog", "1")
@@ -963,7 +870,7 @@ ErrorTrap:
                 '
                 ' -- print what is needed
                 '
-                If (Not BlockNonContentExtras) And (Not pageManager_printVersion) Then
+                If (Not BlockNonContentExtras) And (Not cpCore.doc.pageManager_printVersion) Then
                     If cpCore.authContext.isAuthenticatedContentManager(cpCore) And cpCore.authContext.user.AllowToolsPanel Then
                         If AllowTools Then
                             s = s & cpCore.html.main_GetToolsPanel()
@@ -1018,8 +925,8 @@ ErrorTrap:
                 ' ----- Include any other close page
                 '
                 If Not BlockNonContentExtras Then
-                    If htmlForEndOfBody <> "" Then
-                        s = s & htmlForEndOfBody
+                    If cpCore.doc.htmlForEndOfBody <> "" Then
+                        s = s & cpCore.doc.htmlForEndOfBody
                     End If
                     If cpCore.main_testPointMessage <> "" Then
                         s = s & "<div class=""ccTestPointMessageCon"">" & cpCore.main_testPointMessage & "</div>"
@@ -1032,9 +939,9 @@ ErrorTrap:
                 '
                 ' Add Script Code to Head
                 '
-                If cpCore.html.main_HeadScriptCnt > 0 Then
-                    For Ptr = 0 To cpCore.html.main_HeadScriptCnt - 1
-                        With cpCore.html.main_HeadScripts(Ptr)
+                If cpCore.doc.main_HeadScriptCnt > 0 Then
+                    For Ptr = 0 To cpCore.doc.main_HeadScriptCnt - 1
+                        With cpCore.doc.main_HeadScripts(Ptr)
                             If .addedByMessage <> "" Then
                                 JS = JS & vbCrLf & "/* from " & .addedByMessage & " */ "
                             End If
@@ -1052,13 +959,13 @@ ErrorTrap:
                             End If
                         End With
                     Next
-                    cpCore.html.main_HeadScriptCnt = 0
+                    cpCore.doc.main_HeadScriptCnt = 0
                 End If
                 '
                 ' ----- Add onload javascript
                 '
-                If (main_OnLoadJavascript <> "") Then
-                    JS = JS & vbCrLf & vbTab & "cj.addLoadEvent(function(){" & main_OnLoadJavascript & "});"
+                If (cpCore.doc.main_OnLoadJavascript <> "") Then
+                    JS = JS & vbCrLf & vbTab & "cj.addLoadEvent(function(){" & cpCore.doc.main_OnLoadJavascript & "});"
                 End If
                 '
                 ' ----- Add any left over style links
@@ -1066,10 +973,10 @@ ErrorTrap:
                 Dim headTags As String
                 headTags = ""
                 '
-                If (main_MetaContent_StyleSheetTags <> "") Then
-                    headTags = headTags & cr & main_MetaContent_StyleSheetTags
+                If (cpCore.doc.main_MetaContent_StyleSheetTags <> "") Then
+                    headTags = headTags & cr & cpCore.doc.main_MetaContent_StyleSheetTags
                     'JS = JS & vbCrLf & vbTab & "cjAddHeadTag('" & genericController.EncodeJavascript(main_MetaContent_StyleSheetTags) & "');"
-                    main_MetaContent_StyleSheetTags = ""
+                    cpCore.doc.main_MetaContent_StyleSheetTags = ""
                 End If
                 '
                 ' ----- Add any left over shared styles
@@ -1077,9 +984,9 @@ ErrorTrap:
                 Dim FileList As String
                 Dim Files() As String
                 Dim Parts() As String
-                If (main_MetaContent_SharedStyleIDList <> "") Then
-                    FileList = htmlController.main_GetSharedStyleFileList(cpCore, main_MetaContent_SharedStyleIDList, main_IsAdminSite)
-                    main_MetaContent_SharedStyleIDList = ""
+                If (cpCore.doc.main_MetaContent_SharedStyleIDList <> "") Then
+                    FileList = htmlController.main_GetSharedStyleFileList(cpCore, cpCore.doc.main_MetaContent_SharedStyleIDList, main_IsAdminSite)
+                    cpCore.doc.main_MetaContent_SharedStyleIDList = ""
                     If FileList <> "" Then
                         Files = Split(FileList, vbCrLf)
                         For Ptr = 0 To UBound(Files)
@@ -1109,10 +1016,10 @@ ErrorTrap:
                 '
                 ' ----- Add any left over head tags
                 '
-                If (main_MetaContent_OtherHeadTags <> "") Then
-                    headTags = headTags & cr & main_MetaContent_OtherHeadTags
+                If (cpCore.doc.main_MetaContent_OtherHeadTags <> "") Then
+                    headTags = headTags & cr & cpCore.doc.main_MetaContent_OtherHeadTags
                     'JS = JS & vbCrLf & vbTab & "cjAddHeadTag('" & genericController.EncodeJavascript(main_MetaContent_OtherHeadTags) & "');"
-                    main_MetaContent_OtherHeadTags = ""
+                    cpCore.doc.main_MetaContent_OtherHeadTags = ""
                 End If
                 If (headTags <> "") Then
                     JS = JS & vbCrLf & vbTab & "cj.addHeadTag('" & genericController.EncodeJavascript(headTags) & "');"
@@ -1121,21 +1028,21 @@ ErrorTrap:
                 '
                 ' ----- Add end of body javascript
                 '
-                If (main_endOfBodyJavascript <> "") Then
-                    JS = JS & vbCrLf & main_endOfBodyJavascript
-                    main_endOfBodyJavascript = ""
+                If (cpCore.doc.main_endOfBodyJavascript <> "") Then
+                    JS = JS & vbCrLf & cpCore.doc.main_endOfBodyJavascript
+                    cpCore.doc.main_endOfBodyJavascript = ""
                 End If
                 '
                 ' ----- If javascript stream, output it all now
                 '
-                If (cpCore.webServer.webServerIO_OutStreamDevice = htmlDoc_OutStreamJavaScript) Then
+                If (cpCore.webServer.webServerIO_OutStreamDevice = cpCore.doc.htmlDoc_OutStreamJavaScript) Then
                     '
                     ' This is a js output stream from a <script src=url></script>
                     ' process everything into a var=msg;document.write(var)
                     ' any js from the page should be added to this group
                     '
                     Call writeAltBuffer(s)
-                    cpCore.webServer.webServerIO_OutStreamDevice = htmlDoc_OutStreamStandard
+                    cpCore.webServer.webServerIO_OutStreamDevice = docController.htmlDoc_OutStreamStandard
                     s = webServerIO_JavaStream_Text
                     If JS <> "" Then
                         s = s & vbCrLf & JS
@@ -1159,8 +1066,8 @@ ErrorTrap:
                 '
                 ' end-of-body string -- include it without csv because it may have error strings
                 '
-                If (Not BlockNonContentExtras) And (main_endOfBodyString <> "") Then
-                    s = s & main_endOfBodyString
+                If (Not BlockNonContentExtras) And (cpCore.doc.main_endOfBodyString <> "") Then
+                    s = s & cpCore.doc.main_endOfBodyString
                 End If
             Catch ex As Exception
                 Call cpCore.handleExceptionAndContinue(ex) : Throw
@@ -1239,9 +1146,9 @@ ErrorTrap:
             return_IsEmptyList = True
             '
             CurrentValueText = CStr(CurrentValue)
-            If cpCore.html.main_InputSelectCacheCnt > 0 Then
-                For CachePtr = 0 To cpCore.html.main_InputSelectCacheCnt - 1
-                    With cpCore.html.main_InputSelectCache(CachePtr)
+            If cpCore.doc.main_InputSelectCacheCnt > 0 Then
+                For CachePtr = 0 To cpCore.doc.main_InputSelectCacheCnt - 1
+                    With cpCore.doc.main_InputSelectCache(CachePtr)
                         If (.ContentName = ContentName) And (.Criteria = LcaseCriteria) And (.CurrentValue = CurrentValueText) Then
                             SelectRaw = .SelectRaw
                             return_IsEmptyList = False
@@ -1496,14 +1403,14 @@ ErrorTrap:
                 ' Save the SelectRaw
                 '
                 If Not return_IsEmptyList Then
-                    CachePtr = cpCore.html.main_InputSelectCacheCnt
-                    cpCore.html.main_InputSelectCacheCnt = cpCore.html.main_InputSelectCacheCnt + 1
-                    ReDim Preserve cpCore.html.main_InputSelectCache(Ptr)
-                    ReDim Preserve cpCore.html.main_InputSelectCache(CachePtr)
-                    cpCore.html.main_InputSelectCache(CachePtr).ContentName = ContentName
-                    cpCore.html.main_InputSelectCache(CachePtr).Criteria = LcaseCriteria
-                    cpCore.html.main_InputSelectCache(CachePtr).CurrentValue = CurrentValue.ToString
-                    cpCore.html.main_InputSelectCache(CachePtr).SelectRaw = SelectRaw
+                    CachePtr = cpCore.doc.main_InputSelectCacheCnt
+                    cpCore.doc.main_InputSelectCacheCnt = cpCore.doc.main_InputSelectCacheCnt + 1
+                    ReDim Preserve cpCore.doc.main_InputSelectCache(Ptr)
+                    ReDim Preserve cpCore.doc.main_InputSelectCache(CachePtr)
+                    cpCore.doc.main_InputSelectCache(CachePtr).ContentName = ContentName
+                    cpCore.doc.main_InputSelectCache(CachePtr).Criteria = LcaseCriteria
+                    cpCore.doc.main_InputSelectCache(CachePtr).CurrentValue = CurrentValue.ToString
+                    cpCore.doc.main_InputSelectCache(CachePtr).SelectRaw = SelectRaw
                 End If
             End If
             '
@@ -1594,9 +1501,9 @@ ErrorTrap:
             iNoneCaption = genericController.encodeEmptyText(NoneCaption, "Select One")
             'iCriteria = genericController.vbLCase(encodeMissingText(Criteria, ""))
             '
-            If cpCore.html.main_InputSelectCacheCnt > 0 Then
-                For CachePtr = 0 To cpCore.html.main_InputSelectCacheCnt - 1
-                    With cpCore.html.main_InputSelectCache(CachePtr)
+            If cpCore.doc.main_InputSelectCacheCnt > 0 Then
+                For CachePtr = 0 To cpCore.doc.main_InputSelectCacheCnt - 1
+                    With cpCore.doc.main_InputSelectCache(CachePtr)
                         If (.ContentName = "Group:" & GroupID) And (.Criteria = iCriteria) And (genericController.EncodeInteger(.CurrentValue) = iCurrentValue) Then
                             SelectRaw = .SelectRaw
                             Exit For
@@ -1830,14 +1737,14 @@ ErrorTrap:
                 '
                 ' Save the SelectRaw
                 '
-                CachePtr = cpCore.html.main_InputSelectCacheCnt
-                cpCore.html.main_InputSelectCacheCnt = cpCore.html.main_InputSelectCacheCnt + 1
-                ReDim Preserve cpCore.html.main_InputSelectCache(Ptr)
-                ReDim Preserve cpCore.html.main_InputSelectCache(CachePtr)
-                cpCore.html.main_InputSelectCache(CachePtr).ContentName = "Group:" & GroupID
-                cpCore.html.main_InputSelectCache(CachePtr).Criteria = iCriteria
-                cpCore.html.main_InputSelectCache(CachePtr).CurrentValue = iCurrentValue.ToString
-                cpCore.html.main_InputSelectCache(CachePtr).SelectRaw = SelectRaw
+                CachePtr = cpCore.doc.main_InputSelectCacheCnt
+                cpCore.doc.main_InputSelectCacheCnt = cpCore.doc.main_InputSelectCacheCnt + 1
+                ReDim Preserve cpCore.doc.main_InputSelectCache(Ptr)
+                ReDim Preserve cpCore.doc.main_InputSelectCache(CachePtr)
+                cpCore.doc.main_InputSelectCache(CachePtr).ContentName = "Group:" & GroupID
+                cpCore.doc.main_InputSelectCache(CachePtr).Criteria = iCriteria
+                cpCore.doc.main_InputSelectCache(CachePtr).CurrentValue = iCurrentValue.ToString
+                cpCore.doc.main_InputSelectCache(CachePtr).SelectRaw = SelectRaw
             End If
             '
             SelectRaw = genericController.vbReplace(SelectRaw, MenuNameFPO, iMenuName)
@@ -1942,7 +1849,7 @@ ErrorTrap:
                 If cpCore.authContext.isAuthenticatedContentManager(cpCore) Then
                     main_GetLoginLink = main_GetLoginLink & "<a href=""" & html_EncodeHTML(cpCore.siteProperties.adminURL) & """ target=""_blank"">"
                 Else
-                    Link = cpCore.webServer.webServerIO_requestPage & "?" & cpCore.html.refreshQueryString
+                    Link = cpCore.webServer.webServerIO_requestPage & "?" & cpCore.doc.refreshQueryString
                     Link = genericController.modifyLinkQuery(Link, RequestNameHardCodedPage, HardCodedPageLogin, True)
                     'Link = genericController.modifyLinkQuery(Link, RequestNameInterceptpage, LegacyInterceptPageSNLogin, True)
                     main_GetLoginLink = main_GetLoginLink & "<a href=""" & html_EncodeHTML(Link) & """ >"
@@ -2010,15 +1917,15 @@ ErrorTrap:
             '
             If cpCore.continueProcessing Then
                 Select Case cpCore.webServer.webServerIO_OutStreamDevice
-                    Case htmlDoc_OutStreamJavaScript
+                    Case docController.htmlDoc_OutStreamJavaScript
                         Call webServerIO_JavaStream_Add(genericController.encodeText(Message))
                     Case Else
 
                         If (cpCore.webServer.iisContext IsNot Nothing) Then
-                            htmlDoc_IsStreamWritten = True
+                            cpCore.doc.htmlDoc_IsStreamWritten = True
                             Call cpCore.webServer.iisContext.Response.Write(genericController.encodeText(Message))
                         Else
-                            docBuffer = docBuffer & genericController.encodeText(Message)
+                            cpCore.doc.docBuffer = cpCore.doc.docBuffer & genericController.encodeText(Message)
                         End If
                 End Select
             End If
@@ -2033,12 +1940,12 @@ ErrorTrap:
         Private Sub webServerIO_JavaStream_Add(ByVal NewString As String)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00375")
             '
-            If htmlDoc_JavaStreamCount >= htmlDoc_JavaStreamSize Then
-                htmlDoc_JavaStreamSize = htmlDoc_JavaStreamSize + htmlDoc_JavaStreamChunk
-                ReDim Preserve htmlDoc_JavaStreamHolder(htmlDoc_JavaStreamSize)
+            If cpCore.doc.htmlDoc_JavaStreamCount >= cpCore.doc.htmlDoc_JavaStreamSize Then
+                cpCore.doc.htmlDoc_JavaStreamSize = cpCore.doc.htmlDoc_JavaStreamSize + cpCore.doc.htmlDoc_JavaStreamChunk
+                ReDim Preserve cpCore.doc.htmlDoc_JavaStreamHolder(cpCore.doc.htmlDoc_JavaStreamSize)
             End If
-            htmlDoc_JavaStreamHolder(htmlDoc_JavaStreamCount) = NewString
-            htmlDoc_JavaStreamCount = htmlDoc_JavaStreamCount + 1
+            cpCore.doc.htmlDoc_JavaStreamHolder(cpCore.doc.htmlDoc_JavaStreamCount) = NewString
+            cpCore.doc.htmlDoc_JavaStreamCount = cpCore.doc.htmlDoc_JavaStreamCount + 1
             Exit Sub
             '
 ErrorTrap:
@@ -2053,7 +1960,7 @@ ErrorTrap:
                 '
                 MsgLabel = "Msg" & genericController.encodeText(genericController.GetRandomInteger)
                 '
-                webServerIO_JavaStream_Text = Join(htmlDoc_JavaStreamHolder, "")
+                webServerIO_JavaStream_Text = Join(cpCore.doc.htmlDoc_JavaStreamHolder, "")
                 webServerIO_JavaStream_Text = genericController.vbReplace(webServerIO_JavaStream_Text, "'", "'+""'""+'")
                 webServerIO_JavaStream_Text = genericController.vbReplace(webServerIO_JavaStream_Text, vbCrLf, "\n")
                 webServerIO_JavaStream_Text = genericController.vbReplace(webServerIO_JavaStream_Text, vbCr, "\n")
@@ -2071,9 +1978,9 @@ ErrorTrap:
                 '
                 If (InStr(1, Name, "=") > 0) Then
                     temp = Split(Name, "=")
-                    refreshQueryString = genericController.ModifyQueryString(refreshQueryString, temp(0), temp(1), True)
+                    cpCore.doc.refreshQueryString = genericController.ModifyQueryString(cpCore.doc.refreshQueryString, temp(0), temp(1), True)
                 Else
-                    refreshQueryString = genericController.ModifyQueryString(refreshQueryString, Name, Value, True)
+                    cpCore.doc.refreshQueryString = genericController.ModifyQueryString(cpCore.doc.refreshQueryString, Name, Value, True)
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
@@ -2084,8 +1991,8 @@ ErrorTrap:
         Public Function html_GetLegacySiteStyles() As String
             On Error GoTo ErrorTrap
             '
-            If Not html_LegacySiteStyles_Loaded Then
-                html_LegacySiteStyles_Loaded = True
+            If Not cpCore.doc.html_LegacySiteStyles_Loaded Then
+                cpCore.doc.html_LegacySiteStyles_Loaded = True
                 '
                 ' compatibility with old sites - if they do not main_Get the default style sheet, put it in here
                 '
@@ -2147,16 +2054,16 @@ ErrorTrap:
         '
         Public Sub enableOutputBuffer(BufferOn As Boolean)
             Try
-                If outputBufferEnabled Then
+                If cpCore.doc.outputBufferEnabled Then
                     '
                     ' ----- once on, can not be turned off Response Object
                     '
-                    outputBufferEnabled = BufferOn
+                    cpCore.doc.outputBufferEnabled = BufferOn
                 Else
                     '
                     ' ----- StreamBuffer off, allow on and off
                     '
-                    outputBufferEnabled = BufferOn
+                    cpCore.doc.outputBufferEnabled = BufferOn
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
@@ -2172,7 +2079,7 @@ ErrorTrap:
         Public Function html_GetUploadFormStart(Optional ByVal ActionQueryString As String = Nothing) As String
 
             If ActionQueryString Is Nothing Then
-                ActionQueryString = refreshQueryString
+                ActionQueryString = cpCore.doc.refreshQueryString
             End If
             On Error GoTo ErrorTrap
             '
@@ -2220,7 +2127,7 @@ ErrorTrap:
             MethodName = "main_GetFormStart3"
             '
             If ActionQueryString Is Nothing Then
-                ActionQS = cpCore.html.refreshQueryString
+                ActionQS = cpCore.doc.refreshQueryString
             Else
                 ActionQS = ActionQueryString
             End If
@@ -2329,7 +2236,7 @@ ErrorTrap:
                 Else
                     html_GetFormInputText2 = "<textarea NAME=""" & htmlName & """ ROWS=""" & iHeight.ToString & """ COLS=""" & iWidth.ToString & """" & TagID & TagDisabled & ">" & iDefaultValue & "</TEXTAREA>"
                 End If
-                main_FormInputTextCnt = main_FormInputTextCnt + 1
+                cpCore.doc.main_FormInputTextCnt = cpCore.doc.main_FormInputTextCnt + 1
             End If
             '
             Exit Function
@@ -2369,7 +2276,7 @@ ErrorTrap:
             Value_Local = html_EncodeHTML(Value)
             IDRoot = Id
             If IDRoot = "" Then
-                IDRoot = "TextArea" & main_FormInputTextCnt
+                IDRoot = "TextArea" & cpCore.doc.main_FormInputTextCnt
             End If
             '
             StyleWidth_Local = styleWidth
@@ -2411,7 +2318,7 @@ ErrorTrap:
                 & genericController.htmlIndent(EditorClosed) _
                 & genericController.htmlIndent(EditorOpened) _
                 & "</div>"
-            main_FormInputTextCnt = main_FormInputTextCnt + 1
+            cpCore.doc.main_FormInputTextCnt = cpCore.doc.main_FormInputTextCnt + 1
             Exit Function
             '
             ' ----- Error Trap
@@ -2457,10 +2364,10 @@ ErrorTrap:
                 iWidth = 20
             End If
             '
-            CalendarObjName = "Cal" & cpCore.html.main_InputDateCnt
-            AnchorName = "ACal" & cpCore.html.main_InputDateCnt
+            CalendarObjName = "Cal" & cpCore.doc.main_InputDateCnt
+            AnchorName = "ACal" & cpCore.doc.main_InputDateCnt
 
-            If cpCore.html.main_InputDateCnt = 0 Then
+            If cpCore.doc.main_InputDateCnt = 0 Then
                 HeadJS = "" _
                     & vbCrLf & "<SCRIPT LANGUAGE=""JavaScript"" SRC=""/ccLib/mktree/CalendarPopup.js""></SCRIPT>" _
                     & vbCrLf & "<SCRIPT LANGUAGE=""JavaScript"">" _
@@ -2489,7 +2396,7 @@ ErrorTrap:
                 & vbCrLf & "<a HREF=""#"" Onclick = ""cal.select(document.getElementById('" & iTagName & "'),'" & AnchorName & "','MM/dd/yyyy','" & DateString & "'); return false;"" NAME=""" & AnchorName & """ ID=""" & AnchorName & """><img title=""Select a date"" alt=""Select a date"" src=""/ccLib/images/table.jpg"" width=12 height=10 border=0></A>" _
                 & vbCrLf & ""
 
-            cpCore.html.main_InputDateCnt = cpCore.html.main_InputDateCnt + 1
+            cpCore.doc.main_InputDateCnt = cpCore.doc.main_InputDateCnt + 1
             Exit Function
             '
             ' ----- Error Trap
@@ -7031,7 +6938,7 @@ ErrorTrap:
                     main_MemberShipSize = 0
                     returnHtml = ""
                     If (SecondaryTablename <> "") And (rulesTablename <> "") Then
-                        OldFolderVar = "OldFolder" & main_CheckListCnt
+                        OldFolderVar = "OldFolder" & cpCore.doc.main_CheckListCnt
                         javaScriptRequired &= "var " & OldFolderVar & ";"
                         If PrimaryRecordID = 0 Then
                             '
@@ -7276,7 +7183,7 @@ ErrorTrap:
                         Call main_AddHeadScriptCode(javaScriptRequired, "CheckList Categories")
                     End If
                     'End If
-                    main_CheckListCnt = main_CheckListCnt + 1
+                    cpCore.doc.main_CheckListCnt = cpCore.doc.main_CheckListCnt + 1
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
@@ -7319,7 +7226,7 @@ ErrorTrap:
                 result = getInputCheckList(TagName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectCriteria, CaptionFieldName, readOnlyField, False, "")
             Else
                 IsAuthoringMode = True
-                LinkBase = cpCore.html.refreshQueryString
+                LinkBase = cpCore.doc.refreshQueryString
                 BakeName = "ContentFolderNav"
                 If Not IsAuthoringMode Then
                     '          main_GetFormInputCheckListCategories = cache.cache_readBake(BakeName)
@@ -7341,7 +7248,7 @@ ErrorTrap:
                             FirstCaption = Caption
                         End If
                         JSCaption = genericController.EncodeJavascript(Caption)
-                        JSSwitch = "switchContentFolderDiv( '" & TagName & ".ContentCategoryID" & Id & "',OldFolder" & main_CheckListCnt & ",'" & TagName & ".ContentCaption','" & JSCaption & "','" & EmptyDivID & "'); OldFolder" & main_CheckListCnt & "='" & TagName & ".ContentCategoryID" & Id & "';return false;"
+                        JSSwitch = "switchContentFolderDiv( '" & TagName & ".ContentCategoryID" & Id & "',OldFolder" & cpCore.doc.main_CheckListCnt & ",'" & TagName & ".ContentCaption','" & JSCaption & "','" & EmptyDivID & "'); OldFolder" & cpCore.doc.main_CheckListCnt & "='" & TagName & ".ContentCategoryID" & Id & "';return false;"
                         If JSSwitchFirst = "" Then
                             JSSwitchFirst = JSSwitch
                         End If
@@ -7357,7 +7264,7 @@ ErrorTrap:
                     ' Add the top 'All' node
                     '
                     JSCaption = "All"
-                    JSSwitchAll = "switchContentFolderDiv( '" & TagName & ".All',  OldFolder" & main_CheckListCnt & ",'" & TagName & ".ContentCaption','" & JSCaption & "','" & EmptyDivID & "'); OldFolder" & main_CheckListCnt & "='" & TagName & ".All';"
+                    JSSwitchAll = "switchContentFolderDiv( '" & TagName & ".All',  OldFolder" & cpCore.doc.main_CheckListCnt & ",'" & TagName & ".ContentCaption','" & JSCaption & "','" & EmptyDivID & "'); OldFolder" & cpCore.doc.main_CheckListCnt & "='" & TagName & ".All';"
                     If genericController.vbInstr(1, LeftPane, "<LI", vbTextCompare) = 0 Then
                         AllNode = "<div class=""caption""><a href=""#"" onClick=""" & JSSwitchAll & ";return false;"">Show all</a></div>"
                         LeftPane = cr & AllNode & LeftPane
@@ -7369,7 +7276,7 @@ ErrorTrap:
                     ' + Add Category
                     '
                     If cpCore.authContext.isAuthenticatedContentManager(cpCore, "Content Categories") Then
-                        LeftPane = LeftPane & cr & "<div class=""caption""><a href=""" & cpCore.siteProperties.adminURL & "?editreferer=" & genericController.EncodeRequestVariable("?" & cpCore.html.refreshQueryString) & "&cid=" & cpCore.metaData.getContentId("Content Categories") & "&af=4&aa=2"">+&nbsp;Add&nbsp;Category</a></div>"
+                        LeftPane = LeftPane & cr & "<div class=""caption""><a href=""" & cpCore.siteProperties.adminURL & "?editreferer=" & genericController.EncodeRequestVariable("?" & cpCore.doc.refreshQueryString) & "&cid=" & cpCore.metaData.getContentId("Content Categories") & "&af=4&aa=2"">+&nbsp;Add&nbsp;Category</a></div>"
                     End If
                     '
                     LeftPane = cr & "<div class=""ccCategoryListCon"">" & genericController.htmlIndent(LeftPane) & cr & "</div>"
@@ -7421,7 +7328,7 @@ ErrorTrap:
             '
             Dim s As String
             '
-            s = main_OnLoadJavascript
+            s = cpCore.doc.main_OnLoadJavascript
             If NewCode <> "" And genericController.vbInstr(1, s, NewCode, vbTextCompare) = 0 Then
                 If s <> "" Then
                     s = s & ";"
@@ -7430,7 +7337,7 @@ ErrorTrap:
                     s = s & " /* from " & addedByMessage & " */ "
                 End If
                 s = s & NewCode
-                main_OnLoadJavascript = s
+                cpCore.doc.main_OnLoadJavascript = s
             End If
             '
             Exit Sub
@@ -7456,13 +7363,13 @@ ErrorTrap:
             Dim s As String
             '
             s = ""
-            If NewCode <> "" And genericController.vbInstr(1, main_endOfBodyJavascript, NewCode, vbTextCompare) = 0 Then
+            If NewCode <> "" And genericController.vbInstr(1, cpCore.doc.main_endOfBodyJavascript, NewCode, vbTextCompare) = 0 Then
                 's = s & vbCrLf
                 If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
                     s = s & "/* from " & addedByMessage & "*/"
                 End If
                 s = s & NewCode
-                main_endOfBodyJavascript = main_endOfBodyJavascript & vbCrLf & s
+                cpCore.doc.main_endOfBodyJavascript = cpCore.doc.main_endOfBodyJavascript & vbCrLf & s
             End If
             '
             Exit Sub
@@ -7513,11 +7420,11 @@ ErrorTrap:
                 NewCode = genericController.vbReplace(NewCode, vbCrLf & vbCrLf, vbCrLf)
                 NewCode = genericController.vbReplace(NewCode, vbCrLf & vbCrLf, vbCrLf)
                 NewCode = genericController.vbReplace(NewCode, vbCrLf, cr2)
-                ReDim Preserve cpCore.html.main_HeadScripts(cpCore.html.main_HeadScriptCnt)
-                cpCore.html.main_HeadScripts(cpCore.html.main_HeadScriptCnt).IsLink = False
-                cpCore.html.main_HeadScripts(cpCore.html.main_HeadScriptCnt).Text = NewCode
-                cpCore.html.main_HeadScripts(cpCore.html.main_HeadScriptCnt).addedByMessage = genericController.vbLCase(addedByMessage)
-                cpCore.html.main_HeadScriptCnt = cpCore.html.main_HeadScriptCnt + 1
+                ReDim Preserve cpCore.doc.main_HeadScripts(cpCore.doc.main_HeadScriptCnt)
+                cpCore.doc.main_HeadScripts(cpCore.doc.main_HeadScriptCnt).IsLink = False
+                cpCore.doc.main_HeadScripts(cpCore.doc.main_HeadScriptCnt).Text = NewCode
+                cpCore.doc.main_HeadScripts(cpCore.doc.main_HeadScriptCnt).addedByMessage = genericController.vbLCase(addedByMessage)
+                cpCore.doc.main_HeadScriptCnt = cpCore.doc.main_HeadScriptCnt + 1
             End If
             '    If NewCode <> "" And genericController.vbInstr(1, main_HeadScriptCode, NewCode, vbTextCompare) = 0 Then
             '        s = NewCode
@@ -7556,11 +7463,11 @@ ErrorTrap:
             Dim s As String
             '
             If Filename <> "" Then
-                ReDim Preserve cpCore.html.main_HeadScripts(cpCore.html.main_HeadScriptCnt)
-                cpCore.html.main_HeadScripts(cpCore.html.main_HeadScriptCnt).IsLink = True
-                cpCore.html.main_HeadScripts(cpCore.html.main_HeadScriptCnt).Text = Filename
-                cpCore.html.main_HeadScripts(cpCore.html.main_HeadScriptCnt).addedByMessage = addedByMessage
-                cpCore.html.main_HeadScriptCnt = cpCore.html.main_HeadScriptCnt + 1
+                ReDim Preserve cpCore.doc.main_HeadScripts(cpCore.doc.main_HeadScriptCnt)
+                cpCore.doc.main_HeadScripts(cpCore.doc.main_HeadScriptCnt).IsLink = True
+                cpCore.doc.main_HeadScripts(cpCore.doc.main_HeadScriptCnt).Text = Filename
+                cpCore.doc.main_HeadScripts(cpCore.doc.main_HeadScriptCnt).addedByMessage = addedByMessage
+                cpCore.doc.main_HeadScriptCnt = cpCore.doc.main_HeadScriptCnt + 1
             End If
             '    If Filename <> "" And genericController.vbInstr(1, s, Filename, vbTextCompare) = 0 Then
             '
@@ -7585,14 +7492,14 @@ ErrorTrap:
         Public Sub main_AddPagetitle2(PageTitle As String, addedByMessage As String)
             On Error GoTo ErrorTrap
             '
-            If PageTitle <> "" And genericController.vbInstr(1, main_MetaContent_Title, PageTitle, vbTextCompare) = 0 Then
+            If PageTitle <> "" And genericController.vbInstr(1, cpCore.doc.main_MetaContent_Title, PageTitle, vbTextCompare) = 0 Then
                 If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
                     Call main_AddHeadTag2("<!-- title from " & addedByMessage & " -->", "")
                 End If
-                If main_MetaContent_Title <> "" Then
-                    main_MetaContent_Title = main_MetaContent_Title & ", "
+                If cpCore.doc.main_MetaContent_Title <> "" Then
+                    cpCore.doc.main_MetaContent_Title = cpCore.doc.main_MetaContent_Title & ", "
                 End If
-                main_MetaContent_Title = main_MetaContent_Title & PageTitle
+                cpCore.doc.main_MetaContent_Title = cpCore.doc.main_MetaContent_Title & PageTitle
                 'main_MetaContent_Title_ToBeAdded = True
             End If
             '
@@ -7614,14 +7521,14 @@ ErrorTrap:
         Public Sub main_addMetaDescription2(MetaDescription As String, addedByMessage As String)
             On Error GoTo ErrorTrap
             '
-            If MetaDescription <> "" And genericController.vbInstr(1, main_MetaContent_Description, MetaDescription, vbTextCompare) = 0 Then
+            If MetaDescription <> "" And genericController.vbInstr(1, cpCore.doc.main_MetaContent_Description, MetaDescription, vbTextCompare) = 0 Then
                 If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
                     Call main_AddHeadTag2("<!-- meta description from " & addedByMessage & " -->", "")
                 End If
-                If main_MetaContent_Description <> "" Then
-                    main_MetaContent_Description = main_MetaContent_Description & ", "
+                If cpCore.doc.main_MetaContent_Description <> "" Then
+                    cpCore.doc.main_MetaContent_Description = cpCore.doc.main_MetaContent_Description & ", "
                 End If
-                main_MetaContent_Description = main_MetaContent_Description & MetaDescription
+                cpCore.doc.main_MetaContent_Description = cpCore.doc.main_MetaContent_Description & MetaDescription
             End If
             '
             Exit Sub
@@ -7643,18 +7550,18 @@ ErrorTrap:
             On Error GoTo ErrorTrap
             '
             If StyleSheetLink <> "" Then
-                main_MetaContent_StyleSheetTags = main_MetaContent_StyleSheetTags & cr
+                cpCore.doc.main_MetaContent_StyleSheetTags = cpCore.doc.main_MetaContent_StyleSheetTags & cr
                 If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
-                    main_MetaContent_StyleSheetTags = main_MetaContent_StyleSheetTags & "<!-- from " & addedByMessage & " -->"
+                    cpCore.doc.main_MetaContent_StyleSheetTags = cpCore.doc.main_MetaContent_StyleSheetTags & "<!-- from " & addedByMessage & " -->"
                 End If
                 If cpCore.visitProperty.getBoolean("AllowAdvancedEditor") Then
                     If genericController.vbInstr(1, StyleSheetLink, "&") <> 0 Then
-                        main_MetaContent_StyleSheetTags = main_MetaContent_StyleSheetTags & "<link rel=""stylesheet"" type=""text/css"" href=""" & StyleSheetLink & """>"
+                        cpCore.doc.main_MetaContent_StyleSheetTags = cpCore.doc.main_MetaContent_StyleSheetTags & "<link rel=""stylesheet"" type=""text/css"" href=""" & StyleSheetLink & """>"
                     Else
-                        main_MetaContent_StyleSheetTags = main_MetaContent_StyleSheetTags & "<link rel=""stylesheet"" type=""text/css"" href=""" & StyleSheetLink & """>"
+                        cpCore.doc.main_MetaContent_StyleSheetTags = cpCore.doc.main_MetaContent_StyleSheetTags & "<link rel=""stylesheet"" type=""text/css"" href=""" & StyleSheetLink & """>"
                     End If
                 Else
-                    main_MetaContent_StyleSheetTags = main_MetaContent_StyleSheetTags & "<link rel=""stylesheet"" type=""text/css"" href=""" & StyleSheetLink & """ >"
+                    cpCore.doc.main_MetaContent_StyleSheetTags = cpCore.doc.main_MetaContent_StyleSheetTags & "<link rel=""stylesheet"" type=""text/css"" href=""" & StyleSheetLink & """ >"
                 End If
             End If
             '
@@ -7676,11 +7583,11 @@ ErrorTrap:
         Public Sub main_AddSharedStyleID2(ByVal styleId As Integer, Optional ByVal addedByMessage As String = "")
             On Error GoTo ErrorTrap
             '
-            If genericController.vbInstr(1, main_MetaContent_SharedStyleIDList & ",", "," & styleId & ",") = 0 Then
+            If genericController.vbInstr(1, cpCore.doc.main_MetaContent_SharedStyleIDList & ",", "," & styleId & ",") = 0 Then
                 If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
                     Call main_AddHeadTag2("<!-- shared style " & styleId & " from " & addedByMessage & " -->", "")
                 End If
-                main_MetaContent_SharedStyleIDList = main_MetaContent_SharedStyleIDList & "," & styleId
+                cpCore.doc.main_MetaContent_SharedStyleIDList = cpCore.doc.main_MetaContent_SharedStyleIDList & "," & styleId
             End If
             '
             Exit Sub
@@ -7701,14 +7608,14 @@ ErrorTrap:
         Public Sub main_addMetaKeywordList2(MetaKeywordList As String, addedByMessage As String)
             On Error GoTo ErrorTrap
             '
-            If MetaKeywordList <> "" And genericController.vbInstr(1, main_MetaContent_KeyWordList, MetaKeywordList, vbTextCompare) = 0 Then
+            If MetaKeywordList <> "" And genericController.vbInstr(1, cpCore.doc.main_MetaContent_KeyWordList, MetaKeywordList, vbTextCompare) = 0 Then
                 If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
                     Call main_AddHeadTag2("<!-- meta keyword list from " & addedByMessage & " -->", "")
                 End If
-                If main_MetaContent_KeyWordList <> "" Then
-                    main_MetaContent_KeyWordList = main_MetaContent_KeyWordList & ", "
+                If cpCore.doc.main_MetaContent_KeyWordList <> "" Then
+                    cpCore.doc.main_MetaContent_KeyWordList = cpCore.doc.main_MetaContent_KeyWordList & ", "
                 End If
-                main_MetaContent_KeyWordList = main_MetaContent_KeyWordList & MetaKeywordList
+                cpCore.doc.main_MetaContent_KeyWordList = cpCore.doc.main_MetaContent_KeyWordList & MetaKeywordList
             End If
             '
             Exit Sub
@@ -7729,14 +7636,14 @@ ErrorTrap:
         Public Sub main_AddHeadTag2(HeadTag As String, addedByMessage As String)
             On Error GoTo ErrorTrap
             '
-            If HeadTag <> "" And genericController.vbInstr(1, main_MetaContent_OtherHeadTags, HeadTag, vbTextCompare) = 0 Then
-                If main_MetaContent_OtherHeadTags <> "" Then
-                    main_MetaContent_OtherHeadTags = main_MetaContent_OtherHeadTags & vbCrLf
+            If HeadTag <> "" And genericController.vbInstr(1, cpCore.doc.main_MetaContent_OtherHeadTags, HeadTag, vbTextCompare) = 0 Then
+                If cpCore.doc.main_MetaContent_OtherHeadTags <> "" Then
+                    cpCore.doc.main_MetaContent_OtherHeadTags = cpCore.doc.main_MetaContent_OtherHeadTags & vbCrLf
                 End If
                 If (addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
-                    main_MetaContent_OtherHeadTags = main_MetaContent_OtherHeadTags & "<!-- from " & addedByMessage & " -->" & vbCrLf
+                    cpCore.doc.main_MetaContent_OtherHeadTags = cpCore.doc.main_MetaContent_OtherHeadTags & "<!-- from " & addedByMessage & " -->" & vbCrLf
                 End If
-                main_MetaContent_OtherHeadTags = main_MetaContent_OtherHeadTags & HeadTag
+                cpCore.doc.main_MetaContent_OtherHeadTags = cpCore.doc.main_MetaContent_OtherHeadTags & HeadTag
             End If
             '
             Exit Sub
@@ -7786,7 +7693,7 @@ ErrorTrap:
                             & genericController.encodeText(Caption) _
                             & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=1 height=22 align=absmiddle>" _
                             & "</td></tr></table>" _
-                            & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapperContent"" id=""editWrapper" & html_EditWrapperCnt & """>" _
+                            & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapperContent"" id=""editWrapper" & cpCore.doc.html_EditWrapperCnt & """>" _
                             & genericController.encodeText(Content) _
                             & "</td></tr></table>" _
                         & "</td></tr></table>" _
@@ -7802,12 +7709,12 @@ ErrorTrap:
                                 & "</td></tr></table>"
                     End If
                     main_GetEditWrapper = main_GetEditWrapper _
-                            & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapperContent"" id=""editWrapper" & html_EditWrapperCnt & """>" _
+                            & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccEditWrapperContent"" id=""editWrapper" & cpCore.doc.html_EditWrapperCnt & """>" _
                             & genericController.encodeText(Content) _
                             & "</td></tr></table>" _
                         & "</td></tr></table>"
                 End If
-                html_EditWrapperCnt = html_EditWrapperCnt + 1
+                cpCore.doc.html_EditWrapperCnt = cpCore.doc.html_EditWrapperCnt + 1
             End If
 
             Exit Function
@@ -8808,10 +8715,10 @@ ErrorTrap:
             '
             ' should use the ccNav object, no the ccCommon module for this code
             '
-            If (main_LiveTabObject Is Nothing) Then
-                main_LiveTabObject = New menuLiveTabController
+            If (cpCore.doc.main_LiveTabObject Is Nothing) Then
+                cpCore.doc.main_LiveTabObject = New menuLiveTabController
             End If
-            Call main_LiveTabObject.AddEntry(genericController.encodeText(Caption), genericController.encodeText(LiveBody), genericController.encodeText(StylePrefix))
+            Call cpCore.doc.main_LiveTabObject.AddEntry(genericController.encodeText(Caption), genericController.encodeText(LiveBody), genericController.encodeText(StylePrefix))
             '
             Exit Sub
 ErrorTrap:
@@ -8825,10 +8732,10 @@ ErrorTrap:
             '
             ' should use the ccNav object, no the ccCommon module for this code
             '
-            If (main_LiveTabObject Is Nothing) Then
-                main_LiveTabObject = New menuLiveTabController
+            If (cpCore.doc.main_LiveTabObject Is Nothing) Then
+                cpCore.doc.main_LiveTabObject = New menuLiveTabController
             End If
-            main_GetLiveTabs = main_LiveTabObject.GetTabs()
+            main_GetLiveTabs = cpCore.doc.main_LiveTabObject.GetTabs()
             '
             Exit Function
 ErrorTrap:
@@ -8842,10 +8749,10 @@ ErrorTrap:
             '
             ' should use the ccNav object, no the ccCommon module for this code
             '
-            If (html_ComboTabObject Is Nothing) Then
-                html_ComboTabObject = New menuComboTabController
+            If (cpCore.doc.html_ComboTabObject Is Nothing) Then
+                cpCore.doc.html_ComboTabObject = New menuComboTabController
             End If
-            Call html_ComboTabObject.AddEntry(Caption, Link, AjaxLink, LiveBody, IsHit, ContainerClass)
+            Call cpCore.doc.html_ComboTabObject.AddEntry(Caption, Link, AjaxLink, LiveBody, IsHit, ContainerClass)
             '
             Exit Sub
 ErrorTrap:
@@ -8859,10 +8766,10 @@ ErrorTrap:
             '
             ' should use the ccNav object, no the ccCommon module for this code
             '
-            If (html_ComboTabObject Is Nothing) Then
-                html_ComboTabObject = New menuComboTabController
+            If (cpCore.doc.html_ComboTabObject Is Nothing) Then
+                cpCore.doc.html_ComboTabObject = New menuComboTabController
             End If
-            menu_GetComboTabs = html_ComboTabObject.GetTabs()
+            menu_GetComboTabs = cpCore.doc.html_ComboTabObject.GetTabs()
             '
             Exit Function
 ErrorTrap:
@@ -9216,7 +9123,7 @@ ErrorTrap:
                         '
                         ' login successful, redirect back to this page (without a method)
                         '
-                        QS = cpCore.html.refreshQueryString
+                        QS = cpCore.doc.refreshQueryString
                         QS = genericController.ModifyQueryString(QS, "method", "")
                         QS = genericController.ModifyQueryString(QS, "RequestBinary", "")
                         '
@@ -9282,7 +9189,7 @@ ErrorTrap:
                         End With
                     Next
                     '
-                    QueryString = cpCore.html.refreshQueryString
+                    QueryString = cpCore.doc.refreshQueryString
                     QueryString = genericController.ModifyQueryString(QueryString, "S", "")
                     QueryString = genericController.ModifyQueryString(QueryString, "ccIPage", "")
                     returnResult = "" _
@@ -9344,8 +9251,8 @@ ErrorTrap:
             ' Template shared styles
             '
             ' !!!!! dont know why this was blocked. Running add-ons with shared styles need this in the admin site.
-            FileList = main_GetSharedStyleFileList(cpCore, cpCore.html.main_MetaContent_SharedStyleIDList, main_IsAdminSite)
-            cpCore.html.main_MetaContent_SharedStyleIDList = ""
+            FileList = main_GetSharedStyleFileList(cpCore, cpCore.doc.main_MetaContent_SharedStyleIDList, main_IsAdminSite)
+            cpCore.doc.main_MetaContent_SharedStyleIDList = ""
             If FileList <> "" Then
                 Files = Split(FileList, vbCrLf)
                 For Ptr = 0 To UBound(Files)
@@ -9365,15 +9272,15 @@ ErrorTrap:
             '
             ' Template exclusive styles
             '
-            If cpCore.html.main_MetaContent_TemplateStyleSheetTag <> "" Then
-                getHtmlDocHead = getHtmlDocHead & cpCore.html.main_MetaContent_TemplateStyleSheetTag
+            If cpCore.doc.main_MetaContent_TemplateStyleSheetTag <> "" Then
+                getHtmlDocHead = getHtmlDocHead & cpCore.doc.main_MetaContent_TemplateStyleSheetTag
             End If
             '
             ' Page Styles
             '
-            If cpCore.html.main_MetaContent_StyleSheetTags <> "" Then
-                getHtmlDocHead = getHtmlDocHead & cpCore.html.main_MetaContent_StyleSheetTags
-                cpCore.html.main_MetaContent_StyleSheetTags = ""
+            If cpCore.doc.main_MetaContent_StyleSheetTags <> "" Then
+                getHtmlDocHead = getHtmlDocHead & cpCore.doc.main_MetaContent_StyleSheetTags
+                cpCore.doc.main_MetaContent_StyleSheetTags = ""
             End If
             '
             ' Member Styles
@@ -9385,17 +9292,17 @@ ErrorTrap:
             '
             ' meta content
             '
-            Copy = cpCore.html.main_MetaContent_Title
+            Copy = cpCore.doc.main_MetaContent_Title
             If Copy <> "" Then
                 getHtmlDocHead = getHtmlDocHead & cr & "<title>" & Copy & "</title>"
             End If
             '
-            Copy = cpCore.html.main_MetaContent_KeyWordList
+            Copy = cpCore.doc.main_MetaContent_KeyWordList
             If Copy <> "" Then
                 getHtmlDocHead = getHtmlDocHead & cr & "<meta name=""keywords"" content=""" & Copy & """ >"
             End If
             '
-            Copy = cpCore.html.main_MetaContent_Description
+            Copy = cpCore.doc.main_MetaContent_Description
             If Copy <> "" Then
                 getHtmlDocHead = getHtmlDocHead & cr & "<meta name=""description"" content=""" & Copy & """ >"
             End If
@@ -9450,8 +9357,8 @@ ErrorTrap:
                 ' no base in admin site
                 '
             ElseIf BaseHref <> "" Then
-                If cpCore.html.refreshQueryString <> "" Then
-                    BaseHref = BaseHref & "?" & cpCore.html.refreshQueryString
+                If cpCore.doc.refreshQueryString <> "" Then
+                    BaseHref = BaseHref & "?" & cpCore.doc.refreshQueryString
                 End If
                 getHtmlDocHead = getHtmlDocHead & cr & "<base href=""" & BaseHref & """ >"
             End If
@@ -9461,9 +9368,9 @@ ErrorTrap:
             getHtmlDocHead = getHtmlDocHead _
                 & cr & "<script language=""JavaScript"" type=""text/javascript""  src=""" & cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.webServerIO_requestDomain & "/ccLib/ClientSide/Core.js""></script>" _
                 & ""
-            If cpCore.html.main_HeadScriptCnt > 0 Then
-                For Ptr = 0 To cpCore.html.main_HeadScriptCnt - 1
-                    With cpCore.html.main_HeadScripts(Ptr)
+            If cpCore.doc.main_HeadScriptCnt > 0 Then
+                For Ptr = 0 To cpCore.doc.main_HeadScriptCnt - 1
+                    With cpCore.doc.main_HeadScripts(Ptr)
                         If (.addedByMessage <> "") And cpCore.visitProperty.getBoolean("AllowDebugging") Then
                             getHtmlDocHead = getHtmlDocHead & cr & "<!-- from " & .addedByMessage & " -->"
                         End If
@@ -9474,12 +9381,12 @@ ErrorTrap:
                         End If
                     End With
                 Next
-                cpCore.html.main_HeadScriptCnt = 0
+                cpCore.doc.main_HeadScriptCnt = 0
             End If
             '
             ' other head tags - always last
             '
-            OtherHeadTags = cpCore.html.main_MetaContent_OtherHeadTags
+            OtherHeadTags = cpCore.doc.main_MetaContent_OtherHeadTags
             If OtherHeadTags <> "" Then
                 If Left(OtherHeadTags, 2) <> vbCrLf Then
                     OtherHeadTags = vbCrLf & OtherHeadTags
@@ -9959,7 +9866,7 @@ ErrorTrap:
                         ' Cut Link if enabled
                         '
                         If iAllowCut Then
-                            WorkingLink = genericController.modifyLinkQuery(cpCore.webServer.webServerIO_requestPage & "?" & cpCore.html.refreshQueryString, RequestNameCut, genericController.encodeText(ContentID) & "." & genericController.encodeText(RecordID), True)
+                            WorkingLink = genericController.modifyLinkQuery(cpCore.webServer.webServerIO_requestPage & "?" & cpCore.doc.refreshQueryString, RequestNameCut, genericController.encodeText(ContentID) & "." & genericController.encodeText(RecordID), True)
                             main_GetRecordEditLink2 = "" _
                                 & main_GetRecordEditLink2 _
                                 & "<a class=""ccRecordCutLink"" TabIndex=""-1"" href=""" & cpCore.html.html_EncodeHTML(WorkingLink) & """><img src=""/ccLib/images/Contentcut.gif"" border=""0"" alt=""Cut this " & ContentCaption & " to clipboard"" title=""Cut this " & ContentCaption & " to clipboard"" align=""absmiddle""></a>"
@@ -10184,7 +10091,7 @@ ErrorTrap:
                                             '
                                             ' Can not paste as child of itself
                                             '
-                                            PasteLink = cpCore.webServer.webServerIO_requestPage & "?" & cpCore.html.refreshQueryString
+                                            PasteLink = cpCore.webServer.webServerIO_requestPage & "?" & cpCore.doc.refreshQueryString
                                             PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePaste, "1", True)
                                             PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteParentContentID, CStr(iContentID), True)
                                             PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteParentRecordID, CStr(ParentID), True)
@@ -10417,7 +10324,7 @@ ErrorTrap:
             Return result
         End Function
         Public Sub main_ClearStream()
-            docBuffer = ""
+            cpCore.doc.docBuffer = ""
             cpCore.webServer.webServerIO_bufferRedirect = ""
             cpCore.webServer.webServerIO_bufferResponseHeader = ""
         End Sub
@@ -10730,11 +10637,11 @@ ErrorTrap:
                 LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & cpCore.html.html_EncodeHTML(cpCore.siteProperties.adminURL & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
                 If cpCore.siteProperties.getBoolean("AllowMobileTemplates", False) Then
                     If cpCore.authContext.visit.Mobile Then
-                        QS = cpCore.html.refreshQueryString
+                        QS = cpCore.doc.refreshQueryString
                         QS = genericController.ModifyQueryString(QS, "method", "forcenonmobile")
                         LinkPanel.Add("<a class=""ccAdminLink"" href=""?" & QS & """>Non-Mobile Version</A> | ")
                     Else
-                        QS = cpCore.html.refreshQueryString
+                        QS = cpCore.doc.refreshQueryString
                         QS = genericController.ModifyQueryString(QS, "method", "forcemobile")
                         LinkPanel.Add("<a class=""ccAdminLink"" href=""?" & QS & """>Mobile Version</A> | ")
                     End If
@@ -10743,7 +10650,7 @@ ErrorTrap:
                 '
                 If ShowLegacyToolsPanel Then
                     ToolsPanel = New stringBuilderLegacyController
-                    WorkingQueryString = genericController.ModifyQueryString(cpCore.html.refreshQueryString, "ma", "", False)
+                    WorkingQueryString = genericController.ModifyQueryString(cpCore.doc.refreshQueryString, "ma", "", False)
                     '
                     ' ----- Tools Panel Caption
                     '

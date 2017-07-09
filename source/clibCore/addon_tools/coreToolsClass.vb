@@ -3864,7 +3864,7 @@ ErrorTrap:
                             FileSize = LineSplit(5)
                             FileDate = LineSplit(3)
                             FileURL = StartPath & CurrentPath & "\" & Filename
-                            QueryString = cpCore.html.refreshQueryString
+                            QueryString = cpcore.doc.refreshQueryString
                             QueryString = genericController.ModifyQueryString(QueryString, RequestNameAdminForm, CStr(AdminFormTool), True)
                             QueryString = genericController.ModifyQueryString(QueryString, "at", AdminFormToolLogFileView, True)
                             QueryString = genericController.ModifyQueryString(QueryString, "SourceFile", FileURL, True)
