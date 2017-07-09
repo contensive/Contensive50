@@ -8,7 +8,7 @@ Namespace Contensive.Core
         '
         Public Shared Function CloseFormTable(cpCore As coreClass, ByVal ButtonList As String) As String
             If ButtonList <> "" Then
-                CloseFormTable = "</td></tr></TABLE>" & cpCore.htmlDoc.main_GetPanelButtons(ButtonList, "Button") & "</form>"
+                CloseFormTable = "</td></tr></TABLE>" & cpCore.html.main_GetPanelButtons(ButtonList, "Button") & "</form>"
             Else
                 CloseFormTable = "</td></tr></TABLE></form>"
             End If
@@ -18,9 +18,9 @@ Namespace Contensive.Core
         Public Shared Function OpenFormTable(cpCore As coreClass, ByVal ButtonList As String) As String
             Dim result As String = ""
             Try
-                result = cpCore.htmldoc.html_GetFormStart()
+                result = cpCore.html.html_GetFormStart()
                 If ButtonList <> "" Then
-                    result = result & cpCore.htmlDoc.main_GetPanelButtons(ButtonList, "Button")
+                    result = result & cpCore.html.main_GetPanelButtons(ButtonList, "Button")
                 End If
                 result = result & "<table border=""0"" cellpadding=""10"" cellspacing=""0"" width=""100%""><tr><TD>"
             Catch ex As Exception

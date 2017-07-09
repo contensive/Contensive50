@@ -242,7 +242,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' ----- handle content special cases (prevent redirect to deleted records)
                     '
-                    NonEncodedLink = cpcore.htmlDoc.main_DecodeUrl(EncodedLink)
+                    NonEncodedLink = cpcore.html.main_DecodeUrl(EncodedLink)
                     Select Case genericController.vbUCase(iContentName)
                         Case "CONTENT WATCH"
                             '

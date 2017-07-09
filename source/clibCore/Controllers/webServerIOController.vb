@@ -459,7 +459,7 @@ Namespace Contensive.Core
                     '
                     webServerIO_InitCounter += 1
                     '
-                    Call cpCore.htmlDoc.enableOutputBuffer(True)
+                    Call cpCore.html.enableOutputBuffer(True)
                     cpCore.continueProcessing = True
                     Call setResponseContentType("text/html")
                     '
@@ -500,7 +500,7 @@ Namespace Contensive.Core
                         ' Add JSProcessForm to form
                         '
                         webServerIO_BlockClosePageCopyright = True
-                        webServerIO_OutStreamDevice = htmlDocController.htmlDoc_OutStreamJavaScript ' refactor - these should just be setContentType as a string so developers can set whatever
+                        webServerIO_OutStreamDevice = htmlController.htmlDoc_OutStreamJavaScript ' refactor - these should just be setContentType as a string so developers can set whatever
                         Call setResponseContentType("application/javascript") ' refactor -- this should be setContentType
                         '
                         ' Add the cpcore.main_ServerReferrer QS to the cpcore.doc.main_InStreamArray()
@@ -824,11 +824,11 @@ Namespace Contensive.Core
                     '
                     Id = cpCore.docProperties.getInteger(rnPageId)
                     If Id <> 0 Then
-                        Call cpCore.htmlDoc.webServerIO_addRefreshQueryString(rnPageId, Id.ToString)
+                        Call cpCore.html.webServerIO_addRefreshQueryString(rnPageId, Id.ToString)
                     End If
                     Id = cpCore.docProperties.getInteger("sid")
                     If Id <> 0 Then
-                        Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("sid", Id.ToString)
+                        Call cpCore.html.webServerIO_addRefreshQueryString("sid", Id.ToString)
                     End If
                     '
                     ' ----- Create Server Link property
@@ -1012,7 +1012,7 @@ Namespace Contensive.Core
                 '
                 MethodName = "main_addResponseCookie"
                 '
-                If cpCore.continueProcessing And cpCore.htmlDoc.outputBufferEnabled Then
+                If cpCore.continueProcessing And cpCore.html.outputBufferEnabled Then
                     If (False) Then
                         ''
                         '' no domain provided, new mode
@@ -1274,11 +1274,11 @@ ErrorTrap:
                             '
                             ' -- Verbose - do not redirect, just print the link
                             EncodedLink = NonEncodedLink
-                            cpCore.htmlDoc.writeAltBuffer("<div style=""padding:20px;border:1px dashed black;background-color:white;color:black;"">" & RedirectReason & "<p>Click to continue the redirect to <a href=" & EncodedLink & ">" & cpCore.htmlDoc.html_EncodeHTML(NonEncodedLink) & "</a>...</p></div>")
+                            cpCore.html.writeAltBuffer("<div style=""padding:20px;border:1px dashed black;background-color:white;color:black;"">" & RedirectReason & "<p>Click to continue the redirect to <a href=" & EncodedLink & ">" & cpCore.html.html_EncodeHTML(NonEncodedLink) & "</a>...</p></div>")
                         Else
                             '
                             ' -- Redirect now
-                            Call cpCore.htmlDoc.main_ClearStream()
+                            Call cpCore.html.main_ClearStream()
                             EncodedLink = genericController.EncodeURL(NonEncodedLink)
                             If (Not iisContext Is Nothing) Then
                                 '

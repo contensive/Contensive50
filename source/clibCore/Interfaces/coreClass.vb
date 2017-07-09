@@ -121,15 +121,15 @@ Namespace Contensive.Core
         Private _email As emailController
         '
         '===================================================================================================
-        Public ReadOnly Property pages As pagesController
+        Public ReadOnly Property doc As docController
             Get
-                If (_pages Is Nothing) Then
-                    _pages = New pagesController(Me, docProperties.getInteger(rnPageId))
+                If (_doc Is Nothing) Then
+                    _doc = New docController(Me, docProperties.getInteger(rnPageId))
                 End If
-                Return _pages
+                Return _doc
             End Get
         End Property
-        Private _pages As pagesController
+        Private _doc As docController
         '
         '===================================================================================================
         Public ReadOnly Property menuTab As menuTabController
@@ -143,15 +143,15 @@ Namespace Contensive.Core
         Private _menuTab As menuTabController
         '
         '===================================================================================================
-        Public ReadOnly Property htmlDoc As Controllers.htmlDocController
+        Public ReadOnly Property html As Controllers.htmlController
             Get
-                If (_htmlDoc Is Nothing) Then
-                    _htmlDoc = New Controllers.htmlDocController(Me)
+                If (_html Is Nothing) Then
+                    _html = New Controllers.htmlController(Me)
                 End If
-                Return _htmlDoc
+                Return _html
             End Get
         End Property
-        Private _htmlDoc As Controllers.htmlDocController
+        Private _html As Controllers.htmlController
         '
         '===================================================================================================
         Public ReadOnly Property addon As Controllers.addonController
@@ -211,13 +211,13 @@ Namespace Contensive.Core
         '===================================================================================================
         Public ReadOnly Property docProperties() As docPropertyController
             Get
-                If (_doc Is Nothing) Then
-                    _doc = New docPropertyController(Me)
+                If (_docProperties Is Nothing) Then
+                    _docProperties = New docPropertyController(Me)
                 End If
-                Return _doc
+                Return _docProperties
             End Get
         End Property
-        Private _doc As docPropertyController = Nothing
+        Private _docProperties As docPropertyController = Nothing
         '
         '===================================================================================================
         ''' <summary>
@@ -478,7 +478,7 @@ Namespace Contensive.Core
             cp_forAddonExecutionOnly = cp
             '
             ' -- create default auth objects for non-user methods, or until auth is available
-            authContext = New authContextModel
+            authContext = New authContextModel(Me)
             '
             serverConfig = Models.Entity.serverConfigModel.getObject(Me)
             Me.serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
@@ -497,7 +497,7 @@ Namespace Contensive.Core
             Me.cp_forAddonExecutionOnly = cp
             '
             ' -- create default auth objects for non-user methods, or until auth is available
-            authContext = New authContextModel
+            authContext = New authContextModel(Me)
             '
             Me.serverConfig = serverConfig
             Me.serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
@@ -517,7 +517,7 @@ Namespace Contensive.Core
             Me.cp_forAddonExecutionOnly = cp
             '
             ' -- create default auth objects for non-user methods, or until auth is available
-            authContext = New authContextModel
+            authContext = New authContextModel(Me)
             '
             Me.serverConfig = serverConfig
             Me.serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
@@ -537,7 +537,7 @@ Namespace Contensive.Core
             Me.cp_forAddonExecutionOnly = cp
             '
             ' -- create default auth objects for non-user methods, or until auth is available
-            authContext = New authContextModel
+            authContext = New authContextModel(Me)
             '
             serverConfig = Models.Entity.serverConfigModel.getObject(Me, applicationName)
             serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
@@ -559,7 +559,7 @@ Namespace Contensive.Core
             Me.cp_forAddonExecutionOnly = cp
             '
             ' -- create default auth objects for non-user methods, or until auth is available
-            authContext = New authContextModel
+            authContext = New authContextModel(Me)
             '
             serverConfig = Models.Entity.serverConfigModel.getObject(Me, applicationName)
             serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
@@ -694,7 +694,7 @@ Namespace Contensive.Core
                                                 Call db.cs_Close(cs)
                                                 handleExceptionAndContinue(New ApplicationException("Add-on call from [" & refHost & "] was blocked because this domain is not in the Aggregate Access Content. An inactive record was added. To allow this domain access, mark the record active.")) ' handleLegacyError12("Init", "")
                                                 continueProcessing = False '--- should be disposed by caller --- Call dispose
-                                                Return htmlDoc.docBuffer
+                                                Return html.docBuffer
                                             ElseIf Not db.cs_getBoolean(cs, "active") Then
                                                 '
                                                 ' inactive record, throw error
@@ -702,7 +702,7 @@ Namespace Contensive.Core
                                                 Call db.cs_Close(cs)
                                                 handleExceptionAndContinue(New ApplicationException("Add-on call from [" & refHost & "] was blocked because this domain is not active in the Aggregate Access Content. To allow this domain access, mark the record active.")) ' handleLegacyError12("Init", "")
                                                 continueProcessing = False '--- should be disposed by caller --- Call dispose
-                                                Return htmlDoc.docBuffer
+                                                Return html.docBuffer
                                             Else
                                                 '
                                                 ' Active record, allow hit
@@ -758,7 +758,7 @@ Namespace Contensive.Core
                             '
                             webServer.webServerIO_BlockClosePageCopyright = True
                             html_BlockClosePageLink = True
-                            If (webServer.webServerIO_OutStreamDevice = htmlDocController.htmlDoc_OutStreamJavaScript) Then
+                            If (webServer.webServerIO_OutStreamDevice = htmlController.htmlDoc_OutStreamJavaScript) Then
                                 If genericController.vbInstr(1, returnResult, "<form ", vbTextCompare) <> 0 Then
                                     Dim FormSplit As String() = Split(returnResult, "<form ", , vbTextCompare)
                                     returnResult = FormSplit(0)
@@ -772,7 +772,7 @@ Namespace Contensive.Core
                                     Next
                                 End If
                                 '
-                                Call htmlDoc.writeAltBuffer(returnResult)
+                                Call html.writeAltBuffer(returnResult)
                                 returnResult = ""
                             End If
                             Return returnResult
@@ -832,7 +832,7 @@ Namespace Contensive.Core
                                                 Dim addonId As Integer = genericController.EncodeInteger(rsDr("addonid"))
                                                 If (addonId <> 0) And (addonId <> addonDefaultEditorId) Then
                                                     returnResult = returnResult _
-                                                    & vbCrLf & vbTab & "<div class=""radioCon"">" & htmlDoc.html_GetFormInputRadioBox(radioGroupName, genericController.encodeText(addonId), CStr(currentEditorAddonId)) & "&nbsp;Use " & genericController.encodeText(rsDr("addonName")) & "</div>" _
+                                                    & vbCrLf & vbTab & "<div class=""radioCon"">" & html.html_GetFormInputRadioBox(radioGroupName, genericController.encodeText(addonId), CStr(currentEditorAddonId)) & "&nbsp;Use " & genericController.encodeText(rsDr("addonName")) & "</div>" _
                                                     & ""
                                                 End If
 
@@ -852,7 +852,7 @@ Namespace Contensive.Core
                                         returnResult = "" _
                                         & vbCrLf & vbTab & "<h1>Editor Preference</h1>" _
                                         & vbCrLf & vbTab & "<p>Select the editor you will use for this field. Select default if you want to use the current system default.</p>" _
-                                        & vbCrLf & vbTab & "<div class=""radioCon"">" & htmlDoc.html_GetFormInputRadioBox("setEditorPreference" & fieldId, "0", "0") & "&nbsp;Use Default Editor" & addonDefaultEditorName & "</div>" _
+                                        & vbCrLf & vbTab & "<div class=""radioCon"">" & html.html_GetFormInputRadioBox("setEditorPreference" & fieldId, "0", "0") & "&nbsp;Use Default Editor" & addonDefaultEditorName & "</div>" _
                                         & vbCrLf & vbTab & returnResult _
                                         & vbCrLf & vbTab & "<div class=""buttonCon"">" _
                                         & vbCrLf & vbTab & "<button type=""button"" onclick=""" & OnClick & """>Select</button>" _
@@ -894,8 +894,8 @@ Namespace Contensive.Core
                                             Call visitProperty.setProperty(PropertyName, PropertyValue)
                                         Next
                                         returnResult = remoteQueryController.main_FormatRemoteQueryOutput(Me, gd, RemoteFormatEnum.RemoteFormatJsonNameValue)
-                                        returnResult = htmlDoc.main_encodeHTML(returnResult)
-                                        Call htmlDoc.writeAltBuffer(returnResult)
+                                        returnResult = html.main_encodeHTML(returnResult)
+                                        Call html.writeAltBuffer(returnResult)
                                     Case AjaxGetVisitProperty
                                         '
                                         ' 7/7/2009 - Moved from HardCodedPages - sets a visit property from the cj object
@@ -921,13 +921,13 @@ Namespace Contensive.Core
                                             gd.row(0).Cell(Ptr).v = visitProperty.getText(PropertyName, PropertyValue)
                                         Next
                                         returnResult = remoteQueryController.main_FormatRemoteQueryOutput(Me, gd, RemoteFormatEnum.RemoteFormatJsonNameValue)
-                                        returnResult = htmlDoc.main_encodeHTML(returnResult)
-                                        Call htmlDoc.writeAltBuffer(returnResult)
+                                        returnResult = html.main_encodeHTML(returnResult)
+                                        Call html.writeAltBuffer(returnResult)
                                     Case AjaxData
                                         '
                                         ' 7/7/2009 - Moved from HardCodedPages - Run remote query from cj.remote object call, and return results html encoded in a <result></result> block
                                         ' 20050427 - not used
-                                        Call htmlDoc.writeAltBuffer(executeRoute_ProcessAjaxData())
+                                        Call html.writeAltBuffer(executeRoute_ProcessAjaxData())
                                     Case AjaxPing
                                         '
                                         ' returns OK if the server is alive
@@ -961,10 +961,10 @@ Namespace Contensive.Core
                                 webServer.webServerIO_BlockClosePageCopyright = True
                                 html_BlockClosePageLink = True
                                 'Call AppendLog("call main_getEndOfBody, from main_initf")
-                                returnResult = returnResult & htmlDoc.getHtmlDoc_beforeEndOfBodyHtml(False, False, True, False)
-                                Call htmlDoc.writeAltBuffer(returnResult)
+                                returnResult = returnResult & html.getHtmlDoc_beforeEndOfBodyHtml(False, False, True, False)
+                                Call html.writeAltBuffer(returnResult)
                                 continueProcessing = False '--- should be disposed by caller --- Call dispose
-                                Return htmlDoc.docBuffer
+                                Return html.docBuffer
                             End If
                         End If
                         '
@@ -1070,7 +1070,7 @@ Namespace Contensive.Core
                                 '
                                 ' set the meta content flag to show it is not needed for the head tag
                                 '
-                                Call htmlDoc.main_SetMetaContent(0, 0)
+                                Call html.main_SetMetaContent(0, 0)
                                 Select Case formType
                                     Case FormTypeSiteStyleEditor
                                         If authContext.isAuthenticated() And authContext.isAuthenticatedAdmin(Me) Then
@@ -1094,8 +1094,8 @@ Namespace Contensive.Core
                                                 '
                                                 ' Save new public stylesheet
                                                 '
-                                                Call appRootFiles.saveFile("templates\Public" & StyleSN & ".css", pages.pageManager_GetStyleSheet)
-                                                Call appRootFiles.saveFile("templates\Admin" & StyleSN & ".css", pages.pageManager_GetStyleSheetDefault)
+                                                Call appRootFiles.saveFile("templates\Public" & StyleSN & ".css", doc.pageManager_GetStyleSheet)
+                                                Call appRootFiles.saveFile("templates\Admin" & StyleSN & ".css", doc.pageManager_GetStyleSheetDefault)
                                             End If
                                         End If
                                     Case FormTypeAddonStyleEditor
@@ -1134,37 +1134,37 @@ Namespace Contensive.Core
                                         '
                                         '
                                         '
-                                        Call htmlDoc.pageManager_ProcessAddonSettingsEditor()
+                                        Call html.pageManager_ProcessAddonSettingsEditor()
                                     Case FormTypeHelpBubbleEditor
                                         '
                                         '
                                         '
-                                        Call htmlDoc.main_ProcessHelpBubbleEditor()
+                                        Call html.main_ProcessHelpBubbleEditor()
                                     Case FormTypeJoin
                                         '
                                         '
                                         '
-                                        Call htmlDoc.processFormJoin()
+                                        Call html.processFormJoin()
                                     Case FormTypeSendPassword
                                         '
                                         '
                                         '
-                                        Call htmlDoc.processFormSendPassword()
+                                        Call html.processFormSendPassword()
                                     Case FormTypeLogin, "l09H58a195"
                                         '
                                         '
                                         '
-                                        Call htmlDoc.processFormLoginDefault()
+                                        Call html.processFormLoginDefault()
                                     Case FormTypeToolsPanel
                                         '
                                         ' ----- Administrator Tools Panel
                                         '
-                                        Call htmlDoc.pageManager_ProcessFormToolsPanel()
+                                        Call html.pageManager_ProcessFormToolsPanel()
                                     Case FormTypePageAuthoring
                                         '
                                         ' ----- Page Authoring Tools Panel
                                         '
-                                        Call pages.pageManager_ProcessFormQuickEditing()
+                                        Call doc.pageManager_ProcessFormQuickEditing()
                                     Case FormTypeActiveEditor
                                         '
                                         ' ----- Active Editor
@@ -1188,7 +1188,7 @@ Namespace Contensive.Core
                             Dim ExitNow As Boolean = executeRoute_hardCodedPage(HardCodedPage)
                             If ExitNow Then
                                 continueProcessing = False '--- should be disposed by caller --- Call dispose
-                                Return htmlDoc.docBuffer
+                                Return html.docBuffer
                             End If
                         End If
                         '
@@ -1575,7 +1575,7 @@ Namespace Contensive.Core
                         ' output
                         '
                         Copy = remoteQueryController.main_FormatRemoteQueryOutput(Me, gd, RemoteFormat)
-                        Copy = htmlDoc.html_EncodeHTML(Copy)
+                        Copy = html.html_EncodeHTML(Copy)
                         result = "<data>" & Copy & "</data>"
                     End If
                 End If
@@ -1632,9 +1632,9 @@ Namespace Contensive.Core
                             Copy = "" _
                             & "<div style=""width:300px;margin:100px auto 0 auto;"">" _
                             & "<p>An attempt to send login information for email address '" & Emailtext & "' has been made.</p>" _
-                            & "<p><a href=""?" & htmlDoc.refreshQueryString & """>Return to the Site.</a></p>" _
+                            & "<p><a href=""?" & html.refreshQueryString & """>Return to the Site.</a></p>" _
                             & "</div>"
-                            Call htmlDoc.writeAltBuffer(Copy)
+                            Call html.writeAltBuffer(Copy)
                             result = True
                         Else
                             result = False
@@ -1710,39 +1710,39 @@ Namespace Contensive.Core
                         '
                         ' main_Get FormIndex (the index to the InsertImage# function called on selection)
                         '
-                        Call htmlDoc.webServerIO_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageResourceLibrary)
+                        Call html.webServerIO_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageResourceLibrary)
                         EditorObjectName = docProperties.getText("EditorObjectName")
                         LinkObjectName = docProperties.getText("LinkObjectName")
                         If EditorObjectName <> "" Then
                             '
                             ' Open a page compatible with a dialog
                             '
-                            Call htmlDoc.webServerIO_addRefreshQueryString("EditorObjectName", EditorObjectName)
-                            Call htmlDoc.main_AddHeadScriptLink("/ccLib/ClientSide/dialogs.js", "Resource Library")
+                            Call html.webServerIO_addRefreshQueryString("EditorObjectName", EditorObjectName)
+                            Call html.main_AddHeadScriptLink("/ccLib/ClientSide/dialogs.js", "Resource Library")
                             'Call AddHeadScript("<script type=""text/javascript"" src=""/ccLib/ClientSide/dialogs.js""></script>")
-                            Call htmlDoc.main_SetMetaContent(0, 0)
-                            Call htmlDoc.main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Resource Library")
-                            Copy = htmlDoc.main_GetResourceLibrary2("", True, EditorObjectName, LinkObjectName, True)
+                            Call html.main_SetMetaContent(0, 0)
+                            Call html.main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Resource Library")
+                            Copy = html.main_GetResourceLibrary2("", True, EditorObjectName, LinkObjectName, True)
                             'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2b")
                             Copy = "" _
                             & siteProperties.docTypeDeclaration() _
                             & "<html>" _
                             & cr & "<head>" _
-                            & genericController.htmlIndent(htmlDoc.getHtmlDocHead(False)) _
+                            & genericController.htmlIndent(html.getHtmlDocHead(False)) _
                             & cr & "</head>" _
                             & cr & "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">" _
-                            & genericController.htmlIndent(htmlDoc.main_GetPanelHeader("Contensive Resource Library")) _
+                            & genericController.htmlIndent(html.main_GetPanelHeader("Contensive Resource Library")) _
                             & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td>" _
                             & cr2 & "<div style=""border-top:1px solid white;border-bottom:1px solid black;height:2px""><img alt=""spacer"" src=""/ccLib/images/spacer.gif"" width=1 height=1></div>" _
                             & genericController.htmlIndent(Copy) _
                             & cr & "</td></tr>" _
                             & cr & "<tr><td>" _
-                            & genericController.htmlIndent(htmlDoc.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False)) _
+                            & genericController.htmlIndent(html.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False)) _
                             & cr & "</td></tr></table>" _
                             & cr & "<script language=javascript type=""text/javascript"">fixDialog();</script>" _
                             & cr & "</body>" _
                             & "</html>"
-                            Call htmlDoc.writeAltBuffer(Copy)
+                            Call html.writeAltBuffer(Copy)
                             result = True
                             'Call main_GetEndOfBody(False, False)
                             ''--- should be disposed by caller --- Call dispose
@@ -1755,36 +1755,36 @@ Namespace Contensive.Core
                             '
                             ' Open a page compatible with a dialog
                             '
-                            Call htmlDoc.webServerIO_addRefreshQueryString("LinkObjectName", LinkObjectName)
-                            Call htmlDoc.main_AddHeadScriptLink("/ccLib/ClientSide/dialogs.js", "Resource Library")
+                            Call html.webServerIO_addRefreshQueryString("LinkObjectName", LinkObjectName)
+                            Call html.main_AddHeadScriptLink("/ccLib/ClientSide/dialogs.js", "Resource Library")
                             'Call AddHeadScript("<script type=""text/javascript"" src=""/ccLib/ClientSide/dialogs.js""></script>")
-                            Call htmlDoc.main_SetMetaContent(0, 0)
-                            Call htmlDoc.main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Resource Library")
-                            Copy = htmlDoc.main_GetResourceLibrary2("", True, EditorObjectName, LinkObjectName, True)
+                            Call html.main_SetMetaContent(0, 0)
+                            Call html.main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Resource Library")
+                            Copy = html.main_GetResourceLibrary2("", True, EditorObjectName, LinkObjectName, True)
                             'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2c")
                             Copy = "" _
                             & siteProperties.docTypeDeclaration() _
                             & cr & "<html>" _
                             & cr & "<head>" _
-                            & genericController.htmlIndent(htmlDoc.getHtmlDocHead(False)) _
+                            & genericController.htmlIndent(html.getHtmlDocHead(False)) _
                             & cr & "</head>" _
                             & cr & "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">" _
-                            & htmlDoc.main_GetPanelHeader("Contensive Resource Library") _
+                            & html.main_GetPanelHeader("Contensive Resource Library") _
                             & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td>" _
                             & Copy _
-                            & cr & "</td></tr><tr><td>" & htmlDoc.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False) & "</td></tr></table>" _
+                            & cr & "</td></tr><tr><td>" & html.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False) & "</td></tr></table>" _
                             & cr & "<script language=javascript type=text/javascript>fixDialog();</script>" _
                             & cr & "</body>" _
                             & vbCrLf & "</html>"
-                            Call htmlDoc.writeAltBuffer(Copy)
+                            Call html.writeAltBuffer(Copy)
                             result = True
                         End If
                     Case HardCodedPageLoginDefault
                         '
                         ' 9/4/2012 added to prevent lockout if login addon fails
-                        htmlDoc.refreshQueryString = webServer.requestQueryString
+                        html.refreshQueryString = webServer.requestQueryString
                         'Call main_AddRefreshQueryString("method", "")
-                        Call htmlDoc.writeAltBuffer(htmlDoc.getLoginPage(True))
+                        Call html.writeAltBuffer(html.getLoginPage(True))
                         result = True
                     Case HardCodedPageLogin, HardCodedPageLogoutLogin
                         '
@@ -1797,9 +1797,9 @@ Namespace Contensive.Core
                         If genericController.vbUCase(HardCodedPage) = "LOGOUTLOGIN" Then
                             Call authContext.logout(Me)
                         End If
-                        htmlDoc.refreshQueryString = webServer.requestQueryString
+                        html.refreshQueryString = webServer.requestQueryString
                         'Call main_AddRefreshQueryString("method", "")
-                        Call htmlDoc.writeAltBuffer(htmlDoc.getLoginPage(False))
+                        Call html.writeAltBuffer(html.getLoginPage(False))
                         'Call writeAltBuffer(main_GetLoginPage2(false) & main_GetEndOfBody(False, False, False))
                         result = True
                     Case HardCodedPageLogout
@@ -1812,33 +1812,33 @@ Namespace Contensive.Core
                         '
                         ' 7/8/9 - Moved from intercept pages
                         '
-                        Call htmlDoc.webServerIO_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageSiteExplorer)
+                        Call html.webServerIO_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageSiteExplorer)
                         LinkObjectName = docProperties.getText("LinkObjectName")
                         If LinkObjectName <> "" Then
                             '
                             ' Open a page compatible with a dialog
                             '
-                            Call htmlDoc.webServerIO_addRefreshQueryString("LinkObjectName", LinkObjectName)
-                            Call htmlDoc.main_AddPagetitle("Site Explorer")
-                            Call htmlDoc.main_SetMetaContent(0, 0)
+                            Call html.webServerIO_addRefreshQueryString("LinkObjectName", LinkObjectName)
+                            Call html.main_AddPagetitle("Site Explorer")
+                            Call html.main_SetMetaContent(0, 0)
                             Copy = addon.execute_legacy5(0, "Site Explorer", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", 0)
-                            Call htmlDoc.main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Site Explorer")
+                            Call html.main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Site Explorer")
                             'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2d")
                             Copy = "" _
                             & siteProperties.docTypeDeclaration() _
                             & cr & "<html>" _
                             & cr & "<head>" _
-                            & genericController.htmlIndent(htmlDoc.getHtmlDocHead(False)) _
+                            & genericController.htmlIndent(html.getHtmlDocHead(False)) _
                             & cr & "</head>" _
                             & cr & "<body class=""ccBodyAdmin ccCon"" style=""overflow:scroll"">" _
-                            & genericController.htmlIndent(htmlDoc.main_GetPanelHeader("Contensive Site Explorer")) _
+                            & genericController.htmlIndent(html.main_GetPanelHeader("Contensive Site Explorer")) _
                             & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td>" _
                             & genericController.htmlIndent(Copy) _
-                            & cr & "</td></tr><tr><td>" & htmlDoc.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False) & "</td></tr></table>" _
+                            & cr & "</td></tr><tr><td>" & html.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False) & "</td></tr></table>" _
                             & cr & "</body>" _
                             & cr & "</html>"
                             'Set Obj = Nothing
-                            Call htmlDoc.writeAltBuffer(Copy)
+                            Call html.writeAltBuffer(Copy)
                             result = True
                         End If
                     Case HardCodedPageStatus
@@ -1872,16 +1872,16 @@ Namespace Contensive.Core
                         '
                         ' Close page
                         '
-                        Call htmlDoc.main_ClearStream()
+                        Call html.main_ClearStream()
                         If app_errorCount = 0 Then
-                            Call htmlDoc.writeAltBuffer("Contensive OK")
+                            Call html.writeAltBuffer("Contensive OK")
                         Else
-                            Call htmlDoc.writeAltBuffer("Contensive Error Count = " & app_errorCount)
+                            Call html.writeAltBuffer("Contensive Error Count = " & app_errorCount)
                         End If
                         webServer.webServerIO_BlockClosePageCopyright = True
                         html_BlockClosePageLink = True
                         'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2f")
-                        Call htmlDoc.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False)
+                        Call html.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False)
                         result = True
                     'Case HardCodedPageGetJSPage
                     '    '
@@ -1933,14 +1933,14 @@ Namespace Contensive.Core
                         webServer.webServerIO_BlockClosePageCopyright = True
                         Copy = Copy & "<p align=""center""><CENTER>"
                         If Not authContext.isAuthenticated() Then
-                            Copy = Copy & htmlDoc.getLoginPanel()
+                            Copy = Copy & html.getLoginPanel()
                         ElseIf authContext.isAuthenticatedContentManager(Me, "Page Content") Then
                             'Copy = Copy & main_GetToolsPanel
                         Else
                             Copy = Copy & "You are currently logged in as " & authContext.user.Name & ". To logout, click <a HREF=""" & webServer.webServerIO_ServerFormActionURL & "?Method=logout"" rel=""nofollow"">Here</A>."
                         End If
                         'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2h")
-                        Copy = Copy & htmlDoc.getHtmlDoc_beforeEndOfBodyHtml(True, True, False, False)
+                        Copy = Copy & html.getHtmlDoc_beforeEndOfBodyHtml(True, True, False, False)
                         Copy = Copy & "</CENTER></p>"
                         Copy = genericController.vbReplace(Copy, "'", "'+""'""+'")
                         Copy = genericController.vbReplace(Copy, vbCr, "")
@@ -1951,19 +1951,19 @@ Namespace Contensive.Core
                         '
                         MsgLabel = "Msg" & genericController.encodeText(genericController.GetRandomInteger)
                         Call webServer.setResponseContentType("text/plain")
-                        Call htmlDoc.writeAltBuffer("var " & MsgLabel & " = '" & Copy & "'; " & vbCrLf)
-                        Call htmlDoc.writeAltBuffer("document.write( " & MsgLabel & " ); " & vbCrLf)
+                        Call html.writeAltBuffer("var " & MsgLabel & " = '" & Copy & "'; " & vbCrLf)
+                        Call html.writeAltBuffer("document.write( " & MsgLabel & " ); " & vbCrLf)
                         result = True
                     Case HardCodedPageRedirect
                         '
                         ' ----- Redirect with RC and RI
                         '
-                        htmlDoc.pageManager_RedirectContentID = docProperties.getInteger(rnRedirectContentId)
-                        htmlDoc.pageManager_RedirectRecordID = docProperties.getInteger(rnRedirectRecordId)
-                        If htmlDoc.pageManager_RedirectContentID <> 0 And htmlDoc.pageManager_RedirectRecordID <> 0 Then
-                            ContentName = metaData.getContentNameByID(htmlDoc.pageManager_RedirectContentID)
+                        html.pageManager_RedirectContentID = docProperties.getInteger(rnRedirectContentId)
+                        html.pageManager_RedirectRecordID = docProperties.getInteger(rnRedirectRecordId)
+                        If html.pageManager_RedirectContentID <> 0 And html.pageManager_RedirectRecordID <> 0 Then
+                            ContentName = metaData.getContentNameByID(html.pageManager_RedirectContentID)
                             If ContentName <> "" Then
-                                Call iisController.main_RedirectByRecord_ReturnStatus(Me, ContentName, htmlDoc.pageManager_RedirectRecordID)
+                                Call iisController.main_RedirectByRecord_ReturnStatus(Me, ContentName, html.pageManager_RedirectRecordID)
                             End If
                         End If
                         webServer.webServerIO_BlockClosePageCopyright = True
@@ -1980,7 +1980,7 @@ Namespace Contensive.Core
                             '
                             ' Administrator required
                             '
-                            Call htmlDoc.writeAltBuffer("Error: You must be an administrator to use the ExportAscii method")
+                            Call html.writeAltBuffer("Error: You must be an administrator to use the ExportAscii method")
                         Else
                             webServer.webServerIO_BlockClosePageCopyright = True
                             ContentName = docProperties.getText("content")
@@ -1993,9 +1993,9 @@ Namespace Contensive.Core
                                 PageNumber = 1
                             End If
                             If (ContentName = "") Then
-                                Call htmlDoc.writeAltBuffer("Error: ExportAscii method requires ContentName")
+                                Call html.writeAltBuffer("Error: ExportAscii method requires ContentName")
                             Else
-                                Call htmlDoc.writeAltBuffer(Controllers.exportAsciiController.exportAscii_GetAsciiExport(Me, ContentName, PageSize, PageNumber))
+                                Call html.writeAltBuffer(Controllers.exportAsciiController.exportAscii_GetAsciiExport(Me, ContentName, PageSize, PageNumber))
                             End If
                         End If
                         result = True
@@ -2244,8 +2244,8 @@ Namespace Contensive.Core
                             '
                             ViewingName = Left(authContext.visit.id & "." & authContext.visit.PageVisits, 10)
                             PageID = 0
-                            If (pages.page IsNot Nothing) Then
-                                PageID = pages.page.id
+                            If (doc.page IsNot Nothing) Then
+                                PageID = doc.page.id
                             End If
                             FieldNames = "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,ContentControlID,pagetime,Active,CreateKey,RecordID"
                             FieldNames = FieldNames & ",ExcludeFromAnalytics"
@@ -2270,7 +2270,7 @@ Namespace Contensive.Core
                                 & "," & db.encodeSQLNumber(CSMax) _
                                 & "," & db.encodeSQLNumber(PageID)
                             SQL &= "," & db.encodeSQLBoolean(webServer.webServerIO_PageExcludeFromAnalytics)
-                            SQL &= "," & db.encodeSQLText(htmlDoc.main_MetaContent_Title)
+                            SQL &= "," & db.encodeSQLText(html.main_MetaContent_Title)
                             SQL &= ");"
                             Call db.executeSql(SQL)
                             'Call db.executeSqlAsync(SQL)
@@ -2334,10 +2334,10 @@ Namespace Contensive.Core
                         _domains = Nothing
                     End If
                     '
-                    If Not (_doc Is Nothing) Then
+                    If Not (_docProperties Is Nothing) Then
                         ' no dispose
                         'Call _doc.Dispose()
-                        _doc = Nothing
+                        _docProperties = Nothing
                     End If
                     '
                     If Not (_security Is Nothing) Then

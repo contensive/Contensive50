@@ -240,7 +240,7 @@ Namespace Contensive.Core
 
         Public Overrides Function GetFormInput(ByVal ContentName As String, ByVal FieldName As String, Optional ByVal Height As String = "", Optional ByVal Width As String = "", Optional ByVal HtmlId As String = "") As Object
             If True Then
-                Return cpCore.htmldoc.html_GetFormInputCS(CSPointer, ContentName, FieldName, Height, Width, HtmlId)
+                Return cpCore.html.html_GetFormInputCS(CSPointer, ContentName, FieldName, Height, Width, HtmlId)
             Else
                 Return ""
             End If
@@ -279,7 +279,7 @@ Namespace Contensive.Core
             Dim result As Object
             '
             Try
-                result = cpCore.htmlDoc.main_cs_getRecordAddLink(CSPointer, PresetNameValueList, AllowPaste)
+                result = cpCore.html.main_cs_getRecordAddLink(CSPointer, PresetNameValueList, AllowPaste)
                 If result Is Nothing Then
                     result = String.Empty
                 End If
@@ -319,7 +319,7 @@ Namespace Contensive.Core
         Public Overrides Function GetEditLink(Optional ByVal AllowCut As Boolean = False) As String
             Dim result As Object
             Try
-                result = cpCore.htmlDoc.cs_cs_getRecordEditLink(CSPointer, AllowCut)
+                result = cpCore.html.cs_cs_getRecordEditLink(CSPointer, AllowCut)
                 If result Is Nothing Then
                     result = String.Empty
                 End If

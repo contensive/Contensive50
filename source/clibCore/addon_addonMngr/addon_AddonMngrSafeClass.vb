@@ -726,7 +726,7 @@ Namespace Contensive.Core
                                                                 '
                                                                 ' Not installed yet
                                                                 '
-                                                                Cells3(RowPtr, 0) = "<input TYPE=""CheckBox"" NAME=""LibraryRow"" VALUE=""" & RowPtr & """ onClick=""clearLibraryRows('" & RowPtr & "');"">" & cpCore.htmlDoc.html_GetFormInputHidden("LibraryRowGuid" & RowPtr, CollectionGuid) & cpCore.htmlDoc.html_GetFormInputHidden("LibraryRowName" & RowPtr, Collectionname)
+                                                                Cells3(RowPtr, 0) = "<input TYPE=""CheckBox"" NAME=""LibraryRow"" VALUE=""" & RowPtr & """ onClick=""clearLibraryRows('" & RowPtr & "');"">" & cpCore.html.html_GetFormInputHidden("LibraryRowGuid" & RowPtr, CollectionGuid) & cpCore.html.html_GetFormInputHidden("LibraryRowName" & RowPtr, Collectionname)
                                                                 'Cells3(RowPtr, 0) = cpcore.main_GetFormInputCheckBox2("LibraryRow" & RowPtr) & cpcore.main_GetFormInputHidden("LibraryRowGuid" & RowPtr, CollectionGUID) & cpcore.main_GetFormInputHidden("LibraryRowName" & RowPtr, CollectionName)
                                                                 Cells3(RowPtr, 1) = Collectionname & "&nbsp;"
                                                                     Cells3(RowPtr, 2) = CollectionLastChangeDate & "&nbsp;"
@@ -753,8 +753,8 @@ Namespace Contensive.Core
                                         & "<div style=""width:100%"">" & Adminui.GetReport2(RowPtr, ColCaption, ColAlign, ColWidth, Cells3, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) & "</div>" _
                                         & ""
                                         BodyHTML = Adminui.GetEditPanel(True, "Add-on Collection Library", "Select an Add-on to install from the Contensive Add-on Library. Please select only one at a time. Click OK to install the selected Add-on. The site may need to be stopped during the installation, but will be available again in approximately one minute.", BodyHTML)
-                                    BodyHTML = BodyHTML & cpCore.htmlDoc.html_GetFormInputHidden("AOCnt", RowPtr)
-                                    Call cpCore.htmlDoc.main_AddLiveTabEntry("<nobr>Collection&nbsp;Library</nobr>", BodyHTML, "ccAdminTab")
+                                    BodyHTML = BodyHTML & cpCore.html.html_GetFormInputHidden("AOCnt", RowPtr)
+                                    Call cpCore.html.main_AddLiveTabEntry("<nobr>Collection&nbsp;Library</nobr>", BodyHTML, "ccAdminTab")
                                 End If
                                     '
                                     ' --------------------------------------------------------------------------------
@@ -809,7 +809,7 @@ Namespace Contensive.Core
                                     ReDim Preserve Cells(cpCore.db.cs_getRowCount(CS), ColumnCnt)
                                     RowPtr = 0
                                     Do While cpCore.db.cs_ok(CS)
-                                    Cells(RowPtr, 0) = cpCore.htmlDoc.html_GetFormInputCheckBox2("AC" & RowPtr) & cpCore.htmlDoc.html_GetFormInputHidden("ACID" & RowPtr, cpCore.db.cs_getInteger(CS, "ID"))
+                                    Cells(RowPtr, 0) = cpCore.html.html_GetFormInputCheckBox2("AC" & RowPtr) & cpCore.html.html_GetFormInputHidden("ACID" & RowPtr, cpCore.db.cs_getInteger(CS, "ID"))
                                     'Cells(RowPtr, 1) = "<a href=""" & cpcore.app.SiteProperty_AdminURL & "?id=" & cpcore.app.cs_getInteger(CS, "ID") & "&cid=" & cpcore.app.cs_getInteger(CS, "ContentControlID") & "&af=4""><img src=""/ccLib/images/IconContentEdit.gif"" border=0></a>"
                                     Cells(RowPtr, 1) = cpCore.db.cs_getText(CS, "name")
                                         If DisplaySystem Then
@@ -823,8 +823,8 @@ Namespace Contensive.Core
                                     Call cpCore.db.cs_Close(CS)
                                     BodyHTML = "<div style=""width:100%"">" & Adminui.GetReport2(RowPtr, ColCaption, ColAlign, ColWidth, Cells, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) & "</div>"
                                     BodyHTML = Adminui.GetEditPanel(True, "Add-on Collections", "Use this form to review and delete current add-on collections.", BodyHTML)
-                                BodyHTML = BodyHTML & cpCore.htmlDoc.html_GetFormInputHidden("accnt", RowPtr)
-                                Call cpCore.htmlDoc.main_AddLiveTabEntry("Installed&nbsp;Collections", BodyHTML, "ccAdminTab")
+                                BodyHTML = BodyHTML & cpCore.html.html_GetFormInputHidden("accnt", RowPtr)
+                                Call cpCore.html.main_AddLiveTabEntry("Installed&nbsp;Collections", BodyHTML, "ccAdminTab")
                                 '
                                 ' --------------------------------------------------------------------------------
                                 ' Get the Upload Add-ons tab
@@ -836,30 +836,30 @@ Namespace Contensive.Core
                                     Else
                                         Call Body.Add(Adminui.EditTableOpen)
                                     If cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
-                                        Call Body.Add(Adminui.GetEditRow(cpCore.htmlDoc.html_GetFormInputCheckBox2("InstallCore"), "Reinstall Core Collection", "", False, False, ""))
+                                        Call Body.Add(Adminui.GetEditRow(cpCore.html.html_GetFormInputCheckBox2("InstallCore"), "Reinstall Core Collection", "", False, False, ""))
                                     End If
-                                    Call Body.Add(Adminui.GetEditRow(cpCore.htmlDoc.html_GetFormInputFile("MetaFile"), "Add-on Collection File(s)", "", True, False, ""))
+                                    Call Body.Add(Adminui.GetEditRow(cpCore.html.html_GetFormInputFile("MetaFile"), "Add-on Collection File(s)", "", True, False, ""))
                                     FormInput = "" _
                                         & "<table id=""UploadInsert"" border=""0"" cellpadding=""0"" cellspacing=""1"" width=""100%"">" _
                                         & "</table>" _
                                         & "<table border=""0"" cellpadding=""0"" cellspacing=""1"" width=""100%"">" _
                                         & "<tr><td align=""left""><a href=""#"" onClick=""InsertUpload(); return false;"">+ Add more files</a></td></tr>" _
                                         & "</table>" _
-                                        & cpCore.htmlDoc.html_GetFormInputHidden("UploadCount", 1, "UploadCount") _
+                                        & cpCore.html.html_GetFormInputHidden("UploadCount", 1, "UploadCount") _
                                         & ""
                                     Call Body.Add(Adminui.GetEditRow(FormInput, "&nbsp;", "", True, False, ""))
                                         Call Body.Add(Adminui.EditTableClose)
                                     End If
-                                Call cpCore.htmlDoc.main_AddLiveTabEntry("Add&nbsp;Manually", Adminui.GetEditPanel(True, "Install or Update an Add-on Collection.", "Use this form to upload a new or updated Add-on Collection to your site. A collection file can be a single xml configuration file, a single zip file containing the configuration file and other resource files, or a configuration with other resource files uploaded separately. Use the 'Add more files' link to add as many files as you need. When you hit OK, the Collection will be checked, and only submitted if all files are uploaded.", Body.Text), "ccAdminTab")
+                                Call cpCore.html.main_AddLiveTabEntry("Add&nbsp;Manually", Adminui.GetEditPanel(True, "Install or Update an Add-on Collection.", "Use this form to upload a new or updated Add-on Collection to your site. A collection file can be a single xml configuration file, a single zip file containing the configuration file and other resource files, or a configuration with other resource files uploaded separately. Use the 'Add more files' link to add as many files as you need. When you hit OK, the Collection will be checked, and only submitted if all files are uploaded.", Body.Text), "ccAdminTab")
                                 '
                                 ' --------------------------------------------------------------------------------
                                 ' Build Page from tabs
                                 ' --------------------------------------------------------------------------------
                                 '
-                                Content.Add(cpCore.htmlDoc.main_GetLiveTabs())
+                                Content.Add(cpCore.html.main_GetLiveTabs())
                                 '
                                 ButtonList = ButtonCancel & "," & ButtonOK
-                                Content.Add(cpCore.htmlDoc.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormLegacyAddonManager))
+                                Content.Add(cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormLegacyAddonManager))
                             End If
                             End If
                         End If
@@ -875,7 +875,7 @@ Namespace Contensive.Core
                         Description = Description & "<div style=""Margin-left:50px"">" & status & "</div>"
                     End If
                     addonManager = Adminui.GetBody(Caption, ButtonList, "", False, False, Description, "", 0, Content.Text)
-                    Call cpCore.htmlDoc.main_AddPagetitle("Add-on Manager")
+                    Call cpCore.html.main_AddPagetitle("Add-on Manager")
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw

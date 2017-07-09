@@ -23,7 +23,7 @@ Namespace Contensive.Core
         Private cpCore As Contensive.Core.coreClass
         Private cp As CPClass
         Private accum As String
-        Private htmlDoc As Controllers.htmlDocController
+        Private htmlDoc As Controllers.htmlController
         Protected disposed As Boolean = False
         '
         ' Constructor - Initialize the Main and Csv objects
@@ -35,7 +35,7 @@ Namespace Contensive.Core
                 cp = cpParent
                 cpCore = cp.core
                 Try
-                    htmlDoc = New Controllers.htmlDocController(cpCore)
+                    htmlDoc = New Controllers.htmlController(cpCore)
                 Catch ex As Exception
                     cpCore.handleExceptionAndContinue(ex, "Error creating object Controllers.htmlToolsController during cp.block constructor.")
                 End Try
@@ -165,11 +165,11 @@ Namespace Contensive.Core
                 If wwwFileName <> "" Then
                     accum = cp.wwwFiles.read(wwwFileName)
                     If accum <> "" Then
-                        headTags = Controllers.htmlDocController.getTagInnerHTML(accum, "head", False)
+                        headTags = Controllers.htmlController.getTagInnerHTML(accum, "head", False)
                         If headTags <> "" Then
-                            Call cpCore.htmldoc.html_addHeadTags(headTags)
+                            Call cpCore.html.html_addHeadTags(headTags)
                         End If
-                        accum = Controllers.htmlDocController.getTagInnerHTML(accum, "body", False)
+                        accum = Controllers.htmlController.getTagInnerHTML(accum, "body", False)
                     End If
                 End If
             Catch ex As Exception

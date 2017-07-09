@@ -54,13 +54,13 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetCopy(ByVal CopyName As String, Optional ByVal DefaultContent As String = "") As String
-            GetCopy = cpCore.htmldoc.html_GetContentCopy(CopyName, DefaultContent, cpcore.authContext.user.id, True, cpcore.authContext.isAuthenticated)
+            GetCopy = cpCore.html.html_GetContentCopy(CopyName, DefaultContent, cpCore.authContext.user.id, True, cpCore.authContext.isAuthenticated)
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Function GetCopy(ByVal CopyName As String, ByVal DefaultContent As String, ByVal personalizationPeopleId As Integer) As String
-            GetCopy = cpCore.htmldoc.html_GetContentCopy(CopyName, DefaultContent, personalizationPeopleId, True, cpcore.authContext.isAuthenticated)
+            GetCopy = cpCore.html.html_GetContentCopy(CopyName, DefaultContent, personalizationPeopleId, True, cpCore.authContext.isAuthenticated)
         End Function
         '
         '====================================================================================================
@@ -72,7 +72,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetAddLink(ByVal ContentName As String, ByVal PresetNameValueList As String, ByVal AllowPaste As Boolean, ByVal IsEditing As Boolean) As String
-            Return cpCore.htmlDoc.main_GetRecordAddLink2(ContentName, PresetNameValueList, AllowPaste, IsEditing)
+            Return cpCore.html.main_GetRecordAddLink2(ContentName, PresetNameValueList, AllowPaste, IsEditing)
         End Function
         '
         '====================================================================================================
@@ -109,7 +109,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function GetEditLink(ByVal ContentName As String, ByVal RecordID As String, ByVal AllowCut As Boolean, ByVal RecordName As String, ByVal IsEditing As Boolean) As String
             If True Then
-                Return cpCore.htmlDoc.main_GetRecordEditLink2(ContentName, RecordID, AllowCut, RecordName, IsEditing)
+                Return cpCore.html.main_GetRecordEditLink2(ContentName, RecordID, AllowCut, RecordName, IsEditing)
             Else
                 Return ""
             End If
@@ -118,13 +118,13 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetLinkAliasByPageID(ByVal PageID As Integer, ByVal QueryStringSuffix As String, ByVal DefaultLink As String) As String
-            Return pagesController.getLinkAlias(cpCore, PageID, QueryStringSuffix, DefaultLink)
+            Return docController.getLinkAlias(cpCore, PageID, QueryStringSuffix, DefaultLink)
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Function GetPageLink(ByVal PageID As Integer, Optional ByVal QueryStringSuffix As String = "", Optional ByVal AllowLinkAlias As Boolean = True) As String
-            Return cpCore.pages.main_GetPageLink3(PageID, QueryStringSuffix, AllowLinkAlias)
+            Return cpCore.doc.main_GetPageLink3(PageID, QueryStringSuffix, AllowLinkAlias)
         End Function
         '
         '====================================================================================================
@@ -148,7 +148,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetTemplateLink(ByVal TemplateID As Integer) As String
-            Return cpCore.pages.main_GetTemplateLink(TemplateID)
+            Return cpCore.doc.main_GetTemplateLink(TemplateID)
         End Function
         '
         '====================================================================================================

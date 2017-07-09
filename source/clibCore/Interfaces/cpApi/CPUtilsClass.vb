@@ -71,7 +71,7 @@ Namespace Contensive.Core
         Public Overrides Function ConvertHTML2Text(ByVal Source As String) As String
 
             If True Then
-                ConvertHTML2Text = CP.core.htmlDoc.main_ConvertHTML2Text(Source)
+                ConvertHTML2Text = CP.core.html.main_ConvertHTML2Text(Source)
             Else
                 ConvertHTML2Text = Source
             End If
@@ -81,7 +81,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function ConvertText2Html(ByVal Source As String) As String
             If True Then
-                ConvertText2Html = CP.core.htmlDoc.html_convertText2HTML(Source)
+                ConvertText2Html = CP.core.html.html_convertText2HTML(Source)
             Else
                 ConvertText2Html = Source
             End If
@@ -97,7 +97,7 @@ Namespace Contensive.Core
 
         Public Overrides Function EncodeContentForWeb(ByVal Source As String, Optional ByVal ContextContentName As String = "", Optional ByVal ContextRecordID As Integer = 0, Optional ByVal WrapperID As Integer = 0) As String
             If True Then
-                EncodeContentForWeb = CP.core.htmlDoc.html_encodeContentForWeb(Source, ContextContentName, ContextRecordID, "", WrapperID)
+                EncodeContentForWeb = CP.core.html.html_encodeContentForWeb(Source, ContextContentName, ContextRecordID, "", WrapperID)
             Else
                 EncodeContentForWeb = ""
             End If
@@ -116,7 +116,7 @@ Namespace Contensive.Core
             Dim returnValue As String = ""
             '
             If (Source <> "") Then
-                returnValue = CP.core.htmlDoc.html_EncodeHTML(Source)
+                returnValue = CP.core.html.html_EncodeHTML(Source)
             End If
             Return returnValue
         End Function
@@ -443,7 +443,7 @@ Namespace Contensive.Core
         ''' <param name="Source"></param>
         ''' <returns></returns>
         Public Overrides Function EncodeHtmlForWysiwygEditor(Source As String) As String
-            Return CP.core.htmlDoc.html_encodeContent10(Source, 0, "", 0, 0, False, False, False, True, True, False, "", "", False, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple, False, Nothing, False)
+            Return CP.core.html.html_encodeContent10(Source, 0, "", 0, 0, False, False, False, True, True, False, "", "", False, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple, False, Nothing, False)
             'Return CP.core.encodeContent9(Source, 0, "", 0, 0, False, False, False, True, True, False, "", "", False, 0, "", 1)
         End Function
         '
@@ -454,7 +454,7 @@ Namespace Contensive.Core
         ''' <param name="Source"></param>
         ''' <returns></returns>
         Public Overrides Function DecodeHtmlFromWysiwygEditor(Source As String) As String
-            Return CP.core.htmlDoc.html_DecodeContent(Source)
+            Return CP.core.html.html_DecodeContent(Source)
             'Throw New NotImplementedException()
         End Function
         '

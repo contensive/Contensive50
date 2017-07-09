@@ -45,7 +45,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' ----- convert editor active edit icons
                     '
-                    ContentCopy = cpCore.htmlDoc.html_DecodeContent(ContentCopy)
+                    ContentCopy = cpCore.html.html_DecodeContent(ContentCopy)
                     '
                     ' ----- save the content
                     '
@@ -86,32 +86,32 @@ Namespace Contensive.Core.Controllers
             ContentID = cpcore.metaData.getContentId(intContentName)
             If (ContentID < 1) Or (intRecordId < 1) Or (strFieldName = "") Then
                 PanelCopy = SpanClassAdminNormal & "The information you have selected can not be accessed.</span>"
-                EditorPanel = EditorPanel & cpcore.htmlDoc.main_GetPanel(PanelCopy)
+                EditorPanel = EditorPanel & cpcore.html.main_GetPanel(PanelCopy)
             Else
                 intContentName = cpcore.metaData.getContentNameByID(ContentID)
                 If intContentName <> "" Then
                     CSPointer = cpcore.db.cs_open(intContentName, "ID=" & intRecordId)
                     If Not cpcore.db.cs_ok(CSPointer) Then
                         PanelCopy = SpanClassAdminNormal & "The information you have selected can not be accessed.</span>"
-                        EditorPanel = EditorPanel & cpcore.htmlDoc.main_GetPanel(PanelCopy)
+                        EditorPanel = EditorPanel & cpcore.html.main_GetPanel(PanelCopy)
                     Else
                         Copy = cpcore.db.cs_get(CSPointer, strFieldName)
-                        EditorPanel = EditorPanel & cpcore.htmlDoc.html_GetFormInputHidden("Type", FormTypeActiveEditor)
-                        EditorPanel = EditorPanel & cpcore.htmlDoc.html_GetFormInputHidden("cid", ContentID)
-                        EditorPanel = EditorPanel & cpcore.htmlDoc.html_GetFormInputHidden("ID", intRecordId)
-                        EditorPanel = EditorPanel & cpcore.htmlDoc.html_GetFormInputHidden("fn", strFieldName)
+                        EditorPanel = EditorPanel & cpcore.html.html_GetFormInputHidden("Type", FormTypeActiveEditor)
+                        EditorPanel = EditorPanel & cpcore.html.html_GetFormInputHidden("cid", ContentID)
+                        EditorPanel = EditorPanel & cpcore.html.html_GetFormInputHidden("ID", intRecordId)
+                        EditorPanel = EditorPanel & cpcore.html.html_GetFormInputHidden("fn", strFieldName)
                         EditorPanel = EditorPanel & genericController.encodeText(FormElements)
-                        EditorPanel = EditorPanel & cpcore.htmlDoc.html_GetFormInputHTML3("ContentCopy", Copy, "3", "45", False, True)
+                        EditorPanel = EditorPanel & cpcore.html.html_GetFormInputHTML3("ContentCopy", Copy, "3", "45", False, True)
                         'EditorPanel = EditorPanel & main_GetFormInputActiveContent( "ContentCopy", Copy, 3, 45)
-                        ButtonPanel = cpcore.htmlDoc.main_GetPanelButtons(ButtonCancel & "," & ButtonSave, "button")
+                        ButtonPanel = cpcore.html.main_GetPanelButtons(ButtonCancel & "," & ButtonSave, "button")
                         EditorPanel = EditorPanel & ButtonPanel
                     End If
                     cpcore.db.cs_Close(CSPointer)
                 End If
             End If
-            Stream = Stream & cpcore.htmlDoc.main_GetPanelHeader("Contensive Active Content Editor")
-            Stream = Stream & cpcore.htmlDoc.main_GetPanel(EditorPanel)
-            Stream = cpcore.htmlDoc.html_GetFormStart() & Stream & cpcore.htmlDoc.html_GetFormEnd()
+            Stream = Stream & cpcore.html.main_GetPanelHeader("Contensive Active Content Editor")
+            Stream = Stream & cpcore.html.main_GetPanel(EditorPanel)
+            Stream = cpcore.html.html_GetFormStart() & Stream & cpcore.html.html_GetFormEnd()
             Return Stream
         End Function
         '
@@ -129,27 +129,25 @@ Namespace Contensive.Core.Controllers
             Dim RS As DataTable
             Dim fieldTypeID As Integer
             '
-            If Not cpCore.htmlDoc.html_Private_FieldEditorList_Loaded Then
-                '
-                ' load default editors into editors() - these are the editors used when there is no editorPreference
-                '   editors(fieldtypeid) = addonid
-                '
-                ReDim editorAddonIds(FieldTypeIdMax)
-                SQL = "select t.id,t.editorAddonId" _
+            Dim docFieldEditorList As String = ""
+            '
+            ' load default editors into editors() - these are the editors used when there is no editorPreference
+            '   editors(fieldtypeid) = addonid
+            '
+            ReDim editorAddonIds(FieldTypeIdMax)
+            SQL = "select t.id,t.editorAddonId" _
                     & " from ccFieldTypes t" _
                     & " left join ccaggregatefunctions a on a.id=t.editorAddonId" _
                     & " where (t.active<>0)and(a.active<>0) order by t.id"
-                RS = cpCore.db.executeSql(SQL)
-                For Each dr As DataRow In RS.Rows
-                    fieldTypeID = genericController.EncodeInteger(dr("id"))
-                    If (fieldTypeID <= FieldTypeIdMax) Then
-                        editorAddonIds(fieldTypeID) = genericController.encodeText(dr("editorAddonId"))
-                    End If
-                Next
-                cpCore.htmlDoc.html_Private_FieldEditorList = Join(editorAddonIds, ",")
-                cpCore.htmlDoc.html_Private_FieldEditorList_Loaded = True
-            End If
-            getFieldTypeDefaultEditorAddonIdList = cpCore.htmlDoc.html_Private_FieldEditorList
+            RS = cpCore.db.executeSql(SQL)
+            For Each dr As DataRow In RS.Rows
+                fieldTypeID = genericController.EncodeInteger(dr("id"))
+                If (fieldTypeID <= FieldTypeIdMax) Then
+                    editorAddonIds(fieldTypeID) = genericController.encodeText(dr("editorAddonId"))
+                End If
+            Next
+            docFieldEditorList = Join(editorAddonIds, ",")
+            getFieldTypeDefaultEditorAddonIdList = docFieldEditorList
         End Function
         '
         '====================================================================================================

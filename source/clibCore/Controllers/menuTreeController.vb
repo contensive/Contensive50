@@ -325,7 +325,7 @@ ErrorTrap:
                         ' The Node has not already been used in this branch
                         '
                         Caption = iEntry(NodePointer).Caption
-                        Link = cpCore.htmlDoc.html_EncodeHTML(iEntry(NodePointer).Link)
+                        Link = cpCore.html.html_EncodeHTML(iEntry(NodePointer).Link)
                         If Link <> "" Then
                             Caption = "<A TARGET=""_blank"" HREF=""" & Link & """>" & Caption & "</A>"
                         End If

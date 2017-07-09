@@ -5253,7 +5253,7 @@ ErrorTrap:
         ''' <returns></returns>
         '------------------------------------------------------------------------------------------------------------
         '
-        Friend Shared Function encodeLegacyAddonOptionArgument(ByVal Arg As String) As String
+        Friend Shared Function encodeLegacyOptionStringArgument(ByVal Arg As String) As String
             Dim a As String = ""
             If Not String.IsNullOrEmpty(Arg) Then
                 a = Arg

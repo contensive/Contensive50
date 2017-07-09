@@ -140,49 +140,49 @@ ErrorTrap:
                 '
                 ' Publish
                 '
-                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.htmlDoc.html_GetFormButton(ButtonPublish, RequestNameButton)
+                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html.html_GetFormButton(ButtonPublish, RequestNameButton)
             End If
             If AllowAbort Then
                 '
                 ' Abort
                 '
-                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.htmlDoc.html_GetFormButton(ButtonAbortEdit, RequestNameButton)
+                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html.html_GetFormButton(ButtonAbortEdit, RequestNameButton)
             End If
             If AllowSubmit Then
                 '
                 ' Submit for Publishing
                 '
-                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.htmlDoc.html_GetFormButton(ButtonPublishSubmit, RequestNameButton)
+                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html.html_GetFormButton(ButtonPublishSubmit, RequestNameButton)
             End If
             If AllowApprove Then
                 '
                 ' Approve Publishing
                 '
-                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.htmlDoc.html_GetFormButton(ButtonPublishApprove, RequestNameButton)
+                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html.html_GetFormButton(ButtonPublishApprove, RequestNameButton)
             End If
             If ignore_AllowReloadCDef Then
                 '
                 ' Reload Content Definitions
                 '
-                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.htmlDoc.html_GetFormButton(ButtonSaveandInvalidateCache, RequestNameButton)
+                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html.html_GetFormButton(ButtonSaveandInvalidateCache, RequestNameButton)
             End If
             If AllowMarkReviewed Then
                 '
                 ' Reload Content Definitions
                 '
-                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.htmlDoc.html_GetFormButton(ButtonMarkReviewed, RequestNameButton)
+                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html.html_GetFormButton(ButtonMarkReviewed, RequestNameButton)
             End If
             If AllowRefresh Then
                 '
                 ' just like a save, but don't save jsut redraw
                 '
-                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.htmlDoc.html_GetFormButton(ButtonRefresh, RequestNameButton)
+                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html.html_GetFormButton(ButtonRefresh, RequestNameButton)
             End If
             If AllowCreateDuplicate Then
                 '
                 ' just like a save, but don't save jsut redraw
                 '
-                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.htmlDoc.html_GetFormButton(ButtonCreateDuplicate, RequestNameButton, , "return processSubmit(this)")
+                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html.html_GetFormButton(ButtonCreateDuplicate, RequestNameButton, , "return processSubmit(this)")
             End If
             '
             GetEditButtonBar2 = "" _
@@ -263,7 +263,7 @@ ErrorTrap:
                                 s = s & "<input TYPE=SUBMIT NAME=""" & ButtonName & """ DISABLED VALUE=""" & Buttons(Ptr) & """>"
                             End If
                         Case Trim(ButtonClose)
-                            s = s & cpCore.htmlDoc.html_GetFormButton(Buttons(Ptr), , , "window.close();")
+                            s = s & cpCore.html.html_GetFormButton(Buttons(Ptr), , , "window.close();")
                         Case Trim(ButtonAdd)
                             If AllowAdd Then
                                 s = s & "<input TYPE=SUBMIT NAME=""" & ButtonName & """ VALUE=""" & Buttons(Ptr) & """ onClick=""return processSubmit(this);"">"
@@ -272,7 +272,7 @@ ErrorTrap:
                             End If
                         Case ""
                         Case Else
-                            s = s & cpCore.htmlDoc.html_GetFormButton(Buttons(Ptr), ButtonName)
+                            s = s & cpCore.html.html_GetFormButton(Buttons(Ptr), ButtonName)
                     End Select
                 Next
             End If
@@ -419,7 +419,7 @@ ErrorTrap:
             If ContentSummary <> "" Then
                 CellContentSummary = "" _
                     & cr & "<div class=""ccPanelBackground"" style=""padding:10px;"">" _
-                    & htmlIndent(cpCore.htmlDoc.main_GetPanel(ContentSummary, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)) _
+                    & htmlIndent(cpCore.html.main_GetPanel(ContentSummary, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)) _
                     & cr & "</div>"
             End If
             '
@@ -456,9 +456,9 @@ ErrorTrap:
                 & ""
 
             GetBody = "" _
-                & cr & cpCore.htmlDoc.html_GetUploadFormStart() _
+                & cr & cpCore.html.html_GetUploadFormStart() _
                 & htmlIndent(GetBody) _
-                & cr & cpCore.htmlDoc.html_GetUploadFormEnd
+                & cr & cpCore.html.html_GetUploadFormEnd
             '
             Exit Function
             '
@@ -849,7 +849,7 @@ ErrorTrap:
             'If IsArray(Cells) Then
             ColumnCount = UBound(Cells, 2)
             'End If
-            RQS = cpCore.htmlDoc.refreshQueryString
+            RQS = cpCore.html.refreshQueryString
             '
             SortColPtr = GetReportSortColumnPtr(DefaultSortColumnPtr)
             SortColType = GetReportSortType()
@@ -934,11 +934,11 @@ ErrorTrap:
                 If PageCount > 1 Then
                     GetReport2 = GetReport2 & "<br>Go to Page "
                     If PagePointer <> 1 Then
-                        WorkingQS = cpCore.htmlDoc.refreshQueryString
+                        WorkingQS = cpCore.html.refreshQueryString
                         WorkingQS = genericController.ModifyQueryString(WorkingQS, "GotoPage", "1", True)
                         GetReport2 = GetReport2 & "<a href=""" & cpCore.webServer.webServerIO_requestPage & "?" & WorkingQS & """>1</A>...&nbsp;"
                     End If
-                    WorkingQS = cpCore.htmlDoc.refreshQueryString
+                    WorkingQS = cpCore.html.refreshQueryString
                     WorkingQS = genericController.ModifyQueryString(WorkingQS, RequestNamePageSize, CStr(ReportPageSize), True)
                     Do While (PagePointer <= PageCount) And (LinkCount < 20)
                         If PagePointer = ReportPageNumber Then

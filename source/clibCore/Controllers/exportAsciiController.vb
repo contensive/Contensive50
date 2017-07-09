@@ -54,7 +54,7 @@ Namespace Contensive.Core.Controllers
                 ' ----- Check for special case iContentNames
                 '
                 Call cpCore.webServer.setResponseContentType("text/plain")
-                Call cpCore.htmlDoc.enableOutputBuffer(False)
+                Call cpCore.html.enableOutputBuffer(False)
                 TableName = genericController.GetDbObjectTableName(cpCore.metaData.getContentTablename(iContentName))
                 Select Case genericController.vbUCase(TableName)
                     Case "CCMEMBERS"

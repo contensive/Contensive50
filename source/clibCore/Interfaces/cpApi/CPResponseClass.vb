@@ -86,7 +86,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub Clear() 'Inherits BaseClasses.CPResponseBaseClass.Clear
             If True Then
-                Call cpCore.htmlDoc.main_ClearStream()
+                Call cpCore.html.main_ClearStream()
             End If
         End Sub
         '
@@ -115,7 +115,7 @@ Namespace Contensive.Core
 
         Public Overrides Sub SetBuffer(ByVal BufferOn As Boolean)
             If True Then
-                Call cpCore.htmlDoc.enableOutputBuffer(BufferOn)
+                Call cpCore.html.enableOutputBuffer(BufferOn)
             End If
         End Sub
 
@@ -145,7 +145,7 @@ Namespace Contensive.Core
 
         Public Overrides Sub Write(ByVal message As String)
             If True Then
-                Call cpCore.htmlDoc.writeAltBuffer(message)
+                Call cpCore.html.writeAltBuffer(message)
             End If
         End Sub
         '

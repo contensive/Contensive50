@@ -200,7 +200,7 @@ Namespace Contensive.Core.Controllers
         Public Function getStyles(ByVal EmailID As Integer) As String
             On Error GoTo ErrorTrap 'Const Tn = "getEmailStyles": 'Dim th as integer: th = profileLogMethodEnter(Tn)
             '
-            getStyles = cpcore.htmlDoc.html_getStyleSheet2(csv_contentTypeEnum.contentTypeEmail, 0, genericController.EncodeInteger(EmailID))
+            getStyles = cpcore.html.html_getStyleSheet2(csv_contentTypeEnum.contentTypeEmail, 0, genericController.EncodeInteger(EmailID))
             If getStyles <> "" Then
                 getStyles = "" _
                     & vbCrLf & StyleSheetStart _
@@ -259,19 +259,19 @@ ErrorTrap:
                         '
                         ' encode subject
                         '
-                        subjectEncoded = cpcore.htmlDoc.html_executeContentCommands(Nothing, subjectEncoded, CPUtilsBaseClass.addonContext.ContextEmail, personId, True, layoutError)
-                        subjectEncoded = cpcore.htmlDoc.html_encodeContent10(subjectEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
+                        subjectEncoded = cpcore.html.html_executeContentCommands(Nothing, subjectEncoded, CPUtilsBaseClass.addonContext.ContextEmail, personId, True, layoutError)
+                        subjectEncoded = cpcore.html.html_encodeContent10(subjectEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
                         '
                         ' encode Body
                         '
-                        bodyEncoded = cpcore.htmlDoc.html_executeContentCommands(Nothing, bodyEncoded, CPUtilsBaseClass.addonContext.ContextEmail, personId, True, layoutError)
-                        bodyEncoded = cpcore.htmlDoc.html_encodeContent10(bodyEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
+                        bodyEncoded = cpcore.html.html_executeContentCommands(Nothing, bodyEncoded, CPUtilsBaseClass.addonContext.ContextEmail, personId, True, layoutError)
+                        bodyEncoded = cpcore.html.html_encodeContent10(bodyEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
                         '
                         ' encode template
                         '
                         If (templateEncoded <> "") Then
-                            templateEncoded = cpcore.htmlDoc.html_executeContentCommands(Nothing, templateEncoded, CPUtilsBaseClass.addonContext.ContextEmail, personId, True, layoutError)
-                            templateEncoded = cpcore.htmlDoc.html_encodeContent10(templateEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
+                            templateEncoded = cpcore.html.html_executeContentCommands(Nothing, templateEncoded, CPUtilsBaseClass.addonContext.ContextEmail, personId, True, layoutError)
+                            templateEncoded = cpcore.html.html_encodeContent10(templateEncoded, personId, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & cpcore.serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
                             '
                             If (InStr(1, templateEncoded, fpoContentBox) <> 0) Then
                                 bodyEncoded = genericController.vbReplace(templateEncoded, fpoContentBox, bodyEncoded)
@@ -430,7 +430,7 @@ ErrorTrap:
                     ' This field is default true, and non-authorable
                     ' It will be true in all cases, except a possible unforseen exception
                     '
-                    EmailTemplateSource = EmailTemplateSource & "<div style=""clear: both;padding:10px;"">" & genericController.csv_GetLinkedText("<a href=""" & cpcore.htmlDoc.html_EncodeHTML("http://" & cpcore.serverConfig.appConfig.domainList(0) & "/" & cpcore.siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", cpcore.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
+                    EmailTemplateSource = EmailTemplateSource & "<div style=""clear: both;padding:10px;"">" & genericController.csv_GetLinkedText("<a href=""" & cpcore.html.html_EncodeHTML("http://" & cpcore.serverConfig.appConfig.domainList(0) & "/" & cpcore.siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", cpcore.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
                 End If
                 '
                 ' --- Send message to the additional member
@@ -644,7 +644,7 @@ ErrorTrap:
                         ' This field is default true, and non-authorable
                         ' It will be true in all cases, except a possible unforseen exception
                         '
-                        EmailBody = EmailBody & "<div style=""clear:both;padding:10px;"">" & genericController.csv_GetLinkedText("<a href=""" & cpcore.htmlDoc.html_EncodeHTML(cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.requestDomain & requestAppRootPath & cpcore.siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", cpcore.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
+                        EmailBody = EmailBody & "<div style=""clear:both;padding:10px;"">" & genericController.csv_GetLinkedText("<a href=""" & cpcore.html.html_EncodeHTML(cpcore.webServer.webServerIO_requestProtocol & cpcore.webServer.requestDomain & requestAppRootPath & cpcore.siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", cpcore.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
                         EmailBody = genericController.vbReplace(EmailBody, "#member_email#", "UserEmailAddress")
                     End If
                     '
@@ -926,7 +926,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            getPasswordRecoveryForm = cpcore.htmlDoc.getSendPasswordForm()
+            getPasswordRecoveryForm = cpcore.html.getSendPasswordForm()
             '
             Exit Function
 ErrorTrap:
@@ -1064,7 +1064,7 @@ ErrorTrap:
                                         Do While Not usernameOK And (Ptr < 100)
                                             'hint = "240"
                                             Username = EMailName & Int(Rnd() * 9999)
-                                            usernameOK = Not cpcore.authContext.main_IsLoginOK(cpcore, Username, "test")
+                                            usernameOK = Not cpcore.authContext.isLoginOK(cpcore, Username, "test")
                                             Ptr = Ptr + 1
                                         Loop
                                         'hint = "250"

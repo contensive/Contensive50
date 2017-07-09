@@ -54,7 +54,7 @@ Namespace Contensive.Core.Controllers
                 If Not cpcore.errList Is Nothing Then
                     If cpcore.errList.Count > 0 Then
                         For Each exMsg As String In cpcore.errList
-                            returnHtmlList &= cr2 & "<li class=""ccExceptionListRow"">" & cr3 & cpcore.htmlDoc.html_convertText2HTML(exMsg) & cr2 & "</li>"
+                            returnHtmlList &= cr2 & "<li class=""ccExceptionListRow"">" & cr3 & cpcore.html.html_convertText2HTML(exMsg) & cr2 & "</li>"
                         Next
                         returnHtmlList = cr & "<ul class=""ccExceptionList"">" & returnHtmlList & cr & "</ul>"
                     End If

@@ -130,7 +130,7 @@ Namespace Contensive.Core.Controllers
         '
         Public Function getRenderedActiveContent(ByVal RequestName As String) As String
             Try
-                Return cpCore.htmlDoc.html_RenderActiveContent(genericController.encodeText(getProperty(RequestName).Value))
+                Return cpCore.html.html_RenderActiveContent(genericController.encodeText(getProperty(RequestName).Value))
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
@@ -252,7 +252,7 @@ Namespace Contensive.Core.Controllers
             Try
                 For Each key As String In getKeyList()
                     With getProperty(key)
-                        returnString &= "" & "&" & genericController.encodeLegacyAddonOptionArgument(key) & "=" & encodeLegacyAddonOptionArgument(.Value)
+                        returnString &= "" & "&" & genericController.encodeLegacyOptionStringArgument(key) & "=" & encodeLegacyOptionStringArgument(.Value)
                     End With
                 Next
             Catch ex As Exception

@@ -312,7 +312,7 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Sub addLinkAlias(ByVal linkAlias As String, ByVal pageId As Integer, Optional ByVal queryStringSuffix As String = "")
-            Call pagesController.app_addLinkAlias(cpCore, linkAlias, pageId, queryStringSuffix)
+            Call docController.app_addLinkAlias(cpCore, linkAlias, pageId, queryStringSuffix)
         End Sub
         '
         '

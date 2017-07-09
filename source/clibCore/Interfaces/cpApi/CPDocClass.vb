@@ -66,14 +66,14 @@ Namespace Contensive.Core
         <Obsolete("Page Content comes from the pageManager cpcore.addon.", True)> Public Overrides Property content() As String
             Get
                 If True Then
-                    Return cpCore.pages.bodyContent
+                    Return cpCore.doc.bodyContent
                 Else
                     Return ""
                 End If
             End Get
             Set(ByVal value As String)
                 If True Then
-                    cpCore.pages.bodyContent = value
+                    cpCore.doc.bodyContent = value
                 End If
             End Set
         End Property
@@ -120,10 +120,10 @@ Namespace Contensive.Core
         ''' <returns></returns>
         Public Overrides ReadOnly Property pageId() As Integer
             Get
-                If (cpCore.pages.page Is Nothing) Then
+                If (cpCore.doc.page Is Nothing) Then
                     Return 0
                 Else
-                    Return cpCore.pages.page.id
+                    Return cpCore.doc.page.id
                 End If
             End Get
         End Property
@@ -135,10 +135,10 @@ Namespace Contensive.Core
         ''' <returns></returns>
         Public Overrides ReadOnly Property pageName() As String
             Get
-                If (cpCore.pages.page Is Nothing) Then
+                If (cpCore.doc.page Is Nothing) Then
                     Return ""
                 Else
-                    Return cpCore.pages.page.name
+                    Return cpCore.doc.page.name
                 End If
             End Get
         End Property
@@ -150,7 +150,7 @@ Namespace Contensive.Core
         ''' <returns></returns>
         Public Overrides ReadOnly Property refreshQueryString() As String
             Get
-                Return cpCore.htmlDoc.refreshQueryString
+                Return cpCore.html.refreshQueryString
             End Get
         End Property
         '
@@ -188,9 +188,9 @@ Namespace Contensive.Core
         ''' <returns></returns>
         Public Overrides ReadOnly Property templateId() As Integer
             Get
-                If (cpCore.pages IsNot Nothing) Then
-                    If (cpCore.pages.template IsNot Nothing) Then
-                        Return cpCore.pages.template.ID
+                If (cpCore.doc IsNot Nothing) Then
+                    If (cpCore.doc.template IsNot Nothing) Then
+                        Return cpCore.doc.template.ID
                     End If
                 End If
                 Return 0
@@ -219,7 +219,7 @@ Namespace Contensive.Core
         ''' <param name="NewCode"></param>
         Public Overrides Sub addHeadJavascript(ByVal NewCode As String)
             If True Then
-                Call cpCore.htmlDoc.main_AddHeadJavascript(NewCode)
+                Call cpCore.html.main_AddHeadJavascript(NewCode)
             End If
         End Sub
         '
@@ -230,7 +230,7 @@ Namespace Contensive.Core
         ''' <param name="HeadTag"></param>
         Public Overrides Sub addHeadTag(ByVal HeadTag As String)
             If True Then
-                Call cpCore.htmlDoc.main_AddHeadTag(HeadTag)
+                Call cpCore.html.main_AddHeadTag(HeadTag)
             End If
         End Sub
         '
@@ -238,7 +238,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub addMetaDescription(ByVal MetaDescription As String)
             If True Then
-                Call cpCore.htmlDoc.main_addMetaDescription(MetaDescription)
+                Call cpCore.html.main_addMetaDescription(MetaDescription)
             End If
         End Sub
         '
@@ -246,7 +246,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub addMetaKeywordList(ByVal MetaKeywordList As String)
             If True Then
-                Call cpCore.htmlDoc.main_addMetaKeywordList(MetaKeywordList)
+                Call cpCore.html.main_addMetaKeywordList(MetaKeywordList)
             End If
         End Sub
         '
@@ -254,7 +254,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub addOnLoadJavascript(ByVal NewCode As String)
             If True Then
-                Call cpCore.htmlDoc.main_AddOnLoadJavascript(NewCode)
+                Call cpCore.html.main_AddOnLoadJavascript(NewCode)
             End If
         End Sub
         '
@@ -262,7 +262,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub addTitle(ByVal PageTitle As String)
             If True Then
-                Call cpCore.htmlDoc.main_AddPagetitle(PageTitle)
+                Call cpCore.html.main_AddPagetitle(PageTitle)
             End If
         End Sub
         '
@@ -270,7 +270,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub addRefreshQueryString(ByVal Name As String, ByVal Value As String)
             If True Then
-                Call cpCore.htmlDoc.webServerIO_addRefreshQueryString(Name, Value)
+                Call cpCore.html.webServerIO_addRefreshQueryString(Name, Value)
             End If
         End Sub
         '
@@ -286,7 +286,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub addHeadStyleLink(ByVal StyleSheetLink As String)
             If True Then
-                Call cpCore.htmlDoc.main_AddStylesheetLink(StyleSheetLink)
+                Call cpCore.html.main_AddStylesheetLink(StyleSheetLink)
             End If
         End Sub
         '
@@ -294,7 +294,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub addBodyEnd(ByVal NewCode As String)
             If True Then
-                cpCore.htmlDoc.htmlForEndOfBody = cpCore.htmlDoc.htmlForEndOfBody & NewCode
+                cpCore.html.htmlForEndOfBody = cpCore.html.htmlForEndOfBody & NewCode
             End If
         End Sub
         '
@@ -303,14 +303,14 @@ Namespace Contensive.Core
         Public Overrides Property body() As String
             Get
                 If True Then
-                    body = cpCore.htmlDoc.html_DocBodyFilter
+                    body = cpCore.html.html_DocBodyFilter
                 Else
                     Return ""
                 End If
             End Get
             Set(ByVal value As String)
                 If True Then
-                    cpCore.htmlDoc.html_DocBodyFilter = value
+                    cpCore.html.html_DocBodyFilter = value
                 End If
             End Set
         End Property
@@ -320,7 +320,7 @@ Namespace Contensive.Core
         '
         Public Overrides ReadOnly Property siteStylesheet() As String
             Get
-                Return cpCore.pages.pageManager_GetStyleSheet2()
+                Return cpCore.html.html_getStyleSheet2(0, 0)
             End Get
         End Property
         '
@@ -340,10 +340,10 @@ Namespace Contensive.Core
         '
         '------------------------------------------------------------------------------------------------------------
         '
-        Public Function decodeLegacyAddonOptionArgument(ByVal EncodedArg As String) As String
+        Public Function decodeLegacyOptionStringArgument(ByVal EncodedArg As String) As String
             Dim a As String
             '
-            decodeLegacyAddonOptionArgument = ""
+            decodeLegacyOptionStringArgument = ""
             If EncodedArg <> "" Then
                 a = EncodedArg
                 a = genericController.vbReplace(a, "#0058#", ":")
@@ -356,7 +356,7 @@ Namespace Contensive.Core
                 a = genericController.vbReplace(a, "#0061#", "=")
                 a = genericController.vbReplace(a, "#0038#", "&")
                 a = genericController.vbReplace(a, "#0013#", vbCrLf)
-                decodeLegacyAddonOptionArgument = a
+                decodeLegacyOptionStringArgument = a
             End If
         End Function
         '

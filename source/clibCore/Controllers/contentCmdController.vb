@@ -299,7 +299,7 @@ Namespace Contensive.Core.Controllers
                 ' accumulator gets the result of each cmd, then is passed to the next command to filter
                 '
                 Dim CmdAccumulator As String
-                Dim htmlDoc As Controllers.htmlDocController
+                Dim htmlDoc As Controllers.htmlController
                 Dim importHead As String
                 Dim ArgName As String
                 Dim ArgInstanceId As String
@@ -323,7 +323,7 @@ Namespace Contensive.Core.Controllers
                 Dim trimming As Boolean
                 Dim addonStatusOK As Boolean
                 '
-                htmlDoc = New Controllers.htmlDocController(cpCore)
+                htmlDoc = New Controllers.htmlController(cpCore)
                 '
                 cmdSrc = Trim(cmdSrc)
                 whiteChrs = vbCr & vbLf & vbTab & " "
@@ -587,7 +587,7 @@ Namespace Contensive.Core.Controllers
                                     End Select
                                 Next
                                 If ArgName <> "" Then
-                                    CmdAccumulator = cpCore.htmlDoc.html_GetContentCopy(ArgName, "copy content", cpCore.authContext.user.id, True, cpCore.authContext.isAuthenticated)
+                                    CmdAccumulator = cpCore.html.html_GetContentCopy(ArgName, "copy content", cpCore.authContext.user.id, True, cpCore.authContext.isAuthenticated)
                                 End If
                             Case "opencopy"
                                 '
@@ -607,7 +607,7 @@ Namespace Contensive.Core.Controllers
                                     End Select
                                 Next
                                 If ArgName <> "" Then
-                                    CmdAccumulator = cpCore.htmlDoc.html_GetContentCopy(ArgName, "copy content", cpCore.authContext.user.id, True, cpCore.authContext.isAuthenticated)
+                                    CmdAccumulator = cpCore.html.html_GetContentCopy(ArgName, "copy content", cpCore.authContext.user.id, True, cpCore.authContext.isAuthenticated)
                                 End If
                             Case "openlayout"
                                 '
@@ -674,12 +674,12 @@ Namespace Contensive.Core.Controllers
                                 If ArgName <> "" Then
                                     CmdAccumulator = cpCore.appRootFiles.readFile(ArgName)
                                     If CmdAccumulator <> "" Then
-                                        importHead = Controllers.htmlDocController.getTagInnerHTML(CmdAccumulator, "head", False)
+                                        importHead = Controllers.htmlController.getTagInnerHTML(CmdAccumulator, "head", False)
                                         If importHead <> "" Then
                                             ' try this, but it may not be implemented yet
-                                            Call cpCore.htmlDoc.html_addHeadTags(importHead)
+                                            Call cpCore.html.html_addHeadTags(importHead)
                                         End If
-                                        CmdAccumulator = Controllers.htmlDocController.getTagInnerHTML(CmdAccumulator, "body", False)
+                                        CmdAccumulator = Controllers.htmlController.getTagInnerHTML(CmdAccumulator, "body", False)
                                     End If
                                 End If
                             Case "user"

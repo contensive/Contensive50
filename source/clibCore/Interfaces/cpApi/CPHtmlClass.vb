@@ -103,7 +103,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function CheckBox(ByVal HtmlName As String, Optional ByVal HtmlValue As Boolean = False, Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Inherits BaseClasses.CPHtmlBaseClass.CheckBox
             If True Then
-                Return cpCore.htmldoc.html_GetFormInputCheckBox(HtmlName, HtmlValue.ToString, HtmlId)
+                Return cpCore.html.html_GetFormInputCheckBox(HtmlName, HtmlValue.ToString, HtmlId)
             Else
                 Return ""
             End If
@@ -113,7 +113,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function CheckList(ByVal HtmlName As String, ByVal PrimaryContentName As String, ByVal PrimaryRecordId As Integer, ByVal SecondaryContentName As String, ByVal RulesContentName As String, ByVal RulesPrimaryFieldname As String, ByVal RulesSecondaryFieldName As String, Optional ByVal SecondaryContentSelectSQLCriteria As String = "", Optional ByVal CaptionFieldName As String = "", Optional ByVal IsReadOnly As Boolean = False, Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Inherits BaseClasses.CPHtmlBaseClass.CheckList
             If True Then
-                Return cpCore.htmlDoc.main_GetFormInputCheckList(HtmlName, PrimaryContentName, PrimaryRecordId, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectSQLCriteria, CaptionFieldName, IsReadOnly)
+                Return cpCore.html.main_GetFormInputCheckList(HtmlName, PrimaryContentName, PrimaryRecordId, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectSQLCriteria, CaptionFieldName, IsReadOnly)
             Else
                 Return ""
             End If
@@ -129,16 +129,16 @@ Namespace Contensive.Core
                         Call cpCore.handleExceptionAndContinue(New ApplicationException("cp.html.form called with method=get can not contain an upload file (input type=file)"))
                     End If
                     If ActionQueryString = "" Then
-                        FormStart = cpCore.htmldoc.html_GetFormStart(, HtmlName, HtmlId, Method)
+                        FormStart = cpCore.html.html_GetFormStart(, HtmlName, HtmlId, Method)
                     Else
-                        FormStart = cpCore.htmldoc.html_GetFormStart(ActionQueryString, HtmlName, HtmlId, Method)
+                        FormStart = cpCore.html.html_GetFormStart(ActionQueryString, HtmlName, HtmlId, Method)
                     End If
 
                 Else
                     If ActionQueryString = "" Then
-                        FormStart = cpCore.htmldoc.html_GetUploadFormStart()
+                        FormStart = cpCore.html.html_GetUploadFormStart()
                     Else
-                        FormStart = cpCore.htmldoc.html_GetUploadFormStart(ActionQueryString)
+                        FormStart = cpCore.html.html_GetUploadFormStart(ActionQueryString)
                     End If
                     If HtmlName <> "" Then
                         FormStart = FormStart.Replace(">", " name=""" & HtmlName & """>")
@@ -197,7 +197,7 @@ Namespace Contensive.Core
 
         Public Overrides Function RadioBox(ByVal HtmlName As String, ByVal HtmlValue As String, ByVal CurrentValue As String, Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Inherits BaseClasses.CPHtmlBaseClass.RadioBox
             If True Then
-                Return cpCore.htmldoc.html_GetFormInputRadioBox(HtmlName, HtmlValue, CurrentValue, HtmlId)
+                Return cpCore.html.html_GetFormInputRadioBox(HtmlName, HtmlValue, CurrentValue, HtmlId)
             Else
                 Return ""
             End If
@@ -207,7 +207,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function SelectContent(ByVal HtmlName As String, ByVal HtmlValue As String, ByVal ContentName As String, Optional ByVal SQLCriteria As String = "", Optional ByVal NoneCaption As String = "", Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Inherits BaseClasses.CPHtmlBaseClass.SelectContent
             If True Then
-                SelectContent = cpCore.htmlDoc.main_GetFormInputSelect(HtmlName, genericController.EncodeInteger(HtmlValue), ContentName, SQLCriteria, NoneCaption)
+                SelectContent = cpCore.html.main_GetFormInputSelect(HtmlName, genericController.EncodeInteger(HtmlValue), ContentName, SQLCriteria, NoneCaption)
                 If HtmlClass <> "" Then
                     SelectContent = SelectContent.Replace("<select ", "<select class=""" & HtmlClass & """ ")
                 End If
@@ -222,7 +222,7 @@ Namespace Contensive.Core
 
         Public Overrides Function SelectList(ByVal HtmlName As String, ByVal HtmlValue As String, ByVal OptionList As String, Optional ByVal NoneCaption As String = "", Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Inherits BaseClasses.CPHtmlBaseClass.SelectList
             If True Then
-                SelectList = cpCore.htmlDoc.main_GetFormInputSelectList(HtmlName, HtmlValue, OptionList, NoneCaption, HtmlId)
+                SelectList = cpCore.html.getInputSelectList(HtmlName, HtmlValue, OptionList, NoneCaption, HtmlId)
                 If HtmlClass <> "" Then
                     SelectList = SelectList.Replace("<select ", "<select class=""" & HtmlClass & """ ")
                 End If
@@ -236,7 +236,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub ProcessCheckList(ByVal HtmlName As String, ByVal PrimaryContentName As String, ByVal PrimaryRecordID As String, ByVal SecondaryContentName As String, ByVal RulesContentName As String, ByVal RulesPrimaryFieldname As String, ByVal RulesSecondaryFieldName As String) 'Inherits BaseClasses.CPHtmlBaseClass.ProcessCheckList
             If True Then
-                Call cpCore.htmlDoc.main_ProcessCheckList(HtmlName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName)
+                Call cpCore.html.main_ProcessCheckList(HtmlName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName)
             End If
         End Sub
         '
@@ -281,7 +281,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function Hidden(ByVal HtmlName As String, ByVal HtmlValue As String, Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Inherits BaseClasses.CPHtmlBaseClass.Hidden
             If True Then
-                Return cpCore.htmldoc.html_GetFormInputHidden(HtmlName, HtmlValue, HtmlId)
+                Return cpCore.html.html_GetFormInputHidden(HtmlName, HtmlValue, HtmlId)
             Else
                 Return ""
             End If
@@ -292,7 +292,7 @@ Namespace Contensive.Core
         Public Overrides Function InputDate(ByVal HtmlName As String, Optional ByVal HtmlValue As String = "", Optional ByVal Width As String = "", Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Inherits BaseClasses.CPHtmlBaseClass.InputDate
             Dim returnValue As String = ""
             If True Then
-                returnValue = cpCore.htmldoc.html_GetFormInputDate(HtmlName, HtmlValue, Width, HtmlId)
+                returnValue = cpCore.html.html_GetFormInputDate(HtmlName, HtmlValue, Width, HtmlId)
                 If HtmlClass <> "" Then
                     returnValue = returnValue.Replace(">", " class=""" & HtmlClass & """>")
                 End If
@@ -305,7 +305,7 @@ Namespace Contensive.Core
         Public Overrides Function InputFile(ByVal HtmlName As String, Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String
             Dim returnValue As String = ""
             If True Then
-                returnValue = cpCore.htmldoc.html_GetFormInputFile2(HtmlName, HtmlId, HtmlClass)
+                returnValue = cpCore.html.html_GetFormInputFile2(HtmlName, HtmlId, HtmlClass)
             End If
             Return returnValue
         End Function
@@ -315,7 +315,7 @@ Namespace Contensive.Core
         Public Overrides Function InputText(ByVal HtmlName As String, Optional ByVal HtmlValue As String = "", Optional ByVal Height As String = "", Optional ByVal Width As String = "", Optional ByVal IsPassword As Boolean = False, Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Inherits BaseClasses.CPHtmlBaseClass.InputText
             Dim returnValue As String = ""
             If True Then
-                returnValue = cpCore.htmldoc.html_GetFormInputText2(HtmlName, HtmlValue, genericController.EncodeInteger(Height), genericController.EncodeInteger(Width), HtmlId, IsPassword, False, HtmlClass)
+                returnValue = cpCore.html.html_GetFormInputText2(HtmlName, HtmlValue, genericController.EncodeInteger(Height), genericController.EncodeInteger(Width), HtmlId, IsPassword, False, HtmlClass)
                 returnValue = returnValue.Replace(" SIZE=""60""", "")
             End If
             Return returnValue
@@ -335,7 +335,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function InputTextExpandable(ByVal HtmlName As String, Optional ByVal HtmlValue As String = "", Optional ByVal Rows As Integer = 0, Optional ByVal StyleWidth As String = "", Optional ByVal IsPassword As Boolean = False, Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Inherits BaseClasses.CPHtmlBaseClass.InputTextExpandable
             If True Then
-                Return cpCore.htmldoc.html_GetFormInputTextExpandable(HtmlName, HtmlValue, Rows, StyleWidth, HtmlId, IsPassword)
+                Return cpCore.html.html_GetFormInputTextExpandable(HtmlName, HtmlValue, Rows, StyleWidth, HtmlId, IsPassword)
             Else
                 Return ""
             End If
@@ -345,7 +345,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function SelectUser(ByVal HtmlName As String, ByVal HtmlValue As Integer, ByVal GroupId As Integer, Optional ByVal NoneCaption As String = "", Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Inherits BaseClasses.CPHtmlBaseClass.SelectUser
             If True Then
-                Return cpCore.htmldoc.html_GetFormInputMemberSelect(HtmlName, HtmlValue, GroupId, NoneCaption, HtmlId)
+                Return cpCore.html.getInputMemberSelect(HtmlName, HtmlValue, GroupId, NoneCaption, HtmlId)
             Else
                 Return ""
             End If
@@ -418,7 +418,7 @@ Namespace Contensive.Core
 
         Public Overrides Function InputWysiwyg(ByVal HtmlName As String, Optional ByVal HtmlValue As String = "", Optional ByVal UserScope As BaseClasses.CPHtmlBaseClass.EditorUserScope = BaseClasses.CPHtmlBaseClass.EditorUserScope.CurrentUser, Optional ByVal ContentScope As BaseClasses.CPHtmlBaseClass.EditorContentScope = BaseClasses.CPHtmlBaseClass.EditorContentScope.Page, Optional ByVal Height As String = "", Optional ByVal Width As String = "", Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Inherits BaseClasses.CPHtmlBaseClass.InputWysiwyg
             If True Then
-                Return cpCore.htmldoc.html_GetFormInputHTML(HtmlName, HtmlValue, Height, Width)
+                Return cpCore.html.html_GetFormInputHTML(HtmlName, HtmlValue, Height, Width)
             Else
                 Return ""
             End If
@@ -428,7 +428,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub AddEvent(ByVal HtmlId As String, ByVal DOMEvent As String, ByVal JavaScript As String)
             If True Then
-                Call cpCore.htmldoc.html_AddEvent(HtmlId, DOMEvent, JavaScript)
+                Call cpCore.html.html_AddEvent(HtmlId, DOMEvent, JavaScript)
             End If
         End Sub
         '
@@ -436,7 +436,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function Button(ByVal HtmlName As String, Optional ByVal HtmlValue As String = "", Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String
             If True Then
-                Button = cpCore.htmldoc.html_GetFormButton(HtmlValue, HtmlName, HtmlId, "")
+                Button = cpCore.html.html_GetFormButton(HtmlValue, HtmlName, HtmlId, "")
                 If HtmlClass <> "" Then
                     Button = Button.Replace(">", " class=""" & HtmlClass & """>")
                 End If
@@ -450,7 +450,7 @@ Namespace Contensive.Core
         Public Overrides Function adminHint(innerHtml As String) As String
             Dim returnString As String = innerHtml
             Try
-                If cpCore.authContext.isEditingAnything(cpCore) Or cpCore.authContext.user.Admin Then
+                If cpCore.authContext.isEditingAnything() Or cpCore.authContext.user.Admin Then
                     returnString = "" _
                         & "<div class=""ccHintWrapper"">" _
                             & "<div  class=""ccHintWrapperContent"">" _

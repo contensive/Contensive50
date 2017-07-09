@@ -74,7 +74,7 @@ Namespace Contensive.Addons
                 ' main_Get Content
                 '
                 cpCore.db.sqlCommandTimeout = 300
-                Call cpCore.htmlDoc.main_SetMetaContent(0, 0)
+                Call cpCore.html.main_SetMetaContent(0, 0)
                 '
                 AdminContent = execute_getContent("")
                 If Not cpCore.continueProcessing Then
@@ -96,7 +96,7 @@ Namespace Contensive.Addons
                     '
                     ' normal
                     '
-                    returnHtml = cpCore.htmlDoc.getHtmlDoc(cpCore, AdminContent, True, True, False, True)
+                    returnHtml = cpCore.html.getHtmlDoc(cpCore, AdminContent, True, True, False, True)
                     'returnHtml = "" _
                     '    & cpCore.htmlDoc.getHtmlDoc_beforeBodyHtml() _
                     '    & AdminContent _
@@ -227,7 +227,7 @@ Namespace Contensive.Addons
             ContentWatchLoaded = False
             editRecord.Loaded = False
             UseContentWatchLink = cpCore.siteProperties.useContentWatchLink
-            Call cpCore.htmlDoc.main_AddOnLoadJavascript2("document.getElementsByTagName('BODY')[0].onclick = BodyOnClick;", "Contensive")
+            Call cpCore.html.main_AddOnLoadJavascript2("document.getElementsByTagName('BODY')[0].onclick = BodyOnClick;", "Contensive")
             '
             '-------------------------------------------------------------------------------
             ' check for member login, if logged in and no admin, lock out
@@ -243,7 +243,7 @@ leak200:
                 '
                 ' --- must be authenticated to continue
                 '
-                Stream.Add(cpCore.htmlDoc.getLoginPage(False))
+                Stream.Add(cpCore.html.getLoginPage(False))
             ElseIf Not cpCore.authContext.isAuthenticatedContentManager(cpCore) Then
                 '
                 ' --- member must have proper access to continue
@@ -259,8 +259,8 @@ leak200:
                     & "</span></p>" _
                     & ""
                 s = "" _
-                    & cpCore.htmlDoc.main_GetPanelHeader("Unauthorized Access") _
-                    & cpCore.htmlDoc.main_GetPanel(s, "ccPanel", "ccPanelHilite", "ccPanelShadow", "400", 15) _
+                    & cpCore.html.main_GetPanelHeader("Unauthorized Access") _
+                    & cpCore.html.main_GetPanel(s, "ccPanel", "ccPanelHilite", "ccPanelShadow", "400", 15) _
                     & ""
                 Call Stream.Add("" _
                     & cr & "<div style=""display:table;margin:100px auto auto auto;"">" _
@@ -332,7 +332,7 @@ leak200:
                 '-------------------------------------------------------------------------------
                 '
                 If (AdminSourceForm = AdminFormEdit) Then
-                    If (Not (cpCore.debug_iUserError <> "")) And cpCore.htmlDoc.main_ReturnAfterEdit And ((AdminButton = ButtonOK) Or (AdminButton = ButtonCancel) Or (AdminButton = ButtonDelete) Or (AdminButton = ButtonPublish) Or (AdminButton = ButtonPublishApprove) Or (AdminButton = ButtonAbortEdit) Or (AdminButton = ButtonPublishSubmit)) Then
+                    If (Not (cpCore.debug_iUserError <> "")) And cpCore.html.main_ReturnAfterEdit And ((AdminButton = ButtonOK) Or (AdminButton = ButtonCancel) Or (AdminButton = ButtonDelete) Or (AdminButton = ButtonPublish) Or (AdminButton = ButtonPublishApprove) Or (AdminButton = ButtonAbortEdit) Or (AdminButton = ButtonPublishSubmit)) Then
                         EditReferer = cpCore.docProperties.getText("EditReferer")
                         CurrentLink = genericController.modifyLinkQuery(cpCore.webServer.requestUrl, "editreferer", "", False)
                         CurrentLink = genericController.vbLCase(CurrentLink)
@@ -370,13 +370,13 @@ leak200:
                 ' build refresh string
                 '-------------------------------------------------------------------------------
                 '
-                If AdminContent.Id <> 0 Then Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("cid", genericController.encodeText(AdminContent.Id))
-                If editRecord.id <> 0 Then Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("id", genericController.encodeText(editRecord.id))
-                If TitleExtension <> "" Then Call cpCore.htmlDoc.webServerIO_addRefreshQueryString(RequestNameTitleExtension, cpCore.htmlDoc.main_EncodeRequestVariable(TitleExtension))
-                If RecordTop <> 0 Then Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("rt", genericController.encodeText(RecordTop))
-                If RecordsPerPage <> RecordsPerPageDefault Then Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("rs", genericController.encodeText(RecordsPerPage))
-                If AdminForm <> 0 Then Call cpCore.htmlDoc.webServerIO_addRefreshQueryString(RequestNameAdminForm, genericController.encodeText(AdminForm))
-                If MenuDepth <> 0 Then Call cpCore.htmlDoc.webServerIO_addRefreshQueryString(RequestNameAdminDepth, genericController.encodeText(MenuDepth))
+                If AdminContent.Id <> 0 Then Call cpCore.html.webServerIO_addRefreshQueryString("cid", genericController.encodeText(AdminContent.Id))
+                If editRecord.id <> 0 Then Call cpCore.html.webServerIO_addRefreshQueryString("id", genericController.encodeText(editRecord.id))
+                If TitleExtension <> "" Then Call cpCore.html.webServerIO_addRefreshQueryString(RequestNameTitleExtension, cpCore.html.main_EncodeRequestVariable(TitleExtension))
+                If RecordTop <> 0 Then Call cpCore.html.webServerIO_addRefreshQueryString("rt", genericController.encodeText(RecordTop))
+                If RecordsPerPage <> RecordsPerPageDefault Then Call cpCore.html.webServerIO_addRefreshQueryString("rs", genericController.encodeText(RecordsPerPage))
+                If AdminForm <> 0 Then Call cpCore.html.webServerIO_addRefreshQueryString(RequestNameAdminForm, genericController.encodeText(AdminForm))
+                If MenuDepth <> 0 Then Call cpCore.html.webServerIO_addRefreshQueryString(RequestNameAdminDepth, genericController.encodeText(MenuDepth))
                 '
                 ' normalize guid
                 '
@@ -417,13 +417,13 @@ leak200:
                     '
                     ' display Addon Help
                     '
-                    Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("helpaddonid", HelpAddonID.ToString)
+                    Call cpCore.html.webServerIO_addRefreshQueryString("helpaddonid", HelpAddonID.ToString)
                     ContentCell = GetAddonHelp(HelpAddonID, "")
                 ElseIf (HelpCollectionID <> 0) Then
                     '
                     ' display Collection Help
                     '
-                    Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("helpcollectionid", HelpCollectionID.ToString)
+                    Call cpCore.html.webServerIO_addRefreshQueryString("helpcollectionid", HelpCollectionID.ToString)
                     ContentCell = GetCollectionHelp(HelpCollectionID, "")
                 ElseIf (AdminForm <> 0) Then
                     '
@@ -446,7 +446,7 @@ leak200:
                         Case AdminFormSpiderControl
                             ContentCell = cpCore.addon.execute_legacy4("Content Spider Control", "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
                         Case AdminFormResourceLibrary
-                            ContentCell = cpCore.htmlDoc.main_GetResourceLibrary2("", False, "", "", True)
+                            ContentCell = cpCore.html.main_GetResourceLibrary2("", False, "", "", True)
                         Case AdminFormQuickStats
                             ContentCell = (GetForm_QuickStats())
                         Case AdminFormIndex
@@ -493,17 +493,17 @@ leak200:
                         '
                         ' Special case, call the routine that provides a backup
                         '
-                        Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("addonguid", AddonManagerGuid)
+                        Call cpCore.html.webServerIO_addRefreshQueryString("addonguid", AddonManagerGuid)
                         ContentCell = GetAddonManager()
                     Else
                         If addonId <> 0 Then
-                            Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("addonid", CStr(addonId))
+                            Call cpCore.html.webServerIO_addRefreshQueryString("addonid", CStr(addonId))
                             CS = cpCore.db.csOpenRecord(cnAddons, addonId)
                             If Not cpCore.db.cs_ok(CS) Then
                                 Call errorController.error_AddUserError(cpCore, "The Add-on you requested could not be found by its id " & addonId)
                             End If
                         ElseIf AddonGuid <> "" Then
-                            Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("addonguid", AddonGuid)
+                            Call cpCore.html.webServerIO_addRefreshQueryString("addonguid", AddonGuid)
                             '$$$$$ cache this
                             If True Then ' 3.4.060" Then
                                 CS = cpCore.db.cs_open(cnAddons, "ccguid=" & cpCore.db.encodeSQLText(AddonGuid))
@@ -514,7 +514,7 @@ leak200:
                                 Call errorController.error_AddUserError(cpCore, "The Add-on you requested could not be found by its guid " & AddonGuid)
                             End If
                         ElseIf AddonName <> "" Then
-                            Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("addonname", AddonName)
+                            Call cpCore.html.webServerIO_addRefreshQueryString("addonname", AddonName)
                             CS = cpCore.db.cs_open(cnAddons, "name=" & cpCore.db.encodeSQLText(AddonName))
                             If Not cpCore.db.cs_ok(CS) Then
                                 Call errorController.error_AddUserError(cpCore, "The Add-on you requested could not be found by its name " & AddonName)
@@ -524,7 +524,7 @@ leak200:
                             addonId = cpCore.db.cs_getInteger(CS, "ID")
                             AddonName = cpCore.db.cs_getText(CS, "name")
                             AddonHelpCopy = cpCore.db.cs_getText(CS, "help")
-                            Call cpCore.htmlDoc.webServerIO_addRefreshQueryString(RequestNameRunAddon, addonId.ToString)
+                            Call cpCore.html.webServerIO_addRefreshQueryString(RequestNameRunAddon, addonId.ToString)
                         End If
                         Call cpCore.db.cs_Close(CS)
                         InstanceOptionString = cpCore.userProperty.getText("Addon [" & AddonName & "] Options", "")
@@ -548,7 +548,7 @@ leak200:
                 '
                 If includeFancyBox Then
                     Call cpCore.addon.execute_legacy4(jQueryFancyBoxGuid)
-                    Call cpCore.htmlDoc.main_AddHeadJavascript("jQuery(document).ready(function() {" & fancyBoxHeadJS & "});")
+                    Call cpCore.html.main_AddHeadJavascript("jQuery(document).ready(function() {" & fancyBoxHeadJS & "});")
                 End If
                 '
                 ' Pickup user errors
@@ -568,7 +568,7 @@ leak200:
                 '    'ContentCell = "<div class=""ccAdminMsg"">The form you requested did not return a valid response.</div>"
                 'End If
                 '
-                If cpCore.htmlDoc.pageManager_printVersion Then
+                If cpCore.html.pageManager_printVersion Then
                     '
                     ' For print version, just add content
                     '
@@ -712,8 +712,8 @@ ErrorTrap:
                     Exit For
                 Else
                     WherePair(1, WCount) = genericController.encodeText(cpCore.docProperties.getText("WR" & WCount))
-                    Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("wl" & WCount, cpCore.htmlDoc.main_EncodeRequestVariable(WherePair(0, WCount)))
-                    Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("wr" & WCount, cpCore.htmlDoc.main_EncodeRequestVariable(WherePair(1, WCount)))
+                    Call cpCore.html.webServerIO_addRefreshQueryString("wl" & WCount, cpCore.html.main_EncodeRequestVariable(WherePair(0, WCount)))
+                    Call cpCore.html.webServerIO_addRefreshQueryString("wr" & WCount, cpCore.html.main_EncodeRequestVariable(WherePair(1, WCount)))
                 End If
             Next
             '
@@ -724,7 +724,7 @@ ErrorTrap:
                 '
                 ' ***** really needs a server.URLDecode() function
                 '
-                Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("wc", WhereClauseContent)
+                Call cpCore.html.webServerIO_addRefreshQueryString("wc", WhereClauseContent)
                 'WhereClauseContent = genericController.vbReplace(WhereClauseContent, "%3D", "=")
                 'WhereClauseContent = genericController.vbReplace(WhereClauseContent, "%26", "&")
                 If WhereClauseContent <> "" Then
@@ -778,7 +778,7 @@ ErrorTrap:
             If (AdminButton = ButtonDeleteEmail) Or (AdminButton = ButtonDeletePage) Or (AdminButton = ButtonDeletePerson) Or (AdminButton = ButtonDeleteRecord) Then
                 AdminButton = ButtonDelete
             End If
-            If (AdminForm = AdminFormEdit) And cpCore.htmlDoc.main_ReturnAfterEdit Then
+            If (AdminForm = AdminFormEdit) And cpCore.html.main_ReturnAfterEdit Then
                 MenuDepth = 0
             Else
                 MenuDepth = cpCore.docProperties.getInteger(RequestNameAdminDepth)
@@ -1046,7 +1046,7 @@ ErrorTrap:
                                     'no - if WF, on process on publish
                                     'Call ProcessSpecialCaseAfterSave(false,AdminContent.Name, EditRecord.ID, EditRecord.Name, EditRecord.ParentID, UseContentWatchLink)
                                     Call cpCore.workflow.main_SubmitEdit(adminContent.Name, editRecord.id)
-                                    Call cpCore.pages.pageManager_SendPublishSubmitNotice(adminContent.Name, editRecord.id, editRecord.nameLc)
+                                    Call cpCore.doc.pageManager_SendPublishSubmitNotice(adminContent.Name, editRecord.id, editRecord.nameLc)
                                 Else
                                     AdminForm = AdminSourceForm
                                 End If
@@ -1101,7 +1101,7 @@ ErrorTrap:
                                         'ContentName = EditRecord.ContentName
                                         'ContentName = cpCore.metaData.getContentNameByID(cpCore.app.cs_getInteger(CSEditRecord, "ContentControlID"))
                                         If cpCore.metaData.isContentFieldSupported(adminContent.Name, "parentid") Then
-                                            Call cpCore.pages.pageManager_DeleteChildRecords(adminContent.Name, editRecord.id, False)
+                                            Call cpCore.doc.pageManager_DeleteChildRecords(adminContent.Name, editRecord.id, False)
                                         End If
                                     End If
                                     Call cpCore.db.cs_deleteRecord(CSEditRecord)
@@ -1721,11 +1721,11 @@ ErrorTrap:
                 '
                 ' ----- Set the local global copy of Edit Record Locks
                 '
-                Call cpCore.pages.pageManager_GetAuthoringStatus(adminContent.Name, editRecord.id, editRecord.SubmitLock, editRecord.ApproveLock, editRecord.SubmittedName, editRecord.ApprovedName, editRecord.IsInserted, editRecord.IsDeleted, editRecord.IsModified, editRecord.LockModifiedName, editRecord.LockModifiedDate, editRecord.SubmittedDate, editRecord.ApprovedDate)
+                Call cpCore.doc.pageManager_GetAuthoringStatus(adminContent.Name, editRecord.id, editRecord.SubmitLock, editRecord.ApproveLock, editRecord.SubmittedName, editRecord.ApprovedName, editRecord.IsInserted, editRecord.IsDeleted, editRecord.IsModified, editRecord.LockModifiedName, editRecord.LockModifiedDate, editRecord.SubmittedDate, editRecord.ApprovedDate)
                 '
                 ' ----- Set flags used to determine the Authoring State
                 '
-                Call cpCore.pages.pageManager_GetAuthoringPermissions(adminContent.Name, editRecord.id, editRecord.AllowInsert, editRecord.AllowCancel, editRecord.AllowSave, editRecord.AllowDelete, editRecord.AllowPublish, editRecord.AllowAbort, editRecord.AllowSubmit, editRecord.AllowApprove, editRecord.Read_Only)
+                Call cpCore.doc.pageManager_GetAuthoringPermissions(adminContent.Name, editRecord.id, editRecord.AllowInsert, editRecord.AllowCancel, editRecord.AllowSave, editRecord.AllowDelete, editRecord.AllowPublish, editRecord.AllowAbort, editRecord.AllowSubmit, editRecord.AllowApprove, editRecord.Read_Only)
                 '
                 ' ----- Set Edit Lock
                 '
@@ -2663,7 +2663,7 @@ ErrorTrap:
                                                 ' this is a fix for when content editors leave white space in the editor, and do not realize it
                                                 '   then cannot fixgure out how to remove it
                                                 '
-                                                ResponseFieldValueText = cpCore.htmlDoc.html_DecodeContent(ResponseFieldValueText)
+                                                ResponseFieldValueText = cpCore.html.html_DecodeContent(ResponseFieldValueText)
                                                 ResponseFieldValueText = genericController.vbLCase(genericController.encodeText(ResponseFieldValueText))
                                                 If Len(ResponseFieldValueText) < 20 Then
                                                     HasInput = (InStr(1, ResponseFieldValueText, "<input ") <> 0)
@@ -3033,7 +3033,7 @@ ErrorTrap:
                     ElseIf cpCore.db.cs_isFieldSupported(CS, "OtherHeadTags") Then
                         Call cpCore.db.cs_set(CS, "OtherHeadTags", cpCore.docProperties.getText("MetaContent.OtherHeadTags"))
                     End If
-                    Call cpCore.htmlDoc.main_ProcessCheckList("MetaContent.KeywordList", "Meta Content", genericController.encodeText(MetaContentID), "Meta Keywords", "Meta Keyword Rules", "MetaContentID", "MetaKeywordID")
+                    Call cpCore.html.main_ProcessCheckList("MetaContent.KeywordList", "Meta Content", genericController.encodeText(MetaContentID), "Meta Keywords", "Meta Keyword Rules", "MetaContentID", "MetaKeywordID")
                 End If
                 Call cpCore.db.cs_Close(CS)
                 '
@@ -3105,7 +3105,7 @@ ErrorTrap:
                             '
                             ' Update the Link Aliases
                             '
-                            Call pagesController.app_addLinkAlias2(cpCore, linkAlias, editRecord.id, "", OverRideDuplicate, DupCausesWarning)
+                            Call docController.app_addLinkAlias2(cpCore, linkAlias, editRecord.id, "", OverRideDuplicate, DupCausesWarning)
                         End If
                     End If
                     'End If
@@ -3433,7 +3433,7 @@ ErrorTrap:
                                         MTMRuleContent = cpCore.metaData.getContentNameByID(.manyToManyRuleContentID)
                                         MTMRuleField0 = .ManyToManyRulePrimaryField
                                         MTMRuleField1 = .ManyToManyRuleSecondaryField
-                                        Call cpCore.htmlDoc.main_ProcessCheckList("ManyToMany" & .id, MTMContent0, CStr(editRecord.id), MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1)
+                                        Call cpCore.html.main_ProcessCheckList("ManyToMany" & .id, MTMContent0, CStr(editRecord.id), MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1)
                                     Case Else
                                         '
                                         ' Unknown other types
@@ -3662,7 +3662,7 @@ ErrorTrap:
                             Filename = cpCore.db.cs_get(CS, .nameLc)
                             If Filename <> "" Then
                                 Copy = cpCore.cdnFiles.readFile(Filename)
-                                Copy = cpCore.htmlDoc.html_encodeContent10(Copy, cpCore.authContext.user.id, "", 0, 0, True, False, False, False, True, False, "", "", IsEmailContent, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, cpCore.authContext.isAuthenticated, Nothing, cpCore.authContext.isEditingAnything(cpCore))
+                                Copy = cpCore.html.html_encodeContent10(Copy, cpCore.authContext.user.id, "", 0, 0, True, False, False, False, True, False, "", "", IsEmailContent, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, cpCore.authContext.isAuthenticated, Nothing, cpCore.authContext.isEditingAnything())
                                 Stream.Add(Copy)
                             End If
                         Case FieldTypeIdRedirect, FieldTypeIdManyToMany
@@ -3676,7 +3676,7 @@ ErrorTrap:
                     End Select
                 End With
                 '
-                return_formIndexCell = cpCore.htmlDoc.html_EncodeHTML(Stream.Text)
+                return_formIndexCell = cpCore.html.html_EncodeHTML(Stream.Text)
             Catch ex As Exception
                 Call cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
@@ -3899,7 +3899,7 @@ ErrorTrap:
                         End If
                     End If
                 End If
-                Call cpCore.htmlDoc.webServerIO_addRefreshQueryString(RequestNameEditReferer, EditReferer)
+                Call cpCore.html.webServerIO_addRefreshQueryString(RequestNameEditReferer, EditReferer)
                 '
                 ' Print common form elements
                 '
@@ -4212,8 +4212,8 @@ ErrorTrap:
                 '
                 ' ----- editor strings needed - needs to be on-demand
                 '
-                editorAddonListJSON = cpCore.htmlDoc.main_GetEditorAddonListJSON(ContentType)
-                styleList = cpCore.htmlDoc.main_GetStyleSheet2(ContentType, TemplateIDForStyles, emailIdForStyles)
+                editorAddonListJSON = cpCore.html.main_GetEditorAddonListJSON(ContentType)
+                styleList = cpCore.html.main_GetStyleSheet2(ContentType, TemplateIDForStyles, emailIdForStyles)
                 '
                 ' ----- Create edit page
                 '
@@ -4239,7 +4239,7 @@ ErrorTrap:
                             Call Stream.Add(GetForm_Edit_AddTab("Reports", GetForm_Edit_MemberReports(adminContent, editRecord), allowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                             If allowAdminTabs Then
-                                Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
+                                Call Stream.Add(cpCore.html.menu_GetComboTabs())
                             End If
                             Call Stream.Add(EditSectionButtonBar)
                         End If
@@ -4263,7 +4263,7 @@ ErrorTrap:
                             'Call Stream.Add(GetForm_Edit_AddTab("Calendar", GetForm_Edit_CalendarEvents, AllowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                             If allowAdminTabs Then
-                                Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
+                                Call Stream.Add(cpCore.html.menu_GetComboTabs())
                                 'Call Stream.Add("<div class=""ccPanelBackground"">" & cpCore.main_GetComboTabs() & "</div>")
                             End If
                             Call Stream.Add(EditSectionButtonBar)
@@ -4301,21 +4301,21 @@ ErrorTrap:
                             End If
                             EditSectionButtonBar = ""
                             If MenuDepth > 0 Then
-                                EditSectionButtonBar = EditSectionButtonBar & cpCore.htmlDoc.html_GetFormButton(ButtonClose, , , "window.close();")
+                                EditSectionButtonBar = EditSectionButtonBar & cpCore.html.html_GetFormButton(ButtonClose, , , "window.close();")
                             Else
-                                EditSectionButtonBar = EditSectionButtonBar & cpCore.htmlDoc.html_GetFormButton(ButtonCancel, , , "Return processSubmit(this)")
+                                EditSectionButtonBar = EditSectionButtonBar & cpCore.html.html_GetFormButton(ButtonCancel, , , "Return processSubmit(this)")
                             End If
                             If (AllowDelete) And (cpCore.authContext.isAuthenticatedDeveloper(cpCore)) Then
-                                EditSectionButtonBar = EditSectionButtonBar & cpCore.htmlDoc.html_GetFormButton(ButtonDeleteEmail, , , "If(!DeleteCheck())Return False;")
+                                EditSectionButtonBar = EditSectionButtonBar & cpCore.html.html_GetFormButton(ButtonDeleteEmail, , , "If(!DeleteCheck())Return False;")
                             End If
                             If (Not EmailSubmitted) And (Not EmailSent) Then
-                                EditSectionButtonBar = EditSectionButtonBar & cpCore.htmlDoc.html_GetFormButton(ButtonSave, , , "Return processSubmit(this)")
-                                EditSectionButtonBar = EditSectionButtonBar & cpCore.htmlDoc.html_GetFormButton(ButtonOK, , , "Return processSubmit(this)")
-                                EditSectionButtonBar = EditSectionButtonBar & cpCore.htmlDoc.html_GetFormButton(ButtonSendTest, , , "Return processSubmit(this)")
+                                EditSectionButtonBar = EditSectionButtonBar & cpCore.html.html_GetFormButton(ButtonSave, , , "Return processSubmit(this)")
+                                EditSectionButtonBar = EditSectionButtonBar & cpCore.html.html_GetFormButton(ButtonOK, , , "Return processSubmit(this)")
+                                EditSectionButtonBar = EditSectionButtonBar & cpCore.html.html_GetFormButton(ButtonSendTest, , , "Return processSubmit(this)")
                             ElseIf AllowAdd Then
-                                EditSectionButtonBar = EditSectionButtonBar & cpCore.htmlDoc.html_GetFormButton(ButtonCreateDuplicate, , , "Return processSubmit(this)")
+                                EditSectionButtonBar = EditSectionButtonBar & cpCore.html.html_GetFormButton(ButtonCreateDuplicate, , , "Return processSubmit(this)")
                             End If
-                            EditSectionButtonBar = cpCore.htmlDoc.main_GetPanel(EditSectionButtonBar, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 4)
+                            EditSectionButtonBar = cpCore.html.main_GetPanel(EditSectionButtonBar, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 4)
                             '
                             Call Stream.Add(EditSectionButtonBar)
                             Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
@@ -4325,7 +4325,7 @@ ErrorTrap:
                             Call Stream.Add(GetForm_Edit_AddTab("Bounce&nbsp;Control", GetForm_Edit_EmailBounceStatus(), allowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                             If allowAdminTabs Then
-                                Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
+                                Call Stream.Add(cpCore.html.menu_GetComboTabs())
                                 'Call Stream.Add("<div Class=""ccPanelBackground"">" & cpCore.main_GetComboTabs() & "</div>")
                             End If
                             Call Stream.Add(EditSectionButtonBar)
@@ -4344,31 +4344,31 @@ ErrorTrap:
                             End If
                             EditSectionButtonBar = ""
                             If MenuDepth > 0 Then
-                                EditSectionButtonBar = EditSectionButtonBar & cpCore.htmlDoc.html_GetFormButton(ButtonClose, , , "window.close();")
+                                EditSectionButtonBar = EditSectionButtonBar & cpCore.html.html_GetFormButton(ButtonClose, , , "window.close();")
                             Else
-                                EditSectionButtonBar = EditSectionButtonBar & cpCore.htmlDoc.html_GetFormButton(ButtonCancel, , , "Return processSubmit(this)")
+                                EditSectionButtonBar = EditSectionButtonBar & cpCore.html.html_GetFormButton(ButtonCancel, , , "Return processSubmit(this)")
                             End If
                             If AllowDelete Then
-                                EditSectionButtonBar = EditSectionButtonBar & cpCore.htmlDoc.html_GetFormButton(ButtonDeleteEmail, , , "If(!DeleteCheck())Return False;")
+                                EditSectionButtonBar = EditSectionButtonBar & cpCore.html.html_GetFormButton(ButtonDeleteEmail, , , "If(!DeleteCheck())Return False;")
                             End If
                             If (Not EmailSubmitted) Then
                                 '
                                 ' Not Submitted
                                 '
-                                EditSectionButtonBar = EditSectionButtonBar & cpCore.htmlDoc.html_GetFormButton(ButtonSave, , , "Return processSubmit(this)")
-                                EditSectionButtonBar = EditSectionButtonBar & cpCore.htmlDoc.html_GetFormButton(ButtonOK, , , "Return processSubmit(this)")
-                                EditSectionButtonBar = EditSectionButtonBar & cpCore.htmlDoc.html_GetFormButton2(ButtonActivate, , , "Return processSubmit(this)", (LastSendTestDate = Date.MinValue) And (Not AllowEmailSendWithoutTest))
-                                EditSectionButtonBar = EditSectionButtonBar & cpCore.htmlDoc.html_GetFormButton(ButtonSendTest, , , "Return processSubmit(this)")
+                                EditSectionButtonBar = EditSectionButtonBar & cpCore.html.html_GetFormButton(ButtonSave, , , "Return processSubmit(this)")
+                                EditSectionButtonBar = EditSectionButtonBar & cpCore.html.html_GetFormButton(ButtonOK, , , "Return processSubmit(this)")
+                                EditSectionButtonBar = EditSectionButtonBar & cpCore.html.html_GetFormButton2(ButtonActivate, , , "Return processSubmit(this)", (LastSendTestDate = Date.MinValue) And (Not AllowEmailSendWithoutTest))
+                                EditSectionButtonBar = EditSectionButtonBar & cpCore.html.html_GetFormButton(ButtonSendTest, , , "Return processSubmit(this)")
                             Else
                                 '
                                 ' Submitted
                                 '
                                 If AllowAdd Then
-                                    EditSectionButtonBar = EditSectionButtonBar & cpCore.htmlDoc.html_GetFormButton(ButtonCreateDuplicate, , , "Return processSubmit(this)")
+                                    EditSectionButtonBar = EditSectionButtonBar & cpCore.html.html_GetFormButton(ButtonCreateDuplicate, , , "Return processSubmit(this)")
                                 End If
-                                EditSectionButtonBar = EditSectionButtonBar & cpCore.htmlDoc.html_GetFormButton(ButtonDeactivate, , , "Return processSubmit(this)")
+                                EditSectionButtonBar = EditSectionButtonBar & cpCore.html.html_GetFormButton(ButtonDeactivate, , , "Return processSubmit(this)")
                             End If
-                            EditSectionButtonBar = cpCore.htmlDoc.main_GetPanel(EditSectionButtonBar, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 4)
+                            EditSectionButtonBar = cpCore.html.main_GetPanel(EditSectionButtonBar, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 4)
                             '
                             Call Stream.Add(EditSectionButtonBar)
                             Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
@@ -4378,7 +4378,7 @@ ErrorTrap:
                             Call Stream.Add(GetForm_Edit_AddTab("Bounce&nbsp;Control", GetForm_Edit_EmailBounceStatus(), allowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                             If allowAdminTabs Then
-                                Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
+                                Call Stream.Add(cpCore.html.menu_GetComboTabs())
                                 'Call Stream.Add("<div Class=""ccPanelBackground"">" & cpCore.main_GetComboTabs() & "</div>")
                             End If
                             Call Stream.Add(EditSectionButtonBar)
@@ -4401,25 +4401,25 @@ ErrorTrap:
                             End If
                             EditSectionButtonBar = ""
                             If MenuDepth > 0 Then
-                                EditSectionButtonBar = EditSectionButtonBar & cpCore.htmlDoc.html_GetFormButton(ButtonClose, , , "window.close();")
+                                EditSectionButtonBar = EditSectionButtonBar & cpCore.html.html_GetFormButton(ButtonClose, , , "window.close();")
                             Else
-                                EditSectionButtonBar = EditSectionButtonBar & cpCore.htmlDoc.html_GetFormButton(ButtonCancel, , , "Return processSubmit(this)")
+                                EditSectionButtonBar = EditSectionButtonBar & cpCore.html.html_GetFormButton(ButtonCancel, , , "Return processSubmit(this)")
                             End If
                             If (editRecord.id <> 0) Then
-                                EditSectionButtonBar = EditSectionButtonBar & cpCore.htmlDoc.html_GetFormButton(ButtonDeleteEmail, , , "If(!DeleteCheck())Return False;")
+                                EditSectionButtonBar = EditSectionButtonBar & cpCore.html.html_GetFormButton(ButtonDeleteEmail, , , "If(!DeleteCheck())Return False;")
                             End If
                             If (Not EmailSubmitted) And (Not EmailSent) Then
-                                EditSectionButtonBar = EditSectionButtonBar & cpCore.htmlDoc.html_GetFormButton(ButtonSave, , , "Return processSubmit(this)")
-                                EditSectionButtonBar = EditSectionButtonBar & cpCore.htmlDoc.html_GetFormButton(ButtonOK, , , "Return processSubmit(this)")
-                                EditSectionButtonBar = EditSectionButtonBar & cpCore.htmlDoc.html_GetFormButton2(ButtonSend, , , "Return processSubmit(this)", (LastSendTestDate = Date.MinValue) And (Not AllowEmailSendWithoutTest))
-                                EditSectionButtonBar = EditSectionButtonBar & cpCore.htmlDoc.html_GetFormButton(ButtonSendTest, , , "Return processSubmit(this)")
+                                EditSectionButtonBar = EditSectionButtonBar & cpCore.html.html_GetFormButton(ButtonSave, , , "Return processSubmit(this)")
+                                EditSectionButtonBar = EditSectionButtonBar & cpCore.html.html_GetFormButton(ButtonOK, , , "Return processSubmit(this)")
+                                EditSectionButtonBar = EditSectionButtonBar & cpCore.html.html_GetFormButton2(ButtonSend, , , "Return processSubmit(this)", (LastSendTestDate = Date.MinValue) And (Not AllowEmailSendWithoutTest))
+                                EditSectionButtonBar = EditSectionButtonBar & cpCore.html.html_GetFormButton(ButtonSendTest, , , "Return processSubmit(this)")
                             Else
                                 '
                                 ' Submitted
                                 '
-                                EditSectionButtonBar = EditSectionButtonBar & cpCore.htmlDoc.html_GetFormButton(ButtonCreateDuplicate, , , "Return processSubmit(this)")
+                                EditSectionButtonBar = EditSectionButtonBar & cpCore.html.html_GetFormButton(ButtonCreateDuplicate, , , "Return processSubmit(this)")
                             End If
-                            EditSectionButtonBar = cpCore.htmlDoc.main_GetPanel(EditSectionButtonBar, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 4)
+                            EditSectionButtonBar = cpCore.html.main_GetPanel(EditSectionButtonBar, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 4)
                             '
                             Call Stream.Add(EditSectionButtonBar)
                             Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
@@ -4429,7 +4429,7 @@ ErrorTrap:
                             Call Stream.Add(GetForm_Edit_AddTab("Bounce&nbsp;Control", GetForm_Edit_EmailBounceStatus(), allowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                             If allowAdminTabs Then
-                                Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
+                                Call Stream.Add(cpCore.html.menu_GetComboTabs())
                                 'Call Stream.Add("<div Class=""ccPanelBackground"">" & cpCore.main_GetComboTabs() & "</div>")
                             End If
                             Call Stream.Add(EditSectionButtonBar)
@@ -4452,7 +4452,7 @@ ErrorTrap:
                             Call Stream.Add(GetForm_Edit_AddTab("Authoring Permissions", GetForm_Edit_GroupRules(adminContent, editRecord), allowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                             If allowAdminTabs Then
-                                Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
+                                Call Stream.Add(cpCore.html.menu_GetComboTabs())
                                 'Call Stream.Add("<div class=""ccPanelBackground"">" & cpCore.main_GetComboTabs() & "</div>")
                             End If
                             Call Stream.Add(EditSectionButtonBar)
@@ -4476,7 +4476,7 @@ ErrorTrap:
                         'Call Stream.Add(GetForm_Edit_AddTab("Calendar", GetForm_Edit_CalendarEvents, AllowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                         If allowAdminTabs Then
-                            Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
+                            Call Stream.Add(cpCore.html.menu_GetComboTabs())
                         End If
                         Call Stream.Add(EditSectionButtonBar)
                     'Case "CCSECTIONS"
@@ -4524,7 +4524,7 @@ ErrorTrap:
                         Call Stream.Add(GetForm_Edit_AddTab("Authoring Access", GetForm_Edit_LibraryFolderRules(adminContent, editRecord), allowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                         If allowAdminTabs Then
-                            Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
+                            Call Stream.Add(cpCore.html.menu_GetComboTabs())
                         End If
                         Call Stream.Add(EditSectionButtonBar)
                     Case genericController.vbUCase("ccGroups")
@@ -4544,7 +4544,7 @@ ErrorTrap:
                         'Call Stream.Add(GetForm_Edit_AddTab("Calendar", GetForm_Edit_CalendarEvents, AllowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                         If allowAdminTabs Then
-                            Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
+                            Call Stream.Add(cpCore.html.menu_GetComboTabs())
                         End If
                         Call Stream.Add(EditSectionButtonBar)
                     '
@@ -4581,7 +4581,7 @@ ErrorTrap:
                         Call Stream.Add(GetForm_Edit_AddTab("Reports", GetForm_Edit_LayoutReports(adminContent, editRecord), allowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                         If allowAdminTabs Then
-                            Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
+                            Call Stream.Add(cpCore.html.menu_GetComboTabs())
                         End If
                         Call Stream.Add(EditSectionButtonBar)
                     Case Else
@@ -4597,18 +4597,18 @@ ErrorTrap:
                         Call Stream.Add(GetForm_Edit_AddTab("Content Watch", GetForm_Edit_ContentTracking(adminContent, editRecord), allowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                         If allowAdminTabs Then
-                            Call Stream.Add(cpCore.htmlDoc.menu_GetComboTabs())
+                            Call Stream.Add(cpCore.html.menu_GetComboTabs())
                         End If
                         Call Stream.Add(EditSectionButtonBar)
                 End Select
                 Call Stream.Add("</form>")
                 returnHtml = Stream.Text
                 If editRecord.id = 0 Then
-                    Call cpCore.htmlDoc.main_AddPagetitle("Add " & adminContent.Name)
+                    Call cpCore.html.main_AddPagetitle("Add " & adminContent.Name)
                 ElseIf editRecord.nameLc = "" Then
-                    Call cpCore.htmlDoc.main_AddPagetitle("Edit #" & editRecord.id & " in " & editRecord.contentControlId_Name)
+                    Call cpCore.html.main_AddPagetitle("Edit #" & editRecord.id & " in " & editRecord.contentControlId_Name)
                 Else
-                    Call cpCore.htmlDoc.main_AddPagetitle("Edit " & editRecord.nameLc & " in " & editRecord.contentControlId_Name)
+                    Call cpCore.html.main_AddPagetitle("Edit " & editRecord.nameLc & " in " & editRecord.contentControlId_Name)
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
@@ -4773,7 +4773,7 @@ ErrorTrap:
                 ' ----- Bad Links
                 '
                 Copy = "n/a"
-                QueryString = genericController.ModifyQueryString(cpCore.htmlDoc.refreshQueryString, RequestNameAdminForm, AdminFormReports, True)
+                QueryString = genericController.ModifyQueryString(cpCore.html.refreshQueryString, RequestNameAdminForm, AdminFormReports, True)
                 QueryString = genericController.ModifyQueryString(QueryString, RequestNameReportForm, ReportFormEDGDocErrors, True)
                 SQL = "SELECT Count(ccEDGPublishDocs.ID) AS PagesFound FROM ccEDGPublishDocs where (UpToDate=1) And (LinkAlias Is Not null) And ((HTTPResponse Is null) Or ((Not (HTTPResponse Like '% 200 %'))and (not (HTTPResponse like '% 302 %'))));"
                 CSPointer = cpCore.db.cs_openCsSql_rev("Default", SQL)
@@ -4781,7 +4781,7 @@ ErrorTrap:
                     Copy = genericController.encodeText(cpCore.db.cs_getInteger(CSPointer, "PagesFound"))
                 End If
                 Call cpCore.db.cs_Close(CSPointer)
-                Call Content.Add(Adminui.GetEditRow("<a href=""" & cpCore.htmlDoc.html_EncodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & QueryString) & """ target=""_blank"">" & SpanClassAdminNormal & Copy & "</a>", "Bad Links", "", False, False, ""))
+                Call Content.Add(Adminui.GetEditRow("<a href=""" & cpCore.html.html_EncodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & QueryString) & """ target=""_blank"">" & SpanClassAdminNormal & Copy & "</a>", "Bad Links", "", False, False, ""))
                 '
                 ' ----- Options
                 '
@@ -4797,17 +4797,17 @@ ErrorTrap:
                     '
                     ' Ready
                     '
-                    Call Content.Add(Adminui.GetEditRow(cpCore.htmlDoc.html_GetFormInputCheckBox2("EDGCreateSnapShot", EDGCreateSnapShot), "Create Staging Snap-Shot", "", False, False, ""))
-                    Call Content.Add(Adminui.GetEditRow(cpCore.htmlDoc.html_GetFormInputCheckBox2("EDGPublishToProduction", EDGPublishToProduction), "Publish Snap-Shot to Production", "", False, False, ""))
+                    Call Content.Add(Adminui.GetEditRow(cpCore.html.html_GetFormInputCheckBox2("EDGCreateSnapShot", EDGCreateSnapShot), "Create Staging Snap-Shot", "", False, False, ""))
+                    Call Content.Add(Adminui.GetEditRow(cpCore.html.html_GetFormInputCheckBox2("EDGPublishToProduction", EDGPublishToProduction), "Publish Snap-Shot to Production", "", False, False, ""))
                 End If
                 '
                 ' Username
                 '
-                Call Content.Add(Adminui.GetEditRow(cpCore.htmlDoc.html_GetFormInputText2("EDGAuthUsername", EDGAuthUsername), "Username", "", False, False, ""))
+                Call Content.Add(Adminui.GetEditRow(cpCore.html.html_GetFormInputText2("EDGAuthUsername", EDGAuthUsername), "Username", "", False, False, ""))
                 '
                 ' Password
                 '
-                Call Content.Add(Adminui.GetEditRow(cpCore.htmlDoc.html_GetFormInputText2("EDGAuthPassword", EDGAuthPassword), "Password", "", False, False, ""))
+                Call Content.Add(Adminui.GetEditRow(cpCore.html.html_GetFormInputText2("EDGAuthPassword", EDGAuthPassword), "Password", "", False, False, ""))
                 '
                 ' Seed Documents
                 '
@@ -4817,11 +4817,11 @@ ErrorTrap:
                     If Copy <> "" Then
                         Copy = Copy & "<br>"
                     End If
-                    Copy = Copy & cpCore.htmlDoc.cs_cs_getRecordEditLink(CSPointer) & cpCore.db.cs_get(CSPointer, "Name")
+                    Copy = Copy & cpCore.html.cs_cs_getRecordEditLink(CSPointer) & cpCore.db.cs_get(CSPointer, "Name")
                     cpCore.db.cs_goNext(CSPointer)
                 Loop
                 Call cpCore.db.cs_Close(CSPointer)
-                Copy = Copy & "<br>" & cpCore.htmlDoc.main_cs_getRecordAddLink(CSPointer)
+                Copy = Copy & "<br>" & cpCore.html.main_cs_getRecordAddLink(CSPointer)
                 Call Content.Add(Adminui.GetEditRow(Copy, "Seed URLs", "", False, False, ""))
                 '
                 ' Production Servers
@@ -4832,7 +4832,7 @@ ErrorTrap:
                     If Copy <> "" Then
                         Copy = Copy & "<br>"
                     End If
-                    Copy = Copy & cpCore.htmlDoc.cs_cs_getRecordEditLink(CSPointer) & cpCore.db.cs_get(CSPointer, "Name")
+                    Copy = Copy & cpCore.html.cs_cs_getRecordEditLink(CSPointer) & cpCore.db.cs_get(CSPointer, "Name")
                     cpCore.db.cs_goNext(CSPointer)
                 Loop
                 Call cpCore.db.cs_Close(CSPointer)
@@ -4840,7 +4840,7 @@ ErrorTrap:
                 '    If Copy <> "" Then
                 '        'Copy = Copy & "<br>"
                 '        End If
-                Copy = Copy & "<br>" & cpCore.htmlDoc.main_cs_getRecordAddLink(CSPointer)
+                Copy = Copy & "<br>" & cpCore.html.main_cs_getRecordAddLink(CSPointer)
                 '    End If
                 Call Content.Add(Adminui.GetEditRow(Copy, "Production Servers", "", False, False, ""))
                 '
@@ -4853,7 +4853,7 @@ ErrorTrap:
                 End If
                 '
                 Content.Add(Adminui.EditTableClose)
-                Content.Add(cpCore.htmlDoc.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormEDGControl))
+                Content.Add(cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormEDGControl))
             End If
             '
             Description = "Static Publishing lets you create a completely static version of your website on remote servers. Some dynamic features such as personalization will not work on a static site."
@@ -4981,7 +4981,7 @@ ErrorTrap:
                         ContentID = cpCore.db.cs_getInteger(CS, "contentID")
                         ContentName = cpCore.db.cs_getText(CS, "contentname")
                         RecordID = cpCore.db.cs_getInteger(CS, "recordid")
-                        Link = cpCore.pages.getPageLink4(RecordID, "", True, False)
+                        Link = cpCore.doc.getPageLink4(RecordID, "", True, False)
                         'Link = cpCore.main_GetPageLink3(RecordID, "", True)
                         'If Link = "" Then
                         '    Link = cpCore.db.cs_getText(CS, "Link")
@@ -5002,7 +5002,7 @@ ErrorTrap:
                                 'Call HandleInternalError("GetForm_Publish", "Admin Workflow Publish selected an authoring control record [" & ContentID & "." & RecordID & "] for a content definition [" & ContentName & "] that does not AllowWorkflowAuthoring.")
                             Else
 
-                                Call cpCore.pages.pageManager_GetAuthoringStatus(ContentName, RecordID, IsSubmitted, IsApproved, SubmitName, ApprovedName, IsInserted, IsDeleted, IsModified, ModifiedName, ModifiedDate, SubmittedDate, ApprovedDate)
+                                Call cpCore.doc.pageManager_GetAuthoringStatus(ContentName, RecordID, IsSubmitted, IsApproved, SubmitName, ApprovedName, IsInserted, IsDeleted, IsModified, ModifiedName, ModifiedDate, SubmittedDate, ApprovedDate)
                                 If RowColor = "class=""ccPanelRowOdd""" Then
                                     RowColor = "class=""ccPanelRowEven"""
                                 Else
@@ -5041,7 +5041,7 @@ ErrorTrap:
                                         If Link = "" Then
                                             Link = "unknown"
                                         Else
-                                            Link = "<a href=""" & cpCore.htmlDoc.html_EncodeHTML(Link) & """ target=""_blank"">" & Link & "</a>"
+                                            Link = "<a href=""" & cpCore.html.html_EncodeHTML(Link) & """ target=""_blank"">" & Link & "</a>"
                                         End If
                                         '
                                         ' get approved status of the submitted record
@@ -5051,9 +5051,9 @@ ErrorTrap:
                                         ' Publish Checkbox
                                         '
                                         Body &= ("<td align=""center"" valign=""top"" " & RowColor & ">" _
-                                            & cpCore.htmlDoc.html_GetFormInputCheckBox2("row" & RecordCount, False) _
-                                            & cpCore.htmlDoc.html_GetFormInputHidden("rowid" & RecordCount, RecordID) _
-                                            & cpCore.htmlDoc.html_GetFormInputHidden("rowcontentname" & RecordCount, ContentName) _
+                                            & cpCore.html.html_GetFormInputCheckBox2("row" & RecordCount, False) _
+                                            & cpCore.html.html_GetFormInputHidden("rowid" & RecordCount, RecordID) _
+                                            & cpCore.html.html_GetFormInputHidden("rowcontentname" & RecordCount, ContentName) _
                                             & "</td>")
                                         '
                                         ' Submitted
@@ -5185,7 +5185,7 @@ ErrorTrap:
                     Body &= cr & "<tr><td width=""100%"" colspan=""9"" class=""ccAdminSmall"">** To view these records on the public site you must disable Rendering Mode because they are deleted records that have not been published.</td></tr>"
                 End If
                 Body &= cr & "</table>"
-                Body &= cpCore.htmlDoc.html_GetFormInputHidden("RowCnt", RecordCount)
+                Body &= cpCore.html.html_GetFormInputHidden("RowCnt", RecordCount)
                 Body = "<div style=""Background-color:white;"">" & Body & "</div>"
                 '
                 ' Headers, etc
@@ -5201,7 +5201,7 @@ ErrorTrap:
                 '
                 ' Assemble Page
                 '
-                Body &= cpCore.htmlDoc.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormPublishing)
+                Body &= cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormPublishing)
             End If
             '
             Caption = SpanClassAdminNormal & "<strong>Workflow Publishing</strong></span>"
@@ -5210,7 +5210,7 @@ ErrorTrap:
                 Description = Description & BR & BR & "Only the first 100 record are displayed"
             End If
             GetForm_Publish = Adminui.GetBody(Caption, ButtonList, "", True, True, Description, "", 0, Body)
-            Call cpCore.htmlDoc.main_AddPagetitle("Workflow Publishing")
+            Call cpCore.html.main_AddPagetitle("Workflow Publishing")
             Exit Function
             '
             ' ----- Error Trap
@@ -5537,7 +5537,7 @@ ErrorTrap:
                                         RedirectPath = .RedirectPath
                                     End If
                                     RedirectPath = RedirectPath _
-                                        & "?" & RequestNameTitleExtension & "=" & cpCore.htmlDoc.main_EncodeRequestVariable(" For " & editRecord.nameLc & TitleExtension) _
+                                        & "?" & RequestNameTitleExtension & "=" & cpCore.html.main_EncodeRequestVariable(" For " & editRecord.nameLc & TitleExtension) _
                                         & "&" & RequestNameAdminDepth & "=" & (MenuDepth + 1) _
                                         & "&wl0=" & .RedirectID _
                                         & "&wr0=" & editRecord.id
@@ -5575,8 +5575,8 @@ ErrorTrap:
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
                                             FieldValueBoolean = genericController.EncodeBoolean(FieldValueObject)
-                                            EditorString &= (cpCore.htmlDoc.html_GetFormInputHidden(FormFieldLCaseName, genericController.encodeText(FieldValueBoolean)))
-                                            EditorString &= (cpCore.htmlDoc.html_GetFormInputCheckBox2(FormFieldLCaseName, FieldValueBoolean, , True, "checkBox"))
+                                            EditorString &= (cpCore.html.html_GetFormInputHidden(FormFieldLCaseName, genericController.encodeText(FieldValueBoolean)))
+                                            EditorString &= (cpCore.html.html_GetFormInputCheckBox2(FormFieldLCaseName, FieldValueBoolean, , True, "checkBox"))
                                             EditorString &= WhyReadOnlyMsg
                                             '
                                         Case FieldTypeIdFile, FieldTypeIdFileImage
@@ -5587,7 +5587,7 @@ ErrorTrap:
                                             FieldValueText = genericController.encodeText(FieldValueObject)
                                             NonEncodedLink = cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, FieldValueText)
                                             EncodedLink = genericController.EncodeURL(NonEncodedLink)
-                                            EditorString &= (cpCore.htmlDoc.html_GetFormInputHidden(FormFieldLCaseName, ""))
+                                            EditorString &= (cpCore.html.html_GetFormInputHidden(FormFieldLCaseName, ""))
                                             If FieldValueText = "" Then
                                                 EditorString &= ("[no file]")
                                             Else
@@ -5604,7 +5604,7 @@ ErrorTrap:
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
                                             FieldValueInteger = genericController.EncodeInteger(FieldValueObject)
-                                            EditorString &= (cpCore.htmlDoc.html_GetFormInputHidden(FormFieldLCaseName, genericController.encodeText(FieldValueInteger)))
+                                            EditorString &= (cpCore.html.html_GetFormInputHidden(FormFieldLCaseName, genericController.encodeText(FieldValueInteger)))
                                             'Call s.Add("<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
                                             LookupContentName = ""
                                             If .lookupContentID <> 0 Then
@@ -5616,7 +5616,7 @@ ErrorTrap:
                                                     If cpCore.db.cs_get(CSLookup, "Name") = "" Then
                                                         EditorString &= ("No Name")
                                                     Else
-                                                        EditorString &= (cpCore.htmlDoc.main_encodeHTML(cpCore.db.cs_get(CSLookup, "Name")))
+                                                        EditorString &= (cpCore.html.main_encodeHTML(cpCore.db.cs_get(CSLookup, "Name")))
                                                     End If
                                                     EditorString &= ("&nbsp;[<a TabIndex=-1 href=""?" & RequestNameAdminForm & "=4&cid=" & .lookupContentID & "&id=" & FieldValueObject.ToString & """ target=""_blank"">View details in new window</a>]")
                                                 Else
@@ -5642,7 +5642,7 @@ ErrorTrap:
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
                                             FieldValueInteger = genericController.EncodeInteger(FieldValueObject)
-                                            EditorString &= (cpCore.htmlDoc.html_GetFormInputHidden(FormFieldLCaseName, genericController.encodeText(FieldValueInteger)))
+                                            EditorString &= (cpCore.html.html_GetFormInputHidden(FormFieldLCaseName, genericController.encodeText(FieldValueInteger)))
                                             If FieldValueInteger = 0 Then
                                                 EditorString &= ("None")
                                             Else
@@ -5650,7 +5650,7 @@ ErrorTrap:
                                                 If RecordName = "" Then
                                                     EditorString &= ("No Name")
                                                 Else
-                                                    EditorString &= (cpCore.htmlDoc.main_encodeHTML(RecordName))
+                                                    EditorString &= (cpCore.html.main_encodeHTML(RecordName))
                                                 End If
                                                 SelectMessage = "Select from Administrators"
                                                 'If .MemberSelectGroupID <> 0 Then
@@ -5674,7 +5674,7 @@ ErrorTrap:
                                             MTMRuleContent = cpCore.metaData.getContentNameByID(.manyToManyRuleContentID)
                                             MTMRuleField0 = .ManyToManyRulePrimaryField
                                             MTMRuleField1 = .ManyToManyRuleSecondaryField
-                                            EditorString &= (cpCore.htmlDoc.main_GetFormInputCheckListCategories("ManyToMany" & .id, MTMContent0, editRecord.id, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, , , True, MTMContent1))
+                                            EditorString &= (cpCore.html.getInputCheckListCategories("ManyToMany" & .id, MTMContent0, editRecord.id, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, , , True, MTMContent1))
                                             EditorString &= WhyReadOnlyMsg
                                             '
                                         Case FieldTypeIdCurrency
@@ -5683,8 +5683,8 @@ ErrorTrap:
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
                                             FieldValueNumber = genericController.EncodeNumber(FieldValueObject)
-                                            EditorString &= (cpCore.htmlDoc.html_GetFormInputHidden(FormFieldLCaseName, genericController.encodeText(FieldValueNumber)))
-                                            EditorString &= (cpCore.htmlDoc.html_GetFormInputText2(FormFieldLCaseName, CStr(FieldValueNumber), , , , , True, "text"))
+                                            EditorString &= (cpCore.html.html_GetFormInputHidden(FormFieldLCaseName, genericController.encodeText(FieldValueNumber)))
+                                            EditorString &= (cpCore.html.html_GetFormInputText2(FormFieldLCaseName, CStr(FieldValueNumber), , , , , True, "text"))
                                             EditorString &= (FormatCurrency(FieldValueNumber))
                                             EditorString &= WhyReadOnlyMsg
                                             '
@@ -5699,8 +5699,8 @@ ErrorTrap:
                                             Else
                                                 FieldValueText = CStr(FieldValueDate)
                                             End If
-                                            EditorString &= (cpCore.htmlDoc.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText))
-                                            EditorString &= (cpCore.htmlDoc.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, , , , , True, "date"))
+                                            EditorString &= (cpCore.html.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText))
+                                            EditorString &= (cpCore.html.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, , , , , True, "date"))
                                             EditorString &= WhyReadOnlyMsg
                                             '
                                         Case FieldTypeIdAutoIdIncrement, FieldTypeIdFloat, FieldTypeIdInteger
@@ -5709,8 +5709,8 @@ ErrorTrap:
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
                                             FieldValueText = genericController.encodeText(FieldValueObject)
-                                            EditorString &= (cpCore.htmlDoc.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText))
-                                            EditorString &= (cpCore.htmlDoc.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, , , , , True, "number"))
+                                            EditorString &= (cpCore.html.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText))
+                                            EditorString &= (cpCore.html.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, , , , , True, "number"))
                                             EditorString &= WhyReadOnlyMsg
                                             '
                                         Case FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
@@ -5723,23 +5723,23 @@ ErrorTrap:
                                                 '
                                                 return_NewFieldList = return_NewFieldList & "," & FieldName
                                                 FieldValueText = genericController.encodeText(FieldValueObject)
-                                                EditorString &= cpCore.htmlDoc.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText)
+                                                EditorString &= cpCore.html.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText)
                                                 EditorStyleModifier = "textexpandable"
                                                 FieldRows = (cpCore.userProperty.getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
-                                                EditorString &= cpCore.htmlDoc.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, FieldRows, , FormFieldLCaseName, False, True)
+                                                EditorString &= cpCore.html.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, FieldRows, , FormFieldLCaseName, False, True)
                                             Else
                                                 '
                                                 ' edit html as wysiwyg
                                                 '
                                                 return_NewFieldList = return_NewFieldList & "," & FieldName
                                                 FieldValueText = genericController.encodeText(FieldValueObject)
-                                                EditorString &= cpCore.htmlDoc.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText)
+                                                EditorString &= cpCore.html.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText)
                                                 '
                                                 EditorStyleModifier = "text"
                                                 FieldRows = (cpCore.userProperty.getInteger(adminContent.Name & "." & FieldName & ".PixelHeight", 500))
                                                 'EditorString &=  cpCore.main_GetFormInputHTML(FormFieldLCaseName, FieldValueText)
                                                 '
-                                                EditorString &= cpCore.htmlDoc.html_GetFormInputHTML3(FormFieldLCaseName, FieldValueText, "500", , True, True, editorAddonListJSON, styleList, styleOptionList)
+                                                EditorString &= cpCore.html.html_GetFormInputHTML3(FormFieldLCaseName, FieldValueText, "500", , True, True, editorAddonListJSON, styleList, styleOptionList)
                                                 'innovaEditor = New innovaEditorAddonClassFPO
                                                 'EditorString &=  innovaEditor.getInnovaEditor( FormFieldLCaseName, EditorContext, FieldValueText, "", "", True, True, TemplateIDForStyles, emailIdForStyles)
                                                 EditorString = "<div style=""width:95%"">" & EditorString & "</div>"
@@ -5751,17 +5751,17 @@ ErrorTrap:
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
                                             FieldValueText = genericController.encodeText(FieldValueObject)
-                                            EditorString &= cpCore.htmlDoc.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText)
+                                            EditorString &= cpCore.html.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText)
                                             If .Password Then
                                                 '
                                                 ' Password forces simple text box
                                                 '
-                                                EditorString &= cpCore.htmlDoc.html_GetFormInputText2(FormFieldLCaseName, "*****", , , , True, True, "password")
+                                                EditorString &= cpCore.html.html_GetFormInputText2(FormFieldLCaseName, "*****", , , , True, True, "password")
                                             Else
                                                 '
                                                 ' non-password
                                                 '
-                                                EditorString &= cpCore.htmlDoc.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, , , , True, "text")
+                                                EditorString &= cpCore.html.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, , , , True, "text")
                                             End If
                                         Case FieldTypeIdLongText, FieldTypeIdFileTextPrivate
                                             '
@@ -5769,22 +5769,22 @@ ErrorTrap:
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
                                             FieldValueText = genericController.encodeText(FieldValueObject)
-                                            EditorString &= cpCore.htmlDoc.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText)
+                                            EditorString &= cpCore.html.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText)
                                             EditorStyleModifier = "textexpandable"
                                             FieldRows = (cpCore.userProperty.getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
-                                            EditorString &= cpCore.htmlDoc.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, FieldRows, , FormFieldLCaseName, False, True)
+                                            EditorString &= cpCore.html.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, FieldRows, , FormFieldLCaseName, False, True)
                                         Case Else
                                             '
                                             ' ----- Legacy text type -- not used unless something was missed
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
                                             FieldValueText = genericController.encodeText(FieldValueObject)
-                                            EditorString &= cpCore.htmlDoc.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText)
+                                            EditorString &= cpCore.html.html_GetFormInputHidden(FormFieldLCaseName, FieldValueText)
                                             If .Password Then
                                                 '
                                                 ' Password forces simple text box
                                                 '
-                                                EditorString &= cpCore.htmlDoc.html_GetFormInputText2(FormFieldLCaseName, "*****", , , , True, True, "password")
+                                                EditorString &= cpCore.html.html_GetFormInputText2(FormFieldLCaseName, "*****", , , , True, True, "password")
                                             ElseIf (Not .htmlContent) Then
                                                 '
                                                 ' not HTML capable, textarea with resizing
@@ -5793,13 +5793,13 @@ ErrorTrap:
                                                     '
                                                     ' text field shorter then 40 characters without a CR
                                                     '
-                                                    EditorString &= cpCore.htmlDoc.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, , , , True, "text")
+                                                    EditorString &= cpCore.html.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, , , , True, "text")
                                                 Else
                                                     '
                                                     ' longer text data, or text that contains a CR
                                                     '
                                                     EditorStyleModifier = "textexpandable"
-                                                    EditorString &= cpCore.htmlDoc.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, 10, , , , True)
+                                                    EditorString &= cpCore.html.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, 10, , , , True)
                                                 End If
                                             ElseIf .htmlContent And FieldPreferenceHTML Then
                                                 '
@@ -5807,7 +5807,7 @@ ErrorTrap:
                                                 '
                                                 EditorStyleModifier = "text"
                                                 FieldRows = (cpCore.userProperty.getInteger(adminContent.Name & "." & FieldName & ".PixelHeight", 500))
-                                                EditorString &= cpCore.htmlDoc.html_GetFormInputHTML3(FormFieldLCaseName, FieldValueText, "500", , False, True, editorAddonListJSON, styleList, styleOptionList)
+                                                EditorString &= cpCore.html.html_GetFormInputHTML3(FormFieldLCaseName, FieldValueText, "500", , False, True, editorAddonListJSON, styleList, styleOptionList)
                                                 'innovaEditor = New innovaEditorAddonClassFPO
                                                 'EditorString &=  innovaEditor.getInnovaEditor( FormFieldLCaseName, EditorContext, FieldValueText, "", "", True, True, TemplateIDForStyles, emailIdForStyles)
                                                 EditorString = "<div style=""width:95%"">" & EditorString & "</div>"
@@ -5818,7 +5818,7 @@ ErrorTrap:
                                                 '
                                                 EditorStyleModifier = "textexpandable"
                                                 FieldRows = (cpCore.userProperty.getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
-                                                EditorString &= cpCore.htmlDoc.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, FieldRows, , FormFieldLCaseName, False, True)
+                                                EditorString &= cpCore.html.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, FieldRows, , FormFieldLCaseName, False, True)
                                                 'EditorString = cpCore.main_GetFormInputTextExpandable(FormFieldLCaseName, encodeHTML(FieldValueText), FieldRows, "600px", FormFieldLCaseName, False)
                                             End If
                                     End Select
@@ -5836,7 +5836,7 @@ ErrorTrap:
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
                                             FieldValueBoolean = genericController.EncodeBoolean(FieldValueObject)
                                             's.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
-                                            EditorString &= (cpCore.htmlDoc.html_GetFormInputCheckBox2(FormFieldLCaseName, FieldValueBoolean, , , "checkBox"))
+                                            EditorString &= (cpCore.html.html_GetFormInputCheckBox2(FormFieldLCaseName, FieldValueBoolean, , , "checkBox"))
                                             's.Add( "&nbsp;</span></nobr></td>")
                                             '
                                         Case FieldTypeIdFile, FieldTypeIdFileImage
@@ -5847,7 +5847,7 @@ ErrorTrap:
                                             FieldValueText = genericController.encodeText(FieldValueObject)
                                             'Call s.Add("<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
                                             If FieldValueText = "" Then
-                                                EditorString &= (cpCore.htmlDoc.html_GetFormInputFile2(FormFieldLCaseName, , "file"))
+                                                EditorString &= (cpCore.html.html_GetFormInputFile2(FormFieldLCaseName, , "file"))
                                             Else
                                                 NonEncodedLink = cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, FieldValueText)
                                                 EncodedLink = genericController.EncodeURL(NonEncodedLink)
@@ -5855,8 +5855,8 @@ ErrorTrap:
                                                 Dim path As String = ""
                                                 cpCore.privateFiles.splitPathFilename(FieldValueText, path, filename)
                                                 EditorString &= ("&nbsp;<a href=""http://" & EncodedLink & """ target=""_blank"">" & SpanClassAdminSmall & "[" & filename & "]</A>")
-                                                EditorString &= ("&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & cpCore.htmlDoc.html_GetFormInputCheckBox2(FormFieldLCaseName & ".DeleteFlag", False))
-                                                EditorString &= ("&nbsp;&nbsp;&nbsp;Change:&nbsp;" & cpCore.htmlDoc.html_GetFormInputFile2(FormFieldLCaseName, , "file"))
+                                                EditorString &= ("&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & cpCore.html.html_GetFormInputCheckBox2(FormFieldLCaseName & ".DeleteFlag", False))
+                                                EditorString &= ("&nbsp;&nbsp;&nbsp;Change:&nbsp;" & cpCore.html.html_GetFormInputFile2(FormFieldLCaseName, , "file"))
                                             End If
                                             '
                                         Case FieldTypeIdLookup
@@ -5871,9 +5871,9 @@ ErrorTrap:
                                             If LookupContentName <> "" Then
                                                 return_NewFieldList = return_NewFieldList & "," & FieldName
                                                 If Not .Required Then
-                                                    EditorString &= (cpCore.htmlDoc.main_GetFormInputSelect2(FormFieldLCaseName, FieldValueInteger, LookupContentName, "", "None", "", IsEmptyList, "select"))
+                                                    EditorString &= (cpCore.html.main_GetFormInputSelect2(FormFieldLCaseName, FieldValueInteger, LookupContentName, "", "None", "", IsEmptyList, "select"))
                                                 Else
-                                                    EditorString &= (cpCore.htmlDoc.main_GetFormInputSelect2(FormFieldLCaseName, FieldValueInteger, LookupContentName, "", "", "", IsEmptyList, "select"))
+                                                    EditorString &= (cpCore.html.main_GetFormInputSelect2(FormFieldLCaseName, FieldValueInteger, LookupContentName, "", "", "", IsEmptyList, "select"))
                                                 End If
                                                 If FieldValueInteger <> 0 Then
                                                     CSPointer = cpCore.db.cs_open2(LookupContentName, FieldValueInteger, , , "ID")
@@ -5886,9 +5886,9 @@ ErrorTrap:
                                             ElseIf .lookupList <> "" Then
                                                 return_NewFieldList = return_NewFieldList & "," & FieldName
                                                 If Not .Required Then
-                                                    EditorString &= cpCore.htmlDoc.main_GetFormInputSelectList2(FormFieldLCaseName, FieldValueInteger, .lookupList, "Select One", "", "select")
+                                                    EditorString &= cpCore.html.getInputSelectList2(FormFieldLCaseName, FieldValueInteger, .lookupList, "Select One", "", "select")
                                                 Else
-                                                    EditorString &= cpCore.htmlDoc.main_GetFormInputSelectList2(FormFieldLCaseName, FieldValueInteger, .lookupList, "", "", "select")
+                                                    EditorString &= cpCore.html.getInputSelectList2(FormFieldLCaseName, FieldValueInteger, .lookupList, "", "", "select")
                                                 End If
                                             Else
                                                 Throw (New ApplicationException("Field [" & FieldName & "] is a Lookup field, but no LookupContent or LookupList has been configured"))
@@ -5903,9 +5903,9 @@ ErrorTrap:
                                             FieldValueInteger = genericController.EncodeInteger(FieldValueObject)
                                             's.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
                                             If Not .Required Then
-                                                EditorString &= (cpCore.htmlDoc.html_GetFormInputMemberSelect(FormFieldLCaseName, FieldValueInteger, .MemberSelectGroupID, "", "None", "select"))
+                                                EditorString &= (cpCore.html.getInputMemberSelect(FormFieldLCaseName, FieldValueInteger, .MemberSelectGroupID, "", "None", "select"))
                                             Else
-                                                EditorString &= (cpCore.htmlDoc.html_GetFormInputMemberSelect(FormFieldLCaseName, FieldValueInteger, .MemberSelectGroupID, "", "", "select"))
+                                                EditorString &= (cpCore.html.getInputMemberSelect(FormFieldLCaseName, FieldValueInteger, .MemberSelectGroupID, "", "", "select"))
                                             End If
                                             If FieldValueInteger <> 0 Then
                                                 CSPointer = cpCore.db.cs_open2("people", FieldValueInteger, , , "ID")
@@ -5930,7 +5930,7 @@ ErrorTrap:
                                             MTMRuleContent = cpCore.metaData.getContentNameByID(.manyToManyRuleContentID)
                                             MTMRuleField0 = .ManyToManyRulePrimaryField
                                             MTMRuleField1 = .ManyToManyRuleSecondaryField
-                                            EditorString &= (cpCore.htmlDoc.main_GetFormInputCheckListCategories("ManyToMany" & .id, MTMContent0, editRecord.id, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, , , False, MTMContent1, FieldValueText))
+                                            EditorString &= (cpCore.html.getInputCheckListCategories("ManyToMany" & .id, MTMContent0, editRecord.id, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, , , False, MTMContent1, FieldValueText))
                                         Case FieldTypeIdDate
                                             '
                                             ' ----- Date
@@ -5942,7 +5942,7 @@ ErrorTrap:
                                             Else
                                                 FieldValueText = CStr(FieldValueDate)
                                             End If
-                                            EditorString &= (cpCore.htmlDoc.html_GetFormInputDate(FormFieldLCaseName, FieldValueText))
+                                            EditorString &= (cpCore.html.html_GetFormInputDate(FormFieldLCaseName, FieldValueText))
                                             's.Add( "&nbsp;</span></nobr></td>")
                                         Case FieldTypeIdAutoIdIncrement, FieldTypeIdCurrency, FieldTypeIdFloat, FieldTypeIdInteger
                                             '
@@ -5952,15 +5952,15 @@ ErrorTrap:
                                             FieldValueText = genericController.encodeText(FieldValueObject)
                                             's.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
                                             If .Password Then
-                                                EditorString &= (cpCore.htmlDoc.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, , , , True, False, "password"))
+                                                EditorString &= (cpCore.html.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, , , , True, False, "password"))
                                             Else
                                                 If (FieldValueText = "") Then
-                                                    EditorString &= (cpCore.htmlDoc.html_GetFormInputText2(FormFieldLCaseName, , , , , , , "text"))
+                                                    EditorString &= (cpCore.html.html_GetFormInputText2(FormFieldLCaseName, , , , , , , "text"))
                                                 Else
                                                     If CBool(InStr(1, FieldValueText, vbLf)) Or (Len(FieldValueText) > 40) Then
-                                                        EditorString &= (cpCore.htmlDoc.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, , , , , , "text"))
+                                                        EditorString &= (cpCore.html.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, , , , , , "text"))
                                                     Else
-                                                        EditorString &= (cpCore.htmlDoc.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, , , , , "text"))
+                                                        EditorString &= (cpCore.html.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, , , , , "text"))
                                                     End If
                                                 End If
                                                 's.Add( "&nbsp;</span></nobr></td>")
@@ -5973,7 +5973,7 @@ ErrorTrap:
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
                                             FieldValueText = genericController.encodeText(FieldValueObject)
                                             EditorString = "" _
-                                                & cpCore.htmlDoc.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80, FormFieldLCaseName, , , "link") _
+                                                & cpCore.html.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80, FormFieldLCaseName, , , "link") _
                                                 & "&nbsp;<a href=""#"" onClick=""OpenResourceLinkWindow( '" & FormFieldLCaseName & "' ) ;return false;""><img src=""/ccLib/images/ResourceLink1616.gif"" width=16 height=16 border=0 alt=""Link to a resource"" title=""Link to a resource""></a>" _
                                                 & "&nbsp;<a href=""#"" onClick=""OpenSiteExplorerWindow( '" & FormFieldLCaseName & "' ) ;return false;""><img src=""/ccLib/images/PageLink1616.gif"" width=16 height=16 border=0 alt=""Link to a page"" title=""Link to a page""></a>"
                                             's.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal & EditorString & "</span></nobr></td>")
@@ -5984,7 +5984,7 @@ ErrorTrap:
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
                                             FieldValueText = genericController.encodeText(FieldValueObject)
                                             EditorString = "" _
-                                                & cpCore.htmlDoc.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80, FormFieldLCaseName, , , "resourceLink") _
+                                                & cpCore.html.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80, FormFieldLCaseName, , , "resourceLink") _
                                                 & "&nbsp;<a href=""#"" onClick=""OpenResourceLinkWindow( '" & FormFieldLCaseName & "' ) ;return false;""><img src=""/ccLib/images/ResourceLink1616.gif"" width=16 height=16 border=0 alt=""Link to a resource"" title=""Link to a resource""></a>"
                                             '
                                         Case FieldTypeIdText
@@ -5997,7 +5997,7 @@ ErrorTrap:
                                                 '
                                                 ' Password forces simple text box
                                                 '
-                                                EditorString = cpCore.htmlDoc.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, , , , True, , "password")
+                                                EditorString = cpCore.html.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, , , , True, , "password")
                                             Else
                                                 '
                                                 ' non-password
@@ -6006,13 +6006,13 @@ ErrorTrap:
                                                     '
                                                     ' text field shorter then 40 characters without a CR
                                                     '
-                                                    EditorString = cpCore.htmlDoc.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, , , , , "text")
+                                                    EditorString = cpCore.html.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, , , , , "text")
                                                 Else
                                                     '
                                                     ' longer text data, or text that contains a CR
                                                     '
                                                     EditorStyleModifier = "textexpandable"
-                                                    EditorString = cpCore.htmlDoc.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, 10, , , , , "text")
+                                                    EditorString = cpCore.html.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, 10, , , , , "text")
                                                 End If
                                             End If
                                             '
@@ -6032,7 +6032,7 @@ ErrorTrap:
                                                 ' View the content as Html, not wysiwyg
                                                 '
                                                 EditorStyleModifier = "textexpandable"
-                                                EditorString = cpCore.htmlDoc.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, 10, , , , , "text")
+                                                EditorString = cpCore.html.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, 10, , , , , "text")
                                             Else
                                                 '
                                                 ' wysiwyg editor
@@ -6045,7 +6045,7 @@ ErrorTrap:
                                                 End If
                                                 EditorStyleModifier = "htmleditor"
                                                 FieldRows = (cpCore.userProperty.getInteger(adminContent.Name & "." & FieldName & ".PixelHeight", 500))
-                                                EditorString &= cpCore.htmlDoc.html_GetFormInputHTML3(FormFieldLCaseName, FieldValueText, "500", , False, True, editorAddonListJSON, styleList, styleOptionList)
+                                                EditorString &= cpCore.html.html_GetFormInputHTML3(FormFieldLCaseName, FieldValueText, "500", , False, True, editorAddonListJSON, styleList, styleOptionList)
                                                 'innovaEditor = New innovaEditorAddonClassFPO
                                                 'EditorString = innovaEditor.getInnovaEditor( FormFieldLCaseName, EditorContext, FieldValueText, "", "", True, False, TemplateIDForStyles, emailIdForStyles)
                                                 EditorString = "<div style=""width:95%"">" & EditorString & "</div>"
@@ -6061,7 +6061,7 @@ ErrorTrap:
                                             '
                                             EditorStyleModifier = "textexpandable"
                                             FieldRows = (cpCore.userProperty.getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
-                                            EditorString = cpCore.htmlDoc.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, FieldRows, , FormFieldLCaseName, False, , "text")
+                                            EditorString = cpCore.html.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, FieldRows, , FormFieldLCaseName, False, , "text")
                                             '
                                         Case FieldTypeIdFileCSS
                                             '
@@ -6081,7 +6081,7 @@ ErrorTrap:
                                             FieldValueText = genericController.encodeText(FieldValueObject)
                                             EditorStyleModifier = "textexpandable"
                                             FieldRows = (cpCore.userProperty.getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
-                                            EditorString = cpCore.htmlDoc.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, FieldRows, , FormFieldLCaseName, False, , "text")
+                                            EditorString = cpCore.html.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, FieldRows, , FormFieldLCaseName, False, , "text")
                                             '
                                         Case FieldTypeIdFileXML
                                             '
@@ -6091,7 +6091,7 @@ ErrorTrap:
                                             FieldValueText = genericController.encodeText(FieldValueObject)
                                             EditorStyleModifier = "textexpandable"
                                             FieldRows = (cpCore.userProperty.getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
-                                            EditorString = cpCore.htmlDoc.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, FieldRows, , FormFieldLCaseName, False, , "text")
+                                            EditorString = cpCore.html.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, FieldRows, , FormFieldLCaseName, False, , "text")
                                             '
                                         Case Else
                                             '
@@ -6103,7 +6103,7 @@ ErrorTrap:
                                                 '
                                                 ' Password forces simple text box
                                                 '
-                                                EditorString = cpCore.htmlDoc.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, , , , True, , "password")
+                                                EditorString = cpCore.html.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, , , , True, , "password")
                                             ElseIf (Not .htmlContent) Then
                                                 '
                                                 ' not HTML capable, textarea with resizing
@@ -6112,13 +6112,13 @@ ErrorTrap:
                                                     '
                                                     ' text field shorter then 40 characters without a CR
                                                     '
-                                                    EditorString = cpCore.htmlDoc.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, , , , , "text")
+                                                    EditorString = cpCore.html.html_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, , , , , "text")
                                                 Else
                                                     '
                                                     ' longer text data, or text that contains a CR
                                                     '
                                                     EditorStyleModifier = "textexpandable"
-                                                    EditorString = cpCore.htmlDoc.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, 10, , , , , "text")
+                                                    EditorString = cpCore.html.html_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, 10, , , , , "text")
                                                 End If
                                             ElseIf .htmlContent And FieldPreferenceHTML Then
                                                 '
@@ -6132,7 +6132,7 @@ ErrorTrap:
                                                 End If
                                                 EditorStyleModifier = "htmleditor"
                                                 FieldRows = (cpCore.userProperty.getInteger(adminContent.Name & "." & FieldName & ".PixelHeight", 500))
-                                                EditorString &= cpCore.htmlDoc.html_GetFormInputHTML3(FormFieldLCaseName, FieldValueText, "500", , False, True, editorAddonListJSON, styleList, styleOptionList)
+                                                EditorString &= cpCore.html.html_GetFormInputHTML3(FormFieldLCaseName, FieldValueText, "500", , False, True, editorAddonListJSON, styleList, styleOptionList)
                                                 'innovaEditor = New innovaEditorAddonClassFPO
                                                 'EditorString = innovaEditor.getInnovaEditor( FormFieldLCaseName, EditorContext, FieldValueText, "", "", True, False, TemplateIDForStyles, emailIdForStyles)
                                                 EditorString = "<div style=""width:95%"">" & EditorString & "</div>"
@@ -6143,7 +6143,7 @@ ErrorTrap:
                                                 '
                                                 EditorStyleModifier = "textexpandable"
                                                 FieldRows = (cpCore.userProperty.getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
-                                                EditorString = cpCore.htmlDoc.html_GetFormInputTextExpandable2(FormFieldLCaseName, cpCore.htmlDoc.html_EncodeHTML(FieldValueText), FieldRows, "600px", FormFieldLCaseName, False, , "text")
+                                                EditorString = cpCore.html.html_GetFormInputTextExpandable2(FormFieldLCaseName, cpCore.html.html_EncodeHTML(FieldValueText), FieldRows, "600px", FormFieldLCaseName, False, , "text")
                                             End If
                                             's.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal & EditorString & "</span></nobr></td>")
                                     End Select
@@ -6442,14 +6442,14 @@ ErrorTrap:
                             If editRecord.Read_Only Then
                                 HTMLFieldString = genericController.encodeText(cpCore.db.cs_ok(CSRules))
                             Else
-                                HTMLFieldString = cpCore.htmlDoc.html_GetFormInputCheckBox2("ContentWatchList." & cpCore.db.cs_get(CSLists, "ID"), cpCore.db.cs_ok(CSRules))
+                                HTMLFieldString = cpCore.html.html_GetFormInputCheckBox2("ContentWatchList." & cpCore.db.cs_get(CSLists, "ID"), cpCore.db.cs_ok(CSRules))
                             End If
                             Call cpCore.db.cs_Close(CSRules)
                         Else
                             If editRecord.Read_Only Then
                                 HTMLFieldString = genericController.encodeText(False)
                             Else
-                                HTMLFieldString = cpCore.htmlDoc.html_GetFormInputCheckBox2("ContentWatchList." & cpCore.db.cs_get(CSLists, "ID"), False)
+                                HTMLFieldString = cpCore.html.html_GetFormInputCheckBox2("ContentWatchList." & cpCore.db.cs_get(CSLists, "ID"), False)
                             End If
                         End If
                         '
@@ -6461,9 +6461,9 @@ ErrorTrap:
                     ' ----- Whats New Headline (editable)
                     '
                     If editRecord.Read_Only Then
-                        HTMLFieldString = cpCore.htmlDoc.main_encodeHTML(ContentWatchLinkLabel)
+                        HTMLFieldString = cpCore.html.main_encodeHTML(ContentWatchLinkLabel)
                     Else
-                        HTMLFieldString = cpCore.htmlDoc.html_GetFormInputText2("ContentWatchLinkLabel", ContentWatchLinkLabel, 1, cpCore.siteProperties.defaultFormInputWidth)
+                        HTMLFieldString = cpCore.html.html_GetFormInputText2("ContentWatchLinkLabel", ContentWatchLinkLabel, 1, cpCore.siteProperties.defaultFormInputWidth)
                         'HTMLFieldString = "<textarea rows=""1"" name=""ContentWatchLinkLabel"" cols=""" & cpCore.app.SiteProperty_DefaultFormInputWidth & """>" & ContentWatchLinkLabel & "</textarea>"
                     End If
                     Call FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Caption", "This caption is displayed on all Content Watch Lists, linked to the location on the web site where this content is displayed. RSS feeds created from Content Watch Lists will use this caption as the record title if not other field is selected in the Content Definition.", False, True, "ContentWatchLinkLabel"))
@@ -6475,9 +6475,9 @@ ErrorTrap:
                         Copy = ""
                     End If
                     If editRecord.Read_Only Then
-                        HTMLFieldString = cpCore.htmlDoc.main_encodeHTML(Copy)
+                        HTMLFieldString = cpCore.html.main_encodeHTML(Copy)
                     Else
-                        HTMLFieldString = cpCore.htmlDoc.html_GetFormInputDate("ContentWatchExpires", Copy, cpCore.siteProperties.defaultFormInputWidth.ToString)
+                        HTMLFieldString = cpCore.html.html_GetFormInputDate("ContentWatchExpires", Copy, cpCore.siteProperties.defaultFormInputWidth.ToString)
                         'HTMLFieldString = "<textarea rows=""1"" name=""ContentWatchExpires"" cols=""" & cpCore.app.SiteProperty_DefaultFormInputWidth & """>" & Copy & "</textarea>"
                     End If
                     Call FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Expires", "When this record is included in a What's New list, this record is blocked from the list after this date.", False, False, ""))
@@ -6507,8 +6507,8 @@ ErrorTrap:
                         & Adminui.EditTableOpen _
                         & FastString.Text _
                         & Adminui.EditTableClose _
-                        & cpCore.htmlDoc.html_GetFormInputHidden("WhatsNewResponse", "-1") _
-                        & cpCore.htmlDoc.html_GetFormInputHidden("contentwatchrecordid", ContentWatchRecordID.ToString)
+                        & cpCore.html.html_GetFormInputHidden("WhatsNewResponse", "-1") _
+                        & cpCore.html.html_GetFormInputHidden("contentwatchrecordid", ContentWatchRecordID.ToString)
                     GetForm_Edit_ContentTracking = Adminui.GetEditPanel((Not allowAdminTabs), "Content Tracking", "Include in Content Watch Lists", s)
                     EditSectionPanelCount = EditSectionPanelCount + 1
                     '
@@ -6607,7 +6607,7 @@ ErrorTrap:
                 Else
                     HTMLFieldString = genericController.encodeText(editRecord.id)
                 End If
-                HTMLFieldString = cpCore.htmlDoc.html_GetFormInputText2("ignore", HTMLFieldString, , , , , True)
+                HTMLFieldString = cpCore.html.html_GetFormInputText2("ignore", HTMLFieldString, , , , , True)
                 Call FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Record Number", FieldHelp, True, False, ""))
                 '
                 ' ----- If Page Content , check if this is the default PageNotFound page
@@ -6619,9 +6619,9 @@ ErrorTrap:
                     Copy = "If selected, this page will be displayed when a user comes to your website with just your domain name and no other page is requested. This is called your default Landing Page. Only one page on the site can be the default Landing Page. If you want a unique Landing Page for a specific domain name, add it in the 'Domains' content and the default will not be used for that docpCore.main_"
                     Checked = ((editRecord.id <> 0) And (editRecord.id = (cpCore.siteProperties.getinteger("LandingPageID", 0))))
                     If cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
-                        HTMLFieldString = cpCore.htmlDoc.html_GetFormInputCheckBox2("LandingPageID", Checked)
+                        HTMLFieldString = cpCore.html.html_GetFormInputCheckBox2("LandingPageID", Checked)
                     Else
-                        HTMLFieldString = "<b>" & genericController.GetYesNo(Checked) & "</b>" & cpCore.htmlDoc.html_GetFormInputHidden("LandingPageID", Checked)
+                        HTMLFieldString = "<b>" & genericController.GetYesNo(Checked) & "</b>" & cpCore.html.html_GetFormInputHidden("LandingPageID", Checked)
                     End If
                     HTMLFieldString = HTMLFieldString
                     Call FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Set Default Landing Page", Copy, False, False, ""))
@@ -6631,9 +6631,9 @@ ErrorTrap:
                     Copy = "If selected, this content will be displayed when a page can not be found. Only one page on the site can be marked."
                     Checked = ((editRecord.id <> 0) And (editRecord.id = (cpCore.siteProperties.getinteger("PageNotFoundPageID", 0))))
                     If cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
-                        HTMLFieldString = cpCore.htmlDoc.html_GetFormInputCheckBox2("PageNotFound", Checked)
+                        HTMLFieldString = cpCore.html.html_GetFormInputCheckBox2("PageNotFound", Checked)
                     Else
-                        HTMLFieldString = "<b>" & genericController.GetYesNo(Checked) & "</b>" & cpCore.htmlDoc.html_GetFormInputHidden("PageNotFound", Checked)
+                        HTMLFieldString = "<b>" & genericController.GetYesNo(Checked) & "</b>" & cpCore.html.html_GetFormInputHidden("PageNotFound", Checked)
                     End If
                     '            If (EditRecord.ID <> 0) And (EditRecord.ID = cpCore.main_GetSiteProperty2("PageNotFoundPageID", "0", True)) Then
                     '                HTMLFieldString = cpCore.main_GetFormInputCheckBox2("PageNotFound", True)
@@ -6648,11 +6648,11 @@ ErrorTrap:
                 '
                 If (UCase(adminContent.ContentTableName) = "CCPAGECONTENT") Or (UCase(adminContent.ContentTableName) = "ITEMS") Then
                     FieldHelp = "This is the URL where this record was last displayed on the site. It may be blank if the record has not been displayed yet."
-                    Copy = cpCore.pages.getContentWatchLinkByKey(editRecord.contentControlId & "." & editRecord.id, , False)
+                    Copy = cpCore.doc.getContentWatchLinkByKey(editRecord.contentControlId & "." & editRecord.id, , False)
                     If Copy = "" Then
                         HTMLFieldString = "unknown"
                     Else
-                        HTMLFieldString = "<a href=""" & cpCore.htmlDoc.html_EncodeHTML(Copy) & """ target=""_blank"">" & Copy & "</a>"
+                        HTMLFieldString = "<a href=""" & cpCore.html.html_EncodeHTML(Copy) & """ target=""_blank"">" & Copy & "</a>"
                     End If
                     Call FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Last Known Public URL", FieldHelp, False, False, ""))
                 End If
@@ -6671,7 +6671,7 @@ ErrorTrap:
                     If Not AllowWidget Then
                         FieldHelp = "If you wish to use this add-on as a widget, enable 'Is Remote Method' on the 'Placement' tab and save the record. The necessary html code, or 'embed code' will be created here for you to cut-and-paste into the website."
                         HTMLFieldString = ""
-                        HTMLFieldString = cpCore.htmlDoc.html_GetFormInputTextExpandable2("ignore", HTMLFieldString, 1, , , , True)
+                        HTMLFieldString = cpCore.html.html_GetFormInputTextExpandable2("ignore", HTMLFieldString, 1, , , , True)
                         Call FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Widget Code", FieldHelp, True, False, ""))
                     Else
                         FieldHelp = "If you wish to use this add-on as a widget, cut and paste the 'Widget Code' into the website content. If any code appears in the 'Widget Head', this will need to be pasted into the head section of the website."
@@ -6689,7 +6689,7 @@ ErrorTrap:
                         '                    & "<script language=""javascript"" type=""text/javascript"" src=""http://" & cpCore.main_ServerDomain & "/ccLib/ClientSide/Core.js""></script>" _
                         '                    & vbCrLf & "<script language=""javascript"" type=""text/javascript"" src=""http://" & cpCore.main_ServerDomain & "/" & EditRecord.Name & "?requestjsform=1""></script>" _
                         '                    & ""
-                        HTMLFieldString = cpCore.htmlDoc.html_GetFormInputTextExpandable2("ignore", HTMLFieldString, 8)
+                        HTMLFieldString = cpCore.html.html_GetFormInputTextExpandable2("ignore", HTMLFieldString, 8)
                         Call FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Widget Code", FieldHelp, True, False, ""))
                     End If
                 End If
@@ -6706,15 +6706,15 @@ ErrorTrap:
                         '
                         Dim ccGuid As String
                         ccGuid = "{" & Guid.NewGuid.ToString() & "}"
-                        HTMLFieldString = cpCore.htmlDoc.html_GetFormInputText2("ccguid", HTMLFieldString, , , "ccguid", , False) & "<input type=button value=set onclick=""var e=document.getElementById('ccguid');e.value='" & ccGuid & "';this.disabled=true;"">"
+                        HTMLFieldString = cpCore.html.html_GetFormInputText2("ccguid", HTMLFieldString, , , "ccguid", , False) & "<input type=button value=set onclick=""var e=document.getElementById('ccguid');e.value='" & ccGuid & "';this.disabled=true;"">"
                     Else
                         '
                         ' field is read-only except for developers
                         '
                         If cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
-                            HTMLFieldString = cpCore.htmlDoc.html_GetFormInputText2("ccguid", HTMLFieldString, , , , , False) & ""
+                            HTMLFieldString = cpCore.html.html_GetFormInputText2("ccguid", HTMLFieldString, , , , , False) & ""
                         Else
-                            HTMLFieldString = cpCore.htmlDoc.html_GetFormInputText2("ccguid", HTMLFieldString, , , , , True) & cpCore.htmlDoc.html_GetFormInputHidden("ccguid", HTMLFieldString)
+                            HTMLFieldString = cpCore.html.html_GetFormInputText2("ccguid", HTMLFieldString, , , , , True) & cpCore.html.html_GetFormInputHidden("ccguid", HTMLFieldString)
                         End If
                     End If
                     Call FastString.Add(Adminui.GetEditRow(HTMLFieldString, "GUID", FieldHelp, False, False, ""))
@@ -6723,9 +6723,9 @@ ErrorTrap:
                 ' ----- ContentCategoryID
                 '
                 FieldHelp = "All content on the site can be subdivided into content categories. This is the category for this record."
-                HTMLFieldString = cpCore.htmlDoc.main_GetFormInputSelect2("ContentCategoryID", editRecord.contentCategoryID, "Content Categories", "", "", "", IsEmptyList)
+                HTMLFieldString = cpCore.html.main_GetFormInputSelect2("ContentCategoryID", editRecord.contentCategoryID, "Content Categories", "", "", "", IsEmptyList)
                 If IsEmptyList Then
-                    hiddenInputs &= cpCore.htmlDoc.html_GetFormInputHidden("contentcategoryid", editRecord.contentCategoryID)
+                    hiddenInputs &= cpCore.html.html_GetFormInputHidden("contentcategoryid", editRecord.contentCategoryID)
                 Else
                     Call FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Content Category", FieldHelp, True, False, ""))
                 End If
@@ -6754,7 +6754,7 @@ ErrorTrap:
                         End If
                         FieldHelp = FieldHelp & " To enable, disable or modify this feature, use the security tab on the Preferences page."
                     End If
-                    HTMLFieldString = cpCore.htmlDoc.html_GetFormInputText2("ignore", HTMLFieldString)
+                    HTMLFieldString = cpCore.html.html_GetFormInputText2("ignore", HTMLFieldString)
                     Call FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Member Link Login EID", FieldHelp, True, False, ""))
                 End If
                 '
@@ -6776,7 +6776,7 @@ ErrorTrap:
                         '
                         '
                         If Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
-                            HTMLFieldString = HTMLFieldString & cpCore.htmlDoc.html_GetFormInputHidden("ContentControlID", FieldValueInteger)
+                            HTMLFieldString = HTMLFieldString & cpCore.html.html_GetFormInputHidden("ContentControlID", FieldValueInteger)
                         Else
                             RecordContentName = editRecord.contentControlId_Name
                             Dim RecordCDef As cdefModel
@@ -6819,7 +6819,7 @@ ErrorTrap:
                                 '
                                 ' administrator, and either ( no parentid or does not support it), let them select any content compatible with the table
                                 '
-                                HTMLFieldString = HTMLFieldString & cpCore.htmlDoc.main_GetFormInputSelect2("ContentControlID", FieldValueInteger, "Content", "ContentTableID=" & TableID, "", "", IsEmptyList)
+                                HTMLFieldString = HTMLFieldString & cpCore.html.main_GetFormInputSelect2("ContentControlID", FieldValueInteger, "Content", "ContentTableID=" & TableID, "", "", IsEmptyList)
                                 FieldHelp = FieldHelp & " (Only administrators have access to this control. Changing the Controlling Content allows you to change who can author the record, as well as how it is edited.)"
                             Else
                                 '
@@ -6841,7 +6841,7 @@ ErrorTrap:
                                 Call cpCore.db.cs_Close(CSPointer)
                                 If CIDList <> "" Then
                                     CIDList = Mid(CIDList, 2)
-                                    HTMLFieldString = cpCore.htmlDoc.main_GetFormInputSelect2("ContentControlID", FieldValueInteger, "Content", "id in (" & CIDList & ")", "", "", IsEmptyList)
+                                    HTMLFieldString = cpCore.html.main_GetFormInputSelect2("ContentControlID", FieldValueInteger, "Content", "id in (" & CIDList & ")", "", "", IsEmptyList)
                                     FieldHelp = FieldHelp & " (Only administrators have access to this control. Changing the Controlling Content allows you to change who can author the record, as well as how it is edited. This record includes a Parent field, so your choices for controlling content are limited to those compatible with the parent of this record.)"
                                 End If
                             End If
@@ -6873,7 +6873,7 @@ ErrorTrap:
                         Call cpCore.db.cs_Close(CSPointer)
                     End If
                 End If
-                HTMLFieldString = cpCore.htmlDoc.html_GetFormInputText2("ignore", HTMLFieldString, , , , , True)
+                HTMLFieldString = cpCore.html.html_GetFormInputText2("ignore", HTMLFieldString, , , , , True)
                 Call FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Created By", FieldHelp, FieldRequired, False, ""))
                 '
                 ' ----- Created Date
@@ -6887,7 +6887,7 @@ ErrorTrap:
                         HTMLFieldString = "unknown"
                     End If
                 End If
-                HTMLFieldString = cpCore.htmlDoc.html_GetFormInputText2("ignore", HTMLFieldString, , , , , True)
+                HTMLFieldString = cpCore.html.html_GetFormInputText2("ignore", HTMLFieldString, , , , , True)
                 Call FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Created Date", FieldHelp, FieldRequired, False, ""))
                 '
                 ' ----- Modified By
@@ -6906,7 +6906,7 @@ ErrorTrap:
                         Call cpCore.db.cs_Close(CSPointer)
                     End If
                 End If
-                HTMLFieldString = cpCore.htmlDoc.html_GetFormInputText2("ignore", HTMLFieldString, , , , , True)
+                HTMLFieldString = cpCore.html.html_GetFormInputText2("ignore", HTMLFieldString, , , , , True)
                 Call FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Modified By", FieldHelp, FieldRequired, False, ""))
                 '
                 ' ----- Modified Date
@@ -6920,7 +6920,7 @@ ErrorTrap:
                         HTMLFieldString = "unknown"
                     End If
                 End If
-                HTMLFieldString = cpCore.htmlDoc.html_GetFormInputText2("ignore", HTMLFieldString, , , , , True)
+                HTMLFieldString = cpCore.html.html_GetFormInputText2("ignore", HTMLFieldString, , , , , True)
                 Call FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Modified Date", FieldHelp, False, False, ""))
             End With
             s = "" _
@@ -7011,7 +7011,7 @@ ErrorTrap:
             If SitePropertyName = "" Then
                 HTMLFieldString = "This Site Property is not defined"
             Else
-                HTMLFieldString = cpCore.htmlDoc.html_GetFormInputHidden("name", SitePropertyName)
+                HTMLFieldString = cpCore.html.html_GetFormInputHidden("name", SitePropertyName)
                 Call cpCore.addon.buildAddonOptionLists(ignore, ExpandedSelector, SitePropertyName & "=" & selector, SitePropertyName & "=" & SitePropertyValue, "0", True)
 
 
@@ -7103,7 +7103,7 @@ ErrorTrap:
                     '
 
                     selector = genericController.decodeNvaArgument(selector)
-                    HTMLFieldString = cpCore.htmlDoc.html_GetFormInputText2(SitePropertyName, selector, 1, 20)
+                    HTMLFieldString = cpCore.html.html_GetFormInputText2(SitePropertyName, selector, 1, 20)
                 End If
                 '--------------
 
@@ -7249,10 +7249,10 @@ ErrorTrap:
             '
             ' --- Start a form to make a refresh button
             '
-            Call Stream.Add(cpCore.htmlDoc.html_GetFormStart)
-            Call Stream.Add(cpCore.htmlDoc.main_GetPanelButtons(ButtonCancel & "," & ButtonRefresh, "" & RequestNameButton & ""))
+            Call Stream.Add(cpCore.html.html_GetFormStart)
+            Call Stream.Add(cpCore.html.main_GetPanelButtons(ButtonCancel & "," & ButtonRefresh, "" & RequestNameButton & ""))
             Call Stream.Add("<input TYPE=""hidden"" NAME=""asf"" VALUE=""" & AdminFormQuickStats & """>")
-            Call Stream.Add(cpCore.htmlDoc.main_GetPanel(" "))
+            Call Stream.Add(cpCore.html.main_GetPanel(" "))
             '
             ' --- Indented part (Title Area plus page)
             '
@@ -7278,7 +7278,7 @@ ErrorTrap:
                 PageCount = cpCore.db.cs_getNumber(CS, "pageCount")
                 Stream.Add("<tr>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "All Visits</span></td>")
-                Stream.Add("<td style=""width:150px;border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.htmlDoc.html_EncodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.app_startTime & "&DateTo=" & cpCore.app_startTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
+                Stream.Add("<td style=""width:150px;border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.html.html_EncodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.app_startTime & "&DateTo=" & cpCore.app_startTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "This includes all visitors to the website, including guests, bots and administrators. Pages/visit includes page hits and not ajax or remote method hits.</span></td>")
                 Stream.Add("</tr>")
             End If
@@ -7293,7 +7293,7 @@ ErrorTrap:
                 PageCount = cpCore.db.cs_getNumber(CS, "pageCount")
                 Stream.Add("<tr>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "Non-bot Visits</span></td>")
-                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.htmlDoc.html_EncodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.app_startTime.ToShortDateString & "&DateTo=" & cpCore.app_startTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
+                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.html.html_EncodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.app_startTime.ToShortDateString & "&DateTo=" & cpCore.app_startTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "This excludes hits from visitors identified as bots. Pages/visit includes page hits and not ajax or remote method hits.</span></td>")
                 Stream.Add("</tr>")
             End If
@@ -7308,7 +7308,7 @@ ErrorTrap:
                 PageCount = cpCore.db.cs_getNumber(CS, "pageCount")
                 Stream.Add("<tr>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "Visits by New Visitors</span></td>")
-                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.htmlDoc.html_EncodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&ExcludeOldVisitors=1&DateFrom=" & cpCore.app_startTime.ToShortDateString & "&DateTo=" & cpCore.app_startTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
+                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.html.html_EncodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&ExcludeOldVisitors=1&DateFrom=" & cpCore.app_startTime.ToShortDateString & "&DateTo=" & cpCore.app_startTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "This includes only new visitors not identified as bots. Pages/visit includes page hits and not ajax or remote method hits.</span></td>")
                 Stream.Add("</tr>")
             End If
@@ -7340,7 +7340,7 @@ ErrorTrap:
                     Do While cpCore.db.cs_ok(CS)
                         VisitID = cpCore.db.cs_getInteger(CS, "VisitID")
                         Panel = Panel & "<tr class=""" & RowColor & """>"
-                        Panel = Panel & "<td align=""left"">" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.htmlDoc.html_EncodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=16&MemberID=" & cpCore.db.cs_getInteger(CS, "MemberID")) & """>" & cpCore.db.cs_get(CS, "MemberName") & "</A></span></td>"
+                        Panel = Panel & "<td align=""left"">" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.html.html_EncodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=16&MemberID=" & cpCore.db.cs_getInteger(CS, "MemberID")) & """>" & cpCore.db.cs_get(CS, "MemberName") & "</A></span></td>"
                         Panel = Panel & "<td align=""left"">" & SpanClassAdminNormal & cpCore.db.cs_get(CS, "Remote_Addr") & "</span></td>"
                         Panel = Panel & "<td align=""left"">" & SpanClassAdminNormal & FormatDateTime(cpCore.db.cs_getDate(CS, "LastVisitTime"), vbLongTime) & "</span></td>"
                         Panel = Panel & "<td align=""right"">" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=10&VisitID=" & VisitID & """>" & cpCore.db.cs_get(CS, "PageVisits") & "</A></span></td>"
@@ -7357,13 +7357,13 @@ ErrorTrap:
                     Panel = Panel & "</table>"
                 End If
                 Call cpCore.db.cs_Close(CS)
-                Stream.Add(cpCore.htmlDoc.main_GetPanel(Panel, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 0))
+                Stream.Add(cpCore.html.main_GetPanel(Panel, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 0))
             End If
             Call Stream.Add("</td></tr></table>")
-            Call Stream.Add(cpCore.htmlDoc.html_GetFormEnd)
+            Call Stream.Add(cpCore.html.html_GetFormEnd)
             '
             GetForm_QuickStats = Stream.Text
-            Call cpCore.htmlDoc.main_AddPagetitle("Quick Stats")
+            Call cpCore.html.main_AddPagetitle("Quick Stats")
             Exit Function
             '
             ' ----- Error Trap
@@ -7542,7 +7542,7 @@ ErrorTrap:
                 If readOnlyField Then
                     Call f.Add(linkAlias)
                 Else
-                    Call f.Add(cpCore.htmlDoc.html_GetFormInputText2("LinkAlias", linkAlias))
+                    Call f.Add(cpCore.html.html_GetFormInputText2("LinkAlias", linkAlias))
                 End If
                 Call f.Add("</span></td></tr>")
                 '
@@ -7553,16 +7553,16 @@ ErrorTrap:
                 If readOnlyField Then
                     Call f.Add("No")
                 Else
-                    Call f.Add(cpCore.htmlDoc.html_GetFormInputCheckBox2("OverrideDuplicate", False))
+                    Call f.Add(cpCore.html.html_GetFormInputCheckBox2("OverrideDuplicate", False))
                 End If
                 Call f.Add("</span></td></tr>")
                 '
                 ' Table of old Link Aliases
                 '
-                Link = cpCore.pages.main_GetPageDynamicLink(editRecord.id, False)
+                Link = cpCore.doc.main_GetPageDynamicLink(editRecord.id, False)
                 CS = cpCore.db.cs_open("Link Aliases", "pageid=" & editRecord.id, "ID Desc", , , , , "name")
                 Do While cpCore.db.cs_ok(CS)
-                    LinkList = LinkList & "<div style=""margin-left:4px;margin-bottom:4px;"">" & cpCore.htmlDoc.html_EncodeHTML(cpCore.db.cs_getText(CS, "name")) & "</div>"
+                    LinkList = LinkList & "<div style=""margin-left:4px;margin-bottom:4px;"">" & cpCore.html.html_EncodeHTML(cpCore.db.cs_getText(CS, "name")) & "</div>"
                     LinkCnt = LinkCnt + 1
                     Call cpCore.db.cs_goNext(CS)
                 Loop
@@ -7635,7 +7635,7 @@ ErrorTrap:
                 If readOnlyField Then
                     Call FastString.Add(PageTitle)
                 Else
-                    Call FastString.Add(cpCore.htmlDoc.html_GetFormInputText2("MetaContent.PageTitle", PageTitle))
+                    Call FastString.Add(cpCore.html.html_GetFormInputText2("MetaContent.PageTitle", PageTitle))
                 End If
                 Call FastString.Add("</span></td></tr>")
                 '
@@ -7646,7 +7646,7 @@ ErrorTrap:
                 If readOnlyField Then
                     Call FastString.Add(MetaDescription)
                 Else
-                    Call FastString.Add(cpCore.htmlDoc.html_GetFormInputTextExpandable("MetaContent.MetaDescription", MetaDescription, 10))
+                    Call FastString.Add(cpCore.html.html_GetFormInputTextExpandable("MetaContent.MetaDescription", MetaDescription, 10))
                 End If
                 Call FastString.Add("</span></td></tr>")
                 '
@@ -7657,7 +7657,7 @@ ErrorTrap:
                 If readOnlyField Then
                     Call FastString.Add(MetaKeywordList)
                 Else
-                    Call FastString.Add(cpCore.htmlDoc.html_GetFormInputTextExpandable("MetaContent.MetaKeywordList", MetaKeywordList, 10))
+                    Call FastString.Add(cpCore.html.html_GetFormInputTextExpandable("MetaContent.MetaKeywordList", MetaKeywordList, 10))
                 End If
                 Call FastString.Add("</span></td></tr>")
                 '
@@ -7665,7 +7665,7 @@ ErrorTrap:
                 '
                 Call FastString.Add("<tr><td class=""ccAdminEditCaption"">" & SpanClassAdminSmall & "Shared Meta Keywords</td>")
                 Call FastString.Add("<td class=""ccAdminEditField"" colspan=""2"">")
-                Call FastString.Add(cpCore.htmlDoc.main_GetFormInputCheckListCategories("MetaContent.KeywordList", "Meta Content", MetaContentID, "Meta Keywords", "Meta Keyword Rules", "MetaContentID", "MetaKeywordID", , "Name", readOnlyField, "Meta Keywords"))
+                Call FastString.Add(cpCore.html.getInputCheckListCategories("MetaContent.KeywordList", "Meta Content", MetaContentID, "Meta Keywords", "Meta Keyword Rules", "MetaContentID", "MetaKeywordID", , "Name", readOnlyField, "Meta Keywords"))
                 Call FastString.Add("</td></tr>")
                 '
                 ' Other Head Tags
@@ -7675,13 +7675,13 @@ ErrorTrap:
                 If readOnlyField Then
                     Call FastString.Add(OtherHeadTags)
                 Else
-                    Call FastString.Add(cpCore.htmlDoc.html_GetFormInputTextExpandable("MetaContent.OtherHeadTags", OtherHeadTags, 10))
+                    Call FastString.Add(cpCore.html.html_GetFormInputTextExpandable("MetaContent.OtherHeadTags", OtherHeadTags, 10))
                 End If
                 Call FastString.Add("</span></td></tr>")
                 '
                 s = "" _
                     & Adminui.EditTableOpen & FastString.Text & Adminui.EditTableClose _
-                    & cpCore.htmlDoc.html_GetFormInputHidden("MetaContent.MetaContentID", MetaContentID) _
+                    & cpCore.html.html_GetFormInputHidden("MetaContent.MetaContentID", MetaContentID) _
                     & ""
                 '
                 GetForm_Edit_MetaContent = Adminui.GetEditPanel((Not allowAdminTabs), "Meta Content", "Meta Tags available for pages using this content", s)
@@ -7718,7 +7718,7 @@ ErrorTrap:
             Dim Adminui As New adminUIController(cpCore)
             Dim s As String
             '
-            s = cpCore.htmlDoc.main_GetFormInputCheckListCategories("EmailGroups", "Group Email", editRecord.id, "Groups", "Email Groups", "EmailID", "GroupID", , "Caption", readOnlyField, "Groups")
+            s = cpCore.html.getInputCheckListCategories("EmailGroups", "Group Email", editRecord.id, "Groups", "Email Groups", "EmailID", "GroupID", , "Caption", readOnlyField, "Groups")
             s = "<tr>" _
                 & "<td class=""ccAdminEditCaption"">Groups</td>" _
                 & "<td class=""ccAdminEditField"" colspan=2>" & SpanClassAdminNormal & s & "</span></td>" _
@@ -7798,7 +7798,7 @@ ErrorTrap:
             '
             Dim s As String
             '
-            s = cpCore.htmlDoc.main_GetFormInputCheckListCategories("EmailTopics", "Group Email", editRecord.id, "Topics", "Email Topics", "EmailID", "TopicID", , "Name", readOnlyField, "Topics")
+            s = cpCore.html.getInputCheckListCategories("EmailTopics", "Group Email", editRecord.id, "Topics", "Email Topics", "EmailID", "TopicID", , "Name", readOnlyField, "Topics")
             s = "<tr>" _
                 & "<td class=""ccAdminEditCaption"">Topics</td>" _
                 & "<td class=""ccAdminEditField"" colspan=2>" & SpanClassAdminNormal & s & "</span></td>" _
@@ -8020,8 +8020,8 @@ ErrorTrap:
                         f.Add("<tr><td class=""ccAdminEditCaption"">" & Caption & "</td>")
                         f.Add("<td class=""ccAdminEditField"">")
                         f.Add("<table border=0 cellpadding=0 cellspacing=0 width=""100%"" ><tr>")
-                        f.Add("<td width=""40%"">" & cpCore.htmlDoc.html_GetFormInputHidden("Memberrules." & GroupCount & ".ID", GroupID) & cpCore.htmlDoc.html_GetFormInputCheckBox2("MemberRules." & GroupCount, GroupActive) & GroupCaption & "</td>")
-                        f.Add("<td width=""30%""> Expires " & cpCore.htmlDoc.html_GetFormInputText2("MemberRules." & GroupCount & ".DateExpires", DateExpireValue, 1, 20) & "</td>")
+                        f.Add("<td width=""40%"">" & cpCore.html.html_GetFormInputHidden("Memberrules." & GroupCount & ".ID", GroupID) & cpCore.html.html_GetFormInputCheckBox2("MemberRules." & GroupCount, GroupActive) & GroupCaption & "</td>")
+                        f.Add("<td width=""30%""> Expires " & cpCore.html.html_GetFormInputText2("MemberRules." & GroupCount & ".DateExpires", DateExpireValue, 1, 20) & "</td>")
                         f.Add("<td width=""30%"">" & ReportLink & "</td>")
                         f.Add("</tr></table>")
                         f.Add("</td></tr>")
@@ -8128,7 +8128,7 @@ ErrorTrap:
             FastString = New stringBuilderLegacyController
             Call FastString.Add("<tr>")
             Call FastString.Add("<td valign=""top"" align=""right"">" & SpanClassAdminSmall & "Groups</td>")
-            Call FastString.Add("<td colspan=""2"" class=""ccAdminEditField"" align=""left"">" & SpanClassAdminNormal & cpCore.htmlDoc.main_GetFormInputCheckList("PathRules", "Paths", editRecord.id, "Groups", "Path Rules", "PathID", "GroupID", , "Caption") & "</span></td>")
+            Call FastString.Add("<td colspan=""2"" class=""ccAdminEditField"" align=""left"">" & SpanClassAdminNormal & cpCore.html.main_GetFormInputCheckList("PathRules", "Paths", editRecord.id, "Groups", "Path Rules", "PathID", "GroupID", , "Caption") & "</span></td>")
             Call FastString.Add("</tr>")
             'Call FastString.Add(adminui.EditTableClose)
             GetForm_Edit_PathRules = Adminui.GetEditPanel((Not allowAdminTabs), "Path Permissions", "Groups that have access to this path", Adminui.EditTableOpen & FastString.Text & Adminui.EditTableClose)
@@ -8158,7 +8158,7 @@ ErrorTrap:
             Dim ReportLink As String
             Dim Adminui As New adminUIController(cpCore)
             '
-            GroupList = cpCore.htmlDoc.main_GetFormInputCheckList("PageContentBlockRules", adminContent.Name, editRecord.id, "Groups", "Page Content Block Rules", "RecordID", "GroupID", , "Caption", False)
+            GroupList = cpCore.html.main_GetFormInputCheckList("PageContentBlockRules", adminContent.Name, editRecord.id, "Groups", "Page Content Block Rules", "RecordID", "GroupID", , "Caption", False)
             GroupSplit = Split(GroupList, "<br >", , vbTextCompare)
             For Ptr = 0 To UBound(GroupSplit)
                 GroupID = 0
@@ -8206,7 +8206,7 @@ ErrorTrap:
             Dim ReportLink As String
             Dim Adminui As New adminUIController(cpCore)
             '
-            GroupList = cpCore.htmlDoc.main_GetFormInputCheckList("LibraryFolderRules", adminContent.Name, editRecord.id, "Groups", "Library Folder Rules", "FolderID", "GroupID", , "Caption")
+            GroupList = cpCore.html.main_GetFormInputCheckList("LibraryFolderRules", adminContent.Name, editRecord.id, "Groups", "Library Folder Rules", "FolderID", "GroupID", , "Caption")
             GroupSplit = Split(GroupList, "<br >", , vbTextCompare)
             For Ptr = 0 To UBound(GroupSplit)
                 GroupID = 0
@@ -8516,13 +8516,13 @@ ErrorTrap:
                         Call FastString.Add("<input type=""hidden"" name=""GroupID" & GroupCount & """ value=""" & cpCore.db.cs_get(CS, "ID") & """>")
                         Call FastString.Add("<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""400""><tr>")
                         If GroupFound Then
-                            Call FastString.Add("<td width=""200"">" & SpanClassAdminSmall & cpCore.htmlDoc.html_GetFormInputCheckBox2("Group" & GroupCount, True) & GroupName & "</span></td>")
-                            Call FastString.Add("<td width=""100"">" & SpanClassAdminSmall & cpCore.htmlDoc.html_GetFormInputCheckBox2("GroupRuleAllowAdd" & GroupCount, GroupRules(GroupRulesPointer).AllowAdd) & " Allow Add</span></td>")
-                            Call FastString.Add("<td width=""100"">" & SpanClassAdminSmall & cpCore.htmlDoc.html_GetFormInputCheckBox2("GroupRuleAllowDelete" & GroupCount, GroupRules(GroupRulesPointer).AllowDelete) & " Allow Delete</span></td>")
+                            Call FastString.Add("<td width=""200"">" & SpanClassAdminSmall & cpCore.html.html_GetFormInputCheckBox2("Group" & GroupCount, True) & GroupName & "</span></td>")
+                            Call FastString.Add("<td width=""100"">" & SpanClassAdminSmall & cpCore.html.html_GetFormInputCheckBox2("GroupRuleAllowAdd" & GroupCount, GroupRules(GroupRulesPointer).AllowAdd) & " Allow Add</span></td>")
+                            Call FastString.Add("<td width=""100"">" & SpanClassAdminSmall & cpCore.html.html_GetFormInputCheckBox2("GroupRuleAllowDelete" & GroupCount, GroupRules(GroupRulesPointer).AllowDelete) & " Allow Delete</span></td>")
                         Else
-                            Call FastString.Add("<td width=""200"">" & SpanClassAdminSmall & cpCore.htmlDoc.html_GetFormInputCheckBox2("Group" & GroupCount, False) & GroupName & "</span></td>")
-                            Call FastString.Add("<td width=""100"">" & SpanClassAdminSmall & cpCore.htmlDoc.html_GetFormInputCheckBox2("GroupRuleAllowAdd" & GroupCount, False) & " Allow Add</span></td>")
-                            Call FastString.Add("<td width=""100"">" & SpanClassAdminSmall & cpCore.htmlDoc.html_GetFormInputCheckBox2("GroupRuleAllowDelete" & GroupCount, False) & " Allow Delete</span></td>")
+                            Call FastString.Add("<td width=""200"">" & SpanClassAdminSmall & cpCore.html.html_GetFormInputCheckBox2("Group" & GroupCount, False) & GroupName & "</span></td>")
+                            Call FastString.Add("<td width=""100"">" & SpanClassAdminSmall & cpCore.html.html_GetFormInputCheckBox2("GroupRuleAllowAdd" & GroupCount, False) & " Allow Add</span></td>")
+                            Call FastString.Add("<td width=""100"">" & SpanClassAdminSmall & cpCore.html.html_GetFormInputCheckBox2("GroupRuleAllowDelete" & GroupCount, False) & " Allow Delete</span></td>")
                         End If
                         Call FastString.Add("</tr></table>")
                         Call FastString.Add("</span></td>")
@@ -8633,13 +8633,13 @@ ErrorTrap:
                         Call FastString.Add("<input type=""hidden"" name=""ContentID" & ContentCount & """ value=""" & cpCore.db.cs_get(CS, "ID") & """>")
                         Call FastString.Add("<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""400""><tr>")
                         If ContentFound Then
-                            Call FastString.Add("<td width=""200"">" & SpanClassAdminSmall & cpCore.htmlDoc.html_GetFormInputCheckBox2("Content" & ContentCount, True) & ContentName & "</span></td>")
-                            Call FastString.Add("<td width=""100"">" & SpanClassAdminSmall & cpCore.htmlDoc.html_GetFormInputCheckBox2("ContentGroupRuleAllowAdd" & ContentCount, ContentGroupRules(ContentGroupRulesPointer).AllowAdd) & " Allow Add</span></td>")
-                            Call FastString.Add("<td width=""100"">" & SpanClassAdminSmall & cpCore.htmlDoc.html_GetFormInputCheckBox2("ContentGroupRuleAllowDelete" & ContentCount, ContentGroupRules(ContentGroupRulesPointer).AllowDelete) & " Allow Delete</span></td>")
+                            Call FastString.Add("<td width=""200"">" & SpanClassAdminSmall & cpCore.html.html_GetFormInputCheckBox2("Content" & ContentCount, True) & ContentName & "</span></td>")
+                            Call FastString.Add("<td width=""100"">" & SpanClassAdminSmall & cpCore.html.html_GetFormInputCheckBox2("ContentGroupRuleAllowAdd" & ContentCount, ContentGroupRules(ContentGroupRulesPointer).AllowAdd) & " Allow Add</span></td>")
+                            Call FastString.Add("<td width=""100"">" & SpanClassAdminSmall & cpCore.html.html_GetFormInputCheckBox2("ContentGroupRuleAllowDelete" & ContentCount, ContentGroupRules(ContentGroupRulesPointer).AllowDelete) & " Allow Delete</span></td>")
                         Else
-                            Call FastString.Add("<td width=""200"">" & SpanClassAdminSmall & cpCore.htmlDoc.html_GetFormInputCheckBox2("Content" & ContentCount, False) & ContentName & "</span></td>")
-                            Call FastString.Add("<td width=""100"">" & SpanClassAdminSmall & cpCore.htmlDoc.html_GetFormInputCheckBox2("ContentGroupRuleAllowAdd" & ContentCount, False) & " Allow Add</span></td>")
-                            Call FastString.Add("<td width=""100"">" & SpanClassAdminSmall & cpCore.htmlDoc.html_GetFormInputCheckBox2("ContentGroupRuleAllowDelete" & ContentCount, False) & " Allow Delete</span></td>")
+                            Call FastString.Add("<td width=""200"">" & SpanClassAdminSmall & cpCore.html.html_GetFormInputCheckBox2("Content" & ContentCount, False) & ContentName & "</span></td>")
+                            Call FastString.Add("<td width=""100"">" & SpanClassAdminSmall & cpCore.html.html_GetFormInputCheckBox2("ContentGroupRuleAllowAdd" & ContentCount, False) & " Allow Add</span></td>")
+                            Call FastString.Add("<td width=""100"">" & SpanClassAdminSmall & cpCore.html.html_GetFormInputCheckBox2("ContentGroupRuleAllowDelete" & ContentCount, False) & " Allow Delete</span></td>")
                         End If
                         Call FastString.Add("</tr></table>")
                         Call FastString.Add("</span></td>")
@@ -9092,7 +9092,7 @@ ErrorTrap:
                 '
                 ' AdminTabs
                 '
-                QS = cpCore.htmlDoc.refreshQueryString
+                QS = cpCore.html.refreshQueryString
                 If allowAdminTabs Then
                     QS = genericController.ModifyQueryString(QS, "tabs", "0", True)
                     RightSide = RightSide & GetActiveImage(cpCore.serverConfig.appConfig.adminRoute & "?" & QS, "Disable Tabs", "LibButtonNoTabs.GIF", "LibButtonNoTabsRev.GIF", "Disable Tabs", "16", "16", "", "", "")
@@ -9103,7 +9103,7 @@ ErrorTrap:
                 '
                 ' Menu Mode
                 '
-                QS = cpCore.htmlDoc.refreshQueryString
+                QS = cpCore.html.refreshQueryString
                 If MenuDepth = 0 Then
                     RightSide = RightSide & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""16"" >"
                     If AdminMenuModeID = AdminMenuModeTop Then
@@ -9118,7 +9118,7 @@ ErrorTrap:
                 ' Refresh Button
                 '
                 RightSide = RightSide & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""16"" >"
-                RightSide = RightSide & GetActiveImage(cpCore.serverConfig.appConfig.adminRoute & "?" & cpCore.htmlDoc.refreshQueryString, "Refresh", "LibButtonRefresh.GIF", "LibButtonRefreshOver.GIF", "Refresh", "16", "16", "", "", "")
+                RightSide = RightSide & GetActiveImage(cpCore.serverConfig.appConfig.adminRoute & "?" & cpCore.html.refreshQueryString, "Refresh", "LibButtonRefresh.GIF", "LibButtonRefreshOver.GIF", "Refresh", "16", "16", "", "", "")
                 '
                 ' Assemble header
                 '
@@ -9809,9 +9809,9 @@ ErrorTrap:
             '        & "}" _
             '        & ""
             '
-            Call cpCore.htmlDoc.main_AddHeadScriptCode("var docLoaded=false", "Form loader")
-            Call cpCore.htmlDoc.main_AddOnLoadJavascript2("docLoaded=true;", "Form loader")
-            s = cpCore.htmlDoc.html_GetUploadFormStart()
+            Call cpCore.html.main_AddHeadScriptCode("var docLoaded=false", "Form loader")
+            Call cpCore.html.main_AddOnLoadJavascript2("docLoaded=true;", "Form loader")
+            s = cpCore.html.html_GetUploadFormStart()
             s = genericController.vbReplace(s, ">", " onSubmit=""cj.admin.saveEmptyFieldList('" & "FormEmptyFieldList');"">")
             s = genericController.vbReplace(s, ">", " autocomplete=""off"">")
             s = genericController.vbReplace(s, ">", " id=""adminEditForm"">")
@@ -9977,7 +9977,7 @@ ErrorTrap:
                             '
                             '
                             Call SaveEditRecord(adminContent, editRecord)
-                            Call cpCore.htmlDoc.main_ProcessCheckList("PathRules", "Paths", genericController.encodeText(editRecord.id), "Groups", "Path Rules", "PathID", "GroupID")
+                            Call cpCore.html.main_ProcessCheckList("PathRules", "Paths", genericController.encodeText(editRecord.id), "Groups", "Path Rules", "PathID", "GroupID")
                         Case "CCEMAIL"
                             '
                             '
@@ -9987,8 +9987,8 @@ ErrorTrap:
                             'If cpCore.main_GetSiteProperty2("BuildVersion") >= "3.3.291" Then
                             '    Call cpCore.app.executeSql( "update ccEmail set InlineStyles=" & encodeSQLText(cpCore.main_GetStyleSheetProcessed) & " where ID=" & EditRecord.ID)
                             'End If
-                            Call cpCore.htmlDoc.main_ProcessCheckList("EmailGroups", "Group Email", genericController.encodeText(editRecord.id), "Groups", "Email Groups", "EmailID", "GroupID")
-                            Call cpCore.htmlDoc.main_ProcessCheckList("EmailTopics", "Group Email", genericController.encodeText(editRecord.id), "Topics", "Email Topics", "EmailID", "TopicID")
+                            Call cpCore.html.main_ProcessCheckList("EmailGroups", "Group Email", genericController.encodeText(editRecord.id), "Groups", "Email Groups", "EmailID", "GroupID")
+                            Call cpCore.html.main_ProcessCheckList("EmailTopics", "Group Email", genericController.encodeText(editRecord.id), "Topics", "Email Topics", "EmailID", "TopicID")
                         Case "CCCONTENT"
                             '
                             '
@@ -10041,7 +10041,7 @@ ErrorTrap:
                             Call LoadContentTrackingResponse(adminContent, editRecord)
                             'Call LoadAndSaveCalendarEvents
                             Call LoadAndSaveMetaContent()
-                            Call cpCore.htmlDoc.main_ProcessCheckList("LibraryFolderRules", adminContent.Name, genericController.encodeText(editRecord.id), "Groups", "Library Folder Rules", "FolderID", "GroupID")
+                            Call cpCore.html.main_ProcessCheckList("LibraryFolderRules", adminContent.Name, genericController.encodeText(editRecord.id), "Groups", "Library Folder Rules", "FolderID", "GroupID")
                             'call SaveTopicRules
                             Call SaveContentTracking(adminContent, editRecord)
                         Case "CCSETUP"
@@ -10178,7 +10178,7 @@ ErrorTrap:
                             End If
                             '
                             editRecord.id = 0
-                            Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("id", genericController.encodeText(editRecord.id))
+                            Call cpCore.html.webServerIO_addRefreshQueryString("id", genericController.encodeText(editRecord.id))
                         End If
                     Case Else
                         '
@@ -10230,7 +10230,7 @@ ErrorTrap:
                                 End With
                             Next
                             '
-                            Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("id", genericController.encodeText(editRecord.id))
+                            Call cpCore.html.webServerIO_addRefreshQueryString("id", genericController.encodeText(editRecord.id))
                         End If
                         'Call cpCore.htmldoc.main_AddUserError("The create duplicate action is not supported for this content.")
                 End Select
@@ -10341,7 +10341,7 @@ ErrorTrap:
                             '    Link = Link
                             '    End If
                             NewWindow = cpCore.db.cs_getBoolean(CSMenus, "NewWindow")
-                            Call cpCore.htmlDoc.menu_AddEntry(genericController.encodeText(Id), ParentID.ToString, ImageLink, ImageOverLink, Link, LinkLabel, StyleSheet, StyleSheetHover, NewWindow)
+                            Call cpCore.html.menu_AddEntry(genericController.encodeText(Id), ParentID.ToString, ImageLink, ImageOverLink, Link, LinkLabel, StyleSheet, StyleSheetHover, NewWindow)
 
                             Call cpCore.db.cs_goNext(CSMenus)
                         Loop
@@ -10383,17 +10383,17 @@ ErrorTrap:
                             Call cpCore.db.cs_goNext(CSMenus)
                         Loop
                         GetMenuTopMode = GetMenuTopMode & "</tr></table>"
-                        GetMenuTopMode = cpCore.htmlDoc.main_GetPanel(GetMenuTopMode, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 1)
+                        GetMenuTopMode = cpCore.html.main_GetPanel(GetMenuTopMode, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 1)
                     End If
                     cpCore.db.cs_Close(CSMenus)
                     '
                     ' Save the Baked Menu
                     '
-                    MenuClose = cpCore.htmlDoc.menu_GetClose()
+                    MenuClose = cpCore.html.menu_GetClose()
                     'GetMenuTopMode = GetMenuTopMode & cpCore.main_GetMenuClose
                     Call cpCore.cache.setObject(BakeName, GetMenuTopMode & MenuDelimiter & MenuClose, "Menu Entries,People,Content,Groups,Group Rules")
                 End If
-                cpCore.htmlDoc.htmlForEndOfBody = cpCore.htmlDoc.htmlForEndOfBody & MenuClose
+                cpCore.html.htmlForEndOfBody = cpCore.html.htmlForEndOfBody & MenuClose
             End If
             Exit Function
             '
@@ -10733,11 +10733,11 @@ ErrorTrap:
 
                     Call Content.Add(Adminui.GetEditRow(FieldValue, "Parent Content Name", "", False, False, ""))
                     '
-                    FieldValue = cpCore.htmlDoc.html_GetFormInputText2("ChildContentName", ChildContentName, 1, 40)
+                    FieldValue = cpCore.html.html_GetFormInputText2("ChildContentName", ChildContentName, 1, 40)
                     Call Content.Add(Adminui.GetEditRow(FieldValue, "New Child Content Name", "", False, False, ""))
                     '
-                    FieldValue = cpCore.htmlDoc.html_GetFormInputRadioBox("NewGroup", False.ToString, NewGroup.ToString) & cpCore.htmlDoc.main_GetFormInputSelect2("GroupID", GroupID, "Groups", "", "", "", IsEmptyList) & "(Select a current group)" _
-                        & "<br>" & cpCore.htmlDoc.html_GetFormInputRadioBox("NewGroup", True.ToString, NewGroup.ToString) & cpCore.htmlDoc.html_GetFormInputText2("NewGroupName", NewGroupName) & "(Create a new group)"
+                    FieldValue = cpCore.html.html_GetFormInputRadioBox("NewGroup", False.ToString, NewGroup.ToString) & cpCore.html.main_GetFormInputSelect2("GroupID", GroupID, "Groups", "", "", "", IsEmptyList) & "(Select a current group)" _
+                        & "<br>" & cpCore.html.html_GetFormInputRadioBox("NewGroup", True.ToString, NewGroup.ToString) & cpCore.html.html_GetFormInputText2("NewGroupName", NewGroupName) & "(Create a new group)"
                     Call Content.Add(Adminui.GetEditRow(FieldValue, "Content Manager Group", "", False, False, ""))
                     '            '
                     '            FieldValue = cpCore.main_GetFormInputCheckBox2("AddAdminMenuEntry", AddAdminMenuEntry) & "(Add Navigator Entry under Manager Site Content &gt; Advanced)"
@@ -10748,7 +10748,7 @@ ErrorTrap:
                     '
                     ButtonList = ButtonOK & "," & ButtonCancel
                 End If
-                Content.Add(cpCore.htmlDoc.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormContentChildTool))
+                Content.Add(cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormContentChildTool))
             End If
             '
             Caption = "Create Content Definition"
@@ -10970,19 +10970,19 @@ ErrorTrap:
                 Call Content.Add(genericController.StartTableRow() & "<td colspan=""3"" class=""ccPanel3D ccAdminEditSubHeader""><b>Options</b>" & kmaEndTableCell & kmaEndTableRow)
                 '
                 Caption = "Archive Age"
-                Copy = cpCore.htmlDoc.html_GetFormInputText2("ArchiveRecordAgeDays", CStr(ArchiveRecordAgeDays), , 20) & "&nbsp;Number of days to keep visit records. 0 disables housekeeping."
+                Copy = cpCore.html.html_GetFormInputText2("ArchiveRecordAgeDays", CStr(ArchiveRecordAgeDays), , 20) & "&nbsp;Number of days to keep visit records. 0 disables housekeeping."
                 Call Content.Add(Adminui.GetEditRow(Copy, Caption))
                 '
                 Caption = "Housekeeping Time"
-                Copy = cpCore.htmlDoc.html_GetFormInputText2("ArchiveTimeOfDay", ArchiveTimeOfDay, , 20) & "&nbsp;The time of day when record deleting should start."
+                Copy = cpCore.html.html_GetFormInputText2("ArchiveTimeOfDay", ArchiveTimeOfDay, , 20) & "&nbsp;The time of day when record deleting should start."
                 Call Content.Add(Adminui.GetEditRow(Copy, Caption))
                 '
                 Caption = "Purge Content Files"
-                Copy = cpCore.htmlDoc.html_GetFormInputCheckBox2("ArchiveAllowFileClean", ArchiveAllowFileClean) & "&nbsp;Delete Contensive content files with no associated database record."
+                Copy = cpCore.html.html_GetFormInputCheckBox2("ArchiveAllowFileClean", ArchiveAllowFileClean) & "&nbsp;Delete Contensive content files with no associated database record."
                 Call Content.Add(Adminui.GetEditRow(Copy, Caption))
                 '
                 Content.Add(Adminui.EditTableClose)
-                Content.Add(cpCore.htmlDoc.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminformHousekeepingControl))
+                Content.Add(cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminformHousekeepingControl))
                 ButtonList = ButtonCancel & ",Refresh," & ButtonSave & "," & ButtonOK
             End If
             '
@@ -10990,7 +10990,7 @@ ErrorTrap:
             Description = "This tool is used to control the database record housekeeping process. This process deletes visit history records, so care should be taken before making any changes."
             GetForm_HouseKeepingControl = Adminui.GetBody(Caption, ButtonList, "", False, False, Description, "", 0, Content.Text)
             '
-            Call cpCore.htmlDoc.main_AddPagetitle(Caption)
+            Call cpCore.html.main_AddPagetitle(Caption)
             Exit Function
             '
             ' ----- Error Trap
@@ -11039,10 +11039,10 @@ ErrorTrap:
             ElseIf ProcessRequest Then
                 CurrentValue = cpCore.docProperties.getText(Name)
                 Call cpCore.siteProperties.setProperty(Name, CurrentValue)
-                GetPropertyHTMLControl = cpCore.htmlDoc.html_GetFormInputHTML(Name, CurrentValue)
+                GetPropertyHTMLControl = cpCore.html.html_GetFormInputHTML(Name, CurrentValue)
             Else
                 CurrentValue = cpCore.siteProperties.getText(Name, DefaultValue)
-                GetPropertyHTMLControl = cpCore.htmlDoc.html_GetFormInputHTML(Name, CurrentValue)
+                GetPropertyHTMLControl = cpCore.html.html_GetFormInputHTML(Name, CurrentValue)
             End If
             Exit Function
             '
@@ -11088,17 +11088,17 @@ ErrorTrap:
                     AllowCSSReset = (cpCore.siteProperties.getBoolean("Allow CSS Reset", False))
                 End If
                 '
-                Copy = cpCore.htmlDoc.html_GetFormInputTextExpandable("StyleEditor", cpCore.cdnFiles.readFile(DynamicStylesFilename), 20)
+                Copy = cpCore.html.html_GetFormInputTextExpandable("StyleEditor", cpCore.cdnFiles.readFile(DynamicStylesFilename), 20)
                 Copy = genericController.vbReplace(Copy, " cols=""100""", " style=""width:100%;""", 1, 99, vbTextCompare)
                 Copy = "" _
-                    & "<div style=""padding:10px;"">" & cpCore.htmlDoc.html_GetFormInputCheckBox2(RequestNameAllowCSSReset, AllowCSSReset) & "&nbsp;Include Contensive reset styles</div>" _
+                    & "<div style=""padding:10px;"">" & cpCore.html.html_GetFormInputCheckBox2(RequestNameAllowCSSReset, AllowCSSReset) & "&nbsp;Include Contensive reset styles</div>" _
                     & "<div style=""padding:10px;"">" & Copy & "</div>"
 
                 '& "<div style=""padding:10px;"">" & cpCore.main_GetFormInputCheckBox2(RequestNameInlineStyles, (StyleSN = 0)) & "&nbsp;Force site styles inline</div>"
 
                 Content.Add(Copy)
                 ButtonList = ButtonCancel & "," & ButtonRefresh & "," & ButtonSave & "," & ButtonOK
-                Content.Add(cpCore.htmlDoc.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormStyleEditor))
+                Content.Add(cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormStyleEditor))
             End If
             '
             Description = "" _
@@ -11114,7 +11114,7 @@ ErrorTrap:
                 & ""
             admin_GetForm_StyleEditor = Adminui.GetBody("Site Styles", ButtonList, "", True, True, Description, "", 0, Content.Text)
             '
-            Call cpCore.htmlDoc.main_AddPagetitle("Style Editor")
+            Call cpCore.html.main_AddPagetitle("Style Editor")
             Exit Function
             '
             ' ----- Error Trap
@@ -11544,7 +11544,7 @@ ErrorTrap:
                 '
                 'Tab0.Add( "<p>The following is a list of available downloads</p>")
                 ''
-                RQS = cpCore.htmlDoc.refreshQueryString
+                RQS = cpCore.html.refreshQueryString
                 PageSize = cpCore.docProperties.getInteger(RequestNamePageSize)
                 If PageSize = 0 Then
                     PageSize = 50
@@ -11605,7 +11605,7 @@ ErrorTrap:
                         RecordID = cpCore.db.cs_getInteger(CS, "ID")
                         DateCompleted = cpCore.db.cs_getDate(CS, "DateCompleted")
                         ResultMessage = cpCore.db.cs_getText(CS, "ResultMessage")
-                        Cells(RowPointer, 0) = cpCore.htmlDoc.html_GetFormInputCheckBox2("Row" & RowPointer) & cpCore.htmlDoc.html_GetFormInputHidden("RowID" & RowPointer, RecordID)
+                        Cells(RowPointer, 0) = cpCore.html.html_GetFormInputCheckBox2("Row" & RowPointer) & cpCore.html.html_GetFormInputHidden("RowID" & RowPointer, RecordID)
                         Cells(RowPointer, 1) = cpCore.db.cs_getText(CS, "name")
                         Cells(RowPointer, 2) = cpCore.db.cs_getText(CS, "CreatedByName")
                         Cells(RowPointer, 3) = cpCore.db.cs_getDate(CS, "DateAdded").ToShortDateString
@@ -11649,7 +11649,7 @@ ErrorTrap:
                     Loop
                 End If
                 Call cpCore.db.cs_Close(CS)
-                Tab0.Add(cpCore.htmlDoc.html_GetFormInputHidden("RowCnt", RowPointer))
+                Tab0.Add(cpCore.html.html_GetFormInputHidden("RowCnt", RowPointer))
                 Cell = Adminui.GetReport(RowPointer, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, "ccPanel")
                 Tab0.Add(Cell)
                 'Tab0.Add( "<div style=""height:200px;"">" & Cell & "</div>"
@@ -11687,7 +11687,7 @@ ErrorTrap:
                 ButtonListLeft = ButtonCancel & "," & ButtonRefresh & "," & ButtonDelete
                 'ButtonListLeft = ButtonCancel & "," & ButtonRefresh & "," & ButtonDelete & "," & ButtonRequestDownload
                 ButtonListRight = ""
-                Content = Content & cpCore.htmlDoc.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormDownloads)
+                Content = Content & cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormDownloads)
             End If
             '
             Caption = "Download Manager"
@@ -11697,7 +11697,7 @@ ErrorTrap:
             ContentPadding = 0
             GetForm_Downloads = Adminui.GetBody(Caption, ButtonListLeft, ButtonListRight, True, True, Description, ContentSummary, ContentPadding, Content)
             '
-            Call cpCore.htmlDoc.main_AddPagetitle(Caption)
+            Call cpCore.html.main_AddPagetitle(Caption)
             Exit Function
             '
             ' ----- Error Trap
@@ -11717,7 +11717,7 @@ ErrorTrap:
                 If Not AllowAdminTabs Then
                     GetForm_Edit_AddTab = Content
                 Else
-                    Call cpCore.htmlDoc.menu_AddComboTabEntry(Replace(Caption, " ", "&nbsp;"), "", "", Content, False, "ccAdminTab")
+                    Call cpCore.html.menu_AddComboTabEntry(Replace(Caption, " ", "&nbsp;"), "", "", Content, False, "ccAdminTab")
                     'Call cpCore.htmldoc.main_AddLiveTabEntry(Replace(Caption, " ", "&nbsp;"), Content, "ccAdminTab")
                 End If
             End If
@@ -11744,12 +11744,12 @@ ErrorTrap:
                 '
                 ' Ajax Tab
                 '
-                Call cpCore.htmlDoc.menu_AddComboTabEntry(Replace(Caption, " ", "&nbsp;"), "", AjaxLink, "", False, "ccAdminTab")
+                Call cpCore.html.menu_AddComboTabEntry(Replace(Caption, " ", "&nbsp;"), "", AjaxLink, "", False, "ccAdminTab")
             Else
                 '
                 ' Live Tab
                 '
-                Call cpCore.htmlDoc.menu_AddComboTabEntry(Replace(Caption, " ", "&nbsp;"), "", "", Content, False, "ccAdminTab")
+                Call cpCore.html.menu_AddComboTabEntry(Replace(Caption, " ", "&nbsp;"), "", "", Content, False, "ccAdminTab")
             End If
             '
             Exit Function
@@ -11880,7 +11880,7 @@ ErrorTrap:
                 '
                 ' moved this to GetEditTabContent - so one is added for each tab.
                 '
-                returnHtml &= cpCore.htmlDoc.html_GetFormInputHidden("FormFieldList", FormFieldList)
+                returnHtml &= cpCore.html.html_GetFormInputHidden("FormFieldList", FormFieldList)
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
@@ -12188,7 +12188,7 @@ ErrorTrap:
                 '
                 Tab0.Add("<p>The following is a list of available custom reports.</p>")
                 '
-                RQS = cpCore.htmlDoc.refreshQueryString
+                RQS = cpCore.html.refreshQueryString
                 PageSize = cpCore.docProperties.getInteger(RequestNamePageSize)
                 If PageSize = 0 Then
                     PageSize = 50
@@ -12244,7 +12244,7 @@ ErrorTrap:
                     Do While cpCore.db.cs_ok(CS) And (RowPointer < PageSize)
                         RecordID = cpCore.db.cs_getInteger(CS, "ID")
                         'DateCompleted = cpCore.db.cs_getDate(CS, "DateCompleted")
-                        Cells(RowPointer, 0) = cpCore.htmlDoc.html_GetFormInputCheckBox2("Row" & RowPointer) & cpCore.htmlDoc.html_GetFormInputHidden("RowID" & RowPointer, RecordID)
+                        Cells(RowPointer, 0) = cpCore.html.html_GetFormInputCheckBox2("Row" & RowPointer) & cpCore.html.html_GetFormInputHidden("RowID" & RowPointer, RecordID)
                         Cells(RowPointer, 1) = cpCore.db.cs_getText(CS, "name")
                         Cells(RowPointer, 2) = cpCore.db.cs_get(CS, "CreatedBy")
                         Cells(RowPointer, 3) = cpCore.db.cs_getDate(CS, "DateAdded").ToShortDateString
@@ -12255,7 +12255,7 @@ ErrorTrap:
                 End If
                 Call cpCore.db.cs_Close(CS)
                 Dim Cell As String
-                Tab0.Add(cpCore.htmlDoc.html_GetFormInputHidden("RowCnt", RowPointer))
+                Tab0.Add(cpCore.html.html_GetFormInputHidden("RowCnt", RowPointer))
                 Dim Adminui As New adminUIController(cpCore)
                 Cell = Adminui.GetReport(RowPointer, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, "ccPanel")
                 Tab0.Add("<div>" & Cell & "</div>")
@@ -12268,12 +12268,12 @@ ErrorTrap:
                 '
                 Call Tab1.Add("<tr>")
                 Call Tab1.Add("<td align=right>Name</td>")
-                Call Tab1.Add("<td>" & cpCore.htmlDoc.html_GetFormInputText2("Name", "", 1, 40) & "</td>")
+                Call Tab1.Add("<td>" & cpCore.html.html_GetFormInputText2("Name", "", 1, 40) & "</td>")
                 Call Tab1.Add("</tr>")
                 '
                 Call Tab1.Add("<tr>")
                 Call Tab1.Add("<td align=right>SQL Query</td>")
-                Call Tab1.Add("<td>" & cpCore.htmlDoc.html_GetFormInputText2(SQLFieldName, "", 8, 40) & "</td>")
+                Call Tab1.Add("<td>" & cpCore.html.html_GetFormInputText2(SQLFieldName, "", 8, 40) & "</td>")
                 Call Tab1.Add("</tr>")
                 '
                 Call Tab1.Add("" _
@@ -12285,15 +12285,15 @@ ErrorTrap:
                 '
                 ' Build and add tabs
                 '
-                Call cpCore.htmlDoc.main_AddLiveTabEntry("Custom&nbsp;Reports", Tab0.Text, "ccAdminTab")
-                Call cpCore.htmlDoc.main_AddLiveTabEntry("Request&nbsp;New&nbsp;Report", Tab1.Text, "ccAdminTab")
-                Content = cpCore.htmlDoc.main_GetLiveTabs()
+                Call cpCore.html.main_AddLiveTabEntry("Custom&nbsp;Reports", Tab0.Text, "ccAdminTab")
+                Call cpCore.html.main_AddLiveTabEntry("Request&nbsp;New&nbsp;Report", Tab1.Text, "ccAdminTab")
+                Content = cpCore.html.main_GetLiveTabs()
                 '
             End If
             '
             GetForm_CustomReports = admin_GetAdminFormBody(Caption, ButtonListLeft, ButtonListRight, True, True, Description, ContentSummary, ContentPadding, Content)
             '
-            Call cpCore.htmlDoc.main_AddPagetitle("Custom Reports")
+            Call cpCore.html.main_AddPagetitle("Custom Reports")
             Exit Function
             '
             ' ----- Error Trap
@@ -12513,14 +12513,14 @@ ErrorTrap:
                             '
                             ' Refresh Query String
                             '
-                            Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("tr", IndexConfig.RecordTop.ToString())
-                            Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("asf", AdminForm.ToString())
-                            Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("cid", adminContent.Id.ToString())
-                            Call cpCore.htmlDoc.webServerIO_addRefreshQueryString(RequestNameTitleExtension, cpCore.htmlDoc.main_EncodeRequestVariable(TitleExtension))
+                            Call cpCore.html.webServerIO_addRefreshQueryString("tr", IndexConfig.RecordTop.ToString())
+                            Call cpCore.html.webServerIO_addRefreshQueryString("asf", AdminForm.ToString())
+                            Call cpCore.html.webServerIO_addRefreshQueryString("cid", adminContent.Id.ToString())
+                            Call cpCore.html.webServerIO_addRefreshQueryString(RequestNameTitleExtension, cpCore.html.main_EncodeRequestVariable(TitleExtension))
                             If WherePairCount > 0 Then
                                 For WhereCount = 0 To WherePairCount - 1
-                                    Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("wl" & WhereCount, WherePair(0, WhereCount))
-                                    Call cpCore.htmlDoc.webServerIO_addRefreshQueryString("wr" & WhereCount, WherePair(1, WhereCount))
+                                    Call cpCore.html.webServerIO_addRefreshQueryString("wl" & WhereCount, WherePair(0, WhereCount))
+                                    Call cpCore.html.webServerIO_addRefreshQueryString("wr" & WhereCount, WherePair(1, WhereCount))
                                 Next
                             End If
                             '
@@ -12528,9 +12528,9 @@ ErrorTrap:
                             '
                             AllowAdd = adminContent.AllowAdd And (Not IsLimitedToSubContent) And (allowCMAdd)
                             If MenuDepth > 0 Then
-                                LeftButtons = LeftButtons & cpCore.htmlDoc.html_GetFormButton(ButtonClose, , , "window.close();")
+                                LeftButtons = LeftButtons & cpCore.html.html_GetFormButton(ButtonClose, , , "window.close();")
                             Else
-                                LeftButtons = LeftButtons & cpCore.htmlDoc.html_GetFormButton(ButtonCancel)
+                                LeftButtons = LeftButtons & cpCore.html.html_GetFormButton(ButtonCancel)
                                 'LeftButtons = LeftButtons & cpCore.main_GetFormButton(ButtonCancel, , , "return processSubmit(this)")
                             End If
                             If AllowAdd Then
@@ -12695,7 +12695,7 @@ ErrorTrap:
                                 & "</div>"
                             TitleRows = 0
                             If SubTitle <> "" Then
-                                Title = Title & "<div style=""clear:both"">Filter: " & cpCore.htmlDoc.html_EncodeHTML(Mid(SubTitle, 3)) & "</div>"
+                                Title = Title & "<div style=""clear:both"">Filter: " & cpCore.html.html_EncodeHTML(Mid(SubTitle, 3)) & "</div>"
                                 TitleRows = TitleRows + 1
                             End If
                             If ContentAccessLimitMessage <> "" Then
@@ -12766,7 +12766,7 @@ ErrorTrap:
                                         & vbCrLf & "<div id=""IndexFilterContentClosed"" class=""closed"">" & FilterClosedLabel & "</div>" _
                                         & vbCrLf & "<div id=""IndexFilterContentMinWidth"" style=""display:none;""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""200"" height=""1"" style=""clear:both""></div>" _
                                         & vbCrLf & "</div>"
-                                    AjaxQS = cpCore.htmlDoc.refreshQueryString
+                                    AjaxQS = cpCore.html.refreshQueryString
                                     AjaxQS = genericController.ModifyQueryString(AjaxQS, RequestNameAjaxFunction, AjaxOpenIndexFilterGetContent)
                                     IndexFilterJS = "" _
                                         & vbCrLf & "<script Language=""JavaScript"" type=""text/javascript"">" _
@@ -12820,7 +12820,7 @@ ErrorTrap:
                                 '
                                 'if this is a current sort ,add the reverse flag
                                 '
-                                ButtonHref = cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormIndex & "&SetSortField=" & FieldName & "&RT=0&" & RequestNameTitleExtension & "=" & cpCore.htmlDoc.main_EncodeRequestVariable(TitleExtension) & "&cid=" & adminContent.Id & "&ad=" & MenuDepth
+                                ButtonHref = cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormIndex & "&SetSortField=" & FieldName & "&RT=0&" & RequestNameTitleExtension & "=" & cpCore.html.main_EncodeRequestVariable(TitleExtension) & "&cid=" & adminContent.Id & "&ad=" & MenuDepth
                                 For Each sortKvp In IndexConfig.Sorts
                                     Dim sort As indexConfigSortClass = sortKvp.Value
 
@@ -12836,8 +12836,8 @@ ErrorTrap:
                                 If WherePairCount > 0 Then
                                     For WhereCount = 0 To WherePairCount - 1
                                         If WherePair(0, WhereCount) <> "" Then
-                                            ButtonHref &= "&wl" & WhereCount & "=" & cpCore.htmlDoc.main_EncodeRequestVariable(WherePair(0, WhereCount))
-                                            ButtonHref &= "&wr" & WhereCount & "=" & cpCore.htmlDoc.main_EncodeRequestVariable(WherePair(1, WhereCount))
+                                            ButtonHref &= "&wl" & WhereCount & "=" & cpCore.html.main_EncodeRequestVariable(WherePair(0, WhereCount))
+                                            ButtonHref &= "&wr" & WhereCount & "=" & cpCore.html.main_EncodeRequestVariable(WherePair(1, WhereCount))
                                         End If
                                     Next
                                 End If
@@ -12856,7 +12856,7 @@ ErrorTrap:
                                 ButtonObject = "Button" & ButtonObjectCount
                                 ButtonObjectCount = ButtonObjectCount + 1
                                 DataTable_HdrRow &= "<td width=""" & ColumnWidth & "%"" valign=bottom align=left class=""ccAdminListCaption"">"
-                                DataTable_HdrRow &= ("<a title=""" & SortTitle & """ href=""" & cpCore.htmlDoc.html_EncodeHTML(ButtonHref) & """ class=""ccAdminListCaption"">" & ButtonFace & "</A>")
+                                DataTable_HdrRow &= ("<a title=""" & SortTitle & """ href=""" & cpCore.html.html_EncodeHTML(ButtonHref) & """ class=""ccAdminListCaption"">" & ButtonFace & "</A>")
                                 DataTable_HdrRow &= ("</td>")
                             Next
                             DataTable_HdrRow &= ("</tr>")
@@ -12907,17 +12907,17 @@ ErrorTrap:
                                     URI = cpCore.serverConfig.appConfig.adminRoute _
                                         & "?" & RequestNameAdminAction & "=" & AdminActionNop _
                                         & "&id=" & RecordID _
-                                        & "&" & RequestNameTitleExtension & "=" & cpCore.htmlDoc.main_EncodeRequestVariable(TitleExtension) _
+                                        & "&" & RequestNameTitleExtension & "=" & cpCore.html.main_EncodeRequestVariable(TitleExtension) _
                                         & "&ad=" & MenuDepth _
                                         & "&cid=" & adminContent.Id _
                                         & "&" & RequestNameAdminSourceForm & "=" & AdminForm _
                                         & "&" & RequestNameAdminForm & "=" & AdminFormEdit
                                     If WherePairCount > 0 Then
                                         For WhereCount = 0 To WherePairCount - 1
-                                            URI = URI & "&wl" & WhereCount & "=" & cpCore.htmlDoc.main_EncodeRequestVariable(WherePair(0, WhereCount)) & "&wr" & WhereCount & "=" & cpCore.htmlDoc.main_EncodeRequestVariable(WherePair(1, WhereCount))
+                                            URI = URI & "&wl" & WhereCount & "=" & cpCore.html.main_EncodeRequestVariable(WherePair(0, WhereCount)) & "&wr" & WhereCount & "=" & cpCore.html.main_EncodeRequestVariable(WherePair(1, WhereCount))
                                         Next
                                     End If
-                                    DataTable_DataRows &= ("<a href=""" & cpCore.htmlDoc.html_EncodeHTML(URI) & """><img src=""/ccLib/images/IconContentEdit.gif"" border=""0""></a>")
+                                    DataTable_DataRows &= ("<a href=""" & cpCore.html.html_EncodeHTML(URI) & """><img src=""/ccLib/images/IconContentEdit.gif"" border=""0""></a>")
                                     DataTable_DataRows &= ("</td>")
                                     '
                                     ' --- field columns
@@ -13021,7 +13021,7 @@ ErrorTrap:
                                 & vbCrLf & "  }" _
                                 & vbCrLf & "} " _
                                 & vbCrLf & "</script>"
-                            DataTable_FindRow = DataTable_FindRow & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""60"" height=""1"" ><br >" & cpCore.htmlDoc.html_GetFormButton(ButtonFind, , "FindButton") & "</td>"
+                            DataTable_FindRow = DataTable_FindRow & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""60"" height=""1"" ><br >" & cpCore.html.html_GetFormButton(ButtonFind, , "FindButton") & "</td>"
                             ColumnPointer = 0
                             For Each kvp In IndexConfig.Columns
                                 Dim column As indexConfigColumnClass = kvp.Value
@@ -13077,17 +13077,17 @@ ErrorTrap:
                             ' Assemble LiveWindowTable
                             '
                             ' Stream.Add( OpenLiveWindowTable)
-                            Stream.Add(vbCrLf & cpCore.htmlDoc.html_GetFormStart(, "adminForm"))
+                            Stream.Add(vbCrLf & cpCore.html.html_GetFormStart(, "adminForm"))
                             Stream.Add("<input type=""hidden"" name=""indexGoToPage"" value="""">")
                             Stream.Add(ButtonBar)
                             Stream.Add(Adminui.GetTitleBar(TitleBar, HeaderDescription))
                             Stream.Add(FilterDataTable)
                             Stream.Add(ButtonBar)
-                            Stream.Add(cpCore.htmlDoc.main_GetPanel("<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"", height=""10"" >"))
+                            Stream.Add(cpCore.html.main_GetPanel("<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"", height=""10"" >"))
                             Stream.Add("<input type=hidden name=Columncnt VALUE=" & IndexConfig.Columns.Count & ">")
                             Stream.Add("</form>")
                             '  Stream.Add( CloseLiveWindowTable)
-                            Call cpCore.htmlDoc.main_AddPagetitle(adminContent.Name)
+                            Call cpCore.html.main_AddPagetitle(adminContent.Name)
                         End If
                     End If
                     'End If
@@ -14418,7 +14418,7 @@ ErrorTrap:
         '
         '
         Private Function GetFormInputWithFocus2(ByVal ElementName As String, Optional ByVal CurrentValue As String = "", Optional ByVal Height As Integer = -1, Optional ByVal Width As Integer = -1, Optional ByVal ElementID As String = "", Optional ByVal OnFocusJavascript As String = "", Optional ByVal HtmlClass As String = "") As String
-            GetFormInputWithFocus2 = cpCore.htmlDoc.html_GetFormInputText2(ElementName, CurrentValue, Height, Width, ElementID)
+            GetFormInputWithFocus2 = cpCore.html.html_GetFormInputText2(ElementName, CurrentValue, Height, Width, ElementID)
             If OnFocusJavascript <> "" Then
                 GetFormInputWithFocus2 = genericController.vbReplace(GetFormInputWithFocus2, ">", " onFocus=""" & OnFocusJavascript & """>")
             End If
@@ -14436,7 +14436,7 @@ ErrorTrap:
         '
         '
         Private Function GetFormInputDateWithFocus2(ByVal ElementName As String, Optional ByVal CurrentValue As String = "", Optional ByVal Width As String = "", Optional ByVal ElementID As String = "", Optional ByVal OnFocusJavascript As String = "", Optional ByVal HtmlClass As String = "") As String
-            GetFormInputDateWithFocus2 = cpCore.htmlDoc.html_GetFormInputDate(ElementName, CurrentValue, Width, ElementID)
+            GetFormInputDateWithFocus2 = cpCore.html.html_GetFormInputDate(ElementName, CurrentValue, Width, ElementID)
             If OnFocusJavascript <> "" Then
                 GetFormInputDateWithFocus2 = genericController.vbReplace(GetFormInputDateWithFocus2, ">", " onFocus=""" & OnFocusJavascript & """>")
             End If
@@ -14542,17 +14542,17 @@ ErrorTrap:
                     End If
                     IndexConfig = LoadIndexConfig(adminContent)
                     Button = "CriteriaSelect"
-                    RQS = cpCore.htmlDoc.refreshQueryString
+                    RQS = cpCore.html.refreshQueryString
                     '
                     ' ----- ButtonBar
                     '
                     If MenuDepth > 0 Then
-                        LeftButtons &= cpCore.htmlDoc.html_GetFormButton(ButtonClose, , , "window.close();")
+                        LeftButtons &= cpCore.html.html_GetFormButton(ButtonClose, , , "window.close();")
                     Else
-                        LeftButtons &= cpCore.htmlDoc.html_GetFormButton(ButtonCancel)
+                        LeftButtons &= cpCore.html.html_GetFormButton(ButtonCancel)
                         'LeftButtons &= cpCore.main_GetFormButton(ButtonCancel, , , "return processSubmit(this)")
                     End If
-                    LeftButtons &= cpCore.htmlDoc.html_GetFormButton(ButtonSearch)
+                    LeftButtons &= cpCore.html.html_GetFormButton(ButtonSearch)
                     'LeftButtons &= cpCore.main_GetFormButton(ButtonSearch, , , "return processSubmit(this)")
                     ButtonBar = Adminui.GetButtonBar(LeftButtons, "")
                     '
@@ -14687,7 +14687,7 @@ ErrorTrap:
                     '
                     RowPointer = 0
                     For FieldPtr = 0 To FieldCnt - 1
-                        returnForm = returnForm & cpCore.htmlDoc.html_GetFormInputHidden("fieldname" & FieldPtr, FieldNames(FieldPtr))
+                        returnForm = returnForm & cpCore.html.html_GetFormInputHidden("fieldname" & FieldPtr, FieldNames(FieldPtr))
                         RowEven = ((RowPointer Mod 2) = 0)
                         FieldMatchOption = FieldMatchOptions(FieldPtr)
                         Select Case fieldTypeId(FieldPtr)
@@ -14700,12 +14700,12 @@ ErrorTrap:
                                 & "<td class=""ccAdminEditCaption"">" & FieldCaption(FieldPtr) & "</td>" _
                                 & "<td class=""ccAdminEditField"">" _
                                 & "<div style=""display:block;float:left;width:800px;"">" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.htmlDoc.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchIgnore).ToString, FieldMatchOption.ToString, "") & "ignore</div>" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.htmlDoc.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchEmpty).ToString, FieldMatchOption.ToString, "") & "empty</div>" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.htmlDoc.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchNotEmpty).ToString, FieldMatchOption.ToString, "") & "not&nbsp;empty</div>" _
-                                & "<div style=""display:block;float:left;width:50px;"">" & cpCore.htmlDoc.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchEquals).ToString, FieldMatchOption.ToString, "") & "=</div>" _
-                                & "<div style=""display:block;float:left;width:50px;"">" & cpCore.htmlDoc.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchGreaterThan).ToString, FieldMatchOption.ToString, "") & "&gt;</div>" _
-                                & "<div style=""display:block;float:left;width:50px;"">" & cpCore.htmlDoc.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchLessThan).ToString, FieldMatchOption.ToString, "") & "&lt;</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.html.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchIgnore).ToString, FieldMatchOption.ToString, "") & "ignore</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.html.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchEmpty).ToString, FieldMatchOption.ToString, "") & "empty</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.html.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchNotEmpty).ToString, FieldMatchOption.ToString, "") & "not&nbsp;empty</div>" _
+                                & "<div style=""display:block;float:left;width:50px;"">" & cpCore.html.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchEquals).ToString, FieldMatchOption.ToString, "") & "=</div>" _
+                                & "<div style=""display:block;float:left;width:50px;"">" & cpCore.html.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchGreaterThan).ToString, FieldMatchOption.ToString, "") & "&gt;</div>" _
+                                & "<div style=""display:block;float:left;width:50px;"">" & cpCore.html.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchLessThan).ToString, FieldMatchOption.ToString, "") & "&lt;</div>" _
                                 & "<div style=""display:block;float:left;width:300px;"">" & GetFormInputDateWithFocus2("fieldvalue" & FieldPtr, FieldValue(FieldPtr), "5", "", "", "ccAdvSearchText") & "</div>" _
                                 & "</div>" _
                                 & "</td>" _
@@ -14720,12 +14720,12 @@ ErrorTrap:
                                 & "<td class=""ccAdminEditCaption"">" & FieldCaption(FieldPtr) & "</td>" _
                                 & "<td class=""ccAdminEditField"">" _
                                 & "<div style=""display:block;float:left;width:800px;"">" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.htmlDoc.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchIgnore).ToString, FieldMatchOption.ToString, "") & "ignore</div>" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.htmlDoc.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchEmpty).ToString, FieldMatchOption.ToString, "") & "empty</div>" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.htmlDoc.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchNotEmpty).ToString, FieldMatchOption.ToString, "") & "not&nbsp;empty</div>" _
-                                & "<div style=""display:block;float:left;width:50px;"">" & cpCore.htmlDoc.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.matchincludes).ToString, FieldMatchOption.ToString, "n" & FieldPtr) & "=</div>" _
-                                & "<div style=""display:block;float:left;width:50px;"">" & cpCore.htmlDoc.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchGreaterThan).ToString, FieldMatchOption.ToString, "") & "&gt;</div>" _
-                                & "<div style=""display:block;float:left;width:50px;"">" & cpCore.htmlDoc.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchLessThan).ToString, FieldMatchOption.ToString, "") & "&lt;</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.html.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchIgnore).ToString, FieldMatchOption.ToString, "") & "ignore</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.html.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchEmpty).ToString, FieldMatchOption.ToString, "") & "empty</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.html.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchNotEmpty).ToString, FieldMatchOption.ToString, "") & "not&nbsp;empty</div>" _
+                                & "<div style=""display:block;float:left;width:50px;"">" & cpCore.html.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.matchincludes).ToString, FieldMatchOption.ToString, "n" & FieldPtr) & "=</div>" _
+                                & "<div style=""display:block;float:left;width:50px;"">" & cpCore.html.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchGreaterThan).ToString, FieldMatchOption.ToString, "") & "&gt;</div>" _
+                                & "<div style=""display:block;float:left;width:50px;"">" & cpCore.html.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchLessThan).ToString, FieldMatchOption.ToString, "") & "&lt;</div>" _
                                 & "<div style=""display:block;float:left;width:300px;"">" & GetFormInputWithFocus2("fieldvalue" & FieldPtr, FieldValue(FieldPtr), 1, 5, "", "var e=getElementById('n" & FieldPtr & "');e.checked=1;", "ccAdvSearchText") & "</div>" _
                                 & "</div>" _
                                 & "</td>" _
@@ -14763,9 +14763,9 @@ ErrorTrap:
                                 & "<td class=""ccAdminEditCaption"">" & FieldCaption(FieldPtr) & "</td>" _
                                 & "<td class=""ccAdminEditField"">" _
                                 & "<div style=""display:block;float:left;width:800px;"">" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.htmlDoc.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchIgnore).ToString, FieldMatchOption.ToString, "") & "ignore</div>" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.htmlDoc.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchEmpty).ToString, FieldMatchOption.ToString, "") & "empty</div>" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.htmlDoc.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchNotEmpty).ToString, FieldMatchOption.ToString, "") & "not&nbsp;empty</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.html.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchIgnore).ToString, FieldMatchOption.ToString, "") & "ignore</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.html.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchEmpty).ToString, FieldMatchOption.ToString, "") & "empty</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.html.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchNotEmpty).ToString, FieldMatchOption.ToString, "") & "not&nbsp;empty</div>" _
                                 & "</div>" _
                                 & "</td>" _
                                 & "</tr>"
@@ -14793,9 +14793,9 @@ ErrorTrap:
                                 & "<td class=""ccAdminEditCaption"">" & FieldCaption(FieldPtr) & "</td>" _
                                 & "<td class=""ccAdminEditField"">" _
                                 & "<div style=""display:block;float:left;width:800px;"">" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.htmlDoc.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchIgnore).ToString, FieldMatchOption.ToString, "") & "ignore</div>" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.htmlDoc.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchTrue).ToString, FieldMatchOption.ToString, "") & "true</div>" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.htmlDoc.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchFalse).ToString, FieldMatchOption.ToString, "") & "false</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.html.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchIgnore).ToString, FieldMatchOption.ToString, "") & "ignore</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.html.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchTrue).ToString, FieldMatchOption.ToString, "") & "true</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.html.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchFalse).ToString, FieldMatchOption.ToString, "") & "false</div>" _
                                 & "</div>" _
                                 & "</td>" _
                                 & "</tr>"
@@ -14822,10 +14822,10 @@ ErrorTrap:
                                 & "<td class=""ccAdminEditCaption"">" & FieldCaption(FieldPtr) & "</td>" _
                                 & "<td class=""ccAdminEditField"">" _
                                 & "<div style=""display:block;float:left;width:800px;"">" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.htmlDoc.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchIgnore).ToString, FieldMatchOption.ToString, "") & "ignore</div>" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.htmlDoc.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchEmpty).ToString, FieldMatchOption.ToString, "") & "empty</div>" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.htmlDoc.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchNotEmpty).ToString, FieldMatchOption.ToString, "") & "not&nbsp;empty</div>" _
-                                & "<div style=""display:block;float:left;width:150px;"">" & cpCore.htmlDoc.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.matchincludes).ToString, FieldMatchOption.ToString, "t" & FieldPtr) & "includes</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.html.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchIgnore).ToString, FieldMatchOption.ToString, "") & "ignore</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.html.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchEmpty).ToString, FieldMatchOption.ToString, "") & "empty</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.html.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchNotEmpty).ToString, FieldMatchOption.ToString, "") & "not&nbsp;empty</div>" _
+                                & "<div style=""display:block;float:left;width:150px;"">" & cpCore.html.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.matchincludes).ToString, FieldMatchOption.ToString, "t" & FieldPtr) & "includes</div>" _
                                 & "<div style=""display:block;float:left;width:300px;"">" & GetFormInputWithFocus2("fieldvalue" & FieldPtr, FieldValue(FieldPtr), 1, 5, "", "var e=getElementById('t" & FieldPtr & "');e.checked=1;", "ccAdvSearchText") & "</div>" _
                                 & "</div>" _
                                 & "</td>" _
@@ -14888,10 +14888,10 @@ ErrorTrap:
                                 & "<td class=""ccAdminEditCaption"">" & FieldCaption(FieldPtr) & "</td>" _
                                 & "<td class=""ccAdminEditField"">" _
                                 & "<div style=""display:block;float:left;width:800px;"">" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.htmlDoc.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchIgnore).ToString, FieldMatchOption.ToString, "") & "ignore</div>" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.htmlDoc.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchEmpty).ToString, FieldMatchOption.ToString, "") & "empty</div>" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.htmlDoc.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchNotEmpty).ToString, FieldMatchOption.ToString, "") & "not&nbsp;empty</div>" _
-                                & "<div style=""display:block;float:left;width:150px;"">" & cpCore.htmlDoc.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.matchincludes).ToString, FieldMatchOption.ToString, "t" & FieldPtr) & "includes</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.html.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchIgnore).ToString, FieldMatchOption.ToString, "") & "ignore</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.html.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchEmpty).ToString, FieldMatchOption.ToString, "") & "empty</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.html.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchNotEmpty).ToString, FieldMatchOption.ToString, "") & "not&nbsp;empty</div>" _
+                                & "<div style=""display:block;float:left;width:150px;"">" & cpCore.html.html_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.matchincludes).ToString, FieldMatchOption.ToString, "t" & FieldPtr) & "includes</div>" _
                                 & "<div style=""display:block;float:left;width:300px;"">" & GetFormInputWithFocus2("fieldvalue" & FieldPtr, FieldValue(FieldPtr), 1, 5, "", "var e=getElementById('t" & FieldPtr & "');e.checked=1;", "ccAdvSearchText") & "</div>" _
                                 & "</div>" _
                                 & "</td>" _
@@ -14943,7 +14943,7 @@ ErrorTrap:
                     ' Assemble LiveWindowTable
                     '
                     '        Stream.Add( OpenLiveWindowTable)
-                    Stream.Add(vbCrLf & cpCore.htmlDoc.html_GetFormStart())
+                    Stream.Add(vbCrLf & cpCore.html.html_GetFormStart())
                     Stream.Add(ButtonBar)
                     Stream.Add(TitleBar)
                     Stream.Add(Content)
@@ -14955,7 +14955,7 @@ ErrorTrap:
                     '        Stream.Add( CloseLiveWindowTable)
                     '
                     returnForm = Stream.Text
-                    Call cpCore.htmlDoc.main_AddPagetitle(adminContent.Name & " Advanced Search")
+                    Call cpCore.html.main_AddPagetitle(adminContent.Name & " Advanced Search")
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
@@ -15022,7 +15022,7 @@ ErrorTrap:
                     '
                     Content = "" _
                         & "<p>You must be a content manager of " & adminContent.Name & " to use this tool. Hit Cancel to return to main admin page.</p>" _
-                        & cpCore.htmlDoc.html_GetFormInputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) _
+                        & cpCore.html.html_GetFormInputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) _
                         & ""
                     ButtonList = ButtonCancelAll
                 Else
@@ -15094,7 +15094,7 @@ ErrorTrap:
                             '
                             Content = "" _
                                 & "<p>This selection has no records.. Hit Cancel to return to the " & adminContent.Name & " list page.</p>" _
-                                & cpCore.htmlDoc.html_GetFormInputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) _
+                                & cpCore.html.html_GetFormInputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) _
                                 & ""
                             ButtonList = ButtonCancel
                         ElseIf Button = ButtonRequestDownload Then
@@ -15110,7 +15110,7 @@ ErrorTrap:
                             '
                             Content = "" _
                                 & "<p>Your export has been requested and will be available shortly in the <a href=""?" & RequestNameAdminForm & "=" & AdminFormDownloads & """>Download Manager</a>. Hit Cancel to return to the " & adminContent.Name & " list page.</p>" _
-                                & cpCore.htmlDoc.html_GetFormInputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) _
+                                & cpCore.html.html_GetFormInputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) _
                                 & ""
                             '
                             ButtonList = ButtonCancel
@@ -15121,22 +15121,22 @@ ErrorTrap:
                             Content = Content _
                                 & cr & "<tr>" _
                                 & cr2 & "<td class=""exportTblCaption"">Export Name</td>" _
-                                & cr2 & "<td class=""exportTblInput"">" & cpCore.htmlDoc.html_GetFormInputText2("ExportName", ExportName) & "</td>" _
+                                & cr2 & "<td class=""exportTblInput"">" & cpCore.html.html_GetFormInputText2("ExportName", ExportName) & "</td>" _
                                 & cr & "</tr>"
                             Content = Content _
                                 & cr & "<tr>" _
                                 & cr2 & "<td class=""exportTblCaption"">Export Format</td>" _
-                                & cr2 & "<td class=""exportTblInput"">" & cpCore.htmlDoc.main_GetFormInputSelectList2("ExportType", ExportType, "Comma Delimited,XML", "", "") & "</td>" _
+                                & cr2 & "<td class=""exportTblInput"">" & cpCore.html.getInputSelectList2("ExportType", ExportType, "Comma Delimited,XML", "", "") & "</td>" _
                                 & cr & "</tr>"
                             Content = Content _
                                 & cr & "<tr>" _
                                 & cr2 & "<td class=""exportTblCaption"">Records Found</td>" _
-                                & cr2 & "<td class=""exportTblInput"">" & cpCore.htmlDoc.html_GetFormInputText2("RecordCnt", CStr(recordCnt), , , , , True) & "</td>" _
+                                & cr2 & "<td class=""exportTblInput"">" & cpCore.html.html_GetFormInputText2("RecordCnt", CStr(recordCnt), , , , , True) & "</td>" _
                                 & cr & "</tr>"
                             Content = Content _
                                 & cr & "<tr>" _
                                 & cr2 & "<td class=""exportTblCaption"">Record Limit</td>" _
-                                & cr2 & "<td class=""exportTblInput"">" & cpCore.htmlDoc.html_GetFormInputText2("RecordLimit", RecordLimitText) & "</td>" _
+                                & cr2 & "<td class=""exportTblInput"">" & cpCore.html.html_GetFormInputText2("RecordLimit", RecordLimitText) & "</td>" _
                                 & cr & "</tr>"
                             If cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
                                 Content = Content _
@@ -15159,7 +15159,7 @@ ErrorTrap:
                                 & cr2 & ".exportTblInput {}" _
                                 & cr & "</style>" _
                                 & Content _
-                                & cpCore.htmlDoc.html_GetFormInputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) _
+                                & cpCore.html.html_GetFormInputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) _
                                 & ""
                             ButtonList = ButtonCancel & "," & ButtonRequestDownload
                             If cpCore.authContext.isAuthenticatedDeveloper(cpCore) Then
@@ -15634,7 +15634,7 @@ ErrorTrap:
                                     Caption = Caption & "*"
                                     InheritedFieldCount = InheritedFieldCount + 1
                                 End If
-                                AStart = "<a href=""?" & cpCore.htmlDoc.refreshQueryString & "&FieldName=" & cpCore.htmlDoc.html_EncodeHTML(.nameLc) & "&fi=" & fieldId & "&dtcn=" & ColumnPtr & "&" & RequestNameAdminSubForm & "=" & AdminFormIndex_SubFormSetColumns
+                                AStart = "<a href=""?" & cpCore.html.refreshQueryString & "&FieldName=" & cpCore.html.html_EncodeHTML(.nameLc) & "&fi=" & fieldId & "&dtcn=" & ColumnPtr & "&" & RequestNameAdminSubForm & "=" & AdminFormIndex_SubFormSetColumns
                                 Call Stream.Add("<td width=""" & ColumnWidth & "%"" valign=""top"" align=""left"">" & SpanClassAdminNormal & Caption & "<br >")
                                 Call Stream.Add("<img src=""/ccLib/images/black.GIF"" width=""100%"" height=""1"" >")
                                 Call Stream.Add(AStart & "&dta=" & ToolsActionRemoveField & """><img src=""/ccLib/images/LibButtonDeleteUp.gif"" width=""50"" height=""15"" border=""0"" ></A><BR >")
@@ -15737,7 +15737,7 @@ ErrorTrap:
                                     '
                                     ' can be used as column header
                                     '
-                                    Stream.Add("<a href=""?" & cpCore.htmlDoc.refreshQueryString & "&fi=" & .id & "&dta=" & ToolsActionAddField & "&" & RequestNameAddFieldID & "=" & .id & "&" & RequestNameAdminSubForm & "=" & AdminFormIndex_SubFormSetColumns & """><img src=""/ccLib/images/LibButtonAddUp.gif"" width=""50"" height=""15"" border=""0"" ></A> " & .caption & "<br>")
+                                    Stream.Add("<a href=""?" & cpCore.html.refreshQueryString & "&fi=" & .id & "&dta=" & ToolsActionAddField & "&" & RequestNameAddFieldID & "=" & .id & "&" & RequestNameAdminSubForm & "=" & AdminFormIndex_SubFormSetColumns & """><img src=""/ccLib/images/LibButtonAddUp.gif"" width=""50"" height=""15"" border=""0"" ></A> " & .caption & "<br>")
                                 End If
                             End If
                         End With
@@ -15759,7 +15759,7 @@ ErrorTrap:
 
             Content = "" _
                 & Stream.Text _
-                & cpCore.htmlDoc.html_GetFormInputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormSetColumns) _
+                & cpCore.html.html_GetFormInputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormSetColumns) _
                 & ""
             GetForm_Index_SetColumns = Adminui.GetBody(Title, ButtonOK & "," & ButtonReset, "", False, False, Description, "", 10, Content)
             '
@@ -15789,7 +15789,7 @@ ErrorTrap:
             '    Stream.Add( CloseLiveWindowTable)
             '    '
             '    GetForm_Index_SetColumns = Stream.Text
-            Call cpCore.htmlDoc.main_AddPagetitle(Title)
+            Call cpCore.html.main_AddPagetitle(Title)
             Exit Function
             '
             ' ----- Error Trap
@@ -15822,14 +15822,14 @@ ErrorTrap:
                         '
                         ' Add the link alias
                         '
-                        Call pagesController.app_addLinkAlias2(cpCore, linkAlias, cpCore.db.cs_getInteger(CS, "ID"), "", False, True)
+                        Call docController.app_addLinkAlias2(cpCore, linkAlias, cpCore.db.cs_getInteger(CS, "ID"), "", False, True)
                     Else
                         '
                         ' Add the name
                         '
                         linkAlias = cpCore.db.cs_getText(CS, "name")
                         If linkAlias <> "" Then
-                            Call pagesController.app_addLinkAlias2(cpCore, linkAlias, cpCore.db.cs_getInteger(CS, "ID"), "", False, False)
+                            Call docController.app_addLinkAlias2(cpCore, linkAlias, cpCore.db.cs_getInteger(CS, "ID"), "", False, False)
                         End If
                     End If
                     '
@@ -15916,7 +15916,7 @@ ErrorTrap:
                     '
                     ButtonList = ButtonCancel
                     Content.Add(Adminui.GetFormBodyAdminOnly())
-                    Call cpCore.htmlDoc.main_AddPagetitle("Style Editor")
+                    Call cpCore.html.main_AddPagetitle("Style Editor")
                     GetForm_EditConfig = Adminui.GetBody("Site Styles", ButtonList, "", True, True, Description, "", 0, Content.Text)
                 Else
                     '
@@ -16016,24 +16016,24 @@ ErrorTrap:
                                 Copy = Copy & vbCrLf _
                                     & "<tr>" _
                                     & TDLeft & FeatureName & "</td>" _
-                                    & TDCenter & cpCore.htmlDoc.html_GetFormInputCheckBox2(FeatureName & ".admin", AllowAdmin) & "</td>" _
-                                    & TDCenter & cpCore.htmlDoc.html_GetFormInputCheckBox2(FeatureName & ".cm", AllowCM) & "</td>" _
-                                    & TDCenter & cpCore.htmlDoc.html_GetFormInputCheckBox2(FeatureName & ".public", AllowPublic) & "</td>" _
+                                    & TDCenter & cpCore.html.html_GetFormInputCheckBox2(FeatureName & ".admin", AllowAdmin) & "</td>" _
+                                    & TDCenter & cpCore.html.html_GetFormInputCheckBox2(FeatureName & ".cm", AllowCM) & "</td>" _
+                                    & TDCenter & cpCore.html.html_GetFormInputCheckBox2(FeatureName & ".public", AllowPublic) & "</td>" _
                                     & "</tr>"
                                 RowPtr = RowPtr + 1
                             End If
                         Next
                         Copy = "" _
                             & vbCrLf & "<div><b>body background style color</b> (default='white')</div>" _
-                            & vbCrLf & "<div>" & cpCore.htmlDoc.html_GetFormInputText2("editorbackgroundcolor", cpCore.siteProperties.getText("Editor Background Color", "white")) & "</div>" _
+                            & vbCrLf & "<div>" & cpCore.html.html_GetFormInputText2("editorbackgroundcolor", cpCore.siteProperties.getText("Editor Background Color", "white")) & "</div>" _
                             & vbCrLf & "<div>&nbsp;</div>" _
                             & vbCrLf & "<div><b>Toolbar features available</b></div>" _
                             & vbCrLf & "<table border=""0"" cellpadding=""4"" cellspacing=""0"" width=""500px"" align=left>" & genericController.htmlIndent(Copy) & vbCrLf & kmaEndTable
                         Copy = vbCrLf & genericController.StartTable(20, 0, 0) & "<tr><td>" & genericController.htmlIndent(Copy) & "</td></tr>" & vbCrLf & kmaEndTable
                         Content.Add(Copy)
                         ButtonList = ButtonCancel & "," & ButtonRefresh & "," & ButtonSave & "," & ButtonOK
-                        Content.Add(cpCore.htmlDoc.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormEditorConfig))
-                        Call cpCore.htmlDoc.main_AddPagetitle("Editor Settings")
+                        Content.Add(cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormEditorConfig))
+                        Call cpCore.html.main_AddPagetitle("Editor Settings")
                         GetForm_EditConfig = Adminui.GetBody("Editor Configuration", ButtonList, "", True, True, Description, "", 0, Content.Text)
                     End If
                 End If
@@ -16103,7 +16103,7 @@ ErrorTrap:
                 ' List Add-ons to include
                 '
 
-                Copy = cpCore.htmlDoc.html_GetFormInputCheckBox2("AllowAutoLogin", AllowAutoLogin)
+                Copy = cpCore.html.html_GetFormInputCheckBox2("AllowAutoLogin", AllowAutoLogin)
                 Copy = Copy _
             & "<div>When checked, returning users are automatically logged-in, without requiring a username or password. This is very convenient, but creates a high security risk. Each time you login, you will be given the option to not allow Auto-Login from that computer.</div>"
                 Call Content.Add(Adminui.GetEditRow(Copy, "Allow Auto Login", "", False, False, ""))
@@ -16115,7 +16115,7 @@ ErrorTrap:
                 ' Close Tables
                 '
                 Content.Add(Adminui.EditTableClose)
-                Content.Add(cpCore.htmlDoc.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormBuilderCollection))
+                Content.Add(cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormBuilderCollection))
             End If
             '
             Description = "Use this tool to modify the site security settings"
@@ -16571,7 +16571,7 @@ ErrorTrap:
                     ' Close Tables
                     '
                     Content.Add(Adminui.EditTableClose)
-                    Content.Add(cpCore.htmlDoc.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormClearCache))
+                    Content.Add(cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormClearCache))
                 End If
                 '
                 Description = "Hit Apply or OK to clear all current content caches"
@@ -16670,7 +16670,7 @@ ErrorTrap:
                 '
                 ' KeywordList
                 '
-                Copy = cpCore.htmlDoc.html_GetFormInputTextExpandable("KeywordList", , 10)
+                Copy = cpCore.html.html_GetFormInputTextExpandable("KeywordList", , 10)
                 Copy = Copy _
             & "<div>Paste your Meta Keywords into this text box, separated by either commas or enter keys. When you hit Save or OK, Meta Keyword records will be made out of each word. These can then be checked on any content page.</div>"
                 Call Content.Add(Adminui.GetEditRow(Copy, "Paste Meta Keywords", "", False, False, ""))
@@ -16682,7 +16682,7 @@ ErrorTrap:
                 ' Close Tables
                 '
                 Content.Add(Adminui.EditTableClose)
-                Content.Add(cpCore.htmlDoc.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormSecurityControl))
+                Content.Add(cpCore.html.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormSecurityControl))
             End If
             '
             Description = "Use this tool to enter multiple Meta Keywords"
@@ -17951,8 +17951,8 @@ ErrorTrap:
             Dim FieldOptionRow As String
             Dim Copy As String
             '
-            Copy = cpCore.htmlDoc.html_EncodeHTML(StyleCopy)
-            main_GetFormInputStyles = cpCore.htmlDoc.html_GetFormInputTextExpandable2(TagName, StyleCopy, 10, , HtmlId, , , HtmlClass)
+            Copy = cpCore.html.html_EncodeHTML(StyleCopy)
+            main_GetFormInputStyles = cpCore.html.html_GetFormInputTextExpandable2(TagName, StyleCopy, 10, , HtmlId, , , HtmlClass)
         End Function
 
     End Class

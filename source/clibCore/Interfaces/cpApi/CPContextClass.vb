@@ -328,7 +328,7 @@ Namespace Contensive.Core
         '
         Public ReadOnly Property responseBuffer() As String
             Get
-                Return cp.core.htmlDoc.docBuffer
+                Return cp.core.html.docBuffer
             End Get
         End Property
         '

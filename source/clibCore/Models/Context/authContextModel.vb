@@ -15,6 +15,9 @@ Namespace Contensive.Core.Models.Context
     ''' </summary>
     Public Class authContextModel
         '
+        ' -- this class stores state, so it can hold a pointer to the cpCore instance
+        Private cpCore As coreClass
+        '
         ' -- the visit is the collection of pages, constructor creates default non-authenticated instance
         Public visit As Models.Entity.visitModel
         '
@@ -59,7 +62,8 @@ Namespace Contensive.Core.Models.Context
         ''' <summary>
         ''' constructor, no arguments, created default authentication model for use without user, and before user is available
         ''' </summary>
-        Public Sub New()
+        Public Sub New(cpCore As coreClass)
+            Me.cpCore = cpCore
             visit = New Models.Entity.visitModel()
             visitor = New Models.Entity.visitorModel()
             user = New Models.Entity.personModel()
@@ -79,7 +83,7 @@ Namespace Contensive.Core.Models.Context
                     If (cpCore.serverConfig.appConfig Is Nothing) Then
                         '
                         ' -- no application, this is a server-only call not related to a 
-                        resultAuthContext = New authContextModel
+                        resultAuthContext = New authContextModel(cpCore)
                     Else
                         Dim visitCookie_changes As Boolean
                         Dim TrackGuests As Boolean
@@ -102,7 +106,7 @@ Namespace Contensive.Core.Models.Context
                         '
                         main_appNameCookiePrefix = genericController.vbLCase(genericController.main_encodeCookieName(cpCore.serverConfig.appConfig.name))
                         '
-                        resultAuthContext = New authContextModel
+                        resultAuthContext = New authContextModel(cpCore)
                         'resultAuthContext.visit = New Models.Entity.visitModel
                         'resultAuthContext.visitor = New Models.Entity.visitorModel
                         'resultAuthContext.user = New Models.Entity.personModel
@@ -763,20 +767,20 @@ Namespace Contensive.Core.Models.Context
                     ' ----- loginFieldValue blank, stop here
                     '
                     If allowEmailLogin Then
-                        Call errorController.error_AddUserError(cpcore,"A valid login requires a non-blank username or email.")
+                        Call errorController.error_AddUserError(cpCore, "A valid login requires a non-blank username or email.")
                     Else
-                        Call errorController.error_AddUserError(cpcore,"A valid login requires a non-blank username.")
+                        Call errorController.error_AddUserError(cpCore, "A valid login requires a non-blank username.")
                     End If
                 ElseIf (Not allowNoPasswordLogin) And (iPassword = "") Then
                     '
                     ' ----- password blank, stop here
                     '
-                    Call errorController.error_AddUserError(cpcore,"A valid login requires a non-blank password.")
+                    Call errorController.error_AddUserError(cpCore, "A valid login requires a non-blank password.")
                 ElseIf (visit.LoginAttempts >= cpCore.siteProperties.maxVisitLoginAttempts) Then
                     '
                     ' ----- already tried 5 times
                     '
-                    Call errorController.error_AddUserError(cpcore,badLoginUserError)
+                    Call errorController.error_AddUserError(cpCore, badLoginUserError)
                 Else
                     If allowEmailLogin Then
                         '
@@ -797,12 +801,12 @@ Namespace Contensive.Core.Models.Context
                         '
                         ' ----- loginFieldValue not found, stop here
                         '
-                        Call errorController.error_AddUserError(cpcore,badLoginUserError)
+                        Call errorController.error_AddUserError(cpCore, badLoginUserError)
                     ElseIf (Not genericController.EncodeBoolean(cpCore.siteProperties.getBoolean("AllowDuplicateUsernames", False))) And (cpCore.db.cs_getRowCount(CS) > 1) Then
                         '
                         ' ----- AllowDuplicates is false, and there are more then one record
                         '
-                        Call errorController.error_AddUserError(cpcore,"This user account can not be used because the username is not unique on this website. Please contact the site administrator.")
+                        Call errorController.error_AddUserError(cpCore, "This user account can not be used because the username is not unique on this website. Please contact the site administrator.")
                     Else
                         '
                         ' ----- search all found records for the correct password
@@ -852,7 +856,7 @@ Namespace Contensive.Core.Models.Context
                             Call cpCore.db.cs_goNext(CS)
                         Loop
                         If returnUserId = 0 Then
-                            Call errorController.error_AddUserError(cpcore,badLoginUserError)
+                            Call errorController.error_AddUserError(cpCore, badLoginUserError)
                         End If
                     End If
                     Call cpCore.db.cs_Close(CS)
@@ -1366,8 +1370,8 @@ Namespace Contensive.Core.Models.Context
         ''' true if editing any content
         ''' </summary>
         ''' <returns></returns>
-        Public Function isEditingAnything(cpCore As coreClass) As Boolean
-            Return isEditing(cpCore, "")
+        Public Function isEditingAnything() As Boolean
+            Return isEditing("")
         End Function
         '
         '========================================================================
@@ -1376,7 +1380,7 @@ Namespace Contensive.Core.Models.Context
         ''' </summary>
         ''' <param name="ContentNameOrId"></param>
         ''' <returns></returns>
-        Public Function isEditing(cpCore As coreClass, ByVal ContentNameOrId As String) As Boolean
+        Public Function isEditing(ByVal ContentNameOrId As String) As Boolean
             Dim returnResult As Boolean = False
             Try
                 Dim localContentNameOrId As String
@@ -1394,7 +1398,7 @@ Namespace Contensive.Core.Models.Context
                     Call debugController.debug_testPoint(cpCore, "...is in main_IsNotEditingContentList")
                 Else
                     If isAuthenticated() Then
-                        If Not cpCore.htmlDoc.pageManager_printVersion Then
+                        If Not cpCore.html.pageManager_printVersion Then
                             If (cpCore.visitProperty.getBoolean("AllowEditing") Or cpCore.visitProperty.getBoolean("AllowAdvancedEditor")) Then
                                 If localContentNameOrId <> "" Then
                                     If genericController.vbIsNumeric(localContentNameOrId) Then
@@ -1426,7 +1430,7 @@ Namespace Contensive.Core.Models.Context
         Public Function isQuickEditing(cpCore As coreClass, ByVal ContentName As String) As Boolean
             Dim returnResult As Boolean = False
             Try
-                If (Not cpCore.htmlDoc.pageManager_printVersion) Then
+                If (Not cpCore.html.pageManager_printVersion) Then
                     If isAuthenticatedContentManager(cpCore, ContentName) Then
                         returnResult = cpCore.visitProperty.getBoolean("AllowQuickEditor")
                     End If
@@ -1447,7 +1451,7 @@ Namespace Contensive.Core.Models.Context
         Public Function isAdvancedEditing(cpCore As coreClass, ByVal ContentName As String) As Boolean
             Dim returnResult As Boolean = False
             Try
-                If (Not cpCore.htmlDoc.pageManager_printVersion) Then
+                If (Not cpCore.html.pageManager_printVersion) Then
                     If isAuthenticatedContentManager(cpCore, ContentName) Then
                         returnResult = cpCore.visitProperty.getBoolean("AllowAdvancedEditor")
                     End If
@@ -1488,10 +1492,10 @@ Namespace Contensive.Core.Models.Context
         '
         '   Checks the username and password
         '
-        Public Function main_IsLoginOK(cpcore As coreClass, ByVal Username As String, ByVal Password As String, Optional ByVal ErrorMessage As String = "", Optional ByVal ErrorCode As Integer = 0) As Boolean
+        Public Function isLoginOK(cpcore As coreClass, ByVal Username As String, ByVal Password As String, Optional ByVal ErrorMessage As String = "", Optional ByVal ErrorCode As Integer = 0) As Boolean
             Dim result As Boolean = (authenticateGetId(cpcore, Username, Password) <> 0)
             If Not result Then
-                ErrorMessage = errorController.error_GetUserError(cpCore)
+                ErrorMessage = errorController.error_GetUserError(cpcore)
             End If
             Return result
         End Function
@@ -1628,6 +1632,23 @@ Namespace Contensive.Core.Models.Context
                     Delimiter = "<BR >"
                 End If
             End If
+            Return result
+        End Function
+        '
+        '========================================================================
+        ' main_IsWorkflowRendering()
+        '   True if the current visitor is a content manager in workflow rendering mode
+        '========================================================================
+        '
+        Public Function isWorkflowRendering() As Boolean
+            Dim result As Boolean = False
+            Try
+                If isAuthenticatedContentManager(cpCore) Then
+                    isWorkflowRendering = cpCore.visitProperty.getBoolean("AllowWorkflowRendering")
+                End If
+            Catch ex As Exception
+                cpCore.handleExceptionAndContinue(ex) : Throw
+            End Try
             Return result
         End Function
     End Class

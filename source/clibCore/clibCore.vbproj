@@ -437,7 +437,7 @@
     <Compile Include="Models\Entity\cdefFieldModel.vb" />
     <Compile Include="Models\Entity\cdefModel.vb" />
     <Compile Include="Models\Entity\domainLegacyModel.vb" />
-    <Compile Include="Controllers\pagesController.vb" />
+    <Compile Include="Controllers\docController.vb" />
     <Compile Include="addon_tools\addon_toolConfigureEdit.vb" />
     <Compile Include="Models\Context\coreSitePropertiesClass.vb" />
     <Compile Include="Controllers\webServerIOController.vb" />
@@ -450,7 +450,7 @@
     <Compile Include="Controllers\adminUIController.vb" />
     <Compile Include="Controllers\dbController.vb" />
     <Compile Include="Controllers\contentCmdController.vb" />
-    <Compile Include="Controllers\htmlDocController.vb" />
+    <Compile Include="Controllers\htmlController.vb" />
     <Compile Include="Models\Context\propertyModel.vb" />
     <Compile Include="Controllers\taskRunnerController.vb" />
     <Compile Include="Controllers\taskSchedulerController.vb" />

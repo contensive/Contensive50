@@ -180,7 +180,7 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         Public Function getFormInput(ByVal ContentName As String, ByVal FieldName As String, Optional ByVal HeightLines As Integer = 1, Optional ByVal WidthRows As Integer = 40, Optional ByVal HtmlId As String = "") As String
-            Return cpCore.htmldoc.html_GetFormInputCS(csPtr, ContentName, FieldName, HeightLines, WidthRows, HtmlId)
+            Return cpCore.html.html_GetFormInputCS(csPtr, ContentName, FieldName, HeightLines, WidthRows, HtmlId)
         End Function
         '
         '====================================================================================================
@@ -202,7 +202,7 @@ Namespace Contensive.Core
         Public Function getAddLink(Optional ByVal PresetNameValueList As String = "", Optional ByVal AllowPaste As Boolean = False) As String
             Dim result As String = ""
             Try
-                result = cpCore.htmlDoc.main_cs_getRecordAddLink(csPtr, PresetNameValueList, AllowPaste)
+                result = cpCore.html.main_cs_getRecordAddLink(csPtr, PresetNameValueList, AllowPaste)
                 If result Is Nothing Then
                     result = String.Empty
                 End If
@@ -226,7 +226,7 @@ Namespace Contensive.Core
         Public Function getEditLink(Optional ByVal AllowCut As Boolean = False) As String
             Dim result As String = String.Empty
             Try
-                result = cpCore.htmlDoc.cs_cs_getRecordEditLink(csPtr, AllowCut)
+                result = cpCore.html.cs_cs_getRecordEditLink(csPtr, AllowCut)
                 If result Is Nothing Then
                     result = String.Empty
                 End If
@@ -447,7 +447,7 @@ Namespace Contensive.Core
                 RecordID = cpcore.db.cs_getInteger(CSPointer, "id")
                 ContentName = cpcore.metaData.getContentNameByID(cpcore.db.cs_getInteger(CSPointer, "contentcontrolId"))
             End If
-            result = cpcore.htmlDoc.html_encodeContent10(cpcore.db.cs_get(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName)), cpcore.authContext.user.id, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.isAuthenticated, Nothing, cpcore.authContext.isEditingAnything(cpcore))
+            result = cpcore.html.html_encodeContent10(cpcore.db.cs_get(genericController.EncodeInteger(CSPointer), genericController.encodeText(FieldName)), cpcore.authContext.user.id, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & cpcore.webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, cpcore.authContext.isAuthenticated, Nothing, cpcore.authContext.isEditingAnything())
             Return result
         End Function
 
