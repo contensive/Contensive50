@@ -12,163 +12,19 @@ Namespace Contensive.Core.Controllers
     '
     Public Class docController
         ''' <summary>
-        ''' Assemble a document, html or otherwise. maintain all the parts and output the results
+        ''' Assemble a document, html or otherwise. maintain all the parts and output the results. Constructor initializes the object. Call initDoc() to setup pages
         ''' </summary>
         ' -- not sure if this is the best plan, buts lets try this and see if we can get out of it later (to make this an addon) 
-        Private cpcore As coreClass
-        '
-        ' Public view bubble editors
-        '
-        'Public Property html_HelpViewerButtonID As String = ""
-        Public Property html_EditWrapperCnt As Integer = 0
-        '
-        Public Property html_DocBodyFilter As String = ""
-        '
-        '
-        Public Property html_LegacySiteStyles_Loaded As Boolean = False
-        '
-        Public Property menu_MenuSystemCloseCount As Integer = 0
-        '
-        ' -- Help Subsystem
-        Friend Property htmlDoc_HelpCodeCount As Integer = 0
-        Friend Property htmlDoc_HelpCodeSize As Integer = 0
-        Friend Property htmlDoc_HelpCodes As String()
-        Friend Property htmlDoc_HelpCaptions As String()
-        Friend Property htmlDoc_HelpDialogCnt As Integer = 0
-        '
-        Public Property htmlForEndOfBody As String = ""             ' Anything that needs to be written to the Page during main_GetClosePage
-        '
-        Public Property pageManager_printVersion As Boolean = False
         '
         Public Const htmlDoc_JavaStreamChunk = 100
         Public Const htmlDoc_OutStreamStandard = 0
         Public Const htmlDoc_OutStreamJavaScript = 1
-        '
-        Public Property refreshQueryString As String = ""      ' the querystring required to return to the current state (perform a refresh)
-        Public Property pageManager_RedirectContentID As Integer = 0
-        Public Property pageManager_RedirectRecordID As Integer = 0
-        Public Property htmlDoc_JavaStreamHolder As String()
-        Public Property htmlDoc_JavaStreamSize As Integer = 0
-        Public Property htmlDoc_JavaStreamCount As Integer = 0
-        Public Property htmlDoc_IsStreamWritten As Boolean = False       ' true when anything has been writeAltBuffered.
-        '
-        Public Property outputBufferEnabled As Boolean = True          ' when true (default), stream is buffered until page is done
-        Public Property docBuffer As String = ""                   ' if any method calls writeAltBuffer, string concatinates here. If this is not empty at exit, it is used instead of returned string
-        '
-        Public Property main_MetaContent_Title As String = ""
-        Public Property main_MetaContent_Description As String = ""
-        Public Property main_MetaContent_OtherHeadTags As String = ""
-        Public Property main_MetaContent_KeyWordList As String = ""
-        Public Property main_MetaContent_StyleSheetTags As String = ""
-        Public Property main_MetaContent_TemplateStyleSheetTag As String = ""
-        Public Property main_MetaContent_SharedStyleIDList As String = ""
-        '
-        Public Property main_TabObject As menuTabController
-        Public Property html_ComboTabObject As menuComboTabController
-        Public Property main_LiveTabObject As menuLiveTabController
-        '
-        Public Property main_AdminWarning As String = ""                                      ' Message - when set displays in an admin hint box in the page
-        Public Property main_AdminWarningPageID As Integer = 0                                  ' PageID that goes with the warning
-        'Public main_AdminWarningSectionID As Integer = 0                               ' PageID that goes with the warning
-        '
-        Public Property main_CheckListCnt As Integer = 0                    ' cnt of the main_GetFormInputCheckList calls - used for javascript
-        '
-        Public Property main_page_IncludedAddonIDList As String = ""
-        '
-        Public Property main_OnLoadJavascript As String = ""
-        Public Property main_endOfBodyJavascript As String = ""           ' javascript that goes at the end of the close page
-        Public Property main_endOfBodyString As String = ""
-        '
-        ' block of js code that goes into a script tag
-        '
-        Public Structure main_HeadScriptType
-            Dim IsLink As Boolean
-            Dim Text As String
-            Dim addedByMessage As String
-        End Structure
-        Public Property main_HeadScriptCnt As Integer = 0
-        Public Property main_HeadScripts As main_HeadScriptType()
-        '
-        ' Page Bake Header
-        '
         Public Const main_BakeHeadDelimiter = "#####MultilineFlag#####"
-        '
-        ' Count of how many main_GetFormInputDate calendars have been placed
-        '
-        Public Property main_InputDateCnt As Integer = 0
-        '
-        ' Cache the input selects (admin uses the same ones over and over)
-        '
-        Public Structure main_InputSelectCacheType
-            Dim SelectRaw As String
-            Dim ContentName As String
-            Dim Criteria As String
-            Dim CurrentValue As String
-        End Structure
-        Public Property main_InputSelectCacheCnt As Integer = 0
-        Public Property main_InputSelectCache As main_InputSelectCacheType()
-        '
-        Public Property main_FormInputTextCnt As Integer = 0
-        Public Property docQuickEditCopy As String = ""
-        Private Property docJavascriptOnLoad_Cnt As Integer
-        Private Property docJavascriptOnLoad As String()
-        Private Property docJSFilename_Cnt As Integer
-        Private Property docJSFilename As String()
-        Friend Property docJavascriptBodyEnd_cnt As Integer
-        Friend Property docJavascriptBodyEnd As String()
-        Friend Property docStyleFilenames_Cnt As Integer
-        Friend Property docStyleFilenames As String()
-        '
-        Public domain As Models.Entity.domainModel
-        Public page As Models.Entity.pageContentModel
-        Public pageToRootList As List(Of Models.Entity.pageContentModel)
-        Public template As Models.Entity.pageTemplateModel
-        Public templateReason As String = ""                           ' a message that explains why this template was selected
-        '
-        Public Property siteStructure As String = ""
-        Public Property siteStructure_LocalLoaded As Boolean = False
         Public Const navStruc_Descriptor = 1           ' Descriptors:0 = RootPage, 1 = Parent Page, 2 = Current Page, 3 = Child Page
         Public Const navStruc_Descriptor_CurrentPage = 2
         Public Const navStruc_Descriptor_ChildPage = 3
         Public Const navStruc_TemplateId = 7
-        Public Property bodyContent As String = ""                    ' The page's content at the OnPageEndEvent - used to let OnPageStart and OnPageEnd Add-ons change the content
-        'Public pageManager_ContentPageStructure As String = ""           ' deprecated name for currentNavigationStructure
-        Public Property landingPageID As Integer = 0                              ' Set from Site Property (use main_GetLandingPageID)
-        Public Property landingPageID_Loaded As Boolean = False                   '   true when pageManager_LandingPageID is loaded
-        Public Property landingPageName As String = ""                          ' Set from pageManager_LandingPageID (use main_GetLandingPageName)
-        Public Property landingLink As String = ""                              ' Default Landing page - managed through main_GetLandingLink()
-        'Public templateName As String = ""                             ' Name of the template
-        'Public templateLink As String = ""                             ' Link this template requires - redirect caused if this is not the current link
-        'Public templateBody As String = ""                             ' Body field of the TemplateID
-        'Public templateBodyTag As String = ""                          ' BodyTag - from Template record, if blank, use TemplateDefaultBodyTag
-        Public Property sectionMenuLinkDefault As String = ""
         Public Const blockMessageDefault = "<p>The content on this page has restricted access. If you have a username and password for this system, <a href=""?method=login"" rel=""nofollow"">Click Here</a>. For more information, please contact the administrator.</p>"
-        Public Property redirectLink As String = ""                             ' If there is a problem, a redirect is forced
-        Public Property pageManager_RedirectReason As String = ""                           ' reason for redirect
-        Public Property pageManager_RedirectBecausePageNotFound As Boolean = False            ' if true, redirect will go through a 404 so bots will not follow
-        Public Property pageManager_RedirectSourcePageID As Integer = 0                       ' the pageid of the page with this issue, 0 if not a page problem
-        '
-        'Public currentPageID As Integer = 0                   ' The current page's id
-        'Public currentPageName As String = ""               ' The current page's name
-        'Public currentSectionID As Integer = 0                ' The current page's section id
-        'Public currentSectionName As String = ""            ' The current Section's name
-        'Public currentTemplateID As Integer = 0               ' The current template's Id
-        'Public currentTemplateName As String = ""           ' The current template's name
-        'Public currentNavigationStructure As String = ""    ' Public string describing the current page
-        'Public currentParentID As Integer = 0               '
-        'Public main_RenderCache_Loaded As Boolean = False                               ' true after main_loadRenderCache
-        'Public main_RenderCache_CurrentPage_PCCPtr As Integer = 0
-        'Public main_RenderCache_CurrentPage_ContentId As Integer = 0                        '
-        'Public pageContentModel.contentName As String = ""                   ' set during LoadContent_CurrentPage
-        'Public main_RenderCache_CurrentPage_IsRenderingMode As Boolean = False             ' true if tools panel rendering is on
-        'Public main_RenderCache_CurrentPage_IsQuickEditing As Boolean = False              ' true if tools panel is on, and user can author current page
-        'Public main_RenderCache_CurrentPage_IsEditing As Boolean = False                   ' true if tools panel is on
-        'Public main_RenderCache_CurrentPage_IsAuthoring As Boolean = False                ' true if either editing or quickediting
-        'Public main_RenderCache_CurrentPage_IsRootPage As Boolean = False                  ' true after LoadContent if the current page is the root page
-        'Public main_RenderCache_ParentBranch_PCCPtrCnt As Integer = 0
-        'Public main_RenderCache_ParentBranch_PCCPtrs As Integer()
-        'Public main_RenderCache_ChildBranch_PCCPtrCnt As Integer = 0
-        'Public main_RenderCache_ChildBranch_PCCPtrs As Integer()
         Private Const main_BlockSourceDefaultMessage = 0
         Private Const main_BlockSourceCustomMessage = 1
         Private Const main_BlockSourceLogin = 2
@@ -198,33 +54,95 @@ Namespace Contensive.Core.Controllers
             Dim AuthenticateOnFormProcess As Boolean
             Dim Inst() As main_FormPagetype_InstType
         End Structure
-        ''
-        '' ----------------------------------------------------------------------------------------
-        ''   values collected from add-ons as the page progresses
-        '' ----------------------------------------------------------------------------------------
-        ''
-        '' ----- Site Section Cache
-        ''
-        'Public Const cache_siteSection_cacheName = "cache_siteSection"
-        'Public cache_siteSection As String(,)
-        'Public cache_siteSection_rows As Integer = 0
-        'Public cache_siteSection_IDIndex As keyPtrController
-        'Public cache_siteSection_RootPageIDIndex As keyPtrController
-        'Public cache_siteSection_NameIndex As keyPtrController
-        ''
-        '' ----- Template Content store
-        ''
-        'Public Const cache_pageTemplate_cacheName = "cache_pageTemplate"
-        'Public cache_pageTemplate As String(,)
-        'Public cache_pageTemplate_rows As Integer = 0
-        'Public cache_pageTemplate_contentIdindex As keyPtrController
-        ''
-        '' -- Page Content store (old names for compatibility)
-        'Public cache_pageContent_rows As Integer = 0
-        'Public cache_pageContent As String(,)
-        'Public cache_pageContent_idIndex As keyPtrController
-        'Public cache_pageContent_parentIdIndex As keyPtrController
-        'Public cache_pageContent_nameIndex As keyPtrController
+        '
+        ' Cache the input selects (admin uses the same ones over and over)
+        '
+        Public Structure main_InputSelectCacheType
+            Dim SelectRaw As String
+            Dim ContentName As String
+            Dim Criteria As String
+            Dim CurrentValue As String
+        End Structure
+        '
+        ' block of js code that goes into a script tag
+        '
+        Public Structure main_HeadScriptType
+            Dim IsLink As Boolean
+            Dim Text As String
+            Dim addedByMessage As String
+        End Structure
+        '
+        Private cpcore As coreClass
+        Public Property domain As Models.Entity.domainModel
+        Public Property page As Models.Entity.pageContentModel
+        Public Property pageToRootList As List(Of Models.Entity.pageContentModel)
+        Public Property template As Models.Entity.pageTemplateModel
+        Public Property templateReason As String = ""                           ' a message that explains why this template was selected
+        'Public Property html_HelpViewerButtonID As String = ""
+        Public Property html_EditWrapperCnt As Integer = 0
+        Public Property html_DocBodyFilter As String = ""
+        Public Property html_LegacySiteStyles_Loaded As Boolean = False
+        Public Property menu_MenuSystemCloseCount As Integer = 0
+        Friend Property htmlDoc_HelpCodeCount As Integer = 0
+        Friend Property htmlDoc_HelpCodeSize As Integer = 0
+        Friend Property htmlDoc_HelpCodes As String()
+        Friend Property htmlDoc_HelpCaptions As String()
+        Friend Property htmlDoc_HelpDialogCnt As Integer = 0
+        Public Property htmlForEndOfBody As String = ""             ' Anything that needs to be written to the Page during main_GetClosePage
+        Public Property pageManager_printVersion As Boolean = False
+        Public Property refreshQueryString As String = ""      ' the querystring required to return to the current state (perform a refresh)
+        Public Property pageManager_RedirectContentID As Integer = 0
+        Public Property pageManager_RedirectRecordID As Integer = 0
+        Public Property htmlDoc_JavaStreamHolder As String()
+        Public Property htmlDoc_JavaStreamSize As Integer = 0
+        Public Property htmlDoc_JavaStreamCount As Integer = 0
+        Public Property htmlDoc_IsStreamWritten As Boolean = False       ' true when anything has been writeAltBuffered.
+        Public Property outputBufferEnabled As Boolean = True          ' when true (default), stream is buffered until page is done
+        Public Property docBuffer As String = ""                   ' if any method calls writeAltBuffer, string concatinates here. If this is not empty at exit, it is used instead of returned string
+        Public Property main_MetaContent_Title As String = ""
+        Public Property main_MetaContent_Description As String = ""
+        Public Property main_MetaContent_OtherHeadTags As String = ""
+        Public Property main_MetaContent_KeyWordList As String = ""
+        Public Property main_MetaContent_StyleSheetTags As String = ""
+        Public Property main_MetaContent_TemplateStyleSheetTag As String = ""
+        Public Property main_MetaContent_SharedStyleIDList As String = ""
+        Public Property main_TabObject As menuTabController
+        Public Property html_ComboTabObject As menuComboTabController
+        Public Property main_LiveTabObject As menuLiveTabController
+        Public Property main_AdminWarning As String = ""                                      ' Message - when set displays in an admin hint box in the page
+        Public Property main_AdminWarningPageID As Integer = 0                                  ' PageID that goes with the warning
+        Public Property main_CheckListCnt As Integer = 0                    ' cnt of the main_GetFormInputCheckList calls - used for javascript
+        Public Property main_page_IncludedAddonIDList As String = ""
+        Public Property main_OnLoadJavascript As String = ""
+        Public Property main_endOfBodyJavascript As String = ""           ' javascript that goes at the end of the close page
+        Public Property main_endOfBodyString As String = ""
+        Public Property main_HeadScriptCnt As Integer = 0
+        Public Property main_HeadScripts As main_HeadScriptType()
+        Public Property main_InputDateCnt As Integer = 0
+        Public Property main_InputSelectCacheCnt As Integer = 0
+        Public Property main_InputSelectCache As main_InputSelectCacheType()
+        Public Property main_FormInputTextCnt As Integer = 0
+        Public Property docQuickEditCopy As String = ""
+        Private Property docJavascriptOnLoad_Cnt As Integer
+        Private Property docJavascriptOnLoad As String()
+        Private Property docJSFilename_Cnt As Integer
+        Private Property docJSFilename As String()
+        Friend Property docJavascriptBodyEnd_cnt As Integer
+        Friend Property docJavascriptBodyEnd As String()
+        Friend Property docStyleFilenames_Cnt As Integer
+        Friend Property docStyleFilenames As String()
+        Public Property siteStructure As String = ""
+        Public Property siteStructure_LocalLoaded As Boolean = False
+        Public Property bodyContent As String = ""                    ' The page's content at the OnPageEndEvent - used to let OnPageStart and OnPageEnd Add-ons change the content
+        Public Property landingPageID As Integer = 0                              ' Set from Site Property (use main_GetLandingPageID)
+        Public Property landingPageID_Loaded As Boolean = False                   '   true when pageManager_LandingPageID is loaded
+        Public Property landingPageName As String = ""                          ' Set from pageManager_LandingPageID (use main_GetLandingPageName)
+        Public Property landingLink As String = ""                              ' Default Landing page - managed through main_GetLandingLink()
+        Public Property sectionMenuLinkDefault As String = ""
+        Public Property redirectLink As String = ""                             ' If there is a problem, a redirect is forced
+        Public Property pageManager_RedirectReason As String = ""                           ' reason for redirect
+        Public Property pageManager_RedirectBecausePageNotFound As Boolean = False            ' if true, redirect will go through a 404 so bots will not follow
+        Public Property pageManager_RedirectSourcePageID As Integer = 0                       ' the pageid of the page with this issue, 0 if not a page problem
         '
         '====================================================================================================
         ''' <summary>
@@ -232,77 +150,169 @@ Namespace Contensive.Core.Controllers
         ''' </summary>
         ''' <param name="cpCore"></param>
 
-        Public Sub New(cpCore As coreClass, pageId As Integer)
+        Public Sub New(cpCore As coreClass)
             Me.cpcore = cpCore
             '
-            ' -- setup domain
-            domain = Models.Entity.domainModel.createByName(cpCore, cpCore.webServer.requestDomain, New List(Of String))
-            If (pageId = 0) Then
+            domain = New Models.Entity.domainModel()
+            page = New pageContentModel()
+            pageToRootList = New List(Of pageContentModel)
+            template = New pageTemplateModel()
+            '' -- setup domain
+            'domain = Models.Entity.domainModel.createByName(cpCore, cpCore.webServer.requestDomain, New List(Of String))
+            'If (domain Is Nothing) Then
+            '    '
+            '    ' -- domain not configured
+            '    cpCore.handleExceptionAndContinue(New ApplicationException("Domain [" & cpCore.webServer.requestDomain & "] has not been configured."))
+            'Else
+            '    If (pageId = 0) Then
+            '        '
+            '        ' -- Nothing specified, use the Landing Page
+            '        pageId = getLandingPageID()
+            '    End If
+            '    Call cpCore.doc.addRefreshQueryString(rnPageId, CStr(pageId))
+            '    '
+            '    ' -- build parentpageList (first = current page, last = root)
+            '    ' -- add a 0, then repeat until another 0 is found, or there is a repeat
+            '    pageToRootList = New List(Of Models.Entity.pageContentModel)()
+            '    Dim usedPageIdList As New List(Of Integer)()
+            '    Dim targetPageId = pageId
+            '    usedPageIdList.Add(0)
+            '    Do While (Not usedPageIdList.Contains(targetPageId))
+            '        usedPageIdList.Add(targetPageId)
+            '        Dim targetpage As Models.Entity.pageContentModel = Models.Entity.pageContentModel.create(cpCore, targetPageId, New List(Of String))
+            '        If (targetpage Is Nothing) Then
+            '            Exit Do
+            '        Else
+            '            pageToRootList.Add(targetpage)
+            '            targetPageId = targetpage.ParentID
+            '        End If
+            '    Loop
+            '    If (pageToRootList.Count = 0) Then
+            '        '
+            '        page = New pageContentModel()
+            '    Else
+            '        page = pageToRootList.First
+            '    End If
+            '    '
+            '    ' -- get template from pages
+            '    template = Nothing
+            '    For Each page As Models.Entity.pageContentModel In pageToRootList
+            '        If page.TemplateID > 0 Then
+            '            template = Models.Entity.pageTemplateModel.create(cpCore, page.TemplateID, New List(Of String))
+            '            If (template IsNot Nothing) Then
+            '                If (page Is pageToRootList.First) Then
+            '                    templateReason = "This template was used because it is selected by the current page."
+            '                Else
+            '                    templateReason = "This template was used because it is selected one of this page's parents [" & page.name & "]."
+            '                End If
+            '                Exit For
+            '            End If
+            '        End If
+            '    Next
+            '    '
+            '    If (template Is Nothing) Then
+            '        '
+            '        ' -- get template from domain
+            '        If (domain IsNot Nothing) Then
+            '            template = Models.Entity.pageTemplateModel.create(cpCore, domain.DefaultTemplateId, New List(Of String))
+            '        End If
+            '        If (template Is Nothing) Then
+            '            '
+            '            ' -- get template named Default
+            '            template = Models.Entity.pageTemplateModel.createByName(cpCore, defaultTemplateName, New List(Of String))
+            '        End If
+            '        If (template Is Nothing) Then
+            '            '
+            '            ' -- ceate new template named Default
+            '            template = Models.Entity.pageTemplateModel.add(cpCore, New List(Of String))
+            '            template.Name = defaultTemplateName
+            '            template.BodyHTML = defaultTemplateHtml
+            '            template.save(cpCore)
+            '        End If
+            '    End If
+            'End If
+        End Sub
+        '
+        Public Sub initDoc(pageId As Integer, Optional domainName As String = "")
+            Try
                 '
-                ' -- Nothing specified, use the Landing Page
-                pageId = getLandingPageID()
-            End If
-            Call cpCore.html.webServerIO_addRefreshQueryString(rnPageId, CStr(pageId))
-            '
-            ' -- build parentpageList (first = current page, last = root)
-            ' -- add a 0, then repeat until another 0 is found, or there is a repeat
-            pageToRootList = New List(Of Models.Entity.pageContentModel)()
-            Dim usedPageIdList As New List(Of Integer)()
-            Dim targetPageId = pageId
-            usedPageIdList.Add(0)
-            Do While (Not usedPageIdList.Contains(targetPageId))
-                usedPageIdList.Add(targetPageId)
-                Dim targetpage As Models.Entity.pageContentModel = Models.Entity.pageContentModel.create(cpCore, targetPageId, New List(Of String))
-                If (targetpage Is Nothing) Then
-                    Exit Do
+                ' -- setup domain
+                domain = Models.Entity.domainModel.createByName(cpcore, domainName, New List(Of String))
+                If (domain Is Nothing) Then
+                    '
+                    ' -- domain not configured
+                    cpcore.handleExceptionAndContinue(New ApplicationException("Domain [" & cpcore.webServer.requestDomain & "] has not been configured."))
                 Else
-                    pageToRootList.Add(targetpage)
-                    targetPageId = targetpage.ParentID
-                End If
-            Loop
-            If (pageToRootList.Count = 0) Then
-                '
-                page = New pageContentModel()
-            Else
-                page = pageToRootList.First
-            End If
-            '
-            ' -- get template from pages
-            template = Nothing
-            For Each page As Models.Entity.pageContentModel In pageToRootList
-                If page.TemplateID > 0 Then
-                    template = Models.Entity.pageTemplateModel.create(cpCore, page.TemplateID, New List(Of String))
-                    If (template IsNot Nothing) Then
-                        If (page Is pageToRootList.First) Then
-                            templateReason = "This template was used because it is selected by the current page."
+                    If (pageId = 0) Then
+                        '
+                        ' -- Nothing specified, use the Landing Page
+                        pageId = getLandingPageID()
+                    End If
+                    Call cpcore.doc.addRefreshQueryString(rnPageId, CStr(pageId))
+                    '
+                    ' -- build parentpageList (first = current page, last = root)
+                    ' -- add a 0, then repeat until another 0 is found, or there is a repeat
+                    pageToRootList = New List(Of Models.Entity.pageContentModel)()
+                    Dim usedPageIdList As New List(Of Integer)()
+                    Dim targetPageId = pageId
+                    usedPageIdList.Add(0)
+                    Do While (Not usedPageIdList.Contains(targetPageId))
+                        usedPageIdList.Add(targetPageId)
+                        Dim targetpage As Models.Entity.pageContentModel = Models.Entity.pageContentModel.create(cpcore, targetPageId, New List(Of String))
+                        If (targetpage Is Nothing) Then
+                            Exit Do
                         Else
-                            templateReason = "This template was used because it is selected one of this page's parents [" & page.name & "]."
+                            pageToRootList.Add(targetpage)
+                            targetPageId = targetpage.ParentID
                         End If
-                        Exit For
+                    Loop
+                    If (pageToRootList.Count = 0) Then
+                        '
+                        page = New pageContentModel()
+                    Else
+                        page = pageToRootList.First
+                    End If
+                    '
+                    ' -- get template from pages
+                    template = Nothing
+                    For Each page As Models.Entity.pageContentModel In pageToRootList
+                        If page.TemplateID > 0 Then
+                            template = Models.Entity.pageTemplateModel.create(cpcore, page.TemplateID, New List(Of String))
+                            If (template IsNot Nothing) Then
+                                If (page Is pageToRootList.First) Then
+                                    templateReason = "This template was used because it is selected by the current page."
+                                Else
+                                    templateReason = "This template was used because it is selected one of this page's parents [" & page.name & "]."
+                                End If
+                                Exit For
+                            End If
+                        End If
+                    Next
+                    '
+                    If (template Is Nothing) Then
+                        '
+                        ' -- get template from domain
+                        If (domain IsNot Nothing) Then
+                            template = Models.Entity.pageTemplateModel.create(cpcore, domain.DefaultTemplateId, New List(Of String))
+                        End If
+                        If (template Is Nothing) Then
+                            '
+                            ' -- get template named Default
+                            template = Models.Entity.pageTemplateModel.createByName(cpcore, defaultTemplateName, New List(Of String))
+                        End If
+                        If (template Is Nothing) Then
+                            '
+                            ' -- ceate new template named Default
+                            template = Models.Entity.pageTemplateModel.add(cpcore, New List(Of String))
+                            template.Name = defaultTemplateName
+                            template.BodyHTML = defaultTemplateHtml
+                            template.save(cpcore)
+                        End If
                     End If
                 End If
-            Next
-            '
-            If (template Is Nothing) Then
-                '
-                ' -- get template from domain
-                If (domain IsNot Nothing) Then
-                    template = Models.Entity.pageTemplateModel.create(cpCore, domain.DefaultTemplateId, New List(Of String))
-                End If
-                If (template Is Nothing) Then
-                    '
-                    ' -- get template named Default
-                    template = Models.Entity.pageTemplateModel.createByName(cpCore, defaultTemplateName, New List(Of String))
-                End If
-                If (template Is Nothing) Then
-                    '
-                    ' -- ceate new template named Default
-                    template = Models.Entity.pageTemplateModel.add(cpCore, New List(Of String))
-                    template.Name = defaultTemplateName
-                    template.BodyHTML = defaultTemplateHtml
-                    template.save(cpCore)
-                End If
-            End If
+            Catch ex As Exception
+
+            End Try
         End Sub
         '
         '========================================================================
@@ -966,7 +976,7 @@ Namespace Contensive.Core.Controllers
                     ' ----- do anonymous access blocking
                     '
                     If Not cpCore.authContext.isAuthenticated() Then
-                        If (cpCore.webServer.webServerIO_requestPath <> "/") And genericController.vbInstr(1, cpCore.siteProperties.adminURL, cpCore.webServer.webServerIO_requestPath, vbTextCompare) <> 0 Then
+                        If (cpCore.webServer.requestPath <> "/") And genericController.vbInstr(1, cpCore.siteProperties.adminURL, cpCore.webServer.requestPath, vbTextCompare) <> 0 Then
                             '
                             ' admin page is excluded from custom blocking
                             '
@@ -1175,11 +1185,11 @@ Namespace Contensive.Core.Controllers
                             '
                             ' Referer had no page, figure out what it should have been
                             '
-                            If cpCore.webServer.webServerIO_requestPage <> "" Then
+                            If cpCore.webServer.requestPage <> "" Then
                                 '
                                 ' If the referer had no page, and there is one here now, it must have been from an IIS redirect, use the current page as the default page
                                 '
-                                main_ServerReferrerURL = main_ServerReferrerURL & cpCore.webServer.webServerIO_requestPage
+                                main_ServerReferrerURL = main_ServerReferrerURL & cpCore.webServer.requestPage
                             Else
                                 main_ServerReferrerURL = main_ServerReferrerURL & cpCore.siteProperties.serverPageDefault
                             End If
@@ -2202,7 +2212,7 @@ Namespace Contensive.Core.Controllers
                             QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, HardCodedPagePrinterVersion, True)
                             Dim Caption As String = cpcore.siteProperties.getText("PagePrinterVersionCaption", "Printer Version")
                             Caption = genericController.vbReplace(Caption, " ", "&nbsp;")
-                            IconRow = IconRow & cr & "&nbsp;&nbsp;<a href=""" & cpcore.html.html_EncodeHTML(cpcore.webServer.webServerIO_requestPage & "?" & QueryString) & """ target=""_blank""><img alt=""image"" src=""/ccLib/images/IconSmallPrinter.gif"" width=""13"" height=""13"" border=""0"" align=""absmiddle""></a>&nbsp<a href=""" & cpcore.html.html_EncodeHTML(cpcore.webServer.webServerIO_requestPage & "?" & QueryString) & """ target=""_blank"" style=""text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;"">" & Caption & "</a>"
+                            IconRow = IconRow & cr & "&nbsp;&nbsp;<a href=""" & cpcore.html.html_EncodeHTML(cpcore.webServer.requestPage & "?" & QueryString) & """ target=""_blank""><img alt=""image"" src=""/ccLib/images/IconSmallPrinter.gif"" width=""13"" height=""13"" border=""0"" align=""absmiddle""></a>&nbsp<a href=""" & cpcore.html.html_EncodeHTML(cpcore.webServer.requestPage & "?" & QueryString) & """ target=""_blank"" style=""text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;"">" & Caption & "</a>"
                         End If
                         If page.AllowEmailPage Then
                             Dim QueryString As String = cpcore.doc.refreshQueryString
@@ -2692,7 +2702,7 @@ Namespace Contensive.Core.Controllers
                         If (LinkLabel <> "") Then
                             result = result & cr & "<li class=""ccListItem"">"
                             If (Link <> "") Then
-                                result = result & genericController.csv_GetLinkedText("<a href=""" & Me.cpcore.html.html_EncodeHTML(cpcore.webServer.webServerIO_requestPage & "?rc=" & ContentID & "&ri=" & RecordID) & """>", LinkLabel)
+                                result = result & genericController.csv_GetLinkedText("<a href=""" & Me.cpcore.html.html_EncodeHTML(cpcore.webServer.requestPage & "?rc=" & ContentID & "&ri=" & RecordID) & """>", LinkLabel)
                             Else
                                 result = result & LinkLabel
                             End If
@@ -2789,7 +2799,7 @@ Namespace Contensive.Core.Controllers
                         If (LinkLabel <> "") Then
                             result = result & cr & "<li id=""main_ContentWatch" & RecordID & """ class=""ccListItem"">"
                             If (Link <> "") Then
-                                result = result & "<a href=""http://" & Me.cpcore.webServer.webServerIO_requestDomain & requestAppRootPath & Me.cpcore.webServer.webServerIO_requestPage & "?rc=" & ContentID & "&ri=" & RecordID & """>" & LinkLabel & "</a>"
+                                result = result & "<a href=""http://" & Me.cpcore.webServer.webServerIO_requestDomain & requestAppRootPath & Me.cpcore.webServer.requestPage & "?rc=" & ContentID & "&ri=" & RecordID & """>" & LinkLabel & "</a>"
                             Else
                                 result = result & LinkLabel
                             End If
@@ -7978,24 +7988,30 @@ ErrorTrap:
         Public Function getLandingPageID() As Integer
             Dim landingPageid As Integer = 0
             Try
-                landingPageid = domain.RootPageID
-                If landingPageid = 0 Then
+                If (domain Is Nothing) Then
                     '
-                    ' -- try the site property landing page id
-                    landingPageid = cpcore.siteProperties.getinteger("LandingPageID", 0)
+                    ' -- domain not available
+                    cpcore.handleExceptionAndContinue(New ApplicationException("Landing page could not be determined because the domain was not recognized."))
+                Else
+                    landingPageid = domain.RootPageID
                     If landingPageid = 0 Then
                         '
-                        ' -- landing page could not be determined
-                        Dim landingPage As pageContentModel = pageContentModel.add(cpcore)
-                        landingPage.save(cpcore)
-                        landingPageid = landingPage.id
+                        ' -- try the site property landing page id
+                        landingPageid = cpcore.siteProperties.getinteger("LandingPageID", 0)
+                        If landingPageid = 0 Then
+                            '
+                            ' -- landing page could not be determined
+                            Dim landingPage As pageContentModel = pageContentModel.add(cpcore)
+                            landingPage.save(cpcore)
+                            landingPageid = landingPage.id
+                            '
+                            Me.landingPageID = main_GetPageNotFoundPageId()
+                        End If
                         '
-                        Me.landingPageID = main_GetPageNotFoundPageId()
+                        ' -- save new page to the domain
+                        domain.RootPageID = landingPageid
+                        domain.save(cpcore)
                     End If
-                    '
-                    ' -- save new page to the domain
-                    domain.RootPageID = landingPageid
-                    domain.save(cpcore)
                 End If
             Catch ex As Exception
                 cpcore.handleExceptionAndContinue(ex) : Throw
@@ -8641,6 +8657,24 @@ ErrorTrap:
             End If
             Return result
         End Function
+        '
+        '
+        '
+        Public Sub addRefreshQueryString(ByVal Name As String, Optional ByVal Value As String = "")
+            Try
+                Dim temp As String()
+                '
+                If (InStr(1, Name, "=") > 0) Then
+                    temp = Split(Name, "=")
+                    refreshQueryString = genericController.ModifyQueryString(cpcore.doc.refreshQueryString, temp(0), temp(1), True)
+                Else
+                    refreshQueryString = genericController.ModifyQueryString(cpcore.doc.refreshQueryString, Name, Value, True)
+                End If
+            Catch ex As Exception
+                cpcore.handleExceptionAndContinue(ex) : Throw
+            End Try
+
+        End Sub
 
     End Class
 End Namespace

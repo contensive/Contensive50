@@ -124,7 +124,7 @@ Namespace Contensive.Core
         Public ReadOnly Property doc As docController
             Get
                 If (_doc Is Nothing) Then
-                    _doc = New docController(Me, docProperties.getInteger(rnPageId))
+                    _doc = New docController(Me)
                 End If
                 Return _doc
             End Get
@@ -694,7 +694,7 @@ Namespace Contensive.Core
                                                 Call db.cs_Close(cs)
                                                 handleExceptionAndContinue(New ApplicationException("Add-on call from [" & refHost & "] was blocked because this domain is not in the Aggregate Access Content. An inactive record was added. To allow this domain access, mark the record active.")) ' handleLegacyError12("Init", "")
                                                 continueProcessing = False '--- should be disposed by caller --- Call dispose
-                                                Return html.docBuffer
+                                                Return doc.docBuffer
                                             ElseIf Not db.cs_getBoolean(cs, "active") Then
                                                 '
                                                 ' inactive record, throw error
@@ -702,7 +702,7 @@ Namespace Contensive.Core
                                                 Call db.cs_Close(cs)
                                                 handleExceptionAndContinue(New ApplicationException("Add-on call from [" & refHost & "] was blocked because this domain is not active in the Aggregate Access Content. To allow this domain access, mark the record active.")) ' handleLegacyError12("Init", "")
                                                 continueProcessing = False '--- should be disposed by caller --- Call dispose
-                                                Return html.docBuffer
+                                                Return doc.docBuffer
                                             Else
                                                 '
                                                 ' Active record, allow hit
@@ -758,7 +758,7 @@ Namespace Contensive.Core
                             '
                             webServer.webServerIO_BlockClosePageCopyright = True
                             html_BlockClosePageLink = True
-                            If (webServer.webServerIO_OutStreamDevice = htmlController.htmlDoc_OutStreamJavaScript) Then
+                            If (webServer.webServerIO_OutStreamDevice = docController.htmlDoc_OutStreamJavaScript) Then
                                 If genericController.vbInstr(1, returnResult, "<form ", vbTextCompare) <> 0 Then
                                     Dim FormSplit As String() = Split(returnResult, "<form ", , vbTextCompare)
                                     returnResult = FormSplit(0)
@@ -964,7 +964,7 @@ Namespace Contensive.Core
                                 returnResult = returnResult & html.getHtmlDoc_beforeEndOfBodyHtml(False, False, True, False)
                                 Call html.writeAltBuffer(returnResult)
                                 continueProcessing = False '--- should be disposed by caller --- Call dispose
-                                Return html.docBuffer
+                                Return doc.docBuffer
                             End If
                         End If
                         '
@@ -1188,7 +1188,7 @@ Namespace Contensive.Core
                             Dim ExitNow As Boolean = executeRoute_hardCodedPage(HardCodedPage)
                             If ExitNow Then
                                 continueProcessing = False '--- should be disposed by caller --- Call dispose
-                                Return html.docBuffer
+                                Return doc.docBuffer
                             End If
                         End If
                         '
@@ -1632,7 +1632,7 @@ Namespace Contensive.Core
                             Copy = "" _
                             & "<div style=""width:300px;margin:100px auto 0 auto;"">" _
                             & "<p>An attempt to send login information for email address '" & Emailtext & "' has been made.</p>" _
-                            & "<p><a href=""?" & html.refreshQueryString & """>Return to the Site.</a></p>" _
+                            & "<p><a href=""?" & doc.refreshQueryString & """>Return to the Site.</a></p>" _
                             & "</div>"
                             Call html.writeAltBuffer(Copy)
                             result = True
@@ -1710,14 +1710,14 @@ Namespace Contensive.Core
                         '
                         ' main_Get FormIndex (the index to the InsertImage# function called on selection)
                         '
-                        Call html.webServerIO_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageResourceLibrary)
+                        Call doc.addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageResourceLibrary)
                         EditorObjectName = docProperties.getText("EditorObjectName")
                         LinkObjectName = docProperties.getText("LinkObjectName")
                         If EditorObjectName <> "" Then
                             '
                             ' Open a page compatible with a dialog
                             '
-                            Call html.webServerIO_addRefreshQueryString("EditorObjectName", EditorObjectName)
+                            Call doc.addRefreshQueryString("EditorObjectName", EditorObjectName)
                             Call html.main_AddHeadScriptLink("/ccLib/ClientSide/dialogs.js", "Resource Library")
                             'Call AddHeadScript("<script type=""text/javascript"" src=""/ccLib/ClientSide/dialogs.js""></script>")
                             Call html.main_SetMetaContent(0, 0)
@@ -1755,7 +1755,7 @@ Namespace Contensive.Core
                             '
                             ' Open a page compatible with a dialog
                             '
-                            Call html.webServerIO_addRefreshQueryString("LinkObjectName", LinkObjectName)
+                            Call doc.addRefreshQueryString("LinkObjectName", LinkObjectName)
                             Call html.main_AddHeadScriptLink("/ccLib/ClientSide/dialogs.js", "Resource Library")
                             'Call AddHeadScript("<script type=""text/javascript"" src=""/ccLib/ClientSide/dialogs.js""></script>")
                             Call html.main_SetMetaContent(0, 0)
@@ -1782,7 +1782,7 @@ Namespace Contensive.Core
                     Case HardCodedPageLoginDefault
                         '
                         ' 9/4/2012 added to prevent lockout if login addon fails
-                        html.refreshQueryString = webServer.requestQueryString
+                        doc.refreshQueryString = webServer.requestQueryString
                         'Call main_AddRefreshQueryString("method", "")
                         Call html.writeAltBuffer(html.getLoginPage(True))
                         result = True
@@ -1797,7 +1797,7 @@ Namespace Contensive.Core
                         If genericController.vbUCase(HardCodedPage) = "LOGOUTLOGIN" Then
                             Call authContext.logout(Me)
                         End If
-                        html.refreshQueryString = webServer.requestQueryString
+                        doc.refreshQueryString = webServer.requestQueryString
                         'Call main_AddRefreshQueryString("method", "")
                         Call html.writeAltBuffer(html.getLoginPage(False))
                         'Call writeAltBuffer(main_GetLoginPage2(false) & main_GetEndOfBody(False, False, False))
@@ -1812,13 +1812,13 @@ Namespace Contensive.Core
                         '
                         ' 7/8/9 - Moved from intercept pages
                         '
-                        Call html.webServerIO_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageSiteExplorer)
+                        Call doc.addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageSiteExplorer)
                         LinkObjectName = docProperties.getText("LinkObjectName")
                         If LinkObjectName <> "" Then
                             '
                             ' Open a page compatible with a dialog
                             '
-                            Call html.webServerIO_addRefreshQueryString("LinkObjectName", LinkObjectName)
+                            Call doc.addRefreshQueryString("LinkObjectName", LinkObjectName)
                             Call html.main_AddPagetitle("Site Explorer")
                             Call html.main_SetMetaContent(0, 0)
                             Copy = addon.execute_legacy5(0, "Site Explorer", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", 0)
@@ -1958,12 +1958,12 @@ Namespace Contensive.Core
                         '
                         ' ----- Redirect with RC and RI
                         '
-                        html.pageManager_RedirectContentID = docProperties.getInteger(rnRedirectContentId)
-                        html.pageManager_RedirectRecordID = docProperties.getInteger(rnRedirectRecordId)
-                        If html.pageManager_RedirectContentID <> 0 And html.pageManager_RedirectRecordID <> 0 Then
-                            ContentName = metaData.getContentNameByID(html.pageManager_RedirectContentID)
+                        doc.pageManager_RedirectContentID = docProperties.getInteger(rnRedirectContentId)
+                        doc.pageManager_RedirectRecordID = docProperties.getInteger(rnRedirectRecordId)
+                        If doc.pageManager_RedirectContentID <> 0 And doc.pageManager_RedirectRecordID <> 0 Then
+                            ContentName = metaData.getContentNameByID(doc.pageManager_RedirectContentID)
                             If ContentName <> "" Then
-                                Call iisController.main_RedirectByRecord_ReturnStatus(Me, ContentName, html.pageManager_RedirectRecordID)
+                                Call iisController.main_RedirectByRecord_ReturnStatus(Me, ContentName, doc.pageManager_RedirectRecordID)
                             End If
                         End If
                         webServer.webServerIO_BlockClosePageCopyright = True
@@ -2215,7 +2215,7 @@ Namespace Contensive.Core
             Dim CSMax As Integer
             Dim PageID As Integer
             Dim FieldNames As String
-            Dim Form As String
+            Dim requestForm As String
             '
             If Not Me.disposed Then
                 Me.disposed = True
@@ -2244,8 +2244,10 @@ Namespace Contensive.Core
                             '
                             ViewingName = Left(authContext.visit.id & "." & authContext.visit.PageVisits, 10)
                             PageID = 0
-                            If (doc.page IsNot Nothing) Then
-                                PageID = doc.page.id
+                            If (_doc IsNot Nothing) Then
+                                If (doc.page IsNot Nothing) Then
+                                    PageID = doc.page.id
+                                End If
                             End If
                             FieldNames = "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,ContentControlID,pagetime,Active,CreateKey,RecordID"
                             FieldNames = FieldNames & ",ExcludeFromAnalytics"
@@ -2257,10 +2259,10 @@ Namespace Contensive.Core
                                 & "," & db.encodeSQLNumber(authContext.visit.id) _
                                 & "," & db.encodeSQLNumber(authContext.user.id) _
                                 & "," & db.encodeSQLText(webServer.requestDomain) _
-                                & "," & db.encodeSQLText(webServer.webServerIO_requestPath) _
-                                & "," & db.encodeSQLText(webServer.webServerIO_requestPage) _
+                                & "," & db.encodeSQLText(webServer.requestPath) _
+                                & "," & db.encodeSQLText(webServer.requestPage) _
                                 & "," & db.encodeSQLText(Left(webServer.requestQueryString, 255)) _
-                                & "," & db.encodeSQLText(Left(Form, 255)) _
+                                & "," & db.encodeSQLText(Left(webServer.requestFormString, 255)) _
                                 & "," & db.encodeSQLText(Left(webServer.requestReferrer, 255)) _
                                 & "," & db.encodeSQLDate(app_startTime) _
                                 & "," & db.encodeSQLBoolean(authContext.visit_stateOK) _
@@ -2270,18 +2272,15 @@ Namespace Contensive.Core
                                 & "," & db.encodeSQLNumber(CSMax) _
                                 & "," & db.encodeSQLNumber(PageID)
                             SQL &= "," & db.encodeSQLBoolean(webServer.webServerIO_PageExcludeFromAnalytics)
-                            SQL &= "," & db.encodeSQLText(html.main_MetaContent_Title)
+                            SQL &= "," & db.encodeSQLText(doc.main_MetaContent_Title)
                             SQL &= ");"
                             Call db.executeSql(SQL)
-                            'Call db.executeSqlAsync(SQL)
                         End If
                     End If
                     '
                     ' ----- dispose objects created here
                     '
                     If Not (_addonCache Is Nothing) Then
-                        ' no dispose
-                        'Call _addonCache.Dispose()
                         _addonCache = Nothing
                     End If
                     '

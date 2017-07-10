@@ -370,13 +370,13 @@ leak200:
                 ' build refresh string
                 '-------------------------------------------------------------------------------
                 '
-                If AdminContent.Id <> 0 Then Call cpCore.html.webServerIO_addRefreshQueryString("cid", genericController.encodeText(AdminContent.Id))
-                If editRecord.id <> 0 Then Call cpCore.html.webServerIO_addRefreshQueryString("id", genericController.encodeText(editRecord.id))
-                If TitleExtension <> "" Then Call cpCore.html.webServerIO_addRefreshQueryString(RequestNameTitleExtension, cpCore.html.main_EncodeRequestVariable(TitleExtension))
-                If RecordTop <> 0 Then Call cpCore.html.webServerIO_addRefreshQueryString("rt", genericController.encodeText(RecordTop))
-                If RecordsPerPage <> RecordsPerPageDefault Then Call cpCore.html.webServerIO_addRefreshQueryString("rs", genericController.encodeText(RecordsPerPage))
-                If AdminForm <> 0 Then Call cpCore.html.webServerIO_addRefreshQueryString(RequestNameAdminForm, genericController.encodeText(AdminForm))
-                If MenuDepth <> 0 Then Call cpCore.html.webServerIO_addRefreshQueryString(RequestNameAdminDepth, genericController.encodeText(MenuDepth))
+                If AdminContent.Id <> 0 Then Call cpCore.doc.addRefreshQueryString("cid", genericController.encodeText(AdminContent.Id))
+                If editRecord.id <> 0 Then Call cpCore.doc.addRefreshQueryString("id", genericController.encodeText(editRecord.id))
+                If TitleExtension <> "" Then Call cpCore.doc.addRefreshQueryString(RequestNameTitleExtension, cpCore.html.main_EncodeRequestVariable(TitleExtension))
+                If RecordTop <> 0 Then Call cpCore.doc.addRefreshQueryString("rt", genericController.encodeText(RecordTop))
+                If RecordsPerPage <> RecordsPerPageDefault Then Call cpCore.doc.addRefreshQueryString("rs", genericController.encodeText(RecordsPerPage))
+                If AdminForm <> 0 Then Call cpCore.doc.addRefreshQueryString(RequestNameAdminForm, genericController.encodeText(AdminForm))
+                If MenuDepth <> 0 Then Call cpCore.doc.addRefreshQueryString(RequestNameAdminDepth, genericController.encodeText(MenuDepth))
                 '
                 ' normalize guid
                 '
@@ -417,13 +417,13 @@ leak200:
                     '
                     ' display Addon Help
                     '
-                    Call cpCore.html.webServerIO_addRefreshQueryString("helpaddonid", HelpAddonID.ToString)
+                    Call cpCore.doc.addRefreshQueryString("helpaddonid", HelpAddonID.ToString)
                     ContentCell = GetAddonHelp(HelpAddonID, "")
                 ElseIf (HelpCollectionID <> 0) Then
                     '
                     ' display Collection Help
                     '
-                    Call cpCore.html.webServerIO_addRefreshQueryString("helpcollectionid", HelpCollectionID.ToString)
+                    Call cpCore.doc.addRefreshQueryString("helpcollectionid", HelpCollectionID.ToString)
                     ContentCell = GetCollectionHelp(HelpCollectionID, "")
                 ElseIf (AdminForm <> 0) Then
                     '
@@ -493,17 +493,17 @@ leak200:
                         '
                         ' Special case, call the routine that provides a backup
                         '
-                        Call cpCore.html.webServerIO_addRefreshQueryString("addonguid", AddonManagerGuid)
+                        Call cpCore.doc.addRefreshQueryString("addonguid", AddonManagerGuid)
                         ContentCell = GetAddonManager()
                     Else
                         If addonId <> 0 Then
-                            Call cpCore.html.webServerIO_addRefreshQueryString("addonid", CStr(addonId))
+                            Call cpCore.doc.addRefreshQueryString("addonid", CStr(addonId))
                             CS = cpCore.db.csOpenRecord(cnAddons, addonId)
                             If Not cpCore.db.cs_ok(CS) Then
                                 Call errorController.error_AddUserError(cpCore, "The Add-on you requested could not be found by its id " & addonId)
                             End If
                         ElseIf AddonGuid <> "" Then
-                            Call cpCore.html.webServerIO_addRefreshQueryString("addonguid", AddonGuid)
+                            Call cpCore.doc.addRefreshQueryString("addonguid", AddonGuid)
                             '$$$$$ cache this
                             If True Then ' 3.4.060" Then
                                 CS = cpCore.db.cs_open(cnAddons, "ccguid=" & cpCore.db.encodeSQLText(AddonGuid))
@@ -514,7 +514,7 @@ leak200:
                                 Call errorController.error_AddUserError(cpCore, "The Add-on you requested could not be found by its guid " & AddonGuid)
                             End If
                         ElseIf AddonName <> "" Then
-                            Call cpCore.html.webServerIO_addRefreshQueryString("addonname", AddonName)
+                            Call cpCore.doc.addRefreshQueryString("addonname", AddonName)
                             CS = cpCore.db.cs_open(cnAddons, "name=" & cpCore.db.encodeSQLText(AddonName))
                             If Not cpCore.db.cs_ok(CS) Then
                                 Call errorController.error_AddUserError(cpCore, "The Add-on you requested could not be found by its name " & AddonName)
@@ -524,7 +524,7 @@ leak200:
                             addonId = cpCore.db.cs_getInteger(CS, "ID")
                             AddonName = cpCore.db.cs_getText(CS, "name")
                             AddonHelpCopy = cpCore.db.cs_getText(CS, "help")
-                            Call cpCore.html.webServerIO_addRefreshQueryString(RequestNameRunAddon, addonId.ToString)
+                            Call cpCore.doc.addRefreshQueryString(RequestNameRunAddon, addonId.ToString)
                         End If
                         Call cpCore.db.cs_Close(CS)
                         InstanceOptionString = cpCore.userProperty.getText("Addon [" & AddonName & "] Options", "")
@@ -568,7 +568,7 @@ leak200:
                 '    'ContentCell = "<div class=""ccAdminMsg"">The form you requested did not return a valid response.</div>"
                 'End If
                 '
-                If cpcore.doc.pageManager_printVersion Then
+                If cpCore.doc.pageManager_printVersion Then
                     '
                     ' For print version, just add content
                     '
@@ -712,8 +712,8 @@ ErrorTrap:
                     Exit For
                 Else
                     WherePair(1, WCount) = genericController.encodeText(cpCore.docProperties.getText("WR" & WCount))
-                    Call cpCore.html.webServerIO_addRefreshQueryString("wl" & WCount, cpCore.html.main_EncodeRequestVariable(WherePair(0, WCount)))
-                    Call cpCore.html.webServerIO_addRefreshQueryString("wr" & WCount, cpCore.html.main_EncodeRequestVariable(WherePair(1, WCount)))
+                    Call cpCore.doc.addRefreshQueryString("wl" & WCount, cpCore.html.main_EncodeRequestVariable(WherePair(0, WCount)))
+                    Call cpCore.doc.addRefreshQueryString("wr" & WCount, cpCore.html.main_EncodeRequestVariable(WherePair(1, WCount)))
                 End If
             Next
             '
@@ -724,7 +724,7 @@ ErrorTrap:
                 '
                 ' ***** really needs a server.URLDecode() function
                 '
-                Call cpCore.html.webServerIO_addRefreshQueryString("wc", WhereClauseContent)
+                Call cpCore.doc.addRefreshQueryString("wc", WhereClauseContent)
                 'WhereClauseContent = genericController.vbReplace(WhereClauseContent, "%3D", "=")
                 'WhereClauseContent = genericController.vbReplace(WhereClauseContent, "%26", "&")
                 If WhereClauseContent <> "" Then
@@ -3899,7 +3899,7 @@ ErrorTrap:
                         End If
                     End If
                 End If
-                Call cpCore.html.webServerIO_addRefreshQueryString(RequestNameEditReferer, EditReferer)
+                Call cpCore.doc.addRefreshQueryString(RequestNameEditReferer, EditReferer)
                 '
                 ' Print common form elements
                 '
@@ -4773,7 +4773,7 @@ ErrorTrap:
                 ' ----- Bad Links
                 '
                 Copy = "n/a"
-                QueryString = genericController.ModifyQueryString(cpcore.doc.refreshQueryString, RequestNameAdminForm, AdminFormReports, True)
+                QueryString = genericController.ModifyQueryString(cpCore.doc.refreshQueryString, RequestNameAdminForm, AdminFormReports, True)
                 QueryString = genericController.ModifyQueryString(QueryString, RequestNameReportForm, ReportFormEDGDocErrors, True)
                 SQL = "SELECT Count(ccEDGPublishDocs.ID) AS PagesFound FROM ccEDGPublishDocs where (UpToDate=1) And (LinkAlias Is Not null) And ((HTTPResponse Is null) Or ((Not (HTTPResponse Like '% 200 %'))and (not (HTTPResponse like '% 302 %'))));"
                 CSPointer = cpCore.db.cs_openCsSql_rev("Default", SQL)
@@ -9092,7 +9092,7 @@ ErrorTrap:
                 '
                 ' AdminTabs
                 '
-                QS = cpcore.doc.refreshQueryString
+                QS = cpCore.doc.refreshQueryString
                 If allowAdminTabs Then
                     QS = genericController.ModifyQueryString(QS, "tabs", "0", True)
                     RightSide = RightSide & GetActiveImage(cpCore.serverConfig.appConfig.adminRoute & "?" & QS, "Disable Tabs", "LibButtonNoTabs.GIF", "LibButtonNoTabsRev.GIF", "Disable Tabs", "16", "16", "", "", "")
@@ -9103,7 +9103,7 @@ ErrorTrap:
                 '
                 ' Menu Mode
                 '
-                QS = cpcore.doc.refreshQueryString
+                QS = cpCore.doc.refreshQueryString
                 If MenuDepth = 0 Then
                     RightSide = RightSide & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""16"" >"
                     If AdminMenuModeID = AdminMenuModeTop Then
@@ -9118,7 +9118,7 @@ ErrorTrap:
                 ' Refresh Button
                 '
                 RightSide = RightSide & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""16"" >"
-                RightSide = RightSide & GetActiveImage(cpCore.serverConfig.appConfig.adminRoute & "?" & cpcore.doc.refreshQueryString, "Refresh", "LibButtonRefresh.GIF", "LibButtonRefreshOver.GIF", "Refresh", "16", "16", "", "", "")
+                RightSide = RightSide & GetActiveImage(cpCore.serverConfig.appConfig.adminRoute & "?" & cpCore.doc.refreshQueryString, "Refresh", "LibButtonRefresh.GIF", "LibButtonRefreshOver.GIF", "Refresh", "16", "16", "", "", "")
                 '
                 ' Assemble header
                 '
@@ -10178,7 +10178,7 @@ ErrorTrap:
                             End If
                             '
                             editRecord.id = 0
-                            Call cpCore.html.webServerIO_addRefreshQueryString("id", genericController.encodeText(editRecord.id))
+                            Call cpCore.doc.addRefreshQueryString("id", genericController.encodeText(editRecord.id))
                         End If
                     Case Else
                         '
@@ -10230,7 +10230,7 @@ ErrorTrap:
                                 End With
                             Next
                             '
-                            Call cpCore.html.webServerIO_addRefreshQueryString("id", genericController.encodeText(editRecord.id))
+                            Call cpCore.doc.addRefreshQueryString("id", genericController.encodeText(editRecord.id))
                         End If
                         'Call cpCore.htmldoc.main_AddUserError("The create duplicate action is not supported for this content.")
                 End Select
@@ -10393,7 +10393,7 @@ ErrorTrap:
                     'GetMenuTopMode = GetMenuTopMode & cpCore.main_GetMenuClose
                     Call cpCore.cache.setObject(BakeName, GetMenuTopMode & MenuDelimiter & MenuClose, "Menu Entries,People,Content,Groups,Group Rules")
                 End If
-                cpCore.html.htmlForEndOfBody = cpCore.html.htmlForEndOfBody & MenuClose
+                cpCore.doc.htmlForEndOfBody = cpCore.doc.htmlForEndOfBody & MenuClose
             End If
             Exit Function
             '
@@ -11544,7 +11544,7 @@ ErrorTrap:
                 '
                 'Tab0.Add( "<p>The following is a list of available downloads</p>")
                 ''
-                RQS = cpcore.doc.refreshQueryString
+                RQS = cpCore.doc.refreshQueryString
                 PageSize = cpCore.docProperties.getInteger(RequestNamePageSize)
                 If PageSize = 0 Then
                     PageSize = 50
@@ -12188,7 +12188,7 @@ ErrorTrap:
                 '
                 Tab0.Add("<p>The following is a list of available custom reports.</p>")
                 '
-                RQS = cpcore.doc.refreshQueryString
+                RQS = cpCore.doc.refreshQueryString
                 PageSize = cpCore.docProperties.getInteger(RequestNamePageSize)
                 If PageSize = 0 Then
                     PageSize = 50
@@ -12513,14 +12513,14 @@ ErrorTrap:
                             '
                             ' Refresh Query String
                             '
-                            Call cpCore.html.webServerIO_addRefreshQueryString("tr", IndexConfig.RecordTop.ToString())
-                            Call cpCore.html.webServerIO_addRefreshQueryString("asf", AdminForm.ToString())
-                            Call cpCore.html.webServerIO_addRefreshQueryString("cid", adminContent.Id.ToString())
-                            Call cpCore.html.webServerIO_addRefreshQueryString(RequestNameTitleExtension, cpCore.html.main_EncodeRequestVariable(TitleExtension))
+                            Call cpCore.doc.addRefreshQueryString("tr", IndexConfig.RecordTop.ToString())
+                            Call cpCore.doc.addRefreshQueryString("asf", AdminForm.ToString())
+                            Call cpCore.doc.addRefreshQueryString("cid", adminContent.Id.ToString())
+                            Call cpCore.doc.addRefreshQueryString(RequestNameTitleExtension, cpCore.html.main_EncodeRequestVariable(TitleExtension))
                             If WherePairCount > 0 Then
                                 For WhereCount = 0 To WherePairCount - 1
-                                    Call cpCore.html.webServerIO_addRefreshQueryString("wl" & WhereCount, WherePair(0, WhereCount))
-                                    Call cpCore.html.webServerIO_addRefreshQueryString("wr" & WhereCount, WherePair(1, WhereCount))
+                                    Call cpCore.doc.addRefreshQueryString("wl" & WhereCount, WherePair(0, WhereCount))
+                                    Call cpCore.doc.addRefreshQueryString("wr" & WhereCount, WherePair(1, WhereCount))
                                 Next
                             End If
                             '

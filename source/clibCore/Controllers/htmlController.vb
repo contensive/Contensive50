@@ -1849,7 +1849,7 @@ ErrorTrap:
                 If cpCore.authContext.isAuthenticatedContentManager(cpCore) Then
                     main_GetLoginLink = main_GetLoginLink & "<a href=""" & html_EncodeHTML(cpCore.siteProperties.adminURL) & """ target=""_blank"">"
                 Else
-                    Link = cpCore.webServer.webServerIO_requestPage & "?" & cpCore.doc.refreshQueryString
+                    Link = cpCore.webServer.requestPage & "?" & cpCore.doc.refreshQueryString
                     Link = genericController.modifyLinkQuery(Link, RequestNameHardCodedPage, HardCodedPageLogin, True)
                     'Link = genericController.modifyLinkQuery(Link, RequestNameInterceptpage, LegacyInterceptPageSNLogin, True)
                     main_GetLoginLink = main_GetLoginLink & "<a href=""" & html_EncodeHTML(Link) & """ >"
@@ -1969,24 +1969,24 @@ ErrorTrap:
 
             End Get
         End Property
+        ''
+        ''
+        ''
+        'Public Sub webServerIO_addRefreshQueryString(ByVal Name As String, Optional ByVal Value As String = "")
+        '    Try
+        '        Dim temp() As String
+        '        '
+        '        If (InStr(1, Name, "=") > 0) Then
+        '            temp = Split(Name, "=")
+        '            cpCore.doc.refreshQueryString = genericController.ModifyQueryString(cpCore.doc.refreshQueryString, temp(0), temp(1), True)
+        '        Else
+        '            cpCore.doc.refreshQueryString = genericController.ModifyQueryString(cpCore.doc.refreshQueryString, Name, Value, True)
+        '        End If
+        '    Catch ex As Exception
+        '        cpCore.handleExceptionAndContinue(ex) : Throw
+        '    End Try
         '
-        '
-        '
-        Public Sub webServerIO_addRefreshQueryString(ByVal Name As String, Optional ByVal Value As String = "")
-            Try
-                Dim temp() As String
-                '
-                If (InStr(1, Name, "=") > 0) Then
-                    temp = Split(Name, "=")
-                    cpCore.doc.refreshQueryString = genericController.ModifyQueryString(cpCore.doc.refreshQueryString, temp(0), temp(1), True)
-                Else
-                    cpCore.doc.refreshQueryString = genericController.ModifyQueryString(cpCore.doc.refreshQueryString, Name, Value, True)
-                End If
-            Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
-            End Try
-            '
-        End Sub
+        '  End Sub
         '
         Public Function html_GetLegacySiteStyles() As String
             On Error GoTo ErrorTrap
@@ -6216,7 +6216,7 @@ ErrorTrap:
                                 ' ----- Create Path Block record, if requested
                                 '
                                 CreatePathBlock = cpCore.docProperties.getBoolean("CreatePathBlock")
-                                CS = cpCore.db.cs_open("Paths", "name=" & cpCore.db.encodeSQLText(cpCore.webServer.webServerIO_requestPath))
+                                CS = cpCore.db.cs_open("Paths", "name=" & cpCore.db.encodeSQLText(cpCore.webServer.requestPath))
                                 PathID = 0
                                 If cpCore.db.cs_ok(CS) Then
                                     PathID = cpCore.db.cs_getInteger(CS, "id")
@@ -6228,7 +6228,7 @@ ErrorTrap:
                                     '
                                     CS = cpCore.db.cs_insertRecord("Paths")
                                     If cpCore.db.cs_ok(CS) Then
-                                        Call cpCore.db.cs_set(CS, "name", cpCore.webServer.webServerIO_requestPath)
+                                        Call cpCore.db.cs_set(CS, "name", cpCore.webServer.requestPath)
                                         Call cpCore.db.cs_set(CS, "active", 1)
                                     End If
                                     Call cpCore.db.cs_Close(CS)
@@ -8978,7 +8978,7 @@ ErrorTrap:
                     '
                     ' ----- When page loads, set focus on login username
                     '
-                    Call cpCore.html.webServerIO_addRefreshQueryString("method", "")
+                    Call cpCore.doc.addRefreshQueryString("method", "")
                     loginForm = ""
                     Call cpCore.html.main_AddOnLoadJavascript2("document.getElementById('LoginUsernameInput').focus()", "login")
                     '
@@ -9866,7 +9866,7 @@ ErrorTrap:
                         ' Cut Link if enabled
                         '
                         If iAllowCut Then
-                            WorkingLink = genericController.modifyLinkQuery(cpCore.webServer.webServerIO_requestPage & "?" & cpCore.doc.refreshQueryString, RequestNameCut, genericController.encodeText(ContentID) & "." & genericController.encodeText(RecordID), True)
+                            WorkingLink = genericController.modifyLinkQuery(cpCore.webServer.requestPage & "?" & cpCore.doc.refreshQueryString, RequestNameCut, genericController.encodeText(ContentID) & "." & genericController.encodeText(RecordID), True)
                             main_GetRecordEditLink2 = "" _
                                 & main_GetRecordEditLink2 _
                                 & "<a class=""ccRecordCutLink"" TabIndex=""-1"" href=""" & cpCore.html.html_EncodeHTML(WorkingLink) & """><img src=""/ccLib/images/Contentcut.gif"" border=""0"" alt=""Cut this " & ContentCaption & " to clipboard"" title=""Cut this " & ContentCaption & " to clipboard"" align=""absmiddle""></a>"
@@ -10091,7 +10091,7 @@ ErrorTrap:
                                             '
                                             ' Can not paste as child of itself
                                             '
-                                            PasteLink = cpCore.webServer.webServerIO_requestPage & "?" & cpCore.doc.refreshQueryString
+                                            PasteLink = cpCore.webServer.requestPage & "?" & cpCore.doc.refreshQueryString
                                             PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePaste, "1", True)
                                             PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteParentContentID, CStr(iContentID), True)
                                             PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteParentRecordID, CStr(ParentID), True)
@@ -10749,7 +10749,7 @@ ErrorTrap:
                                 ' Path blocking allowed
                                 '
                                 'OptionsPanel = OptionsPanel & SpanClassAdminSmall & "<LABEL for=""" & TagID & """>"
-                                CS = cpCore.db.cs_open("Paths", "name=" & cpCore.db.encodeSQLText(cpCore.webServer.webServerIO_requestPath), , , , , , "ID")
+                                CS = cpCore.db.cs_open("Paths", "name=" & cpCore.db.encodeSQLText(cpCore.webServer.requestPath), , , , , , "ID")
                                 If cpCore.db.cs_ok(CS) Then
                                     PathID = (cpCore.db.cs_getInteger(CS, "ID"))
                                 End If
@@ -10758,12 +10758,12 @@ ErrorTrap:
                                     '
                                     ' Path is blocked
                                     '
-                                    Tag = cpCore.html.html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & cpCore.webServer.webServerIO_requestPath & "] [<a href=""" & cpCore.html.html_EncodeHTML(cpCore.siteProperties.adminURL & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & cpCore.metaData.getContentId("paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
+                                    Tag = cpCore.html.html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & cpCore.webServer.requestPath & "] [<a href=""" & cpCore.html.html_EncodeHTML(cpCore.siteProperties.adminURL & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & cpCore.metaData.getContentId("paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
                                 Else
                                     '
                                     ' Path is not blocked
                                     '
-                                    Tag = cpCore.html.html_GetFormInputCheckBox2(TagID, False, TagID) & "&nbsp;Block this path [" & cpCore.webServer.webServerIO_requestPath & "]</LABEL>"
+                                    Tag = cpCore.html.html_GetFormInputCheckBox2(TagID, False, TagID) & "&nbsp;Block this path [" & cpCore.webServer.requestPath & "]</LABEL>"
                                 End If
                                 helpLink = ""
                                 'helpLink = main_GetHelpLink(10, "Enable Debugging", "Debugging is a developer only debugging tool. With Debugging enabled, ccLib.TestPoints(...) will print, ErrorTrapping will be displayed, redirections are blocked, and more.")
@@ -10902,8 +10902,8 @@ ErrorTrap:
                     DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerDomain", cpCore.html.html_EncodeHTML(cpCore.webServer.webServerIO_requestDomain))
                     DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerProtocol", cpCore.html.html_EncodeHTML(cpCore.webServer.webServerIO_requestProtocol))
                     DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerHost", cpCore.html.html_EncodeHTML(cpCore.webServer.requestDomain))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerPath", cpCore.html.html_EncodeHTML(cpCore.webServer.webServerIO_requestPath))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerPage", cpCore.html.html_EncodeHTML(cpCore.webServer.webServerIO_requestPage))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerPath", cpCore.html.html_EncodeHTML(cpCore.webServer.requestPath))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerPage", cpCore.html.html_EncodeHTML(cpCore.webServer.requestPage))
                     Copy = ""
                     If cpCore.webServer.requestQueryString <> "" Then
                         CopySplit = Split(cpCore.webServer.requestQueryString, "&")

@@ -65,8 +65,8 @@ Namespace Contensive.Core
         Public requestUrl As String = ""                 ' The current URL, from protocol to end of quesrystring
         Public webServerIO_requestVirtualFilePath As String = ""          ' The Virtual path for the site (host+main_ServerVirtualPath+"/" is site URI)
         Public webServerIO_requestDomain As String = ""               ' This is the proper domain for the site (may not always match the current SERVER_NAME
-        Public webServerIO_requestPath As String = ""                 ' The path part of the current URI
-        Public webServerIO_requestPage As String = ""                 ' The page part of the current URI
+        Public requestPath As String = ""                 ' The path part of the current URI
+        Public requestPage As String = ""                 ' The page part of the current URI
         Public webServerIO_requestSecureURLRoot As String = ""        ' The URL to the root of the secure area for this site
         '
         Public webServerIO_response_NoFollow As Boolean = False   ' when set, Meta no follow is added
@@ -363,11 +363,11 @@ Namespace Contensive.Core
                     Dim inputStream As IO.Stream = iisContext.Request.InputStream
                 Catch ex As httpException
                     Call cpCore.handleExceptionAndContinue(ex) : Throw
-                    errorController.error_AddUserError(cpcore,ex.Message)
+                    errorController.error_AddUserError(cpCore, ex.Message)
                     postError = True
                 Catch ex As Exception
                     Call cpCore.handleExceptionAndContinue(ex) : Throw
-                    errorController.error_AddUserError(cpcore,ex.Message)
+                    errorController.error_AddUserError(cpCore, ex.Message)
                     postError = True
                 End Try
                 If Not postError Then
@@ -500,7 +500,7 @@ Namespace Contensive.Core
                         ' Add JSProcessForm to form
                         '
                         webServerIO_BlockClosePageCopyright = True
-                        webServerIO_OutStreamDevice = htmlController.htmlDoc_OutStreamJavaScript ' refactor - these should just be setContentType as a string so developers can set whatever
+                        webServerIO_OutStreamDevice = docController.htmlDoc_OutStreamJavaScript ' refactor - these should just be setContentType as a string so developers can set whatever
                         Call setResponseContentType("application/javascript") ' refactor -- this should be setContentType
                         '
                         ' Add the cpcore.main_ServerReferrer QS to the cpcore.doc.main_InStreamArray()
@@ -789,12 +789,12 @@ Namespace Contensive.Core
                     '       all cpcore.main_ContentWatch URLs should be checked (and changed to) AppRootPath
                     '
                     '
-                    webServerIO_requestPath = "/"
-                    webServerIO_requestPage = cpCore.siteProperties.serverPageDefault
+                    requestPath = "/"
+                    requestPage = cpCore.siteProperties.serverPageDefault
                     TextStartPointer = InStrRev(requestPathPage, "/")
                     If TextStartPointer <> 0 Then
-                        webServerIO_requestPath = Mid(requestPathPage, 1, TextStartPointer)
-                        webServerIO_requestPage = Mid(requestPathPage, TextStartPointer + 1)
+                        requestPath = Mid(requestPathPage, 1, TextStartPointer)
+                        requestPage = Mid(requestPathPage, TextStartPointer + 1)
                     End If
                     ' cpcore.web_requestAppPath = Mid(cpcore.web_requestPath, Len(appRootPath) + 1)
                     webServerIO_requestSecureURLRoot = "https://" & webServerIO_requestDomain & requestAppRootPath
@@ -824,16 +824,16 @@ Namespace Contensive.Core
                     '
                     Id = cpCore.docProperties.getInteger(rnPageId)
                     If Id <> 0 Then
-                        Call cpCore.html.webServerIO_addRefreshQueryString(rnPageId, Id.ToString)
+                        Call cpCore.doc.addRefreshQueryString(rnPageId, Id.ToString)
                     End If
                     Id = cpCore.docProperties.getInteger("sid")
                     If Id <> 0 Then
-                        Call cpCore.html.webServerIO_addRefreshQueryString("sid", Id.ToString)
+                        Call cpCore.doc.addRefreshQueryString("sid", Id.ToString)
                     End If
                     '
                     ' ----- Create Server Link property
                     '
-                    requestUrl = webServerIO_requestProtocol & requestDomain & requestAppRootPath & webServerIO_requestPath & webServerIO_requestPage
+                    requestUrl = webServerIO_requestProtocol & requestDomain & requestAppRootPath & requestPath & requestPage
                     If requestQueryString <> "" Then
                         requestUrl = requestUrl & "?" & requestQueryString
                     End If
@@ -863,7 +863,7 @@ Namespace Contensive.Core
                     ' ----- Create Server Link property
                     '--------------------------------------------------------------------------
                     '
-                    requestUrl = webServerIO_requestProtocol & requestDomain & requestAppRootPath & webServerIO_requestPath & webServerIO_requestPage
+                    requestUrl = webServerIO_requestProtocol & requestDomain & requestAppRootPath & requestPath & requestPage
                     If requestQueryString <> "" Then
                         requestUrl = requestUrl & "?" & requestQueryString
                     End If
@@ -881,9 +881,9 @@ Namespace Contensive.Core
                         '
                         Copy = "Redirecting to domain [" & webServerIO_requestDomain & "] because this site is configured to run on the current domain [" & requestDomain & "]"
                         If requestQueryString <> "" Then
-                            Call redirect(webServerIO_requestProtocol & webServerIO_requestDomain & webServerIO_requestPath & webServerIO_requestPage & "?" & requestQueryString, Copy, False)
+                            Call redirect(webServerIO_requestProtocol & webServerIO_requestDomain & requestPath & requestPage & "?" & requestQueryString, Copy, False)
                         Else
-                            Call redirect(webServerIO_requestProtocol & webServerIO_requestDomain & webServerIO_requestPath & webServerIO_requestPage, Copy, False)
+                            Call redirect(webServerIO_requestProtocol & webServerIO_requestDomain & requestPath & requestPage, Copy, False)
                         End If
                         cpCore.continueProcessing = False '--- should be disposed by caller --- Call dispose
                         Return cpCore.continueProcessing
@@ -906,7 +906,7 @@ Namespace Contensive.Core
                     ' ----- Create cpcore.main_ServerFormActionURL if it has not been overridden manually
                     '
                     If webServerIO_ServerFormActionURL = "" Then
-                        webServerIO_ServerFormActionURL = webServerIO_requestProtocol & requestDomain & webServerIO_requestPath & webServerIO_requestPage
+                        webServerIO_ServerFormActionURL = webServerIO_requestProtocol & requestDomain & requestPath & requestPage
                     End If
                     ''
                     ''--------------------------------------------------------------------------
@@ -1012,7 +1012,8 @@ Namespace Contensive.Core
                 '
                 MethodName = "main_addResponseCookie"
                 '
-                If cpCore.continueProcessing And cpCore.html.outputBufferEnabled Then
+                If cpCore.continueProcessing Then
+                    'If cpCore.continueProcessing And cpCore.doc.outputBufferEnabled Then
                     If (False) Then
                         ''
                         '' no domain provided, new mode

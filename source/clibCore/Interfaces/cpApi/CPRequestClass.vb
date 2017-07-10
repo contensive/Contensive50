@@ -283,7 +283,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Page() As String 'Inherits BaseClasses.CPRequestBaseClass.Page
             Get
                 If True Then
-                    Return cpCore.webServer.webServerIO_requestPage
+                    Return cpCore.webServer.requestPage
                 Else
                     Return ""
                 End If
@@ -293,7 +293,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Path() As String 'Inherits BaseClasses.CPRequestBaseClass.Path
             Get
                 If True Then
-                    Return cpCore.webServer.webServerIO_requestPath
+                    Return cpCore.webServer.requestPath
                 Else
                     Return ""
                 End If

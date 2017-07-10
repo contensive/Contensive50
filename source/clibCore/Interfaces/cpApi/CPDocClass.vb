@@ -270,7 +270,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub addRefreshQueryString(ByVal Name As String, ByVal Value As String)
             If True Then
-                Call cpCore.html.webServerIO_addRefreshQueryString(Name, Value)
+                Call cpCore.doc.addRefreshQueryString(Name, Value)
             End If
         End Sub
         '
@@ -294,7 +294,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub addBodyEnd(ByVal NewCode As String)
             If True Then
-                cpCore.html.htmlForEndOfBody = cpCore.html.htmlForEndOfBody & NewCode
+                cpCore.doc.htmlForEndOfBody &= NewCode
             End If
         End Sub
         '
@@ -303,14 +303,14 @@ Namespace Contensive.Core
         Public Overrides Property body() As String
             Get
                 If True Then
-                    body = cpCore.html.html_DocBodyFilter
+                    body = cpCore.doc.html_DocBodyFilter
                 Else
                     Return ""
                 End If
             End Get
             Set(ByVal value As String)
                 If True Then
-                    cpCore.html.html_DocBodyFilter = value
+                    cpCore.doc.html_DocBodyFilter = value
                 End If
             End Set
         End Property

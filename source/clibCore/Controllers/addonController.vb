@@ -940,8 +940,8 @@ Namespace Contensive.Core.Controllers
                                     ' Add-on setup for InFrame, running the call-back - this page must think it is just the remotemethod
                                     '
                                     If isMainOk Then
-                                        Call cpCore.html.webServerIO_addRefreshQueryString(RequestNameRemoteMethodAddon, AddonNameOrGuid_Local)
-                                        Call cpCore.html.webServerIO_addRefreshQueryString("optionstring", WorkingOptionString)
+                                        Call cpCore.doc.addRefreshQueryString(RequestNameRemoteMethodAddon, AddonNameOrGuid_Local)
+                                        Call cpCore.doc.addRefreshQueryString("optionstring", WorkingOptionString)
                                     End If
                                 ElseIf (AsAjax And (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) Then
                                     '
@@ -963,7 +963,7 @@ Namespace Contensive.Core.Controllers
                                             If NVPair <> "" Then
                                                 NVSplit = Split(NVPair, "=")
                                                 If UBound(NVSplit) > 0 Then
-                                                    Call cpCore.html.webServerIO_addRefreshQueryString(NVSplit(0), NVSplit(1))
+                                                    Call cpCore.doc.addRefreshQueryString(NVSplit(0), NVSplit(1))
                                                 End If
                                             End If
                                         Next

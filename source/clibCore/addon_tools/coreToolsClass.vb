@@ -210,7 +210,7 @@ Namespace Contensive.Core
                 defaultAddMenu = cpCore.docProperties.getBoolean("dtdam")
                 DefaultCreateBlankRecord = cpCore.docProperties.getBoolean("dtblank")
                 '
-                Call cpCore.html.webServerIO_addRefreshQueryString("dta", ToolsAction.ToString())
+                Call cpCore.doc.addRefreshQueryString("dta", ToolsAction.ToString())
                 'Call cpCore.main_AddRefreshQueryString("Button=" & Button)
                 'Call cpCore.main_AddRefreshQueryString("af=" & AdminFormTool)
                 '
@@ -347,7 +347,7 @@ ErrorTrap:
             Dim Stream As New stringBuilderLegacyController
             Dim ButtonList As String = ""
             '
-            Stream.Add(SpanClassAdminNormal & "<strong><A href=""" & cpCore.webServer.webServerIO_requestPage & "?af=" & AdminFormToolRoot & """>Tools</A></strong></SPAN>")
+            Stream.Add(SpanClassAdminNormal & "<strong><A href=""" & cpCore.webServer.requestPage & "?af=" & AdminFormToolRoot & """>Tools</A></strong></SPAN>")
             Stream.Add(SpanClassAdminNormal & ":Create Content Fields from Table</SPAN>")
             '
             '   print out the submit form
@@ -408,7 +408,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) '  throw (New ApplicationException("Unexpected exception"))'  Call handleLegacyClassErrors1("GetForm_DefineContentFieldsFromTable", "ErrorTrap")
+            Throw (New ApplicationException("Unexpected exception")) '  throw (New ApplicationException("Unexpected exception"))'  Call handleLegacyClassErrors1("GetForm_DefineContentFieldsFromTable", "ErrorTrap")
         End Function
         '
         Private Class fieldSortClass
@@ -457,7 +457,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) '  throw (New ApplicationException("Unexpected exception"))'  Call handleLegacyClassErrors1("GetForm_Root", "ErrorTrap")
+            Throw (New ApplicationException("Unexpected exception")) '  throw (New ApplicationException("Unexpected exception"))'  Call handleLegacyClassErrors1("GetForm_Root", "ErrorTrap")
         End Function
         '
         '==================================================================================
@@ -469,7 +469,7 @@ ErrorTrap:
             '
             GetForm_RootRow = ""
             GetForm_RootRow = GetForm_RootRow & "<tr><td colspan=""2"">"
-            GetForm_RootRow = GetForm_RootRow & SpanClassAdminNormal & "<P class=""ccAdminNormal""><A href=""" & cpCore.webServer.webServerIO_requestPage & "?af=" & AdminFormToolId.ToString() & """><B>" & Caption & "</b></SPAN></A></p>"
+            GetForm_RootRow = GetForm_RootRow & SpanClassAdminNormal & "<P class=""ccAdminNormal""><A href=""" & cpCore.webServer.requestPage & "?af=" & AdminFormToolId.ToString() & """><B>" & Caption & "</b></SPAN></A></p>"
             GetForm_RootRow = GetForm_RootRow & "</td></tr>"
             If Description <> "" Then
                 GetForm_RootRow = GetForm_RootRow & "<tr><td width=""30""><img src=""/ccLib/images/spacer.gif"" height=""1"" width=""30""></td>"
@@ -480,7 +480,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) '  throw (New ApplicationException("Unexpected exception"))'  Call handleLegacyClassErrors1("GetForm_RootRow", "ErrorTrap")
+            Throw (New ApplicationException("Unexpected exception")) '  throw (New ApplicationException("Unexpected exception"))'  Call handleLegacyClassErrors1("GetForm_RootRow", "ErrorTrap")
         End Function
         '
         '==================================================================================
@@ -492,7 +492,7 @@ ErrorTrap:
             Try
                 result = "" _
                     & "<p>" & SpanClassAdminNormal _
-                    & "<a href=""" & cpCore.webServer.webServerIO_requestPage & "?af=" & AdminFormToolRoot & """><b>Tools</b></a>&nbsp;&gt;&nbsp;" & Title _
+                    & "<a href=""" & cpCore.webServer.requestPage & "?af=" & AdminFormToolRoot & """><b>Tools</b></a>&nbsp;&gt;&nbsp;" & Title _
                     & "</p>" _
                     & "<p>" & SpanClassAdminNormal & Description & "</p>"
             Catch ex As Exception
@@ -765,7 +765,7 @@ ErrorTrap:
                     Call cpCore.db.createContentFromSQLTable(datasource, TableName, ContentName)
                     cpCore.cache.invalidateAll()
                     cpCore.metaData.clear()
-                    ContentID = cpCore.metaData.getContentID(ContentName)
+                    ContentID = cpCore.metaData.getContentId(ContentName)
                     ParentNavID = cpCore.db.getRecordID("Navigator Entries", "Manage Site Content")
                     If ParentNavID <> 0 Then
                         CS = cpCore.db.cs_open("Navigator Entries", "(name=" & cpCore.db.encodeSQLText("Advanced") & ")and(parentid=" & ParentNavID & ")")
@@ -789,7 +789,7 @@ ErrorTrap:
                         End If
                     End If
                     Call Controllers.appBuilderController.admin_VerifyAdminMenu(cpCore, "Site Content", ContentName, ContentName, "", "")
-                    ContentID = cpCore.metaData.getContentID(ContentName)
+                    ContentID = cpCore.metaData.getContentId(ContentName)
                     Call Stream.Add("<P>Content Definition was created. An admin menu entry for this definition has been added under 'Site Content', and will be visible on the next page view. Use the [<a href=""?af=105&ContentID=" & ContentID & """>Edit Content Definition Fields</a>] tool to review and edit this definition's fields.</P>")
                 Else
                     Stream.Add("<P>Error, a required field is missing. Content not created.</P>")
@@ -817,7 +817,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) '  throw (New ApplicationException("Unexpected exception"))'  Call handleLegacyClassErrors1("GetForm_CreateContentDefinition", "ErrorTrap")
+            Throw (New ApplicationException("Unexpected exception")) '  throw (New ApplicationException("Unexpected exception"))'  Call handleLegacyClassErrors1("GetForm_CreateContentDefinition", "ErrorTrap")
         End Function
         '
         '=============================================================================
@@ -951,7 +951,7 @@ ErrorTrap:
                                     If cpCore.db.cs_ok(CSSource) Then
                                         CSTarget = cpCore.db.cs_insertRecord("Content Fields")
                                         If cpCore.db.cs_ok(CSTarget) Then
-                                            Call cpCore.db.cs_CopyRecord(CSSource, CSTarget)
+                                            Call cpCore.db.cs_copyRecord(CSSource, CSTarget)
                                             Call cpCore.db.cs_set(CSTarget, "ContentID", ContentID)
                                             ReloadCDef = True
                                         End If
@@ -977,7 +977,7 @@ ErrorTrap:
                             If cpCore.db.cs_ok(CSSource) Then
                                 CSTarget = cpCore.db.cs_insertRecord("Content Fields")
                                 If cpCore.db.cs_ok(CSTarget) Then
-                                    Call cpCore.db.cs_CopyRecord(CSSource, CSTarget)
+                                    Call cpCore.db.cs_copyRecord(CSSource, CSTarget)
                                     Call cpCore.db.cs_set(CSTarget, "ContentID", ContentID)
                                     ReloadCDef = True
                                 End If
@@ -1339,7 +1339,7 @@ ErrorTrap:
                                     Caption = Caption & "*"
                                     InheritedFieldCount = InheritedFieldCount + 1
                                 End If
-                                AStart = "<A href=""" & cpCore.webServer.webServerIO_requestPage & "?" & RequestNameToolContentID & "=" & ContentID & "&af=" & AdminFormToolConfigureListing & "&fi=" & fieldId & "&dtcn=" & ColumnCount
+                                AStart = "<A href=""" & cpCore.webServer.requestPage & "?" & RequestNameToolContentID & "=" & ContentID & "&af=" & AdminFormToolConfigureListing & "&fi=" & fieldId & "&dtcn=" & ColumnCount
                                 Call Stream.Add("<td width=""" & ColumnWidth & "%"" valign=""top"" align=""left"">" & SpanClassAdminNormal & Caption & "<br>")
                                 Call Stream.Add("<IMG src=""/ccLib/images/black.GIF"" width=""100%"" height=""1"">")
                                 Call Stream.Add(AStart & "&dta=" & ToolsActionRemoveField & """><IMG src=""/ccLib/images/LibButtonDeleteUp.gif"" width=""50"" height=""15"" border=""0""></A><br>")
@@ -1443,7 +1443,7 @@ ErrorTrap:
                                     '
                                     ' can be used as column header
                                     '
-                                    Stream.Add("<A href=""" & cpCore.webServer.webServerIO_requestPage & "?" & RequestNameToolContentID & "=" & ContentID & "&af=" & AdminFormToolConfigureListing & "&fi=" & .id & "&dta=" & ToolsActionAddField & "&" & RequestNameAddFieldID & "=" & .id & """><IMG src=""/ccLib/images/LibButtonAddUp.gif"" width=""50"" height=""15"" border=""0""></A> " & .caption & "<br>")
+                                    Stream.Add("<A href=""" & cpCore.webServer.requestPage & "?" & RequestNameToolContentID & "=" & ContentID & "&af=" & AdminFormToolConfigureListing & "&fi=" & .id & "&dta=" & ToolsActionAddField & "&" & RequestNameAddFieldID & "=" & .id & """><IMG src=""/ccLib/images/LibButtonAddUp.gif"" width=""50"" height=""15"" border=""0""></A> " & .caption & "<br>")
                                 End If
                             End If
                         End With
@@ -1470,7 +1470,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_ConfigureListing", "ErrorTrap")
+            Throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_ConfigureListing", "ErrorTrap")
         End Function
         '
         '=============================================================================
@@ -1911,7 +1911,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_ContentDiagnostic", "ErrorTrap")
+            Throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_ContentDiagnostic", "ErrorTrap")
         End Function
         '
         '=============================================================================
@@ -1933,7 +1933,7 @@ ErrorTrap:
             '
             CSPointer = cpCore.db.cs_open("Content Fields", "(ContentID=" & ContentID & ")", "IndexColumn")
             If Not cpCore.db.cs_ok(CSPointer) Then
-                throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors2("NormalizeIndexColumns", "Could not read Content Field Definitions")
+                Throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors2("NormalizeIndexColumns", "Could not read Content Field Definitions")
             Else
                 '
                 ' Adjust IndexSortOrder to be 0 based, count by 1
@@ -1994,7 +1994,7 @@ ErrorTrap:
             '
             CSPointer = cpCore.db.cs_open("Content Fields", "(ContentID=" & ContentID & ")", "IndexSortPriority, IndexColumn")
             If Not cpCore.db.cs_ok(CSPointer) Then
-                throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors2("NormalizeIndexColumns", "Error reading Content Field Definitions")
+                Throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors2("NormalizeIndexColumns", "Error reading Content Field Definitions")
             Else
                 '
                 ' Go through all fields, clear Sort Priority if it does not appear
@@ -2032,7 +2032,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("NormalizeIndexColumns", "ErrorTrap")
+            Throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("NormalizeIndexColumns", "ErrorTrap")
         End Sub
         '
         '=============================================================================
@@ -2127,7 +2127,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_CreateChildContent", "ErrorTrap")
+            Throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_CreateChildContent", "ErrorTrap")
         End Function
         '
         '=============================================================================
@@ -2167,7 +2167,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_ClearContentWatchLinks", "ErrorTrap")
+            Throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_ClearContentWatchLinks", "ErrorTrap")
         End Function
         '
         '=============================================================================
@@ -2269,7 +2269,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetDiagError", "ErrorTrap")
+            Throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetDiagError", "ErrorTrap")
         End Function
         '
         '
@@ -2477,7 +2477,7 @@ ErrorTrap:
             '
 ErrorTrap:
             'RS = Nothing
-            throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_Benchmark", "ErrorTrap")
+            Throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_Benchmark", "ErrorTrap")
         End Function
         '
         '=============================================================================
@@ -2500,7 +2500,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("Local_GetContentID", "ErrorTrap")
+            Throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("Local_GetContentID", "ErrorTrap")
         End Function
         '
         '=============================================================================
@@ -2523,7 +2523,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("Local_GetContentNameByID", "ErrorTrap")
+            Throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("Local_GetContentNameByID", "ErrorTrap")
         End Function
         '
         '=============================================================================
@@ -2546,7 +2546,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("Local_GetContentTableName", "ErrorTrap")
+            Throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("Local_GetContentTableName", "ErrorTrap")
         End Function
         '
         '=============================================================================
@@ -2579,7 +2579,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("Local_GetContentDataSource", "ErrorTrap")
+            Throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("Local_GetContentDataSource", "ErrorTrap")
         End Function
         '
         '=============================================================================
@@ -2878,7 +2878,7 @@ ErrorTrap:
             '
 ErrorTrap:
             'RSSchema = Nothing
-            throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_DbSchema", "ErrorTrap")
+            Throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_DbSchema", "ErrorTrap")
             StatusOK = False
         End Function
         '
@@ -2977,7 +2977,7 @@ ErrorTrap:
                                                 If (cpCore.db.cs_ok(CSTarget)) Then
                                                     CSSource = cpCore.db.cs_openContentRecord("Content Fields", formFieldId)
                                                     If (cpCore.db.cs_ok(CSSource)) Then
-                                                        Call cpCore.db.cs_CopyRecord(CSSource, CSTarget)
+                                                        Call cpCore.db.cs_copyRecord(CSSource, CSTarget)
                                                     End If
                                                     Call cpCore.db.cs_Close(CSSource)
                                                     formFieldId = cpCore.db.cs_getInteger(CSTarget, "ID")
@@ -3108,7 +3108,7 @@ ErrorTrap:
                         '
                         ' ----- Exit back to menu
                         '
-                        Call cpCore.webServer.redirect(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.webServerIO_requestDomain & cpCore.webServer.webServerIO_requestPath & cpCore.webServer.webServerIO_requestPage & "?af=" & AdminFormTools)
+                        Call cpCore.webServer.redirect(cpCore.webServer.webServerIO_requestProtocol & cpCore.webServer.webServerIO_requestDomain & cpCore.webServer.requestPath & cpCore.webServer.requestPage & "?af=" & AdminFormTools)
                     End If
                 End If
                 '
@@ -3116,7 +3116,7 @@ ErrorTrap:
                 '   Print Output
                 '--------------------------------------------------------------------------------
                 '
-                Stream.Add(SpanClassAdminNormal & "<strong><a href=""" & cpCore.webServer.webServerIO_requestPage & "?af=" & AdminFormToolRoot & """>Tools</a></strong>&nbsp;»&nbsp;Manage Admin Edit Fields</span>")
+                Stream.Add(SpanClassAdminNormal & "<strong><a href=""" & cpCore.webServer.requestPage & "?af=" & AdminFormToolRoot & """>Tools</a></strong>&nbsp;»&nbsp;Manage Admin Edit Fields</span>")
                 Stream.Add("<div>")
                 Stream.Add("<div style=""width:45%;float:left;padding:10px;"">" _
                     & "Use this tool to add or modify content definition fields. Contensive uses a caching system for content definitions that is not automatically reloaded. Change you make will not take effect until the next time the system is reloaded. When you create a new field, the database field is created automatically when you have saved both a name and a field type. If you change the field type, you may have to manually change the database field." _
@@ -3128,7 +3128,7 @@ ErrorTrap:
                 Else
                     Stream.Add("<div style=""width:45%;float:left;padding:10px;"">Related Tools:" _
                         & "<div style=""padding-left:20px;""><a href=""?af=104&ContentID=" & ContentID & """>Set Default Admin Listing page columns for '" & ContentName & "'</a></div>" _
-                        & "<div style=""padding-left:20px;""><a href=""?af=4&cid=" & cpCore.metaData.getContentID("content") & "&id=" & ContentID & """>Edit '" & ContentName & "' Content Definition</a></div>" _
+                        & "<div style=""padding-left:20px;""><a href=""?af=4&cid=" & cpCore.metaData.getContentId("content") & "&id=" & ContentID & """>Edit '" & ContentName & "' Content Definition</a></div>" _
                         & "<div style=""padding-left:20px;""><a href=""?cid=" & ContentID & """>View records in '" & ContentName & "'</a></div>" _
                         & "</div>")
                 End If
@@ -3643,7 +3643,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_DbIndex", "ErrorTrap")
+            Throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_DbIndex", "ErrorTrap")
         End Function
         '
         '=============================================================================
@@ -3716,7 +3716,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_ContentDbSchema", "ErrorTrap")
+            Throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_ContentDbSchema", "ErrorTrap")
         End Function
         '
         '=============================================================================
@@ -3746,7 +3746,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_LogFiles", "ErrorTrap")
+            Throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_LogFiles", "ErrorTrap")
         End Function
         '
         '==============================================================================================
@@ -3824,7 +3824,7 @@ ErrorTrap:
                 If CurrentPath <> ParentPath Then
                     FileSize = ""
                     FileDate = ""
-                    GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetForm_LogFiles_Details_GetRow("<A href=""" & cpCore.webServer.webServerIO_requestPage & "?SetPath=" & ParentPath & """>" & FolderOpenImage & "</A>", "<A href=""" & cpCore.webServer.webServerIO_requestPage & "?SetPath=" & ParentPath & """>" & ParentPath & "</A>", FileSize, FileDate, RowEven)
+                    GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetForm_LogFiles_Details_GetRow("<A href=""" & cpCore.webServer.requestPage & "?SetPath=" & ParentPath & """>" & FolderOpenImage & "</A>", "<A href=""" & cpCore.webServer.requestPage & "?SetPath=" & ParentPath & """>" & ParentPath & "</A>", FileSize, FileDate, RowEven)
                 End If
                 '
                 ' Sub-Folders
@@ -3841,7 +3841,7 @@ ErrorTrap:
                             FolderName = LineSplit(0)
                             FileSize = LineSplit(1)
                             FileDate = LineSplit(2)
-                            GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetForm_LogFiles_Details_GetRow("<A href=""" & cpCore.webServer.webServerIO_requestPage & "?SetPath=" & CurrentPath & "\" & FolderName & """>" & FolderClosedImage & "</A>", "<A href=""" & cpCore.webServer.webServerIO_requestPage & "?SetPath=" & CurrentPath & "\" & FolderName & """>" & FolderName & "</A>", FileSize, FileDate, RowEven)
+                            GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetForm_LogFiles_Details_GetRow("<A href=""" & cpCore.webServer.requestPage & "?SetPath=" & CurrentPath & "\" & FolderName & """>" & FolderClosedImage & "</A>", "<A href=""" & cpCore.webServer.requestPage & "?SetPath=" & CurrentPath & "\" & FolderName & """>" & FolderName & "</A>", FileSize, FileDate, RowEven)
                         End If
                     Next
                 End If
@@ -3864,11 +3864,11 @@ ErrorTrap:
                             FileSize = LineSplit(5)
                             FileDate = LineSplit(3)
                             FileURL = StartPath & CurrentPath & "\" & Filename
-                            QueryString = cpcore.doc.refreshQueryString
+                            QueryString = cpCore.doc.refreshQueryString
                             QueryString = genericController.ModifyQueryString(QueryString, RequestNameAdminForm, CStr(AdminFormTool), True)
                             QueryString = genericController.ModifyQueryString(QueryString, "at", AdminFormToolLogFileView, True)
                             QueryString = genericController.ModifyQueryString(QueryString, "SourceFile", FileURL, True)
-                            CellCopy = "<A href=""" & cpCore.webServer.webServerIO_requestPath & "?" & QueryString & """ target=""_blank"">" & Filename & "</A>"
+                            CellCopy = "<A href=""" & cpCore.webServer.requestPath & "?" & QueryString & """ target=""_blank"">" & Filename & "</A>"
                             GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetForm_LogFiles_Details_GetRow(SpacerImage, CellCopy, FileSize, FileDate, RowEven)
                         End If
                     Next
@@ -4010,7 +4010,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_Restart", "ErrorTrap")
+            Throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_Restart", "ErrorTrap")
         End Function
         '
         '
@@ -4124,7 +4124,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_LoadTemplates", "ErrorTrap")
+            Throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_LoadTemplates", "ErrorTrap")
         End Function
         ''
         ''=============================================================================
@@ -4438,7 +4438,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_ContentFileManager", "ErrorTrap")
+            Throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_ContentFileManager", "ErrorTrap")
         End Function
         '
         '=============================================================================
@@ -4475,7 +4475,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_WebsiteFileManager", "ErrorTrap")
+            Throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_WebsiteFileManager", "ErrorTrap")
         End Function
         '
         '=============================================================================
@@ -4599,7 +4599,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_FindAndReplace", "ErrorTrap")
+            Throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_FindAndReplace", "ErrorTrap")
         End Function
         '
         '=============================================================================
@@ -4652,7 +4652,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_IISReset", "ErrorTrap")
+            Throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_IISReset", "ErrorTrap")
         End Function
         '
         '=============================================================================
@@ -4687,7 +4687,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_CreateGUID", "ErrorTrap")
+            Throw (New ApplicationException("Unexpected exception")) '  Call handleLegacyClassErrors1("GetForm_CreateGUID", "ErrorTrap")
         End Function
         ''
         ''====================================================================================================
