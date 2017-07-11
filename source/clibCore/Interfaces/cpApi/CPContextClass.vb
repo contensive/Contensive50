@@ -271,10 +271,23 @@ Namespace Contensive.Core
         '
         Public Property form() As String
             Get
-                Return cp.core.webServer.requestFormString
+                Return genericController.convertNameValueDictToREquestString(cp.core.webServer.requestFormDict)
             End Get
             Set(ByVal value As String)
-                cp.core.webServer.requestFormString = value
+                cp.core.webServer.requestFormDict.Clear()
+                If (Not String.IsNullOrEmpty(value)) Then
+                    Dim keyValuePairs As String() = value.Split(CChar("&"))
+                    For Each keyValuePair As String In keyValuePairs
+                        If (Not String.IsNullOrEmpty(keyValuePair)) Then
+                            Dim keyValue As String() = keyValuePair.Split(CChar("="))
+                            If keyValue.Length > 1 Then
+                                cp.core.webServer.requestFormDict.Add(keyValue(0), keyValue(1))
+                            Else
+                                cp.core.webServer.requestFormDict.Add(keyValue(0), "")
+                            End If
+                        End If
+                    Next
+                End If
             End Set
         End Property
         '==========================================================================================

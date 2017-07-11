@@ -481,34 +481,34 @@ Namespace Contensive.Core
                                 End If
                             Next
                         End If
-                        ''
-                        '' --------------------------------------------------------------------------------
-                        ''   Install Library Collections
-                        '' --------------------------------------------------------------------------------
-                        ''
-                        'If InstallLibCollectionList <> "" Then
-                        '    InstallLibCollectionList = Mid(InstallLibCollectionList, 2)
-                        '    LibGuids = Split(InstallLibCollectionList, ",")
-                        '    Cnt = UBound(LibGuids) + 1
-                        '    For Ptr = 0 To Cnt - 1
-                        '        RegisterList = ""
-                        '        UpgradeOK = addonInstall.installCollectionFromRemoteRepo(LibGuids(Ptr), ErrorMessage, "", False)
-                        '        If Not UpgradeOK Then
-                        '            '
-                        '            ' block the reset because we will loose the error message
-                        '            '
-                        '            IISResetRequired = False
-                        '            errorController.error_AddUserError(cpcore,"This Add-on Collection did not install correctly, " & ErrorMessage)
-                        '        Else
-                        '            '
-                        '            ' Save the first collection as the installed collection
-                        '            '
-                        '            If InstalledCollectionGuid = "" Then
-                        '                InstalledCollectionGuid = LibGuids(Ptr)
-                        '            End If
-                        '        End If
-                        '    Next
-                        'End If
+                        '
+                        ' --------------------------------------------------------------------------------
+                        '   Install Library Collections
+                        ' --------------------------------------------------------------------------------
+                        '
+                        If InstallLibCollectionList <> "" Then
+                            InstallLibCollectionList = Mid(InstallLibCollectionList, 2)
+                            Dim LibGuids As String() = Split(InstallLibCollectionList, ",")
+                            Cnt = UBound(LibGuids) + 1
+                            For Ptr = 0 To Cnt - 1
+                                RegisterList = ""
+                                UpgradeOK = addonInstall.installCollectionFromRemoteRepo(LibGuids(Ptr), ErrorMessage, "", False)
+                                If Not UpgradeOK Then
+                                    '
+                                    ' block the reset because we will loose the error message
+                                    '
+                                    'IISResetRequired = False
+                                    errorController.error_AddUserError(cpCore, "This Add-on Collection did not install correctly, " & ErrorMessage)
+                                Else
+                                    '
+                                    ' Save the first collection as the installed collection
+                                    '
+                                    'If InstalledCollectionGuid = "" Then
+                                    '    InstalledCollectionGuid = LibGuids(Ptr)
+                                    'End If
+                                End If
+                            Next
+                        End If
                         '
                         ' --------------------------------------------------------------------------------
                         '   Install Manual Collections

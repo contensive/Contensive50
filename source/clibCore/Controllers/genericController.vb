@@ -3661,32 +3661,37 @@ ErrorTrap:
         '========================================================================
         '
         Public Shared Function EncodeRequestVariable(ByVal Source As String) As String
-            ' ##### removed to catch err<>0 problem on error resume next
-            '
-            Dim SourcePointer As Integer
-            Dim Character As String
-            Dim LocalSource As String
-            '
-            EncodeRequestVariable = ""
-            If Source <> "" Then
-                LocalSource = Source
-                ' "+" is an allowed character for filenames. If you add it, the wrong file will be looked up
-                'LocalSource = vbReplace(LocalSource, " ", "+")
-                For SourcePointer = 1 To Len(LocalSource)
-                    Character = Mid(LocalSource, SourcePointer, 1)
-                    ' "%" added so if this is called twice, it will not destroy "%20" values
-                    If False Then
-                        'End If
-                        'If Character = " " Then
-                        EncodeRequestVariable += "+"
-                    ElseIf vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./:-_!*()", Character, vbTextCompare) <> 0 Then
-                        'ElseIf vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./:?#-_!~*'()%", Character, vbTextCompare) <> 0 Then
-                        EncodeRequestVariable += Character
-                    Else
-                        EncodeRequestVariable += "%" & Hex(Asc(Character))
-                    End If
-                Next
+            If (Source Is Nothing) Then
+                Return ""
+            Else
+                Return System.Uri.EscapeDataString(Source)
             End If
+            '' ##### removed to catch err<>0 problem on error resume next
+            ''
+            'Dim SourcePointer As Integer
+            'Dim Character As String
+            'Dim LocalSource As String
+            ''
+            'EncodeRequestVariable = ""
+            'If Source <> "" Then
+            '    LocalSource = Source
+            '    ' "+" is an allowed character for filenames. If you add it, the wrong file will be looked up
+            '    'LocalSource = vbReplace(LocalSource, " ", "+")
+            '    For SourcePointer = 1 To Len(LocalSource)
+            '        Character = Mid(LocalSource, SourcePointer, 1)
+            '        ' "%" added so if this is called twice, it will not destroy "%20" values
+            '        If False Then
+            '            'End If
+            '            'If Character = " " Then
+            '            EncodeRequestVariable += "+"
+            '        ElseIf vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./:-_!*()", Character, vbTextCompare) <> 0 Then
+            '            'ElseIf vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./:?#-_!~*'()%", Character, vbTextCompare) <> 0 Then
+            '            EncodeRequestVariable += Character
+            '        Else
+            '            EncodeRequestVariable += "%" & Hex(Asc(Character))
+            '        End If
+            '    Next
+            'End If
             '
         End Function
         ''
@@ -5486,6 +5491,17 @@ ErrorTrap:
                 End If
             End If
             Return result
+        End Function
+        '
+        Friend Shared Function convertNameValueDictToREquestString(nameValueDict As Dictionary(Of String, String)) As String
+            Dim requestFormSerialized As String = ""
+            If nameValueDict.Count > 0 Then
+                For Each kvp As KeyValuePair(Of String, String) In nameValueDict
+                    requestFormSerialized &= "&" & EncodeURL(Left(kvp.Key, 255)) & "=" & EncodeURL(Left(kvp.Value, 255))
+                    If (requestFormSerialized.Length > 255) Then Exit For
+                Next
+            End If
+            Return requestFormSerialized
         End Function
     End Class
 End Namespace

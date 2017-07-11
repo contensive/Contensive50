@@ -402,7 +402,7 @@ ErrorTrap:
                 End If
             End If
             '
-            GetForm_DefineContentFieldsFromTable = genericLegacyView.OpenFormTable(cpCore, ButtonList) & Stream.Text & genericLegacyView.CloseFormTable(cpCore, ButtonList)
+            GetForm_DefineContentFieldsFromTable = htmlController.OpenFormTable(cpCore, ButtonList) & Stream.Text & htmlController.CloseFormTable(cpCore, ButtonList)
             Exit Function
             '
             ' ----- Error Trap
@@ -451,7 +451,7 @@ ErrorTrap:
             Stream.Add(GetForm_RootRow(AdminFormTools, AdminFormToolRestart, "Contensive Application Restart", "Restart the Contensive Applicaiton. This will stop your site on the server for a short period."))
             Stream.Add(GetForm_RootRow(AdminFormTools, AdminformToolCreateGUID, "Create GUID", "Use this tool to create a new GUID. This is useful when creating a new cpcore.addon."))
             Stream.Add("</table>")
-            GetForm_Root = genericLegacyView.OpenFormTable(cpCore, ButtonList) & Stream.Text & genericLegacyView.CloseFormTable(cpCore, ButtonList)
+            GetForm_Root = htmlController.OpenFormTable(cpCore, ButtonList) & Stream.Text & htmlController.CloseFormTable(cpCore, ButtonList)
             Exit Function
             '
             ' ----- Error Trap
@@ -716,7 +716,7 @@ ErrorTrap:
                 'Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolManualQuery))
                 'Stream.Add( cpCore.main_GetFormEnd & "</SPAN>")
                 '
-                returnHtml = genericLegacyView.OpenFormTable(cpCore, ButtonList) & Stream.Text & genericLegacyView.CloseFormTable(cpCore, ButtonList)
+                returnHtml = htmlController.OpenFormTable(cpCore, ButtonList) & Stream.Text & htmlController.CloseFormTable(cpCore, ButtonList)
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
@@ -1463,7 +1463,7 @@ ErrorTrap:
             Call cpCore.siteProperties.setProperty("AllowContentAutoLoad", AllowContentAutoLoad)
             Stream.Add(cpCore.html.html_GetFormInputHidden("ReloadCDef", ReloadCDef))
 
-            GetForm_ConfigureListing = genericLegacyView.OpenFormTable(cpCore, ButtonList) & Stream.Text & genericLegacyView.CloseFormTable(cpCore, ButtonList)
+            GetForm_ConfigureListing = htmlController.OpenFormTable(cpCore, ButtonList) & Stream.Text & htmlController.CloseFormTable(cpCore, ButtonList)
             '
             Exit Function
             '
@@ -1905,7 +1905,7 @@ ErrorTrap:
             '
             'Call Stream.Add(cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolContentDiagnostic))
             '
-            GetForm_ContentDiagnostic = genericLegacyView.OpenFormTable(cpCore, ButtonList) & Stream.Text & genericLegacyView.CloseFormTable(cpCore, ButtonList)
+            GetForm_ContentDiagnostic = htmlController.OpenFormTable(cpCore, ButtonList) & Stream.Text & htmlController.CloseFormTable(cpCore, ButtonList)
             Exit Function
             '
             ' ----- Error Trap
@@ -2120,7 +2120,7 @@ ErrorTrap:
             ''Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolCreateChildContent)
             Call Stream.Add("</SPAN>")
             '
-            GetForm_CreateChildContent = genericLegacyView.OpenFormTable(cpCore, ButtonList) & Stream.Text & genericLegacyView.CloseFormTable(cpCore, ButtonList)
+            GetForm_CreateChildContent = htmlController.OpenFormTable(cpCore, ButtonList) & Stream.Text & htmlController.CloseFormTable(cpCore, ButtonList)
 
             Exit Function
             '
@@ -2160,7 +2160,7 @@ ErrorTrap:
             ''Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolClearContentWatchLink)
             Call Stream.Add("</span>")
             '
-            GetForm_ClearContentWatchLinks = genericLegacyView.OpenFormTable(cpCore, ButtonList) & Stream.Text & genericLegacyView.CloseFormTable(cpCore, ButtonList)
+            GetForm_ClearContentWatchLinks = htmlController.OpenFormTable(cpCore, ButtonList) & Stream.Text & htmlController.CloseFormTable(cpCore, ButtonList)
             '
             Exit Function
             '
@@ -2218,7 +2218,7 @@ ErrorTrap:
                     Call cpCore.db.cs_Close(CSContent)
                 End If
                 '
-                returnValue = genericLegacyView.OpenFormTable(cpCore, ButtonList) & Stream.Text & genericLegacyView.CloseFormTable(cpCore, ButtonList)
+                returnValue = htmlController.OpenFormTable(cpCore, ButtonList) & Stream.Text & htmlController.CloseFormTable(cpCore, ButtonList)
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
@@ -2470,7 +2470,7 @@ ErrorTrap:
             '
             ''Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolBenchmark)
             '
-            GetForm_Benchmark = genericLegacyView.OpenFormTable(cpCore, ButtonList) & Stream.Text & genericLegacyView.CloseFormTable(cpCore, ButtonList)
+            GetForm_Benchmark = htmlController.OpenFormTable(cpCore, ButtonList) & Stream.Text & htmlController.CloseFormTable(cpCore, ButtonList)
             Exit Function
             '
             ' ----- Error Trap
@@ -2870,7 +2870,7 @@ ErrorTrap:
             ''Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolSchema)
             Call Stream.Add("</SPAN>")
             '
-            GetForm_DbSchema = genericLegacyView.OpenFormTable(cpCore, ButtonList) & Stream.Text & genericLegacyView.CloseFormTable(cpCore, ButtonList)
+            GetForm_DbSchema = htmlController.OpenFormTable(cpCore, ButtonList) & Stream.Text & htmlController.CloseFormTable(cpCore, ButtonList)
             '
             Exit Function
             '
@@ -3451,7 +3451,7 @@ ErrorTrap:
                 End If
                 '
                 Call Stream.Add(cpCore.html.html_GetFormInputHidden("ReloadCDef", ReloadCDef))
-                result = genericLegacyView.OpenFormTable(cpCore, ButtonList) & Stream.Text & genericLegacyView.CloseFormTable(cpCore, ButtonList)
+                result = htmlController.OpenFormTable(cpCore, ButtonList) & Stream.Text & htmlController.CloseFormTable(cpCore, ButtonList)
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex)
             End Try
@@ -3636,7 +3636,7 @@ ErrorTrap:
             ' Buttons
             '
             'GetForm_DbIndex = GetForm_DbIndex & cpCore.main_GetFormInputHidden("af", AdminFormToolDbIndex)
-            GetForm_DbIndex = genericLegacyView.OpenFormTable(cpCore, ButtonList) & GetForm_DbIndex & genericLegacyView.CloseFormTable(cpCore, ButtonList)
+            GetForm_DbIndex = htmlController.OpenFormTable(cpCore, ButtonList) & GetForm_DbIndex & htmlController.CloseFormTable(cpCore, ButtonList)
             '
             Exit Function
             '
@@ -3709,7 +3709,7 @@ ErrorTrap:
             GetForm_ContentDbSchema = GetForm_ContentDbSchema & kmaEndTable
             '
             'GetForm_ContentDbSchema = GetForm_ContentDbSchema & cpCore.main_GetFormInputHidden("af", AdminFormToolContentDbSchema)
-            GetForm_ContentDbSchema = (genericLegacyView.OpenFormTable(cpCore, ButtonList)) & GetForm_ContentDbSchema & (genericLegacyView.CloseFormTable(cpCore, ButtonList))
+            GetForm_ContentDbSchema = (htmlController.OpenFormTable(cpCore, ButtonList)) & GetForm_ContentDbSchema & (htmlController.CloseFormTable(cpCore, ButtonList))
             '
             Exit Function
             '
@@ -3739,7 +3739,7 @@ ErrorTrap:
             GetForm_LogFiles = GetForm_LogFiles & genericController.vbReplace(GetForm_LogFiles_Details(), QueryOld, QueryNew & "&", 1, 99, vbTextCompare)
             '
             'GetForm_LogFiles = GetForm_LogFiles & cpCore.main_GetFormInputHidden("af", AdminFormToolLogFileView)
-            GetForm_LogFiles = (genericLegacyView.OpenFormTable(cpCore, ButtonList)) & GetForm_LogFiles & (genericLegacyView.CloseFormTable(cpCore, ButtonList))
+            GetForm_LogFiles = (htmlController.OpenFormTable(cpCore, ButtonList)) & GetForm_LogFiles & (htmlController.CloseFormTable(cpCore, ButtonList))
             '
             Exit Function
             '
@@ -3944,7 +3944,7 @@ ErrorTrap:
                 Call Stream.Add("<br>")
                 Call Stream.Add("</span>")
                 '
-                result = genericLegacyView.OpenFormTable(cpCore, ButtonList) & Stream.Text & genericLegacyView.CloseFormTable(cpCore, ButtonList)
+                result = htmlController.OpenFormTable(cpCore, ButtonList) & Stream.Text & htmlController.CloseFormTable(cpCore, ButtonList)
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
@@ -4003,7 +4003,7 @@ ErrorTrap:
             ''Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolRestart)
             Call Stream.Add("</SPAN>")
             '
-            GetForm_Restart = genericLegacyView.OpenFormTable(cpCore, ButtonList) & Stream.Text & genericLegacyView.CloseFormTable(cpCore, ButtonList)
+            GetForm_Restart = htmlController.OpenFormTable(cpCore, ButtonList) & Stream.Text & htmlController.CloseFormTable(cpCore, ButtonList)
             '
             Exit Function
             '
@@ -4117,7 +4117,7 @@ ErrorTrap:
             Call Stream.Add("</SPAN>")
             '
             ButtonList = ButtonCancel & "," & ButtonImportTemplates
-            GetForm_LoadTemplates = genericLegacyView.OpenFormTable(cpCore, ButtonList) & Stream.Text & genericLegacyView.CloseFormTable(cpCore, ButtonList)
+            GetForm_LoadTemplates = htmlController.OpenFormTable(cpCore, ButtonList) & Stream.Text & htmlController.CloseFormTable(cpCore, ButtonList)
             '
             Exit Function
             '
@@ -4593,7 +4593,7 @@ ErrorTrap:
             Call cpCore.db.cs_Close(CS)
             Stream.Add(TopHalf & BottomHalf & cpCore.html.html_GetFormInputHidden("CDefRowCnt", RowPtr))
             '
-            GetForm_FindAndReplace = genericLegacyView.OpenFormTable(cpCore, ButtonCancel & "," & ButtonFindAndReplace) & Stream.Text & genericLegacyView.CloseFormTable(cpCore, ButtonCancel & "," & ButtonFindAndReplace)
+            GetForm_FindAndReplace = htmlController.OpenFormTable(cpCore, ButtonCancel & "," & ButtonFindAndReplace) & Stream.Text & htmlController.CloseFormTable(cpCore, ButtonCancel & "," & ButtonFindAndReplace)
             Exit Function
             '
             ' ----- Error Trap
@@ -4646,7 +4646,7 @@ ErrorTrap:
             '
             ' Display form
             '
-            GetForm_IISReset = genericLegacyView.OpenFormTable(cpCore, ButtonCancel & "," & ButtonIISReset) & s.Text & genericLegacyView.CloseFormTable(cpCore, ButtonCancel & "," & ButtonIISReset)
+            GetForm_IISReset = htmlController.OpenFormTable(cpCore, ButtonCancel & "," & ButtonIISReset) & s.Text & htmlController.CloseFormTable(cpCore, ButtonCancel & "," & ButtonIISReset)
             Exit Function
             '
             ' ----- Error Trap
@@ -4681,7 +4681,7 @@ ErrorTrap:
             '
             ' Display form
             '
-            GetForm_CreateGUID = genericLegacyView.OpenFormTable(cpCore, ButtonCancel & "," & ButtonCreateGUID) & s.Text & genericLegacyView.CloseFormTable(cpCore, ButtonCancel & "," & ButtonCreateGUID)
+            GetForm_CreateGUID = htmlController.OpenFormTable(cpCore, ButtonCancel & "," & ButtonCreateGUID) & s.Text & htmlController.CloseFormTable(cpCore, ButtonCancel & "," & ButtonCreateGUID)
             Exit Function
             '
             ' ----- Error Trap

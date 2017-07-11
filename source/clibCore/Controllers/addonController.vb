@@ -872,11 +872,13 @@ Namespace Contensive.Core.Controllers
                                         & RequestNameRemoteMethodAddon & "=" & EncodeRequestVariable(AddonNameOrGuid_Local) _
                                         & "&HostContentName=" & EncodeRequestVariable(HostContentName) _
                                         & "&HostRecordID=" & HostRecordID _
-                                        & "&HostRQS=" & EncodeRequestVariable(cpcore.doc.refreshQueryString) _
+                                        & "&HostRQS=" & EncodeRequestVariable(cpCore.doc.refreshQueryString) _
                                         & "&HostQS=" & EncodeRequestVariable(cpCore.webServer.requestQueryString) _
-                                        & "&HostForm=" & EncodeRequestVariable(cpCore.webServer.requestFormString) _
                                         & "&optionstring=" & EncodeRequestVariable(WorkingOptionString) _
                                         & ""
+                                    '
+                                    ' -- exception made here. AsAjax is not used often, and this can create a QS too long
+                                    '& "&HostForm=" & EncodeRequestVariable(cpCore.webServer.requestFormString) _
                                     If IsInline Then
                                         returnVal = cr & "<div ID=" & AsAjaxID & " Class=""ccAddonAjaxCon"" style=""display:inline;""><img src=""/ccLib/images/ajax-loader-small.gif"" width=""16"" height=""16""></div>"
                                     Else
@@ -2359,89 +2361,106 @@ ErrorTrap:
                     Throw New ApplicationException(return_errorMessage, ex)
                 End Try
                 If String.IsNullOrEmpty(return_errorMessage) Then
-                    If True Then
-                        If True Then
-                            If True Then
-                                If True Then
-                                    Try
-                                        Call sc.AddObject("cp", cpCore.cp_forAddonExecutionOnly)
-                                    Catch ex As Exception
-                                        '
-                                        ' Error adding cp object
-                                        '
-                                        return_errorMessage = "Error adding cp object to script environment"
-                                        If sc.Error.Number <> 0 Then
-                                            With sc.Error
-                                                return_errorMessage = return_errorMessage & ", #" & .Number & ", " & .Description & ", line " & .Line & ", character " & .Column
-                                                If .Line <> 0 Then
-                                                    Lines = Split(WorkingCode, vbCrLf)
-                                                    If UBound(Lines) >= .Line Then
-                                                        return_errorMessage = return_errorMessage & ", code [" & Lines(.Line - 1) & "]"
-                                                    End If
-                                                End If
-                                            End With
-                                        Else
-                                            return_errorMessage &= ", no scripting error"
-                                        End If
-                                        Throw New ApplicationException(return_errorMessage, ex)
-                                    End Try
-                                    If String.IsNullOrEmpty(return_errorMessage) Then
-                                        '
-                                        If EntryPointName = "" Then
-                                            If sc.Procedures.Count > 0 Then
-                                                EntryPointName = sc.Procedures(1).Name
-                                            End If
-                                        End If
-                                        Try
-                                            If EntryPointArgs = "" Then
-                                                returnText = genericController.encodeText(sc.Run(EntryPointName))
-
-                                            Else
-                                                Select Case UBound(Args)
-                                                    Case 0
-                                                        returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0)))
-                                                    Case 1
-                                                        returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1)))
-                                                    Case 2
-                                                        returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2)))
-                                                    Case 3
-                                                        returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3)))
-                                                    Case 4
-                                                        returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4)))
-                                                    Case 5
-                                                        returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5)))
-                                                    Case 6
-                                                        returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6)))
-                                                    Case 7
-                                                        returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6), Args(7)))
-                                                    Case 8
-                                                        returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6), Args(7), Args(8)))
-                                                    Case 9
-                                                        returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6), Args(7), Args(8), Args(9)))
-                                                    Case Else
-                                                        Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError6("csv_ExecuteScript4", "Scripting only supports 10 arguments.")
-                                                End Select
-                                            End If
-                                        Catch ex As Exception
-                                            return_errorMessage = "Error executing script [" & ScriptName & "]"
-                                            If sc.Error.Number <> 0 Then
-                                                With sc.Error
-                                                    return_errorMessage = return_errorMessage & ", #" & .Number & ", " & .Description & ", line " & .Line & ", character " & .Column
-                                                    If .Line <> 0 Then
-                                                        Lines = Split(WorkingCode, vbCrLf)
-                                                        If UBound(Lines) >= .Line Then
-                                                            return_errorMessage = return_errorMessage & ", code [" & Lines(.Line - 1) & "]"
-                                                        End If
-                                                    End If
-                                                End With
-                                            Else
-                                                return_errorMessage = return_errorMessage & ", " & GetErrString()
-                                            End If
-                                            Throw New ApplicationException(return_errorMessage, ex)
-                                        End Try
+                    Try
+                        Dim mainCsv As New mainCsvCompatibilityClass(cpCore)
+                        Call sc.AddObject("ccLib", mainCsv)
+                    Catch ex As Exception
+                        '
+                        ' Error adding cclib object
+                        '
+                        return_errorMessage = "Error adding cclib compatibility object to script environment"
+                        If sc.Error.Number <> 0 Then
+                            With sc.Error
+                                return_errorMessage = return_errorMessage & ", #" & .Number & ", " & .Description & ", line " & .Line & ", character " & .Column
+                                If .Line <> 0 Then
+                                    Lines = Split(WorkingCode, vbCrLf)
+                                    If UBound(Lines) >= .Line Then
+                                        return_errorMessage = return_errorMessage & ", code [" & Lines(.Line - 1) & "]"
                                     End If
                                 End If
+                            End With
+                        Else
+                            return_errorMessage &= ", no scripting error"
+                        End If
+                        Throw New ApplicationException(return_errorMessage, ex)
+                    End Try
+                    If String.IsNullOrEmpty(return_errorMessage) Then
+                        Try
+                            Call sc.AddObject("cp", cpCore.cp_forAddonExecutionOnly)
+                        Catch ex As Exception
+                            '
+                            ' Error adding cp object
+                            '
+                            return_errorMessage = "Error adding cp object to script environment"
+                            If sc.Error.Number <> 0 Then
+                                With sc.Error
+                                    return_errorMessage = return_errorMessage & ", #" & .Number & ", " & .Description & ", line " & .Line & ", character " & .Column
+                                    If .Line <> 0 Then
+                                        Lines = Split(WorkingCode, vbCrLf)
+                                        If UBound(Lines) >= .Line Then
+                                            return_errorMessage = return_errorMessage & ", code [" & Lines(.Line - 1) & "]"
+                                        End If
+                                    End If
+                                End With
+                            Else
+                                return_errorMessage &= ", no scripting error"
                             End If
+                            Throw New ApplicationException(return_errorMessage, ex)
+                        End Try
+                        If String.IsNullOrEmpty(return_errorMessage) Then
+                            '
+                            If EntryPointName = "" Then
+                                If sc.Procedures.Count > 0 Then
+                                    EntryPointName = sc.Procedures(1).Name
+                                End If
+                            End If
+                            Try
+                                If EntryPointArgs = "" Then
+                                    returnText = genericController.encodeText(sc.Run(EntryPointName))
+
+                                Else
+                                    Select Case UBound(Args)
+                                        Case 0
+                                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0)))
+                                        Case 1
+                                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1)))
+                                        Case 2
+                                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2)))
+                                        Case 3
+                                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3)))
+                                        Case 4
+                                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4)))
+                                        Case 5
+                                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5)))
+                                        Case 6
+                                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6)))
+                                        Case 7
+                                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6), Args(7)))
+                                        Case 8
+                                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6), Args(7), Args(8)))
+                                        Case 9
+                                            returnText = genericController.encodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6), Args(7), Args(8), Args(9)))
+                                        Case Else
+                                            Throw New ApplicationException("Unexpected exception") ' Call cpcore.handleLegacyError6("csv_ExecuteScript4", "Scripting only supports 10 arguments.")
+                                    End Select
+                                End If
+                            Catch ex As Exception
+                                return_errorMessage = "Error executing script [" & ScriptName & "]"
+                                If sc.Error.Number <> 0 Then
+                                    With sc.Error
+                                        return_errorMessage = return_errorMessage & ", #" & .Number & ", " & .Description & ", line " & .Line & ", character " & .Column
+                                        If .Line <> 0 Then
+                                            Lines = Split(WorkingCode, vbCrLf)
+                                            If UBound(Lines) >= .Line Then
+                                                return_errorMessage = return_errorMessage & ", code [" & Lines(.Line - 1) & "]"
+                                            End If
+                                        End If
+                                    End With
+                                Else
+                                    return_errorMessage = return_errorMessage & ", " & GetErrString()
+                                End If
+                                Throw New ApplicationException(return_errorMessage, ex)
+                            End Try
                         End If
                     End If
                 End If

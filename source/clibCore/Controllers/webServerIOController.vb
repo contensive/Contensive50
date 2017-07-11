@@ -40,7 +40,8 @@ Namespace Contensive.Core
         Public requestQueryString As String = ""            ' The QueryString of the current URI
         Public requestFormUseBinaryHeader As Boolean = False ' When set true with RequestNameBinaryRead=true, InitEnvironment reads the form in with a binary read
         Public requestFormBinaryHeader As Byte()            ' For asp pages, this is the full multipart header
-        Public requestFormString As String = ""             ' String from an HTML form post - buffered to remove passwords
+        'Public requestFormString As String = ""             ' String from an HTML form post - buffered to remove passwords
+        Public requestFormDict As New Dictionary(Of String, String)
         Public requesFilesString As String = ""             ' String from an HTML form post
         'Public requestCookieString As String = ""          ' Set in InitASPEnvironment, the full cookie string
         Public requestSpaceAsUnderscore As Boolean = False  ' when true, is it assumed that dots in request variable names will convert
@@ -357,7 +358,8 @@ Namespace Contensive.Core
                 '
                 ' ----- http Form
                 '
-                requestFormString = ""
+                'requestFormString = ""
+                requestFormDict.Clear()
                 Dim postError As Boolean = False
                 Try
                     Dim inputStream As IO.Stream = iisContext.Request.InputStream
@@ -378,7 +380,7 @@ Namespace Contensive.Core
                         For Each key In iisContext.Request.Form.Keys
                             keyValue = iisContext.Request.Form(key)
                             cpCore.docProperties.setProperty(key, keyValue, True)
-                            requestFormString = genericController.ModifyQueryString(requestFormString, key, keyValue)
+                            requestFormDict.Add(key, keyValue)
                         Next
                     Else
                         '
@@ -393,7 +395,7 @@ Namespace Contensive.Core
                                     key = parameter.Name
                                     keyValue = parameter.Data
                                     cpCore.docProperties.setProperty(key, keyValue, True)
-                                    requestFormString = genericController.ModifyQueryString(requestFormString, key, keyValue)
+                                    requestFormDict.Add(key, keyValue)
                                 Next
                                 '
                                 ' file uploads, add to doc properties
@@ -1241,7 +1243,7 @@ ErrorTrap:
                         ' the same as the destination of the link forward, this throws an error and does not forward. the only case where main_ServerLinksource is different
                         ' then main_ServerLink is the linkfforward/linkalias case.
                         '
-                    ElseIf (requestFormString = "") And (requestUrlSource = FullLink) Then
+                    ElseIf (requestFormdict.Count = 0) And (requestUrlSource = FullLink) Then
                         '
                         ' Loop redirect error, throw trap and block redirect to prevent loop
                         '

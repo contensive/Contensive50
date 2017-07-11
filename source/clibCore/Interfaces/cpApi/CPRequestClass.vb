@@ -133,7 +133,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Form() As String 'Inherits BaseClasses.CPRequestBaseClass.Form
             Get
                 If True Then
-                    Return cpCore.webServer.requestFormString
+                    Return Controllers.genericController.convertNameValueDictToREquestString(cpCore.webServer.requestFormDict)
                 Else
                     Return ""
                 End If

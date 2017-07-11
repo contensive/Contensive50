@@ -534,7 +534,7 @@
     <Compile Include="addon_tools\coreToolsClass.vb" />
     <Compile Include="Controllers\uploadFileController.vb" />
     <Compile Include="Controllers\xmlController.vb" />
-    <Compile Include="Interfaces\genericLegacyView.vb" />
+    <Compile Include="Interfaces\mainCsvCompatibilityClass.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">

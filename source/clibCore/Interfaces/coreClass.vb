@@ -2249,6 +2249,9 @@ Namespace Contensive.Core
                                     PageID = doc.page.id
                                 End If
                             End If
+                            '
+                            ' -- convert requestFormDict to a name=value string for Db storage
+                            Dim requestFormSerialized As String = genericController.convertNameValueDictToREquestString(webServer.requestFormDict)
                             FieldNames = "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,ContentControlID,pagetime,Active,CreateKey,RecordID"
                             FieldNames = FieldNames & ",ExcludeFromAnalytics"
                             FieldNames = FieldNames & ",pagetitle"
@@ -2262,7 +2265,7 @@ Namespace Contensive.Core
                                 & "," & db.encodeSQLText(webServer.requestPath) _
                                 & "," & db.encodeSQLText(webServer.requestPage) _
                                 & "," & db.encodeSQLText(Left(webServer.requestQueryString, 255)) _
-                                & "," & db.encodeSQLText(Left(webServer.requestFormString, 255)) _
+                                & "," & db.encodeSQLText(Left(requestFormSerialized, 255)) _
                                 & "," & db.encodeSQLText(Left(webServer.requestReferrer, 255)) _
                                 & "," & db.encodeSQLDate(app_startTime) _
                                 & "," & db.encodeSQLBoolean(authContext.visit_stateOK) _
