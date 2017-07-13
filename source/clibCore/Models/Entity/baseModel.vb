@@ -354,18 +354,18 @@ Namespace Contensive.Core.Models.Entity
                                     Case "String"
                                         instanceProperty.SetValue(instance, cs.getText(instanceProperty.Name), Nothing)
                                     Case "fieldTypeTextFile"
-                                        Dim copy As String = ""
-                                        copy = cs.getTextFile(instanceProperty.Name)
-                                        Dim filename As String = cs.getText(instanceProperty.Name) ' = DirectCast(filenameProperty.GetValue(propertyInstance), String)
+                                        Dim copy As String = cs.getTextFile(instanceProperty.Name)
+                                        ' copy = cs.getTextFile(instanceProperty.Name)
+                                        'Dim filename As String = cs.getText(instanceProperty.Name) ' = DirectCast(filenameProperty.GetValue(propertyInstance), String)
                                         Dim propertyInstance As fieldTypeTextFile = DirectCast(instanceProperty.GetValue(instance), fieldTypeTextFile)
                                         Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("copy")
-                                        If (Not String.IsNullOrEmpty(filename)) Then
-                                            copy = cpCore.privateFiles.readFile(filename)
-                                            If (String.IsNullOrEmpty(copy)) Then
-                                                cpCore.programDataFiles.deleteFile(filename)
-                                                cs.setField(instanceProperty.Name, "")
-                                            End If
-                                        End If
+                                        'If (Not String.IsNullOrEmpty(filename)) Then
+                                        '    copy = cpCore.privateFiles.readFile(filename)
+                                        '    If (String.IsNullOrEmpty(copy)) Then
+                                        '        cpCore.programDataFiles.deleteFile(filename)
+                                        '        cs.setField(instanceProperty.Name, "")
+                                        '    End If
+                                        'End If
                                         copyProperty.SetValue(propertyInstance, copy)
                                     Case Else
                                         instanceProperty.SetValue(instance, cs.getText(instanceProperty.Name), Nothing)

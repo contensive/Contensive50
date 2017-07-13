@@ -2334,7 +2334,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="FieldName"></param>
         ''' <returns></returns>
         Public Function cs_getTextFile(ByVal CSPointer As Integer, ByVal FieldName As String) As String
-            Dim returnResult As String = ""
+            Dim result As String = ""
             Try
                 If Not cs_ok(CSPointer) Then
                     Throw New ArgumentException("dataset must be valid")
@@ -2343,13 +2343,13 @@ Namespace Contensive.Core.Controllers
                 Else
                     Dim Filename As String = cs_getText(CSPointer, FieldName)
                     If Not String.IsNullOrEmpty(Filename) Then
-                        cs_getTextFile = cpCore.cdnFiles.readFile(Filename)
+                        result = cpCore.privateFiles.readFile(Filename)
                     End If
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
-            Return returnResult
+            Return result
         End Function
         ''
         ''========================================================================

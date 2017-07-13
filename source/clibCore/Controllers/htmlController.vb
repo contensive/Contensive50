@@ -4792,18 +4792,18 @@ ErrorTrap:
                 Dim ImageAllowSFResize As Boolean
                 Dim sf As imageEditController
                 '
-                html_DecodeActiveContent = SourceCopy
-                If html_DecodeActiveContent <> "" Then
+                result = SourceCopy
+                If result <> "" Then
                     '
                     ' leave this in to make sure old <acform tags are converted back
                     ' new editor deals with <form, so no more converting
                     '
-                    html_DecodeActiveContent = genericController.vbReplace(html_DecodeActiveContent, "<ACFORM>", "<FORM>")
-                    html_DecodeActiveContent = genericController.vbReplace(html_DecodeActiveContent, "<ACFORM ", "<FORM ")
-                    html_DecodeActiveContent = genericController.vbReplace(html_DecodeActiveContent, "</ACFORM>", "</form>")
-                    html_DecodeActiveContent = genericController.vbReplace(html_DecodeActiveContent, "</ACFORM ", "</FORM ")
-                    If DHTML.Load(html_DecodeActiveContent) Then
-                        html_DecodeActiveContent = ""
+                    result = genericController.vbReplace(result, "<ACFORM>", "<FORM>")
+                    result = genericController.vbReplace(result, "<ACFORM ", "<FORM ")
+                    result = genericController.vbReplace(result, "</ACFORM>", "</form>")
+                    result = genericController.vbReplace(result, "</ACFORM ", "</FORM ")
+                    If DHTML.Load(result) Then
+                        result = ""
                         ElementCount = DHTML.ElementCount
                         If ElementCount > 0 Then
                             '
@@ -5354,7 +5354,7 @@ ErrorTrap:
                                 Stream.Add(ElementText)
                             Next
                         End If
-                        html_DecodeActiveContent = Stream.Text
+                        result = Stream.Text
                     End If
                 End If
             Catch ex As Exception
