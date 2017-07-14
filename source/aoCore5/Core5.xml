@@ -2,7 +2,134 @@
 <Collection name="Core5" guid="{04998B99-AA56-4709-8060-4EA7BC2C4D76}" system="Yes" updatable="Yes" blockNavigatorNode="No">
 	<HelpLink></HelpLink>
 	<Help></Help>
-	<Addon name="Admin Common" guid="{76E7F79E-489F-4B0F-8EE5-0BAC3E4CD782}" type="Add-on">
+	<Addon name="Child Page List" guid="{D291F133-AB50-4640-9A9A-18DB68FF363B}" type="Add-on">
+		<Copy></Copy>
+		<CopyText><![CDATA[<ac type="childlist" name="$list name$">]]></CopyText>
+		<ActiveXProgramID></ActiveXProgramID>
+		<DotNetClass></DotNetClass>
+		<ArgumentList><![CDATA[List Name]]></ArgumentList>
+		<AsAjax>No</AsAjax>
+		<Filter>No</Filter>
+		<Help></Help>
+		<HelpLink></HelpLink>
+		<Icon Link="" width="0" height="0" sprites="0" />
+		<InIframe>No</InIframe>
+		<BlockEditTools>No</BlockEditTools>
+		<FormXML></FormXML>
+		<IsInline>No</IsInline>
+		<JavascriptOnLoad></JavascriptOnLoad>
+		<JavascriptInHead></JavascriptInHead>
+		<JavascriptBodyEnd></JavascriptBodyEnd>
+		<MetaDescription></MetaDescription>
+		<OtherHeadTags></OtherHeadTags>
+		<Content>Yes</Content>
+		<Template>Yes</Template>
+		<Email>No</Email>
+		<Admin>Yes</Admin>
+		<OnPageEndEvent>No</OnPageEndEvent>
+		<OnPageStartEvent>No</OnPageStartEvent>
+		<OnBodyStart>No</OnBodyStart>
+		<OnBodyEnd>No</OnBodyEnd>
+		<RemoteMethod>No</RemoteMethod>
+		<ProcessRunOnce>No</ProcessRunOnce>
+		<ProcessInterval>0</ProcessInterval>
+		<PageTitle></PageTitle>
+		<RemoteAssetLink></RemoteAssetLink>
+		<Styles></Styles>
+		<Scripting Language="" EntryPoint="" Timeout="5000"/>
+	</Addon>
+	<Addon name="Child Page Sorting" guid="{281CABBC-3FCA-4B6F-A0F2-4A792500D152}" type="Add-on">
+		<Copy></Copy>
+		<CopyText></CopyText>
+		<ActiveXProgramID></ActiveXProgramID>
+		<DotNetClass></DotNetClass>
+		<ArgumentList></ArgumentList>
+		<AsAjax>No</AsAjax>
+		<Filter>No</Filter>
+		<Help></Help>
+		<HelpLink></HelpLink>
+		<Icon Link="" width="0" height="0" sprites="0" />
+		<InIframe>No</InIframe>
+		<BlockEditTools>Yes</BlockEditTools>
+		<FormXML></FormXML>
+		<IncludeAddon name="JQuery UI" guid="{840B9AEF-9470-4599-BD47-7EC0C9298614}"/>
+		<IsInline>No</IsInline>
+		<JavascriptOnLoad></JavascriptOnLoad>
+		<JavascriptInHead><![CDATA[function saveSortable(listId){
+		var e,c,s;
+		s=listId;
+		e=document.getElementById(listId);
+		for (i=0;i<e.childNodes.length;i++){
+			c=e.childNodes[i];
+			if(c.id) {s+=','+c.id }
+		}
+		cj.ajax.addon('ChildListResort','sortlist='+s)
+}]]></JavascriptInHead>
+		<JavascriptBodyEnd></JavascriptBodyEnd>
+		<MetaDescription></MetaDescription>
+		<OtherHeadTags></OtherHeadTags>
+		<Content>No</Content>
+		<Template>No</Template>
+		<Email>No</Email>
+		<Admin>No</Admin>
+		<OnPageEndEvent>Yes</OnPageEndEvent>
+		<OnPageStartEvent>No</OnPageStartEvent>
+		<OnBodyStart>No</OnBodyStart>
+		<OnBodyEnd>No</OnBodyEnd>
+		<RemoteMethod>No</RemoteMethod>
+		<ProcessRunOnce>No</ProcessRunOnce>
+		<ProcessInterval>0</ProcessInterval>
+		<PageTitle></PageTitle>
+		<RemoteAssetLink></RemoteAssetLink>
+		<Styles><![CDATA[1]]></Styles>
+		<Scripting Language="" EntryPoint="" Timeout="5000">
+			<Code><![CDATA[Function AddSortable()
+	if cp.user.isediting("Page Content") then
+		AddSortable = "<script language=""javascript"">" _
+			& "jQuery(function() {jQuery("".ccChildList"").sortable({stop: function(event, ui) { saveSortable(jQuery(this).attr('id')); }});});" _
+			& "cj.addHeadStyle('.ccChildList li {min-height:30px;vertical-align:middle;border:1px dashed #262;padding-right:40px !important;background:white url(/childPageSort/arrowUpDown.png) no-repeat right;}');" _
+			& "</script>"
+	end if
+End Function]]></Code>
+		</Scripting>
+	</Addon>
+	<Addon name="ChildListResort" guid="{8429641A-03C9-4CD1-9369-5B9F2FA509E9}" type="Add-on">
+		<Copy></Copy>
+		<CopyText></CopyText>
+		<ActiveXProgramID></ActiveXProgramID>
+		<DotNetClass><![CDATA[Contensive.Addons.PageManager.childPageResortClass]]></DotNetClass>
+		<ArgumentList></ArgumentList>
+		<AsAjax>No</AsAjax>
+		<Filter>No</Filter>
+		<Help></Help>
+		<HelpLink></HelpLink>
+		<Icon Link="" width="0" height="0" sprites="0" />
+		<InIframe>No</InIframe>
+		<BlockEditTools>Yes</BlockEditTools>
+		<FormXML></FormXML>
+		<IsInline>No</IsInline>
+		<JavascriptOnLoad></JavascriptOnLoad>
+		<JavascriptInHead></JavascriptInHead>
+		<JavascriptBodyEnd></JavascriptBodyEnd>
+		<MetaDescription></MetaDescription>
+		<OtherHeadTags></OtherHeadTags>
+		<Content>No</Content>
+		<Template>No</Template>
+		<Email>No</Email>
+		<Admin>No</Admin>
+		<OnPageEndEvent>No</OnPageEndEvent>
+		<OnPageStartEvent>No</OnPageStartEvent>
+		<OnBodyStart>No</OnBodyStart>
+		<OnBodyEnd>No</OnBodyEnd>
+		<RemoteMethod>Yes</RemoteMethod>
+		<ProcessRunOnce>No</ProcessRunOnce>
+		<ProcessInterval>0</ProcessInterval>
+		<PageTitle></PageTitle>
+		<RemoteAssetLink></RemoteAssetLink>
+		<Styles></Styles>
+		<Scripting Language="" EntryPoint="" Timeout="5000"/>
+	</Addon>
+	<Addon name="Email This Page Icon" guid="Email This Page Icon" type="Add-on">
 		<Copy></Copy>
 		<CopyText></CopyText>
 		<ActiveXProgramID></ActiveXProgramID>
@@ -16,7 +143,6 @@
 		<InIframe>No</InIframe>
 		<BlockEditTools>No</BlockEditTools>
 		<FormXML></FormXML>
-		<IncludeAddon name="JQuery" guid="{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"/>
 		<IsInline>No</IsInline>
 		<JavascriptOnLoad></JavascriptOnLoad>
 		<JavascriptInHead></JavascriptInHead>
@@ -25,6 +151,7 @@
 		<OtherHeadTags></OtherHeadTags>
 		<Content>No</Content>
 		<Template>No</Template>
+		<Email>No</Email>
 		<Admin>No</Admin>
 		<OnPageEndEvent>No</OnPageEndEvent>
 		<OnPageStartEvent>No</OnPageStartEvent>
@@ -36,6 +163,42 @@
 		<PageTitle></PageTitle>
 		<RemoteAssetLink></RemoteAssetLink>
 		<Styles></Styles>
+		<Scripting Language="" EntryPoint="" Timeout="5000"/>
+	</Addon>
+	<Addon name="Page Manager" guid="{3a01572e-0f08-4feb-b189-18371752a3c3}" type="Add-on">
+		<Copy></Copy>
+		<CopyText><![CDATA[<p>PageManager</p>]]></CopyText>
+		<ActiveXProgramID></ActiveXProgramID>
+		<DotNetClass><![CDATA[Contensive.Addons.PageManager.PageManagerClass]]></DotNetClass>
+		<ArgumentList></ArgumentList>
+		<AsAjax>No</AsAjax>
+		<Filter>No</Filter>
+		<Help></Help>
+		<HelpLink></HelpLink>
+		<Icon Link="" width="0" height="0" sprites="0" />
+		<InIframe>No</InIframe>
+		<BlockEditTools>No</BlockEditTools>
+		<FormXML></FormXML>
+		<IsInline>No</IsInline>
+		<JavascriptOnLoad></JavascriptOnLoad>
+		<JavascriptInHead></JavascriptInHead>
+		<JavascriptBodyEnd></JavascriptBodyEnd>
+		<MetaDescription></MetaDescription>
+		<OtherHeadTags></OtherHeadTags>
+		<Content>No</Content>
+		<Template>No</Template>
+		<Email>No</Email>
+		<Admin>No</Admin>
+		<OnPageEndEvent>No</OnPageEndEvent>
+		<OnPageStartEvent>No</OnPageStartEvent>
+		<OnBodyStart>No</OnBodyStart>
+		<OnBodyEnd>No</OnBodyEnd>
+		<RemoteMethod>No</RemoteMethod>
+		<ProcessRunOnce>No</ProcessRunOnce>
+		<ProcessInterval>0</ProcessInterval>
+		<PageTitle></PageTitle>
+		<RemoteAssetLink></RemoteAssetLink>
+		<Styles><![CDATA[@import url('/pageManager/pageManager.css')]]></Styles>
 		<Scripting Language="" EntryPoint="" Timeout="5000"/>
 	</Addon>
 	<ImportCollection name="Primitives">{4D357C85-ABE2-4370-B1D9-2C859BF7762F}</ImportCollection>
@@ -50,7 +213,7 @@
 	<ImportCollection name="Content Watch List">{3C5C2B2C-CAA5-46DC-92ED-A21DD23DF597}</ImportCollection>
 	<ImportCollection name="Form Wizard">{B5D1FE5B-71EC-403D-90E8-01AE7F8E18AD}</ImportCollection>
 	<ImportCollection name="Child Page List">{88563066-35F0-4A1F-A7AE-0C014BCB70DB}</ImportCollection>
-	<ImportCollection name="Menuing">{EA22C082-C723-41A6-858D-840B7801DB59}</ImportCollection>
+	<ImportCollection name="Menuing5">{237805fb-fcc4-42e5-a1b5-5383850085d5}</ImportCollection>
 	<ImportCollection name="RSS Client">{685E4C5C-6E24-4A1D-8A43-B7F1710500D4}</ImportCollection>
 	<ImportCollection name="Text Box">{2F869726-B685-458C-8827-B94F37848A1C}</ImportCollection>
 	<ImportCollection name="Fancy Box">{B59F4D89-ADD9-4FEA-9D3F-B5A44DFD8F39}</ImportCollection>
@@ -113,4 +276,6 @@
 	<NavigatorEntry Name="Group Member List Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=35" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{4802DA7B-91D1-4DB1-960B-9DBCCF21AC11}"/>
 	<NavigatorEntry Name="Trap Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=12&amp;rid=36" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{018FA96F-43F3-4AAE-9794-0450CE2F9318}"/>
 	<NavigatorEntry Name="Real-Time Activity Report" NameSpace="Reports" NavIconTitle="" NavIconType="Report" LinkPage="?af=18" ContentName="" AdminOnly="0" DeveloperOnly="0" NewWindow="" Active="1" AddonName="" guid="{5DEFCA75-9F8E-48E7-97A4-D09B7423C180}"/>
+	<Resource name="pageManager.js" type="www" path="/pageManager" />
+	<Resource name="pageManager.css" type="www" path="/pageManager" />
 </Collection>

@@ -100,7 +100,7 @@ Namespace Contensive.Core.Controllers
             Try
                 Dim ContentId As Integer
                 ContentId = getContentId(contentName)
-                If (ContentId < 0) Then
+                If (ContentId <= 0) Then
                     Throw New ApplicationException("No metadata was found for content name [" & contentName & "]")
                 Else
                     returnCdef = getCdef(ContentId)

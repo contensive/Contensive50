@@ -73,44 +73,52 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         Public Class appConfigModel
             Public name As String = ""
-            Public appStatus As applicationStatusEnum = applicationStatusEnum.ApplicationStatusAppConfigNotFound
+            Public appStatus As appStatusEnum = appStatusEnum.errorAppConfigNotFound
+            Public appMode As appModeEnum = appModeEnum.maintainence                    ' must be set to normal after setup
             Public enabled As Boolean = False
-            Public privateKey As String = ""                ' rename hashKey
-            Public appRootFilesPath As String = ""          ' local file path to the appRoot (i.e. d:\inetpub\myApp\wwwRoot\)
-            Public cdnFilesPath As String = ""              ' local file path to the content files (i.e. d:\inetpub\myApp\files\)
-            Public privateFilesPath As String = ""          ' local file path to the content files (i.e. d:\inetpub\myApp\private\)
-            Public cdnFilesNetprefix As String = ""         ' in some cases (like legacy), cdnFiles are iis virtual folder mapped to appRoot (/appName/files/). Some cases this is a URL (http:\\cdn.domain.com pointing to s3)
+            Public privateKey As String = ""                                            ' rename hashKey
+            Public appRootFilesPath As String = ""                                      ' local file path to the appRoot (i.e. d:\inetpub\myApp\wwwRoot\)
+            Public cdnFilesPath As String = ""                                          ' local file path to the content files (i.e. d:\inetpub\myApp\files\)
+            Public privateFilesPath As String = ""                                      ' local file path to the content files (i.e. d:\inetpub\myApp\private\)
+            Public cdnFilesNetprefix As String = ""                                     ' in some cases (like legacy), cdnFiles are iis virtual folder mapped to appRoot (/appName/files/). Some cases this is a URL (http:\\cdn.domain.com pointing to s3)
             Public allowSiteMonitor As Boolean = False
-            Public domainList As New List(Of String)        ' primary domain is the first item in the list
-            Public adminRoute As String = ""              ' The url pathpath that executes the addon site
-            Public defaultPage As String = "default.aspx"   ' when exeecuting iis 
+            Public domainList As New List(Of String)                                    ' primary domain is the first item in the list
+            Public adminRoute As String = ""                                            ' The url pathpath that executes the addon site
+            Public defaultPage As String = "default.aspx"                               ' when exeecuting iis 
         End Class    '
         '
         '====================================================================================================
         ''' <summary>
         ''' status of the app in the appConfigModel. Only applies to the app loaded in the serverstatus.appconfig
         ''' </summary>
-        Public Enum applicationStatusEnum
-            ApplicationStatusNotFound = 0
-            ApplicationStatusNotEnabled = 1
-            ApplicationStatusReady = 2
-            ApplicationStatusLoading = 3
-            ApplicationStatusUpgrading = 4
-            ' ApplicationStatusConnectionBusy = 5    ' can not open connection because already open
-            ApplicationStatusKernelFailure = 6     ' can not create Kernel
-            ApplicationStatusNoHostService = 7     ' host service process ID not set
-            ApplicationStatusLicenseFailure = 8    ' failed to start because of License failure
-            ApplicationStatusDbNotFound = 9         ' failed to start because ccSetup table not found
-            ApplicationStatusFailedToInitialize = 10   ' failed to start because of unknown error, see trace log
-            ApplicationStatusDbBad = 11            ' ccContent,ccFields no records found
-            ApplicationStatusConnectionObjectFailure = 12 ' Connection Object FAiled
-            ApplicationStatusConnectionStringFailure = 13 ' Connection String FAiled to open the ODBC connection
-            ApplicationStatusDataSourceFailure = 14 ' DataSource failed to open
-            ApplicationStatusDuplicateDomains = 15 ' Can not locate application because there are 1+ apps that match the domain
-            ApplicationStatusPaused = 16           ' Running, but all activity is blocked (for backup)
-            ApplicationStatusAppConfigNotFound = 17
-            ApplicationStatusAppConfigNotValid = 18
-            ApplicationStatusDbFoundButContentMetaMissing = 19
+        Public Enum appModeEnum
+            normal = 0
+            maintainence = 1
+        End Enum
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' status of the app in the appConfigModel. Only applies to the app loaded in the serverstatus.appconfig
+        ''' </summary>
+        Public Enum appStatusEnum
+            notFound = 0
+            notEnabled = 1
+            ready = 2
+            loading = 3
+            errorKernelFailure = 6     ' can not create Kernel
+            errorNoHostService = 7     ' host service process ID not set
+            errorLicenseFailure = 8    ' failed to start because of License failure
+            errorDbNotFound = 9         ' failed to start because ccSetup table not found
+            errorFailedToInitialize = 10   ' failed to start because of unknown error, see trace log
+            errorDbBad = 11            ' ccContent,ccFields no records found
+            errorConnectionObjectFailure = 12 ' Connection Object FAiled
+            errorConnectionStringFailure = 13 ' Connection String FAiled to open the ODBC connection
+            errorDataSourceFailure = 14 ' DataSource failed to open
+            errorDuplicateDomains = 15 ' Can not locate application because there are 1+ apps that match the domain
+            paused = 16           ' Running, but all activity is blocked (for backup)
+            errorAppConfigNotFound = 17
+            errorAppConfigNotValid = 18
+            errorDbFoundButContentMetaMissing = 19
         End Enum
         '
         '====================================================================================================
@@ -174,7 +182,7 @@ Namespace Contensive.Core.Models.Entity
                         Throw New Exception("application [" & appName & "] was not found in this server group.")
                     Else
                         returnModel.appConfig = returnModel.apps(appName.ToLower())
-                        returnModel.appConfig.appStatus = applicationStatusEnum.ApplicationStatusReady
+                        returnModel.appConfig.appStatus = appStatusEnum.ready
                     End If
                 End If
             Catch ex As Exception

@@ -262,12 +262,22 @@ Namespace Contensive.Core.Controllers
                                 Next
                                 If Not cacheMiss Then
                                     If (TypeOf cacheWrapper.data Is Newtonsoft.Json.Linq.JObject) Then
+                                        '
+                                        ' -- newtonsoft types
                                         Dim data As Newtonsoft.Json.Linq.JObject = DirectCast(cacheWrapper.data, Newtonsoft.Json.Linq.JObject)
                                         returnObject = data.ToObject(Of objectClass)()
                                     ElseIf (TypeOf cacheWrapper.data Is Newtonsoft.Json.Linq.JArray) Then
+                                        '
+                                        ' -- newtonsoft types
                                         Dim data As Newtonsoft.Json.Linq.JArray = DirectCast(cacheWrapper.data, Newtonsoft.Json.Linq.JArray)
                                         returnObject = data.ToObject(Of objectClass)()
+                                    ElseIf (TypeOf cacheWrapper.data Is String) And (TypeOf returnObject IsNot String) Then
+                                        '
+                                        ' -- if cache data was left as a string (might be empty), and return object is not string, there was an error
+                                        returnObject = Nothing
                                     Else
+                                        '
+                                        ' -- all worked
                                         returnObject = DirectCast(cacheWrapper.data, objectClass)
                                     End If
                                 End If

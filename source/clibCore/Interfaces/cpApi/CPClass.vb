@@ -80,7 +80,7 @@ Namespace Contensive.Core
         '
         '
         '
-        Public ReadOnly Property status As Models.Entity.serverConfigModel.applicationStatusEnum
+        Public ReadOnly Property status As Models.Entity.serverConfigModel.appStatusEnum
             Get
                 Return core.serverConfig.appConfig.appStatus
             End Get
@@ -120,7 +120,7 @@ Namespace Contensive.Core
                 If (core Is Nothing) Then
                     Return False
                 Else
-                    Return (core.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady)
+                    Return (core.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.ready)
                 End If
             End Get
         End Property

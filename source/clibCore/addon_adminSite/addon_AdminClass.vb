@@ -5450,29 +5450,41 @@ ErrorTrap:
                                 ' generate the style list on demand
                                 ' note: &editorFieldType should be deprecated
                                 '
-                                addonOptionString = "" _
-                                    & "editorName=" & genericController.encodeNvaArgument(FormFieldLCaseName) _
-                                    & "&editorValue=" & genericController.encodeNvaArgument(FieldValueText) _
-                                    & "&editorFieldId=" & fieldId _
-                                    & "&editorFieldType=" & fieldTypeId _
-                                    & "&editorReadOnly=" & editorReadOnly _
-                                    & "&editorWidth=" _
-                                    & "&editorHeight=" _
-                                    & ""
+                                cpCore.docProperties.setProperty("editorName", FormFieldLCaseName)
+                                cpCore.docProperties.setProperty("editorValue", FieldValueText)
+                                cpCore.docProperties.setProperty("editorFieldId", fieldId)
+                                cpCore.docProperties.setProperty("editorFieldType", fieldTypeId)
+                                cpCore.docProperties.setProperty("editorReadOnly", editorReadOnly)
+                                cpCore.docProperties.setProperty("editorWidth", "")
+                                cpCore.docProperties.setProperty("editorHeight", "")
+
+                                'addonOptionString = "" _
+                                '    & "editorName=" & genericController.encodeNvaArgument(FormFieldLCaseName) _
+                                '    & "&editorValue=" & genericController.encodeNvaArgument(FieldValueText) _
+                                '    & "&editorFieldId=" & fieldId _
+                                '    & "&editorFieldType=" & fieldTypeId _
+                                '    & "&editorReadOnly=" & editorReadOnly _
+                                '    & "&editorWidth=" _
+                                '    & "&editorHeight=" _
+                                '    & ""
                                 If genericController.EncodeBoolean((fieldTypeId = FieldTypeIdHTML) Or (fieldTypeId = FieldTypeIdFileHTMLPrivate)) Then
                                     '
                                     ' include html related arguments
                                     '
-                                    '                            ac = New innovaEditorAddonClassFPO
-                                    '                            Call ac.Init()
-                                    '                            editorAddonListJSON = ac.GetEditorAddonListJSON(IsTemplateTable, EditorContext)
+                                    cpCore.docProperties.setProperty("editorAllowActiveContent", "1")
+                                    cpCore.docProperties.setProperty("editorAddonList", editorAddonListJSON)
+                                    cpCore.docProperties.setProperty("editorStyles", styleList)
+                                    cpCore.docProperties.setProperty("editorStyleOptions", styleOptionList)
+                                    ''                            ac = New innovaEditorAddonClassFPO
+                                    ''                            Call ac.Init()
+                                    ''                            editorAddonListJSON = ac.GetEditorAddonListJSON(IsTemplateTable, EditorContext)
 
-                                    addonOptionString = addonOptionString _
-                                        & "&editorAllowActiveContent=1" _
-                                        & "&editorAddonList=" & genericController.encodeNvaArgument(editorAddonListJSON) _
-                                        & "&editorStyles=" & genericController.encodeNvaArgument(styleList) _
-                                        & "&editorStyleOptions=" & genericController.encodeNvaArgument(styleOptionList) _
-                                        & ""
+                                    'addonOptionString = addonOptionString _
+                                    '    & "&editorAllowActiveContent=1" _
+                                    '    & "&editorAddonList=" & genericController.encodeNvaArgument(editorAddonListJSON) _
+                                    '    & "&editorStyles=" & genericController.encodeNvaArgument(styleList) _
+                                    '    & "&editorStyleOptions=" & genericController.encodeNvaArgument(styleOptionList) _
+                                    '    & ""
                                 End If
 
                                 EditorString = cpCore.addon.execute(editorAddonID, "", addonOptionString, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextEditor, "", 0, "", "", False, 0, "", useEditorAddon, Nothing, "", Nothing, "", 0, False)

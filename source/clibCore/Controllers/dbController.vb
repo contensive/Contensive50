@@ -4132,21 +4132,21 @@ Namespace Contensive.Core.Controllers
                     Criteria = "(ContentRecordKey=" & encodeSQLText(ContentRecordKey) & ")"
                     ContentName = cpCore.metaData.getContentNameByID(ContentID)
                     TableName = cpCore.metaData.getContentTablename(ContentName)
-                    '
-                    ' ----- Delete CalendarEventRules and CalendarEvents
-                    '
-                    If cpCore.metaData.isContentFieldSupported("calendar events", "ID") Then
-                        Call deleteContentRecords("Calendar Events", Criteria)
-                    End If
-                    '
-                    ' ----- Delete ContentWatch
-                    '
-                    CS = cs_open("Content Watch", Criteria)
-                    Do While cs_ok(CS)
-                        Call cs_deleteRecord(CS)
-                        cs_goNext(CS)
-                    Loop
-                    Call cs_Close(CS)
+                    ''
+                    '' ----- Delete CalendarEventRules and CalendarEvents
+                    ''
+                    'If cpCore.metaData.isContentFieldSupported("calendar events", "ID") Then
+                    '    Call deleteContentRecords("Calendar Events", Criteria)
+                    'End If
+                    ''
+                    '' ----- Delete ContentWatch
+                    ''
+                    'CS = cs_open("Content Watch", Criteria)
+                    'Do While cs_ok(CS)
+                    '    Call cs_deleteRecord(CS)
+                    '    cs_goNext(CS)
+                    'Loop
+                    'Call cs_Close(CS)
                     '
                     ' ----- Table Specific rules
                     '

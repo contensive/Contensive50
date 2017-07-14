@@ -2143,8 +2143,6 @@ Namespace Contensive.Core.Controllers
                     Call cpCore.db.createSQLTableField("Default", "ccDataSources", "password", FieldTypeIdText)
                     Call cpCore.db.createSQLTableField("Default", "ccDataSources", "ConnString", FieldTypeIdText)
                     Call cpCore.db.createSQLTableField("Default", "ccDataSources", "endpoint", FieldTypeIdText)
-                    Call cpCore.db.createSQLTableField("Default", "ccDataSources", "username", FieldTypeIdText)
-                    Call cpCore.db.createSQLTableField("Default", "ccDataSources", "password", FieldTypeIdText)
                     Call cpCore.db.createSQLTableField("Default", "ccDataSources", "dbtypeid", FieldTypeIdLookup)
                     '
                     Call cpCore.db.createSQLTable("Default", "ccTables")

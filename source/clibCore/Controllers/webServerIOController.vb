@@ -451,7 +451,7 @@ Namespace Contensive.Core
                 '
                 '--------------------------------------------------------------------------
                 '
-                If (cpCore.serverConfig.appConfig.appStatus <> Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady) Then
+                If (cpCore.serverConfig.appConfig.appStatus <> Models.Entity.serverConfigModel.appStatusEnum.ready) Then
                     '
                     ' did not initialize correctly
                     '

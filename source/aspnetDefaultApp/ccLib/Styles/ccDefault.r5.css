@@ -303,3 +303,8 @@ Container for the default login form
 	width: 350px;
 	margin: 0 auto;
 }
+/*
+Exception list
+*/
+ul.ccExceptionList { padding: 10px 20px;margin:0;background-color:red;list-style-type: none;}
+li.ccExceptionListRow { padding:0;margin: 10px auto;}

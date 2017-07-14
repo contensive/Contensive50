@@ -501,7 +501,7 @@ Namespace Contensive.Core
             '
             Me.serverConfig = serverConfig
             Me.serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
-            Me.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady
+            Me.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.ready
             webServer.iisContext = Nothing
             constructorInitialize()
         End Sub
@@ -521,7 +521,7 @@ Namespace Contensive.Core
             '
             Me.serverConfig = serverConfig
             Me.serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
-            Me.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady
+            Me.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.ready
             webServer.initWebContext(httpContext)
             constructorInitialize()
         End Sub
@@ -2150,6 +2150,12 @@ Namespace Contensive.Core
                 '
                 ' -- attempt auth load
                 If (serverConfig.appConfig Is Nothing) Then
+                    '
+                    ' -- server mode, there is no application
+                    authContext = Models.Context.authContextModel.create(Me, False)
+                ElseIf ((serverConfig.appConfig.appMode <> Models.Entity.serverConfigModel.appModeEnum.normal) Or (serverConfig.appConfig.appStatus <> Models.Entity.serverConfigModel.appStatusEnum.ready)) Then
+                    '
+                    ' -- application is not ready, might be error, or in maintainence mode
                     authContext = Models.Context.authContextModel.create(Me, False)
                 Else
                     authContext = Models.Context.authContextModel.create(Me, siteProperties.allowVisitTracking)
@@ -2208,14 +2214,11 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="disposing"></param>
         Protected Overridable Overloads Sub Dispose(ByVal disposing As Boolean)
-            'Exit Sub
-
             Dim SQL As String
             Dim ViewingName As String
             Dim CSMax As Integer
             Dim PageID As Integer
             Dim FieldNames As String
-            Dim requestForm As String
             '
             If Not Me.disposed Then
                 Me.disposed = True
@@ -2237,47 +2240,51 @@ Namespace Contensive.Core
                     '
                     ' content server object is valid
                     '
-                    If (serverConfig.appConfig IsNot Nothing) Then
-                        If siteProperties.allowVisitTracking Then
-                            '
-                            ' If visit tracking, save the viewing record
-                            '
-                            ViewingName = Left(authContext.visit.id & "." & authContext.visit.PageVisits, 10)
-                            PageID = 0
-                            If (_doc IsNot Nothing) Then
-                                If (doc.page IsNot Nothing) Then
-                                    PageID = doc.page.id
+                    If (serverConfig IsNot Nothing) Then
+                        If (serverConfig.appConfig IsNot Nothing) Then
+                            If (serverConfig.appConfig.appMode = serverConfigModel.appModeEnum.normal) And (serverConfig.appConfig.appStatus = serverConfigModel.appStatusEnum.ready) Then
+                                If siteProperties.allowVisitTracking Then
+                                    '
+                                    ' If visit tracking, save the viewing record
+                                    '
+                                    ViewingName = Left(authContext.visit.id & "." & authContext.visit.PageVisits, 10)
+                                    PageID = 0
+                                    If (_doc IsNot Nothing) Then
+                                        If (doc.page IsNot Nothing) Then
+                                            PageID = doc.page.id
+                                        End If
+                                    End If
+                                    '
+                                    ' -- convert requestFormDict to a name=value string for Db storage
+                                    Dim requestFormSerialized As String = genericController.convertNameValueDictToREquestString(webServer.requestFormDict)
+                                    FieldNames = "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,ContentControlID,pagetime,Active,CreateKey,RecordID"
+                                    FieldNames = FieldNames & ",ExcludeFromAnalytics"
+                                    FieldNames = FieldNames & ",pagetitle"
+                                    SQL = "INSERT INTO ccViewings (" _
+                                    & FieldNames _
+                                    & ")VALUES(" _
+                                    & " " & db.encodeSQLText(ViewingName) _
+                                    & "," & db.encodeSQLNumber(authContext.visit.id) _
+                                    & "," & db.encodeSQLNumber(authContext.user.id) _
+                                    & "," & db.encodeSQLText(webServer.requestDomain) _
+                                    & "," & db.encodeSQLText(webServer.requestPath) _
+                                    & "," & db.encodeSQLText(webServer.requestPage) _
+                                    & "," & db.encodeSQLText(Left(webServer.requestQueryString, 255)) _
+                                    & "," & db.encodeSQLText(Left(requestFormSerialized, 255)) _
+                                    & "," & db.encodeSQLText(Left(webServer.requestReferrer, 255)) _
+                                    & "," & db.encodeSQLDate(app_startTime) _
+                                    & "," & db.encodeSQLBoolean(authContext.visit_stateOK) _
+                                    & "," & db.encodeSQLNumber(metaData.getContentId("Viewings")) _
+                                    & "," & db.encodeSQLNumber(appStopWatch.ElapsedMilliseconds) _
+                                    & ",1" _
+                                    & "," & db.encodeSQLNumber(CSMax) _
+                                    & "," & db.encodeSQLNumber(PageID)
+                                    SQL &= "," & db.encodeSQLBoolean(webServer.webServerIO_PageExcludeFromAnalytics)
+                                    SQL &= "," & db.encodeSQLText(doc.main_MetaContent_Title)
+                                    SQL &= ");"
+                                    Call db.executeSql(SQL)
                                 End If
                             End If
-                            '
-                            ' -- convert requestFormDict to a name=value string for Db storage
-                            Dim requestFormSerialized As String = genericController.convertNameValueDictToREquestString(webServer.requestFormDict)
-                            FieldNames = "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,ContentControlID,pagetime,Active,CreateKey,RecordID"
-                            FieldNames = FieldNames & ",ExcludeFromAnalytics"
-                            FieldNames = FieldNames & ",pagetitle"
-                            SQL = "INSERT INTO ccViewings (" _
-                                & FieldNames _
-                                & ")VALUES(" _
-                                & " " & db.encodeSQLText(ViewingName) _
-                                & "," & db.encodeSQLNumber(authContext.visit.id) _
-                                & "," & db.encodeSQLNumber(authContext.user.id) _
-                                & "," & db.encodeSQLText(webServer.requestDomain) _
-                                & "," & db.encodeSQLText(webServer.requestPath) _
-                                & "," & db.encodeSQLText(webServer.requestPage) _
-                                & "," & db.encodeSQLText(Left(webServer.requestQueryString, 255)) _
-                                & "," & db.encodeSQLText(Left(requestFormSerialized, 255)) _
-                                & "," & db.encodeSQLText(Left(webServer.requestReferrer, 255)) _
-                                & "," & db.encodeSQLDate(app_startTime) _
-                                & "," & db.encodeSQLBoolean(authContext.visit_stateOK) _
-                                & "," & db.encodeSQLNumber(metaData.getContentId("Viewings")) _
-                                & "," & db.encodeSQLNumber(appStopWatch.ElapsedMilliseconds) _
-                                & ",1" _
-                                & "," & db.encodeSQLNumber(CSMax) _
-                                & "," & db.encodeSQLNumber(PageID)
-                            SQL &= "," & db.encodeSQLBoolean(webServer.webServerIO_PageExcludeFromAnalytics)
-                            SQL &= "," & db.encodeSQLText(doc.main_MetaContent_Title)
-                            SQL &= ");"
-                            Call db.executeSql(SQL)
                         End If
                     End If
                     '

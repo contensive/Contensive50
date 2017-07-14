@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Contensive.Core;
+using System.Security.Permissions;
+using System.Security;
 
 namespace  Contensive.CLI {
     class createAppClass {
@@ -110,8 +112,19 @@ namespace  Contensive.CLI {
                             break;
                     }
                     System.IO.Directory.CreateDirectory(appConfig.appRootFilesPath);
+                    FileIOPermission f2 = new FileIOPermission(FileIOPermissionAccess.Read, appConfig.appRootFilesPath);
+                    f2.AddPathList(FileIOPermissionAccess.Write | FileIOPermissionAccess.Read, appConfig.appRootFilesPath);
+                    try
+                    {
+                        f2.Demand();
+                    }
+                    catch (SecurityException s)
+                    {
+                        Console.WriteLine(s.Message);
+                    }
                     System.IO.Directory.CreateDirectory(appConfig.cdnFilesPath);
                     System.IO.Directory.CreateDirectory(appConfig.privateFilesPath);
+
                     //
                     // -- save the app configuration and reload the server using this app
                     cp.core.serverConfig.apps.Add(appName, appConfig);
@@ -144,7 +157,7 @@ namespace  Contensive.CLI {
                     //
                     string defaultContent = cp.core.appRootFiles.readFile("web.config");
                     defaultContent = defaultContent.Replace("{{appName}}", appName);
-                    cp.core.appRootFiles.saveFile(iisDefaultDoc, "web.config");
+                    cp.core.appRootFiles.saveFile("web.config", defaultContent);
                 }
                 //
                 // initialize the new app, use the save authentication that was used to authorize this object
@@ -153,6 +166,10 @@ namespace  Contensive.CLI {
                 {
                     Core.Controllers.iisController.verifySite(cp.core,appName, domainName, cp.core.serverConfig.appConfig.appRootFilesPath, iisDefaultDoc);
                     Core.Controllers.appBuilderController.upgrade(cp.core,true);
+                    //
+                    // -- set the application back to normal mode
+                    cp.core.serverConfig.apps[appName].appMode = Core.Models.Entity.serverConfigModel.appModeEnum.normal;
+                    cp.core.serverConfig.saveObject(cp.core);
                     cp.core.siteProperties.setProperty(constants.siteproperty_serverPageDefault_name, iisDefaultDoc);
                 }
             }

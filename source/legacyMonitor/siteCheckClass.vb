@@ -506,7 +506,7 @@ ErrorTrap:
                                 '    ' Paused
                                 '    '
                                 '    Call appendMonitorLog(AppName & " paused")
-                            ElseIf AppStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady Then
+                            ElseIf AppStatus = Models.Entity.serverConfigModel.appStatusEnum.ready Then
                                 '
                                 ' Running
                                 '

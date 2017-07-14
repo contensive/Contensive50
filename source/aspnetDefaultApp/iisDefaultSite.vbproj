@@ -642,7 +642,9 @@
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
     </None>
     <None Include="My Project\PublishProfiles\app20170508130101.pubxml" />
+    <None Include="My Project\PublishProfiles\app20170713123353.pubxml" />
     <None Include="My Project\PublishProfiles\aspxtest.pubxml" />
+    <None Include="My Project\PublishProfiles\c-pf-kma-c5-resources-iisDefaultSite.pubxml" />
     <None Include="My Project\PublishProfiles\deployToLocalAppPatternsAspnet.pubxml" />
     <None Include="My Project\PublishProfiles\DevDefaultApp.pubxml" />
     <None Include="My Project\PublishProfiles\StagingDefaultApp.pubxml" />

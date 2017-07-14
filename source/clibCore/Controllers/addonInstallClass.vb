@@ -1650,7 +1650,7 @@ Namespace Contensive.Core
                                                                         CollectionWrapper = "<" & CollectionFileRootNode & ">" & CollectionWrapper & "</" & CollectionFileRootNode & ">"
                                                                         'saveLogFolder = builder.classLogFolder
                                                                         'builder.classLogFolder = "AddonInstall"
-                                                                        Call installCollection_BuildDbFromXmlData(CollectionWrapper, IsNewBuild, isBaseCollection)
+                                                                        Call installCollectionFromLocalRepo_BuildDbFromXmlData(CollectionWrapper, IsNewBuild, isBaseCollection)
                                                                         'builder.classLogFolder = saveLogFolder
                                                                         '
                                                                         ' Process nodes to save Collection data
@@ -3881,34 +3881,25 @@ Namespace Contensive.Core
                 Dim tmpFolderPath As String = "tmp" & genericController.GetRandomInteger().ToString & "\"
                 Dim ignoreString As String = ""
                 Dim returnErrorMessage As String = ""
-                'Dim builder As New coreBuilderClass(cpCore)
                 Dim ignoreBoolean As Boolean = False
                 Dim isBaseCollection As Boolean = True
                 '
                 If isNewBuild Then
                     '
                     ' special case, with base collection, first do just a pass with the cdef nodes, to build out a new site
-                    '
                     Call appendInstallLog(cpCore.serverConfig.appConfig.name, "installBaseCollection", "Special case -- installing base collection on new site, run cdef first")
                     '
                     Dim CollectionWorking As New miniCollectionModel
                     Dim CollectionNew As New miniCollectionModel
-                    Dim baseCollectionXml As String
-                    Dim ignoreRefactor As Boolean
-                    '
-                    If True Then
-                        baseCollectionXml = cpCore.programFiles.readFile("resources\baseCollection.xml")
-                        Call installCollection_LoadXmlToMiniCollection(baseCollectionXml, CollectionNew, True, True, isNewBuild, CollectionWorking)
-                        Call installCollection_BuildDbFromMiniCollection(CollectionNew, cpCore.siteProperties.dataBuildVersion, isNewBuild)
-                        Call cpCore.db.executeSql("update ccfields set IsBaseField=1")
-                        Call cpCore.db.executeSql("update cccontent set IsBaseContent=1")
-                    End If
+                    Dim baseCollectionXml As String = cpCore.programFiles.readFile("aoBase5.xml")
+                    Call installCollection_LoadXmlToMiniCollection(baseCollectionXml, CollectionNew, True, True, isNewBuild, CollectionWorking)
+                    Call installCollection_BuildDbFromMiniCollection(CollectionNew, cpCore.siteProperties.dataBuildVersion, isNewBuild)
                 End If
                 '
                 ' now treat as a regular collection and install - to pickup everything else 
                 '
                 cpCore.privateFiles.createPath(tmpFolderPath)
-                cpCore.programFiles.copyFile("resources\baseCollection.xml", tmpFolderPath & "baseCollection.xml", cpCore.privateFiles)
+                cpCore.programFiles.copyFile("aoBase5.xml", tmpFolderPath & "aoBase5.xml", cpCore.privateFiles)
                 Dim ignoreList As New List(Of String)
                 If Not InstallCollectionsFromPrivateFolder(tmpFolderPath, returnErrorMessage, ignoreList, isNewBuild) Then
                     Throw New ApplicationException(returnErrorMessage)
@@ -3924,7 +3915,7 @@ Namespace Contensive.Core
                 '    Call AppendClassLogFile(cpCore.app.config.name, "installBaseCollection", "Adding base collection to current application collection.")
                 '    CollectionWorking = installCollection_GetApplicationCollectionX(isNewBuild)
                 'End If
-                'baseCollectionXml = cpCore.cluster.files.ReadFile("clibResources\baseCollection.xml")
+                'baseCollectionXml = cpCore.cluster.files.ReadFile("clibResources\aoBase5.xml")
                 'Call installCollection_LoadXmlToCollectionX(baseCollectionXml, CollectionNew, True, False, isNewBuild, CollectionWorking)
                 'Call installCollection_AddCollectionXSrcToDst(CollectionWorking, CollectionNew, False)
                 ''
@@ -3948,29 +3939,17 @@ Namespace Contensive.Core
         '
         '=========================================================================================
         '
-        Public Sub installCollection_BuildDbFromXmlData(ByVal XMLText As String, isNewBuild As Boolean, isBaseCollection As Boolean)
+        Public Sub installCollectionFromLocalRepo_BuildDbFromXmlData(ByVal XMLText As String, isNewBuild As Boolean, isBaseCollection As Boolean)
             Try
                 '
-                Dim miniCollectionWorking As miniCollectionModel
-                Dim miniCollectionToAdd As New miniCollectionModel
+                Call appendInstallLog(cpCore.serverConfig.appConfig.name, "installCollectionFromLocalRepo_BuildDbFromXmlData", "Application: " & cpCore.serverConfig.appConfig.name)
                 '
                 ' ----- Import any CDef files, allowing for changes
-                '
-                Call appendInstallLog(cpCore.serverConfig.appConfig.name, "ImportCDefData", "Application: " & cpCore.serverConfig.appConfig.name & ", Importing Collection Data")
-                '
-                Call appendInstallLog(cpCore.serverConfig.appConfig.name, "ImportCDefData", "Application: " & cpCore.serverConfig.appConfig.name & ", ImportCDefData, creating ApplicationCollection")
-                miniCollectionWorking = installCollection_GetApplicationMiniCollection(isNewBuild)
-                '
-                Call appendInstallLog(cpCore.serverConfig.appConfig.name, "ImportCDefData", "Application: " & cpCore.serverConfig.appConfig.name & ", ImportCDefData, loading collectionfile data (length=" & Len(XMLText) & ") to CollectionNew")
+                Dim miniCollectionToAdd As New miniCollectionModel
+                Dim miniCollectionWorking As miniCollectionModel = installCollection_GetApplicationMiniCollection(isNewBuild)
                 Call installCollection_LoadXmlToMiniCollection(XMLText, miniCollectionToAdd, isBaseCollection, False, isNewBuild, miniCollectionWorking)
-                '
-                Call appendInstallLog(cpCore.serverConfig.appConfig.name, "ImportCDefData", "Application: " & cpCore.serverConfig.appConfig.name & ", ImportCDefData, calling AddSrcToDst")
                 Call installCollection_AddMiniCollectionSrcToDst(miniCollectionWorking, miniCollectionToAdd, True)
-                '
-                Call appendInstallLog(cpCore.serverConfig.appConfig.name, "ImportCDefData", "Application: " & cpCore.serverConfig.appConfig.name & ", ImportCDefData, calling BuildDbFromCollection")
                 Call installCollection_BuildDbFromMiniCollection(miniCollectionWorking, cpCore.siteProperties.dataBuildVersion, isNewBuild)
-                '
-                Call appendInstallLog(cpCore.serverConfig.appConfig.name, "ImportCDefData", "Application: " & cpCore.serverConfig.appConfig.name & ", ImportCDefData done")
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex) : Throw
             End Try
@@ -5028,7 +5007,7 @@ Namespace Contensive.Core
                         ContentID = 0
                         ContentName = .Name
                         ContentIsBaseContent = False
-                        FieldHelpCID = cpCore.db.getContentId("Field Help")
+                        FieldHelpCID = cpCore.db.getContentId("Content Field Help")
                         Dim datasource As Contensive.Core.Models.Entity.dataSourceModel = Models.Entity.dataSourceModel.createByName(cpCore, .ContentDataSourceName, New List(Of String))
                         '
                         ' get contentid and protect content with IsBaseContent true

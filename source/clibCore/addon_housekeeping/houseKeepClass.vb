@@ -25,9 +25,6 @@ Namespace Contensive.Core
         '
         '
         Public Sub HouseKeep(ByVal DebugMode As Boolean)
-            '
-            On Error GoTo ErrorTrap
-            ''
             Dim EmailDropArchiveAgeDays As Integer
             Dim Pos As Integer
             Dim DomainNameList As String
@@ -149,10 +146,6 @@ Namespace Contensive.Core
             Dim apps() As String
             'Dim appRow As String = ""
             Dim appArg() As String
-            Dim appName As String
-            Dim appStatus As Integer
-            '
-            On Error Resume Next
             '
             ' put token in a config file
             '
@@ -257,28 +250,11 @@ Namespace Contensive.Core
             ' Housekeep each application
             '
             For Each kvp As KeyValuePair(Of String, Models.Entity.serverConfigModel.appConfigModel) In cp.core.serverConfig.apps
-                appName = kvp.Value.name
+                Dim appConfig As Models.Entity.serverConfigModel.appConfigModel = kvp.Value
                 If True Then
-                    'End If
-                    ''20151109 - removed but unsure what in initContext can/must be moved to cp constructor
-                    'If Not cp.execute_initContext() Then
-                    '    '
-                    '    ' failed to initialize, skip it
-                    '    '
-                    'Else
-                    'appArg = Split(appRow, vbTab)
-                    'appName = appArg(0)
-                    appStatus = genericController.EncodeInteger(appName)
-                    If appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady Then
-
-
-                        '
-
-                        cp = New CPClass(appName)
-                        If Not (cp Is Nothing) Then
-                            '20151109 - removed but unsure what in initContext can/must be moved to cp constructor
-                            'Call cp.execute_initContext()
-                            'cpCore = cp.core
+                    If (appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.ready) And (appConfig.appMode = Models.Entity.serverConfigModel.appModeEnum.normal) Then
+                        cp = New CPClass(appConfig.name)
+                        If (cp IsNot Nothing) Then
                             If True Then
                                 '
                                 ' Register and unregister files in the Addon folder
@@ -296,7 +272,7 @@ Namespace Contensive.Core
                                     If ErrorMessage = "" Then
                                         ErrorMessage = "No detailed error message was returned from UpgradeAllLocalCollectionsFromLib2 although it returned 'not ok' status."
                                     End If
-                                    Call AppendClassLog(cp.Core, "", "HouseKeep", "Updating local collections from Library returned an error, " & ErrorMessage)
+                                    Call AppendClassLog(cp.core, "", "HouseKeep", "Updating local collections from Library returned an error, " & ErrorMessage)
                                 End If
                                 '
                                 ' Verify core installation
@@ -357,7 +333,7 @@ Namespace Contensive.Core
                                         '
                                         ' Move Archived pages from their current parent to their archive parent
                                         '
-                                        Call AppendClassLog(cp.core, appName, "HouseKeep", "Archive update for pages on [" & cp.core.serverConfig.appConfig.name & "]")
+                                        Call AppendClassLog(cp.core, appConfig.name, "HouseKeep", "Archive update for pages on [" & cp.core.serverConfig.appConfig.name & "]")
                                         SQL = "select * from ccpagecontent where (( DateArchive is not null )and(DateArchive<" & SQLNow & "))and(active<>0)"
                                         CS = cp.core.db.cs_openCsSql_rev("default", SQL)
                                         Do While cp.core.db.cs_ok(CS)

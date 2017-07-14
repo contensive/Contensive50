@@ -91,54 +91,28 @@ ErrorTrap:
         '==========================================================================================
         '
         Private Sub ProcessEmailForApp()
-            '
-            On Error GoTo ErrorTrap
-            '
-            'dim buildversion As String
             Dim EmailServiceLastCheck As Date
             Dim IsNewHour As Boolean
             Dim IsNewDay As Boolean
-            Dim appName As String
-            Dim hint As String
-            Dim appStatus As Integer
+            Dim appConfig As Core.Models.Entity.serverConfigModel.appConfigModel = cpCore.serverConfig.appConfig
             '
-            'hint = "1"
-            appName = cpCore.serverConfig.appConfig.name
-            appStatus = cpCore.serverConfig.appConfig.appStatus
-            'hint = "3"
-            If (appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady) Or (appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusUpgrading) Then
-                Using cp As New CPClass(appName)
-                    If True Then
-                        'End If
-                        '20151109 - removed but unsure what in initApp can/must be moved to cp constructor
-                        'If cp.execute_initContext() Then
-                        '
-                        'hint = "4"
-                        cpCore.db.sqlCommandTimeout = 120
-                        EmailServiceLastCheck = (cpCore.siteProperties.getDate("EmailServiceLastCheck"))
-                        Call cpCore.siteProperties.setProperty("EmailServiceLastCheck", CStr(Now()))
-                        'buildversion = cpCore.app.GetSiteProperty("BuildVersion", 0, 0)
-                        IsNewHour = (Now - EmailServiceLastCheck).TotalHours > 1
-                        IsNewDay = EmailServiceLastCheck.Date <> Now().Date
-                        '
-                        ' Send Submitted Group Email (submitted, not sent, no conditions)
-                        '
-                        'hint = "5"
-                        Call ProcessEmail_GroupEmail(cpCore.siteProperties.dataBuildVersion)
-                        '
-                        ' Send Conditional Email - Offset days after Joining
-                        '
-                        'hint = "6"
-                        Call ProcessEmail_ConditionalEmail(cpCore.siteProperties.dataBuildVersion, IsNewHour, IsNewDay)
-                        '
-                    End If
+            If (appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.ready) And (appConfig.appMode = Models.Entity.serverConfigModel.appModeEnum.normal) Then
+                Using cp As New CPClass(appConfig.name)
+                    cpCore.db.sqlCommandTimeout = 120
+                    EmailServiceLastCheck = (cpCore.siteProperties.getDate("EmailServiceLastCheck"))
+                    Call cpCore.siteProperties.setProperty("EmailServiceLastCheck", CStr(Now()))
+                    IsNewHour = (Now - EmailServiceLastCheck).TotalHours > 1
+                    IsNewDay = EmailServiceLastCheck.Date <> Now().Date
+                    '
+                    ' Send Submitted Group Email (submitted, not sent, no conditions)
+                    '
+                    Call ProcessEmail_GroupEmail(cpCore.siteProperties.dataBuildVersion)
+                    '
+                    ' Send Conditional Email - Offset days after Joining
+                    '
+                    Call ProcessEmail_ConditionalEmail(cpCore.siteProperties.dataBuildVersion, IsNewHour, IsNewDay)
                 End Using
             End If
-            '
-            Exit Sub
-ErrorTrap:
-            throw (New ApplicationException("Unexpected exception")) 'cpCore.handleLegacyError3(appName, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmailForApp, hint=" & hint, Err.Number, Err.Source, Err.Description, True, True, "")
-            Err.Clear()
         End Sub
         '
         '==========================================================================================

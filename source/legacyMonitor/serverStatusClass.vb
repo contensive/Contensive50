@@ -241,52 +241,52 @@ Namespace Contensive.Core
 
                                     'hint = "Checking status for application [" & AppName & "]"
                                     Select Case cpApp.core.serverConfig.appConfig.appStatus
-                                        Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusConnectionObjectFailure
+                                        Case Models.Entity.serverConfigModel.appStatusEnum.errorConnectionObjectFailure
                                             ReDim Preserve errors(ErrorCount)
                                             errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Connection Object failure")
                                             Content = Content & StatusLine(2, errors(ErrorCount))
                                             ErrorCount = ErrorCount + 1
-                                        Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusConnectionStringFailure
+                                        Case Models.Entity.serverConfigModel.appStatusEnum.errorConnectionStringFailure
                                             ReDim Preserve errors(ErrorCount)
                                             errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Connection String Failure")
                                             Content = Content & StatusLine(2, errors(ErrorCount))
                                             ErrorCount = ErrorCount + 1
-                                        Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusDataSourceFailure
+                                        Case Models.Entity.serverConfigModel.appStatusEnum.errorDataSourceFailure
                                             ReDim Preserve errors(ErrorCount)
                                             errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Data Source Failure")
                                             Content = Content & StatusLine(2, errors(ErrorCount))
                                             ErrorCount = ErrorCount + 1
-                                        Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusDbBad
+                                        Case Models.Entity.serverConfigModel.appStatusEnum.errorDbBad
                                             ReDim Preserve errors(ErrorCount)
                                             errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Bad Database")
                                             Content = Content & StatusLine(2, errors(ErrorCount))
                                             ErrorCount = ErrorCount + 1
-                                        Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusDbNotFound
+                                        Case Models.Entity.serverConfigModel.appStatusEnum.errorDbNotFound
                                             ReDim Preserve errors(ErrorCount)
                                             errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Database Failure")
                                             Content = Content & StatusLine(2, errors(ErrorCount))
                                             ErrorCount = ErrorCount + 1
-                                        Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusKernelFailure
+                                        Case Models.Entity.serverConfigModel.appStatusEnum.errorKernelFailure
                                             ReDim Preserve errors(ErrorCount)
                                             errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Kernel Failure")
                                             Content = Content & StatusLine(2, errors(ErrorCount))
                                             ErrorCount = ErrorCount + 1
-                                        Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusLicenseFailure
+                                        Case Models.Entity.serverConfigModel.appStatusEnum.errorLicenseFailure
                                             ReDim Preserve errors(ErrorCount)
                                             errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned License Failure")
                                             Content = Content & StatusLine(2, errors(ErrorCount))
                                             ErrorCount = ErrorCount + 1
-                                        Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusNoHostService
+                                        Case Models.Entity.serverConfigModel.appStatusEnum.errorNoHostService
                                             ReDim Preserve errors(ErrorCount)
                                             errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned ccServer Service is not running")
                                             Content = Content & StatusLine(2, errors(ErrorCount))
                                             ErrorCount = ErrorCount + 1
-                                        Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusNotFound
+                                        Case Models.Entity.serverConfigModel.appStatusEnum.notFound
                                             ReDim Preserve errors(ErrorCount)
                                             errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned application not found")
                                             Content = Content & StatusLine(2, errors(ErrorCount))
                                             ErrorCount = ErrorCount + 1
-                                        Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusNotEnabled
+                                        Case Models.Entity.serverConfigModel.appStatusEnum.notEnabled
                                             ReDim Preserve errors(ErrorCount)
                                             errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned application not running")
                                             Content = Content & StatusLine(2, errors(ErrorCount))
@@ -296,12 +296,7 @@ Namespace Contensive.Core
                                                 '    errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned application starting")
                                                 '    Content = Content & StatusLine(2, errors(ErrorCount))
                                                 '    ErrorCount = ErrorCount + 1
-                                        Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusUpgrading
-                                            ReDim Preserve errors(ErrorCount)
-                                            errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned application upgrading")
-                                            Content = Content & StatusLine(2, errors(ErrorCount))
-                                            ErrorCount = ErrorCount + 1
-                                        Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady
+                                        Case Models.Entity.serverConfigModel.appStatusEnum.ready
                                             If True Then
                                                 '
                                                 ' access content server for this application

@@ -610,6 +610,9 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="aoBase5.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Models\dataModelFields.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

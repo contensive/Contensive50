@@ -171,17 +171,11 @@ Namespace Contensive.Core.Controllers
                     ' query tasks that need to be run
                     '
                     Using cpSite As New CPClass(AppName)
-                        If cpSite.core.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady Then
-                            'hint &= ",app [" & AppName & "] is running, setup cp and cmc"
-                            '
-                            ' Execute Processes
-                            '
+                        If (cpSite.core.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.ready) And (cpSite.core.serverConfig.appConfig.appMode = Models.Entity.serverConfigModel.appModeEnum.normal) Then
                             Try
-                                'hint &= ",go through process addons that need to be run"
                                 Do
                                     '
                                     ' for now run an sql to get processes, eventually cache in variant cache
-                                    '
                                     recordsRemaining = False
                                     sql = "" _
                                     & vbCrLf & " BEGIN TRANSACTION" _

@@ -186,7 +186,7 @@ Namespace Contensive.Core.Controllers
                     appendLog(cpClusterCore, "taskScheduler.scheduleTasks, app=[" & AppName & "]")
                     '
                     Using cpSite As New CPClass(AppName)
-                        If cpSite.core.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady Then
+                        If (cpSite.core.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.appStatusEnum.ready) And (cpSite.core.serverConfig.appConfig.appMode = Models.Entity.serverConfigModel.appModeEnum.normal) Then
                             '
                             ' Execute Processes
                             '
