@@ -190,7 +190,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnStatus
         End Function
@@ -211,7 +211,7 @@ Namespace Contensive.Core.Controllers
             '
             Exit Function
 ErrorTrap:
-            cpCore.handleExceptionAndContinue(New Exception("Unexpected exception"))
+            cpCore.handleException(New Exception("Unexpected exception"))
         End Function
         '  
         '========================================================================
@@ -287,7 +287,7 @@ ErrorTrap:
                 End If
                 Call cpcore.db.cs_Close(CS)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnStatus
         End Function
@@ -567,7 +567,7 @@ ErrorTrap:
             Try
                 returnStatus = send(genericController.encodeText(ToAddress), genericController.encodeText(FromAddress), genericController.encodeText(SubjectMessage), genericController.encodeText(BodyMessage), "", "", "", Immediate, genericController.EncodeBoolean(HTML), genericController.EncodeInteger(optionalEmailIdForLog))
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnStatus
         End Function
@@ -742,7 +742,7 @@ ErrorTrap:
                 End If
                 Call cpcore.db.cs_Close(CS)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -1119,7 +1119,7 @@ ErrorTrap:
                     '    main_ClosePageHTML = main_ClosePageHTML & main_GetPopupMessage(app.publicFiles.ReadFile("ccLib\Popup\PasswordSent.htm"), 300, 300, "no")
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnREsult
         End Function

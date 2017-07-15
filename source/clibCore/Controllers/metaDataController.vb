@@ -21,7 +21,7 @@ Namespace Contensive.Core.Controllers
         ' objects to destruct during dispose
         '------------------------------------------------------------------------------------------------------------------------
         '
-        Private cdefList As Dictionary(Of String, cdefModel)
+        Private cdefDict As Dictionary(Of String, cdefModel)
         Private tableSchemaList As Dictionary(Of String, tableSchemaModel)
         '
         Private ReadOnly Property contentNameIdDictionary As Dictionary(Of String, Integer)
@@ -66,7 +66,7 @@ Namespace Contensive.Core.Controllers
             '
             ' reset metaData
             '
-            cdefList = New Dictionary(Of String, cdefModel)
+            cdefDict = New Dictionary(Of String, cdefModel)
             'contentNameIdDictionary = Nothing
             tableSchemaList = Nothing
         End Sub
@@ -84,7 +84,7 @@ Namespace Contensive.Core.Controllers
                     returnId = contentNameIdDictionary(contentName.ToLower)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnId
         End Function
@@ -98,53 +98,37 @@ Namespace Contensive.Core.Controllers
         Public Function getCdef(contentName As String) As cdefModel
             Dim returnCdef As cdefModel = Nothing
             Try
-                Dim ContentId As Integer
-                ContentId = getContentId(contentName)
-                If (ContentId <= 0) Then
-                    Throw New ApplicationException("No metadata was found for content name [" & contentName & "]")
-                Else
+                Dim ContentId As Integer = getContentId(contentName)
+                If (ContentId > 0) Then
                     returnCdef = getCdef(ContentId)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnCdef
         End Function
         '        
         '====================================================================================================
         ''' <summary>
-        ''' return a cdef class from content id
+        ''' return a cdef class from content id. Returns nothing if contentId is not valid
         ''' </summary>
         ''' <param name="contentId"></param>
         ''' <returns></returns>
         Public Function getCdef(contentId As Integer, Optional forceDbLoad As Boolean = False, Optional loadInvalidFields As Boolean = False) As cdefModel
             Dim returnCdef As cdefModel = Nothing
             Try
-                Dim sql As String
-                Dim dt As DataTable
-                Dim contentName As String
-                Dim contentTablename As String
-                Dim field As CDefFieldModel
-                Dim row As DataRow
-                Dim fieldId As Integer
-                Dim fieldTypeId As Integer
-                Dim fieldHtmlContent As Boolean
-                Dim fieldName As String
-                Dim parentCdef As cdefModel
-                Dim contentIdKey As String = contentId.ToString
-                '
                 If (contentId <= 0) Then
                     '
                     ' -- invalid id                    
-                ElseIf (Not forceDbLoad) And (cdefList.ContainsKey(contentIdKey)) Then
+                ElseIf (Not forceDbLoad) And (cdefDict.ContainsKey(contentId.ToString)) Then
                     '
                     ' -- already loaded and no force re-load, just return the current cdef                    
-                    returnCdef = cdefList.Item(contentIdKey)
+                    returnCdef = cdefDict.Item(contentId.ToString)
                 Else
-                    If (cdefList.ContainsKey(contentIdKey)) Then
+                    If (cdefDict.ContainsKey(contentId.ToString)) Then
                         '
                         ' -- key is already there, remove it first                        
-                        cdefList.Remove(contentIdKey)
+                        cdefDict.Remove(contentId.ToString)
                     End If
                     '
                     ' load cache version
@@ -155,13 +139,14 @@ Namespace Contensive.Core.Controllers
                         Try
                             returnCdef = cpCore.cache.getObject(Of cdefModel)(cacheName)
                         Catch ex As Exception
-                            cpCore.handleExceptionAndContinue(ex)
+                            cpCore.handleException(ex)
                         End Try
                     End If
                     If returnCdef Is Nothing Then
                         '
                         ' load Db version
                         '
+                        Dim sql As String
                         sql = "SELECT " _
                                 & "c.ID" _
                                 & ", c.Name" _
@@ -194,6 +179,7 @@ Namespace Contensive.Core.Controllers
                                 & " left join ccGroups ON c.EditorGroupID = ccGroups.ID" _
                                 & " where (c.Active<>0)" _
                                 & " and(c.id=" & contentId.ToString & ")"
+                        Dim dt As DataTable
                         dt = cpCore.db.executeSql(sql)
                         If dt.Rows.Count = 0 Then
                             '
@@ -210,10 +196,10 @@ Namespace Contensive.Core.Controllers
                                 '
                                 ' ----- save values in definition
                                 '
-                                row = dt.Rows(0)
+                                Dim contentName As String
+                                Dim row As DataRow = dt.Rows(0)
                                 contentName = Trim(genericController.encodeText(row.Item(1)))
-                                'contentId = genericController.EncodeInteger(row.Item(0))
-                                contentTablename = genericController.encodeText(row.Item(10))
+                                Dim contentTablename As String = genericController.encodeText(row.Item(10))
                                 .Name = contentName
                                 .Id = contentId
                                 .AllowAdd = genericController.EncodeBoolean(row.Item(3))
@@ -247,7 +233,7 @@ Namespace Contensive.Core.Controllers
                                 If .parentID = 0 Then
                                     .parentID = -1
                                 Else
-                                    parentCdef = getCdef(.parentID, forceDbLoad)
+                                    Dim parentCdef As cdefModel = getCdef(.parentID, forceDbLoad)
                                     For Each keyvaluepair In parentCdef.fields
                                         Dim parentField As CDefFieldModel = keyvaluepair.Value
                                         Dim childField As New CDefFieldModel
@@ -347,10 +333,10 @@ Namespace Contensive.Core.Controllers
                                 Else
                                     Dim usedFields As New List(Of String)
                                     For Each row In dt.Rows
-                                        Dim skipDuplicateField As Boolean = False
-                                        fieldName = genericController.encodeText(row.Item(13))
-                                        fieldId = genericController.EncodeInteger(row.Item(12))
+                                        Dim fieldName As String = genericController.encodeText(row.Item(13))
+                                        Dim fieldId As Integer = genericController.EncodeInteger(row.Item(12))
                                         Dim fieldNameLower As String = fieldName.ToLower()
+                                        Dim skipDuplicateField As Boolean = False
                                         If usedFields.Contains(fieldNameLower) Then
                                             '
                                             ' this is a dup field for this content (not accounting for possibleinherited field) - keep the one with the lowest id
@@ -377,20 +363,18 @@ Namespace Contensive.Core.Controllers
                                                 '
                                                 .fields.Remove(fieldNameLower)
                                             End If
-                                            field = New CDefFieldModel
+                                            Dim field As CDefFieldModel = New CDefFieldModel
                                             With field
-                                                Dim fieldIndexColumn As Integer
-                                                fieldTypeId = genericController.EncodeInteger(row.Item(15))
-                                                If (genericController.encodeText(row.Item(4)) = "") Then
-                                                    fieldIndexColumn = -1
-                                                Else
+                                                Dim fieldIndexColumn As Integer = -1
+                                                Dim fieldTypeId As Integer = genericController.EncodeInteger(row.Item(15))
+                                                If (genericController.encodeText(row.Item(4)) <> "") Then
                                                     fieldIndexColumn = genericController.EncodeInteger(row.Item(4))
                                                 End If
                                                 '
                                                 ' translate htmlContent to fieldtypehtml
                                                 '   this is also converted in upgrade, daily housekeep, addon install
                                                 '
-                                                fieldHtmlContent = genericController.EncodeBoolean(row.Item(25))
+                                                Dim fieldHtmlContent As Boolean = genericController.EncodeBoolean(row.Item(25))
                                                 If fieldHtmlContent Then
                                                     If fieldTypeId = FieldTypeIdLongText Then
                                                         fieldTypeId = FieldTypeIdHTML
@@ -490,13 +474,9 @@ Namespace Contensive.Core.Controllers
                                             End With
                                             .fields.Add(fieldNameLower, field)
                                             'REFACTOR
-                                            If (contentName.ToLower() = "system email") And (field.nameLc = "sharedstylesid") Then
-                                                contentName = contentName
-                                            End If
                                             If ((field.fieldTypeId <> FieldTypeIdManyToMany) And (field.fieldTypeId <> FieldTypeIdRedirect) And (Not .selectList.Contains(fieldNameLower))) Then
                                                 '
                                                 ' add only fields that can be selected
-                                                '
                                                 .selectList.Add(fieldNameLower)
                                             End If
                                         End If
@@ -507,7 +487,7 @@ Namespace Contensive.Core.Controllers
                                 ' ----- Apply WorkflowAuthoring Rule that any definition must match its parent
                                 '
                                 If .parentID > 0 Then
-                                    parentCdef = getCdef(.parentID)
+                                    Dim parentCdef As cdefModel = getCdef(.parentID)
                                     If Not (parentCdef Is Nothing) Then
                                         .AllowWorkflowAuthoring = parentCdef.AllowWorkflowAuthoring
                                     End If
@@ -523,13 +503,13 @@ Namespace Contensive.Core.Controllers
                         Try
                             Call cpCore.cache.setObject(cacheName, returnCdef, dependantCacheNameList)
                         Catch ex As Exception
-                            cpCore.handleExceptionAndContinue(ex)
+                            cpCore.handleException(ex)
                         End Try
                     End If
-                    cdefList.Add(contentIdKey, returnCdef)
+                    cdefDict.Add(contentId.ToString, returnCdef)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnCdef
         End Function
@@ -571,7 +551,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnCriteria
         End Function
@@ -604,7 +584,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnOK
         End Function
@@ -683,7 +663,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End With
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         ''
@@ -1011,7 +991,7 @@ ErrorTrap:
                 '    main_GetContentManagementList = Mid(main_GetContentManagementList, 2)
                 'End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnList
         End Function
@@ -1022,8 +1002,8 @@ ErrorTrap:
         ''' </summary>
         Public Sub clear()
             Try
-                If (Not cdefList Is Nothing) Then
-                    cdefList.Clear()
+                If (Not cdefDict Is Nothing) Then
+                    cdefDict.Clear()
                 End If
                 If (Not tableSchemaList Is Nothing) Then
                     tableSchemaList.Clear()
@@ -1031,7 +1011,7 @@ ErrorTrap:
                 _contentNameIdDictionary = Nothing
                 _contentIdDict = Nothing
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -1107,7 +1087,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return tableSchema
         End Function
@@ -1127,7 +1107,7 @@ ErrorTrap:
                 Models.Entity.contentModel.delete(cpCore, cpCore.metaData.getContentId(ContentName))
                 clear()
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -1142,7 +1122,7 @@ ErrorTrap:
                 cpCore.cache.invalidateObject("content")
                 clear()
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -1342,7 +1322,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnCopy
         End Function
@@ -1393,7 +1373,7 @@ ErrorTrap:
                 '
                 returnCopy = "_a" & returnCopy & CStr(crc Mod 9)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnCopy
         End Function
@@ -1412,7 +1392,7 @@ ErrorTrap:
                     returnTableName = CDef.ContentTableName
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnTableName
         End Function
@@ -1432,7 +1412,7 @@ ErrorTrap:
                     returnDataSource = CDef.ContentDataSourceName
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnDataSource
         End Function
@@ -1452,7 +1432,7 @@ ErrorTrap:
                     returnName = cdef.Name
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnName
         End Function
@@ -1586,7 +1566,7 @@ ErrorTrap:
                                 sqlList.add("name", cpCore.db.encodeSQLText(TableName))
                                 sqlList.add("active", SQLTrue)
                                 sqlList.add("DATASOURCEID", cpCore.db.encodeSQLNumber(datasource.ID))
-                                sqlList.add("CONTENTCONTROLID", cpCore.db.encodeSQLNumber(cpCore.db.getContentId("Tables")))
+                                sqlList.add("CONTENTCONTROLID", cpCore.db.encodeSQLNumber(cpCore.metaData.getContentId("Tables")))
                                 '
                                 Call cpCore.db.updateTableRecord("Default", "ccTables", "ID=" & TableID, sqlList)
                             Else
@@ -1886,7 +1866,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnContentId
         End Function
@@ -2032,28 +2012,28 @@ ErrorTrap:
                     ManyToManyRuleSecondaryField = field.ManyToManyRuleSecondaryField
                     '
                     If RedirectContentName <> "" Then
-                        RedirectContentID = cpCore.db.getContentId(RedirectContentName)
+                        RedirectContentID = cpCore.metaData.getContentId(RedirectContentName)
                         If RedirectContentID <= 0 Then
                             Throw (New Exception("Could Not create redirect For field [" & field.nameLc & "] For Content Definition [" & ContentName & "] because no Content Definition was found For RedirectContentName [" & RedirectContentName & "]."))
                         End If
                     End If
                     '
                     If LookupContentName <> "" Then
-                        LookupContentID = cpCore.db.getContentId(LookupContentName)
+                        LookupContentID = cpCore.metaData.getContentId(LookupContentName)
                         If LookupContentID <= 0 Then
                             Throw (New Exception("Could Not create lookup For field [" & field.nameLc & "] For Content Definition [" & ContentName & "] because no Content Definition was found For [" & LookupContentName & "]."))
                         End If
                     End If
                     '
                     If ManyToManyContent <> "" Then
-                        ManyToManyContentID = cpCore.db.getContentId(ManyToManyContent)
+                        ManyToManyContentID = cpCore.metaData.getContentId(ManyToManyContent)
                         If ManyToManyContentID <= 0 Then
                             Throw (New ApplicationException("Could Not create many To many For field [" & field.nameLc & "] For Content Definition [" & ContentName & "] because no Content Definition was found For ManyToManyContent [" & ManyToManyContent & "]."))
                         End If
                     End If
                     '
                     If ManyToManyRuleContent <> "" Then
-                        ManyToManyRuleContentID = cpCore.db.getContentId(ManyToManyRuleContent)
+                        ManyToManyRuleContentID = cpCore.metaData.getContentId(ManyToManyRuleContent)
                         If ManyToManyRuleContentID <= 0 Then
                             Throw (New ApplicationException("Could Not create many To many For field [" & field.nameLc & "] For Content Definition [" & ContentName & "] because no Content Definition was found For ManyToManyRuleContent [" & ManyToManyRuleContent & "]."))
                         End If
@@ -2155,7 +2135,7 @@ ErrorTrap:
                             Call sqlList.add("EDITSORTPRIORITY", cpCore.db.encodeSQLNumber(field.editSortPriority)) ' Pointer)
                             Call sqlList.add("ADMINONLY", cpCore.db.encodeSQLBoolean(field.adminOnly)) ' Pointer)
                             Call sqlList.add("DEVELOPERONLY", cpCore.db.encodeSQLBoolean(FieldDeveloperOnly)) ' Pointer)
-                            Call sqlList.add("CONTENTCONTROLID", cpCore.db.encodeSQLNumber(cpCore.db.getContentId("Content Fields"))) ' Pointer)
+                            Call sqlList.add("CONTENTCONTROLID", cpCore.db.encodeSQLNumber(cpCore.metaData.getContentId("Content Fields"))) ' Pointer)
                             Call sqlList.add("DefaultValue", cpCore.db.encodeSQLText(DefaultValue)) ' Pointer)
                             Call sqlList.add("HTMLCONTENT", cpCore.db.encodeSQLBoolean(HTMLContent)) ' Pointer)
                             Call sqlList.add("NOTEDITABLE", cpCore.db.encodeSQLBoolean(NotEditable)) ' Pointer)
@@ -2208,7 +2188,7 @@ ErrorTrap:
                 '
                 returnId = RecordID
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnId
         End Function
@@ -2227,7 +2207,7 @@ ErrorTrap:
                     returnOk = cdef.fields.ContainsKey(FieldName.ToLower)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnOk
         End Function

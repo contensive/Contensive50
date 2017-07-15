@@ -117,7 +117,7 @@ Namespace Contensive.Core
                 Copy = genericController.vbReplace(Copy, vbCr, "\n")
                 Copy = genericController.vbReplace(Copy, vbLf, "\n")
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -143,7 +143,7 @@ Namespace Contensive.Core
                 Copy = genericController.vbReplace(Copy, vbCr, "\n")
                 Copy = genericController.vbReplace(Copy, vbLf, "\n")
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -169,7 +169,7 @@ Namespace Contensive.Core
                 Copy = genericController.vbReplace(Copy, vbCr, "\n")
                 Copy = genericController.vbReplace(Copy, vbLf, "\n")
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -191,7 +191,7 @@ Namespace Contensive.Core
                     End If
                 Next
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -364,11 +364,11 @@ Namespace Contensive.Core
                 Try
                     Dim inputStream As IO.Stream = iisContext.Request.InputStream
                 Catch ex As httpException
-                    Call cpCore.handleExceptionAndContinue(ex) : Throw
+                    Call cpCore.handleException(ex) : Throw
                     errorController.error_AddUserError(cpCore, ex.Message)
                     postError = True
                 Catch ex As Exception
-                    Call cpCore.handleExceptionAndContinue(ex) : Throw
+                    Call cpCore.handleException(ex) : Throw
                     errorController.error_AddUserError(cpCore, ex.Message)
                     postError = True
                 End Try
@@ -436,7 +436,7 @@ Namespace Contensive.Core
                                 'https://github.com/Vodurden/Http-Multipart-Data-Parser
                             End If
                         Catch ex As Exception
-                            cpCore.handleExceptionAndContinue(ex, "Exception processing multipart form input")
+                            cpCore.handleException(ex, "Exception processing multipart form input")
                         End Try
                     End If
                 End If
@@ -945,7 +945,7 @@ Namespace Contensive.Core
                 '
                 '
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return cpCore.continueProcessing
         End Function
@@ -974,7 +974,7 @@ Namespace Contensive.Core
                 '    Next
                 'End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return cookieValue
         End Function
@@ -1164,7 +1164,7 @@ Namespace Contensive.Core
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -1298,7 +1298,7 @@ ErrorTrap:
                     cpCore.continueProcessing = False
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
             End Try
         End Sub
         '

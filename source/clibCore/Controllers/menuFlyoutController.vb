@@ -109,7 +109,7 @@ Namespace Contensive.Core.Controllers
                         returnHtml = getMenuType(menuName, True, 0, encodeEmptyText(StyleSheetPrefix, ""))
                 End Select
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnHtml
         End Function
@@ -416,7 +416,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
             End Try
             Return result
         End Function

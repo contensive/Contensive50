@@ -882,7 +882,7 @@ ErrorTrap:
                 End If
                 Call cpCore.db.cs_Close(CSPeople)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
     End Class

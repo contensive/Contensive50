@@ -25,88 +25,88 @@ Namespace Contensive.Core
             MyBase.New()
             Me.cpCore = cpCore
         End Sub
-        '
-        '====================================================================================================
-        '
-        Private Function GetNonRootNavigatorID(ByVal EntryName As String, ByVal ParentID As Integer, ByVal addonId As Integer, ByVal ContentID As Integer, ByVal NavIconType As Integer, ByVal NavIconTitle As String, ByVal DeveloperOnly As Boolean, ByVal ignore As Integer, ByVal LinkPage As String, ByVal HelpCollectionID As Integer, ByVal HelpAddonID As Integer, ByVal InstalledByCollectionID As Integer, ByVal AdminOnly As Boolean) As Integer
-            Dim result As Integer = 0
-            Try
-                If ParentID <= 0 Then
-                    '
-                    ' Block entries to the root node - this is to block entries made for system collections I may have missed
-                    '
-                    Throw (New Exception("Adding root navigator entry [" & EntryName & "] by collection [" & cpCore.db.getRecordName("content", InstalledByCollectionID) & "]. This Is Not allowed."))
-                Else
-                    result = GetNavigatorID(EntryName, ParentID, addonId, ContentID, NavIconType, NavIconTitle, DeveloperOnly, ignore, LinkPage, HelpCollectionID, HelpAddonID, InstalledByCollectionID, AdminOnly)
-                End If
-            Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
-            End Try
-            Return result
-        End Function
-        '
-        '====================================================================================================
-        '
-        Private Function GetNavigatorID(ByVal EntryName As String, ByVal ParentID As Integer, ByVal addonId As Integer, ByVal ContentID As Integer, ByVal NavIconType As Integer, ByVal NavIconTitle As String, ByVal DeveloperOnly As Boolean, ByVal ignore As Integer, ByVal LinkPage As String, ByVal HelpCollectionID As Integer, ByVal HelpAddonID As Integer, ByVal InstalledByCollectionID As Integer, ByVal AdminOnly As Boolean) As Integer
-            Dim result As Integer = 0
-            Try
-                Dim CS As Integer
-                Dim Criteria As String
-                ''dim buildversion As String
-                '
-                'BuildVersion = cpCore.app.DataBuildVersion_DontUseThis
-                Criteria = "(Name = " & cpCore.db.encodeSQLText(EntryName) & ")"
-                If ParentID = 0 Then
-                    Criteria = Criteria & "And((parentid=0)Or(parentid Is null))"
-                Else
-                    Criteria = Criteria & "And(parentid=" & ParentID & ")"
-                End If
-                CS = cpCore.db.cs_open("Navigator Entries", Criteria, "ID")
-                If Not cpCore.db.cs_ok(CS) Then
-                    Call cpCore.db.cs_Close(CS)
-                    CS = cpCore.db.cs_insertRecord("Navigator Entries", SystemMemberID)
-                    If cpCore.db.cs_ok(CS) Then
-                        'Call cmc.cpCore.app.csv_SetCSRecordDefaults(CS)
-                        Call cpCore.db.cs_set(CS, "name", EntryName)
-                        Call cpCore.db.cs_set(CS, "parentid", ParentID)
-                        Call cpCore.db.cs_set(CS, "AddonID", addonId)
-                        Call cpCore.db.cs_set(CS, "ContentID", ContentID)
-                        Call cpCore.db.cs_set(CS, "NavIconType", NavIconType)
-                        Call cpCore.db.cs_set(CS, "AdminOnly", AdminOnly)
-                        Call cpCore.db.cs_set(CS, "DeveloperOnly", DeveloperOnly)
-                        Call cpCore.db.cs_set(CS, "LinkPage", LinkPage)
-                        If True Then
-                            Call cpCore.db.cs_set(CS, "HelpAddonID", HelpAddonID)
-                            Call cpCore.db.cs_set(CS, "HelpCollectionID", HelpCollectionID)
-                        End If
-                        If True Then
-                            Call cpCore.db.cs_set(CS, "InstalledByCollectionID", InstalledByCollectionID)
-                        End If
-                        '
-                        '
-                        ' set initial caps because some content definitions were not named with this in mind -- it looks bad
-                        '
-                        Call cpCore.db.cs_set(CS, "NavIconTitle", EncodeInitialCaps(NavIconTitle))
-                        '
-                        ' if there are more, these are a errors - move their child nodes to the first and delete them
-                        '
-                        Call cpCore.db.cs_goNext(CS)
-                        Do While cpCore.db.cs_ok(CS)
-                            Call cpCore.db.executeSql("update ccmenuentries set parentid=" & "0" & " where parentid=" & cpCore.db.cs_getInteger(CS, "ID"))
-                            Call cpCore.db.executeSql("delete from ccmenuentries where id=" & cpCore.db.cs_getInteger(CS, "ID"))
-                            Call cpCore.db.cs_goNext(CS)
-                        Loop
-                    End If
-                End If
-                If cpCore.db.cs_ok(CS) Then
-                    result = cpCore.db.cs_getInteger(CS, "ID")
-                End If
-                Call cpCore.db.cs_Close(CS)
-            Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
-            End Try
-            Return result
-        End Function
+        ''
+        ''====================================================================================================
+        ''
+        'Private Function GetNonRootNavigatorID(ByVal EntryName As String, ByVal ParentID As Integer, ByVal addonId As Integer, ByVal ContentID As Integer, ByVal NavIconType As Integer, ByVal NavIconTitle As String, ByVal DeveloperOnly As Boolean, ByVal ignore As Integer, ByVal LinkPage As String, ByVal HelpCollectionID As Integer, ByVal HelpAddonID As Integer, ByVal InstalledByCollectionID As Integer, ByVal AdminOnly As Boolean) As Integer
+        '    Dim result As Integer = 0
+        '    Try
+        '        If ParentID <= 0 Then
+        '            '
+        '            ' Block entries to the root node - this is to block entries made for system collections I may have missed
+        '            '
+        '            Throw (New Exception("Adding root navigator entry [" & EntryName & "] by collection [" & cpCore.db.getRecordName("content", InstalledByCollectionID) & "]. This Is Not allowed."))
+        '        Else
+        '            result = GetNavigatorID(EntryName, ParentID, addonId, ContentID, NavIconType, NavIconTitle, DeveloperOnly, ignore, LinkPage, HelpCollectionID, HelpAddonID, InstalledByCollectionID, AdminOnly)
+        '        End If
+        '    Catch ex As Exception
+        '        cpCore.handleException(ex) : Throw
+        '    End Try
+        '    Return result
+        'End Function
+        ''
+        ''====================================================================================================
+        ''
+        'Private Function GetNavigatorID(ByVal EntryName As String, ByVal ParentID As Integer, ByVal addonId As Integer, ByVal ContentID As Integer, ByVal NavIconType As Integer, ByVal NavIconTitle As String, ByVal DeveloperOnly As Boolean, ByVal ignore As Integer, ByVal LinkPage As String, ByVal HelpCollectionID As Integer, ByVal HelpAddonID As Integer, ByVal InstalledByCollectionID As Integer, ByVal AdminOnly As Boolean) As Integer
+        '    Dim result As Integer = 0
+        '    Try
+        '        Dim CS As Integer
+        '        Dim Criteria As String
+        '        ''dim buildversion As String
+        '        '
+        '        'BuildVersion = cpCore.app.DataBuildVersion_DontUseThis
+        '        Criteria = "(Name = " & cpCore.db.encodeSQLText(EntryName) & ")"
+        '        If ParentID = 0 Then
+        '            Criteria = Criteria & "And((parentid=0)Or(parentid Is null))"
+        '        Else
+        '            Criteria = Criteria & "And(parentid=" & ParentID & ")"
+        '        End If
+        '        CS = cpCore.db.cs_open(cnNavigatorEntries, Criteria, "ID")
+        '        If Not cpCore.db.cs_ok(CS) Then
+        '            Call cpCore.db.cs_Close(CS)
+        '            CS = cpCore.db.cs_insertRecord(cnNavigatorEntries, SystemMemberID)
+        '            If cpCore.db.cs_ok(CS) Then
+        '                'Call cmc.cpCore.app.csv_SetCSRecordDefaults(CS)
+        '                Call cpCore.db.cs_set(CS, "name", EntryName)
+        '                Call cpCore.db.cs_set(CS, "parentid", ParentID)
+        '                Call cpCore.db.cs_set(CS, "AddonID", addonId)
+        '                Call cpCore.db.cs_set(CS, "ContentID", ContentID)
+        '                Call cpCore.db.cs_set(CS, "NavIconType", NavIconType)
+        '                Call cpCore.db.cs_set(CS, "AdminOnly", AdminOnly)
+        '                Call cpCore.db.cs_set(CS, "DeveloperOnly", DeveloperOnly)
+        '                Call cpCore.db.cs_set(CS, "LinkPage", LinkPage)
+        '                If True Then
+        '                    Call cpCore.db.cs_set(CS, "HelpAddonID", HelpAddonID)
+        '                    Call cpCore.db.cs_set(CS, "HelpCollectionID", HelpCollectionID)
+        '                End If
+        '                If True Then
+        '                    Call cpCore.db.cs_set(CS, "InstalledByCollectionID", InstalledByCollectionID)
+        '                End If
+        '                '
+        '                '
+        '                ' set initial caps because some content definitions were not named with this in mind -- it looks bad
+        '                '
+        '                Call cpCore.db.cs_set(CS, "NavIconTitle", EncodeInitialCaps(NavIconTitle))
+        '                '
+        '                ' if there are more, these are a errors - move their child nodes to the first and delete them
+        '                '
+        '                Call cpCore.db.cs_goNext(CS)
+        '                Do While cpCore.db.cs_ok(CS)
+        '                    Call cpCore.db.executeSql("update ccmenuentries set parentid=" & "0" & " where parentid=" & cpCore.db.cs_getInteger(CS, "ID"))
+        '                    Call cpCore.db.executeSql("delete from ccmenuentries where id=" & cpCore.db.cs_getInteger(CS, "ID"))
+        '                    Call cpCore.db.cs_goNext(CS)
+        '                Loop
+        '            End If
+        '        End If
+        '        If cpCore.db.cs_ok(CS) Then
+        '            result = cpCore.db.cs_getInteger(CS, "ID")
+        '        End If
+        '        Call cpCore.db.cs_Close(CS)
+        '    Catch ex As Exception
+        '        cpCore.handleException(ex) : Throw
+        '    End Try
+        '    Return result
+        'End Function
         '
         '====================================================================================================
         '
@@ -224,7 +224,7 @@ Namespace Contensive.Core
                                                         Case "guid"
                                                             CollectionGuid = CDefInterfaces.InnerText
                                                         Case "lastchangedate"
-                                                            return_CollectionLastChangeDate =  genericController.EncodeDate(CDefInterfaces.InnerText)
+                                                            return_CollectionLastChangeDate = genericController.EncodeDate(CDefInterfaces.InnerText)
                                                         Case "version"
                                                             CollectionVersion = CDefInterfaces.InnerText
                                                         Case "collectionfilelink"
@@ -306,7 +306,7 @@ Namespace Contensive.Core
                 'End If
                 '
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return DownloadCollectionFiles
         End Function
@@ -373,7 +373,7 @@ Namespace Contensive.Core
                     UpgradeOK = installCollectionFromLocalRepo(CollectionGuid, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
                 Throw ex
             End Try
             Return UpgradeOK
@@ -682,7 +682,7 @@ Namespace Contensive.Core
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnOk
         End Function
@@ -718,7 +718,7 @@ Namespace Contensive.Core
                     Next
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return success
         End Function
@@ -1100,7 +1100,7 @@ Namespace Contensive.Core
                 BuildLocalCollectionRepoFromFile = (return_ErrorMessage = "")
                 return_CollectionGUID = CollectionGuid
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return result
         End Function
@@ -1284,10 +1284,12 @@ Namespace Contensive.Core
                                                         return_ErrorMessage = return_ErrorMessage & "<P>The collection was not installed because the collection name in the xml collection file is blank</P>"
                                                     Else
                                                         CollectionSystem = genericController.EncodeBoolean(GetXMLAttribute(CollectionSystem_fileValueOK, Doc.DocumentElement, "system", ""))
-                                                        Parent_NavID = GetManageAddonNavID()
-                                                        If CollectionSystem Then
-                                                            Parent_NavID = GetNonRootNavigatorID("System", Parent_NavID, 0, 0, NavIconTypeFolder, "System Collections", True, 0, "", 0, 0, 0, True)
-                                                        End If
+                                                        Parent_NavID = appBuilderController.verifyNavigatorEntry(cpCore, guidManageAddon, "", "Manage Add-ons", "", "", "", False, False, False, True, "", "", "", 0)
+                                                        'Parent_NavID = GetManageAddonNavID()
+                                                        'If CollectionSystem Then
+                                                        '    'Parent_NavID = appBuilderController.verifyNavigatorEntry(cpCore, ccguid, "")
+                                                        '    Parent_NavID = GetNonRootNavigatorID("System", Parent_NavID, 0, 0, NavIconTypeFolder, "System Collections", True, 0, "", 0, 0, 0, True)
+                                                        'End If
                                                         CollectionUpdatable = genericController.EncodeBoolean(GetXMLAttribute(CollectionUpdatable_fileValueOK, Doc.DocumentElement, "updatable", ""))
                                                         CollectionblockNavigatorNode = genericController.EncodeBoolean(GetXMLAttribute(CollectionblockNavigatorNode_fileValueOK, Doc.DocumentElement, "blockNavigatorNode", ""))
                                                         FileGuid = GetXMLAttribute(IsFound, Doc.DocumentElement, "guid", Collectionname)
@@ -1604,7 +1606,7 @@ Namespace Contensive.Core
                                                                     ' ----- remove any current navigator nodes installed by the collection previously
                                                                     '
                                                                     If (True) And (CollectionID <> 0) Then
-                                                                        Call cpCore.db.deleteContentRecords("navigator entries", "installedbycollectionid=" & CollectionID)
+                                                                        Call cpCore.db.deleteContentRecords(cnNavigatorEntries, "installedbycollectionid=" & CollectionID)
                                                                     End If
                                                                     '
                                                                     '-------------------------------------------------------------------------------
@@ -1678,7 +1680,7 @@ Namespace Contensive.Core
                                                                                             '
                                                                                             ' setup cdef rule
                                                                                             '
-                                                                                            ContentID = cpCore.db.getContentId(ContentName)
+                                                                                            ContentID = cpCore.metaData.getContentId(ContentName)
                                                                                             If ContentID > 0 Then
                                                                                                 CS = cpCore.db.cs_insertRecord("Add-on Collection CDef Rules", 0)
                                                                                                 If cpCore.db.cs_ok(CS) Then
@@ -2178,7 +2180,7 @@ Namespace Contensive.Core
                 '
                 ' Log error and exit with failure. This way any other upgrading will still continue
                 '
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return result
         End Function
@@ -2243,7 +2245,7 @@ Namespace Contensive.Core
                     Call cpCore.privateFiles.saveFile(collectionFilePathFilename, returnXml)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnXml
         End Function
@@ -2337,7 +2339,7 @@ Namespace Contensive.Core
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -2350,7 +2352,7 @@ Namespace Contensive.Core
                 Dim Collectionname As String = ""
                 Call GetCollectionConfig(CollectionGuid, result, LastChangeDate, Collectionname)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return result
         End Function
@@ -2437,7 +2439,7 @@ Namespace Contensive.Core
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -2466,7 +2468,7 @@ Namespace Contensive.Core
                     Next
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
                 returnSuccess = False
                 If (String.IsNullOrEmpty(return_ErrorMessage)) Then
                     return_ErrorMessage = "There was an unexpected error installing the collection, details [" & ex.Message & "]"
@@ -2503,7 +2505,7 @@ Namespace Contensive.Core
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
                 returnSuccess = False
                 If (String.IsNullOrEmpty(return_ErrorMessage)) Then
                     return_ErrorMessage = "There was an unexpected error installing the collection, details [" & ex.Message & "]"
@@ -2519,13 +2521,13 @@ Namespace Contensive.Core
             Try
                 Dim CS As Integer
                 '
-                CS = cpCore.db.cs_open("Navigator Entries", "ccguid=" & cpCore.db.encodeSQLText(ccGuid), "ID", , , , , "ID")
+                CS = cpCore.db.cs_open(cnNavigatorEntries, "ccguid=" & cpCore.db.encodeSQLText(ccGuid), "ID", , , , , "ID")
                 If cpCore.db.cs_ok(CS) Then
                     navId = cpCore.db.cs_getInteger(CS, "id")
                 End If
                 Call cpCore.db.cs_Close(CS)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return navId
         End Function
@@ -2583,7 +2585,7 @@ Namespace Contensive.Core
                     Next
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -2630,23 +2632,23 @@ Namespace Contensive.Core
                     Next
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return result
         End Function
-        '
-        '
-        '
-        Private Function GetManageAddonNavID() As Integer
-            Dim result As Integer = 0
-            Try
-                result = GetNavigatorID("Manage Add-ons", 0, 0, 0, NavIconTypeAddon, "Manage Add-ons", False, 0, "", 0, 0, 0, False)
-                'result = ManagerAddonNavID_Local
-            Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
-            End Try
-            Return result
-        End Function
+        ''
+        ''
+        ''
+        'Private Function GetManageAddonNavID() As Integer
+        '    Dim result As Integer = 0
+        '    Try
+        '        result = GetNavigatorID("Manage Add-ons", 0, 0, 0, NavIconTypeAddon, "Manage Add-ons", False, 0, "", 0, 0, 0, False)
+        '        'result = ManagerAddonNavID_Local
+        '    Catch ex As Exception
+        '        cpCore.handleException(ex) : Throw
+        '    End Try
+        '    Return result
+        'End Function
         '
         '
         '
@@ -2934,7 +2936,7 @@ Namespace Contensive.Core
                                                 NavIconTypeString = "Addon"
                                             End If
                                             'Dim builder As New coreBuilderClass(cpCore)
-                                            Call csv_VerifyNavigatorEntry4("", menuNameSpace, addonName, "", "", "", False, False, False, True, "Navigator Entries", addonName, NavIconTypeString, addonName, CollectionID)
+                                            Call appBuilderController.verifyNavigatorEntry(cpCore, "", menuNameSpace, addonName, "", "", "", False, False, False, True, addonName, NavIconTypeString, addonName, CollectionID)
                                         End If
                                     Case "argument", "argumentlist"
                                         '
@@ -3225,7 +3227,7 @@ Namespace Contensive.Core
                     'Call cpCore.db.cs_Close(CS)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -3348,7 +3350,7 @@ Namespace Contensive.Core
                     Call cpCore.db.cs_Close(CS)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return result
             '
@@ -3867,7 +3869,7 @@ Namespace Contensive.Core
                 Console.WriteLine(Method & ", " & LogMessage)
                 logController.appendLogWithLegacyRow(cpCore, cpCore.serverConfig.appConfig.name, LogMessage, "dll", "AddonInstallClass", Method, 0, "", "", False, True, "", "Build", "")
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
             End Try
         End Sub
         '
@@ -3931,7 +3933,7 @@ Namespace Contensive.Core
                 'cpCore.metaData.clear()
                 'End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -3951,7 +3953,7 @@ Namespace Contensive.Core
                 Call installCollection_AddMiniCollectionSrcToDst(miniCollectionWorking, miniCollectionToAdd, True)
                 Call installCollection_BuildDbFromMiniCollection(miniCollectionWorking, cpCore.siteProperties.dataBuildVersion, isNewBuild)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '        '
@@ -4519,7 +4521,7 @@ Namespace Contensive.Core
                     End With
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -4777,18 +4779,14 @@ Namespace Contensive.Core
                                 .Name = .Name
                             End If
                             If .dataChanged Then
-                                If .IsNavigator Then
-                                    ContentName = "Navigator Entries"
-                                    If (.Name = "Advanced") And (.menuNameSpace = "Settings") Then
-                                        .Name = .Name
-                                    End If
-                                    Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "creating navigator entry [" & .Name & "], namespace [" & .menuNameSpace & "], guid [" & .Guid & "]")
-                                    Call csv_VerifyNavigatorEntry4(.Guid, .menuNameSpace, .Name, .ContentName, .LinkPage, .SortOrder, .AdminOnly, .DeveloperOnly, .NewWindow, .Active, ContentName, .AddonName, .NavIconType, .NavIconTitle, 0)
-                                Else
-                                    ContentName = "Menu Entries"
-                                    Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "creating menu entry [" & .Name & "], parentname [" & .ParentName & "]")
-                                    Call Controllers.appBuilderController.admin_VerifyMenuEntry(cpCore, .ParentName, .Name, .ContentName, .LinkPage, .SortOrder, .AdminOnly, .DeveloperOnly, .NewWindow, .Active, ContentName, .AddonName)
-                                End If
+                                Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "creating navigator entry [" & .Name & "], namespace [" & .menuNameSpace & "], guid [" & .Guid & "]")
+                                Call appBuilderController.verifyNavigatorEntry(cpCore, .Guid, .menuNameSpace, .Name, .ContentName, .LinkPage, .SortOrder, .AdminOnly, .DeveloperOnly, .NewWindow, .Active, .AddonName, .NavIconType, .NavIconTitle, 0)
+                                'If .IsNavigator Then
+                                'Else
+                                '    ContentName = cnNavigatorEntries
+                                '    Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "creating menu entry [" & .Name & "], parentname [" & .ParentName & "]")
+                                '    Call Controllers.appBuilderController.admin_VerifyMenuEntry(cpCore, .ParentName, .Name, .ContentName, .LinkPage, .SortOrder, .AdminOnly, .DeveloperOnly, .NewWindow, .Active, ContentName, .AddonName)
+                                'End If
                             End If
                         End With
                     Next
@@ -4973,7 +4971,7 @@ Namespace Contensive.Core
                 '
                 Call cpCore.siteProperties.setProperty("AllowContentAutoLoad", CStr(AllowContentAutoLoad))
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -5007,7 +5005,7 @@ Namespace Contensive.Core
                         ContentID = 0
                         ContentName = .Name
                         ContentIsBaseContent = False
-                        FieldHelpCID = cpCore.db.getContentId("Content Field Help")
+                        FieldHelpCID = cpCore.metaData.getContentId("Content Field Help")
                         Dim datasource As Contensive.Core.Models.Entity.dataSourceModel = Models.Entity.dataSourceModel.createByName(cpCore, .ContentDataSourceName, New List(Of String))
                         '
                         ' get contentid and protect content with IsBaseContent true
@@ -5033,7 +5031,7 @@ Namespace Contensive.Core
                                 '
                                 ' Can not update a base content with a non-base content
                                 '
-                                cpCore.handleExceptionAndContinue(New ApplicationException("Warning: An attempt was made to update Content Definition [" & .Name & "] from base to non-base. This should only happen when a base cdef is removed from the base collection. The update was ignored."))
+                                cpCore.handleException(New ApplicationException("Warning: An attempt was made to update Content Definition [" & .Name & "] from base to non-base. This should only happen when a base cdef is removed from the base collection. The update was ignored."))
                                 .IsBaseContent = ContentIsBaseContent
                                 'cpCore.handleLegacyError3(cpCore.serverconfig.appConfig.name, "", "dll", "builderClass", "UpgradeCDef_BuildDbFromCollection_AddCDefToDb", 0, "", "", False, True, "")
                             End If
@@ -5154,7 +5152,7 @@ Namespace Contensive.Core
                     End With
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -5204,7 +5202,7 @@ Namespace Contensive.Core
                 'Dim SrcFPtr As Integer
                 Dim okToUpdateDstFromSrc As Boolean
                 Dim srcCollectionCdef As cdefModel
-                Dim DebugName As String
+                'Dim DebugName As String
                 Dim DebugSrcFound As Boolean
                 Dim DebugDstFound As Boolean
                 Dim IsFound As Boolean
@@ -5251,9 +5249,7 @@ Namespace Contensive.Core
                 ' -------------------------------------------------------------------------------------------------
                 '
                 Call appendInstallLog(cpCore.serverConfig.appConfig.name, "UpgradeCDef_AddSrcToDst", "Application: " & cpCore.serverConfig.appConfig.name & ", UpgradeCDef_AddSrcToDst")
-                'Call AppendClassLogFile(cpcore.app.config.name,"UpgradeCDef_AddSrcToDst", "CollectionSrc.CDefCnt=" & CollectionSrc.CDefCnt)
-                ''
-                DebugName = "admin menuing"
+                '
                 For Each srcKeyValuePair In srcCollection.CDef
                     srcCollectionCdef = srcKeyValuePair.Value
 
@@ -5262,7 +5258,7 @@ Namespace Contensive.Core
                         SrcContentName = SrcContentName
                     End If
                     DebugSrcFound = False
-                    If genericController.vbInstr(1, SrcContentName, DebugName, vbTextCompare) <> 0 Then
+                    If genericController.vbInstr(1, SrcContentName, cnNavigatorEntries, vbTextCompare) <> 0 Then
                         DebugSrcFound = True
                     End If
                     '
@@ -6018,7 +6014,7 @@ Namespace Contensive.Core
                 '
                 '
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnOk
         End Function
@@ -6057,7 +6053,7 @@ Namespace Contensive.Core
                     Call installCollection_LoadXmlToMiniCollection(CollectionData, returnColl, False, False, isNewBuild, New miniCollectionModel)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnColl
         End Function
@@ -6092,7 +6088,7 @@ Namespace Contensive.Core
                     Found = True
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnAttr
         End Function
@@ -6160,7 +6156,7 @@ Namespace Contensive.Core
                     End If
                 End With
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnAttr
         End Function
@@ -6179,7 +6175,7 @@ Namespace Contensive.Core
                 Call sqlList.add("CreatedBy", "0")
                 Call sqlList.add("OrderByClause", cpCore.db.encodeSQLText(OrderByCriteria))
                 Call sqlList.add("active", SQLTrue)
-                Call sqlList.add("ContentControlID", cpCore.db.getContentId("Sort Methods").ToString())
+                Call sqlList.add("ContentControlID", cpCore.metaData.getContentId("Sort Methods").ToString())
                 '
                 dt = cpCore.db.openTable("Default", "ccSortMethods", "Name=" & cpCore.db.encodeSQLText(Name), "ID", "ID", 1)
                 If dt.Rows.Count > 0 Then
@@ -6194,7 +6190,7 @@ Namespace Contensive.Core
                     Call cpCore.db.insertTableRecord("Default", "ccSortMethods", sqlList)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -6213,7 +6209,7 @@ Namespace Contensive.Core
                 Call VerifySortMethod("By Date Reverse", "DateAdded Desc")
                 Call VerifySortMethod("By Alpha Sort Order Then Oldest First", "SortOrder,ID")
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -6270,7 +6266,7 @@ Namespace Contensive.Core
                 '
                 RowsNeeded = FieldTypeIdMax - RowsFound
                 If RowsNeeded > 0 Then
-                    CID = cpCore.db.getContentId("Content Field Types")
+                    CID = cpCore.metaData.getContentId("Content Field Types")
                     If CID <= 0 Then
                         '
                         ' Problem
@@ -6309,236 +6305,9 @@ Namespace Contensive.Core
                 Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='HTML' where ID=21;")
                 Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='HTML File' where ID=22;")
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
-        '
-        '=============================================================================
-        '   Verify an Admin Navigator Entry
-        '       Entries are unique by their ccGuid
-        '       Includes InstalledByCollectionID
-        '       returns the entry id
-        '=============================================================================
-        '
-        Public Function csv_VerifyNavigatorEntry4(ByVal ccGuid As String, ByVal menuNameSpace As String, ByVal EntryName As String, ByVal ContentName As String, ByVal LinkPage As String, ByVal SortOrder As String, ByVal AdminOnly As Boolean, ByVal DeveloperOnly As Boolean, ByVal NewWindow As Boolean, ByVal Active As Boolean, ByVal MenuContentName As String, ByVal AddonName As String, ByVal NavIconType As String, ByVal NavIconTitle As String, ByVal InstalledByCollectionID As Integer) As Integer
-            Dim returnEntry As Integer = 0
-            Try
-                '
-                Const AddonContentName = cnAddons
-                '
-                Dim DupFound As Boolean
-                Dim EntryID As Integer
-                Dim DuplicateID As Integer
-                Dim Parents() As String
-                Dim ParentPtr As Integer
-                Dim Criteria As String
-                Dim Ptr As Integer
-                Dim RecordID As Integer
-                Dim RecordName As String
-                Dim SelectList As String
-                Dim ErrorDescription As String
-                Dim CSEntry As Integer
-                Dim ContentID As Integer
-                Dim ParentID As Integer
-                Dim addonId As Integer
-                Dim CS As Integer
-                Dim SupportAddonID As Boolean
-                Dim SupportGuid As Boolean
-                Dim SupportNavGuid As Boolean
-                Dim SupportccGuid As Boolean
-                Dim SupportNavIcon As Boolean
-                Dim GuidFieldName As String
-                Dim SupportInstalledByCollectionID As Boolean
-                '
-                If Trim(EntryName) <> "" Then
-                    If genericController.vbLCase(EntryName) = "manage add-ons" Then
-                        EntryName = EntryName
-                    End If
-                    '
-                    ' Setup misc arguments
-                    '
-                    SelectList = "Name,ContentID,ParentID,LinkPage,SortOrder,AdminOnly,DeveloperOnly,NewWindow,Active,NavIconType,NavIconTitle"
-                    SupportAddonID = cpCore.metaData.isContentFieldSupported(MenuContentName, "AddonID")
-                    SupportInstalledByCollectionID = cpCore.metaData.isContentFieldSupported(MenuContentName, "InstalledByCollectionID")
-                    If SupportAddonID Then
-                        SelectList = SelectList & ",AddonID"
-                    Else
-                        SelectList = SelectList & ",0 as AddonID"
-                    End If
-                    If SupportInstalledByCollectionID Then
-                        SelectList = SelectList & ",InstalledByCollectionID"
-                    End If
-                    If cpCore.metaData.isContentFieldSupported(MenuContentName, "ccGuid") Then
-                        SupportGuid = True
-                        SupportccGuid = True
-                        GuidFieldName = "ccguid"
-                        SelectList = SelectList & ",ccGuid"
-                    ElseIf cpCore.metaData.isContentFieldSupported(MenuContentName, "NavGuid") Then
-                        SupportGuid = True
-                        SupportNavGuid = True
-                        GuidFieldName = "navguid"
-                        SelectList = SelectList & ",NavGuid"
-                    Else
-                        SelectList = SelectList & ",'' as ccGuid"
-                    End If
-                    SupportNavIcon = cpCore.metaData.isContentFieldSupported(MenuContentName, "NavIconType")
-                    addonId = 0
-                    If SupportAddonID And (AddonName <> "") Then
-                        CS = cpCore.db.cs_open(AddonContentName, "name=" & cpCore.db.encodeSQLText(AddonName), "ID", False, , , , "ID", 1)
-                        If cpCore.db.cs_ok(CS) Then
-                            addonId = cpCore.db.cs_getInteger(CS, "ID")
-                        End If
-                        Call cpCore.db.cs_Close(CS)
-                    End If
-                    ParentID = getParentIDFromNameSpace(MenuContentName, menuNameSpace)
-                    ContentID = -1
-                    If ContentName <> "" Then
-                        ContentID = cpCore.db.getContentId(ContentName)
-                    End If
-                    '
-                    ' Locate current entry(s)
-                    '
-                    CSEntry = -1
-                    Criteria = ""
-                    If True Then
-                        ' 12/19/2008 change to ActiveOnly - because if there is a non-guid entry, it is marked inactive. We only want to update the active entries
-                        If ccGuid = "" Then
-                            '
-                            ' ----- Find match by menuNameSpace
-                            '
-                            CSEntry = cpCore.db.cs_open(MenuContentName, "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(Parentid=" & ParentID & ")and((" & GuidFieldName & " is null)or(" & GuidFieldName & "=''))", "ID", True, , , , SelectList)
-                        Else
-                            '
-                            ' ----- Find match by guid
-                            '
-                            CSEntry = cpCore.db.cs_open(MenuContentName, "(" & GuidFieldName & "=" & cpCore.db.encodeSQLText(ccGuid) & ")", "ID", True, , , , SelectList)
-                        End If
-                        If Not cpCore.db.cs_ok(CSEntry) Then
-                            '
-                            ' ----- if not found by guid, look for a name/parent match with a blank guid
-                            '
-                            Call cpCore.db.cs_Close(CSEntry)
-                            Criteria = "AND((" & GuidFieldName & " is null)or(" & GuidFieldName & "=''))"
-                        End If
-                    End If
-                    If Not cpCore.db.cs_ok(CSEntry) Then
-                        If ParentID = 0 Then
-                            ' 12/19/2008 change to ActiveOnly - because if there is a non-guid entry, it is marked inactive. We only want to update the active entries
-                            Criteria = Criteria & "And(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(ParentID is null)"
-                        Else
-                            ' 12/19/2008 change to ActiveOnly - because if there is a non-guid entry, it is marked inactive. We only want to update the active entries
-                            Criteria = Criteria & "And(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(ParentID=" & ParentID & ")"
-                        End If
-                        CSEntry = cpCore.db.cs_open(MenuContentName, Mid(Criteria, 4), "ID", True, , , , SelectList)
-                    End If
-                    '
-                    ' If no current entry, create one
-                    '
-                    If Not cpCore.db.cs_ok(CSEntry) Then
-                        cpCore.db.cs_Close(CSEntry)
-                        '
-                        ' This entry was not found - insert a new record if there is no other name/menuNameSpace match
-                        '
-                        If False Then
-                            '
-                            ' OK - the first entry search was name/menuNameSpace
-                            '
-                            DupFound = False
-                        ElseIf ParentID = 0 Then
-                            CSEntry = cpCore.db.cs_open(MenuContentName, "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(ParentID is null)", "ID", False, , , , SelectList)
-                            DupFound = cpCore.db.cs_ok(CSEntry)
-                            cpCore.db.cs_Close(CSEntry)
-                        Else
-                            CSEntry = cpCore.db.cs_open(MenuContentName, "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(ParentID=" & ParentID & ")", "ID", False, , , , SelectList)
-                            DupFound = cpCore.db.cs_ok(CSEntry)
-                            cpCore.db.cs_Close(CSEntry)
-                        End If
-                        If DupFound Then
-                            '
-                            ' Must block this entry because a menuNameSpace duplicate exists
-                            '
-                            CSEntry = -1
-                        Else
-                            '
-                            ' Create new entry
-                            '
-                            CSEntry = cpCore.db.cs_insertRecord(MenuContentName, SystemMemberID)
-                        End If
-                    End If
-                    If cpCore.db.cs_ok(CSEntry) Then
-                        EntryID = cpCore.db.cs_getInteger(CSEntry, "ID")
-                        If EntryID = 265 Then
-                            EntryID = EntryID
-                        End If
-                        Call cpCore.db.cs_set(CSEntry, "name", EntryName)
-                        If ParentID = 0 Then
-                            Call cpCore.db.cs_set(CSEntry, "ParentID", 0)
-                        Else
-                            Call cpCore.db.cs_set(CSEntry, "ParentID", ParentID)
-                        End If
-                        If (ContentID = -1) Then
-                            Call cpCore.db.cs_set(CSEntry, "ContentID", 0)
-                        Else
-                            Call cpCore.db.cs_set(CSEntry, "ContentID", ContentID)
-                        End If
-                        Call cpCore.db.cs_set(CSEntry, "LinkPage", LinkPage)
-                        Call cpCore.db.cs_set(CSEntry, "SortOrder", SortOrder)
-                        Call cpCore.db.cs_set(CSEntry, "AdminOnly", AdminOnly)
-                        Call cpCore.db.cs_set(CSEntry, "DeveloperOnly", DeveloperOnly)
-                        Call cpCore.db.cs_set(CSEntry, "NewWindow", NewWindow)
-                        Call cpCore.db.cs_set(CSEntry, "Active", Active)
-                        If SupportAddonID Then
-                            Call cpCore.db.cs_set(CSEntry, "AddonID", addonId)
-                        End If
-                        If SupportGuid Then
-                            Call cpCore.db.cs_set(CSEntry, GuidFieldName, ccGuid)
-                        End If
-                        If SupportNavIcon Then
-                            Call cpCore.db.cs_set(CSEntry, "NavIconTitle", NavIconTitle)
-                            Dim NavIconID As Integer
-                            NavIconID = GetListIndex(NavIconType, NavIconTypeList)
-                            Call cpCore.db.cs_set(CSEntry, "NavIconType", NavIconID)
-                        End If
-                        If SupportInstalledByCollectionID Then
-                            Call cpCore.db.cs_set(CSEntry, "InstalledByCollectionID", InstalledByCollectionID)
-                        End If
-                        '
-                        ' merge any duplicate guid matches
-                        '
-                        Call cpCore.db.cs_goNext(CSEntry)
-                        Do While cpCore.db.cs_ok(CSEntry)
-                            DuplicateID = cpCore.db.cs_getInteger(CSEntry, "ID")
-                            Call cpCore.db.executeSql("update ccMenuEntries set ParentID=" & EntryID & " where ParentID=" & DuplicateID)
-                            Call cpCore.db.deleteContentRecord(MenuContentName, DuplicateID)
-                            Call cpCore.db.cs_goNext(CSEntry)
-                        Loop
-                    End If
-                    Call cpCore.db.cs_Close(CSEntry)
-                    '
-                    ' Merge duplicates with menuNameSpace.Name match
-                    '
-                    If EntryID <> 0 Then
-                        If ParentID = 0 Then
-                            CSEntry = cpCore.db.cs_openCsSql_rev("default", "select * from ccMenuEntries where (parentid is null)and(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(id<>" & EntryID & ")")
-                        Else
-                            CSEntry = cpCore.db.cs_openCsSql_rev("default", "select * from ccMenuEntries where (parentid=" & ParentID & ")and(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(id<>" & EntryID & ")")
-                        End If
-                        Do While cpCore.db.cs_ok(CSEntry)
-                            DuplicateID = cpCore.db.cs_getInteger(CSEntry, "ID")
-                            Call cpCore.db.executeSql("update ccMenuEntries set ParentID=" & EntryID & " where ParentID=" & DuplicateID)
-                            Call cpCore.db.deleteContentRecord(MenuContentName, DuplicateID)
-                            Call cpCore.db.cs_goNext(CSEntry)
-                        Loop
-                        Call cpCore.db.cs_Close(CSEntry)
-                    End If
-                End If
-                '
-                returnEntry = EntryID
-            Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
-            End Try
-            Return returnEntry
-        End Function
         '
         '=============================================================================
         '
@@ -6572,7 +6341,7 @@ Namespace Contensive.Core
                 End If
                 Call cpCore.db.cs_Close(CSEntry)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -6616,7 +6385,7 @@ Namespace Contensive.Core
                 End If
                 Call cpCore.db.cs_Close(CSEntry)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub        '
         '
@@ -6654,60 +6423,9 @@ Namespace Contensive.Core
                 End If
                 Call cpCore.db.cs_Close(CSEntry)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
-        '
-        '
-        '
-        Public Function getParentIDFromNameSpace(ByVal ContentName As String, ByVal menuNameSpace As String) As Integer
-            Try
-                '
-                Dim Parents() As String
-                Dim ParentID As Integer
-                Dim Ptr As Integer
-                Dim RecordName As String
-                Dim Criteria As String
-                Dim CS As Integer
-                Dim RecordID As Integer
-                '
-                ParentID = 0
-                If Not String.IsNullOrEmpty(menuNameSpace.Trim) Then
-                    Parents = Split(menuNameSpace.Trim, ".")
-                    For Ptr = 0 To UBound(Parents)
-                        RecordName = Parents(Ptr)
-                        If ParentID = 0 Then
-                            Criteria = "(name=" & cpCore.db.encodeSQLText(RecordName) & ")and(Parentid is null)"
-                        Else
-                            Criteria = "(name=" & cpCore.db.encodeSQLText(RecordName) & ")and(Parentid=" & ParentID & ")"
-                        End If
-                        RecordID = 0
-                        ' 12/19/2008 change to ActiveOnly - because if there is a non-guid entry, it is marked inactive. We only want to attach to the active entries
-                        CS = cpCore.db.cs_open(ContentName, Criteria, "ID", True, , , , "ID", 1)
-                        If cpCore.db.cs_ok(CS) Then
-                            RecordID = (cpCore.db.cs_getInteger(CS, "ID"))
-                        End If
-                        Call cpCore.db.cs_Close(CS)
-                        If RecordID = 0 Then
-                            CS = cpCore.db.cs_insertRecord(ContentName, SystemMemberID)
-                            If cpCore.db.cs_ok(CS) Then
-                                RecordID = cpCore.db.cs_getInteger(CS, "ID")
-                                Call cpCore.db.cs_set(CS, "name", RecordName)
-                                If ParentID <> 0 Then
-                                    Call cpCore.db.cs_set(CS, "parentID", ParentID)
-                                End If
-                            End If
-                            Call cpCore.db.cs_Close(CS)
-                        End If
-                        ParentID = RecordID
-                    Next
-                End If
-                '
-                getParentIDFromNameSpace = ParentID
-            Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
-            End Try
-        End Function
         '
         '========================================================================
         '
@@ -6723,7 +6441,7 @@ Namespace Contensive.Core
                 Call cpCore.privateFiles.saveFile(privateFilesPathFilename, Content)
                 XML = Nothing
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
     End Class

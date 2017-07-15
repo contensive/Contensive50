@@ -70,7 +70,7 @@ Namespace Contensive.Core.Controllers
                 End With
                 TabsCnt = TabsCnt + 1
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
 
@@ -158,7 +158,7 @@ Namespace Contensive.Core.Controllers
                     TabsCnt = 0
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return result
         End Function
@@ -177,7 +177,7 @@ Namespace Contensive.Core.Controllers
                 ' code
                 '
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnValue
         End Function

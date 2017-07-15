@@ -62,7 +62,7 @@ Namespace Contensive.Core
                 Throw New ApplicationException("Installation upgrade through the cp interface is deprecated. Please use the command line tool.")
                 ' Controllers.appBuilderController.upgrade(CP.core, isNewApp)
             Catch ex As Exception
-                CP.core.handleExceptionAndContinue(ex)
+                CP.core.handleException(ex)
             End Try
         End Sub
         '

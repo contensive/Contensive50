@@ -210,7 +210,7 @@ Namespace Contensive.Core
                     result = IsInGroupList(groupId.ToString, userId)
                 End If
             Catch ex As Exception
-                Call CP.core.handleExceptionAndContinue(ex, "Unexpected error in cs.user.IsInGroup")
+                Call CP.core.handleException(ex, "Unexpected error in cs.user.IsInGroup")
                 result = False
             End Try
             Return result
@@ -227,7 +227,7 @@ Namespace Contensive.Core
                 End If
                 result = CP.core.authContext.isMemberOfGroupIdList(cpCore, userId, IsAuthenticated(), GroupIDList, False)
             Catch ex As Exception
-                Call CP.core.handleExceptionAndContinue(ex, "Unexpected error in cs.user.IsInGroupList")
+                Call CP.core.handleException(ex, "Unexpected error in cs.user.IsInGroupList")
                 result = False
             End Try
             Return result

@@ -204,7 +204,7 @@ Namespace Contensive.Addons
             Dim Copy As String
             Dim Stream As New stringBuilderLegacyController
             Dim AdminURL As String
-            Dim MenuEntryContentName As String
+            'Dim MenuEntryContentName As String
             Dim addonId As Integer
             Dim AddonGuid As String
             Dim addonOptionString As String
@@ -219,8 +219,6 @@ Namespace Contensive.Addons
             ' Setup defaults
             '-------------------------------------------------------------------------------
             '
-            MenuEntryContentName = "Menu Entries"
-            'ApplicationName = cpCore.app.config.name
             ButtonObjectCount = 0
             ImagePreloadCount = 0
             JavaScriptString = ""
@@ -574,7 +572,7 @@ leak200:
                     '
                     Call Stream.Add(ContentCell)
                 Else
-                    Call Stream.Add(cr & GetForm_Top(MenuEntryContentName))
+                    Call Stream.Add(cr & GetForm_Top())
                     Call Stream.Add(genericController.htmlIndent(ContentCell))
                     Call Stream.Add(cr & AdminFormBottom)
                 End If
@@ -1912,7 +1910,7 @@ ErrorTrap:
                     End With
                 Next
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -2201,7 +2199,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -3581,7 +3579,7 @@ ErrorTrap:
                     returnHas = cpCore.authContext.isAuthenticatedContentManager(cpCore, ContentName)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnHas
         End Function
@@ -3678,7 +3676,7 @@ ErrorTrap:
                 '
                 return_formIndexCell = cpCore.html.html_EncodeHTML(Stream.Text)
             Catch ex As Exception
-                Call cpCore.handleExceptionAndContinue(ex) : Throw
+                Call cpCore.handleException(ex) : Throw
             End Try
             Return return_formIndexCell
 
@@ -4611,7 +4609,7 @@ ErrorTrap:
                     Call cpCore.html.main_AddPagetitle("Edit " & editRecord.nameLc & " in " & editRecord.contentControlId_Name)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnHtml
         End Function
@@ -6393,7 +6391,7 @@ ErrorTrap:
                     'End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnHtml
         End Function
@@ -7238,7 +7236,7 @@ ErrorTrap:
                     & ""
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnHtml
         End Function
@@ -8822,7 +8820,7 @@ ErrorTrap:
         '    Dim returnString As String = ""
         '    Try
         '        '
-        '        Const MenuEntryContentName = "Menu Entries"
+        '        Const MenuEntryContentName = cnNavigatorEntries
         '        '
         '        Dim HeaderNameCurrent As String
         '        Dim MenuName As String
@@ -9086,7 +9084,7 @@ ErrorTrap:
         '   After this, print the content window, then PrintFormBottom()
         '========================================================================
         '
-        Private Function GetForm_Top(ByVal MenuEntryContentName As String, Optional ByVal BackgroundColor As String = "") As String
+        Private Function GetForm_Top(Optional ByVal BackgroundColor As String = "") As String
             Dim return_formTop As String = ""
             Try
                 Const AdminNavigatorGuid = "{5168964F-B6D2-4E9F-A5A8-BB1CF908A2C9}"
@@ -9184,7 +9182,7 @@ ErrorTrap:
                 '
                 return_formTop = Stream.Text
             Catch ex As Exception
-                Call cpCore.handleExceptionAndContinue(ex) : Throw
+                Call cpCore.handleException(ex) : Throw
             End Try
             Return return_formTop
         End Function
@@ -9247,7 +9245,7 @@ ErrorTrap:
                 '    End If
                 GetActiveImage = Panel
             Catch ex As Exception
-                Call cpCore.handleExceptionAndContinue(ex) : Throw
+                Call cpCore.handleException(ex) : Throw
             End Try
             Return return_ActiveImage
         End Function
@@ -9359,17 +9357,7 @@ ErrorTrap:
             If iParentCriteria <> "" Then
                 Criteria = "(" & iParentCriteria & ")AND" & Criteria
             End If
-            If True Then ' 3.4.044" Then
-                SelectList = "ccMenuEntries.contentcontrolid, ccMenuEntries.Name, ccMenuEntries.ID, ccMenuEntries.LinkPage, ccMenuEntries.ContentID, ccMenuEntries.NewWindow, ccMenuEntries.ParentID, ccMenuEntries.AddonID, ccMenuEntries.NavIconType, ccMenuEntries.NavIconTitle, HelpAddonID,HelpCollectionID,0 as collectionid"
-            ElseIf True Then ' 3.3.982" Then
-                SelectList = "ccMenuEntries.contentcontrolid, ccMenuEntries.Name, ccMenuEntries.ID, ccMenuEntries.LinkPage, ccMenuEntries.ContentID, ccMenuEntries.NewWindow, ccMenuEntries.ParentID, ccMenuEntries.AddonID, ccMenuEntries.NavIconType, ccMenuEntries.NavIconTitle,0 as HelpAddonID,0 as HelpCollectionID,0 as collectionid"
-            ElseIf True Then ' 3.3.865" Then
-                SelectList = "ccMenuEntries.contentcontrolid, ccMenuEntries.Name, ccMenuEntries.ID, ccMenuEntries.LinkPage, ccMenuEntries.ContentID, ccMenuEntries.NewWindow, ccMenuEntries.ParentID, ccMenuEntries.AddonID, ccMenuEntries.NavIconType, ccMenuEntries.NavIconTitle,0 as HelpAddonID,0 as HelpCollectionID,0 as collectionid"
-            ElseIf True Then ' 3.3.686" Then
-                SelectList = "ccMenuEntries.contentcontrolid, ccMenuEntries.Name, ccMenuEntries.ID, ccMenuEntries.LinkPage, ccMenuEntries.ContentID, ccMenuEntries.NewWindow, ccMenuEntries.ParentID, ccMenuEntries.AddonID, 'folder' as NavIconType, ccMenuEntries.Name as NavIconTitle,0 as HelpAddonID,0 as HelpCollectionID,0 as collectionid"
-            Else
-                SelectList = "ccMenuEntries.contentcontrolid, ccMenuEntries.Name, ccMenuEntries.ID, ccMenuEntries.LinkPage, ccMenuEntries.ContentID, ccMenuEntries.NewWindow, ccMenuEntries.ParentID, 0 as AddonID, 'folder' as NavIconType, ccMenuEntries.Name as NavIconTitle,0 as HelpAddonID,0 as HelpCollectionID,0 as collectionid"
-            End If
+            SelectList = "ccMenuEntries.contentcontrolid, ccMenuEntries.Name, ccMenuEntries.ID, ccMenuEntries.LinkPage, ccMenuEntries.ContentID, ccMenuEntries.NewWindow, ccMenuEntries.ParentID, ccMenuEntries.AddonID, ccMenuEntries.NavIconType, ccMenuEntries.NavIconTitle, HelpAddonID,HelpCollectionID,0 as collectionid"
             GetMenuSQL = "select " & SelectList & " from ccMenuEntries where " & Criteria & " order by ccMenuEntries.Name"
             Exit Function
             '
@@ -9384,89 +9372,14 @@ ErrorTrap:
         ' Get sql for menu
         '========================================================================
         '
-        Private Function GetMenuCSPointer(ByVal ParentCriteria As String, ByVal MenuEntryContentName As String) As Integer
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetMenuCSPointer")
+        Private Function GetMenuCSPointer(ByVal ParentCriteria As String) As Integer
             '
             Dim iParentCriteria As String
             iParentCriteria = genericController.encodeEmptyText(ParentCriteria, "")
             If iParentCriteria <> "" Then
                 iParentCriteria = "(" & iParentCriteria & ")"
             End If
-            GetMenuCSPointer = cpCore.db.cs_openCsSql_rev("default", GetMenuSQL(iParentCriteria, MenuEntryContentName))
-            '
-            '    Dim iParentCriteria As String
-            '    Dim Criteria As String
-            '    Dim SQL As String
-            '    '
-            '    iParentCriteria = encodeMissingText(ParentCriteria, "")
-            '    'If iParentCriteria <> "" Then
-            '    '    iParentCriteria = "(" & iParentCriteria & ")"
-            '    '    End If
-            '    If cpCore.main_IsDeveloper Then
-            '        '
-            '        ' ----- Developer
-            '        '
-            '        Criteria = "(Active<>0)"
-            '        'Criteria = "(CCMenuEntries.Active<>0)"
-            '        'SQL = "SELECT ccMenuEntries.Name, ccMenuEntries.ID, ccMenuEntries.LinkPage, ccMenuEntries.ContentID, ccMenuEntries.NewWindow, ccMenuEntries.ParentID" _
-            '        '    & " FROM CCMenuEntries" _
-            '        '    & " WHERE (" & iParentCriteria & "(CCMenuEntries.Active<>0))" _
-            '        '    & " ORDER BY ccMenuEntries.ParentID, CCMenuEntries.SortOrder, CCMenuEntries.Name;"
-            '    ElseIf cpCore.main_IsAdmin Then
-            '        '
-            '        ' ----- Administrator
-            '        '
-            '        Criteria = "(Active<>0)" _
-            '            & "AND((DeveloperOnly is null)or(DeveloperOnly=0))" _
-            '            & "AND(ID in (" _
-            '            & " SELECT AllowedEntries.ID" _
-            '            & " FROM CCMenuEntries AllowedEntries LEFT JOIN ccContent ON AllowedEntries.ContentID = ccContent.ID" _
-            '            & " Where ((ccContent.Active<>0)And((ccContent.DeveloperOnly is null)or(ccContent.DeveloperOnly=0)))" _
-            '                & "OR(ccContent.ID Is Null)" _
-            '            & "))"
-            ''        '
-            ''        Criteria = "(CCMenuEntries.Active<>0)" _
-            ''            & "AND((CCMenuEntries.DeveloperOnly is null)or(CCMenuEntries.DeveloperOnly=0))" _
-            ''            & "AND(ID in (" _
-            ''            & " SELECT ccMenuEntries.ID" _
-            ''            & " FROM CCMenuEntries LEFT JOIN ccContent ON CCMenuEntries.ContentID = ccContent.ID" _
-            ''            & " Where (ccContent.Active<>0)And((ccContent.DeveloperOnly is null)or(ccContent.DeveloperOnly=0))" _
-            ''                & "OR(ccContent.ID Is Null)" _
-            ''            & "))"
-            '    Else
-            '        '
-            '        ' ----- Content Manager
-            '        '
-            '        Criteria = "(Active<>0)" _
-            '            & "AND((DeveloperOnly is null)or(DeveloperOnly=0))" _
-            '            & "AND(ID in (" _
-            '            & " SELECT AllowedEntries.ID" _
-            '            & " FROM CCMenuEntries AllowedEntries LEFT JOIN ccContent ON AllowedEntries.ContentID = ccContent.ID" _
-            '            & " Where ((ccContent.Active<>0)And((ccContent.DeveloperOnly is null)or(ccContent.DeveloperOnly=0))And((ccContent.AdminOnly is null)or(ccContent.AdminOnly=0)))" _
-            '                & "OR(ccContent.ID Is Null)" _
-            '            & "))"
-            ''        '
-            ''        Criteria = "(CCMenuEntries.Active<>0)" _
-            ''            & "AND((CCMenuEntries.DeveloperOnly is null)or(CCMenuEntries.DeveloperOnly=0))" _
-            ''            & "AND((CCMenuEntries.AdminOnly is null)or(CCMenuEntries.AdminOnly=0))" _
-            ''            & "AND(ID in (" _
-            ''            & " SELECT ccMenuEntries.ID" _
-            ''            & " FROM CCMenuEntries LEFT JOIN ccContent ON CCMenuEntries.ContentID = ccContent.ID" _
-            ''            & " Where (ccContent.ID Is Null)" _
-            ''                & "OR((ccContent.Active<>0)And((ccContent.DeveloperOnly is null)or(ccContent.DeveloperOnly=0))And((ccContent.AdminOnly is null)or(ccContent.AdminOnly=0)))" _
-            ''            & "))"
-            '        End If
-            '    If iParentCriteria <> "" Then
-            '        Criteria = "(" & iParentCriteria & ")AND" & Criteria
-            '    End If
-            '    GetMenuCSPointer = cpCore.app.csOpen("Menu Entries", Criteria, , , , , "ccMenuEntries.Name, ccMenuEntries.ID, ccMenuEntries.LinkPage, ccMenuEntries.ContentID, ccMenuEntries.NewWindow, ccMenuEntries.ParentID")
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassError3("GetMenuCSPointer")
-            '
+            GetMenuCSPointer = cpCore.db.cs_openCsSql_rev("default", GetMenuSQL(iParentCriteria, cnNavigatorEntries))
         End Function
         '
         '========================================================================
@@ -10267,7 +10180,7 @@ ErrorTrap:
         Private Function GetMenuTopMode() As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter("GetMenuTopMode")
             '
-            Const MenuEntryContentName = "Menu Entries"
+            'Const MenuEntryContentName = cnNavigatorEntries
             '
             Dim CSMenus As Integer
             Dim Name As String
@@ -10312,7 +10225,7 @@ ErrorTrap:
                     '
                     ' ----- Bake the menu
                     '
-                    CSMenus = GetMenuCSPointer("", MenuEntryContentName)
+                    CSMenus = GetMenuCSPointer("")
                     'CSMenus = cpCore.app_openCsSql_Rev_Internal("default", GetMenuSQLNew())
                     If cpCore.db.cs_ok(CSMenus) Then
                         '
@@ -10367,9 +10280,7 @@ ErrorTrap:
                     ' Create menus
                     '
                     Dim ButtonCnt As Integer
-                    CSMenus = GetMenuCSPointer("(ParentID is null)or(ParentID=0)", MenuEntryContentName)
-                    'CSMenus = GetMenuCSPointer("(ccMenuEntries.ParentID is null)or(ccMenuEntries.ParentID=0)")
-                    'CSMenus = cpCore.app_openCsSql_Rev_Internal("default", GetMenuSQLNew("CCMenuEntries.ParentID=" & encodeSQLNumber(nothing)))
+                    CSMenus = GetMenuCSPointer("(ParentID is null)or(ParentID=0)")
                     If cpCore.db.cs_ok(CSMenus) Then
                         GetMenuTopMode = "<table border=""0"" cellpadding=""0"" cellspacing=""0""><tr>"
                         ButtonCnt = 0
@@ -10403,7 +10314,7 @@ ErrorTrap:
                     '
                     MenuClose = cpCore.html.menu_GetClose()
                     'GetMenuTopMode = GetMenuTopMode & cpCore.main_GetMenuClose
-                    Call cpCore.cache.setObject(BakeName, GetMenuTopMode & MenuDelimiter & MenuClose, "Menu Entries,People,Content,Groups,Group Rules")
+                    Call cpCore.cache.setObject(BakeName, GetMenuTopMode & MenuDelimiter & MenuClose, "Navigator Entries,People,Content,Groups,Group Rules")
                 End If
                 cpCore.doc.htmlForEndOfBody = cpCore.doc.htmlForEndOfBody & MenuClose
             End If
@@ -10662,10 +10573,10 @@ ErrorTrap:
                             ' Add Navigator entries
                             '
                             '                    cmc = cpCore.main_cs_getv()
-                            '                    MenuContentName = "Navigator Entries"
+                            '                    MenuContentName = cnNavigatorEntries
                             '                    SupportAddonID = cpCore.csv_IsContentFieldSupported(MenuContentName, "AddonID")
                             '                    SupportGuid = cpCore.csv_IsContentFieldSupported(MenuContentName, "ccGuid")
-                            '                    CS = cpCore.app.csOpen("Navigator Entries", "ContentID=" & ParentContentID)
+                            '                    CS = cpCore.app.csOpen(cnNavigatorEntries, "ContentID=" & ParentContentID)
                             '                    Do While cpCore.app.csv_IsCSOK(CS)
                             '                        ParentID = cpCore.app.csv_cs_getText(CS, "ID")
                             '                        ParentName = cpCore.app.csv_cs_getText(CS, "name")
@@ -10697,7 +10608,7 @@ ErrorTrap:
                             '                            End If
                             '                        End If
                             '                        Call cpCore.app.csv_CloseCS(CSEntry)
-                            '                        'Call cpCore.csv_VerifyNavigatorEntry2(ccGuid, menuNameSpace, MenuName, ChildContenName, "", "", AdminOnly, DeveloperOnly, False, True, "Navigator Entries", "")
+                            '                        'Call cpCore.csv_VerifyNavigatorEntry2(ccGuid, menuNameSpace, MenuName, ChildContenName, "", "", AdminOnly, DeveloperOnly, False, True, cnNavigatorEntries, "")
                             '                        'Call cpCore.main_CreateAdminMenu(MenuName, ChildContentName, ChildContentName, "", ChildContentName, AdminOnly, DeveloperOnly, False)
                             '                        Description = Description _
                             '                            & "<div>Creating navigator entry for [" & ChildContentName & "] under entry [" & ParentName & "].</div>"
@@ -10705,22 +10616,23 @@ ErrorTrap:
                             '                    Loop
                             '                    Call cpCore.app.closeCS(CS)
                             '
-                            ' Add Legacy menu entries
+                            ' Add Legacy Navigator Entries
                             '
-                            CS = cpCore.db.cs_open("Menu Entries", "ContentID=" & ParentContentID)
-                            Do While cpCore.db.cs_ok(CS)
-                                MenuName = cpCore.db.cs_get(CS, "name")
-                                AdminOnly = cpCore.db.cs_getBoolean(CS, "AdminOnly")
-                                DeveloperOnly = cpCore.db.cs_getBoolean(CS, "DeveloperOnly")
-                                If MenuName = "" Then
-                                    MenuName = "Site Content"
-                                End If
-                                Call Controllers.appBuilderController.admin_VerifyAdminMenu(cpCore, MenuName, ChildContentName, ChildContentName, "", ChildContentName, AdminOnly, DeveloperOnly, False)
-                                Description = Description _
-                                    & "<div>Creating Legacy site menu for [" & ChildContentName & "] under entry [" & MenuName & "].</div>"
-                                cpCore.db.cs_goNext(CS)
-                            Loop
-                            Call cpCore.db.cs_Close(CS)
+                            ' -- deprecated
+                            'CS = cpCore.db.cs_open(cnNavigatorEntries, "ContentID=" & ParentContentID)
+                            'Do While cpCore.db.cs_ok(CS)
+                            '    MenuName = cpCore.db.cs_get(CS, "name")
+                            '    AdminOnly = cpCore.db.cs_getBoolean(CS, "AdminOnly")
+                            '    DeveloperOnly = cpCore.db.cs_getBoolean(CS, "DeveloperOnly")
+                            '    If MenuName = "" Then
+                            '        MenuName = "Site Content"
+                            '    End If
+                            '    Call Controllers.appBuilderController.admin_VerifyAdminMenu(cpCore, MenuName, ChildContentName, ChildContentName, "", ChildContentName, AdminOnly, DeveloperOnly, False)
+                            '    Description = Description _
+                            '        & "<div>Creating Legacy site menu for [" & ChildContentName & "] under entry [" & MenuName & "].</div>"
+                            '    cpCore.db.cs_goNext(CS)
+                            'Loop
+                            'Call cpCore.db.cs_Close(CS)
                         End If
                         '
                         Description = Description _
@@ -10806,7 +10718,7 @@ ErrorTrap:
                 Loop
                 Call cpCore.db.cs_Close(CS)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnOptions
         End Function
@@ -11894,7 +11806,7 @@ ErrorTrap:
                 '
                 returnHtml &= cpCore.html.html_GetFormInputHidden("FormFieldList", FormFieldList)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnHtml
         End Function
@@ -12778,7 +12690,7 @@ ErrorTrap:
                                         & vbCrLf & "<div id=""IndexFilterContentClosed"" class=""closed"">" & FilterClosedLabel & "</div>" _
                                         & vbCrLf & "<div id=""IndexFilterContentMinWidth"" style=""display:none;""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""200"" height=""1"" style=""clear:both""></div>" _
                                         & vbCrLf & "</div>"
-                                    AjaxQS = cpcore.doc.refreshQueryString
+                                    AjaxQS = cpCore.doc.refreshQueryString
                                     AjaxQS = genericController.ModifyQueryString(AjaxQS, RequestNameAjaxFunction, AjaxOpenIndexFilterGetContent)
                                     IndexFilterJS = "" _
                                         & vbCrLf & "<script Language=""JavaScript"" type=""text/javascript"">" _
@@ -13108,7 +13020,7 @@ ErrorTrap:
                 returnForm = Stream.Text
                 '
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnForm
         End Function
@@ -13539,7 +13451,7 @@ ErrorTrap:
                     returnContent = "<div style=""padding-left:10px;padding-right:10px;"">" & returnContent & "</div>"
                 End With
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnContent
         End Function
@@ -13793,7 +13705,7 @@ ErrorTrap:
                     '        End If
                 End With
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnIndexConfig
         End Function
@@ -14554,7 +14466,7 @@ ErrorTrap:
                     End If
                     IndexConfig = LoadIndexConfig(adminContent)
                     Button = "CriteriaSelect"
-                    RQS = cpcore.doc.refreshQueryString
+                    RQS = cpCore.doc.refreshQueryString
                     '
                     ' ----- ButtonBar
                     '
@@ -14970,7 +14882,7 @@ ErrorTrap:
                     Call cpCore.html.main_AddPagetitle(adminContent.Name & " Advanced Search")
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnForm
         End Function
@@ -15646,7 +15558,7 @@ ErrorTrap:
                                     Caption = Caption & "*"
                                     InheritedFieldCount = InheritedFieldCount + 1
                                 End If
-                                AStart = "<a href=""?" & cpcore.doc.refreshQueryString & "&FieldName=" & cpCore.html.html_EncodeHTML(.nameLc) & "&fi=" & fieldId & "&dtcn=" & ColumnPtr & "&" & RequestNameAdminSubForm & "=" & AdminFormIndex_SubFormSetColumns
+                                AStart = "<a href=""?" & cpCore.doc.refreshQueryString & "&FieldName=" & cpCore.html.html_EncodeHTML(.nameLc) & "&fi=" & fieldId & "&dtcn=" & ColumnPtr & "&" & RequestNameAdminSubForm & "=" & AdminFormIndex_SubFormSetColumns
                                 Call Stream.Add("<td width=""" & ColumnWidth & "%"" valign=""top"" align=""left"">" & SpanClassAdminNormal & Caption & "<br >")
                                 Call Stream.Add("<img src=""/ccLib/images/black.GIF"" width=""100%"" height=""1"" >")
                                 Call Stream.Add(AStart & "&dta=" & ToolsActionRemoveField & """><img src=""/ccLib/images/LibButtonDeleteUp.gif"" width=""50"" height=""15"" border=""0"" ></A><BR >")
@@ -15749,7 +15661,7 @@ ErrorTrap:
                                     '
                                     ' can be used as column header
                                     '
-                                    Stream.Add("<a href=""?" & cpcore.doc.refreshQueryString & "&fi=" & .id & "&dta=" & ToolsActionAddField & "&" & RequestNameAddFieldID & "=" & .id & "&" & RequestNameAdminSubForm & "=" & AdminFormIndex_SubFormSetColumns & """><img src=""/ccLib/images/LibButtonAddUp.gif"" width=""50"" height=""15"" border=""0"" ></A> " & .caption & "<br>")
+                                    Stream.Add("<a href=""?" & cpCore.doc.refreshQueryString & "&fi=" & .id & "&dta=" & ToolsActionAddField & "&" & RequestNameAddFieldID & "=" & .id & "&" & RequestNameAdminSubForm & "=" & AdminFormIndex_SubFormSetColumns & """><img src=""/ccLib/images/LibButtonAddUp.gif"" width=""50"" height=""15"" border=""0"" ></A> " & .caption & "<br>")
                                 End If
                             End If
                         End With
@@ -16590,7 +16502,7 @@ ErrorTrap:
                 returnHtml = Adminui.GetBody("Clear Cache", ButtonList, "", True, True, Description, "", 0, Content.Text)
                 Content = Nothing
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnHtml
         End Function
@@ -16802,7 +16714,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return addonHelp
         End Function
@@ -16886,7 +16798,7 @@ ErrorTrap:
                     returnHelp = returnHelp & "</div>"
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnHelp
         End Function
@@ -16902,11 +16814,11 @@ ErrorTrap:
                 Try
                     addonManager = cpCore.addon.execute_legacy2(0, AddonManagerGuid, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "0", False, -1, "", AddonStatusOK, Nothing)
                 Catch ex As Exception
-                    Call cpCore.handleExceptionAndContinue(New Exception("Error calling ExecuteAddon with AddonManagerGuid, will attempt Safe Mode Addon Manager. Exception=[" & ex.ToString & "]"))
+                    Call cpCore.handleException(New Exception("Error calling ExecuteAddon with AddonManagerGuid, will attempt Safe Mode Addon Manager. Exception=[" & ex.ToString & "]"))
                     AddonStatusOK = False
                 End Try
                 If addonManager = "" Then
-                    Call cpCore.handleExceptionAndContinue(New Exception("AddonManager returned blank, calling Safe Mode Addon Manager."))
+                    Call cpCore.handleException(New Exception("AddonManager returned blank, calling Safe Mode Addon Manager."))
                     AddonStatusOK = False
                 End If
                 If Not AddonStatusOK Then
@@ -16914,7 +16826,7 @@ ErrorTrap:
                     addonManager = AddonMan.GetForm_SafeModeAddonManager()
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return addonManager
         End Function
@@ -17445,7 +17357,7 @@ ErrorTrap:
                     orderByDelim = ","
                 Next
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '

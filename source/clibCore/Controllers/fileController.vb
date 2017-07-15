@@ -63,7 +63,7 @@ Namespace Contensive.Core.Controllers
         ''' <param name="remoteFileEndpoint">If not isLocal, this endpoint is used for file sync</param>
         Public Sub New(cpCore As coreClass, isLocal As Boolean, fileSyncMode As fileSyncModeEnum, rootLocalPath As String, Optional remoteFileEndpoint As String = "")
             If (String.IsNullOrEmpty(rootLocalPath)) Then
-                cpCore.handleExceptionAndContinue(New ArgumentException("Blank file system root path not permitted."))
+                cpCore.handleException(New ArgumentException("Blank file system root path not permitted."))
             Else
                 Me.cpCore = cpCore
                 Me.isLocal = isLocal
@@ -85,7 +85,7 @@ Namespace Contensive.Core.Controllers
                 pathFilename = normalizePathFilename(pathFilename)
                 returnPath = IO.Path.Combine(path & pathFilename)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnPath
         End Function
@@ -113,7 +113,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -146,7 +146,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnContent
         End Function
@@ -172,7 +172,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnContent
         End Function
@@ -218,14 +218,14 @@ Namespace Contensive.Core.Controllers
                             File.WriteAllText(convertToAbsPath(pathFilename), textContent)
                         End If
                     Catch ex As Exception
-                        Call cpCore.handleExceptionAndContinue(ex) : Throw
+                        Call cpCore.handleException(ex) : Throw
                     End Try
                     If Not isLocal Then
                         ' s3 transfer
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -266,7 +266,7 @@ Namespace Contensive.Core.Controllers
                 '    ' s3 transfer
                 'End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -315,7 +315,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw '
+                cpCore.handleException(ex) : Throw '
             End Try
         End Sub
         '
@@ -333,7 +333,7 @@ Namespace Contensive.Core.Controllers
                     ' s3 transfer
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw '
+                cpCore.handleException(ex) : Throw '
             End Try
         End Sub
         '
@@ -360,7 +360,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw '
+                cpCore.handleException(ex) : Throw '
             End Try
         End Sub
         '
@@ -399,7 +399,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw '
+                cpCore.handleException(ex) : Throw '
             End Try
         End Sub
         '
@@ -448,7 +448,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw '
+                cpCore.handleException(ex) : Throw '
             End Try
         End Sub
         '
@@ -470,7 +470,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnFileInfoList
         End Function
@@ -493,7 +493,7 @@ Namespace Contensive.Core.Controllers
                     returnList = returnList.Substring(1)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnList
         End Function
@@ -517,7 +517,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnFolders
         End Function
@@ -535,7 +535,7 @@ Namespace Contensive.Core.Controllers
                     returnOK = File.Exists(localPathFilename)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnOK
         End Function
@@ -553,7 +553,7 @@ Namespace Contensive.Core.Controllers
                     returnOK = Directory.Exists(absPath)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnOK
         End Function
@@ -598,7 +598,7 @@ Namespace Contensive.Core.Controllers
                 End If
 
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw '
+                cpCore.handleException(ex) : Throw '
             End Try
         End Sub
         '
@@ -620,7 +620,7 @@ Namespace Contensive.Core.Controllers
                     returnSize = scriptingDrive.AvailableFreeSpace
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnSize
         End Function
@@ -660,7 +660,7 @@ Namespace Contensive.Core.Controllers
                     Next
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -684,7 +684,7 @@ Namespace Contensive.Core.Controllers
                     Call copyLocalFileFolder(rootLocalPath & srcPath, dstFileSystem.rootLocalPath & dstPath)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -745,7 +745,7 @@ Namespace Contensive.Core.Controllers
                     Call HTTP.getUrlToFile(CStr(URLLink), convertToAbsPath(pathFilename))
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -771,7 +771,7 @@ Namespace Contensive.Core.Controllers
                 splitPathFilename(absPathFilename, path, filename)
                 fastZip.ExtractZip(absPathFilename, path, fileFilter)                '
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub        '
         '
@@ -796,7 +796,7 @@ Namespace Contensive.Core.Controllers
                 splitPathFilename(archivePathFilename, archivepath, archiveFilename)
                 fastZip.CreateZip(rootLocalPath & archivePathFilename, rootLocalPath & addPathFilename, recurse, fileFilter)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub        '
         '
@@ -820,7 +820,7 @@ Namespace Contensive.Core.Controllers
                     result = joinPath(rootLocalPath, normalizedPathFilename)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return result
         End Function
@@ -921,7 +921,7 @@ Namespace Contensive.Core.Controllers
                     End With
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return success
         End Function

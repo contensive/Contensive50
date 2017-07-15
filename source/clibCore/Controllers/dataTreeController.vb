@@ -85,7 +85,7 @@ Namespace Contensive.Core.Controllers
                             Call MSxml.LoadXml(XMLSource)
                     End Select
                 Catch ex As Exception
-                    Call cpCore.handleExceptionAndContinue(ex) : Throw
+                    Call cpCore.handleException(ex) : Throw
                     loadOK = False
                 End Try
                 If loadOK Then
@@ -187,7 +187,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -259,7 +259,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
 

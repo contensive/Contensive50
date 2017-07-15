@@ -179,7 +179,7 @@ Namespace Contensive.Core.Controllers
                 End If
                 result = execute(addonId, "", optionString, context, "", 0, "", "", False, 0, "", return_StatusOk, Nothing, "", Nothing, "", 0, False)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
             End Try
             Return result
         End Function
@@ -1454,7 +1454,7 @@ Namespace Contensive.Core.Controllers
                 '
                 ' protect environment from addon error
                 '
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
             End Try
             Return returnVal
         End Function
@@ -2465,7 +2465,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnText
         End Function
@@ -2530,7 +2530,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
                 Throw ex
             End Try
             Return result
@@ -2646,7 +2646,7 @@ ErrorTrap:
                                                                 '
                                                                 return_userErrorMessage = "There was an error executing the addon Dot Net assembly."
                                                                 detailedErrorMessage = "There was an error in the addon [" & AddonDisplayName & "]. It could not be executed because there was an error in the addon assembly [" & TestFilePathname & "], in class [" & testAssemblyType.FullName.Trim.ToLower & "]. The error was [" & Ex.ToString() & "]"
-                                                                cpCore.handleExceptionAndContinue(Ex, detailedErrorMessage)
+                                                                cpCore.handleException(Ex, detailedErrorMessage)
                                                                 'Throw New ApplicationException(detailedErrorMessage)
                                                             End Try
                                                         Catch Ex As Exception
@@ -2687,7 +2687,7 @@ ErrorTrap:
                                     '
                                     return_userErrorMessage = "There was an unknown error in the addon's Dot Net DLL [" & AddonDisplayName & "]."
                                     detailedErrorMessage = "A non-load exception occured while loading the addon [" & AddonDisplayName & "], DLL [" & testAssemblyType.FullName & "]. The error was [" & ex.ToString() & "]."
-                                    cpCore.handleExceptionAndContinue(New ApplicationException(detailedErrorMessage))
+                                    cpCore.handleException(New ApplicationException(detailedErrorMessage))
                                 End Try
                             End If
                             filePtr += 1
@@ -2697,7 +2697,7 @@ ErrorTrap:
             Catch ex As Exception
                 '
                 ' -- this exception should interrupt the caller
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnValue
         End Function

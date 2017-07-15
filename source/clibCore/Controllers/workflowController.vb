@@ -66,7 +66,7 @@ Namespace Contensive.Core.Controllers
                 Me.cpCore = cpCore
                 constructed = True
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
                 Throw (ex)
             End Try
         End Sub
@@ -100,7 +100,7 @@ Namespace Contensive.Core.Controllers
                     main_EditLockMemberName_Local = ""
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return main_EditLockStatus_Local
         End Function
@@ -132,7 +132,7 @@ Namespace Contensive.Core.Controllers
                     GetEditLockMemberName = main_EditLockMemberName_Local
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return main_EditLockMemberName_Local
         End Function
@@ -151,7 +151,7 @@ Namespace Contensive.Core.Controllers
                     returnDate = main_EditLockDateExpires_Local
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnDate
         End Function
@@ -539,7 +539,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -682,7 +682,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -702,7 +702,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -722,7 +722,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -741,7 +741,7 @@ Namespace Contensive.Core.Controllers
                 result = cpCore.db.cs_ok(CS)
                 Call cpCore.db.cs_Close(CS)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return result
         End Function
@@ -788,7 +788,7 @@ Namespace Contensive.Core.Controllers
                     result = "(ContentID In (" & Mid(Criteria, 2) & "))And(RecordID=" & cpCore.db.encodeSQLNumber(RecordID) & ")And((DateExpires>" & cpCore.db.encodeSQLDate(Now) & ")Or(DateExpires Is null))"
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return result
         End Function
@@ -809,7 +809,7 @@ Namespace Contensive.Core.Controllers
                         Call cpCore.db.deleteContentRecords("Authoring Controls", Criteria, MemberID)
                 End Select
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -905,7 +905,7 @@ Namespace Contensive.Core.Controllers
                     End Select
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -995,7 +995,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -1008,7 +1008,7 @@ Namespace Contensive.Core.Controllers
             Try
                 Call setEditLock2(ContentName, RecordID, MemberID, False)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -1021,7 +1021,7 @@ Namespace Contensive.Core.Controllers
             Try
                 Call setEditLock2(ContentName, RecordID, MemberID, True)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -1119,7 +1119,7 @@ Namespace Contensive.Core.Controllers
                     EditLockCount = DestinationPointer
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -1151,7 +1151,7 @@ Namespace Contensive.Core.Controllers
                     Next
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return EditLock2
         End Function

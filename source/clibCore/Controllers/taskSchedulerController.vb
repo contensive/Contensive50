@@ -74,7 +74,7 @@ Namespace Contensive.Core.Controllers
                 processTimer.Enabled = False
             Catch ex As Exception
                 Using cp As New CPClass()
-                    cp.core.handleExceptionAndContinue(ex)
+                    cp.core.handleException(ex)
                 End Using
             End Try
         End Sub
@@ -104,7 +104,7 @@ Namespace Contensive.Core.Controllers
                 End If
             Catch ex As Exception
                 Using cp As New CPClass()
-                    cp.core.handleExceptionAndContinue(ex)
+                    cp.core.handleException(ex)
                 End Using
             End Try
             Return returnStartedOk
@@ -147,7 +147,7 @@ Namespace Contensive.Core.Controllers
                 ' End Using
             Catch ex As Exception
                 Using cp As New CPClass()
-                    cp.core.handleExceptionAndContinue(ex)
+                    cp.core.handleException(ex)
                 End Using
             End Try
         End Sub
@@ -249,14 +249,14 @@ Namespace Contensive.Core.Controllers
                                 Loop
                                 Call cpSite.core.db.cs_Close(CS)
                             Catch ex As Exception
-                                cpClusterCore.handleExceptionAndContinue(ex)
+                                cpClusterCore.handleException(ex)
                             End Try
                         End If
                     End Using
                     hint &= ",app done"
                 Next
             Catch ex As Exception
-                cpClusterCore.handleExceptionAndContinue(ex)
+                cpClusterCore.handleException(ex)
             End Try
         End Sub
         '
@@ -306,7 +306,7 @@ Namespace Contensive.Core.Controllers
                     Call cpSiteCore.db.cs_Close(cs)
                 End If
             Catch ex As Exception
-                cpSiteCore.handleExceptionAndContinue(ex)
+                cpSiteCore.handleException(ex)
                 Throw
             End Try
             Return returnTaskAdded
@@ -343,7 +343,7 @@ Namespace Contensive.Core.Controllers
                     Next
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnList
         End Function

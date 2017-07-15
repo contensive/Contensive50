@@ -111,7 +111,7 @@ Namespace Contensive.Core.Models.Entity
                 addonCache.propertyBag_nameIndex = ""
                 Call cpCore.cache.setObject(cacheName, addonCache, cnAddons)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -247,7 +247,7 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -306,7 +306,7 @@ Namespace Contensive.Core.Models.Entity
                 End If
                 '
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return ReturnPtr
         End Function
@@ -482,7 +482,7 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
                 'Call main_HandleClassError_RevArgs(Err.Number, Err.Source, Err.Description & " Hint=[" & hint & "]", "cache_addon_load", True, False)
             End Try
         End Sub
@@ -509,7 +509,7 @@ Namespace Contensive.Core.Models.Entity
                 'Call cpCore.cache.setObject("testCache2", localCache)
                 'Call cpCore.cache.setObject("testCache3", "sampleName")
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try            '
         End Sub
     End Class

@@ -249,7 +249,7 @@ Namespace Contensive.Core.Models.Context
                         End If
                     End If
                 Catch ex As Exception
-                    cpCore.handleExceptionAndContinue(ex) : Throw
+                    cpCore.handleException(ex) : Throw
                 End Try
                 Return _childListAddonID_Local
             End Get
@@ -559,7 +559,7 @@ Namespace Contensive.Core.Models.Context
                 'End If
                 'Call cpCore.cache.setObject(cacheName, Value)
             Catch ex As Exception
-                Call cpCore.handleExceptionAndContinue(ex) : Throw
+                Call cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -614,7 +614,7 @@ Namespace Contensive.Core.Models.Context
                     End If
                 End Using
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnString
         End Function
@@ -652,7 +652,7 @@ Namespace Contensive.Core.Models.Context
                 '    End If
                 'End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnString
         End Function
@@ -741,7 +741,7 @@ Namespace Contensive.Core.Models.Context
                     End If
                     returnString = _dataBuildVersion
                 Catch ex As Exception
-                    cpCore.handleExceptionAndContinue(ex) : Throw
+                    cpCore.handleException(ex) : Throw
                 End Try
                 Return returnString
             End Get
@@ -775,7 +775,7 @@ Namespace Contensive.Core.Models.Context
                 End If
                 cs.Close()
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return result
         End Function

@@ -404,7 +404,7 @@ Namespace Contensive.Core
                 Dim ignoreReturnedCollectionGuid As String = ""
                 returnOk = cp.core.addon.addonInstall.InstallCollectionsFromPrivateFile(privatePathFilename, returnUserError, ignoreReturnedCollectionGuid, False)
             Catch ex As Exception
-                cp.core.handleExceptionAndContinue(ex)
+                cp.core.handleException(ex)
                 If Not cp.core.siteProperties.trapErrors Then Throw
             End Try
             Return returnOk

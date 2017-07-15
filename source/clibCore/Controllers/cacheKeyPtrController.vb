@@ -63,7 +63,7 @@ Namespace Contensive.Core.Controllers
                 dataStore.keyPtrIndex = New keyPtrController
                 Call cpCore.cache.setObject(cacheName & "-dataList", dataStore.dataList)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -89,7 +89,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex, "key[" & key & "]")
+                cpCore.handleException(ex, "key[" & key & "]")
             End Try
             Return returnPtr
         End Function
@@ -111,7 +111,7 @@ Namespace Contensive.Core.Controllers
                     returnPtr = dataStore.keyPtrIndex.getNextPtr()
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnPtr
         End Function
@@ -138,7 +138,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex, "key[" & key & "]")
+                cpCore.handleException(ex, "key[" & key & "]")
             End Try
             Return returnPtr
         End Function
@@ -165,7 +165,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex, "ptr[" & ptr.ToString() & "]")
+                cpCore.handleException(ex, "ptr[" & ptr.ToString() & "]")
             End Try
             Return returnValue
         End Function

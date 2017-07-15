@@ -355,22 +355,9 @@ Namespace Contensive.Core.Controllers
                         sb.Append(" IconHeight=""" & GetRSXMLAttribute(appName, dr, "IconHeight") & """")
                         sb.Append(" IconWidth=""" & GetRSXMLAttribute(appName, dr, "IconWidth") & """")
                         sb.Append(" IconSprites=""" & GetRSXMLAttribute(appName, dr, "IconSprites") & """")
-                        '
-                        '
-                        If True Then
-                            '
-                            ' Add IsBaseContent
-                            '
-                            sb.Append(" isbasecontent=""" & GetRSXMLAttribute(appName, dr, "IsBaseContent") & """")
-                        End If
+                        sb.Append(" isbasecontent=""" & GetRSXMLAttribute(appName, dr, "IsBaseContent") & """")
                     End If
-                    '
-                    If True Then
-                        '
-                        ' Add guid
-                        '
-                        sb.Append(" guid=""" & GetRSXMLAttribute(appName, dr, "ccGuid") & """")
-                    End If
+                    sb.Append(" guid=""" & GetRSXMLAttribute(appName, dr, "ccGuid") & """")
                     sb.Append(" >")
                     '
                     ' ----- <field>
@@ -849,7 +836,7 @@ ErrorTrap:
             ' ****************************** if cdef not loaded, this fails
             '
             appName = cpCore.serverConfig.appConfig.name
-            MenuContentID = cpCore.db.getRecordID("Content", "Navigator Entries")
+            MenuContentID = cpCore.db.getRecordID("Content", cnNavigatorEntries)
             dt = cpCore.db.executeSql("select * from ccMenuEntries where (contentcontrolid=" & MenuContentID & ")and(name<>'')")
             If dt.Rows.Count > 0 Then
                 NavIconType = 0
@@ -924,7 +911,7 @@ ErrorTrap:
             '
             ' ****************************** if cdef not loaded, this fails
             '
-            MenuContentID = cpCore.db.getRecordID("Content", "Menu Entries")
+            MenuContentID = cpCore.db.getRecordID("Content", cnNavigatorEntries)
             rs = cpCore.db.executeSql("select * from ccMenuEntries where (contentcontrolid=" & MenuContentID & ")and(name<>'')")
             If (isDataTableOk(rs)) Then
                 If True Then

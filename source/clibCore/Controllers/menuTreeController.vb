@@ -44,7 +44,7 @@ Namespace Contensive.Core.Controllers
             Dim OnClick As String           ' Holds action for onClick
         End Structure
         '
-        ' ----- A collection of menu entries that have a single function (unique name)
+        ' ----- A collection of Navigator Entries that have a single function (unique name)
         '
         'private structure MenuType
         '    Name As String              ' Unique name for this menu
@@ -57,7 +57,7 @@ Namespace Contensive.Core.Controllers
         '    StyleSheetHover As String   ' Hover Stylesheet to put on the whole menu
         '    EntryCount as integer          ' Number of Entries in this panel
         '    EntrySize as integer           ' Number of Entries in this panel
-        '    Entries() As MenuEntryType  ' The menu entries
+        '    Entries() As MenuEntryType  ' The Navigator Entries
         '    End structure
         '
         ' ----- Local storage
@@ -262,7 +262,7 @@ ErrorTrap:
                     End With
                 Next
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
             End Try
             Return result
         End Function
@@ -363,7 +363,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
             End Try
             Return result
         End Function

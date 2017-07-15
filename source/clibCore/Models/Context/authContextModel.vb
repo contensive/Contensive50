@@ -78,7 +78,7 @@ Namespace Contensive.Core.Models.Context
                 If (cpCore.serverConfig Is Nothing) Then
                     '
                     ' -- application error if no server config
-                    cpCore.handleExceptionAndContinue(New ApplicationException("authorization context cannot be created without a server configuration."))
+                    cpCore.handleException(New ApplicationException("authorization context cannot be created without a server configuration."))
                 Else
                     If (cpCore.serverConfig.appConfig Is Nothing) Then
                         '
@@ -595,7 +595,7 @@ Namespace Contensive.Core.Models.Context
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return resultAuthContext
         End Function
@@ -618,7 +618,7 @@ Namespace Contensive.Core.Models.Context
                 'End If
                 'result = isAuthenticatedAdmin_cache
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return result
         End Function
@@ -639,7 +639,7 @@ Namespace Contensive.Core.Models.Context
                 'End If
                 'result = isAuthenticatedDeveloper_cache
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return result
         End Function
@@ -700,7 +700,7 @@ Namespace Contensive.Core.Models.Context
                     Call getContentAccessRights(cpCore, ContentName, returnIsContentManager, notImplemented_allowAdd, notImplemented_allowDelete)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnIsContentManager
         End Function
@@ -731,7 +731,7 @@ Namespace Contensive.Core.Models.Context
                 'property_user_isMember_isLoaded = False
                 'isAuthenticatedDeveloper_cache_isLoaded = False
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -862,7 +862,7 @@ Namespace Contensive.Core.Models.Context
                     Call cpCore.db.cs_Close(CS)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnUserId
         End Function
@@ -911,7 +911,7 @@ Namespace Contensive.Core.Models.Context
                     Call cpCore.db.cs_Close(CSPointer)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnOk
         End Function
@@ -964,7 +964,7 @@ Namespace Contensive.Core.Models.Context
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -1059,7 +1059,7 @@ Namespace Contensive.Core.Models.Context
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -1087,7 +1087,7 @@ Namespace Contensive.Core.Models.Context
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnREsult
         End Function
@@ -1112,7 +1112,7 @@ Namespace Contensive.Core.Models.Context
                     authContext.visit.saveObject(cpCore)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -1151,7 +1151,7 @@ Namespace Contensive.Core.Models.Context
                 Call authContext.user.saveObject(cpCore)
                 returnResult = True
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -1170,7 +1170,7 @@ Namespace Contensive.Core.Models.Context
                 End If
                 returnREsult = isMemberOfGroupList(cpCore, "," & groupController.group_GetGroupID(cpCore, genericController.encodeText(GroupName)), iMemberID, True)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnREsult
         End Function
@@ -1189,7 +1189,7 @@ Namespace Contensive.Core.Models.Context
                 End If
                 returnREsult = isMemberOfGroupList(cpCore, "," & groupController.group_GetGroupID(cpCore, genericController.encodeText(GroupName)), iMemberID, adminReturnsTrue)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnREsult
         End Function
@@ -1207,7 +1207,7 @@ Namespace Contensive.Core.Models.Context
                 End If
                 returnREsult = isMemberOfGroupIdList(cpCore, checkMemberID, isAuthenticated(), GroupIDList, adminReturnsTrue)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnREsult
         End Function
@@ -1227,7 +1227,7 @@ Namespace Contensive.Core.Models.Context
                 'End If
                 'result = property_user_isMember
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return result
         End Function
@@ -1333,7 +1333,7 @@ Namespace Contensive.Core.Models.Context
                 End If
 
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnREsult
         End Function
@@ -1416,7 +1416,7 @@ Namespace Contensive.Core.Models.Context
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -1436,7 +1436,7 @@ Namespace Contensive.Core.Models.Context
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -1457,7 +1457,7 @@ Namespace Contensive.Core.Models.Context
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -1647,7 +1647,7 @@ Namespace Contensive.Core.Models.Context
                     isWorkflowRendering = cpCore.visitProperty.getBoolean("AllowWorkflowRendering")
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return result
         End Function

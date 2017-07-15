@@ -173,7 +173,7 @@ Namespace Contensive.Core.Controllers
                 result = cpCore.appRootFiles.readFile(TestFilename)
                 Call cpCore.appRootFiles.deleteFile(TestFilename)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
             End Try
             Return result
         End Function

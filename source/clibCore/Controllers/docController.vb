@@ -241,7 +241,7 @@ Namespace Contensive.Core.Controllers
                 If (domain Is Nothing) Then
                     '
                     ' -- domain not configured
-                    cpcore.handleExceptionAndContinue(New ApplicationException("Domain [" & cpcore.webServer.requestDomain & "] has not been configured."))
+                    cpcore.handleException(New ApplicationException("Domain [" & cpcore.webServer.requestDomain & "] has not been configured."))
                 Else
                     If (pageId = 0) Then
                         '
@@ -465,7 +465,7 @@ Namespace Contensive.Core.Controllers
                 End If
                 '
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnBody
         End Function
@@ -1409,7 +1409,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpcore.handleExceptionAndContinue(ex)
+                cpcore.handleException(ex)
                 Throw
             End Try
         End Sub
@@ -1455,7 +1455,7 @@ Namespace Contensive.Core.Controllers
                     pageManager_RedirectBecausePageNotFound = True
                     pageManager_RedirectReason = "Redirecting because the page selected could not be found."
                     redirectLink = main_ProcessPageNotFound_GetLink(pageManager_RedirectReason, , , PageID, 0)
-                    cpCore.handleExceptionAndContinue(New ApplicationException("Page could not be determined. Error message displayed."))
+                    cpCore.handleException(New ApplicationException("Page could not be determined. Error message displayed."))
                     Return "<div style=""width:300px; margin: 100px auto auto auto;text-align:center;"">This page is not valid.</div>"
                 End If
                 'PageID = cpCore.docProperties.getInteger(rnPageId)
@@ -1577,7 +1577,7 @@ Namespace Contensive.Core.Controllers
                 End If
                 '
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
             End Try
             Return returnHtml
         End Function
@@ -2070,7 +2070,7 @@ Namespace Contensive.Core.Controllers
                     cpcore.doc.main_AdminWarning = ""
                 End If
             Catch ex As Exception
-                cpcore.handleExceptionAndContinue(ex)
+                cpcore.handleException(ex)
             End Try
             Return returnHtml
         End Function
@@ -2116,7 +2116,7 @@ Namespace Contensive.Core.Controllers
                 '
                 Call debugController.debug_testPoint(cpcore, "pageManager_GetHtmlBody_GetSection_GetContentBox")
             Catch ex As Exception
-                cpcore.handleExceptionAndContinue(ex)
+                cpcore.handleException(ex)
             End Try
             Return result
         End Function
@@ -2346,7 +2346,7 @@ Namespace Contensive.Core.Controllers
                 End If
                 'Call cpcore.db.cs_Close(CS)
             Catch ex As Exception
-                cpcore.handleExceptionAndContinue(ex)
+                cpcore.handleException(ex)
             End Try
             Return result
         End Function
@@ -2445,7 +2445,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                Me.cpcore.handleExceptionAndContinue(ex)
+                Me.cpcore.handleException(ex)
             End Try
             Return result
         End Function
@@ -2460,7 +2460,7 @@ Namespace Contensive.Core.Controllers
             Try
                 main_GetMoreInfo = pageManager_getMoreInfoHtml(cpcore, genericController.EncodeInteger(contactMemberID))
             Catch ex As Exception
-                Me.cpcore.handleExceptionAndContinue(ex)
+                Me.cpcore.handleException(ex)
             End Try
             Return result
         End Function
@@ -2581,7 +2581,7 @@ Namespace Contensive.Core.Controllers
                         result = Panel
                 End Select
             Catch ex As Exception
-                Me.cpcore.handleExceptionAndContinue(ex)
+                Me.cpcore.handleException(ex)
             End Try
         End Function
         '
@@ -2594,7 +2594,7 @@ Namespace Contensive.Core.Controllers
             Try
                 result = main_OpenCSContentWatchList(cpCore, "What's New", SortFieldList, ActiveOnly, PageSize, PageNumber)
             Catch ex As Exception
-                Me.cpcore.handleExceptionAndContinue(ex)
+                Me.cpcore.handleException(ex)
             End Try
             Return result
         End Function
@@ -2672,7 +2672,7 @@ Namespace Contensive.Core.Controllers
                     Call Me.cpcore.db.cs_Close(CS)
                 End If
             Catch ex As Exception
-                Me.cpcore.handleExceptionAndContinue(ex)
+                Me.cpcore.handleException(ex)
             End Try
             Return result
         End Function
@@ -2714,7 +2714,7 @@ Namespace Contensive.Core.Controllers
                 End If
                 Call Me.cpcore.db.cs_Close(CSPointer)
             Catch ex As Exception
-                Me.cpcore.handleExceptionAndContinue(ex)
+                Me.cpcore.handleException(ex)
             End Try
             Return result
         End Function
@@ -2768,7 +2768,7 @@ Namespace Contensive.Core.Controllers
                 '
                 result = Copy
             Catch ex As Exception
-                Me.cpcore.handleExceptionAndContinue(ex)
+                Me.cpcore.handleException(ex)
             End Try
             Return result
         End Function
@@ -2817,7 +2817,7 @@ Namespace Contensive.Core.Controllers
                     result = Me.cpcore.html.main_GetEditWrapper("Watch List [" & ListName & "]", result)
                 End If
             Catch ex As Exception
-                Me.cpcore.handleExceptionAndContinue(ex)
+                Me.cpcore.handleException(ex)
             End Try
             Return result
         End Function
@@ -4036,7 +4036,7 @@ Namespace Contensive.Core.Controllers
         '                Loop
         '                ChildCountWithNoPubs = Ptr
         '                '
-        '                ' ----- Output menu entries
+        '                ' ----- Output Navigator Entries
         '                '
         '                If ChildCount > 0 Then
         '                    '
@@ -7835,7 +7835,7 @@ ErrorTrap:
                     pageId = cpcore.siteProperties.getinteger("PageNotFoundPageID", 0)
                 End If
             Catch ex As Exception
-                cpcore.handleExceptionAndContinue(ex) : Throw
+                cpcore.handleException(ex) : Throw
             End Try
             Return pageId
         End Function
@@ -7991,7 +7991,7 @@ ErrorTrap:
                 If (domain Is Nothing) Then
                     '
                     ' -- domain not available
-                    cpcore.handleExceptionAndContinue(New ApplicationException("Landing page could not be determined because the domain was not recognized."))
+                    cpcore.handleException(New ApplicationException("Landing page could not be determined because the domain was not recognized."))
                 Else
                     landingPageid = domain.RootPageID
                     If landingPageid = 0 Then
@@ -8014,7 +8014,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpcore.handleExceptionAndContinue(ex) : Throw
+                cpcore.handleException(ex) : Throw
             End Try
             Return landingPageid
         End Function
@@ -8135,7 +8135,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpcore.handleExceptionAndContinue(ex) : Throw
+                cpcore.handleException(ex) : Throw
             End Try
             Return sectionId
         End Function
@@ -8283,7 +8283,7 @@ ErrorTrap:
                 End If
                 resultLink = genericController.EncodeAppRootPath(resultLink, cpcore.webServer.webServerIO_requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain)
             Catch ex As Exception
-                cpcore.handleExceptionAndContinue(ex) : Throw
+                cpcore.handleException(ex) : Throw
             End Try
             Return resultLink
         End Function
@@ -8338,7 +8338,7 @@ ErrorTrap:
                 End If
                 Call cpcore.db.cs_Close(CS)
             Catch ex As Exception
-                cpcore.handleExceptionAndContinue(ex)
+                cpcore.handleException(ex)
             End Try
         End Sub
         '
@@ -8671,7 +8671,7 @@ ErrorTrap:
                     refreshQueryString = genericController.ModifyQueryString(cpcore.doc.refreshQueryString, Name, Value, True)
                 End If
             Catch ex As Exception
-                cpcore.handleExceptionAndContinue(ex) : Throw
+                cpcore.handleException(ex) : Throw
             End Try
 
         End Sub

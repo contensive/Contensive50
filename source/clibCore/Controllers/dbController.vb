@@ -113,7 +113,7 @@ Namespace Contensive.Core.Controllers
                 _sqlTimeoutSecond = 30
                 sqlSlowThreshholdMsec = 1000
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         ''
@@ -193,7 +193,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnConnString
         End Function
@@ -256,7 +256,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnConnString
         End Function
@@ -346,17 +346,17 @@ Namespace Contensive.Core.Controllers
                 If (cpCore.serverConfig Is Nothing) Then
                     '
                     ' -- server config fail
-                    cpCore.handleExceptionAndContinue(New ApplicationException("Cannot execute Sql in dbController without an application"))
+                    cpCore.handleException(New ApplicationException("Cannot execute Sql in dbController without an application"))
                 ElseIf (cpCore.serverConfig.appConfig Is Nothing) Then
                     '
                     ' -- server config fail
-                    cpCore.handleExceptionAndContinue(New ApplicationException("Cannot execute Sql in dbController without an application"))
+                    cpCore.handleException(New ApplicationException("Cannot execute Sql in dbController without an application"))
                 Else
                     returnData = executeSql_noErrorHandling(sql, getConnectionStringADONET(cpCore.serverConfig.appConfig.name, dataSourceName), startRecord, maxRecords, recordsAffected)
                 End If
             Catch ex As Exception
                 Dim newEx As New ApplicationException("Exception [" & ex.Message & "] executing sql [" & sql & "], datasource [" & dataSourceName & "], startRecord [" & startRecord & "], maxRecords [" & maxRecords & "]", ex)
-                cpCore.handleExceptionAndContinue(newEx)
+                cpCore.handleException(newEx)
             End Try
             Return returnData
         End Function
@@ -433,7 +433,7 @@ Namespace Contensive.Core.Controllers
                 End If
             Catch ex As Exception
                 Dim newEx As New ApplicationException("Exception [" & ex.Message & "] executing sql [" & sql & "], datasource [" & dataSourceName & "], startRecord [" & startRecord & "], maxRecords [" & maxRecords & "]", ex)
-                cpCore.handleExceptionAndContinue(newEx)
+                cpCore.handleException(newEx)
                 Throw newEx
             End Try
             Return rs
@@ -465,31 +465,31 @@ Namespace Contensive.Core.Controllers
                 End If
             Catch ex As Exception
                 Dim newEx As New ApplicationException("Exception [" & ex.Message & "] executing sql async [" & sql & "], datasource [" & dataSourceName & "]", ex)
-                cpCore.handleExceptionAndContinue(newEx)
+                cpCore.handleException(newEx)
                 Throw newEx
             End Try
         End Sub
-        '
-        '========================================================================
-        ''' <summary>
-        ''' Get a Contents ID from the ContentName, Returns -1 if not found
-        ''' </summary>
-        ''' <param name="ContentName"></param>
-        ''' <returns></returns>
-        Public Function getContentId(ByVal ContentName As String) As Integer
-            Dim returnId As Integer = -1
-            Try
-                Dim cdef As cdefModel
-                '
-                cdef = cpCore.metaData.getCdef(ContentName)
-                If (cdef IsNot Nothing) Then
-                    returnId = cdef.Id
-                End If
-            Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
-            End Try
-            Return returnId
-        End Function
+        ''
+        ''========================================================================
+        '''' <summary>
+        '''' Get a Contents ID from the ContentName, Returns -1 if not found
+        '''' </summary>
+        '''' <param name="ContentName"></param>
+        '''' <returns></returns>
+        'Public Function getContentId(ByVal ContentName As String) As Integer
+        '    Dim returnId As Integer = -1
+        '    Try
+        '        If (Not String.IsNullOrEmpty(ContentName.Trim())) Then
+        '            Dim cdef As cdefModel = cpCore.metaData.getCdef(ContentName)
+        '            If (cdef IsNot Nothing) Then
+        '                returnId = cdef.Id
+        '            End If
+        '        End If
+        '    Catch ex As Exception
+        '        cpCore.handleException(ex) : Throw
+        '    End Try
+        '    Return returnId
+        'End Function
         '
         '========================================================================
         ''' <summary>
@@ -505,7 +505,7 @@ Namespace Contensive.Core.Controllers
                 Dim dt As DataTable = executeSql(SQL, DataSourceName)
                 dt.Dispose()
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -526,7 +526,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End Using
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnId
         End Function
@@ -546,7 +546,7 @@ Namespace Contensive.Core.Controllers
                 Dim CreateKeyString As String
                 Dim DateAddedString As String
                 '
-                CreateKeyString = encodeSQLNumber(genericController.getRandomInteger)
+                CreateKeyString = encodeSQLNumber(genericController.GetRandomInteger)
                 DateAddedString = encodeSQLDate(Now)
                 '
                 sqlList.add("createkey", CreateKeyString)
@@ -564,7 +564,7 @@ Namespace Contensive.Core.Controllers
                 Call insertTableRecord(DataSourceName, TableName, sqlList)
                 returnDt = openTable(DataSourceName, TableName, "(DateAdded=" & DateAddedString & ")and(CreateKey=" & CreateKeyString & ")", "ID DESC",, 1)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnDt
         End Function
@@ -584,7 +584,7 @@ Namespace Contensive.Core.Controllers
                     dt.Dispose()
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -619,7 +619,7 @@ Namespace Contensive.Core.Controllers
                 'SQL &= ";"
                 returnDataTable = executeSql(SQL, DataSourceName, (PageNumber - 1) * PageSize, PageSize)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnDataTable
         End Function
@@ -672,7 +672,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnPos
         End Function
@@ -693,7 +693,7 @@ Namespace Contensive.Core.Controllers
                     returnOK = tableSchema.columns.Contains(FieldName.ToLower)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnOK
         End Function
@@ -710,7 +710,7 @@ Namespace Contensive.Core.Controllers
             Try
                 ReturnOK = (Not cpCore.metaData.getTableSchema(TableName, DataSourceName) Is Nothing)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return ReturnOK
         End Function
@@ -792,7 +792,7 @@ Namespace Contensive.Core.Controllers
                 End If
                 cpCore.metaData.tableSchemaListClear()
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -855,7 +855,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -871,7 +871,7 @@ Namespace Contensive.Core.Controllers
                 cpCore.cache.invalidateAll()
                 cpCore.metaData.clear()
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -905,7 +905,7 @@ Namespace Contensive.Core.Controllers
                     Call executeSql("ALTER TABLE " & TableName & " DROP COLUMN " & FieldName & ";", DataSourceName)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -934,7 +934,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -954,14 +954,14 @@ Namespace Contensive.Core.Controllers
                 End If
                 Call cs_Close(CS)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnRecordName
         End Function
         '
         '=============================================================
         ''' <summary>
-        ''' get the lowest recordId based on its name. If not record is found, 0 is returned
+        ''' get the lowest recordId based on its name. If no record is found, 0 is returned
         ''' </summary>
         ''' <param name="ContentName"></param>
         ''' <param name="RecordName"></param>
@@ -969,16 +969,15 @@ Namespace Contensive.Core.Controllers
         Public Function getRecordID(ByVal ContentName As String, ByVal RecordName As String) As Integer
             Dim returnValue As Integer = 0
             Try
-                Dim CS As Integer = cs_open(ContentName, "name=" & encodeSQLText(RecordName), "ID", , , , , "ID")
-                If cs_ok(CS) Then
-                    returnValue = genericController.EncodeInteger(cs_get(CS, "ID"))
-                    If returnValue = 0 Then
-                        Throw New ApplicationException("getRecordId, contentname [" & ContentName & "], recordName [" & RecordName & "]), a record was found but id returned 0")
+                If (Not String.IsNullOrEmpty(ContentName.Trim())) And (Not String.IsNullOrEmpty(RecordName.Trim())) Then
+                    Dim cs As Integer = cs_open(ContentName, "name=" & encodeSQLText(RecordName), "ID", , , , , "ID")
+                    If cs_ok(cs) Then
+                        returnValue = cs_getInteger(cs, "ID")
                     End If
+                    Call cs_Close(cs)
                 End If
-                Call cs_Close(CS)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnValue
         End Function
@@ -1047,7 +1046,7 @@ Namespace Contensive.Core.Controllers
                         Throw New ApplicationException("Can Not proceed because the field being created has an invalid FieldType [" & fieldType & "]")
                 End Select
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnType
         End Function
@@ -1084,7 +1083,7 @@ Namespace Contensive.Core.Controllers
                 End If
 
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -1102,7 +1101,7 @@ Namespace Contensive.Core.Controllers
                 isCdefField = genericController.isDataTableOk(dt)
                 dt.Dispose()
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnOk
         End Function
@@ -1153,7 +1152,7 @@ Namespace Contensive.Core.Controllers
                         returnType = FieldTypeIdText
                 End Select
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnType
         End Function
@@ -1221,7 +1220,7 @@ Namespace Contensive.Core.Controllers
                         returnTypeId = FieldTypeIdText
                 End Select
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnTypeId
         End Function
@@ -1565,7 +1564,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnCs
         End Function
@@ -1666,7 +1665,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -1717,7 +1716,7 @@ Namespace Contensive.Core.Controllers
                     'Call cs_loadCurrentRow(returnCs)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnCs
         End Function
@@ -1767,7 +1766,7 @@ Namespace Contensive.Core.Controllers
                     .LastUsed = DateTime.Now
                 End With
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnCs
         End Function
@@ -1801,7 +1800,7 @@ Namespace Contensive.Core.Controllers
                     CSPointer = -1
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -1844,7 +1843,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -1861,7 +1860,7 @@ Namespace Contensive.Core.Controllers
                     contentSetStore(CSPointer).readCacheRowPtr = 0
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -1951,7 +1950,7 @@ Namespace Contensive.Core.Controllers
                     End With
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnValue
         End Function
@@ -1972,7 +1971,7 @@ Namespace Contensive.Core.Controllers
                     returnFieldName = cs_getNextFieldName(CSPointer)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnFieldName
         End Function
@@ -2004,7 +2003,7 @@ Namespace Contensive.Core.Controllers
                     End With
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnFieldName
         End Function
@@ -2029,7 +2028,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnFieldTypeid
         End Function
@@ -2057,7 +2056,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -2091,7 +2090,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -2115,7 +2114,7 @@ Namespace Contensive.Core.Controllers
                     returnResult = genericController.IsInDelimitedString(CSSelectFieldList, FieldName, ",")
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -2230,7 +2229,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnFilename
         End Function
@@ -2320,7 +2319,7 @@ Namespace Contensive.Core.Controllers
                     End With
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -2347,7 +2346,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return result
         End Function
@@ -2455,7 +2454,7 @@ Namespace Contensive.Core.Controllers
                     result = dr.Item(FieldName).ToString
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return result
         End Function
@@ -2484,7 +2483,7 @@ Namespace Contensive.Core.Controllers
                 End If
                 Call cs_Close(CS)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return result
         End Function
@@ -2513,7 +2512,7 @@ Namespace Contensive.Core.Controllers
                     Call cs_Close(CSPointer)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -2577,7 +2576,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -2725,7 +2724,7 @@ Namespace Contensive.Core.Controllers
                                 Call sqlList.add("EDITBLANK", SQLFalse) ' ArrayPointer)
                             End If
                             '
-                            CreateKeyString = encodeSQLNumber(genericController.getRandomInteger)
+                            CreateKeyString = encodeSQLNumber(genericController.GetRandomInteger)
                             DateAddedString = encodeSQLDate(Now)
                             '
                             Call sqlList.add("CREATEKEY", CreateKeyString) ' ArrayPointer)
@@ -2749,7 +2748,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnCs
         End Function        '
@@ -2769,7 +2768,7 @@ Namespace Contensive.Core.Controllers
                     returnResult = cs_open(ContentName, "(ID=" & encodeSQLNumber(RecordID) & ")", , False, MemberID, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -2793,7 +2792,7 @@ Namespace Contensive.Core.Controllers
                     End With
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -2871,7 +2870,7 @@ Namespace Contensive.Core.Controllers
                     Call cs_save2(CSDestination)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub   '
         '       
@@ -2890,7 +2889,7 @@ Namespace Contensive.Core.Controllers
                     returnResult = contentSetStore(CSPointer).Source
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -3090,7 +3089,7 @@ Namespace Contensive.Core.Controllers
                     End With
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return fieldValue
         End Function
@@ -3257,7 +3256,7 @@ Namespace Contensive.Core.Controllers
                                                 ' Set if text of value changes
                                                 '
                                                 If (FieldValue.Length > 255) Then
-                                                    cpCore.handleExceptionAndContinue(New ApplicationException("Text length too long saving field [" & FieldName & "], length [" & FieldValue.Length & "], but max for Text field is 255. Save will be attempted"))
+                                                    cpCore.handleException(New ApplicationException("Text length too long saving field [" & FieldName & "], length [" & FieldValue.Length & "], but max for Text field is 255. Save will be attempted"))
                                                 Else
                                                     If genericController.encodeText(FieldValue) <> cs_getText(CSPointer, FieldNameLc) Then
                                                         SetNeeded = True
@@ -3268,7 +3267,7 @@ Namespace Contensive.Core.Controllers
                                                 ' Set if text of value changes
                                                 '
                                                 If (FieldValue.Length > 65535) Then
-                                                    cpCore.handleExceptionAndContinue(New ApplicationException("Text length too long saving field [" & FieldName & "], length [" & FieldValue.Length & "], but max for LongText and Html is 65535. Save will be attempted"))
+                                                    cpCore.handleException(New ApplicationException("Text length too long saving field [" & FieldName & "], length [" & FieldValue.Length & "], but max for LongText and Html is 65535. Save will be attempted"))
                                                 Else
                                                     If genericController.encodeText(FieldValue) <> cs_getText(CSPointer, FieldNameLc) Then
                                                         SetNeeded = True
@@ -3310,7 +3309,7 @@ Namespace Contensive.Core.Controllers
                     End With
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         Public Sub cs_set(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal FieldValue As Date)
@@ -3339,7 +3338,7 @@ Namespace Contensive.Core.Controllers
                     contentSetStore(CSPointer).writeCache.Clear()
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -3736,7 +3735,7 @@ Namespace Contensive.Core.Controllers
                     End With
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -3772,7 +3771,7 @@ Namespace Contensive.Core.Controllers
                     .writeCache = New Dictionary(Of String, String)
                 End With
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -3794,7 +3793,7 @@ Namespace Contensive.Core.Controllers
                     End With
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -3823,11 +3822,11 @@ Namespace Contensive.Core.Controllers
                     Case FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdRedirect, FieldTypeIdManyToMany, FieldTypeIdText, FieldTypeIdFileTextPrivate, FieldTypeIdFileJavascript, FieldTypeIdFileXML, FieldTypeIdFileCSS, FieldTypeIdFileHTMLPrivate
                         returnResult = encodeSQLText(genericController.encodeText(expression))
                     Case Else
-                        cpCore.handleExceptionAndContinue(New ApplicationException("Unknown Field Type [" & fieldType & ""))
+                        cpCore.handleException(New ApplicationException("Unknown Field Type [" & fieldType & ""))
                         returnResult = encodeSQLText(genericController.encodeText(expression))
                 End Select
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -3877,7 +3876,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -3931,7 +3930,7 @@ Namespace Contensive.Core.Controllers
                     returnResult = SQLTrue
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -3979,7 +3978,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -4058,7 +4057,7 @@ Namespace Contensive.Core.Controllers
                     returnResult = cs_openCsSql_rev("default", SQL, PageSize, PageNumber)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function '
@@ -4081,7 +4080,7 @@ Namespace Contensive.Core.Controllers
                 End If
                 dt.Dispose()
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -4104,7 +4103,7 @@ Namespace Contensive.Core.Controllers
                     Call DeleteTableRecords(TableName, "ID=" & RecordID, DataSourceName)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub     '
         '==================================================================================================
@@ -4202,7 +4201,7 @@ Namespace Contensive.Core.Controllers
                     End Select
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -4231,7 +4230,7 @@ Namespace Contensive.Core.Controllers
             Try
                 returnResult = contentSetStore(CSPointer).readCache
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -4296,7 +4295,7 @@ Namespace Contensive.Core.Controllers
                     returnResult = contentSetStore(CSPointer).readCacheRowCnt
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -4317,7 +4316,7 @@ Namespace Contensive.Core.Controllers
                     returnResult = contentSetStore(CSPointer).fieldNames
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -4343,7 +4342,7 @@ Namespace Contensive.Core.Controllers
                     Call executeSql(SQL, DataSourceName)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -4363,7 +4362,7 @@ Namespace Contensive.Core.Controllers
                     returnResult = contentSetStore(CSPointer).ContentName
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -4434,7 +4433,7 @@ Namespace Contensive.Core.Controllers
                         End If
                 End Select
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex, "Unexpected exception")
+                cpCore.handleException(ex, "Unexpected exception")
             End Try
             Return returnFieldTypeName
         End Function
@@ -4553,7 +4552,7 @@ Namespace Contensive.Core.Controllers
                     Call cs_Close(CS)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -4573,7 +4572,7 @@ Namespace Contensive.Core.Controllers
                 Call cs_Close(CS)
                 '
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnRows
         End Function
@@ -4648,7 +4647,7 @@ Namespace Contensive.Core.Controllers
                     Next
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -4705,7 +4704,7 @@ Namespace Contensive.Core.Controllers
                         End If
                 End Select
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return SQL
         End Function
@@ -4730,7 +4729,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnList
         End Function
@@ -4750,7 +4749,7 @@ Namespace Contensive.Core.Controllers
                     returnDt = connSQL.GetSchema("Tables", {cpCore.serverConfig.appConfig.name, Nothing, tableName, Nothing})
                 End Using
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnDt
         End Function
@@ -4774,7 +4773,7 @@ Namespace Contensive.Core.Controllers
                     End Using
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnDt
         End Function
@@ -4794,7 +4793,7 @@ Namespace Contensive.Core.Controllers
                     End Using
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnDt
         End Function
@@ -4858,7 +4857,7 @@ Namespace Contensive.Core.Controllers
                     sqlCriteria = "name=" & encodeSQLText(nameIdOrGuid)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return sqlCriteria
         End Function
@@ -4878,7 +4877,7 @@ Namespace Contensive.Core.Controllers
                 End If
                 dt.Dispose()
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnContentId
         End Function
@@ -4947,7 +4946,7 @@ Namespace Contensive.Core.Controllers
                 '
                 'DataSourceID = cpCore.db.GetDataSourceID(DataSourceName)
                 DateAddedString = cpCore.db.encodeSQLDate(Now())
-                CreateKeyString = cpCore.db.encodeSQLNumber(genericController.getRandomInteger)
+                CreateKeyString = cpCore.db.encodeSQLNumber(genericController.GetRandomInteger)
                 '
                 '----------------------------------------------------------------
                 ' ----- Read in a record from the table to get fields
@@ -4973,7 +4972,7 @@ Namespace Contensive.Core.Controllers
                     ' --- Find/Create the Content Definition
                     '----------------------------------------------------------------
                     '
-                    ContentID = cpCore.db.getContentId(ContentName)
+                    ContentID = cpCore.metaData.getContentId(ContentName)
                     If (ContentID < 0) Then
                         '
                         ' ----- Content definition not found, create it
@@ -5045,7 +5044,7 @@ Namespace Contensive.Core.Controllers
                 cpCore.metaData.clear()
                 dt.Dispose()
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         ' 
@@ -5242,7 +5241,7 @@ Namespace Contensive.Core.Controllers
                 End Select
                 Call cpCore.metaData.verifyCDefField_ReturnID(ContentName, field)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -5279,7 +5278,7 @@ Namespace Contensive.Core.Controllers
                     Next
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return rows
         End Function
@@ -5303,7 +5302,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
             End Try
         End Sub
         '

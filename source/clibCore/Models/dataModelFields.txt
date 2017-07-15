@@ -1664,45 +1664,43 @@ instance.NewWindow = genericController.EncodeBoolean(.fields("NewWindow").defaul
 instance.ParentID = genericController.EncodeInteger(.fields("ParentID").defaultValue)
 instance.SortOrder = genericController.EncodeText(.fields("SortOrder").defaultValue)
 
----------------------------------------------
-MenuEntrieModel
-
-public ccGuid as String
-public NavIconTitle as String
-public NavIconType as Integer
-public ParentID as Integer
-
-.ccGuid = cs.getText("ccGuid")
-.NavIconTitle = cs.getText("NavIconTitle")
-.NavIconType = cs.getInteger("NavIconType")
-.ParentID = cs.getInteger("ParentID")
-
-cs.SetField("ccGuid", ccGuid)
-cs.SetField("NavIconTitle", NavIconTitle)
-cs.SetField("NavIconType", NavIconType.ToString())
-cs.SetField("ParentID", ParentID.ToString())
-if (String.IsNullOrEmpty(ccGuid)) Then ccGuid = Controllers.genericController.getGUID()
-
-instance.ccGuid = genericController.EncodeText(.fields("ccGuid").defaultValue)
-instance.NavIconTitle = genericController.EncodeText(.fields("NavIconTitle").defaultValue)
-instance.NavIconType = genericController.EncodeInteger(.fields("NavIconType").defaultValue)
-instance.ParentID = genericController.EncodeInteger(.fields("ParentID").defaultValue)
 
 ---------------------------------------------
 NavigatorEntrieModel
 
 public Name as String
 public ParentID as Integer
-
-.Name = cs.getText("Name")
-.ParentID = cs.getInteger("ParentID")
-
-cs.SetField("Name", Name)
-cs.SetField("ParentID", ParentID.ToString())
-if (String.IsNullOrEmpty(ccGuid)) Then ccGuid = Controllers.genericController.getGUID()
-
-instance.Name = genericController.EncodeText(.fields("Name").defaultValue)
-instance.ParentID = genericController.EncodeInteger(.fields("ParentID").defaultValue)
+public ccGuid as String
+public NavIconTitle as String
+public NavIconType as Integer
+public ParentID as Integer
+public ID as Integer
+public Active as Boolean
+public AddonID as Integer
+public AdminOnly as Boolean
+public ccGuid as String
+public ContentCategoryID as Integer
+public ContentControlID as Integer
+public ContentID as Integer
+public CreatedBy as Integer
+public CreateKey as Integer
+public DateAdded as Date
+public DeveloperOnly as Boolean
+public EditArchive as Boolean
+public EditBlank as Boolean
+public EditSourceID as Integer
+public HelpAddonID as Integer
+public HelpCollectionID as Integer
+public InstalledByCollectionID as Integer
+public LinkPage as String
+public ModifiedBy as Integer
+public ModifiedDate as Date
+public Name as String
+public NavIconTitle as String
+public NavIconType as Integer
+public NewWindow as Boolean
+public ParentID as Integer
+public SortOrder as String
 
 ---------------------------------------------
 ReportRuleModel

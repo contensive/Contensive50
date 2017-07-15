@@ -195,7 +195,7 @@ Namespace Contensive.Core.Models.Entity
             Try
                 result = createList(cpCore, "(OnNewVisitEvent<>0)")
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return result
         End Function
@@ -212,7 +212,7 @@ Namespace Contensive.Core.Models.Entity
             Try
                 result = createList(cpCore, "(OnPageStartEvent<>0)")
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return result
         End Function
@@ -229,7 +229,7 @@ Namespace Contensive.Core.Models.Entity
             Try
                 result = createList(cpCore, "(remoteMethod=1)")
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return result
         End Function

@@ -214,7 +214,7 @@ Namespace Contensive.Core
                 End If
                 Call cs.Close()
             Catch ex As Exception
-                Call cpCore.handleExceptionAndContinue(ex, "Unexpected error in getLayout")
+                Call cpCore.handleException(ex, "Unexpected error in getLayout")
             End Try
             Return result
         End Function
@@ -231,7 +231,7 @@ Namespace Contensive.Core
                 End If
                 Call cs.Close()
             Catch ex As Exception
-                Call cpCore.handleExceptionAndContinue(ex, "Unexpected error in AddRecord")
+                Call cpCore.handleException(ex, "Unexpected error in AddRecord")
             End Try
             Return recordId
         End Function
@@ -251,7 +251,7 @@ Namespace Contensive.Core
                 End If
                 Call cs.Close()
             Catch ex As Exception
-                Call cpCore.handleExceptionAndContinue(ex, "Unexpected error in AddRecord")
+                Call cpCore.handleException(ex, "Unexpected error in AddRecord")
             End Try
             Return recordId
         End Function
@@ -378,7 +378,7 @@ Namespace Contensive.Core
                     & " align=""absmiddle""" _
                     & "></a>"
             Catch ex As Exception
-                Call cpCore.handleExceptionAndContinue(ex, "Unexpected error in GetListLink")
+                Call cpCore.handleException(ex, "Unexpected error in GetListLink")
             End Try
             Return returnHtml
         End Function

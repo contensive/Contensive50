@@ -60,7 +60,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnValue
         End Function
@@ -95,7 +95,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnValue
         End Function
@@ -146,7 +146,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnValue
         End Function
@@ -187,7 +187,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnValue
         End Function
@@ -350,7 +350,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnValue
         End Function
@@ -539,7 +539,7 @@ Namespace Contensive.Core.Controllers
                 '
                 returnValue = returnPos
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnValue
         End Function
@@ -550,7 +550,7 @@ Namespace Contensive.Core.Controllers
             Try
                 returnValue = getTagStartPos2(ignore, layout, layoutStartPos, Key)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnValue
         End Function
@@ -667,7 +667,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnValue
         End Function
@@ -847,13 +847,13 @@ ErrorTrap:
                 '
                 cpCore.main_ClosePageCounter = cpCore.main_ClosePageCounter + 1
                 If cpCore.webServer.webServerIO_InitCounter = 0 Then
-                    cpCore.handleExceptionAndContinue(New Exception("Page was not initialized properly. Init(...) call may be missing."))
+                    cpCore.handleException(New Exception("Page was not initialized properly. Init(...) call may be missing."))
                 End If
                 If cpCore.webServer.webServerIO_InitCounter > 1 Then
-                    cpCore.handleExceptionAndContinue(New Exception("Page was not initialized properly. Init(...) was called multiple times."))
+                    cpCore.handleException(New Exception("Page was not initialized properly. Init(...) was called multiple times."))
                 End If
                 If cpCore.main_ClosePageCounter > 1 Then
-                    cpCore.handleExceptionAndContinue(New Exception("Page was not closed properly. main_GetEndOfBody was called multiple times."))
+                    cpCore.handleException(New Exception("Page was not closed properly. main_GetEndOfBody was called multiple times."))
                 End If
                 '
                 ' ----- add window.print if this is the Printerversion
@@ -1070,7 +1070,7 @@ ErrorTrap:
                     s = s & cpCore.doc.main_endOfBodyString
                 End If
             Catch ex As Exception
-                Call cpCore.handleExceptionAndContinue(ex) : Throw
+                Call cpCore.handleException(ex) : Throw
             End Try
             Return s
         End Function
@@ -1201,7 +1201,7 @@ ErrorTrap:
                     Call errorController.error_AddUserError(cpCore, "The drop down list for " & ContentName & " called " & MenuName & " is too long to display. The site administrator has been notified and the problem will be resolved shortly. To fix this issue temporarily, go to the admin tab of the Preferences page and set the Select Field Limit larger than " & RowCnt & ".")
                     '                    cpcore.handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
 
-                    cpCore.handleExceptionAndContinue(New Exception("Error creating select list from content [" & ContentName & "] called [" & MenuName & "]. Selection of [" & RowCnt & "] records exceeds [" & cpCore.siteProperties.selectFieldLimit & "], the current Site Property SelectFieldLimit."))
+                    cpCore.handleException(New Exception("Error creating select list from content [" & ContentName & "] called [" & MenuName & "]. Selection of [" & RowCnt & "] records exceeds [" & cpCore.siteProperties.selectFieldLimit & "], the current Site Property SelectFieldLimit."))
                     main_GetFormInputSelect2 = main_GetFormInputSelect2 & html_GetFormInputHidden(MenuNameFPO, CurrentValue)
                     If CurrentValue = 0 Then
                         main_GetFormInputSelect2 = html_GetFormInputText2(MenuName, "0")
@@ -1278,7 +1278,7 @@ ErrorTrap:
                         DropDownFieldCount = DropDownFieldCount + 1
                     End If
                     If DropDownFieldCount = 0 Then
-                        cpCore.handleExceptionAndContinue(New Exception("No drop down field names found for content [" & ContentName & "]."))
+                        cpCore.handleException(New Exception("No drop down field names found for content [" & ContentName & "]."))
                     Else
                         ReDim DropDownFieldPointer(DropDownFieldCount - 1)
                         SelectFields = "ID"
@@ -1549,7 +1549,7 @@ ErrorTrap:
                     '
                     ' Selection is too big
                     '
-                    cpCore.handleExceptionAndContinue(New Exception("While building a group members list for group [" & groupController.group_GetGroupName(cpCore, GroupID) & "], too many rows were selected. [" & RowMax & "] records exceeds [" & cpCore.siteProperties.selectFieldLimit & "], the current Site Property app.SiteProperty_SelectFieldLimit."))
+                    cpCore.handleException(New Exception("While building a group members list for group [" & groupController.group_GetGroupName(cpCore, GroupID) & "], too many rows were selected. [" & RowMax & "] records exceeds [" & cpCore.siteProperties.selectFieldLimit & "], the current Site Property app.SiteProperty_SelectFieldLimit."))
                     html_GetFormInputMemberSelect2 = html_GetFormInputMemberSelect2 & html_GetFormInputHidden(MenuNameFPO, iCurrentValue)
                     If iCurrentValue <> 0 Then
                         CSPointer = cpCore.db.csOpenRecord("people", iCurrentValue)
@@ -1623,7 +1623,7 @@ ErrorTrap:
                         DropDownFieldCount = DropDownFieldCount + 1
                     End If
                     If DropDownFieldCount = 0 Then
-                        cpCore.handleExceptionAndContinue(New Exception("No drop down field names found for content [" & GroupID & "]."))
+                        cpCore.handleException(New Exception("No drop down field names found for content [" & GroupID & "]."))
                     Else
                         ReDim DropDownFieldPointer(DropDownFieldCount - 1)
                         SelectFields = "P.ID"
@@ -2066,7 +2066,7 @@ ErrorTrap:
                     cpCore.doc.outputBufferEnabled = BufferOn
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
 
@@ -2324,7 +2324,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            cpCore.handleExceptionAndContinue(New Exception("Unexpected exception"))
+            cpCore.handleException(New Exception("Unexpected exception"))
             '
         End Function
         '
@@ -2667,7 +2667,7 @@ ErrorTrap:
                         End With
                     Next
                     If Not fieldFound Then
-                        cpCore.handleExceptionAndContinue(New Exception("Field [" & FieldName & "] was not found in Content Definition [" & ContentName & "]"))
+                        cpCore.handleException(New Exception("Field [" & FieldName & "] was not found in Content Definition [" & ContentName & "]"))
                     Else
                         '
                         ' main_Get the current value if the record was found
@@ -2839,7 +2839,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Function
         '
@@ -3304,7 +3304,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            cpCore.handleExceptionAndContinue(New Exception("Unexpected exception"))
+            cpCore.handleException(New Exception("Unexpected exception"))
             '
         End Function
         ''
@@ -3669,7 +3669,7 @@ ErrorTrap:
                     LoopPtr = LoopPtr + 1
                 Loop
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnValue
         End Function
@@ -4704,7 +4704,7 @@ ErrorTrap:
                 End If
                 result = workingContent
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return result
         End Function
@@ -5358,7 +5358,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
             End Try
             Return result
             '
@@ -6078,7 +6078,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            cpCore.handleExceptionAndContinue(New Exception("Unexpected exception"))
+            cpCore.handleException(New Exception("Unexpected exception"))
         End Function
         '
         '========================================================================
@@ -6136,7 +6136,7 @@ ErrorTrap:
                 End If
 
             Catch ex As Exception
-                Call cpCore.handleExceptionAndContinue(ex) : Throw
+                Call cpCore.handleException(ex) : Throw
             End Try
             Return returnHtml
         End Function
@@ -6462,14 +6462,14 @@ ErrorTrap:
                 '
                 ' ----- Public Site call, must have contentname and recordid
                 '
-                cpCore.handleExceptionAndContinue(New Exception("invalid content [" & ContentName & "], RecordID [" & RecordID & "]"))
+                cpCore.handleException(New Exception("invalid content [" & ContentName & "], RecordID [" & RecordID & "]"))
             Else
                 '
                 ' ----- Normal Content Edit - find instance in the content
                 '
                 CS = cpCore.db.csOpenRecord(ContentName, RecordID)
                 If Not cpCore.db.cs_ok(CS) Then
-                    cpCore.handleExceptionAndContinue(New Exception("No record found with content [" & ContentName & "] and RecordID [" & RecordID & "]"))
+                    cpCore.handleException(New Exception("No record found with content [" & ContentName & "] and RecordID [" & RecordID & "]"))
                 Else
                     If FieldName <> "" Then
                         '
@@ -6503,7 +6503,7 @@ ErrorTrap:
                     ' Parse out the Addon Name
                     '
                     If PosACInstanceID = 0 Then
-                        cpCore.handleExceptionAndContinue(New Exception("AC Instance [" & ACInstanceID & "] not found in record with content [" & ContentName & "] and RecordID [" & RecordID & "]"))
+                        cpCore.handleException(New Exception("AC Instance [" & ACInstanceID & "] not found in record with content [" & ContentName & "] and RecordID [" & RecordID & "]"))
                     Else
                         Copy = html_EncodeContentUpgrades(Copy)
                         ParseOK = False
@@ -6602,7 +6602,7 @@ ErrorTrap:
                             End If
                         End If
                         If Not ParseOK Then
-                            cpCore.handleExceptionAndContinue(New Exception("There was a problem parsing AC Instance [" & ACInstanceID & "] record with content [" & ContentName & "] and RecordID [" & RecordID & "]"))
+                            cpCore.handleException(New Exception("There was a problem parsing AC Instance [" & ACInstanceID & "] record with content [" & ContentName & "] and RecordID [" & RecordID & "]"))
                         End If
                     End If
                 End If
@@ -6917,7 +6917,7 @@ ErrorTrap:
                 CaptionFieldName = genericController.encodeEmptyText(CaptionFieldName, "name")
                 If PrimaryContentName = "" Or SecondaryContentName = "" Or RulesContentName = "" Or RulesPrimaryFieldname = "" Or RulesSecondaryFieldName = "" Then
                     returnHtml = "[Checklist not configured]"
-                    cpCore.handleExceptionAndContinue(New Exception("Creating checklist, all required fields were not supplied, Caption=[" & CaptionFieldName & "], PrimaryContentName=[" & PrimaryContentName & "], SecondaryContentName=[" & SecondaryContentName & "], RulesContentName=[" & RulesContentName & "], RulesPrimaryFieldName=[" & RulesPrimaryFieldname & "], RulesSecondaryFieldName=[" & RulesSecondaryFieldName & "]"))
+                    cpCore.handleException(New Exception("Creating checklist, all required fields were not supplied, Caption=[" & CaptionFieldName & "], PrimaryContentName=[" & PrimaryContentName & "], SecondaryContentName=[" & SecondaryContentName & "], RulesContentName=[" & RulesContentName & "], RulesPrimaryFieldName=[" & RulesPrimaryFieldname & "], RulesSecondaryFieldName=[" & RulesSecondaryFieldName & "]"))
                 Else
                     '
                     ' ----- Gather all the SecondaryContent that associates to the PrimaryContent
@@ -7186,7 +7186,7 @@ ErrorTrap:
                     cpCore.doc.main_CheckListCnt = cpCore.doc.main_CheckListCnt + 1
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnHtml
         End Function
@@ -8621,7 +8621,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            cpCore.handleExceptionAndContinue(New Exception("Unexpected exception"))
+            cpCore.handleException(New Exception("Unexpected exception"))
             'Call csv_HandleClassTrapError(Err.Number, Err.Source, Err.Description, "unknownMethodNameLegacyCall" & ", hint=[" & hint & "]", True)
         End Function
         '
@@ -8671,7 +8671,7 @@ ErrorTrap:
                 End If
                 Call cpCore.db.cs_Close(CS)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnCopy
         End Function
@@ -8817,7 +8817,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnREsult
         End Function
@@ -8830,7 +8830,7 @@ ErrorTrap:
             Try
                 Call cpCore.email.sendPassword(cpCore.docProperties.getText("email"))
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -8865,7 +8865,7 @@ ErrorTrap:
                         If Not (cpCore.debug_iUserError <> "") Then
                             CS = cpCore.db.cs_open("people", "ID=" & cpCore.db.encodeSQLNumber(cpCore.authContext.user.id))
                             If Not cpCore.db.cs_ok(CS) Then
-                                cpCore.handleExceptionAndContinue(New Exception("Could not open the current members account to set the username and password."))
+                                cpCore.handleException(New Exception("Could not open the current members account to set the username and password."))
                             Else
                                 If (cpCore.db.cs_getText(CS, "username") <> "") Or (cpCore.db.cs_getText(CS, "password") <> "") Or (cpCore.db.cs_getBoolean(CS, "admin")) Or (cpCore.db.cs_getBoolean(CS, "developer")) Then
                                     '
@@ -8890,7 +8890,7 @@ ErrorTrap:
                 End If
                 Call cpCore.cache.invalidateContent("People")
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -8944,7 +8944,7 @@ ErrorTrap:
                 'Call AppendLog("call main_getEndOfBody, from main_getLoginPage2 ")
                 returnREsult = assembleHtmlDoc(cpCore.siteProperties.docTypeDeclaration(), head, bodyTag, Body & cpCore.html.getHtmlDoc_beforeEndOfBodyHtml(False, False, False, False))
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnREsult
         End Function
@@ -9085,7 +9085,7 @@ ErrorTrap:
                         & ""
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnHtml
         End Function
@@ -9137,7 +9137,7 @@ ErrorTrap:
                     returnHtml = getLoginForm_Default()
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnHtml
         End Function
@@ -9199,7 +9199,7 @@ ErrorTrap:
                     & ""
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -10105,7 +10105,7 @@ ErrorTrap:
                         End If
                     End If
                     '
-                    ' Add in the available flyout menu entries
+                    ' Add in the available flyout Navigator Entries
                     '
                     If LowestRequiredMenuName <> "" Then
                         main_GetRecordAddLink2 = main_GetRecordAddLink2 & cpCore.menuFlyout.getMenu(LowestRequiredMenuName, 0)
@@ -10158,7 +10158,7 @@ ErrorTrap:
         '
         '   adds an add entry for the content name, and all the child content
         '   returns the MenuName of the lowest branch that has valid
-        '   menu entries.
+        '   Navigator Entries.
         '
         '   ContentName The content for this link
         '   PresetNameValueList The sql equivalent used to select the record.
@@ -11007,7 +11007,7 @@ ErrorTrap:
                     & vbCrLf & "</html>" _
                     & ""
             Catch ex As Exception
-                cpcore.handleExceptionAndContinue(ex)
+                cpcore.handleException(ex)
             End Try
             Return result
         End Function
@@ -11082,7 +11082,7 @@ ErrorTrap:
                 End If
                 result = result & "<table border=""0"" cellpadding=""10"" cellspacing=""0"" width=""100%""><tr><TD>"
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
             End Try
             Return result
         End Function

@@ -57,7 +57,7 @@ Namespace Contensive.Core
             Try
                 Call groupController.group_add2(cpCore, GroupNameOrGuid, groupCaption)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex, "Unexpected error in cp.group.add()")
+                cpCore.handleException(ex, "Unexpected error in cp.group.add()")
             End Try
         End Sub
         '
@@ -67,7 +67,7 @@ Namespace Contensive.Core
             Try
                 Call groupController.group_AddUser(cpCore, GroupNameIdOrGuid, UserId, DateExpires)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
             End Try
         End Sub
         '
@@ -77,7 +77,7 @@ Namespace Contensive.Core
             Try
                 Models.Entity.groupModel.delete(cpCore, GroupNameIdOrGuid)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
             End Try
         End Sub
         '

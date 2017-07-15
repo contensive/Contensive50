@@ -159,7 +159,7 @@ Namespace Contensive.Core.Models.Entity
                 ' -- block the configured app that last saved the server model
                 returnModel.appConfig = Nothing
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex, "exception in serverConfigModel.getObject")
+                cpCore.handleException(ex, "exception in serverConfigModel.getObject")
             End Try
             Return returnModel
         End Function
@@ -186,7 +186,7 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex, "exception in serverConfigModel.getObject")
+                cpCore.handleException(ex, "exception in serverConfigModel.getObject")
             End Try
             Return returnModel
         End Function
@@ -202,7 +202,7 @@ Namespace Contensive.Core.Models.Entity
                 Dim jsonTemp As String = cpCore.json.Serialize(Me)
                 cpCore.programDataFiles.saveFile("config.json", jsonTemp)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
             End Try
             Return 0
         End Function

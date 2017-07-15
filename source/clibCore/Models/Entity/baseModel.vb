@@ -173,18 +173,18 @@ Namespace Contensive.Core.Models.Entity
                 If (cpCore.serverConfig Is Nothing) Then
                     '
                     ' -- cannot use models without an application
-                    cpCore.handleExceptionAndContinue(New ApplicationException("Cannot use data models without a valid server configuration."))
+                    cpCore.handleException(New ApplicationException("Cannot use data models without a valid server configuration."))
                 ElseIf (cpCore.serverConfig.appConfig Is Nothing) Then
                     '
                     ' -- cannot use models without an application
-                    cpCore.handleExceptionAndContinue(New ApplicationException("Cannot use data models without a valid application configuration."))
+                    cpCore.handleException(New ApplicationException("Cannot use data models without a valid application configuration."))
                 Else
                     Dim instanceType As Type = GetType(T)
                     Dim contentName As String = derivedContentName(instanceType)
                     result = create(Of T)(cpCore, cpCore.db.metaData_InsertContentRecordGetID(contentName, cpCore.authContext.user.id), callersCacheNameList)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
                 Throw
             End Try
             Return result
@@ -214,11 +214,11 @@ Namespace Contensive.Core.Models.Entity
                 If (cpCore.serverConfig Is Nothing) Then
                     '
                     ' -- cannot use models without an application
-                    cpCore.handleExceptionAndContinue(New ApplicationException("Cannot use data models without a valid server configuration."))
+                    cpCore.handleException(New ApplicationException("Cannot use data models without a valid server configuration."))
                 ElseIf (cpCore.serverConfig.appConfig Is Nothing) Then
                     '
                     ' -- cannot use models without an application
-                    cpCore.handleExceptionAndContinue(New ApplicationException("Cannot use data models without a valid application configuration."))
+                    cpCore.handleException(New ApplicationException("Cannot use data models without a valid application configuration."))
                 Else
                     If recordId > 0 Then
                         Dim instanceType As Type = GetType(T)
@@ -234,7 +234,7 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
                 Throw
             End Try
             Return result
@@ -257,11 +257,11 @@ Namespace Contensive.Core.Models.Entity
                 If (cpCore.serverConfig Is Nothing) Then
                     '
                     ' -- cannot use models without an application
-                    cpCore.handleExceptionAndContinue(New ApplicationException("Cannot use data models without a valid server configuration."))
+                    cpCore.handleException(New ApplicationException("Cannot use data models without a valid server configuration."))
                 ElseIf (cpCore.serverConfig.appConfig Is Nothing) Then
                     '
                     ' -- cannot use models without an application
-                    cpCore.handleExceptionAndContinue(New ApplicationException("Cannot use data models without a valid application configuration."))
+                    cpCore.handleException(New ApplicationException("Cannot use data models without a valid application configuration."))
                 Else
                     If Not String.IsNullOrEmpty(recordGuid) Then
                         Dim instanceType As Type = GetType(T)
@@ -277,7 +277,7 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
                 Throw
             End Try
             Return result
@@ -300,11 +300,11 @@ Namespace Contensive.Core.Models.Entity
                 If (cpCore.serverConfig Is Nothing) Then
                     '
                     ' -- cannot use models without an application
-                    cpCore.handleExceptionAndContinue(New ApplicationException("Cannot use data models without a valid server configuration."))
+                    cpCore.handleException(New ApplicationException("Cannot use data models without a valid server configuration."))
                 ElseIf (cpCore.serverConfig.appConfig Is Nothing) Then
                     '
                     ' -- cannot use models without an application
-                    cpCore.handleExceptionAndContinue(New ApplicationException("Cannot use data models without a valid application configuration."))
+                    cpCore.handleException(New ApplicationException("Cannot use data models without a valid application configuration."))
                 Else
                     If Not String.IsNullOrEmpty(recordName) Then
                         Dim instanceType As Type = GetType(T)
@@ -320,7 +320,7 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return result
         End Function
@@ -390,7 +390,7 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
                 Throw
             End Try
             Return instance
@@ -407,11 +407,11 @@ Namespace Contensive.Core.Models.Entity
                 If (cpCore.serverConfig Is Nothing) Then
                     '
                     ' -- cannot use models without an application
-                    cpCore.handleExceptionAndContinue(New ApplicationException("Cannot use data models without a valid server configuration."))
+                    cpCore.handleException(New ApplicationException("Cannot use data models without a valid server configuration."))
                 ElseIf (cpCore.serverConfig.appConfig Is Nothing) Then
                     '
                     ' -- cannot use models without an application
-                    cpCore.handleExceptionAndContinue(New ApplicationException("Cannot use data models without a valid application configuration."))
+                    cpCore.handleException(New ApplicationException("Cannot use data models without a valid application configuration."))
                 Else
                     Dim cs As New csController(cpCore)
                     Dim instanceType As Type = Me.GetType()
@@ -496,7 +496,7 @@ Namespace Contensive.Core.Models.Entity
                     cpCore.cache.setObject(Controllers.cacheController.getDbRecordCacheName(tableName, "id", Me.id.ToString()), Me)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
                 Throw
             End Try
             Return id
@@ -513,11 +513,11 @@ Namespace Contensive.Core.Models.Entity
                 If (cpCore.serverConfig Is Nothing) Then
                     '
                     ' -- cannot use models without an application
-                    cpCore.handleExceptionAndContinue(New ApplicationException("Cannot use data models without a valid server configuration."))
+                    cpCore.handleException(New ApplicationException("Cannot use data models without a valid server configuration."))
                 ElseIf (cpCore.serverConfig.appConfig Is Nothing) Then
                     '
                     ' -- cannot use models without an application
-                    cpCore.handleExceptionAndContinue(New ApplicationException("Cannot use data models without a valid application configuration."))
+                    cpCore.handleException(New ApplicationException("Cannot use data models without a valid application configuration."))
                 Else
                     If (recordId > 0) Then
                         Dim instanceType As Type = GetType(T)
@@ -528,7 +528,7 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
                 Throw
             End Try
         End Sub
@@ -544,11 +544,11 @@ Namespace Contensive.Core.Models.Entity
                 If (cpCore.serverConfig Is Nothing) Then
                     '
                     ' -- cannot use models without an application
-                    cpCore.handleExceptionAndContinue(New ApplicationException("Cannot use data models without a valid server configuration."))
+                    cpCore.handleException(New ApplicationException("Cannot use data models without a valid server configuration."))
                 ElseIf (cpCore.serverConfig.appConfig Is Nothing) Then
                     '
                     ' -- cannot use models without an application
-                    cpCore.handleExceptionAndContinue(New ApplicationException("Cannot use data models without a valid application configuration."))
+                    cpCore.handleException(New ApplicationException("Cannot use data models without a valid application configuration."))
                 Else
                     If (Not String.IsNullOrEmpty(ccguid)) Then
                         Dim instanceType As Type = GetType(T)
@@ -561,7 +561,7 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
                 Throw
             End Try
         End Sub
@@ -589,11 +589,11 @@ Namespace Contensive.Core.Models.Entity
                 If (cpCore.serverConfig Is Nothing) Then
                     '
                     ' -- cannot use models without an application
-                    cpCore.handleExceptionAndContinue(New ApplicationException("Cannot use data models without a valid server configuration."))
+                    cpCore.handleException(New ApplicationException("Cannot use data models without a valid server configuration."))
                 ElseIf (cpCore.serverConfig.appConfig Is Nothing) Then
                     '
                     ' -- cannot use models without an application
-                    cpCore.handleExceptionAndContinue(New ApplicationException("Cannot use data models without a valid application configuration."))
+                    cpCore.handleException(New ApplicationException("Cannot use data models without a valid application configuration."))
                 Else
                     Dim cs As New csController(cpCore)
                     Dim ignoreCacheNames As New List(Of String)
@@ -612,7 +612,7 @@ Namespace Contensive.Core.Models.Entity
                     cs.Close()
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return result
         End Function
@@ -628,11 +628,11 @@ Namespace Contensive.Core.Models.Entity
                 If (cpCore.serverConfig Is Nothing) Then
                     '
                     ' -- cannot use models without an application
-                    cpCore.handleExceptionAndContinue(New ApplicationException("Cannot use data models without a valid server configuration."))
+                    cpCore.handleException(New ApplicationException("Cannot use data models without a valid server configuration."))
                 ElseIf (cpCore.serverConfig.appConfig Is Nothing) Then
                     '
                     ' -- cannot use models without an application
-                    cpCore.handleExceptionAndContinue(New ApplicationException("Cannot use data models without a valid application configuration."))
+                    cpCore.handleException(New ApplicationException("Cannot use data models without a valid application configuration."))
                 Else
                     Dim instanceType = GetType(T)
                     Dim tableName As String = derivedContentTableName(instanceType)
@@ -642,7 +642,7 @@ Namespace Contensive.Core.Models.Entity
                     cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(tableName, "id", "0"))
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
             End Try
         End Sub
         '
@@ -658,11 +658,11 @@ Namespace Contensive.Core.Models.Entity
                 If (cpcore.serverConfig Is Nothing) Then
                     '
                     ' -- cannot use models without an application
-                    cpcore.handleExceptionAndContinue(New ApplicationException("Cannot use data models without a valid server configuration."))
+                    cpcore.handleException(New ApplicationException("Cannot use data models without a valid server configuration."))
                 ElseIf (cpcore.serverConfig.appConfig Is Nothing) Then
                     '
                     ' -- cannot use models without an application
-                    cpcore.handleExceptionAndContinue(New ApplicationException("Cannot use data models without a valid application configuration."))
+                    cpcore.handleException(New ApplicationException("Cannot use data models without a valid application configuration."))
                 Else
                     If (recordId > 0) Then
                         Dim instanceType As Type = GetType(T)
@@ -675,7 +675,7 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
             Catch ex As Exception
-                cpcore.handleExceptionAndContinue(ex)
+                cpcore.handleException(ex)
             End Try
             Return ""
         End Function
@@ -692,11 +692,11 @@ Namespace Contensive.Core.Models.Entity
                 If (cpcore.serverConfig Is Nothing) Then
                     '
                     ' -- cannot use models without an application
-                    cpcore.handleExceptionAndContinue(New ApplicationException("Cannot use data models without a valid server configuration."))
+                    cpcore.handleException(New ApplicationException("Cannot use data models without a valid server configuration."))
                 ElseIf (cpcore.serverConfig.appConfig Is Nothing) Then
                     '
                     ' -- cannot use models without an application
-                    cpcore.handleExceptionAndContinue(New ApplicationException("Cannot use data models without a valid application configuration."))
+                    cpcore.handleException(New ApplicationException("Cannot use data models without a valid application configuration."))
                 Else
                     If (Not String.IsNullOrEmpty(ccGuid)) Then
                         Dim instanceType As Type = GetType(T)
@@ -709,7 +709,7 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
             Catch ex As Exception
-                cpcore.handleExceptionAndContinue(ex)
+                cpcore.handleException(ex)
             End Try
             Return ""
         End Function
@@ -726,11 +726,11 @@ Namespace Contensive.Core.Models.Entity
                 If (cpcore.serverConfig Is Nothing) Then
                     '
                     ' -- cannot use models without an application
-                    cpcore.handleExceptionAndContinue(New ApplicationException("Cannot use data models without a valid server configuration."))
+                    cpcore.handleException(New ApplicationException("Cannot use data models without a valid server configuration."))
                 ElseIf (cpcore.serverConfig.appConfig Is Nothing) Then
                     '
                     ' -- cannot use models without an application
-                    cpcore.handleExceptionAndContinue(New ApplicationException("Cannot use data models without a valid application configuration."))
+                    cpcore.handleException(New ApplicationException("Cannot use data models without a valid application configuration."))
                 Else
                     If (Not String.IsNullOrEmpty(ccGuid)) Then
                         Dim instanceType As Type = GetType(T)
@@ -743,7 +743,7 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
             Catch ex As Exception
-                cpcore.handleExceptionAndContinue(ex)
+                cpcore.handleException(ex)
             End Try
             Return 0
         End Function
@@ -758,11 +758,11 @@ Namespace Contensive.Core.Models.Entity
                 If (cpcore.serverConfig Is Nothing) Then
                     '
                     ' -- cannot use models without an application
-                    cpcore.handleExceptionAndContinue(New ApplicationException("Cannot use data models without a valid server configuration."))
+                    cpcore.handleException(New ApplicationException("Cannot use data models without a valid server configuration."))
                 ElseIf (cpcore.serverConfig.appConfig Is Nothing) Then
                     '
                     ' -- cannot use models without an application
-                    cpcore.handleExceptionAndContinue(New ApplicationException("Cannot use data models without a valid application configuration."))
+                    cpcore.handleException(New ApplicationException("Cannot use data models without a valid application configuration."))
                 Else
                     Dim contentName As String = derivedContentName(instanceType)
                     Dim CDef As cdefModel = cpcore.metaData.getCdef(contentName)
@@ -795,7 +795,7 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
             Catch ex As Exception
-                cpcore.handleExceptionAndContinue(ex)
+                cpcore.handleException(ex)
             End Try
             Return instance
         End Function

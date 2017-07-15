@@ -65,7 +65,7 @@ Namespace Contensive.Core.Models.Entity
             Try
                 result = create(cpCore, cpCore.db.metaData_InsertContentRecordGetID(primaryContentName, cpCore.authContext.user.id), callersCacheNameList)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
                 Throw
             End Try
             Return result
@@ -92,7 +92,7 @@ Namespace Contensive.Core.Models.Entity
                 End If
 
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
                 Throw
             End Try
             Return result
@@ -117,7 +117,7 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
                 Throw
             End Try
             Return result
@@ -139,7 +139,7 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
                 Throw
             End Try
             Return result
@@ -197,7 +197,7 @@ Namespace Contensive.Core.Models.Entity
                 End If
                 Call cs.Close()
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
                 Throw
             End Try
             Return result
@@ -261,7 +261,7 @@ Namespace Contensive.Core.Models.Entity
                 ' -- object is here, but the cache was invalidated, setting
                 cpCore.cache.setObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", Me.ID.ToString()), Me)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
                 Throw
             End Try
             Return ID
@@ -280,7 +280,7 @@ Namespace Contensive.Core.Models.Entity
                     cpCore.cache.invalidateObject(Controllers.cacheController.getDbRecordCacheName(primaryContentTableName, "id", recordId.ToString))
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
                 Throw
             End Try
         End Sub
@@ -301,7 +301,7 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
                 Throw
             End Try
         End Sub
@@ -323,7 +323,7 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
                 Throw
             End Try
         End Sub
@@ -352,7 +352,7 @@ Namespace Contensive.Core.Models.Entity
                 End If
                 cs.Close()
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return result
         End Function
@@ -449,7 +449,7 @@ Namespace Contensive.Core.Models.Entity
                     result.Add("default", getDefaultDatasource(cpcore))
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return result
         End Function
@@ -473,7 +473,7 @@ Namespace Contensive.Core.Models.Entity
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
                 Throw
             End Try
             Return result
@@ -504,7 +504,7 @@ Namespace Contensive.Core.Models.Entity
                     .username = cpCore.serverConfig.username
                 End With
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
                 Throw
             End Try
             Return result

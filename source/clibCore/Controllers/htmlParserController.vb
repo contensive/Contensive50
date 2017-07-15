@@ -306,7 +306,7 @@ Namespace Contensive.Core.Controllers
             '
             Exit Function
 ErrorTrap:
-            cpCore.handleExceptionAndContinue(New Exception("unexpected exception"))
+            cpCore.handleException(New Exception("unexpected exception"))
         End Function
         '
         '========================================================================
@@ -331,7 +331,7 @@ ErrorTrap:
                     result = LocalElements(ElementPointer).IsTag
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
             End Try
             Return result
         End Function
@@ -351,7 +351,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            cpCore.handleExceptionAndContinue(New Exception("unexpected exception"))
+            cpCore.handleException(New Exception("unexpected exception"))
         End Function
         '
         '========================================================================
@@ -369,7 +369,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            cpCore.handleExceptionAndContinue(New Exception("unexpected exception"))
+            cpCore.handleException(New Exception("unexpected exception"))
         End Function
         '
         '========================================================================
@@ -387,7 +387,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            cpCore.handleExceptionAndContinue(New Exception("unexpected exception"))
+            cpCore.handleException(New Exception("unexpected exception"))
         End Function
         '
         '========================================================================
@@ -405,7 +405,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            cpCore.handleExceptionAndContinue(New Exception("unexpected exception"))
+            cpCore.handleException(New Exception("unexpected exception"))
         End Function
         '
         '========================================================================
@@ -425,7 +425,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            cpCore.handleExceptionAndContinue(New Exception("unexpected exception"))
+            cpCore.handleException(New Exception("unexpected exception"))
         End Function
         '
         '========================================================================
@@ -445,7 +445,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            cpCore.handleExceptionAndContinue(New Exception("unexpected exception"))
+            cpCore.handleException(New Exception("unexpected exception"))
         End Function
         '
         '========================================================================
@@ -476,7 +476,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            cpCore.handleExceptionAndContinue(New Exception("unexpected exception"))
+            cpCore.handleException(New Exception("unexpected exception"))
         End Function
         '
         '========================================================================
@@ -631,7 +631,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            cpCore.handleExceptionAndContinue(New Exception("unexpected exception"))
+            cpCore.handleException(New Exception("unexpected exception"))
         End Sub
         ''
         ''   CursorPosition points to the first character of an attribute name
@@ -684,7 +684,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            cpCore.handleExceptionAndContinue(New Exception("unexpected exception"))
+            cpCore.handleException(New Exception("unexpected exception"))
         End Function
         '
         ' Pass spaces at the current cursor position
@@ -699,7 +699,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            cpCore.handleExceptionAndContinue(New Exception("unexpected exception"))
+            cpCore.handleException(New Exception("unexpected exception"))
         End Function
         '        '
         '        ' Create the full URI from a possible relative URI
@@ -995,7 +995,7 @@ ErrorTrap:
         ''' <remarks></remarks>
         Private Sub handleLegacyClassError(ByVal MethodName As String, ByVal ErrNumber As Integer, ByVal ErrSource As String, ByVal ErrDescription As String)
             '
-            cpCore.handleExceptionAndContinue(New Exception("unexpected exception in method [" & MethodName & "], ErrDescription [" & ErrDescription & "]"))
+            cpCore.handleException(New Exception("unexpected exception in method [" & MethodName & "], ErrDescription [" & ErrDescription & "]"))
             '
         End Sub
     End Class

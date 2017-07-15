@@ -2461,7 +2461,7 @@ ErrorTrap:
 
             '
             If BuildVersion < cp.Version Then
-                cp.core.handleExceptionAndContinue(New ApplicationException("Can not summarize analytics until this site's data needs been upgraded."))
+                cp.core.handleException(New ApplicationException("Can not summarize analytics until this site's data needs been upgraded."))
             Else
                 PeriodStart = StartTimeDate
                 If PeriodStart < OldestVisitSummaryWeCareAbout Then

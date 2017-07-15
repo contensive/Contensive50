@@ -77,7 +77,7 @@ Namespace Contensive.Core.Models.Entity
                     End If
                     returnDomainDbList = domainList_local
                 Catch ex As Exception
-                    cpCore.handleExceptionAndContinue(ex) : Throw
+                    cpCore.handleException(ex) : Throw
                 End Try
                 Return returnDomainDbList
             End Get

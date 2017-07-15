@@ -16,6 +16,7 @@ Namespace Contensive.Core
         Public Const cnDataSources As String = "data sources"
         Public Const cnPeople As String = "people"
         Public Const cnAddons As String = "Add-ons"
+        Public Const cnNavigatorEntries As String = "Navigator Entries"
         '
         Public Const requestAppRootPath As String = "/"
         '
@@ -40,9 +41,10 @@ Namespace Contensive.Core
         Public Const CoreCollectionGuid = "{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}"                  ' contains core Contensive objects, loaded from Library
         Public Const ApplicationCollectionGuid = "{C58A76E2-248B-4DE8-BF9C-849A960F79C6}"           ' exported from application during upgrade
         '
+        ' -- navigator entries
+        Public Const guidManageAddon As String = "{DBA354AB-5D3E-4882-8718-CF23CAAB7927}"
         ' -- addons
         Public Const adminSiteAddonGuid As String = "{c2de2acf-ca39-4668-b417-aa491e7d8460}"
-        'Public Const adminCommonAddonGuid = "{76E7F79E-489F-4B0F-8EE5-0BAC3E4CD782}"
         Public Const DashboardAddonGuid = "{4BA7B4A2-ED6C-46C5-9C7B-8CE251FC8FF5}"
         Public Const PersonalizationGuid = "{C82CB8A6-D7B9-4288-97FF-934080F5FC9C}"
         Public Const TextBoxGuid = "{7010002E-5371-41F7-9C77-0BBFF1F8B728}"

@@ -161,7 +161,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
             End Try
         End Sub
         '
@@ -287,7 +287,7 @@ Namespace Contensive.Core.Controllers
                     appendCacheLog("getObject(" & cacheName & "), exit(" & sw.ElapsedMilliseconds & "ms)") : sw.Stop()
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnObject
         End Function
@@ -323,7 +323,7 @@ Namespace Contensive.Core.Controllers
                             Else
                                 '
                                 ' -- some other error
-                                cpCore.handleExceptionAndContinue(ex) : Throw
+                                cpCore.handleException(ex) : Throw
                             End If
                         End Try
                         If (returnObj IsNot Nothing) Then
@@ -422,7 +422,7 @@ Namespace Contensive.Core.Controllers
                 End If
                 appendCacheLog("getCacheWrapper(" & cacheName & "), exit ")
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnObj
         End Function
@@ -445,7 +445,7 @@ Namespace Contensive.Core.Controllers
                 }
                 setCacheWrapper(cacheName, cacheWrapper)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -469,7 +469,7 @@ Namespace Contensive.Core.Controllers
                 }
                 setCacheWrapper(cacheName, cacheWrapper)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
             End Try
         End Sub
         '
@@ -495,7 +495,7 @@ Namespace Contensive.Core.Controllers
                 }
                 setCacheWrapper(cacheName, cacheWrapper)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -518,7 +518,7 @@ Namespace Contensive.Core.Controllers
                 }
                 setCacheWrapper(cacheName, cacheWrapper)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -537,7 +537,7 @@ Namespace Contensive.Core.Controllers
                 'dependantObjectList.Add(dependantObject)
                 setObject(cacheName, data, New List(Of String)({dependantObject}))
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
             End Try
         End Sub
         '
@@ -559,7 +559,7 @@ Namespace Contensive.Core.Controllers
                 }
                 setCacheWrapper(cacheName, cacheWrapper)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
             End Try
         End Sub
         '
@@ -573,7 +573,7 @@ Namespace Contensive.Core.Controllers
                 Call setCacheWrapper("globalInvalidationDate", New cacheWrapperClass With {.saveDate = Now()})
                 _globalInvalidationDate = Nothing
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         ''
@@ -625,7 +625,7 @@ Namespace Contensive.Core.Controllers
                     'End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -638,7 +638,7 @@ Namespace Contensive.Core.Controllers
             Try
                 invalidateDbTable(cpCore.metaData.getContentTablename(ContentName))
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -652,7 +652,7 @@ Namespace Contensive.Core.Controllers
             Try
                 invalidateObject(dbTableName.ToLower().Replace(" ", "_"))
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -668,7 +668,7 @@ Namespace Contensive.Core.Controllers
                     Call invalidateObject(cacheName)
                 Next
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -695,7 +695,7 @@ Namespace Contensive.Core.Controllers
             Try
                 logController.appendLog(cpCore, line, "cache")
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(New ApplicationException("appendCacheLog exception", ex))
+                cpCore.handleException(New ApplicationException("appendCacheLog exception", ex))
             End Try
         End Sub
         ''

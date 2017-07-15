@@ -496,7 +496,7 @@ ErrorTrap:
                     & "</p>" _
                     & "<p>" & SpanClassAdminNormal & Description & "</p>"
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
             End Try
             Return result
         End Function
@@ -718,7 +718,7 @@ ErrorTrap:
                 '
                 returnHtml = htmlController.OpenFormTable(cpCore, ButtonList) & Stream.Text & htmlController.CloseFormTable(cpCore, ButtonList)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnHtml
         End Function
@@ -766,19 +766,19 @@ ErrorTrap:
                     cpCore.cache.invalidateAll()
                     cpCore.metaData.clear()
                     ContentID = cpCore.metaData.getContentId(ContentName)
-                    ParentNavID = cpCore.db.getRecordID("Navigator Entries", "Manage Site Content")
+                    ParentNavID = cpCore.db.getRecordID(cnNavigatorEntries, "Manage Site Content")
                     If ParentNavID <> 0 Then
-                        CS = cpCore.db.cs_open("Navigator Entries", "(name=" & cpCore.db.encodeSQLText("Advanced") & ")and(parentid=" & ParentNavID & ")")
+                        CS = cpCore.db.cs_open(cnNavigatorEntries, "(name=" & cpCore.db.encodeSQLText("Advanced") & ")and(parentid=" & ParentNavID & ")")
                         ParentNavID = 0
                         If cpCore.db.cs_ok(CS) Then
                             ParentNavID = cpCore.db.cs_getInteger(CS, "ID")
                         End If
                         Call cpCore.db.cs_Close(CS)
                         If ParentNavID <> 0 Then
-                            CS = cpCore.db.cs_open("Navigator Entries", "(name=" & cpCore.db.encodeSQLText(ContentName) & ")and(parentid=" & NavID & ")")
+                            CS = cpCore.db.cs_open(cnNavigatorEntries, "(name=" & cpCore.db.encodeSQLText(ContentName) & ")and(parentid=" & NavID & ")")
                             If Not cpCore.db.cs_ok(CS) Then
                                 Call cpCore.db.cs_Close(CS)
-                                CS = cpCore.db.cs_insertRecord("Navigator Entries")
+                                CS = cpCore.db.cs_insertRecord(cnNavigatorEntries)
                             End If
                             If cpCore.db.cs_ok(CS) Then
                                 Call cpCore.db.cs_set(CS, "name", ContentName)
@@ -788,7 +788,6 @@ ErrorTrap:
                             Call cpCore.db.cs_Close(CS)
                         End If
                     End If
-                    Call Controllers.appBuilderController.admin_VerifyAdminMenu(cpCore, "Site Content", ContentName, ContentName, "", "")
                     ContentID = cpCore.metaData.getContentId(ContentName)
                     Call Stream.Add("<P>Content Definition was created. An admin menu entry for this definition has been added under 'Site Content', and will be visible on the next page view. Use the [<a href=""?af=105&ContentID=" & ContentID & """>Edit Content Definition Fields</a>] tool to review and edit this definition's fields.</P>")
                 Else
@@ -1847,13 +1846,13 @@ ErrorTrap:
                         Call cpCore.db.cs_Close(CSContent)
                     End If
                     '
-                    ' ----- Check menu entries
+                    ' ----- Check Navigator Entries
                     '
                     If (DiagActionCount < DiagActionCountMax) Then
-                        Stream.Add(GetDiagHeader("Checking Menu Entries...<br>"))
-                        CSPointer = cpCore.db.cs_open("Menu Entries")
+                        Stream.Add(GetDiagHeader("Checking Navigator Entries...<br>"))
+                        CSPointer = cpCore.db.cs_open(cnNavigatorEntries)
                         If Not cpCore.db.cs_ok(CSPointer) Then
-                            DiagProblem = "PROBLEM: Could not open the [Menu Entries] content."
+                            DiagProblem = "PROBLEM: Could not open the [Navigator Entries] content."
                             ReDim DiagActions(3)
                             DiagActions(0).Name = "Ignore, or handle this issue manually"
                             DiagActions(0).Command = ""
@@ -1869,7 +1868,7 @@ ErrorTrap:
                                         DiagActions(0).Name = "Ignore, or handle this issue manually"
                                         DiagActions(0).Command = ""
                                         DiagActions(1).Name = "Remove this menu entry"
-                                        DiagActions(1).Command = CStr(DiagActionDeleteRecord) & ",Menu Entries," & cpCore.db.cs_getInteger(CSPointer, "ID")
+                                        DiagActions(1).Command = CStr(DiagActionDeleteRecord) & ",Navigator Entries," & cpCore.db.cs_getInteger(CSPointer, "ID")
                                         Stream.Add(GetDiagError(DiagProblem, DiagActions))
                                     End If
                                     Call cpCore.db.cs_Close(CSContent)
@@ -2084,21 +2083,21 @@ ErrorTrap:
                     '
                     ' Add Admin Menu Entry
                     '
-                    If AddAdminMenuEntry Then
-                        Stream.Add("<br>Adding menu entry (will not display until the next page)...")
-                        CS = cpCore.db.cs_open("Menu Entries", "ContentID=" & ParentContentID)
-                        If cpCore.db.cs_ok(CS) Then
-                            MenuName = cpCore.db.cs_getText(CS, "name")
-                            AdminOnly = cpCore.db.cs_getBoolean(CS, "AdminOnly")
-                            DeveloperOnly = cpCore.db.cs_getBoolean(CS, "DeveloperOnly")
-                        End If
-                        Call cpCore.db.cs_Close(CS)
-                        If MenuName <> "" Then
-                            Call Controllers.appBuilderController.admin_VerifyAdminMenu(cpCore, MenuName, ChildContentName, ChildContentName, "", ChildContentName, AdminOnly, DeveloperOnly, False)
-                        Else
-                            Call Controllers.appBuilderController.admin_VerifyAdminMenu(cpCore, "Site Content", ChildContentName, ChildContentName, "", "")
-                        End If
-                    End If
+                    'If AddAdminMenuEntry Then
+                    '    Stream.Add("<br>Adding menu entry (will not display until the next page)...")
+                    '    CS = cpCore.db.cs_open(cnNavigatorEntries, "ContentID=" & ParentContentID)
+                    '    If cpCore.db.cs_ok(CS) Then
+                    '        MenuName = cpCore.db.cs_getText(CS, "name")
+                    '        AdminOnly = cpCore.db.cs_getBoolean(CS, "AdminOnly")
+                    '        DeveloperOnly = cpCore.db.cs_getBoolean(CS, "DeveloperOnly")
+                    '    End If
+                    '    Call cpCore.db.cs_Close(CS)
+                    '    If MenuName <> "" Then
+                    '        Call Controllers.appBuilderController.admin_VerifyAdminMenu(cpCore, MenuName, ChildContentName, ChildContentName, "", ChildContentName, AdminOnly, DeveloperOnly, False)
+                    '    Else
+                    '        Call Controllers.appBuilderController.admin_VerifyAdminMenu(cpCore, "Site Content", ChildContentName, ChildContentName, "", "")
+                    '    End If
+                    'End If
                     Stream.Add("<br>Finished</P>")
                 End If
                 Call Stream.Add("</SPAN>")
@@ -2220,7 +2219,7 @@ ErrorTrap:
                 '
                 returnValue = htmlController.OpenFormTable(cpCore, ButtonList) & Stream.Text & htmlController.CloseFormTable(cpCore, ButtonList)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnValue
         End Function
@@ -3453,7 +3452,7 @@ ErrorTrap:
                 Call Stream.Add(cpCore.html.html_GetFormInputHidden("ReloadCDef", ReloadCDef))
                 result = htmlController.OpenFormTable(cpCore, ButtonList) & Stream.Text & htmlController.CloseFormTable(cpCore, ButtonList)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex)
+                cpCore.handleException(ex)
             End Try
             Return result
         End Function
@@ -3946,7 +3945,7 @@ ErrorTrap:
                 '
                 result = htmlController.OpenFormTable(cpCore, ButtonList) & Stream.Text & htmlController.CloseFormTable(cpCore, ButtonList)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return result
         End Function

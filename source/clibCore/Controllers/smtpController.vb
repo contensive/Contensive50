@@ -133,7 +133,7 @@ Namespace Contensive.Core.Controllers
                 End If
                 '
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
                 'Mailer = Nothing
                 'converthtmlToText = Nothing
                 sendEmail5 = "There was an unexpected error sending the email."
@@ -328,7 +328,7 @@ ErrorTrap:
                     Body = Mid(Body, EOL + 2)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return line
         End Function

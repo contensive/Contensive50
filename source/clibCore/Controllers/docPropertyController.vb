@@ -61,7 +61,7 @@ Namespace Contensive.Core.Controllers
                 prop.Value = value
                 setProperty(key, prop)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '
@@ -99,7 +99,7 @@ Namespace Contensive.Core.Controllers
             Try
                 Return genericController.EncodeNumber(getProperty(RequestName).Value)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return 0
         End Function
@@ -110,7 +110,7 @@ Namespace Contensive.Core.Controllers
             Try
                 Return genericController.EncodeInteger(getProperty(RequestName).Value)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return 0
         End Function
@@ -121,7 +121,7 @@ Namespace Contensive.Core.Controllers
             Try
                 Return genericController.encodeText(getProperty(RequestName).Value)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return String.Empty
         End Function
@@ -132,7 +132,7 @@ Namespace Contensive.Core.Controllers
             Try
                 Return cpCore.html.html_RenderActiveContent(genericController.encodeText(getProperty(RequestName).Value))
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return String.Empty
         End Function
@@ -143,7 +143,7 @@ Namespace Contensive.Core.Controllers
             Try
                 Return genericController.EncodeBoolean(getProperty(RequestName).Value)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return False
         End Function
@@ -154,7 +154,7 @@ Namespace Contensive.Core.Controllers
             Try
                 Return genericController.EncodeDate(getProperty(RequestName).Value)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return Date.MinValue
         End Function
@@ -172,7 +172,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return New docPropertiesClass
         End Function
@@ -192,7 +192,7 @@ Namespace Contensive.Core.Controllers
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -238,7 +238,7 @@ Namespace Contensive.Core.Controllers
                     End With
                 Next
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
         End Sub
         '

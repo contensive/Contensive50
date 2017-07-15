@@ -37,7 +37,7 @@ Namespace Contensive.Core.Controllers
             Try
                 returnResult = hashEncode.ComputeHash(password, "SHA512", Nothing)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -53,7 +53,7 @@ Namespace Contensive.Core.Controllers
             Try
                 returnResult = hashEncode.VerifyHash(sourceToTest, "SHA512", encryptedTaken)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -88,7 +88,7 @@ Namespace Contensive.Core.Controllers
                     returnResult = Convert.ToBase64String(Buffer)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -121,11 +121,11 @@ Namespace Contensive.Core.Controllers
                         ' Transform and return the string.
                         returnResult = System.Text.ASCIIEncoding.ASCII.GetString(DESDecrypt.TransformFinalBlock(buffer, 0, buffer.Length))
                     Catch ex As Exception
-                        cpCore.handleExceptionAndContinue(ex) : Throw
+                        cpCore.handleException(ex) : Throw
                     End Try
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return returnResult
         End Function
@@ -456,7 +456,7 @@ Namespace Contensive.Core.Controllers
                 Dim sourceText As String = keyInteger.ToString & vbTab & keyDate.ToString
                 returnToken = twoWayEncrypt(sourceText)
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex, "EncodeToken failure. Returning blank result for keyInteger [" & keyInteger & "], keyDate [" & keyDate & "]")
+                cpCore.handleException(ex, "EncodeToken failure. Returning blank result for keyInteger [" & keyInteger & "], keyDate [" & keyDate & "]")
                 returnToken = ""
             End Try
             Return returnToken
@@ -479,7 +479,7 @@ Namespace Contensive.Core.Controllers
                     returnDate = genericController.EncodeDate(parts(1))
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex, "DecodeToken failure. Returning blank result for token [" & token & "]")
+                cpCore.handleException(ex, "DecodeToken failure. Returning blank result for token [" & token & "]")
                 returnNumber = 0
                 returnDate = Date.MinValue
             End Try

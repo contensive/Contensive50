@@ -264,7 +264,7 @@ Namespace Contensive.Core
                                         '                                                            Next
                                         '                                                        Case "contensivecdef"
                                         '                                                            '
-                                        '                                                            ' load menu entries
+                                        '                                                            ' load Navigator Entries
                                         '                                                            '
                                         '                                                            For Each CDefNode In CDef_Node.childNodes
                                         '                                                                If genericController.vbLCase(CDefNode.name) = "adminmenu" Then
@@ -342,7 +342,7 @@ Namespace Contensive.Core
                                         '                                    Next
                                         '                                End If
                                         '                                '
-                                        '                                ' Delete Menu Entries not used by other Collections
+                                        '                                ' Delete Navigator Entries not used by other Collections
                                         '                                '
                                         '                                TargetCnt = Collections(TargetCollectionPtr).MenuCnt
                                         '                                For TargetPtr = 0 To TargetCnt - 1
@@ -364,7 +364,7 @@ Namespace Contensive.Core
                                         '                                        '
                                         '                                        ' OK to delete the target addon
                                         '                                        '
-                                        '                                        Call cpcore.app.DeleteContentRecords("Menu Entries", "(name=" & encodeSQLText(TargetName) & ")")
+                                        '                                        Call cpcore.app.DeleteContentRecords(cnNavigatorEntries, "(name=" & encodeSQLText(TargetName) & ")")
                                         '                                    End If
                                         '                                Next
                                         '                                '
@@ -398,7 +398,7 @@ Namespace Contensive.Core
                                         '                                        '
                                         '                                        ' OK to delete the target addon
                                         '                                        '
-                                        '                                        ParentID = GetParentIDFromNameSpace("Navigator Entries", TargetNameSpace)
+                                        '                                        ParentID = GetParentIDFromNameSpace(cnNavigatorEntries, TargetNameSpace)
                                         '                                        ReDim Preserve Deletes(DeleteCnt)
                                         '                                        Deletes(DeleteCnt).name = TargetName
                                         '                                        Deletes(DeleteCnt).ParentID = ParentID
@@ -419,7 +419,7 @@ Namespace Contensive.Core
                                         '
                                         If TargetCollectionID > 0 Then
                                             AddonNavigatorID = 0
-                                            CS = cpCore.db.cs_open("Navigator Entries", "name='Manage Add-ons' and ((parentid=0)or(parentid is null))")
+                                            CS = cpCore.db.cs_open(cnNavigatorEntries, "name='Manage Add-ons' and ((parentid=0)or(parentid is null))")
                                             If cpCore.db.cs_ok(CS) Then
                                                 AddonNavigatorID = cpCore.db.cs_getInteger(CS, "ID")
                                             End If
@@ -434,7 +434,7 @@ Namespace Contensive.Core
                                             '
                                             ' Delete Navigator Entries set as installed by the collection (this may be all that is needed)
                                             '
-                                            Call cpCore.db.deleteContentRecords("Navigator Entries", "installedbycollectionid=" & TargetCollectionID)
+                                            Call cpCore.db.deleteContentRecords(cnNavigatorEntries, "installedbycollectionid=" & TargetCollectionID)
                                         End If
                                     End If
                                 Next
@@ -878,7 +878,7 @@ Namespace Contensive.Core
                     Call cpCore.html.main_AddPagetitle("Add-on Manager")
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndContinue(ex) : Throw
+                cpCore.handleException(ex) : Throw
             End Try
             Return addonManager
         End Function
@@ -892,9 +892,9 @@ Namespace Contensive.Core
             Dim EntryID As Integer
             '
             If EntryParentID = 0 Then
-                CS = cpCore.db.cs_open("Navigator Entries", "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and((parentID is null)or(parentid=0))")
+                CS = cpCore.db.cs_open(cnNavigatorEntries, "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and((parentID is null)or(parentid=0))")
             Else
-                CS = cpCore.db.cs_open("Navigator Entries", "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(parentID=" & cpCore.db.encodeSQLNumber(EntryParentID) & ")")
+                CS = cpCore.db.cs_open(cnNavigatorEntries, "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(parentID=" & cpCore.db.encodeSQLNumber(EntryParentID) & ")")
             End If
             If cpCore.db.cs_ok(CS) Then
                 EntryID = cpCore.db.cs_getInteger(CS, "ID")
@@ -902,13 +902,13 @@ Namespace Contensive.Core
             Call cpCore.db.cs_Close(CS)
             '
             If EntryID <> 0 Then
-                CS = cpCore.db.cs_open("Navigator Entries", "(parentID=" & cpCore.db.encodeSQLNumber(EntryID) & ")")
+                CS = cpCore.db.cs_open(cnNavigatorEntries, "(parentID=" & cpCore.db.encodeSQLNumber(EntryID) & ")")
                 Do While cpCore.db.cs_ok(CS)
                     Call GetForm_SafeModeAddonManager_DeleteNavigatorBranch(cpCore.db.cs_getText(CS, "name"), EntryID)
                     Call cpCore.db.cs_goNext(CS)
                 Loop
                 Call cpCore.db.cs_Close(CS)
-                Call cpCore.db.deleteContentRecord("Navigator Entries", EntryID)
+                Call cpCore.db.deleteContentRecord(cnNavigatorEntries, EntryID)
             End If
             '
             Exit Sub

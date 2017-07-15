@@ -139,7 +139,7 @@ Namespace Contensive.Core.Controllers
                 End If
             Catch ex As Exception
                 Using cp As New CPClass
-                    cp.core.handleExceptionAndContinue(ex)
+                    cp.core.handleException(ex)
                 End Using
             End Try
         End Sub
@@ -203,13 +203,13 @@ Namespace Contensive.Core.Controllers
                                     cpSite.core.db.cs_Close(CS)
                                 Loop While recordsRemaining
                             Catch ex As Exception
-                                cpClusterCore.handleExceptionAndContinue(ex)
+                                cpClusterCore.handleException(ex)
                             End Try
                         End If
                     End Using
                 Next
             Catch ex As Exception
-                cpClusterCore.handleExceptionAndContinue(ex)
+                cpClusterCore.handleException(ex)
             End Try
         End Sub
         '

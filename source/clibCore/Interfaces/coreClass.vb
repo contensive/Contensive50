@@ -692,7 +692,7 @@ Namespace Contensive.Core
                                                     Call db.cs_set(cs, "active", False)
                                                 End If
                                                 Call db.cs_Close(cs)
-                                                handleExceptionAndContinue(New ApplicationException("Add-on call from [" & refHost & "] was blocked because this domain is not in the Aggregate Access Content. An inactive record was added. To allow this domain access, mark the record active.")) ' handleLegacyError12("Init", "")
+                                                handleException(New ApplicationException("Add-on call from [" & refHost & "] was blocked because this domain is not in the Aggregate Access Content. An inactive record was added. To allow this domain access, mark the record active.")) ' handleLegacyError12("Init", "")
                                                 continueProcessing = False '--- should be disposed by caller --- Call dispose
                                                 Return doc.docBuffer
                                             ElseIf Not db.cs_getBoolean(cs, "active") Then
@@ -700,7 +700,7 @@ Namespace Contensive.Core
                                                 ' inactive record, throw error
                                                 '
                                                 Call db.cs_Close(cs)
-                                                handleExceptionAndContinue(New ApplicationException("Add-on call from [" & refHost & "] was blocked because this domain is not active in the Aggregate Access Content. To allow this domain access, mark the record active.")) ' handleLegacyError12("Init", "")
+                                                handleException(New ApplicationException("Add-on call from [" & refHost & "] was blocked because this domain is not active in the Aggregate Access Content. To allow this domain access, mark the record active.")) ' handleLegacyError12("Init", "")
                                                 continueProcessing = False '--- should be disposed by caller --- Call dispose
                                                 Return doc.docBuffer
                                             Else
@@ -1245,7 +1245,7 @@ Namespace Contensive.Core
                     End If
                 End If
             Catch ex As Exception
-                Call handleExceptionAndContinue(ex)
+                Call handleException(ex)
             End Try
             Return returnResult
         End Function
@@ -2062,7 +2062,7 @@ Namespace Contensive.Core
                         result = True
                 End Select
             Catch ex As Exception
-                handleExceptionAndContinue(ex)
+                handleException(ex)
             End Try
             Return result
         End Function
@@ -2124,11 +2124,11 @@ Namespace Contensive.Core
         End Sub
         Private _handlingExceptionRecursionBlock As Boolean = False
         '
-        Public Sub handleExceptionAndContinue(ByVal ex As Exception, ByVal cause As String)
+        Public Sub handleException(ByVal ex As Exception, ByVal cause As String)
             Call handleException(ex, cause, 2)
         End Sub
         '
-        Public Sub handleExceptionAndContinue(ByVal ex As Exception)
+        Public Sub handleException(ByVal ex As Exception)
             Call handleException(ex, "n/a", 2)
         End Sub
         '
