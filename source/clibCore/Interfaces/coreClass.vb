@@ -74,7 +74,7 @@ Namespace Contensive.Core
         '------------------------------------------------------------------------
         ' ----- Debugging
         '
-        Public Property csv_ConnectionID As Integer = 0                     ' Random number (semi) unique to this hit
+        Public Property docGuid As String                        ' Random number (semi) unique to this hit
         Friend Property addonsRunOnThisPageIdList As New List(Of Integer)
         Friend Property addonsCurrentlyRunningIdList As New List(Of Integer)
         Public Structure csv_stylesheetCacheType
@@ -2141,6 +2141,7 @@ Namespace Contensive.Core
         Private Sub constructorInitialize()
             Try
                 '
+                docGuid = genericController.createGuid()
                 app_startTickCount = GetTickCount
                 CPTickCountBase = GetTickCount
                 main_ClosePageCounter = 0

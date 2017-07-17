@@ -2208,91 +2208,86 @@ ErrorTrap:
         '========================================================================
         '
         Private Sub LoadEditResponse(adminContent As cdefModel, editRecord As editRecordClass)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "LoadEditResponse")
-            '
-            ' converted array to dictionary - Dim FieldPointer As Integer
-            Dim FieldCount As Integer
-            Dim DataSourceName As String
-            Dim PageNotFoundPageID As Integer
-            'Dim LandingPageID As Integer
-            Dim FormFieldListToBeLoaded As String
-            Dim FormEmptyFieldList As String
-            '
-            ' List of fields that were created for the form, and should be verified (starts and ends with a comma)
-            '
-            FormFieldListToBeLoaded = cpCore.docProperties.getText("FormFieldList")
-            If FormFieldListToBeLoaded = "" Then
-                FormFieldListToBeLoaded = ","
-            Else
-                'FormFieldListToBeLoaded = "," & FormFieldListToBeLoaded & ","
-            End If
-            '
-            ' List of fields coming from the form that are empty -- and should not be in stream (starts and ends with a comma)
-            '
-            FormEmptyFieldList = cpCore.docProperties.getText("FormEmptyFieldList")
-            '
-            If AllowAdminFieldCheck() And (FormFieldListToBeLoaded = ",") Then
+            Try
                 '
-                ' The field list was not returned
+                ' converted array to dictionary - Dim FieldPointer As Integer
+                Dim FieldCount As Integer
+                Dim DataSourceName As String
+                Dim PageNotFoundPageID As Integer
+                'Dim LandingPageID As Integer
+                Dim FormFieldListToBeLoaded As String
+                Dim FormEmptyFieldList As String
                 '
-                Call errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [no field list].")
-            ElseIf AllowAdminFieldCheck() And (FormEmptyFieldList = "") Then
+                ' List of fields that were created for the form, and should be verified (starts and ends with a comma)
                 '
-                ' The field list was not returned
+                FormFieldListToBeLoaded = cpCore.docProperties.getText("FormFieldList")
+                If FormFieldListToBeLoaded = "" Then
+                    FormFieldListToBeLoaded = ","
+                Else
+                    'FormFieldListToBeLoaded = "," & FormFieldListToBeLoaded & ","
+                End If
                 '
-                Call errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [no empty field list].")
-            Else
+                ' List of fields coming from the form that are empty -- and should not be in stream (starts and ends with a comma)
                 '
-                ' fixup the string so it can be reduced by each field found, leaving and empty string if all correct
+                FormEmptyFieldList = cpCore.docProperties.getText("FormEmptyFieldList")
                 '
-                Dim datasource As Models.Entity.dataSourceModel = Models.Entity.dataSourceModel.create(cpCore, adminContent.dataSourceId, New List(Of String))
-                'DataSourceName = cpCore.db.getDataSourceNameByID(adminContent.dataSourceId)
-                For Each keyValuePair In adminContent.fields
-                    Dim field As CDefFieldModel = keyValuePair.Value
-                    Call LoadEditResponseByPointer(adminContent, editRecord, field, datasource.Name, FormFieldListToBeLoaded, FormEmptyFieldList)
-                Next
-                '
-                ' If there are any form fields that were no loaded, flag the error now
-                '
-                If AllowAdminFieldCheck() And (FormFieldListToBeLoaded <> ",") Then
-                    Call errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The following fields where Not found [" & Mid(FormFieldListToBeLoaded, 2, Len(FormFieldListToBeLoaded) - 2) & "].")
-                    Throw (New ApplicationException("Unexpected exception")) '  cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", There were fields In the fieldlist sent out To the browser that did Not Return, [" & Mid(FormFieldListToBeLoaded, 2, Len(FormFieldListToBeLoaded) - 2) & "]")
+                If AllowAdminFieldCheck() And (FormFieldListToBeLoaded = ",") Then
+                    '
+                    ' The field list was not returned
+                    '
+                    Call errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [no field list].")
+                ElseIf AllowAdminFieldCheck() And (FormEmptyFieldList = "") Then
+                    '
+                    ' The field list was not returned
+                    '
+                    Call errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [no empty field list].")
                 Else
                     '
-                    ' if page content, check for the 'pagenotfound','landingpageid' checkboxes in control tab
+                    ' fixup the string so it can be reduced by each field found, leaving and empty string if all correct
                     '
-                    If genericController.vbLCase(adminContent.ContentTableName) = "ccpagecontent" Then
+                    Dim datasource As Models.Entity.dataSourceModel = Models.Entity.dataSourceModel.create(cpCore, adminContent.dataSourceId, New List(Of String))
+                    'DataSourceName = cpCore.db.getDataSourceNameByID(adminContent.dataSourceId)
+                    For Each keyValuePair In adminContent.fields
+                        Dim field As CDefFieldModel = keyValuePair.Value
+                        Call LoadEditResponseByPointer(adminContent, editRecord, field, datasource.Name, FormFieldListToBeLoaded, FormEmptyFieldList)
+                    Next
+                    '
+                    ' If there are any form fields that were no loaded, flag the error now
+                    '
+                    If AllowAdminFieldCheck() And (FormFieldListToBeLoaded <> ",") Then
+                        Call errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The following fields where Not found [" & Mid(FormFieldListToBeLoaded, 2, Len(FormFieldListToBeLoaded) - 2) & "].")
+                        Throw (New ApplicationException("Unexpected exception")) '  cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", There were fields In the fieldlist sent out To the browser that did Not Return, [" & Mid(FormFieldListToBeLoaded, 2, Len(FormFieldListToBeLoaded) - 2) & "]")
+                    Else
                         '
-                        PageNotFoundPageID = (cpCore.siteProperties.getinteger("PageNotFoundPageID", 0))
-                        If cpCore.docProperties.getBoolean("PageNotFound") Then
-                            editRecord.SetPageNotFoundPageID = True
-                        ElseIf editRecord.id = PageNotFoundPageID Then
-                            Call cpCore.siteProperties.setProperty("PageNotFoundPageID", "0")
-                        End If
+                        ' if page content, check for the 'pagenotfound','landingpageid' checkboxes in control tab
                         '
-                        If cpCore.docProperties.getBoolean("LandingPageID") Then
-                            editRecord.SetLandingPageID = True
-                        ElseIf (editRecord.id = 0) Then
+                        If genericController.vbLCase(adminContent.ContentTableName) = "ccpagecontent" Then
                             '
-                            ' New record, allow it to be set, but do not compare it to LandingPageID
+                            PageNotFoundPageID = (cpCore.siteProperties.getinteger("PageNotFoundPageID", 0))
+                            If cpCore.docProperties.getBoolean("PageNotFound") Then
+                                editRecord.SetPageNotFoundPageID = True
+                            ElseIf editRecord.id = PageNotFoundPageID Then
+                                Call cpCore.siteProperties.setProperty("PageNotFoundPageID", "0")
+                            End If
                             '
-                        ElseIf (editRecord.id = cpCore.siteProperties.landingPageID) Then
-                            '
-                            ' Do not reset the LandingPageID from here -- set another instead
-                            '
-                            Call errorController.error_AddUserError(cpCore, "This page was marked As the Landing Page For the website, And the checkbox has been cleared. This Is Not allowed. To remove this page As the Landing Page, locate a New landing page And Select it, Or go To Settings &gt; Page Settings And Select a New Landing Page.")
+                            If cpCore.docProperties.getBoolean("LandingPageID") Then
+                                editRecord.SetLandingPageID = True
+                            ElseIf (editRecord.id = 0) Then
+                                '
+                                ' New record, allow it to be set, but do not compare it to LandingPageID
+                                '
+                            ElseIf (editRecord.id = cpCore.siteProperties.landingPageID) Then
+                                '
+                                ' Do not reset the LandingPageID from here -- set another instead
+                                '
+                                Call errorController.error_AddUserError(cpCore, "This page was marked As the Landing Page For the website, And the checkbox has been cleared. This Is Not allowed. To remove this page As the Landing Page, locate a New landing page And Select it, Or go To Settings &gt; Page Settings And Select a New Landing Page.")
+                            End If
                         End If
                     End If
                 End If
-            End If
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassError3("LoadEditResponse")
-            '
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
         End Sub
         ''
         ''========================================================================
@@ -2340,512 +2335,507 @@ ErrorTrap:
         '========================================================================
         '
         Private Sub LoadEditResponseByPointer(adminContent As cdefModel, editRecord As editRecordClass, field As CDefFieldModel, DataSourceName As String, ByRef FormFieldListToBeLoaded As String, FormEmptyFieldList As String)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogAdminMethodEnter( "LoadEditResponseByPointer")
-            '
-            Dim blockDuplicateUsername As Boolean
-            Dim blockDuplicateEmail As Boolean
-            Dim lcaseCopy As String
-            Dim HasImg As Boolean
-            Dim HasInput As Boolean
-            Dim HasAC As Boolean
-            Dim HasText As Boolean
-            'Dim ResponseText As String
-            Dim EditorPixelHeight As Integer
-            Dim EditorRowHeight As Integer
-            Dim HTMLDecode As htmlToTextControllers
-            Dim Copy As String
-            'Dim ResponseValueVariant As Object
-            Dim FieldName As String
-            Dim ResponseFieldValueIsOKToSave As Boolean
-            Dim SQLUnique As String
-            Dim CSPointer As Integer
-            Dim ResponseFieldIsEmpty As Boolean
-            Dim ResponseFieldValueText As String
-            Dim Filename As String
-            'Dim innovaEditor As New innovaEditorAddonClassFPO
-            Dim HTML As New htmlParserController(cpCore)
-            Dim ElementPointer As Integer
-            Dim Result As String
-            Dim Word As String
-            Dim WordList As String
-            'Dim Speller As New kmaSpellCheck2.SpellingClass
-            Dim TabCopy As String = ""
-            Dim ParentID As Integer
-            Dim UsedIDs As String
-            Dim LoopPtr As Integer
-            Const LoopPtrMax = 100
-            Dim CS As Integer
-            Dim InLoadedFieldList As Boolean
-            Dim InEmptyFieldList As Boolean
-            Dim InResponse As Boolean
-            Dim responseName As String
-            '
-            '   Read in form values
-            '
-            With field
-                If Not .active Then
-                    '
-                    ' Exclude from all field testing, do not load a resposne for this field
-                    '
-                Else
-                    '
-                    ' Read value in and test it for valid response
-                    ' Assume OK, mark not ok if there is a problem
-                    '
-                    ResponseFieldValueIsOKToSave = True
-                    FieldName = genericController.vbUCase(.nameLc)
-                    responseName = FieldName
-                    InLoadedFieldList = (InStr(1, FormFieldListToBeLoaded, "," & FieldName & ",", vbTextCompare) <> 0)
-                    InEmptyFieldList = (InStr(1, FormEmptyFieldList, "," & responseName & ",", vbTextCompare) <> 0)
-                    InResponse = cpCore.docProperties.containsKey(responseName)
-                    FormFieldListToBeLoaded = genericController.vbReplace(FormFieldListToBeLoaded, "," & FieldName & ",", ",", 1, 99, vbTextCompare)
-                    ResponseFieldValueText = cpCore.docProperties.getText(responseName)
-                    ResponseFieldIsEmpty = String.IsNullOrEmpty(ResponseFieldValueText)
-                    If .editTabName <> "" Then
-                        TabCopy = " In the " & .editTabName & " tab"
-                    End If
-                    '
-                    If genericController.vbInstr(1, FieldName, "PARENTID", vbTextCompare) <> 0 Then
-                        FieldName = FieldName
-                    End If
-                    '
-                    ' process reserved fields
-                    '
-                    Select Case FieldName
+            Try
+                Dim blockDuplicateUsername As Boolean
+                Dim blockDuplicateEmail As Boolean
+                Dim lcaseCopy As String
+                Dim HasImg As Boolean
+                Dim HasInput As Boolean
+                Dim HasAC As Boolean
+                Dim HasText As Boolean
+                'Dim ResponseText As String
+                Dim EditorPixelHeight As Integer
+                Dim EditorRowHeight As Integer
+                Dim HTMLDecode As htmlToTextControllers
+                Dim Copy As String
+                'Dim ResponseValueVariant As Object
+                Dim FieldName As String
+                Dim ResponseFieldValueIsOKToSave As Boolean
+                Dim SQLUnique As String
+                Dim CSPointer As Integer
+                Dim ResponseFieldIsEmpty As Boolean
+                Dim ResponseFieldValueText As String
+                Dim Filename As String
+                'Dim innovaEditor As New innovaEditorAddonClassFPO
+                Dim HTML As New htmlParserController(cpCore)
+                Dim ElementPointer As Integer
+                Dim Result As String
+                Dim Word As String
+                Dim WordList As String
+                'Dim Speller As New kmaSpellCheck2.SpellingClass
+                Dim TabCopy As String = ""
+                Dim ParentID As Integer
+                Dim UsedIDs As String
+                Dim LoopPtr As Integer
+                Const LoopPtrMax = 100
+                Dim CS As Integer
+                Dim InLoadedFieldList As Boolean
+                Dim InEmptyFieldList As Boolean
+                Dim InResponse As Boolean
+                Dim responseName As String
+                '
+                '   Read in form values
+                '
+                With field
+                    If Not .active Then
+                        '
+                        ' Exclude from all field testing, do not load a resposne for this field
+                        '
+                    Else
+                        '
+                        ' Read value in and test it for valid response
+                        ' Assume OK, mark not ok if there is a problem
+                        '
+                        ResponseFieldValueIsOKToSave = True
+                        FieldName = genericController.vbUCase(.nameLc)
+                        responseName = FieldName
+                        InLoadedFieldList = (InStr(1, FormFieldListToBeLoaded, "," & FieldName & ",", vbTextCompare) <> 0)
+                        InEmptyFieldList = (InStr(1, FormEmptyFieldList, "," & responseName & ",", vbTextCompare) <> 0)
+                        InResponse = cpCore.docProperties.containsKey(responseName)
+                        FormFieldListToBeLoaded = genericController.vbReplace(FormFieldListToBeLoaded, "," & FieldName & ",", ",", 1, 99, vbTextCompare)
+                        ResponseFieldValueText = cpCore.docProperties.getText(responseName)
+                        ResponseFieldIsEmpty = String.IsNullOrEmpty(ResponseFieldValueText)
+                        If .editTabName <> "" Then
+                            TabCopy = " In the " & .editTabName & " tab"
+                        End If
+                        '
+                        If genericController.vbInstr(1, FieldName, "PARENTID", vbTextCompare) <> 0 Then
+                            FieldName = FieldName
+                        End If
+                        '
+                        ' process reserved fields
+                        '
+                        Select Case FieldName
                         '
                         ' ----- block control fields by name
                         '
-                        Case "CONTENTCONTROLID"
-                            '
-                            '
-                            '
-                            If AllowAdminFieldCheck() Then
-                                If (Not cpCore.docProperties.containsKey(FieldName)) Then
-                                    If Not (cpCore.debug_iUserError <> "") Then
-                                        '
-                                        ' Add user error only for the first missing field
-                                        '
-                                        Call errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try again, taking care Not To submit the page until your browser has finished loading. If this Error occurs again, please report this problem To your site administrator. The first Error was [" & FieldName & " Not found]. There may have been others.")
+                            Case "CONTENTCONTROLID"
+                                '
+                                '
+                                '
+                                If AllowAdminFieldCheck() Then
+                                    If (Not cpCore.docProperties.containsKey(FieldName)) Then
+                                        If Not (cpCore.debug_iUserError <> "") Then
+                                            '
+                                            ' Add user error only for the first missing field
+                                            '
+                                            Call errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try again, taking care Not To submit the page until your browser has finished loading. If this Error occurs again, please report this problem To your site administrator. The first Error was [" & FieldName & " Not found]. There may have been others.")
+                                        End If
+                                        Throw (New ApplicationException("Unexpected exception")) '  cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
+                                        Exit Sub
                                     End If
-                                    Throw (New ApplicationException("Unexpected exception")) '  cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
-                                    Exit Sub
                                 End If
-                            End If
-                            '
-                            ResponseFieldValueText = cpCore.docProperties.getText(FieldName)
-                            'ResponseValueVariant = cpCore.main_ReadStreamText(FieldName)
-                            'ResponseValueText = genericController.encodeText(ResponseValueVariant)
-                            If genericController.EncodeInteger(ResponseFieldValueText) = genericController.EncodeInteger(editRecord.fieldsLc(.nameLc).value) Then
                                 '
-                                ' No change
-                                '
-                            Else
-                                '
-                                ' new value
-                                '
-                                editRecord.fieldsLc(.nameLc).value = ResponseFieldValueText
-                                ResponseFieldIsEmpty = False
-                            End If
-                        Case "CONTENTCATEGORYID"
-                            '
-                            '
-                            '
-                            InEmptyFieldList = (InStr(1, FormEmptyFieldList, "," & FieldName & ",", vbTextCompare) <> 0)
-                            InResponse = cpCore.docProperties.containsKey(FieldName)
-                            If AllowAdminFieldCheck() Then
-                                If (Not InResponse) And (Not InEmptyFieldList) Then
-                                    Call errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [" & FieldName & " Not found].")
-                                    Throw (New ApplicationException("Unexpected exception")) '  cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
-                                    Exit Sub
+                                ResponseFieldValueText = cpCore.docProperties.getText(FieldName)
+                                'ResponseValueVariant = cpCore.main_ReadStreamText(FieldName)
+                                'ResponseValueText = genericController.encodeText(ResponseValueVariant)
+                                If genericController.EncodeInteger(ResponseFieldValueText) = genericController.EncodeInteger(editRecord.fieldsLc(.nameLc).value) Then
+                                    '
+                                    ' No change
+                                    '
+                                Else
+                                    '
+                                    ' new value
+                                    '
+                                    editRecord.fieldsLc(.nameLc).value = ResponseFieldValueText
+                                    ResponseFieldIsEmpty = False
                                 End If
-                            End If
-                            '
-                            ResponseFieldValueText = cpCore.docProperties.getText(FieldName)
-                            'ResponseValueText = genericController.encodeText(ResponseValueVariant)
-                            If genericController.EncodeInteger(ResponseFieldValueText) = genericController.EncodeInteger(editRecord.fieldsLc(.nameLc).value) Then
+                            Case "CONTENTCATEGORYID"
                                 '
-                                ' No change
                                 '
-                            Else
                                 '
-                                ' new value
-                                '
-                                editRecord.fieldsLc(.nameLc).value = ResponseFieldValueText
-                                ResponseFieldIsEmpty = False
-                            End If
-                        Case "CCGUID"
-                            '
-                            '
-                            '
-                            InEmptyFieldList = (InStr(1, FormEmptyFieldList, "," & FieldName & ",", vbTextCompare) <> 0)
-                            InResponse = cpCore.docProperties.containsKey(FieldName)
-                            If AllowAdminFieldCheck() Then
-                                If (Not InResponse) And (Not InEmptyFieldList) Then
-                                    Call errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [" & FieldName & " Not found].")
-                                    Throw (New ApplicationException("Unexpected exception")) '  cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
-                                    Exit Sub
+                                InEmptyFieldList = (InStr(1, FormEmptyFieldList, "," & FieldName & ",", vbTextCompare) <> 0)
+                                InResponse = cpCore.docProperties.containsKey(FieldName)
+                                If AllowAdminFieldCheck() Then
+                                    If (Not InResponse) And (Not InEmptyFieldList) Then
+                                        Call errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [" & FieldName & " Not found].")
+                                        Throw (New ApplicationException("Unexpected exception")) '  cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
+                                        Exit Sub
+                                    End If
                                 End If
-                            End If
-                            '
-                            ResponseFieldValueText = cpCore.docProperties.getText(FieldName)
-                            If ResponseFieldValueText = editRecord.fieldsLc(.nameLc).value.ToString Then
                                 '
-                                ' No change
+                                ResponseFieldValueText = cpCore.docProperties.getText(FieldName)
+                                'ResponseValueText = genericController.encodeText(ResponseValueVariant)
+                                If genericController.EncodeInteger(ResponseFieldValueText) = genericController.EncodeInteger(editRecord.fieldsLc(.nameLc).value) Then
+                                    '
+                                    ' No change
+                                    '
+                                Else
+                                    '
+                                    ' new value
+                                    '
+                                    editRecord.fieldsLc(.nameLc).value = ResponseFieldValueText
+                                    ResponseFieldIsEmpty = False
+                                End If
+                            Case "CCGUID"
                                 '
-                            Else
                                 '
-                                ' new value
                                 '
-                                editRecord.fieldsLc(.nameLc).value = ResponseFieldValueText
-                                ResponseFieldIsEmpty = False
-                            End If
-                        Case "ID", "MODIFIEDBY", "MODIFIEDDATE", "CREATEDBY", "DATEADDED"
-                            '
-                            ' -----Control fields that cannot be edited
-                            '       9/24/2009 - do not save these into the response
-                            ResponseFieldValueIsOKToSave = False
-                            '
-                        Case Else
-                            '
-                            ' ----- Read response for user fields
-                            '       9/24/2009 - if fieldname is not in FormFieldListToBeLoaded, go with what is there (Db value or default value)
-                            '
-                            If (Not .authorable) Then
+                                InEmptyFieldList = (InStr(1, FormEmptyFieldList, "," & FieldName & ",", vbTextCompare) <> 0)
+                                InResponse = cpCore.docProperties.containsKey(FieldName)
+                                If AllowAdminFieldCheck() Then
+                                    If (Not InResponse) And (Not InEmptyFieldList) Then
+                                        Call errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [" & FieldName & " Not found].")
+                                        Throw (New ApplicationException("Unexpected exception")) '  cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
+                                        Exit Sub
+                                    End If
+                                End If
                                 '
-                                ' Is blocked from authoring, leave current value
+                                ResponseFieldValueText = cpCore.docProperties.getText(FieldName)
+                                If ResponseFieldValueText = editRecord.fieldsLc(.nameLc).value.ToString Then
+                                    '
+                                    ' No change
+                                    '
+                                Else
+                                    '
+                                    ' new value
+                                    '
+                                    editRecord.fieldsLc(.nameLc).value = ResponseFieldValueText
+                                    ResponseFieldIsEmpty = False
+                                End If
+                            Case "ID", "MODIFIEDBY", "MODIFIEDDATE", "CREATEDBY", "DATEADDED"
                                 '
+                                ' -----Control fields that cannot be edited
+                                '       9/24/2009 - do not save these into the response
                                 ResponseFieldValueIsOKToSave = False
-                            ElseIf (.fieldTypeId = FieldTypeIdAutoIdIncrement) Or (.fieldTypeId = FieldTypeIdRedirect) Or (.fieldTypeId = FieldTypeIdManyToMany) Then
                                 '
-                                ' These fields types have no values to load, leave current value
-                                ' (many to many is handled during save)
+                            Case Else
                                 '
-                                ResponseFieldValueIsOKToSave = False
-                            ElseIf (.adminOnly) And (Not cpCore.authContext.isAuthenticatedAdmin(cpCore)) Then
+                                ' ----- Read response for user fields
+                                '       9/24/2009 - if fieldname is not in FormFieldListToBeLoaded, go with what is there (Db value or default value)
                                 '
-                                ' non-admin and admin only field, leave current value
-                                '
-                                ResponseFieldValueIsOKToSave = False
-                            ElseIf (.developerOnly) And (Not cpCore.authContext.isAuthenticatedDeveloper(cpCore)) Then
-                                '
-                                ' non-developer and developer only field, leave current value
-                                '
-                                ResponseFieldValueIsOKToSave = False
-                            ElseIf (.ReadOnly) Or (.NotEditable And (editRecord.id <> 0)) Then
-                                '
-                                ' read only field, leave current
-                                '
-                                ResponseFieldValueIsOKToSave = False
-                            ElseIf (Not InLoadedFieldList) Then
-                                '
-                                ' Was not sent out, so just go with the current value
-                                ' Also, if the loaded field list is not returned, and the field is not returned, this is the bestwe can do.
-                                '
-                                ResponseFieldValueIsOKToSave = False
-                                'ElseIf (InEmptyFieldList And (Not InResponse)) Then
-                                '    '
-                                '    ' NO - InEmptyFieldList is what comes back from the browser as a list of fields that are blank after the submit button is pressed
-                                '    ' Was sent out blank, and nothing was returned back, so go with current value
-                                '    '
-                                '    ResponseValueIsOKToSave = False
-                            ElseIf AllowAdminFieldCheck() And (Not InResponse) And (Not InEmptyFieldList) Then
-                                '
-                                ' Was sent out non-blank, and no response back, flag error and leave the current value to a retry
-                                '
-                                Call errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. The field [" & .caption & "]" & TabCopy & " was missing. Please Try your change again. If this Error happens repeatedly, please report this problem To your site administrator.")
-                                Throw (New ApplicationException("Unexpected exception")) '  cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
-                                ResponseFieldValueIsOKToSave = False
-                            Else
-                                '
-                                ' Test input value for valid data
-                                '
-                                Select Case .fieldTypeId
-                                    Case FieldTypeIdInteger
-                                        '
-                                        ' ----- Integer
-                                        '
-                                        ResponseFieldIsEmpty = ResponseFieldIsEmpty Or (ResponseFieldValueText = "")
-                                        If Not ResponseFieldIsEmpty Then
-                                            If genericController.vbIsNumeric(ResponseFieldValueText) Then
-                                                'ResponseValueVariant = genericController.EncodeInteger(ResponseValueVariant)
-                                            Else
-                                                errorController.error_AddUserError(cpCore, "The record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be a numeric value.")
-                                                ResponseFieldValueIsOKToSave = False
-                                            End If
-                                        End If
-                                    Case FieldTypeIdCurrency, FieldTypeIdFloat
-                                        '
-                                        ' ----- Floating point number
-                                        '
-                                        ResponseFieldIsEmpty = ResponseFieldIsEmpty Or (ResponseFieldValueText = "")
-                                        If Not ResponseFieldIsEmpty Then
-                                            If genericController.vbIsNumeric(ResponseFieldValueText) Then
-                                                'ResponseValueVariant = EncodeNumber(ResponseValueVariant)
-                                            Else
-                                                errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be a numeric value.")
-                                                ResponseFieldValueIsOKToSave = False
-                                            End If
-                                        End If
-                                    Case FieldTypeIdLookup
-                                        '
-                                        ' ----- Must be a recordID
-                                        '
-                                        ResponseFieldIsEmpty = ResponseFieldIsEmpty Or (ResponseFieldValueText = "")
-                                        If Not ResponseFieldIsEmpty Then
-                                            If genericController.vbIsNumeric(ResponseFieldValueText) Then
-                                                'ResponseValueVariant = genericController.EncodeInteger(ResponseValueVariant)
-                                            Else
-                                                errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " had an invalid selection.")
-                                                ResponseFieldValueIsOKToSave = False
-                                            End If
-                                        End If
-                                    Case FieldTypeIdDate
-                                        '
-                                        ' ----- Must be a Date value
-                                        '
-                                        ResponseFieldIsEmpty = ResponseFieldIsEmpty Or (ResponseFieldValueText = "")
-                                        If Not ResponseFieldIsEmpty Then
-                                            If Not IsDate(ResponseFieldValueText) Then
-                                                errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be a date And/Or time in the form mm/dd/yy 0000 AM(PM).")
-                                                ResponseFieldValueIsOKToSave = False
-                                            End If
-                                        End If
-                                        'End Case
-                                    Case FieldTypeIdBoolean
-                                        '
-                                        ' ----- translate to boolean
-                                        '
-                                        ResponseFieldValueText = genericController.EncodeBoolean(ResponseFieldValueText).ToString
-                                    Case FieldTypeIdLink
-                                        '
-                                        ' ----- Link field - if it starts with 'www.', add the http:// automatically
-                                        '
-                                        ResponseFieldValueText = genericController.encodeText(ResponseFieldValueText)
-                                        If Left(LCase(ResponseFieldValueText), 4) = "www." Then
-                                            ResponseFieldValueText = "http//" & ResponseFieldValueText
-                                        End If
-                                    Case FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
-                                        '
-                                        ' ----- Html fields
-                                        '
-                                        EditorRowHeight = cpCore.docProperties.getInteger(FieldName & "Rows")
-                                        If EditorRowHeight <> 0 Then
-                                            Call cpCore.userProperty.setProperty(adminContent.Name & "." & FieldName & ".RowHeight", EditorRowHeight)
-                                        End If
-                                        EditorPixelHeight = cpCore.docProperties.getInteger(FieldName & "PixelHeight")
-                                        If EditorPixelHeight <> 0 Then
-                                            Call cpCore.userProperty.setProperty(adminContent.Name & "." & FieldName & ".PixelHeight", EditorPixelHeight)
-                                        End If
-                                        '
-                                        If Not .htmlContent Then
-                                            lcaseCopy = genericController.vbLCase(ResponseFieldValueText)
-                                            lcaseCopy = genericController.vbReplace(lcaseCopy, vbCr, "")
-                                            lcaseCopy = genericController.vbReplace(lcaseCopy, vbLf, "")
-                                            lcaseCopy = Trim(lcaseCopy)
-                                            If (lcaseCopy = HTMLEditorDefaultCopyNoCr) Or (lcaseCopy = HTMLEditorDefaultCopyNoCr2) Then
-                                                '
-                                                ' if the editor was left blank, remote the default copy
-                                                '
-                                                ResponseFieldValueText = ""
-                                            Else
-                                                If genericController.vbInstr(1, ResponseFieldValueText, HTMLEditorDefaultCopyStartMark) <> 0 Then
-                                                    '
-                                                    ' if the default copy was editing, remote the markers
-                                                    '
-                                                    ResponseFieldValueText = genericController.vbReplace(ResponseFieldValueText, HTMLEditorDefaultCopyStartMark, "")
-                                                    ResponseFieldValueText = genericController.vbReplace(ResponseFieldValueText, HTMLEditorDefaultCopyEndMark, "")
-                                                    'ResponseValueVariant = ResponseValueText
+                                If (Not .authorable) Then
+                                    '
+                                    ' Is blocked from authoring, leave current value
+                                    '
+                                    ResponseFieldValueIsOKToSave = False
+                                ElseIf (.fieldTypeId = FieldTypeIdAutoIdIncrement) Or (.fieldTypeId = FieldTypeIdRedirect) Or (.fieldTypeId = FieldTypeIdManyToMany) Then
+                                    '
+                                    ' These fields types have no values to load, leave current value
+                                    ' (many to many is handled during save)
+                                    '
+                                    ResponseFieldValueIsOKToSave = False
+                                ElseIf (.adminOnly) And (Not cpCore.authContext.isAuthenticatedAdmin(cpCore)) Then
+                                    '
+                                    ' non-admin and admin only field, leave current value
+                                    '
+                                    ResponseFieldValueIsOKToSave = False
+                                ElseIf (.developerOnly) And (Not cpCore.authContext.isAuthenticatedDeveloper(cpCore)) Then
+                                    '
+                                    ' non-developer and developer only field, leave current value
+                                    '
+                                    ResponseFieldValueIsOKToSave = False
+                                ElseIf (.ReadOnly) Or (.NotEditable And (editRecord.id <> 0)) Then
+                                    '
+                                    ' read only field, leave current
+                                    '
+                                    ResponseFieldValueIsOKToSave = False
+                                ElseIf (Not InLoadedFieldList) Then
+                                    '
+                                    ' Was not sent out, so just go with the current value
+                                    ' Also, if the loaded field list is not returned, and the field is not returned, this is the bestwe can do.
+                                    '
+                                    ResponseFieldValueIsOKToSave = False
+                                    'ElseIf (InEmptyFieldList And (Not InResponse)) Then
+                                    '    '
+                                    '    ' NO - InEmptyFieldList is what comes back from the browser as a list of fields that are blank after the submit button is pressed
+                                    '    ' Was sent out blank, and nothing was returned back, so go with current value
+                                    '    '
+                                    '    ResponseValueIsOKToSave = False
+                                ElseIf AllowAdminFieldCheck() And (Not InResponse) And (Not InEmptyFieldList) Then
+                                    '
+                                    ' Was sent out non-blank, and no response back, flag error and leave the current value to a retry
+                                    '
+                                    Call errorController.error_AddUserError(cpCore, "There has been an Error reading the response from your browser. The field [" & .caption & "]" & TabCopy & " was missing. Please Try your change again. If this Error happens repeatedly, please report this problem To your site administrator.")
+                                    Throw (New ApplicationException("Unexpected exception")) '  cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
+                                    ResponseFieldValueIsOKToSave = False
+                                Else
+                                    '
+                                    ' Test input value for valid data
+                                    '
+                                    Select Case .fieldTypeId
+                                        Case FieldTypeIdInteger
+                                            '
+                                            ' ----- Integer
+                                            '
+                                            ResponseFieldIsEmpty = ResponseFieldIsEmpty Or (ResponseFieldValueText = "")
+                                            If Not ResponseFieldIsEmpty Then
+                                                If genericController.vbIsNumeric(ResponseFieldValueText) Then
+                                                    'ResponseValueVariant = genericController.EncodeInteger(ResponseValueVariant)
+                                                Else
+                                                    errorController.error_AddUserError(cpCore, "The record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be a numeric value.")
+                                                    ResponseFieldValueIsOKToSave = False
                                                 End If
-                                                '
-                                                ' If the response is only white space, remove it
-                                                ' this is a fix for when content editors leave white space in the editor, and do not realize it
-                                                '   then cannot fixgure out how to remove it
-                                                '
-                                                ResponseFieldValueText = cpCore.html.html_DecodeContent(ResponseFieldValueText)
-                                                ResponseFieldValueText = genericController.vbLCase(genericController.encodeText(ResponseFieldValueText))
-                                                If Len(ResponseFieldValueText) < 20 Then
-                                                    HasInput = (InStr(1, ResponseFieldValueText, "<input ") <> 0)
-                                                    If Not HasInput Then
-                                                        HasImg = (InStr(1, ResponseFieldValueText, "<img ") <> 0)
-                                                        If Not HasImg Then
-                                                            HasAC = (InStr(1, ResponseFieldValueText, "<ac ") <> 0)
-                                                            If Not HasAC Then
-                                                                HTMLDecode = New htmlToTextControllers(cpCore)
-                                                                Copy = Trim(HTMLDecode.convert(genericController.encodeText(ResponseFieldValueText)))
-                                                                If Copy = "" Then
-                                                                    ResponseFieldValueText = ""
+                                            End If
+                                        Case FieldTypeIdCurrency, FieldTypeIdFloat
+                                            '
+                                            ' ----- Floating point number
+                                            '
+                                            ResponseFieldIsEmpty = ResponseFieldIsEmpty Or (ResponseFieldValueText = "")
+                                            If Not ResponseFieldIsEmpty Then
+                                                If genericController.vbIsNumeric(ResponseFieldValueText) Then
+                                                    'ResponseValueVariant = EncodeNumber(ResponseValueVariant)
+                                                Else
+                                                    errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be a numeric value.")
+                                                    ResponseFieldValueIsOKToSave = False
+                                                End If
+                                            End If
+                                        Case FieldTypeIdLookup
+                                            '
+                                            ' ----- Must be a recordID
+                                            '
+                                            ResponseFieldIsEmpty = ResponseFieldIsEmpty Or (ResponseFieldValueText = "")
+                                            If Not ResponseFieldIsEmpty Then
+                                                If genericController.vbIsNumeric(ResponseFieldValueText) Then
+                                                    'ResponseValueVariant = genericController.EncodeInteger(ResponseValueVariant)
+                                                Else
+                                                    errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " had an invalid selection.")
+                                                    ResponseFieldValueIsOKToSave = False
+                                                End If
+                                            End If
+                                        Case FieldTypeIdDate
+                                            '
+                                            ' ----- Must be a Date value
+                                            '
+                                            ResponseFieldIsEmpty = ResponseFieldIsEmpty Or (ResponseFieldValueText = "")
+                                            If Not ResponseFieldIsEmpty Then
+                                                If Not IsDate(ResponseFieldValueText) Then
+                                                    errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be a date And/Or time in the form mm/dd/yy 0000 AM(PM).")
+                                                    ResponseFieldValueIsOKToSave = False
+                                                End If
+                                            End If
+                                        'End Case
+                                        Case FieldTypeIdBoolean
+                                            '
+                                            ' ----- translate to boolean
+                                            '
+                                            ResponseFieldValueText = genericController.EncodeBoolean(ResponseFieldValueText).ToString
+                                        Case FieldTypeIdLink
+                                            '
+                                            ' ----- Link field - if it starts with 'www.', add the http:// automatically
+                                            '
+                                            ResponseFieldValueText = genericController.encodeText(ResponseFieldValueText)
+                                            If Left(LCase(ResponseFieldValueText), 4) = "www." Then
+                                                ResponseFieldValueText = "http//" & ResponseFieldValueText
+                                            End If
+                                        Case FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
+                                            '
+                                            ' ----- Html fields
+                                            '
+                                            EditorRowHeight = cpCore.docProperties.getInteger(FieldName & "Rows")
+                                            If EditorRowHeight <> 0 Then
+                                                Call cpCore.userProperty.setProperty(adminContent.Name & "." & FieldName & ".RowHeight", EditorRowHeight)
+                                            End If
+                                            EditorPixelHeight = cpCore.docProperties.getInteger(FieldName & "PixelHeight")
+                                            If EditorPixelHeight <> 0 Then
+                                                Call cpCore.userProperty.setProperty(adminContent.Name & "." & FieldName & ".PixelHeight", EditorPixelHeight)
+                                            End If
+                                            '
+                                            If Not .htmlContent Then
+                                                lcaseCopy = genericController.vbLCase(ResponseFieldValueText)
+                                                lcaseCopy = genericController.vbReplace(lcaseCopy, vbCr, "")
+                                                lcaseCopy = genericController.vbReplace(lcaseCopy, vbLf, "")
+                                                lcaseCopy = Trim(lcaseCopy)
+                                                If (lcaseCopy = HTMLEditorDefaultCopyNoCr) Or (lcaseCopy = HTMLEditorDefaultCopyNoCr2) Then
+                                                    '
+                                                    ' if the editor was left blank, remote the default copy
+                                                    '
+                                                    ResponseFieldValueText = ""
+                                                Else
+                                                    If genericController.vbInstr(1, ResponseFieldValueText, HTMLEditorDefaultCopyStartMark) <> 0 Then
+                                                        '
+                                                        ' if the default copy was editing, remote the markers
+                                                        '
+                                                        ResponseFieldValueText = genericController.vbReplace(ResponseFieldValueText, HTMLEditorDefaultCopyStartMark, "")
+                                                        ResponseFieldValueText = genericController.vbReplace(ResponseFieldValueText, HTMLEditorDefaultCopyEndMark, "")
+                                                        'ResponseValueVariant = ResponseValueText
+                                                    End If
+                                                    '
+                                                    ' If the response is only white space, remove it
+                                                    ' this is a fix for when content editors leave white space in the editor, and do not realize it
+                                                    '   then cannot fixgure out how to remove it
+                                                    '
+                                                    ResponseFieldValueText = cpCore.html.html_DecodeContent(ResponseFieldValueText)
+                                                    ResponseFieldValueText = genericController.vbLCase(genericController.encodeText(ResponseFieldValueText))
+                                                    If Len(ResponseFieldValueText) < 20 Then
+                                                        HasInput = (InStr(1, ResponseFieldValueText, "<input ") <> 0)
+                                                        If Not HasInput Then
+                                                            HasImg = (InStr(1, ResponseFieldValueText, "<img ") <> 0)
+                                                            If Not HasImg Then
+                                                                HasAC = (InStr(1, ResponseFieldValueText, "<ac ") <> 0)
+                                                                If Not HasAC Then
+                                                                    HTMLDecode = New htmlToTextControllers(cpCore)
+                                                                    Copy = Trim(HTMLDecode.convert(genericController.encodeText(ResponseFieldValueText)))
+                                                                    If Copy = "" Then
+                                                                        ResponseFieldValueText = ""
+                                                                    End If
+                                                                    HTMLDecode = Nothing
                                                                 End If
-                                                                HTMLDecode = Nothing
                                                             End If
                                                         End If
                                                     End If
                                                 End If
                                             End If
-                                        End If
-                                    Case Else
+                                        Case Else
+                                            '
+                                            ' ----- text types
+                                            '
+                                            EditorRowHeight = cpCore.docProperties.getInteger(FieldName & "Rows")
+                                            If EditorRowHeight <> 0 Then
+                                                Call cpCore.userProperty.setProperty(adminContent.Name & "." & FieldName & ".RowHeight", EditorRowHeight)
+                                            End If
+                                            EditorPixelHeight = cpCore.docProperties.getInteger(FieldName & "PixelHeight")
+                                            If EditorPixelHeight <> 0 Then
+                                                Call cpCore.userProperty.setProperty(adminContent.Name & "." & FieldName & ".PixelHeight", EditorPixelHeight)
+                                            End If
+                                    End Select
+                                    If (LCase(FieldName) = "parentid") Then
                                         '
-                                        ' ----- text types
+                                        ' check circular reference on all parentid fields
                                         '
-                                        EditorRowHeight = cpCore.docProperties.getInteger(FieldName & "Rows")
-                                        If EditorRowHeight <> 0 Then
-                                            Call cpCore.userProperty.setProperty(adminContent.Name & "." & FieldName & ".RowHeight", EditorRowHeight)
-                                        End If
-                                        EditorPixelHeight = cpCore.docProperties.getInteger(FieldName & "PixelHeight")
-                                        If EditorPixelHeight <> 0 Then
-                                            Call cpCore.userProperty.setProperty(adminContent.Name & "." & FieldName & ".PixelHeight", EditorPixelHeight)
-                                        End If
-                                End Select
-                                If (LCase(FieldName) = "parentid") Then
-                                    '
-                                    ' check circular reference on all parentid fields
-                                    '
 
-                                    ParentID = genericController.EncodeInteger(ResponseFieldValueText)
-                                    LoopPtr = 0
-                                    UsedIDs = editRecord.id.ToString
-                                    Do While (LoopPtr < LoopPtrMax) And (ParentID <> 0) And (InStr(1, "," & UsedIDs & ",", "," & CStr(ParentID) & ",", vbBinaryCompare) = 0)
-                                        UsedIDs = UsedIDs & "," & CStr(ParentID)
-                                        CS = cpCore.db.cs_open(adminContent.Name, "ID=" & ParentID, , , , , , "ParentID")
-                                        If Not cpCore.db.cs_ok(CS) Then
-                                            ParentID = 0
-                                        Else
-                                            ParentID = cpCore.db.cs_getInteger(CS, "ParentID")
-                                        End If
-                                        Call cpCore.db.cs_Close(CS)
-                                        LoopPtr = LoopPtr + 1
-                                    Loop
-                                    If LoopPtr = LoopPtrMax Then
-                                        '
-                                        ' Too deep
-                                        '
-                                        errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " creates a relationship between records that Is too large. Please limit the depth of this relationship to " & LoopPtrMax & " records.")
-                                        ResponseFieldValueIsOKToSave = False
-                                    ElseIf (editRecord.id <> 0) And (editRecord.id = ParentID) Then
-                                        '
-                                        ' Reference to iteslf
-                                        '
-                                        errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " contains a circular reference. This record points back to itself. This Is Not allowed.")
-                                        ResponseFieldValueIsOKToSave = False
-                                    ElseIf ParentID <> 0 Then
-                                        '
-                                        ' Circular reference
-                                        '
-                                        errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " contains a circular reference. This field either points to other records which then point back to this record. This Is Not allowed.")
-                                        ResponseFieldValueIsOKToSave = False
-                                    End If
-                                End If
-                                If .TextBuffered Then
-                                    '
-                                    ' text buffering
-                                    '
-                                    ResponseFieldValueText = genericController.main_RemoveControlCharacters(ResponseFieldValueText)
-                                End If
-                                If (.Required) And (ResponseFieldIsEmpty) Then
-                                    '
-                                    ' field is required and is not given
-                                    '
-                                    errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " Is required but has no value.")
-                                    ResponseFieldValueIsOKToSave = False
-                                End If
-                                '
-                                ' special case - people records without Allowduplicateusername require username to be unique
-                                '
-                                If genericController.vbLCase(adminContent.ContentTableName) = "ccmembers" Then
-                                    If genericController.vbLCase(.nameLc) = "username" Then
-                                        blockDuplicateUsername = Not (cpCore.siteProperties.getBoolean("allowduplicateusername", False))
-                                    End If
-                                    If genericController.vbLCase(.nameLc) = "email" Then
-                                        blockDuplicateEmail = (cpCore.siteProperties.getBoolean("allowemaillogin", False))
-                                    End If
-                                End If
-                                If (blockDuplicateUsername Or blockDuplicateEmail Or .UniqueName) And (Not ResponseFieldIsEmpty) Then
-                                    '
-                                    ' ----- Do the unique check for this field
-                                    '
-                                    ' 7/22/2009 - moved this out of EditRecord.ID<>0 check -- so unique does not check edit or archive records
-                                    If editRecord.id = 0 Then
-                                        '
-                                        ' new record
-                                        '
-                                        If AdminContentWorkflowAuthoring Then
-                                            SQLUnique = "SELECT ID,EditSourceID FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & cpCore.db.EncodeSQL(ResponseFieldValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.metaData.content_getContentControlCriteria(adminContent.Name) & ")"
-                                            SQLUnique = SQLUnique & "And((EditArchive Is null)Or(EditArchive=0))"
-                                        Else
-                                            SQLUnique = "SELECT ID,0 as editsourceid FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & cpCore.db.EncodeSQL(ResponseFieldValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.metaData.content_getContentControlCriteria(adminContent.Name) & ")"
-                                        End If
-                                    Else
-                                        '
-                                        ' editing record
-                                        '
-                                        If AdminContentWorkflowAuthoring Then
-                                            '
-                                            ' check for another edit record that matches this record -or- a live record that matches it
-                                            '
-                                            SQLUnique = "SELECT ID,EditSourceID FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & cpCore.db.EncodeSQL(ResponseFieldValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.metaData.content_getContentControlCriteria(adminContent.Name) & ")"
-                                            SQLUnique = SQLUnique & "And( (EditSourceID Is null) Or ((EditSourceID<>" & editRecord.id & ")And((EditArchive Is null)Or(EditArchive=0))))"
-                                        Else
-                                            SQLUnique = "SELECT ID,0 as editsourceid FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & cpCore.db.EncodeSQL(ResponseFieldValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.metaData.content_getContentControlCriteria(adminContent.Name) & ")"
-                                        End If
-                                        SQLUnique = SQLUnique & "And(ID<>" & editRecord.id & ")"
-                                    End If
-                                    CSPointer = cpCore.db.cs_openCsSql_rev(DataSourceName, SQLUnique)
-                                    If cpCore.db.cs_ok(CSPointer) Then
-                                        '
-                                        ' field is not unique, skip it and flag error
-                                        '
-                                        If blockDuplicateUsername Then
-                                            '
-                                            '
-                                            '
-                                            errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record with [" & ResponseFieldValueText & "]. This must be unique because the preference Allow Duplicate Usernames Is Not checked.")
-                                        ElseIf blockDuplicateEmail Then
-                                            '
-                                            '
-                                            '
-                                            errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record with [" & ResponseFieldValueText & "]. This must be unique because the preference Allow Email Login Is checked.")
-                                        ElseIf AdminContentWorkflowAuthoring Then
-                                            '
-                                            ' Workflow
-                                            '
-                                            If (cpCore.db.cs_getInteger(CSPointer, "EditSourceID") = 0) Then
-                                                '
-                                                ' there is a live record that matches
-                                                '
-                                                errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record with the value [" & ResponseFieldValueText & "].")
+                                        ParentID = genericController.EncodeInteger(ResponseFieldValueText)
+                                        LoopPtr = 0
+                                        UsedIDs = editRecord.id.ToString
+                                        Do While (LoopPtr < LoopPtrMax) And (ParentID <> 0) And (InStr(1, "," & UsedIDs & ",", "," & CStr(ParentID) & ",", vbBinaryCompare) = 0)
+                                            UsedIDs = UsedIDs & "," & CStr(ParentID)
+                                            CS = cpCore.db.cs_open(adminContent.Name, "ID=" & ParentID, , , , , , "ParentID")
+                                            If Not cpCore.db.cs_ok(CS) Then
+                                                ParentID = 0
                                             Else
-                                                '
-                                                ' there is an edit record that matches
-                                                '
-                                                errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record whose current edits include the value [" & ResponseFieldValueText & "].")
+                                                ParentID = cpCore.db.cs_getInteger(CS, "ParentID")
+                                            End If
+                                            Call cpCore.db.cs_Close(CS)
+                                            LoopPtr = LoopPtr + 1
+                                        Loop
+                                        If LoopPtr = LoopPtrMax Then
+                                            '
+                                            ' Too deep
+                                            '
+                                            errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " creates a relationship between records that Is too large. Please limit the depth of this relationship to " & LoopPtrMax & " records.")
+                                            ResponseFieldValueIsOKToSave = False
+                                        ElseIf (editRecord.id <> 0) And (editRecord.id = ParentID) Then
+                                            '
+                                            ' Reference to iteslf
+                                            '
+                                            errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " contains a circular reference. This record points back to itself. This Is Not allowed.")
+                                            ResponseFieldValueIsOKToSave = False
+                                        ElseIf ParentID <> 0 Then
+                                            '
+                                            ' Circular reference
+                                            '
+                                            errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " contains a circular reference. This field either points to other records which then point back to this record. This Is Not allowed.")
+                                            ResponseFieldValueIsOKToSave = False
+                                        End If
+                                    End If
+                                    If .TextBuffered Then
+                                        '
+                                        ' text buffering
+                                        '
+                                        ResponseFieldValueText = genericController.main_RemoveControlCharacters(ResponseFieldValueText)
+                                    End If
+                                    If (.Required) And (ResponseFieldIsEmpty) Then
+                                        '
+                                        ' field is required and is not given
+                                        '
+                                        errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " Is required but has no value.")
+                                        ResponseFieldValueIsOKToSave = False
+                                    End If
+                                    '
+                                    ' special case - people records without Allowduplicateusername require username to be unique
+                                    '
+                                    If genericController.vbLCase(adminContent.ContentTableName) = "ccmembers" Then
+                                        If genericController.vbLCase(.nameLc) = "username" Then
+                                            blockDuplicateUsername = Not (cpCore.siteProperties.getBoolean("allowduplicateusername", False))
+                                        End If
+                                        If genericController.vbLCase(.nameLc) = "email" Then
+                                            blockDuplicateEmail = (cpCore.siteProperties.getBoolean("allowemaillogin", False))
+                                        End If
+                                    End If
+                                    If (blockDuplicateUsername Or blockDuplicateEmail Or .UniqueName) And (Not ResponseFieldIsEmpty) Then
+                                        '
+                                        ' ----- Do the unique check for this field
+                                        '
+                                        ' 7/22/2009 - moved this out of EditRecord.ID<>0 check -- so unique does not check edit or archive records
+                                        If editRecord.id = 0 Then
+                                            '
+                                            ' new record
+                                            '
+                                            If AdminContentWorkflowAuthoring Then
+                                                SQLUnique = "SELECT ID,EditSourceID FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & cpCore.db.EncodeSQL(ResponseFieldValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.metaData.content_getContentControlCriteria(adminContent.Name) & ")"
+                                                SQLUnique = SQLUnique & "And((EditArchive Is null)Or(EditArchive=0))"
+                                            Else
+                                                SQLUnique = "SELECT ID,0 as editsourceid FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & cpCore.db.EncodeSQL(ResponseFieldValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.metaData.content_getContentControlCriteria(adminContent.Name) & ")"
                                             End If
                                         Else
                                             '
-                                            ' non-workflow
+                                            ' editing record
                                             '
-                                            errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record with [" & ResponseFieldValueText & "].")
+                                            If AdminContentWorkflowAuthoring Then
+                                                '
+                                                ' check for another edit record that matches this record -or- a live record that matches it
+                                                '
+                                                SQLUnique = "SELECT ID,EditSourceID FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & cpCore.db.EncodeSQL(ResponseFieldValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.metaData.content_getContentControlCriteria(adminContent.Name) & ")"
+                                                SQLUnique = SQLUnique & "And( (EditSourceID Is null) Or ((EditSourceID<>" & editRecord.id & ")And((EditArchive Is null)Or(EditArchive=0))))"
+                                            Else
+                                                SQLUnique = "SELECT ID,0 as editsourceid FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & cpCore.db.EncodeSQL(ResponseFieldValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.metaData.content_getContentControlCriteria(adminContent.Name) & ")"
+                                            End If
+                                            SQLUnique = SQLUnique & "And(ID<>" & editRecord.id & ")"
                                         End If
-                                        ResponseFieldValueIsOKToSave = False
+                                        CSPointer = cpCore.db.cs_openCsSql_rev(DataSourceName, SQLUnique)
+                                        If cpCore.db.cs_ok(CSPointer) Then
+                                            '
+                                            ' field is not unique, skip it and flag error
+                                            '
+                                            If blockDuplicateUsername Then
+                                                '
+                                                '
+                                                '
+                                                errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record with [" & ResponseFieldValueText & "]. This must be unique because the preference Allow Duplicate Usernames Is Not checked.")
+                                            ElseIf blockDuplicateEmail Then
+                                                '
+                                                '
+                                                '
+                                                errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record with [" & ResponseFieldValueText & "]. This must be unique because the preference Allow Email Login Is checked.")
+                                            ElseIf AdminContentWorkflowAuthoring Then
+                                                '
+                                                ' Workflow
+                                                '
+                                                If (cpCore.db.cs_getInteger(CSPointer, "EditSourceID") = 0) Then
+                                                    '
+                                                    ' there is a live record that matches
+                                                    '
+                                                    errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record with the value [" & ResponseFieldValueText & "].")
+                                                Else
+                                                    '
+                                                    ' there is an edit record that matches
+                                                    '
+                                                    errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record whose current edits include the value [" & ResponseFieldValueText & "].")
+                                                End If
+                                            Else
+                                                '
+                                                ' non-workflow
+                                                '
+                                                errorController.error_AddUserError(cpCore, "This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record with [" & ResponseFieldValueText & "].")
+                                            End If
+                                            ResponseFieldValueIsOKToSave = False
+                                        End If
+                                        Call cpCore.db.cs_Close(CSPointer)
                                     End If
-                                    Call cpCore.db.cs_Close(CSPointer)
                                 End If
-                            End If
-                            ' end case
-                    End Select
-                    '
-                    ' Save response if it is valid
-                    '
-                    If ResponseFieldValueIsOKToSave Then
-                        editRecord.fieldsLc(.nameLc).value = ResponseFieldValueText
+                                ' end case
+                        End Select
+                        '
+                        ' Save response if it is valid
+                        '
+                        If ResponseFieldValueIsOKToSave Then
+                            editRecord.fieldsLc(.nameLc).value = ResponseFieldValueText
+                        End If
                     End If
-                End If
-            End With
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassError3("LoadEditResponseByPointer")
-            '
+                End With
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
         End Sub
         '
         '========================================================================

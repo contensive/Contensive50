@@ -7199,93 +7199,93 @@ ErrorTrap:
         '
         Public Function getInputCheckListCategories(ByVal TagName As String, ByVal PrimaryContentName As String, ByVal PrimaryRecordID As Integer, ByVal SecondaryContentName As String, ByVal RulesContentName As String, ByVal RulesPrimaryFieldname As String, ByVal RulesSecondaryFieldName As String, Optional ByVal SecondaryContentSelectCriteria As String = "", Optional ByVal CaptionFieldName As String = "", Optional ByVal readOnlyField As Boolean = False, Optional ByVal RightSideHeader As String = "", Optional ByVal DefaultSecondaryIDList As String = "") As String
             Dim result As String = ""
+            Try
+                Dim AllNode As String
+                Dim LeftPane As String
+                Dim RightPane As String
+                Dim CS As Integer
+                Dim SQL As String
+                Dim BakeName As String
+                Dim Caption As String
+                Dim Id As Integer
+                Dim CurrentFolderID As Integer
+                Dim Link As String
+                Dim IsAuthoringMode As Boolean
+                Dim LinkBase As String
+                Dim OpenMenuName As String
+                Dim JSCaption As String
+                Dim JSSwitch As String
+                Dim JSSwitchFirst As String
+                Dim FirstCaption As String
+                Dim EmptyDivID As String
+                Dim JSSwitchAll As String
+                Dim IsContentCategoriesSupported As Boolean
+                '
+                IsContentCategoriesSupported = cpCore.metaData.isContentFieldSupported(SecondaryContentName, "ContentCategoryID")
+                If Not IsContentCategoriesSupported Then
+                    result = getInputCheckList(TagName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectCriteria, CaptionFieldName, readOnlyField, False, "")
+                Else
+                    IsAuthoringMode = True
+                    LinkBase = cpCore.doc.refreshQueryString
+                    BakeName = "ContentFolderNav"
+                    If Not IsAuthoringMode Then
+                        '          main_GetFormInputCheckListCategories = cache.cache_readBake(BakeName)
+                    End If
 
-            Dim AllNode As String
-            Dim LeftPane As String
-            Dim RightPane As String
-            Dim CS As Integer
-            Dim SQL As String
-            Dim BakeName As String
-            Dim Caption As String
-            Dim Id As Integer
-            Dim CurrentFolderID As Integer
-            Dim Link As String
-            Dim IsAuthoringMode As Boolean
-            Dim LinkBase As String
-            Dim OpenMenuName As String
-            Dim JSCaption As String
-            Dim JSSwitch As String
-            Dim JSSwitchFirst As String
-            Dim FirstCaption As String
-            Dim EmptyDivID As String
-            Dim JSSwitchAll As String
-            Dim IsContentCategoriesSupported As Boolean
-            '
-            IsContentCategoriesSupported = cpCore.metaData.isContentFieldSupported(SecondaryContentName, "ContentCategoryID")
-            If Not IsContentCategoriesSupported Then
-                result = getInputCheckList(TagName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectCriteria, CaptionFieldName, readOnlyField, False, "")
-            Else
-                IsAuthoringMode = True
-                LinkBase = cpCore.doc.refreshQueryString
-                BakeName = "ContentFolderNav"
-                If Not IsAuthoringMode Then
-                    '          main_GetFormInputCheckListCategories = cache.cache_readBake(BakeName)
-                End If
+                    Dim s As String
 
-                Dim s As String
-
-                If result = "" Then
-                    EmptyDivID = TagName & ".empty"
-                    SQL = cpCore.db.GetSQLSelect("", "ccContentCategories", "ID,ContentCategoryID,Name", , "Name")
-                    CS = cpCore.db.cs_openSql(SQL)
-                    Do While cpCore.db.cs_ok(CS)
-                        Caption = cpCore.db.cs_getText(CS, "name")
-                        Id = cpCore.db.cs_getInteger(CS, "ID")
-                        CurrentFolderID = cpCore.db.cs_getInteger(CS, "ContentCategoryID")
+                    If result = "" Then
+                        EmptyDivID = TagName & ".empty"
+                        SQL = cpCore.db.GetSQLSelect("", "ccContentCategories", "ID,ContentCategoryID,Name", , "Name")
+                        CS = cpCore.db.cs_openSql(SQL)
+                        Do While cpCore.db.cs_ok(CS)
+                            Caption = cpCore.db.cs_getText(CS, "name")
+                            Id = cpCore.db.cs_getInteger(CS, "ID")
+                            CurrentFolderID = cpCore.db.cs_getInteger(CS, "ContentCategoryID")
+                            '
+                            Caption = genericController.vbReplace(Caption, " ", "&nbsp;")
+                            If FirstCaption = "" Then
+                                FirstCaption = Caption
+                            End If
+                            JSCaption = genericController.EncodeJavascript(Caption)
+                            JSSwitch = "switchContentFolderDiv( '" & TagName & ".ContentCategoryID" & Id & "',OldFolder" & cpCore.doc.main_CheckListCnt & ",'" & TagName & ".ContentCaption','" & JSCaption & "','" & EmptyDivID & "'); OldFolder" & cpCore.doc.main_CheckListCnt & "='" & TagName & ".ContentCategoryID" & Id & "';return false;"
+                            If JSSwitchFirst = "" Then
+                                JSSwitchFirst = JSSwitch
+                            End If
+                            s = s & cr & "<li class=""ccAdminSmall ccPanel""><a href=""#"" onclick=""" & JSSwitch & """>" & Caption & "</a></li>"
+                            'Call Tree.AddEntry(CStr(Id), CStr(CurrentFolderID), , , Link, Caption, JSSwitch)
+                            'Call Tree.AddEntry(CStr(ID), CStr(CurrentFolderID), , , Link, Caption, "switchContentFolderDiv( '" & TagName & ".ContentCategoryID" & ID & "', OldFolder" & main_CheckListCnt & ",'" & TagName & ".ContentCaption'," & JSCaption & "); OldFolder" & main_CheckListCnt & "='" & TagName & ".ContentCategoryID" & ID & "';")
+                            Call cpCore.db.cs_goNext(CS)
+                        Loop
+                        Call cpCore.db.cs_Close(CS)
+                        LeftPane = cr & "<ul>" & genericController.htmlIndent(s) & cr & "</ul>"
+                        'LeftPane = Tree.GetTree(CStr(0), OpenMenuName)
                         '
-                        Caption = genericController.vbReplace(Caption, " ", "&nbsp;")
-                        If FirstCaption = "" Then
-                            FirstCaption = Caption
+                        ' Add the top 'All' node
+                        '
+                        JSCaption = "All"
+                        JSSwitchAll = "switchContentFolderDiv( '" & TagName & ".All',  OldFolder" & cpCore.doc.main_CheckListCnt & ",'" & TagName & ".ContentCaption','" & JSCaption & "','" & EmptyDivID & "'); OldFolder" & cpCore.doc.main_CheckListCnt & "='" & TagName & ".All';"
+                        If genericController.vbInstr(1, LeftPane, "<LI", vbTextCompare) = 0 Then
+                            AllNode = "<div class=""caption""><a href=""#"" onClick=""" & JSSwitchAll & ";return false;"">Show all</a></div>"
+                            LeftPane = cr & AllNode & LeftPane
+                        Else
+                            AllNode = "<div class=""caption""><a href=""#"" onClick=""" & JSSwitchAll & ";return false;"">Show all</a></div>"
+                            LeftPane = cr & AllNode & LeftPane
                         End If
-                        JSCaption = genericController.EncodeJavascript(Caption)
-                        JSSwitch = "switchContentFolderDiv( '" & TagName & ".ContentCategoryID" & Id & "',OldFolder" & cpCore.doc.main_CheckListCnt & ",'" & TagName & ".ContentCaption','" & JSCaption & "','" & EmptyDivID & "'); OldFolder" & cpCore.doc.main_CheckListCnt & "='" & TagName & ".ContentCategoryID" & Id & "';return false;"
-                        If JSSwitchFirst = "" Then
-                            JSSwitchFirst = JSSwitch
+                        '
+                        ' + Add Category
+                        '
+                        If cpCore.authContext.isAuthenticatedContentManager(cpCore, "Content Categories") Then
+                            LeftPane = LeftPane & cr & "<div class=""caption""><a href=""" & cpCore.siteProperties.adminURL & "?editreferer=" & genericController.EncodeRequestVariable("?" & cpCore.doc.refreshQueryString) & "&cid=" & cpCore.metaData.getContentId("Content Categories") & "&af=4&aa=2"">+&nbsp;Add&nbsp;Category</a></div>"
                         End If
-                        s = s & cr & "<li class=""ccAdminSmall ccPanel""><a href=""#"" onclick=""" & JSSwitch & """>" & Caption & "</a></li>"
-                        'Call Tree.AddEntry(CStr(Id), CStr(CurrentFolderID), , , Link, Caption, JSSwitch)
-                        'Call Tree.AddEntry(CStr(ID), CStr(CurrentFolderID), , , Link, Caption, "switchContentFolderDiv( '" & TagName & ".ContentCategoryID" & ID & "', OldFolder" & main_CheckListCnt & ",'" & TagName & ".ContentCaption'," & JSCaption & "); OldFolder" & main_CheckListCnt & "='" & TagName & ".ContentCategoryID" & ID & "';")
-                        Call cpCore.db.cs_goNext(CS)
-                    Loop
-                    Call cpCore.db.cs_Close(CS)
-                    LeftPane = cr & "<ul>" & genericController.htmlIndent(s) & cr & "</ul>"
-                    'LeftPane = Tree.GetTree(CStr(0), OpenMenuName)
-                    '
-                    ' Add the top 'All' node
-                    '
-                    JSCaption = "All"
-                    JSSwitchAll = "switchContentFolderDiv( '" & TagName & ".All',  OldFolder" & cpCore.doc.main_CheckListCnt & ",'" & TagName & ".ContentCaption','" & JSCaption & "','" & EmptyDivID & "'); OldFolder" & cpCore.doc.main_CheckListCnt & "='" & TagName & ".All';"
-                    If genericController.vbInstr(1, LeftPane, "<LI", vbTextCompare) = 0 Then
-                        AllNode = "<div class=""caption""><a href=""#"" onClick=""" & JSSwitchAll & ";return false;"">Show all</a></div>"
-                        LeftPane = cr & AllNode & LeftPane
-                    Else
-                        AllNode = "<div class=""caption""><a href=""#"" onClick=""" & JSSwitchAll & ";return false;"">Show all</a></div>"
-                        LeftPane = cr & AllNode & LeftPane
-                    End If
-                    '
-                    ' + Add Category
-                    '
-                    If cpCore.authContext.isAuthenticatedContentManager(cpCore, "Content Categories") Then
-                        LeftPane = LeftPane & cr & "<div class=""caption""><a href=""" & cpCore.siteProperties.adminURL & "?editreferer=" & genericController.EncodeRequestVariable("?" & cpCore.doc.refreshQueryString) & "&cid=" & cpCore.metaData.getContentId("Content Categories") & "&af=4&aa=2"">+&nbsp;Add&nbsp;Category</a></div>"
-                    End If
-                    '
-                    LeftPane = cr & "<div class=""ccCategoryListCon"">" & genericController.htmlIndent(LeftPane) & cr & "</div>"
-                    '
-                    ' open the current node
-                    '
-                    RightPane = getInputCheckList(TagName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectCriteria, CaptionFieldName, readOnlyField, True, DefaultSecondaryIDList)
-                    '
-                    result = "" _
+                        '
+                        LeftPane = cr & "<div class=""ccCategoryListCon"">" & genericController.htmlIndent(LeftPane) & cr & "</div>"
+                        '
+                        ' open the current node
+                        '
+                        RightPane = getInputCheckList(TagName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectCriteria, CaptionFieldName, readOnlyField, True, DefaultSecondaryIDList)
+                        '
+                        result = "" _
                         & "<div style=""border:1px solid #A0A0A0;"">" _
                         & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%;"">" _
                         & "<tr>" _
@@ -7300,15 +7300,19 @@ ErrorTrap:
                         & "</td></tr>" _
                         & "</table>" _
                         & "</div>"
-                    If Not IsAuthoringMode Then
-                        Call cpCore.cache.setObject(BakeName, result, "Content Categories," & PrimaryContentName & "," & SecondaryContentName & "," & RulesContentName)
+                        If Not IsAuthoringMode Then
+                            Call cpCore.cache.setObject(BakeName, result, "Content Categories," & PrimaryContentName & "," & SecondaryContentName & "," & RulesContentName)
+                        End If
+                        '
+                        ' initialize with all open
+                        '
+                        Call main_AddOnLoadJavascript2(JSSwitchAll, "Checklist Categories")
                     End If
-                    '
-                    ' initialize with all open
-                    '
-                    Call main_AddOnLoadJavascript2(JSSwitchAll, "Checklist Categories")
                 End If
-            End If
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
+            Return result
         End Function
         '
         '=========================================================================================================
