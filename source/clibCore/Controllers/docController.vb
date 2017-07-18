@@ -4137,186 +4137,192 @@ Namespace Contensive.Core.Controllers
         '=============================================================================
         '
         Public Function pageManager_GetChildPageList(ByVal RequestedListName As String, ByVal ContentName As String, ByVal parentPageID As Integer, ByVal allowChildListDisplay As Boolean, Optional ByVal ArchivePages As Boolean = False) As String
-            Dim ChildContent As String
-            Dim Brief As String
-            Dim UcaseRequestedListName As String
-            Dim ChildListCount As Integer
-            Dim AddLink As String
-            Dim BlockContentComposite As Boolean
-            Dim Link As String
-            Dim LinkedText As String
-            Dim ActiveList As String = ""
-            Dim InactiveList As String
-            Dim archiveLink As String
-            Dim PageLink As String
-            Dim pageMenuHeadline As String
-            Dim pageEditLink As String
-            Dim isAuthoring = cpcore.authContext.isEditing(pageContentModel.contentName)
-            '
-            ChildListCount = 0
-            UcaseRequestedListName = genericController.vbUCase(RequestedListName)
-            If (UcaseRequestedListName = "NONE") Or (UcaseRequestedListName = "ORPHAN") Then
-                UcaseRequestedListName = ""
-            End If
-            '
-            archiveLink = cpcore.webServer.requestPathPage
-            archiveLink = genericController.ConvertLinkToShortLink(archiveLink, cpcore.webServer.requestDomain, cpcore.webServer.webServerIO_requestVirtualFilePath)
-            archiveLink = genericController.EncodeAppRootPath(archiveLink, cpcore.webServer.webServerIO_requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain)
-            '
-            Dim sqlCriteria As String = "(parentId=" & page.id & ")"
-            Dim sqlOrderBy As String = "sortOrder"
-            Dim childPageList As List(Of pageContentModel) = pageContentModel.createList(cpcore, sqlCriteria, sqlOrderBy)
-            For Each testPage As pageContentModel In childPageList
-                PageLink = getPageLink4(page.id, "", True, False)
-                pageMenuHeadline = page.MenuHeadline
-                If pageMenuHeadline = "" Then
-                    pageMenuHeadline = Trim(page.name)
-                    If pageMenuHeadline = "" Then
-                        pageMenuHeadline = "Related Page"
-                    End If
-                End If
-                pageEditLink = ""
-                If cpcore.authContext.isEditing(ContentName) Then
-                    pageEditLink = cpcore.html.main_GetRecordEditLink2(ContentName, page.id, True, page.name, True)
+            Dim result As String = ""
+            Try
+                Dim ChildContent As String
+                Dim Brief As String
+                Dim UcaseRequestedListName As String
+                Dim ChildListCount As Integer
+                Dim AddLink As String
+                Dim BlockContentComposite As Boolean
+                Dim Link As String
+                Dim LinkedText As String
+                Dim ActiveList As String = ""
+                Dim InactiveList As String
+                Dim archiveLink As String
+                Dim PageLink As String
+                Dim pageMenuHeadline As String
+                Dim pageEditLink As String
+                Dim isAuthoring = cpcore.authContext.isEditing(pageContentModel.contentName)
+                '
+                ChildListCount = 0
+                UcaseRequestedListName = genericController.vbUCase(RequestedListName)
+                If (UcaseRequestedListName = "NONE") Or (UcaseRequestedListName = "ORPHAN") Then
+                    UcaseRequestedListName = ""
                 End If
                 '
-                If ArchivePages Then
-                    Link = genericController.modifyLinkQuery(archiveLink, rnPageId, CStr(page.id), True)
-                Else
-                    Link = PageLink
-                End If
-                If page.BlockContent Or page.BlockPage Then
-                    BlockContentComposite = Not pageManager_BypassContentBlock(page.ContentControlID, page.id)
-                Else
-                    BlockContentComposite = False
-                End If
-                LinkedText = genericController.csv_GetLinkedText("<a href=""" & cpcore.html.html_EncodeHTML(Link) & """>", pageMenuHeadline)
-                If (UcaseRequestedListName = "") And (page.ParentListName <> "") And (Not isAuthoring) Then
-                    '
-                    ' ----- Requested orphan list, and this record is in a named list, and not editing, do not display
-                    '
-                ElseIf (UcaseRequestedListName = "") And (page.ParentListName <> "") Then
-                    '
-                    ' ----- Requested orphan list, and this record is in a named list, but authoring, list it
-                    '
-                    If isAuthoring Then
-                        InactiveList = InactiveList & cr & "<li name=""page" & page.id & """ name=""page" & page.id & """  id=""page" & page.id & """ class=""ccListItem"">"
-                        InactiveList = InactiveList & pageEditLink
-                        InactiveList = InactiveList & "[from Child Page List '" & page.ParentListName & "': " & LinkedText & "]"
-                        InactiveList = InactiveList & "</li>"
-                    End If
-                ElseIf (UcaseRequestedListName = "") And (Not allowChildListDisplay) And (Not isAuthoring) Then
-                    '
-                    ' ----- Requested orphan List, Not AllowChildListDisplay, not Authoring, do not display
-                    '
-                ElseIf (UcaseRequestedListName <> "") And (UcaseRequestedListName <> genericController.vbUCase(page.ParentListName)) Then
-                    '
-                    ' ----- requested named list and wrong RequestedListName, do not display
-                    '
-                ElseIf (Not page.AllowInChildLists) Then
-                    '
-                    ' ----- Allow in Child Page Lists is false, display hint to authors
-                    '
-                    If isAuthoring Then
-                        InactiveList = InactiveList & cr & "<li name=""page" & page.id & """  id=""page" & page.id & """ class=""ccListItem"">"
-                        InactiveList = InactiveList & pageEditLink
-                        InactiveList = InactiveList & "[Hidden (Allow in Child Lists is not checked): " & LinkedText & "]"
-                        InactiveList = InactiveList & "</li>"
-                    End If
-                ElseIf Not page.Active Then
-                    '
-                    ' ----- Not active record, display hint if authoring
-                    '
-                    If isAuthoring Then
-                        InactiveList = InactiveList & cr & "<li name=""page" & page.id & """  id=""page" & page.id & """ class=""ccListItem"">"
-                        InactiveList = InactiveList & pageEditLink
-                        InactiveList = InactiveList & "[Hidden (Inactive): " & LinkedText & "]"
-                        InactiveList = InactiveList & "</li>"
-                    End If
-                ElseIf (page.PubDate <> Date.MinValue) And (page.PubDate > cpcore.app_startTime) Then
-                    '
-                    ' ----- Child page has not been published
-                    '
-                    If isAuthoring Then
-                        InactiveList = InactiveList & cr & "<li name=""page" & page.id & """  id=""page" & page.id & """ class=""ccListItem"">"
-                        InactiveList = InactiveList & pageEditLink
-                        InactiveList = InactiveList & "[Hidden (To be published " & page.PubDate & "): " & LinkedText & "]"
-                        InactiveList = InactiveList & "</li>"
-                    End If
-                ElseIf (page.DateExpires <> Date.MinValue) And (page.DateExpires < cpcore.app_startTime) Then
-                    '
-                    ' ----- Child page has expired
-                    '
-                    If isAuthoring Then
-                        InactiveList = InactiveList & cr & "<li name=""page" & page.id & """  id=""page" & page.id & """ class=""ccListItem"">"
-                        InactiveList = InactiveList & pageEditLink
-                        InactiveList = InactiveList & "[Hidden (Expired " & page.DateExpires & "): " & LinkedText & "]"
-                        InactiveList = InactiveList & "</li>"
-                    End If
-                Else
-                    '
-                    ' ----- display list (and authoring links)
-                    '
-                    ActiveList = ActiveList & cr & "<li name=""page" & page.id & """  id=""page" & page.id & """ class=""ccListItem"">"
-                    If pageEditLink <> "" Then
-                        ActiveList = ActiveList & pageEditLink & "&nbsp;"
-                    End If
-                    ActiveList = ActiveList & LinkedText
-                    '
-                    ' include authoring mark for content block
-                    '
-                    If isAuthoring Then
-                        If page.BlockContent Then
-                            ActiveList = ActiveList & "&nbsp;[Content Blocked]"
-                        End If
-                        If page.BlockPage Then
-                            ActiveList = ActiveList & "&nbsp;[Page Blocked]"
+                archiveLink = cpcore.webServer.requestPathPage
+                archiveLink = genericController.ConvertLinkToShortLink(archiveLink, cpcore.webServer.requestDomain, cpcore.webServer.webServerIO_requestVirtualFilePath)
+                archiveLink = genericController.EncodeAppRootPath(archiveLink, cpcore.webServer.webServerIO_requestVirtualFilePath, requestAppRootPath, cpcore.webServer.requestDomain)
+                '
+                Dim sqlCriteria As String = "(parentId=" & page.id & ")"
+                Dim sqlOrderBy As String = "sortOrder"
+                Dim childPageList As List(Of pageContentModel) = pageContentModel.createList(cpcore, sqlCriteria, sqlOrderBy)
+                For Each testPage As pageContentModel In childPageList
+                    PageLink = getPageLink4(page.id, "", True, False)
+                    pageMenuHeadline = page.MenuHeadline
+                    If pageMenuHeadline = "" Then
+                        pageMenuHeadline = Trim(page.name)
+                        If pageMenuHeadline = "" Then
+                            pageMenuHeadline = "Related Page"
                         End If
                     End If
-                    '
-                    ' include overview
-                    ' if AllowBrief is false, BriefFilename is not loaded
-                    '
-                    If (page.BriefFilename <> "") And (page.AllowBrief) Then
-                        Brief = Trim(cpcore.cdnFiles.readFile(page.BriefFilename))
-                        If Brief <> "" Then
-                            ActiveList = ActiveList & "<div class=""ccListCopy"">" & Brief & "</div>"
-                        End If
+                    pageEditLink = ""
+                    If cpcore.authContext.isEditing(ContentName) Then
+                        pageEditLink = cpcore.html.main_GetRecordEditLink2(ContentName, page.id, True, page.name, True)
                     End If
-                    ActiveList = ActiveList & "</li>"
-                    ChildListCount = ChildListCount + 1
-                    '.IsDisplayed = True
+                    '
+                    If ArchivePages Then
+                        Link = genericController.modifyLinkQuery(archiveLink, rnPageId, CStr(page.id), True)
+                    Else
+                        Link = PageLink
+                    End If
+                    If page.BlockContent Or page.BlockPage Then
+                        BlockContentComposite = Not pageManager_BypassContentBlock(page.ContentControlID, page.id)
+                    Else
+                        BlockContentComposite = False
+                    End If
+                    LinkedText = genericController.csv_GetLinkedText("<a href=""" & cpcore.html.html_EncodeHTML(Link) & """>", pageMenuHeadline)
+                    If (UcaseRequestedListName = "") And (page.ParentListName <> "") And (Not isAuthoring) Then
+                        '
+                        ' ----- Requested orphan list, and this record is in a named list, and not editing, do not display
+                        '
+                    ElseIf (UcaseRequestedListName = "") And (page.ParentListName <> "") Then
+                        '
+                        ' ----- Requested orphan list, and this record is in a named list, but authoring, list it
+                        '
+                        If isAuthoring Then
+                            InactiveList = InactiveList & cr & "<li name=""page" & page.id & """ name=""page" & page.id & """  id=""page" & page.id & """ class=""ccListItem"">"
+                            InactiveList = InactiveList & pageEditLink
+                            InactiveList = InactiveList & "[from Child Page List '" & page.ParentListName & "': " & LinkedText & "]"
+                            InactiveList = InactiveList & "</li>"
+                        End If
+                    ElseIf (UcaseRequestedListName = "") And (Not allowChildListDisplay) And (Not isAuthoring) Then
+                        '
+                        ' ----- Requested orphan List, Not AllowChildListDisplay, not Authoring, do not display
+                        '
+                    ElseIf (UcaseRequestedListName <> "") And (UcaseRequestedListName <> genericController.vbUCase(page.ParentListName)) Then
+                        '
+                        ' ----- requested named list and wrong RequestedListName, do not display
+                        '
+                    ElseIf (Not page.AllowInChildLists) Then
+                        '
+                        ' ----- Allow in Child Page Lists is false, display hint to authors
+                        '
+                        If isAuthoring Then
+                            InactiveList = InactiveList & cr & "<li name=""page" & page.id & """  id=""page" & page.id & """ class=""ccListItem"">"
+                            InactiveList = InactiveList & pageEditLink
+                            InactiveList = InactiveList & "[Hidden (Allow in Child Lists is not checked): " & LinkedText & "]"
+                            InactiveList = InactiveList & "</li>"
+                        End If
+                    ElseIf Not page.Active Then
+                        '
+                        ' ----- Not active record, display hint if authoring
+                        '
+                        If isAuthoring Then
+                            InactiveList = InactiveList & cr & "<li name=""page" & page.id & """  id=""page" & page.id & """ class=""ccListItem"">"
+                            InactiveList = InactiveList & pageEditLink
+                            InactiveList = InactiveList & "[Hidden (Inactive): " & LinkedText & "]"
+                            InactiveList = InactiveList & "</li>"
+                        End If
+                    ElseIf (page.PubDate <> Date.MinValue) And (page.PubDate > cpcore.app_startTime) Then
+                        '
+                        ' ----- Child page has not been published
+                        '
+                        If isAuthoring Then
+                            InactiveList = InactiveList & cr & "<li name=""page" & page.id & """  id=""page" & page.id & """ class=""ccListItem"">"
+                            InactiveList = InactiveList & pageEditLink
+                            InactiveList = InactiveList & "[Hidden (To be published " & page.PubDate & "): " & LinkedText & "]"
+                            InactiveList = InactiveList & "</li>"
+                        End If
+                    ElseIf (page.DateExpires <> Date.MinValue) And (page.DateExpires < cpcore.app_startTime) Then
+                        '
+                        ' ----- Child page has expired
+                        '
+                        If isAuthoring Then
+                            InactiveList = InactiveList & cr & "<li name=""page" & page.id & """  id=""page" & page.id & """ class=""ccListItem"">"
+                            InactiveList = InactiveList & pageEditLink
+                            InactiveList = InactiveList & "[Hidden (Expired " & page.DateExpires & "): " & LinkedText & "]"
+                            InactiveList = InactiveList & "</li>"
+                        End If
+                    Else
+                        '
+                        ' ----- display list (and authoring links)
+                        '
+                        ActiveList = ActiveList & cr & "<li name=""page" & page.id & """  id=""page" & page.id & """ class=""ccListItem"">"
+                        If pageEditLink <> "" Then
+                            ActiveList = ActiveList & pageEditLink & "&nbsp;"
+                        End If
+                        ActiveList = ActiveList & LinkedText
+                        '
+                        ' include authoring mark for content block
+                        '
+                        If isAuthoring Then
+                            If page.BlockContent Then
+                                ActiveList = ActiveList & "&nbsp;[Content Blocked]"
+                            End If
+                            If page.BlockPage Then
+                                ActiveList = ActiveList & "&nbsp;[Page Blocked]"
+                            End If
+                        End If
+                        '
+                        ' include overview
+                        ' if AllowBrief is false, BriefFilename is not loaded
+                        '
+                        If (page.BriefFilename <> "") And (page.AllowBrief) Then
+                            Brief = Trim(cpcore.cdnFiles.readFile(page.BriefFilename))
+                            If Brief <> "" Then
+                                ActiveList = ActiveList & "<div class=""ccListCopy"">" & Brief & "</div>"
+                            End If
+                        End If
+                        ActiveList = ActiveList & "</li>"
+                        ChildListCount = ChildListCount + 1
+                        '.IsDisplayed = True
+                    End If
+                Next
+                '
+                ' ----- Add Link
+                '
+                If (Not ArchivePages) Then
+                    ChildContent = pageContentModel.contentName
+                    If ChildContent = "" Then
+                        ChildContent = "Page Content"
+                    End If
+                    AddLink = cpcore.html.main_GetRecordAddLink(ChildContent, "parentid=" & parentPageID & ",ParentListName=" & UcaseRequestedListName, True)
+                    If AddLink <> "" Then
+                        InactiveList = InactiveList & cr & "<li class=""ccListItem"">" & AddLink & "</LI>"
+                    End If
                 End If
-            Next
-            '
-            ' ----- Add Link
-            '
-            If (Not ArchivePages) Then
-                ChildContent = pageContentModel.contentName
-                If ChildContent = "" Then
-                    ChildContent = "Page Content"
+                '
+                ' ----- If there is a list, add the list start and list end
+                '
+                result = ""
+                If ActiveList <> "" Then
+                    result = result & cr & "<ul id=""childPageList" & parentPageID & "_" & RequestedListName & """ class=""ccChildList"">" & genericController.htmlIndent(ActiveList) & cr & "</ul>"
                 End If
-                AddLink = cpcore.html.main_GetRecordAddLink(ChildContent, "parentid=" & parentPageID & ",ParentListName=" & UcaseRequestedListName, True)
-                If AddLink <> "" Then
-                    InactiveList = InactiveList & cr & "<li class=""ccListItem"">" & AddLink & "</LI>"
+                If InactiveList <> "" Then
+                    result = result & cr & "<ul id=""childPageList" & parentPageID & "_" & RequestedListName & """ class=""ccChildListInactive"">" & genericController.htmlIndent(InactiveList) & cr & "</ul>"
                 End If
-            End If
-            '
-            ' ----- If there is a list, add the list start and list end
-            '
-            pageManager_GetChildPageList = ""
-            If ActiveList <> "" Then
-                pageManager_GetChildPageList = pageManager_GetChildPageList & cr & "<ul id=""childPageList" & parentPageID & "_" & RequestedListName & """ class=""ccChildList"">" & genericController.htmlIndent(ActiveList) & cr & "</ul>"
-            End If
-            If InactiveList <> "" Then
-                pageManager_GetChildPageList = pageManager_GetChildPageList & cr & "<ul id=""childPageList" & parentPageID & "_" & RequestedListName & """ class=""ccChildListInactive"">" & genericController.htmlIndent(InactiveList) & cr & "</ul>"
-            End If
-            '
-            ' ----- if non-orphan list, authoring and none found, print none message
-            '
-            If (UcaseRequestedListName <> "") And (ChildListCount = 0) And isAuthoring Then
-                pageManager_GetChildPageList = "[Child Page List with no pages]</p><p>" & pageManager_GetChildPageList
-            End If
+                '
+                ' ----- if non-orphan list, authoring and none found, print none message
+                '
+                If (UcaseRequestedListName <> "") And (ChildListCount = 0) And isAuthoring Then
+                    result = "[Child Page List with no pages]</p><p>" & result
+                End If
+            Catch ex As Exception
+                cpcore.handleException(ex)
+            End Try
+            Return result
         End Function
         '        '
         '        '=============================================================================

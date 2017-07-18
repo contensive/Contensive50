@@ -5,6 +5,7 @@ Option Explicit On
 Imports Contensive.BaseClasses
 Imports System.Net
 Imports System.Text.RegularExpressions
+Imports System.Text
 '
 Namespace Contensive.Core.Controllers
     '
@@ -5095,18 +5096,33 @@ ErrorTrap:
             Return vbReplace(expression, find, replacement, 1, 9999, CompareMethod.Binary)
         End Function
         '
-        Public Shared Function vbReplace(expression As String, find As String, replacement As String, startIgnore As Integer, countIgnore As Integer, compare As CompareMethod) As String
+        Public Shared Function vbReplace(expression As String, oldValue As String, replacement As String, startIgnore As Integer, countIgnore As Integer, compare As CompareMethod) As String
             If String.IsNullOrEmpty(expression) Then
                 Return expression
-            ElseIf String.IsNullOrEmpty(find) Then
+            ElseIf String.IsNullOrEmpty(oldValue) Then
                 Return expression
             Else
                 If compare = CompareMethod.Binary Then
-                    Return expression.Replace(find, replacement)
-                ElseIf String.IsNullOrEmpty(replacement) Then
-                    Return Regex.Replace(expression, find, "", RegexOptions.IgnoreCase)
+                    Return expression.Replace(oldValue, replacement)
                 Else
-                    Return Regex.Replace(expression, find, replacement, RegexOptions.IgnoreCase)
+
+                    Dim sb As New StringBuilder()
+                    Dim previousIndex As Integer = 0
+                    Dim Index As Integer = expression.IndexOf(oldValue, StringComparison.CurrentCultureIgnoreCase)
+                    Do While (Index <> -1)
+                        sb.Append(expression.Substring(previousIndex, Index - previousIndex))
+                        sb.Append(replacement)
+                        Index += oldValue.Length
+                        previousIndex = Index
+                        Index = expression.IndexOf(oldValue, Index, StringComparison.CurrentCultureIgnoreCase)
+                    Loop
+                    sb.Append(expression.Substring(previousIndex))
+                    Return sb.ToString()
+
+                    '    ElseIf String.IsNullOrEmpty(replacement) Then
+                    '    Return Regex.Replace(expression, find, "", RegexOptions.IgnoreCase)
+                    'Else
+                    '    Return Regex.Replace(expression, find, replacement, RegexOptions.IgnoreCase)
                 End If
             End If
         End Function
