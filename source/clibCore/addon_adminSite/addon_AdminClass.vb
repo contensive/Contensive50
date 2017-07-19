@@ -566,7 +566,7 @@ leak200:
                 '    'ContentCell = "<div class=""ccAdminMsg"">The form you requested did not return a valid response.</div>"
                 'End If
                 '
-                If cpCore.doc.pageManager_printVersion Then
+                If cpCore.doc.isPrintVersion Then
                     '
                     ' For print version, just add content
                     '
@@ -1044,7 +1044,7 @@ ErrorTrap:
                                     'no - if WF, on process on publish
                                     'Call ProcessSpecialCaseAfterSave(false,AdminContent.Name, EditRecord.ID, EditRecord.Name, EditRecord.ParentID, UseContentWatchLink)
                                     Call cpCore.workflow.main_SubmitEdit(adminContent.Name, editRecord.id)
-                                    Call cpCore.doc.pageManager_SendPublishSubmitNotice(adminContent.Name, editRecord.id, editRecord.nameLc)
+                                    Call cpCore.doc.sendPublishSubmitNotice(adminContent.Name, editRecord.id, editRecord.nameLc)
                                 Else
                                     AdminForm = AdminSourceForm
                                 End If
@@ -1099,7 +1099,7 @@ ErrorTrap:
                                         'ContentName = EditRecord.ContentName
                                         'ContentName = cpCore.metaData.getContentNameByID(cpCore.app.cs_getInteger(CSEditRecord, "ContentControlID"))
                                         If cpCore.metaData.isContentFieldSupported(adminContent.Name, "parentid") Then
-                                            Call cpCore.doc.pageManager_DeleteChildRecords(adminContent.Name, editRecord.id, False)
+                                            Call cpCore.doc.deleteChildRecords(adminContent.Name, editRecord.id, False)
                                         End If
                                     End If
                                     Call cpCore.db.cs_deleteRecord(CSEditRecord)
@@ -1719,11 +1719,11 @@ ErrorTrap:
                 '
                 ' ----- Set the local global copy of Edit Record Locks
                 '
-                Call cpCore.doc.pageManager_GetAuthoringStatus(adminContent.Name, editRecord.id, editRecord.SubmitLock, editRecord.ApproveLock, editRecord.SubmittedName, editRecord.ApprovedName, editRecord.IsInserted, editRecord.IsDeleted, editRecord.IsModified, editRecord.LockModifiedName, editRecord.LockModifiedDate, editRecord.SubmittedDate, editRecord.ApprovedDate)
+                Call cpCore.doc.getAuthoringStatus(adminContent.Name, editRecord.id, editRecord.SubmitLock, editRecord.ApproveLock, editRecord.SubmittedName, editRecord.ApprovedName, editRecord.IsInserted, editRecord.IsDeleted, editRecord.IsModified, editRecord.LockModifiedName, editRecord.LockModifiedDate, editRecord.SubmittedDate, editRecord.ApprovedDate)
                 '
                 ' ----- Set flags used to determine the Authoring State
                 '
-                Call cpCore.doc.pageManager_GetAuthoringPermissions(adminContent.Name, editRecord.id, editRecord.AllowInsert, editRecord.AllowCancel, editRecord.AllowSave, editRecord.AllowDelete, editRecord.AllowPublish, editRecord.AllowAbort, editRecord.AllowSubmit, editRecord.AllowApprove, editRecord.Read_Only)
+                Call cpCore.doc.getAuthoringPermissions(adminContent.Name, editRecord.id, editRecord.AllowInsert, editRecord.AllowCancel, editRecord.AllowSave, editRecord.AllowDelete, editRecord.AllowPublish, editRecord.AllowAbort, editRecord.AllowSubmit, editRecord.AllowApprove, editRecord.Read_Only)
                 '
                 ' ----- Set Edit Lock
                 '
@@ -2655,7 +2655,7 @@ ErrorTrap:
                                                     ' this is a fix for when content editors leave white space in the editor, and do not realize it
                                                     '   then cannot fixgure out how to remove it
                                                     '
-                                                    ResponseFieldValueText = cpCore.html.html_DecodeContent(ResponseFieldValueText)
+                                                    ResponseFieldValueText = cpCore.html.decodeContent(ResponseFieldValueText)
                                                     ResponseFieldValueText = genericController.vbLCase(genericController.encodeText(ResponseFieldValueText))
                                                     If Len(ResponseFieldValueText) < 20 Then
                                                         HasInput = (InStr(1, ResponseFieldValueText, "<input ") <> 0)
@@ -4969,7 +4969,7 @@ ErrorTrap:
                         ContentID = cpCore.db.cs_getInteger(CS, "contentID")
                         ContentName = cpCore.db.cs_getText(CS, "contentname")
                         RecordID = cpCore.db.cs_getInteger(CS, "recordid")
-                        Link = cpCore.doc.getPageLink4(RecordID, "", True, False)
+                        Link = cpCore.doc.getPageLink(RecordID, "", True, False)
                         'Link = cpCore.main_GetPageLink3(RecordID, "", True)
                         'If Link = "" Then
                         '    Link = cpCore.db.cs_getText(CS, "Link")
@@ -4990,7 +4990,7 @@ ErrorTrap:
                                 'Call HandleInternalError("GetForm_Publish", "Admin Workflow Publish selected an authoring control record [" & ContentID & "." & RecordID & "] for a content definition [" & ContentName & "] that does not AllowWorkflowAuthoring.")
                             Else
 
-                                Call cpCore.doc.pageManager_GetAuthoringStatus(ContentName, RecordID, IsSubmitted, IsApproved, SubmitName, ApprovedName, IsInserted, IsDeleted, IsModified, ModifiedName, ModifiedDate, SubmittedDate, ApprovedDate)
+                                Call cpCore.doc.getAuthoringStatus(ContentName, RecordID, IsSubmitted, IsApproved, SubmitName, ApprovedName, IsInserted, IsDeleted, IsModified, ModifiedName, ModifiedDate, SubmittedDate, ApprovedDate)
                                 If RowColor = "class=""ccPanelRowOdd""" Then
                                     RowColor = "class=""ccPanelRowEven"""
                                 Else
@@ -12238,7 +12238,7 @@ ErrorTrap:
                 Dim Copy As String = ""
                 Dim RightCopy As String
                 Dim TitleRows As Integer
-                ' refactor -- is was using pagemanager code, and it only detected if the page is the current domain's 
+                ' refactor -- is was using page manager code, and it only detected if the page is the current domain's 
                 'Dim LandingPageID As Integer
                 'Dim IsPageContent As Boolean
                 'Dim IsLandingPage As Boolean

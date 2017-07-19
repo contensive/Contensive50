@@ -45,7 +45,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' ----- convert editor active edit icons
                     '
-                    ContentCopy = cpCore.html.html_DecodeContent(ContentCopy)
+                    ContentCopy = cpCore.html.decodeContent(ContentCopy)
                     '
                     ' ----- save the content
                     '

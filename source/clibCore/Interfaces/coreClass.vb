@@ -82,10 +82,9 @@ Namespace Contensive.Core
             Dim EmailID As Integer
             Dim StyleSheet As String
         End Structure
-        Public Property csv_stylesheetCache As csv_stylesheetCacheType()
-        Public Property csv_stylesheetCacheCnt As Integer
-        Friend Property web_EncodeContent_HeadTags As String = ""
-        Public Property pageManager_PageAddonCnt As Integer = 0
+        Public Property stylesheetCache As csv_stylesheetCacheType()
+        Public Property stylesheetCacheCnt As Integer
+        Public Property pageAddonCnt As Integer = 0
         '
         '===================================================================================================
         Public ReadOnly Property addonStyleRulesIndex() As keyPtrIndexController
@@ -570,7 +569,7 @@ Namespace Contensive.Core
         End Sub
         '=============================================================================
         ''' <summary>
-        ''' Executes the current route (pathPage and/or querystring based). If not found, the default route (addon) is executed. Initially the default route is the pageManager.
+        ''' Executes the current route (pathPage and/or querystring based). If not found, the default route (addon) is executed. Initially the default route is the page Manager.
         ''' </summary>
         ''' <returns>The doc created by the default addon. (html, json, etc)</returns>
         Public Function executeRoute(Optional route As String = "") As String
@@ -1094,8 +1093,8 @@ Namespace Contensive.Core
                                                 '
                                                 ' Save new public stylesheet
                                                 '
-                                                Call appRootFiles.saveFile("templates\Public" & StyleSN & ".css", doc.pageManager_GetStyleSheet)
-                                                Call appRootFiles.saveFile("templates\Admin" & StyleSN & ".css", doc.pageManager_GetStyleSheetDefault)
+                                                Call appRootFiles.saveFile("templates\Public" & StyleSN & ".css", html.html_getStyleSheet2(0, 0))
+                                                Call appRootFiles.saveFile("templates\Admin" & StyleSN & ".css", html.getStyleSheetDefault())
                                             End If
                                         End If
                                     Case FormTypeAddonStyleEditor
@@ -1117,29 +1116,20 @@ Namespace Contensive.Core
                                             '
                                             ' Clear Caches
                                             '
-                                            'Call pages.cache_pageContent_clear()
-                                            'Call pages.pageManager_cache_pageTemplate_clear()
-                                            'Call pages.pageManager_cache_siteSection_clear()
-                                            'Call cache.invalidateObjectList("")
                                             If contentName <> "" Then
                                                 Call cache.invalidateContent(contentName)
-                                                tableName = metaData.getContentTablename(contentName)
-                                                If genericController.vbLCase(tableName) = "cctemplates" Then
-                                                    'Call cache.setObject(pagesController.cache_pageTemplate_cacheName, nothingObject)
-                                                    'Call pages.pageManager_cache_pageTemplate_load()
-                                                End If
                                             End If
                                         End If
                                     Case FormTypeAddonSettingsEditor
                                         '
                                         '
                                         '
-                                        Call html.pageManager_ProcessAddonSettingsEditor()
+                                        Call html.processAddonSettingsEditor()
                                     Case FormTypeHelpBubbleEditor
                                         '
                                         '
                                         '
-                                        Call html.main_ProcessHelpBubbleEditor()
+                                        Call html.processHelpBubbleEditor()
                                     Case FormTypeJoin
                                         '
                                         '
@@ -1159,12 +1149,12 @@ Namespace Contensive.Core
                                         '
                                         ' ----- Administrator Tools Panel
                                         '
-                                        Call html.pageManager_ProcessFormToolsPanel()
+                                        Call html.processFormToolsPanel()
                                     Case FormTypePageAuthoring
                                         '
                                         ' ----- Page Authoring Tools Panel
                                         '
-                                        Call doc.pageManager_ProcessFormQuickEditing()
+                                        Call doc.processFormQuickEditing()
                                     Case FormTypeActiveEditor
                                         '
                                         ' ----- Active Editor
@@ -1639,73 +1629,6 @@ Namespace Contensive.Core
                         Else
                             result = False
                         End If
-                'Case HardCodedPagePrinterVersion
-                '    '
-                '    ' ----- Page Content Printer main_version
-                '    '
-                '    Call htmlDoc.webServerIO_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPagePrinterVersion)
-                '    htmlDoc.pageManager_printVersion = True
-                '    autoPrintText = docProperties.getText("AutoPrint")
-                '    '
-                '    If ContentName = "" Then
-                '        ContentName = "Page Content"
-                '    End If
-                '    If autoPrintText = "" Then
-                '        autoPrintText = siteProperties.getText("AllowAutoPrintDialog", "1")
-                '    End If
-                '    If RootPageName = "" Then
-                '        blockSiteWithLogin = False
-                '        PageCopy = pages.pageManager_GetHtmlBody_GetSection(AllowChildPage, False, False, blockSiteWithLogin)
-                '        'PageCopy = main_GetSectionPage(AllowChildPage, False)
-                '    Else
-                '        OrderByClause = docProperties.getText(RequestNameOrderByClause)
-                '        PageID = docProperties.getInteger(rnPageId)
-                '        '
-                '        ' 5/12/2008 - converted to RootPageID call because we do not use RootPageName anymore
-                '        '
-                '        allowPageWithoutSectionDisplay = siteProperties.getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default)
-                '        If Not allowPageWithoutSectionDisplay Then
-                '            allowPageWithoutSectionDisplay = authContext.isAuthenticatedContentManager(Me, ContentName)
-                '        End If
-                '        PageCopy = pages.pageManager_GetHtmlBody_GetSection_GetContent(PageID, rootPageId, ContentName, OrderByClause, False, False, False, 0, siteProperties.useContentWatchLink, allowPageWithoutSectionDisplay)
-                '        If pages.redirectLink <> "" Then
-                '            Call webServer.webServerIO_Redirect2(pages.redirectLink, pages.pageManager_RedirectReason, False)
-                '        End If
-                '        'PageCopy = main_GetContentPage(RootPageName, ContentName, OrderByClause, AllowChildPage, False, PageID)
-                '    End If
-                '    '
-                '    If genericController.EncodeBoolean(autoPrintText) Then
-                '        Call htmlDoc.main_AddOnLoadJavascript2("window.print(); window.close()", "Print Page")
-                '    End If
-                '    BodyOpen = "<body class=""ccBodyPrint"">"
-
-                '    'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage")
-                '    Call htmlDoc.writeAltBuffer("" _
-                '        & main_docType _
-                '        & vbCrLf & "<html>" _
-                '        & cr & "<head>" & htmlDoc.getHTMLInternalHead(False) _
-                '        & cr & "</head>" _
-                '        & vbCrLf & BodyOpen _
-                '        & cr & "<div align=""left"">" _
-                '        & cr2 & "<table border=""0"" cellpadding=""20"" cellspacing=""0"" width=""100%""><tr><td width=""100%"">" _
-                '        & cr3 & "<p>" _
-                '        & genericController.kmaIndent(PageCopy) _
-                '        & cr3 & "</p>" _
-                '        & cr2 & "</td></tr></table>" _
-                '        & cr & "</div>" _
-                '        & genericController.kmaIndent(htmlDoc.html_GetEndOfBody(False, False, False, False)) _
-                '        & cr & "</body>" _
-                '        & vbCrLf & "</html>" _
-                '        & "")
-
-                '    result = True
-                ''Case HardCodedPageMyProfile
-                ''    '
-                ''    ' Print a User Profile page with the current member
-                ''    '
-                ''    Call web_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPageMyProfile)
-                ''    Call writeAltBuffer(main_GetMyProfilePage())
-                ''    result = True
                     Case HardCodedPageResourceLibrary
                         '
                         ' main_Get FormIndex (the index to the InsertImage# function called on selection)
@@ -1958,12 +1881,12 @@ Namespace Contensive.Core
                         '
                         ' ----- Redirect with RC and RI
                         '
-                        doc.pageManager_RedirectContentID = docProperties.getInteger(rnRedirectContentId)
-                        doc.pageManager_RedirectRecordID = docProperties.getInteger(rnRedirectRecordId)
-                        If doc.pageManager_RedirectContentID <> 0 And doc.pageManager_RedirectRecordID <> 0 Then
-                            ContentName = metaData.getContentNameByID(doc.pageManager_RedirectContentID)
+                        doc.redirectContentID = docProperties.getInteger(rnRedirectContentId)
+                        doc.redirectRecordID = docProperties.getInteger(rnRedirectRecordId)
+                        If doc.redirectContentID <> 0 And doc.redirectRecordID <> 0 Then
+                            ContentName = metaData.getContentNameByID(doc.redirectContentID)
                             If ContentName <> "" Then
-                                Call iisController.main_RedirectByRecord_ReturnStatus(Me, ContentName, doc.pageManager_RedirectRecordID)
+                                Call iisController.main_RedirectByRecord_ReturnStatus(Me, ContentName, doc.redirectRecordID)
                             End If
                         End If
                         webServer.webServerIO_BlockClosePageCopyright = True
@@ -2281,7 +2204,7 @@ Namespace Contensive.Core
                                     & "," & db.encodeSQLNumber(CSMax) _
                                     & "," & db.encodeSQLNumber(PageID)
                                     SQL &= "," & db.encodeSQLBoolean(webServer.webServerIO_PageExcludeFromAnalytics)
-                                    SQL &= "," & db.encodeSQLText(doc.main_MetaContent_Title)
+                                    SQL &= "," & db.encodeSQLText(doc.metaContent_Title)
                                     SQL &= ");"
                                     Call db.executeSql(SQL)
                                 End If

@@ -60,10 +60,10 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         ''' <summary>
-        ''' Returns the pageManager content
+        ''' Returns the page content
         ''' </summary>
         ''' <returns></returns>
-        <Obsolete("Page Content comes from the pageManager cpcore.addon.", True)> Public Overrides Property content() As String
+        Public Overrides Property content() As String
             Get
                 If True Then
                     Return cpCore.doc.bodyContent
@@ -115,7 +115,7 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         ''' <summary>
-        ''' returns the pageId set by the pageManager Addon
+        ''' returns the pageId
         ''' </summary>
         ''' <returns></returns>
         Public Overrides ReadOnly Property pageId() As Integer
@@ -156,7 +156,7 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         ''' <summary>
-        ''' Returns the value of sectionId as set by pageManager
+        ''' Returns the value of sectionId
         ''' </summary>
 
         <Obsolete("Section is no longer supported", True)>
@@ -303,14 +303,14 @@ Namespace Contensive.Core
         Public Overrides Property body() As String
             Get
                 If True Then
-                    body = cpCore.doc.html_DocBodyFilter
+                    body = cpCore.doc.docBodyFilter
                 Else
                     Return ""
                 End If
             End Get
             Set(ByVal value As String)
                 If True Then
-                    cpCore.doc.html_DocBodyFilter = value
+                    cpCore.doc.docBodyFilter = value
                 End If
             End Set
         End Property

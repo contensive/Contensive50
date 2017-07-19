@@ -454,7 +454,7 @@ Namespace Contensive.Core
         ''' <param name="Source"></param>
         ''' <returns></returns>
         Public Overrides Function DecodeHtmlFromWysiwygEditor(Source As String) As String
-            Return CP.core.html.html_DecodeContent(Source)
+            Return CP.core.html.decodeContent(Source)
             'Throw New NotImplementedException()
         End Function
         '

@@ -677,7 +677,7 @@ Namespace Contensive.Core.Controllers
                                         importHead = Controllers.htmlController.getTagInnerHTML(CmdAccumulator, "head", False)
                                         If importHead <> "" Then
                                             ' try this, but it may not be implemented yet
-                                            Call cpCore.html.html_addHeadTags(importHead)
+                                            Call cpCore.doc.addHeadTags(importHead)
                                         End If
                                         CmdAccumulator = Controllers.htmlController.getTagInnerHTML(CmdAccumulator, "body", False)
                                     End If
