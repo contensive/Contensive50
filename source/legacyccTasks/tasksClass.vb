@@ -285,7 +285,7 @@ ErrorTrap:
                             FieldName = FieldNames(FieldNamePtr)
                             If FieldName <> "" Then
                                 Copy = cpCore.db.cs_get(CS, FieldNames(FieldNamePtr))
-                                Copy = cpcore.html.html_EncodeHTML(Copy)
+                                Copy = genericController.encodeHTML(Copy)
                                 If Copy = "" Then
                                     RowBuffer = RowBuffer & "<" & FieldName & " />"
                                 Else

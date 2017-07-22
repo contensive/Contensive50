@@ -297,12 +297,13 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
+        <Obsolete("Deprecated", True)>
         Public Property formFiles() As String
             Get
-                Return cp.core.webServer.requesFilesString
+                Return "" 'cp.core.webServer.requesFilesString
             End Get
             Set(ByVal value As String)
-                cp.core.webServer.requesFilesString = value
+                'cp.core.webServer.requesFilesString = value
             End Set
         End Property
         '

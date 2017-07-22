@@ -69,8 +69,9 @@ namespace  Contensive.CLI {
                             appConfig.appRootFilesPath = cliController.promptForReply("App Root", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\wwwRoot");
                             appConfig.cdnFilesPath = cliController.promptForReply("CDN files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\files");
                             appConfig.privateFilesPath = cliController.promptForReply("private files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\private");
+                            appConfig.tempFilesPath = cliController.promptForReply("temp files (ephemeral storage)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\temp");
                             cdnDomainName = domainName;
-                            appConfig.cdnFilesNetprefix = cliController.promptForReply("CDN files Url (virtual path)", "\\" + appName + "\\files\\");
+                            appConfig.cdnFilesNetprefix = cliController.promptForReply("CDN files Url (virtual path)", "/" + appName + "/files/");
                             break;
                         case "2":
                             //
@@ -79,8 +80,9 @@ namespace  Contensive.CLI {
                             appConfig.appRootFilesPath = cliController.promptForReply("App Root", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\wwwRoot");
                             appConfig.cdnFilesPath = cliController.promptForReply("CDN files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\files");
                             appConfig.privateFilesPath = cliController.promptForReply("private files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\private");
+                            appConfig.tempFilesPath = cliController.promptForReply("temp files (ephemeral storage)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\temp");
                             cdnDomainName = domainName;
-                            appConfig.cdnFilesNetprefix = cliController.promptForReply("CDN files Url (virtual path)", "\\cdn\\");
+                            appConfig.cdnFilesNetprefix = cliController.promptForReply("CDN files Url (virtual path)", "/cdn/");
                             break;
                         case "3":
                             //
@@ -89,10 +91,11 @@ namespace  Contensive.CLI {
                             appConfig.appRootFilesPath = cliController.promptForReply("App Root", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\wwwRoot");
                             appConfig.cdnFilesPath = cliController.promptForReply("CDN files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\files");
                             appConfig.privateFilesPath = cliController.promptForReply("private files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\private");
+                            appConfig.tempFilesPath = cliController.promptForReply("temp files (ephemeral storage)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\temp");
                             cdnDomainName = cliController.promptForReply("domain for CDN", domainName);
                             if (cdnDomainName == domainName)
                             {
-                                appConfig.cdnFilesNetprefix = cliController.promptForReply("CDN files Url (virtual path)", "\\cdn\\");
+                                appConfig.cdnFilesNetprefix = cliController.promptForReply("CDN files Url (virtual path)", "/cdn/");
                             }
                             else
                             {
@@ -107,6 +110,7 @@ namespace  Contensive.CLI {
                             appConfig.appRootFilesPath = cliController.promptForReply("App Root (local mirror)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\wwwRoot");
                             appConfig.cdnFilesPath = cliController.promptForReply("CDN files (local mirror)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\files");
                             appConfig.privateFilesPath = cliController.promptForReply("private files (local mirror)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\private");
+                            appConfig.tempFilesPath = cliController.promptForReply("temp files (ephemeral storage)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\temp");
                             cdnDomainName = cliController.promptForReply("domain for CDN", domainName);
                             appConfig.cdnFilesNetprefix = cliController.promptForReply("CDN files Url (website)", "http://" + cdnDomainName + "/");
                             break;

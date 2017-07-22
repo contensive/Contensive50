@@ -823,7 +823,7 @@ Namespace Contensive.Core.Controllers
                                                                 EditFilename = ""
                                                                 LiveFilename = genericController.encodeText(FieldValueVariant)
                                                                 If LiveFilename <> "" Then
-                                                                    EditFilename = csv_GetVirtualFilenameByTable(AuthoringTableName, field.nameLc, EditRecordID, "", field.fieldTypeId)
+                                                                    EditFilename = getVirtualRecordPathFilename(AuthoringTableName, field.nameLc, EditRecordID, "", field.fieldTypeId)
                                                                     FieldValueVariant = EditFilename
                                                                     If EditFilename <> "" Then
                                                                         Copy = cpCore.privateFiles.readFile(convertCdnUrlToCdnPathFilename(EditFilename))
@@ -842,7 +842,7 @@ Namespace Contensive.Core.Controllers
                                                                 EditFilename = ""
                                                                 LiveFilename = genericController.encodeText(FieldValueVariant)
                                                                 If LiveFilename <> "" Then
-                                                                    EditFilename = csv_GetVirtualFilenameByTable(AuthoringTableName, field.nameLc, EditRecordID, "", field.fieldTypeId)
+                                                                    EditFilename = getVirtualRecordPathFilename(AuthoringTableName, field.nameLc, EditRecordID, "", field.fieldTypeId)
                                                                     FieldValueVariant = EditFilename
                                                                     If EditFilename <> "" Then
                                                                         Copy = cpCore.cdnFiles.readFile(convertCdnUrlToCdnPathFilename(EditFilename))

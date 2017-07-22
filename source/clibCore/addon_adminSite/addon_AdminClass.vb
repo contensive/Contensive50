@@ -3185,7 +3185,6 @@ ErrorTrap:
             Dim RecordValueFloat As Double
             Dim RecordValueDate As Date
             Dim RecordValueBoolean As Boolean
-            Dim Path As String
             Dim SQLUnique As String
             'Dim RSUnique as datatable
             Dim SaveCCIDValue As Integer
@@ -3351,14 +3350,12 @@ ErrorTrap:
                                         End If
                                         FieldValueText = genericController.encodeText(fieldValueObject)
                                         If FieldValueText <> "" Then
-                                            Filename = FieldValueText
-                                            Dim pathFilename As String = cpCore.db.cs_getFilename(CSEditRecord, FieldName, Filename, adminContent.Name)
-                                            Path = pathFilename
-                                            Path = genericController.vbReplace(Path, "\", "/")
-                                            Path = genericController.vbReplace(Path, "/" & Filename, "")
-                                            cpCore.cdnFiles.saveUpload(FieldName, Path, Filename)
-                                            Call cpCore.db.cs_set(CSEditRecord, FieldName, Path & Filename)
-                                            'Call cpCore.web_processFormInputFile(FieldName, cpCore.cdnFiles, Path)
+                                            Filename = encodeFilename(FieldValueText)
+                                            Dim unixPathFilename As String = cpCore.db.cs_getFilename(CSEditRecord, FieldName, Filename, adminContent.Name)
+                                            Dim dosPathFilename As String = genericController.convertToDosSlash(unixPathFilename)
+                                            Dim dosPath As String = genericController.getPath(dosPathFilename)
+                                            cpCore.cdnFiles.saveUpload(FieldName, dosPath, Filename)
+                                            Call cpCore.db.cs_set(CSEditRecord, FieldName, unixPathFilename)
                                             RecordChanged = True
                                             FieldChanged = True
                                         End If
@@ -3664,7 +3661,7 @@ ErrorTrap:
                     End Select
                 End With
                 '
-                return_formIndexCell = cpCore.html.html_EncodeHTML(Stream.Text)
+                return_formIndexCell = genericController.encodeHTML(Stream.Text)
             Catch ex As Exception
                 Call cpCore.handleException(ex) : Throw
             End Try
@@ -3798,7 +3795,7 @@ ErrorTrap:
                     ' Invalid Content
                     '
                     Call errorController.error_AddUserError(cpCore, "There was a problem identifying the content you requested. Please return to the previous form and verify your selection.")
-                    Exit Function
+                    Return ""
                 ElseIf editRecord.Loaded And Not editRecord.Saved Then
                     '
                     '   File types need to be reloaded from the Db, because...
@@ -3840,7 +3837,7 @@ ErrorTrap:
                             '
                             errorController.error_AddUserError(cpCore, "There was an unknown error in your request for data. Please let the site administrator know.")
                         End If
-                        Exit Function
+                        Return ""
                     End If
                 End If
                 '
@@ -3854,7 +3851,7 @@ ErrorTrap:
                 '
                 If Not userHasContentAccess(editRecord.contentControlId) Then
                     Call errorController.error_AddUserError(cpCore, "Your account on this system does not have access rights to edit this content.")
-                    Exit Function
+                    Return ""
                 End If
                 If False Then
                     '
@@ -4769,7 +4766,7 @@ ErrorTrap:
                     Copy = genericController.encodeText(cpCore.db.cs_getInteger(CSPointer, "PagesFound"))
                 End If
                 Call cpCore.db.cs_Close(CSPointer)
-                Call Content.Add(Adminui.GetEditRow("<a href=""" & cpCore.html.html_EncodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & QueryString) & """ target=""_blank"">" & SpanClassAdminNormal & Copy & "</a>", "Bad Links", "", False, False, ""))
+                Call Content.Add(Adminui.GetEditRow("<a href=""" & genericController.encodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & QueryString) & """ target=""_blank"">" & SpanClassAdminNormal & Copy & "</a>", "Bad Links", "", False, False, ""))
                 '
                 ' ----- Options
                 '
@@ -5029,7 +5026,7 @@ ErrorTrap:
                                         If Link = "" Then
                                             Link = "unknown"
                                         Else
-                                            Link = "<a href=""" & cpCore.html.html_EncodeHTML(Link) & """ target=""_blank"">" & Link & "</a>"
+                                            Link = "<a href=""" & genericController.encodeHTML(Link) & """ target=""_blank"">" & Link & "</a>"
                                         End If
                                         '
                                         ' get approved status of the submitted record
@@ -5850,7 +5847,7 @@ ErrorTrap:
                                                 EditorString &= (cpCore.html.html_GetFormInputFile2(FormFieldLCaseName, , "file"))
                                             Else
                                                 NonEncodedLink = cpCore.webServer.requestDomain & genericController.getCdnFileLink(cpCore, FieldValueText)
-                                                EncodedLink = genericController.EncodeURL(NonEncodedLink)
+                                                EncodedLink = genericController.encodeHTML(NonEncodedLink)
                                                 Dim filename As String = ""
                                                 Dim path As String = ""
                                                 cpCore.privateFiles.splitPathFilename(FieldValueText, path, filename)
@@ -6143,7 +6140,7 @@ ErrorTrap:
                                                 '
                                                 EditorStyleModifier = "textexpandable"
                                                 FieldRows = (cpCore.userProperty.getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
-                                                EditorString = cpCore.html.html_GetFormInputTextExpandable2(FormFieldLCaseName, cpCore.html.html_EncodeHTML(FieldValueText), FieldRows, "600px", FormFieldLCaseName, False, , "text")
+                                                EditorString = cpCore.html.html_GetFormInputTextExpandable2(FormFieldLCaseName, genericController.encodeHTML(FieldValueText), FieldRows, "600px", FormFieldLCaseName, False, , "text")
                                             End If
                                             's.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal & EditorString & "</span></nobr></td>")
                                     End Select
@@ -6652,7 +6649,7 @@ ErrorTrap:
                     If Copy = "" Then
                         HTMLFieldString = "unknown"
                     Else
-                        HTMLFieldString = "<a href=""" & cpCore.html.html_EncodeHTML(Copy) & """ target=""_blank"">" & Copy & "</a>"
+                        HTMLFieldString = "<a href=""" & genericController.encodeHTML(Copy) & """ target=""_blank"">" & Copy & "</a>"
                     End If
                     Call FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Last Known Public URL", FieldHelp, False, False, ""))
                 End If
@@ -7278,7 +7275,7 @@ ErrorTrap:
                 PageCount = cpCore.db.cs_getNumber(CS, "pageCount")
                 Stream.Add("<tr>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "All Visits</span></td>")
-                Stream.Add("<td style=""width:150px;border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.html.html_EncodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.app_startTime & "&DateTo=" & cpCore.app_startTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
+                Stream.Add("<td style=""width:150px;border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & genericController.encodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.app_startTime & "&DateTo=" & cpCore.app_startTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "This includes all visitors to the website, including guests, bots and administrators. Pages/visit includes page hits and not ajax or remote method hits.</span></td>")
                 Stream.Add("</tr>")
             End If
@@ -7293,7 +7290,7 @@ ErrorTrap:
                 PageCount = cpCore.db.cs_getNumber(CS, "pageCount")
                 Stream.Add("<tr>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "Non-bot Visits</span></td>")
-                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.html.html_EncodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.app_startTime.ToShortDateString & "&DateTo=" & cpCore.app_startTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
+                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & genericController.encodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.app_startTime.ToShortDateString & "&DateTo=" & cpCore.app_startTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "This excludes hits from visitors identified as bots. Pages/visit includes page hits and not ajax or remote method hits.</span></td>")
                 Stream.Add("</tr>")
             End If
@@ -7308,7 +7305,7 @@ ErrorTrap:
                 PageCount = cpCore.db.cs_getNumber(CS, "pageCount")
                 Stream.Add("<tr>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "Visits by New Visitors</span></td>")
-                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.html.html_EncodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&ExcludeOldVisitors=1&DateFrom=" & cpCore.app_startTime.ToShortDateString & "&DateTo=" & cpCore.app_startTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
+                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & genericController.encodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&ExcludeOldVisitors=1&DateFrom=" & cpCore.app_startTime.ToShortDateString & "&DateTo=" & cpCore.app_startTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "This includes only new visitors not identified as bots. Pages/visit includes page hits and not ajax or remote method hits.</span></td>")
                 Stream.Add("</tr>")
             End If
@@ -7340,7 +7337,7 @@ ErrorTrap:
                     Do While cpCore.db.cs_ok(CS)
                         VisitID = cpCore.db.cs_getInteger(CS, "VisitID")
                         Panel = Panel & "<tr class=""" & RowColor & """>"
-                        Panel = Panel & "<td align=""left"">" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.html.html_EncodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=16&MemberID=" & cpCore.db.cs_getInteger(CS, "MemberID")) & """>" & cpCore.db.cs_get(CS, "MemberName") & "</A></span></td>"
+                        Panel = Panel & "<td align=""left"">" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & genericController.encodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=16&MemberID=" & cpCore.db.cs_getInteger(CS, "MemberID")) & """>" & cpCore.db.cs_get(CS, "MemberName") & "</A></span></td>"
                         Panel = Panel & "<td align=""left"">" & SpanClassAdminNormal & cpCore.db.cs_get(CS, "Remote_Addr") & "</span></td>"
                         Panel = Panel & "<td align=""left"">" & SpanClassAdminNormal & FormatDateTime(cpCore.db.cs_getDate(CS, "LastVisitTime"), vbLongTime) & "</span></td>"
                         Panel = Panel & "<td align=""right"">" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=10&VisitID=" & VisitID & """>" & cpCore.db.cs_get(CS, "PageVisits") & "</A></span></td>"
@@ -7562,7 +7559,7 @@ ErrorTrap:
                 Link = cpCore.doc.main_GetPageDynamicLink(editRecord.id, False)
                 CS = cpCore.db.cs_open("Link Aliases", "pageid=" & editRecord.id, "ID Desc", , , , , "name")
                 Do While cpCore.db.cs_ok(CS)
-                    LinkList = LinkList & "<div style=""margin-left:4px;margin-bottom:4px;"">" & cpCore.html.html_EncodeHTML(cpCore.db.cs_getText(CS, "name")) & "</div>"
+                    LinkList = LinkList & "<div style=""margin-left:4px;margin-bottom:4px;"">" & genericController.encodeHTML(cpCore.db.cs_getText(CS, "name")) & "</div>"
                     LinkCnt = LinkCnt + 1
                     Call cpCore.db.cs_goNext(CS)
                 Loop
@@ -12609,7 +12606,7 @@ ErrorTrap:
                                 & "</div>"
                             TitleRows = 0
                             If SubTitle <> "" Then
-                                Title = Title & "<div style=""clear:both"">Filter: " & cpCore.html.html_EncodeHTML(Mid(SubTitle, 3)) & "</div>"
+                                Title = Title & "<div style=""clear:both"">Filter: " & genericController.encodeHTML(Mid(SubTitle, 3)) & "</div>"
                                 TitleRows = TitleRows + 1
                             End If
                             If ContentAccessLimitMessage <> "" Then
@@ -12770,7 +12767,7 @@ ErrorTrap:
                                 ButtonObject = "Button" & ButtonObjectCount
                                 ButtonObjectCount = ButtonObjectCount + 1
                                 DataTable_HdrRow &= "<td width=""" & ColumnWidth & "%"" valign=bottom align=left class=""ccAdminListCaption"">"
-                                DataTable_HdrRow &= ("<a title=""" & SortTitle & """ href=""" & cpCore.html.html_EncodeHTML(ButtonHref) & """ class=""ccAdminListCaption"">" & ButtonFace & "</A>")
+                                DataTable_HdrRow &= ("<a title=""" & SortTitle & """ href=""" & genericController.encodeHTML(ButtonHref) & """ class=""ccAdminListCaption"">" & ButtonFace & "</A>")
                                 DataTable_HdrRow &= ("</td>")
                             Next
                             DataTable_HdrRow &= ("</tr>")
@@ -12831,7 +12828,7 @@ ErrorTrap:
                                             URI = URI & "&wl" & WhereCount & "=" & cpCore.html.main_EncodeRequestVariable(WherePair(0, WhereCount)) & "&wr" & WhereCount & "=" & cpCore.html.main_EncodeRequestVariable(WherePair(1, WhereCount))
                                         Next
                                     End If
-                                    DataTable_DataRows &= ("<a href=""" & cpCore.html.html_EncodeHTML(URI) & """><img src=""/ccLib/images/IconContentEdit.gif"" border=""0""></a>")
+                                    DataTable_DataRows &= ("<a href=""" & genericController.encodeHTML(URI) & """><img src=""/ccLib/images/IconContentEdit.gif"" border=""0""></a>")
                                     DataTable_DataRows &= ("</td>")
                                     '
                                     ' --- field columns
@@ -15548,7 +15545,7 @@ ErrorTrap:
                                     Caption = Caption & "*"
                                     InheritedFieldCount = InheritedFieldCount + 1
                                 End If
-                                AStart = "<a href=""?" & cpCore.doc.refreshQueryString & "&FieldName=" & cpCore.html.html_EncodeHTML(.nameLc) & "&fi=" & fieldId & "&dtcn=" & ColumnPtr & "&" & RequestNameAdminSubForm & "=" & AdminFormIndex_SubFormSetColumns
+                                AStart = "<a href=""?" & cpCore.doc.refreshQueryString & "&FieldName=" & genericController.encodeHTML(.nameLc) & "&fi=" & fieldId & "&dtcn=" & ColumnPtr & "&" & RequestNameAdminSubForm & "=" & AdminFormIndex_SubFormSetColumns
                                 Call Stream.Add("<td width=""" & ColumnWidth & "%"" valign=""top"" align=""left"">" & SpanClassAdminNormal & Caption & "<br >")
                                 Call Stream.Add("<img src=""/ccLib/images/black.GIF"" width=""100%"" height=""1"" >")
                                 Call Stream.Add(AStart & "&dta=" & ToolsActionRemoveField & """><img src=""/ccLib/images/LibButtonDeleteUp.gif"" width=""50"" height=""15"" border=""0"" ></A><BR >")
@@ -16449,7 +16446,7 @@ ErrorTrap:
                     '
                     ' Cancel just exits with no content
                     '
-                    Exit Function
+                    Return ""
                 ElseIf Not cpCore.authContext.isAuthenticatedAdmin(cpCore) Then
                     '
                     ' Not Admin Error
@@ -16475,7 +16472,7 @@ ErrorTrap:
                         '
                         ' Exit on OK or cancel
                         '
-                        Exit Function
+                        Return ""
                     End If
                     '
                     ' Buttons
@@ -17865,7 +17862,7 @@ ErrorTrap:
             Dim FieldOptionRow As String
             Dim Copy As String
             '
-            Copy = cpCore.html.html_EncodeHTML(StyleCopy)
+            Copy = genericController.encodeHTML(StyleCopy)
             main_GetFormInputStyles = cpCore.html.html_GetFormInputTextExpandable2(TagName, StyleCopy, 10, , HtmlId, , , HtmlClass)
         End Function
 

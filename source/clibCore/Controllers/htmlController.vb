@@ -672,25 +672,6 @@ Namespace Contensive.Core.Controllers
             Return returnValue
         End Function
         '
-        '========================================================================
-        ' EncodeHTML
-        '
-        '   Convert all characters that are not allowed in HTML to their Text equivalent
-        '   in preperation for use on an HTML page
-        '========================================================================
-        '
-        Public Function html_EncodeHTML(ByVal Source As String) As String
-            ' ##### removed to catch err<>0 problem on error resume next
-            '
-            html_EncodeHTML = Source
-            html_EncodeHTML = genericController.vbReplace(html_EncodeHTML, "&", "&amp;")
-            html_EncodeHTML = genericController.vbReplace(html_EncodeHTML, "<", "&lt;")
-            html_EncodeHTML = genericController.vbReplace(html_EncodeHTML, ">", "&gt;")
-            html_EncodeHTML = genericController.vbReplace(html_EncodeHTML, """", "&quot;")
-            html_EncodeHTML = genericController.vbReplace(html_EncodeHTML, "'", "&apos;")
-            '
-        End Function
-        '
         '========================================================================================================
         '
         ' Finds all tags matching the input, and concatinates them into the output
@@ -1355,7 +1336,7 @@ ErrorTrap:
                                         Copy = Left(Copy, cpCore.siteProperties.selectFieldWidthLimit) & "...+"
                                     End If
                                 End If
-                                Call FastString.Add(">" & html_EncodeHTML(Copy) & "</option>")
+                                Call FastString.Add(">" & encodeHTML(Copy) & "</option>")
                             Next
                             If Not SelectedFound And (CurrentValue <> 0) Then
                                 Call cpCore.db.cs_Close(CSPointer)
@@ -1390,7 +1371,7 @@ ErrorTrap:
                                             Copy = Left(Copy, cpCore.siteProperties.selectFieldWidthLimit) & "...+"
                                         End If
                                     End If
-                                    Call FastString.Add(">" & html_EncodeHTML(Copy) & "</option>")
+                                    Call FastString.Add(">" & encodeHTML(Copy) & "</option>")
                                 End If
                             End If
                         End If
@@ -1847,12 +1828,12 @@ ErrorTrap:
                 main_GetLoginLink = main_GetLoginLink & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"">"
                 main_GetLoginLink = main_GetLoginLink & "<tr><td align=""right"">"
                 If cpCore.authContext.isAuthenticatedContentManager(cpCore) Then
-                    main_GetLoginLink = main_GetLoginLink & "<a href=""" & html_EncodeHTML(cpCore.siteProperties.adminURL) & """ target=""_blank"">"
+                    main_GetLoginLink = main_GetLoginLink & "<a href=""" & encodeHTML(cpCore.siteProperties.adminURL) & """ target=""_blank"">"
                 Else
                     Link = cpCore.webServer.requestPage & "?" & cpCore.doc.refreshQueryString
                     Link = genericController.modifyLinkQuery(Link, RequestNameHardCodedPage, HardCodedPageLogin, True)
                     'Link = genericController.modifyLinkQuery(Link, RequestNameInterceptpage, LegacyInterceptPageSNLogin, True)
-                    main_GetLoginLink = main_GetLoginLink & "<a href=""" & html_EncodeHTML(Link) & """ >"
+                    main_GetLoginLink = main_GetLoginLink & "<a href=""" & encodeHTML(Link) & """ >"
                 End If
                 IconFilename = cpCore.siteProperties.LoginIconFilename
                 If genericController.vbLCase(Mid(IconFilename, 1, 7)) <> "/ccLib/" Then
@@ -2156,7 +2137,7 @@ ErrorTrap:
                         Else
                             QSName = genericController.DecodeResponseVariable(QSNameValues(0))
                             QSValue = genericController.DecodeResponseVariable(QSNameValues(1))
-                            RefreshHiddens = RefreshHiddens & cr & "<input type=""hidden"" name=""" & html_EncodeHTML(QSName) & """ value=""" & html_EncodeHTML(QSValue) & """>"
+                            RefreshHiddens = RefreshHiddens & cr & "<input type=""hidden"" name=""" & encodeHTML(QSName) & """ value=""" & encodeHTML(QSValue) & """>"
                         End If
                     Next
                 End If
@@ -2206,7 +2187,7 @@ ErrorTrap:
             If True Then
                 TagID = ""
                 '
-                iDefaultValue = html_EncodeHTML(DefaultValue)
+                iDefaultValue = encodeHTML(DefaultValue)
                 If HtmlId <> "" Then
                     TagID = TagID & " id=""" & genericController.encodeEmptyText(HtmlId, "") & """"
                 End If
@@ -2273,7 +2254,7 @@ ErrorTrap:
             Dim EditorClosed As String
             Dim EditorOpened As String
             '
-            Value_Local = html_EncodeHTML(Value)
+            Value_Local = encodeHTML(Value)
             IDRoot = Id
             If IDRoot = "" Then
                 IDRoot = "TextArea" & cpCore.doc.formInputTextCnt
@@ -2353,7 +2334,7 @@ ErrorTrap:
             If (iDefaultValue = "0") Or (iDefaultValue = "12:00:00 AM") Then
                 iDefaultValue = ""
             Else
-                iDefaultValue = html_EncodeHTML(iDefaultValue)
+                iDefaultValue = encodeHTML(iDefaultValue)
             End If
             If genericController.encodeEmptyText(Id, "") <> "" Then
                 TagID = " ID=""" & genericController.encodeEmptyText(Id, "") & """"
@@ -2899,16 +2880,16 @@ ErrorTrap:
             Dim ihtmlId As String
             Dim s As String
             '
-            s = cr & "<input type=""hidden"" NAME=""" & html_EncodeHTML(genericController.encodeText(TagName)) & """"
+            s = cr & "<input type=""hidden"" NAME=""" & encodeHTML(genericController.encodeText(TagName)) & """"
             '
-            iTagValue = html_EncodeHTML(genericController.encodeText(TagValue))
+            iTagValue = encodeHTML(genericController.encodeText(TagValue))
             If iTagValue <> "" Then
                 s = s & " VALUE=""" & iTagValue & """"
             End If
             '
             ihtmlId = genericController.encodeText(htmlId)
             If ihtmlId <> "" Then
-                s = s & " ID=""" & html_EncodeHTML(ihtmlId) & """"
+                s = s & " ID=""" & encodeHTML(ihtmlId) & """"
             End If
             '
             s = s & ">"
@@ -4404,7 +4385,7 @@ ErrorTrap:
                                                             End If
                                                         End If
                                                         ACNameCaption = genericController.vbReplace(ACName, """", "")
-                                                        ACNameCaption = html_EncodeHTML(ACNameCaption)
+                                                        ACNameCaption = encodeHTML(ACNameCaption)
                                                         IDControlString = "AC," & ACType & "," & NotUsedID & "," & genericController.encodeNvaArgument(ACName) & "," & ResultOptionListHTMLEncoded & "," & ACGuid
                                                         Copy = genericController.GetAddonIconImg(AdminURL, IconWidth, IconHeight, IconSprites, AddonIsInline, IDControlString, IconFilename, serverFilePath, IconAlt, IconTitle, ACInstanceID, 0)
                                                     ElseIf EncodeNonCachableTags Then
@@ -4900,7 +4881,7 @@ ErrorTrap:
                                                                         RecordID = genericController.EncodeInteger(ACInstanceName)
                                                                         ImageWidthText = DHTML.ElementAttribute(ElementPointer, "WIDTH")
                                                                         ImageHeightText = DHTML.ElementAttribute(ElementPointer, "HEIGHT")
-                                                                        ImageAlt = html_EncodeHTML(DHTML.ElementAttribute(ElementPointer, "Alt"))
+                                                                        ImageAlt = encodeHTML(DHTML.ElementAttribute(ElementPointer, "Alt"))
                                                                         ImageVSpace = genericController.EncodeInteger(DHTML.ElementAttribute(ElementPointer, "vspace"))
                                                                         ImageHSpace = genericController.EncodeInteger(DHTML.ElementAttribute(ElementPointer, "hspace"))
                                                                         ImageAlign = DHTML.ElementAttribute(ElementPointer, "Align")
@@ -4979,7 +4960,7 @@ ErrorTrap:
                                                                             If Pos > 0 Then
                                                                                 QSSplit(QSPtr) = Mid(QSSplit(QSPtr), 1, Pos - 1)
                                                                             End If
-                                                                            QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
+                                                                            QSSplit(QSPtr) = encodeHTML(QSSplit(QSPtr))
                                                                         Next
                                                                         QueryString = Join(QSSplit, "&")
                                                                     End If
@@ -4998,7 +4979,7 @@ ErrorTrap:
                                                                         QueryString = genericController.encodeText(ImageIDArray(4))
                                                                         QSSplit = Split(QueryString, "&")
                                                                         For QSPtr = 0 To UBound(QSSplit)
-                                                                            QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
+                                                                            QSSplit(QSPtr) = encodeHTML(QSSplit(QSPtr))
                                                                         Next
                                                                         QueryString = Join(QSSplit, "&")
 
@@ -5014,7 +4995,7 @@ ErrorTrap:
                                                                         QueryString = genericController.decodeHtml(QueryString)
                                                                         QSSplit = Split(QueryString, "&")
                                                                         For QSPtr = 0 To UBound(QSSplit)
-                                                                            QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
+                                                                            QSSplit(QSPtr) = encodeHTML(QSSplit(QSPtr))
                                                                         Next
                                                                         QueryString = Join(QSSplit, "&")
                                                                     End If
@@ -5029,7 +5010,7 @@ ErrorTrap:
                                                                         QueryString = genericController.decodeHtml(QueryString)
                                                                         QSSplit = Split(QueryString, "&")
                                                                         For QSPtr = 0 To UBound(QSSplit)
-                                                                            QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
+                                                                            QSSplit(QSPtr) = encodeHTML(QSSplit(QSPtr))
                                                                         Next
                                                                         QueryString = Join(QSSplit, "&")
                                                                     End If
@@ -5044,7 +5025,7 @@ ErrorTrap:
                                                                         QueryString = genericController.decodeHtml(QueryString)
                                                                         QSSplit = Split(QueryString, "&")
                                                                         For QSPtr = 0 To UBound(QSSplit)
-                                                                            QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
+                                                                            QSSplit(QSPtr) = encodeHTML(QSSplit(QSPtr))
                                                                         Next
                                                                         QueryString = Join(QSSplit, "&")
                                                                     End If
@@ -5226,14 +5207,14 @@ ErrorTrap:
                                                                                             NewImageFilename = ImageFilenameNoExt & "-" & ImageAltSize & "." & ImageFilenameExt
                                                                                             ' images included in email have spaces that must be converted to "%20" or they 404
                                                                                             imageNewLink = genericController.EncodeURL(genericController.getCdnFileLink(cpCore, ImageVirtualFilePath) & NewImageFilename)
-                                                                                            ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, html_EncodeHTML(imageNewLink))
+                                                                                            ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, encodeHTML(imageNewLink))
                                                                                         ElseIf (RecordWidth < ImageWidth) Or (RecordHeight < ImageHeight) Then
                                                                                             '
                                                                                             ' OK
                                                                                             ' reize image larger then original - go with it as is
                                                                                             '
                                                                                             ' images included in email have spaces that must be converted to "%20" or they 404
-                                                                                            ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, html_EncodeHTML(genericController.EncodeURL(genericController.getCdnFileLink(cpCore, RecordVirtualFilename))))
+                                                                                            ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, encodeHTML(genericController.EncodeURL(genericController.getCdnFileLink(cpCore, RecordVirtualFilename))))
                                                                                         Else
                                                                                             '
                                                                                             ' resized image - create NewImageFilename (and add new alt size to the record)
@@ -5321,7 +5302,7 @@ ErrorTrap:
                                                                                                 End If
                                                                                                 '
                                                                                                 ' Change the image src to the AltSize
-                                                                                                ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, html_EncodeHTML(genericController.EncodeURL(genericController.getCdnFileLink(cpCore, ImageVirtualFilePath) & NewImageFilename)))
+                                                                                                ElementText = genericController.vbReplace(ElementText, ImageSrcOriginal, encodeHTML(genericController.EncodeURL(genericController.getCdnFileLink(cpCore, ImageVirtualFilePath) & NewImageFilename)))
                                                                                             End If
                                                                                         End If
                                                                                     End If
@@ -5410,7 +5391,7 @@ ErrorTrap:
         Public Function main_encodeHTML(ByVal Source As Object) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("encodeHTML")
             '
-            main_encodeHTML = html_EncodeHTML(genericController.encodeText(Source))
+            main_encodeHTML = encodeHTML(genericController.encodeText(Source))
             Exit Function
             '
             ' ----- Error Trap
@@ -5429,7 +5410,7 @@ ErrorTrap:
         Public Function html_convertText2HTML(ByVal Source As Object) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("ConvertText2HTML")
             '
-            html_convertText2HTML = html_EncodeHTML(genericController.encodeText(Source))
+            html_convertText2HTML = encodeHTML(genericController.encodeText(Source))
             html_convertText2HTML = main_EncodeCRLF(html_convertText2HTML)
             '
             Exit Function
@@ -6038,9 +6019,9 @@ ErrorTrap:
             ' Build output string
             '
             'csv_GetAddonSelector = encodeNvaArgument(SrcOptionName)
-            getAddonSelector = html_EncodeHTML(genericController.encodeNvaArgument(SrcOptionName)) & "="
+            getAddonSelector = encodeHTML(genericController.encodeNvaArgument(SrcOptionName)) & "="
             If InstanceOptionValue_AddonEncoded <> "" Then
-                getAddonSelector = getAddonSelector & html_EncodeHTML(InstanceOptionValue_AddonEncoded)
+                getAddonSelector = getAddonSelector & encodeHTML(InstanceOptionValue_AddonEncoded)
             End If
             If SrcSelectorSuffix = "" And list = "" Then
                 '
@@ -6563,7 +6544,7 @@ ErrorTrap:
                                     PosIDEnd = genericController.vbInstr(PosIDStart, Copy, """")
                                     If PosIDEnd <> 0 Then
                                         ParseOK = True
-                                        Copy = Mid(Copy, 1, PosIDStart - 1) & html_EncodeHTML(addonOption_String) & Mid(Copy, PosIDEnd)
+                                        Copy = Mid(Copy, 1, PosIDStart - 1) & encodeHTML(addonOption_String) & Mid(Copy, PosIDEnd)
                                         Call cpCore.db.cs_set(CS, FieldName, Copy)
                                         needToClearCache = True
                                     End If
@@ -6774,7 +6755,7 @@ ErrorTrap:
                     '
                     '
                     rulesTablename = cpCore.metaData.getContentTablename(RulesContentName)
-                    SingularPrefixHtmlEncoded = html_EncodeHTML(genericController.GetSingular(SecondaryContentName)) & "&nbsp;"
+                    SingularPrefixHtmlEncoded = encodeHTML(genericController.GetSingular(SecondaryContentName)) & "&nbsp;"
                     '
                     main_MemberShipCount = 0
                     main_MemberShipSize = 0
@@ -6958,7 +6939,7 @@ ErrorTrap:
                                         If OptionCaption = "" Then
                                             optionCaptionHtmlEncoded = SingularPrefixHtmlEncoded & RecordID
                                         Else
-                                            optionCaptionHtmlEncoded = html_EncodeHTML(OptionCaption)
+                                            optionCaptionHtmlEncoded = encodeHTML(OptionCaption)
                                         End If
                                         If DivCheckBoxCnt <> 0 Then
                                             ' leave this between checkboxes - it is searched in the admin page
@@ -7500,13 +7481,13 @@ ErrorTrap:
         '
         '
         Public Sub main_addMeta(metaName As String, metaContent As String, addedByMessage As String)
-            Call main_AddHeadTag2("<meta name=""" & html_EncodeHTML(metaName) & """ content=""" & html_EncodeHTML(metaContent) & """>", addedByMessage)
+            Call main_AddHeadTag2("<meta name=""" & encodeHTML(metaName) & """ content=""" & encodeHTML(metaContent) & """>", addedByMessage)
         End Sub
         '
         '
         '
         Public Sub main_addMetaProperty(metaProperty As String, metaContent As String, addedByMessage As String)
-            Call main_AddHeadTag2("<meta property=""" & html_EncodeHTML(metaProperty) & """ content=""" & html_EncodeHTML(metaContent) & """>", addedByMessage)
+            Call main_AddHeadTag2("<meta property=""" & encodeHTML(metaProperty) & """ content=""" & encodeHTML(metaContent) & """>", addedByMessage)
         End Sub
         '
         Friend ReadOnly Property main_ReturnAfterEdit() As Boolean
@@ -8997,7 +8978,7 @@ ErrorTrap:
                     & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"">" _
                     & cr2 & "<tr>" _
                     & cr3 & "<td style=""text-align:right;vertical-align:middle;width:30%;padding:4px"" align=""right"" width=""30%"">" & SpanClassAdminNormal & "Email</span></td>" _
-                    & cr3 & "<td style=""text-align:left;vertical-align:middle;width:70%;padding:4px"" align=""left""  width=""70%""><input NAME=""" & "email"" VALUE=""" & cpCore.html.html_EncodeHTML(cpCore.authContext.user.Email) & """ SIZE=""20"" MAXLENGTH=""50""></td>" _
+                    & cr3 & "<td style=""text-align:left;vertical-align:middle;width:70%;padding:4px"" align=""left""  width=""70%""><input NAME=""" & "email"" VALUE=""" & genericController.encodeHTML(cpCore.authContext.user.Email) & """ SIZE=""20"" MAXLENGTH=""50""></td>" _
                     & cr2 & "</tr>" _
                     & cr2 & "<tr>" _
                     & cr3 & "<td colspan=""2"">&nbsp;</td>" _
@@ -9170,7 +9151,7 @@ ErrorTrap:
             ' misc caching, etc
             '
             Dim encoding As String
-            encoding = cpCore.html.html_EncodeHTML(cpCore.siteProperties.getText("Site Character Encoding", "utf-8"))
+            encoding = genericController.encodeHTML(cpCore.siteProperties.getText("Site Character Encoding", "utf-8"))
             getHtmlDocHead = getHtmlDocHead _
                 & OtherHeadTags _
                 & cr & "<meta http-equiv=""content-type"" content=""text/html; charset=" & encoding & """ >" _
@@ -9416,8 +9397,8 @@ ErrorTrap:
                 CS = cpCore.db.cs_open("Meta Content", Criteria, , , , ,, FieldList)
                 If cpCore.db.cs_ok(CS) Then
                     MetaContentID = cpCore.db.cs_getInteger(CS, "ID")
-                    Call cpCore.html.main_AddPagetitle2(cpCore.html.html_EncodeHTML(cpCore.db.cs_getText(CS, "Name")), "page content")
-                    Call cpCore.html.main_addMetaDescription2(cpCore.html.html_EncodeHTML(cpCore.db.cs_getText(CS, "MetaDescription")), "page content")
+                    Call cpCore.html.main_AddPagetitle2(genericController.encodeHTML(cpCore.db.cs_getText(CS, "Name")), "page content")
+                    Call cpCore.html.main_addMetaDescription2(genericController.encodeHTML(cpCore.db.cs_getText(CS, "MetaDescription")), "page content")
                     Call cpCore.html.main_AddHeadTag2(cpCore.db.cs_getText(CS, "OtherHeadTags"), "page content")
                     If True Then
                         KeywordList = genericController.vbReplace(cpCore.db.cs_getText(CS, "MetaKeywordList"), vbCrLf, ",")
@@ -9444,7 +9425,7 @@ ErrorTrap:
                         KeywordList = Mid(KeywordList, 2)
                     End If
                     'KeyWordList = Mid(KeyWordList, 2)
-                    KeywordList = cpCore.html.html_EncodeHTML(KeywordList)
+                    KeywordList = genericController.encodeHTML(KeywordList)
                     Call cpCore.html.main_addMetaKeywordList2(KeywordList, "page content")
                 End If
                 Call cpCore.db.cs_Close(CS)
@@ -9659,7 +9640,7 @@ ErrorTrap:
             iContentName = genericController.encodeText(ContentName)
             iRecordID = genericController.EncodeInteger(RecordID)
             iAllowCut = genericController.EncodeBoolean(AllowCut)
-            ContentCaption = cpCore.html.html_EncodeHTML(iContentName)
+            ContentCaption = genericController.encodeHTML(iContentName)
             If genericController.vbLCase(ContentCaption) = "aggregate functions" Then
                 ContentCaption = "Add-on"
             End If
@@ -9690,7 +9671,7 @@ ErrorTrap:
                             & "<a" _
                             & " class=""ccRecordEditLink"" " _
                             & " TabIndex=-1" _
-                            & " href=""" & cpCore.html.html_EncodeHTML(cpCore.siteProperties.adminURL & "?cid=" & ContentID & "&id=" & iRecordID & "&af=4&aa=2&ad=1") & """"
+                            & " href=""" & genericController.encodeHTML(cpCore.siteProperties.adminURL & "?cid=" & ContentID & "&id=" & iRecordID & "&af=4&aa=2&ad=1") & """"
                         If Not cpCore.html.main_ReturnAfterEdit Then
                             main_GetRecordEditLink2 = main_GetRecordEditLink2 & " target=""_blank"""
                         End If
@@ -9698,8 +9679,8 @@ ErrorTrap:
                             & "><img" _
                             & " src=""/ccLib/images/IconContentEdit.gif""" _
                             & " border=""0""" _
-                            & " alt=""Edit this " & cpCore.html.html_EncodeHTML(ContentCaption) & """" _
-                            & " title=""Edit this " & cpCore.html.html_EncodeHTML(ContentCaption) & """" _
+                            & " alt=""Edit this " & genericController.encodeHTML(ContentCaption) & """" _
+                            & " title=""Edit this " & genericController.encodeHTML(ContentCaption) & """" _
                             & " align=""absmiddle""" _
                             & "></a>"
                         '
@@ -9709,7 +9690,7 @@ ErrorTrap:
                             WorkingLink = genericController.modifyLinkQuery(cpCore.webServer.requestPage & "?" & cpCore.doc.refreshQueryString, RequestNameCut, genericController.encodeText(ContentID) & "." & genericController.encodeText(RecordID), True)
                             main_GetRecordEditLink2 = "" _
                                 & main_GetRecordEditLink2 _
-                                & "<a class=""ccRecordCutLink"" TabIndex=""-1"" href=""" & cpCore.html.html_EncodeHTML(WorkingLink) & """><img src=""/ccLib/images/Contentcut.gif"" border=""0"" alt=""Cut this " & ContentCaption & " to clipboard"" title=""Cut this " & ContentCaption & " to clipboard"" align=""absmiddle""></a>"
+                                & "<a class=""ccRecordCutLink"" TabIndex=""-1"" href=""" & genericController.encodeHTML(WorkingLink) & """><img src=""/ccLib/images/Contentcut.gif"" border=""0"" alt=""Cut this " & ContentCaption & " to clipboard"" title=""Cut this " & ContentCaption & " to clipboard"" align=""absmiddle""></a>"
                         End If
                         '
                         ' Help link if enabled
@@ -9883,7 +9864,7 @@ ErrorTrap:
                         main_GetRecordAddLink2 = main_GetRecordAddLink2 _
                             & "<a" _
                             & " TabIndex=-1" _
-                            & " href=""" & cpCore.html.html_EncodeHTML(Link) & """"
+                            & " href=""" & genericController.encodeHTML(Link) & """"
                         If Not cpCore.html.main_ReturnAfterEdit Then
                             main_GetRecordAddLink2 = main_GetRecordAddLink2 & " target=""_blank"""
                         End If
@@ -9937,7 +9918,7 @@ ErrorTrap:
                                             PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteParentRecordID, CStr(ParentID), True)
                                             PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteFieldList, iPresetNameValueList, True)
                                             main_GetRecordAddLink2 = main_GetRecordAddLink2 _
-                                                & "<a class=""ccRecordCutLink"" TabIndex=""-1"" href=""" & cpCore.html.html_EncodeHTML(PasteLink) & """><img src=""/ccLib/images/ContentPaste.gif"" border=""0"" alt=""Paste record in clipboard here"" title=""Paste record in clipboard here"" align=""absmiddle""></a>"
+                                                & "<a class=""ccRecordCutLink"" TabIndex=""-1"" href=""" & genericController.encodeHTML(PasteLink) & """><img src=""/ccLib/images/ContentPaste.gif"" border=""0"" alt=""Paste record in clipboard here"" title=""Paste record in clipboard here"" align=""absmiddle""></a>"
                                         End If
                                     End If
                                 End If
@@ -9951,7 +9932,7 @@ ErrorTrap:
                         main_GetRecordAddLink2 = main_GetRecordAddLink2 & cpCore.menuFlyout.getMenu(LowestRequiredMenuName, 0)
                         main_GetRecordAddLink2 = genericController.vbReplace(main_GetRecordAddLink2, "class=""ccFlyoutButton"" ", "", 1, 99, vbTextCompare)
                         If PasteLink <> "" Then
-                            main_GetRecordAddLink2 = main_GetRecordAddLink2 & "<a TabIndex=-1 href=""" & cpCore.html.html_EncodeHTML(PasteLink) & """><img src=""/ccLib/images/ContentPaste.gif"" border=""0"" alt=""Paste content from clipboard"" align=""absmiddle""></a>"
+                            main_GetRecordAddLink2 = main_GetRecordAddLink2 & "<a TabIndex=-1 href=""" & genericController.encodeHTML(PasteLink) & """><img src=""/ccLib/images/ContentPaste.gif"" border=""0"" alt=""Paste content from clipboard"" align=""absmiddle""></a>"
                         End If
                     End If
                     '
@@ -10472,9 +10453,9 @@ ErrorTrap:
                 LinkPanel.Add("Contensive " & cpCore.codeVersion() & " | ")
                 LinkPanel.Add(FormatDateTime(cpCore.app_startTime) & " | ")
                 LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""http://support.Contensive.com/"">Support</A> | ")
-                LinkPanel.Add("<a class=""ccAdminLink"" href=""" & cpCore.html.html_EncodeHTML(cpCore.siteProperties.adminURL) & """>Admin Home</A> | ")
-                LinkPanel.Add("<a class=""ccAdminLink"" href=""" & cpCore.html.html_EncodeHTML("http://" & cpCore.webServer.webServerIO_requestDomain) & """>Public Home</A> | ")
-                LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & cpCore.html.html_EncodeHTML(cpCore.siteProperties.adminURL & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
+                LinkPanel.Add("<a class=""ccAdminLink"" href=""" & genericController.encodeHTML(cpCore.siteProperties.adminURL) & """>Admin Home</A> | ")
+                LinkPanel.Add("<a class=""ccAdminLink"" href=""" & genericController.encodeHTML("http://" & cpCore.webServer.webServerIO_requestDomain) & """>Public Home</A> | ")
+                LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & genericController.encodeHTML(cpCore.siteProperties.adminURL & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
                 If cpCore.siteProperties.getBoolean("AllowMobileTemplates", False) Then
                     If cpCore.authContext.visit.Mobile Then
                         QS = cpCore.doc.refreshQueryString
@@ -10598,7 +10579,7 @@ ErrorTrap:
                                     '
                                     ' Path is blocked
                                     '
-                                    Tag = cpCore.html.html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & cpCore.webServer.requestPath & "] [<a href=""" & cpCore.html.html_EncodeHTML(cpCore.siteProperties.adminURL & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & cpCore.metaData.getContentId("paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
+                                    Tag = cpCore.html.html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & cpCore.webServer.requestPath & "] [<a href=""" & genericController.encodeHTML(cpCore.siteProperties.adminURL & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & cpCore.metaData.getContentId("paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
                                 Else
                                     '
                                     ' Path is not blocked
@@ -10719,9 +10700,9 @@ ErrorTrap:
                     LinkPanel.Add("Contensive " & cpCore.codeVersion() & " | ")
                     LinkPanel.Add(FormatDateTime(cpCore.app_startTime) & " | ")
                     LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""http: //support.Contensive.com/"">Support</A> | ")
-                    LinkPanel.Add("<a class=""ccAdminLink"" href=""" & cpCore.html.html_EncodeHTML(cpCore.siteProperties.adminURL) & """>Admin Home</A> | ")
-                    LinkPanel.Add("<a class=""ccAdminLink"" href=""" & cpCore.html.html_EncodeHTML("http://" & cpCore.webServer.webServerIO_requestDomain) & """>Public Home</A> | ")
-                    LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & cpCore.html.html_EncodeHTML(cpCore.siteProperties.adminURL & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
+                    LinkPanel.Add("<a class=""ccAdminLink"" href=""" & genericController.encodeHTML(cpCore.siteProperties.adminURL) & """>Admin Home</A> | ")
+                    LinkPanel.Add("<a class=""ccAdminLink"" href=""" & genericController.encodeHTML("http://" & cpCore.webServer.webServerIO_requestDomain) & """>Public Home</A> | ")
+                    LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & genericController.encodeHTML(cpCore.siteProperties.adminURL & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
                     LinkPanel.Add("</span>")
                     '
                     '
@@ -10736,14 +10717,14 @@ ErrorTrap:
                         & cr2 & "</tr>"
                     '
                     DebugPanel = DebugPanel & main_DebugPanelRow("DOM", "<a class=""ccAdminLink"" href=""/ccLib/clientside/DOMViewer.htm"" target=""_blank"">Click</A>")
-                    DebugPanel = DebugPanel & main_DebugPanelRow("Trap Errors", cpCore.html.html_EncodeHTML(cpCore.siteProperties.trapErrors.ToString))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("Trap Email", cpCore.html.html_EncodeHTML(cpCore.siteProperties.getText("TrapEmail")))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerLink", cpCore.html.html_EncodeHTML(cpCore.webServer.requestUrl))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerDomain", cpCore.html.html_EncodeHTML(cpCore.webServer.webServerIO_requestDomain))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerProtocol", cpCore.html.html_EncodeHTML(cpCore.webServer.webServerIO_requestProtocol))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerHost", cpCore.html.html_EncodeHTML(cpCore.webServer.requestDomain))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerPath", cpCore.html.html_EncodeHTML(cpCore.webServer.requestPath))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerPage", cpCore.html.html_EncodeHTML(cpCore.webServer.requestPage))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Trap Errors", genericController.encodeHTML(cpCore.siteProperties.trapErrors.ToString))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Trap Email", genericController.encodeHTML(cpCore.siteProperties.getText("TrapEmail")))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerLink", genericController.encodeHTML(cpCore.webServer.requestUrl))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerDomain", genericController.encodeHTML(cpCore.webServer.webServerIO_requestDomain))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerProtocol", genericController.encodeHTML(cpCore.webServer.webServerIO_requestProtocol))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerHost", genericController.encodeHTML(cpCore.webServer.requestDomain))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerPath", genericController.encodeHTML(cpCore.webServer.requestPath))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerPage", genericController.encodeHTML(cpCore.webServer.requestPage))
                     Copy = ""
                     If cpCore.webServer.requestQueryString <> "" Then
                         CopySplit = Split(cpCore.webServer.requestQueryString, "&")
@@ -10756,7 +10737,7 @@ ErrorTrap:
                                 If UBound(copyNameValueSplit) > 0 Then
                                     copyValue = genericController.DecodeResponseVariable(copyNameValueSplit(1))
                                 End If
-                                Copy = Copy & cr & "<br>" & cpCore.html.html_EncodeHTML(CopyName & "=" & copyValue)
+                                Copy = Copy & cr & "<br>" & genericController.encodeHTML(CopyName & "=" & copyValue)
                             End If
                         Next
                         Copy = Mid(Copy, 8)
@@ -10766,7 +10747,7 @@ ErrorTrap:
                     For Each key As String In cpCore.docProperties.getKeyList()
                         Dim docProperty As docPropertiesClass = cpCore.docProperties.getProperty(key)
                         If docProperty.IsForm Then
-                            Copy = Copy & cr & "<br>" & cpCore.html.html_EncodeHTML(docProperty.NameValue)
+                            Copy = Copy & cr & "<br>" & genericController.encodeHTML(docProperty.NameValue)
                         End If
                     Next
                     DebugPanel = DebugPanel & main_DebugPanelRow("Render Time &gt;= ", Format((GetTickCount - cpCore.app_startTickCount) / 1000, "0.000") & " sec")

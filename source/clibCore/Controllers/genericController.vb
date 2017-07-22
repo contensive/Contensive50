@@ -1869,6 +1869,8 @@ Namespace Contensive.Core.Controllers
                 chr = Mid(Source, Ptr, 1)
                 If (InStr(1, allowed, chr, vbBinaryCompare) >= 0) Then
                     returnString = returnString & chr
+                Else
+                    returnString &= "_"
                 End If
             Next
             encodeFilename = returnString
@@ -4882,7 +4884,14 @@ ErrorTrap:
         Public Shared Function isMinDate(sourceDate As Date) As Boolean
             Return encodeDateMinValue(sourceDate) = Date.MinValue
         End Function
-
+        '
+        Public Shared Function getVirtualTableFieldPath(ByVal TableName As String, ByVal FieldName As String) As String
+            Dim result As String = TableName & "/" & FieldName & "/"
+            Return result.Replace(" ", "_").Replace(".", "_")
+        End Function
+        Public Shared Function getVirtualTableFieldIdPath(ByVal TableName As String, ByVal FieldName As String, ByVal RecordID As Integer) As String
+            Return getVirtualTableFieldPath(TableName, FieldName) & RecordID.ToString().PadLeft(12, "0"c) & "/"
+        End Function
         '
         '========================================================================
         ' ----- Create a filename for the Virtual Directory
@@ -4891,52 +4900,33 @@ ErrorTrap:
         '   current authoring record.
         '========================================================================
         '
-        Public Shared Function csv_GetVirtualFilenameByTable(ByVal TableName As String, ByVal FieldName As String, ByVal RecordID As Integer, ByVal OriginalFilename As String, ByVal fieldType As Integer) As String
+        Public Shared Function getVirtualRecordPathFilename(ByVal TableName As String, ByVal FieldName As String, ByVal RecordID As Integer, ByVal OriginalFilename As String, ByVal fieldType As Integer) As String
+            Dim result As String = ""
             '
-            Dim RecordIDString As String
-            Dim iTableName As String
-            Dim iFieldName As String
-            Dim MethodName As String
-            Dim iOriginalFilename As String
-            '
-            MethodName = "csv_GetVirtualFilenameByTable"
-            '
-            iTableName = TableName
-            iTableName = vbReplace(iTableName, " ", "_")
-            iTableName = vbReplace(iTableName, ".", "_")
-            '
-            iFieldName = FieldName
-            iFieldName = vbReplace(FieldName, " ", "_")
-            iFieldName = vbReplace(iFieldName, ".", "_")
-            '
-            iOriginalFilename = OriginalFilename
-            iOriginalFilename = vbReplace(iOriginalFilename, " ", "_")
-            iOriginalFilename = vbReplace(iOriginalFilename, ".", "_")
-            '
-            RecordIDString = CStr(RecordID)
-            If RecordID = 0 Then
-                RecordIDString = CStr(GetRandomInteger())
-                RecordIDString = New String("0"c, 12 - Len(RecordIDString)) & RecordIDString
-            Else
-                RecordIDString = New String("0"c, 12 - Len(RecordIDString)) & RecordIDString
-            End If
-            '
+            Dim iOriginalFilename As String = OriginalFilename.Replace(" ", "_").Replace(".", "_")
             If OriginalFilename <> "" Then
-                csv_GetVirtualFilenameByTable = iTableName & "/" & iFieldName & "/" & RecordIDString & "/" & OriginalFilename
+                result = getVirtualTableFieldIdPath(TableName, FieldName, RecordID) & OriginalFilename
             Else
+                Dim IdFilename As String = CStr(RecordID)
+                If RecordID = 0 Then
+                    IdFilename = getGUID().Replace("{", "").Replace("}", "").Replace("-", "")
+                Else
+                    IdFilename = RecordID.ToString().PadLeft(12, "0"c)
+                End If
                 Select Case fieldType
                     Case FieldTypeIdFileCSS
-                        csv_GetVirtualFilenameByTable = iTableName & "/" & iFieldName & "/" & RecordIDString & ".css"
+                        result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".css"
                     Case FieldTypeIdFileXML
-                        csv_GetVirtualFilenameByTable = iTableName & "/" & iFieldName & "/" & RecordIDString & ".xml"
+                        result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".xml"
                     Case FieldTypeIdFileJavascript
-                        csv_GetVirtualFilenameByTable = iTableName & "/" & iFieldName & "/" & RecordIDString & ".js"
+                        result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".js"
                     Case FieldTypeIdFileHTMLPrivate
-                        csv_GetVirtualFilenameByTable = iTableName & "/" & iFieldName & "/" & RecordIDString & ".html"
+                        result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".html"
                     Case Else
-                        csv_GetVirtualFilenameByTable = iTableName & "/" & iFieldName & "/" & RecordIDString & ".txt"
+                        result = getVirtualTableFieldPath(TableName, FieldName) & IdFilename & ".txt"
                 End Select
             End If
+            Return result
         End Function
         '
         '====================================================================================================
@@ -5516,6 +5506,91 @@ ErrorTrap:
                 Next
             End If
             Return requestFormSerialized
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' if date is invalid, set to minValue
+        ''' </summary>
+        ''' <param name="srcDate"></param>
+        ''' <returns></returns>
+        Public Shared Function encodeMinDate(srcDate As DateTime) As DateTime
+            Dim returnDate As DateTime = srcDate
+            If srcDate < New DateTime(1900, 1, 1) Then
+                returnDate = DateTime.MinValue
+            End If
+            Return returnDate
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' if valid date, return the short date, else return blank string 
+        ''' </summary>
+        ''' <param name="srcDate"></param>
+        ''' <returns></returns>
+        Public Shared Function getShortDateString(srcDate As DateTime) As String
+            Dim returnString As String = ""
+            Dim workingDate As DateTime = encodeMinDate(srcDate)
+            If Not isDateEmpty(srcDate) Then
+                returnString = workingDate.ToShortDateString()
+            End If
+            Return returnString
+        End Function
+        '
+        '====================================================================================================
+        '
+        Public Shared Function isDateEmpty(srcDate As DateTime) As Boolean
+            Return (srcDate < New DateTime(1900, 1, 1))
+        End Function
+        '
+        '====================================================================================================
+        '
+        Public Shared Function urlEncodePath(ByVal path As String) As String
+            Return Uri.EscapeUriString(convertToUnixSlash(path))
+        End Function
+        '
+        '====================================================================================================
+        '
+        Public Shared Function convertToDosSlash(ByVal path As String) As String
+            Return path.Replace("/", "\")
+        End Function
+        '
+        '====================================================================================================
+        '
+        Public Shared Function convertToUnixSlash(ByVal path As String) As String
+            Return path.Replace("\", "/")
+        End Function
+        '
+        '====================================================================================================
+        '
+        Public Shared Function getPath(ByVal PathFilename As String) As String
+            Dim result As String = PathFilename
+            If (Not String.IsNullOrEmpty(result)) Then
+                Dim slashpos As Integer = PathFilename.Replace("/", "\").LastIndexOf("\")
+                If (slashpos >= 0) And (slashpos < PathFilename.Length) Then
+                    result = PathFilename.Substring(0, slashpos + 1)
+                End If
+            End If
+            Return result
+        End Function
+        '
+        '========================================================================
+        ' EncodeHTML
+        '
+        '   Convert all characters that are not allowed in HTML to their Text equivalent
+        '   in preperation for use on an HTML page
+        '========================================================================
+        '
+        Public Shared Function encodeHTML(ByVal Source As String) As String
+            ' ##### removed to catch err<>0 problem on error resume next
+            '
+            encodeHTML = Source
+            encodeHTML = genericController.vbReplace(encodeHTML, "&", "&amp;")
+            encodeHTML = genericController.vbReplace(encodeHTML, "<", "&lt;")
+            encodeHTML = genericController.vbReplace(encodeHTML, ">", "&gt;")
+            encodeHTML = genericController.vbReplace(encodeHTML, """", "&quot;")
+            encodeHTML = genericController.vbReplace(encodeHTML, "'", "&apos;")
+            '
         End Function
     End Class
 End Namespace

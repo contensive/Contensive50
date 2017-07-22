@@ -1308,12 +1308,12 @@ Namespace Contensive.Core.Controllers
                                         End If
                                         Call cpcore.db.cs_Close(CS)
                                         If Not Success Then
-                                            errorController.error_AddUserError(cpcore, "The field [" & .Caption & "] must be unique, and the value [" & cpcore.html.html_EncodeHTML(FormValue) & "] has already been used.")
+                                            errorController.error_AddUserError(cpcore, "The field [" & .Caption & "] must be unique, and the value [" & genericController.encodeHTML(FormValue) & "] has already been used.")
                                         End If
                                     End If
                                     If (.REquired Or genericController.EncodeBoolean(cpcore.metaData.GetContentFieldProperty("people", .PeopleField, "required"))) And FormValue = "" Then
                                         Success = False
-                                        errorController.error_AddUserError(cpcore, "The field [" & cpcore.html.html_EncodeHTML(.Caption) & "] is required.")
+                                        errorController.error_AddUserError(cpcore, "The field [" & genericController.encodeHTML(.Caption) & "] is required.")
                                     Else
                                         If Not cpcore.db.cs_ok(CSPeople) Then
                                             CSPeople = cpcore.db.csOpenRecord("people", cpcore.authContext.user.id)
@@ -2203,7 +2203,7 @@ Namespace Contensive.Core.Controllers
                             QueryString = genericController.ModifyQueryString(QueryString, RequestNameHardCodedPage, HardCodedPagePrinterVersion, True)
                             Dim Caption As String = cpcore.siteProperties.getText("PagePrinterVersionCaption", "Printer Version")
                             Caption = genericController.vbReplace(Caption, " ", "&nbsp;")
-                            IconRow = IconRow & cr & "&nbsp;&nbsp;<a href=""" & cpcore.html.html_EncodeHTML(cpcore.webServer.requestPage & "?" & QueryString) & """ target=""_blank""><img alt=""image"" src=""/ccLib/images/IconSmallPrinter.gif"" width=""13"" height=""13"" border=""0"" align=""absmiddle""></a>&nbsp<a href=""" & cpcore.html.html_EncodeHTML(cpcore.webServer.requestPage & "?" & QueryString) & """ target=""_blank"" style=""text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;"">" & Caption & "</a>"
+                            IconRow = IconRow & cr & "&nbsp;&nbsp;<a href=""" & genericController.encodeHTML(cpcore.webServer.requestPage & "?" & QueryString) & """ target=""_blank""><img alt=""image"" src=""/ccLib/images/IconSmallPrinter.gif"" width=""13"" height=""13"" border=""0"" align=""absmiddle""></a>&nbsp<a href=""" & genericController.encodeHTML(cpcore.webServer.requestPage & "?" & QueryString) & """ target=""_blank"" style=""text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;"">" & Caption & "</a>"
                         End If
                         If page.AllowEmailPage Then
                             Dim QueryString As String = cpcore.doc.refreshQueryString
@@ -2393,7 +2393,7 @@ Namespace Contensive.Core.Controllers
                                 If IsEditingLocal Then
                                     result = result & Me.cpcore.html.main_GetRecordEditLink2("See Also", (cpcore.db.cs_getInteger(CS, "ID")), False, "", Me.cpcore.authContext.isEditing("See Also"))
                                 End If
-                                result = result & "<a href=""" & Me.cpcore.html.html_EncodeHTML(SeeAlsoLink) & """ target=""_blank"">" & (cpcore.db.cs_getText(CS, "Name")) & "</A>"
+                                result = result & "<a href=""" & genericController.encodeHTML(SeeAlsoLink) & """ target=""_blank"">" & (cpcore.db.cs_getText(CS, "Name")) & "</A>"
                                 Copy = (cpcore.db.cs_getText(CS, "Brief"))
                                 If Copy <> "" Then
                                     result = result & "<br >" & AddSpan(Copy, "ccListCopy")
@@ -2526,14 +2526,14 @@ Namespace Contensive.Core.Controllers
                         '
                         Copy = Me.cpcore.authContext.user.Name
                         Panel = Panel & "<td align=""right"" width=""100""><p>Your Name</p></td>"
-                        Panel = Panel & "<td align=""left""><input type=""text"" name=""NoteFromName"" value=""" & Me.cpcore.html.html_EncodeHTML(Copy) & """></span></td>"
+                        Panel = Panel & "<td align=""left""><input type=""text"" name=""NoteFromName"" value=""" & genericController.encodeHTML(Copy) & """></span></td>"
                         Panel = Panel & "</tr><tr>"
                         '
                         ' ----- From Email address
                         '
                         Copy = Me.cpcore.authContext.user.Email
                         Panel = Panel & "<td align=""right"" width=""100""><p>Your Email</p></td>"
-                        Panel = Panel & "<td align=""left""><input type=""text"" name=""NoteFromEmail"" value=""" & Me.cpcore.html.html_EncodeHTML(Copy) & """></span></td>"
+                        Panel = Panel & "<td align=""left""><input type=""text"" name=""NoteFromEmail"" value=""" & genericController.encodeHTML(Copy) & """></span></td>"
                         Panel = Panel & "</tr><tr>"
                         '
                         ' ----- Message
@@ -2675,7 +2675,7 @@ Namespace Contensive.Core.Controllers
                         If (LinkLabel <> "") Then
                             result = result & cr & "<li class=""ccListItem"">"
                             If (Link <> "") Then
-                                result = result & genericController.csv_GetLinkedText("<a href=""" & Me.cpcore.html.html_EncodeHTML(cpcore.webServer.requestPage & "?rc=" & ContentID & "&ri=" & RecordID) & """>", LinkLabel)
+                                result = result & genericController.csv_GetLinkedText("<a href=""" & genericController.encodeHTML(cpcore.webServer.requestPage & "?rc=" & ContentID & "&ri=" & RecordID) & """>", LinkLabel)
                             Else
                                 result = result & LinkLabel
                             End If
@@ -3049,7 +3049,7 @@ Namespace Contensive.Core.Controllers
                 If returnHtml = "" Then
                     returnHtml = pageCaption
                 Else
-                    returnHtml = "<a href=""" & cpcore.html.html_EncodeHTML(getPageLink(testpage.id, "", True, False)) & """>" & pageCaption & "</a>" & BreadCrumbDelimiter & returnHtml
+                    returnHtml = "<a href=""" & genericController.encodeHTML(getPageLink(testpage.id, "", True, False)) & """>" & pageCaption & "</a>" & BreadCrumbDelimiter & returnHtml
                 End If
             Next
             Return returnHtml
@@ -3426,7 +3426,7 @@ Namespace Contensive.Core.Controllers
                     Else
                         BlockContentComposite = False
                     End If
-                    LinkedText = genericController.csv_GetLinkedText("<a href=""" & cpcore.html.html_EncodeHTML(Link) & """>", pageMenuHeadline)
+                    LinkedText = genericController.csv_GetLinkedText("<a href=""" & genericController.encodeHTML(Link) & """>", pageMenuHeadline)
                     If (UcaseRequestedListName = "") And (childPage.ParentListName <> "") And (Not isAuthoring) Then
                         '
                         ' ----- Requested orphan list, and this record is in a named list, and not editing, do not display
@@ -3920,7 +3920,7 @@ ErrorTrap:
             CDef = cpcore.metaData.getCdef(ContentName)
             Link = cpcore.siteProperties.adminURL & "?af=" & AdminFormPublishing
             Copy = Msg_AuthoringSubmittedNotification
-            Copy = genericController.vbReplace(Copy, "<DOMAINNAME>", "<a href=""" & cpcore.html.html_EncodeHTML(Link) & """>" & cpcore.webServer.webServerIO_requestDomain & "</a>")
+            Copy = genericController.vbReplace(Copy, "<DOMAINNAME>", "<a href=""" & genericController.encodeHTML(Link) & """>" & cpcore.webServer.webServerIO_requestDomain & "</a>")
             Copy = genericController.vbReplace(Copy, "<RECORDNAME>", RecordName)
             Copy = genericController.vbReplace(Copy, "<CONTENTNAME>", ContentName)
             Copy = genericController.vbReplace(Copy, "<RECORDID>", RecordID.ToString)

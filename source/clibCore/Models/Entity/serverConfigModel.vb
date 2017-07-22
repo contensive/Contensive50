@@ -80,6 +80,7 @@ Namespace Contensive.Core.Models.Entity
             Public appRootFilesPath As String = ""                                      ' local file path to the appRoot (i.e. d:\inetpub\myApp\wwwRoot\)
             Public cdnFilesPath As String = ""                                          ' local file path to the content files (i.e. d:\inetpub\myApp\files\)
             Public privateFilesPath As String = ""                                      ' local file path to the content files (i.e. d:\inetpub\myApp\private\)
+            Public tempFilesPath As String = ""                                         ' ephemeral storage, files live just during rendering life
             Public cdnFilesNetprefix As String = ""                                     ' in some cases (like legacy), cdnFiles are iis virtual folder mapped to appRoot (/appName/files/). Some cases this is a URL (http:\\cdn.domain.com pointing to s3)
             Public allowSiteMonitor As Boolean = False
             Public domainList As New List(Of String)                                    ' primary domain is the first item in the list

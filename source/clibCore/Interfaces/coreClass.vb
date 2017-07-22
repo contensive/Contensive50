@@ -34,7 +34,6 @@ Namespace Contensive.Core
         '
         ' -- application storage
         '
-        Friend deleteOnDisposeFileList As New List(Of String)               ' tmp file list of files that need to be deleted during dispose
         Friend errList As List(Of String)                                   ' exceptions collected during document construction
         Friend userErrorList As List(Of String)                           ' user messages
         '
@@ -281,23 +280,17 @@ Namespace Contensive.Core
         Private _appRootFiles As fileController = Nothing
         '
         '===================================================================================================
-        Public ReadOnly Property serverFiles() As fileController
+        Public ReadOnly Property tempFiles() As fileController
             Get
-                If (_serverFiles Is Nothing) Then
-                    If serverConfig.isLocalFileSystem Then
-                        '
-                        ' local server -- everything is ephemeral
-                        _serverFiles = New fileController(Me, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.noSync, "")
-                    Else
-                        '
-                        ' cluster mode - each filesystem is configured accordingly
-                        _serverFiles = New fileController(Me, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.noSync, "")
-                    End If
+                If (_tmpFiles Is Nothing) Then
+                    '
+                    ' local server -- everything is ephemeral
+                    _tmpFiles = New fileController(Me, serverConfig.isLocalFileSystem, fileController.fileSyncModeEnum.noSync, fileController.normalizePath(serverConfig.appConfig.tempFilesPath))
                 End If
-                Return _serverFiles
+                Return _tmpFiles
             End Get
         End Property
-        Private _serverFiles As fileController = Nothing
+        Private _tmpFiles As fileController = Nothing
         '
         '===================================================================================================
         Public ReadOnly Property privateFiles() As fileController
@@ -1565,7 +1558,7 @@ Namespace Contensive.Core
                         ' output
                         '
                         Copy = remoteQueryController.main_FormatRemoteQueryOutput(Me, gd, RemoteFormat)
-                        Copy = html.html_EncodeHTML(Copy)
+                        Copy = genericController.encodeHTML(Copy)
                         result = "<data>" & Copy & "</data>"
                     End If
                 End If
@@ -2149,13 +2142,6 @@ Namespace Contensive.Core
                 If disposing Then
                     '
                     ' call .dispose for managed objects
-                    ' delete tmp files
-                    '
-                    If deleteOnDisposeFileList.Count > 0 Then
-                        For Each filename As String In deleteOnDisposeFileList
-                            privateFiles.deleteFile(filename)
-                        Next
-                    End If
                     '
                     ' ----- Block all output from underlying routines
                     '

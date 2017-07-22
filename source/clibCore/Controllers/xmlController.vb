@@ -412,19 +412,19 @@ Namespace Contensive.Core.Controllers
                                 '
                                 RecordID = genericController.EncodeInteger(CFields(f_LookupContentID, CFieldPtr))
                                 RecordName = CacheLookup(RecordID, Contents)
-                                sb.Append(" LookupContent=""" & cpCore.html.html_EncodeHTML(RecordName) & """")
+                                sb.Append(" LookupContent=""" & genericController.encodeHTML(RecordName) & """")
                                 '
                                 RecordID = genericController.EncodeInteger(CFields(f_RedirectContentID, CFieldPtr))
                                 RecordName = CacheLookup(RecordID, Contents)
-                                sb.Append(" RedirectContent=""" & cpCore.html.html_EncodeHTML(RecordName) & """")
+                                sb.Append(" RedirectContent=""" & genericController.encodeHTML(RecordName) & """")
                                 '
                                 RecordID = genericController.EncodeInteger(CFields(f_ManyToManyContentID, CFieldPtr))
                                 RecordName = CacheLookup(RecordID, Contents)
-                                sb.Append(" ManyToManyContent=""" & cpCore.html.html_EncodeHTML(RecordName) & """")
+                                sb.Append(" ManyToManyContent=""" & genericController.encodeHTML(RecordName) & """")
                                 '
                                 RecordID = genericController.EncodeInteger(CFields(f_ManyToManyRuleContentID, CFieldPtr))
                                 RecordName = CacheLookup(RecordID, Contents)
-                                sb.Append(" ManyToManyRuleContent=""" & cpCore.html.html_EncodeHTML(RecordName) & """")
+                                sb.Append(" ManyToManyRuleContent=""" & genericController.encodeHTML(RecordName) & """")
                                 '
                                 sb.Append(" >")
                                 '
@@ -982,7 +982,7 @@ ErrorTrap:
         '
         '
         Private Function EncodeXMLattribute(ByVal Source As String) As String
-            EncodeXMLattribute = cpCore.html.html_EncodeHTML(Source)
+            EncodeXMLattribute = genericController.encodeHTML(Source)
             EncodeXMLattribute = genericController.vbReplace(EncodeXMLattribute, vbCrLf, " ")
             EncodeXMLattribute = genericController.vbReplace(EncodeXMLattribute, vbCr, "")
             EncodeXMLattribute = genericController.vbReplace(EncodeXMLattribute, vbLf, "")

@@ -1895,7 +1895,7 @@ Namespace Contensive.Core
         Public IsForm As Boolean
         Public IsFile As Boolean
         'Public FileContent() As Byte
-        Public tmpPrivatePathfilename As String
+        Public tempfilename As String
         Public FileSize As Integer
         Public fileType As String
     End Class

@@ -1627,7 +1627,8 @@ Namespace Contensive.Core.Controllers
                                                 '
                                                 Filename = cs_getText(CSPointer, fieldName)
                                                 If Filename <> "" Then
-                                                    Call cpCore.cdnFiles.deleteFile(cpCore.cdnFiles.joinPath(cpCore.serverConfig.appConfig.cdnFilesNetprefix, Filename))
+                                                    Call cpCore.cdnFiles.deleteFile(Filename)
+                                                    'Call cpCore.cdnFiles.deleteFile(cpCore.cdnFiles.joinPath(cpCore.serverConfig.appConfig.cdnFilesNetprefix, Filename))
                                                 End If
                                             Case FieldTypeIdFileTextPrivate, FieldTypeIdFileHTMLPrivate
                                                 '
@@ -2222,7 +2223,7 @@ Namespace Contensive.Core.Controllers
                             Else
                                 fieldTypeId = .CDef.fields(FieldName.ToLower()).fieldTypeId
                             End If
-                            returnFilename = genericController.csv_GetVirtualFilenameByTable(TableName, FieldName, RecordID, OriginalFilename, fieldTypeId)
+                            returnFilename = genericController.getVirtualRecordPathFilename(TableName, FieldName, RecordID, OriginalFilename, fieldTypeId)
                             ' 20160607 - no, if you call the cs_set, it stack-overflows. this is a get, so do not save it here.
                             'Call cs_set(CSPointer, fieldNameUpper, returnFilename)
                         End With
@@ -3951,7 +3952,7 @@ Namespace Contensive.Core.Controllers
             Try
                 Dim fieldTypeId As Integer
                 Dim TableName As String
-                Dim iOriginalFilename As String
+                'Dim iOriginalFilename As String
                 Dim CDef As cdefModel
                 '
                 If String.IsNullOrEmpty(ContentName.Trim()) Then
@@ -3970,11 +3971,11 @@ Namespace Contensive.Core.Controllers
                             TableName = ContentName
                         End If
                         '
-                        iOriginalFilename = genericController.encodeEmptyText(OriginalFilename, "")
+                        'iOriginalFilename = genericController.encodeEmptyText(OriginalFilename, "")
                         '
                         fieldTypeId = CDef.fields(FieldName.ToLower()).fieldTypeId
                         '
-                        returnResult = genericController.csv_GetVirtualFilenameByTable(TableName, FieldName, RecordID, iOriginalFilename, fieldTypeId)
+                        returnResult = genericController.getVirtualRecordPathFilename(TableName, FieldName, RecordID, OriginalFilename, fieldTypeId)
                     End If
                 End If
             Catch ex As Exception

@@ -52,6 +52,7 @@ Namespace Contensive.Core.Controllers
         Public Property rootLocalPath As String                ' path ends in \, folder ends in foldername 
         Private Property clusterFileEndpoint As String
         Private Property fileSyncMode As fileSyncModeEnum
+        Public Property deleteOnDisposeFileList As New List(Of String)               ' tmp file list of files that need to be deleted during dispose
         '
         '==============================================================================================================
         ''' <summary>
@@ -910,11 +911,11 @@ Namespace Contensive.Core.Controllers
                             returnFilename = encodeFilename(.Value)
                             returnPathFilename &= returnFilename
                             Call deleteFile(returnPathFilename)
-                            If .tmpPrivatePathfilename <> "" Then
+                            If .tempfilename <> "" Then
                                 '
                                 ' copy tmp private files to the appropriate folder in the destination file system
                                 '
-                                Call cpCore.privateFiles.copyFile(.tmpPrivatePathfilename, returnPathFilename, Me)
+                                Call cpCore.tempFiles.copyFile(.tempfilename, returnPathFilename, Me)
                                 success = True
                             End If
                         End If
@@ -946,7 +947,11 @@ Namespace Contensive.Core.Controllers
                     '
                     ' call .dispose for managed objects
                     '
-                    'CP = Nothing
+                    If deleteOnDisposeFileList.Count > 0 Then
+                        For Each filename As String In deleteOnDisposeFileList
+                            deleteFile(filename)
+                        Next
+                    End If
                 End If
                 '
                 ' Add code here to release the unmanaged resource.

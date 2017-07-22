@@ -332,7 +332,7 @@ Namespace Contensive.Core.Controllers
                     '---------------------------------------------------------------------
                     '
                     If isNewBuild Then
-                        cpcore.siteProperties.setProperty("publicFileContentPathPrefix", cpcore.serverConfig.appConfig.cdnFilesNetprefix)
+                        'cpcore.siteProperties.setProperty("publicFileContentPathPrefix", cpcore.serverConfig.appConfig.cdnFilesNetprefix)
                         '
                         ' add the root developer
                         '

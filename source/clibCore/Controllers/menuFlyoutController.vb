@@ -298,7 +298,7 @@ ErrorTrap:
                         End Select
                         '
                         With iEntry(EntryPointer)
-                            Link = cpCore.html.html_EncodeHTML(.Link)
+                            Link = genericController.encodeHTML(.Link)
                             If .Image <> "" Then
                                 '
                                 ' Create hotspot from image
@@ -467,7 +467,7 @@ ErrorTrap:
                                     '
                                     ' ----- Link but no child panel
                                     '
-                                    PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ href=""" & cpCore.html.html_EncodeHTML(.Link) & """" & target & " onmouseover=""ccFlyoutHoverMode(1); ccFlyoutPanelButtonHover(event,'','" & StyleSheetPrefix & "');"">" & HotSpotHTML & "</a>"
+                                    PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ href=""" & genericController.encodeHTML(.Link) & """" & target & " onmouseover=""ccFlyoutHoverMode(1); ccFlyoutPanelButtonHover(event,'','" & StyleSheetPrefix & "');"">" & HotSpotHTML & "</a>"
                                 End If
                             Else
                                 If .Link = "" Then
@@ -484,9 +484,9 @@ ErrorTrap:
                                     ' ----- Child Panel and a link
                                     '
                                     If FlyoutHover Then
-                                        PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ onmouseover=""ccFlyoutHoverMode(1); ccFlyoutPanelButtonHover(event,'" & MenuFlyoutNamePrefix & "_" & .Name & "','" & StyleSheetPrefix & "');"" onmouseout=""ccFlyoutHoverMode(0);"" href=""" & cpCore.html.html_EncodeHTML(.Link) & """" & target & ">" & HotSpotHTML & MenuFlyoutIcon_Local & "</a>"
+                                        PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ onmouseover=""ccFlyoutHoverMode(1); ccFlyoutPanelButtonHover(event,'" & MenuFlyoutNamePrefix & "_" & .Name & "','" & StyleSheetPrefix & "');"" onmouseout=""ccFlyoutHoverMode(0);"" href=""" & genericController.encodeHTML(.Link) & """" & target & ">" & HotSpotHTML & MenuFlyoutIcon_Local & "</a>"
                                     Else
-                                        PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ onmouseover=""ccFlyoutPanelButtonHover(event,'" & MenuFlyoutNamePrefix & "_" & .Name & "','" & StyleSheetPrefix & "');"" href=""" & cpCore.html.html_EncodeHTML(.Link) & """" & target & ">" & HotSpotHTML & MenuFlyoutIcon_Local & "</a>"
+                                        PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ onmouseover=""ccFlyoutPanelButtonHover(event,'" & MenuFlyoutNamePrefix & "_" & .Name & "','" & StyleSheetPrefix & "');"" href=""" & genericController.encodeHTML(.Link) & """" & target & ">" & HotSpotHTML & MenuFlyoutIcon_Local & "</a>"
                                     End If
                                 End If
                             End If

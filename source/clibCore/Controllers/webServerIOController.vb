@@ -42,7 +42,7 @@ Namespace Contensive.Core
         Public requestFormBinaryHeader As Byte()            ' For asp pages, this is the full multipart header
         'Public requestFormString As String = ""             ' String from an HTML form post - buffered to remove passwords
         Public requestFormDict As New Dictionary(Of String, String)
-        Public requesFilesString As String = ""             ' String from an HTML form post
+        'Public requesFilesString As String = ""             ' String from an HTML form post
         'Public requestCookieString As String = ""          ' Set in InitASPEnvironment, the full cookie string
         Public requestSpaceAsUnderscore As Boolean = False  ' when true, is it assumed that dots in request variable names will convert
         Public requestDotAsUnderscore As Boolean = False    ' (php converts spaces and dots to underscores)
@@ -207,7 +207,7 @@ Namespace Contensive.Core
                 '
                 iisContext = httpContext
                 Dim key As String
-                Dim isMultipartPost As Boolean
+                'Dim isMultipartPost As Boolean
                 Dim keyValue As String
                 Dim parser As HttpMultipartParser.MultipartFormDataParser
                 Dim isAdmin As Boolean = False
@@ -259,15 +259,13 @@ Namespace Contensive.Core
                 Dim RemoteMethodFromPage As String = ""
                 Dim RemoteMethodFromQueryString As String = ""
                 '
-                ' setup IIS Response
-                '
+                ' -- setup IIS Response
                 iisContext.Response.CacheControl = "no-cache"
                 iisContext.Response.Expires = -1
                 iisContext.Response.Buffer = True
                 ''
                 '
-                ' ----- basic request environment
-                '
+                ' -- basic request environment
                 requestDomain = iisContext.Request.ServerVariables("SERVER_NAME")
                 requestPathPage = CStr(iisContext.Request.ServerVariables("SCRIPT_NAME"))
                 requestReferrer = CStr(iisContext.Request.ServerVariables("HTTP_REFERER"))
@@ -279,9 +277,7 @@ Namespace Contensive.Core
                 requestHttpAcceptCharset = CStr(iisContext.Request.ServerVariables("HTTP_ACCEPT_CHARSET"))
                 requestHttpProfile = CStr(iisContext.Request.ServerVariables("HTTP_PROFILE"))
                 '
-                ' ----- http QueryString
-                '
-                isMultipartPost = False
+                ' -- http QueryString
                 If (iisContext.Request.QueryString.Count > 0) Then
                     requestQueryString = ""
                     aliasRoute = ""
@@ -351,95 +347,42 @@ Namespace Contensive.Core
                                 requestPathPage = aliasPathPage
                             End If
                         End If
-                        isMultipartPost = isMultipartPost Or (LCase(key) = "requestbinary")
+                        'isMultipartPost = isMultipartPost Or (LCase(key) = "requestbinary")
                         qsCnt += 1
                     Next
                 End If
                 '
-                ' ----- http Form
-                '
-                'requestFormString = ""
+                ' -- form
                 requestFormDict.Clear()
-                Dim postError As Boolean = False
-                Try
-                    Dim inputStream As IO.Stream = iisContext.Request.InputStream
-                Catch ex As httpException
-                    Call cpCore.handleException(ex) : Throw
-                    errorController.error_AddUserError(cpCore, ex.Message)
-                    postError = True
-                Catch ex As Exception
-                    Call cpCore.handleException(ex) : Throw
-                    errorController.error_AddUserError(cpCore, ex.Message)
-                    postError = True
-                End Try
-                If Not postError Then
-                    If Not isMultipartPost Then
-                        '
-                        ' ----- non-multipart form
-                        '
-                        For Each key In iisContext.Request.Form.Keys
-                            keyValue = iisContext.Request.Form(key)
-                            cpCore.docProperties.setProperty(key, keyValue, True)
-                            requestFormDict.Add(key, keyValue)
-                        Next
-                    Else
-                        '
-                        ' ----- multipart form (and file uploads)
-                        '
-                        Try
-                            If (iisContext.Request.InputStream.Length <= 0) Then
-                                '
-                            Else
-                                parser = New HttpMultipartParser.MultipartFormDataParser(iisContext.Request.InputStream)
-                                For Each parameter As HttpMultipartParser.ParameterPart In parser.Parameters
-                                    key = parameter.Name
-                                    keyValue = parameter.Data
-                                    cpCore.docProperties.setProperty(key, keyValue, True)
-                                    requestFormDict.Add(key, keyValue)
-                                Next
-                                '
-                                ' file uploads, add to doc properties
-                                '
-                                If parser.Files.Count > 0 Then
-                                    Dim ptr As Integer = 0
-                                    Dim ptrText As String
-                                    Dim instanceId As String = genericController.createGuid().Replace("{", "").Replace("-", "").Replace("}", "")
-                                    For Each file As HttpMultipartParser.FilePart In parser.Files
-                                        If file.FileName.Length > 0 Then
-                                            Dim prop As New docPropertiesClass
-                                            ptrText = ptr.ToString
-                                            prop.Name = file.Name
-                                            prop.Value = file.FileName
-                                            prop.NameValue = EncodeRequestVariable(prop.Name) & "=" & EncodeRequestVariable(prop.Value)
-                                            prop.IsFile = True
-                                            prop.IsForm = True
-                                            prop.tmpPrivatePathfilename = instanceId & "-" & ptrText & ".bin"
-                                            cpCore.deleteOnDisposeFileList.Add(prop.tmpPrivatePathfilename)
-                                            Using fileStream As System.IO.FileStream = System.IO.File.OpenWrite(cpCore.privateFiles.rootLocalPath & prop.tmpPrivatePathfilename)
-                                                file.Data.CopyTo(fileStream)
-                                            End Using
-                                            prop.FileSize = CInt(file.Data.Length)
-                                            cpCore.docProperties.setProperty(file.Name, prop)
-                                            '
-                                            requesFilesString = "" _
-                                        & "&" & ptrText & "formname=" & EncodeRequestVariable(prop.Name) _
-                                        & "&" & ptrText & "filename=" & EncodeRequestVariable(prop.Value) _
-                                        & "&" & ptrText & "type=" _
-                                        & "&" & ptrText & "tmpFile=" & EncodeRequestVariable(prop.tmpPrivatePathfilename) _
-                                        & "&" & ptrText & "error=" _
-                                        & "&" & ptrText & "size=" & prop.FileSize _
-                                        & ""
-                                            ptr += 1
-                                        End If
-                                    Next
-                                End If
-                                'https://github.com/Vodurden/Http-Multipart-Data-Parser
-                            End If
-                        Catch ex As Exception
-                            cpCore.handleException(ex, "Exception processing multipart form input")
-                        End Try
+                For Each key In iisContext.Request.Form.Keys
+                    keyValue = iisContext.Request.Form(key)
+                    cpCore.docProperties.setProperty(key, keyValue, True)
+                    requestFormDict.Add(key, keyValue)
+                Next
+                '
+                ' -- handle files
+                Dim filePtr As Integer = 0
+                Dim instanceId As String = genericController.createGuid().Replace("{", "").Replace("-", "").Replace("}", "")
+                Dim formNames As String() = iisContext.Request.Files.AllKeys
+                For Each formName As String In formNames
+                    Dim file As System.Web.HttpPostedFile = iisContext.Request.Files(formName)
+                    If (file IsNot Nothing) Then
+                        If (file.ContentLength > 0) And (Not String.IsNullOrEmpty(file.FileName)) Then
+                            Dim prop As New docPropertiesClass
+                            prop.Name = formName
+                            prop.Value = file.FileName
+                            prop.NameValue = EncodeRequestVariable(prop.Name) & "=" & EncodeRequestVariable(prop.Value)
+                            prop.IsFile = True
+                            prop.IsForm = True
+                            prop.tempfilename = instanceId & "-" & filePtr.ToString() & ".bin"
+                            file.SaveAs(IO.Path.Combine(cpCore.tempFiles.rootLocalPath, prop.tempfilename))
+                            cpCore.tempFiles.deleteOnDisposeFileList.Add(prop.tempfilename)
+                            prop.FileSize = CInt(file.ContentLength)
+                            cpCore.docProperties.setProperty(formName, prop)
+                            filePtr += 1
+                        End If
                     End If
-                End If
+                Next
                 '
                 ' load request cookies
                 '
@@ -1277,7 +1220,7 @@ ErrorTrap:
                             '
                             ' -- Verbose - do not redirect, just print the link
                             EncodedLink = NonEncodedLink
-                            cpCore.html.writeAltBuffer("<div style=""padding:20px;border:1px dashed black;background-color:white;color:black;"">" & RedirectReason & "<p>Click to continue the redirect to <a href=" & EncodedLink & ">" & cpCore.html.html_EncodeHTML(NonEncodedLink) & "</a>...</p></div>")
+                            cpCore.html.writeAltBuffer("<div style=""padding:20px;border:1px dashed black;background-color:white;color:black;"">" & RedirectReason & "<p>Click to continue the redirect to <a href=" & EncodedLink & ">" & genericController.encodeHTML(NonEncodedLink) & "</a>...</p></div>")
                         Else
                             '
                             ' -- Redirect now

@@ -1130,7 +1130,7 @@ Namespace Contensive.Core.Controllers
                                 '-----------------------------------------------------------------------------------------------------
                                 '
                                 If (True) And (inlineScript <> "") Then
-                                    inlineScriptContent = "<!-- inlineScript(" & cpCore.docGuid & ")[" & cpCore.html.html_EncodeHTML(inlineScript) & "] -->"
+                                    inlineScriptContent = "<!-- inlineScript(" & cpCore.docGuid & ")[" & genericController.encodeHTML(inlineScript) & "] -->"
                                 End If
                                 '
                                 '-----------------------------------------------------------------------------------------------------
@@ -2073,7 +2073,7 @@ Namespace Contensive.Core.Controllers
                                                                                     ElseIf genericController.encodeText(CellData) = "" Then
                                                                                         Copy = Copy & (ColumnStart & "[empty]" & ColumnEnd)
                                                                                     Else
-                                                                                        Copy = Copy & (ColumnStart & cpCore.html.html_EncodeHTML(genericController.encodeText(CellData)) & ColumnEnd)
+                                                                                        Copy = Copy & (ColumnStart & genericController.encodeHTML(genericController.encodeText(CellData)) & ColumnEnd)
                                                                                     End If
                                                                                 Next
                                                                                 Copy = Copy & (RowEnd)
@@ -4100,7 +4100,7 @@ ErrorTrap:
                                                                         ElseIf genericController.encodeText(CellData) = "" Then
                                                                             Copy = Copy & (ColumnStart & "[empty]" & ColumnEnd)
                                                                         Else
-                                                                            Copy = Copy & (ColumnStart & cpCore.html.html_EncodeHTML(genericController.encodeText(CellData)) & ColumnEnd)
+                                                                            Copy = Copy & (ColumnStart & genericController.encodeHTML(genericController.encodeText(CellData)) & ColumnEnd)
                                                                         End If
                                                                     Next
                                                                     Copy = Copy & (RowEnd)
